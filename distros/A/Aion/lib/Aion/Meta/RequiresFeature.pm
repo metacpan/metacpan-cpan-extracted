@@ -149,6 +149,31 @@ String representation of a feature.
 
 Compares with a feature, but only the specified aspects.
 
+	package Float { use Aion }
+	
+	package Fpu { use Aion -role;
+		req float => (is => 'ro');
+	}
+	
+	package Cpu { use Aion; with 'Fpu';
+		has float => (is => 'ro', isa => Object['Float']);
+	}
+	
+	ref Cpu->new(float => Float->new)->float # => Float
+
+And throws an exception if they don't match:
+
+	package Fpu { use Aion -role;
+		req int => (is => 'ro', isa => Object['Int']);
+	}
+	
+	eval {
+		package Cpu { use Aion; with 'Fpu';
+			has int => (is => 'ro', isa => Object['Float']);
+		}
+	};
+	$@ # ^=> Feature mismatch (isa => Object['Int'] != Object['Float']) with req int => (is => 'ro', isa => Object['Int']) of Fpu
+
 =head1 AUTHOR
 
 Yaroslav O. Kosmina L<mailto:dart@cpan.org>

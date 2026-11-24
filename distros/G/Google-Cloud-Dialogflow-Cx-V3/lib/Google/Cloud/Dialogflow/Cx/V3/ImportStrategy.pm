@@ -1,0 +1,86 @@
+package Google::Cloud::Dialogflow::Cx::V3::ImportStrategy;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+CjNnb29nbGUvY2xvdWQvZGlhbG9nZmxvdy9jeC92My9pbXBvcnRfc3RyYXRlZ3kucHJvdG8S
+HWdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzKsQBCg5JbXBvcnRTdHJhdGVneRIfChtJ
+TVBPUlRfU1RSQVRFR1lfVU5TUEVDSUZJRUQQABIeChpJTVBPUlRfU1RSQVRFR1lfQ1JFQVRF
+X05FVxABEhsKF0lNUE9SVF9TVFJBVEVHWV9SRVBMQUNFEAISGAoUSU1QT1JUX1NUUkFURUdZ
+X0tFRVAQAxIZChVJTVBPUlRfU1RSQVRFR1lfTUVSR0UQBBIfChtJTVBPUlRfU1RSQVRFR1lf
+VEhST1dfRVJST1IQBUK2AQohY29tLmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzQhNJ
+bXBvcnRTdHJhdGVneVByb3RvUAFaMWNsb3VkLmdvb2dsZS5jb20vZ28vZGlhbG9nZmxvdy9j
+eC9hcGl2My9jeHBiO2N4cGKiAgJERqoCHUdvb2dsZS5DbG91ZC5EaWFsb2dmbG93LkN4LlYz
+6gIhR29vZ2xlOjpDbG91ZDo6RGlhbG9nZmxvdzo6Q1g6OlYzSsEMCgYSBA4AMgEKvAQKAQwS
+Aw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhl
+IEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5
+IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vu
+c2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0
+cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVp
+cmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2Fy
+ZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4g
+IkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFO
+WSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZv
+ciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGlt
+aXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQACYKCAoBCBIDEgA6CgkKAggl
+EgMSADoKCAoBCBIDEwBICgkKAggLEgMTAEgKCAoBCBIDFAAiCgkKAggKEgMUACIKCAoBCBID
+FQA0CgkKAggIEgMVADQKCAoBCBIDFgA6CgkKAggBEgMWADoKCAoBCBIDFwAgCgkKAggkEgMX
+ACAKCAoBCBIDGAA6CgkKAggtEgMYADoKqQEKAgUAEgQdADIBGpwBIEltcG9ydCBzdHJhdGVn
+aWVzIGZvciB0aGUgY29uZmxpY3QgcmVzb2x1dGlvbiBvZiByZXNvdXJjZXMgKGkuZS4gaW50
+ZW50cywKIGVudGl0aWVzLCBhbmQgd2ViaG9va3MpIHdpdGggaWRlbnRpY2FsIGRpc3BsYXkg
+bmFtZXMgZHVyaW5nIGltcG9ydAogb3BlcmF0aW9ucy4KCgoKAwUAARIDHQUTCjQKBAUAAgAS
+Ax8CIhonIFVuc3BlY2lmaWVkLiBUcmVhdGVkIGFzICdDUkVBVEVfTkVXJy4KCgwKBQUAAgAB
+EgMfAh0KDAoFBQACAAISAx8gIQptCgQFAAIBEgMjAiEaYCBDcmVhdGUgYSBuZXcgcmVzb3Vy
+Y2Ugd2l0aCBhIG51bWVyaWMgc3VmZml4IGFwcGVuZGVkIHRvIHRoZSBlbmQgb2YgdGhlCiBl
+eGlzdGluZyBkaXNwbGF5IG5hbWUuCgoMCgUFAAIBARIDIwIcCgwKBQUAAgECEgMjHyAKXwoE
+BQACAhIDJwIeGlIgUmVwbGFjZSBleGlzdGluZyByZXNvdXJjZSB3aXRoIGluY29taW5nIHJl
+c291cmNlIGluIHRoZSBjb250ZW50IHRvIGJlCiBpbXBvcnRlZC4KCgwKBQUAAgIBEgMnAhkK
+DAoFBQACAgISAyccHQpjCgQFAAIDEgMrAhsaViBLZWVwIGV4aXN0aW5nIHJlc291cmNlIGFu
+ZCBkaXNjYXJkIGluY29taW5nIHJlc291cmNlIGluIHRoZSBjb250ZW50IHRvIGJlCiBpbXBv
+cnRlZC4KCgwKBQUAAgMBEgMrAhYKDAoFBQACAwISAysZGgpWCgQFAAIEEgMuAhwaSSBDb21i
+aW5lIGV4aXN0aW5nIGFuZCBpbmNvbWluZyByZXNvdXJjZXMgd2hlbiBhIGNvbmZsaWN0IGlz
+IGVuY291bnRlcmVkLgoKDAoFBQACBAESAy4CFwoMCgUFAAIEAhIDLhobCjgKBAUAAgUSAzEC
+IhorIFRocm93IGVycm9yIGlmIGEgY29uZmxpY3QgaXMgZW5jb3VudGVyZWQuCgoMCgUFAAIF
+ARIDMQIdCgwKBQUAAgUCEgMxICFiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Dialogflow::Cx::V3::ImportStrategy - Compiled Protocol Buffers messages for google/cloud/dialogflow/cx/v3/import_strategy.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dialogflow/cx/v3/import_strategy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dialogflow::Cx::V3::ImportStrategy::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

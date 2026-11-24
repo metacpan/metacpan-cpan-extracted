@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::JobStats;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1813,36 +1813,6 @@ EOF
     # Field: kind Type: 9 ()
     # Field: substeps Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStep - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStep->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<substeps>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStage ===
     # Fields for ExplainQueryStage
     # Field: name Type: 9 ()
@@ -1877,174 +1847,10 @@ Type: String
     # Field: slot_ms Type: 11 (.google.protobuf.Int64Value)
     # Field: compute_mode Type: 14 (.google.cloud.bigquery.v2.ExplainQueryStage.ComputeMode)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStage - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStage->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<id>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<start_ms>
-
-Type: Int64
-
-=item * B<end_ms>
-
-Type: Int64
-
-=item * B<input_stages>
-
-Type: Int64
-
-=item * B<wait_ratio_avg>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<wait_ms_avg>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<wait_ratio_max>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<wait_ms_max>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<read_ratio_avg>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<read_ms_avg>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<read_ratio_max>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<read_ms_max>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<compute_ratio_avg>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<compute_ms_avg>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<compute_ratio_max>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<compute_ms_max>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<write_ratio_avg>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<write_ms_avg>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<write_ratio_max>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<write_ms_max>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<shuffle_output_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<shuffle_output_bytes_spilled>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<records_read>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<records_written>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<parallel_inputs>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<completed_parallel_inputs>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<status>
-
-Type: String
-
-=item * B<steps>
-
-Type: Message (.google.cloud.bigquery.v2.ExplainQueryStep)
-
-=item * B<slot_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<compute_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.ExplainQueryStage.ComputeMode)
-
-=back
-
-=cut
-
 # Enum: ExplainQueryStage::ComputeMode
 our $ExplainQueryStage_COMPUTE_MODE_UNSPECIFIED = 0;
 our $ExplainQueryStage_BIGQUERY = 1;
 our $ExplainQueryStage_BI_ENGINE = 2;
-
-=pod
-
-=head2 Enum: ExplainQueryStage::ComputeMode
-
-Values:
-
-=over 4
-
-=item * C<COMPUTE_MODE_UNSPECIFIED> => 0
-
-=item * C<BIGQUERY> => 1
-
-=item * C<BI_ENGINE> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::QueryTimelineSample ===
     # Fields for QueryTimelineSample
@@ -2056,56 +1862,6 @@ Values:
     # Field: shuffle_ram_usage_ratio Type: 11 (.google.protobuf.DoubleValue)
     # Field: estimated_runnable_units Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::QueryTimelineSample - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::QueryTimelineSample->new(
-        elapsed_ms => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<elapsed_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<total_slot_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<pending_units>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<completed_units>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<active_units>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<shuffle_ram_usage_ratio>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<estimated_runnable_units>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::ExternalServiceCost ===
     # Fields for ExternalServiceCost
     # Field: external_service Type: 9 ()
@@ -2115,121 +1871,15 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: reserved_slot_count Type: 3 ()
     # Field: billing_method Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::ExternalServiceCost - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::ExternalServiceCost->new(
-        external_service => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<external_service>
-
-Type: String
-
-=item * B<bytes_processed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<bytes_billed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<slot_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<reserved_slot_count>
-
-Type: Int64
-
-=item * B<billing_method>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::ExportDataStatistics ===
     # Fields for ExportDataStatistics
     # Field: file_count Type: 11 (.google.protobuf.Int64Value)
     # Field: row_count Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::ExportDataStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::ExportDataStatistics->new(
-        file_count => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<file_count>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<row_count>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::BiEngineReason ===
     # Fields for BiEngineReason
     # Field: code Type: 14 (.google.cloud.bigquery.v2.BiEngineReason.Code)
     # Field: message Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::BiEngineReason - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::BiEngineReason->new(
-        code => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<code>
-
-Type: Enum (.google.cloud.bigquery.v2.BiEngineReason.Code)
-
-=item * B<message>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: BiEngineReason::Code
 our $BiEngineReason_CODE_UNSPECIFIED = 0;
@@ -2240,97 +1890,17 @@ our $BiEngineReason_INPUT_TOO_LARGE = 5;
 our $BiEngineReason_OTHER_REASON = 6;
 our $BiEngineReason_TABLE_EXCLUDED = 7;
 
-=pod
-
-=head2 Enum: BiEngineReason::Code
-
-Values:
-
-=over 4
-
-=item * C<CODE_UNSPECIFIED> => 0
-
-=item * C<NO_RESERVATION> => 1
-
-=item * C<INSUFFICIENT_RESERVATION> => 2
-
-=item * C<UNSUPPORTED_SQL_TEXT> => 4
-
-=item * C<INPUT_TOO_LARGE> => 5
-
-=item * C<OTHER_REASON> => 6
-
-=item * C<TABLE_EXCLUDED> => 7
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::BiEngineStatistics ===
     # Fields for BiEngineStatistics
     # Field: bi_engine_mode Type: 14 (.google.cloud.bigquery.v2.BiEngineStatistics.BiEngineMode)
     # Field: acceleration_mode Type: 14 (.google.cloud.bigquery.v2.BiEngineStatistics.BiEngineAccelerationMode)
     # Field: bi_engine_reasons Type: 11 (.google.cloud.bigquery.v2.BiEngineReason)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::BiEngineStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::BiEngineStatistics->new(
-        bi_engine_mode => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bi_engine_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.BiEngineStatistics.BiEngineMode)
-
-=item * B<acceleration_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.BiEngineStatistics.BiEngineAccelerationMode)
-
-=item * B<bi_engine_reasons>
-
-Type: Message (.google.cloud.bigquery.v2.BiEngineReason)
-
-=back
-
-=cut
-
 # Enum: BiEngineStatistics::BiEngineMode
 our $BiEngineStatistics_ACCELERATION_MODE_UNSPECIFIED = 0;
 our $BiEngineStatistics_DISABLED = 1;
 our $BiEngineStatistics_PARTIAL = 2;
 our $BiEngineStatistics_FULL = 3;
-
-=pod
-
-=head2 Enum: BiEngineStatistics::BiEngineMode
-
-Values:
-
-=over 4
-
-=item * C<ACCELERATION_MODE_UNSPECIFIED> => 0
-
-=item * C<DISABLED> => 1
-
-=item * C<PARTIAL> => 2
-
-=item * C<FULL> => 3
-
-=back
-
-=cut
 
 # Enum: BiEngineStatistics::BiEngineAccelerationMode
 our $BiEngineStatistics_BI_ENGINE_ACCELERATION_MODE_UNSPECIFIED = 0;
@@ -2339,72 +1909,12 @@ our $BiEngineStatistics_PARTIAL_INPUT = 2;
 our $BiEngineStatistics_FULL_INPUT = 3;
 our $BiEngineStatistics_FULL_QUERY = 4;
 
-=pod
-
-=head2 Enum: BiEngineStatistics::BiEngineAccelerationMode
-
-Values:
-
-=over 4
-
-=item * C<BI_ENGINE_ACCELERATION_MODE_UNSPECIFIED> => 0
-
-=item * C<BI_ENGINE_DISABLED> => 1
-
-=item * C<PARTIAL_INPUT> => 2
-
-=item * C<FULL_INPUT> => 3
-
-=item * C<FULL_QUERY> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::IndexUnusedReason ===
     # Fields for IndexUnusedReason
     # Field: code Type: 14 (.google.cloud.bigquery.v2.IndexUnusedReason.Code)
     # Field: message Type: 9 ()
     # Field: base_table Type: 11 (.google.cloud.bigquery.v2.TableReference)
     # Field: index_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::IndexUnusedReason - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::IndexUnusedReason->new(
-        code => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<code>
-
-Type: Enum (.google.cloud.bigquery.v2.IndexUnusedReason.Code)
-
-=item * B<message>
-
-Type: String
-
-=item * B<base_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<index_name>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: IndexUnusedReason::Code
 our $IndexUnusedReason_CODE_UNSPECIFIED = 0;
@@ -2430,62 +1940,6 @@ our $IndexUnusedReason_STALE_INDEX = 20;
 our $IndexUnusedReason_INTERNAL_ERROR = 10;
 our $IndexUnusedReason_OTHER_REASON = 16;
 
-=pod
-
-=head2 Enum: IndexUnusedReason::Code
-
-Values:
-
-=over 4
-
-=item * C<CODE_UNSPECIFIED> => 0
-
-=item * C<INDEX_CONFIG_NOT_AVAILABLE> => 1
-
-=item * C<PENDING_INDEX_CREATION> => 2
-
-=item * C<BASE_TABLE_TRUNCATED> => 3
-
-=item * C<INDEX_CONFIG_MODIFIED> => 4
-
-=item * C<TIME_TRAVEL_QUERY> => 5
-
-=item * C<NO_PRUNING_POWER> => 6
-
-=item * C<UNINDEXED_SEARCH_FIELDS> => 7
-
-=item * C<UNSUPPORTED_SEARCH_PATTERN> => 8
-
-=item * C<OPTIMIZED_WITH_MATERIALIZED_VIEW> => 9
-
-=item * C<SECURED_BY_DATA_MASKING> => 11
-
-=item * C<MISMATCHED_TEXT_ANALYZER> => 12
-
-=item * C<BASE_TABLE_TOO_SMALL> => 13
-
-=item * C<BASE_TABLE_TOO_LARGE> => 14
-
-=item * C<ESTIMATED_PERFORMANCE_GAIN_TOO_LOW> => 15
-
-=item * C<COLUMN_METADATA_INDEX_NOT_USED> => 21
-
-=item * C<NOT_SUPPORTED_IN_STANDARD_EDITION> => 17
-
-=item * C<INDEX_SUPPRESSED_BY_FUNCTION_OPTION> => 18
-
-=item * C<QUERY_CACHE_HIT> => 19
-
-=item * C<STALE_INDEX> => 20
-
-=item * C<INTERNAL_ERROR> => 10
-
-=item * C<OTHER_REASON> => 16
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::IndexPruningStats ===
     # Fields for IndexPruningStats
     # Field: base_table Type: 11 (.google.cloud.bigquery.v2.TableReference)
@@ -2493,83 +1947,11 @@ Values:
     # Field: pre_index_pruning_parallel_input_count Type: 3 ()
     # Field: post_index_pruning_parallel_input_count Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::IndexPruningStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::IndexPruningStats->new(
-        base_table => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<base_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<index_id>
-
-Type: String
-
-=item * B<pre_index_pruning_parallel_input_count>
-
-Type: Int64
-
-=item * B<post_index_pruning_parallel_input_count>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::StoredColumnsUsage ===
     # Fields for StoredColumnsUsage
     # Field: is_query_accelerated Type: 8 ()
     # Field: base_table Type: 11 (.google.cloud.bigquery.v2.TableReference)
     # Field: stored_columns_unused_reasons Type: 11 (.google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::StoredColumnsUsage - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::StoredColumnsUsage->new(
-        is_query_accelerated => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<is_query_accelerated>
-
-Type: Bool
-
-=item * B<base_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<stored_columns_unused_reasons>
-
-Type: Message (.google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedReason)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::SearchStatistics ===
     # Fields for SearchStatistics
@@ -2577,65 +1959,11 @@ Type: Message (.google.cloud.bigquery.v2.StoredColumnsUsage.StoredColumnsUnusedR
     # Field: index_unused_reasons Type: 11 (.google.cloud.bigquery.v2.IndexUnusedReason)
     # Field: index_pruning_stats Type: 11 (.google.cloud.bigquery.v2.IndexPruningStats)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::SearchStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::SearchStatistics->new(
-        index_usage_mode => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<index_usage_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.SearchStatistics.IndexUsageMode)
-
-=item * B<index_unused_reasons>
-
-Type: Message (.google.cloud.bigquery.v2.IndexUnusedReason)
-
-=item * B<index_pruning_stats>
-
-Type: Message (.google.cloud.bigquery.v2.IndexPruningStats)
-
-=back
-
-=cut
-
 # Enum: SearchStatistics::IndexUsageMode
 our $SearchStatistics_INDEX_USAGE_MODE_UNSPECIFIED = 0;
 our $SearchStatistics_UNUSED = 1;
 our $SearchStatistics_PARTIALLY_USED = 2;
 our $SearchStatistics_FULLY_USED = 4;
-
-=pod
-
-=head2 Enum: SearchStatistics::IndexUsageMode
-
-Values:
-
-=over 4
-
-=item * C<INDEX_USAGE_MODE_UNSPECIFIED> => 0
-
-=item * C<UNUSED> => 1
-
-=item * C<PARTIALLY_USED> => 2
-
-=item * C<FULLY_USED> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::VectorSearchStatistics ===
     # Fields for VectorSearchStatistics
@@ -2643,95 +1971,15 @@ Values:
     # Field: index_unused_reasons Type: 11 (.google.cloud.bigquery.v2.IndexUnusedReason)
     # Field: stored_columns_usages Type: 11 (.google.cloud.bigquery.v2.StoredColumnsUsage)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::VectorSearchStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::VectorSearchStatistics->new(
-        index_usage_mode => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<index_usage_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.VectorSearchStatistics.IndexUsageMode)
-
-=item * B<index_unused_reasons>
-
-Type: Message (.google.cloud.bigquery.v2.IndexUnusedReason)
-
-=item * B<stored_columns_usages>
-
-Type: Message (.google.cloud.bigquery.v2.StoredColumnsUsage)
-
-=back
-
-=cut
-
 # Enum: VectorSearchStatistics::IndexUsageMode
 our $VectorSearchStatistics_INDEX_USAGE_MODE_UNSPECIFIED = 0;
 our $VectorSearchStatistics_UNUSED = 1;
 our $VectorSearchStatistics_PARTIALLY_USED = 2;
 our $VectorSearchStatistics_FULLY_USED = 4;
 
-=pod
-
-=head2 Enum: VectorSearchStatistics::IndexUsageMode
-
-Values:
-
-=over 4
-
-=item * C<INDEX_USAGE_MODE_UNSPECIFIED> => 0
-
-=item * C<UNUSED> => 1
-
-=item * C<PARTIALLY_USED> => 2
-
-=item * C<FULLY_USED> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::QueryInfo ===
     # Fields for QueryInfo
     # Field: optimization_details Type: 11 (.google.protobuf.Struct)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::QueryInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::QueryInfo->new(
-        optimization_details => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<optimization_details>
-
-Type: Message (.google.protobuf.Struct)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::LoadQueryStatistics ===
     # Fields for LoadQueryStatistics
@@ -2740,48 +1988,6 @@ Type: Message (.google.protobuf.Struct)
     # Field: output_rows Type: 11 (.google.protobuf.Int64Value)
     # Field: output_bytes Type: 11 (.google.protobuf.Int64Value)
     # Field: bad_records Type: 11 (.google.protobuf.Int64Value)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::LoadQueryStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::LoadQueryStatistics->new(
-        input_files => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<input_files>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<input_file_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<output_rows>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<output_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<bad_records>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::IncrementalResultStats ===
     # Fields for IncrementalResultStats
@@ -2793,78 +1999,10 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: last_incremental_row_time Type: 11 (.google.protobuf.Timestamp)
     # Field: incremental_row_count Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::IncrementalResultStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::IncrementalResultStats->new(
-        disabled_reason => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<disabled_reason>
-
-Type: Enum (.google.cloud.bigquery.v2.IncrementalResultStats.DisabledReason)
-
-=item * B<disabled_reason_details>
-
-Type: String
-
-=item * B<result_set_last_replace_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<result_set_last_modify_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<first_incremental_row_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<last_incremental_row_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<incremental_row_count>
-
-Type: Int64
-
-=back
-
-=cut
-
 # Enum: IncrementalResultStats::DisabledReason
 our $IncrementalResultStats_DISABLED_REASON_UNSPECIFIED = 0;
 our $IncrementalResultStats_OTHER = 1;
 our $IncrementalResultStats_UNSUPPORTED_OPERATOR = 2;
-
-=pod
-
-=head2 Enum: IncrementalResultStats::DisabledReason
-
-Values:
-
-=over 4
-
-=item * C<DISABLED_REASON_UNSPECIFIED> => 0
-
-=item * C<OTHER> => 1
-
-=item * C<UNSUPPORTED_OPERATOR> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::JobStatistics2 ===
     # Fields for JobStatistics2
@@ -2914,273 +2052,17 @@ Values:
     # Field: gen_ai_stats Type: 11 (.google.cloud.bigquery.v2.GenAiStats)
     # Field: object_storage_stats Type: 11 (.google.cloud.bigquery.v2.ObjectStorageStats)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::JobStatistics2 - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::JobStatistics2->new(
-        query_plan => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query_plan>
-
-Type: Message (.google.cloud.bigquery.v2.ExplainQueryStage)
-
-=item * B<estimated_bytes_processed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<timeline>
-
-Type: Message (.google.cloud.bigquery.v2.QueryTimelineSample)
-
-=item * B<total_partitions_processed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<total_bytes_processed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<total_bytes_processed_accuracy>
-
-Type: String
-
-=item * B<total_bytes_billed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<billing_tier>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<total_slot_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<total_services_sku_slot_ms>
-
-Type: Int64
-
-=item * B<cache_hit>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<referenced_tables>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<referenced_routines>
-
-Type: Message (.google.cloud.bigquery.v2.RoutineReference)
-
-=item * B<referenced_property_graphs>
-
-Type: Message (.google.cloud.bigquery.v2.PropertyGraphReference)
-
-=item * B<schema>
-
-Type: Message (.google.cloud.bigquery.v2.TableSchema)
-
-=item * B<num_dml_affected_rows>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<dml_stats>
-
-Type: Message (.google.cloud.bigquery.v2.DmlStats)
-
-=item * B<undeclared_query_parameters>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameter)
-
-=item * B<statement_type>
-
-Type: String
-
-=item * B<ddl_operation_performed>
-
-Type: String
-
-=item * B<ddl_target_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<ddl_destination_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<ddl_target_row_access_policy>
-
-Type: Message (.google.cloud.bigquery.v2.RowAccessPolicyReference)
-
-=item * B<ddl_affected_row_access_policy_count>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<ddl_target_routine>
-
-Type: Message (.google.cloud.bigquery.v2.RoutineReference)
-
-=item * B<ddl_target_dataset>
-
-Type: Message (.google.cloud.bigquery.v2.DatasetReference)
-
-=item * B<ml_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.MlStatistics)
-
-=item * B<export_data_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.ExportDataStatistics)
-
-=item * B<external_service_costs>
-
-Type: Message (.google.cloud.bigquery.v2.ExternalServiceCost)
-
-=item * B<bi_engine_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.BiEngineStatistics)
-
-=item * B<load_query_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.LoadQueryStatistics)
-
-=item * B<dcl_target_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<dcl_target_view>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<dcl_target_dataset>
-
-Type: Message (.google.cloud.bigquery.v2.DatasetReference)
-
-=item * B<search_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.SearchStatistics)
-
-=item * B<vector_search_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.VectorSearchStatistics)
-
-=item * B<performance_insights>
-
-Type: Message (.google.cloud.bigquery.v2.PerformanceInsights)
-
-=item * B<query_info>
-
-Type: Message (.google.cloud.bigquery.v2.QueryInfo)
-
-=item * B<spark_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.SparkStatistics)
-
-=item * B<transferred_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<materialized_view_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.MaterializedViewStatistics)
-
-=item * B<metadata_cache_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.MetadataCacheStatistics)
-
-=item * B<incremental_result_stats>
-
-Type: Message (.google.cloud.bigquery.v2.IncrementalResultStats)
-
-=item * B<gen_ai_stats>
-
-Type: Message (.google.cloud.bigquery.v2.GenAiStats)
-
-=item * B<object_storage_stats>
-
-Type: Message (.google.cloud.bigquery.v2.ObjectStorageStats)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::ObjectStorageStats ===
     # Fields for ObjectStorageStats
     # Field: cloud_provider Type: 14 (.google.cloud.bigquery.v2.ObjectStorageStats.CloudProvider)
     # Field: object_storage_bytes_read Type: 3 ()
     # Field: cache_bytes_read Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::ObjectStorageStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::ObjectStorageStats->new(
-        cloud_provider => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cloud_provider>
-
-Type: Enum (.google.cloud.bigquery.v2.ObjectStorageStats.CloudProvider)
-
-=item * B<object_storage_bytes_read>
-
-Type: Int64
-
-=item * B<cache_bytes_read>
-
-Type: Int64
-
-=back
-
-=cut
-
 # Enum: ObjectStorageStats::CloudProvider
 our $ObjectStorageStats_CLOUD_PROVIDER_UNSPECIFIED = 0;
 our $ObjectStorageStats_GCP = 1;
 our $ObjectStorageStats_AWS = 2;
 our $ObjectStorageStats_AZURE = 3;
-
-=pod
-
-=head2 Enum: ObjectStorageStats::CloudProvider
-
-Values:
-
-=over 4
-
-=item * C<CLOUD_PROVIDER_UNSPECIFIED> => 0
-
-=item * C<GCP> => 1
-
-=item * C<AWS> => 2
-
-=item * C<AZURE> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::JobStatistics3 ===
     # Fields for JobStatistics3
@@ -3191,131 +2073,17 @@ Values:
     # Field: bad_records Type: 11 (.google.protobuf.Int64Value)
     # Field: timeline Type: 11 (.google.cloud.bigquery.v2.QueryTimelineSample)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::JobStatistics3 - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::JobStatistics3->new(
-        input_files => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<input_files>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<input_file_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<output_rows>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<output_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<bad_records>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<timeline>
-
-Type: Message (.google.cloud.bigquery.v2.QueryTimelineSample)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::JobStatistics4 ===
     # Fields for JobStatistics4
     # Field: destination_uri_file_counts Type: 3 ()
     # Field: input_bytes Type: 11 (.google.protobuf.Int64Value)
     # Field: timeline Type: 11 (.google.cloud.bigquery.v2.QueryTimelineSample)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::JobStatistics4 - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::JobStatistics4->new(
-        destination_uri_file_counts => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<destination_uri_file_counts>
-
-Type: Int64
-
-=item * B<input_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<timeline>
-
-Type: Message (.google.cloud.bigquery.v2.QueryTimelineSample)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::CopyJobStatistics ===
     # Fields for CopyJobStatistics
     # Field: copied_rows Type: 11 (.google.protobuf.Int64Value)
     # Field: copied_logical_bytes Type: 11 (.google.protobuf.Int64Value)
     # Field: remote_destination_region Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::CopyJobStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::CopyJobStatistics->new(
-        copied_rows => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<copied_rows>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<copied_logical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<remote_destination_region>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::MlStatistics ===
     # Fields for MlStatistics
@@ -3325,188 +2093,28 @@ Type: String
     # Field: training_type Type: 14 (.google.cloud.bigquery.v2.MlStatistics.TrainingType)
     # Field: hparam_trials Type: 11 (.google.cloud.bigquery.v2.Model.HparamTuningTrial)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::MlStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::MlStatistics->new(
-        max_iterations => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<max_iterations>
-
-Type: Int64
-
-=item * B<iteration_results>
-
-Type: Message (.google.cloud.bigquery.v2.Model.TrainingRun.IterationResult)
-
-=item * B<model_type>
-
-Type: Enum (.google.cloud.bigquery.v2.Model.ModelType)
-
-=item * B<training_type>
-
-Type: Enum (.google.cloud.bigquery.v2.MlStatistics.TrainingType)
-
-=item * B<hparam_trials>
-
-Type: Message (.google.cloud.bigquery.v2.Model.HparamTuningTrial)
-
-=back
-
-=cut
-
 # Enum: MlStatistics::TrainingType
 our $MlStatistics_TRAINING_TYPE_UNSPECIFIED = 0;
 our $MlStatistics_SINGLE_TRAINING = 1;
 our $MlStatistics_HPARAM_TUNING = 2;
-
-=pod
-
-=head2 Enum: MlStatistics::TrainingType
-
-Values:
-
-=over 4
-
-=item * C<TRAINING_TYPE_UNSPECIFIED> => 0
-
-=item * C<SINGLE_TRAINING> => 1
-
-=item * C<HPARAM_TUNING> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::ScriptStatistics ===
     # Fields for ScriptStatistics
     # Field: evaluation_kind Type: 14 (.google.cloud.bigquery.v2.ScriptStatistics.EvaluationKind)
     # Field: stack_frames Type: 11 (.google.cloud.bigquery.v2.ScriptStatistics.ScriptStackFrame)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::ScriptStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::ScriptStatistics->new(
-        evaluation_kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<evaluation_kind>
-
-Type: Enum (.google.cloud.bigquery.v2.ScriptStatistics.EvaluationKind)
-
-=item * B<stack_frames>
-
-Type: Message (.google.cloud.bigquery.v2.ScriptStatistics.ScriptStackFrame)
-
-=back
-
-=cut
-
 # Enum: ScriptStatistics::EvaluationKind
 our $ScriptStatistics_EVALUATION_KIND_UNSPECIFIED = 0;
 our $ScriptStatistics_STATEMENT = 1;
 our $ScriptStatistics_EXPRESSION = 2;
 
-=pod
-
-=head2 Enum: ScriptStatistics::EvaluationKind
-
-Values:
-
-=over 4
-
-=item * C<EVALUATION_KIND_UNSPECIFIED> => 0
-
-=item * C<STATEMENT> => 1
-
-=item * C<EXPRESSION> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::RowLevelSecurityStatistics ===
     # Fields for RowLevelSecurityStatistics
     # Field: row_level_security_applied Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::RowLevelSecurityStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::RowLevelSecurityStatistics->new(
-        row_level_security_applied => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<row_level_security_applied>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::DataMaskingStatistics ===
     # Fields for DataMaskingStatistics
     # Field: data_masking_applied Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::DataMaskingStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::DataMaskingStatistics->new(
-        data_masking_applied => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_masking_applied>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::JobStatistics ===
     # Fields for JobStatistics
@@ -3535,124 +2143,6 @@ Type: Bool
     # Field: global_query_remote_regions Type: 9 ()
     # Field: parent_global_query_job Type: 11 (.google.cloud.bigquery.v2.JobReference)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::JobStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::JobStatistics->new(
-        creation_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<creation_time>
-
-Type: Int64
-
-=item * B<start_time>
-
-Type: Int64
-
-=item * B<end_time>
-
-Type: Int64
-
-=item * B<total_bytes_processed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<completion_ratio>
-
-Type: Message (.google.protobuf.DoubleValue)
-
-=item * B<quota_deferments>
-
-Type: String
-
-=item * B<query>
-
-Type: Message (.google.cloud.bigquery.v2.JobStatistics2)
-
-=item * B<load>
-
-Type: Message (.google.cloud.bigquery.v2.JobStatistics3)
-
-=item * B<extract>
-
-Type: Message (.google.cloud.bigquery.v2.JobStatistics4)
-
-=item * B<copy>
-
-Type: Message (.google.cloud.bigquery.v2.CopyJobStatistics)
-
-=item * B<total_slot_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<reservation_id>
-
-Type: String
-
-=item * B<num_child_jobs>
-
-Type: Int64
-
-=item * B<parent_job_id>
-
-Type: String
-
-=item * B<script_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.ScriptStatistics)
-
-=item * B<row_level_security_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.RowLevelSecurityStatistics)
-
-=item * B<data_masking_statistics>
-
-Type: Message (.google.cloud.bigquery.v2.DataMaskingStatistics)
-
-=item * B<transaction_info>
-
-Type: Message (.google.cloud.bigquery.v2.JobStatistics.TransactionInfo)
-
-=item * B<session_info>
-
-Type: Message (.google.cloud.bigquery.v2.SessionInfo)
-
-=item * B<final_execution_duration_ms>
-
-Type: Int64
-
-=item * B<edition>
-
-Type: Enum (.google.cloud.bigquery.v2.ReservationEdition)
-
-=item * B<reservation_group_path>
-
-Type: String
-
-=item * B<global_query_remote_regions>
-
-Type: String
-
-=item * B<parent_global_query_job>
-
-Type: Message (.google.cloud.bigquery.v2.JobReference)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::DmlStats ===
     # Fields for DmlStats
     # Field: inserted_row_count Type: 11 (.google.protobuf.Int64Value)
@@ -3661,96 +2151,16 @@ Type: Message (.google.cloud.bigquery.v2.JobReference)
     # Field: dml_mode Type: 14 (.google.cloud.bigquery.v2.DmlStats.DmlMode)
     # Field: fine_grained_dml_unused_reason Type: 14 (.google.cloud.bigquery.v2.DmlStats.FineGrainedDmlUnusedReason)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::DmlStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::DmlStats->new(
-        inserted_row_count => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<inserted_row_count>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<deleted_row_count>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<updated_row_count>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<dml_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.DmlStats.DmlMode)
-
-=item * B<fine_grained_dml_unused_reason>
-
-Type: Enum (.google.cloud.bigquery.v2.DmlStats.FineGrainedDmlUnusedReason)
-
-=back
-
-=cut
-
 # Enum: DmlStats::DmlMode
 our $DmlStats_DML_MODE_UNSPECIFIED = 0;
 our $DmlStats_COARSE_GRAINED_DML = 1;
 our $DmlStats_FINE_GRAINED_DML = 2;
-
-=pod
-
-=head2 Enum: DmlStats::DmlMode
-
-Values:
-
-=over 4
-
-=item * C<DML_MODE_UNSPECIFIED> => 0
-
-=item * C<COARSE_GRAINED_DML> => 1
-
-=item * C<FINE_GRAINED_DML> => 2
-
-=back
-
-=cut
 
 # Enum: DmlStats::FineGrainedDmlUnusedReason
 our $DmlStats_FINE_GRAINED_DML_UNUSED_REASON_UNSPECIFIED = 0;
 our $DmlStats_MAX_PARTITION_SIZE_EXCEEDED = 1;
 our $DmlStats_TABLE_NOT_ENROLLED = 2;
 our $DmlStats_DML_IN_MULTI_STATEMENT_TRANSACTION = 3;
-
-=pod
-
-=head2 Enum: DmlStats::FineGrainedDmlUnusedReason
-
-Values:
-
-=over 4
-
-=item * C<FINE_GRAINED_DML_UNUSED_REASON_UNSPECIFIED> => 0
-
-=item * C<MAX_PARTITION_SIZE_EXCEEDED> => 1
-
-=item * C<TABLE_NOT_ENROLLED> => 2
-
-=item * C<DML_IN_MULTI_STATEMENT_TRANSACTION> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::PerformanceInsights ===
     # Fields for PerformanceInsights
@@ -3759,108 +2169,14 @@ Values:
     # Field: stage_performance_change_insights Type: 11 (.google.cloud.bigquery.v2.StagePerformanceChangeInsight)
     # Field: table_change_insights Type: 11 (.google.cloud.bigquery.v2.TableChangeInsight)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::PerformanceInsights - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::PerformanceInsights->new(
-        avg_previous_execution_ms => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<avg_previous_execution_ms>
-
-Type: Int64
-
-=item * B<stage_performance_standalone_insights>
-
-Type: Message (.google.cloud.bigquery.v2.StagePerformanceStandaloneInsight)
-
-=item * B<stage_performance_change_insights>
-
-Type: Message (.google.cloud.bigquery.v2.StagePerformanceChangeInsight)
-
-=item * B<table_change_insights>
-
-Type: Message (.google.cloud.bigquery.v2.TableChangeInsight)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::StagePerformanceChangeInsight ===
     # Fields for StagePerformanceChangeInsight
     # Field: stage_id Type: 3 ()
     # Field: input_data_change Type: 11 (.google.cloud.bigquery.v2.InputDataChange)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::StagePerformanceChangeInsight - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::StagePerformanceChangeInsight->new(
-        stage_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<stage_id>
-
-Type: Int64
-
-=item * B<input_data_change>
-
-Type: Message (.google.cloud.bigquery.v2.InputDataChange)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::InputDataChange ===
     # Fields for InputDataChange
     # Field: records_read_diff_percentage Type: 2 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::InputDataChange - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::InputDataChange->new(
-        records_read_diff_percentage => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<records_read_diff_percentage>
-
-Type: Float
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::StagePerformanceStandaloneInsight ===
     # Fields for StagePerformanceStandaloneInsight
@@ -3871,52 +2187,6 @@ Type: Float
     # Field: high_cardinality_joins Type: 11 (.google.cloud.bigquery.v2.HighCardinalityJoin)
     # Field: partition_skew Type: 11 (.google.cloud.bigquery.v2.PartitionSkew)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::StagePerformanceStandaloneInsight - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::StagePerformanceStandaloneInsight->new(
-        stage_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<stage_id>
-
-Type: Int64
-
-=item * B<slot_contention>
-
-Type: Bool
-
-=item * B<insufficient_shuffle_quota>
-
-Type: Bool
-
-=item * B<bi_engine_reasons>
-
-Type: Message (.google.cloud.bigquery.v2.BiEngineReason)
-
-=item * B<high_cardinality_joins>
-
-Type: Message (.google.cloud.bigquery.v2.HighCardinalityJoin)
-
-=item * B<partition_skew>
-
-Type: Message (.google.cloud.bigquery.v2.PartitionSkew)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::HighCardinalityJoin ===
     # Fields for HighCardinalityJoin
     # Field: left_rows Type: 3 ()
@@ -3924,73 +2194,9 @@ Type: Message (.google.cloud.bigquery.v2.PartitionSkew)
     # Field: output_rows Type: 3 ()
     # Field: step_index Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::HighCardinalityJoin - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::HighCardinalityJoin->new(
-        left_rows => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<left_rows>
-
-Type: Int64
-
-=item * B<right_rows>
-
-Type: Int64
-
-=item * B<output_rows>
-
-Type: Int64
-
-=item * B<step_index>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::PartitionSkew ===
     # Fields for PartitionSkew
     # Field: skew_sources Type: 11 (.google.cloud.bigquery.v2.PartitionSkew.SkewSource)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::PartitionSkew - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::PartitionSkew->new(
-        skew_sources => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<skew_sources>
-
-Type: Message (.google.cloud.bigquery.v2.PartitionSkew.SkewSource)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::TableChangeInsight ===
     # Fields for TableChangeInsight
@@ -3998,74 +2204,10 @@ Type: Message (.google.cloud.bigquery.v2.PartitionSkew.SkewSource)
     # Field: metadata_cache_staleness_insight Type: 11 (.google.cloud.bigquery.v2.MetadataCacheStalenessInsight)
     # Field: metadata_cache_not_used_but_used_previously Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::TableChangeInsight - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::TableChangeInsight->new(
-        table_reference => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<table_reference>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<metadata_cache_staleness_insight>
-
-Type: Message (.google.cloud.bigquery.v2.MetadataCacheStalenessInsight)
-
-=item * B<metadata_cache_not_used_but_used_previously>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStalenessInsight ===
     # Fields for MetadataCacheStalenessInsight
     # Field: avg_previous_staleness_ms Type: 11 (.google.protobuf.Duration)
     # Field: staleness_percentage_increase Type: 1 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStalenessInsight - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStalenessInsight->new(
-        avg_previous_staleness_ms => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<avg_previous_staleness_ms>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<staleness_percentage_increase>
-
-Type: Double
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::SparkStatistics ===
     # Fields for SparkStatistics
@@ -4076,81 +2218,9 @@ Type: Double
     # Field: kms_key_name Type: 9 ()
     # Field: gcs_staging_bucket Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::SparkStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::SparkStatistics->new(
-        spark_job_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<spark_job_id>
-
-Type: String
-
-=item * B<spark_job_location>
-
-Type: String
-
-=item * B<endpoints>
-
-Type: Message (.google.cloud.bigquery.v2.SparkStatistics.EndpointsEntry)
-
-=item * B<logging_info>
-
-Type: Message (.google.cloud.bigquery.v2.SparkStatistics.LoggingInfo)
-
-=item * B<kms_key_name>
-
-Type: String
-
-=item * B<gcs_staging_bucket>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::MaterializedViewStatistics ===
     # Fields for MaterializedViewStatistics
     # Field: materialized_view Type: 11 (.google.cloud.bigquery.v2.MaterializedView)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::MaterializedViewStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::MaterializedViewStatistics->new(
-        materialized_view => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<materialized_view>
-
-Type: Message (.google.cloud.bigquery.v2.MaterializedView)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::MaterializedView ===
     # Fields for MaterializedView
@@ -4158,44 +2228,6 @@ Type: Message (.google.cloud.bigquery.v2.MaterializedView)
     # Field: chosen Type: 8 ()
     # Field: estimated_bytes_saved Type: 3 ()
     # Field: rejected_reason Type: 14 (.google.cloud.bigquery.v2.MaterializedView.RejectedReason)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::MaterializedView - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::MaterializedView->new(
-        table_reference => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<table_reference>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<chosen>
-
-Type: Bool
-
-=item * B<estimated_bytes_saved>
-
-Type: Int64
-
-=item * B<rejected_reason>
-
-Type: Enum (.google.cloud.bigquery.v2.MaterializedView.RejectedReason)
-
-=back
-
-=cut
 
 # Enum: MaterializedView::RejectedReason
 our $MaterializedView_REJECTED_REASON_UNSPECIFIED = 0;
@@ -4211,81 +2243,11 @@ our $MaterializedView_OUT_OF_TIME_TRAVEL_WINDOW = 9;
 our $MaterializedView_BASE_TABLE_FINE_GRAINED_SECURITY_POLICY = 10;
 our $MaterializedView_BASE_TABLE_TOO_STALE = 11;
 
-=pod
-
-=head2 Enum: MaterializedView::RejectedReason
-
-Values:
-
-=over 4
-
-=item * C<REJECTED_REASON_UNSPECIFIED> => 0
-
-=item * C<NO_DATA> => 1
-
-=item * C<COST> => 2
-
-=item * C<BASE_TABLE_TRUNCATED> => 3
-
-=item * C<BASE_TABLE_DATA_CHANGE> => 4
-
-=item * C<BASE_TABLE_PARTITION_EXPIRATION_CHANGE> => 5
-
-=item * C<BASE_TABLE_EXPIRED_PARTITION> => 6
-
-=item * C<BASE_TABLE_INCOMPATIBLE_METADATA_CHANGE> => 7
-
-=item * C<TIME_ZONE> => 8
-
-=item * C<OUT_OF_TIME_TRAVEL_WINDOW> => 9
-
-=item * C<BASE_TABLE_FINE_GRAINED_SECURITY_POLICY> => 10
-
-=item * C<BASE_TABLE_TOO_STALE> => 11
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::PruningStats ===
     # Fields for PruningStats
     # Field: post_cmeta_pruning_partition_count Type: 3 ()
     # Field: pre_cmeta_pruning_parallel_input_count Type: 3 ()
     # Field: post_cmeta_pruning_parallel_input_count Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::PruningStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::PruningStats->new(
-        post_cmeta_pruning_partition_count => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<post_cmeta_pruning_partition_count>
-
-Type: Int64
-
-=item * B<pre_cmeta_pruning_parallel_input_count>
-
-Type: Int64
-
-=item * B<post_cmeta_pruning_parallel_input_count>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobStats::TableMetadataCacheUsage ===
     # Fields for TableMetadataCacheUsage
@@ -4296,119 +2258,2471 @@ Type: Int64
     # Field: table_type Type: 9 ()
     # Field: pruning_stats Type: 11 (.google.cloud.bigquery.v2.PruningStats)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::TableMetadataCacheUsage - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::TableMetadataCacheUsage->new(
-        table_reference => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<table_reference>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<unused_reason>
-
-Type: Enum (.google.cloud.bigquery.v2.TableMetadataCacheUsage.UnusedReason)
-
-=item * B<explanation>
-
-Type: String
-
-=item * B<staleness>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<table_type>
-
-Type: String
-
-=item * B<pruning_stats>
-
-Type: Message (.google.cloud.bigquery.v2.PruningStats)
-
-=back
-
-=cut
-
 # Enum: TableMetadataCacheUsage::UnusedReason
 our $TableMetadataCacheUsage_UNUSED_REASON_UNSPECIFIED = 0;
 our $TableMetadataCacheUsage_EXCEEDED_MAX_STALENESS = 1;
 our $TableMetadataCacheUsage_METADATA_CACHING_NOT_ENABLED = 3;
 our $TableMetadataCacheUsage_OTHER_REASON = 2;
 
-=pod
-
-=head2 Enum: TableMetadataCacheUsage::UnusedReason
-
-Values:
-
-=over 4
-
-=item * C<UNUSED_REASON_UNSPECIFIED> => 0
-
-=item * C<EXCEEDED_MAX_STALENESS> => 1
-
-=item * C<METADATA_CACHING_NOT_ENABLED> => 3
-
-=item * C<OTHER_REASON> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStatistics ===
     # Fields for MetadataCacheStatistics
     # Field: table_metadata_cache_usage Type: 11 (.google.cloud.bigquery.v2.TableMetadataCacheUsage)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStatistics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStatistics->new(
-        table_metadata_cache_usage => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<table_metadata_cache_usage>
-
-Type: Message (.google.cloud.bigquery.v2.TableMetadataCacheUsage)
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::JobStats - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::JobStats - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/job_stats.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::JobStats;
+
+    my $msg = Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStep->new({
+        kind => $kind,
+        substeps => $substeps,
+    });
+
+    # Read or update a field
+    my $val = $msg->kind();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStep->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/job_stats.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStep
+
+An operation within a stage.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+Machine-readable operation type.
+
+=item * C<< $msg->substeps() >> / C<< $msg->substeps($value) >>
+
+Type: C<String>
+
+Human-readable description of the step(s).
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStage
+
+A single stage of query execution.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Human-readable name for the stage.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Unique ID for the stage within the plan.
+
+=item * C<< $msg->start_ms() >> / C<< $msg->start_ms($value) >>
+
+Type: C<Int64>
+
+Stage start time represented as milliseconds since the epoch.
+
+=item * C<< $msg->end_ms() >> / C<< $msg->end_ms($value) >>
+
+Type: C<Int64>
+
+Stage end time represented as milliseconds since the epoch.
+
+=item * C<< $msg->input_stages() >> / C<< $msg->input_stages($value) >>
+
+Type: C<Int64>
+
+IDs for stages that are inputs to this stage.
+
+=item * C<< $msg->wait_ratio_avg() >> / C<< $msg->wait_ratio_avg($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Relative amount of time the average shard spent waiting to be
+scheduled.
+
+=item * C<< $msg->wait_ms_avg() >> / C<< $msg->wait_ms_avg($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Milliseconds the average shard spent waiting to be scheduled.
+
+=item * C<< $msg->wait_ratio_max() >> / C<< $msg->wait_ratio_max($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Relative amount of time the slowest shard spent waiting to be
+scheduled.
+
+=item * C<< $msg->wait_ms_max() >> / C<< $msg->wait_ms_max($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Milliseconds the slowest shard spent waiting to be scheduled.
+
+=item * C<< $msg->read_ratio_avg() >> / C<< $msg->read_ratio_avg($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Relative amount of time the average shard spent reading input.
+
+=item * C<< $msg->read_ms_avg() >> / C<< $msg->read_ms_avg($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Milliseconds the average shard spent reading input.
+
+=item * C<< $msg->read_ratio_max() >> / C<< $msg->read_ratio_max($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Relative amount of time the slowest shard spent reading input.
+
+=item * C<< $msg->read_ms_max() >> / C<< $msg->read_ms_max($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Milliseconds the slowest shard spent reading input.
+
+=item * C<< $msg->compute_ratio_avg() >> / C<< $msg->compute_ratio_avg($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Relative amount of time the average shard spent on CPU-bound tasks.
+
+=item * C<< $msg->compute_ms_avg() >> / C<< $msg->compute_ms_avg($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Milliseconds the average shard spent on CPU-bound tasks.
+
+=item * C<< $msg->compute_ratio_max() >> / C<< $msg->compute_ratio_max($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Relative amount of time the slowest shard spent on CPU-bound tasks.
+
+=item * C<< $msg->compute_ms_max() >> / C<< $msg->compute_ms_max($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Milliseconds the slowest shard spent on CPU-bound tasks.
+
+=item * C<< $msg->write_ratio_avg() >> / C<< $msg->write_ratio_avg($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Relative amount of time the average shard spent on writing output.
+
+=item * C<< $msg->write_ms_avg() >> / C<< $msg->write_ms_avg($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Milliseconds the average shard spent on writing output.
+
+=item * C<< $msg->write_ratio_max() >> / C<< $msg->write_ratio_max($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Relative amount of time the slowest shard spent on writing output.
+
+=item * C<< $msg->write_ms_max() >> / C<< $msg->write_ms_max($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Milliseconds the slowest shard spent on writing output.
+
+=item * C<< $msg->shuffle_output_bytes() >> / C<< $msg->shuffle_output_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Total number of bytes written to shuffle.
+
+=item * C<< $msg->shuffle_output_bytes_spilled() >> / C<< $msg->shuffle_output_bytes_spilled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Total number of bytes written to shuffle and spilled to disk.
+
+=item * C<< $msg->records_read() >> / C<< $msg->records_read($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Number of records read into the stage.
+
+=item * C<< $msg->records_written() >> / C<< $msg->records_written($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Number of records written by the stage.
+
+=item * C<< $msg->parallel_inputs() >> / C<< $msg->parallel_inputs($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Number of parallel input segments to be processed
+
+=item * C<< $msg->completed_parallel_inputs() >> / C<< $msg->completed_parallel_inputs($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Number of parallel input segments completed.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<String>
+
+Current status for this stage.
+
+=item * C<< $msg->steps() >> / C<< $msg->steps($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStep>)
+
+List of operations within the stage in dependency order (approximately
+chronological).
+
+=item * C<< $msg->slot_ms() >> / C<< $msg->slot_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Slot-milliseconds used by the stage.
+
+=item * C<< $msg->compute_mode() >> / C<< $msg->compute_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ExplainQueryStage::ComputeMode>)
+
+Output only. Compute mode for this stage.
+
+=back
+
+=head3 Enum: ExplainQueryStage::ComputeMode
+
+=over 4
+
+=item * C<COMPUTE_MODE_UNSPECIFIED> => C<0>
+
+=item * C<BIGQUERY> => C<1>
+
+=item * C<BI_ENGINE> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::QueryTimelineSample
+
+Summary of the state of query execution at a given time.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->elapsed_ms() >> / C<< $msg->elapsed_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Milliseconds elapsed since the start of query execution.
+
+=item * C<< $msg->total_slot_ms() >> / C<< $msg->total_slot_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Cumulative slot-ms consumed by the query.
+
+=item * C<< $msg->pending_units() >> / C<< $msg->pending_units($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Total units of work remaining for the query. This number can be revised
+(increased or decreased) while the query is running.
+
+=item * C<< $msg->completed_units() >> / C<< $msg->completed_units($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Total parallel units of work completed by this query.
+
+=item * C<< $msg->active_units() >> / C<< $msg->active_units($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Total number of active workers. This does not correspond directly to
+slot usage. This is the largest value observed since the last sample.
+
+=item * C<< $msg->shuffle_ram_usage_ratio() >> / C<< $msg->shuffle_ram_usage_ratio($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Total shuffle usage ratio in shuffle RAM per reservation of this query.
+This will be provided for reservation customers only.
+
+=item * C<< $msg->estimated_runnable_units() >> / C<< $msg->estimated_runnable_units($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Units of work that can be scheduled immediately. Providing additional slots
+for these units of work will accelerate the query, if no other query in
+the reservation needs additional slots.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::ExternalServiceCost
+
+The external service cost is a portion of the total cost, these costs are not
+additive with total_bytes_billed. Moreover, this field only track external
+service costs that will show up as BigQuery costs (e.g. training BigQuery
+ML job with google cloud CAIP or Automl Tables services), not other costs
+which may be accrued by running the query (e.g. reading from Bigtable or
+Cloud Storage). The external service costs with different billing sku (e.g.
+CAIP job is charged based on VM usage) are converted to BigQuery
+billed_bytes and slot_ms with equivalent amount of US dollars. Services may
+not directly correlate to these metrics, but these are the equivalents for
+billing purposes.
+Output only.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->external_service() >> / C<< $msg->external_service($value) >>
+
+Type: C<String>
+
+External service name.
+
+=item * C<< $msg->bytes_processed() >> / C<< $msg->bytes_processed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+External service cost in terms of bigquery bytes processed.
+
+=item * C<< $msg->bytes_billed() >> / C<< $msg->bytes_billed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+External service cost in terms of bigquery bytes billed.
+
+=item * C<< $msg->slot_ms() >> / C<< $msg->slot_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+External service cost in terms of bigquery slot milliseconds.
+
+=item * C<< $msg->reserved_slot_count() >> / C<< $msg->reserved_slot_count($value) >>
+
+Type: C<Int64>
+
+Non-preemptable reserved slots used for external job.
+For example, reserved slots for Cloua AI Platform job are the VM usages
+converted to BigQuery slot with equivalent mount of price.
+
+=item * C<< $msg->billing_method() >> / C<< $msg->billing_method($value) >>
+
+Type: C<String>
+
+The billing method used for the external job.
+This field, set to `SERVICES_SKU`, is only used when billing under the
+services SKU. Otherwise, it is unspecified for backward compatibility.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::ExportDataStatistics
+
+Statistics for the EXPORT DATA statement as part of Query Job. EXTRACT
+JOB statistics are populated in JobStatistics4.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->file_count() >> / C<< $msg->file_count($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Number of destination files generated in case of EXPORT DATA
+statement only.
+
+=item * C<< $msg->row_count() >> / C<< $msg->row_count($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+[Alpha] Number of destination rows generated in case of EXPORT DATA
+statement only.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::BiEngineReason
+
+Reason why BI Engine didn't accelerate the query (or sub-query).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::BiEngineReason::Code>)
+
+Output only. High-level BI Engine reason for partial or disabled
+acceleration
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+Output only. Free form human-readable reason for partial or disabled
+acceleration.
+
+=back
+
+=head3 Enum: BiEngineReason::Code
+
+=over 4
+
+=item * C<CODE_UNSPECIFIED> => C<0>
+
+=item * C<NO_RESERVATION> => C<1>
+
+=item * C<INSUFFICIENT_RESERVATION> => C<2>
+
+=item * C<UNSUPPORTED_SQL_TEXT> => C<4>
+
+=item * C<INPUT_TOO_LARGE> => C<5>
+
+=item * C<OTHER_REASON> => C<6>
+
+=item * C<TABLE_EXCLUDED> => C<7>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::BiEngineStatistics
+
+Statistics for a BI Engine specific query.
+Populated as part of JobStatistics2
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bi_engine_mode() >> / C<< $msg->bi_engine_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::BiEngineStatistics::BiEngineMode>)
+
+Output only. Specifies which mode of BI Engine acceleration was performed
+(if any).
+
+=item * C<< $msg->acceleration_mode() >> / C<< $msg->acceleration_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::BiEngineStatistics::BiEngineAccelerationMode>)
+
+Output only. Specifies which mode of BI Engine acceleration was performed
+(if any).
+
+=item * C<< $msg->bi_engine_reasons() >> / C<< $msg->bi_engine_reasons($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::BiEngineReason>)
+
+In case of DISABLED or PARTIAL bi_engine_mode, these contain the
+explanatory reasons as to why BI Engine could not accelerate.
+In case the full query was accelerated, this field is not populated.
+
+=back
+
+=head3 Enum: BiEngineStatistics::BiEngineMode
+
+=over 4
+
+=item * C<ACCELERATION_MODE_UNSPECIFIED> => C<0>
+
+=item * C<DISABLED> => C<1>
+
+=item * C<PARTIAL> => C<2>
+
+=item * C<FULL> => C<3>
+
+=back
+
+=head3 Enum: BiEngineStatistics::BiEngineAccelerationMode
+
+=over 4
+
+=item * C<BI_ENGINE_ACCELERATION_MODE_UNSPECIFIED> => C<0>
+
+=item * C<BI_ENGINE_DISABLED> => C<1>
+
+=item * C<PARTIAL_INPUT> => C<2>
+
+=item * C<FULL_INPUT> => C<3>
+
+=item * C<FULL_QUERY> => C<4>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::IndexUnusedReason
+
+Reason about why no search index was used in the search query (or
+sub-query).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::IndexUnusedReason::Code>)
+
+Specifies the high-level reason for the scenario when no search index was
+used.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+Free form human-readable reason for the scenario when no search index was
+used.
+
+=item * C<< $msg->base_table() >> / C<< $msg->base_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Specifies the base table involved in the reason that no search index was
+used.
+
+=item * C<< $msg->index_name() >> / C<< $msg->index_name($value) >>
+
+Type: C<String>
+
+Specifies the name of the unused search index, if available.
+
+=back
+
+=head3 Enum: IndexUnusedReason::Code
+
+=over 4
+
+=item * C<CODE_UNSPECIFIED> => C<0>
+
+=item * C<INDEX_CONFIG_NOT_AVAILABLE> => C<1>
+
+=item * C<PENDING_INDEX_CREATION> => C<2>
+
+=item * C<BASE_TABLE_TRUNCATED> => C<3>
+
+=item * C<INDEX_CONFIG_MODIFIED> => C<4>
+
+=item * C<TIME_TRAVEL_QUERY> => C<5>
+
+=item * C<NO_PRUNING_POWER> => C<6>
+
+=item * C<UNINDEXED_SEARCH_FIELDS> => C<7>
+
+=item * C<UNSUPPORTED_SEARCH_PATTERN> => C<8>
+
+=item * C<OPTIMIZED_WITH_MATERIALIZED_VIEW> => C<9>
+
+=item * C<SECURED_BY_DATA_MASKING> => C<11>
+
+=item * C<MISMATCHED_TEXT_ANALYZER> => C<12>
+
+=item * C<BASE_TABLE_TOO_SMALL> => C<13>
+
+=item * C<BASE_TABLE_TOO_LARGE> => C<14>
+
+=item * C<ESTIMATED_PERFORMANCE_GAIN_TOO_LOW> => C<15>
+
+=item * C<COLUMN_METADATA_INDEX_NOT_USED> => C<21>
+
+=item * C<NOT_SUPPORTED_IN_STANDARD_EDITION> => C<17>
+
+=item * C<INDEX_SUPPRESSED_BY_FUNCTION_OPTION> => C<18>
+
+=item * C<QUERY_CACHE_HIT> => C<19>
+
+=item * C<STALE_INDEX> => C<20>
+
+=item * C<INTERNAL_ERROR> => C<10>
+
+=item * C<OTHER_REASON> => C<16>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::IndexPruningStats
+
+Statistics for index pruning.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->base_table() >> / C<< $msg->base_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+The base table reference.
+
+=item * C<< $msg->index_id() >> / C<< $msg->index_id($value) >>
+
+Type: C<String>
+
+The index id.
+
+=item * C<< $msg->pre_index_pruning_parallel_input_count() >> / C<< $msg->pre_index_pruning_parallel_input_count($value) >>
+
+Type: C<Int64>
+
+The number of parallel inputs before index pruning.
+
+=item * C<< $msg->post_index_pruning_parallel_input_count() >> / C<< $msg->post_index_pruning_parallel_input_count($value) >>
+
+Type: C<Int64>
+
+The number of parallel inputs after index pruning.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::StoredColumnsUsage
+
+Indicates the stored columns usage in the query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->is_query_accelerated() >> / C<< $msg->is_query_accelerated($value) >>
+
+Type: C<Bool>
+
+Specifies whether the query was accelerated with stored columns.
+
+=item * C<< $msg->base_table() >> / C<< $msg->base_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Specifies the base table.
+
+=item * C<< $msg->stored_columns_unused_reasons() >> / C<< $msg->stored_columns_unused_reasons($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::StoredColumnsUsage::StoredColumnsUnusedReason>)
+
+If stored columns were not used, explain why.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::SearchStatistics
+
+Statistics for a search query.
+Populated as part of JobStatistics2.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->index_usage_mode() >> / C<< $msg->index_usage_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::SearchStatistics::IndexUsageMode>)
+
+Specifies the index usage mode for the query.
+
+=item * C<< $msg->index_unused_reasons() >> / C<< $msg->index_unused_reasons($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::IndexUnusedReason>)
+
+When `indexUsageMode` is `UNUSED` or `PARTIALLY_USED`, this field explains
+why indexes were not used in all or part of the search query. If
+`indexUsageMode` is `FULLY_USED`, this field is not populated.
+
+=item * C<< $msg->index_pruning_stats() >> / C<< $msg->index_pruning_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::IndexPruningStats>)
+
+Search index pruning statistics, one for each base table that has a search
+index. If a base table does not have a search index or the index does not
+help with pruning on the base table, then there is no pruning statistics
+for that table.
+
+=back
+
+=head3 Enum: SearchStatistics::IndexUsageMode
+
+=over 4
+
+=item * C<INDEX_USAGE_MODE_UNSPECIFIED> => C<0>
+
+=item * C<UNUSED> => C<1>
+
+=item * C<PARTIALLY_USED> => C<2>
+
+=item * C<FULLY_USED> => C<4>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::VectorSearchStatistics
+
+Statistics for a vector search query.
+Populated as part of JobStatistics2.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->index_usage_mode() >> / C<< $msg->index_usage_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::VectorSearchStatistics::IndexUsageMode>)
+
+Specifies the index usage mode for the query.
+
+=item * C<< $msg->index_unused_reasons() >> / C<< $msg->index_unused_reasons($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::IndexUnusedReason>)
+
+When `indexUsageMode` is `UNUSED` or `PARTIALLY_USED`, this field explains
+why indexes were not used in all or part of the vector search query. If
+`indexUsageMode` is `FULLY_USED`, this field is not populated.
+
+=item * C<< $msg->stored_columns_usages() >> / C<< $msg->stored_columns_usages($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::StoredColumnsUsage>)
+
+Specifies the usage of stored columns in the query when stored columns are
+used in the query.
+
+=back
+
+=head3 Enum: VectorSearchStatistics::IndexUsageMode
+
+=over 4
+
+=item * C<INDEX_USAGE_MODE_UNSPECIFIED> => C<0>
+
+=item * C<UNUSED> => C<1>
+
+=item * C<PARTIALLY_USED> => C<2>
+
+=item * C<FULLY_USED> => C<4>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::QueryInfo
+
+Query optimization information for a QUERY job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->optimization_details() >> / C<< $msg->optimization_details($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Output only. Information about query optimizations.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::LoadQueryStatistics
+
+Statistics for a LOAD query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->input_files() >> / C<< $msg->input_files($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of source files in a LOAD query.
+
+=item * C<< $msg->input_file_bytes() >> / C<< $msg->input_file_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of bytes of source data in a LOAD query.
+
+=item * C<< $msg->output_rows() >> / C<< $msg->output_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of rows imported in a LOAD query.
+Note that while a LOAD query is in the running state, this value may
+change.
+
+=item * C<< $msg->output_bytes() >> / C<< $msg->output_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Size of the loaded data in bytes. Note that while a LOAD query
+is in the running state, this value may change.
+
+=item * C<< $msg->bad_records() >> / C<< $msg->bad_records($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The number of bad records encountered while processing a LOAD
+query. Note that if the job has failed because of more bad records
+encountered than the maximum allowed in the load job configuration, then
+this number can be less than the total number of bad records present in the
+input data.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::IncrementalResultStats
+
+Statistics related to Incremental Query Results. Populated as part of
+JobStatistics2. This feature is not yet available.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->disabled_reason() >> / C<< $msg->disabled_reason($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::IncrementalResultStats::DisabledReason>)
+
+Output only. Reason why incremental query results are/were not written by
+the query.
+
+=item * C<< $msg->disabled_reason_details() >> / C<< $msg->disabled_reason_details($value) >>
+
+Type: C<String>
+
+Output only. Additional human-readable clarification, if available, for
+DisabledReason.
+
+=item * C<< $msg->result_set_last_replace_time() >> / C<< $msg->result_set_last_replace_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the result table's contents were completely
+replaced. May be absent if no results have been written or the query has
+completed.
+
+=item * C<< $msg->result_set_last_modify_time() >> / C<< $msg->result_set_last_modify_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the result table's contents were modified.
+May be absent if no results have been written or the query has completed.
+
+=item * C<< $msg->first_incremental_row_time() >> / C<< $msg->first_incremental_row_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the first incremental result was written. If
+the query needed to restart internally, this only describes the final
+attempt.
+
+=item * C<< $msg->last_incremental_row_time() >> / C<< $msg->last_incremental_row_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the last incremental result was written.
+Does not include the final result written after query completion.
+
+=item * C<< $msg->incremental_row_count() >> / C<< $msg->incremental_row_count($value) >>
+
+Type: C<Int64>
+
+Output only. Number of rows that were in the latest result set before query
+completion.
+
+=back
+
+=head3 Enum: IncrementalResultStats::DisabledReason
+
+=over 4
+
+=item * C<DISABLED_REASON_UNSPECIFIED> => C<0>
+
+=item * C<OTHER> => C<1>
+
+=item * C<UNSUPPORTED_OPERATOR> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::JobStatistics2
+
+Statistics for a query job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query_plan() >> / C<< $msg->query_plan($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::ExplainQueryStage>)
+
+Output only. Describes execution plan for the query.
+
+=item * C<< $msg->estimated_bytes_processed() >> / C<< $msg->estimated_bytes_processed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The original estimate of bytes processed for the job.
+
+=item * C<< $msg->timeline() >> / C<< $msg->timeline($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::QueryTimelineSample>)
+
+Output only. Describes a timeline of job execution.
+
+=item * C<< $msg->total_partitions_processed() >> / C<< $msg->total_partitions_processed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Total number of partitions processed from all partitioned
+tables referenced in the job.
+
+=item * C<< $msg->total_bytes_processed() >> / C<< $msg->total_bytes_processed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Total bytes processed for the job.
+
+=item * C<< $msg->total_bytes_processed_accuracy() >> / C<< $msg->total_bytes_processed_accuracy($value) >>
+
+Type: C<String>
+
+Output only. For dry-run jobs, totalBytesProcessed is an estimate and this
+field specifies the accuracy of the estimate. Possible values can be:
+UNKNOWN: accuracy of the estimate is unknown.
+PRECISE: estimate is precise.
+LOWER_BOUND: estimate is lower bound of what the query would cost.
+UPPER_BOUND: estimate is upper bound of what the query would cost.
+
+=item * C<< $msg->total_bytes_billed() >> / C<< $msg->total_bytes_billed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. If the project is configured to use on-demand pricing,
+then this field contains the total bytes billed for the job.
+If the project is configured to use flat-rate pricing, then you are
+not billed for bytes and this field is informational only.
+
+=item * C<< $msg->billing_tier() >> / C<< $msg->billing_tier($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Output only. Billing tier for the job. This is a BigQuery-specific concept
+which is not related to the Google Cloud notion of "free tier". The value
+here is a measure of the query's resource consumption relative to the
+amount of data scanned. For on-demand queries, the limit is 100, and all
+queries within this limit are billed at the standard on-demand rates.
+On-demand queries that exceed this limit will fail with a
+billingTierLimitExceeded error.
+
+=item * C<< $msg->total_slot_ms() >> / C<< $msg->total_slot_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Slot-milliseconds for the job.
+
+=item * C<< $msg->total_services_sku_slot_ms() >> / C<< $msg->total_services_sku_slot_ms($value) >>
+
+Type: C<Int64>
+
+Output only. Total slot milliseconds for the job that ran on external
+services and billed on the services SKU. This field is only populated for
+jobs that have external service costs, and is the total of the usage for
+costs whose billing method is `"SERVICES_SKU"`.
+
+=item * C<< $msg->cache_hit() >> / C<< $msg->cache_hit($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Output only. Whether the query result was fetched from the query cache.
+
+=item * C<< $msg->referenced_tables() >> / C<< $msg->referenced_tables($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Output only. Referenced tables for the job.
+
+=item * C<< $msg->referenced_routines() >> / C<< $msg->referenced_routines($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RoutineReference::RoutineReference>)
+
+Output only. Referenced routines for the job.
+
+=item * C<< $msg->referenced_property_graphs() >> / C<< $msg->referenced_property_graphs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::PropertyGraphReference::PropertyGraphReference>)
+
+Output only. Referenced property graphs for the job. Queries that reference
+more than 50 property graphs will not have a complete list.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableSchema>)
+
+Output only. The schema of the results. Present only for successful dry
+run of non-legacy SQL queries.
+
+=item * C<< $msg->num_dml_affected_rows() >> / C<< $msg->num_dml_affected_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The number of rows affected by a DML statement. Present
+only for DML statements INSERT, UPDATE or DELETE.
+
+=item * C<< $msg->dml_stats() >> / C<< $msg->dml_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::DmlStats>)
+
+Output only. Detailed statistics for DML statements INSERT, UPDATE, DELETE,
+MERGE or TRUNCATE.
+
+=item * C<< $msg->undeclared_query_parameters() >> / C<< $msg->undeclared_query_parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter>)
+
+Output only. GoogleSQL only: list of undeclared query
+parameters detected during a dry run validation.
+
+=item * C<< $msg->statement_type() >> / C<< $msg->statement_type($value) >>
+
+Type: C<String>
+
+Output only. The type of query statement, if valid.
+Possible values:
+
+* `SELECT`:
+[`SELECT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#select_list)
+statement.
+* `ASSERT`:
+[`ASSERT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/debugging-statements#assert)
+statement.
+* `INSERT`:
+[`INSERT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#insert_statement)
+statement.
+* `UPDATE`:
+[`UPDATE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#update_statement)
+statement.
+* `DELETE`:
+[`DELETE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language)
+statement.
+* `MERGE`:
+[`MERGE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language)
+statement.
+* `CREATE_TABLE`: [`CREATE
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_statement)
+statement, without `AS SELECT`.
+* `CREATE_TABLE_AS_SELECT`: [`CREATE TABLE AS
+SELECT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_statement)
+statement.
+* `CREATE_VIEW`: [`CREATE
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_view_statement)
+statement.
+* `CREATE_MODEL`: [`CREATE
+MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-create#create_model_statement)
+statement.
+* `CREATE_MATERIALIZED_VIEW`: [`CREATE MATERIALIZED
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_materialized_view_statement)
+statement.
+* `CREATE_FUNCTION`: [`CREATE
+FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_function_statement)
+statement.
+* `CREATE_TABLE_FUNCTION`: [`CREATE TABLE
+FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_function_statement)
+statement.
+* `CREATE_PROCEDURE`: [`CREATE
+PROCEDURE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_procedure)
+statement.
+* `CREATE_ROW_ACCESS_POLICY`: [`CREATE ROW ACCESS
+POLICY`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_row_access_policy_statement)
+statement.
+* `CREATE_SCHEMA`: [`CREATE
+SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_schema_statement)
+statement.
+* `CREATE_SNAPSHOT_TABLE`: [`CREATE SNAPSHOT
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_snapshot_table_statement)
+statement.
+* `CREATE_SEARCH_INDEX`: [`CREATE SEARCH
+INDEX`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_search_index_statement)
+statement.
+* `DROP_TABLE`: [`DROP
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_table_statement)
+statement.
+* `DROP_EXTERNAL_TABLE`: [`DROP EXTERNAL
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_external_table_statement)
+statement.
+* `DROP_VIEW`: [`DROP
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_view_statement)
+statement.
+* `DROP_MODEL`: [`DROP
+MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-drop-model)
+statement.
+* `DROP_MATERIALIZED_VIEW`: [`DROP MATERIALIZED
+ VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_materialized_view_statement)
+statement.
+* `DROP_FUNCTION` : [`DROP
+FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_function_statement)
+statement.
+* `DROP_TABLE_FUNCTION` : [`DROP TABLE
+FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_table_function)
+statement.
+* `DROP_PROCEDURE`: [`DROP
+PROCEDURE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_procedure_statement)
+statement.
+* `DROP_SEARCH_INDEX`: [`DROP SEARCH
+INDEX`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_search_index)
+statement.
+* `DROP_SCHEMA`: [`DROP
+SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_schema_statement)
+statement.
+* `DROP_SNAPSHOT_TABLE`: [`DROP SNAPSHOT
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_snapshot_table_statement)
+statement.
+* `DROP_ROW_ACCESS_POLICY`: [`DROP [ALL] ROW ACCESS
+POLICY|POLICIES`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_row_access_policy_statement)
+statement.
+* `ALTER_TABLE`: [`ALTER
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_table_set_options_statement)
+statement.
+* `ALTER_VIEW`: [`ALTER
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_view_set_options_statement)
+statement.
+* `ALTER_MATERIALIZED_VIEW`: [`ALTER MATERIALIZED
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_materialized_view_set_options_statement)
+statement.
+* `ALTER_SCHEMA`: [`ALTER
+SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_schema_set_options_statement)
+statement.
+* `SCRIPT`:
+[`SCRIPT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language).
+* `TRUNCATE_TABLE`: [`TRUNCATE
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#truncate_table_statement)
+statement.
+* `CREATE_EXTERNAL_TABLE`: [`CREATE EXTERNAL
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_external_table_statement)
+statement.
+* `EXPORT_DATA`: [`EXPORT
+DATA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/other-statements#export_data_statement)
+statement.
+* `EXPORT_MODEL`: [`EXPORT
+MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-export-model)
+statement.
+* `LOAD_DATA`: [`LOAD
+DATA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/other-statements#load_data_statement)
+statement.
+* `CALL`:
+[`CALL`](https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language#call)
+statement.
+
+=item * C<< $msg->ddl_operation_performed() >> / C<< $msg->ddl_operation_performed($value) >>
+
+Type: C<String>
+
+Output only. The DDL operation performed, possibly
+dependent on the pre-existence of the DDL target.
+
+=item * C<< $msg->ddl_target_table() >> / C<< $msg->ddl_target_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Output only. The DDL target table. Present only for
+CREATE/DROP TABLE/VIEW and DROP ALL ROW ACCESS POLICIES queries.
+
+=item * C<< $msg->ddl_destination_table() >> / C<< $msg->ddl_destination_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Output only. The table after rename. Present only for ALTER TABLE RENAME TO
+query.
+
+=item * C<< $msg->ddl_target_row_access_policy() >> / C<< $msg->ddl_target_row_access_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RowAccessPolicyReference::RowAccessPolicyReference>)
+
+Output only. The DDL target row access policy. Present only for
+CREATE/DROP ROW ACCESS POLICY queries.
+
+=item * C<< $msg->ddl_affected_row_access_policy_count() >> / C<< $msg->ddl_affected_row_access_policy_count($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The number of row access policies affected by a DDL statement.
+Present only for DROP ALL ROW ACCESS POLICIES queries.
+
+=item * C<< $msg->ddl_target_routine() >> / C<< $msg->ddl_target_routine($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RoutineReference::RoutineReference>)
+
+Output only. [Beta] The DDL target routine. Present only for
+CREATE/DROP FUNCTION/PROCEDURE queries.
+
+=item * C<< $msg->ddl_target_dataset() >> / C<< $msg->ddl_target_dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference>)
+
+Output only. The DDL target dataset. Present only for CREATE/ALTER/DROP
+SCHEMA(dataset) queries.
+
+=item * C<< $msg->ml_statistics() >> / C<< $msg->ml_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::MlStatistics>)
+
+Output only. Statistics of a BigQuery ML training job.
+
+=item * C<< $msg->export_data_statistics() >> / C<< $msg->export_data_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::ExportDataStatistics>)
+
+Output only. Stats for EXPORT DATA statement.
+
+=item * C<< $msg->external_service_costs() >> / C<< $msg->external_service_costs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::ExternalServiceCost>)
+
+Output only. Job cost breakdown as bigquery internal cost and external
+service costs.
+
+=item * C<< $msg->bi_engine_statistics() >> / C<< $msg->bi_engine_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::BiEngineStatistics>)
+
+Output only. BI Engine specific Statistics.
+
+=item * C<< $msg->load_query_statistics() >> / C<< $msg->load_query_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::LoadQueryStatistics>)
+
+Output only. Statistics for a LOAD query.
+
+=item * C<< $msg->dcl_target_table() >> / C<< $msg->dcl_target_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Output only. Referenced table for DCL statement.
+
+=item * C<< $msg->dcl_target_view() >> / C<< $msg->dcl_target_view($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Output only. Referenced view for DCL statement.
+
+=item * C<< $msg->dcl_target_dataset() >> / C<< $msg->dcl_target_dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference>)
+
+Output only. Referenced dataset for DCL statement.
+
+=item * C<< $msg->search_statistics() >> / C<< $msg->search_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::SearchStatistics>)
+
+Output only. Search query specific statistics.
+
+=item * C<< $msg->vector_search_statistics() >> / C<< $msg->vector_search_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::VectorSearchStatistics>)
+
+Output only. Vector Search query specific statistics.
+
+=item * C<< $msg->performance_insights() >> / C<< $msg->performance_insights($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::PerformanceInsights>)
+
+Output only. Performance insights.
+
+=item * C<< $msg->query_info() >> / C<< $msg->query_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::QueryInfo>)
+
+Output only. Query optimization information for a QUERY job.
+
+=item * C<< $msg->spark_statistics() >> / C<< $msg->spark_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::SparkStatistics>)
+
+Output only. Statistics of a Spark procedure job.
+
+=item * C<< $msg->transferred_bytes() >> / C<< $msg->transferred_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Total bytes transferred for BigQuery Omni queries from the
+remote cloud back to Google Cloud. This tracks data movement over
+Google-managed connections (like query results). It doesn't include input
+data read from the external data lake (for example, S3) because that data
+stays within the remote cloud.
+
+=item * C<< $msg->materialized_view_statistics() >> / C<< $msg->materialized_view_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::MaterializedViewStatistics>)
+
+Output only. Statistics of materialized views of a query job.
+
+=item * C<< $msg->metadata_cache_statistics() >> / C<< $msg->metadata_cache_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStatistics>)
+
+Output only. Statistics of metadata cache usage in a query for BigLake
+tables.
+
+=item * C<< $msg->incremental_result_stats() >> / C<< $msg->incremental_result_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::IncrementalResultStats>)
+
+Output only. Statistics related to incremental query results, if enabled
+for the query. This feature is not yet available.
+
+=item * C<< $msg->gen_ai_stats() >> / C<< $msg->gen_ai_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::GenAiStats::GenAiStats>)
+
+Output only. Statistics related to GenAI usage in the query.
+
+=item * C<< $msg->object_storage_stats() >> / C<< $msg->object_storage_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::ObjectStorageStats>)
+
+Output only. Storage and caching statistics per cloud provider for queries
+over object storage.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::ObjectStorageStats
+
+Storage and caching statistics for object storage.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cloud_provider() >> / C<< $msg->cloud_provider($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ObjectStorageStats::CloudProvider>)
+
+The cloud provider for this block of statistics.
+
+=item * C<< $msg->object_storage_bytes_read() >> / C<< $msg->object_storage_bytes_read($value) >>
+
+Type: C<Int64>
+
+Total bytes read directly from the cloud provider's storage.
+
+=item * C<< $msg->cache_bytes_read() >> / C<< $msg->cache_bytes_read($value) >>
+
+Type: C<Int64>
+
+Total bytes read from the GCP Lakehouse-internal cache, avoiding an
+object storage read.
+
+=back
+
+=head3 Enum: ObjectStorageStats::CloudProvider
+
+=over 4
+
+=item * C<CLOUD_PROVIDER_UNSPECIFIED> => C<0>
+
+=item * C<GCP> => C<1>
+
+=item * C<AWS> => C<2>
+
+=item * C<AZURE> => C<3>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::JobStatistics3
+
+Statistics for a load job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->input_files() >> / C<< $msg->input_files($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of source files in a load job.
+
+=item * C<< $msg->input_file_bytes() >> / C<< $msg->input_file_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of bytes of source data in a load job.
+
+=item * C<< $msg->output_rows() >> / C<< $msg->output_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of rows imported in a load job.
+Note that while an import job is in the running state, this
+value may change.
+
+=item * C<< $msg->output_bytes() >> / C<< $msg->output_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Size of the loaded data in bytes. Note
+that while a load job is in the running state, this value may change.
+
+=item * C<< $msg->bad_records() >> / C<< $msg->bad_records($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The number of bad records encountered. Note that if the job
+has failed because of more bad records encountered than the maximum
+allowed in the load job configuration, then this number can be less than
+the total number of bad records present in the input data.
+
+=item * C<< $msg->timeline() >> / C<< $msg->timeline($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::QueryTimelineSample>)
+
+Output only. Describes a timeline of job execution.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::JobStatistics4
+
+Statistics for an extract job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->destination_uri_file_counts() >> / C<< $msg->destination_uri_file_counts($value) >>
+
+Type: C<Int64>
+
+Output only. Number of files per destination URI or URI pattern
+specified in the extract configuration. These values will be in the same
+order as the URIs specified in the 'destinationUris' field.
+
+=item * C<< $msg->input_bytes() >> / C<< $msg->input_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of user bytes extracted into the result. This is the
+byte count as computed by BigQuery for billing purposes
+and doesn't have any relationship with the number of actual
+result bytes extracted in the desired format.
+
+=item * C<< $msg->timeline() >> / C<< $msg->timeline($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::QueryTimelineSample>)
+
+Output only. Describes a timeline of job execution.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::CopyJobStatistics
+
+Statistics for a copy job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->copied_rows() >> / C<< $msg->copied_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of rows copied to the destination table.
+
+=item * C<< $msg->copied_logical_bytes() >> / C<< $msg->copied_logical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of logical bytes copied to the destination table.
+
+=item * C<< $msg->remote_destination_region() >> / C<< $msg->remote_destination_region($value) >>
+
+Type: C<String>
+
+Output only. Destination region for a cross-region copy job. Not set for
+in-region copy jobs.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::MlStatistics
+
+Job statistics specific to a BigQuery ML training job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->max_iterations() >> / C<< $msg->max_iterations($value) >>
+
+Type: C<Int64>
+
+Output only. Maximum number of iterations specified as max_iterations in
+the 'CREATE MODEL' query. The actual number of iterations may be less than
+this number due to early stop.
+
+=item * C<< $msg->iteration_results() >> / C<< $msg->iteration_results($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::Model::TrainingRun::IterationResult>)
+
+Results for all completed iterations.
+Empty for [hyperparameter tuning
+jobs](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview).
+
+=item * C<< $msg->model_type() >> / C<< $msg->model_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::Model::ModelType>)
+
+Output only. The type of the model that is being trained.
+
+=item * C<< $msg->training_type() >> / C<< $msg->training_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::MlStatistics::TrainingType>)
+
+Output only. Training type of the job.
+
+=item * C<< $msg->hparam_trials() >> / C<< $msg->hparam_trials($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::Model::HparamTuningTrial>)
+
+Output only. Trials of a [hyperparameter tuning
+job](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview)
+sorted by trial_id.
+
+=back
+
+=head3 Enum: MlStatistics::TrainingType
+
+=over 4
+
+=item * C<TRAINING_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<SINGLE_TRAINING> => C<1>
+
+=item * C<HPARAM_TUNING> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::ScriptStatistics
+
+Job statistics specific to the child job of a script.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->evaluation_kind() >> / C<< $msg->evaluation_kind($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ScriptStatistics::EvaluationKind>)
+
+Whether this child job was a statement or expression.
+
+=item * C<< $msg->stack_frames() >> / C<< $msg->stack_frames($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::ScriptStatistics::ScriptStackFrame>)
+
+Stack trace showing the line/column/procedure name of each frame on the
+stack at the point where the current evaluation happened. The leaf frame
+is first, the primary script is last. Never empty.
+
+=back
+
+=head3 Enum: ScriptStatistics::EvaluationKind
+
+=over 4
+
+=item * C<EVALUATION_KIND_UNSPECIFIED> => C<0>
+
+=item * C<STATEMENT> => C<1>
+
+=item * C<EXPRESSION> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::RowLevelSecurityStatistics
+
+Statistics for row-level security.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->row_level_security_applied() >> / C<< $msg->row_level_security_applied($value) >>
+
+Type: C<Bool>
+
+Whether any accessed data was protected by row access policies.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::DataMaskingStatistics
+
+Statistics for data-masking.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_masking_applied() >> / C<< $msg->data_masking_applied($value) >>
+
+Type: C<Bool>
+
+Whether any accessed data was protected by the data masking.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::JobStatistics
+
+Statistics for a single job execution.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->creation_time() >> / C<< $msg->creation_time($value) >>
+
+Type: C<Int64>
+
+Output only. Creation time of this job, in milliseconds since the epoch.
+This field will be present on all jobs.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Int64>
+
+Output only. Start time of this job, in milliseconds since the epoch.
+This field will be present when the job transitions from the PENDING state
+to either RUNNING or DONE.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Int64>
+
+Output only. End time of this job, in milliseconds since the epoch. This
+field will be present whenever a job is in the DONE state.
+
+=item * C<< $msg->total_bytes_processed() >> / C<< $msg->total_bytes_processed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Total bytes processed for the job.
+
+=item * C<< $msg->completion_ratio() >> / C<< $msg->completion_ratio($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::DoubleValue>)
+
+Output only. [TrustedTester] Job progress (0.0 -> 1.0) for LOAD and
+EXTRACT jobs.
+
+=item * C<< $msg->quota_deferments() >> / C<< $msg->quota_deferments($value) >>
+
+Type: C<String>
+
+Output only. Quotas which delayed this job's start time.
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::JobStatistics2>)
+
+Output only. Statistics for a query job.
+
+=item * C<< $msg->load() >> / C<< $msg->load($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::JobStatistics3>)
+
+Output only. Statistics for a load job.
+
+=item * C<< $msg->extract() >> / C<< $msg->extract($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::JobStatistics4>)
+
+Output only. Statistics for an extract job.
+
+=item * C<< $msg->copy() >> / C<< $msg->copy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::CopyJobStatistics>)
+
+Output only. Statistics for a copy job.
+
+=item * C<< $msg->total_slot_ms() >> / C<< $msg->total_slot_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Slot-milliseconds for the job.
+
+=item * C<< $msg->reservation_id() >> / C<< $msg->reservation_id($value) >>
+
+Type: C<String>
+
+Output only. Name of the primary reservation assigned to this job. Note
+that this could be different than reservations reported in the reservation
+usage field if parent reservations were used to execute this job.
+
+=item * C<< $msg->num_child_jobs() >> / C<< $msg->num_child_jobs($value) >>
+
+Type: C<Int64>
+
+Output only. Number of child jobs executed.
+
+=item * C<< $msg->parent_job_id() >> / C<< $msg->parent_job_id($value) >>
+
+Type: C<String>
+
+Output only. If this is a child job, specifies the job ID of the parent.
+
+=item * C<< $msg->script_statistics() >> / C<< $msg->script_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::ScriptStatistics>)
+
+Output only. If this a child job of a script, specifies information about
+the context of this job within the script.
+
+=item * C<< $msg->row_level_security_statistics() >> / C<< $msg->row_level_security_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::RowLevelSecurityStatistics>)
+
+Output only. Statistics for row-level security. Present only for query and
+extract jobs.
+
+=item * C<< $msg->data_masking_statistics() >> / C<< $msg->data_masking_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::DataMaskingStatistics>)
+
+Output only. Statistics for data-masking. Present only for query and
+extract jobs.
+
+=item * C<< $msg->transaction_info() >> / C<< $msg->transaction_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::JobStatistics::TransactionInfo>)
+
+Output only. [Alpha] Information of the multi-statement transaction if this
+job is part of one.
+
+This property is only expected on a child job or a job that is in a
+session. A script parent job is not part of the transaction started in the
+script.
+
+=item * C<< $msg->session_info() >> / C<< $msg->session_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::SessionInfo::SessionInfo>)
+
+Output only. Information of the session if this job is part of one.
+
+=item * C<< $msg->final_execution_duration_ms() >> / C<< $msg->final_execution_duration_ms($value) >>
+
+Type: C<Int64>
+
+Output only. The duration in milliseconds of the execution of the final
+attempt of this job, as BigQuery may internally re-attempt to execute the
+job.
+
+=item * C<< $msg->edition() >> / C<< $msg->edition($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ReservationEdition>)
+
+Output only. Name of edition corresponding to the reservation for this job
+at the time of this update.
+
+=item * C<< $msg->reservation_group_path() >> / C<< $msg->reservation_group_path($value) >>
+
+Type: C<String>
+
+Output only. The reservation group path of the reservation assigned to this
+job. This field has a limit of 10 nested reservation groups. This is to
+maintain consistency between reservatins info schema and jobs info schema.
+The first reservation group is the root reservation group and the last is
+the leaf or lowest level reservation group.
+
+=item * C<< $msg->global_query_remote_regions() >> / C<< $msg->global_query_remote_regions($value) >>
+
+Type: C<String>
+
+Output only. Regions where the global query accesses data.
+
+=item * C<< $msg->parent_global_query_job() >> / C<< $msg->parent_global_query_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobReference::JobReference>)
+
+Output only. The global query that created this job.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::DmlStats
+
+Detailed statistics for DML statements
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->inserted_row_count() >> / C<< $msg->inserted_row_count($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of inserted Rows. Populated by DML INSERT and MERGE
+statements
+
+=item * C<< $msg->deleted_row_count() >> / C<< $msg->deleted_row_count($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of deleted Rows. populated by DML DELETE, MERGE and
+TRUNCATE statements.
+
+=item * C<< $msg->updated_row_count() >> / C<< $msg->updated_row_count($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of updated Rows. Populated by DML UPDATE and MERGE
+statements.
+
+=item * C<< $msg->dml_mode() >> / C<< $msg->dml_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::DmlStats::DmlMode>)
+
+Output only. DML mode used.
+
+=item * C<< $msg->fine_grained_dml_unused_reason() >> / C<< $msg->fine_grained_dml_unused_reason($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::DmlStats::FineGrainedDmlUnusedReason>)
+
+Output only. Reason for disabling fine-grained DML if applicable.
+
+=back
+
+=head3 Enum: DmlStats::DmlMode
+
+=over 4
+
+=item * C<DML_MODE_UNSPECIFIED> => C<0>
+
+=item * C<COARSE_GRAINED_DML> => C<1>
+
+=item * C<FINE_GRAINED_DML> => C<2>
+
+=back
+
+=head3 Enum: DmlStats::FineGrainedDmlUnusedReason
+
+=over 4
+
+=item * C<FINE_GRAINED_DML_UNUSED_REASON_UNSPECIFIED> => C<0>
+
+=item * C<MAX_PARTITION_SIZE_EXCEEDED> => C<1>
+
+=item * C<TABLE_NOT_ENROLLED> => C<2>
+
+=item * C<DML_IN_MULTI_STATEMENT_TRANSACTION> => C<3>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::PerformanceInsights
+
+Performance insights for the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->avg_previous_execution_ms() >> / C<< $msg->avg_previous_execution_ms($value) >>
+
+Type: C<Int64>
+
+Output only. Average execution ms of previous runs. Indicates the job ran
+slow compared to previous executions. To find previous executions, use
+INFORMATION_SCHEMA tables and filter jobs with same query hash.
+
+=item * C<< $msg->stage_performance_standalone_insights() >> / C<< $msg->stage_performance_standalone_insights($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::StagePerformanceStandaloneInsight>)
+
+Output only. Standalone query stage performance insights, for exploring
+potential improvements.
+
+=item * C<< $msg->stage_performance_change_insights() >> / C<< $msg->stage_performance_change_insights($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::StagePerformanceChangeInsight>)
+
+Output only. Query stage performance insights compared to previous runs,
+for diagnosing performance regression.
+
+=item * C<< $msg->table_change_insights() >> / C<< $msg->table_change_insights($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::TableChangeInsight>)
+
+Output only. Performance insights for table-level attributes that changed
+compared to previous runs.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::StagePerformanceChangeInsight
+
+Performance insights compared to the previous executions for a specific
+stage.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->stage_id() >> / C<< $msg->stage_id($value) >>
+
+Type: C<Int64>
+
+Output only. The stage id that the insight mapped to.
+
+=item * C<< $msg->input_data_change() >> / C<< $msg->input_data_change($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::InputDataChange>)
+
+Output only. Input data change insight of the query stage.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::InputDataChange
+
+Details about the input data change insight.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->records_read_diff_percentage() >> / C<< $msg->records_read_diff_percentage($value) >>
+
+Type: C<Float>
+
+Output only. Records read difference percentage compared to a previous run.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::StagePerformanceStandaloneInsight
+
+Standalone performance insights for a specific stage.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->stage_id() >> / C<< $msg->stage_id($value) >>
+
+Type: C<Int64>
+
+Output only. The stage id that the insight mapped to.
+
+=item * C<< $msg->slot_contention() >> / C<< $msg->slot_contention($value) >>
+
+Type: C<Bool>
+
+Output only. True if the stage has a slot contention issue.
+
+=item * C<< $msg->insufficient_shuffle_quota() >> / C<< $msg->insufficient_shuffle_quota($value) >>
+
+Type: C<Bool>
+
+Output only. True if the stage has insufficient shuffle quota.
+
+=item * C<< $msg->bi_engine_reasons() >> / C<< $msg->bi_engine_reasons($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::BiEngineReason>)
+
+Output only. If present, the stage had the following reasons for being
+disqualified from BI Engine execution.
+
+=item * C<< $msg->high_cardinality_joins() >> / C<< $msg->high_cardinality_joins($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::HighCardinalityJoin>)
+
+Output only. High cardinality joins in the stage.
+
+=item * C<< $msg->partition_skew() >> / C<< $msg->partition_skew($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::PartitionSkew>)
+
+Output only. Partition skew in the stage.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::HighCardinalityJoin
+
+High cardinality join detailed information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->left_rows() >> / C<< $msg->left_rows($value) >>
+
+Type: C<Int64>
+
+Output only. Count of left input rows.
+
+=item * C<< $msg->right_rows() >> / C<< $msg->right_rows($value) >>
+
+Type: C<Int64>
+
+Output only. Count of right input rows.
+
+=item * C<< $msg->output_rows() >> / C<< $msg->output_rows($value) >>
+
+Type: C<Int64>
+
+Output only. Count of the output rows.
+
+=item * C<< $msg->step_index() >> / C<< $msg->step_index($value) >>
+
+Type: C<Int32>
+
+Output only. The index of the join operator in the ExplainQueryStep lists.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::PartitionSkew
+
+Partition skew detailed information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->skew_sources() >> / C<< $msg->skew_sources($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::PartitionSkew::SkewSource>)
+
+Output only. Source stages which produce skewed data.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::TableChangeInsight
+
+Table-level performance insights compared to previous runs. These insights
+don't apply to specific query stages, rather they apply to the whole table.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->table_reference() >> / C<< $msg->table_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Output only. The table that was queried.
+
+=item * C<< $msg->metadata_cache_staleness_insight() >> / C<< $msg->metadata_cache_staleness_insight($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStalenessInsight>)
+
+Output only. If present, indicates that the table's metadata column index
+staleness has increased significantly compared to previous jobs with the
+same query hash.
+
+=item * C<< $msg->metadata_cache_not_used_but_used_previously() >> / C<< $msg->metadata_cache_not_used_but_used_previously($value) >>
+
+Type: C<Bool>
+
+Output only. True if the table's column metadata index was not used in the
+current job, but was used in a previous job with the same query hash.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStalenessInsight
+
+Column Metadata Index staleness detailed infnormation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->avg_previous_staleness_ms() >> / C<< $msg->avg_previous_staleness_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Output only. Average column metadata index staleness of previous runs with
+the same query hash.
+
+=item * C<< $msg->staleness_percentage_increase() >> / C<< $msg->staleness_percentage_increase($value) >>
+
+Type: C<Double>
+
+Output only. The percent increase in staleness between the current job and
+the average staleness of previous jobs with the same query hash.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::SparkStatistics
+
+Statistics for a BigSpark query.
+Populated as part of JobStatistics2
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->spark_job_id() >> / C<< $msg->spark_job_id($value) >>
+
+Type: C<String>
+
+Output only. Spark job ID if a Spark job is created successfully.
+
+=item * C<< $msg->spark_job_location() >> / C<< $msg->spark_job_location($value) >>
+
+Type: C<String>
+
+Output only. Location where the Spark job is executed.
+A location is selected by BigQueury for jobs configured to run in a
+multi-region.
+
+=item * C<< $msg->endpoints() >> / C<< $msg->endpoints($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::SparkStatistics::EndpointsEntry>)
+
+Output only. Endpoints returned from Dataproc.
+Key list:
+ - history_server_endpoint: A link to Spark job UI.
+
+=item * C<< $msg->logging_info() >> / C<< $msg->logging_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::SparkStatistics::LoggingInfo>)
+
+Output only. Logging info is used to generate a link to Cloud Logging.
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<String>
+
+Output only. The Cloud KMS encryption key that is used to protect the
+resources created by the Spark job. If the Spark procedure uses the invoker
+security mode, the Cloud KMS encryption key is either inferred from the
+provided system variable,
+`@@spark_proc_properties.kms_key_name`, or the default key of the BigQuery
+job's project (if the CMEK organization policy is enforced). Otherwise, the
+Cloud KMS key is either inferred from the Spark connection associated with
+the procedure (if it is provided), or from the default key of the Spark
+connection's project if the CMEK organization policy is enforced.
+
+Example:
+
+* `projects/[kms_project_id]/locations/[region]/keyRings/[key_region]/cryptoKeys/[key]`
+
+=item * C<< $msg->gcs_staging_bucket() >> / C<< $msg->gcs_staging_bucket($value) >>
+
+Type: C<String>
+
+Output only. The Google Cloud Storage bucket that is used as the default
+file system by the Spark application. This field is only filled when the
+Spark procedure uses the invoker security mode. The `gcsStagingBucket`
+bucket is inferred from the `@@spark_proc_properties.staging_bucket` system
+variable (if it is provided). Otherwise, BigQuery creates a default staging
+bucket for the job and returns the bucket name in this field.
+
+Example:
+
+* `gs://[bucket_name]`
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::MaterializedViewStatistics
+
+Statistics of materialized views considered in a query job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->materialized_view() >> / C<< $msg->materialized_view($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::MaterializedView>)
+
+Materialized views considered for the query job. Only certain materialized
+views are used. For a detailed list, see the child message.
+
+If many materialized views are considered, then the list might be
+incomplete.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::MaterializedView
+
+A materialized view considered for a query job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->table_reference() >> / C<< $msg->table_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+The candidate materialized view.
+
+=item * C<< $msg->chosen() >> / C<< $msg->chosen($value) >>
+
+Type: C<Bool>
+
+Whether the materialized view is chosen for the query.
+
+A materialized view can be chosen to rewrite multiple parts of the same
+query. If a materialized view is chosen to rewrite any part of the query,
+then this field is true, even if the materialized view was not chosen to
+rewrite others parts.
+
+=item * C<< $msg->estimated_bytes_saved() >> / C<< $msg->estimated_bytes_saved($value) >>
+
+Type: C<Int64>
+
+If present, specifies a best-effort estimation of the bytes saved by using
+the materialized view rather than its base tables.
+
+=item * C<< $msg->rejected_reason() >> / C<< $msg->rejected_reason($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::MaterializedView::RejectedReason>)
+
+If present, specifies the reason why the materialized view was not chosen
+for the query.
+
+=back
+
+=head3 Enum: MaterializedView::RejectedReason
+
+=over 4
+
+=item * C<REJECTED_REASON_UNSPECIFIED> => C<0>
+
+=item * C<NO_DATA> => C<1>
+
+=item * C<COST> => C<2>
+
+=item * C<BASE_TABLE_TRUNCATED> => C<3>
+
+=item * C<BASE_TABLE_DATA_CHANGE> => C<4>
+
+=item * C<BASE_TABLE_PARTITION_EXPIRATION_CHANGE> => C<5>
+
+=item * C<BASE_TABLE_EXPIRED_PARTITION> => C<6>
+
+=item * C<BASE_TABLE_INCOMPATIBLE_METADATA_CHANGE> => C<7>
+
+=item * C<TIME_ZONE> => C<8>
+
+=item * C<OUT_OF_TIME_TRAVEL_WINDOW> => C<9>
+
+=item * C<BASE_TABLE_FINE_GRAINED_SECURITY_POLICY> => C<10>
+
+=item * C<BASE_TABLE_TOO_STALE> => C<11>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::PruningStats
+
+The column metadata index pruning statistics.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->post_cmeta_pruning_partition_count() >> / C<< $msg->post_cmeta_pruning_partition_count($value) >>
+
+Type: C<Int64>
+
+The number of partitions matched.
+
+=item * C<< $msg->pre_cmeta_pruning_parallel_input_count() >> / C<< $msg->pre_cmeta_pruning_parallel_input_count($value) >>
+
+Type: C<Int64>
+
+The number of parallel inputs scanned.
+
+=item * C<< $msg->post_cmeta_pruning_parallel_input_count() >> / C<< $msg->post_cmeta_pruning_parallel_input_count($value) >>
+
+Type: C<Int64>
+
+The number of parallel inputs matched.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::TableMetadataCacheUsage
+
+Table level detail on the usage of metadata caching. Only set for Metadata
+caching eligible tables referenced in the query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->table_reference() >> / C<< $msg->table_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Metadata caching eligible table referenced in the query.
+
+=item * C<< $msg->unused_reason() >> / C<< $msg->unused_reason($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::TableMetadataCacheUsage::UnusedReason>)
+
+Reason for not using metadata caching for the table.
+
+=item * C<< $msg->explanation() >> / C<< $msg->explanation($value) >>
+
+Type: C<String>
+
+Free form human-readable reason metadata caching was unused for
+the job.
+
+=item * C<< $msg->staleness() >> / C<< $msg->staleness($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Duration since last refresh as of this job for managed tables (indicates
+metadata cache staleness as seen by this job).
+
+=item * C<< $msg->table_type() >> / C<< $msg->table_type($value) >>
+
+Type: C<String>
+
+[Table
+type](https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#Table.FIELDS.type).
+
+=item * C<< $msg->pruning_stats() >> / C<< $msg->pruning_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::PruningStats>)
+
+The column metadata index pruning statistics.
+
+=back
+
+=head3 Enum: TableMetadataCacheUsage::UnusedReason
+
+=over 4
+
+=item * C<UNUSED_REASON_UNSPECIFIED> => C<0>
+
+=item * C<EXCEEDED_MAX_STALENESS> => C<1>
+
+=item * C<METADATA_CACHING_NOT_ENABLED> => C<3>
+
+=item * C<OTHER_REASON> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobStats::MetadataCacheStatistics
+
+Statistics for metadata caching in queried tables.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->table_metadata_cache_usage() >> / C<< $msg->table_metadata_cache_usage($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::TableMetadataCacheUsage>)
+
+Set for the Metadata caching eligible tables referenced in the query.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::JobStats::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

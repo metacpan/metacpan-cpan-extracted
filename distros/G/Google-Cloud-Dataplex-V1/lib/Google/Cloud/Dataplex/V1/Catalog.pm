@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -2415,95 +2415,9 @@ EOF
     # Field: metadata_template Type: 11 (.google.cloud.dataplex.v1.AspectType.MetadataTemplate)
     # Field: transfer_status Type: 14 (.google.cloud.dataplex.v1.TransferStatus)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::AspectType - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::AspectType->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.AspectType.LabelsEntry)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<data_classification>
-
-Type: Enum (.google.cloud.dataplex.v1.AspectType.DataClassification)
-
-=item * B<authorization>
-
-Type: Message (.google.cloud.dataplex.v1.AspectType.Authorization)
-
-=item * B<metadata_template>
-
-Type: Message (.google.cloud.dataplex.v1.AspectType.MetadataTemplate)
-
-=item * B<transfer_status>
-
-Type: Enum (.google.cloud.dataplex.v1.TransferStatus)
-
-=back
-
-=cut
-
 # Enum: AspectType::DataClassification
 our $AspectType_DATA_CLASSIFICATION_UNSPECIFIED = 0;
 our $AspectType_METADATA_AND_DATA = 1;
-
-=pod
-
-=head2 Enum: AspectType::DataClassification
-
-Values:
-
-=over 4
-
-=item * C<DATA_CLASSIFICATION_UNSPECIFIED> => 0
-
-=item * C<METADATA_AND_DATA> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::EntryGroup ===
     # Fields for EntryGroup
@@ -2516,64 +2430,6 @@ Values:
     # Field: labels Type: 11 (.google.cloud.dataplex.v1.EntryGroup.LabelsEntry)
     # Field: etag Type: 9 ()
     # Field: transfer_status Type: 14 (.google.cloud.dataplex.v1.TransferStatus)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::EntryGroup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::EntryGroup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.EntryGroup.LabelsEntry)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<transfer_status>
-
-Type: Enum (.google.cloud.dataplex.v1.TransferStatus)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::EntryType ===
     # Fields for EntryType
@@ -2591,80 +2447,6 @@ Type: Enum (.google.cloud.dataplex.v1.TransferStatus)
     # Field: required_aspects Type: 11 (.google.cloud.dataplex.v1.EntryType.AspectInfo)
     # Field: authorization Type: 11 (.google.cloud.dataplex.v1.EntryType.Authorization)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::EntryType - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::EntryType->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.EntryType.LabelsEntry)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<type_aliases>
-
-Type: String
-
-=item * B<platform>
-
-Type: String
-
-=item * B<system>
-
-Type: String
-
-=item * B<required_aspects>
-
-Type: Message (.google.cloud.dataplex.v1.EntryType.AspectInfo)
-
-=item * B<authorization>
-
-Type: Message (.google.cloud.dataplex.v1.EntryType.Authorization)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::Aspect ===
     # Fields for Aspect
     # Field: aspect_type Type: 9 ()
@@ -2674,91 +2456,11 @@ Type: Message (.google.cloud.dataplex.v1.EntryType.Authorization)
     # Field: data Type: 11 (.google.protobuf.Struct)
     # Field: aspect_source Type: 11 (.google.cloud.dataplex.v1.AspectSource)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::Aspect - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::Aspect->new(
-        aspect_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<aspect_type>
-
-Type: String
-
-=item * B<path>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<data>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<aspect_source>
-
-Type: Message (.google.cloud.dataplex.v1.AspectSource)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::AspectSource ===
     # Fields for AspectSource
     # Field: create_time Type: 11 (.google.protobuf.Timestamp)
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
     # Field: data_version Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::AspectSource - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::AspectSource->new(
-        create_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<data_version>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::Entry ===
     # Fields for Entry
@@ -2770,60 +2472,6 @@ Type: String
     # Field: parent_entry Type: 9 ()
     # Field: fully_qualified_name Type: 9 ()
     # Field: entry_source Type: 11 (.google.cloud.dataplex.v1.EntrySource)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::Entry - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::Entry->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<entry_type>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<aspects>
-
-Type: Message (.google.cloud.dataplex.v1.Entry.AspectsEntry)
-
-=item * B<parent_entry>
-
-Type: String
-
-=item * B<fully_qualified_name>
-
-Type: String
-
-=item * B<entry_source>
-
-Type: Message (.google.cloud.dataplex.v1.EntrySource)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::EntrySource ===
     # Fields for EntrySource
@@ -2838,68 +2486,6 @@ Type: Message (.google.cloud.dataplex.v1.EntrySource)
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::EntrySource - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::EntrySource->new(
-        resource => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<resource>
-
-Type: String
-
-=item * B<system>
-
-Type: String
-
-=item * B<platform>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.EntrySource.LabelsEntry)
-
-=item * B<ancestors>
-
-Type: Message (.google.cloud.dataplex.v1.EntrySource.Ancestor)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::CreateEntryGroupRequest ===
     # Fields for CreateEntryGroupRequest
     # Field: parent Type: 9 ()
@@ -2907,118 +2493,16 @@ Type: String
     # Field: entry_group Type: 11 (.google.cloud.dataplex.v1.EntryGroup)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::CreateEntryGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::CreateEntryGroupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<entry_group_id>
-
-Type: String
-
-=item * B<entry_group>
-
-Type: Message (.google.cloud.dataplex.v1.EntryGroup)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::UpdateEntryGroupRequest ===
     # Fields for UpdateEntryGroupRequest
     # Field: entry_group Type: 11 (.google.cloud.dataplex.v1.EntryGroup)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::UpdateEntryGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::UpdateEntryGroupRequest->new(
-        entry_group => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entry_group>
-
-Type: Message (.google.cloud.dataplex.v1.EntryGroup)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::DeleteEntryGroupRequest ===
     # Fields for DeleteEntryGroupRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::DeleteEntryGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::DeleteEntryGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListEntryGroupsRequest ===
     # Fields for ListEntryGroupsRequest
@@ -3028,117 +2512,15 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListEntryGroupsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListEntryGroupsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListEntryGroupsResponse ===
     # Fields for ListEntryGroupsResponse
     # Field: entry_groups Type: 11 (.google.cloud.dataplex.v1.EntryGroup)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListEntryGroupsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListEntryGroupsResponse->new(
-        entry_groups => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entry_groups>
-
-Type: Message (.google.cloud.dataplex.v1.EntryGroup)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::GetEntryGroupRequest ===
     # Fields for GetEntryGroupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::GetEntryGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::GetEntryGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::CreateEntryTypeRequest ===
     # Fields for CreateEntryTypeRequest
@@ -3147,118 +2529,16 @@ Type: String
     # Field: entry_type Type: 11 (.google.cloud.dataplex.v1.EntryType)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::CreateEntryTypeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::CreateEntryTypeRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<entry_type_id>
-
-Type: String
-
-=item * B<entry_type>
-
-Type: Message (.google.cloud.dataplex.v1.EntryType)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::UpdateEntryTypeRequest ===
     # Fields for UpdateEntryTypeRequest
     # Field: entry_type Type: 11 (.google.cloud.dataplex.v1.EntryType)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::UpdateEntryTypeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::UpdateEntryTypeRequest->new(
-        entry_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entry_type>
-
-Type: Message (.google.cloud.dataplex.v1.EntryType)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::DeleteEntryTypeRequest ===
     # Fields for DeleteEntryTypeRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::DeleteEntryTypeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::DeleteEntryTypeRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListEntryTypesRequest ===
     # Fields for ListEntryTypesRequest
@@ -3268,117 +2548,15 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListEntryTypesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListEntryTypesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListEntryTypesResponse ===
     # Fields for ListEntryTypesResponse
     # Field: entry_types Type: 11 (.google.cloud.dataplex.v1.EntryType)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListEntryTypesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListEntryTypesResponse->new(
-        entry_types => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entry_types>
-
-Type: Message (.google.cloud.dataplex.v1.EntryType)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::GetEntryTypeRequest ===
     # Fields for GetEntryTypeRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::GetEntryTypeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::GetEntryTypeRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::CreateAspectTypeRequest ===
     # Fields for CreateAspectTypeRequest
@@ -3387,118 +2565,16 @@ Type: String
     # Field: aspect_type Type: 11 (.google.cloud.dataplex.v1.AspectType)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::CreateAspectTypeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::CreateAspectTypeRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<aspect_type_id>
-
-Type: String
-
-=item * B<aspect_type>
-
-Type: Message (.google.cloud.dataplex.v1.AspectType)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::UpdateAspectTypeRequest ===
     # Fields for UpdateAspectTypeRequest
     # Field: aspect_type Type: 11 (.google.cloud.dataplex.v1.AspectType)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::UpdateAspectTypeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::UpdateAspectTypeRequest->new(
-        aspect_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<aspect_type>
-
-Type: Message (.google.cloud.dataplex.v1.AspectType)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::DeleteAspectTypeRequest ===
     # Fields for DeleteAspectTypeRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::DeleteAspectTypeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::DeleteAspectTypeRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListAspectTypesRequest ===
     # Fields for ListAspectTypesRequest
@@ -3508,157 +2584,21 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListAspectTypesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListAspectTypesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListAspectTypesResponse ===
     # Fields for ListAspectTypesResponse
     # Field: aspect_types Type: 11 (.google.cloud.dataplex.v1.AspectType)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListAspectTypesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListAspectTypesResponse->new(
-        aspect_types => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<aspect_types>
-
-Type: Message (.google.cloud.dataplex.v1.AspectType)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::GetAspectTypeRequest ===
     # Fields for GetAspectTypeRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::GetAspectTypeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::GetAspectTypeRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::CreateEntryRequest ===
     # Fields for CreateEntryRequest
     # Field: parent Type: 9 ()
     # Field: entry_id Type: 9 ()
     # Field: entry Type: 11 (.google.cloud.dataplex.v1.Entry)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::CreateEntryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::CreateEntryRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<entry_id>
-
-Type: String
-
-=item * B<entry>
-
-Type: Message (.google.cloud.dataplex.v1.Entry)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::UpdateEntryRequest ===
     # Fields for UpdateEntryRequest
@@ -3668,77 +2608,9 @@ Type: Message (.google.cloud.dataplex.v1.Entry)
     # Field: delete_missing_aspects Type: 8 ()
     # Field: aspect_keys Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::UpdateEntryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::UpdateEntryRequest->new(
-        entry => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entry>
-
-Type: Message (.google.cloud.dataplex.v1.Entry)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<allow_missing>
-
-Type: Bool
-
-=item * B<delete_missing_aspects>
-
-Type: Bool
-
-=item * B<aspect_keys>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::DeleteEntryRequest ===
     # Fields for DeleteEntryRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::DeleteEntryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::DeleteEntryRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListEntriesRequest ===
     # Fields for ListEntriesRequest
@@ -3747,78 +2619,10 @@ Type: String
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListEntriesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListEntriesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListEntriesResponse ===
     # Fields for ListEntriesResponse
     # Field: entries Type: 11 (.google.cloud.dataplex.v1.Entry)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListEntriesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListEntriesResponse->new(
-        entries => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entries>
-
-Type: Message (.google.cloud.dataplex.v1.Entry)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::GetEntryRequest ===
     # Fields for GetEntryRequest
@@ -3826,44 +2630,6 @@ Type: String
     # Field: view Type: 14 (.google.cloud.dataplex.v1.EntryView)
     # Field: aspect_types Type: 9 ()
     # Field: paths Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::GetEntryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::GetEntryRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.cloud.dataplex.v1.EntryView)
-
-=item * B<aspect_types>
-
-Type: String
-
-=item * B<paths>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::LookupEntryRequest ===
     # Fields for LookupEntryRequest
@@ -3873,92 +2639,12 @@ Type: String
     # Field: paths Type: 9 ()
     # Field: entry Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::LookupEntryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::LookupEntryRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.cloud.dataplex.v1.EntryView)
-
-=item * B<aspect_types>
-
-Type: String
-
-=item * B<paths>
-
-Type: String
-
-=item * B<entry>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::LookupContextRequest ===
     # Fields for LookupContextRequest
     # Field: name Type: 9 ()
     # Field: resources Type: 9 ()
     # Field: context Type: 9 ()
     # Field: options Type: 11 (.google.cloud.dataplex.v1.LookupContextRequest.OptionsEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::LookupContextRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::LookupContextRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<resources>
-
-Type: String
-
-=item * B<context>
-
-Type: String
-
-=item * B<options>
-
-Type: Message (.google.cloud.dataplex.v1.LookupContextRequest.OptionsEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ModifyEntryRequest ===
     # Fields for ModifyEntryRequest
@@ -3968,77 +2654,9 @@ Type: Message (.google.cloud.dataplex.v1.LookupContextRequest.OptionsEntry)
     # Field: delete_missing_aspects Type: 8 ()
     # Field: aspect_keys Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ModifyEntryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ModifyEntryRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<entry>
-
-Type: Message (.google.cloud.dataplex.v1.Entry)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<delete_missing_aspects>
-
-Type: Bool
-
-=item * B<aspect_keys>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::LookupContextResponse ===
     # Fields for LookupContextResponse
     # Field: context Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::LookupContextResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::LookupContextResponse->new(
-        context => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<context>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::SearchEntriesRequest ===
     # Fields for SearchEntriesRequest
@@ -4050,95 +2668,11 @@ Type: String
     # Field: scope Type: 9 ()
     # Field: semantic_search Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::SearchEntriesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::SearchEntriesRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<query>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=item * B<scope>
-
-Type: String
-
-=item * B<semantic_search>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResult ===
     # Fields for SearchEntriesResult
     # Field: linked_resource Type: 9 ()
     # Field: dataplex_entry Type: 11 (.google.cloud.dataplex.v1.Entry)
     # Field: snippets Type: 11 (.google.cloud.dataplex.v1.SearchEntriesResult.Snippets)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResult - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResult->new(
-        linked_resource => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<linked_resource>
-
-Type: String
-
-=item * B<dataplex_entry>
-
-Type: Message (.google.cloud.dataplex.v1.Entry)
-
-=item * B<snippets>
-
-Type: Message (.google.cloud.dataplex.v1.SearchEntriesResult.Snippets)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResponse ===
     # Fields for SearchEntriesResponse
@@ -4147,88 +2681,12 @@ Type: Message (.google.cloud.dataplex.v1.SearchEntriesResult.Snippets)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResponse->new(
-        results => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<results>
-
-Type: Message (.google.cloud.dataplex.v1.SearchEntriesResult)
-
-=item * B<total_size>
-
-Type: Int32
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ImportItem ===
     # Fields for ImportItem
     # Field: entry Type: 11 (.google.cloud.dataplex.v1.Entry)
     # Field: entry_link Type: 11 (.google.cloud.dataplex.v1.EntryLink)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: aspect_keys Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ImportItem - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ImportItem->new(
-        entry => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entry>
-
-Type: Message (.google.cloud.dataplex.v1.Entry)
-
-=item * B<entry_link>
-
-Type: Message (.google.cloud.dataplex.v1.EntryLink)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<aspect_keys>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::CreateMetadataJobRequest ===
     # Fields for CreateMetadataJobRequest
@@ -4237,73 +2695,9 @@ Type: String
     # Field: metadata_job_id Type: 9 ()
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::CreateMetadataJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::CreateMetadataJobRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<metadata_job>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataJob)
-
-=item * B<metadata_job_id>
-
-Type: String
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::GetMetadataJobRequest ===
     # Fields for GetMetadataJobRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::GetMetadataJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::GetMetadataJobRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListMetadataJobsRequest ===
     # Fields for ListMetadataJobsRequest
@@ -4313,117 +2707,15 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListMetadataJobsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListMetadataJobsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListMetadataJobsResponse ===
     # Fields for ListMetadataJobsResponse
     # Field: metadata_jobs Type: 11 (.google.cloud.dataplex.v1.MetadataJob)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListMetadataJobsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListMetadataJobsResponse->new(
-        metadata_jobs => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<metadata_jobs>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataJob)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::CancelMetadataJobRequest ===
     # Fields for CancelMetadataJobRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::CancelMetadataJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::CancelMetadataJobRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::MetadataJob ===
     # Fields for MetadataJob
@@ -4439,94 +2731,10 @@ Type: String
     # Field: export_result Type: 11 (.google.cloud.dataplex.v1.MetadataJob.ExportJobResult)
     # Field: status Type: 11 (.google.cloud.dataplex.v1.MetadataJob.Status)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::MetadataJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::MetadataJob->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataJob.LabelsEntry)
-
-=item * B<type>
-
-Type: Enum (.google.cloud.dataplex.v1.MetadataJob.Type)
-
-=item * B<import_spec>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataJob.ImportJobSpec)
-
-=item * B<export_spec>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataJob.ExportJobSpec)
-
-=item * B<import_result>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataJob.ImportJobResult)
-
-=item * B<export_result>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataJob.ExportJobResult)
-
-=item * B<status>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataJob.Status)
-
-=back
-
-=cut
-
 # Enum: MetadataJob::Type
 our $MetadataJob_TYPE_UNSPECIFIED = 0;
 our $MetadataJob_IMPORT = 1;
 our $MetadataJob_EXPORT = 2;
-
-=pod
-
-=head2 Enum: MetadataJob::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<IMPORT> => 1
-
-=item * C<EXPORT> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::EntryLink ===
     # Fields for EntryLink
@@ -4537,91 +2745,11 @@ Values:
     # Field: aspects Type: 11 (.google.cloud.dataplex.v1.EntryLink.AspectsEntry)
     # Field: entry_references Type: 11 (.google.cloud.dataplex.v1.EntryLink.EntryReference)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::EntryLink - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::EntryLink->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<entry_link_type>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<aspects>
-
-Type: Message (.google.cloud.dataplex.v1.EntryLink.AspectsEntry)
-
-=item * B<entry_references>
-
-Type: Message (.google.cloud.dataplex.v1.EntryLink.EntryReference)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::CreateEntryLinkRequest ===
     # Fields for CreateEntryLinkRequest
     # Field: parent Type: 9 ()
     # Field: entry_link_id Type: 9 ()
     # Field: entry_link Type: 11 (.google.cloud.dataplex.v1.EntryLink)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::CreateEntryLinkRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::CreateEntryLinkRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<entry_link_id>
-
-Type: String
-
-=item * B<entry_link>
-
-Type: Message (.google.cloud.dataplex.v1.EntryLink)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::UpdateEntryLinkRequest ===
     # Fields for UpdateEntryLinkRequest
@@ -4629,69 +2757,9 @@ Type: Message (.google.cloud.dataplex.v1.EntryLink)
     # Field: allow_missing Type: 8 ()
     # Field: aspect_keys Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::UpdateEntryLinkRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::UpdateEntryLinkRequest->new(
-        entry_link => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entry_link>
-
-Type: Message (.google.cloud.dataplex.v1.EntryLink)
-
-=item * B<allow_missing>
-
-Type: Bool
-
-=item * B<aspect_keys>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::DeleteEntryLinkRequest ===
     # Fields for DeleteEntryLinkRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::DeleteEntryLinkRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::DeleteEntryLinkRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::LookupEntryLinksRequest ===
     # Fields for LookupEntryLinksRequest
@@ -4702,139 +2770,19 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::LookupEntryLinksRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::LookupEntryLinksRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<entry>
-
-Type: String
-
-=item * B<entry_mode>
-
-Type: Enum (.google.cloud.dataplex.v1.LookupEntryLinksRequest.EntryMode)
-
-=item * B<entry_link_types>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: LookupEntryLinksRequest::EntryMode
 our $LookupEntryLinksRequest_ENTRY_MODE_UNSPECIFIED = 0;
 our $LookupEntryLinksRequest_SOURCE = 1;
 our $LookupEntryLinksRequest_TARGET = 2;
-
-=pod
-
-=head2 Enum: LookupEntryLinksRequest::EntryMode
-
-Values:
-
-=over 4
-
-=item * C<ENTRY_MODE_UNSPECIFIED> => 0
-
-=item * C<SOURCE> => 1
-
-=item * C<TARGET> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::LookupEntryLinksResponse ===
     # Fields for LookupEntryLinksResponse
     # Field: entry_links Type: 11 (.google.cloud.dataplex.v1.EntryLink)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::LookupEntryLinksResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::LookupEntryLinksResponse->new(
-        entry_links => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entry_links>
-
-Type: Message (.google.cloud.dataplex.v1.EntryLink)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::GetEntryLinkRequest ===
     # Fields for GetEntryLinkRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::GetEntryLinkRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::GetEntryLinkRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::MetadataFeed ===
     # Fields for MetadataFeed
@@ -4847,60 +2795,6 @@ Type: String
     # Field: labels Type: 11 (.google.cloud.dataplex.v1.MetadataFeed.LabelsEntry)
     # Field: pubsub_topic Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::MetadataFeed - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::MetadataFeed->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<scope>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataFeed.Scope)
-
-=item * B<filters>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataFeed.Filters)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataFeed.LabelsEntry)
-
-=item * B<pubsub_topic>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::CreateMetadataFeedRequest ===
     # Fields for CreateMetadataFeedRequest
     # Field: parent Type: 9 ()
@@ -4908,73 +2802,9 @@ Type: String
     # Field: metadata_feed_id Type: 9 ()
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::CreateMetadataFeedRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::CreateMetadataFeedRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<metadata_feed>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataFeed)
-
-=item * B<metadata_feed_id>
-
-Type: String
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::GetMetadataFeedRequest ===
     # Fields for GetMetadataFeedRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::GetMetadataFeedRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::GetMetadataFeedRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListMetadataFeedsRequest ===
     # Fields for ListMetadataFeedsRequest
@@ -4984,117 +2814,15 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListMetadataFeedsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListMetadataFeedsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::ListMetadataFeedsResponse ===
     # Fields for ListMetadataFeedsResponse
     # Field: metadata_feeds Type: 11 (.google.cloud.dataplex.v1.MetadataFeed)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::ListMetadataFeedsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::ListMetadataFeedsResponse->new(
-        metadata_feeds => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<metadata_feeds>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataFeed)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Catalog::DeleteMetadataFeedRequest ===
     # Fields for DeleteMetadataFeedRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::DeleteMetadataFeedRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::DeleteMetadataFeedRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Catalog::UpdateMetadataFeedRequest ===
     # Fields for UpdateMetadataFeedRequest
@@ -5102,62 +2830,20 @@ Type: String
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Catalog::UpdateMetadataFeedRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Catalog;
-
-    my $msg = Google::Cloud::Dataplex::V1::Catalog::UpdateMetadataFeedRequest->new(
-        metadata_feed => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<metadata_feed>
-
-Type: Message (.google.cloud.dataplex.v1.MetadataFeed)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Dataplex::V1::Catalog::CatalogServiceClient ===
 package Google::Cloud::Dataplex::V1::Catalog::CatalogServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataplex::V1::Catalog::CatalogServiceClient
 
-Google::Cloud::Dataplex::V1::Catalog::CatalogServiceClient - Client stub representing the remote CatalogService service
+Client stub representing the remote C<CatalogService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataplex.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -5680,13 +3366,2622 @@ sub update_metadata_feed {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Catalog - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::Catalog - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/catalog.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Catalog;
+
+    my $msg = Google::Cloud::Dataplex::V1::Catalog::AspectType->new({
+        name => $name,
+        uid => $uid,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Catalog::AspectType->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/catalog.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::AspectType
+
+AspectType is a template for creating Aspects, and represents the
+JSON-schema for a given Entry, for example, BigQuery Table Schema.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the AspectType, of the form:
+projects/{project_number}/locations/{location_id}/aspectTypes/{aspect_type_id}.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the AspectType.
+If you delete and recreate the AspectType with the same name, then this ID
+will be different.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the AspectType was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the AspectType was last updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the AspectType.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::AspectType::LabelsEntry>)
+
+Optional. User-defined labels for the AspectType.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+The service computes this checksum. The client may send it on update and
+delete requests to ensure it has an up-to-date value before proceeding.
+
+=item * C<< $msg->data_classification() >> / C<< $msg->data_classification($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::AspectType::DataClassification>)
+
+Optional. Immutable. Stores data classification of the aspect.
+
+=item * C<< $msg->authorization() >> / C<< $msg->authorization($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::AspectType::Authorization>)
+
+Immutable. Defines the Authorization for this type.
+
+=item * C<< $msg->metadata_template() >> / C<< $msg->metadata_template($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::AspectType::MetadataTemplate>)
+
+Required. MetadataTemplate of the aspect.
+
+=item * C<< $msg->transfer_status() >> / C<< $msg->transfer_status($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::TransferStatus>)
+
+Output only. Denotes the transfer status of the Aspect Type. It is
+unspecified for Aspect Types created from Dataplex API.
+
+=back
+
+=head3 Enum: AspectType::DataClassification
+
+=over 4
+
+=item * C<DATA_CLASSIFICATION_UNSPECIFIED> => C<0>
+
+=item * C<METADATA_AND_DATA> => C<1>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::EntryGroup
+
+An Entry Group represents a logical grouping of one or more Entries.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the EntryGroup, in the format
+projects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the EntryGroup. If you
+delete and recreate the EntryGroup with the same name, this ID will be
+different.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the EntryGroup was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the EntryGroup was last updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the EntryGroup.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryGroup::LabelsEntry>)
+
+Optional. User-defined labels for the EntryGroup.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+This checksum is computed by the service, and might be sent on update and
+delete requests to ensure the client has an up-to-date value before
+proceeding.
+
+=item * C<< $msg->transfer_status() >> / C<< $msg->transfer_status($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::TransferStatus>)
+
+Output only. Denotes the transfer status of the Entry Group. It is
+unspecified for Entry Group created from Dataplex API.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::EntryType
+
+Entry Type is a template for creating Entries.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the EntryType, of the form:
+projects/{project_number}/locations/{location_id}/entryTypes/{entry_type_id}.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the EntryType. This ID
+will be different if the EntryType is deleted and re-created with the same
+name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the EntryType was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the EntryType was last updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the EntryType.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryType::LabelsEntry>)
+
+Optional. User-defined labels for the EntryType.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. This checksum is computed by the service, and might be sent on
+update and delete requests to ensure the client has an up-to-date value
+before proceeding.
+
+=item * C<< $msg->type_aliases() >> / C<< $msg->type_aliases($value) >>
+
+Type: C<String>
+
+Optional. Indicates the classes this Entry Type belongs to, for example,
+TABLE, DATABASE, MODEL.
+
+=item * C<< $msg->platform() >> / C<< $msg->platform($value) >>
+
+Type: C<String>
+
+Optional. The platform that Entries of this type belongs to.
+
+=item * C<< $msg->system() >> / C<< $msg->system($value) >>
+
+Type: C<String>
+
+Optional. The system that Entries of this type belongs to. Examples include
+CloudSQL, MariaDB etc
+
+=item * C<< $msg->required_aspects() >> / C<< $msg->required_aspects($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryType::AspectInfo>)
+
+AspectInfo for the entry type.
+
+=item * C<< $msg->authorization() >> / C<< $msg->authorization($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryType::Authorization>)
+
+Immutable. Authorization defined for this type.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::Aspect
+
+Represents a single piece of metadata describing an entry or entry link.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->aspect_type() >> / C<< $msg->aspect_type($value) >>
+
+Type: C<String>
+
+Output only. The resource name of the type used to create this Aspect.
+
+=item * C<< $msg->path() >> / C<< $msg->path($value) >>
+
+Type: C<String>
+
+Output only. The path in the entry under which the aspect is attached.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the Aspect was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the Aspect was last updated.
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Required. The content of the aspect, according to its aspect type schema.
+The maximum size of the field is 120KB (encoded as UTF-8).
+
+=item * C<< $msg->aspect_source() >> / C<< $msg->aspect_source($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::AspectSource>)
+
+Optional. Information related to the source system of the aspect.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::AspectSource
+
+Information related to the source system of the aspect.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time the aspect was created in the source system.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time the aspect was last updated in the source system.
+
+=item * C<< $msg->data_version() >> / C<< $msg->data_version($value) >>
+
+Type: C<String>
+
+The version of the data format used to produce this data. This field is
+used to indicated when the underlying data format changes (e.g., schema
+modifications, changes to the source URL format definition, etc).
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::Entry
+
+An entry is a representation of a data resource that can be described by
+various metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The relative resource name of the entry, in the format
+`projects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}/entries/{entry_id}`.
+
+=item * C<< $msg->entry_type() >> / C<< $msg->entry_type($value) >>
+
+Type: C<String>
+
+Required. Immutable. The relative resource name of the entry type that was
+used to create this entry, in the format
+`projects/{project_id_or_number}/locations/{location_id}/entryTypes/{entry_type_id}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the entry was created in Dataplex Universal
+Catalog.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the entry was last updated in Dataplex Universal
+Catalog.
+
+=item * C<< $msg->aspects() >> / C<< $msg->aspects($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::Entry::AspectsEntry>)
+
+Optional. The aspects that are attached to the entry. Depending on how the
+aspect is attached to the entry, the format of the aspect key can be one of
+the following:
+
+* If the aspect is attached directly to the entry:
+`{project_id_or_number}.{location_id}.{aspect_type_id}`
+* If the aspect is attached to an entry's path:
+`{project_id_or_number}.{location_id}.{aspect_type_id}@{path}`
+
+=item * C<< $msg->parent_entry() >> / C<< $msg->parent_entry($value) >>
+
+Type: C<String>
+
+Optional. Immutable. The resource name of the parent entry, in the format
+`projects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}/entries/{entry_id}`.
+
+=item * C<< $msg->fully_qualified_name() >> / C<< $msg->fully_qualified_name($value) >>
+
+Type: C<String>
+
+Optional. A name for the entry that can be referenced by an external
+system. For more information, see [Fully qualified
+names](https://cloud.google.com/data-catalog/docs/fully-qualified-names).
+The maximum size of the field is 4000 characters.
+
+=item * C<< $msg->entry_source() >> / C<< $msg->entry_source($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntrySource>)
+
+Optional. Information related to the source system of the data resource
+that is represented by the entry.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::EntrySource
+
+Information related to the source system of the data resource that is
+represented by the entry.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+The name of the resource in the source system.
+Maximum length is 4,000 characters.
+
+=item * C<< $msg->system() >> / C<< $msg->system($value) >>
+
+Type: C<String>
+
+The name of the source system.
+Maximum length is 64 characters.
+
+=item * C<< $msg->platform() >> / C<< $msg->platform($value) >>
+
+Type: C<String>
+
+The platform containing the source system.
+Maximum length is 64 characters.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+A user-friendly display name.
+Maximum length is 500 characters.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+A description of the data resource.
+Maximum length is 2,000 characters.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntrySource::LabelsEntry>)
+
+User-defined labels.
+The maximum size of keys and values is 128 characters each.
+
+=item * C<< $msg->ancestors() >> / C<< $msg->ancestors($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntrySource::Ancestor>)
+
+Immutable. The entries representing the ancestors of the data resource in
+the source system.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the resource was created in the source system.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the resource was last updated in the source system. If the
+entry exists in the system and its `EntrySource` has `update_time`
+populated, further updates to the `EntrySource` of the entry must provide
+incremental updates to its `update_time`.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Output only. Location of the resource in the source system. You can search
+the entry by this location. By default, this should match the location of
+the entry group containing this entry. A different value allows capturing
+the source location for data external to Google Cloud.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::CreateEntryGroupRequest
+
+Create EntryGroup Request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the entryGroup, of the form:
+projects/{project_number}/locations/{location_id}
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->entry_group_id() >> / C<< $msg->entry_group_id($value) >>
+
+Type: C<String>
+
+Required. EntryGroup identifier.
+
+=item * C<< $msg->entry_group() >> / C<< $msg->entry_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryGroup>)
+
+Required. EntryGroup Resource.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. The service validates the request without performing any
+mutations. The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::UpdateEntryGroupRequest
+
+Update EntryGroup Request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entry_group() >> / C<< $msg->entry_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryGroup>)
+
+Required. EntryGroup Resource.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. The service validates the request, without performing any
+mutations. The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::DeleteEntryGroupRequest
+
+Delete EntryGroup Request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the EntryGroup:
+`projects/{project_number}/locations/{location_id}/entryGroups/{entry_group_id}`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. If the client provided etag value does not match the current etag
+value, the DeleteEntryGroupRequest method returns an ABORTED error
+response.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListEntryGroupsRequest
+
+List entryGroups request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the entryGroup location, of the form:
+`projects/{project_number}/locations/{location_id}`
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of EntryGroups to return. The service may return
+fewer than this value. If unspecified, the service returns at most 10
+EntryGroups. The maximum value is 1000; values above 1000 will be coerced
+to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListEntryGroups` call.
+Provide this to retrieve the subsequent page. When paginating, all other
+parameters you provide to `ListEntryGroups` must match the call that
+provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields for the result.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListEntryGroupsResponse
+
+List entry groups response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entry_groups() >> / C<< $msg->entry_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryGroup>)
+
+Entry groups under the given parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that the service couldn't reach.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::GetEntryGroupRequest
+
+Get EntryGroup request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the EntryGroup:
+`projects/{project_number}/locations/{location_id}/entryGroups/{entry_group_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::CreateEntryTypeRequest
+
+Create EntryType Request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the EntryType, of the form:
+projects/{project_number}/locations/{location_id}
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->entry_type_id() >> / C<< $msg->entry_type_id($value) >>
+
+Type: C<String>
+
+Required. EntryType identifier.
+
+=item * C<< $msg->entry_type() >> / C<< $msg->entry_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryType>)
+
+Required. EntryType Resource.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. The service validates the request without performing any
+mutations. The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::UpdateEntryTypeRequest
+
+Update EntryType Request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entry_type() >> / C<< $msg->entry_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryType>)
+
+Required. EntryType Resource.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. The service validates the request without performing any
+mutations. The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::DeleteEntryTypeRequest
+
+Delete EntryType Request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the EntryType:
+`projects/{project_number}/locations/{location_id}/entryTypes/{entry_type_id}`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. If the client provided etag value does not match the current etag
+value, the DeleteEntryTypeRequest method returns an ABORTED error response.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListEntryTypesRequest
+
+List EntryTypes request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the EntryType location, of the form:
+`projects/{project_number}/locations/{location_id}`
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of EntryTypes to return. The service may return
+fewer than this value. If unspecified, the service returns at most 10
+EntryTypes. The maximum value is 1000; values above 1000 will be coerced to
+1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListEntryTypes` call.
+Provide this to retrieve the subsequent page. When paginating, all other
+parameters you provided to `ListEntryTypes` must match the call that
+provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request. Filters are case-sensitive.
+The service supports the following formats:
+
+* labels.key1 = "value1"
+* labels:key1
+* name = "value"
+
+These restrictions can be conjoined with AND, OR, and NOT conjunctions.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Orders the result by `name` or `create_time` fields.
+If not specified, the ordering is undefined.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListEntryTypesResponse
+
+List EntryTypes response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entry_types() >> / C<< $msg->entry_types($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryType>)
+
+EntryTypes under the given parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that the service couldn't reach.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::GetEntryTypeRequest
+
+Get EntryType request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the EntryType:
+`projects/{project_number}/locations/{location_id}/entryTypes/{entry_type_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::CreateAspectTypeRequest
+
+Create AspectType Request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the AspectType, of the form:
+projects/{project_number}/locations/{location_id}
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->aspect_type_id() >> / C<< $msg->aspect_type_id($value) >>
+
+Type: C<String>
+
+Required. AspectType identifier.
+
+=item * C<< $msg->aspect_type() >> / C<< $msg->aspect_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::AspectType>)
+
+Required. AspectType Resource.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. The service validates the request without performing any
+mutations. The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::UpdateAspectTypeRequest
+
+Update AspectType Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->aspect_type() >> / C<< $msg->aspect_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::AspectType>)
+
+Required. AspectType Resource
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::DeleteAspectTypeRequest
+
+Delete AspectType Request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the AspectType:
+`projects/{project_number}/locations/{location_id}/aspectTypes/{aspect_type_id}`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. If the client provided etag value does not match the current etag
+value, the DeleteAspectTypeRequest method returns an ABORTED error
+response.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListAspectTypesRequest
+
+List AspectTypes request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the AspectType location, of the form:
+`projects/{project_number}/locations/{location_id}`
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of AspectTypes to return. The service may return
+fewer than this value. If unspecified, the service returns at most 10
+AspectTypes. The maximum value is 1000; values above 1000 will be coerced
+to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListAspectTypes` call.
+Provide this to retrieve the subsequent page. When paginating, all other
+parameters you provide to `ListAspectTypes` must match the call that
+provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request. Filters are case-sensitive.
+The service supports the following formats:
+
+* labels.key1 = "value1"
+* labels:key1
+* name = "value"
+
+These restrictions can be conjoined with AND, OR, and NOT conjunctions.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Orders the result by `name` or `create_time` fields.
+If not specified, the ordering is undefined.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListAspectTypesResponse
+
+List AspectTypes response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->aspect_types() >> / C<< $msg->aspect_types($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::AspectType>)
+
+AspectTypes under the given parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that the service couldn't reach.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::GetAspectTypeRequest
+
+Get AspectType request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the AspectType:
+`projects/{project_number}/locations/{location_id}/aspectTypes/{aspect_type_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::CreateEntryRequest
+
+Create Entry request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent Entry Group:
+`projects/{project}/locations/{location}/entryGroups/{entry_group}`.
+
+=item * C<< $msg->entry_id() >> / C<< $msg->entry_id($value) >>
+
+Type: C<String>
+
+Required. Entry identifier. It has to be unique within an Entry Group.
+
+Entries corresponding to Google Cloud resources use an Entry ID format
+based on [full resource
+names](https://cloud.google.com/apis/design/resource_names#full_resource_name).
+The format is a full resource name of the resource without the
+prefix double slashes in the API service name part of the full resource
+name. This allows retrieval of entries using their associated resource
+name.
+
+For example, if the full resource name of a resource is
+`//library.googleapis.com/shelves/shelf1/books/book2`,
+then the suggested entry_id is
+`library.googleapis.com/shelves/shelf1/books/book2`.
+
+It is also suggested to follow the same convention for entries
+corresponding to resources from providers or systems other than Google
+Cloud.
+
+The maximum size of the field is 4000 characters.
+
+=item * C<< $msg->entry() >> / C<< $msg->entry($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::Entry>)
+
+Required. Entry resource.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::UpdateEntryRequest
+
+Update Entry request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entry() >> / C<< $msg->entry($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::Entry>)
+
+Required. Entry resource.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Mask of fields to update. To update Aspects, the update_mask must
+contain the value "aspects".
+
+If the update_mask is empty, the service will update all modifiable fields
+present in the request.
+
+=item * C<< $msg->allow_missing() >> / C<< $msg->allow_missing($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true and the entry doesn't exist, the service will
+create it.
+
+=item * C<< $msg->delete_missing_aspects() >> / C<< $msg->delete_missing_aspects($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true and the aspect_keys specify aspect ranges, the
+service deletes any existing aspects from that range that weren't provided
+in the request.
+
+=item * C<< $msg->aspect_keys() >> / C<< $msg->aspect_keys($value) >>
+
+Type: C<String>
+
+Optional. The map keys of the Aspects which the service should modify. It
+supports the following syntaxes:
+
+* `<aspect_type_reference>` - matches an aspect of the given type and empty
+path.
+* `<aspect_type_reference>@path` - matches an aspect of the given type and
+specified path. For example, to attach an aspect to a field that is
+specified by the `schema` aspect, the path should have the format
+`Schema.<field_name>`.
+* `<aspect_type_reference>@*` - matches aspects of the given type for all
+paths.
+* `*@path` - matches aspects of all types on the given path.
+
+The service will not remove existing aspects matching the syntax unless
+`delete_missing_aspects` is set to true.
+
+If this field is left empty, the service treats it as specifying
+exactly those Aspects present in the request.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::DeleteEntryRequest
+
+Delete Entry request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the Entry:
+`projects/{project}/locations/{location}/entryGroups/{entry_group}/entries/{entry}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListEntriesRequest
+
+List Entries request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent Entry Group:
+`projects/{project}/locations/{location}/entryGroups/{entry_group}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Number of items to return per page. If there are remaining
+results, the service returns a next_page_token. If unspecified, the service
+returns at most 10 Entries. The maximum value is 100; values above 100 will
+be coerced to 100.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListEntries` call. Provide
+this to retrieve the subsequent page.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter on the entries to return. Filters are case-sensitive.
+You can filter the request by the following fields:
+
+* entry_type
+* entry_source.display_name
+* parent_entry
+
+The comparison operators are =, !=, <, >, <=, >=. The service compares
+strings according to lexical order.
+
+You can use the logical operators AND, OR, NOT in the filter.
+
+You can use Wildcard "*", but for entry_type and parent_entry you need to
+provide the full project id or number.
+
+You cannot use parent_entry in conjunction with other fields.
+
+Example filter expressions:
+
+* "entry_source.display_name=AnExampleDisplayName"
+* "entry_type=projects/example-project/locations/global/entryTypes/example-entry_type"
+* "entry_type=projects/example-project/locations/us/entryTypes/a* OR
+entry_type=projects/another-project/locations/*"
+* "NOT entry_source.display_name=AnotherExampleDisplayName"
+* "parent_entry=projects/example-project/locations/us/entryGroups/example-entry-group/entries/example-entry"
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListEntriesResponse
+
+List Entries response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entries() >> / C<< $msg->entries($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::Entry>)
+
+The list of entries under the given parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::GetEntryRequest
+
+Get Entry request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the Entry:
+`projects/{project}/locations/{location}/entryGroups/{entry_group}/entries/{entry}`.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::EntryView>)
+
+Optional. View to control which parts of an entry the service should
+return.
+**Please check the limitations on returned aspects in the Entry view
+documentation. Amount of returned aspects depends on the selected Entry
+View.**
+
+=item * C<< $msg->aspect_types() >> / C<< $msg->aspect_types($value) >>
+
+Type: C<String>
+
+Optional. Limits the aspects returned to the provided aspect types.
+It only works for CUSTOM view.
+
+=item * C<< $msg->paths() >> / C<< $msg->paths($value) >>
+
+Type: C<String>
+
+Optional. Limits the aspects returned to those associated with the provided
+paths within the Entry. It only works for CUSTOM view.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::LookupEntryRequest
+
+Lookup Entry request using permissions in the source system.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The project to which the request should be attributed in the
+following form: `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::EntryView>)
+
+Optional. View to control which parts of an entry the service should
+return.
+**Please check the limitations on returned aspects in the Entry view
+documentation. Amount of returned aspects depends on the selected Entry
+View.**
+
+=item * C<< $msg->aspect_types() >> / C<< $msg->aspect_types($value) >>
+
+Type: C<String>
+
+Optional. Limits the aspects returned to the provided aspect types.
+It only works for CUSTOM view.
+
+=item * C<< $msg->paths() >> / C<< $msg->paths($value) >>
+
+Type: C<String>
+
+Optional. Limits the aspects returned to those associated with the provided
+paths within the Entry. It only works for CUSTOM view.
+
+=item * C<< $msg->entry() >> / C<< $msg->entry($value) >>
+
+Type: C<String>
+
+Required. The resource name of the Entry:
+`projects/{project}/locations/{location}/entryGroups/{entry_group}/entries/{entry}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::LookupContextRequest
+
+Lookup Context using permissions in the source system.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The project to which the request should be attributed in the
+following form: `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->resources() >> / C<< $msg->resources($value) >>
+
+Type: C<String>
+
+Required. The entry names to look up the context for. The maximum number of
+resources for a request is limited to 10.
+
+## Examples:
+
+`projects/{project}/locations/{location}/entryGroups/{entry_group}/entries/{entry}`
+
+=item * C<< $msg->context() >> / C<< $msg->context($value) >>
+
+Type: C<String>
+
+Optional. The text representing contextual information for which metadata
+context is being requested.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::LookupContextRequest::OptionsEntry>)
+
+Optional. Allows to configure the context.
+
+Supported options:
+
+- `format` - The format of the context (one of `yaml`,
+`xml`, `json`, default is `yaml`).
+- `context_budget` - If provided, the output will be intelligently
+truncated on a best-effort basis to contain approximately the desired
+amount of characters. There is no guarantee to achieve the specific amount.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ModifyEntryRequest
+
+Modify Entry request using permissions in the source system.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The project to which the request should be attributed in the
+following form: `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->entry() >> / C<< $msg->entry($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::Entry>)
+
+Required. The entry to modify.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Mask of fields to update. To update Aspects, the update_mask must
+contain the value "aspects".
+
+If the update_mask is empty, the service will update all modifiable fields
+present in the request.
+
+=item * C<< $msg->delete_missing_aspects() >> / C<< $msg->delete_missing_aspects($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, any aspects not specified in the request will be
+deleted. The default is false.
+
+=item * C<< $msg->aspect_keys() >> / C<< $msg->aspect_keys($value) >>
+
+Type: C<String>
+
+Optional. The aspect keys which the service should modify. It supports
+the following syntaxes:
+
+* `<aspect_type_reference>` - matches an aspect of the given type and empty
+path.
+* `<aspect_type_reference>@path` - matches an aspect of the given type and
+specified path. For example, to attach an aspect to a field that is
+specified by the `schema` aspect, the path should have the format
+`Schema.<field_name>`.
+* `<aspect_type_reference>@*` - matches aspects of the given type for all
+paths.
+* `*@path` - matches aspects of all types on the given path.
+
+The service will not remove existing aspects matching the syntax unless
+`delete_missing_aspects` is set to true.
+
+If this field is left empty, the service treats it as specifying
+exactly those Aspects present in the request.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::LookupContextResponse
+
+Lookup Context response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->context() >> / C<< $msg->context($value) >>
+
+Type: C<String>
+
+Pre-formatted block of text containing the context for the requested
+resources.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::SearchEntriesRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The project to which the request should be attributed in the
+following form: `projects/{project}/locations/global`.
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Required. The query against which entries in scope should be matched.
+The query syntax is defined in [Search syntax for Dataplex Universal
+Catalog](https://cloud.google.com/dataplex/docs/search-syntax).
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Number of results in the search page. If <=0, then defaults
+to 10. Max limit for page_size is 1000. Throws an invalid argument for
+page_size > 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `SearchEntries` call. Provide
+this to retrieve the subsequent page.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specifies the ordering of results.
+Supported values are:
+
+* `relevance`
+* `last_modified_timestamp`
+* `last_modified_timestamp asc`
+
+=item * C<< $msg->scope() >> / C<< $msg->scope($value) >>
+
+Type: C<String>
+
+Optional. The scope under which the search should be operating. It must
+either be `organizations/<org_id>` or `projects/<project_ref>`. If it is
+unspecified, it defaults to the organization where the project provided in
+`name` is located.
+
+=item * C<< $msg->semantic_search() >> / C<< $msg->semantic_search($value) >>
+
+Type: C<Bool>
+
+Optional. Specifies whether the search should understand the meaning and
+intent behind the query, rather than just matching keywords.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResult
+
+A single result of a SearchEntries request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->linked_resource() >> / C<< $msg->linked_resource($value) >>
+
+Type: C<String>
+
+Linked resource name.
+
+=item * C<< $msg->dataplex_entry() >> / C<< $msg->dataplex_entry($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::Entry>)
+
+=item * C<< $msg->snippets() >> / C<< $msg->snippets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResult::Snippets>)
+
+Snippets.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResponse
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->results() >> / C<< $msg->results($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::SearchEntriesResult>)
+
+The results matching the search query.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The estimated total number of matching entries. This number isn't
+guaranteed to be accurate.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that the service couldn't reach. Search results don't include
+data from these locations.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ImportItem
+
+An object that describes the values that you want to set for an entry and its
+attached aspects when you import metadata. Used when you run a metadata
+import job. See
+[CreateMetadataJob][google.cloud.dataplex.v1.CatalogService.CreateMetadataJob].
+
+You provide a collection of import items in a metadata import file. For more
+information about how to create a metadata import file, see [Metadata import
+file](https://cloud.google.com/dataplex/docs/import-metadata#metadata-import-file).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entry() >> / C<< $msg->entry($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::Entry>)
+
+Information about an entry and its attached aspects.
+
+=item * C<< $msg->entry_link() >> / C<< $msg->entry_link($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryLink>)
+
+Information about the entry link. User should provide either one of the
+entry or entry_link. While providing entry_link, user should not
+provide update_mask and aspect_keys.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+The fields to update, in paths that are relative to the `Entry` resource.
+Separate each field with a comma.
+
+In `FULL` entry sync mode, Dataplex Universal Catalog includes the paths of
+all of the fields for an entry that can be modified, including aspects.
+This means that Dataplex Universal Catalog replaces the existing entry with
+the entry in the metadata import file. All modifiable fields are updated,
+regardless of the fields that are listed in the update mask, and regardless
+of whether a field is present in the `entry` object.
+
+The `update_mask` field is ignored when an entry is created or re-created.
+
+In an aspect-only metadata job (when entry sync mode is `NONE`), set this
+value to `aspects`.
+
+
+Dataplex Universal Catalog also determines which entries and aspects to
+modify by comparing the values and timestamps that you provide in the
+metadata import file with the values and timestamps that exist in your
+project. For more information, see [Comparison
+logic](https://cloud.google.com/dataplex/docs/import-metadata#data-modification-logic).
+
+=item * C<< $msg->aspect_keys() >> / C<< $msg->aspect_keys($value) >>
+
+Type: C<String>
+
+The aspects to modify. Supports the following syntaxes:
+
+* `{aspect_type_reference}`: matches aspects that belong to the specified
+aspect type and are attached directly to the entry.
+* `{aspect_type_reference}@{path}`: matches aspects that belong to the
+specified aspect type and path.
+* `{aspect_type_reference}@*` : matches aspects of the given type for all
+paths.
+* `*@path` : matches aspects of all types on the given path.
+
+Replace `{aspect_type_reference}` with a reference to the aspect type, in
+the format
+`{project_id_or_number}.{location_id}.{aspect_type_id}`.
+
+In `FULL` entry sync mode, if you leave this field empty, it is treated as
+specifying exactly those aspects that are present within the specified
+entry. Dataplex Universal Catalog implicitly adds the keys for all of the
+required aspects of an entry.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::CreateMetadataJobRequest
+
+Create metadata job request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent location, in the format
+`projects/{project_id_or_number}/locations/{location_id}`
+
+=item * C<< $msg->metadata_job() >> / C<< $msg->metadata_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataJob>)
+
+Required. The metadata job resource.
+
+=item * C<< $msg->metadata_job_id() >> / C<< $msg->metadata_job_id($value) >>
+
+Type: C<String>
+
+Optional. The metadata job ID. If not provided, a unique ID is generated
+with the prefix `metadata-job-`.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. The service validates the request without performing any
+mutations. The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::GetMetadataJobRequest
+
+Get metadata job request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the metadata job, in the format
+`projects/{project_id_or_number}/locations/{location_id}/metadataJobs/{metadata_job_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListMetadataJobsRequest
+
+List metadata jobs request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent location, in the format
+`projects/{project_id_or_number}/locations/{location_id}`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of metadata jobs to return. The service might
+return fewer jobs than this value. If unspecified, at most 10 jobs are
+returned. The maximum value is 1,000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The page token received from a previous `ListMetadataJobs` call.
+Provide this token to retrieve the subsequent page of results. When
+paginating, all other parameters that are provided to the
+`ListMetadataJobs` request must match the call that provided the page
+token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request. Filters are case-sensitive.
+The service supports the following formats:
+
+* `labels.key1 = "value1"`
+* `labels:key1`
+* `name = "value"`
+
+You can combine filters with `AND`, `OR`, and `NOT` operators.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. The field to sort the results by, either `name` or `create_time`.
+If not specified, the ordering is undefined.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListMetadataJobsResponse
+
+List metadata jobs response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->metadata_jobs() >> / C<< $msg->metadata_jobs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataJob>)
+
+Metadata jobs under the specified parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve the next page of results. If there are no more results
+in the list, the value is empty.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that the service couldn't reach.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::CancelMetadataJobRequest
+
+Cancel metadata job request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the job, in the format
+`projects/{project_id_or_number}/locations/{location_id}/metadataJobs/{metadata_job_id}`
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::MetadataJob
+
+A metadata job resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The name of the resource that the configuration is
+applied to, in the format
+`projects/{project_number}/locations/{location_id}/metadataJobs/{metadata_job_id}`.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. A system-generated, globally unique ID for the metadata job.
+If the metadata job is deleted and then re-created with the same name, this
+ID is different.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the metadata job was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the metadata job was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataJob::LabelsEntry>)
+
+Optional. User-defined labels.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::MetadataJob::Type>)
+
+Required. Metadata job type.
+
+=item * C<< $msg->import_spec() >> / C<< $msg->import_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataJob::ImportJobSpec>)
+
+Import job specification.
+
+=item * C<< $msg->export_spec() >> / C<< $msg->export_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataJob::ExportJobSpec>)
+
+Export job specification.
+
+=item * C<< $msg->import_result() >> / C<< $msg->import_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataJob::ImportJobResult>)
+
+Output only. Import job result.
+
+=item * C<< $msg->export_result() >> / C<< $msg->export_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataJob::ExportJobResult>)
+
+Output only. Export job result.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataJob::Status>)
+
+Output only. Metadata job status.
+
+=back
+
+=head3 Enum: MetadataJob::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<IMPORT> => C<1>
+
+=item * C<EXPORT> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::EntryLink
+
+EntryLink represents a link between two Entries.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Immutable. Identifier. The relative resource name of the Entry
+Link, of the form:
+`projects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}/entryLinks/{entry_link_id}`
+
+=item * C<< $msg->entry_link_type() >> / C<< $msg->entry_link_type($value) >>
+
+Type: C<String>
+
+Required. Immutable. Relative resource name of the Entry Link Type used to
+create this Entry Link. For example:
+
+- Entry link between synonym terms in a glossary:
+`projects/dataplex-types/locations/global/entryLinkTypes/synonym`
+- Entry link between related terms in a glossary:
+`projects/dataplex-types/locations/global/entryLinkTypes/related`
+- Entry link between glossary terms and data assets:
+`projects/dataplex-types/locations/global/entryLinkTypes/definition`
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the Entry Link was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the Entry Link was last updated.
+
+=item * C<< $msg->aspects() >> / C<< $msg->aspects($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryLink::AspectsEntry>)
+
+Optional. The aspects that are attached to the entry link.
+The format of the aspect key has to be the following:
+`{project_id_or_number}.{location_id}.{aspect_type_id}`
+Currently, only a single aspect of a Dataplex-owned Aspect Type is allowed.
+
+=item * C<< $msg->entry_references() >> / C<< $msg->entry_references($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryLink::EntryReference>)
+
+Required. Immutable. Specifies the Entries referenced in the Entry Link.
+There should be exactly two entry references.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::CreateEntryLinkRequest
+
+Request message for CreateEntryLink.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent Entry Group:
+`projects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}`.
+
+=item * C<< $msg->entry_link_id() >> / C<< $msg->entry_link_id($value) >>
+
+Type: C<String>
+
+Required. Entry Link identifier
+* Must contain only lowercase letters, numbers and hyphens.
+* Must start with a letter.
+* Must be between 1-63 characters.
+* Must end with a number or a letter.
+* Must be unique within the EntryGroup.
+
+=item * C<< $msg->entry_link() >> / C<< $msg->entry_link($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryLink>)
+
+Required. Entry Link resource.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::UpdateEntryLinkRequest
+
+Request message for UpdateEntryLink method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entry_link() >> / C<< $msg->entry_link($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryLink>)
+
+Required. Entry Link resource.
+
+=item * C<< $msg->allow_missing() >> / C<< $msg->allow_missing($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true and the entry link doesn't exist, the service will
+create it.
+
+=item * C<< $msg->aspect_keys() >> / C<< $msg->aspect_keys($value) >>
+
+Type: C<String>
+
+Optional. The map keys of the Aspects which the service should modify.
+It should be the aspect type reference in the format
+`{project_id_or_number}.{location_id}.{aspect_type_id}`.
+
+If this field is left empty, the service treats it as specifying
+exactly those Aspects present in the request.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::DeleteEntryLinkRequest
+
+Request message for DeleteEntryLink.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the Entry Link:
+`projects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}/entryLinks/{entry_link_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::LookupEntryLinksRequest
+
+Request message for LookupEntryLinks.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The project to which the request should be attributed to
+Format: `projects/{project_id_or_number}/locations/{location_id}`.
+
+=item * C<< $msg->entry() >> / C<< $msg->entry($value) >>
+
+Type: C<String>
+
+Required. The resource name of the referred Entry.
+Format:
+`projects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}/entries/{entry_id}`.
+Entry Links which references this entry will be returned in the response.
+
+=item * C<< $msg->entry_mode() >> / C<< $msg->entry_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::LookupEntryLinksRequest::EntryMode>)
+
+Mode of entry reference.
+
+=item * C<< $msg->entry_link_types() >> / C<< $msg->entry_link_types($value) >>
+
+Type: C<String>
+
+Entry link types to filter the response by. If empty, all entry link types
+will be returned. At most 10 entry link types can be specified.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of EntryLinks to return. The service may return fewer
+than this value. If unspecified, at most 10 EntryLinks will be returned.
+The maximum value is 10; values above 10 will be coerced to 10.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Page token received from a previous `LookupEntryLinks` call. Provide this
+to retrieve the subsequent page. When paginating, all other parameters that
+are provided to the `LookupEntryLinks` request must match the call that
+provided the page token.
+
+=back
+
+=head3 Enum: LookupEntryLinksRequest::EntryMode
+
+=over 4
+
+=item * C<ENTRY_MODE_UNSPECIFIED> => C<0>
+
+=item * C<SOURCE> => C<1>
+
+=item * C<TARGET> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::LookupEntryLinksResponse
+
+Response message for LookupEntryLinks.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entry_links() >> / C<< $msg->entry_links($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::EntryLink>)
+
+List of entry links that reference the specified entry.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::GetEntryLinkRequest
+
+Request message for GetEntryLink.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the Entry Link:
+`projects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}/entryLinks/{entry_link_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::MetadataFeed
+
+MetadataFeed contains information related to the metadata feed.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The resource name of the metadata feed, in the format
+`projects/{project_id_or_number}/locations/{location_id}/metadataFeeds/{metadata_feed_id}`.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. A system-generated, globally unique ID for the metadata job.
+If the metadata job is deleted and then re-created with the same name, this
+ID is different.
+
+=item * C<< $msg->scope() >> / C<< $msg->scope($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataFeed::Scope>)
+
+Required. The scope of the metadata feed.
+Only the in scope changes are published.
+
+=item * C<< $msg->filters() >> / C<< $msg->filters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataFeed::Filters>)
+
+Optional. The filters of the metadata feed.
+Only the changes that match the filters are published.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the feed was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the feed was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataFeed::LabelsEntry>)
+
+Optional. User-defined labels.
+
+=item * C<< $msg->pubsub_topic() >> / C<< $msg->pubsub_topic($value) >>
+
+Type: C<String>
+
+Optional. The pubsub topic that you want the metadata feed messages to
+publish to. Please grant Dataplex service account the permission to
+publish messages to the topic. The service account is:
+service-{PROJECT_NUMBER}@gcp-sa-dataplex.iam.gserviceaccount.com.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::CreateMetadataFeedRequest
+
+Request message for CreateMetadataFeed.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent location, in the format
+`projects/{project_id_or_number}/locations/{location_id}`
+
+=item * C<< $msg->metadata_feed() >> / C<< $msg->metadata_feed($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataFeed>)
+
+Required. The metadata job resource.
+
+=item * C<< $msg->metadata_feed_id() >> / C<< $msg->metadata_feed_id($value) >>
+
+Type: C<String>
+
+Optional. The metadata job ID. If not provided, a unique ID is generated
+with the prefix `metadata-job-`.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. The service validates the request without performing any
+mutations. The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::GetMetadataFeedRequest
+
+Request message for GetMetadataFeed.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the metadata feed, in the format
+`projects/{project_id_or_number}/locations/{location_id}/MetadataFeeds/{metadata_feed_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListMetadataFeedsRequest
+
+Request message for ListMetadataFeedsRequest.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent location, in the format
+`projects/{project_id_or_number}/locations/{location_id}`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of metadata feeds to return. The service
+might return fewer feeds than this value. If unspecified, at most 10 feeds
+are returned. The maximum value is 1,000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The page token received from a previous `ListMetadataFeeds` call.
+Provide this token to retrieve the subsequent page of results. When
+paginating, all other parameters that are provided to the
+`ListMetadataFeeds` request must match the call that provided the
+page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request. Filters are case-sensitive.
+The service supports the following formats:
+
+* `labels.key1 = "value1"`
+* `labels:key1`
+* `name = "value"`
+
+You can combine filters with `AND`, `OR`, and `NOT` operators.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. The field to sort the results by, either `name` or `create_time`.
+If not specified, the ordering is undefined.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::ListMetadataFeedsResponse
+
+Response message for ListMetadataFeeds.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->metadata_feeds() >> / C<< $msg->metadata_feeds($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataFeed>)
+
+List of metadata feeds under the specified parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve the next page of results. If there are no more results
+in the list, the value is empty.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unordered list. Locations that the service couldn't reach.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::DeleteMetadataFeedRequest
+
+Request message for DeleteMetadataFeed.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the metadata feed, in the format
+`projects/{project_id_or_number}/locations/{location_id}/MetadataFeeds/{metadata_feed_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Catalog::UpdateMetadataFeedRequest
+
+Request message for UpdateMetadataFeed.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->metadata_feed() >> / C<< $msg->metadata_feed($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::MetadataFeed>)
+
+Required. Update description.
+Only fields specified in `update_mask` are updated.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Mask of fields to update.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Catalog::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

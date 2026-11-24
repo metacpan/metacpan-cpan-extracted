@@ -50,23 +50,6 @@ my $client = Google::Cloud::Metastore::V1->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 
-subtest 'list_federations method' => sub {
-    $client->transport->{mock_call} = sub {
-        my ($args) = @_;
-        is($args->{service}, 'google.cloud.metastore.v1.DataprocMetastoreFederation', 'Correct service path');
-        is($args->{method}, 'ListFederations', 'Correct RPC method');
-        isa_ok($args->{request}, 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsRequest', 'Request object');
-        
-        my $response = 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse'->new();
-        return $response;
-    };
-    
-    my $res = $client->list_federations();
-    ok($res, 'Method returned a response');
-    isa_ok($res, 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse', 'Response object class');
-    done_testing();
-};
-
 subtest 'list_services method' => sub {
     $client->transport->{mock_call} = sub {
         my ($args) = @_;
@@ -81,6 +64,23 @@ subtest 'list_services method' => sub {
     my $res = $client->list_services();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Metastore::V1::Metastore::ListServicesResponse', 'Response object class');
+    done_testing();
+};
+
+subtest 'list_federations method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.metastore.v1.DataprocMetastoreFederation', 'Correct service path');
+        is($args->{method}, 'ListFederations', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->list_federations();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse', 'Response object class');
     done_testing();
 };
 

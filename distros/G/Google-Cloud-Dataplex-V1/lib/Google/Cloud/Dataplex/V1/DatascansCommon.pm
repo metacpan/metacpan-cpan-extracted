@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::DatascansCommon;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -59,69 +59,85 @@ EOF
     # Fields for DataScanCatalogPublishingStatus
     # Field: state Type: 14 (.google.cloud.dataplex.v1.DataScanCatalogPublishingStatus.State)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DatascansCommon::DataScanCatalogPublishingStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DatascansCommon;
-
-    my $msg = Google::Cloud::Dataplex::V1::DatascansCommon::DataScanCatalogPublishingStatus->new(
-        state => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.DataScanCatalogPublishingStatus.State)
-
-=back
-
-=cut
-
 # Enum: DataScanCatalogPublishingStatus::State
 our $DataScanCatalogPublishingStatus_STATE_UNSPECIFIED = 0;
 our $DataScanCatalogPublishingStatus_SUCCEEDED = 1;
 our $DataScanCatalogPublishingStatus_FAILED = 2;
 our $DataScanCatalogPublishingStatus_SKIPPED = 3;
 
-=pod
-
-=head2 Enum: DataScanCatalogPublishingStatus::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<SUCCEEDED> => 1
-
-=item * C<FAILED> => 2
-
-=item * C<SKIPPED> => 3
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::DatascansCommon - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::DatascansCommon - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/datascans_common.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::DatascansCommon;
+
+    my $msg = Google::Cloud::Dataplex::V1::DatascansCommon::DataScanCatalogPublishingStatus->new({
+        state => $state,
+    });
+
+    # Read or update a field
+    my $val = $msg->state();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::DatascansCommon::DataScanCatalogPublishingStatus->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/datascans_common.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::DatascansCommon::DataScanCatalogPublishingStatus
+
+The status of publishing the data scan result as Dataplex Universal Catalog
+metadata. Multiple DataScan log events may exist, each with different
+publishing information depending on the type of publishing triggered.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataScanCatalogPublishingStatus::State>)
+
+Output only. Execution state for publishing.
+
+=back
+
+=head3 Enum: DataScanCatalogPublishingStatus::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<SUCCEEDED> => C<1>
+
+=item * C<FAILED> => C<2>
+
+=item * C<SKIPPED> => C<3>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::DatascansCommon::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

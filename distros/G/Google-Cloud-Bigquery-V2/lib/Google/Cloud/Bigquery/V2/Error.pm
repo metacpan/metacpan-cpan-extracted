@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -52,55 +52,85 @@ EOF
     # Field: debug_info Type: 9 ()
     # Field: message Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::Error::ErrorProto - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::Error - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/error.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::Error;
 
-    my $msg = Google::Cloud::Bigquery::V2::Error::ErrorProto->new(
-        reason => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::Error::ErrorProto->new({
+        reason => $reason,
+        location => $location,
+        debug_info => $debug_info,
+        message => $message,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->reason();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::Error::ErrorProto->parse($bytes);
 
-=item * B<reason>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=item * B<debug_info>
-
-Type: String
-
-=item * B<message>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Error - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/error.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::Error::ErrorProto
+
+Error details.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->reason() >> / C<< $msg->reason($value) >>
+
+Type: C<String>
+
+A short error code that summarizes the error.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Specifies where the error occurred, if present.
+
+=item * C<< $msg->debug_info() >> / C<< $msg->debug_info($value) >>
+
+Type: C<String>
+
+Debugging information. This property is internal to Google and should not
+be used.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+A human-readable description of the error.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::Error::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

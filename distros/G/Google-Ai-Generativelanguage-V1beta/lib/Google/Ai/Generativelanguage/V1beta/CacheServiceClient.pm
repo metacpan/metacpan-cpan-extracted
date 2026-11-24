@@ -10,26 +10,26 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Ai::Generativelanguage::V1beta::Citation;
-use Google::Ai::Generativelanguage::V1beta::File;
 use Google::Ai::Generativelanguage::V1beta::Permission;
-use Google::Ai::Generativelanguage::V1beta::Retriever;
+use Google::Ai::Generativelanguage::V1beta::Citation;
 use Google::Ai::Generativelanguage::V1beta::Safety;
-use Google::Ai::Generativelanguage::V1beta::Content;
-use Google::Ai::Generativelanguage::V1beta::Model;
+use Google::Ai::Generativelanguage::V1beta::File;
+use Google::Ai::Generativelanguage::V1beta::Retriever;
 use Google::Ai::Generativelanguage::V1beta::TunedModel;
+use Google::Ai::Generativelanguage::V1beta::Model;
+use Google::Ai::Generativelanguage::V1beta::Content;
 use Google::Ai::Generativelanguage::V1beta::PredictionService;
-use Google::Ai::Generativelanguage::V1beta::FileService;
 use Google::Ai::Generativelanguage::V1beta::PermissionService;
-use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-use Google::Ai::Generativelanguage::V1beta::DiscussService;
 use Google::Ai::Generativelanguage::V1beta::TextService;
+use Google::Ai::Generativelanguage::V1beta::DiscussService;
+use Google::Ai::Generativelanguage::V1beta::FileService;
+use Google::Ai::Generativelanguage::V1beta::RetrieverService;
+use Google::Ai::Generativelanguage::V1beta::ModelService;
 use Google::Ai::Generativelanguage::V1beta::CachedContent;
 use Google::Ai::Generativelanguage::V1beta::GenerativeService;
-use Google::Ai::Generativelanguage::V1beta::ModelService;
 use Google::Ai::Generativelanguage::V1beta::CacheService;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -276,9 +276,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
-
 =item * C<googleapis/google/ai/generativelanguage/v1beta/cache_service.proto>
+
+=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
 
 =item * C<googleapis/google/ai/generativelanguage/v1beta/citation.proto>
 
@@ -345,23 +345,109 @@ The following RPC methods are available in this client:
 
 =item * B<list_cached_contents>
 
-Calls the RPC method C<ListCachedContents> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_cached_contents(
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListCachedContents> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<create_cached_content>
 
-Calls the RPC method C<CreateCachedContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_cached_content(
+        cached_content           => $cached_content,
+    );
+
+Calls the RPC method C<CreateCachedContent> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::CreateCachedContentRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+Parameters:
+
+=over 4
+
+=item * C<cached_content> - L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+=back
 
 =item * B<get_cached_content>
 
-Calls the RPC method C<GetCachedContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_cached_content(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetCachedContent> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::GetCachedContentRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<update_cached_content>
 
-Calls the RPC method C<UpdateCachedContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_cached_content(
+        cached_content           => $cached_content,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<UpdateCachedContent> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::UpdateCachedContentRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+Parameters:
+
+=over 4
+
+=item * C<cached_content> - L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<delete_cached_content>
 
-Calls the RPC method C<DeleteCachedContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_cached_content(
+        name                     => $name,
+    );
+
+Calls the RPC method C<DeleteCachedContent> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::DeleteCachedContentRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =back
 

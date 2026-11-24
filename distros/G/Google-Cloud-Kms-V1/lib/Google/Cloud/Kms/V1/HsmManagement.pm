@@ -3,7 +3,7 @@ package Google::Cloud::Kms::V1::HsmManagement;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1009,60 +1009,6 @@ EOF
     # Field: disable_time Type: 11 (.google.protobuf.Timestamp)
     # Field: key_portability_enabled Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstance - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstance->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.kms.v1.SingleTenantHsmInstance.State)
-
-=item * B<quorum_auth>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstance.QuorumAuth)
-
-=item * B<delete_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<unrefreshed_duration_until_disable>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<disable_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<key_portability_enabled>
-
-Type: Bool
-
-=back
-
-=cut
-
 # Enum: SingleTenantHsmInstance::State
 our $SingleTenantHsmInstance_STATE_UNSPECIFIED = 0;
 our $SingleTenantHsmInstance_CREATING = 1;
@@ -1073,36 +1019,6 @@ our $SingleTenantHsmInstance_DISABLED = 5;
 our $SingleTenantHsmInstance_DELETING = 6;
 our $SingleTenantHsmInstance_DELETED = 7;
 our $SingleTenantHsmInstance_FAILED = 8;
-
-=pod
-
-=head2 Enum: SingleTenantHsmInstance::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<PENDING_TWO_FACTOR_AUTH_REGISTRATION> => 2
-
-=item * C<ACTIVE> => 3
-
-=item * C<DISABLING> => 4
-
-=item * C<DISABLED> => 5
-
-=item * C<DELETING> => 6
-
-=item * C<DELETED> => 7
-
-=item * C<FAILED> => 8
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal ===
     # Fields for SingleTenantHsmInstanceProposal
@@ -1125,100 +1041,6 @@ Values:
     # Field: refresh_single_tenant_hsm_instance Type: 11 (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.RefreshSingleTenantHsmInstance)
     # Field: upgrade_key_trust Type: 11 (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.UpgradeKeyTrust)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.State)
-
-=item * B<failure_reason>
-
-Type: String
-
-=item * B<quorum_parameters>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.QuorumParameters)
-
-=item * B<required_action_quorum_parameters>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.RequiredActionQuorumParameters)
-
-=item * B<expire_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<delete_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<purge_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<register_two_factor_auth_keys>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.RegisterTwoFactorAuthKeys)
-
-=item * B<disable_single_tenant_hsm_instance>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.DisableSingleTenantHsmInstance)
-
-=item * B<enable_single_tenant_hsm_instance>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.EnableSingleTenantHsmInstance)
-
-=item * B<delete_single_tenant_hsm_instance>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.DeleteSingleTenantHsmInstance)
-
-=item * B<add_quorum_member>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.AddQuorumMember)
-
-=item * B<remove_quorum_member>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.RemoveQuorumMember)
-
-=item * B<refresh_single_tenant_hsm_instance>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.RefreshSingleTenantHsmInstance)
-
-=item * B<upgrade_key_trust>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal.UpgradeKeyTrust)
-
-=back
-
-=cut
-
 # Enum: SingleTenantHsmInstanceProposal::State
 our $SingleTenantHsmInstanceProposal_STATE_UNSPECIFIED = 0;
 our $SingleTenantHsmInstanceProposal_CREATING = 1;
@@ -1229,103 +1051,15 @@ our $SingleTenantHsmInstanceProposal_SUCCEEDED = 5;
 our $SingleTenantHsmInstanceProposal_FAILED = 6;
 our $SingleTenantHsmInstanceProposal_DELETED = 7;
 
-=pod
-
-=head2 Enum: SingleTenantHsmInstanceProposal::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<PENDING> => 2
-
-=item * C<APPROVED> => 3
-
-=item * C<RUNNING> => 4
-
-=item * C<SUCCEEDED> => 5
-
-=item * C<FAILED> => 6
-
-=item * C<DELETED> => 7
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::Challenge ===
     # Fields for Challenge
     # Field: challenge Type: 12 ()
     # Field: public_key_pem Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::Challenge - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::Challenge->new(
-        challenge => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<challenge>
-
-Type: Bytes
-
-=item * B<public_key_pem>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ChallengeReply ===
     # Fields for ChallengeReply
     # Field: signed_challenge Type: 12 ()
     # Field: public_key_pem Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ChallengeReply - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ChallengeReply->new(
-        signed_challenge => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<signed_challenge>
-
-Type: Bytes
-
-=item * B<public_key_pem>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesRequest ===
     # Fields for ListSingleTenantHsmInstancesRequest
@@ -1336,121 +1070,15 @@ Type: String
     # Field: order_by Type: 9 ()
     # Field: show_deleted Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=item * B<show_deleted>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesResponse ===
     # Fields for ListSingleTenantHsmInstancesResponse
     # Field: single_tenant_hsm_instances Type: 11 (.google.cloud.kms.v1.SingleTenantHsmInstance)
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesResponse->new(
-        single_tenant_hsm_instances => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<single_tenant_hsm_instances>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstance)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::GetSingleTenantHsmInstanceRequest ===
     # Fields for GetSingleTenantHsmInstanceRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::GetSingleTenantHsmInstanceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::GetSingleTenantHsmInstanceRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceRequest ===
     # Fields for CreateSingleTenantHsmInstanceRequest
@@ -1458,63 +1086,8 @@ Type: String
     # Field: single_tenant_hsm_instance_id Type: 9 ()
     # Field: single_tenant_hsm_instance Type: 11 (.google.cloud.kms.v1.SingleTenantHsmInstance)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<single_tenant_hsm_instance_id>
-
-Type: String
-
-=item * B<single_tenant_hsm_instance>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstance)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceMetadata ===
     # Fields for CreateSingleTenantHsmInstanceMetadata
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceMetadata->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceProposalRequest ===
     # Fields for CreateSingleTenantHsmInstanceProposalRequest
@@ -1522,93 +1095,12 @@ Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceMetadata - C
     # Field: single_tenant_hsm_instance_proposal_id Type: 9 ()
     # Field: single_tenant_hsm_instance_proposal Type: 11 (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceProposalRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceProposalRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<single_tenant_hsm_instance_proposal_id>
-
-Type: String
-
-=item * B<single_tenant_hsm_instance_proposal>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceProposalMetadata ===
     # Fields for CreateSingleTenantHsmInstanceProposalMetadata
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceProposalMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceProposalMetadata->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::HsmManagement::GetSingleTenantHsmInstanceProposalRequest ===
     # Fields for GetSingleTenantHsmInstanceProposalRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::GetSingleTenantHsmInstanceProposalRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::GetSingleTenantHsmInstanceProposalRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalRequest ===
     # Fields for ApproveSingleTenantHsmInstanceProposalRequest
@@ -1616,141 +1108,18 @@ Type: String
     # Field: quorum_reply Type: 11 (.google.cloud.kms.v1.ApproveSingleTenantHsmInstanceProposalRequest.QuorumReply)
     # Field: required_action_quorum_reply Type: 11 (.google.cloud.kms.v1.ApproveSingleTenantHsmInstanceProposalRequest.RequiredActionQuorumReply)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<quorum_reply>
-
-Type: Message (.google.cloud.kms.v1.ApproveSingleTenantHsmInstanceProposalRequest.QuorumReply)
-
-=item * B<required_action_quorum_reply>
-
-Type: Message (.google.cloud.kms.v1.ApproveSingleTenantHsmInstanceProposalRequest.RequiredActionQuorumReply)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalResponse ===
     # Fields for ApproveSingleTenantHsmInstanceProposalResponse
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalRequest ===
     # Fields for ExecuteSingleTenantHsmInstanceProposalRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalResponse ===
     # Fields for ExecuteSingleTenantHsmInstanceProposalResponse
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalMetadata ===
     # Fields for ExecuteSingleTenantHsmInstanceProposalMetadata
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalMetadata->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstanceProposalsRequest ===
     # Fields for ListSingleTenantHsmInstanceProposalsRequest
@@ -1761,144 +1130,30 @@ Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalMet
     # Field: order_by Type: 9 ()
     # Field: show_deleted Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstanceProposalsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstanceProposalsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=item * B<show_deleted>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstanceProposalsResponse ===
     # Fields for ListSingleTenantHsmInstanceProposalsResponse
     # Field: single_tenant_hsm_instance_proposals Type: 11 (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal)
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstanceProposalsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstanceProposalsResponse->new(
-        single_tenant_hsm_instance_proposals => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<single_tenant_hsm_instance_proposals>
-
-Type: Message (.google.cloud.kms.v1.SingleTenantHsmInstanceProposal)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::HsmManagement::DeleteSingleTenantHsmInstanceProposalRequest ===
     # Fields for DeleteSingleTenantHsmInstanceProposalRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::HsmManagement::DeleteSingleTenantHsmInstanceProposalRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::HsmManagement;
-
-    my $msg = Google::Cloud::Kms::V1::HsmManagement::DeleteSingleTenantHsmInstanceProposalRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Kms::V1::HsmManagement::HsmManagementClient ===
 package Google::Cloud::Kms::V1::HsmManagement::HsmManagementClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Kms::V1::HsmManagement::HsmManagementClient
 
-Google::Cloud::Kms::V1::HsmManagement::HsmManagementClient - Client stub representing the remote HsmManagement service
+Client stub representing the remote C<HsmManagement> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<kms.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2044,13 +1299,884 @@ sub delete_single_tenant_hsm_instance_proposal {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Kms::V1::HsmManagement - Protocol Buffers schema definition
+Google::Cloud::Kms::V1::HsmManagement - Compiled Protocol Buffers messages for google/cloud/kms/v1/hsm_management.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::HsmManagement;
+
+    my $msg = Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstance->new({
+        name => $name,
+        create_time => $create_time,
+        state => $state,
+        quorum_auth => $quorum_auth,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstance->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/kms/v1/hsm_management.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstance
+
+A [SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+represents a single-tenant HSM instance. It can be used for creating
+[CryptoKeys][google.cloud.kms.v1.CryptoKey] with a
+[ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of
+[HSM_SINGLE_TENANT][CryptoKeyVersion.ProtectionLevel.HSM_SINGLE_TENANT], as
+well as performing cryptographic operations using keys created within the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The resource name for this
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance] in
+the format `projects/*/locations/*/singleTenantHsmInstances/*`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance] was
+created.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::SingleTenantHsmInstance::State>)
+
+Output only. The state of the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+
+=item * C<< $msg->quorum_auth() >> / C<< $msg->quorum_auth($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstance::QuorumAuth>)
+
+Required. The quorum auth configuration for the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+
+=item * C<< $msg->delete_time() >> / C<< $msg->delete_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance] was
+deleted.
+
+=item * C<< $msg->unrefreshed_duration_until_disable() >> / C<< $msg->unrefreshed_duration_until_disable($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Output only. The system-defined duration that an instance can remain
+unrefreshed until it is automatically disabled. This will have a value of
+730 days.
+
+=item * C<< $msg->disable_time() >> / C<< $msg->disable_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the instance will be automatically disabled
+if not refreshed. This field is updated upon creation and after each
+successful refresh operation and enable. A
+[RefreshSingleTenantHsmInstance][] operation must be made via a
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+before this time otherwise the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance] will
+become disabled.
+
+=item * C<< $msg->key_portability_enabled() >> / C<< $msg->key_portability_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Immutable. Indicates whether key portability is enabled for the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+This can only be set at creation time. Key portability features are
+disabled by default.
+
+=back
+
+=head3 Enum: SingleTenantHsmInstance::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<PENDING_TWO_FACTOR_AUTH_REGISTRATION> => C<2>
+
+=item * C<ACTIVE> => C<3>
+
+=item * C<DISABLING> => C<4>
+
+=item * C<DISABLED> => C<5>
+
+=item * C<DELETING> => C<6>
+
+=item * C<DELETED> => C<7>
+
+=item * C<FAILED> => C<8>
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal
+
+A
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+represents a proposal to perform an operation on a
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The resource name for this
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance] in
+the format `projects/*/locations/*/singleTenantHsmInstances/*/proposals/*`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+was created.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::SingleTenantHsmInstanceProposal::State>)
+
+Output only. The state of the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal].
+
+=item * C<< $msg->failure_reason() >> / C<< $msg->failure_reason($value) >>
+
+Type: C<String>
+
+Output only. The root cause of the most recent failure. Only present if
+[state][google.cloud.kms.v1.SingleTenantHsmInstanceProposal.state] is
+[FAILED][SingleTenantHsmInstanceProposal.FAILED].
+
+=item * C<< $msg->quorum_parameters() >> / C<< $msg->quorum_parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::QuorumParameters>)
+
+Output only. The quorum approval parameters for the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal].
+
+=item * C<< $msg->required_action_quorum_parameters() >> / C<< $msg->required_action_quorum_parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::RequiredActionQuorumParameters>)
+
+Output only. Parameters for an approval of a
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+that has both required challenges and a quorum.
+
+=item * C<< $msg->expire_time() >> / C<< $msg->expire_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time at which the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+will expire if not approved and executed.
+
+=item * C<< $msg->ttl() >> / C<< $msg->ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Input only. The TTL for the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal].
+Proposals will expire after this duration.
+
+=item * C<< $msg->delete_time() >> / C<< $msg->delete_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+was deleted.
+
+=item * C<< $msg->purge_time() >> / C<< $msg->purge_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the soft-deleted
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+will be permanently purged. This field is only populated
+when the state is DELETED and will be set a time after expiration of the
+proposal, i.e. >= expire_time or (create_time + ttl).
+
+=item * C<< $msg->register_two_factor_auth_keys() >> / C<< $msg->register_two_factor_auth_keys($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::RegisterTwoFactorAuthKeys>)
+
+Register 2FA keys for the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+This operation requires all N Challenges to be signed by 2FA keys. The
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+must be in the
+[PENDING_TWO_FACTOR_AUTH_REGISTRATION][google.cloud.kms.v1.SingleTenantHsmInstance.State.PENDING_TWO_FACTOR_AUTH_REGISTRATION]
+state to perform this operation.
+
+=item * C<< $msg->disable_single_tenant_hsm_instance() >> / C<< $msg->disable_single_tenant_hsm_instance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::DisableSingleTenantHsmInstance>)
+
+Disable the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+The
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+must be in the
+[ACTIVE][google.cloud.kms.v1.SingleTenantHsmInstance.State.ACTIVE] state
+to perform this operation.
+
+=item * C<< $msg->enable_single_tenant_hsm_instance() >> / C<< $msg->enable_single_tenant_hsm_instance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::EnableSingleTenantHsmInstance>)
+
+Enable the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+The
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+must be in the
+[DISABLED][google.cloud.kms.v1.SingleTenantHsmInstance.State.DISABLED]
+state to perform this operation.
+
+=item * C<< $msg->delete_single_tenant_hsm_instance() >> / C<< $msg->delete_single_tenant_hsm_instance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::DeleteSingleTenantHsmInstance>)
+
+Delete the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+Deleting a
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+will make all [CryptoKeys][google.cloud.kms.v1.CryptoKey] attached to the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+unusable. The
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+must be in the
+[DISABLED][google.cloud.kms.v1.SingleTenantHsmInstance.State.DISABLED] or
+[PENDING_TWO_FACTOR_AUTH_REGISTRATION][google.cloud.kms.v1.SingleTenantHsmInstance.State.PENDING_TWO_FACTOR_AUTH_REGISTRATION]
+state to perform this operation.
+
+=item * C<< $msg->add_quorum_member() >> / C<< $msg->add_quorum_member($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::AddQuorumMember>)
+
+Add a quorum member to the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+This will increase the
+[total_approver_count][google.cloud.kms.v1.SingleTenantHsmInstance.QuorumAuth.total_approver_count]
+by 1. The
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+must be in the
+[ACTIVE][google.cloud.kms.v1.SingleTenantHsmInstance.State.ACTIVE] state
+to perform this operation.
+
+=item * C<< $msg->remove_quorum_member() >> / C<< $msg->remove_quorum_member($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::RemoveQuorumMember>)
+
+Remove a quorum member from the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+This will reduce
+[total_approver_count][google.cloud.kms.v1.SingleTenantHsmInstance.QuorumAuth.total_approver_count]
+by 1. The
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+must be in the
+[ACTIVE][google.cloud.kms.v1.SingleTenantHsmInstance.State.ACTIVE] state
+to perform this operation.
+
+=item * C<< $msg->refresh_single_tenant_hsm_instance() >> / C<< $msg->refresh_single_tenant_hsm_instance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::RefreshSingleTenantHsmInstance>)
+
+Refreshes the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance].
+This operation must be performed periodically to keep the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+active. This operation must be performed before
+[unrefreshed_duration_until_disable][google.cloud.kms.v1.SingleTenantHsmInstance.unrefreshed_duration_until_disable]
+has passed. The
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+must be in the
+[ACTIVE][google.cloud.kms.v1.SingleTenantHsmInstance.State.ACTIVE] state
+to perform this operation.
+
+=item * C<< $msg->upgrade_key_trust() >> / C<< $msg->upgrade_key_trust($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal::UpgradeKeyTrust>)
+
+Promotes a key with the AES_WRAPPING purpose to a trusted wrapping key.
+The key must be in the
+[ACTIVE][CryptoKeyVersion.CryptoKeyVersionState.ACTIVE] state to perform
+this operation.
+
+=back
+
+=head3 Enum: SingleTenantHsmInstanceProposal::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<PENDING> => C<2>
+
+=item * C<APPROVED> => C<3>
+
+=item * C<RUNNING> => C<4>
+
+=item * C<SUCCEEDED> => C<5>
+
+=item * C<FAILED> => C<6>
+
+=item * C<DELETED> => C<7>
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::Challenge
+
+A challenge to be signed by a 2FA key.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->challenge() >> / C<< $msg->challenge($value) >>
+
+Type: C<Bytes>
+
+Output only. The challenge to be signed by the 2FA key indicated by the
+public key.
+
+=item * C<< $msg->public_key_pem() >> / C<< $msg->public_key_pem($value) >>
+
+Type: C<String>
+
+Output only. The public key associated with the 2FA key that should sign
+the challenge.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ChallengeReply
+
+A reply to a challenge signed by a 2FA key.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->signed_challenge() >> / C<< $msg->signed_challenge($value) >>
+
+Type: C<Bytes>
+
+Required. The signed challenge associated with the 2FA key.
+The signature must be RSASSA-PKCS1 v1.5 with a SHA256 digest.
+
+=item * C<< $msg->public_key_pem() >> / C<< $msg->public_key_pem($value) >>
+
+Type: C<String>
+
+Required. The public key associated with the 2FA key.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesRequest
+
+Request message for
+[HsmManagement.ListSingleTenantHsmInstances][google.cloud.kms.v1.HsmManagement.ListSingleTenantHsmInstances].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the location associated with the
+[SingleTenantHsmInstances][google.cloud.kms.v1.SingleTenantHsmInstance] to
+list, in the format `projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Optional limit on the number of
+[SingleTenantHsmInstances][google.cloud.kms.v1.SingleTenantHsmInstance] to
+include in the response. Further
+[SingleTenantHsmInstances][google.cloud.kms.v1.SingleTenantHsmInstance] can
+subsequently be
+obtained by including the
+[ListSingleTenantHsmInstancesResponse.next_page_token][google.cloud.kms.v1.ListSingleTenantHsmInstancesResponse.next_page_token]
+in a subsequent request. If unspecified, the server will pick an
+appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Optional pagination token, returned earlier via
+[ListSingleTenantHsmInstancesResponse.next_page_token][google.cloud.kms.v1.ListSingleTenantHsmInstancesResponse.next_page_token].
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Only include resources that match the filter in the response. For
+more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify how the results should be sorted. If not specified, the
+results will be sorted in the default order.  For more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=item * C<< $msg->show_deleted() >> / C<< $msg->show_deleted($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true,
+[HsmManagement.ListSingleTenantHsmInstances][google.cloud.kms.v1.HsmManagement.ListSingleTenantHsmInstances]
+will also return
+[SingleTenantHsmInstances][google.cloud.kms.v1.SingleTenantHsmInstance] in
+DELETED state.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesResponse
+
+Response message for
+[HsmManagement.ListSingleTenantHsmInstances][google.cloud.kms.v1.HsmManagement.ListSingleTenantHsmInstances].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->single_tenant_hsm_instances() >> / C<< $msg->single_tenant_hsm_instances($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstance>)
+
+The list of
+[SingleTenantHsmInstances][google.cloud.kms.v1.SingleTenantHsmInstance].
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve next page of results. Pass this value in
+[ListSingleTenantHsmInstancesRequest.page_token][google.cloud.kms.v1.ListSingleTenantHsmInstancesRequest.page_token]
+to retrieve the next page of results.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The total number of
+[SingleTenantHsmInstances][google.cloud.kms.v1.SingleTenantHsmInstance]
+that matched the query.
+
+This field is not populated if
+[ListSingleTenantHsmInstancesRequest.filter][google.cloud.kms.v1.ListSingleTenantHsmInstancesRequest.filter]
+is applied.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::GetSingleTenantHsmInstanceRequest
+
+Request message for
+[HsmManagement.GetSingleTenantHsmInstance][google.cloud.kms.v1.HsmManagement.GetSingleTenantHsmInstance].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.SingleTenantHsmInstance.name] of
+the [SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+to get.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceRequest
+
+Request message for
+[HsmManagement.CreateSingleTenantHsmInstance][google.cloud.kms.v1.HsmManagement.CreateSingleTenantHsmInstance].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the location associated with the
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance], in
+the format `projects/*/locations/*`.
+
+=item * C<< $msg->single_tenant_hsm_instance_id() >> / C<< $msg->single_tenant_hsm_instance_id($value) >>
+
+Type: C<String>
+
+Optional. It must be unique within a location and match the regular
+expression `[a-zA-Z0-9_-]{1,63}`.
+
+=item * C<< $msg->single_tenant_hsm_instance() >> / C<< $msg->single_tenant_hsm_instance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstance>)
+
+Required. An
+[SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance] with
+initial field values.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceMetadata
+
+Metadata message for
+[CreateSingleTenantHsmInstance][google.cloud.kms.v1.HsmManagement.CreateSingleTenantHsmInstance]
+long-running operation response.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceProposalRequest
+
+Request message for
+[HsmManagement.CreateSingleTenantHsmInstanceProposal][google.cloud.kms.v1.HsmManagement.CreateSingleTenantHsmInstanceProposal].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.SingleTenantHsmInstance.name] of
+the [SingleTenantHsmInstance][google.cloud.kms.v1.SingleTenantHsmInstance]
+associated with the
+[SingleTenantHsmInstanceProposals][google.cloud.kms.v1.SingleTenantHsmInstanceProposal].
+
+=item * C<< $msg->single_tenant_hsm_instance_proposal_id() >> / C<< $msg->single_tenant_hsm_instance_proposal_id($value) >>
+
+Type: C<String>
+
+Optional. It must be unique within a location and match the regular
+expression `[a-zA-Z0-9_-]{1,63}`.
+
+=item * C<< $msg->single_tenant_hsm_instance_proposal() >> / C<< $msg->single_tenant_hsm_instance_proposal($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal>)
+
+Required. The
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+to create.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::CreateSingleTenantHsmInstanceProposalMetadata
+
+Metadata message for
+[CreateSingleTenantHsmInstanceProposal][google.cloud.kms.v1.HsmManagement.CreateSingleTenantHsmInstanceProposal]
+long-running operation response.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::GetSingleTenantHsmInstanceProposalRequest
+
+Request message for
+[HsmManagement.GetSingleTenantHsmInstanceProposal][google.cloud.kms.v1.HsmManagement.GetSingleTenantHsmInstanceProposal].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The
+[name][google.cloud.kms.v1.SingleTenantHsmInstanceProposal.name] of the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+to get.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalRequest
+
+Request message for
+[HsmManagement.ApproveSingleTenantHsmInstanceProposal][google.cloud.kms.v1.HsmManagement.ApproveSingleTenantHsmInstanceProposal].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The
+[name][google.cloud.kms.v1.SingleTenantHsmInstanceProposal.name] of the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+to approve.
+
+=item * C<< $msg->quorum_reply() >> / C<< $msg->quorum_reply($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalRequest::QuorumReply>)
+
+Required. The reply to
+[QuorumParameters][google.cloud.kms.v1.SingleTenantHsmInstanceProposal.QuorumParameters]
+for approving the proposal.
+
+=item * C<< $msg->required_action_quorum_reply() >> / C<< $msg->required_action_quorum_reply($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalRequest::RequiredActionQuorumReply>)
+
+Required. The reply to
+[RequiredActionQuorumParameters][google.cloud.kms.v1.SingleTenantHsmInstanceProposal.RequiredActionQuorumParameters]
+for approving the proposal.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ApproveSingleTenantHsmInstanceProposalResponse
+
+Response message for
+[HsmManagement.ApproveSingleTenantHsmInstanceProposal][google.cloud.kms.v1.HsmManagement.ApproveSingleTenantHsmInstanceProposal].
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalRequest
+
+Request message for
+[HsmManagement.ExecuteSingleTenantHsmInstanceProposal][google.cloud.kms.v1.HsmManagement.ExecuteSingleTenantHsmInstanceProposal].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The
+[name][google.cloud.kms.v1.SingleTenantHsmInstanceProposal.name] of the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+to execute.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalResponse
+
+Response message for
+[HsmManagement.ExecuteSingleTenantHsmInstanceProposal][google.cloud.kms.v1.HsmManagement.ExecuteSingleTenantHsmInstanceProposal].
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ExecuteSingleTenantHsmInstanceProposalMetadata
+
+Metadata message for
+[ExecuteSingleTenantHsmInstanceProposal][google.cloud.kms.v1.HsmManagement.ExecuteSingleTenantHsmInstanceProposal]
+long-running operation response.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstanceProposalsRequest
+
+Request message for
+[HsmManagement.ListSingleTenantHsmInstanceProposals][google.cloud.kms.v1.HsmManagement.ListSingleTenantHsmInstanceProposals].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the single tenant HSM instance associated
+with the
+[SingleTenantHsmInstanceProposals][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+to list, in the format `projects/*/locations/*/singleTenantHsmInstances/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Optional limit on the number of
+[SingleTenantHsmInstanceProposals][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+to include in the response. Further
+[SingleTenantHsmInstanceProposals][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+can subsequently be obtained by including the
+[ListSingleTenantHsmInstanceProposalsResponse.next_page_token][google.cloud.kms.v1.ListSingleTenantHsmInstanceProposalsResponse.next_page_token]
+in a subsequent request. If unspecified, the server will pick an
+appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Optional pagination token, returned earlier via
+[ListSingleTenantHsmInstanceProposalsResponse.next_page_token][google.cloud.kms.v1.ListSingleTenantHsmInstanceProposalsResponse.next_page_token].
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Only include resources that match the filter in the response. For
+more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify how the results should be sorted. If not specified, the
+results will be sorted in the default order.  For more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=item * C<< $msg->show_deleted() >> / C<< $msg->show_deleted($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true,
+[HsmManagement.ListSingleTenantHsmInstanceProposals][google.cloud.kms.v1.HsmManagement.ListSingleTenantHsmInstanceProposals]
+will also return
+[SingleTenantHsmInstanceProposals][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+in DELETED state.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstanceProposalsResponse
+
+Response message for
+[HsmManagement.ListSingleTenantHsmInstanceProposals][google.cloud.kms.v1.HsmManagement.ListSingleTenantHsmInstanceProposals].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->single_tenant_hsm_instance_proposals() >> / C<< $msg->single_tenant_hsm_instance_proposals($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::HsmManagement::SingleTenantHsmInstanceProposal>)
+
+The list of
+[SingleTenantHsmInstanceProposals][google.cloud.kms.v1.SingleTenantHsmInstanceProposal].
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve next page of results. Pass this value in
+[ListSingleTenantHsmInstanceProposalsRequest.page_token][google.cloud.kms.v1.ListSingleTenantHsmInstanceProposalsRequest.page_token]
+to retrieve the next page of results.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The total number of
+[SingleTenantHsmInstanceProposals][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+that matched the query.
+
+This field is not populated if
+[ListSingleTenantHsmInstanceProposalsRequest.filter][google.cloud.kms.v1.ListSingleTenantHsmInstanceProposalsRequest.filter]
+is applied.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::HsmManagement::DeleteSingleTenantHsmInstanceProposalRequest
+
+Request message for
+[HsmManagement.DeleteSingleTenantHsmInstanceProposal][google.cloud.kms.v1.HsmManagement.DeleteSingleTenantHsmInstanceProposal].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The
+[name][google.cloud.kms.v1.SingleTenantHsmInstanceProposal.name] of the
+[SingleTenantHsmInstanceProposal][google.cloud.kms.v1.SingleTenantHsmInstanceProposal]
+to delete.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Kms::V1::HsmManagement::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

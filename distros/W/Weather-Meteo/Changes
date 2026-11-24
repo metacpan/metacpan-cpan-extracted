@@ -1,5 +1,48 @@
 Revision history for Weather::Meteo
 
+0.16	Mon Nov 23 10:13:37 EST 2026
+	[ Enhancements ]
+	- Retry transient API failures (HTTP 429, 502, 503, 504) with exponential
+	  backoff, honouring a numeric Retry-After header (waits capped at 60s)
+	- Add max_retries (default 3, 0 disables) and retry_delay (default 1s)
+	  options to new()
+	- Add i18n() and a messages option to new(): every warning and error is
+	  now looked up by key and can be translated or reworded; supports
+	  {name} placeholders, plural/gender variants and sprintf arguments
+	- forecast() and sunrise_sunset() now carp with the API's reason when
+	  the API reports {"error":true}, as weather() already did
+
+	[ Bug Fixes ]
+	- Mark helper routines as protected
+	- weather() returned data for a pre-1940 date given as an object with
+	  strftime(); it now returns undef silently, as for a string
+	- Dates and days were matched with $ so a trailing newline was accepted;
+	  now anchored with \z, and dates are untainted
+	- The rate limiter used whole-second time() and could wait for the wrong
+	  length of time; it now uses Time::HiRes::time()
+	- The JSON body was decoded twice (once by HTTP::Message, once as UTF-8);
+	  non-ASCII text in a response could fail to parse
+
+	[ Internal ]
+	- Coordinate, call-form, URL, cache and error handling that was copied
+	  into weather(), forecast() and sunrise_sunset() is now shared
+	- Helper functions are Sub::Private (enforce mode), helper methods are
+	  Sub::Protected; both are relaxed under a test harness
+	- Magic numbers and strings moved into Readonly tables
+	- bin/weather: shared safe_path(), File::Path::make_path() replaces the
+	  hand-written mkdir idiom, autodie; the three output lines now all
+	  use "label: value" (two lacked the colon)
+	- New prerequisites: Readonly, Sub::Private (0.09), Sub::Protected (0.03),
+	  autodie, POSIX, File::Path
+	- Geo::Coder::Free, LWP::UserAgent::Cached and File::HomeDir are needed
+	  only by bin/weather, so they are now "recommends" instead of hard
+	  prerequisites; bin/weather says what to install if one is missing
+	- The library uses plain "use autodie", so IPC::System::Simple is no
+	  longer a runtime prerequisite
+	- Licence wording in the POD now agrees with Makefile.PL and LICENSE (GPL2)
+	- Tests: declare IPC::Run3 and HTTP::Response; add an author test that
+	  checks the code needs no more than Perl 5.10
+
 0.15	Mon Jul 13 12:51:54 EDT 2026
 	[ Security ]
 	- Fix SSRF: validate and untaint the host parameter in new() against a

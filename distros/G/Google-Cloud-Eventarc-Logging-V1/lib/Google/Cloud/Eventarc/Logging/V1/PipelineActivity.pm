@@ -1,0 +1,328 @@
+package Google::Cloud::Eventarc::Logging::V1::PipelineActivity;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldInfo };
+    eval { require Google::Protobuf::Timestamp };
+    eval { require Google::Rpc::Status };
+    my $descriptor_b64 = <<'EOF';
+Cjhnb29nbGUvY2xvdWQvZXZlbnRhcmMvbG9nZ2luZy92MS9waXBlbGluZV9hY3Rpdml0eS5w
+cm90bxIgZ29vZ2xlLmNsb3VkLmV2ZW50YXJjLmxvZ2dpbmcudjEaG2dvb2dsZS9hcGkvZmll
+bGRfaW5mby5wcm90bxofZ29vZ2xlL3Byb3RvYnVmL3RpbWVzdGFtcC5wcm90bxoXZ29vZ2xl
+L3JwYy9zdGF0dXMucHJvdG8i9xAKEFBpcGVsaW5lQWN0aXZpdHkSKQoLbWVzc2FnZV91aWQY
+ASABKAlCCOKMz9cIAggBUgptZXNzYWdlVWlkEmIKCmF0dHJpYnV0ZXMYAiADKAsyQi5nb29n
+bGUuY2xvdWQuZXZlbnRhcmMubG9nZ2luZy52MS5QaXBlbGluZUFjdGl2aXR5LkF0dHJpYnV0
+ZXNFbnRyeVIKYXR0cmlidXRlcxI/Cg1hY3Rpdml0eV90aW1lGAMgASgLMhouZ29vZ2xlLnBy
+b3RvYnVmLlRpbWVzdGFtcFIMYWN0aXZpdHlUaW1lEm8KEG1lc3NhZ2VfcmVjZWl2ZWQYBCAB
+KAsyQi5nb29nbGUuY2xvdWQuZXZlbnRhcmMubG9nZ2luZy52MS5QaXBlbGluZUFjdGl2aXR5
+Lk1lc3NhZ2VSZWNlaXZlZEgAUg9tZXNzYWdlUmVjZWl2ZWQSeAoTbWVzc2FnZV90cmFuc2Zv
+cm1lZBgFIAEoCzJFLmdvb2dsZS5jbG91ZC5ldmVudGFyYy5sb2dnaW5nLnYxLlBpcGVsaW5l
+QWN0aXZpdHkuTWVzc2FnZVRyYW5zZm9ybWVkSABSEm1lc3NhZ2VUcmFuc2Zvcm1lZBJyChFt
+ZXNzYWdlX2NvbnZlcnRlZBgGIAEoCzJDLmdvb2dsZS5jbG91ZC5ldmVudGFyYy5sb2dnaW5n
+LnYxLlBpcGVsaW5lQWN0aXZpdHkuTWVzc2FnZUNvbnZlcnRlZEgAUhBtZXNzYWdlQ29udmVy
+dGVkEosBChptZXNzYWdlX3JlcXVlc3RfZGlzcGF0Y2hlZBgHIAEoCzJLLmdvb2dsZS5jbG91
+ZC5ldmVudGFyYy5sb2dnaW5nLnYxLlBpcGVsaW5lQWN0aXZpdHkuTWVzc2FnZVJlcXVlc3RE
+aXNwYXRjaGVkSABSGG1lc3NhZ2VSZXF1ZXN0RGlzcGF0Y2hlZBKIAQoZbWVzc2FnZV9yZXNw
+b25zZV9yZWNlaXZlZBgIIAEoCzJKLmdvb2dsZS5jbG91ZC5ldmVudGFyYy5sb2dnaW5nLnYx
+LlBpcGVsaW5lQWN0aXZpdHkuTWVzc2FnZVJlc3BvbnNlUmVjZWl2ZWRIAFIXbWVzc2FnZVJl
+c3BvbnNlUmVjZWl2ZWQayQEKD01lc3NhZ2VSZWNlaXZlZBIYCgdkZXRhaWxzGAEgASgJUgdk
+ZXRhaWxzEnIKFGlucHV0X3BheWxvYWRfZm9ybWF0GAIgASgOMkAuZ29vZ2xlLmNsb3VkLmV2
+ZW50YXJjLmxvZ2dpbmcudjEuUGlwZWxpbmVBY3Rpdml0eS5QYXlsb2FkRm9ybWF0UhJpbnB1
+dFBheWxvYWRGb3JtYXQSKAoFZXJyb3IYAyABKAsyEi5nb29nbGUucnBjLlN0YXR1c1IFZXJy
+b3IaWAoSTWVzc2FnZVRyYW5zZm9ybWVkEhgKB2RldGFpbHMYASABKAlSB2RldGFpbHMSKAoF
+ZXJyb3IYAiABKAsyEi5nb29nbGUucnBjLlN0YXR1c1IFZXJyb3IawAIKEE1lc3NhZ2VDb252
+ZXJ0ZWQSGAoHZGV0YWlscxgBIAEoCVIHZGV0YWlscxJyChRpbnB1dF9wYXlsb2FkX2Zvcm1h
+dBgCIAEoDjJALmdvb2dsZS5jbG91ZC5ldmVudGFyYy5sb2dnaW5nLnYxLlBpcGVsaW5lQWN0
+aXZpdHkuUGF5bG9hZEZvcm1hdFISaW5wdXRQYXlsb2FkRm9ybWF0EnQKFW91dHB1dF9wYXls
+b2FkX2Zvcm1hdBgDIAEoDjJALmdvb2dsZS5jbG91ZC5ldmVudGFyYy5sb2dnaW5nLnYxLlBp
+cGVsaW5lQWN0aXZpdHkuUGF5bG9hZEZvcm1hdFITb3V0cHV0UGF5bG9hZEZvcm1hdBIoCgVl
+cnJvchgEIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzUgVlcnJvchqAAQoYTWVzc2FnZVJlcXVl
+c3REaXNwYXRjaGVkEhgKB2RldGFpbHMYASABKAlSB2RldGFpbHMSIAoLZGVzdGluYXRpb24Y
+AiABKAlSC2Rlc3RpbmF0aW9uEigKBWVycm9yGAMgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNS
+BWVycm9yGpMDChdNZXNzYWdlUmVzcG9uc2VSZWNlaXZlZBIYCgdkZXRhaWxzGAEgASgJUgdk
+ZXRhaWxzEnkKDHJldHJ5X3N0YXR1cxgCIAEoDjJWLmdvb2dsZS5jbG91ZC5ldmVudGFyYy5s
+b2dnaW5nLnYxLlBpcGVsaW5lQWN0aXZpdHkuTWVzc2FnZVJlc3BvbnNlUmVjZWl2ZWQuUmV0
+cnlTdGF0dXNSC3JldHJ5U3RhdHVzEjkKCnJldHJ5X3RpbWUYAyABKAsyGi5nb29nbGUucHJv
+dG9idWYuVGltZXN0YW1wUglyZXRyeVRpbWUSLAoSaHR0cF9yZXNwb25zZV9jb2RlGAQgASgF
+UhBodHRwUmVzcG9uc2VDb2RlEigKBWVycm9yGAUgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNS
+BWVycm9yIlAKC1JldHJ5U3RhdHVzEhwKGFJFVFJZX1NUQVRVU19VTlNQRUNJRklFRBAAEg4K
+CldJTExfUkVUUlkQARITCg9SRVRSWV9FWEhBVVNURUQQAho9Cg9BdHRyaWJ1dGVzRW50cnkS
+EAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4ASJOCg1QYXlsb2Fk
+Rm9ybWF0Eh4KGlBBWUxPQURfRk9STUFUX1VOU1BFQ0lGSUVEEAASCAoESlNPThABEgkKBVBS
+T1RPEAISCAoEQVZSTxADQgoKCGFjdGl2aXR5QuwBCiRjb20uZ29vZ2xlLmNsb3VkLmV2ZW50
+YXJjLmxvZ2dpbmcudjFCFVBpcGVsaW5lQWN0aXZpdHlQcm90b1ABWj5jbG91ZC5nb29nbGUu
+Y29tL2dvL2V2ZW50YXJjL2xvZ2dpbmcvYXBpdjEvbG9nZ2luZ3BiO2xvZ2dpbmdwYqoCIEdv
+b2dsZS5DbG91ZC5FdmVudGFyYy5Mb2dnaW5nLlYxygIgR29vZ2xlXENsb3VkXEV2ZW50YXJj
+XExvZ2dpbmdcVjHqAiRHb29nbGU6OkNsb3VkOjpFdmVudGFyYzo6TG9nZ2luZzo6VjFK/y0K
+BxIFDgCoAQEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNSBHb29nbGUgTExDCgogTGlj
+ZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNl
+bnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNl
+IHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vu
+c2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4w
+CgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3
+cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlz
+dHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBD
+T05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2Vl
+IHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1p
+c3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQACkK
+CQoCAwASAxIAJQoJCgIDARIDEwApCgkKAgMCEgMUACEKCAoBCBIDFgA9CgkKAgglEgMWAD0K
+CAoBCBIDFwBVCgkKAggLEgMXAFUKCAoBCBIDGAAiCgkKAggKEgMYACIKCAoBCBIDGQA2CgkK
+AggIEgMZADYKCAoBCBIDGgA9CgkKAggBEgMaAD0KCAoBCBIDGwA+CgkKAggpEgMbAD4KCAoB
+CBIDHAA9CgkKAggtEgMcAD0KRwoCBAASBR8AqAEBGjogTG9nZ2VkIGR1cmluZyB0aGUgcHJv
+Y2Vzc2luZyBvZiBhIG1lc3NhZ2UgaW4gYSBwaXBlbGluZS4KCgoKAwQAARIDHwgYCiYKBAQA
+BAASBCECLQMaGCBGb3JtYXQgb2YgdGhlIHBheWxvYWQuCgoMCgUEAAQAARIDIQcUCjUKBgQA
+BAACABIDIwQjGiYgRGVmYXVsdCB2YWx1ZS4gVGhpcyB2YWx1ZSBpcyB1bnVzZWQuCgoOCgcE
+AAQAAgABEgMjBB4KDgoHBAAEAAIAAhIDIyEiCiUKBgQABAACARIDJgQNGhYgSlNPTiBwYXls
+b2FkIGZvcm1hdC4KCg4KBwQABAACAQESAyYECAoOCgcEAAQAAgECEgMmCwwKJgoGBAAEAAIC
+EgMpBA4aFyBQcm90byBwYXlsb2FkIGZvcm1hdC4KCg4KBwQABAACAgESAykECQoOCgcEAAQA
+AgICEgMpDA0KJQoGBAAEAAIDEgMsBA0aFiBBdnJvIHBheWxvYWQgZm9ybWF0LgoKDgoHBAAE
+AAIDARIDLAQICg4KBwQABAACAwISAywLDAp2CgQEAAMAEgQxAjsDGmggU3RydWN0dXJlZCBs
+b2cgdGhhdCBpcyBlbWl0dGVkIHdoZW4gYSBtZXNzYWdlIGlzIHJlY2VpdmVkIGluIHRoaXMg
+UGlwZWxpbmUKIChvciBhbiBlcnJvciBlbmNvdW50ZXJlZCkuCgoMCgUEAAMAARIDMQoZClAK
+BgQAAwACABIDMwQXGkEgSW5mb3JtYXRpb25hbCBkZXRhaWxzIHdoZW4gYSBtZXNzYWdlIGlz
+IHJlY2VpdmVkIGZyb20gYSBzb3VyY2UuCgoOCgcEAAMAAgAFEgMzBAoKDgoHBAADAAIAARID
+MwsSCg4KBwQAAwACAAMSAzMVFgo1CgYEAAMAAgESAzYEKxomIElucHV0IHBheWxvYWQgZm9y
+bWF0IG9mIHRoZSBtZXNzYWdlLgoKDgoHBAADAAIBBhIDNgQRCg4KBwQAAwACAQESAzYSJgoO
+CgcEAAMAAgEDEgM2KSoKbAoGBAADAAICEgM6BCAaXSBFcnJvciBlbmNvdW50ZXJlZCB3aGVu
+IHJlY2VpdmluZyBhIG1lc3NhZ2UgZnJvbSBhIENoYW5uZWwsIG9yIGlmIHRoZQogbWVzc2Fn
+ZSBpcyBtYWxmb3JtZWQuCgoOCgcEAAMAAgIGEgM6BBUKDgoHBAADAAICARIDOhYbCg4KBwQA
+AwACAgMSAzoeHwqHAQoEBAADARIEPwJFAxp5IFN0cnVjdHVyZWQgbG9nIHRoYXQgaXMgZW1p
+dHRlZCB3aGVuIGEgbWVzc2FnZSBpcyB0cmFuc2Zvcm1lZCBkdXJpbmcKIG1lZGlhdGlvbiAo
+b3IgYW4gZXJyb3IgZW5jb3VudGVyZWQpIGluIGEgUGlwZWxpbmUuCgoMCgUEAAMBARIDPwoc
+ClYKBgQAAwECABIDQQQXGkcgSW5mb3JtYXRpb25hbCBkZXRhaWxzIHdoZW4gYSBtZXNzYWdl
+IGlzIHRyYW5zZm9ybWVkIGR1cmluZyBtZWRpYXRpb24uCgoOCgcEAAMBAgAFEgNBBAoKDgoH
+BAADAQIAARIDQQsSCg4KBwQAAwECAAMSA0EVFgo/CgYEAAMBAgESA0QEIBowIEVycm9yIGVu
+Y291bnRlcmVkIHdoZW4gdHJhbnNmb3JtaW5nIGEgbWVzc2FnZS4KCg4KBwQAAwECAQYSA0QE
+FQoOCgcEAAMBAgEBEgNEFhsKDgoHBAADAQIBAxIDRB4fCoUBCgQEAAMCEgRJAlUDGncgU3Ry
+dWN0dXJlZCBsb2cgdGhhdCBpcyBlbWl0dGVkIHdoZW4gYSBtZXNzYWdlIGlzIGNvbnZlcnRl
+ZCBkdXJpbmcKIG1lZGlhdGlvbiAob3IgYW4gZXJyb3IgZW5jb3VudGVyZWQpIGluIGEgUGlw
+ZWxpbmUuCgoMCgUEAAMCARIDSQoaClQKBgQAAwICABIDSwQXGkUgSW5mb3JtYXRpb25hbCBk
+ZXRhaWxzIHdoZW4gYSBtZXNzYWdlIGlzIGNvbnZlcnRlZCBkdXJpbmcgbWVkaWF0aW9uLgoK
+DgoHBAADAgIABRIDSwQKCg4KBwQAAwICAAESA0sLEgoOCgcEAAMCAgADEgNLFRYKNQoGBAAD
+AgIBEgNOBCsaJiBJbnB1dCBwYXlsb2FkIGZvcm1hdCBvZiB0aGUgbWVzc2FnZS4KCg4KBwQA
+AwICAQYSA04EEQoOCgcEAAMCAgEBEgNOEiYKDgoHBAADAgIBAxIDTikqCjYKBgQAAwICAhID
+UQQsGicgT3V0cHV0IHBheWxvYWQgZm9ybWF0IG9mIHRoZSBtZXNzYWdlLgoKDgoHBAADAgIC
+BhIDUQQRCg4KBwQAAwICAgESA1ESJwoOCgcEAAMCAgIDEgNRKisKPQoGBAADAgIDEgNUBCAa
+LiBFcnJvciBlbmNvdW50ZXJlZCB3aGVuIGNvbnZlcnRpbmcgYSBtZXNzYWdlLgoKDgoHBAAD
+AgIDBhIDVAQVCg4KBwQAAwICAwESA1QWGwoOCgcEAAMCAgMDEgNUHh8KjwEKBAQAAwMSBFkC
+YwMagAEgU3RydWN0dXJlZCBsb2cgdGhhdCBpcyBlbWl0dGVkIHdoZW4gYSBtZXNzYWdlIHJl
+cXVlc3QgaXMgZGlzcGF0Y2hlZCB0byBhCiBkZXN0aW5hdGlvbiAob3IgYW4gZXJyb3IgZW5j
+b3VudGVyZWQpIGluIGEgUGlwZWxpbmUuCgoMCgUEAAMDARIDWQoiClUKBgQAAwMCABIDWwQX
+GkYgSW5mb3JtYXRpb25hbCBkZXRhaWxzIHdoZW4gYSBtZXNzYWdlIGlzIGRpc3BhdGNoZWQg
+dG8gYSBkZXN0aW5hdGlvbi4KCg4KBwQAAwMCAAUSA1sECgoOCgcEAAMDAgABEgNbCxIKDgoH
+BAADAwIAAxIDWxUWCjwKBgQAAwMCARIDXgQbGi0gVGhlIGRlc3RpbmF0aW9uIHdoZXJlIHRo
+ZSBldmVudCBpcyBzZW50IHRvLgoKDgoHBAADAwIBBRIDXgQKCg4KBwQAAwMCAQESA14LFgoO
+CgcEAAMDAgEDEgNeGRoKXgoGBAADAwICEgNiBCAaTyBFcnJvciBlbmNvdW50ZXJlZCBiZWZv
+cmUgZGlzcGF0Y2hpbmcgYSBtZXNzYWdlLCBlLmcuLCBtYWxmb3JtZWQKIGRlc3RpbmF0aW9u
+LgoKDgoHBAADAwICBhIDYgQVCg4KBwQAAwMCAgESA2IWGwoOCgcEAAMDAgIDEgNiHh8KtQEK
+BAQAAwQSBWgChgEDGqUBIFN0cnVjdHVyZWQgbG9nIHRoYXQgaXMgZW1pdHRlZCB3aGVuIGEg
+bWVzc2FnZSByZXNwb25zZSAob3IgZXJyb3IpIGlzCiByZWNlaXZlZCBmcm9tIGEgZGVzdGlu
+YXRpb24gZm9yIGEgbWVzc2FnZSByZXF1ZXN0IHRoYXQgd2FzIGRpc3BhdGNoZWQKIGVhcmxp
+ZXIgaW4gYSBQaXBlbGluZS4KCgwKBQQAAwQBEgNoCiEKZAoGBAADBAQAEgRrBHQFGlQgRW51
+bSB0byBlbmNvZGUgdGhlIHJldHJ5IGRlY2lzaW9uIGZvciB0aGUgbWVzc2FnZSBhZnRlciB0
+aGUgcmVzcG9uc2UgaXMKIHJlY2VpdmVkLgoKDgoHBAADBAQAARIDawkUCjcKCAQAAwQEAAIA
+EgNtBiMaJiBEZWZhdWx0IHZhbHVlLiBUaGlzIHZhbHVlIGlzIHVudXNlZC4KChAKCQQAAwQE
+AAIAARIDbQYeChAKCQQAAwQEAAIAAhIDbSEiClYKCAQAAwQEAAIBEgNwBhUaRSBUaGUgUGlw
+ZWxpbmUgd2lsbCByZXRyeSBkaXNwYXRjaGluZyB0aGUgbWVzc2FnZSB0byB0aGUgZGVzdGlu
+YXRpb24uCgoQCgkEAAMEBAACAQESA3AGEAoQCgkEAAMEBAACAQISA3ATFApECggEAAMEBAAC
+AhIDcwYaGjMgVGhlIFBpcGVsaW5lIHdpbGwgbm90IHJldHJ5IHRoaXMgbWVzc2FnZSBhbnlt
+b3JlLgoKEAoJBAADBAQAAgIBEgNzBhUKEAoJBAADBAQAAgICEgNzGBkKdwoGBAADBAIAEgN4
+BBcaaCBJbmZvcm1hdGlvbmFsIGRldGFpbHMgd2hlbiBhIG1lc3NhZ2UgcmVzcG9uc2Ugd2Fz
+IHJlY2VpdmVkIGJ5IHRoZSB0YXJnZXQsCiBvciB3aGVuIHRoZSByZXF1ZXN0IGZhaWxlZC4K
+Cg4KBwQAAwQCAAUSA3gECgoOCgcEAAMEAgABEgN4CxIKDgoHBAADBAIAAxIDeBUWClMKBgQA
+AwQCARIDewQhGkQgVGhlIHJldHJ5IGRlY2lzaW9uIGZvciB0aGUgbWVzc2FnZSBhZnRlciB0
+aGUgcmVzcG9uc2UgaXMgcmVjZWl2ZWQuCgoOCgcEAAMEAgEGEgN7BA8KDgoHBAADBAIBARID
+exAcCg4KBwQAAwQCAQMSA3sfIAqGAQoGBAADBAICEgN/BC0adyBUaGUgZnV0dXJlIHRpbWUg
+d2hlbiB0aGUgbWVzc2FnZSByZXF1ZXN0IHdpbGwgYmUgcmV0cmllZC4gUHJlc2VudCBpZiBh
+bmQKIG9ubHkgaWYgdGhlIGByZXRyeV9zdGF0dXNgIGlzIGBXSUxMX1JFVFJZYC4KCg4KBwQA
+AwQCAgYSA38EHQoOCgcEAAMEAgIBEgN/HigKDgoHBAADBAICAxIDfyssCkwKBgQAAwQCAxIE
+ggEEIRo8IFRoZSBIVFRQIHJlc3BvbnNlIGNvZGUgcmVjZWl2ZWQgd2l0aCB0aGUgbWVzc2Fn
+ZSByZXNwb25zZS4KCg8KBwQAAwQCAwUSBIIBBAkKDwoHBAADBAIDARIEggEKHAoPCgcEAAME
+AgMDEgSCAR8gCjoKBgQAAwQCBBIEhQEEIBoqIFN0YXR1cyBvZiB0aGUgbWVzc2FnZSByZXNw
+b25zZSByZWNlaXZlZC4KCg8KBwQAAwQCBAYSBIUBBBUKDwoHBAADBAIEARIEhQEWGwoPCgcE
+AAMEAgQDEgSFAR4fCmYKBAQAAgASBIoBAkIaWCBUaGUgdW5pcXVlIHN5c3RlbSBnZW5lcmF0
+ZWQgSUQgYXNzb2NpYXRlZCB3aXRoIHRoZSBldmVudCBwYXNzZWQgZnJvbSB0aGUKIG1lc3Nh
+Z2UgYnVzLgoKDQoFBAACAAUSBIoBAggKDQoFBAACAAESBIoBCRQKDQoFBAACAAMSBIoBFxgK
+DQoFBAACAAgSBIoBGUEKEwoLBAACAAjM8fmKAQESBIoBGkAKTgoEBAACARIEjQECJRpAIFRo
+ZSBDbG91ZEV2ZW50IElEIGFuZCBzb3VyY2UgZnJvbSB0aGUgYXR0cmlidXRlcyBvZiB0aGUg
+ZXZlbnQuCgoNCgUEAAIBBhIEjQECFQoNCgUEAAIBARIEjQEWIAoNCgUEAAIBAxIEjQEjJAo9
+CgQEAAICEgSQAQIuGi8gVGhlIHBvaW50IGluIHRpbWUgd2hlbiB0aGUgYWN0aXZpdHkgb2Nj
+dXJyZWQuCgoNCgUEAAICBhIEkAECGwoNCgUEAAICARIEkAEcKQoNCgUEAAICAxIEkAEsLQpL
+CgQEAAgAEgaTAQKnAQMaOyBPbmVvZiBmb3IgdGhlIGRpZmZlcmVudCBsb2dnaW5nIGFjdGl2
+aXRpZXMgaW4gYSBwaXBlbGluZS4KCg0KBQQACAABEgSTAQgQCl8KBAQAAgMSBJYBBCkaUSBM
+b2dnaW5nIHdoZW4gYSBtZXNzYWdlIGlzIHJlY2VpdmVkIGluIHRoaXMgUGlwZWxpbmUgKG9y
+IGFuIGVycm9yCiBlbmNvdW50ZXJlZCkuCgoNCgUEAAIDBhIElgEEEwoNCgUEAAIDARIElgEU
+JAoNCgUEAAIDAxIElgEnKApiCgQEAAIEEgSaAQQvGlQgTG9nZ2luZyB3aGVuIGEgbWVzc2Fn
+ZSBpcyB0cmFuc2Zvcm1lZCBkdXJpbmcgbWVkaWF0aW9uIChvciBhbiBlcnJvcgogZW5jb3Vu
+dGVyZWQpLgoKDQoFBAACBAYSBJoBBBYKDQoFBAACBAESBJoBFyoKDQoFBAACBAMSBJoBLS4K
+YAoEBAACBRIEngEEKxpSIExvZ2dpbmcgd2hlbiBhIG1lc3NhZ2UgaXMgY29udmVydGVkIGR1
+cmluZyBtZWRpYXRpb24gKG9yIGFuIGVycm9yCiBlbmNvdW50ZXJlZCkuCgoNCgUEAAIFBhIE
+ngEEFAoNCgUEAAIFARIEngEVJgoNCgUEAAIFAxIEngEpKgppCgQEAAIGEgSiAQQ8GlsgTG9n
+Z2luZyB3aGVuIGEgbWVzc2FnZSByZXF1ZXN0IGlzIGRpc3BhdGNoZWQgdG8gYSBkZXN0aW5h
+dGlvbiAob3IgYW4KIGVycm9yIGVuY291bnRlcmVkKS4KCg0KBQQAAgYGEgSiAQQcCg0KBQQA
+AgYBEgSiAR03Cg0KBQQAAgYDEgSiATo7ClsKBAQAAgcSBKYBBDoaTSBMb2dnaW5nIHdoZW4g
+YSBtZXNzYWdlIHJlc3BvbnNlIChvciBlcnJvcikgaXMgcmVjZWl2ZWQgZnJvbSBhCiBkZXN0
+aW5hdGlvbi4KCg0KBQQAAgcGEgSmAQQbCg0KBQQAAgcBEgSmARw1Cg0KBQQAAgcDEgSmATg5
+YgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity ===
+    # Fields for PipelineActivity
+    # Field: message_uid Type: 9 ()
+    # Field: attributes Type: 11 (.google.cloud.eventarc.logging.v1.PipelineActivity.AttributesEntry)
+    # Field: activity_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: message_received Type: 11 (.google.cloud.eventarc.logging.v1.PipelineActivity.MessageReceived)
+    # Field: message_transformed Type: 11 (.google.cloud.eventarc.logging.v1.PipelineActivity.MessageTransformed)
+    # Field: message_converted Type: 11 (.google.cloud.eventarc.logging.v1.PipelineActivity.MessageConverted)
+    # Field: message_request_dispatched Type: 11 (.google.cloud.eventarc.logging.v1.PipelineActivity.MessageRequestDispatched)
+    # Field: message_response_received Type: 11 (.google.cloud.eventarc.logging.v1.PipelineActivity.MessageResponseReceived)
+
+# Enum: PipelineActivity::PayloadFormat
+our $PipelineActivity_PAYLOAD_FORMAT_UNSPECIFIED = 0;
+our $PipelineActivity_JSON = 1;
+our $PipelineActivity_PROTO = 2;
+our $PipelineActivity_AVRO = 3;
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Eventarc::Logging::V1::PipelineActivity - Compiled Protocol Buffers messages for google/cloud/eventarc/logging/v1/pipeline_activity.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Eventarc::Logging::V1::PipelineActivity;
+
+    my $msg = Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity->new({
+        message_uid => $message_uid,
+        attributes => $attributes,
+        activity_time => $activity_time,
+        message_received => $message_received,
+    });
+
+    # Read or update a field
+    my $val = $msg->message_uid();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/eventarc/logging/v1/pipeline_activity.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity
+
+Logged during the processing of a message in a pipeline.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message_uid() >> / C<< $msg->message_uid($value) >>
+
+Type: C<String>
+
+The unique system generated ID associated with the event passed from the
+message bus.
+
+=item * C<< $msg->attributes() >> / C<< $msg->attributes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity::AttributesEntry>)
+
+The CloudEvent ID and source from the attributes of the event.
+
+=item * C<< $msg->activity_time() >> / C<< $msg->activity_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The point in time when the activity occurred.
+
+=item * C<< $msg->message_received() >> / C<< $msg->message_received($value) >>
+
+Type: C<Message> (L<Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity::MessageReceived>)
+
+Logging when a message is received in this Pipeline (or an error
+encountered).
+
+=item * C<< $msg->message_transformed() >> / C<< $msg->message_transformed($value) >>
+
+Type: C<Message> (L<Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity::MessageTransformed>)
+
+Logging when a message is transformed during mediation (or an error
+encountered).
+
+=item * C<< $msg->message_converted() >> / C<< $msg->message_converted($value) >>
+
+Type: C<Message> (L<Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity::MessageConverted>)
+
+Logging when a message is converted during mediation (or an error
+encountered).
+
+=item * C<< $msg->message_request_dispatched() >> / C<< $msg->message_request_dispatched($value) >>
+
+Type: C<Message> (L<Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity::MessageRequestDispatched>)
+
+Logging when a message request is dispatched to a destination (or an
+error encountered).
+
+=item * C<< $msg->message_response_received() >> / C<< $msg->message_response_received($value) >>
+
+Type: C<Message> (L<Google::Cloud::Eventarc::Logging::V1::PipelineActivity::PipelineActivity::MessageResponseReceived>)
+
+Logging when a message response (or error) is received from a
+destination.
+
+=back
+
+=head3 Enum: PipelineActivity::PayloadFormat
+
+=over 4
+
+=item * C<PAYLOAD_FORMAT_UNSPECIFIED> => C<0>
+
+=item * C<JSON> => C<1>
+
+=item * C<PROTO> => C<2>
+
+=item * C<AVRO> => C<3>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Eventarc::Logging::V1::PipelineActivity::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

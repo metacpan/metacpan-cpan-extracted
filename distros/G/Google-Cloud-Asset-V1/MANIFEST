@@ -1,0 +1,24 @@
+Changes
+lib/Google/Cloud/Asset/V1.pm
+lib/Google/Cloud/Asset/V1/AssetEnrichmentResourceowners.pm
+lib/Google/Cloud/Asset/V1/AssetEnrichmentResourceowners/Types.pm
+lib/Google/Cloud/Asset/V1/Assets.pm
+lib/Google/Cloud/Asset/V1/Assets/Types.pm
+lib/Google/Cloud/Asset/V1/AssetService.pm
+lib/Google/Cloud/Asset/V1/AssetService/Types.pm
+lib/Google/Cloud/Asset/V1/AssetServiceClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-AssetService.t
+t/01-service-Default.t
+t/02-rest-transport-AssetService.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::DnsThreatDetector;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -226,71 +226,9 @@ EOF
     # Field: excluded_networks Type: 9 ()
     # Field: provider Type: 14 (.google.cloud.networksecurity.v1.DnsThreatDetector.Provider)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetector - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
-
-    my $msg = Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetector->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.DnsThreatDetector.LabelsEntry)
-
-=item * B<excluded_networks>
-
-Type: String
-
-=item * B<provider>
-
-Type: Enum (.google.cloud.networksecurity.v1.DnsThreatDetector.Provider)
-
-=back
-
-=cut
-
 # Enum: DnsThreatDetector::Provider
 our $DnsThreatDetector_PROVIDER_UNSPECIFIED = 0;
 our $DnsThreatDetector_INFOBLOX = 1;
-
-=pod
-
-=head2 Enum: DnsThreatDetector::Provider
-
-Values:
-
-=over 4
-
-=item * C<PROVIDER_UNSPECIFIED> => 0
-
-=item * C<INFOBLOX> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsRequest ===
     # Fields for ListDnsThreatDetectorsRequest
@@ -298,109 +236,15 @@ Values:
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
-
-    my $msg = Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsResponse ===
     # Fields for ListDnsThreatDetectorsResponse
     # Field: dns_threat_detectors Type: 11 (.google.cloud.networksecurity.v1.DnsThreatDetector)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
-
-    my $msg = Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsResponse->new(
-        dns_threat_detectors => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dns_threat_detectors>
-
-Type: Message (.google.cloud.networksecurity.v1.DnsThreatDetector)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::DnsThreatDetector::GetDnsThreatDetectorRequest ===
     # Fields for GetDnsThreatDetectorRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::DnsThreatDetector::GetDnsThreatDetectorRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
-
-    my $msg = Google::Cloud::Networksecurity::V1::DnsThreatDetector::GetDnsThreatDetectorRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::DnsThreatDetector::CreateDnsThreatDetectorRequest ===
     # Fields for CreateDnsThreatDetectorRequest
@@ -408,127 +252,29 @@ Type: String
     # Field: dns_threat_detector_id Type: 9 ()
     # Field: dns_threat_detector Type: 11 (.google.cloud.networksecurity.v1.DnsThreatDetector)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::DnsThreatDetector::CreateDnsThreatDetectorRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
-
-    my $msg = Google::Cloud::Networksecurity::V1::DnsThreatDetector::CreateDnsThreatDetectorRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<dns_threat_detector_id>
-
-Type: String
-
-=item * B<dns_threat_detector>
-
-Type: Message (.google.cloud.networksecurity.v1.DnsThreatDetector)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::DnsThreatDetector::UpdateDnsThreatDetectorRequest ===
     # Fields for UpdateDnsThreatDetectorRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: dns_threat_detector Type: 11 (.google.cloud.networksecurity.v1.DnsThreatDetector)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::DnsThreatDetector::UpdateDnsThreatDetectorRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
-
-    my $msg = Google::Cloud::Networksecurity::V1::DnsThreatDetector::UpdateDnsThreatDetectorRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<dns_threat_detector>
-
-Type: Message (.google.cloud.networksecurity.v1.DnsThreatDetector)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::DnsThreatDetector::DeleteDnsThreatDetectorRequest ===
     # Fields for DeleteDnsThreatDetectorRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::DnsThreatDetector::DeleteDnsThreatDetectorRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
-
-    my $msg = Google::Cloud::Networksecurity::V1::DnsThreatDetector::DeleteDnsThreatDetectorRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetectorServiceClient ===
 package Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetectorServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetectorServiceClient
 
-Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetectorServiceClient - Client stub representing the remote DnsThreatDetectorService service
+Client stub representing the remote C<DnsThreatDetectorService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networksecurity.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -622,13 +368,268 @@ sub delete_dns_threat_detector {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::DnsThreatDetector - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::DnsThreatDetector - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/dns_threat_detector.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
+
+    my $msg = Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetector->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        labels => $labels,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetector->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/dns_threat_detector.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetector
+
+A DNS threat detector sends DNS query logs to a _provider_ that then
+analyzes the logs to identify threat events in the DNS queries.
+By default, all VPC networks in your projects are included. You can exclude
+specific networks by supplying `excluded_networks`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. Name of the DnsThreatDetector resource.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Create time stamp.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Update time stamp.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetector::LabelsEntry>)
+
+Optional. Any labels associated with the DnsThreatDetector, listed as key
+value pairs.
+
+=item * C<< $msg->excluded_networks() >> / C<< $msg->excluded_networks($value) >>
+
+Type: C<String>
+
+Optional. A list of network resource names which aren't monitored by this
+DnsThreatDetector.
+
+Example:
+`projects/PROJECT_ID/global/networks/NETWORK_NAME`.
+
+=item * C<< $msg->provider() >> / C<< $msg->provider($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::Provider>)
+
+Required. The provider used for DNS threat analysis.
+
+=back
+
+=head3 Enum: DnsThreatDetector::Provider
+
+=over 4
+
+=item * C<PROVIDER_UNSPECIFIED> => C<0>
+
+=item * C<INFOBLOX> => C<1>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsRequest
+
+The message for requesting a list of DnsThreatDetectors in the project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent value for `ListDnsThreatDetectorsRequest`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The requested page size. The server may return fewer items than
+requested. If unspecified, the server picks an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token received from a previous
+`ListDnsThreatDetectorsRequest` call. Provide this to retrieve the
+subsequent page.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsResponse
+
+The response message to requesting a list of DnsThreatDetectors.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dns_threat_detectors() >> / C<< $msg->dns_threat_detectors($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetector>)
+
+The list of DnsThreatDetector resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token`, to retrieve the next page.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unordered list. Unreachable `DnsThreatDetector` resources.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::DnsThreatDetector::GetDnsThreatDetectorRequest
+
+The message sent to get a DnsThreatDetector.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the DnsThreatDetector resource.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::DnsThreatDetector::CreateDnsThreatDetectorRequest
+
+The message to create a DnsThreatDetector.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The value for the parent of the DnsThreatDetector resource.
+
+=item * C<< $msg->dns_threat_detector_id() >> / C<< $msg->dns_threat_detector_id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the requesting DnsThreatDetector object.
+If this field is not supplied, the service generates an identifier.
+
+=item * C<< $msg->dns_threat_detector() >> / C<< $msg->dns_threat_detector($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetector>)
+
+Required. The `DnsThreatDetector` resource to create.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::DnsThreatDetector::UpdateDnsThreatDetectorRequest
+
+The message for updating a DnsThreatDetector.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The field mask is used to specify the fields to be overwritten in
+the DnsThreatDetector resource by the update. The fields specified in the
+update_mask are relative to the resource, not the full request. A field
+will be overwritten if it is in the mask. If the mask is not provided then
+all fields present in the request will be overwritten.
+
+=item * C<< $msg->dns_threat_detector() >> / C<< $msg->dns_threat_detector($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::DnsThreatDetector>)
+
+Required. The DnsThreatDetector resource being updated.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::DnsThreatDetector::DeleteDnsThreatDetectorRequest
+
+The message for deleting a DnsThreatDetector.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the DnsThreatDetector resource.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

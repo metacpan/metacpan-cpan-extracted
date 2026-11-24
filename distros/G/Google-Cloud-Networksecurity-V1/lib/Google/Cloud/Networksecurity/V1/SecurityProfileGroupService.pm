@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -430,104 +430,14 @@ EOF
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsResponse ===
     # Fields for ListSecurityProfileGroupsResponse
     # Field: security_profile_groups Type: 11 (.google.cloud.networksecurity.v1.SecurityProfileGroup)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsResponse->new(
-        security_profile_groups => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<security_profile_groups>
-
-Type: Message (.google.cloud.networksecurity.v1.SecurityProfileGroup)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::GetSecurityProfileGroupRequest ===
     # Fields for GetSecurityProfileGroupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::GetSecurityProfileGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::GetSecurityProfileGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::CreateSecurityProfileGroupRequest ===
     # Fields for CreateSecurityProfileGroupRequest
@@ -535,109 +445,15 @@ Type: String
     # Field: security_profile_group_id Type: 9 ()
     # Field: security_profile_group Type: 11 (.google.cloud.networksecurity.v1.SecurityProfileGroup)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::CreateSecurityProfileGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::CreateSecurityProfileGroupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<security_profile_group_id>
-
-Type: String
-
-=item * B<security_profile_group>
-
-Type: Message (.google.cloud.networksecurity.v1.SecurityProfileGroup)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::UpdateSecurityProfileGroupRequest ===
     # Fields for UpdateSecurityProfileGroupRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: security_profile_group Type: 11 (.google.cloud.networksecurity.v1.SecurityProfileGroup)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::UpdateSecurityProfileGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::UpdateSecurityProfileGroupRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<security_profile_group>
-
-Type: Message (.google.cloud.networksecurity.v1.SecurityProfileGroup)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::DeleteSecurityProfileGroupRequest ===
     # Fields for DeleteSecurityProfileGroupRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::DeleteSecurityProfileGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::DeleteSecurityProfileGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfilesRequest ===
     # Fields for ListSecurityProfilesRequest
@@ -645,104 +461,14 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfilesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfilesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfilesResponse ===
     # Fields for ListSecurityProfilesResponse
     # Field: security_profiles Type: 11 (.google.cloud.networksecurity.v1.SecurityProfile)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfilesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfilesResponse->new(
-        security_profiles => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<security_profiles>
-
-Type: Message (.google.cloud.networksecurity.v1.SecurityProfile)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::GetSecurityProfileRequest ===
     # Fields for GetSecurityProfileRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::GetSecurityProfileRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::GetSecurityProfileRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::CreateSecurityProfileRequest ===
     # Fields for CreateSecurityProfileRequest
@@ -750,132 +476,30 @@ Type: String
     # Field: security_profile_id Type: 9 ()
     # Field: security_profile Type: 11 (.google.cloud.networksecurity.v1.SecurityProfile)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::CreateSecurityProfileRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::CreateSecurityProfileRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<security_profile_id>
-
-Type: String
-
-=item * B<security_profile>
-
-Type: Message (.google.cloud.networksecurity.v1.SecurityProfile)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::UpdateSecurityProfileRequest ===
     # Fields for UpdateSecurityProfileRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: security_profile Type: 11 (.google.cloud.networksecurity.v1.SecurityProfile)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::UpdateSecurityProfileRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::UpdateSecurityProfileRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<security_profile>
-
-Type: Message (.google.cloud.networksecurity.v1.SecurityProfile)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::DeleteSecurityProfileRequest ===
     # Fields for DeleteSecurityProfileRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::DeleteSecurityProfileRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::DeleteSecurityProfileRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::SecurityProfileGroupServiceClient ===
 package Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::SecurityProfileGroupServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::SecurityProfileGroupServiceClient
 
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::SecurityProfileGroupServiceClient - Client stub representing the remote SecurityProfileGroupService service
+Client stub representing the remote C<SecurityProfileGroupService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networksecurity.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1035,23 +659,15 @@ package Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::Organiz
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::OrganizationSecurityProfileGroupServiceClient
 
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::OrganizationSecurityProfileGroupServiceClient - Client stub representing the remote OrganizationSecurityProfileGroupService service
+Client stub representing the remote C<OrganizationSecurityProfileGroupService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networksecurity.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1210,13 +826,378 @@ sub delete_security_profile {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupService - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::SecurityProfileGroupService - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/security_profile_group_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
+
+    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsRequest->new({
+        parent => $parent,
+        page_size => $page_size,
+        page_token => $page_token,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/security_profile_group_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsRequest
+
+Request used with the ListSecurityProfileGroups method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project or organization and location from which the
+SecurityProfileGroups should be listed, specified in the format
+`projects|organizations/*/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of SecurityProfileGroups to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The value returned by the last
+`ListSecurityProfileGroupsResponse` Indicates that this is a
+continuation of a prior `ListSecurityProfileGroups` call, and
+that the system should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsResponse
+
+Response returned by the ListSecurityProfileGroups method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->security_profile_groups() >> / C<< $msg->security_profile_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfileGroup>)
+
+List of SecurityProfileGroups resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::GetSecurityProfileGroupRequest
+
+Request used by the GetSecurityProfileGroup method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the SecurityProfileGroup to get. Must be in the format
+`projects|organizations/*/locations/{location}/securityProfileGroups/{security_profile_group}`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::CreateSecurityProfileGroupRequest
+
+Request used by the CreateSecurityProfileGroup method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the SecurityProfileGroup. Must be in the
+format `projects|organizations/*/locations/{location}`.
+
+=item * C<< $msg->security_profile_group_id() >> / C<< $msg->security_profile_group_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the SecurityProfileGroup resource to be created.
+This value should be 1-63 characters long, containing only
+letters, numbers, hyphens, and underscores, and should not start
+with a number. E.g. "security_profile_group1".
+
+=item * C<< $msg->security_profile_group() >> / C<< $msg->security_profile_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfileGroup>)
+
+Required. SecurityProfileGroup resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::UpdateSecurityProfileGroupRequest
+
+Request used by the UpdateSecurityProfileGroup method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Field mask is used to specify the fields to be overwritten in the
+SecurityProfileGroup resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask.
+
+=item * C<< $msg->security_profile_group() >> / C<< $msg->security_profile_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfileGroup>)
+
+Required. Updated SecurityProfileGroup resource.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::DeleteSecurityProfileGroupRequest
+
+Request used by the DeleteSecurityProfileGroup method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the SecurityProfileGroup to delete. Must be in the
+format
+`projects|organizations/*/locations/{location}/securityProfileGroups/{security_profile_group}`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. If client provided etag is out of date, delete will return
+FAILED_PRECONDITION error.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfilesRequest
+
+Request used with the ListSecurityProfiles method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project or organization and location from which the
+SecurityProfiles should be listed, specified in the format
+`projects|organizations/*/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of SecurityProfiles to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The value returned by the last
+`ListSecurityProfilesResponse` Indicates that this is a continuation of a
+prior `ListSecurityProfiles` call, and that the system should return the
+next page of data.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfilesResponse
+
+Response returned by the ListSecurityProfiles method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->security_profiles() >> / C<< $msg->security_profiles($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfile>)
+
+List of SecurityProfile resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::GetSecurityProfileRequest
+
+Request used by the GetSecurityProfile method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the SecurityProfile to get. Must be in the format
+`projects|organizations/*/locations/{location}/securityProfiles/{security_profile_id}`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::CreateSecurityProfileRequest
+
+Request used by the CreateSecurityProfile method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the SecurityProfile. Must be in the format
+`projects|organizations/*/locations/{location}`.
+
+=item * C<< $msg->security_profile_id() >> / C<< $msg->security_profile_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the SecurityProfile resource to be created. This
+value should be 1-63 characters long, containing only letters, numbers,
+hyphens, and underscores, and should not start with a number. E.g.
+"security_profile1".
+
+=item * C<< $msg->security_profile() >> / C<< $msg->security_profile($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfile>)
+
+Required. SecurityProfile resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::UpdateSecurityProfileRequest
+
+Request used by the UpdateSecurityProfile method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Field mask is used to specify the fields to be overwritten in the
+SecurityProfile resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask.
+
+=item * C<< $msg->security_profile() >> / C<< $msg->security_profile($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfile>)
+
+Required. Updated SecurityProfile resource.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::DeleteSecurityProfileRequest
+
+Request used by the DeleteSecurityProfile method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the SecurityProfile to delete. Must be in the format
+`projects|organizations/*/locations/{location}/securityProfiles/{security_profile_id}`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. If client provided etag is out of date, delete will return
+FAILED_PRECONDITION error.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

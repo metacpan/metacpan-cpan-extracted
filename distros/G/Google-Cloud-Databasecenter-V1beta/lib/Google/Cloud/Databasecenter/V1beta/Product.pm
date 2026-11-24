@@ -1,0 +1,223 @@
+package Google::Cloud::Databasecenter::V1beta::Product;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    my $descriptor_b64 = <<'EOF';
+CjBnb29nbGUvY2xvdWQvZGF0YWJhc2VjZW50ZXIvdjFiZXRhL3Byb2R1Y3QucHJvdG8SImdv
+b2dsZS5jbG91ZC5kYXRhYmFzZWNlbnRlci52MWJldGEaH2dvb2dsZS9hcGkvZmllbGRfYmVo
+YXZpb3IucHJvdG8i5QEKB1Byb2R1Y3QSSAoEdHlwZRgBIAEoDjIvLmdvb2dsZS5jbG91ZC5k
+YXRhYmFzZWNlbnRlci52MWJldGEuUHJvZHVjdFR5cGVCA+BBAVIEdHlwZRJHCgZlbmdpbmUY
+AiABKA4yKi5nb29nbGUuY2xvdWQuZGF0YWJhc2VjZW50ZXIudjFiZXRhLkVuZ2luZUID4EEB
+UgZlbmdpbmUSHQoHdmVyc2lvbhgDIAEoCUID4EEBUgd2ZXJzaW9uEigKDW1pbm9yX3ZlcnNp
+b24YBCABKAlCA+BBAVIMbWlub3JWZXJzaW9uKpMDCgZFbmdpbmUSFgoSRU5HSU5FX1VOU1BF
+Q0lGSUVEEAASEAoMRU5HSU5FX01ZU1FMEAESEwoPRU5HSU5FX1BPU1RHUkVTEAISFQoRRU5H
+SU5FX1NRTF9TRVJWRVIQAxIRCg1FTkdJTkVfTkFUSVZFEAQSIAocRU5HSU5FX01FTU9SWVNU
+T1JFX0ZPUl9SRURJUxAIEigKJEVOR0lORV9NRU1PUllTVE9SRV9GT1JfUkVESVNfQ0xVU1RF
+UhAJEiUKIUVOR0lORV9GSVJFU1RPUkVfV0lUSF9OQVRJVkVfTU9ERRAKEigKJEVOR0lORV9G
+SVJFU1RPUkVfV0lUSF9EQVRBU1RPUkVfTU9ERRALEhkKFUVOR0lORV9FWEFEQVRBX09SQUNM
+RRAMEiAKHEVOR0lORV9BREJfU0VSVkVSTEVTU19PUkFDTEUQDRI0CjBFTkdJTkVfRklSRVNU
+T1JFX1dJVEhfTU9OR09EQl9DT01QQVRJQklMSVRZX01PREUQDhIQCgxFTkdJTkVfT1RIRVIQ
+BirEAgoLUHJvZHVjdFR5cGUSHAoYUFJPRFVDVF9UWVBFX1VOU1BFQ0lGSUVEEAASGgoWUFJP
+RFVDVF9UWVBFX0NMT1VEX1NRTBABEhgKFFBST0RVQ1RfVFlQRV9BTExPWURCEAISGAoUUFJP
+RFVDVF9UWVBFX1NQQU5ORVIQAxIZChVQUk9EVUNUX1RZUEVfQklHVEFCTEUQBhIcChhQUk9E
+VUNUX1RZUEVfTUVNT1JZU1RPUkUQBxIaChZQUk9EVUNUX1RZUEVfRklSRVNUT1JFEAgSHwob
+UFJPRFVDVF9UWVBFX0NPTVBVVEVfRU5HSU5FEAkSHgoaUFJPRFVDVF9UWVBFX09SQUNMRV9P
+Tl9HQ1AQChIZChVQUk9EVUNUX1RZUEVfQklHUVVFUlkQCxIWChJQUk9EVUNUX1RZUEVfT1RI
+RVIQBUL6AQomY29tLmdvb2dsZS5jbG91ZC5kYXRhYmFzZWNlbnRlci52MWJldGFCDFByb2R1
+Y3RQcm90b1ABWk5jbG91ZC5nb29nbGUuY29tL2dvL2RhdGFiYXNlY2VudGVyL2FwaXYxYmV0
+YS9kYXRhYmFzZWNlbnRlcnBiO2RhdGFiYXNlY2VudGVycGKqAiJHb29nbGUuQ2xvdWQuRGF0
+YWJhc2VDZW50ZXIuVjFCZXRhygIiR29vZ2xlXENsb3VkXERhdGFiYXNlQ2VudGVyXFYxYmV0
+YeoCJUdvb2dsZTo6Q2xvdWQ6OkRhdGFiYXNlQ2VudGVyOjpWMWJldGFKniEKBxIFDgCBAQEK
+vAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5k
+ZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5
+b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhl
+IExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAg
+ICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNz
+IHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBz
+b2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQg
+b24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05T
+IE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNl
+bnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFu
+ZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQACsKCQoCAwASAxIA
+KQoICgEIEgMUAD8KCQoCCCUSAxQAPwoICgEIEgMVAGUKCQoCCAsSAxUAZQoICgEIEgMWACIK
+CQoCCAoSAxYAIgoICgEIEgMXAC0KCQoCCAgSAxcALQoICgEIEgMYAD8KCQoCCAESAxgAPwoI
+CgEIEgMZAD8KCQoCCCkSAxkAPwoICgEIEgMaAD4KCQoCCC0SAxoAPgpRCgIFABIEHQBFARpF
+IEVuZ2luZSByZWZlcnMgdG8gdW5kZXJseWluZyBkYXRhYmFzZSBiaW5hcnkgcnVubmluZyBp
+biBhbiBpbnN0YW5jZS4KCgoKAwUAARIDHQULCkcKBAUAAgASAx8CGRo6IFVOU1BFQ0lGSUVE
+IG1lYW5zIGVuZ2luZSB0eXBlIGlzIG5vdCBrbm93biBvciBhdmFpbGFibGUuCgoMCgUFAAIA
+ARIDHwIUCgwKBQUAAgACEgMfFxgKSgoEBQACARIDIgITGj0gTXlTUUwgYmluYXJ5IHJ1bm5p
+bmcgYXMgYW4gZW5naW5lIGluIHRoZSBkYXRhYmFzZSBpbnN0YW5jZS4KCgwKBQUAAgEBEgMi
+Ag4KDAoFBQACAQISAyIREgpGCgQFAAICEgMlAhYaOSBQb3N0Z3JlcyBiaW5hcnkgcnVubmlu
+ZyBhcyBlbmdpbmUgaW4gZGF0YWJhc2UgaW5zdGFuY2UuCgoMCgUFAAICARIDJQIRCgwKBQUA
+AgICEgMlFBUKRwoEBQACAxIDKAIYGjogU1FMU2VydmVyIGJpbmFyeSBydW5uaW5nIGFzIGVu
+Z2luZSBpbiBkYXRhYmFzZSBpbnN0YW5jZS4KCgwKBQUAAgMBEgMoAhMKDAoFBQACAwISAygW
+FwpECgQFAAIEEgMrAhQaNyBOYXRpdmUgZGF0YWJhc2UgYmluYXJ5IHJ1bm5pbmcgYXMgZW5n
+aW5lIGluIGluc3RhbmNlLgoKDAoFBQACBAESAysCDwoMCgUFAAIEAhIDKxITCi4KBAUAAgUS
+Ay4CIxohIE1lbW9yeXN0b3JlIHdpdGggUmVkaXMgZGlhbGVjdC4KCgwKBQUAAgUBEgMuAh4K
+DAoFBQACBQISAy4hIgo2CgQFAAIGEgMxAisaKSBNZW1vcnlzdG9yZSB3aXRoIFJlZGlzIGNs
+dXN0ZXIgZGlhbGVjdC4KCgwKBQUAAgYBEgMxAiYKDAoFBQACBgISAzEpKgoqCgQFAAIHEgM0
+AikaHSBGaXJlc3RvcmUgd2l0aCBuYXRpdmUgbW9kZS4KCgwKBQUAAgcBEgM0AiMKDAoFBQAC
+BwISAzQmKAotCgQFAAIIEgM3AiwaICBGaXJlc3RvcmUgd2l0aCBkYXRhc3RvcmUgbW9kZS4K
+CgwKBQUAAggBEgM3AiYKDAoFBQACCAISAzcpKwolCgQFAAIJEgM6Ah0aGCBPcmFjbGUgRXhh
+ZGF0YSBlbmdpbmUuCgoMCgUFAAIJARIDOgIXCgwKBQUAAgkCEgM6GhwKNgoEBQACChIDPQIk
+GikgT3JhY2xlIEF1dG9ub21vdXMgREIgU2VydmVybGVzcyBlbmdpbmUuCgoMCgUFAAIKARID
+PQIeCgwKBQUAAgoCEgM9ISMKNAoEBQACCxIDQAI4GicgRmlyZXN0b3JlIHdpdGggTW9uZ29E
+QiBjb21wYXRpYmlsaXR5LgoKDAoFBQACCwESA0ACMgoMCgUFAAILAhIDQDU3CoYBCgQFAAIM
+EgNEAhMaeSBPdGhlciByZWZlcnMgdG8gcmVzdCBvZiBvdGhlciBkYXRhYmFzZSBlbmdpbmUu
+IFRoaXMgaXMgdG8gYmUgd2hlbiBlbmdpbmUgaXMKIGtub3duLCBidXQgaXQgaXMgbm90IHBy
+ZXNlbnQgaW4gdGhpcyBlbnVtLgoKDAoFBQACDAESA0QCDgoMCgUFAAIMAhIDRBESCr0BCgIF
+ARIESgBtARqwASBQcm9kdWN0VHlwZSBpcyB1c2VkIHRvIGlkZW50aWZ5IGEgZGF0YWJhc2Ug
+c2VydmljZSBvZmZlcmluZyBlaXRoZXIgaW4gYSBjbG91ZAogcHJvdmlkZXIgb3Igb24tcHJl
+bWlzZS4gVGhpcyBlbnVtIG5lZWRzIHRvIGJlIHVwZGF0ZWQgd2hlbmV2ZXIgd2UgaW50cm9k
+dWNlCiBhIG5ldyBQcm9kdWN0VHlwZS4KCgoKAwUBARIDSgUQCoMBCgQFAQIAEgNNAh8adiBQ
+Uk9EVUNUX1RZUEVfVU5TUEVDSUZJRUQgbWVhbnMgcHJvZHVjdCB0eXBlIGlzIG5vdCBrbm93
+biBvciB0aGF0IHRoZSB1c2VyCiBkaWRuJ3QgcHJvdmlkZSB0aGlzIGZpZWxkIGluIHRoZSBy
+ZXF1ZXN0LgoKDAoFBQECAAESA00CGgoMCgUFAQIAAhIDTR0eCjUKBAUBAgESA1ACHRooIENs
+b3VkIFNRTCBwcm9kdWN0IGFyZWEgaW4gR29vZ2xlIENsb3VkCgoMCgUFAQIBARIDUAIYCgwK
+BQUBAgECEgNQGxwKMwoEBQECAhIDUwIbGiYgQWxsb3lEQiBwcm9kdWN0IGFyZWEgaW4gR29v
+Z2xlIENsb3VkCgoMCgUFAQICARIDUwIWCgwKBQUBAgICEgNTGRoKMwoEBQECAxIDVgIbGiYg
+U3Bhbm5lciBwcm9kdWN0IGFyZWEgaW4gR29vZ2xlIENsb3VkCgoMCgUFAQIDARIDVgIWCgwK
+BQUBAgMCEgNWGRoKNAoEBQECBBIDWQIcGicgQmlndGFibGUgcHJvZHVjdCBhcmVhIGluIEdv
+b2dsZSBDbG91ZAoKDAoFBQECBAESA1kCFwoMCgUFAQIEAhIDWRobCjcKBAUBAgUSA1wCHxoq
+IE1lbW9yeXN0b3JlIHByb2R1Y3QgYXJlYSBpbiBHb29nbGUgQ2xvdWQKCgwKBQUBAgUBEgNc
+AhoKDAoFBQECBQISA1wdHgo1CgQFAQIGEgNfAh0aKCBGaXJlc3RvcmUgcHJvZHVjdCBhcmVh
+IGluIEdvb2dsZSBDbG91ZAoKDAoFBQECBgESA18CGAoMCgUFAQIGAhIDXxscCjQKBAUBAgcS
+A2ICIhonIENvbXB1dGUgRW5naW5lIHNlbGYgbWFuYWdlZCBkYXRhYmFzZXMKCgwKBQUBAgcB
+EgNiAh0KDAoFBQECBwISA2IgIQoyCgQFAQIIEgNlAiIaJSBPcmFjbGUgcHJvZHVjdCBhcmVh
+IGluIEdvb2dsZSBDbG91ZAoKDAoFBQECCAESA2UCHAoMCgUFAQIIAhIDZR8hCjQKBAUBAgkS
+A2gCHRonIEJpZ1F1ZXJ5IHByb2R1Y3QgYXJlYSBpbiBHb29nbGUgQ2xvdWQKCgwKBQUBAgkB
+EgNoAhcKDAoFBQECCQISA2gaHAqJAQoEBQECChIDbAIZGnwgT3RoZXIgcmVmZXJzIHRvIHJl
+c3Qgb2Ygb3RoZXIgcHJvZHVjdCB0eXBlLiBUaGlzIGlzIHRvIGJlIHdoZW4gcHJvZHVjdCB0
+eXBlCiBpcyBrbm93biwgYnV0IGl0IGlzIG5vdCBwcmVzZW50IGluIHRoaXMgZW51bS4KCgwK
+BQUBAgoBEgNsAhQKDAoFBQECCgISA2wXGApCCgIEABIFcACBAQEaNSBQcm9kdWN0IHNwZWNp
+ZmljYXRpb24gZm9yIGRhdGFiYXNlY2VudGVyIHJlc291cmNlcy4KCgoKAwQAARIDcAgPCmAK
+BAQAAgASA3MCQBpTIE9wdGlvbmFsLiBUeXBlIG9mIHNwZWNpZmljIGRhdGFiYXNlIHByb2R1
+Y3QuIEl0IGNvdWxkIGJlIENsb3VkU1FMLCBBbGxveURCCiBldGMuLgoKDAoFBAACAAYSA3MC
+DQoMCgUEAAIAARIDcw4SCgwKBQQAAgADEgNzFRYKDAoFBAACAAgSA3MXPwoPCggEAAIACJwI
+ABIDcxg+ClUKBAQAAgESA3YCPRpIIE9wdGlvbmFsLiBUaGUgc3BlY2lmaWMgZW5naW5lIHRo
+YXQgdGhlIHVuZGVybHlpbmcgZGF0YWJhc2UgaXMgcnVubmluZy4KCgwKBQQAAgEGEgN2AggK
+DAoFBAACAQESA3YJDwoMCgUEAAIBAxIDdhITCgwKBQQAAgEIEgN2FDwKDwoIBAACAQicCAAS
+A3YVOwqpAQoEBAACAhIDewI+GpsBIE9wdGlvbmFsLiBWZXJzaW9uIG9mIHRoZSB1bmRlcmx5
+aW5nIGRhdGFiYXNlIGVuZ2luZS4gRXhhbXBsZSB2YWx1ZXM6IEZvcgogTXlTUUwsIGl0IGNv
+dWxkIGJlICI4LjAiLCAiNS43IiBldGMuIEZvciBQb3N0Z3JlcywgaXQgY291bGQgYmUgIjE0
+IiwgIjE1IgogZXRjLgoKDAoFBAACAgUSA3sCCAoMCgUEAAICARIDewkQCgwKBQQAAgIDEgN7
+ExQKDAoFBAACAggSA3sVPQoPCggEAAICCJwIABIDexY8CrwBCgQEAAIDEgSAAQJEGq0BIE9w
+dGlvbmFsLiBNaW5vciB2ZXJzaW9uIG9mIHRoZSB1bmRlcmx5aW5nIGRhdGFiYXNlIGVuZ2lu
+ZS4gRXhhbXBsZSB2YWx1ZXM6CiBGb3IgTXlTUUwsIGl0IGNvdWxkIGJlICI4LjAuMzUiLCAi
+NS43LjI1IiBldGMuIEZvciBQb3N0Z3JlU1FMLCBpdCBjb3VsZCBiZQogIjE0LjQiLCAiMTUu
+NSIgZXRjLgoKDQoFBAACAwUSBIABAggKDQoFBAACAwESBIABCRYKDQoFBAACAwMSBIABGRoK
+DQoFBAACAwgSBIABG0MKEAoIBAACAwicCAASBIABHEJiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Databasecenter::V1beta::Product::Product ===
+    # Fields for Product
+    # Field: type Type: 14 (.google.cloud.databasecenter.v1beta.ProductType)
+    # Field: engine Type: 14 (.google.cloud.databasecenter.v1beta.Engine)
+    # Field: version Type: 9 ()
+    # Field: minor_version Type: 9 ()
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Databasecenter::V1beta::Product - Compiled Protocol Buffers messages for google/cloud/databasecenter/v1beta/product.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Databasecenter::V1beta::Product;
+
+    my $msg = Google::Cloud::Databasecenter::V1beta::Product::Product->new({
+        type => $type,
+        engine => $engine,
+        version => $version,
+        minor_version => $minor_version,
+    });
+
+    # Read or update a field
+    my $val = $msg->type();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Databasecenter::V1beta::Product::Product->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/databasecenter/v1beta/product.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Databasecenter::V1beta::Product::Product
+
+Product specification for databasecenter resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Databasecenter::V1beta::ProductType>)
+
+Optional. Type of specific database product. It could be CloudSQL, AlloyDB
+etc..
+
+=item * C<< $msg->engine() >> / C<< $msg->engine($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Databasecenter::V1beta::Engine>)
+
+Optional. The specific engine that the underlying database is running.
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Optional. Version of the underlying database engine. Example values: For
+MySQL, it could be "8.0", "5.7" etc. For Postgres, it could be "14", "15"
+etc.
+
+=item * C<< $msg->minor_version() >> / C<< $msg->minor_version($value) >>
+
+Type: C<String>
+
+Optional. Minor version of the underlying database engine. Example values:
+For MySQL, it could be "8.0.35", "5.7.25" etc. For PostgreSQL, it could be
+"14.4", "15.5" etc.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Databasecenter::V1beta::Product::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

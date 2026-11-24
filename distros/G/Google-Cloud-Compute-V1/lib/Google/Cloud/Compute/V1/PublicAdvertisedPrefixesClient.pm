@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -362,31 +362,191 @@ The following RPC methods are available in this client:
 
 =item * B<announce>
 
-Calls the RPC method C<Announce> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->announce(
+        project                  => $project,
+        public_advertised_prefix => $public_advertised_prefix,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Announce> on C<google.cloud.compute.v1.PublicAdvertisedPrefixes>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AnnouncePublicAdvertisedPrefixeRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<public_advertised_prefix> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        project                  => $project,
+        public_advertised_prefix => $public_advertised_prefix,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.PublicAdvertisedPrefixes>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeletePublicAdvertisedPrefixeRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<public_advertised_prefix> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        public_advertised_prefix => $public_advertised_prefix,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.PublicAdvertisedPrefixes>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetPublicAdvertisedPrefixeRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::PublicAdvertisedPrefix>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<public_advertised_prefix> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        project                  => $project,
+        public_advertised_prefix_resource => $public_advertised_prefix_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.PublicAdvertisedPrefixes>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertPublicAdvertisedPrefixeRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<public_advertised_prefix_resource> - L<Google::Cloud::Compute::V1::Compute::PublicAdvertisedPrefix>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.PublicAdvertisedPrefixes>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListPublicAdvertisedPrefixesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::PublicAdvertisedPrefixList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        project                  => $project,
+        public_advertised_prefix => $public_advertised_prefix,
+        public_advertised_prefix_resource => $public_advertised_prefix_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.PublicAdvertisedPrefixes>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchPublicAdvertisedPrefixeRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<public_advertised_prefix> - C<string>
+
+=item * C<public_advertised_prefix_resource> - L<Google::Cloud::Compute::V1::Compute::PublicAdvertisedPrefix>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<withdraw>
 
-Calls the RPC method C<Withdraw> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->withdraw(
+        project                  => $project,
+        public_advertised_prefix => $public_advertised_prefix,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Withdraw> on C<google.cloud.compute.v1.PublicAdvertisedPrefixes>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::WithdrawPublicAdvertisedPrefixeRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<public_advertised_prefix> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =back
 

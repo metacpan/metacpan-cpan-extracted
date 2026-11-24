@@ -1,0 +1,35 @@
+Changes
+lib/Google/Cloud/Bigquery/Migration/V2alpha.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/AssessmentTask.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/AssessmentTask/Types.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/MigrationEntities.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/MigrationEntities/Types.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/MigrationErrorDetails.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/MigrationErrorDetails/Types.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/MigrationMetrics.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/MigrationMetrics/Types.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/MigrationService.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/MigrationService/Types.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/MigrationServiceClient.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/SqlTranslationServiceClient.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/TranslationService.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/TranslationService/Types.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/TranslationTask.pm
+lib/Google/Cloud/Bigquery/Migration/V2alpha/TranslationTask/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-MigrationService.t
+t/01-service-SqlTranslationService.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-MigrationService.t
+t/02-rest-transport-SqlTranslationService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

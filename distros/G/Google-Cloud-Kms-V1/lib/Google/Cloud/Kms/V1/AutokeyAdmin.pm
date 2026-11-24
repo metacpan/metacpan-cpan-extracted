@@ -3,7 +3,7 @@ package Google::Cloud::Kms::V1::AutokeyAdmin;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -224,65 +224,9 @@ EOF
     # Field: autokey_config Type: 11 (.google.cloud.kms.v1.AutokeyConfig)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::AutokeyAdmin::UpdateAutokeyConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::AutokeyAdmin;
-
-    my $msg = Google::Cloud::Kms::V1::AutokeyAdmin::UpdateAutokeyConfigRequest->new(
-        autokey_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<autokey_config>
-
-Type: Message (.google.cloud.kms.v1.AutokeyConfig)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::AutokeyAdmin::GetAutokeyConfigRequest ===
     # Fields for GetAutokeyConfigRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::AutokeyAdmin::GetAutokeyConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::AutokeyAdmin;
-
-    my $msg = Google::Cloud::Kms::V1::AutokeyAdmin::GetAutokeyConfigRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig ===
     # Fields for AutokeyConfig
@@ -292,48 +236,6 @@ Type: String
     # Field: etag Type: 9 ()
     # Field: key_project_resolution_mode Type: 14 (.google.cloud.kms.v1.AutokeyConfig.KeyProjectResolutionMode)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::AutokeyAdmin;
-
-    my $msg = Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<key_project>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.kms.v1.AutokeyConfig.State)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<key_project_resolution_mode>
-
-Type: Enum (.google.cloud.kms.v1.AutokeyConfig.KeyProjectResolutionMode)
-
-=back
-
-=cut
-
 # Enum: AutokeyConfig::State
 our $AutokeyConfig_STATE_UNSPECIFIED = 0;
 our $AutokeyConfig_ACTIVE = 1;
@@ -341,136 +243,34 @@ our $AutokeyConfig_KEY_PROJECT_DELETED = 2;
 our $AutokeyConfig_UNINITIALIZED = 3;
 our $AutokeyConfig_KEY_PROJECT_PERMISSION_DENIED = 4;
 
-=pod
-
-=head2 Enum: AutokeyConfig::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<KEY_PROJECT_DELETED> => 2
-
-=item * C<UNINITIALIZED> => 3
-
-=item * C<KEY_PROJECT_PERMISSION_DENIED> => 4
-
-=back
-
-=cut
-
 # Enum: AutokeyConfig::KeyProjectResolutionMode
 our $AutokeyConfig_KEY_PROJECT_RESOLUTION_MODE_UNSPECIFIED = 0;
 our $AutokeyConfig_DEDICATED_KEY_PROJECT = 1;
 our $AutokeyConfig_RESOURCE_PROJECT = 2;
 our $AutokeyConfig_DISABLED = 3;
 
-=pod
-
-=head2 Enum: AutokeyConfig::KeyProjectResolutionMode
-
-Values:
-
-=over 4
-
-=item * C<KEY_PROJECT_RESOLUTION_MODE_UNSPECIFIED> => 0
-
-=item * C<DEDICATED_KEY_PROJECT> => 1
-
-=item * C<RESOURCE_PROJECT> => 2
-
-=item * C<DISABLED> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigRequest ===
     # Fields for ShowEffectiveAutokeyConfigRequest
     # Field: parent Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::AutokeyAdmin;
-
-    my $msg = Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigResponse ===
     # Fields for ShowEffectiveAutokeyConfigResponse
     # Field: key_project Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::AutokeyAdmin;
-
-    my $msg = Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigResponse->new(
-        key_project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<key_project>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyAdminClient ===
 package Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyAdminClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyAdminClient
 
-Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyAdminClient - Client stub representing the remote AutokeyAdmin service
+Client stub representing the remote C<AutokeyAdmin> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<kms.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -538,13 +338,221 @@ sub show_effective_autokey_config {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Kms::V1::AutokeyAdmin - Protocol Buffers schema definition
+Google::Cloud::Kms::V1::AutokeyAdmin - Compiled Protocol Buffers messages for google/cloud/kms/v1/autokey_admin.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::AutokeyAdmin;
+
+    my $msg = Google::Cloud::Kms::V1::AutokeyAdmin::UpdateAutokeyConfigRequest->new({
+        autokey_config => $autokey_config,
+        update_mask => $update_mask,
+    });
+
+    # Read or update a field
+    my $val = $msg->autokey_config();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Kms::V1::AutokeyAdmin::UpdateAutokeyConfigRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/kms/v1/autokey_admin.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Kms::V1::AutokeyAdmin::UpdateAutokeyConfigRequest
+
+Request message for
+[UpdateAutokeyConfig][google.cloud.kms.v1.AutokeyAdmin.UpdateAutokeyConfig].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->autokey_config() >> / C<< $msg->autokey_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig>)
+
+Required. [AutokeyConfig][google.cloud.kms.v1.AutokeyConfig] with values to
+update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Masks which fields of the
+[AutokeyConfig][google.cloud.kms.v1.AutokeyConfig] to update, e.g.
+`keyProject`.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::AutokeyAdmin::GetAutokeyConfigRequest
+
+Request message for
+[GetAutokeyConfig][google.cloud.kms.v1.AutokeyAdmin.GetAutokeyConfig].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the [AutokeyConfig][google.cloud.kms.v1.AutokeyConfig]
+resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig` or
+`projects/{PROJECT_NUMBER}/autokeyConfig`.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig
+
+Cloud KMS Autokey configuration for a folder.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the [AutokeyConfig][google.cloud.kms.v1.AutokeyConfig]
+resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig` or
+`projects/{PROJECT_NUMBER}/autokeyConfig`.
+
+=item * C<< $msg->key_project() >> / C<< $msg->key_project($value) >>
+
+Type: C<String>
+
+Optional. Name of the key project, e.g. `projects/{PROJECT_ID}` or
+`projects/{PROJECT_NUMBER}`, where Cloud KMS Autokey will provision a new
+[CryptoKey][google.cloud.kms.v1.CryptoKey] when a
+[KeyHandle][google.cloud.kms.v1.KeyHandle] is created. On
+[UpdateAutokeyConfig][google.cloud.kms.v1.AutokeyAdmin.UpdateAutokeyConfig],
+the caller will require `cloudkms.cryptoKeys.setIamPolicy` permission on
+this key project. Once configured, for Cloud KMS Autokey to function
+properly, this key project must have the Cloud KMS API activated and the
+Cloud KMS Service Agent for this key project must be granted the
+`cloudkms.admin` role (or pertinent permissions). A request with an empty
+key project field will clear the configuration.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::AutokeyConfig::State>)
+
+Output only. The state for the AutokeyConfig.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. A checksum computed by the server based on the value of other
+fields. This may be sent on update requests to ensure that the client has
+an up-to-date value before proceeding. The request will be rejected with an
+ABORTED error on a mismatched etag.
+
+=item * C<< $msg->key_project_resolution_mode() >> / C<< $msg->key_project_resolution_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::AutokeyConfig::KeyProjectResolutionMode>)
+
+Optional. KeyProjectResolutionMode for the AutokeyConfig.
+Valid values are `DEDICATED_KEY_PROJECT`, `RESOURCE_PROJECT`, or
+`DISABLED`.
+
+=back
+
+=head3 Enum: AutokeyConfig::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<KEY_PROJECT_DELETED> => C<2>
+
+=item * C<UNINITIALIZED> => C<3>
+
+=item * C<KEY_PROJECT_PERMISSION_DENIED> => C<4>
+
+=back
+
+=head3 Enum: AutokeyConfig::KeyProjectResolutionMode
+
+=over 4
+
+=item * C<KEY_PROJECT_RESOLUTION_MODE_UNSPECIFIED> => C<0>
+
+=item * C<DEDICATED_KEY_PROJECT> => C<1>
+
+=item * C<RESOURCE_PROJECT> => C<2>
+
+=item * C<DISABLED> => C<3>
+
+=back
+
+=head2 Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigRequest
+
+Request message for
+[ShowEffectiveAutokeyConfig][google.cloud.kms.v1.AutokeyAdmin.ShowEffectiveAutokeyConfig].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Name of the resource project to the show effective Cloud KMS
+Autokey configuration for. This may be helpful for interrogating the effect
+of nested folder configurations on a given resource project.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigResponse
+
+Response message for
+[ShowEffectiveAutokeyConfig][google.cloud.kms.v1.AutokeyAdmin.ShowEffectiveAutokeyConfig].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->key_project() >> / C<< $msg->key_project($value) >>
+
+Type: C<String>
+
+Name of the key project configured in the resource project's folder
+ancestry.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Kms::V1::AutokeyAdmin::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

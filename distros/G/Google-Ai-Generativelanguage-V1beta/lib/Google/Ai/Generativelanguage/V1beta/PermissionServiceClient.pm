@@ -10,26 +10,26 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Ai::Generativelanguage::V1beta::Citation;
-use Google::Ai::Generativelanguage::V1beta::Safety;
-use Google::Ai::Generativelanguage::V1beta::Content;
-use Google::Ai::Generativelanguage::V1beta::Permission;
 use Google::Ai::Generativelanguage::V1beta::Model;
+use Google::Ai::Generativelanguage::V1beta::Safety;
+use Google::Ai::Generativelanguage::V1beta::Citation;
+use Google::Ai::Generativelanguage::V1beta::Permission;
+use Google::Ai::Generativelanguage::V1beta::PredictionService;
+use Google::Ai::Generativelanguage::V1beta::Content;
 use Google::Ai::Generativelanguage::V1beta::Retriever;
 use Google::Ai::Generativelanguage::V1beta::TunedModel;
 use Google::Ai::Generativelanguage::V1beta::File;
-use Google::Ai::Generativelanguage::V1beta::PredictionService;
-use Google::Ai::Generativelanguage::V1beta::TextService;
 use Google::Ai::Generativelanguage::V1beta::DiscussService;
-use Google::Ai::Generativelanguage::V1beta::CachedContent;
+use Google::Ai::Generativelanguage::V1beta::TextService;
 use Google::Ai::Generativelanguage::V1beta::PermissionService;
-use Google::Ai::Generativelanguage::V1beta::GenerativeService;
+use Google::Ai::Generativelanguage::V1beta::CachedContent;
 use Google::Ai::Generativelanguage::V1beta::RetrieverService;
+use Google::Ai::Generativelanguage::V1beta::GenerativeService;
 use Google::Ai::Generativelanguage::V1beta::ModelService;
 use Google::Ai::Generativelanguage::V1beta::FileService;
 use Google::Ai::Generativelanguage::V1beta::CacheService;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -174,9 +174,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
-
 =item * C<googleapis/google/ai/generativelanguage/v1beta/cache_service.proto>
+
+=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
 
 =item * C<googleapis/google/ai/generativelanguage/v1beta/citation.proto>
 
@@ -243,11 +243,49 @@ The following RPC methods are available in this client:
 
 =item * B<create_permission>
 
-Calls the RPC method C<CreatePermission> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_permission(
+        parent                   => $parent,
+        permission               => $permission,
+    );
+
+Calls the RPC method C<CreatePermission> on C<google.ai.generativelanguage.v1beta.PermissionService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::PermissionService::CreatePermissionRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::Permission::Permission>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<permission> - L<Google::Ai::Generativelanguage::V1beta::Permission::Permission>
+
+=back
 
 =item * B<transfer_ownership>
 
-Calls the RPC method C<TransferOwnership> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->transfer_ownership(
+        name                     => $name,
+        email_address            => $email_address,
+    );
+
+Calls the RPC method C<TransferOwnership> on C<google.ai.generativelanguage.v1beta.PermissionService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=item * C<email_address> - C<string>
+
+=back
 
 =back
 

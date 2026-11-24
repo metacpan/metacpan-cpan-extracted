@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Cmek;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -289,85 +289,11 @@ EOF
     # Field: failure_details Type: 11 (.google.cloud.dataplex.v1.EncryptionConfig.FailureDetails)
     # Field: enable_metastore_encryption Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Cmek;
-
-    my $msg = Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<key>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<encryption_state>
-
-Type: Enum (.google.cloud.dataplex.v1.EncryptionConfig.EncryptionState)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<failure_details>
-
-Type: Message (.google.cloud.dataplex.v1.EncryptionConfig.FailureDetails)
-
-=item * B<enable_metastore_encryption>
-
-Type: Bool
-
-=back
-
-=cut
-
 # Enum: EncryptionConfig::EncryptionState
 our $EncryptionConfig_ENCRYPTION_STATE_UNSPECIFIED = 0;
 our $EncryptionConfig_ENCRYPTING = 1;
 our $EncryptionConfig_COMPLETED = 2;
 our $EncryptionConfig_FAILED = 3;
-
-=pod
-
-=head2 Enum: EncryptionConfig::EncryptionState
-
-Values:
-
-=over 4
-
-=item * C<ENCRYPTION_STATE_UNSPECIFIED> => 0
-
-=item * C<ENCRYPTING> => 1
-
-=item * C<COMPLETED> => 2
-
-=item * C<FAILED> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Cmek::CreateEncryptionConfigRequest ===
     # Fields for CreateEncryptionConfigRequest
@@ -375,139 +301,19 @@ Values:
     # Field: encryption_config_id Type: 9 ()
     # Field: encryption_config Type: 11 (.google.cloud.dataplex.v1.EncryptionConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Cmek::CreateEncryptionConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Cmek;
-
-    my $msg = Google::Cloud::Dataplex::V1::Cmek::CreateEncryptionConfigRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<encryption_config_id>
-
-Type: String
-
-=item * B<encryption_config>
-
-Type: Message (.google.cloud.dataplex.v1.EncryptionConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Cmek::GetEncryptionConfigRequest ===
     # Fields for GetEncryptionConfigRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Cmek::GetEncryptionConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Cmek;
-
-    my $msg = Google::Cloud::Dataplex::V1::Cmek::GetEncryptionConfigRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Cmek::UpdateEncryptionConfigRequest ===
     # Fields for UpdateEncryptionConfigRequest
     # Field: encryption_config Type: 11 (.google.cloud.dataplex.v1.EncryptionConfig)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Cmek::UpdateEncryptionConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Cmek;
-
-    my $msg = Google::Cloud::Dataplex::V1::Cmek::UpdateEncryptionConfigRequest->new(
-        encryption_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<encryption_config>
-
-Type: Message (.google.cloud.dataplex.v1.EncryptionConfig)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Cmek::DeleteEncryptionConfigRequest ===
     # Fields for DeleteEncryptionConfigRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Cmek::DeleteEncryptionConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Cmek;
-
-    my $msg = Google::Cloud::Dataplex::V1::Cmek::DeleteEncryptionConfigRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Cmek::ListEncryptionConfigsRequest ===
     # Fields for ListEncryptionConfigsRequest
@@ -517,110 +323,26 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Cmek::ListEncryptionConfigsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Cmek;
-
-    my $msg = Google::Cloud::Dataplex::V1::Cmek::ListEncryptionConfigsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Cmek::ListEncryptionConfigsResponse ===
     # Fields for ListEncryptionConfigsResponse
     # Field: encryption_configs Type: 11 (.google.cloud.dataplex.v1.EncryptionConfig)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Cmek::ListEncryptionConfigsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Cmek;
-
-    my $msg = Google::Cloud::Dataplex::V1::Cmek::ListEncryptionConfigsResponse->new(
-        encryption_configs => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<encryption_configs>
-
-Type: Message (.google.cloud.dataplex.v1.EncryptionConfig)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Dataplex::V1::Cmek::CmekServiceClient ===
 package Google::Cloud::Dataplex::V1::Cmek::CmekServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataplex::V1::Cmek::CmekServiceClient
 
-Google::Cloud::Dataplex::V1::Cmek::CmekServiceClient - Client stub representing the remote CmekService service
+Client stub representing the remote C<CmekService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataplex.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -714,13 +436,317 @@ sub get_encryption_config {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Cmek - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::Cmek - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/cmek.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Cmek;
+
+    my $msg = Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig->new({
+        name => $name,
+        key => $key,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/cmek.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig
+
+A Resource designed to manage encryption configurations for customers to
+support Customer Managed Encryption Keys (CMEK).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The resource name of the EncryptionConfig.
+Format:
+organizations/{organization}/locations/{location}/encryptionConfigs/{encryption_config}
+Global location is not supported.
+
+=item * C<< $msg->key() >> / C<< $msg->key($value) >>
+
+Type: C<String>
+
+Optional. If a key is chosen, it means that the customer is using CMEK.
+If a key is not chosen, it means that the customer is using Google managed
+encryption.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the Encryption configuration was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the Encryption configuration was last updated.
+
+=item * C<< $msg->encryption_state() >> / C<< $msg->encryption_state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::EncryptionConfig::EncryptionState>)
+
+Output only. The state of encryption of the databases.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Etag of the EncryptionConfig. This is a strong etag.
+
+=item * C<< $msg->failure_details() >> / C<< $msg->failure_details($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig::FailureDetails>)
+
+Output only. Details of the failure if anything related to Cmek db fails.
+
+=item * C<< $msg->enable_metastore_encryption() >> / C<< $msg->enable_metastore_encryption($value) >>
+
+Type: C<Bool>
+
+Optional. Represent the state of CMEK opt-in for metastore.
+
+=back
+
+=head3 Enum: EncryptionConfig::EncryptionState
+
+=over 4
+
+=item * C<ENCRYPTION_STATE_UNSPECIFIED> => C<0>
+
+=item * C<ENCRYPTING> => C<1>
+
+=item * C<COMPLETED> => C<2>
+
+=item * C<FAILED> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Cmek::CreateEncryptionConfigRequest
+
+Create EncryptionConfig Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The location at which the EncryptionConfig is to be created.
+
+=item * C<< $msg->encryption_config_id() >> / C<< $msg->encryption_config_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the
+[EncryptionConfig][google.cloud.dataplex.v1.EncryptionConfig] to create.
+Currently, only a value of "default" is supported.
+
+=item * C<< $msg->encryption_config() >> / C<< $msg->encryption_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig>)
+
+Required. The EncryptionConfig to create.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Cmek::GetEncryptionConfigRequest
+
+Get EncryptionConfig Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the EncryptionConfig to fetch.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Cmek::UpdateEncryptionConfigRequest
+
+Update EncryptionConfig Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->encryption_config() >> / C<< $msg->encryption_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig>)
+
+Required. The EncryptionConfig to update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Mask of fields to update.
+The service treats an omitted field mask as an implied field mask
+equivalent to all fields that are populated (have a non-empty value).
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Cmek::DeleteEncryptionConfigRequest
+
+Delete EncryptionConfig Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the EncryptionConfig to delete.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag of the EncryptionConfig. This is a strong etag.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Cmek::ListEncryptionConfigsRequest
+
+List EncryptionConfigs Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The location for which the EncryptionConfig is to be listed.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of EncryptionConfigs to return. The service may
+return fewer than this value. If unspecified, at most 10 EncryptionConfigs
+will be returned. The maximum value is 1000; values above 1000 will be
+coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListEncryptionConfigs` call.
+Provide this to retrieve the subsequent page. When paginating, the
+parameters - filter and order_by provided to `ListEncryptionConfigs` must
+match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter the EncryptionConfigs to be returned.
+Using bare literals: (These values will be matched anywhere it may appear
+in the object's field values)
+* filter=some_value
+Using fields: (These values will be matched only in the specified field)
+* filter=some_field=some_value
+Supported fields:
+* name, key, create_time, update_time, encryption_state
+Example:
+* filter=name=organizations/123/locations/us-central1/encryptionConfigs/test-config
+conjunctions: (AND, OR, NOT)
+* filter=name=organizations/123/locations/us-central1/encryptionConfigs/test-config
+AND mode=CMEK
+logical operators: (>, <, >=, <=, !=, =, :),
+* filter=create_time>2024-05-01T00:00:00.000Z
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields for the result.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Cmek::ListEncryptionConfigsResponse
+
+List EncryptionConfigs Response
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->encryption_configs() >> / C<< $msg->encryption_configs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig>)
+
+The list of EncryptionConfigs under the given parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Cmek::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

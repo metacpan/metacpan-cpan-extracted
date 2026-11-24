@@ -1,0 +1,33 @@
+Changes
+lib/Google/Cloud/Gkebackup/Logging/V1.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedBackup.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedBackup/Types.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedBackupChannel.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedBackupChannel/Types.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedBackupPlan.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedBackupPlan/Types.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedBackupPlanMetadata.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedBackupPlanMetadata/Types.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedCommon.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedCommon/Types.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedRestore.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedRestore/Types.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedRestoreChannel.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedRestoreChannel/Types.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedRestorePlan.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedRestorePlan/Types.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedRestorePlanMetadata.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/LoggedRestorePlanMetadata/Types.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/Logging.pm
+lib/Google/Cloud/Gkebackup/Logging/V1/Logging/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

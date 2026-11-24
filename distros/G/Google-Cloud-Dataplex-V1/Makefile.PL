@@ -27,6 +27,19 @@ my %WriteMakefileArgs = (
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
     },
+        META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/GoogleCloudPlatform/google-auth-library-perl.git',
+                web  => 'https://github.com/GoogleCloudPlatform/google-auth-library-perl',
+            },
+            bugtracker => {
+                web => 'https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues',
+            },
+        },
+    },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Google-Cloud-Dataplex-V1-*' },
 );

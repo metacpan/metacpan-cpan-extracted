@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::DiscussService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -236,91 +236,11 @@ EOF
     # Field: top_p Type: 2 ()
     # Field: top_k Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::DiscussService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageRequest->new(
-        model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<model>
-
-Type: String
-
-=item * B<prompt>
-
-Type: Message (.google.ai.generativelanguage.v1beta.MessagePrompt)
-
-=item * B<temperature>
-
-Type: Float
-
-=item * B<candidate_count>
-
-Type: Int32
-
-=item * B<top_p>
-
-Type: Float
-
-=item * B<top_k>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageResponse ===
     # Fields for GenerateMessageResponse
     # Field: candidates Type: 11 (.google.ai.generativelanguage.v1beta.Message)
     # Field: messages Type: 11 (.google.ai.generativelanguage.v1beta.Message)
     # Field: filters Type: 11 (.google.ai.generativelanguage.v1beta.ContentFilter)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::DiscussService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageResponse->new(
-        candidates => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<candidates>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Message)
-
-=item * B<messages>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Message)
-
-=item * B<filters>
-
-Type: Message (.google.ai.generativelanguage.v1beta.ContentFilter)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::DiscussService::Message ===
     # Fields for Message
@@ -328,202 +248,40 @@ Type: Message (.google.ai.generativelanguage.v1beta.ContentFilter)
     # Field: content Type: 9 ()
     # Field: citation_metadata Type: 11 (.google.ai.generativelanguage.v1beta.CitationMetadata)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::DiscussService::Message - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::DiscussService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::DiscussService::Message->new(
-        author => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<author>
-
-Type: String
-
-=item * B<content>
-
-Type: String
-
-=item * B<citation_metadata>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CitationMetadata)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt ===
     # Fields for MessagePrompt
     # Field: context Type: 9 ()
     # Field: examples Type: 11 (.google.ai.generativelanguage.v1beta.Example)
     # Field: messages Type: 11 (.google.ai.generativelanguage.v1beta.Message)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::DiscussService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt->new(
-        context => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<context>
-
-Type: String
-
-=item * B<examples>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Example)
-
-=item * B<messages>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Message)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::DiscussService::Example ===
     # Fields for Example
     # Field: input Type: 11 (.google.ai.generativelanguage.v1beta.Message)
     # Field: output Type: 11 (.google.ai.generativelanguage.v1beta.Message)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::DiscussService::Example - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::DiscussService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::DiscussService::Example->new(
-        input => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<input>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Message)
-
-=item * B<output>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Message)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensRequest ===
     # Fields for CountMessageTokensRequest
     # Field: model Type: 9 ()
     # Field: prompt Type: 11 (.google.ai.generativelanguage.v1beta.MessagePrompt)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::DiscussService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensRequest->new(
-        model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<model>
-
-Type: String
-
-=item * B<prompt>
-
-Type: Message (.google.ai.generativelanguage.v1beta.MessagePrompt)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensResponse ===
     # Fields for CountMessageTokensResponse
     # Field: token_count Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::DiscussService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensResponse->new(
-        token_count => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<token_count>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Service Client: Google::Ai::Generativelanguage::V1beta::DiscussService::DiscussServiceClient ===
 package Google::Ai::Generativelanguage::V1beta::DiscussService::DiscussServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Ai::Generativelanguage::V1beta::DiscussService::DiscussServiceClient
 
-Google::Ai::Generativelanguage::V1beta::DiscussService::DiscussServiceClient - Client stub representing the remote DiscussService service
+Client stub representing the remote C<DiscussService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<ai.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -578,13 +336,344 @@ sub count_message_tokens {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::DiscussService - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::DiscussService - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/discuss_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::DiscussService;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageRequest->new({
+        model => $model,
+        prompt => $prompt,
+        temperature => $temperature,
+        candidate_count => $candidate_count,
+    });
+
+    # Read or update a field
+    my $val = $msg->model();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/discuss_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageRequest
+
+Request to generate a message response from the model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Required. The name of the model to use.
+
+Format: `name=models/{model}`.
+
+=item * C<< $msg->prompt() >> / C<< $msg->prompt($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt>)
+
+Required. The structured textual input given to the model as a prompt.
+
+Given a
+prompt, the model will return what it predicts is the next message in the
+discussion.
+
+=item * C<< $msg->temperature() >> / C<< $msg->temperature($value) >>
+
+Type: C<Float>
+
+Optional. Controls the randomness of the output.
+
+Values can range over `[0.0,1.0]`,
+inclusive. A value closer to `1.0` will produce responses that are more
+varied, while a value closer to `0.0` will typically result in
+less surprising responses from the model.
+
+=item * C<< $msg->candidate_count() >> / C<< $msg->candidate_count($value) >>
+
+Type: C<Int32>
+
+Optional. The number of generated response messages to return.
+
+This value must be between
+`[1, 8]`, inclusive. If unset, this will default to `1`.
+
+=item * C<< $msg->top_p() >> / C<< $msg->top_p($value) >>
+
+Type: C<Float>
+
+Optional. The maximum cumulative probability of tokens to consider when
+sampling.
+
+The model uses combined Top-k and nucleus sampling.
+
+Nucleus sampling considers the smallest set of tokens whose probability
+sum is at least `top_p`.
+
+=item * C<< $msg->top_k() >> / C<< $msg->top_k($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of tokens to consider when sampling.
+
+The model uses combined Top-k and nucleus sampling.
+
+Top-k sampling considers the set of `top_k` most probable tokens.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageResponse
+
+The response from the model.
+
+This includes candidate messages and
+conversation history in the form of chronologically-ordered messages.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->candidates() >> / C<< $msg->candidates($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::DiscussService::Message>)
+
+Candidate response messages from the model.
+
+=item * C<< $msg->messages() >> / C<< $msg->messages($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::DiscussService::Message>)
+
+The conversation history used by the model.
+
+=item * C<< $msg->filters() >> / C<< $msg->filters($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Safety::ContentFilter>)
+
+A set of content filtering metadata for the prompt and response
+text.
+
+This indicates which `SafetyCategory`(s) blocked a
+candidate from this response, the lowest `HarmProbability`
+that triggered a block, and the HarmThreshold setting for that category.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::DiscussService::Message
+
+The base unit of structured text.
+
+A `Message` includes an `author` and the `content` of
+the `Message`.
+
+The `author` is used to tag messages when they are fed to the
+model as text.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->author() >> / C<< $msg->author($value) >>
+
+Type: C<String>
+
+Optional. The author of this Message.
+
+This serves as a key for tagging
+the content of this Message when it is fed to the model as text.
+
+The author can be any alphanumeric string.
+
+=item * C<< $msg->content() >> / C<< $msg->content($value) >>
+
+Type: C<String>
+
+Required. The text content of the structured `Message`.
+
+=item * C<< $msg->citation_metadata() >> / C<< $msg->citation_metadata($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Citation::CitationMetadata>)
+
+Output only. Citation information for model-generated `content` in this
+`Message`.
+
+If this `Message` was generated as output from the model, this field may be
+populated with attribution information for any text included in the
+`content`. This field is used only on output.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt
+
+All of the structured input text passed to the model as a prompt.
+
+A `MessagePrompt` contains a structured set of fields that provide context
+for the conversation, examples of user input/model output message pairs that
+prime the model to respond in different ways, and the conversation history
+or list of messages representing the alternating turns of the conversation
+between the user and the model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->context() >> / C<< $msg->context($value) >>
+
+Type: C<String>
+
+Optional. Text that should be provided to the model first to ground the
+response.
+
+If not empty, this `context` will be given to the model first before the
+`examples` and `messages`. When using a `context` be sure to provide it
+with every request to maintain continuity.
+
+This field can be a description of your prompt to the model to help provide
+context and guide the responses. Examples: "Translate the phrase from
+English to French." or "Given a statement, classify the sentiment as happy,
+sad or neutral."
+
+Anything included in this field will take precedence over message history
+if the total input size exceeds the model's `input_token_limit` and the
+input request is truncated.
+
+=item * C<< $msg->examples() >> / C<< $msg->examples($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::DiscussService::Example>)
+
+Optional. Examples of what the model should generate.
+
+This includes both user input and the response that the model should
+emulate.
+
+These `examples` are treated identically to conversation messages except
+that they take precedence over the history in `messages`:
+If the total input size exceeds the model's `input_token_limit` the input
+will be truncated. Items will be dropped from `messages` before `examples`.
+
+=item * C<< $msg->messages() >> / C<< $msg->messages($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::DiscussService::Message>)
+
+Required. A snapshot of the recent conversation history sorted
+chronologically.
+
+Turns alternate between two authors.
+
+If the total input size exceeds the model's `input_token_limit` the input
+will be truncated: The oldest items will be dropped from `messages`.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::DiscussService::Example
+
+An input/output example used to instruct the Model.
+
+It demonstrates how the model should respond or format its response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->input() >> / C<< $msg->input($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::DiscussService::Message>)
+
+Required. An example of an input `Message` from the user.
+
+=item * C<< $msg->output() >> / C<< $msg->output($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::DiscussService::Message>)
+
+Required. An example of what the model should output given the input.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensRequest
+
+Counts the number of tokens in the `prompt` sent to a model.
+
+Models may tokenize text differently, so each model may return a different
+`token_count`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Required. The model's resource name. This serves as an ID for the Model to
+use.
+
+This name should match a model name returned by the `ListModels` method.
+
+Format: `models/{model}`
+
+=item * C<< $msg->prompt() >> / C<< $msg->prompt($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt>)
+
+Required. The prompt, whose token count is to be returned.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensResponse
+
+A response from `CountMessageTokens`.
+
+It returns the model's `token_count` for the `prompt`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->token_count() >> / C<< $msg->token_count($value) >>
+
+Type: C<Int32>
+
+The number of tokens that the `model` tokenizes the `prompt` into.
+
+Always non-negative.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::DiscussService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

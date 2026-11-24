@@ -9,5 +9,7 @@ postamble
 share/README.md
 t/00-file-distdir.t
 t/01-distdir-api.t
+t/02-find-module-fastpath.t
+t/02-find-module.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

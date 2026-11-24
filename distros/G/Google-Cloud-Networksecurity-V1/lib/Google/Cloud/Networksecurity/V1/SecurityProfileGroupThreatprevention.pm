@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -178,74 +178,10 @@ EOF
     # Field: threat_overrides Type: 11 (.google.cloud.networksecurity.v1.ThreatOverride)
     # Field: antivirus_overrides Type: 11 (.google.cloud.networksecurity.v1.AntivirusOverride)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatPreventionProfile - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatPreventionProfile->new(
-        severity_overrides => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<severity_overrides>
-
-Type: Message (.google.cloud.networksecurity.v1.SeverityOverride)
-
-=item * B<threat_overrides>
-
-Type: Message (.google.cloud.networksecurity.v1.ThreatOverride)
-
-=item * B<antivirus_overrides>
-
-Type: Message (.google.cloud.networksecurity.v1.AntivirusOverride)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::SeverityOverride ===
     # Fields for SeverityOverride
     # Field: severity Type: 14 (.google.cloud.networksecurity.v1.Severity)
     # Field: action Type: 14 (.google.cloud.networksecurity.v1.ThreatAction)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::SeverityOverride - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::SeverityOverride->new(
-        severity => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<severity>
-
-Type: Enum (.google.cloud.networksecurity.v1.Severity)
-
-=item * B<action>
-
-Type: Enum (.google.cloud.networksecurity.v1.ThreatAction)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatOverride ===
     # Fields for ThreatOverride
@@ -253,86 +189,165 @@ Type: Enum (.google.cloud.networksecurity.v1.ThreatAction)
     # Field: type Type: 14 (.google.cloud.networksecurity.v1.ThreatType)
     # Field: action Type: 14 (.google.cloud.networksecurity.v1.ThreatAction)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatOverride - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatOverride->new(
-        threat_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<threat_id>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.networksecurity.v1.ThreatType)
-
-=item * B<action>
-
-Type: Enum (.google.cloud.networksecurity.v1.ThreatAction)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::AntivirusOverride ===
     # Fields for AntivirusOverride
     # Field: protocol Type: 14 (.google.cloud.networksecurity.v1.Protocol)
     # Field: action Type: 14 (.google.cloud.networksecurity.v1.ThreatAction)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::AntivirusOverride - Compiled Protocol Buffers message class
+Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/security_profile_group_threatprevention.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
 
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::AntivirusOverride->new(
-        protocol => $value,
-    );
+    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatPreventionProfile->new({
+        severity_overrides => $severity_overrides,
+        threat_overrides => $threat_overrides,
+        antivirus_overrides => $antivirus_overrides,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->severity_overrides();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatPreventionProfile->parse($bytes);
 
-=item * B<protocol>
-
-Type: Enum (.google.cloud.networksecurity.v1.Protocol)
-
-=item * B<action>
-
-Type: Enum (.google.cloud.networksecurity.v1.ThreatAction)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/security_profile_group_threatprevention.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatPreventionProfile
+
+ThreatPreventionProfile defines an action for specific threat signatures or
+severity levels.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->severity_overrides() >> / C<< $msg->severity_overrides($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::SeverityOverride>)
+
+Optional. Configuration for overriding threats actions by severity match.
+
+=item * C<< $msg->threat_overrides() >> / C<< $msg->threat_overrides($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatOverride>)
+
+Optional. Configuration for overriding threats actions by threat_id match.
+If a threat is matched both by configuration provided in severity_overrides
+and threat_overrides, the threat_overrides action is applied.
+
+=item * C<< $msg->antivirus_overrides() >> / C<< $msg->antivirus_overrides($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::AntivirusOverride>)
+
+Optional. Configuration for overriding antivirus actions per protocol.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::SeverityOverride
+
+Defines what action to take for a specific severity match.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->severity() >> / C<< $msg->severity($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::Severity>)
+
+Required. Severity level to match.
+
+=item * C<< $msg->action() >> / C<< $msg->action($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::ThreatAction>)
+
+Required. Threat action override.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatOverride
+
+Defines what action to take for a specific threat_id match.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->threat_id() >> / C<< $msg->threat_id($value) >>
+
+Type: C<String>
+
+Required. Vendor-specific ID of a threat to override.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::ThreatType>)
+
+Output only. Type of the threat (read only).
+
+=item * C<< $msg->action() >> / C<< $msg->action($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::ThreatAction>)
+
+Required. Threat action override. For some threat types, only a subset of
+actions applies.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::AntivirusOverride
+
+Defines what action to take for antivirus threats per protocol.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->protocol() >> / C<< $msg->protocol($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::Protocol>)
+
+Required. Protocol to match.
+
+=item * C<< $msg->action() >> / C<< $msg->action($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::ThreatAction>)
+
+Required. Threat action override. For some threat types, only a subset of
+actions applies.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

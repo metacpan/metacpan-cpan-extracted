@@ -1,0 +1,42 @@
+Changes
+lib/Google/Cloud/Cloudsecuritycompliance/V1.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Audit.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Audit/Types.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/AuditClient.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/CmEnrollmentService.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/CmEnrollmentService/Types.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/CmEnrollmentServiceClient.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Common.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Common/Types.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Config.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Config/Types.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/ConfigClient.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Deployment.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Deployment/Types.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/DeploymentClient.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Monitoring.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/Monitoring/Types.pm
+lib/Google/Cloud/Cloudsecuritycompliance/V1/MonitoringClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Audit.t
+t/01-service-CmEnrollmentService.t
+t/01-service-Config.t
+t/01-service-Default.t
+t/01-service-Deployment.t
+t/01-service-Monitoring.t
+t/02-rest-transport-Audit.t
+t/02-rest-transport-CmEnrollmentService.t
+t/02-rest-transport-Config.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-Deployment.t
+t/02-rest-transport-Monitoring.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

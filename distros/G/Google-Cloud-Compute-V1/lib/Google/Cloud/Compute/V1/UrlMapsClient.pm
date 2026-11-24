@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -464,43 +464,287 @@ The following RPC methods are available in this client:
 
 =item * B<aggregated_list>
 
-Calls the RPC method C<AggregatedList> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list(
+        filter                   => $filter,
+        include_all_scopes       => $include_all_scopes,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        service_project_number   => $service_project_number,
+    );
+
+Calls the RPC method C<AggregatedList> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AggregatedListUrlMapsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::UrlMapsAggregatedList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<include_all_scopes> - C<bool>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<service_project_number> - C<int64>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        project                  => $project,
+        request_id               => $request_id,
+        url_map                  => $url_map,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteUrlMapRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<url_map> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        url_map                  => $url_map,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetUrlMapRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::UrlMap>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<url_map> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        project                  => $project,
+        request_id               => $request_id,
+        url_map_resource         => $url_map_resource,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertUrlMapRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<url_map_resource> - L<Google::Cloud::Compute::V1::Compute::UrlMap>
+
+=back
 
 =item * B<invalidate_cache>
 
-Calls the RPC method C<InvalidateCache> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->invalidate_cache(
+        cache_invalidation_rule_resource => $cache_invalidation_rule_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        url_map                  => $url_map,
+    );
+
+Calls the RPC method C<InvalidateCache> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InvalidateCacheUrlMapRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<cache_invalidation_rule_resource> - L<Google::Cloud::Compute::V1::Compute::CacheInvalidationRule>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<url_map> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListUrlMapsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::UrlMapList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        project                  => $project,
+        request_id               => $request_id,
+        url_map                  => $url_map,
+        url_map_resource         => $url_map_resource,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchUrlMapRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<url_map> - C<string>
+
+=item * C<url_map_resource> - L<Google::Cloud::Compute::V1::Compute::UrlMap>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsUrlMapRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=back
 
 =item * B<update>
 
-Calls the RPC method C<Update> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update(
+        project                  => $project,
+        request_id               => $request_id,
+        url_map                  => $url_map,
+        url_map_resource         => $url_map_resource,
+    );
+
+Calls the RPC method C<Update> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateUrlMapRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<url_map> - C<string>
+
+=item * C<url_map_resource> - L<Google::Cloud::Compute::V1::Compute::UrlMap>
+
+=back
 
 =item * B<validate>
 
-Calls the RPC method C<Validate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->validate(
+        project                  => $project,
+        url_map                  => $url_map,
+        url_maps_validate_request_resource => $url_maps_validate_request_resource,
+    );
+
+Calls the RPC method C<Validate> on C<google.cloud.compute.v1.UrlMaps>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ValidateUrlMapRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::UrlMapsValidateResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<url_map> - C<string>
+
+=item * C<url_maps_validate_request_resource> - L<Google::Cloud::Compute::V1::Compute::UrlMapsValidateRequest>
+
+=back
 
 =back
 

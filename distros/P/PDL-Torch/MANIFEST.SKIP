@@ -1,0 +1,9 @@
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^blib/
+^pm_to_blib$
+^Torch\.c$
+^Torch\.bs$
+\.o$
+^PDL-Torch-

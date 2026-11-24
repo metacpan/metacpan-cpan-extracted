@@ -1,0 +1,4 @@
+Revision history for PDL-ONNX
+
+0.01    2026-11-24
+    - Initial release: ONNX Runtime C API bindings for PDL.

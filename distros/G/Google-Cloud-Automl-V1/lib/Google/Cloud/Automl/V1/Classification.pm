@@ -1,0 +1,334 @@
+package Google::Cloud::Automl::V1::Classification;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Citnb29nbGUvY2xvdWQvYXV0b21sL3YxL2NsYXNzaWZpY2F0aW9uLnByb3RvEhZnb29nbGUu
+Y2xvdWQuYXV0b21sLnYxIjAKGENsYXNzaWZpY2F0aW9uQW5ub3RhdGlvbhIUCgVzY29yZRgB
+IAEoAlIFc2NvcmUi5gkKH0NsYXNzaWZpY2F0aW9uRXZhbHVhdGlvbk1ldHJpY3MSFQoGYXVf
+cHJjGAEgASgCUgVhdVByYxIVCgZhdV9yb2MYBiABKAJSBWF1Um9jEhkKCGxvZ19sb3NzGAcg
+ASgCUgdsb2dMb3NzEogBChhjb25maWRlbmNlX21ldHJpY3NfZW50cnkYAyADKAsyTi5nb29n
+bGUuY2xvdWQuYXV0b21sLnYxLkNsYXNzaWZpY2F0aW9uRXZhbHVhdGlvbk1ldHJpY3MuQ29u
+ZmlkZW5jZU1ldHJpY3NFbnRyeVIWY29uZmlkZW5jZU1ldHJpY3NFbnRyeRJyChBjb25mdXNp
+b25fbWF0cml4GAQgASgLMkcuZ29vZ2xlLmNsb3VkLmF1dG9tbC52MS5DbGFzc2lmaWNhdGlv
+bkV2YWx1YXRpb25NZXRyaWNzLkNvbmZ1c2lvbk1hdHJpeFIPY29uZnVzaW9uTWF0cml4EiwK
+EmFubm90YXRpb25fc3BlY19pZBgFIAMoCVIQYW5ub3RhdGlvblNwZWNJZBrcBAoWQ29uZmlk
+ZW5jZU1ldHJpY3NFbnRyeRIxChRjb25maWRlbmNlX3RocmVzaG9sZBgBIAEoAlITY29uZmlk
+ZW5jZVRocmVzaG9sZBItChJwb3NpdGlvbl90aHJlc2hvbGQYDiABKAVSEXBvc2l0aW9uVGhy
+ZXNob2xkEhYKBnJlY2FsbBgCIAEoAlIGcmVjYWxsEhwKCXByZWNpc2lvbhgDIAEoAlIJcHJl
+Y2lzaW9uEi4KE2ZhbHNlX3Bvc2l0aXZlX3JhdGUYCCABKAJSEWZhbHNlUG9zaXRpdmVSYXRl
+EhkKCGYxX3Njb3JlGAQgASgCUgdmMVNjb3JlEh0KCnJlY2FsbF9hdDEYBSABKAJSCXJlY2Fs
+bEF0MRIjCg1wcmVjaXNpb25fYXQxGAYgASgCUgxwcmVjaXNpb25BdDESNQoXZmFsc2VfcG9z
+aXRpdmVfcmF0ZV9hdDEYCSABKAJSFGZhbHNlUG9zaXRpdmVSYXRlQXQxEiAKDGYxX3Njb3Jl
+X2F0MRgHIAEoAlIKZjFTY29yZUF0MRIuChN0cnVlX3Bvc2l0aXZlX2NvdW50GAogASgDUhF0
+cnVlUG9zaXRpdmVDb3VudBIwChRmYWxzZV9wb3NpdGl2ZV9jb3VudBgLIAEoA1ISZmFsc2VQ
+b3NpdGl2ZUNvdW50EjAKFGZhbHNlX25lZ2F0aXZlX2NvdW50GAwgASgDUhJmYWxzZU5lZ2F0
+aXZlQ291bnQSLgoTdHJ1ZV9uZWdhdGl2ZV9jb3VudBgNIAEoA1IRdHJ1ZU5lZ2F0aXZlQ291
+bnQa7QEKD0NvbmZ1c2lvbk1hdHJpeBIsChJhbm5vdGF0aW9uX3NwZWNfaWQYASADKAlSEGFu
+bm90YXRpb25TcGVjSWQSIQoMZGlzcGxheV9uYW1lGAMgAygJUgtkaXNwbGF5TmFtZRJdCgNy
+b3cYAiADKAsySy5nb29nbGUuY2xvdWQuYXV0b21sLnYxLkNsYXNzaWZpY2F0aW9uRXZhbHVh
+dGlvbk1ldHJpY3MuQ29uZnVzaW9uTWF0cml4LlJvd1IDcm93GioKA1JvdxIjCg1leGFtcGxl
+X2NvdW50GAEgAygFUgxleGFtcGxlQ291bnQqWQoSQ2xhc3NpZmljYXRpb25UeXBlEiMKH0NM
+QVNTSUZJQ0FUSU9OX1RZUEVfVU5TUEVDSUZJRUQQABIOCgpNVUxUSUNMQVNTEAESDgoKTVVM
+VElMQUJFTBACQrUBChpjb20uZ29vZ2xlLmNsb3VkLmF1dG9tbC52MUITQ2xhc3NpZmljYXRp
+b25Qcm90b1ABWjJjbG91ZC5nb29nbGUuY29tL2dvL2F1dG9tbC9hcGl2MS9hdXRvbWxwYjth
+dXRvbWxwYqoCFkdvb2dsZS5DbG91ZC5BdXRvTUwuVjHKAhZHb29nbGVcQ2xvdWRcQXV0b01s
+XFYx6gIZR29vZ2xlOjpDbG91ZDo6QXV0b01MOjpWMUqAOwoHEgUOAKwBAQq8BAoBDBIDDgAS
+MrEEIENvcHlyaWdodCAyMDI1IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBh
+Y2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90
+IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4K
+IFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8v
+d3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQg
+YnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBk
+aXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMg
+SVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJ
+TkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRo
+ZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0
+aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAHwoICgEIEgMSADMKCQoCCCUSAxIA
+MwoICgEIEgMTAEkKCQoCCAsSAxMASQoICgEIEgMUACIKCQoCCAoSAxQAIgoICgEIEgMVADQK
+CQoCCAgSAxUANAoICgEIEgMWADMKCQoCCAESAxYAMwoICgEIEgMXADMKCQoCCCkSAxcAMwoI
+CgEIEgMYADIKCQoCCC0SAxgAMgoxCgIFABIEGwAkARolIFR5cGUgb2YgdGhlIGNsYXNzaWZp
+Y2F0aW9uIHByb2JsZW0uCgoKCgMFAAESAxsFFwosCgQFAAIAEgMdAiYaHyBBbiB1bi1zZXQg
+dmFsdWUgb2YgdGhpcyBlbnVtLgoKDAoFBQACAAESAx0CIQoMCgUFAAIAAhIDHSQlCjgKBAUA
+AgESAyACERorIEF0IG1vc3Qgb25lIGxhYmVsIGlzIGFsbG93ZWQgcGVyIGV4YW1wbGUuCgoM
+CgUFAAIBARIDIAIMCgwKBQUAAgECEgMgDxAKOwoEBQACAhIDIwIRGi4gTXVsdGlwbGUgbGFi
+ZWxzIGFyZSBhbGxvd2VkIGZvciBvbmUgZXhhbXBsZS4KCgwKBQUAAgIBEgMjAgwKDAoFBQAC
+AgISAyMPEApFCgIEABIEJwAuARo5IENvbnRhaW5zIGFubm90YXRpb24gZGV0YWlscyBzcGVj
+aWZpYyB0byBjbGFzc2lmaWNhdGlvbi4KCgoKAwQAARIDJwggCsECCgQEAAIAEgMtAhIaswIg
+T3V0cHV0IG9ubHkuIEEgY29uZmlkZW5jZSBlc3RpbWF0ZSBiZXR3ZWVuIDAuMCBhbmQgMS4w
+LiBBIGhpZ2hlciB2YWx1ZQogbWVhbnMgZ3JlYXRlciBjb25maWRlbmNlIHRoYXQgdGhlIGFu
+bm90YXRpb24gaXMgcG9zaXRpdmUuIElmIGEgdXNlcgogYXBwcm92ZXMgYW4gYW5ub3RhdGlv
+biBhcyBuZWdhdGl2ZSBvciBwb3NpdGl2ZSwgdGhlIHNjb3JlIHZhbHVlIHJlbWFpbnMKIHVu
+Y2hhbmdlZC4gSWYgYSB1c2VyIGNyZWF0ZXMgYW4gYW5ub3RhdGlvbiwgdGhlIHNjb3JlIGlz
+IDAgZm9yIG5lZ2F0aXZlIG9yCiAxIGZvciBwb3NpdGl2ZS4KCgwKBQQAAgAFEgMtAgcKDAoF
+BAACAAESAy0IDQoMCgUEAAIAAxIDLRARCtMBCgIEARIFMwCsAQEaxQEgTW9kZWwgZXZhbHVh
+dGlvbiBtZXRyaWNzIGZvciBjbGFzc2lmaWNhdGlvbiBwcm9ibGVtcy4KIE5vdGU6IEZvciBW
+aWRlbyBDbGFzc2lmaWNhdGlvbiB0aGlzIG1ldHJpY3Mgb25seSBkZXNjcmliZSBxdWFsaXR5
+IG9mIHRoZQogVmlkZW8gQ2xhc3NpZmljYXRpb24gcHJlZGljdGlvbnMgb2YgInNlZ21lbnRf
+Y2xhc3NpZmljYXRpb24iIHR5cGUuCgoKCgMEAQESAzMIJwo6CgQEAQMAEgQ1Am0DGiwgTWV0
+cmljcyBmb3IgYSBzaW5nbGUgY29uZmlkZW5jZSB0aHJlc2hvbGQuCgoMCgUEAQMAARIDNQog
+CpIBCgYEAQMAAgASAzgEIxqCASBPdXRwdXQgb25seS4gTWV0cmljcyBhcmUgY29tcHV0ZWQg
+d2l0aCBhbiBhc3N1bXB0aW9uIHRoYXQgdGhlIG1vZGVsCiBuZXZlciByZXR1cm5zIHByZWRp
+Y3Rpb25zIHdpdGggc2NvcmUgbG93ZXIgdGhhbiB0aGlzIHZhbHVlLgoKDgoHBAEDAAIABRID
+OAQJCg4KBwQBAwACAAESAzgKHgoOCgcEAQMAAgADEgM4ISIK5gEKBgQBAwACARIDPQQiGtYB
+IE91dHB1dCBvbmx5LiBNZXRyaWNzIGFyZSBjb21wdXRlZCB3aXRoIGFuIGFzc3VtcHRpb24g
+dGhhdCB0aGUgbW9kZWwKIGFsd2F5cyByZXR1cm5zIGF0IG1vc3QgdGhpcyBtYW55IHByZWRp
+Y3Rpb25zIChvcmRlcmVkIGJ5IHRoZWlyIHNjb3JlLAogZGVzY2VuZGluZ2x5KSwgYnV0IHRo
+ZXkgYWxsIHN0aWxsIG5lZWQgdG8gbWVldCB0aGUgY29uZmlkZW5jZV90aHJlc2hvbGQuCgoO
+CgcEAQMAAgEFEgM9BAkKDgoHBAEDAAIBARIDPQocCg4KBwQBAwACAQMSAz0fIQpeCgYEAQMA
+AgISA0EEFRpPIE91dHB1dCBvbmx5LiBSZWNhbGwgKFRydWUgUG9zaXRpdmUgUmF0ZSkgZm9y
+IHRoZSBnaXZlbiBjb25maWRlbmNlCiB0aHJlc2hvbGQuCgoOCgcEAQMAAgIFEgNBBAkKDgoH
+BAEDAAICARIDQQoQCg4KBwQBAwACAgMSA0ETFApLCgYEAQMAAgMSA0QEGBo8IE91dHB1dCBv
+bmx5LiBQcmVjaXNpb24gZm9yIHRoZSBnaXZlbiBjb25maWRlbmNlIHRocmVzaG9sZC4KCg4K
+BwQBAwACAwUSA0QECQoOCgcEAQMAAgMBEgNEChMKDgoHBAEDAAIDAxIDRBYXClUKBgQBAwAC
+BBIDRwQiGkYgT3V0cHV0IG9ubHkuIEZhbHNlIFBvc2l0aXZlIFJhdGUgZm9yIHRoZSBnaXZl
+biBjb25maWRlbmNlIHRocmVzaG9sZC4KCg4KBwQBAwACBAUSA0cECQoOCgcEAQMAAgQBEgNH
+Ch0KDgoHBAEDAAIEAxIDRyAhCkgKBgQBAwACBRIDSgQXGjkgT3V0cHV0IG9ubHkuIFRoZSBo
+YXJtb25pYyBtZWFuIG9mIHJlY2FsbCBhbmQgcHJlY2lzaW9uLgoKDgoHBAEDAAIFBRIDSgQJ
+Cg4KBwQBAwACBQESA0oKEgoOCgcEAQMAAgUDEgNKFRYKvwEKBgQBAwACBhIDTwQZGq8BIE91
+dHB1dCBvbmx5LiBUaGUgUmVjYWxsIChUcnVlIFBvc2l0aXZlIFJhdGUpIHdoZW4gb25seSBj
+b25zaWRlcmluZyB0aGUKIGxhYmVsIHRoYXQgaGFzIHRoZSBoaWdoZXN0IHByZWRpY3Rpb24g
+c2NvcmUgYW5kIG5vdCBiZWxvdyB0aGUgY29uZmlkZW5jZQogdGhyZXNob2xkIGZvciBlYWNo
+IGV4YW1wbGUuCgoOCgcEAQMAAgYFEgNPBAkKDgoHBAEDAAIGARIDTwoUCg4KBwQBAwACBgMS
+A08XGAqtAQoGBAEDAAIHEgNUBBwanQEgT3V0cHV0IG9ubHkuIFRoZSBwcmVjaXNpb24gd2hl
+biBvbmx5IGNvbnNpZGVyaW5nIHRoZSBsYWJlbCB0aGF0IGhhcyB0aGUKIGhpZ2hlc3QgcHJl
+ZGljdGlvbiBzY29yZSBhbmQgbm90IGJlbG93IHRoZSBjb25maWRlbmNlIHRocmVzaG9sZCBm
+b3IgZWFjaAogZXhhbXBsZS4KCg4KBwQBAwACBwUSA1QECQoOCgcEAQMAAgcBEgNUChcKDgoH
+BAEDAAIHAxIDVBobCrcBCgYEAQMAAggSA1kEJhqnASBPdXRwdXQgb25seS4gVGhlIEZhbHNl
+IFBvc2l0aXZlIFJhdGUgd2hlbiBvbmx5IGNvbnNpZGVyaW5nIHRoZSBsYWJlbCB0aGF0CiBo
+YXMgdGhlIGhpZ2hlc3QgcHJlZGljdGlvbiBzY29yZSBhbmQgbm90IGJlbG93IHRoZSBjb25m
+aWRlbmNlIHRocmVzaG9sZAogZm9yIGVhY2ggZXhhbXBsZS4KCg4KBwQBAwACCAUSA1kECQoO
+CgcEAQMAAggBEgNZCiEKDgoHBAEDAAIIAxIDWSQlCowCCgYEAQMAAgkSA1wEGxr8ASBPdXRw
+dXQgb25seS4gVGhlIGhhcm1vbmljIG1lYW4gb2YgW3JlY2FsbF9hdDFdW2dvb2dsZS5jbG91
+ZC5hdXRvbWwudjEuQ2xhc3NpZmljYXRpb25FdmFsdWF0aW9uTWV0cmljcy5Db25maWRlbmNl
+TWV0cmljc0VudHJ5LnJlY2FsbF9hdDFdIGFuZCBbcHJlY2lzaW9uX2F0MV1bZ29vZ2xlLmNs
+b3VkLmF1dG9tbC52MS5DbGFzc2lmaWNhdGlvbkV2YWx1YXRpb25NZXRyaWNzLkNvbmZpZGVu
+Y2VNZXRyaWNzRW50cnkucHJlY2lzaW9uX2F0MV0uCgoOCgcEAQMAAgkFEgNcBAkKDgoHBAED
+AAIJARIDXAoWCg4KBwQBAwACCQMSA1wZGgpiCgYEAQMAAgoSA2AEIxpTIE91dHB1dCBvbmx5
+LiBUaGUgbnVtYmVyIG9mIG1vZGVsIGNyZWF0ZWQgbGFiZWxzIHRoYXQgbWF0Y2ggYSBncm91
+bmQgdHJ1dGgKIGxhYmVsLgoKDgoHBAEDAAIKBRIDYAQJCg4KBwQBAwACCgESA2AKHQoOCgcE
+AQMAAgoDEgNgICIKaQoGBAEDAAILEgNkBCQaWiBPdXRwdXQgb25seS4gVGhlIG51bWJlciBv
+ZiBtb2RlbCBjcmVhdGVkIGxhYmVscyB0aGF0IGRvIG5vdCBtYXRjaCBhCiBncm91bmQgdHJ1
+dGggbGFiZWwuCgoOCgcEAQMAAgsFEgNkBAkKDgoHBAEDAAILARIDZAoeCg4KBwQBAwACCwMS
+A2QhIwpvCgYEAQMAAgwSA2gEJBpgIE91dHB1dCBvbmx5LiBUaGUgbnVtYmVyIG9mIGdyb3Vu
+ZCB0cnV0aCBsYWJlbHMgdGhhdCBhcmUgbm90IG1hdGNoZWQKIGJ5IGEgbW9kZWwgY3JlYXRl
+ZCBsYWJlbC4KCg4KBwQBAwACDAUSA2gECQoOCgcEAQMAAgwBEgNoCh4KDgoHBAEDAAIMAxID
+aCEjCpYBCgYEAQMAAg0SA2wEIxqGASBPdXRwdXQgb25seS4gVGhlIG51bWJlciBvZiBsYWJl
+bHMgdGhhdCB3ZXJlIG5vdCBjcmVhdGVkIGJ5IHRoZSBtb2RlbCwKIGJ1dCBpZiB0aGV5IHdv
+dWxkLCB0aGV5IHdvdWxkIG5vdCBtYXRjaCBhIGdyb3VuZCB0cnV0aCBsYWJlbC4KCg4KBwQB
+AwACDQUSA2wECQoOCgcEAQMAAg0BEgNsCh0KDgoHBAEDAAINAxIDbCAiCkoKBAQBAwESBXAC
+jgEDGjsgQ29uZnVzaW9uIG1hdHJpeCBvZiB0aGUgbW9kZWwgcnVubmluZyB0aGUgY2xhc3Np
+ZmljYXRpb24uCgoMCgUEAQMBARIDcAoZCj0KBgQBAwEDABIEcgR4BRotIE91dHB1dCBvbmx5
+LiBBIHJvdyBpbiB0aGUgY29uZnVzaW9uIG1hdHJpeC4KCg4KBwQBAwEDAAESA3IMDwrqAgoI
+BAEDAQMAAgASA3cGJxrYAiBPdXRwdXQgb25seS4gVmFsdWUgb2YgdGhlIHNwZWNpZmljIGNl
+bGwgaW4gdGhlIGNvbmZ1c2lvbiBtYXRyaXguCiBUaGUgbnVtYmVyIG9mIHZhbHVlcyBlYWNo
+IHJvdyBoYXMgKGkuZS4gdGhlIGxlbmd0aCBvZiB0aGUgcm93KSBpcyBlcXVhbAogdG8gdGhl
+IGxlbmd0aCBvZiB0aGUgYGFubm90YXRpb25fc3BlY19pZGAgZmllbGQgb3IsIGlmIHRoYXQg
+b25lIGlzIG5vdAogcG9wdWxhdGVkLCBsZW5ndGggb2YgdGhlIFtkaXNwbGF5X25hbWVdW2dv
+b2dsZS5jbG91ZC5hdXRvbWwudjEuQ2xhc3NpZmljYXRpb25FdmFsdWF0aW9uTWV0cmljcy5D
+b25mdXNpb25NYXRyaXguZGlzcGxheV9uYW1lXSBmaWVsZC4KChAKCQQBAwEDAAIABBIDdwYO
+ChAKCQQBAwEDAAIABRIDdw8UChAKCQQBAwEDAAIAARIDdxUiChAKCQQBAwEDAAIAAxIDdyUm
+CocCCgYEAQMBAgASA34EKxr3ASBPdXRwdXQgb25seS4gSURzIG9mIHRoZSBhbm5vdGF0aW9u
+IHNwZWNzIHVzZWQgaW4gdGhlIGNvbmZ1c2lvbiBtYXRyaXguCiBGb3IgVGFibGVzIENMQVNT
+SUZJQ0FUSU9OCiBbcHJlZGljdGlvbl90eXBlXVtnb29nbGUuY2xvdWQuYXV0b21sLnYxcDFi
+ZXRhLlRhYmxlc01vZGVsTWV0YWRhdGEucHJlZGljdGlvbl90eXBlXQogb25seSBsaXN0IG9m
+IFthbm5vdGF0aW9uX3NwZWNfZGlzcGxheV9uYW1lLXNdW10gaXMgcG9wdWxhdGVkLgoKDgoH
+BAEDAQIABBIDfgQMCg4KBwQBAwECAAUSA34NEwoOCgcEAQMBAgABEgN+FCYKDgoHBAEDAQIA
+AxIDfikqCuUCCgYEAQMBAgESBIYBBCUa1AIgT3V0cHV0IG9ubHkuIERpc3BsYXkgbmFtZSBv
+ZiB0aGUgYW5ub3RhdGlvbiBzcGVjcyB1c2VkIGluIHRoZSBjb25mdXNpb24KIG1hdHJpeCwg
+YXMgdGhleSB3ZXJlIGF0IHRoZSBtb21lbnQgb2YgdGhlIGV2YWx1YXRpb24uIEZvciBUYWJs
+ZXMKIENMQVNTSUZJQ0FUSU9OCiBbcHJlZGljdGlvbl90eXBlLXNdW2dvb2dsZS5jbG91ZC5h
+dXRvbWwudjFwMWJldGEuVGFibGVzTW9kZWxNZXRhZGF0YS5wcmVkaWN0aW9uX3R5cGVdLAog
+ZGlzdGluY3QgdmFsdWVzIG9mIHRoZSB0YXJnZXQgY29sdW1uIGF0IHRoZSBtb21lbnQgb2Yg
+dGhlIG1vZGVsCiBldmFsdWF0aW9uIGFyZSBwb3B1bGF0ZWQgaGVyZS4KCg8KBwQBAwECAQQS
+BIYBBAwKDwoHBAEDAQIBBRIEhgENEwoPCgcEAQMBAgEBEgSGARQgCg8KBwQBAwECAQMSBIYB
+IyQKtwIKBgQBAwECAhIEjQEEGRqmAiBPdXRwdXQgb25seS4gUm93cyBpbiB0aGUgY29uZnVz
+aW9uIG1hdHJpeC4gVGhlIG51bWJlciBvZiByb3dzIGlzIGVxdWFsIHRvCiB0aGUgc2l6ZSBv
+ZiBgYW5ub3RhdGlvbl9zcGVjX2lkYC4KIGByb3dbaV0uZXhhbXBsZV9jb3VudFtqXWAgaXMg
+dGhlIG51bWJlciBvZiBleGFtcGxlcyB0aGF0IGhhdmUgZ3JvdW5kCiB0cnV0aCBvZiB0aGUg
+YGFubm90YXRpb25fc3BlY19pZFtpXWAgYW5kIGFyZSBwcmVkaWN0ZWQgYXMKIGBhbm5vdGF0
+aW9uX3NwZWNfaWRbal1gIGJ5IHRoZSBtb2RlbCBiZWluZyBldmFsdWF0ZWQuCgoPCgcEAQMB
+AgIEEgSNAQQMCg8KBwQBAwECAgYSBI0BDRAKDwoHBAEDAQICARIEjQERFAoPCgcEAQMBAgID
+EgSNARcYCnYKBAQBAgASBJIBAhMaaCBPdXRwdXQgb25seS4gVGhlIEFyZWEgVW5kZXIgUHJl
+Y2lzaW9uLVJlY2FsbCBDdXJ2ZSBtZXRyaWMuIE1pY3JvLWF2ZXJhZ2VkCiBmb3IgdGhlIG92
+ZXJhbGwgZXZhbHVhdGlvbi4KCg0KBQQBAgAFEgSSAQIHCg0KBQQBAgABEgSSAQgOCg0KBQQB
+AgADEgSSARESCocBCgQEAQIBEgSWAQITGnkgT3V0cHV0IG9ubHkuIFRoZSBBcmVhIFVuZGVy
+IFJlY2VpdmVyIE9wZXJhdGluZyBDaGFyYWN0ZXJpc3RpYyBjdXJ2ZSBtZXRyaWMuCiBNaWNy
+by1hdmVyYWdlZCBmb3IgdGhlIG92ZXJhbGwgZXZhbHVhdGlvbi4KCg0KBQQBAgEFEgSWAQIH
+Cg0KBQQBAgEBEgSWAQgOCg0KBQQBAgEDEgSWARESCjEKBAQBAgISBJkBAhUaIyBPdXRwdXQg
+b25seS4gVGhlIExvZyBMb3NzIG1ldHJpYy4KCg0KBQQBAgIFEgSZAQIHCg0KBQQBAgIBEgSZ
+AQgQCg0KBQQBAgIDEgSZARMUCosDCgQEAQIDEgSiAQI/GvwCIE91dHB1dCBvbmx5LiBNZXRy
+aWNzIGZvciBlYWNoIGNvbmZpZGVuY2VfdGhyZXNob2xkIGluCiAwLjAwLDAuMDUsMC4xMCwu
+Li4sMC45NSwwLjk2LDAuOTcsMC45OCwwLjk5IGFuZAogcG9zaXRpb25fdGhyZXNob2xkID0g
+SU5UMzJfTUFYX1ZBTFVFLgogUk9DIGFuZCBwcmVjaXNpb24tcmVjYWxsIGN1cnZlcywgYW5k
+IG90aGVyIGFnZ3JlZ2F0ZWQgbWV0cmljcyBhcmUgZGVyaXZlZAogZnJvbSB0aGVtLiBUaGUg
+Y29uZmlkZW5jZSBtZXRyaWNzIGVudHJpZXMgbWF5IGFsc28gYmUgc3VwcGxpZWQgZm9yCiBh
+ZGRpdGlvbmFsIHZhbHVlcyBvZiBwb3NpdGlvbl90aHJlc2hvbGQsIGJ1dCBmcm9tIHRoZXNl
+IG5vIGFnZ3JlZ2F0ZWQKIG1ldHJpY3MgYXJlIGNvbXB1dGVkLgoKDQoFBAECAwQSBKIBAgoK
+DQoFBAECAwYSBKIBCyEKDQoFBAECAwESBKIBIjoKDQoFBAECAwMSBKIBPT4K4gEKBAQBAgQS
+BKgBAica0wEgT3V0cHV0IG9ubHkuIENvbmZ1c2lvbiBtYXRyaXggb2YgdGhlIGV2YWx1YXRp
+b24uCiBPbmx5IHNldCBmb3IgTVVMVElDTEFTUyBjbGFzc2lmaWNhdGlvbiBwcm9ibGVtcyB3
+aGVyZSBudW1iZXIKIG9mIGxhYmVscyBpcyBubyBtb3JlIHRoYW4gMTAuCiBPbmx5IHNldCBm
+b3IgbW9kZWwgbGV2ZWwgZXZhbHVhdGlvbiwgbm90IGZvciBldmFsdWF0aW9uIHBlciBsYWJl
+bC4KCg0KBQQBAgQGEgSoAQIRCg0KBQQBAgQBEgSoARIiCg0KBQQBAgQDEgSoASUmCk4KBAQB
+AgUSBKsBAikaQCBPdXRwdXQgb25seS4gVGhlIGFubm90YXRpb24gc3BlYyBpZHMgdXNlZCBm
+b3IgdGhpcyBldmFsdWF0aW9uLgoKDQoFBAECBQQSBKsBAgoKDQoFBAECBQUSBKsBCxEKDQoF
+BAECBQESBKsBEiQKDQoFBAECBQMSBKsBJyhiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Automl::V1::Classification::ClassificationAnnotation ===
+    # Fields for ClassificationAnnotation
+    # Field: score Type: 2 ()
+
+# === Message: Google::Cloud::Automl::V1::Classification::ClassificationEvaluationMetrics ===
+    # Fields for ClassificationEvaluationMetrics
+    # Field: au_prc Type: 2 ()
+    # Field: au_roc Type: 2 ()
+    # Field: log_loss Type: 2 ()
+    # Field: confidence_metrics_entry Type: 11 (.google.cloud.automl.v1.ClassificationEvaluationMetrics.ConfidenceMetricsEntry)
+    # Field: confusion_matrix Type: 11 (.google.cloud.automl.v1.ClassificationEvaluationMetrics.ConfusionMatrix)
+    # Field: annotation_spec_id Type: 9 ()
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Automl::V1::Classification - Compiled Protocol Buffers messages for google/cloud/automl/v1/classification.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Automl::V1::Classification;
+
+    my $msg = Google::Cloud::Automl::V1::Classification::ClassificationAnnotation->new({
+        score => $score,
+    });
+
+    # Read or update a field
+    my $val = $msg->score();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Automl::V1::Classification::ClassificationAnnotation->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/automl/v1/classification.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Automl::V1::Classification::ClassificationAnnotation
+
+Contains annotation details specific to classification.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->score() >> / C<< $msg->score($value) >>
+
+Type: C<Float>
+
+Output only. A confidence estimate between 0.0 and 1.0. A higher value
+means greater confidence that the annotation is positive. If a user
+approves an annotation as negative or positive, the score value remains
+unchanged. If a user creates an annotation, the score is 0 for negative or
+1 for positive.
+
+=back
+
+=head2 Google::Cloud::Automl::V1::Classification::ClassificationEvaluationMetrics
+
+Model evaluation metrics for classification problems.
+Note: For Video Classification this metrics only describe quality of the
+Video Classification predictions of "segment_classification" type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->au_prc() >> / C<< $msg->au_prc($value) >>
+
+Type: C<Float>
+
+Output only. The Area Under Precision-Recall Curve metric. Micro-averaged
+for the overall evaluation.
+
+=item * C<< $msg->au_roc() >> / C<< $msg->au_roc($value) >>
+
+Type: C<Float>
+
+Output only. The Area Under Receiver Operating Characteristic curve metric.
+Micro-averaged for the overall evaluation.
+
+=item * C<< $msg->log_loss() >> / C<< $msg->log_loss($value) >>
+
+Type: C<Float>
+
+Output only. The Log Loss metric.
+
+=item * C<< $msg->confidence_metrics_entry() >> / C<< $msg->confidence_metrics_entry($value) >>
+
+Type: C<Message> (L<Google::Cloud::Automl::V1::Classification::ClassificationEvaluationMetrics::ConfidenceMetricsEntry>)
+
+Output only. Metrics for each confidence_threshold in
+0.00,0.05,0.10,...,0.95,0.96,0.97,0.98,0.99 and
+position_threshold = INT32_MAX_VALUE.
+ROC and precision-recall curves, and other aggregated metrics are derived
+from them. The confidence metrics entries may also be supplied for
+additional values of position_threshold, but from these no aggregated
+metrics are computed.
+
+=item * C<< $msg->confusion_matrix() >> / C<< $msg->confusion_matrix($value) >>
+
+Type: C<Message> (L<Google::Cloud::Automl::V1::Classification::ClassificationEvaluationMetrics::ConfusionMatrix>)
+
+Output only. Confusion matrix of the evaluation.
+Only set for MULTICLASS classification problems where number
+of labels is no more than 10.
+Only set for model level evaluation, not for evaluation per label.
+
+=item * C<< $msg->annotation_spec_id() >> / C<< $msg->annotation_spec_id($value) >>
+
+Type: C<String>
+
+Output only. The annotation spec ids used for this evaluation.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Automl::V1::Classification::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

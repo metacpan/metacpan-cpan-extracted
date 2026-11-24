@@ -1,0 +1,528 @@
+package Google::Cloud::Talent::V4;
+
+use strict;
+use warnings;
+use Moo;
+use Google::gRPC::Client;
+use Google::Cloud::REST::Client;
+use Google::Auth;
+use Carp qw(croak);
+
+use Protobuf;
+use Google::Api::Common;
+use Google::Cloud::Talent::V4::Histogram;
+use Google::Cloud::Talent::V4::Event;
+use Google::Cloud::Talent::V4::Common;
+use Google::Cloud::Talent::V4::Tenant;
+use Google::Cloud::Talent::V4::EventService;
+use Google::Cloud::Talent::V4::CompletionService;
+use Google::Cloud::Talent::V4::Company;
+use Google::Cloud::Talent::V4::Job;
+use Google::Cloud::Talent::V4::Filters;
+use Google::Cloud::Talent::V4::TenantService;
+use Google::Cloud::Talent::V4::CompanyService;
+use Google::Cloud::Talent::V4::JobService;
+
+our $VERSION = '0.06';
+
+has credentials => ( is => 'ro', required => 0 );
+has transport   => ( is => 'rw' );
+
+sub BUILD {
+    my ($self) = @_;
+
+    my $auth = $self->credentials;
+    if (!defined $auth) {
+        $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
+    }
+    my $token = $auth->get_token();
+
+    my $target = 'jobs.googleapis.com:443';
+    my $t = $self->transport || 'grpc';
+
+    if (ref($t) && eval { $t->can('call') }) {
+        # Already a transport object
+    } elsif (lc($t) eq 'rest') {
+        my $client = Google::Cloud::REST::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    } else {
+        my $client = Google::gRPC::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    }
+}
+
+sub create_company {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Talent::V4::CompanyService::CreateCompanyRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Talent::V4::Company::Company';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.talent.v4.CompanyService/CreateCompany',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.talent.v4.CompanyService',
+        method         => 'CreateCompany',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub complete_query {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Talent::V4::CompletionService::CompleteQueryRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Talent::V4::CompletionService::CompleteQueryResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.talent.v4.Completion/CompleteQuery',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.talent.v4.Completion',
+        method         => 'CompleteQuery',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub create_client_event {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Talent::V4::EventService::CreateClientEventRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Talent::V4::Event::ClientEvent';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.talent.v4.EventService/CreateClientEvent',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.talent.v4.EventService',
+        method         => 'CreateClientEvent',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub create_job {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Talent::V4::JobService::CreateJobRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Talent::V4::Job::Job';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.talent.v4.JobService/CreateJob',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.talent.v4.JobService',
+        method         => 'CreateJob',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub create_tenant {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Talent::V4::TenantService::CreateTenantRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Talent::V4::Tenant::Tenant';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.talent.v4.TenantService/CreateTenant',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.talent.v4.TenantService',
+        method         => 'CreateTenant',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub list_tenants {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Talent::V4::TenantService::ListTenantsRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Talent::V4::TenantService::ListTenantsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.talent.v4.TenantService/ListTenants',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.talent.v4.TenantService',
+        method         => 'ListTenants',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+1; # End of Google::Cloud::Talent::V4
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Talent::V4 - Client library for Google Cloud Services
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Talent::V4;
+    use Google::Auth;
+
+    my $auth = Google::Auth->default();
+
+    # 1. High-performance gRPC Transport (Default)
+    my $grpc_client = Google::Cloud::Talent::V4->new(
+        credentials => $auth,
+        transport   => 'grpc', # Optional: 'grpc' is default
+    );
+
+    # 2. HTTP/REST Transport
+    my $rest_client = Google::Cloud::Talent::V4->new(
+        credentials => $auth,
+        transport   => 'rest',
+    );
+
+    # Execute service methods
+    my $res = $grpc_client->some_method( %params );
+
+=head1 DESCRIPTION
+
+C<Google::Cloud::Talent::V4> is an auto-generated client library for Google Cloud Services.
+
+It provides a unified client interface supporting both high-performance HTTP/2 gRPC and HTTP/REST transports, with automatic Google Cloud Application Default Credentials (ADC) resolution and typed Protocol Buffers message handling.
+
+=head1 SOURCE
+
+Generated from the following Protocol Buffers schemas:
+
+=over 4
+
+=item * C<googleapis/google/cloud/talent/v4/common.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/company.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/company_service.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/completion_service.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/event.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/event_service.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/filters.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/histogram.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/job.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/job_service.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/tenant.proto>
+
+=item * C<googleapis/google/cloud/talent/v4/tenant_service.proto>
+
+
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $client = Google::Cloud::Talent::V4->new(
+        credentials => $auth,   # Optional: Google::Auth object (defaults to ADC)
+        transport   => 'grpc', # Optional: 'grpc' (default) or 'rest'
+    );
+
+=head1 ATTRIBUTES
+
+=head2 credentials
+
+Returns or accepts the L<Google::Auth> credentials object.
+
+=head2 transport
+
+Returns or accepts the active transport object (L<Google::gRPC::Client> or L<Google::Cloud::REST::Client>).
+
+=head1 METHODS
+
+=head2 METHODS
+
+The following RPC methods are available in this client:
+
+=over 4
+
+=item * B<create_company>
+
+    my $response = $client->create_company(
+        parent                   => $parent,
+        company                  => $company,
+    );
+
+Calls the RPC method C<CreateCompany> on C<google.cloud.talent.v4.CompanyService>.
+
+Request: L<Google::Cloud::Talent::V4::CompanyService::CreateCompanyRequest>
+
+Returns: L<Google::Cloud::Talent::V4::Company::Company>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<company> - L<Google::Cloud::Talent::V4::Company::Company>
+
+=back
+
+=item * B<complete_query>
+
+    my $response = $client->complete_query(
+        tenant                   => $tenant,
+        query                    => $query,
+        language_codes           => [ ... ],
+        page_size                => $page_size,
+        company                  => $company,
+        scope                    => $scope,
+        type                     => $type,
+    );
+
+Calls the RPC method C<CompleteQuery> on C<google.cloud.talent.v4.Completion>.
+
+Request: L<Google::Cloud::Talent::V4::CompletionService::CompleteQueryRequest>
+
+Returns: L<Google::Cloud::Talent::V4::CompletionService::CompleteQueryResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<tenant> - C<string>
+
+=item * C<query> - C<string>
+
+=item * C<language_codes> - ArrayRef of C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<company> - C<string>
+
+=item * C<scope> - L<Google::Cloud::Talent::V4::CompletionService::CompletionScope>
+
+=item * C<type> - L<Google::Cloud::Talent::V4::CompletionService::CompletionType>
+
+=back
+
+=item * B<create_client_event>
+
+    my $response = $client->create_client_event(
+        parent                   => $parent,
+        client_event             => $client_event,
+    );
+
+Calls the RPC method C<CreateClientEvent> on C<google.cloud.talent.v4.EventService>.
+
+Request: L<Google::Cloud::Talent::V4::EventService::CreateClientEventRequest>
+
+Returns: L<Google::Cloud::Talent::V4::Event::ClientEvent>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<client_event> - L<Google::Cloud::Talent::V4::Event::ClientEvent>
+
+=back
+
+=item * B<create_job>
+
+    my $response = $client->create_job(
+        parent                   => $parent,
+        job                      => $job,
+    );
+
+Calls the RPC method C<CreateJob> on C<google.cloud.talent.v4.JobService>.
+
+Request: L<Google::Cloud::Talent::V4::JobService::CreateJobRequest>
+
+Returns: L<Google::Cloud::Talent::V4::Job::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<job> - L<Google::Cloud::Talent::V4::Job::Job>
+
+=back
+
+=item * B<create_tenant>
+
+    my $response = $client->create_tenant(
+        parent                   => $parent,
+        tenant                   => $tenant,
+    );
+
+Calls the RPC method C<CreateTenant> on C<google.cloud.talent.v4.TenantService>.
+
+Request: L<Google::Cloud::Talent::V4::TenantService::CreateTenantRequest>
+
+Returns: L<Google::Cloud::Talent::V4::Tenant::Tenant>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<tenant> - L<Google::Cloud::Talent::V4::Tenant::Tenant>
+
+=back
+
+=item * B<list_tenants>
+
+    my $response = $client->list_tenants(
+        parent                   => $parent,
+        page_token               => $page_token,
+        page_size                => $page_size,
+    );
+
+Calls the RPC method C<ListTenants> on C<google.cloud.talent.v4.TenantService>.
+
+Request: L<Google::Cloud::Talent::V4::TenantService::ListTenantsRequest>
+
+Returns: L<Google::Cloud::Talent::V4::TenantService::ListTenantsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=back
+
+=back
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -21,7 +21,7 @@ use InternetData::Error;
 use InternetData::Oauth;
 use InternetData::Result;
 
-our $VERSION = '1.18.2';
+our $VERSION = '1.19.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.internetdata.io';
@@ -44,16 +44,19 @@ my %OPTIONS = map { $_ => 1 } qw(
 # The shapes of the answers, from the pinned spec's schemas: a member it requires
 # and never sends as null is required, a nullable or optional one may be absent
 # or null, and every one present has the spec's type at every depth. A detail
-# requires no member, so `{}`, its answer under a false flag, is one.
-my $CLASS_DETAIL = [fields => [map { [$_ => ['string']] } qw(provider provider_name confidence last_seen)]];
+# requires no member, so `{}`, its answer under a false flag, is one. A `format: date`
+# member, a seen day among them, is `date`: RFC 3339's full-date on a day that exists.
+my $CLASS_DETAIL = [fields => [
+    (map { [$_ => ['string']] } qw(provider provider_name confidence)), [last_seen => ['date']],
+]];
 my $PROXY_DETAIL = [fields => [
-    (map { [$_ => ['string']] } qw(provider provider_name first_seen last_seen)),
+    (map { [$_ => ['string']] } qw(provider provider_name)), (map { [$_ => ['date']] } qw(first_seen last_seen)),
     (map { [$_ => ['integer']] } qw(hits hits_days_pct providers_num)),
 ]];
 my $PUBPROXY_DETAIL = [fields => [
     [entry => ['boolean']], [exit => ['boolean']], [protocols => [list => ['string']]],
     [num_ports => ['integer']], [num_proxies => ['integer']],
-    (map { [$_ => ['string']] } qw(last_seen last_usable)),
+    [last_seen => ['date']], [last_usable => ['string']],
 ]];
 my $CARRIER_DETAIL = [fields => [map { [$_ => ['string']] } qw(name mcc mnc country confidence)]];
 my $SATELLITE_DETAIL = [fields => [
@@ -64,15 +67,16 @@ my $SATELLITE_DETAIL = [fields => [
 my $BOT_DETAIL = [fields => [
     (map { [$_ => ['string']] } qw(provider provider_name)),
     (map { [$_ => [list => ['string']]] } qw(agents categories)), [verified => ['boolean']],
-    (map { [$_ => ['string']] } qw(identity verified_by confidence first_seen last_seen)),
+    (map { [$_ => ['string']] } qw(identity verified_by confidence)),
+    (map { [$_ => ['date']] } qw(first_seen last_seen)),
 ]];
 my $SSH_DETAIL = [fields => [
     [port => ['integer']], (map { [$_ => ['string']] } qw(banner host_key_fp)),
-    [session_ok => ['boolean']], (map { [$_ => ['string']] } qw(first_seen last_seen)),
+    [session_ok => ['boolean']], (map { [$_ => ['date']] } qw(first_seen last_seen)),
 ]];
 my $SMTP_DETAIL = [fields => [
     [port => ['integer']], [banner => ['string']], [session_ok => ['boolean']],
-    (map { [$_ => ['string']] } qw(first_seen last_seen)),
+    (map { [$_ => ['date']] } qw(first_seen last_seen)),
 ]];
 # Web IP's detail is a list of the web servers found, each one whole.
 my $WEB_SERVER = [fields => [
@@ -80,15 +84,15 @@ my $WEB_SERVER = [fields => [
     [status_code => ['integer'], 1],
     (map { [$_ => ['string'], 1] } qw(server location title cert_subject_cn cert_subject_o cert_issuer_dn)),
     [cert_browser_trusted => ['boolean'], 1],
-    (map { [$_ => ['string'], 1] } qw(tls_version first_seen last_seen)),
+    [tls_version => ['string'], 1], (map { [$_ => ['date'], 1] } qw(first_seen last_seen)),
 ]];
 my $DNS_RESOLVER_DETAIL = [fields => [
     [port => ['integer']], [recursion_available => ['boolean']], [rcode => ['integer']],
-    [answer_correct => ['boolean']], (map { [$_ => ['string']] } qw(first_seen last_seen)),
+    [answer_correct => ['boolean']], (map { [$_ => ['date']] } qw(first_seen last_seen)),
 ]];
 my $BITTORRENT_DETAIL = [fields => [
     (map { [$_ => ['boolean']] } qw(verified id_matches_ip)),
-    (map { [$_ => ['string']] } qw(first_seen last_seen last_reachable)),
+    (map { [$_ => ['date']] } qw(first_seen last_seen)), [last_reachable => ['string']],
     (map { [$_ => ['integer']] } qw(days_seen num_ports peak_num_ports)),
     [indexer => ['boolean']], [clients => [list => ['string']]],
 ]];
@@ -138,7 +142,7 @@ our $LOOKUP = [fields => [
 ]];
 my $AS_PREFIX = [fields => [
     [prefix => ['string'], 1], [peer_count => ['integer'], 1],
-    (map { [$_ => ['string'], 1] } qw(rpki_status first_seen country)),
+    [rpki_status => ['string'], 1], [first_seen => ['date'], 1], [country => ['string'], 1],
     [size => ['integer'], 1], [other_origins => [list => ['integer']], 1],
 ]];
 our $ASN_LOOKUP = [fields => [
@@ -152,12 +156,14 @@ our $ASN_LOOKUP = [fields => [
     [trial_expired => ['boolean']],
     [cap_reached => ['boolean']],
 ]];
-my $DNS_ADDRESS = [fields => [map { [$_ => ['string'], 1] } qw(ip last_seen)]];
+my $DNS_ADDRESS = [fields => [[ip => ['string'], 1], [last_seen => ['date'], 1]]];
 my $DOMAIN_DNS = [fields => [
     (map { [$_ => [list => $DNS_ADDRESS], 1] } qw(a aaaa)),
-    [mx => [list => [fields => [[priority => ['integer'], 1], map { [$_ => ['string'], 1] } qw(host last_seen)]]], 1],
-    [ns => [list => [fields => [map { [$_ => ['string'], 1] } qw(host last_seen)]]], 1],
-    [cname => [list => [fields => [map { [$_ => ['string'], 1] } qw(target last_seen)]]], 1],
+    [mx => [list => [fields => [
+        [priority => ['integer'], 1], [host => ['string'], 1], [last_seen => ['date'], 1],
+    ]]], 1],
+    [ns => [list => [fields => [[host => ['string'], 1], [last_seen => ['date'], 1]]]], 1],
+    [cname => [list => [fields => [[target => ['string'], 1], [last_seen => ['date'], 1]]]], 1],
 ]];
 my $DOMAIN_IP_RANGES = [fields => [
     (map { [$_ => ['string'], 1] } qw(domain redirects_to)), (map { [$_ => ['integer'], 1] } qw(total ipv4)),
@@ -181,7 +187,7 @@ our $DOMAIN_LOOKUP = [fields => [
     [ip_ranges => $DOMAIN_IP_RANGES],
     [disposable => [fields => [
         [confidence => ['string']], [providers => [list => ['string']]],
-        (map { [$_ => ['string']] } qw(first_seen last_seen)),
+        (map { [$_ => ['date']] } qw(first_seen last_seen)),
     ]]],
     [web => $DOMAIN_WEB], (map { [$_ => $DOMAIN_REFERRERS] } qw(redirects backlinks)),
     [trial_expired => ['boolean']],

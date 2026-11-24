@@ -11,14 +11,14 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Dataflow::V1beta3::Streaming;
-use Google::Dataflow::V1beta3::Snapshots;
-use Google::Dataflow::V1beta3::Metrics;
 use Google::Dataflow::V1beta3::Environment;
 use Google::Dataflow::V1beta3::Messages;
+use Google::Dataflow::V1beta3::Snapshots;
+use Google::Dataflow::V1beta3::Metrics;
 use Google::Dataflow::V1beta3::Jobs;
 use Google::Dataflow::V1beta3::Templates;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -244,15 +244,105 @@ The following RPC methods are available in this client:
 
 =item * B<get_job_metrics>
 
-Calls the RPC method C<GetJobMetrics> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_job_metrics(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        start_time               => $start_time,
+        location                 => $location,
+    );
+
+Calls the RPC method C<GetJobMetrics> on C<google.dataflow.v1beta3.MetricsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Metrics::GetJobMetricsRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Metrics::JobMetrics>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<start_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<get_job_execution_details>
 
-Calls the RPC method C<GetJobExecutionDetails> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_job_execution_details(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        location                 => $location,
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<GetJobExecutionDetails> on C<google.dataflow.v1beta3.MetricsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Metrics::GetJobExecutionDetailsRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Metrics::JobExecutionDetails>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<get_stage_execution_details>
 
-Calls the RPC method C<GetStageExecutionDetails> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_stage_execution_details(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        location                 => $location,
+        stage_id                 => $stage_id,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        start_time               => $start_time,
+        end_time                 => $end_time,
+    );
+
+Calls the RPC method C<GetStageExecutionDetails> on C<google.dataflow.v1beta3.MetricsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Metrics::GetStageExecutionDetailsRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Metrics::StageExecutionDetails>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=item * C<stage_id> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<start_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=item * C<end_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=back
 
 =back
 

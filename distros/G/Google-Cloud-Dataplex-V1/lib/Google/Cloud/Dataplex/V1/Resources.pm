@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Resources;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -807,115 +807,11 @@ EOF
     # Field: asset_status Type: 11 (.google.cloud.dataplex.v1.AssetStatus)
     # Field: metastore_status Type: 11 (.google.cloud.dataplex.v1.Lake.MetastoreStatus)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Resources::Lake - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Resources;
-
-    my $msg = Google::Cloud::Dataplex::V1::Resources::Lake->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.Lake.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.State)
-
-=item * B<service_account>
-
-Type: String
-
-=item * B<metastore>
-
-Type: Message (.google.cloud.dataplex.v1.Lake.Metastore)
-
-=item * B<asset_status>
-
-Type: Message (.google.cloud.dataplex.v1.AssetStatus)
-
-=item * B<metastore_status>
-
-Type: Message (.google.cloud.dataplex.v1.Lake.MetastoreStatus)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Resources::AssetStatus ===
     # Fields for AssetStatus
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
     # Field: active_assets Type: 5 ()
     # Field: security_policy_applying_assets Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Resources::AssetStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Resources;
-
-    my $msg = Google::Cloud::Dataplex::V1::Resources::AssetStatus->new(
-        update_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<active_assets>
-
-Type: Int32
-
-=item * B<security_policy_applying_assets>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Resources::Zone ===
     # Fields for Zone
@@ -932,98 +828,10 @@ Type: Int32
     # Field: resource_spec Type: 11 (.google.cloud.dataplex.v1.Zone.ResourceSpec)
     # Field: asset_status Type: 11 (.google.cloud.dataplex.v1.AssetStatus)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Resources::Zone - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Resources;
-
-    my $msg = Google::Cloud::Dataplex::V1::Resources::Zone->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.Zone.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.State)
-
-=item * B<type>
-
-Type: Enum (.google.cloud.dataplex.v1.Zone.Type)
-
-=item * B<discovery_spec>
-
-Type: Message (.google.cloud.dataplex.v1.Zone.DiscoverySpec)
-
-=item * B<resource_spec>
-
-Type: Message (.google.cloud.dataplex.v1.Zone.ResourceSpec)
-
-=item * B<asset_status>
-
-Type: Message (.google.cloud.dataplex.v1.AssetStatus)
-
-=back
-
-=cut
-
 # Enum: Zone::Type
 our $Zone_TYPE_UNSPECIFIED = 0;
 our $Zone_RAW = 1;
 our $Zone_CURATED = 2;
-
-=pod
-
-=head2 Enum: Zone::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<RAW> => 1
-
-=item * C<CURATED> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Resources::Action ===
     # Fields for Action
@@ -1044,117 +852,11 @@ Values:
     # Field: failed_security_policy_apply Type: 11 (.google.cloud.dataplex.v1.Action.FailedSecurityPolicyApply)
     # Field: invalid_data_organization Type: 11 (.google.cloud.dataplex.v1.Action.InvalidDataOrganization)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Resources::Action - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Resources;
-
-    my $msg = Google::Cloud::Dataplex::V1::Resources::Action->new(
-        category => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<category>
-
-Type: Enum (.google.cloud.dataplex.v1.Action.Category)
-
-=item * B<issue>
-
-Type: String
-
-=item * B<detect_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<name>
-
-Type: String
-
-=item * B<lake>
-
-Type: String
-
-=item * B<zone>
-
-Type: String
-
-=item * B<asset>
-
-Type: String
-
-=item * B<data_locations>
-
-Type: String
-
-=item * B<invalid_data_format>
-
-Type: Message (.google.cloud.dataplex.v1.Action.InvalidDataFormat)
-
-=item * B<incompatible_data_schema>
-
-Type: Message (.google.cloud.dataplex.v1.Action.IncompatibleDataSchema)
-
-=item * B<invalid_data_partition>
-
-Type: Message (.google.cloud.dataplex.v1.Action.InvalidDataPartition)
-
-=item * B<missing_data>
-
-Type: Message (.google.cloud.dataplex.v1.Action.MissingData)
-
-=item * B<missing_resource>
-
-Type: Message (.google.cloud.dataplex.v1.Action.MissingResource)
-
-=item * B<unauthorized_resource>
-
-Type: Message (.google.cloud.dataplex.v1.Action.UnauthorizedResource)
-
-=item * B<failed_security_policy_apply>
-
-Type: Message (.google.cloud.dataplex.v1.Action.FailedSecurityPolicyApply)
-
-=item * B<invalid_data_organization>
-
-Type: Message (.google.cloud.dataplex.v1.Action.InvalidDataOrganization)
-
-=back
-
-=cut
-
 # Enum: Action::Category
 our $Action_CATEGORY_UNSPECIFIED = 0;
 our $Action_RESOURCE_MANAGEMENT = 1;
 our $Action_SECURITY_POLICY = 2;
 our $Action_DATA_DISCOVERY = 3;
-
-=pod
-
-=head2 Enum: Action::Category
-
-Values:
-
-=over 4
-
-=item * C<CATEGORY_UNSPECIFIED> => 0
-
-=item * C<RESOURCE_MANAGEMENT> => 1
-
-=item * C<SECURITY_POLICY> => 2
-
-=item * C<DATA_DISCOVERY> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Resources::Asset ===
     # Fields for Asset
@@ -1172,91 +874,510 @@ Values:
     # Field: discovery_spec Type: 11 (.google.cloud.dataplex.v1.Asset.DiscoverySpec)
     # Field: discovery_status Type: 11 (.google.cloud.dataplex.v1.Asset.DiscoveryStatus)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Resources::Asset - Compiled Protocol Buffers message class
+Google::Cloud::Dataplex::V1::Resources - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/resources.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Dataplex::V1::Resources;
 
-    my $msg = Google::Cloud::Dataplex::V1::Resources::Asset->new(
-        name => $value,
-    );
+    my $msg = Google::Cloud::Dataplex::V1::Resources::Lake->new({
+        name => $name,
+        display_name => $display_name,
+        uid => $uid,
+        create_time => $create_time,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Resources::Lake->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.Asset.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.State)
-
-=item * B<resource_spec>
-
-Type: Message (.google.cloud.dataplex.v1.Asset.ResourceSpec)
-
-=item * B<resource_status>
-
-Type: Message (.google.cloud.dataplex.v1.Asset.ResourceStatus)
-
-=item * B<security_status>
-
-Type: Message (.google.cloud.dataplex.v1.Asset.SecurityStatus)
-
-=item * B<discovery_spec>
-
-Type: Message (.google.cloud.dataplex.v1.Asset.DiscoverySpec)
-
-=item * B<discovery_status>
-
-Type: Message (.google.cloud.dataplex.v1.Asset.DiscoveryStatus)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Resources - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/resources.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Resources::Lake
+
+A lake is a centralized repository for managing enterprise data across the
+organization distributed across many cloud projects, and stored in a variety
+of storage services such as Google Cloud Storage and BigQuery. The resources
+attached to a lake are referred to as managed resources. Data within these
+managed resources can be structured or unstructured. A lake provides data
+admins with tools to organize, secure and manage their data at scale, and
+provides data scientists and data engineers an integrated experience to
+easily search, discover, analyze and transform data and associated metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the lake, of the form:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}`.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the lake. This ID will
+be different if the lake is deleted and re-created with the same name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the lake was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the lake was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Lake::LabelsEntry>)
+
+Optional. User-defined labels for the lake.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the lake.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::State>)
+
+Output only. Current state of the lake.
+
+=item * C<< $msg->service_account() >> / C<< $msg->service_account($value) >>
+
+Type: C<String>
+
+Output only. Service account associated with this lake. This service
+account must be authorized to access or operate on resources managed by the
+lake.
+
+=item * C<< $msg->metastore() >> / C<< $msg->metastore($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Lake::Metastore>)
+
+Optional. Settings to manage lake and Dataproc Metastore service instance
+association.
+
+=item * C<< $msg->asset_status() >> / C<< $msg->asset_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::AssetStatus>)
+
+Output only. Aggregated status of the underlying assets of the lake.
+
+=item * C<< $msg->metastore_status() >> / C<< $msg->metastore_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Lake::MetastoreStatus>)
+
+Output only. Metastore status of the lake.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Resources::AssetStatus
+
+Aggregated status of the underlying assets of a lake or zone.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Last update time of the status.
+
+=item * C<< $msg->active_assets() >> / C<< $msg->active_assets($value) >>
+
+Type: C<Int32>
+
+Number of active assets.
+
+=item * C<< $msg->security_policy_applying_assets() >> / C<< $msg->security_policy_applying_assets($value) >>
+
+Type: C<Int32>
+
+Number of assets that are in process of updating the security policy on
+attached resources.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Resources::Zone
+
+A zone represents a logical group of related assets within a lake. A zone can
+be used to map to organizational structure or represent stages of data
+readiness from raw to curated. It provides managing behavior that is shared
+or inherited by all contained assets.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the zone, of the form:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}`.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the zone. This ID will
+be different if the zone is deleted and re-created with the same name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the zone was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the zone was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Zone::LabelsEntry>)
+
+Optional. User defined labels for the zone.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the zone.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::State>)
+
+Output only. Current state of the zone.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::Zone::Type>)
+
+Required. Immutable. The type of the zone.
+
+=item * C<< $msg->discovery_spec() >> / C<< $msg->discovery_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Zone::DiscoverySpec>)
+
+Optional. Specification of the discovery feature applied to data in this
+zone.
+
+=item * C<< $msg->resource_spec() >> / C<< $msg->resource_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Zone::ResourceSpec>)
+
+Required. Specification of the resources that are referenced by the assets
+within this zone.
+
+=item * C<< $msg->asset_status() >> / C<< $msg->asset_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::AssetStatus>)
+
+Output only. Aggregated status of the underlying assets of the zone.
+
+=back
+
+=head3 Enum: Zone::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<RAW> => C<1>
+
+=item * C<CURATED> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Resources::Action
+
+Action represents an issue requiring administrator action for resolution.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->category() >> / C<< $msg->category($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::Action::Category>)
+
+The category of issue associated with the action.
+
+=item * C<< $msg->issue() >> / C<< $msg->issue($value) >>
+
+Type: C<String>
+
+Detailed description of the issue requiring action.
+
+=item * C<< $msg->detect_time() >> / C<< $msg->detect_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time that the issue was detected.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the action, of the form:
+`projects/{project}/locations/{location}/lakes/{lake}/actions/{action}`
+`projects/{project}/locations/{location}/lakes/{lake}/zones/{zone}/actions/{action}`
+`projects/{project}/locations/{location}/lakes/{lake}/zones/{zone}/assets/{asset}/actions/{action}`.
+
+=item * C<< $msg->lake() >> / C<< $msg->lake($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the lake, of the form:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}`.
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the zone, of the form:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}`.
+
+=item * C<< $msg->asset() >> / C<< $msg->asset($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the asset, of the form:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}/assets/{asset_id}`.
+
+=item * C<< $msg->data_locations() >> / C<< $msg->data_locations($value) >>
+
+Type: C<String>
+
+The list of data locations associated with this action. Cloud Storage
+locations are represented as URI paths(E.g.
+`gs://bucket/table1/year=2020/month=Jan/`). BigQuery locations refer to
+resource names(E.g.
+`bigquery.googleapis.com/projects/project-id/datasets/dataset-id`).
+
+=item * C<< $msg->invalid_data_format() >> / C<< $msg->invalid_data_format($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Action::InvalidDataFormat>)
+
+Details for issues related to invalid or unsupported data formats.
+
+=item * C<< $msg->incompatible_data_schema() >> / C<< $msg->incompatible_data_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Action::IncompatibleDataSchema>)
+
+Details for issues related to incompatible schemas detected within data.
+
+=item * C<< $msg->invalid_data_partition() >> / C<< $msg->invalid_data_partition($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Action::InvalidDataPartition>)
+
+Details for issues related to invalid or unsupported data partition
+structure.
+
+=item * C<< $msg->missing_data() >> / C<< $msg->missing_data($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Action::MissingData>)
+
+Details for issues related to absence of data within managed resources.
+
+=item * C<< $msg->missing_resource() >> / C<< $msg->missing_resource($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Action::MissingResource>)
+
+Details for issues related to absence of a managed resource.
+
+=item * C<< $msg->unauthorized_resource() >> / C<< $msg->unauthorized_resource($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Action::UnauthorizedResource>)
+
+Details for issues related to lack of permissions to access data
+resources.
+
+=item * C<< $msg->failed_security_policy_apply() >> / C<< $msg->failed_security_policy_apply($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Action::FailedSecurityPolicyApply>)
+
+Details for issues related to applying security policy.
+
+=item * C<< $msg->invalid_data_organization() >> / C<< $msg->invalid_data_organization($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Action::InvalidDataOrganization>)
+
+Details for issues related to invalid data arrangement.
+
+=back
+
+=head3 Enum: Action::Category
+
+=over 4
+
+=item * C<CATEGORY_UNSPECIFIED> => C<0>
+
+=item * C<RESOURCE_MANAGEMENT> => C<1>
+
+=item * C<SECURITY_POLICY> => C<2>
+
+=item * C<DATA_DISCOVERY> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Resources::Asset
+
+An asset represents a cloud resource that is being managed within a lake as a
+member of a zone.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the asset, of the form:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}/assets/{asset_id}`.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the asset. This ID
+will be different if the asset is deleted and re-created with the same
+name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the asset was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the asset was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Asset::LabelsEntry>)
+
+Optional. User defined labels for the asset.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the asset.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::State>)
+
+Output only. Current state of the asset.
+
+=item * C<< $msg->resource_spec() >> / C<< $msg->resource_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Asset::ResourceSpec>)
+
+Required. Specification of the resource that is referenced by this asset.
+
+=item * C<< $msg->resource_status() >> / C<< $msg->resource_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Asset::ResourceStatus>)
+
+Output only. Status of the resource referenced by this asset.
+
+=item * C<< $msg->security_status() >> / C<< $msg->security_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Asset::SecurityStatus>)
+
+Output only. Status of the security policy applied to resource referenced
+by this asset.
+
+=item * C<< $msg->discovery_spec() >> / C<< $msg->discovery_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Asset::DiscoverySpec>)
+
+Optional. Specification of the discovery feature applied to data referenced
+by this asset. When this spec is left unset, the asset will use the spec
+set on the parent zone.
+
+=item * C<< $msg->discovery_status() >> / C<< $msg->discovery_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Asset::DiscoveryStatus>)
+
+Output only. Status of the discovery feature applied to data referenced by
+this asset.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Resources::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

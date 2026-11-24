@@ -8,7 +8,7 @@ use Test2::Plugin::NoWarnings;
 # name a public module exports, and each public method it defines, is
 # listed, but for those named internal below; each name listed is one
 # the module can call; each has a synopsis, says "Exported by default."
-# or "Exported on request." as it's exported, and ends with a link to a
+# or "Exported upon request." as it's exported, and ends with a link to a
 # section of the reference, which doesn't open with the synopsis again
 # (2026-0042); Tooling names each of its tags; and an internal module
 # lists nothing.
@@ -186,10 +186,10 @@ for my $entry (@entries) {
         ],
         [],
         "$module: says which are exported by default";
-    my @on_request = grep { !$default{$_} } sort keys %request;
-    is [grep { $listed{$_} !~ m( \s Exported \s+ on \s+ request \. )x }
-            @on_request], [],
-        "$module: says which are exported on request";
+    my @upon_request = grep { !$default{$_} } sort keys %request;
+    is [grep { $listed{$_} !~ m( \s Exported \s+ upon \s+ request \. )x }
+            @upon_request], [],
+        "$module: says which are exported upon request";
 }
 
 done_testing;

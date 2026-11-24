@@ -5,6 +5,7 @@ author:
 build_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
+  Archive::Tar: '3.12'
   ExtUtils::MakeMaker: '6.52'
   File::Spec: '0'
   Test::Alien: '0'
@@ -32,7 +33,7 @@ no_index:
 provides:
   Alien::hiredis:
     file: lib/Alien/hiredis.pm
-    version: '0.018'
+    version: '0.019'
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -43,7 +44,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Alien-hiredis/issues
   homepage: https://github.com/Grinnz/Alien-hiredis
   repository: https://github.com/Grinnz/Alien-hiredis.git
-version: '0.018'
+version: '0.019'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.33'
   requires:

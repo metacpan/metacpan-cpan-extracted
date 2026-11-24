@@ -1,0 +1,332 @@
+package Google::Devicesandservices::Health::V4::DataSource;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    my $descriptor_b64 = <<'EOF';
+CjVnb29nbGUvZGV2aWNlc2FuZHNlcnZpY2VzL2hlYWx0aC92NC9kYXRhX3NvdXJjZS5wcm90
+bxIjZ29vZ2xlLmRldmljZXNhbmRzZXJ2aWNlcy5oZWFsdGgudjQaH2dvb2dsZS9hcGkvZmll
+bGRfYmVoYXZpb3IucHJvdG8i1QkKCkRhdGFTb3VyY2USbwoQcmVjb3JkaW5nX21ldGhvZBgB
+IAEoDjI/Lmdvb2dsZS5kZXZpY2VzYW5kc2VydmljZXMuaGVhbHRoLnY0LkRhdGFTb3VyY2Uu
+UmVjb3JkaW5nTWV0aG9kQgPgQQFSD3JlY29yZGluZ01ldGhvZBJTCgZkZXZpY2UYAiABKAsy
+Ni5nb29nbGUuZGV2aWNlc2FuZHNlcnZpY2VzLmhlYWx0aC52NC5EYXRhU291cmNlLkRldmlj
+ZUID4EEBUgZkZXZpY2USYgoLYXBwbGljYXRpb24YAyABKAsyOy5nb29nbGUuZGV2aWNlc2Fu
+ZHNlcnZpY2VzLmhlYWx0aC52NC5EYXRhU291cmNlLkFwcGxpY2F0aW9uQgPgQQNSC2FwcGxp
+Y2F0aW9uElkKCHBsYXRmb3JtGAQgASgOMjguZ29vZ2xlLmRldmljZXNhbmRzZXJ2aWNlcy5o
+ZWFsdGgudjQuRGF0YVNvdXJjZS5QbGF0Zm9ybUID4EEDUghwbGF0Zm9ybRrtAgoGRGV2aWNl
+EmcKC2Zvcm1fZmFjdG9yGAEgASgOMkEuZ29vZ2xlLmRldmljZXNhbmRzZXJ2aWNlcy5oZWFs
+dGgudjQuRGF0YVNvdXJjZS5EZXZpY2UuRm9ybUZhY3RvckID4EEBUgpmb3JtRmFjdG9yEicK
+DG1hbnVmYWN0dXJlchgCIAEoCUID4EEBUgxtYW51ZmFjdHVyZXISJgoMZGlzcGxheV9uYW1l
+GAMgASgJQgPgQQFSC2Rpc3BsYXlOYW1lIqgBCgpGb3JtRmFjdG9yEhsKF0ZPUk1fRkFDVE9S
+X1VOU1BFQ0lGSUVEEAASEAoMRklUTkVTU19CQU5EEAESCQoFV0FUQ0gQAhIJCgVQSE9ORRAD
+EggKBFJJTkcQBBIPCgtDSEVTVF9TVFJBUBAFEgkKBVNDQUxFEAYSCgoGVEFCTEVUEAcSEAoM
+SEVBRF9NT1VOVEVEEAgSEQoNU01BUlRfRElTUExBWRAJGpQBCgtBcHBsaWNhdGlvbhImCgxw
+YWNrYWdlX25hbWUYASABKAlCA+BBA1ILcGFja2FnZU5hbWUSJwoNd2ViX2NsaWVudF9pZBgC
+IAEoCUID4EEDUgt3ZWJDbGllbnRJZBI0ChRnb29nbGVfd2ViX2NsaWVudF9pZBgDIAEoCUID
+4EEDUhFnb29nbGVXZWJDbGllbnRJZCKIAQoPUmVjb3JkaW5nTWV0aG9kEiAKHFJFQ09SRElO
+R19NRVRIT0RfVU5TUEVDSUZJRUQQABIKCgZNQU5VQUwQARIWChJQQVNTSVZFTFlfTUVBU1VS
+RUQQAhILCgdERVJJVkVEEAMSFQoRQUNUSVZFTFlfTUVBU1VSRUQQBBILCgdVTktOT1dOEAUi
+rwEKCFBsYXRmb3JtEhgKFFBMQVRGT1JNX1VOU1BFQ0lGSUVEEAASCgoGRklUQklUEAESEgoO
+SEVBTFRIX0NPTk5FQ1QQAhIOCgpIRUFMVEhfS0lUEAMSBwoDRklUEAQSEgoORklUQklUX1dF
+Ql9BUEkQBRIICgRORVNUEAYSEgoOR09PR0xFX1dFQl9BUEkQBxIeChpHT09HTEVfUEFSVE5F
+Ul9JTlRFR1JBVElPThAIQoECCidjb20uZ29vZ2xlLmRldmljZXNhbmRzZXJ2aWNlcy5oZWFs
+dGgudjRCD0RhdGFTb3VyY2VQcm90b1ABWk5nb29nbGUuZ29sYW5nLm9yZy9nZW5wcm90by9n
+b29nbGVhcGlzL2RldmljZXNhbmRzZXJ2aWNlcy9oZWFsdGgvYXBpdjQ7aGVhbHRocGKqAiNH
+b29nbGUuRGV2aWNlc0FuZFNlcnZpY2VzLkhlYWx0aC5WNMoCI0dvb2dsZVxEZXZpY2VzQW5k
+U2VydmljZXNcSGVhbHRoXFY06gImR29vZ2xlOjpEZXZpY2VzQW5kU2VydmljZXM6OkhlYWx0
+aDo6VjRK3TIKBxIFDgCxAQEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUg
+TExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAo
+dGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBj
+b21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2Yg
+dGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJ
+Q0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVl
+ZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vu
+c2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFO
+VElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBs
+aWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJu
+aW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoI
+CgECEgMQACwKCQoCAwASAxIAKQoICgEIEgMUAEAKCQoCCCUSAxQAQAoICgEIEgMVAGUKCQoC
+CAsSAxUAZQoICgEIEgMWACIKCQoCCAoSAxYAIgoICgEIEgMXADAKCQoCCAgSAxcAMAoICgEI
+EgMYAEAKCQoCCAESAxgAQAoICgEIEgMZAEAKCQoCCCkSAxkAQAoICgEIEgMaAD8KCQoCCC0S
+AxoAPwqjAgoCBAASBSEAsQEBGpUCIERhdGEgU291cmNlIGRlZmluaXRpb24gdG8gdHJhY2sg
+dGhlIG9yaWdpbiBvZiBkYXRhLgoKIEVhY2ggaGVhbHRoIGRhdGEgcG9pbnQsIHJlZ2FyZGxl
+c3Mgb2YgdGhlIGNvbXBsZXhpdHkgb3IgZGF0YSBtb2RlbCAod2hldGhlciBhCiBzaW1wbGUg
+c3RlcCBjb3VudCBvciBhIGRldGFpbGVkIHNsZWVwIHNlc3Npb24pIG11c3QgcmV0YWluIGlu
+Zm9ybWF0aW9uIGFib3V0CiBpdHMgc291cmNlIG9mIG9yaWdpbiAoZS5nLiB0aGUgZGV2aWNl
+IG9yIGFwcCB0aGF0IGNvbGxlY3RlZCBpdCkuCgoKCgMEAAESAyEIEgpRCgQEAAMAEgQjAk0D
+GkMgQ2FwdHVyZXMgbWV0YWRhdGEgYWJvdXQgdGhlIGRldmljZSB0aGF0IHJlY29yZGVkIHRo
+ZSBtZWFzdXJlbWVudC4KCgwKBQQAAwABEgMjChAKSgoGBAADAAQAEgQlBEMFGjogRm9ybSBm
+YWN0b3Igb2YgdGhlIGRldmljZSwgZS5nLiBwaG9uZSwgd2F0Y2gsIGJhbmQsIGV0Yy4KCg4K
+BwQAAwAEAAESAyUJEwoyCggEAAMABAACABIDJwYiGiEgVGhlIGZvcm0gZmFjdG9yIGlzIHVu
+c3BlY2lmaWVkLgoKEAoJBAADAAQAAgABEgMnBh0KEAoJBAADAAQAAgACEgMnICEKMAoIBAAD
+AAQAAgESAyoGFxofIFRoZSBkZXZpY2UgaXMgYSBmaXRuZXNzIGJhbmQuCgoQCgkEAAMABAAC
+AQESAyoGEgoQCgkEAAMABAACAQISAyoVFgopCggEAAMABAACAhIDLQYQGhggVGhlIGRldmlj
+ZSBpcyBhIHdhdGNoLgoKEAoJBAADAAQAAgIBEgMtBgsKEAoJBAADAAQAAgICEgMtDg8KKQoI
+BAADAAQAAgMSAzAGEBoYIFRoZSBkZXZpY2UgaXMgYSBwaG9uZS4KChAKCQQAAwAEAAIDARID
+MAYLChAKCQQAAwAEAAIDAhIDMA4PCigKCAQAAwAEAAIEEgMzBg8aFyBUaGUgZGV2aWNlIGlz
+IGEgcmluZy4KChAKCQQAAwAEAAIEARIDMwYKChAKCQQAAwAEAAIEAhIDMw0OCi8KCAQAAwAE
+AAIFEgM2BhYaHiBUaGUgZGV2aWNlIGlzIGEgY2hlc3Qgc3RyYXAuCgoQCgkEAAMABAACBQES
+AzYGEQoQCgkEAAMABAACBQISAzYUFQopCggEAAMABAACBhIDOQYQGhggVGhlIGRldmljZSBp
+cyBhIHNjYWxlLgoKEAoJBAADAAQAAgYBEgM5BgsKEAoJBAADAAQAAgYCEgM5Dg8KKgoIBAAD
+AAQAAgcSAzwGERoZIFRoZSBkZXZpY2UgaXMgYSB0YWJsZXQuCgoQCgkEAAMABAACBwESAzwG
+DAoQCgkEAAMABAACBwISAzwPEAo3CggEAAMABAACCBIDPwYXGiYgVGhlIGRldmljZSBpcyBh
+IGhlYWQgbW91bnRlZCBkZXZpY2UuCgoQCgkEAAMABAACCAESAz8GEgoQCgkEAAMABAACCAIS
+Az8VFgoxCggEAAMABAACCRIDQgYYGiAgVGhlIGRldmljZSBpcyBhIHNtYXJ0IGRpc3BsYXku
+CgoQCgkEAAMABAACCQESA0IGEwoQCgkEAAMABAACCQISA0IWFwpCCgYEAAMAAgASA0YESBoz
+IE9wdGlvbmFsLiBDYXB0dXJlcyB0aGUgZm9ybSBmYWN0b3Igb2YgdGhlIGRldmljZS4KCg4K
+BwQAAwACAAYSA0YEDgoOCgcEAAMAAgABEgNGDxoKDgoHBAADAAIAAxIDRh0eCg4KBwQAAwAC
+AAgSA0YfRwoRCgoEAAMAAgAInAgAEgNGIEYKQgoGBAADAAIBEgNJBEUaMyBPcHRpb25hbC4g
+QW4gb3B0aW9uYWwgbWFudWZhY3R1cmVyIG9mIHRoZSBkZXZpY2UuCgoOCgcEAAMAAgEFEgNJ
+BAoKDgoHBAADAAIBARIDSQsXCg4KBwQAAwACAQMSA0kaGwoOCgcEAAMAAgEIEgNJHEQKEQoK
+BAADAAIBCJwIABIDSR1DCjsKBgQAAwACAhIDTARFGiwgT3B0aW9uYWwuIEFuIG9wdGlvbmFs
+IG5hbWUgZm9yIHRoZSBkZXZpY2UuCgoOCgcEAAMAAgIFEgNMBAoKDgoHBAADAAICARIDTAsX
+Cg4KBwQAAwACAgMSA0waGwoOCgcEAAMAAgIIEgNMHEQKEQoKBAADAAICCJwIABIDTB1DCk4K
+BAQAAwESBFACawMaQCBPcHRpb25hbCBtZXRhZGF0YSBmb3IgdGhlIGFwcGxpY2F0aW9uIHRo
+YXQgcHJvdmlkZWQgdGhpcyBkYXRhLgoKDAoFBAADAQESA1AKFQqaAwoGBAADAQIAEgNZBEga
+igMgT3V0cHV0IG9ubHkuIEEgdW5pcXVlIGlkZW50aWZpZXIgZm9yIHRoZSBtb2JpbGUgYXBw
+bGljYXRpb24KIHRoYXQgd2FzIHRoZSBzb3VyY2Ugb2YgdGhlIGRhdGEuCgogVGhpcyBpcyB0
+eXBpY2FsbHkgdGhlIGFwcGxpY2F0aW9uJ3MgcGFja2FnZSBuYW1lIG9uIEFuZHJvaWQgKGUu
+Zy4sCiBgY29tLmdvb2dsZS5maXRiaXRgKSBvciB0aGUgYnVuZGxlIElEIG9uIGlPUy4gVGhp
+cyBmaWVsZCBpcyBpbmZvcm1hdGlvbmFsCiBhbmQgaGVscHMgdHJhY2UgZGF0YSBvcmlnaW4u
+IFRoaXMgZmllbGQgaXMgc3lzdGVtLXBvcHVsYXRlZCB3aGVuIHRoZSBkYXRhCiBpcyB1cGxv
+YWRlZCBmcm9tIHRoZSBGaXRiaXQgbW9iaWxlIGFwcGxpY2F0aW9uLCBIZWFsdGggQ29ubmVj
+dCBvciBIZWFsdGgKIEtpdC4KCg4KBwQAAwECAAUSA1kECgoOCgcEAAMBAgABEgNZCxcKDgoH
+BAADAQIAAxIDWRobCg4KBwQAAwECAAgSA1kcRwoRCgoEAAMBAgAInAgAEgNZHUYKkAMKBgQA
+AwECARIDYgRJGoADIE91dHB1dCBvbmx5LiBUaGUgY2xpZW50IElEIG9mIHRoZSBhcHBsaWNh
+dGlvbiB0aGF0IHJlY29yZGVkIHRoZSBkYXRhLgoKIFRoaXMgSUQgaXMgYSBsZWdhY3kgRml0
+Yml0IEFQSSBjbGllbnQgSUQsIHdoaWNoIGlzIGRpZmZlcmVudCBmcm9tIGEKIEdvb2dsZSBP
+QXV0aCBjbGllbnQgSUQuIEV4YW1wbGUgZm9ybWF0OiBgQUJDMTIzYC4KIFRoaXMgZmllbGQg
+aXMgc3lzdGVtLXBvcHVsYXRlZCBhbmQgdXNlZCBmb3IgdHJhY2luZyBkYXRhIGZyb20KIGxl
+Z2FjeSBGaXRiaXQgQVBJIGludGVncmF0aW9ucy4gVGhpcyBmaWVsZCBpcyBzeXN0ZW0tcG9w
+dWxhdGVkIHdoZW4KIHRoZSBkYXRhIGlzIHVwbG9hZGVkIGZyb20gYSBsZWdhY3kgRml0Yml0
+IEFQSSBpbnRlZ3JhdGlvbi4KCg4KBwQAAwECAQUSA2IECgoOCgcEAAMBAgEBEgNiCxgKDgoH
+BAADAQIBAxIDYhscCg4KBwQAAwECAQgSA2IdSAoRCgoEAAMBAgEInAgAEgNiHkcKngIKBgQA
+AwECAhIDagRQGo4CIE91dHB1dCBvbmx5LiBUaGUgR29vZ2xlIE9BdXRoIDIuMCBjbGllbnQg
+SUQgb2YgdGhlIHdlYiBhcHBsaWNhdGlvbiBvcgogc2VydmljZSB0aGF0IHJlY29yZGVkIHRo
+ZSBkYXRhLgoKIFRoaXMgaXMgdGhlIGNsaWVudCBJRCB1c2VkIGR1cmluZyB0aGUgR29vZ2xl
+IE9BdXRoCiBmbG93IHRvIG9idGFpbiB1c2VyIGNyZWRlbnRpYWxzLiBUaGlzIGZpZWxkIGlz
+IHN5c3RlbS1wb3B1bGF0ZWQgd2hlbgogdGhlIGRhdGEgaXMgdXBsb2FkZWQgZnJvbSBHb29n
+bGUgV2ViIEFQSS4KCg4KBwQAAwECAgUSA2oECgoOCgcEAAMBAgIBEgNqCx8KDgoHBAADAQIC
+AxIDaiIjCg4KBwQAAwECAggSA2okTwoRCgoEAAMBAgIInAgAEgNqJU4KOwoEBAAEABIFbgKC
+AQMaLCBUaGUgbWV0aG9kIGJ5IHdoaWNoIHRoZSBkYXRhIHdhcyByZWNvcmRlZC4KCgwKBQQA
+BAABEgNuBxYKNQoGBAAEAAIAEgNwBCUaJiBUaGUgcmVjb3JkaW5nIG1ldGhvZCBpcyB1bnNw
+ZWNpZmllZC4KCg4KBwQABAACAAESA3AEIAoOCgcEAAQAAgACEgNwIyQKOwoGBAAEAAIBEgNz
+BA8aLCBUaGUgZGF0YSB3YXMgbWFudWFsbHkgZW50ZXJlZCBieSB0aGUgdXNlci4KCg4KBwQA
+BAACAQESA3MECgoOCgcEAAQAAgECEgNzDQ4KPQoGBAAEAAICEgN2BBsaLiBUaGUgZGF0YSB3
+YXMgcGFzc2l2ZWx5IG1lYXN1cmVkIGJ5IGEgZGV2aWNlLgoKDgoHBAAEAAICARIDdgQWCg4K
+BwQABAACAgISA3YZGgpdCgYEAAQAAgMSA3oEEBpOIFRoZSBkYXRhIHdhcyBkZXJpdmVkIGZy
+b20gb3RoZXIgZGF0YSwgZS5nLiwgYnkgYW4gYWxnb3JpdGhtIGluIHRoZQogYmFja2VuZC4K
+Cg4KBwQABAACAwESA3oECwoOCgcEAAQAAgMCEgN6Dg8KPAoGBAAEAAIEEgN9BBoaLSBUaGUg
+ZGF0YSB3YXMgYWN0aXZlbHkgbWVhc3VyZWQgYnkgYSBkZXZpY2UuCgoOCgcEAAQAAgQBEgN9
+BBUKDgoHBAAEAAIEAhIDfRgZCpkBCgYEAAQAAgUSBIEBBBAaiAEgVGhlIHJlY29yZGluZyBt
+ZXRob2QgaXMgdW5rbm93bi4gVGhpcyBpcyBzZXQgd2hlbiB0aGUgZGF0YSBpcyB1cGxvYWRl
+ZAogZnJvbSBhIHRoaXJkIHBhcnR5IGFwcCB0aGF0IGRvZXMgbm90IHByb3ZpZGUgdGhpcyBp
+bmZvcm1hdGlvbi4KCg8KBwQABAACBQESBIEBBAsKDwoHBAAEAAIFAhIEgQEODwqnAQoEBAAE
+ARIGhwECogEDGpYBIFRoZSBwbGF0Zm9ybSB0aGF0IHVwbG9hZGVkIHRoZSBkYXRhLgogQWRk
+aXRpb25hbCB2YWx1ZXMgbWF5IGJlIGFkZGVkIGluIHRoZSBmdXR1cmUuIENsaWVudHMgc2hv
+dWxkIGJlIHByZXBhcmVkIHRvCiBoYW5kbGUgdW5rbm93biB2YWx1ZXMgZ3JhY2VmdWxseS4K
+Cg0KBQQABAEBEgSHAQcPCi4KBgQABAECABIEiQEEHRoeIFRoZSBwbGF0Zm9ybSBpcyB1bnNw
+ZWNpZmllZC4KCg8KBwQABAECAAESBIkBBBgKDwoHBAAEAQIAAhIEiQEbHAo0CgYEAAQBAgES
+BIwBBA8aJCBUaGUgZGF0YSB3YXMgdXBsb2FkZWQgZnJvbSBGaXRiaXQuCgoPCgcEAAQBAgEB
+EgSMAQQKCg8KBwQABAECAQISBIwBDQ4KPAoGBAAEAQICEgSPAQQXGiwgVGhlIGRhdGEgd2Fz
+IHVwbG9hZGVkIGZyb20gSGVhbHRoIENvbm5lY3QuCgoPCgcEAAQBAgIBEgSPAQQSCg8KBwQA
+BAECAgISBI8BFRYKOAoGBAAEAQIDEgSSAQQTGiggVGhlIGRhdGEgd2FzIHVwbG9hZGVkIGZy
+b20gSGVhbHRoIEtpdC4KCg8KBwQABAECAwESBJIBBA4KDwoHBAAEAQIDAhIEkgEREgo4CgYE
+AAQBAgQSBJUBBAwaKCBUaGUgZGF0YSB3YXMgdXBsb2FkZWQgZnJvbSBHb29nbGUgRml0LgoK
+DwoHBAAEAQIEARIElQEEBwoPCgcEAAQBAgQCEgSVAQoLCkMKBgQABAECBRIEmAEEFxozIFRo
+ZSBkYXRhIHdhcyB1cGxvYWRlZCBmcm9tIEZpdGJpdCBsZWdhY3kgV2ViIEFQSS4KCg8KBwQA
+BAECBQESBJgBBBIKDwoHBAAEAQIFAhIEmAEVFgo6CgYEAAQBAgYSBJsBBA0aKiBUaGUgZGF0
+YSB3YXMgdXBsb2FkZWQgZnJvbSBOZXN0IGRldmljZXMuCgoPCgcEAAQBAgYBEgSbAQQICg8K
+BwQABAECBgISBJsBCwwKPwoGBAAEAQIHEgSeAQQXGi8gVGhlIGRhdGEgd2FzIHVwbG9hZGVk
+IGZyb20gR29vZ2xlIEhlYWx0aCBBUEkuCgoPCgcEAAQBAgcBEgSeAQQSCg8KBwQABAECBwIS
+BJ4BFRYKSQoGBAAEAQIIEgShAQQjGjkgVGhlIGRhdGEgd2FzIHVwbG9hZGVkIGZyb20gR29v
+Z2xlIFBhcnRuZXIgSW50ZWdyYXRpb25zLgoKDwoHBAAEAQIIARIEoQEEHgoPCgcEAAQBAggC
+EgShASEiCj0KBAQAAgASBKUBAlAaLyBPcHRpb25hbC4gQ2FwdHVyZXMgaG93IHRoZSBkYXRh
+IHdhcyByZWNvcmRlZC4KCg0KBQQAAgAGEgSlAQIRCg0KBQQAAgABEgSlARIiCg0KBQQAAgAD
+EgSlASUmCg0KBQQAAgAIEgSlASdPChAKCAQAAgAInAgAEgSlAShOCqoBCgQEAAIBEgSqAQI9
+GpsBIE9wdGlvbmFsLiBDYXB0dXJlcyBtZXRhZGF0YSBmb3IgcmF3IGRhdGEgcG9pbnRzIG9y
+aWdpbmF0aW5nIGZyb20gZGV2aWNlcy4KIFdlIGV4cGVjdCB0aGlzIGRhdGEgc291cmNlIHRv
+IGJlIHVzZWQgZm9yIGRhdGEgcG9pbnRzIHdyaXR0ZW4gb24KIGRldmljZSBzeW5jLgoKDQoF
+BAACAQYSBKoBAggKDQoFBAACAQESBKoBCQ8KDQoFBAACAQMSBKoBEhMKDQoFBAACAQgSBKoB
+FDwKEAoIBAACAQicCAASBKoBFTsKWwoEBAACAhIErQECShpNIE91dHB1dCBvbmx5LiBDYXB0
+dXJlcyBtZXRhZGF0YSBmb3IgdGhlIGFwcGxpY2F0aW9uIHRoYXQgcHJvdmlkZWQgdGhpcyBk
+YXRhLgoKDQoFBAACAgYSBK0BAg0KDQoFBAACAgESBK0BDhkKDQoFBAACAgMSBK0BHB0KDQoF
+BAACAggSBK0BHkkKEAoIBAACAgicCAASBK0BH0gKSgoEBAACAxIEsAECRBo8IE91dHB1dCBv
+bmx5LiBDYXB0dXJlcyB0aGUgcGxhdGZvcm0gdGhhdCB1cGxvYWRlZCB0aGUgZGF0YS4KCg0K
+BQQAAgMGEgSwAQIKCg0KBQQAAgMBEgSwAQsTCg0KBQQAAgMDEgSwARYXCg0KBQQAAgMIEgSw
+ARhDChAKCAQAAgMInAgAEgSwARlCYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Devicesandservices::Health::V4::DataSource::DataSource ===
+    # Fields for DataSource
+    # Field: recording_method Type: 14 (.google.devicesandservices.health.v4.DataSource.RecordingMethod)
+    # Field: device Type: 11 (.google.devicesandservices.health.v4.DataSource.Device)
+    # Field: application Type: 11 (.google.devicesandservices.health.v4.DataSource.Application)
+    # Field: platform Type: 14 (.google.devicesandservices.health.v4.DataSource.Platform)
+
+# Enum: DataSource::RecordingMethod
+our $DataSource_RECORDING_METHOD_UNSPECIFIED = 0;
+our $DataSource_MANUAL = 1;
+our $DataSource_PASSIVELY_MEASURED = 2;
+our $DataSource_DERIVED = 3;
+our $DataSource_ACTIVELY_MEASURED = 4;
+our $DataSource_UNKNOWN = 5;
+
+# Enum: DataSource::Platform
+our $DataSource_PLATFORM_UNSPECIFIED = 0;
+our $DataSource_FITBIT = 1;
+our $DataSource_HEALTH_CONNECT = 2;
+our $DataSource_HEALTH_KIT = 3;
+our $DataSource_FIT = 4;
+our $DataSource_FITBIT_WEB_API = 5;
+our $DataSource_NEST = 6;
+our $DataSource_GOOGLE_WEB_API = 7;
+our $DataSource_GOOGLE_PARTNER_INTEGRATION = 8;
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Devicesandservices::Health::V4::DataSource - Compiled Protocol Buffers messages for google/devicesandservices/health/v4/data_source.proto
+
+=head1 SYNOPSIS
+
+    use Google::Devicesandservices::Health::V4::DataSource;
+
+    my $msg = Google::Devicesandservices::Health::V4::DataSource::DataSource->new({
+        recording_method => $recording_method,
+        device => $device,
+        application => $application,
+        platform => $platform,
+    });
+
+    # Read or update a field
+    my $val = $msg->recording_method();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Devicesandservices::Health::V4::DataSource::DataSource->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/devicesandservices/health/v4/data_source.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Devicesandservices::Health::V4::DataSource::DataSource
+
+Data Source definition to track the origin of data.
+
+Each health data point, regardless of the complexity or data model (whether a
+simple step count or a detailed sleep session) must retain information about
+its source of origin (e.g. the device or app that collected it).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->recording_method() >> / C<< $msg->recording_method($value) >>
+
+Type: C<Enum> (L<Google::Devicesandservices::Health::V4::DataSource::RecordingMethod>)
+
+Optional. Captures how the data was recorded.
+
+=item * C<< $msg->device() >> / C<< $msg->device($value) >>
+
+Type: C<Message> (L<Google::Devicesandservices::Health::V4::DataSource::DataSource::Device>)
+
+Optional. Captures metadata for raw data points originating from devices.
+We expect this data source to be used for data points written on
+device sync.
+
+=item * C<< $msg->application() >> / C<< $msg->application($value) >>
+
+Type: C<Message> (L<Google::Devicesandservices::Health::V4::DataSource::DataSource::Application>)
+
+Output only. Captures metadata for the application that provided this data.
+
+=item * C<< $msg->platform() >> / C<< $msg->platform($value) >>
+
+Type: C<Enum> (L<Google::Devicesandservices::Health::V4::DataSource::Platform>)
+
+Output only. Captures the platform that uploaded the data.
+
+=back
+
+=head3 Enum: DataSource::RecordingMethod
+
+=over 4
+
+=item * C<RECORDING_METHOD_UNSPECIFIED> => C<0>
+
+=item * C<MANUAL> => C<1>
+
+=item * C<PASSIVELY_MEASURED> => C<2>
+
+=item * C<DERIVED> => C<3>
+
+=item * C<ACTIVELY_MEASURED> => C<4>
+
+=item * C<UNKNOWN> => C<5>
+
+=back
+
+=head3 Enum: DataSource::Platform
+
+=over 4
+
+=item * C<PLATFORM_UNSPECIFIED> => C<0>
+
+=item * C<FITBIT> => C<1>
+
+=item * C<HEALTH_CONNECT> => C<2>
+
+=item * C<HEALTH_KIT> => C<3>
+
+=item * C<FIT> => C<4>
+
+=item * C<FITBIT_WEB_API> => C<5>
+
+=item * C<NEST> => C<6>
+
+=item * C<GOOGLE_WEB_API> => C<7>
+
+=item * C<GOOGLE_PARTNER_INTEGRATION> => C<8>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Devicesandservices::Health::V4::DataSource::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -5,7 +5,7 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # # VERSION
 # 
-# 4.0
+# 4.2
 # 
 # # SYNOPSIS
 # 
@@ -265,7 +265,7 @@ eval {1/0}; local ($::_g0 = $@, $::_e0 = qr{auto}); ok defined($::_g0) && $::_g0
 #@< EOF
 # 
 # Файл experiment/test.txt является:
-{ my $s = 'experiment/test.txt'; open my $__f__, '<:utf8', $s or die "Read $s: $!"; my $got = join '', <$__f__>; close $__f__; my $expected = 'hi!
+{ my $s = 'experiment/test.txt'; open my $__f__, '<:encoding(UTF-8)', $s or die "Read $s: $!"; my $got = join '', <$__f__>; close $__f__; my $expected = 'hi!
 '; ::ok $got eq $expected, 'File experiment/test.txt' or ::diag ::_string_diff($got, $expected) }
 # 
 # **Внимание!** Пустая строка между префиксом и кодом не допускается!
@@ -301,7 +301,7 @@ local ($::_g0 = do {Liveman->new->test_path("lib/PathFix/RestFix.md")}, $::_e0 =
 # При вызове `transform` в `SYNOPSYS` был создан файл `lib/Example.pod`.
 # 
 # Файл lib/Example.pod является:
-{ my $s = 'lib/Example.pod'; open my $__f__, '<:utf8', $s or die "Read $s: $!"; my $got = join '', <$__f__>; close $__f__; my $expected = 'Twice two:
+{ my $s = 'lib/Example.pod'; open my $__f__, '<:encoding(UTF-8)', $s or die "Read $s: $!"; my $got = join '', <$__f__>; close $__f__; my $expected = 'Twice two:
 
 	2*2  # -> 2+2
 
@@ -322,7 +322,7 @@ $liveman->transform("lib/Example.md");
 
 # 
 # Файл lib/Example.pm является:
-{ my $s = 'lib/Example.pm'; open my $__f__, '<:utf8', $s or die "Read $s: $!"; my $got = join '', <$__f__>; close $__f__; my $expected = 'package Example;
+{ my $s = 'lib/Example.pm'; open my $__f__, '<:encoding(UTF-8)', $s or die "Read $s: $!"; my $got = join '', <$__f__>; close $__f__; my $expected = 'package Example;
 
 1;
 

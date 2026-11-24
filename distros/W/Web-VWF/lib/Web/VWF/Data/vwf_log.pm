@@ -6,7 +6,7 @@ package Web::VWF::Data::vwf_log;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.003.1');
+use version; our $VERSION = version->declare('0.004.1');
 
 use Database::Abstraction;
 use DBD::CSV;
@@ -31,7 +31,7 @@ Web::VWF::Data::vwf_log - The access log, as a database
 
 =head1 VERSION
 
-Version 0.003.1
+Version 0.004.1
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ C<duration_ms>.  Lines starting with C<#> are not skipped.
 
 The framework builds this handle itself and gives it to every page as
 C<vwf_log>, which is what L<Web::VWF::Display::meta_data> reads.  It is not one
-of the C<databases> a site declares.
+of the C<data> drivers a site declares.
 
 =head1 AUTHOR
 

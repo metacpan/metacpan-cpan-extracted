@@ -1,0 +1,213 @@
+package Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticPrompt;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticCanvasPrompt };
+    eval { require Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticContentPrompt };
+    eval { require Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticLinkPrompt };
+    eval { require Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticSimplePrompt };
+    eval { require Google::Actions::Sdk::V2::Interactionmodel::Prompt::Suggestion };
+    eval { require Google::Actions::Sdk::V2::Interactionmodel::Prompt::SurfaceCapabilities };
+    eval { require Google::Api::FieldBehavior };
+    my $descriptor_b64 = <<'EOF';
+CkFnb29nbGUvYWN0aW9ucy9zZGsvdjIvaW50ZXJhY3Rpb25tb2RlbC9wcm9tcHQvc3RhdGlj
+X3Byb21wdC5wcm90bxItZ29vZ2xlLmFjdGlvbnMuc2RrLnYyLmludGVyYWN0aW9ubW9kZWwu
+cHJvbXB0GlBnb29nbGUvYWN0aW9ucy9zZGsvdjIvaW50ZXJhY3Rpb25tb2RlbC9wcm9tcHQv
+Y29udGVudC9zdGF0aWNfY2FudmFzX3Byb21wdC5wcm90bxpRZ29vZ2xlL2FjdGlvbnMvc2Rr
+L3YyL2ludGVyYWN0aW9ubW9kZWwvcHJvbXB0L2NvbnRlbnQvc3RhdGljX2NvbnRlbnRfcHJv
+bXB0LnByb3RvGk5nb29nbGUvYWN0aW9ucy9zZGsvdjIvaW50ZXJhY3Rpb25tb2RlbC9wcm9t
+cHQvY29udGVudC9zdGF0aWNfbGlua19wcm9tcHQucHJvdG8aSGdvb2dsZS9hY3Rpb25zL3Nk
+ay92Mi9pbnRlcmFjdGlvbm1vZGVsL3Byb21wdC9zdGF0aWNfc2ltcGxlX3Byb21wdC5wcm90
+bxo+Z29vZ2xlL2FjdGlvbnMvc2RrL3YyL2ludGVyYWN0aW9ubW9kZWwvcHJvbXB0L3N1Z2dl
+c3Rpb24ucHJvdG8aSGdvb2dsZS9hY3Rpb25zL3Nkay92Mi9pbnRlcmFjdGlvbm1vZGVsL3By
+b21wdC9zdXJmYWNlX2NhcGFiaWxpdGllcy5wcm90bxofZ29vZ2xlL2FwaS9maWVsZF9iZWhh
+dmlvci5wcm90byKgCQoMU3RhdGljUHJvbXB0EnEKCmNhbmRpZGF0ZXMYASADKAsyUS5nb29n
+bGUuYWN0aW9ucy5zZGsudjIuaW50ZXJhY3Rpb25tb2RlbC5wcm9tcHQuU3RhdGljUHJvbXB0
+LlN0YXRpY1Byb21wdENhbmRpZGF0ZVIKY2FuZGlkYXRlcxqYBwoVU3RhdGljUHJvbXB0Q2Fu
+ZGlkYXRlEmUKCHNlbGVjdG9yGAEgASgLMkQuZ29vZ2xlLmFjdGlvbnMuc2RrLnYyLmludGVy
+YWN0aW9ubW9kZWwucHJvbXB0LlN0YXRpY1Byb21wdC5TZWxlY3RvckID4EEBUghzZWxlY3Rv
+chKPAQoPcHJvbXB0X3Jlc3BvbnNlGAIgASgLMmYuZ29vZ2xlLmFjdGlvbnMuc2RrLnYyLmlu
+dGVyYWN0aW9ubW9kZWwucHJvbXB0LlN0YXRpY1Byb21wdC5TdGF0aWNQcm9tcHRDYW5kaWRh
+dGUuU3RhdGljUHJvbXB0UmVzcG9uc2VSDnByb21wdFJlc3BvbnNlGoUFChRTdGF0aWNQcm9t
+cHRSZXNwb25zZRJpCgxmaXJzdF9zaW1wbGUYAiABKAsyQS5nb29nbGUuYWN0aW9ucy5zZGsu
+djIuaW50ZXJhY3Rpb25tb2RlbC5wcm9tcHQuU3RhdGljU2ltcGxlUHJvbXB0QgPgQQFSC2Zp
+cnN0U2ltcGxlEmEKB2NvbnRlbnQYAyABKAsyQi5nb29nbGUuYWN0aW9ucy5zZGsudjIuaW50
+ZXJhY3Rpb25tb2RlbC5wcm9tcHQuU3RhdGljQ29udGVudFByb21wdEID4EEBUgdjb250ZW50
+EmcKC2xhc3Rfc2ltcGxlGAQgASgLMkEuZ29vZ2xlLmFjdGlvbnMuc2RrLnYyLmludGVyYWN0
+aW9ubW9kZWwucHJvbXB0LlN0YXRpY1NpbXBsZVByb21wdEID4EEBUgpsYXN0U2ltcGxlEmAK
+C3N1Z2dlc3Rpb25zGAUgAygLMjkuZ29vZ2xlLmFjdGlvbnMuc2RrLnYyLmludGVyYWN0aW9u
+bW9kZWwucHJvbXB0LlN1Z2dlc3Rpb25CA+BBAVILc3VnZ2VzdGlvbnMSWAoEbGluaxgGIAEo
+CzI/Lmdvb2dsZS5hY3Rpb25zLnNkay52Mi5pbnRlcmFjdGlvbm1vZGVsLnByb21wdC5TdGF0
+aWNMaW5rUHJvbXB0QgPgQQFSBGxpbmsSHwoIb3ZlcnJpZGUYByABKAhCA+BBAVIIb3ZlcnJp
+ZGUSWQoGY2FudmFzGAggASgLMkEuZ29vZ2xlLmFjdGlvbnMuc2RrLnYyLmludGVyYWN0aW9u
+bW9kZWwucHJvbXB0LlN0YXRpY0NhbnZhc1Byb21wdFIGY2FudmFzGoEBCghTZWxlY3RvchJ1
+ChRzdXJmYWNlX2NhcGFiaWxpdGllcxgBIAEoCzJCLmdvb2dsZS5hY3Rpb25zLnNkay52Mi5p
+bnRlcmFjdGlvbm1vZGVsLnByb21wdC5TdXJmYWNlQ2FwYWJpbGl0aWVzUhNzdXJmYWNlQ2Fw
+YWJpbGl0aWVzQp0BCjFjb20uZ29vZ2xlLmFjdGlvbnMuc2RrLnYyLmludGVyYWN0aW9ubW9k
+ZWwucHJvbXB0QhFTdGF0aWNQcm9tcHRQcm90b1ABWlNnb29nbGUuZ29sYW5nLm9yZy9nZW5w
+cm90by9nb29nbGVhcGlzL2FjdGlvbnMvc2RrL3YyL2ludGVyYWN0aW9ubW9kZWwvcHJvbXB0
+O3Byb21wdEr9HwoGEgQOAF8BCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjUgR29vZ2xl
+IExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAg
+KHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4g
+Y29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9m
+IHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9M
+SUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3Jl
+ZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNl
+bnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJB
+TlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1w
+bGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVy
+bmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoK
+CAoBAhIDEAA2CgkKAgMAEgMSAFoKCQoCAwESAxMAWwoJCgIDAhIDFABYCgkKAgMDEgMVAFIK
+CQoCAwQSAxYASAoJCgIDBRIDFwBSCgkKAgMGEgMYACkKCAoBCBIDGgBqCgkKAggLEgMaAGoK
+CAoBCBIDGwAiCgkKAggKEgMbACIKCAoBCBIDHAAyCgkKAggIEgMcADIKCAoBCBIDHQBKCgkK
+AggBEgMdAEoKrgEKAgQAEgQiAF8BGqEBIFJlcHJlc2VudHMgYSBsaXN0IG9mIHByb21wdCBj
+YW5kaWRhdGVzLCBvbmUgb2Ygd2hpY2ggd2lsbCBiZSBzZWxlY3RlZCBhcyB0aGUKIHByb21w
+dCB0byBiZSBzaG93biBpbiB0aGUgcmVzcG9uc2UgdG8gdGhlIHVzZXIuCiAqKlRoaXMgbWVz
+c2FnZSBpcyBsb2NhbGl6YWJsZS4qKgoKCgoDBAABEgMiCBQKNQoEBAADABIEJAJTAxonIFJl
+cHJlc2VudHMgYSBzdGF0aWMgcHJvbXB0IGNhbmRpZGF0ZS4KCgwKBQQAAwABEgMkCh8KiAEK
+BgQAAwADABIEJwRLBRp4IFJlcHJlc2VudHMgc3RydWN0dXJlZCByZXNwb25zZXMgdG8gc2Vu
+ZCB0byB0aGUgdXNlciwgc3VjaCBhcyB0ZXh0LAogc3BlZWNoLCBjYXJkcywgY2FudmFzIGRh
+dGEsIHN1Z2dlc3Rpb24gY2hpcHMsIGV0Yy4KCg4KBwQAAwADAAESAycMIApECggEAAMAAwAC
+ABIDKQZTGjMgT3B0aW9uYWwuIFRoZSBmaXJzdCB2b2ljZSBhbmQgdGV4dC1vbmx5IHJlc3Bv
+bnNlLgoKEAoJBAADAAMAAgAGEgMpBhgKEAoJBAADAAMAAgABEgMpGSUKEAoJBAADAAMAAgAD
+EgMpKCkKEAoJBAADAAMAAgAIEgMpKlIKEwoMBAADAAMAAgAInAgAEgMpK1EKWQoIBAADAAMA
+AgESAywGTxpIIE9wdGlvbmFsLiBBIGNvbnRlbnQgbGlrZSBhIGNhcmQsIGxpc3Qgb3IgbWVk
+aWEgdG8gZGlzcGxheSB0byB0aGUgdXNlci4KChAKCQQAAwADAAIBBhIDLAYZChAKCQQAAwAD
+AAIBARIDLBohChAKCQQAAwADAAIBAxIDLCQlChAKCQQAAwADAAIBCBIDLCZOChMKDAQAAwAD
+AAIBCJwIABIDLCdNCkMKCAQAAwADAAICEgMvBlIaMiBPcHRpb25hbC4gVGhlIGxhc3Qgdm9p
+Y2UgYW5kIHRleHQtb25seSByZXNwb25zZS4KChAKCQQAAwADAAICBhIDLwYYChAKCQQAAwAD
+AAICARIDLxkkChAKCQQAAwADAAICAxIDLycoChAKCQQAAwADAAICCBIDLylRChMKDAQAAwAD
+AAICCJwIABIDLypQCswCCggEAAMAAwACAxIDNgZTGroCIE9wdGlvbmFsLiBTdWdnZXN0aW9u
+cyB0byBiZSBkaXNwbGF5ZWQgdG8gdGhlIHVzZXIgd2hpY2ggd2lsbCBhbHdheXMKIGFwcGVh
+ciBhdCB0aGUgZW5kIG9mIHRoZSByZXNwb25zZS4gSWYgdGhlIGBhcHBlbmRgIGZpZWxkIGlu
+IHRoZQogY29udGFpbmluZyBwcm9tcHQgaXMgYHRydWVgIHRoZSB0aXRsZXMgZGVmaW5lZCBp
+biB0aGlzIGZpZWxkIHdpbGwgYmUKIGFkZGVkIHRvIHRpdGxlcyBkZWZpbmVkIGluIGFueSBw
+cmV2aW91c2x5IGRlZmluZWQgc3VnZ2VzdGlvbnMgcHJvbXB0cwogYW5kIGR1cGxpY2F0ZSB2
+YWx1ZXMgd2lsbCBiZSByZW1vdmVkLgoKEAoJBAADAAMAAgMEEgM2Bg4KEAoJBAADAAMAAgMG
+EgM2DxkKEAoJBAADAAMAAgMBEgM2GiUKEAoJBAADAAMAAgMDEgM2KCkKEAoJBAADAAMAAgMI
+EgM2KlIKEwoMBAADAAMAAgMInAgAEgM2K1EKtAEKCAQAAwADAAIEEgM7BkkaogEgT3B0aW9u
+YWwuIEFuIGFkZGl0aW9uYWwgc3VnZ2VzdGlvbiBjaGlwIHRoYXQgY2FuIGxpbmsgb3V0IHRv
+IHRoZSBhc3NvY2lhdGVkIGFwcAogb3Igc2l0ZS4KIFRoZSBjaGlwIHdpbGwgYmUgcmVuZGVy
+ZWQgd2l0aCB0aGUgdGl0bGUgIk9wZW4gPG5hbWU+Ii4gTWF4IDIwIGNoYXJzLgoKEAoJBAAD
+AAMAAgQGEgM7BhYKEAoJBAADAAMAAgQBEgM7FxsKEAoJBAADAAMAAgQDEgM7Hh8KEAoJBAAD
+AAMAAgQIEgM7IEgKEwoMBAADAAMAAgQInAgAEgM7IUcKgAUKCAQAAwADAAIFEgNHBkEa7gQg
+T3B0aW9uYWwuIE1vZGUgZm9yIGhvdyB0aGlzIG1lc3NhZ2VzIHNob3VsZCBiZSBtZXJnZWQg
+d2l0aCBwcmV2aW91c2x5IGRlZmluZWQKIG1lc3NhZ2VzLgogYHRydWVgIHdpbGwgY2xlYXIg
+YWxsIHByZXZpb3VzbHkgZGVmaW5lZCBtZXNzYWdlcyAoZmlyc3QgYW5kIGxhc3QKIHNpbXBs
+ZSwgY29udGVudCwgc3VnZ2VzdGlvbnMgbGluayBhbmQgY2FudmFzKSBhbmQgYWRkIG1lc3Nh
+Z2VzIGRlZmluZWQKIGluIHRoaXMgcHJvbXB0LiBgZmFsc2VgIHdpbGwgYWRkIG1lc3NhZ2Vz
+IGRlZmluZWQgaW4gdGhpcyBwcm9tcHQgdG8KIG1lc3NhZ2VzIGRlZmluZWQgaW4gcHJldmlv
+dXMgcmVzcG9uc2VzLiBTZXR0aW5nIHRoaXMgZmllbGQgdG8gYGZhbHNlYAogd2lsbCBhbHNv
+IGVuYWJsZSBhcHBlbmRpbmcgdG8gc29tZSBmaWVsZHMgaW5zaWRlIFNpbXBsZSBwcm9tcHRz
+LCB0aGUKIFN1Z2dlc3Rpb25zIHByb21wdCBhbmQgdGhlIENhbnZhcyBwcm9tcHQgKHBhcnQg
+b2YgdGhlIENvbnRlbnQgcHJvbXB0KS4KIFRoZSBDb250ZW50IGFuZCBMaW5rIG1lc3NhZ2Vz
+IHdpbGwgYWx3YXlzIGJlIG92ZXJ3cml0dGVuIGlmIGRlZmluZWQgaW4KIHRoZSBwcm9tcHQu
+IERlZmF1bHQgdmFsdWUgaXMgYGZhbHNlYC4KChAKCQQAAwADAAIFBRIDRwYKChAKCQQAAwAD
+AAIFARIDRwsTChAKCQQAAwADAAIFAxIDRxYXChAKCQQAAwADAAIFCBIDRxhAChMKDAQAAwAD
+AAIFCJwIABIDRxk/CksKCAQAAwADAAIGEgNKBiQaOiBBIHJlc3BvbnNlIHRvIGJlIHVzZWQg
+Zm9yIGludGVyYWN0aXZlIGNhbnZhcyBleHBlcmllbmNlLgoKEAoJBAADAAMAAgYGEgNKBhgK
+EAoJBAADAAMAAgYBEgNKGR8KEAoJBAADAAMAAgYDEgNKIiMKlAEKBgQAAwACABIDTwRDGoQB
+IE9wdGlvbmFsLiBUaGUgY3JpdGVyaWEgZm9yIHdoZXRoZXIgdGhpcyBwcm9tcHQgbWF0Y2hl
+cyBhIHJlcXVlc3QuIElmIHRoZSBzZWxlY3RvcgogaXMgZW1wdHksIHRoaXMgcHJvbXB0IHdp
+bGwgYWx3YXlzIGJlIHRyaWdnZXJlZC4KCg4KBwQAAwACAAYSA08EDAoOCgcEAAMAAgABEgNP
+DRUKDgoHBAADAAIAAxIDTxgZCg4KBwQAAwACAAgSA08aQgoRCgoEAAMAAgAInAgAEgNPG0EK
+QgoGBAADAAIBEgNSBC0aMyBUaGUgcHJvbXB0IHJlc3BvbnNlIGFzc29jaWF0ZWQgd2l0aCB0
+aGUgc2VsZWN0b3IuCgoOCgcEAAMAAgEGEgNSBBgKDgoHBAADAAIBARIDUhkoCg4KBwQAAwAC
+AQMSA1IrLApMCgQEAAMBEgRWAlkDGj4gRGVmaW5lcyB0aGUgY3JpdGVyaWEgZm9yIHdoZXRo
+ZXIgYSBwcm9tcHQgbWF0Y2hlcyBhIHJlcXVlc3QuCgoMCgUEAAMBARIDVgoSCjoKBgQAAwEC
+ABIDWAQxGisgVGhlIHNldCBvZiByZXF1aXJlZCBzdXJmYWNlIGNhcGFiaWxpdGllcy4KCg4K
+BwQAAwECAAYSA1gEFwoOCgcEAAMBAgABEgNYGCwKDgoHBAADAQIAAxIDWC8wCtsBCgQEAAIA
+EgNeAjAazQEgVGhlIGxpc3Qgb2YgY2FuZGlkYXRlIHByb21wdHMgdG8gYmUgc2VudCB0byB0
+aGUgY2xpZW50LiBFYWNoIHByb21wdCBoYXMgYQogc2VsZWN0b3IgdG8gZGV0ZXJtaW5lIHdo
+ZW4gaXQgY2FuIGJlIHVzZWQuIFRoZSBmaXJzdCBzZWxlY3RvciB0aGF0IG1hdGNoZXMKIGEg
+cmVxdWVzdCB3aWxsIGJlIHNlbnQgYW5kIHRoZSByZXN0IHdpbGwgYmUgaWdub3JlZC4KCgwK
+BQQAAgAEEgNeAgoKDAoFBAACAAYSA14LIAoMCgUEAAIAARIDXiErCgwKBQQAAgADEgNeLi9i
+BnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticPrompt::StaticPrompt ===
+    # Fields for StaticPrompt
+    # Field: candidates Type: 11 (.google.actions.sdk.v2.interactionmodel.prompt.StaticPrompt.StaticPromptCandidate)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticPrompt - Compiled Protocol Buffers messages for google/actions/sdk/v2/interactionmodel/prompt/static_prompt.proto
+
+=head1 SYNOPSIS
+
+    use Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticPrompt;
+
+    my $msg = Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticPrompt::StaticPrompt->new({
+        candidates => $candidates,
+    });
+
+    # Read or update a field
+    my $val = $msg->candidates();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticPrompt::StaticPrompt->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/actions/sdk/v2/interactionmodel/prompt/static_prompt.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticPrompt::StaticPrompt
+
+Represents a list of prompt candidates, one of which will be selected as the
+prompt to be shown in the response to the user.
+B<This message is localizable.>
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->candidates() >> / C<< $msg->candidates($value) >>
+
+Type: C<Message> (L<Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticPrompt::StaticPrompt::StaticPromptCandidate>)
+
+The list of candidate prompts to be sent to the client. Each prompt has a
+selector to determine when it can be used. The first selector that matches
+a request will be sent and the rest will be ignored.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Actions::Sdk::V2::Interactionmodel::Prompt::StaticPrompt::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -3,6 +3,7 @@ Changes
 GETOPTLONG.md
 LICENSE
 README.md
+SECURITY.md
 cpanfile
 ex/dest.sh
 ex/md

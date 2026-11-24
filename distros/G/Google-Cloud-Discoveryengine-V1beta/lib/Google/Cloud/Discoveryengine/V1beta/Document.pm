@@ -1,0 +1,390 @@
+package Google::Cloud::Discoveryengine::V1beta::Document;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Discoveryengine::V1beta::Common };
+    eval { require Google::Protobuf::Struct };
+    eval { require Google::Protobuf::Timestamp };
+    eval { require Google::Rpc::Status };
+    my $descriptor_b64 = <<'EOF';
+CjJnb29nbGUvY2xvdWQvZGlzY292ZXJ5ZW5naW5lL3YxYmV0YS9kb2N1bWVudC5wcm90bxIj
+Z29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEaH2dvb2dsZS9hcGkvZmllbGRf
+YmVoYXZpb3IucHJvdG8aGWdvb2dsZS9hcGkvcmVzb3VyY2UucHJvdG8aMGdvb2dsZS9jbG91
+ZC9kaXNjb3ZlcnllbmdpbmUvdjFiZXRhL2NvbW1vbi5wcm90bxocZ29vZ2xlL3Byb3RvYnVm
+L3N0cnVjdC5wcm90bxofZ29vZ2xlL3Byb3RvYnVmL3RpbWVzdGFtcC5wcm90bxoXZ29vZ2xl
+L3JwYy9zdGF0dXMucHJvdG8imgsKCERvY3VtZW50EjoKC3N0cnVjdF9kYXRhGAQgASgLMhcu
+Z29vZ2xlLnByb3RvYnVmLlN0cnVjdEgAUgpzdHJ1Y3REYXRhEh0KCWpzb25fZGF0YRgFIAEo
+CUgAUghqc29uRGF0YRIXCgRuYW1lGAEgASgJQgPgQQVSBG5hbWUSEwoCaWQYAiABKAlCA+BB
+BVICaWQSGwoJc2NoZW1hX2lkGAMgASgJUghzY2hlbWFJZBJPCgdjb250ZW50GAogASgLMjUu
+Z29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEuRG9jdW1lbnQuQ29udGVudFIH
+Y29udGVudBIsChJwYXJlbnRfZG9jdW1lbnRfaWQYByABKAlSEHBhcmVudERvY3VtZW50SWQS
+TAoTZGVyaXZlZF9zdHJ1Y3RfZGF0YRgGIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3RC
+A+BBA1IRZGVyaXZlZFN0cnVjdERhdGESUAoIYWNsX2luZm8YCyABKAsyNS5nb29nbGUuY2xv
+dWQuZGlzY292ZXJ5ZW5naW5lLnYxYmV0YS5Eb2N1bWVudC5BY2xJbmZvUgdhY2xJbmZvEj4K
+CmluZGV4X3RpbWUYDSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNSCWlu
+ZGV4VGltZRJhCgxpbmRleF9zdGF0dXMYDyABKAsyOS5nb29nbGUuY2xvdWQuZGlzY292ZXJ5
+ZW5naW5lLnYxYmV0YS5Eb2N1bWVudC5JbmRleFN0YXR1c0ID4EEDUgtpbmRleFN0YXR1cxpk
+CgdDb250ZW50Eh0KCXJhd19ieXRlcxgCIAEoDEgAUghyYXdCeXRlcxISCgN1cmkYAyABKAlI
+AFIDdXJpEhsKCW1pbWVfdHlwZRgBIAEoCVIIbWltZVR5cGVCCQoHY29udGVudBrsAQoHQWNs
+SW5mbxJhCgdyZWFkZXJzGAEgAygLMkcuZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52
+MWJldGEuRG9jdW1lbnQuQWNsSW5mby5BY2Nlc3NSZXN0cmljdGlvblIHcmVhZGVycxp+ChFB
+Y2Nlc3NSZXN0cmljdGlvbhJOCgpwcmluY2lwYWxzGAEgAygLMi4uZ29vZ2xlLmNsb3VkLmRp
+c2NvdmVyeWVuZ2luZS52MWJldGEuUHJpbmNpcGFsUgpwcmluY2lwYWxzEhkKCGlkcF93aWRl
+GAIgASgIUgdpZHBXaWRlGq8BCgtJbmRleFN0YXR1cxI5CgppbmRleF90aW1lGAEgASgLMhou
+Z29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIJaW5kZXhUaW1lEjcKDWVycm9yX3NhbXBsZXMY
+AiADKAsyEi5nb29nbGUucnBjLlN0YXR1c1IMZXJyb3JTYW1wbGVzEiwKD3BlbmRpbmdfbWVz
+c2FnZRgDIAEoCUID4EEFUg5wZW5kaW5nTWVzc2FnZTqWAupBkgIKJ2Rpc2NvdmVyeWVuZ2lu
+ZS5nb29nbGVhcGlzLmNvbS9Eb2N1bWVudBJmcHJvamVjdHMve3Byb2plY3R9L2xvY2F0aW9u
+cy97bG9jYXRpb259L2RhdGFTdG9yZXMve2RhdGFfc3RvcmV9L2JyYW5jaGVzL3ticmFuY2h9
+L2RvY3VtZW50cy97ZG9jdW1lbnR9En9wcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25zL3ts
+b2NhdGlvbn0vY29sbGVjdGlvbnMve2NvbGxlY3Rpb259L2RhdGFTdG9yZXMve2RhdGFfc3Rv
+cmV9L2JyYW5jaGVzL3ticmFuY2h9L2RvY3VtZW50cy97ZG9jdW1lbnR9QgYKBGRhdGFClAIK
+J2NvbS5nb29nbGUuY2xvdWQuZGlzY292ZXJ5ZW5naW5lLnYxYmV0YUINRG9jdW1lbnRQcm90
+b1ABWlFjbG91ZC5nb29nbGUuY29tL2dvL2Rpc2NvdmVyeWVuZ2luZS9hcGl2MWJldGEvZGlz
+Y292ZXJ5ZW5naW5lcGI7ZGlzY292ZXJ5ZW5naW5lcGKiAg9ESVNDT1ZFUllFTkdJTkWqAiNH
+b29nbGUuQ2xvdWQuRGlzY292ZXJ5RW5naW5lLlYxQmV0YcoCI0dvb2dsZVxDbG91ZFxEaXNj
+b3ZlcnlFbmdpbmVcVjFiZXRh6gImR29vZ2xlOjpDbG91ZDo6RGlzY292ZXJ5RW5naW5lOjpW
+MWJldGFKlUAKBxIFDgD6AQEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUg
+TExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAo
+dGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBj
+b21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2Yg
+dGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJ
+Q0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVl
+ZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vu
+c2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFO
+VElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBs
+aWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJu
+aW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoI
+CgECEgMQACwKCQoCAwASAxIAKQoJCgIDARIDEwAjCgkKAgMCEgMUADoKCQoCAwMSAxUAJgoJ
+CgIDBBIDFgApCgkKAgMFEgMXACEKCAoBCBIDGQBACgkKAgglEgMZAEAKCAoBCBIDGgBoCgkK
+AggLEgMaAGgKCAoBCBIDGwAiCgkKAggKEgMbACIKCAoBCBIDHAAuCgkKAggIEgMcAC4KCAoB
+CBIDHQBACgkKAggBEgMdAEAKCAoBCBIDHgAtCgkKAggkEgMeAC0KCAoBCBIDHwBACgkKAggp
+EgMfAEAKCAoBCBIDIAA/CgkKAggtEgMgAD8KZgoCBAASBSQA+gEBGlkgRG9jdW1lbnQgY2Fw
+dHVyZXMgYWxsIHJhdyBtZXRhZGF0YSBpbmZvcm1hdGlvbiBvZiBpdGVtcyB0byBiZSByZWNv
+bW1lbmRlZCBvcgogc2VhcmNoZWQuCgoKCgMEAAESAyQIEAoLCgMEAAcSBCUCKQQKDQoFBAAH
+nQgSBCUCKQQKOgoEBAADABIELAJXAxosIFVuc3RydWN0dXJlZCBkYXRhIGxpbmtlZCB0byB0
+aGlzIGRvY3VtZW50LgoKDAoFBAADAAESAywKEQo7CgYEAAMACAASBC4EPQUaKyBUaGUgY29u
+dGVudCBvZiB0aGUgdW5zdHJ1Y3R1cmVkIGRvY3VtZW50LgoKDgoHBAADAAgAARIDLgoRCqYD
+CgYEAAMAAgASAzcGGhqWAyBUaGUgY29udGVudCByZXByZXNlbnRlZCBhcyBhIHN0cmVhbSBv
+ZiBieXRlcy4gVGhlIG1heGltdW0gbGVuZ3RoIGlzCiAxLDAwMCwwMDAgYnl0ZXMgKDEgTUIg
+LyB+MC45NSBNaUIpLgoKIE5vdGU6IEFzIHdpdGggYWxsIGBieXRlc2AgZmllbGRzLCB0aGlz
+IGZpZWxkIGlzIHJlcHJlc2VudGVkIGFzIHB1cmUKIGJpbmFyeSBpbiBQcm90b2NvbCBCdWZm
+ZXJzIGFuZCBiYXNlNjQtZW5jb2RlZCBzdHJpbmcgaW4gSlNPTi4gRm9yCiBleGFtcGxlLCBg
+YWJjMTIzIT8kKiYoKSctPUB+YCBzaG91bGQgYmUgcmVwcmVzZW50ZWQgYXMKIGBZV0pqTVRJ
+eklUOGtLaVlvS1NjdFBVQitgIGluIEpTT04uIFNlZQogaHR0cHM6Ly9kZXZlbG9wZXJzLmdv
+b2dsZS5jb20vcHJvdG9jb2wtYnVmZmVycy9kb2NzL3Byb3RvMyNqc29uLgoKDgoHBAADAAIA
+BRIDNwYLCg4KBwQAAwACAAESAzcMFQoOCgcEAAMAAgADEgM3GBkKywEKBgQAAwACARIDPAYV
+GrsBIFRoZSBVUkkgb2YgdGhlIGNvbnRlbnQuIE9ubHkgQ2xvdWQgU3RvcmFnZSBVUklzIChl
+LmcuCiBgZ3M6Ly9idWNrZXQtbmFtZS9wYXRoL3RvL2ZpbGVgKSBhcmUgc3VwcG9ydGVkLiBU
+aGUgbWF4aW11bSBmaWxlIHNpemUKIGlzIDIuNSBNQiBmb3IgdGV4dC1iYXNlZCBmb3JtYXRz
+LCAyMDAgTUIgZm9yIG90aGVyIGZvcm1hdHMuCgoOCgcEAAMAAgEFEgM8BgwKDgoHBAADAAIB
+ARIDPA0QCg4KBwQAAwACAQMSAzwTFAq3BgoGBAADAAICEgNWBBkapwYgVGhlIE1JTUUgdHlw
+ZSBvZiB0aGUgY29udGVudC4gU3VwcG9ydGVkIHR5cGVzOgoKICogYGFwcGxpY2F0aW9uL3Bk
+ZmAgKFBERiwgb25seSBuYXRpdmUgUERGcyBhcmUgc3VwcG9ydGVkIGZvciBub3cpCiAqIGB0
+ZXh0L2h0bWxgIChIVE1MKQogKiBgdGV4dC9wbGFpbmAgKFRYVCkKICogYGFwcGxpY2F0aW9u
+L3htbGAgb3IgYHRleHQveG1sYCAoWE1MKQogKiBgYXBwbGljYXRpb24vanNvbmAgKEpTT04p
+CiAqIGBhcHBsaWNhdGlvbi92bmQub3BlbnhtbGZvcm1hdHMtb2ZmaWNlZG9jdW1lbnQud29y
+ZHByb2Nlc3NpbmdtbC5kb2N1bWVudGAgKERPQ1gpCiAqIGBhcHBsaWNhdGlvbi92bmQub3Bl
+bnhtbGZvcm1hdHMtb2ZmaWNlZG9jdW1lbnQucHJlc2VudGF0aW9ubWwucHJlc2VudGF0aW9u
+YCAoUFBUWCkKICogYGFwcGxpY2F0aW9uL3ZuZC5vcGVueG1sZm9ybWF0cy1vZmZpY2Vkb2N1
+bWVudC5zcHJlYWRzaGVldG1sLnNoZWV0YAogKFhMU1gpCiAqIGBhcHBsaWNhdGlvbi92bmQu
+bXMtZXhjZWwuc2hlZXQubWFjcm9lbmFibGVkLjEyYCAoWExTTSkKCiBUaGUgZm9sbG93aW5n
+IHR5cGVzIGFyZSBzdXBwb3J0ZWQgb25seSBpZiBsYXlvdXQgcGFyc2VyIGlzIGVuYWJsZWQg
+aW4gdGhlCiBkYXRhIHN0b3JlOgoKICogYGltYWdlL2JtcGAgKEJNUCkKICogYGltYWdlL2dp
+ZmAgKEdJRikKICogYGltYWdlL2pwZWdgIChKUEVHKQogKiBgaW1hZ2UvcG5nYCAoUE5HKQog
+KiBgaW1hZ2UvdGlmZmAgKFRJRkYpCgogU2VlIGh0dHBzOi8vd3d3LmlhbmEub3JnL2Fzc2ln
+bm1lbnRzL21lZGlhLXR5cGVzL21lZGlhLXR5cGVzLnhodG1sLgoKDgoHBAADAAICBRIDVgQK
+Cg4KBwQAAwACAgESA1YLFAoOCgcEAAMAAgIDEgNWFxgKMQoEBAADARIFWgKgAQMaIiBBQ0wg
+SW5mb3JtYXRpb24gb2YgdGhlIERvY3VtZW50LgoKDAoFBAADAQESA1oKEQq0CAoGBAADAQMA
+EgaWAQScAQUaoQggQWNsUmVzdHJpY3Rpb24gdG8gbW9kZWwgY29tcGxleCBpbmhlcml0YW5j
+ZSByZXN0cmljdGlvbnMuCgogRXhhbXBsZTogTW9kZWxpbmcgYSAiQm90aCBQZXJtaXQiIGlu
+aGVyaXRhbmNlLCB3aGVyZSB0byBhY2Nlc3MgYQogY2hpbGQgZG9jdW1lbnQsIHVzZXIgbmVl
+ZHMgdG8gaGF2ZSBhY2Nlc3MgdG8gcGFyZW50IGRvY3VtZW50LgoKIERvY3VtZW50IEhpZXJh
+cmNoeSAtIFNwYWNlX1MgLS0+IFBhZ2VfUC4KCiBSZWFkZXJzOgogICBTcGFjZV9TOiBncm91
+cF8xLCB1c2VyXzEKICAgUGFnZV9QOiBncm91cF8yLCBncm91cF8zLCB1c2VyXzIKCiBTcGFj
+ZV9TIEFDTCBSZXN0cmljdGlvbiAtCiB7CiAgICJhY2xfaW5mbyI6IHsKICAgICAicmVhZGVy
+cyI6IFsKICAgICAgIHsKICAgICAgICAgInByaW5jaXBhbHMiOiBbCiAgICAgICAgICAgewog
+ICAgICAgICAgICAgImdyb3VwX2lkIjogImdyb3VwXzEiCiAgICAgICAgICAgfSwKICAgICAg
+ICAgICB7CiAgICAgICAgICAgICAidXNlcl9pZCI6ICJ1c2VyXzEiCiAgICAgICAgICAgfQog
+ICAgICAgICBdCiAgICAgICB9CiAgICAgXQogICB9CiB9CgogUGFnZV9QIEFDTCBSZXN0cmlj
+dGlvbi4KIHsKICAgImFjbF9pbmZvIjogewogICAgICJyZWFkZXJzIjogWwogICAgICAgewog
+ICAgICAgICAicHJpbmNpcGFscyI6IFsKICAgICAgICAgICB7CiAgICAgICAgICAgICAiZ3Jv
+dXBfaWQiOiAiZ3JvdXBfMiIKICAgICAgICAgICB9LAogICAgICAgICAgIHsKICAgICAgICAg
+ICAgICJncm91cF9pZCI6ICJncm91cF8zIgogICAgICAgICAgIH0sCiAgICAgICAgICAgewog
+ICAgICAgICAgICAgInVzZXJfaWQiOiAidXNlcl8yIgogICAgICAgICAgIH0KICAgICAgICAg
+XSwKICAgICAgIH0sCiAgICAgICB7CiAgICAgICAgICJwcmluY2lwYWxzIjogWwogICAgICAg
+ICAgIHsKICAgICAgICAgICAgICJncm91cF9pZCI6ICJncm91cF8xIgogICAgICAgICAgIH0s
+CiAgICAgICAgICAgewogICAgICAgICAgICAgInVzZXJfaWQiOiAidXNlcl8xIgogICAgICAg
+ICAgIH0KICAgICAgICAgXSwKICAgICAgIH0KICAgICBdCiAgIH0KIH0KCg8KBwQAAwEDAAES
+BJYBDB0KJwoIBAADAQMAAgASBJgBBigaFSBMaXN0IG9mIHByaW5jaXBhbHMuCgoRCgkEAAMB
+AwACAAQSBJgBBg4KEQoJBAADAQMAAgAGEgSYAQ8YChEKCQQAAwEDAAIAARIEmAEZIwoRCgkE
+AAMBAwACAAMSBJgBJicKOwoIBAADAQMAAgESBJsBBhgaKSBBbGwgdXNlcnMgd2l0aGluIHRo
+ZSBJZGVudGl0eSBQcm92aWRlci4KChEKCQQAAwEDAAIBBRIEmwEGCgoRCgkEAAMBAwACAQES
+BJsBCxMKEQoJBAADAQMAAgEDEgSbARYXCioKBgQAAwECABIEnwEEKxoaIFJlYWRlcnMgb2Yg
+dGhlIGRvY3VtZW50LgoKDwoHBAADAQIABBIEnwEEDAoPCgcEAAMBAgAGEgSfAQ0eCg8KBwQA
+AwECAAESBJ8BHyYKDwoHBAADAQIAAxIEnwEpKgovCgQEAAMCEgajAQKxAQMaHyBJbmRleCBz
+dGF0dXMgb2YgdGhlIGRvY3VtZW50LgoKDQoFBAADAgESBKMBChUK8gEKBgQAAwICABIEqAEE
+LRrhASBUaGUgdGltZSB3aGVuIHRoZSBkb2N1bWVudCB3YXMgaW5kZXhlZC4KIElmIHRoaXMg
+ZmllbGQgaXMgcG9wdWxhdGVkLCBpdCBtZWFucyB0aGUgZG9jdW1lbnQgaGFzIGJlZW4gaW5k
+ZXhlZC4KIFdoaWxlIGRvY3VtZW50cyB0eXBpY2FsbHkgYmVjb21lIHNlYXJjaGFibGUgd2l0
+aGluIHNlY29uZHMgb2YgaW5kZXhpbmcsCiBpdCBjYW4gc29tZXRpbWVzIHRha2UgdXAgdG8g
+YSBmZXcgaG91cnMuCgoPCgcEAAMCAgAGEgSoAQQdCg8KBwQAAwICAAESBKgBHigKDwoHBAAD
+AgIAAxIEqAErLAqWAQoGBAADAgIBEgSsAQQxGoUBIEEgc2FtcGxlIG9mIGVycm9ycyBlbmNv
+dW50ZXJlZCB3aGlsZSBpbmRleGluZyB0aGUgZG9jdW1lbnQuCiBJZiB0aGlzIGZpZWxkIGlz
+IHBvcHVsYXRlZCwgdGhlIGRvY3VtZW50IGlzIG5vdCBpbmRleGVkIGR1ZSB0byBlcnJvcnMu
+CgoPCgcEAAMCAgEEEgSsAQQMCg8KBwQAAwICAQYSBKwBDR4KDwoHBAADAgIBARIErAEfLAoP
+CgcEAAMCAgEDEgSsAS8wCpIBCgYEAAMCAgISBLABBEkagQEgSW1tdXRhYmxlLiBUaGUgbWVz
+c2FnZSBpbmRpY2F0ZXMgdGhlIGRvY3VtZW50IGluZGV4IGlzIGluIHByb2dyZXNzLgogSWYg
+dGhpcyBmaWVsZCBpcyBwb3B1bGF0ZWQsIHRoZSBkb2N1bWVudCBpbmRleCBpcyBwZW5kaW5n
+LgoKDwoHBAADAgICBRIEsAEECgoPCgcEAAMCAgIBEgSwAQsaCg8KBwQAAwICAgMSBLABHR4K
+DwoHBAADAgICCBIEsAEfSAoSCgoEAAMCAgIInAgAEgSwASBHCoQCCgQEAAgAEga3AQLBAQMa
+8wEgRGF0YSByZXByZXNlbnRhdGlvbi4gT25lIG9mCiBbc3RydWN0X2RhdGFdW2dvb2dsZS5j
+bG91ZC5kaXNjb3ZlcnllbmdpbmUudjFiZXRhLkRvY3VtZW50LnN0cnVjdF9kYXRhXSBvcgog
+W2pzb25fZGF0YV1bZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEuRG9jdW1l
+bnQuanNvbl9kYXRhXSBzaG91bGQKIGJlIHByb3ZpZGVkIG90aGVyd2lzZSBhbiBgSU5WQUxJ
+RF9BUkdVTUVOVGAgZXJyb3IgaXMgdGhyb3duLgoKDQoFBAAIAAESBLcBCAwKwAEKBAQAAgAS
+BLsBBCsasQEgVGhlIHN0cnVjdHVyZWQgSlNPTiBkYXRhIGZvciB0aGUgZG9jdW1lbnQuIEl0
+IHNob3VsZCBjb25mb3JtIHRvIHRoZQogcmVnaXN0ZXJlZCBbU2NoZW1hXVtnb29nbGUuY2xv
+dWQuZGlzY292ZXJ5ZW5naW5lLnYxYmV0YS5TY2hlbWFdIG9yIGFuCiBgSU5WQUxJRF9BUkdV
+TUVOVGAgZXJyb3IgaXMgdGhyb3duLgoKDQoFBAACAAYSBLsBBBoKDQoFBAACAAESBLsBGyYK
+DQoFBAACAAMSBLsBKSoKxQEKBAQAAgESBMABBBkatgEgVGhlIEpTT04gc3RyaW5nIHJlcHJl
+c2VudGF0aW9uIG9mIHRoZSBkb2N1bWVudC4gSXQgc2hvdWxkIGNvbmZvcm0gdG8gdGhlCiBy
+ZWdpc3RlcmVkIFtTY2hlbWFdW2dvb2dsZS5jbG91ZC5kaXNjb3ZlcnllbmdpbmUudjFiZXRh
+LlNjaGVtYV0gb3IgYW4KIGBJTlZBTElEX0FSR1VNRU5UYCBlcnJvciBpcyB0aHJvd24uCgoN
+CgUEAAIBBRIEwAEECgoNCgUEAAIBARIEwAELFAoNCgUEAAIBAxIEwAEXGAqoAgoEBAACAhIE
+yQECPBqZAiBJbW11dGFibGUuIFRoZSBmdWxsIHJlc291cmNlIG5hbWUgb2YgdGhlIGRvY3Vt
+ZW50LgogRm9ybWF0OgogYHByb2plY3RzL3twcm9qZWN0fS9sb2NhdGlvbnMve2xvY2F0aW9u
+fS9jb2xsZWN0aW9ucy97Y29sbGVjdGlvbn0vZGF0YVN0b3Jlcy97ZGF0YV9zdG9yZX0vYnJh
+bmNoZXMve2JyYW5jaH0vZG9jdW1lbnRzL3tkb2N1bWVudF9pZH1gLgoKIFRoaXMgZmllbGQg
+bXVzdCBiZSBhIFVURi04IGVuY29kZWQgc3RyaW5nIHdpdGggYSBsZW5ndGggbGltaXQgb2Yg
+MTAyNAogY2hhcmFjdGVycy4KCg0KBQQAAgIFEgTJAQIICg0KBQQAAgIBEgTJAQkNCg0KBQQA
+AgIDEgTJARARCg0KBQQAAgIIEgTJARI7ChAKCAQAAgIInAgAEgTJARM6CrMBCgQEAAIDEgTP
+AQI6GqQBIEltbXV0YWJsZS4gVGhlIGlkZW50aWZpZXIgb2YgdGhlIGRvY3VtZW50LgoKIElk
+IHNob3VsZCBjb25mb3JtIHRvIFtSRkMtMTAzNF0oaHR0cHM6Ly90b29scy5pZXRmLm9yZy9o
+dG1sL3JmYzEwMzQpCiBzdGFuZGFyZCB3aXRoIGEgbGVuZ3RoIGxpbWl0IG9mIDEyOCBjaGFy
+YWN0ZXJzLgoKDQoFBAACAwUSBM8BAggKDQoFBAACAwESBM8BCQsKDQoFBAACAwMSBM8BDg8K
+DQoFBAACAwgSBM8BEDkKEAoIBAACAwicCAASBM8BETgKTAoEBAACBBIE0gECFxo+IFRoZSBp
+ZGVudGlmaWVyIG9mIHRoZSBzY2hlbWEgbG9jYXRlZCBpbiB0aGUgc2FtZSBkYXRhIHN0b3Jl
+LgoKDQoFBAACBAUSBNIBAggKDQoFBAACBAESBNIBCRIKDQoFBAACBAMSBNIBFRYKowEKBAQA
+AgUSBNYBAhcalAEgVGhlIHVuc3RydWN0dXJlZCBkYXRhIGxpbmtlZCB0byB0aGlzIGRvY3Vt
+ZW50LiBDb250ZW50IGNhbiBvbmx5IGJlIHNldAogYW5kIG11c3QgYmUgc2V0IGlmIHRoaXMg
+ZG9jdW1lbnQgaXMgdW5kZXIgYSBgQ09OVEVOVF9SRVFVSVJFRGAgZGF0YSBzdG9yZS4KCg0K
+BQQAAgUGEgTWAQIJCg0KBQQAAgUBEgTWAQoRCg0KBQQAAgUDEgTWARQWCugBCgQEAAIGEgTd
+AQIgGtkBIFRoZSBpZGVudGlmaWVyIG9mIHRoZSBwYXJlbnQgZG9jdW1lbnQuIEN1cnJlbnRs
+eSBzdXBwb3J0cyBhdCBtb3N0IHR3byBsZXZlbAogZG9jdW1lbnQgaGllcmFyY2h5LgoKIElk
+IHNob3VsZCBjb25mb3JtIHRvIFtSRkMtMTAzNF0oaHR0cHM6Ly90b29scy5pZXRmLm9yZy9o
+dG1sL3JmYzEwMzQpCiBzdGFuZGFyZCB3aXRoIGEgbGVuZ3RoIGxpbWl0IG9mIDYzIGNoYXJh
+Y3RlcnMuCgoNCgUEAAIGBRIE3QECCAoNCgUEAAIGARIE3QEJGwoNCgUEAAIGAxIE3QEeHwqA
+AQoEBAACBxIG4QEC4gEyGnAgT3V0cHV0IG9ubHkuIFRoaXMgZmllbGQgaXMgT1VUUFVUX09O
+TFkuCiBJdCBjb250YWlucyBkZXJpdmVkIGRhdGEgdGhhdCBhcmUgbm90IGluIHRoZSBvcmln
+aW5hbCBpbnB1dCBkb2N1bWVudC4KCg0KBQQAAgcGEgThAQIYCg0KBQQAAgcBEgThARksCg0K
+BQQAAgcDEgThAS8wCg0KBQQAAgcIEgTiAQYxChAKCAQAAgcInAgAEgTiAQcwCjwKBAQAAggS
+BOUBAhgaLiBBY2Nlc3MgY29udHJvbCBpbmZvcm1hdGlvbiBmb3IgdGhlIGRvY3VtZW50LgoK
+DQoFBAACCAYSBOUBAgkKDQoFBAACCAESBOUBChIKDQoFBAACCAMSBOUBFRcK1gIKBAQAAgkS
+Bu8BAvABMhrFAiBPdXRwdXQgb25seS4gVGhlIHRpbWUgd2hlbiB0aGUgZG9jdW1lbnQgd2Fz
+IGxhc3QgaW5kZXhlZC4KCiBJZiB0aGlzIGZpZWxkIGlzIHBvcHVsYXRlZCwgaXQgbWVhbnMg
+dGhlIGRvY3VtZW50IGhhcyBiZWVuIGluZGV4ZWQuCiBXaGlsZSBkb2N1bWVudHMgdHlwaWNh
+bGx5IGJlY29tZSBzZWFyY2hhYmxlIHdpdGhpbiBzZWNvbmRzIG9mIGluZGV4aW5nLAogaXQg
+Y2FuIHNvbWV0aW1lcyB0YWtlIHVwIHRvIGEgZmV3IGhvdXJzLgoKIElmIHRoaXMgZmllbGQg
+aXMgbm90IHBvcHVsYXRlZCwgaXQgbWVhbnMgdGhlIGRvY3VtZW50IGhhcyBuZXZlciBiZWVu
+CiBpbmRleGVkLgoKDQoFBAACCQYSBO8BAhsKDQoFBAACCQESBO8BHCYKDQoFBAACCQMSBO8B
+KSsKDQoFBAACCQgSBPABBjEKEAoIBAACCQicCAASBPABBzAKyQIKBAQAAgoSBPkBAkwaugIg
+T3V0cHV0IG9ubHkuIFRoZSBpbmRleCBzdGF0dXMgb2YgdGhlIGRvY3VtZW50LgoKICogSWYg
+ZG9jdW1lbnQgaXMgaW5kZXhlZCBzdWNjZXNzZnVsbHksIHRoZSBpbmRleF90aW1lIGZpZWxk
+IGlzIHBvcHVsYXRlZC4KICogT3RoZXJ3aXNlLCBpZiBkb2N1bWVudCBpcyBub3QgaW5kZXhl
+ZCBkdWUgdG8gZXJyb3JzLCB0aGUgZXJyb3Jfc2FtcGxlcwogICBmaWVsZCBpcyBwb3B1bGF0
+ZWQuCiAqIE90aGVyd2lzZSwgaWYgZG9jdW1lbnQncyBpbmRleCBpcyBpbiBwcm9ncmVzcywg
+dGhlIHBlbmRpbmdfbWVzc2FnZSBmaWVsZAogICBpcyBwb3B1bGF0ZWQuCgoNCgUEAAIKBhIE
++QECDQoNCgUEAAIKARIE+QEOGgoNCgUEAAIKAxIE+QEdHwoNCgUEAAIKCBIE+QEgSwoQCggE
+AAIKCJwIABIE+QEhSmIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Discoveryengine::V1beta::Document::Document ===
+    # Fields for Document
+    # Field: struct_data Type: 11 (.google.protobuf.Struct)
+    # Field: json_data Type: 9 ()
+    # Field: name Type: 9 ()
+    # Field: id Type: 9 ()
+    # Field: schema_id Type: 9 ()
+    # Field: content Type: 11 (.google.cloud.discoveryengine.v1beta.Document.Content)
+    # Field: parent_document_id Type: 9 ()
+    # Field: derived_struct_data Type: 11 (.google.protobuf.Struct)
+    # Field: acl_info Type: 11 (.google.cloud.discoveryengine.v1beta.Document.AclInfo)
+    # Field: index_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: index_status Type: 11 (.google.cloud.discoveryengine.v1beta.Document.IndexStatus)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Discoveryengine::V1beta::Document - Compiled Protocol Buffers messages for google/cloud/discoveryengine/v1beta/document.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Discoveryengine::V1beta::Document;
+
+    my $msg = Google::Cloud::Discoveryengine::V1beta::Document::Document->new({
+        struct_data => $struct_data,
+        json_data => $json_data,
+        name => $name,
+        id => $id,
+    });
+
+    # Read or update a field
+    my $val = $msg->struct_data();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Discoveryengine::V1beta::Document::Document->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/discoveryengine/v1beta/document.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Discoveryengine::V1beta::Document::Document
+
+Document captures all raw metadata information of items to be recommended or
+searched.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->struct_data() >> / C<< $msg->struct_data($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+The structured JSON data for the document. It should conform to the
+registered [Schema][google.cloud.discoveryengine.v1beta.Schema] or an
+`INVALID_ARGUMENT` error is thrown.
+
+=item * C<< $msg->json_data() >> / C<< $msg->json_data($value) >>
+
+Type: C<String>
+
+The JSON string representation of the document. It should conform to the
+registered [Schema][google.cloud.discoveryengine.v1beta.Schema] or an
+`INVALID_ARGUMENT` error is thrown.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. The full resource name of the document.
+Format:
+`projects/{project}/locations/{location}/collections/{collection}/dataStores/{data_store}/branches/{branch}/documents/{document_id}`.
+
+This field must be a UTF-8 encoded string with a length limit of 1024
+characters.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Immutable. The identifier of the document.
+
+Id should conform to [RFC-1034](https://tools.ietf.org/html/rfc1034)
+standard with a length limit of 128 characters.
+
+=item * C<< $msg->schema_id() >> / C<< $msg->schema_id($value) >>
+
+Type: C<String>
+
+The identifier of the schema located in the same data store.
+
+=item * C<< $msg->content() >> / C<< $msg->content($value) >>
+
+Type: C<Message> (L<Google::Cloud::Discoveryengine::V1beta::Document::Document::Content>)
+
+The unstructured data linked to this document. Content can only be set
+and must be set if this document is under a `CONTENT_REQUIRED` data store.
+
+=item * C<< $msg->parent_document_id() >> / C<< $msg->parent_document_id($value) >>
+
+Type: C<String>
+
+The identifier of the parent document. Currently supports at most two level
+document hierarchy.
+
+Id should conform to [RFC-1034](https://tools.ietf.org/html/rfc1034)
+standard with a length limit of 63 characters.
+
+=item * C<< $msg->derived_struct_data() >> / C<< $msg->derived_struct_data($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Output only. This field is OUTPUT_ONLY.
+It contains derived data that are not in the original input document.
+
+=item * C<< $msg->acl_info() >> / C<< $msg->acl_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Discoveryengine::V1beta::Document::Document::AclInfo>)
+
+Access control information for the document.
+
+=item * C<< $msg->index_time() >> / C<< $msg->index_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the document was last indexed.
+
+If this field is populated, it means the document has been indexed.
+While documents typically become searchable within seconds of indexing,
+it can sometimes take up to a few hours.
+
+If this field is not populated, it means the document has never been
+indexed.
+
+=item * C<< $msg->index_status() >> / C<< $msg->index_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Discoveryengine::V1beta::Document::Document::IndexStatus>)
+
+Output only. The index status of the document.
+
+* If document is indexed successfully, the index_time field is populated.
+* Otherwise, if document is not indexed due to errors, the error_samples
+  field is populated.
+* Otherwise, if document's index is in progress, the pending_message field
+  is populated.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Discoveryengine::V1beta::Document::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

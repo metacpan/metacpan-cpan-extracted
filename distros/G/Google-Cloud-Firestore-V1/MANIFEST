@@ -1,0 +1,38 @@
+Changes
+lib/Google/Cloud/Firestore/V1.pm
+lib/Google/Cloud/Firestore/V1/FirestoreClient.pm
+lib/Google/Firestore/V1/AggregationResult.pm
+lib/Google/Firestore/V1/AggregationResult/Types.pm
+lib/Google/Firestore/V1/BloomFilter.pm
+lib/Google/Firestore/V1/BloomFilter/Types.pm
+lib/Google/Firestore/V1/Common.pm
+lib/Google/Firestore/V1/Common/Types.pm
+lib/Google/Firestore/V1/Document.pm
+lib/Google/Firestore/V1/Document/Types.pm
+lib/Google/Firestore/V1/ExplainStats.pm
+lib/Google/Firestore/V1/ExplainStats/Types.pm
+lib/Google/Firestore/V1/Firestore.pm
+lib/Google/Firestore/V1/Firestore/Types.pm
+lib/Google/Firestore/V1/Pipeline.pm
+lib/Google/Firestore/V1/Pipeline/Types.pm
+lib/Google/Firestore/V1/Query.pm
+lib/Google/Firestore/V1/Query/Types.pm
+lib/Google/Firestore/V1/QueryProfile.pm
+lib/Google/Firestore/V1/QueryProfile/Types.pm
+lib/Google/Firestore/V1/Write.pm
+lib/Google/Firestore/V1/Write/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-Firestore.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-Firestore.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

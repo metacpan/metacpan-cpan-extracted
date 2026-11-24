@@ -118,14 +118,6 @@ my $plan = Alt::The::Plan->new;
 $plan->miting($meet, $man, $woman)  # -> .3
 \```
 
-# INSTALL
-
-For install this module in your system run next [command](https://metacpan.org/pod/App::cpm):
-
-\```sh
-sudo cpm install -gvv Alt::The::Plan
-\```
-
 # AUTHOR
 
 Yaroslav O. Kosmina <dart@cpan.org>

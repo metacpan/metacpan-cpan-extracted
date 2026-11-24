@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "1.23";
+our $VERSION = "1.24";
 
 1;
 =encoding utf-8
@@ -54,7 +54,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.23
+Version 1.24
 
 =cut
 =head1 DESCRIPTION

@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Chart;
 #
 # Used in conjunction with Excel::Writer::XLSX.
 #
-# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2026, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -29,7 +29,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
   quote_sheetname );
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 
 ###############################################################################
@@ -9188,6 +9188,7 @@ The following Worksheet methods are also available through a non-embedded Chart 
     set_first_sheet()
     protect()
     set_zoom()
+    set_zoom_to_fit()
     set_tab_color()
 
     set_landscape()

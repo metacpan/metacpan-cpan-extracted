@@ -3,9 +3,21 @@ abstract: 'Perl extension implementing a minimalistic engine for filling real Te
 author:
   - 'Alessandro Gorohovski <an.gorohovski@gmail.com>'
 build_requires:
+  Data::Dumper: '2.183'
   ExtUtils::MakeMaker: '0'
+  Storable: '2.00'
+  Test::Exception: '0.43'
+  Test::File::ShareDir: '1.001000'
+  Test::More: '0.96'
+  Test::More::UTF8: '0.05'
+  Test::Output: '1.01'
+  Test::Pod: '1.22'
+  Test::Warn: '0.30'
+  Text::Hyphen: '0.12'
+  Text::Hyphen::RU: '0.12'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.14'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
 license: perl
@@ -23,18 +35,12 @@ requires:
   File::Basename: '2.00'
   File::Compare: '1.00'
   File::Path: '2.18'
+  File::ShareDir: '1.10'
+  File::ShareDir::Install: '0.14'
   Storable: '2.00'
-  Test::Exception: '0.43'
-  Test::More: '0.98'
-  Test::More::UTF8: '0.05'
-  Test::Output: '1.01'
-  Test::Pod: '1.22'
-  Test::Warn: '0.30'
-  Text::Hyphen: '0.12'
-  Text::Hyphen::RU: '0.12'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/AlessandroGorohovski/LaTeX-Replicase/issues
   repository: git://github.com/AlessandroGorohovski/LaTeX-Replicase.git
-version: '0.803'
+version: '0.815'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

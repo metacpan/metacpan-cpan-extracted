@@ -510,8 +510,8 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['lookup, an empty object', 'lookup', {}],
         ['lookup, a detail of "x"', 'lookup', { %$lookup, vpn => 'x' }],
         ['lookup, no tor', 'lookup', { %$lookup, tor => undef }],
-        ['lookup, a numeric string in a detail', 'lookup', { %$lookup, dcproxy => { %class, hits => '3', first_seen => 'd', hits_days_pct => 1, providers_num => 1 } }],
-        ['lookup, a null protocol', 'lookup', { %$lookup, pubproxy => { entry => \1, exit => \0, protocols => [undef], num_ports => 1, num_proxies => 1, last_seen => 'd', last_usable => '' } }],
+        ['lookup, a numeric string in a detail', 'lookup', { %$lookup, dcproxy => { %class, hits => '3', first_seen => '2026-11-01', hits_days_pct => 1, providers_num => 1 } }],
+        ['lookup, a null protocol', 'lookup', { %$lookup, pubproxy => { entry => \1, exit => \0, protocols => [undef], num_ports => 1, num_proxies => 1, last_seen => '2026-11-13', last_usable => '' } }],
         ['lookup, web as an object', 'lookup', { %$lookup, web => {} }],
         ['lookup, an empty web server', 'lookup', { %$lookup, web => [{}] }],
         ['lookup, an AS number of "9009"', 'lookup', { %$lookup, asn => { %{ $lookup->{asn} }, asn => '9009' } }],
@@ -537,10 +537,10 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['lookup_asn, hosted_domains without total', 'lookup_asn', InternetDataTest::asn(hosted_domains => { domains => [] })],
         ['lookup_asn, a whois value of 1', 'lookup_asn', InternetDataTest::asn(whois => { handle => 1 })],
         ['lookup_asn, a prefix missing its size', 'lookup_asn', InternetDataTest::asn(prefixes => [{
-            prefix => 'p', peer_count => 1, rpki_status => 'valid', first_seen => 'd', country => 'RO', other_origins => [],
+            prefix => 'p', peer_count => 1, rpki_status => 'valid', first_seen => '2026-10-02', country => 'RO', other_origins => [],
         }])],
         ['lookup_asn, another origin of "1"', 'lookup_asn', InternetDataTest::asn(prefixes => [{
-            prefix => 'p', peer_count => 1, rpki_status => 'valid', first_seen => 'd', country => 'RO', size => 1,
+            prefix => 'p', peer_count => 1, rpki_status => 'valid', first_seen => '2026-10-02', country => 'RO', size => 1,
             other_origins => ['1'],
         }])],
         ['lookup_domain, is_registered of null', 'lookup_domain', InternetDataTest::domain(is_registered => undef)],
@@ -602,6 +602,71 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
     is(eval { $client->lookup('9.9.9.9')->location->{longitude} }, -16.37208, 'a coordinate is any JSON number');
     $body = InternetDataTest::domain(disposable => {}, is_disposable => \0);
     is(eval { $client->lookup_domain('example.com')->is_disposable }, 0, 'a domain answer reads');
+};
+
+# A seen day is `format: date`: RFC 3339's full-date on a day that exists. Each
+# of these came back as served while the shapes typed it a string.
+subtest 'a seen day that is no full-date is a retried server_error' => sub {
+    my $lookup = lookup_body();
+    my $web = {
+        port => 443, tls_ok => \1, session_ok => \1, status_code => 200,
+        (map { ($_ => '') } qw(server location title cert_subject_cn cert_subject_o cert_issuer_dn)),
+        cert_browser_trusted => \1, tls_version => 'TLSv1.3', first_seen => '2026-02-30', last_seen => '2026-11-12',
+    };
+    my $prefix = {
+        prefix => 'p', peer_count => 1, rpki_status => 'valid', first_seen => '2026-10-2', country => 'RO', size => 1,
+        other_origins => [],
+    };
+    my @cases = (
+        ['vpn.last_seen', 'lookup', { %$lookup, vpn => { last_seen => '2026-1-05' } }],
+        ['tor.last_seen', 'lookup', { %$lookup, tor => { last_seen => 'tomorrow' } }],
+        ['resproxy.first_seen', 'lookup', { %$lookup, resproxy => { first_seen => '2026-11-23T00:00:00Z' } }],
+        ['pubproxy.last_seen', 'lookup', { %$lookup, pubproxy => { last_seen => ' 2026-11-12' } }],
+        ['bot.last_seen', 'lookup', { %$lookup, bot => { last_seen => "2026-11-12\n" } }],
+        ['ssh.first_seen', 'lookup', { %$lookup, ssh => { first_seen => '2026-13-01' } }],
+        ['smtp.last_seen', 'lookup', { %$lookup, smtp => { last_seen => '20261112' } }],
+        ['web.0.first_seen', 'lookup', { %$lookup, web => [$web] }],
+        ['dns_resolver.first_seen', 'lookup', { %$lookup, dns_resolver => { first_seen => "2026-11-1\x{0662}" } }],
+        ['bittorrent.last_seen', 'lookup', { %$lookup, bittorrent => { last_seen => '2025-02-29' } }],
+        ['my_ip, hosting.last_seen', 'my_ip', { %$lookup, hosting => { last_seen => 'monday' } }],
+        ['prefixes.0.first_seen', 'lookup_asn', InternetDataTest::asn(prefixes => [$prefix])],
+        ['dns.a.0.last_seen', 'lookup_domain', InternetDataTest::domain(dns => {
+            a => [{ ip => '192.0.2.1', last_seen => '2026-11-01T00:00:00Z' }], aaaa => [], mx => [], ns => [], cname => [],
+        })],
+        ['dns.mx.0.last_seen', 'lookup_domain', InternetDataTest::domain(dns => {
+            a => [], aaaa => [], mx => [{ priority => 10, host => 'm', last_seen => 'x' }], ns => [], cname => [],
+        })],
+        ['disposable.first_seen', 'lookup_domain', InternetDataTest::domain(is_disposable => \1, disposable => { first_seen => '2026-02-29' })],
+    );
+    my $body;
+    my $origin = InternetDataTest::Origin->new(sub { $_[0]->render(json => $body) });
+    my $client = InternetData->new(base_url => $origin->url, api_key => 'k', retries => 1, cache_size => 0);
+    my %calls = (
+        lookup => sub { $client->lookup('9.9.9.9') },
+        my_ip => sub { $client->my_ip },
+        lookup_asn => sub { $client->lookup_asn(9009) },
+        lookup_domain => sub { $client->lookup_domain('example.com') },
+    );
+    for my $case (@cases) {
+        my ($name, $call);
+        ($name, $call, $body) = @$case;
+        $origin->reset;
+        my $answer = eval { $calls{$call}->() };
+        my $error = $@;
+        ok(!defined $answer, "$name: no answer");
+        is(ref $error && $error->kind, 'server_error', "$name: a server_error");
+        is(ref $error && $error->status, 200, "$name: carrying the status");
+        is($origin->count, 2, "$name: retried");
+    }
+
+    my $batch = InternetDataTest::Origin->new(sub { $_[0]->render(json => { results => {
+        '9.9.9.1' => lookup_body(ip => '9.9.9.1', vpn => { last_seen => '2026-02-30' }),
+        '9.9.9.2' => lookup_body(ip => '9.9.9.2', vpn => { last_seen => '2024-02-29' }),
+    }, errors => {} }) });
+    my $answers = InternetData->new(base_url => $batch->url, retries => 1, cache_size => 0)
+        ->lookup_batch(['9.9.9.1', '9.9.9.2']);
+    isa_ok($answers->{'9.9.9.1'}, 'InternetData::Error', 'a batch entry with a malformed seen day');
+    is($answers->{'9.9.9.2'}->vpn->{last_seen}, '2024-02-29', 'and its neighbor, on a leap day, reads as served');
 };
 
 # A batch entry of the wrong type came back as a result, and an error entry whose

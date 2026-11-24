@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -285,78 +285,10 @@ EOF
     # Field: action Type: 14 (.google.cloud.networksecurity.v1.AuthorizationPolicy.Action)
     # Field: rules Type: 11 (.google.cloud.networksecurity.v1.AuthorizationPolicy.Rule)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthorizationPolicy.LabelsEntry)
-
-=item * B<action>
-
-Type: Enum (.google.cloud.networksecurity.v1.AuthorizationPolicy.Action)
-
-=item * B<rules>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthorizationPolicy.Rule)
-
-=back
-
-=cut
-
 # Enum: AuthorizationPolicy::Action
 our $AuthorizationPolicy_ACTION_UNSPECIFIED = 0;
 our $AuthorizationPolicy_ALLOW = 1;
 our $AuthorizationPolicy_DENY = 2;
-
-=pod
-
-=head2 Enum: AuthorizationPolicy::Action
-
-Values:
-
-=over 4
-
-=item * C<ACTION_UNSPECIFIED> => 0
-
-=item * C<ALLOW> => 1
-
-=item * C<DENY> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesRequest ===
     # Fields for ListAuthorizationPoliciesRequest
@@ -364,104 +296,14 @@ Values:
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesResponse ===
     # Fields for ListAuthorizationPoliciesResponse
     # Field: authorization_policies Type: 11 (.google.cloud.networksecurity.v1.AuthorizationPolicy)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesResponse->new(
-        authorization_policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<authorization_policies>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthorizationPolicy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AuthorizationPolicy::GetAuthorizationPolicyRequest ===
     # Fields for GetAuthorizationPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthorizationPolicy::GetAuthorizationPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthorizationPolicy::GetAuthorizationPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::AuthorizationPolicy::CreateAuthorizationPolicyRequest ===
     # Fields for CreateAuthorizationPolicyRequest
@@ -469,116 +311,294 @@ Type: String
     # Field: authorization_policy_id Type: 9 ()
     # Field: authorization_policy Type: 11 (.google.cloud.networksecurity.v1.AuthorizationPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthorizationPolicy::CreateAuthorizationPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthorizationPolicy::CreateAuthorizationPolicyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<authorization_policy_id>
-
-Type: String
-
-=item * B<authorization_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthorizationPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AuthorizationPolicy::UpdateAuthorizationPolicyRequest ===
     # Fields for UpdateAuthorizationPolicyRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: authorization_policy Type: 11 (.google.cloud.networksecurity.v1.AuthorizationPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthorizationPolicy::UpdateAuthorizationPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthorizationPolicy::UpdateAuthorizationPolicyRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<authorization_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthorizationPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AuthorizationPolicy::DeleteAuthorizationPolicyRequest ===
     # Fields for DeleteAuthorizationPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthorizationPolicy::DeleteAuthorizationPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthorizationPolicy::DeleteAuthorizationPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::AuthorizationPolicy - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::AuthorizationPolicy - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/authorization_policy.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
+
+    my $msg = Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy->new({
+        name => $name,
+        description => $description,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/authorization_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy
+
+AuthorizationPolicy is a resource that specifies how a server
+should authorize incoming connections. This resource in itself does
+not change the configuration unless it's attached to a target https
+proxy or endpoint config selector resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the AuthorizationPolicy resource. It matches pattern
+`projects/{project}/locations/{location}/authorizationPolicies/<authorization_policy>`.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Free-text description of the resource.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy::LabelsEntry>)
+
+Optional. Set of label tags associated with the AuthorizationPolicy
+resource.
+
+=item * C<< $msg->action() >> / C<< $msg->action($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::AuthorizationPolicy::Action>)
+
+Required. The action to take when a rule match is found. Possible values
+are "ALLOW" or "DENY".
+
+=item * C<< $msg->rules() >> / C<< $msg->rules($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy::Rule>)
+
+Optional. List of rules to match. Note that at least one of the rules must
+match in order for the action specified in the 'action' field to be taken.
+A rule is a match if there is a matching source and destination. If left
+blank, the action specified in the `action` field will be applied on every
+request.
+
+=back
+
+=head3 Enum: AuthorizationPolicy::Action
+
+=over 4
+
+=item * C<ACTION_UNSPECIFIED> => C<0>
+
+=item * C<ALLOW> => C<1>
+
+=item * C<DENY> => C<2>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesRequest
+
+Request used with the ListAuthorizationPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the AuthorizationPolicies
+should be listed, specified in the format
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of AuthorizationPolicies to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last
+`ListAuthorizationPoliciesResponse` Indicates that this is a
+continuation of a prior `ListAuthorizationPolicies` call, and
+that the system should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesResponse
+
+Response returned by the ListAuthorizationPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->authorization_policies() >> / C<< $msg->authorization_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy>)
+
+List of AuthorizationPolicies resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthorizationPolicy::GetAuthorizationPolicyRequest
+
+Request used by the GetAuthorizationPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the AuthorizationPolicy to get. Must be in the format
+`projects/{project}/locations/{location}/authorizationPolicies/*`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthorizationPolicy::CreateAuthorizationPolicyRequest
+
+Request used by the CreateAuthorizationPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the AuthorizationPolicy. Must be in the
+format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->authorization_policy_id() >> / C<< $msg->authorization_policy_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the AuthorizationPolicy resource to be created.
+This value should be 1-63 characters long, containing only
+letters, numbers, hyphens, and underscores, and should not start
+with a number. E.g. "authz_policy".
+
+=item * C<< $msg->authorization_policy() >> / C<< $msg->authorization_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy>)
+
+Required. AuthorizationPolicy resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthorizationPolicy::UpdateAuthorizationPolicyRequest
+
+Request used by the UpdateAuthorizationPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+AuthorizationPolicy resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->authorization_policy() >> / C<< $msg->authorization_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthorizationPolicy::AuthorizationPolicy>)
+
+Required. Updated AuthorizationPolicy resource.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthorizationPolicy::DeleteAuthorizationPolicyRequest
+
+Request used by the DeleteAuthorizationPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the AuthorizationPolicy to delete. Must be in the
+format `projects/{project}/locations/{location}/authorizationPolicies/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::AuthorizationPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

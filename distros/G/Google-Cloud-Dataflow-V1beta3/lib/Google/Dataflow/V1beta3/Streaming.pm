@@ -3,7 +3,7 @@ package Google::Dataflow::V1beta3::Streaming;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -239,48 +239,6 @@ EOF
     # Field: forwarding_key_bits Type: 5 ()
     # Field: persistent_state_version Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::TopologyConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::TopologyConfig->new(
-        computations => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<computations>
-
-Type: Message (.google.dataflow.v1beta3.ComputationTopology)
-
-=item * B<data_disk_assignments>
-
-Type: Message (.google.dataflow.v1beta3.DataDiskAssignment)
-
-=item * B<user_stage_to_computation_name_map>
-
-Type: Message (.google.dataflow.v1beta3.TopologyConfig.UserStageToComputationNameMapEntry)
-
-=item * B<forwarding_key_bits>
-
-Type: Int32
-
-=item * B<persistent_state_version>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Streaming::PubsubLocation ===
     # Fields for PubsubLocation
     # Field: topic Type: 9 ()
@@ -292,154 +250,18 @@ Type: Int32
     # Field: with_attributes Type: 8 ()
     # Field: dynamic_destinations Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::PubsubLocation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::PubsubLocation->new(
-        topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic>
-
-Type: String
-
-=item * B<subscription>
-
-Type: String
-
-=item * B<timestamp_label>
-
-Type: String
-
-=item * B<id_label>
-
-Type: String
-
-=item * B<drop_late_data>
-
-Type: Bool
-
-=item * B<tracking_subscription>
-
-Type: String
-
-=item * B<with_attributes>
-
-Type: Bool
-
-=item * B<dynamic_destinations>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Streaming::StreamingStageLocation ===
     # Fields for StreamingStageLocation
     # Field: stream_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::StreamingStageLocation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::StreamingStageLocation->new(
-        stream_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<stream_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Streaming::StreamingSideInputLocation ===
     # Fields for StreamingSideInputLocation
     # Field: tag Type: 9 ()
     # Field: state_family Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::StreamingSideInputLocation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::StreamingSideInputLocation->new(
-        tag => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tag>
-
-Type: String
-
-=item * B<state_family>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Streaming::CustomSourceLocation ===
     # Fields for CustomSourceLocation
     # Field: stateful Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::CustomSourceLocation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::CustomSourceLocation->new(
-        stateful => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<stateful>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Streaming::StreamLocation ===
     # Fields for StreamLocation
@@ -448,78 +270,10 @@ Type: Bool
     # Field: side_input_location Type: 11 (.google.dataflow.v1beta3.StreamingSideInputLocation)
     # Field: custom_source_location Type: 11 (.google.dataflow.v1beta3.CustomSourceLocation)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::StreamLocation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::StreamLocation->new(
-        streaming_stage_location => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<streaming_stage_location>
-
-Type: Message (.google.dataflow.v1beta3.StreamingStageLocation)
-
-=item * B<pubsub_location>
-
-Type: Message (.google.dataflow.v1beta3.PubsubLocation)
-
-=item * B<side_input_location>
-
-Type: Message (.google.dataflow.v1beta3.StreamingSideInputLocation)
-
-=item * B<custom_source_location>
-
-Type: Message (.google.dataflow.v1beta3.CustomSourceLocation)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Streaming::StateFamilyConfig ===
     # Fields for StateFamilyConfig
     # Field: state_family Type: 9 ()
     # Field: is_read Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::StateFamilyConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::StateFamilyConfig->new(
-        state_family => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<state_family>
-
-Type: String
-
-=item * B<is_read>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Streaming::ComputationTopology ===
     # Fields for ComputationTopology
@@ -530,52 +284,6 @@ Type: Bool
     # Field: outputs Type: 11 (.google.dataflow.v1beta3.StreamLocation)
     # Field: state_families Type: 11 (.google.dataflow.v1beta3.StateFamilyConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::ComputationTopology - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::ComputationTopology->new(
-        system_stage_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<system_stage_name>
-
-Type: String
-
-=item * B<computation_id>
-
-Type: String
-
-=item * B<key_ranges>
-
-Type: Message (.google.dataflow.v1beta3.KeyRangeLocation)
-
-=item * B<inputs>
-
-Type: Message (.google.dataflow.v1beta3.StreamLocation)
-
-=item * B<outputs>
-
-Type: Message (.google.dataflow.v1beta3.StreamLocation)
-
-=item * B<state_families>
-
-Type: Message (.google.dataflow.v1beta3.StateFamilyConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Streaming::KeyRangeLocation ===
     # Fields for KeyRangeLocation
     # Field: start Type: 9 ()
@@ -584,112 +292,14 @@ Type: Message (.google.dataflow.v1beta3.StateFamilyConfig)
     # Field: data_disk Type: 9 ()
     # Field: deprecated_persistent_directory Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::KeyRangeLocation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::KeyRangeLocation->new(
-        start => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start>
-
-Type: String
-
-=item * B<end>
-
-Type: String
-
-=item * B<delivery_endpoint>
-
-Type: String
-
-=item * B<data_disk>
-
-Type: String
-
-=item * B<deprecated_persistent_directory>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Streaming::MountedDataDisk ===
     # Fields for MountedDataDisk
     # Field: data_disk Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::MountedDataDisk - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::MountedDataDisk->new(
-        data_disk => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_disk>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Streaming::DataDiskAssignment ===
     # Fields for DataDiskAssignment
     # Field: vm_instance Type: 9 ()
     # Field: data_disks Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::DataDiskAssignment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::DataDiskAssignment->new(
-        vm_instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<vm_instance>
-
-Type: String
-
-=item * B<data_disks>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Streaming::KeyRangeDataDiskAssignment ===
     # Fields for KeyRangeDataDiskAssignment
@@ -697,121 +307,522 @@ Type: String
     # Field: end Type: 9 ()
     # Field: data_disk Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::KeyRangeDataDiskAssignment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::KeyRangeDataDiskAssignment->new(
-        start => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start>
-
-Type: String
-
-=item * B<end>
-
-Type: String
-
-=item * B<data_disk>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Streaming::StreamingComputationRanges ===
     # Fields for StreamingComputationRanges
     # Field: computation_id Type: 9 ()
     # Field: range_assignments Type: 11 (.google.dataflow.v1beta3.KeyRangeDataDiskAssignment)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming::StreamingComputationRanges - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Streaming;
-
-    my $msg = Google::Dataflow::V1beta3::Streaming::StreamingComputationRanges->new(
-        computation_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<computation_id>
-
-Type: String
-
-=item * B<range_assignments>
-
-Type: Message (.google.dataflow.v1beta3.KeyRangeDataDiskAssignment)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Streaming::StreamingApplianceSnapshotConfig ===
     # Fields for StreamingApplianceSnapshotConfig
     # Field: snapshot_id Type: 9 ()
     # Field: import_state_endpoint Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Dataflow::V1beta3::Streaming::StreamingApplianceSnapshotConfig - Compiled Protocol Buffers message class
+Google::Dataflow::V1beta3::Streaming - Compiled Protocol Buffers messages for google/dataflow/v1beta3/streaming.proto
 
 =head1 SYNOPSIS
 
     use Google::Dataflow::V1beta3::Streaming;
 
-    my $msg = Google::Dataflow::V1beta3::Streaming::StreamingApplianceSnapshotConfig->new(
-        snapshot_id => $value,
-    );
+    my $msg = Google::Dataflow::V1beta3::Streaming::TopologyConfig->new({
+        computations => $computations,
+        data_disk_assignments => $data_disk_assignments,
+        user_stage_to_computation_name_map => $user_stage_to_computation_name_map,
+        forwarding_key_bits => $forwarding_key_bits,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->computations();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Dataflow::V1beta3::Streaming::TopologyConfig->parse($bytes);
 
-=item * B<snapshot_id>
-
-Type: String
-
-=item * B<import_state_endpoint>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Streaming - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/dataflow/v1beta3/streaming.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Dataflow::V1beta3::Streaming::TopologyConfig
+
+Global topology of the streaming Dataflow job, including all
+computations and their sharded locations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->computations() >> / C<< $msg->computations($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::ComputationTopology>)
+
+The computations associated with a streaming Dataflow job.
+
+=item * C<< $msg->data_disk_assignments() >> / C<< $msg->data_disk_assignments($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::DataDiskAssignment>)
+
+The disks assigned to a streaming Dataflow job.
+
+=item * C<< $msg->user_stage_to_computation_name_map() >> / C<< $msg->user_stage_to_computation_name_map($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::TopologyConfig::UserStageToComputationNameMapEntry>)
+
+Maps user stage names to stable computation names.
+
+=item * C<< $msg->forwarding_key_bits() >> / C<< $msg->forwarding_key_bits($value) >>
+
+Type: C<Int32>
+
+The size (in bits) of keys that will be assigned to source messages.
+
+=item * C<< $msg->persistent_state_version() >> / C<< $msg->persistent_state_version($value) >>
+
+Type: C<Int32>
+
+Version number for persistent state.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::PubsubLocation
+
+Identifies a pubsub location to use for transferring data into or
+out of a streaming Dataflow job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+A pubsub topic, in the form of
+"pubsub.googleapis.com/topics/<project-id>/<topic-name>"
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+A pubsub subscription, in the form of
+"pubsub.googleapis.com/subscriptions/<project-id>/<subscription-name>"
+
+=item * C<< $msg->timestamp_label() >> / C<< $msg->timestamp_label($value) >>
+
+Type: C<String>
+
+If set, contains a pubsub label from which to extract record timestamps.
+If left empty, record timestamps will be generated upon arrival.
+
+=item * C<< $msg->id_label() >> / C<< $msg->id_label($value) >>
+
+Type: C<String>
+
+If set, contains a pubsub label from which to extract record ids.
+If left empty, record deduplication will be strictly best effort.
+
+=item * C<< $msg->drop_late_data() >> / C<< $msg->drop_late_data($value) >>
+
+Type: C<Bool>
+
+Indicates whether the pipeline allows late-arriving data.
+
+=item * C<< $msg->tracking_subscription() >> / C<< $msg->tracking_subscription($value) >>
+
+Type: C<String>
+
+If set, specifies the pubsub subscription that will be used for tracking
+custom time timestamps for watermark estimation.
+
+=item * C<< $msg->with_attributes() >> / C<< $msg->with_attributes($value) >>
+
+Type: C<Bool>
+
+If true, then the client has requested to get pubsub attributes.
+
+=item * C<< $msg->dynamic_destinations() >> / C<< $msg->dynamic_destinations($value) >>
+
+Type: C<Bool>
+
+If true, then this location represents dynamic topics.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::StreamingStageLocation
+
+Identifies the location of a streaming computation stage, for
+stage-to-stage communication.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->stream_id() >> / C<< $msg->stream_id($value) >>
+
+Type: C<String>
+
+Identifies the particular stream within the streaming Dataflow
+job.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::StreamingSideInputLocation
+
+Identifies the location of a streaming side input.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tag() >> / C<< $msg->tag($value) >>
+
+Type: C<String>
+
+Identifies the particular side input within the streaming Dataflow job.
+
+=item * C<< $msg->state_family() >> / C<< $msg->state_family($value) >>
+
+Type: C<String>
+
+Identifies the state family where this side input is stored.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::CustomSourceLocation
+
+Identifies the location of a custom souce.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->stateful() >> / C<< $msg->stateful($value) >>
+
+Type: C<Bool>
+
+Whether this source is stateful.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::StreamLocation
+
+Describes a stream of data, either as input to be processed or as
+output of a streaming Dataflow job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->streaming_stage_location() >> / C<< $msg->streaming_stage_location($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::StreamingStageLocation>)
+
+The stream is part of another computation within the current
+streaming Dataflow job.
+
+=item * C<< $msg->pubsub_location() >> / C<< $msg->pubsub_location($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::PubsubLocation>)
+
+The stream is a pubsub stream.
+
+=item * C<< $msg->side_input_location() >> / C<< $msg->side_input_location($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::StreamingSideInputLocation>)
+
+The stream is a streaming side input.
+
+=item * C<< $msg->custom_source_location() >> / C<< $msg->custom_source_location($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::CustomSourceLocation>)
+
+The stream is a custom source.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::StateFamilyConfig
+
+State family configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->state_family() >> / C<< $msg->state_family($value) >>
+
+Type: C<String>
+
+The state family value.
+
+=item * C<< $msg->is_read() >> / C<< $msg->is_read($value) >>
+
+Type: C<Bool>
+
+If true, this family corresponds to a read operation.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::ComputationTopology
+
+All configuration data for a particular Computation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->system_stage_name() >> / C<< $msg->system_stage_name($value) >>
+
+Type: C<String>
+
+The system stage name.
+
+=item * C<< $msg->computation_id() >> / C<< $msg->computation_id($value) >>
+
+Type: C<String>
+
+The ID of the computation.
+
+=item * C<< $msg->key_ranges() >> / C<< $msg->key_ranges($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::KeyRangeLocation>)
+
+The key ranges processed by the computation.
+
+=item * C<< $msg->inputs() >> / C<< $msg->inputs($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::StreamLocation>)
+
+The inputs to the computation.
+
+=item * C<< $msg->outputs() >> / C<< $msg->outputs($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::StreamLocation>)
+
+The outputs from the computation.
+
+=item * C<< $msg->state_families() >> / C<< $msg->state_families($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::StateFamilyConfig>)
+
+The state family values.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::KeyRangeLocation
+
+Location information for a specific key-range of a sharded computation.
+Currently we only support UTF-8 character splits to simplify encoding into
+JSON.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start() >> / C<< $msg->start($value) >>
+
+Type: C<String>
+
+The start (inclusive) of the key range.
+
+=item * C<< $msg->end() >> / C<< $msg->end($value) >>
+
+Type: C<String>
+
+The end (exclusive) of the key range.
+
+=item * C<< $msg->delivery_endpoint() >> / C<< $msg->delivery_endpoint($value) >>
+
+Type: C<String>
+
+The physical location of this range assignment to be used for
+streaming computation cross-worker message delivery.
+
+=item * C<< $msg->data_disk() >> / C<< $msg->data_disk($value) >>
+
+Type: C<String>
+
+The name of the data disk where data for this range is stored.
+This name is local to the Google Cloud Platform project and uniquely
+identifies the disk within that project, for example
+"myproject-1014-104817-4c2-harness-0-disk-1".
+
+=item * C<< $msg->deprecated_persistent_directory() >> / C<< $msg->deprecated_persistent_directory($value) >>
+
+Type: C<String>
+
+DEPRECATED. The location of the persistent state for this range, as a
+persistent directory in the worker local filesystem.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::MountedDataDisk
+
+Describes mounted data disk.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_disk() >> / C<< $msg->data_disk($value) >>
+
+Type: C<String>
+
+The name of the data disk.
+This name is local to the Google Cloud Platform project and uniquely
+identifies the disk within that project, for example
+"myproject-1014-104817-4c2-harness-0-disk-1".
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::DataDiskAssignment
+
+Data disk assignment for a given VM instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->vm_instance() >> / C<< $msg->vm_instance($value) >>
+
+Type: C<String>
+
+VM instance name the data disks mounted to, for example
+"myproject-1014-104817-4c2-harness-0".
+
+=item * C<< $msg->data_disks() >> / C<< $msg->data_disks($value) >>
+
+Type: C<String>
+
+Mounted data disks. The order is important a data disk's 0-based index in
+this list defines which persistent directory the disk is mounted to, for
+example the list of { "myproject-1014-104817-4c2-harness-0-disk-0" },
+{ "myproject-1014-104817-4c2-harness-0-disk-1" }.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::KeyRangeDataDiskAssignment
+
+Data disk assignment information for a specific key-range of a sharded
+computation.
+Currently we only support UTF-8 character splits to simplify encoding into
+JSON.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start() >> / C<< $msg->start($value) >>
+
+Type: C<String>
+
+The start (inclusive) of the key range.
+
+=item * C<< $msg->end() >> / C<< $msg->end($value) >>
+
+Type: C<String>
+
+The end (exclusive) of the key range.
+
+=item * C<< $msg->data_disk() >> / C<< $msg->data_disk($value) >>
+
+Type: C<String>
+
+The name of the data disk where data for this range is stored.
+This name is local to the Google Cloud Platform project and uniquely
+identifies the disk within that project, for example
+"myproject-1014-104817-4c2-harness-0-disk-1".
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::StreamingComputationRanges
+
+Describes full or partial data disk assignment information of the computation
+ranges.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->computation_id() >> / C<< $msg->computation_id($value) >>
+
+Type: C<String>
+
+The ID of the computation.
+
+=item * C<< $msg->range_assignments() >> / C<< $msg->range_assignments($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Streaming::KeyRangeDataDiskAssignment>)
+
+Data disk assignments for ranges from this computation.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Streaming::StreamingApplianceSnapshotConfig
+
+Streaming appliance snapshot configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->snapshot_id() >> / C<< $msg->snapshot_id($value) >>
+
+Type: C<String>
+
+If set, indicates the snapshot id for the snapshot being performed.
+
+=item * C<< $msg->import_state_endpoint() >> / C<< $msg->import_state_endpoint($value) >>
+
+Type: C<String>
+
+Indicates which endpoint is used to import appliance state.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Dataflow::V1beta3::Streaming::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

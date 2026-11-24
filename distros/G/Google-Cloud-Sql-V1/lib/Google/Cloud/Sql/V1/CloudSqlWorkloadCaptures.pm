@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -245,79 +245,11 @@ EOF
     # Field: instance Type: 9 ()
     # Field: start_workload_capture_context Type: 11 (.google.cloud.sql.v1.StartWorkloadCaptureContext)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartRequest->new(
-        project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<start_workload_capture_context>
-
-Type: Message (.google.cloud.sql.v1.StartWorkloadCaptureContext)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopRequest ===
     # Fields for WorkloadCapturesStopRequest
     # Field: project Type: 9 ()
     # Field: instance Type: 9 ()
     # Field: stop_workload_capture_context Type: 11 (.google.cloud.sql.v1.StopWorkloadCaptureContext)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopRequest->new(
-        project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<stop_workload_capture_context>
-
-Type: Message (.google.cloud.sql.v1.StopWorkloadCaptureContext)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartReplayRequest ===
     # Fields for WorkloadCapturesStartReplayRequest
@@ -326,153 +258,21 @@ Type: Message (.google.cloud.sql.v1.StopWorkloadCaptureContext)
     # Field: start_workload_replay_context Type: 11 (.google.cloud.sql.v1.StartWorkloadReplayContext)
     # Field: workload_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartReplayRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartReplayRequest->new(
-        project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<start_workload_replay_context>
-
-Type: Message (.google.cloud.sql.v1.StartWorkloadReplayContext)
-
-=item * B<workload_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopReplayRequest ===
     # Fields for WorkloadCapturesStopReplayRequest
     # Field: project Type: 9 ()
     # Field: instance Type: 9 ()
     # Field: stop_workload_replay_context Type: 11 (.google.cloud.sql.v1.StopWorkloadReplayContext)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopReplayRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopReplayRequest->new(
-        project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<stop_workload_replay_context>
-
-Type: Message (.google.cloud.sql.v1.StopWorkloadReplayContext)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::SqlWorkloadCapturesListRequest ===
     # Fields for SqlWorkloadCapturesListRequest
     # Field: project Type: 9 ()
     # Field: instance Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::SqlWorkloadCapturesListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::SqlWorkloadCapturesListRequest->new(
-        project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesListResponse ===
     # Fields for WorkloadCapturesListResponse
     # Field: workload_captures Type: 11 (.google.cloud.sql.v1.WorkloadCapture)
     # Field: kind Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesListResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesListResponse->new(
-        workload_captures => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<workload_captures>
-
-Type: Message (.google.cloud.sql.v1.WorkloadCapture)
-
-=item * B<kind>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapture ===
     # Fields for WorkloadCapture
@@ -486,64 +286,6 @@ Type: String
     # Field: backup_id Type: 9 ()
     # Field: capture_mode Type: 14 (.google.cloud.sql.v1.WorkloadCapture.WorkloadCaptureMode)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapture - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapture->new(
-        workload_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<workload_id>
-
-Type: String
-
-=item * B<source_instance>
-
-Type: String
-
-=item * B<workload_capture_state>
-
-Type: Enum (.google.cloud.sql.v1.WorkloadCapture.State)
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<replay_instance>
-
-Type: String
-
-=item * B<retention_days>
-
-Type: Int32
-
-=item * B<backup_id>
-
-Type: String
-
-=item * B<capture_mode>
-
-Type: Enum (.google.cloud.sql.v1.WorkloadCapture.WorkloadCaptureMode)
-
-=back
-
-=cut
-
 # Enum: WorkloadCapture::State
 our $WorkloadCapture_STATE_UNSPECIFIED = 0;
 our $WorkloadCapture_RUNNING = 1;
@@ -551,73 +293,25 @@ our $WorkloadCapture_COMPLETED = 2;
 our $WorkloadCapture_FAILED = 3;
 our $WorkloadCapture_TERMINATED = 4;
 
-=pod
-
-=head2 Enum: WorkloadCapture::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<RUNNING> => 1
-
-=item * C<COMPLETED> => 2
-
-=item * C<FAILED> => 3
-
-=item * C<TERMINATED> => 4
-
-=back
-
-=cut
-
 # Enum: WorkloadCapture::WorkloadCaptureMode
 our $WorkloadCapture_WORKLOAD_CAPTURE_MODE_UNSPECIFIED = 0;
 our $WorkloadCapture_CAPTURE_ONLY = 1;
 our $WorkloadCapture_CAPTURE_AND_LIVE_REPLAY = 2;
-
-=pod
-
-=head2 Enum: WorkloadCapture::WorkloadCaptureMode
-
-Values:
-
-=over 4
-
-=item * C<WORKLOAD_CAPTURE_MODE_UNSPECIFIED> => 0
-
-=item * C<CAPTURE_ONLY> => 1
-
-=item * C<CAPTURE_AND_LIVE_REPLAY> => 2
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::SqlWorkloadCapturesServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::SqlWorkloadCapturesServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::SqlWorkloadCapturesServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::SqlWorkloadCapturesServiceClient - Client stub representing the remote SqlWorkloadCapturesService service
+Client stub representing the remote C<SqlWorkloadCapturesService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -711,13 +405,317 @@ sub list {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_workload_captures.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartRequest->new({
+        project => $project,
+        instance => $instance,
+        start_workload_capture_context => $start_workload_capture_context,
+    });
+
+    # Read or update a field
+    my $val = $msg->project();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_workload_captures.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartRequest
+
+Request to start recording traffic from the primary instance (captured
+workload).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. Project ID of the project that contains the instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Required. Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->start_workload_capture_context() >> / C<< $msg->start_workload_capture_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext>)
+
+Optional. Contains details about the start workload capture operation.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopRequest
+
+Request to stop recording traffic from the primary instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. Project ID of the project that contains the instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Required. Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->stop_workload_capture_context() >> / C<< $msg->stop_workload_capture_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext>)
+
+Optional. Contains details about the stop workload capture operation.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartReplayRequest
+
+Request to start executing a captured workload on a replay instance (the
+Cloud SQL instance where the recorded SQL queries are executed).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. Project ID of the project that contains the instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Required. Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->start_workload_replay_context() >> / C<< $msg->start_workload_replay_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext>)
+
+Required. Contains details about the start workload replay operation.
+
+=item * C<< $msg->workload_id() >> / C<< $msg->workload_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the workload to replay.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopReplayRequest
+
+Request to stop an active workload replay on a target Cloud SQL replay
+instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. Project ID of the project that contains the target replay
+instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Required. Cloud SQL instance ID of the target replay instance. This does
+not include the project ID.
+
+=item * C<< $msg->stop_workload_replay_context() >> / C<< $msg->stop_workload_replay_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext>)
+
+Optional. Contains details about the stop workload replay operation. If
+omitted, default values are used.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::SqlWorkloadCapturesListRequest
+
+Instance list captured workloads request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. Project ID of the project that contains the instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Required. Cloud SQL instance ID. This does not include the project ID.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesListResponse
+
+Instance list captured workloads response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->workload_captures() >> / C<< $msg->workload_captures($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapture>)
+
+List of captured workloads for the instance.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#workloadCapturesList`.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapture
+
+Captured workload for an instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->workload_id() >> / C<< $msg->workload_id($value) >>
+
+Type: C<String>
+
+Output only. The ID of the captured workload.
+
+=item * C<< $msg->source_instance() >> / C<< $msg->source_instance($value) >>
+
+Type: C<String>
+
+Output only. The name of the source instance.
+
+=item * C<< $msg->workload_capture_state() >> / C<< $msg->workload_capture_state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::WorkloadCapture::State>)
+
+Output only. The state of the workload capture.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The start time of the workload capture.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The end time of the workload capture.
+
+=item * C<< $msg->replay_instance() >> / C<< $msg->replay_instance($value) >>
+
+Type: C<String>
+
+Output only. The name of the replay instance, if live replay was enabled.
+
+=item * C<< $msg->retention_days() >> / C<< $msg->retention_days($value) >>
+
+Type: C<Int32>
+
+Output only. The retention period in days for the captured workload.
+
+=item * C<< $msg->backup_id() >> / C<< $msg->backup_id($value) >>
+
+Type: C<String>
+
+Output only. The base backup ID associated with the workload capture.
+
+=item * C<< $msg->capture_mode() >> / C<< $msg->capture_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::WorkloadCapture::WorkloadCaptureMode>)
+
+Output only. The capture mode of the workload capture.
+
+=back
+
+=head3 Enum: WorkloadCapture::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<RUNNING> => C<1>
+
+=item * C<COMPLETED> => C<2>
+
+=item * C<FAILED> => C<3>
+
+=item * C<TERMINATED> => C<4>
+
+=back
+
+=head3 Enum: WorkloadCapture::WorkloadCaptureMode
+
+=over 4
+
+=item * C<WORKLOAD_CAPTURE_MODE_UNSPECIFIED> => C<0>
+
+=item * C<CAPTURE_ONLY> => C<1>
+
+=item * C<CAPTURE_AND_LIVE_REPLAY> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

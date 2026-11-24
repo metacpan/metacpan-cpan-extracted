@@ -15,7 +15,7 @@ package App::papersway;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-$App::papersway::VERSION = '4.000';
+$App::papersway::VERSION = '4.001';
 # Placeholder module.
 
 1;
@@ -32,7 +32,7 @@ App::papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 4.000
+version 4.001
 
 =head1 AUTHOR
 

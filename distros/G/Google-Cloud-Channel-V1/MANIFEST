@@ -1,0 +1,47 @@
+Changes
+lib/Google/Cloud/Channel/V1.pm
+lib/Google/Cloud/Channel/V1/BillingAccounts.pm
+lib/Google/Cloud/Channel/V1/BillingAccounts/Types.pm
+lib/Google/Cloud/Channel/V1/ChannelPartnerLinks.pm
+lib/Google/Cloud/Channel/V1/ChannelPartnerLinks/Types.pm
+lib/Google/Cloud/Channel/V1/CloudChannelReportsServiceClient.pm
+lib/Google/Cloud/Channel/V1/CloudChannelServiceClient.pm
+lib/Google/Cloud/Channel/V1/Common.pm
+lib/Google/Cloud/Channel/V1/Common/Types.pm
+lib/Google/Cloud/Channel/V1/Customers.pm
+lib/Google/Cloud/Channel/V1/Customers/Types.pm
+lib/Google/Cloud/Channel/V1/EntitlementChanges.pm
+lib/Google/Cloud/Channel/V1/EntitlementChanges/Types.pm
+lib/Google/Cloud/Channel/V1/Entitlements.pm
+lib/Google/Cloud/Channel/V1/Entitlements/Types.pm
+lib/Google/Cloud/Channel/V1/Offers.pm
+lib/Google/Cloud/Channel/V1/Offers/Types.pm
+lib/Google/Cloud/Channel/V1/Operations.pm
+lib/Google/Cloud/Channel/V1/Operations/Types.pm
+lib/Google/Cloud/Channel/V1/Products.pm
+lib/Google/Cloud/Channel/V1/Products/Types.pm
+lib/Google/Cloud/Channel/V1/ReportsService.pm
+lib/Google/Cloud/Channel/V1/ReportsService/Types.pm
+lib/Google/Cloud/Channel/V1/Repricing.pm
+lib/Google/Cloud/Channel/V1/Repricing/Types.pm
+lib/Google/Cloud/Channel/V1/Service.pm
+lib/Google/Cloud/Channel/V1/Service/Types.pm
+lib/Google/Cloud/Channel/V1/SubscriberEvent.pm
+lib/Google/Cloud/Channel/V1/SubscriberEvent/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-CloudChannelReportsService.t
+t/01-service-CloudChannelService.t
+t/01-service-Default.t
+t/02-rest-transport-CloudChannelReportsService.t
+t/02-rest-transport-CloudChannelService.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -158,7 +158,32 @@ The following RPC methods are available in this client:
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        parent_name              => $parent_name,
+        project                  => $project,
+        reservation_slot         => $reservation_slot,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.ReservationSlots>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetReservationSlotRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ReservationSlotsGetResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent_name> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<reservation_slot> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =back
 

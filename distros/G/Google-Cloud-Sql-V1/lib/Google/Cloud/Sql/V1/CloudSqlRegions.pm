@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlRegions;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -51,23 +51,15 @@ package Google::Cloud::Sql::V1::CloudSqlRegions::SqlRegionsServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlRegions::SqlRegionsServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlRegions::SqlRegionsServiceClient - Client stub representing the remote SqlRegionsService service
+Client stub representing the remote C<SqlRegionsService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -96,13 +88,21 @@ has _grpc_client => (
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlRegions - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlRegions - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_regions.proto
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_regions.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlRegions::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

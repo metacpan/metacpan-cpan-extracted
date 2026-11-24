@@ -11,25 +11,25 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Ai::Generativelanguage::V1beta::Model;
-use Google::Ai::Generativelanguage::V1beta::Safety;
-use Google::Ai::Generativelanguage::V1beta::Permission;
-use Google::Ai::Generativelanguage::V1beta::Citation;
-use Google::Ai::Generativelanguage::V1beta::Retriever;
 use Google::Ai::Generativelanguage::V1beta::TunedModel;
-use Google::Ai::Generativelanguage::V1beta::File;
+use Google::Ai::Generativelanguage::V1beta::Retriever;
 use Google::Ai::Generativelanguage::V1beta::Content;
+use Google::Ai::Generativelanguage::V1beta::Safety;
+use Google::Ai::Generativelanguage::V1beta::Citation;
+use Google::Ai::Generativelanguage::V1beta::Permission;
+use Google::Ai::Generativelanguage::V1beta::File;
 use Google::Ai::Generativelanguage::V1beta::PredictionService;
-use Google::Ai::Generativelanguage::V1beta::PermissionService;
-use Google::Ai::Generativelanguage::V1beta::TextService;
-use Google::Ai::Generativelanguage::V1beta::DiscussService;
-use Google::Ai::Generativelanguage::V1beta::RetrieverService;
 use Google::Ai::Generativelanguage::V1beta::ModelService;
-use Google::Ai::Generativelanguage::V1beta::FileService;
-use Google::Ai::Generativelanguage::V1beta::GenerativeService;
+use Google::Ai::Generativelanguage::V1beta::RetrieverService;
 use Google::Ai::Generativelanguage::V1beta::CachedContent;
+use Google::Ai::Generativelanguage::V1beta::DiscussService;
+use Google::Ai::Generativelanguage::V1beta::GenerativeService;
+use Google::Ai::Generativelanguage::V1beta::TextService;
+use Google::Ai::Generativelanguage::V1beta::PermissionService;
+use Google::Ai::Generativelanguage::V1beta::FileService;
 use Google::Ai::Generativelanguage::V1beta::CacheService;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -174,9 +174,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
-
 =item * C<googleapis/google/ai/generativelanguage/v1beta/cache_service.proto>
+
+=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
 
 =item * C<googleapis/google/ai/generativelanguage/v1beta/citation.proto>
 
@@ -243,11 +243,61 @@ The following RPC methods are available in this client:
 
 =item * B<generate_message>
 
-Calls the RPC method C<GenerateMessage> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->generate_message(
+        model                    => $model,
+        prompt                   => $prompt,
+        temperature              => $temperature,
+        candidate_count          => $candidate_count,
+        top_p                    => $top_p,
+        top_k                    => $top_k,
+    );
+
+Calls the RPC method C<GenerateMessage> on C<google.ai.generativelanguage.v1beta.DiscussService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<prompt> - L<Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt>
+
+=item * C<temperature> - C<float>
+
+=item * C<candidate_count> - C<int32>
+
+=item * C<top_p> - C<float>
+
+=item * C<top_k> - C<int32>
+
+=back
 
 =item * B<count_message_tokens>
 
-Calls the RPC method C<CountMessageTokens> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->count_message_tokens(
+        model                    => $model,
+        prompt                   => $prompt,
+    );
+
+Calls the RPC method C<CountMessageTokens> on C<google.ai.generativelanguage.v1beta.DiscussService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<prompt> - L<Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt>
+
+=back
 
 =back
 

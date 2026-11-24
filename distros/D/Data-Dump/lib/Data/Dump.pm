@@ -8,7 +8,7 @@ require Exporter;
 our @EXPORT = qw(dd ddx);
 our @EXPORT_OK = qw(dump pp dumpf quote);
 
-our $VERSION = "1.27";
+our $VERSION = "1.28";
 our $DEBUG = 0;
 
 use overload ();
@@ -202,9 +202,9 @@ sub _dump
 		my $v = "$rval";
 
 		my $mod = "";
-		if ($v =~ /^\(\?\^?([a-z]*):([\x00-\xFF]*)\)\z/) {
-		    $mod = $1;
-		    $v = $2;
+		if ($v =~ /^\(\?(\^?)([a-z]*)(?:-[a-z]*)?:([\x00-\xFF]*)\)\z/) {
+		    $mod = $2;
+		    $v = $3;
 		}
 
 		my $sep = '/';

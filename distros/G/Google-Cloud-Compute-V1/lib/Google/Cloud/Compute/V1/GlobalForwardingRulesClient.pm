@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -362,31 +362,197 @@ The following RPC methods are available in this client:
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        forwarding_rule          => $forwarding_rule,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.GlobalForwardingRules>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteGlobalForwardingRuleRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<forwarding_rule> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        forwarding_rule          => $forwarding_rule,
+        project                  => $project,
+        view                     => $view,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.GlobalForwardingRules>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetGlobalForwardingRuleRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ForwardingRule>
+
+Parameters:
+
+=over 4
+
+=item * C<forwarding_rule> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<view> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        forwarding_rule_resource => $forwarding_rule_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.GlobalForwardingRules>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertGlobalForwardingRuleRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<forwarding_rule_resource> - L<Google::Cloud::Compute::V1::Compute::ForwardingRule>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.GlobalForwardingRules>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListGlobalForwardingRulesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ForwardingRuleList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        forwarding_rule          => $forwarding_rule,
+        forwarding_rule_resource => $forwarding_rule_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.GlobalForwardingRules>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchGlobalForwardingRuleRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<forwarding_rule> - C<string>
+
+=item * C<forwarding_rule_resource> - L<Google::Cloud::Compute::V1::Compute::ForwardingRule>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<set_labels>
 
-Calls the RPC method C<SetLabels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_labels(
+        global_set_labels_request_resource => $global_set_labels_request_resource,
+        project                  => $project,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<SetLabels> on C<google.cloud.compute.v1.GlobalForwardingRules>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetLabelsGlobalForwardingRuleRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<global_set_labels_request_resource> - L<Google::Cloud::Compute::V1::Compute::GlobalSetLabelsRequest>
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<set_target>
 
-Calls the RPC method C<SetTarget> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_target(
+        forwarding_rule          => $forwarding_rule,
+        project                  => $project,
+        request_id               => $request_id,
+        target_reference_resource => $target_reference_resource,
+    );
+
+Calls the RPC method C<SetTarget> on C<google.cloud.compute.v1.GlobalForwardingRules>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetTargetGlobalForwardingRuleRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<forwarding_rule> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_reference_resource> - L<Google::Cloud::Compute::V1::Compute::TargetReference>
+
+=back
 
 =back
 

@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::AuthzPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -746,97 +746,11 @@ EOF
     # Field: custom_provider Type: 11 (.google.cloud.networksecurity.v1.AuthzPolicy.CustomProvider)
     # Field: policy_profile Type: 14 (.google.cloud.networksecurity.v1.AuthzPolicy.PolicyProfile)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthzPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthzPolicy.LabelsEntry)
-
-=item * B<target>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthzPolicy.Target)
-
-=item * B<http_rules>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthzPolicy.AuthzRule)
-
-=item * B<network_rules>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthzPolicy.AuthzRule)
-
-=item * B<action>
-
-Type: Enum (.google.cloud.networksecurity.v1.AuthzPolicy.AuthzAction)
-
-=item * B<custom_provider>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthzPolicy.CustomProvider)
-
-=item * B<policy_profile>
-
-Type: Enum (.google.cloud.networksecurity.v1.AuthzPolicy.PolicyProfile)
-
-=back
-
-=cut
-
 # Enum: AuthzPolicy::LoadBalancingScheme
 our $AuthzPolicy_LOAD_BALANCING_SCHEME_UNSPECIFIED = 0;
 our $AuthzPolicy_INTERNAL_MANAGED = 1;
 our $AuthzPolicy_EXTERNAL_MANAGED = 2;
 our $AuthzPolicy_INTERNAL_SELF_MANAGED = 3;
-
-=pod
-
-=head2 Enum: AuthzPolicy::LoadBalancingScheme
-
-Values:
-
-=over 4
-
-=item * C<LOAD_BALANCING_SCHEME_UNSPECIFIED> => 0
-
-=item * C<INTERNAL_MANAGED> => 1
-
-=item * C<EXTERNAL_MANAGED> => 2
-
-=item * C<INTERNAL_SELF_MANAGED> => 3
-
-=back
-
-=cut
 
 # Enum: AuthzPolicy::AuthzAction
 our $AuthzPolicy_AUTHZ_ACTION_UNSPECIFIED = 0;
@@ -844,48 +758,10 @@ our $AuthzPolicy_ALLOW = 1;
 our $AuthzPolicy_DENY = 2;
 our $AuthzPolicy_CUSTOM = 3;
 
-=pod
-
-=head2 Enum: AuthzPolicy::AuthzAction
-
-Values:
-
-=over 4
-
-=item * C<AUTHZ_ACTION_UNSPECIFIED> => 0
-
-=item * C<ALLOW> => 1
-
-=item * C<DENY> => 2
-
-=item * C<CUSTOM> => 3
-
-=back
-
-=cut
-
 # Enum: AuthzPolicy::PolicyProfile
 our $AuthzPolicy_POLICY_PROFILE_UNSPECIFIED = 0;
 our $AuthzPolicy_REQUEST_AUTHZ = 1;
 our $AuthzPolicy_CONTENT_AUTHZ = 2;
-
-=pod
-
-=head2 Enum: AuthzPolicy::PolicyProfile
-
-Values:
-
-=over 4
-
-=item * C<POLICY_PROFILE_UNSPECIFIED> => 0
-
-=item * C<REQUEST_AUTHZ> => 1
-
-=item * C<CONTENT_AUTHZ> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::AuthzPolicy::CreateAuthzPolicyRequest ===
     # Fields for CreateAuthzPolicyRequest
@@ -893,44 +769,6 @@ Values:
     # Field: authz_policy_id Type: 9 ()
     # Field: authz_policy Type: 11 (.google.cloud.networksecurity.v1.AuthzPolicy)
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthzPolicy::CreateAuthzPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthzPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthzPolicy::CreateAuthzPolicyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<authz_policy_id>
-
-Type: String
-
-=item * B<authz_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthzPolicy)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::AuthzPolicy::ListAuthzPoliciesRequest ===
     # Fields for ListAuthzPoliciesRequest
@@ -940,117 +778,15 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthzPolicy::ListAuthzPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthzPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthzPolicy::ListAuthzPoliciesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AuthzPolicy::ListAuthzPoliciesResponse ===
     # Fields for ListAuthzPoliciesResponse
     # Field: authz_policies Type: 11 (.google.cloud.networksecurity.v1.AuthzPolicy)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthzPolicy::ListAuthzPoliciesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthzPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthzPolicy::ListAuthzPoliciesResponse->new(
-        authz_policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<authz_policies>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthzPolicy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AuthzPolicy::GetAuthzPolicyRequest ===
     # Fields for GetAuthzPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthzPolicy::GetAuthzPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthzPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthzPolicy::GetAuthzPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::AuthzPolicy::UpdateAuthzPolicyRequest ===
     # Fields for UpdateAuthzPolicyRequest
@@ -1058,86 +794,442 @@ Type: String
     # Field: authz_policy Type: 11 (.google.cloud.networksecurity.v1.AuthzPolicy)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthzPolicy::UpdateAuthzPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AuthzPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AuthzPolicy::UpdateAuthzPolicyRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<authz_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.AuthzPolicy)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AuthzPolicy::DeleteAuthzPolicyRequest ===
     # Fields for DeleteAuthzPolicyRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::AuthzPolicy::DeleteAuthzPolicyRequest - Compiled Protocol Buffers message class
+Google::Cloud::Networksecurity::V1::AuthzPolicy - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/authz_policy.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networksecurity::V1::AuthzPolicy;
 
-    my $msg = Google::Cloud::Networksecurity::V1::AuthzPolicy::DeleteAuthzPolicyRequest->new(
-        name => $value,
-    );
+    my $msg = Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        description => $description,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AuthzPolicy - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/authz_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy
+
+`AuthzPolicy` is a resource that allows to forward traffic to a
+callout backend designed to scan the traffic for security purposes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Identifier. Name of the `AuthzPolicy` resource in the following
+format:
+`projects/{project}/locations/{location}/authzPolicies/{authz_policy}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A human-readable description of the resource.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy::LabelsEntry>)
+
+Optional. Set of labels associated with the `AuthzPolicy` resource.
+
+The format must comply with [the following
+requirements](/compute/docs/labeling-resources#requirements).
+
+=item * C<< $msg->target() >> / C<< $msg->target($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy::Target>)
+
+Required. Specifies the set of resources to which this policy should be
+applied to.
+
+=item * C<< $msg->http_rules() >> / C<< $msg->http_rules($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy::AuthzRule>)
+
+Optional. A list of authorization HTTP rules to match against the incoming
+request. A policy match occurs when at least one HTTP rule matches the
+request or when no HTTP rules are specified in the policy.
+At least one HTTP Rule is required for Allow or Deny Action. Limited
+to 5 rules.
+
+=item * C<< $msg->network_rules() >> / C<< $msg->network_rules($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy::AuthzRule>)
+
+Optional. A list of authorization network rules to match against the
+incoming request. A policy match occurs when at least one network rule
+matches the request.
+At least one network rule is required for Allow or Deny Action if no HTTP
+rules are provided. Network rules are mutually exclusive with HTTP rules.
+Limited to 5 rules.
+
+=item * C<< $msg->action() >> / C<< $msg->action($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzAction>)
+
+Required. Can be one of `ALLOW`, `DENY`, `CUSTOM`.
+
+When the action is `CUSTOM`, `customProvider` must be specified.
+
+When the action is `ALLOW`, only requests matching the policy will
+be allowed.
+
+When the action is `DENY`, only requests matching the policy will be
+denied.
+
+When a request arrives, the policies are evaluated in the following order:
+
+1. If there is a `CUSTOM` policy that matches the request, the `CUSTOM`
+policy is evaluated using the custom authorization providers and the
+request is denied if the provider rejects the request.
+
+2. If there are any `DENY` policies that match the request, the request
+is denied.
+
+3. If there are no `ALLOW` policies for the resource or if any of the
+`ALLOW` policies match the request, the request is allowed.
+
+4. Else the request is denied by default if none of the configured
+AuthzPolicies with `ALLOW` action match the request.
+
+=item * C<< $msg->custom_provider() >> / C<< $msg->custom_provider($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy::CustomProvider>)
+
+Optional. Required if the action is `CUSTOM`. Allows delegating
+authorization decisions to Cloud IAP or to Service Extensions. One of
+`cloudIap` or `authzExtension` must be specified.
+
+=item * C<< $msg->policy_profile() >> / C<< $msg->policy_profile($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::PolicyProfile>)
+
+Optional. Immutable. Defines the type of authorization being performed.
+If not specified, `REQUEST_AUTHZ` is applied. This field cannot be changed
+once AuthzPolicy is created.
+
+=back
+
+=head3 Enum: AuthzPolicy::LoadBalancingScheme
+
+=over 4
+
+=item * C<LOAD_BALANCING_SCHEME_UNSPECIFIED> => C<0>
+
+=item * C<INTERNAL_MANAGED> => C<1>
+
+=item * C<EXTERNAL_MANAGED> => C<2>
+
+=item * C<INTERNAL_SELF_MANAGED> => C<3>
+
+=back
+
+=head3 Enum: AuthzPolicy::AuthzAction
+
+=over 4
+
+=item * C<AUTHZ_ACTION_UNSPECIFIED> => C<0>
+
+=item * C<ALLOW> => C<1>
+
+=item * C<DENY> => C<2>
+
+=item * C<CUSTOM> => C<3>
+
+=back
+
+=head3 Enum: AuthzPolicy::PolicyProfile
+
+=over 4
+
+=item * C<POLICY_PROFILE_UNSPECIFIED> => C<0>
+
+=item * C<REQUEST_AUTHZ> => C<1>
+
+=item * C<CONTENT_AUTHZ> => C<2>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthzPolicy::CreateAuthzPolicyRequest
+
+Message for creating an `AuthzPolicy` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the `AuthzPolicy` resource. Must be in
+the format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->authz_policy_id() >> / C<< $msg->authz_policy_id($value) >>
+
+Type: C<String>
+
+Required. User-provided ID of the `AuthzPolicy` resource to be created.
+
+=item * C<< $msg->authz_policy() >> / C<< $msg->authz_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy>)
+
+Required. `AuthzPolicy` resource to be created.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, ignores the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthzPolicy::ListAuthzPoliciesRequest
+
+Message for requesting list of `AuthzPolicy` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the `AuthzPolicy` resources
+are listed, specified in the following format:
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. The server might return fewer items than
+requested. If unspecified, the server picks an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results that the server returns.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filtering results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Hint for how to order the results.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthzPolicy::ListAuthzPoliciesResponse
+
+Message for response to listing `AuthzPolicy` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->authz_policies() >> / C<< $msg->authz_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy>)
+
+The list of `AuthzPolicy` resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results that the server returns.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthzPolicy::GetAuthzPolicyRequest
+
+Message for getting a `AuthzPolicy` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the `AuthzPolicy` resource to get. Must be in the
+format
+`projects/{project}/locations/{location}/authzPolicies/{authz_policy}`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthzPolicy::UpdateAuthzPolicyRequest
+
+Message for updating an `AuthzPolicy` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Used to specify the fields to be overwritten in the
+`AuthzPolicy` resource by the update.
+The fields specified in the `update_mask` are relative to the resource, not
+the full request. A field is overwritten if it is in the mask. If the
+user does not specify a mask, then all fields are overwritten.
+
+=item * C<< $msg->authz_policy() >> / C<< $msg->authz_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AuthzPolicy::AuthzPolicy>)
+
+Required. `AuthzPolicy` resource being updated.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, ignores the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AuthzPolicy::DeleteAuthzPolicyRequest
+
+Message for deleting an `AuthzPolicy` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `AuthzPolicy` resource to delete. Must be in
+the format
+`projects/{project}/locations/{location}/authzPolicies/{authz_policy}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for at least 60 minutes after the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, ignores the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::AuthzPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

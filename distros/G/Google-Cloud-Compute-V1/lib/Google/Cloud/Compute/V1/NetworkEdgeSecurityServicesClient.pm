@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -294,23 +294,166 @@ The following RPC methods are available in this client:
 
 =item * B<aggregated_list>
 
-Calls the RPC method C<AggregatedList> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list(
+        filter                   => $filter,
+        include_all_scopes       => $include_all_scopes,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        service_project_number   => $service_project_number,
+    );
+
+Calls the RPC method C<AggregatedList> on C<google.cloud.compute.v1.NetworkEdgeSecurityServices>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AggregatedListNetworkEdgeSecurityServicesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::NetworkEdgeSecurityServiceAggregatedList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<include_all_scopes> - C<bool>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<service_project_number> - C<int64>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        network_edge_security_service => $network_edge_security_service,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.NetworkEdgeSecurityServices>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteNetworkEdgeSecurityServiceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network_edge_security_service> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        network_edge_security_service => $network_edge_security_service,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.NetworkEdgeSecurityServices>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetNetworkEdgeSecurityServiceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::NetworkEdgeSecurityService>
+
+Parameters:
+
+=over 4
+
+=item * C<network_edge_security_service> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        network_edge_security_service_resource => $network_edge_security_service_resource,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.NetworkEdgeSecurityServices>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertNetworkEdgeSecurityServiceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network_edge_security_service_resource> - L<Google::Cloud::Compute::V1::Compute::NetworkEdgeSecurityService>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        network_edge_security_service => $network_edge_security_service,
+        network_edge_security_service_resource => $network_edge_security_service_resource,
+        paths                    => $paths,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.NetworkEdgeSecurityServices>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchNetworkEdgeSecurityServiceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network_edge_security_service> - C<string>
+
+=item * C<network_edge_security_service_resource> - L<Google::Cloud::Compute::V1::Compute::NetworkEdgeSecurityService>
+
+=item * C<paths> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<update_mask> - C<string>
+
+=back
 
 =back
 

@@ -7,7 +7,7 @@ use Carp qw(croak);
 use Exporter 'import';
 use JSON::PP ();
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 our @EXPORT_OK = qw(row button text_input modal);
 
 sub _text {

@@ -7,13 +7,13 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Bigquery::Storage::V1::Avro;
 use Google::Cloud::Bigquery::Storage::V1::Arrow;
-use Google::Cloud::Bigquery::Storage::V1::Annotations;
 use Google::Cloud::Bigquery::Storage::V1::Protobuf;
+use Google::Cloud::Bigquery::Storage::V1::Annotations;
 use Google::Cloud::Bigquery::Storage::V1::Table;
 use Google::Cloud::Bigquery::Storage::V1::Stream;
 use Google::Cloud::Bigquery::Storage::V1::Storage;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 1; # End of Google::Cloud::Bigquery::Storage::V1::BigQueryWriteClient
 
 __END__

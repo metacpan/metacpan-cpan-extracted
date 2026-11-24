@@ -10,32 +10,32 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
 use Google::Cloud::Networksecurity::V1::Common;
-use Google::Cloud::Networksecurity::V1::AuthzPolicy;
-use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
-use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
-use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
+use Google::Cloud::Networksecurity::V1::Tls;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
-use Google::Cloud::Networksecurity::V1::Tls;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupIntercept;
+use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
+use Google::Cloud::Networksecurity::V1::AuthzPolicy;
+use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring;
+use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicyRule;
+use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
 use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
 use Google::Cloud::Networksecurity::V1::UrlList;
-use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicyRule;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupIntercept;
 use Google::Cloud::Networksecurity::V1::AddressGroup;
+use Google::Cloud::Networksecurity::V1::Intercept;
 use Google::Cloud::Networksecurity::V1::FirewallActivation;
 use Google::Cloud::Networksecurity::V1::SseRealm;
 use Google::Cloud::Networksecurity::V1::Mirroring;
-use Google::Cloud::Networksecurity::V1::Intercept;
 use Google::Cloud::Networksecurity::V1::ClientTlsPolicy;
 use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroup;
 use Google::Cloud::Networksecurity::V1::NetworkSecurity;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -410,11 +410,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/networksecurity/v1/network_security.proto>
 
+=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group.proto>
+
 =item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_intercept.proto>
 
 =item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_mirroring.proto>
-
-=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group.proto>
 
 =item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_service.proto>
 
@@ -426,9 +426,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/networksecurity/v1/sse_realm.proto>
 
-=item * C<googleapis/google/cloud/networksecurity/v1/tls_inspection_policy.proto>
-
 =item * C<googleapis/google/cloud/networksecurity/v1/tls.proto>
+
+=item * C<googleapis/google/cloud/networksecurity/v1/tls_inspection_policy.proto>
 
 =item * C<googleapis/google/cloud/networksecurity/v1/url_list.proto>
 
@@ -465,35 +465,238 @@ The following RPC methods are available in this client:
 
 =item * B<list_address_groups>
 
-Calls the RPC method C<ListAddressGroups> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_address_groups(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        return_partial_success   => $return_partial_success,
+    );
+
+Calls the RPC method C<ListAddressGroups> on C<google.cloud.networksecurity.v1.AddressGroupService>.
+
+Request: L<Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsRequest>
+
+Returns: L<Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<return_partial_success> - C<bool>
+
+=back
 
 =item * B<list_dns_threat_detectors>
 
-Calls the RPC method C<ListDnsThreatDetectors> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_dns_threat_detectors(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListDnsThreatDetectors> on C<google.cloud.networksecurity.v1.DnsThreatDetectorService>.
+
+Request: L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsRequest>
+
+Returns: L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<list_firewall_endpoints>
 
-Calls the RPC method C<ListFirewallEndpoints> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_firewall_endpoints(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListFirewallEndpoints> on C<google.cloud.networksecurity.v1.FirewallActivation>.
+
+Request: L<Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsRequest>
+
+Returns: L<Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =item * B<list_intercept_endpoint_groups>
 
-Calls the RPC method C<ListInterceptEndpointGroups> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_intercept_endpoint_groups(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListInterceptEndpointGroups> on C<google.cloud.networksecurity.v1.Intercept>.
+
+Request: L<Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsRequest>
+
+Returns: L<Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =item * B<list_mirroring_endpoint_groups>
 
-Calls the RPC method C<ListMirroringEndpointGroups> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_mirroring_endpoint_groups(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListMirroringEndpointGroups> on C<google.cloud.networksecurity.v1.Mirroring>.
+
+Request: L<Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsRequest>
+
+Returns: L<Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =item * B<list_authorization_policies>
 
-Calls the RPC method C<ListAuthorizationPolicies> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_authorization_policies(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListAuthorizationPolicies> on C<google.cloud.networksecurity.v1.NetworkSecurity>.
+
+Request: L<Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesRequest>
+
+Returns: L<Google::Cloud::Networksecurity::V1::AuthorizationPolicy::ListAuthorizationPoliciesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<list_security_profile_groups>
 
-Calls the RPC method C<ListSecurityProfileGroups> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_security_profile_groups(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListSecurityProfileGroups> on C<google.cloud.networksecurity.v1.SecurityProfileGroupService>.
+
+Request: L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsRequest>
+
+Returns: L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupService::ListSecurityProfileGroupsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<list_sacrealms>
 
-Calls the RPC method C<ListSACRealms> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_sacrealms(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListSACRealms> on C<google.cloud.networksecurity.v1.SSERealmService>.
+
+Request: L<Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsRequest>
+
+Returns: L<Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =back
 

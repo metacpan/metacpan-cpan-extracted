@@ -4,7 +4,7 @@ Web::VWF - Versatile Web Framework - easily build a website to support different
 
 ## Version
 
-Version 0.003.1
+Version 0.004.1
 
 ## Synopsis
 
@@ -152,51 +152,62 @@ in it, except `captcha.pm`, is a page.  With no `display` either, that is
 The old `pages` is read when there is no `display`, as is its old form of one
 string of names, `<pages>index, meta_data</pages>`.
 
-### Data: `Databases`
+### Data: `Databases` and `Data`
 
 ```
     <databases>
-            <directory>/path/to/modules</directory>
-            <database>
+            <directory>/path/to/files</directory>
+    </databases>
+    <data>
+            <directory>/path/to/drivers</directory>
+            <driver>
                     <name>states</name>
                     <description>List of data about the U.S. states</description>
-                    <directory>/path/to/this/module</directory>
-            </database>
-    </databases>
+                    <directory>/path/to/this/driver</directory>
+            </driver>
+    </data>
 ```
 
-One `database` for each data module a page may use.  A page is given each as
+`databases` says where the data files are (CSV, XML, SQLite), and `data` where the
+drivers that read them are: the [Database::Abstraction](https://metacpan.org/pod/Database%3A%3AAbstraction) subclasses.  They are
+separate so that the files may be kept apart from code.
+
+`databases`'s `directory` is the directory of the data files.  Default:
+`../databases` beside the script.  Pages are told it as `database_dir` and
+`databasedir`.  The old top-level `database_dir` is read when there is no
+`directory` in `databases`.
+
+One `driver` in `data` for each driver a page may use.  A page is given each as
 a variable named for the last part of its class, lower-cased: the module
 `Web::VWF::Data::states` is `$states` in the page.  A `name` with no `::` in it is
 a `Web::VWF::Data::` module; one with `::`, such as `Bands::Data::bands`, is
 used as written.  The `description` is only logged.
 
-`directory` is where the module's `.pm` file is, in the same way as for
-`display`, named for the last part of the class.  It is not where the
-database's own files are: that is `database_dir`.
+`directory` is where the driver's `.pm` file is, named for the last part of the
+class: in the `driver` for that driver alone, in `data` for all of them.  With
+neither, the drivers are looked for in the `databases` directory.  A driver that
+is not in the `data` or `databases` directory is taken from `@INC`, which is
+how a site uses the distribution's own `Web::VWF::Data::index`.  Only the
+`directory` of a `driver` is strict: a driver that is not in it is not loaded.
 
 What is loaded, in order of preference:
 
-- 1. the `database` elements;
+- 1. the `driver` elements;
 - 2. the old `data_modules`, one string of names, `index, states` (an empty
 one means none);
-- 3. with only a `databases` `directory`, every `.pm` in it;
+- 3. every `.pm` in the `data` directory, or failing that the `databases`
+directory;
 - 4. the default, `Web::VWF::Data::index`.
 
 A module that cannot be loaded is logged and skipped; the pages that do not
 need it still work.
 
-This is not called `data` because the data modules are given the configuration's top-level
-keys as their constructor arguments, and a key called `data` replaces the rows
-of every database.
+Take care in naming a driver's own configuration: the drivers are given the
+configuration's top-level keys as their constructor arguments, so a key called
+`data` would replace the rows of every database.  The framework discards those
+rows, but a driver of your own that is constructed elsewhere must do the same.
 
 ### Other Settings
-
-- `database_dir`
-
-    The directory of the database files (CSV, XML, SQLite) read by the data
-    modules.  Default: `../data` beside the script.  Pages are told it as
-    `database_dir` and `databasedir`.
 
 - `supported_languages`
 
@@ -470,6 +481,157 @@ own beside `cgi-bin/` is configured from the server's directory for it, and
 
 ```perl
     { type => 'object', isa => 'Web::VWF::Config' }
+```
+
+### Sig\_Handler
+
+Internal: not part of the public interface, though it is a plain function, not a
+method.  The handler for TERM and USR1.  It sets the flag that makes `run` leave its loop and, if no
+request is being handled, flushes the response cache and statistics, detaches
+[Log::WarnDie](https://metacpan.org/pod/Log%3A%3AWarnDie) and exits at once.  Mid-request it only sets the flag, so the
+response in flight is sent whole.
+
+#### Api Specification
+
+##### Input
+
+```perl
+    { signal => { type => 'string' } }
+```
+
+##### Output
+
+```perl
+    { type => 'undef' }
+```
+
+### Choose
+
+Internal: a plain function.  Sends the `300 Multiple Choices` response: plain
+text that lists `?page=` and the description of each page the site serves, with
+a `Last-Modified` header from the page script.  The list is left out for
+`HEAD`.  It does nothing when the status of the request is already not 200,
+as for an unknown page, where the status line is sent elsewhere.
+
+#### Api Specification
+
+##### Input
+
+```
+    {}
+```
+
+##### Output
+
+```perl
+    { type => 'undef' }
+```
+
+### Send\_Error
+
+Internal: a plain function.  Sends a short plain-text error response, and
+records the status in the request's [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo).  Takes a hash or a hashref:
+
+- `status`
+
+    The HTTP status code.  Required.
+
+- `body`
+
+    The text to send.  It is not sent for `HEAD`.
+
+- `headers`
+
+    Extra header lines, each ending in a newline, such as `Retry-After`.
+
+- `buffered`
+
+    True once [FCGI::Buffer](https://metacpan.org/pod/FCGI%3A%3ABuffer) is capturing the output: it sends the `Status` line
+    itself, so this does not.
+
+#### Api Specification
+
+##### Input
+
+```perl
+    {
+            status => { type => 'integer', min => 100, max => 599 },
+            body => { type => 'string', optional => 1 },
+            headers => { type => 'string', optional => 1 },
+            buffered => { type => 'boolean', optional => 1 },
+    }
+```
+
+##### Output
+
+```perl
+    { type => 'integer', value => 1 }
+```
+
+### Duration\_Seconds
+
+Internal: a plain function.  Converts a duration such as `60s`, `2 minutes` or
+`90` to whole seconds, with [Time::Duration::Parse](https://metacpan.org/pod/Time%3A%3ADuration%3A%3AParse).  A string of digits is
+already seconds.  One that cannot be parsed is logged as a warning, and
+counts as 60 seconds.
+
+#### Api Specification
+
+##### Input
+
+```perl
+    { duration => { type => 'string' } }
+```
+
+##### Output
+
+```perl
+    { type => 'integer', min => 0 }
+```
+
+### Blacklisted
+
+Internal: a plain function.  Takes the request's [CGI::Info](https://metacpan.org/pod/CGI%3A%3AInfo) and says whether
+the request looks like an SQL injection attempt.  The address that sent one is
+remembered by the worker, so its later requests are refused without scanning
+them again.  It is only a filter for noise, see [Web::VWF::Blacklist](https://metacpan.org/pod/Web%3A%3AVWF%3A%3ABlacklist).  A
+request of more than 8192 characters is not scanned.  There is nothing to check
+without `REMOTE_ADDR`.  When it returns true the status of the request has been
+set to 403.
+
+#### Api Specification
+
+##### Input
+
+```perl
+    { info => { type => 'object', isa => 'CGI::Info' } }
+```
+
+##### Output
+
+```perl
+    { type => 'boolean' }
+```
+
+### Filter
+
+Internal: a plain function, registered with [Log::WarnDie](https://metacpan.org/pod/Log%3A%3AWarnDie).  Called with a
+warning, returns false for the few harmless ones that are not worth logging
+(two missing optional modules under [Net::OAuth](https://metacpan.org/pod/Net%3A%3AOAuth) and [NetAddr::IP](https://metacpan.org/pod/NetAddr%3A%3AIP), and an
+`S_IFFIFO` message from Fcntl) and true for all the rest.
+
+#### Api Specification
+
+##### Input
+
+```perl
+    { message => { type => 'string' } }
+```
+
+##### Output
+
+```perl
+    { type => 'boolean' }
 ```
 
 ## Author

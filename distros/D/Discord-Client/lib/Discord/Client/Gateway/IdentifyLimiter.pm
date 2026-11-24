@@ -8,7 +8,7 @@ use Scalar::Util qw(blessed);
 use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 use Discord::Client::Error;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub new {
     my ( $class, %args ) = @_;

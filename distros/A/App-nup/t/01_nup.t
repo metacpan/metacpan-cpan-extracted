@@ -246,8 +246,8 @@ subtest 'page number at the top' => sub {
     unlike nup('script/nup'), qr/--label NW=/, 'one file: not at the top';
     like nup('script/nup cpanfile'), qr{--label S= %n/%N .*--label NW= %n \@1},
         'two files: at the top as well';
-    like nup('-V script/nup'), qr/--label NW= %n @1/, '-V: at the top as well';
-    like nup('-V date'), qr/--label NW= %n @1/, '-V with a command';
+    like nup('-V script/nup'), qr/--label NW= %n \@1/, '-V: at the top as well';
+    like nup('-V date'), qr/--label NW= %n \@1/, '-V with a command';
     unlike nup('date'), qr/--label NW=/, 'a command: not at the top';
     unlike nup('--no-page-number script/nup cpanfile'), qr/--label/,
         '--no-page-number: no label';

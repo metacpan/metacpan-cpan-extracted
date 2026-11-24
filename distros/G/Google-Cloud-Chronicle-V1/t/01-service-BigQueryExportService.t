@@ -1,0 +1,87 @@
+use strict;
+use warnings;
+use Test::More;
+use File::Spec;
+
+# A. Mock Google::Auth
+package Google::Auth;
+BEGIN { $INC{'Google/Auth.pm'} = 1; }
+sub default {
+    my ($class, %args) = @_;
+    return bless \%args, 'Google::Auth::MockCredentials';
+}
+package Google::Auth::MockCredentials;
+sub get_token {
+    return 'mock-token';
+}
+
+# B. Mock Google::gRPC::Client
+package Google::gRPC::Client;
+BEGIN { $INC{'Google/gRPC/Client.pm'} = 1; }
+sub new {
+    my $class = shift;
+    my $args = ( @_ == 1 && ref($_[0]) eq 'HASH' ) ? $_[0] : { @_ };
+    return bless $args, $class;
+}
+sub call {
+    my ($self, $args) = @_;
+    if ($self->{mock_call}) {
+        return $self->{mock_call}->($args);
+    }
+    die 'No mock_call handler configured in transport!';
+}
+
+# C. Fallback Mocks for External Response Classes
+BEGIN {
+    for my $pkg (qw( Google::Cloud::Chronicle::V1::BigQueryExport::BigQueryExport )) {
+        unless ($pkg->can('new')) {
+            no strict 'refs';
+            *{"${pkg}::new"} = sub { bless {}, $_[0] };
+            $INC{join('/', split('::', $pkg)) . '.pm'} = 1;
+        }
+    }
+}
+
+# D. Main test execution
+package main;
+use Google::Cloud::Chronicle::V1::BigQueryExportServiceClient;
+
+my $client = Google::Cloud::Chronicle::V1::BigQueryExportServiceClient->new();
+ok($client, 'Instantiated generated client');
+isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
+
+subtest 'get_big_query_export method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.chronicle.v1.BigQueryExportService', 'Correct service path');
+        is($args->{method}, 'GetBigQueryExport', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Chronicle::V1::BigQueryExport::GetBigQueryExportRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Chronicle::V1::BigQueryExport::BigQueryExport'->new();
+        return $response;
+    };
+    
+    my $res = $client->get_big_query_export();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Chronicle::V1::BigQueryExport::BigQueryExport', 'Response object class');
+    done_testing();
+};
+
+subtest 'provision_big_query_export method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.chronicle.v1.BigQueryExportService', 'Correct service path');
+        is($args->{method}, 'ProvisionBigQueryExport', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Chronicle::V1::BigQueryExport::ProvisionBigQueryExportRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Chronicle::V1::BigQueryExport::BigQueryExport'->new();
+        return $response;
+    };
+    
+    my $res = $client->provision_big_query_export();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Chronicle::V1::BigQueryExport::BigQueryExport', 'Response object class');
+    done_testing();
+};
+
+done_testing();

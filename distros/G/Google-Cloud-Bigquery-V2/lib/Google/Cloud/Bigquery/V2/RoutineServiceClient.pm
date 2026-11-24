@@ -10,56 +10,56 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
-use Google::Cloud::Bigquery::V2::JsonExtension;
-use Google::Cloud::Bigquery::V2::Error;
-use Google::Cloud::Bigquery::V2::Clustering;
-use Google::Cloud::Bigquery::V2::MapTargetType;
-use Google::Cloud::Bigquery::V2::ManagedTableType;
-use Google::Cloud::Bigquery::V2::LocationMetadata;
 use Google::Cloud::Bigquery::V2::GenAiStats;
+use Google::Cloud::Bigquery::V2::ManagedTableType;
+use Google::Cloud::Bigquery::V2::Error;
 use Google::Cloud::Bigquery::V2::Arrow;
+use Google::Cloud::Bigquery::V2::JsonExtension;
+use Google::Cloud::Bigquery::V2::Clustering;
+use Google::Cloud::Bigquery::V2::LocationMetadata;
+use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
+use Google::Cloud::Bigquery::V2::MapTargetType;
 use Google::Cloud::Bigquery::V2::DecimalTargetTypes;
 use Google::Cloud::Bigquery::V2::UdfResource;
-use Google::Cloud::Bigquery::V2::PartitioningDefinition;
-use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
 use Google::Cloud::Bigquery::V2::DataFormatOptions;
-use Google::Cloud::Bigquery::V2::PropertyGraphReference;
-use Google::Cloud::Bigquery::V2::BiglakeConfig;
-use Google::Cloud::Bigquery::V2::JobStatus;
-use Google::Cloud::Bigquery::V2::RangePartitioning;
-use Google::Cloud::Bigquery::V2::TableReference;
+use Google::Cloud::Bigquery::V2::RoutineReference;
 use Google::Cloud::Bigquery::V2::DatasetReference;
-use Google::Cloud::Bigquery::V2::HivePartitioning;
-use Google::Cloud::Bigquery::V2::EncryptionConfig;
 use Google::Cloud::Bigquery::V2::StandardSql;
-use Google::Cloud::Bigquery::V2::ModelReference;
-use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
+use Google::Cloud::Bigquery::V2::EncryptionConfig;
+use Google::Cloud::Bigquery::V2::TableReference;
+use Google::Cloud::Bigquery::V2::JobStatus;
+use Google::Cloud::Bigquery::V2::BiglakeConfig;
 use Google::Cloud::Bigquery::V2::SessionInfo;
-use Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
-use Google::Cloud::Bigquery::V2::QueryParameter;
+use Google::Cloud::Bigquery::V2::JobReference;
+use Google::Cloud::Bigquery::V2::Project;
 use Google::Cloud::Bigquery::V2::PrivacyPolicy;
-use Google::Cloud::Bigquery::V2::RestrictionConfig;
+use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
+use Google::Cloud::Bigquery::V2::PropertyGraphReference;
+use Google::Cloud::Bigquery::V2::HivePartitioning;
+use Google::Cloud::Bigquery::V2::RangePartitioning;
+use Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
 use Google::Cloud::Bigquery::V2::TimePartitioning;
 use Google::Cloud::Bigquery::V2::TableSchema;
-use Google::Cloud::Bigquery::V2::RoutineReference;
-use Google::Cloud::Bigquery::V2::JobCreationReason;
-use Google::Cloud::Bigquery::V2::JobReference;
+use Google::Cloud::Bigquery::V2::PartitioningDefinition;
 use Google::Cloud::Bigquery::V2::ExternalDatasetReference;
-use Google::Cloud::Bigquery::V2::Project;
-use Google::Cloud::Bigquery::V2::TableConstraints;
+use Google::Cloud::Bigquery::V2::JobCreationReason;
+use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
+use Google::Cloud::Bigquery::V2::ModelReference;
+use Google::Cloud::Bigquery::V2::RestrictionConfig;
+use Google::Cloud::Bigquery::V2::QueryParameter;
 use Google::Cloud::Bigquery::V2::SystemVariable;
-use Google::Cloud::Bigquery::V2::Model;
+use Google::Cloud::Bigquery::V2::Routine;
+use Google::Cloud::Bigquery::V2::TableConstraints;
 use Google::Cloud::Bigquery::V2::RowAccessPolicy;
 use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-use Google::Cloud::Bigquery::V2::Routine;
+use Google::Cloud::Bigquery::V2::Model;
 use Google::Cloud::Bigquery::V2::Dataset;
-use Google::Cloud::Bigquery::V2::JobStats;
 use Google::Cloud::Bigquery::V2::JobConfig;
 use Google::Cloud::Bigquery::V2::Table;
+use Google::Cloud::Bigquery::V2::JobStats;
 use Google::Cloud::Bigquery::V2::Job;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -338,11 +338,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/hive_partitioning.proto>
 
+=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
+
 =item * C<googleapis/google/cloud/bigquery/v2/job_config.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_creation_reason.proto>
-
-=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_reference.proto>
 
@@ -390,9 +390,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/system_variable.proto>
 
-=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
-
 =item * C<googleapis/google/cloud/bigquery/v2/table.proto>
+
+=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/table_reference.proto>
 
@@ -435,23 +435,142 @@ The following RPC methods are available in this client:
 
 =item * B<get_routine>
 
-Calls the RPC method C<GetRoutine> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_routine(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        routine_id               => $routine_id,
+    );
+
+Calls the RPC method C<GetRoutine> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::GetRoutineRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<routine_id> - C<string>
+
+=back
 
 =item * B<insert_routine>
 
-Calls the RPC method C<InsertRoutine> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert_routine(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        routine                  => $routine,
+    );
+
+Calls the RPC method C<InsertRoutine> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::InsertRoutineRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<routine> - L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+=back
 
 =item * B<update_routine>
 
-Calls the RPC method C<UpdateRoutine> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_routine(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        routine_id               => $routine_id,
+        routine                  => $routine,
+    );
+
+Calls the RPC method C<UpdateRoutine> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::UpdateRoutineRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<routine_id> - C<string>
+
+=item * C<routine> - L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+=back
 
 =item * B<delete_routine>
 
-Calls the RPC method C<DeleteRoutine> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_routine(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        routine_id               => $routine_id,
+    );
+
+Calls the RPC method C<DeleteRoutine> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::DeleteRoutineRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<routine_id> - C<string>
+
+=back
 
 =item * B<list_routines>
 
-Calls the RPC method C<ListRoutines> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_routines(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        max_results              => $max_results,
+        page_token               => $page_token,
+        filter                   => $filter,
+    );
+
+Calls the RPC method C<ListRoutines> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::ListRoutinesRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Routine::ListRoutinesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<max_results> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=back
 
 =back
 

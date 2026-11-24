@@ -1,0 +1,4 @@
+Revision history for PDL-Llama
+
+0.01    2026-11-24
+        - Initial release: XS bindings to libllama (llama.cpp) for PDL.

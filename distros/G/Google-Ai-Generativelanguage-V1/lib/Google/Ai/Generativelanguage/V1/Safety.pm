@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1::Safety;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -136,40 +136,6 @@ EOF
     # Field: probability Type: 14 (.google.ai.generativelanguage.v1.SafetyRating.HarmProbability)
     # Field: blocked Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Safety::SafetyRating - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::Safety;
-
-    my $msg = Google::Ai::Generativelanguage::V1::Safety::SafetyRating->new(
-        category => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<category>
-
-Type: Enum (.google.ai.generativelanguage.v1.HarmCategory)
-
-=item * B<probability>
-
-Type: Enum (.google.ai.generativelanguage.v1.SafetyRating.HarmProbability)
-
-=item * B<blocked>
-
-Type: Bool
-
-=back
-
-=cut
-
 # Enum: SafetyRating::HarmProbability
 our $SafetyRating_HARM_PROBABILITY_UNSPECIFIED = 0;
 our $SafetyRating_NEGLIGIBLE = 1;
@@ -177,62 +143,10 @@ our $SafetyRating_LOW = 2;
 our $SafetyRating_MEDIUM = 3;
 our $SafetyRating_HIGH = 4;
 
-=pod
-
-=head2 Enum: SafetyRating::HarmProbability
-
-Values:
-
-=over 4
-
-=item * C<HARM_PROBABILITY_UNSPECIFIED> => 0
-
-=item * C<NEGLIGIBLE> => 1
-
-=item * C<LOW> => 2
-
-=item * C<MEDIUM> => 3
-
-=item * C<HIGH> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1::Safety::SafetySetting ===
     # Fields for SafetySetting
     # Field: category Type: 14 (.google.ai.generativelanguage.v1.HarmCategory)
     # Field: threshold Type: 14 (.google.ai.generativelanguage.v1.SafetySetting.HarmBlockThreshold)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Safety::SafetySetting - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::Safety;
-
-    my $msg = Google::Ai::Generativelanguage::V1::Safety::SafetySetting->new(
-        category => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<category>
-
-Type: Enum (.google.ai.generativelanguage.v1.HarmCategory)
-
-=item * B<threshold>
-
-Type: Enum (.google.ai.generativelanguage.v1.SafetySetting.HarmBlockThreshold)
-
-=back
-
-=cut
 
 # Enum: SafetySetting::HarmBlockThreshold
 our $SafetySetting_HARM_BLOCK_THRESHOLD_UNSPECIFIED = 0;
@@ -242,41 +156,144 @@ our $SafetySetting_BLOCK_ONLY_HIGH = 3;
 our $SafetySetting_BLOCK_NONE = 4;
 our $SafetySetting_OFF = 5;
 
-=pod
-
-=head2 Enum: SafetySetting::HarmBlockThreshold
-
-Values:
-
-=over 4
-
-=item * C<HARM_BLOCK_THRESHOLD_UNSPECIFIED> => 0
-
-=item * C<BLOCK_LOW_AND_ABOVE> => 1
-
-=item * C<BLOCK_MEDIUM_AND_ABOVE> => 2
-
-=item * C<BLOCK_ONLY_HIGH> => 3
-
-=item * C<BLOCK_NONE> => 4
-
-=item * C<OFF> => 5
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1::Safety - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1::Safety - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1/safety.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1::Safety;
+
+    my $msg = Google::Ai::Generativelanguage::V1::Safety::SafetyRating->new({
+        category => $category,
+        probability => $probability,
+        blocked => $blocked,
+    });
+
+    # Read or update a field
+    my $val = $msg->category();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1::Safety::SafetyRating->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1/safety.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1::Safety::SafetyRating
+
+Safety rating for a piece of content.
+
+The safety rating contains the category of harm and the
+harm probability level in that category for a piece of content.
+Content is classified for safety across a number of
+harm categories and the probability of the harm classification is included
+here.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->category() >> / C<< $msg->category($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1::HarmCategory>)
+
+Required. The category for this rating.
+
+=item * C<< $msg->probability() >> / C<< $msg->probability($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1::SafetyRating::HarmProbability>)
+
+Required. The probability of harm for this content.
+
+=item * C<< $msg->blocked() >> / C<< $msg->blocked($value) >>
+
+Type: C<Bool>
+
+Was this content blocked because of this rating?
+
+=back
+
+=head3 Enum: SafetyRating::HarmProbability
+
+=over 4
+
+=item * C<HARM_PROBABILITY_UNSPECIFIED> => C<0>
+
+=item * C<NEGLIGIBLE> => C<1>
+
+=item * C<LOW> => C<2>
+
+=item * C<MEDIUM> => C<3>
+
+=item * C<HIGH> => C<4>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1::Safety::SafetySetting
+
+Safety setting, affecting the safety-blocking behavior.
+
+Passing a safety setting for a category changes the allowed probability that
+content is blocked.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->category() >> / C<< $msg->category($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1::HarmCategory>)
+
+Required. The category for this setting.
+
+=item * C<< $msg->threshold() >> / C<< $msg->threshold($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1::SafetySetting::HarmBlockThreshold>)
+
+Required. Controls the probability threshold at which harm is blocked.
+
+=back
+
+=head3 Enum: SafetySetting::HarmBlockThreshold
+
+=over 4
+
+=item * C<HARM_BLOCK_THRESHOLD_UNSPECIFIED> => C<0>
+
+=item * C<BLOCK_LOW_AND_ABOVE> => C<1>
+
+=item * C<BLOCK_MEDIUM_AND_ABOVE> => C<2>
+
+=item * C<BLOCK_ONLY_HIGH> => C<3>
+
+=item * C<BLOCK_NONE> => C<4>
+
+=item * C<OFF> => C<5>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1::Safety::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

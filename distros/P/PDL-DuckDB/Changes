@@ -1,0 +1,4 @@
+Revision history for PDL-DuckDB
+
+0.01    2026-11-24
+    - Initial release: DuckDB C API (duckdb.h) vectorized SQL/DataFrame bindings for PDL.

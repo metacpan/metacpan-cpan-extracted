@@ -11,10 +11,10 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Secretmanager::V1::Resources;
-use Google::Cloud::Secretmanager::V1::Service;
 use Google::Cloud::Secretmanager::V1::OperationsService;
+use Google::Cloud::Secretmanager::V1::Service;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -198,11 +198,64 @@ The following RPC methods are available in this client:
 
 =item * B<list_backups>
 
-Calls the RPC method C<ListBackups> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_backups(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListBackups> on C<google.cloud.secretmanager.v1.SecretOperationsService>.
+
+Request: L<Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsRequest>
+
+Returns: L<Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =item * B<list_secrets>
 
-Calls the RPC method C<ListSecrets> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_secrets(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+    );
+
+Calls the RPC method C<ListSecrets> on C<google.cloud.secretmanager.v1.SecretManagerService>.
+
+Request: L<Google::Cloud::Secretmanager::V1::Service::ListSecretsRequest>
+
+Returns: L<Google::Cloud::Secretmanager::V1::Service::ListSecretsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=back
 
 =back
 

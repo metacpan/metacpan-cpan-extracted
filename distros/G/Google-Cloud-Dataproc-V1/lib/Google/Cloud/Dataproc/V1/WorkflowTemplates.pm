@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::WorkflowTemplates;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -808,106 +808,10 @@ EOF
     # Field: dag_timeout Type: 11 (.google.protobuf.Duration)
     # Field: encryption_config Type: 11 (.google.cloud.dataproc.v1.WorkflowTemplate.EncryptionConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<version>
-
-Type: Int32
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowTemplate.LabelsEntry)
-
-=item * B<placement>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowTemplatePlacement)
-
-=item * B<jobs>
-
-Type: Message (.google.cloud.dataproc.v1.OrderedJob)
-
-=item * B<parameters>
-
-Type: Message (.google.cloud.dataproc.v1.TemplateParameter)
-
-=item * B<dag_timeout>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<encryption_config>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowTemplate.EncryptionConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplatePlacement ===
     # Fields for WorkflowTemplatePlacement
     # Field: managed_cluster Type: 11 (.google.cloud.dataproc.v1.ManagedCluster)
     # Field: cluster_selector Type: 11 (.google.cloud.dataproc.v1.ClusterSelector)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplatePlacement - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplatePlacement->new(
-        managed_cluster => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<managed_cluster>
-
-Type: Message (.google.cloud.dataproc.v1.ManagedCluster)
-
-=item * B<cluster_selector>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterSelector)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::ManagedCluster ===
     # Fields for ManagedCluster
@@ -915,74 +819,10 @@ Type: Message (.google.cloud.dataproc.v1.ClusterSelector)
     # Field: config Type: 11 (.google.cloud.dataproc.v1.ClusterConfig)
     # Field: labels Type: 11 (.google.cloud.dataproc.v1.ManagedCluster.LabelsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::ManagedCluster - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::ManagedCluster->new(
-        cluster_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<config>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterConfig)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.ManagedCluster.LabelsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterSelector ===
     # Fields for ClusterSelector
     # Field: zone Type: 9 ()
     # Field: cluster_labels Type: 11 (.google.cloud.dataproc.v1.ClusterSelector.ClusterLabelsEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterSelector - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterSelector->new(
-        zone => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<zone>
-
-Type: String
-
-=item * B<cluster_labels>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterSelector.ClusterLabelsEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::OrderedJob ===
     # Fields for OrderedJob
@@ -1001,84 +841,6 @@ Type: Message (.google.cloud.dataproc.v1.ClusterSelector.ClusterLabelsEntry)
     # Field: scheduling Type: 11 (.google.cloud.dataproc.v1.JobScheduling)
     # Field: prerequisite_step_ids Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::OrderedJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::OrderedJob->new(
-        step_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<step_id>
-
-Type: String
-
-=item * B<hadoop_job>
-
-Type: Message (.google.cloud.dataproc.v1.HadoopJob)
-
-=item * B<spark_job>
-
-Type: Message (.google.cloud.dataproc.v1.SparkJob)
-
-=item * B<pyspark_job>
-
-Type: Message (.google.cloud.dataproc.v1.PySparkJob)
-
-=item * B<hive_job>
-
-Type: Message (.google.cloud.dataproc.v1.HiveJob)
-
-=item * B<pig_job>
-
-Type: Message (.google.cloud.dataproc.v1.PigJob)
-
-=item * B<spark_r_job>
-
-Type: Message (.google.cloud.dataproc.v1.SparkRJob)
-
-=item * B<spark_sql_job>
-
-Type: Message (.google.cloud.dataproc.v1.SparkSqlJob)
-
-=item * B<presto_job>
-
-Type: Message (.google.cloud.dataproc.v1.PrestoJob)
-
-=item * B<trino_job>
-
-Type: Message (.google.cloud.dataproc.v1.TrinoJob)
-
-=item * B<flink_job>
-
-Type: Message (.google.cloud.dataproc.v1.FlinkJob)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.OrderedJob.LabelsEntry)
-
-=item * B<scheduling>
-
-Type: Message (.google.cloud.dataproc.v1.JobScheduling)
-
-=item * B<prerequisite_step_ids>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::TemplateParameter ===
     # Fields for TemplateParameter
     # Field: name Type: 9 ()
@@ -1086,138 +848,18 @@ Type: String
     # Field: description Type: 9 ()
     # Field: validation Type: 11 (.google.cloud.dataproc.v1.ParameterValidation)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::TemplateParameter - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::TemplateParameter->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<fields>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<validation>
-
-Type: Message (.google.cloud.dataproc.v1.ParameterValidation)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::ParameterValidation ===
     # Fields for ParameterValidation
     # Field: regex Type: 11 (.google.cloud.dataproc.v1.RegexValidation)
     # Field: values Type: 11 (.google.cloud.dataproc.v1.ValueValidation)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::ParameterValidation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::ParameterValidation->new(
-        regex => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<regex>
-
-Type: Message (.google.cloud.dataproc.v1.RegexValidation)
-
-=item * B<values>
-
-Type: Message (.google.cloud.dataproc.v1.ValueValidation)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::RegexValidation ===
     # Fields for RegexValidation
     # Field: regexes Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::RegexValidation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::RegexValidation->new(
-        regexes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<regexes>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::ValueValidation ===
     # Fields for ValueValidation
     # Field: values Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::ValueValidation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::ValueValidation->new(
-        values => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<values>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowMetadata ===
     # Fields for WorkflowMetadata
@@ -1236,109 +878,11 @@ Type: String
     # Field: dag_start_time Type: 11 (.google.protobuf.Timestamp)
     # Field: dag_end_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowMetadata->new(
-        template => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<template>
-
-Type: String
-
-=item * B<version>
-
-Type: Int32
-
-=item * B<create_cluster>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterOperation)
-
-=item * B<graph>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowGraph)
-
-=item * B<delete_cluster>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterOperation)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataproc.v1.WorkflowMetadata.State)
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<parameters>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowMetadata.ParametersEntry)
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<cluster_uuid>
-
-Type: String
-
-=item * B<dag_timeout>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<dag_start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<dag_end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # Enum: WorkflowMetadata::State
 our $WorkflowMetadata_UNKNOWN = 0;
 our $WorkflowMetadata_PENDING = 1;
 our $WorkflowMetadata_RUNNING = 2;
 our $WorkflowMetadata_DONE = 3;
-
-=pod
-
-=head2 Enum: WorkflowMetadata::State
-
-Values:
-
-=over 4
-
-=item * C<UNKNOWN> => 0
-
-=item * C<PENDING> => 1
-
-=item * C<RUNNING> => 2
-
-=item * C<DONE> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterOperation ===
     # Fields for ClusterOperation
@@ -1346,69 +890,9 @@ Values:
     # Field: error Type: 9 ()
     # Field: done Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterOperation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterOperation->new(
-        operation_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<operation_id>
-
-Type: String
-
-=item * B<error>
-
-Type: String
-
-=item * B<done>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowGraph ===
     # Fields for WorkflowGraph
     # Field: nodes Type: 11 (.google.cloud.dataproc.v1.WorkflowNode)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowGraph - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowGraph->new(
-        nodes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<nodes>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowNode)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowNode ===
     # Fields for WorkflowNode
@@ -1418,48 +902,6 @@ Type: Message (.google.cloud.dataproc.v1.WorkflowNode)
     # Field: state Type: 14 (.google.cloud.dataproc.v1.WorkflowNode.NodeState)
     # Field: error Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowNode - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowNode->new(
-        step_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<step_id>
-
-Type: String
-
-=item * B<prerequisite_step_ids>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataproc.v1.WorkflowNode.NodeState)
-
-=item * B<error>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: WorkflowNode::NodeState
 our $WorkflowNode_NODE_STATE_UNSPECIFIED = 0;
 our $WorkflowNode_BLOCKED = 1;
@@ -1468,99 +910,15 @@ our $WorkflowNode_RUNNING = 3;
 our $WorkflowNode_COMPLETED = 4;
 our $WorkflowNode_FAILED = 5;
 
-=pod
-
-=head2 Enum: WorkflowNode::NodeState
-
-Values:
-
-=over 4
-
-=item * C<NODE_STATE_UNSPECIFIED> => 0
-
-=item * C<BLOCKED> => 1
-
-=item * C<RUNNABLE> => 2
-
-=item * C<RUNNING> => 3
-
-=item * C<COMPLETED> => 4
-
-=item * C<FAILED> => 5
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::CreateWorkflowTemplateRequest ===
     # Fields for CreateWorkflowTemplateRequest
     # Field: parent Type: 9 ()
     # Field: template Type: 11 (.google.cloud.dataproc.v1.WorkflowTemplate)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::CreateWorkflowTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::CreateWorkflowTemplateRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<template>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowTemplate)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::GetWorkflowTemplateRequest ===
     # Fields for GetWorkflowTemplateRequest
     # Field: name Type: 9 ()
     # Field: version Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::GetWorkflowTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::GetWorkflowTemplateRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<version>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::InstantiateWorkflowTemplateRequest ===
     # Fields for InstantiateWorkflowTemplateRequest
@@ -1569,113 +927,15 @@ Type: Int32
     # Field: request_id Type: 9 ()
     # Field: parameters Type: 11 (.google.cloud.dataproc.v1.InstantiateWorkflowTemplateRequest.ParametersEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::InstantiateWorkflowTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::InstantiateWorkflowTemplateRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<version>
-
-Type: Int32
-
-=item * B<request_id>
-
-Type: String
-
-=item * B<parameters>
-
-Type: Message (.google.cloud.dataproc.v1.InstantiateWorkflowTemplateRequest.ParametersEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::InstantiateInlineWorkflowTemplateRequest ===
     # Fields for InstantiateInlineWorkflowTemplateRequest
     # Field: parent Type: 9 ()
     # Field: template Type: 11 (.google.cloud.dataproc.v1.WorkflowTemplate)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::InstantiateInlineWorkflowTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::InstantiateInlineWorkflowTemplateRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<template>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowTemplate)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::UpdateWorkflowTemplateRequest ===
     # Fields for UpdateWorkflowTemplateRequest
     # Field: template Type: 11 (.google.cloud.dataproc.v1.WorkflowTemplate)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::UpdateWorkflowTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::UpdateWorkflowTemplateRequest->new(
-        template => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<template>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowTemplate)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::ListWorkflowTemplatesRequest ===
     # Fields for ListWorkflowTemplatesRequest
@@ -1683,137 +943,31 @@ Type: Message (.google.cloud.dataproc.v1.WorkflowTemplate)
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::ListWorkflowTemplatesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::ListWorkflowTemplatesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::ListWorkflowTemplatesResponse ===
     # Fields for ListWorkflowTemplatesResponse
     # Field: templates Type: 11 (.google.cloud.dataproc.v1.WorkflowTemplate)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::ListWorkflowTemplatesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::ListWorkflowTemplatesResponse->new(
-        templates => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<templates>
-
-Type: Message (.google.cloud.dataproc.v1.WorkflowTemplate)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::WorkflowTemplates::DeleteWorkflowTemplateRequest ===
     # Fields for DeleteWorkflowTemplateRequest
     # Field: name Type: 9 ()
     # Field: version Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::WorkflowTemplates::DeleteWorkflowTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::DeleteWorkflowTemplateRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<version>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplateServiceClient ===
 package Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplateServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplateServiceClient
 
-Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplateServiceClient - Client stub representing the remote WorkflowTemplateService service
+Client stub representing the remote C<WorkflowTemplateService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataproc.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1933,13 +1087,1074 @@ sub delete_workflow_template {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::WorkflowTemplates - Protocol Buffers schema definition
+Google::Cloud::Dataproc::V1::WorkflowTemplates - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/workflow_templates.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataproc::V1::WorkflowTemplates;
+
+    my $msg = Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate->new({
+        id => $id,
+        name => $name,
+        version => $version,
+        create_time => $create_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->id();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/workflow_templates.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate
+
+A Dataproc workflow template resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name of the workflow template, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.workflowTemplates`, the resource name of the
+  template has the following format:
+  `projects/{project_id}/regions/{region}/workflowTemplates/{template_id}`
+
+* For `projects.locations.workflowTemplates`, the resource name of the
+  template has the following format:
+  `projects/{project_id}/locations/{location}/workflowTemplates/{template_id}`
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Int32>
+
+Optional. Used to perform a consistent read-modify-write.
+
+This field should be left blank for a `CreateWorkflowTemplate` request. It
+is required for an `UpdateWorkflowTemplate` request, and must match the
+current server version. A typical update template flow would fetch the
+current template with a `GetWorkflowTemplate` request, which will return
+the current template with the `version` field filled in with the
+current server version. The user updates other fields in the template,
+then returns it as part of the `UpdateWorkflowTemplate` request.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time template was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time template was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate::LabelsEntry>)
+
+Optional. The labels to associate with this template. These labels
+will be propagated to all jobs and clusters created by the workflow
+instance.
+
+Label B<keys> must contain 1 to 63 characters, and must conform to
+[RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).
+
+Label B<values> may be empty, but, if present, must contain 1 to 63
+characters, and must conform to
+[RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).
+
+No more than 32 labels can be associated with a template.
+
+=item * C<< $msg->placement() >> / C<< $msg->placement($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplatePlacement>)
+
+Required. WorkflowTemplate scheduling information.
+
+=item * C<< $msg->jobs() >> / C<< $msg->jobs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::OrderedJob>)
+
+Required. The Directed Acyclic Graph of Jobs to submit.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::TemplateParameter>)
+
+Optional. Template parameters whose values are substituted into the
+template. Values for parameters must be provided when the template is
+instantiated.
+
+=item * C<< $msg->dag_timeout() >> / C<< $msg->dag_timeout($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Timeout duration for the DAG of jobs, expressed in seconds (see
+[JSON representation of
+duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+The timeout duration must be from 10 minutes ("600s") to 24 hours
+("86400s"). The timer begins when the first job is submitted. If the
+workflow is running at the end of the timeout period, any remaining jobs
+are cancelled, the workflow is ended, and if the workflow was running on a
+[managed
+cluster](/dataproc/docs/concepts/workflows/using-workflows#configuring_or_selecting_a_cluster),
+the cluster is deleted.
+
+=item * C<< $msg->encryption_config() >> / C<< $msg->encryption_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate::EncryptionConfig>)
+
+Optional. Encryption settings for encrypting workflow template job
+arguments.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplatePlacement
+
+Specifies workflow execution target.
+
+Either `managed_cluster` or `cluster_selector` is required.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->managed_cluster() >> / C<< $msg->managed_cluster($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::ManagedCluster>)
+
+A cluster that is managed by the workflow.
+
+=item * C<< $msg->cluster_selector() >> / C<< $msg->cluster_selector($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterSelector>)
+
+Optional. A selector that chooses target cluster for jobs based
+on metadata.
+
+The selector is evaluated at the time each job is submitted.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::ManagedCluster
+
+Cluster that is managed by the workflow.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Required. The cluster name prefix. A unique cluster name will be formed by
+appending a random suffix.
+
+The name must contain only lower-case letters (a-z), numbers (0-9),
+and hyphens (-). Must begin with a letter. Cannot begin or end with
+hyphen. Must consist of between 2 and 35 characters.
+
+=item * C<< $msg->config() >> / C<< $msg->config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ClusterConfig>)
+
+Required. The cluster configuration.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::ManagedCluster::LabelsEntry>)
+
+Optional. The labels to associate with this cluster.
+
+Label keys must be between 1 and 63 characters long, and must conform to
+the following PCRE regular expression:
+[\p{Ll}\p{Lo}][\p{Ll}\p{Lo}\p{N}_-]{0,62}
+
+Label values must be between 1 and 63 characters long, and must conform to
+the following PCRE regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63}
+
+No more than 32 labels can be associated with a given cluster.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterSelector
+
+A selector that chooses target cluster for jobs based on metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<String>
+
+Optional. The zone where workflow process executes. This parameter does not
+affect the selection of the cluster.
+
+If unspecified, the zone of the first cluster matching the selector
+is used.
+
+=item * C<< $msg->cluster_labels() >> / C<< $msg->cluster_labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterSelector::ClusterLabelsEntry>)
+
+Required. The cluster labels. Cluster must have all labels
+to match.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::OrderedJob
+
+A job executed by the workflow.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->step_id() >> / C<< $msg->step_id($value) >>
+
+Type: C<String>
+
+Required. The step id. The id must be unique among all jobs
+within the template.
+
+The step id is used as prefix for job id, as job
+`goog-dataproc-workflow-step-id` label, and in
+[prerequisiteStepIds][google.cloud.dataproc.v1.OrderedJob.prerequisite_step_ids]
+field from other steps.
+
+The id must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). Cannot begin or end with underscore
+or hyphen. Must consist of between 3 and 50 characters.
+
+=item * C<< $msg->hadoop_job() >> / C<< $msg->hadoop_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::HadoopJob>)
+
+Optional. Job is a Hadoop job.
+
+=item * C<< $msg->spark_job() >> / C<< $msg->spark_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkJob>)
+
+Optional. Job is a Spark job.
+
+=item * C<< $msg->pyspark_job() >> / C<< $msg->pyspark_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PySparkJob>)
+
+Optional. Job is a PySpark job.
+
+=item * C<< $msg->hive_job() >> / C<< $msg->hive_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::HiveJob>)
+
+Optional. Job is a Hive job.
+
+=item * C<< $msg->pig_job() >> / C<< $msg->pig_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PigJob>)
+
+Optional. Job is a Pig job.
+
+=item * C<< $msg->spark_r_job() >> / C<< $msg->spark_r_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkRJob>)
+
+Optional. Job is a SparkR job.
+
+=item * C<< $msg->spark_sql_job() >> / C<< $msg->spark_sql_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkSqlJob>)
+
+Optional. Job is a SparkSql job.
+
+=item * C<< $msg->presto_job() >> / C<< $msg->presto_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PrestoJob>)
+
+Optional. Job is a Presto job.
+
+=item * C<< $msg->trino_job() >> / C<< $msg->trino_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::TrinoJob>)
+
+Optional. Job is a Trino job.
+
+=item * C<< $msg->flink_job() >> / C<< $msg->flink_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::FlinkJob>)
+
+Optional. Job is a Flink job.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::OrderedJob::LabelsEntry>)
+
+Optional. The labels to associate with this job.
+
+Label keys must be between 1 and 63 characters long, and must conform to
+the following regular expression:
+[\p{Ll}\p{Lo}][\p{Ll}\p{Lo}\p{N}_-]{0,62}
+
+Label values must be between 1 and 63 characters long, and must conform to
+the following regular expression: [\p{Ll}\p{Lo}\p{N}_-]{0,63}
+
+No more than 32 labels can be associated with a given job.
+
+=item * C<< $msg->scheduling() >> / C<< $msg->scheduling($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::JobScheduling>)
+
+Optional. Job scheduling configuration.
+
+=item * C<< $msg->prerequisite_step_ids() >> / C<< $msg->prerequisite_step_ids($value) >>
+
+Type: C<String>
+
+Optional. The optional list of prerequisite job step_ids.
+If not specified, the job will start at the beginning of workflow.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::TemplateParameter
+
+A configurable parameter that replaces one or more fields in the template.
+Parameterizable fields:
+- Labels
+- File uris
+- Job properties
+- Job arguments
+- Script variables
+- Main class (in HadoopJob and SparkJob)
+- Zone (in ClusterSelector)
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Parameter name.
+The parameter name is used as the key, and paired with the
+parameter value, which are passed to the template when the template
+is instantiated.
+The name must contain only capital letters (A-Z), numbers (0-9), and
+underscores (_), and must not start with a number. The maximum length is
+40 characters.
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<String>
+
+Required. Paths to all fields that the parameter replaces.
+A field is allowed to appear in at most one parameter's list of field
+paths.
+
+A field path is similar in syntax to a
+[google.protobuf.FieldMask][google.protobuf.FieldMask]. For example, a
+field path that references the zone field of a workflow template's cluster
+selector would be specified as `placement.clusterSelector.zone`.
+
+Also, field paths can reference fields using the following syntax:
+
+* Values in maps can be referenced by key:
+    * labels['key']
+    * placement.clusterSelector.clusterLabels['key']
+    * placement.managedCluster.labels['key']
+    * placement.clusterSelector.clusterLabels['key']
+    * jobs['step-id'].labels['key']
+
+* Jobs in the jobs list can be referenced by step-id:
+    * jobs['step-id'].hadoopJob.mainJarFileUri
+    * jobs['step-id'].hiveJob.queryFileUri
+    * jobs['step-id'].pySparkJob.mainPythonFileUri
+    * jobs['step-id'].hadoopJob.jarFileUris[0]
+    * jobs['step-id'].hadoopJob.archiveUris[0]
+    * jobs['step-id'].hadoopJob.fileUris[0]
+    * jobs['step-id'].pySparkJob.pythonFileUris[0]
+
+* Items in repeated fields can be referenced by a zero-based index:
+    * jobs['step-id'].sparkJob.args[0]
+
+* Other examples:
+    * jobs['step-id'].hadoopJob.properties['key']
+    * jobs['step-id'].hadoopJob.args[0]
+    * jobs['step-id'].hiveJob.scriptVariables['key']
+    * jobs['step-id'].hadoopJob.mainJarFileUri
+    * placement.clusterSelector.zone
+
+It may not be possible to parameterize maps and repeated fields in their
+entirety since only individual map values and individual items in repeated
+fields can be referenced. For example, the following field paths are
+invalid:
+
+- placement.clusterSelector.clusterLabels
+- jobs['step-id'].sparkJob.args
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Brief description of the parameter.
+Must not exceed 1024 characters.
+
+=item * C<< $msg->validation() >> / C<< $msg->validation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::ParameterValidation>)
+
+Optional. Validation rules to be applied to this parameter's value.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::ParameterValidation
+
+Configuration for parameter validation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->regex() >> / C<< $msg->regex($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::RegexValidation>)
+
+Validation based on regular expressions.
+
+=item * C<< $msg->values() >> / C<< $msg->values($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::ValueValidation>)
+
+Validation based on a list of allowed values.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::RegexValidation
+
+Validation based on regular expressions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->regexes() >> / C<< $msg->regexes($value) >>
+
+Type: C<String>
+
+Required. RE2 regular expressions used to validate the parameter's value.
+The value must match the regex in its entirety (substring
+matches are not sufficient).
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::ValueValidation
+
+Validation based on a list of allowed values.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->values() >> / C<< $msg->values($value) >>
+
+Type: C<String>
+
+Required. List of allowed values for the parameter.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowMetadata
+
+A Dataproc workflow template resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->template() >> / C<< $msg->template($value) >>
+
+Type: C<String>
+
+Output only. The resource name of the workflow template as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.workflowTemplates`, the resource name of the
+  template has the following format:
+  `projects/{project_id}/regions/{region}/workflowTemplates/{template_id}`
+
+* For `projects.locations.workflowTemplates`, the resource name of the
+  template has the following format:
+  `projects/{project_id}/locations/{location}/workflowTemplates/{template_id}`
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Int32>
+
+Output only. The version of template at the time of
+workflow instantiation.
+
+=item * C<< $msg->create_cluster() >> / C<< $msg->create_cluster($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterOperation>)
+
+Output only. The create cluster operation metadata.
+
+=item * C<< $msg->graph() >> / C<< $msg->graph($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowGraph>)
+
+Output only. The workflow graph.
+
+=item * C<< $msg->delete_cluster() >> / C<< $msg->delete_cluster($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterOperation>)
+
+Output only. The delete cluster operation metadata.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::WorkflowMetadata::State>)
+
+Output only. The workflow state.
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Output only. The name of the target cluster.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowMetadata::ParametersEntry>)
+
+Map from parameter names to values that were used for those parameters.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Workflow start time.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Workflow end time.
+
+=item * C<< $msg->cluster_uuid() >> / C<< $msg->cluster_uuid($value) >>
+
+Type: C<String>
+
+Output only. The UUID of target cluster.
+
+=item * C<< $msg->dag_timeout() >> / C<< $msg->dag_timeout($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Output only. The timeout duration for the DAG of jobs, expressed in seconds
+(see [JSON representation of
+duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+=item * C<< $msg->dag_start_time() >> / C<< $msg->dag_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. DAG start time, only set for workflows with
+[dag_timeout][google.cloud.dataproc.v1.WorkflowMetadata.dag_timeout] when
+DAG begins.
+
+=item * C<< $msg->dag_end_time() >> / C<< $msg->dag_end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. DAG end time, only set for workflows with
+[dag_timeout][google.cloud.dataproc.v1.WorkflowMetadata.dag_timeout] when
+DAG ends.
+
+=back
+
+=head3 Enum: WorkflowMetadata::State
+
+=over 4
+
+=item * C<UNKNOWN> => C<0>
+
+=item * C<PENDING> => C<1>
+
+=item * C<RUNNING> => C<2>
+
+=item * C<DONE> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::ClusterOperation
+
+The cluster operation triggered by a workflow.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->operation_id() >> / C<< $msg->operation_id($value) >>
+
+Type: C<String>
+
+Output only. The id of the cluster operation.
+
+=item * C<< $msg->error() >> / C<< $msg->error($value) >>
+
+Type: C<String>
+
+Output only. Error, if operation failed.
+
+=item * C<< $msg->done() >> / C<< $msg->done($value) >>
+
+Type: C<Bool>
+
+Output only. Indicates the operation is done.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowGraph
+
+The workflow graph.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->nodes() >> / C<< $msg->nodes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowNode>)
+
+Output only. The workflow nodes.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowNode
+
+The workflow node.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->step_id() >> / C<< $msg->step_id($value) >>
+
+Type: C<String>
+
+Output only. The name of the node.
+
+=item * C<< $msg->prerequisite_step_ids() >> / C<< $msg->prerequisite_step_ids($value) >>
+
+Type: C<String>
+
+Output only. Node's prerequisite nodes.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Output only. The job id; populated after the node enters RUNNING state.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::WorkflowNode::NodeState>)
+
+Output only. The node state.
+
+=item * C<< $msg->error() >> / C<< $msg->error($value) >>
+
+Type: C<String>
+
+Output only. The error detail.
+
+=back
+
+=head3 Enum: WorkflowNode::NodeState
+
+=over 4
+
+=item * C<NODE_STATE_UNSPECIFIED> => C<0>
+
+=item * C<BLOCKED> => C<1>
+
+=item * C<RUNNABLE> => C<2>
+
+=item * C<RUNNING> => C<3>
+
+=item * C<COMPLETED> => C<4>
+
+=item * C<FAILED> => C<5>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::CreateWorkflowTemplateRequest
+
+A request to create a workflow template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the region or location, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.workflowTemplates.create`, the resource name of the
+  region has the following format:
+  `projects/{project_id}/regions/{region}`
+
+* For `projects.locations.workflowTemplates.create`, the resource name of
+  the location has the following format:
+  `projects/{project_id}/locations/{location}`
+
+=item * C<< $msg->template() >> / C<< $msg->template($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate>)
+
+Required. The Dataproc workflow template to create.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::GetWorkflowTemplateRequest
+
+A request to fetch a workflow template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the workflow template, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.workflowTemplates.get`, the resource name of the
+  template has the following format:
+  `projects/{project_id}/regions/{region}/workflowTemplates/{template_id}`
+
+* For `projects.locations.workflowTemplates.get`, the resource name of the
+  template has the following format:
+  `projects/{project_id}/locations/{location}/workflowTemplates/{template_id}`
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Int32>
+
+Optional. The version of workflow template to retrieve. Only previously
+instantiated versions can be retrieved.
+
+If unspecified, retrieves the current version.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::InstantiateWorkflowTemplateRequest
+
+A request to instantiate a workflow template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the workflow template, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.workflowTemplates.instantiate`, the resource name
+of the template has the following format:
+  `projects/{project_id}/regions/{region}/workflowTemplates/{template_id}`
+
+* For `projects.locations.workflowTemplates.instantiate`, the resource name
+  of the template has the following format:
+  `projects/{project_id}/locations/{location}/workflowTemplates/{template_id}`
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Int32>
+
+Optional. The version of workflow template to instantiate. If specified,
+the workflow will be instantiated only if the current version of
+the workflow template has the supplied version.
+
+This option cannot be used to instantiate a previous version of
+workflow template.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A tag that prevents multiple concurrent workflow
+instances with the same tag from running. This mitigates risk of
+concurrent instances started due to retries.
+
+It is recommended to always set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The tag must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::InstantiateWorkflowTemplateRequest::ParametersEntry>)
+
+Optional. Map from parameter names to values that should be used for those
+parameters. Values may not exceed 1000 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::InstantiateInlineWorkflowTemplateRequest
+
+A request to instantiate an inline workflow template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the region or location, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.workflowTemplates,instantiateinline`, the resource
+  name of the region has the following format:
+  `projects/{project_id}/regions/{region}`
+
+* For `projects.locations.workflowTemplates.instantiateinline`, the
+  resource name of the location has the following format:
+  `projects/{project_id}/locations/{location}`
+
+=item * C<< $msg->template() >> / C<< $msg->template($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate>)
+
+Required. The workflow template to instantiate.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A tag that prevents multiple concurrent workflow
+instances with the same tag from running. This mitigates risk of
+concurrent instances started due to retries.
+
+It is recommended to always set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The tag must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::UpdateWorkflowTemplateRequest
+
+A request to update a workflow template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->template() >> / C<< $msg->template($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate>)
+
+Required. The updated workflow template.
+
+The `template.version` field must match the current version.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::ListWorkflowTemplatesRequest
+
+A request to list workflow templates in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the region or location, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.workflowTemplates,list`, the resource
+  name of the region has the following format:
+  `projects/{project_id}/regions/{region}`
+
+* For `projects.locations.workflowTemplates.list`, the
+  resource name of the location has the following format:
+  `projects/{project_id}/locations/{location}`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of results to return in each response.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The page token, returned by a previous call, to request the
+next page of results.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::ListWorkflowTemplatesResponse
+
+A response to a request to list workflow templates in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->templates() >> / C<< $msg->templates($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate>)
+
+Output only. WorkflowTemplates list.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Output only. This token is included in the response if there are more
+results to fetch. To fetch additional results, provide this value as the
+page_token in a subsequent <code>ListWorkflowTemplatesRequest</code>.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Output only. List of workflow templates that could not be included in the
+response. Attempting to get one of these resources may indicate why it was
+not included in the list response.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::WorkflowTemplates::DeleteWorkflowTemplateRequest
+
+A request to delete a workflow template.
+
+Currently started workflows will remain running.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the workflow template, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.workflowTemplates.delete`, the resource name
+of the template has the following format:
+  `projects/{project_id}/regions/{region}/workflowTemplates/{template_id}`
+
+* For `projects.locations.workflowTemplates.instantiate`, the resource name
+  of the template has the following format:
+  `projects/{project_id}/locations/{location}/workflowTemplates/{template_id}`
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Int32>
+
+Optional. The version of workflow template to delete. If specified,
+will only delete the template if the current server version matches
+specified version.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::WorkflowTemplates::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

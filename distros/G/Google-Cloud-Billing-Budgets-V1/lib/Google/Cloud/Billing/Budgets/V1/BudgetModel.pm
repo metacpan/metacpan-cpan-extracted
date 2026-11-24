@@ -1,0 +1,926 @@
+package Google::Cloud::Billing::Budgets::V1::BudgetModel;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Protobuf::Struct };
+    eval { require Google::Type::Date };
+    eval { require Google::Type::Money };
+    my $descriptor_b64 = <<'EOF';
+CjJnb29nbGUvY2xvdWQvYmlsbGluZy9idWRnZXRzL3YxL2J1ZGdldF9tb2RlbC5wcm90bxIf
+Z29vZ2xlLmNsb3VkLmJpbGxpbmcuYnVkZ2V0cy52MRofZ29vZ2xlL2FwaS9maWVsZF9iZWhh
+dmlvci5wcm90bxoZZ29vZ2xlL2FwaS9yZXNvdXJjZS5wcm90bxocZ29vZ2xlL3Byb3RvYnVm
+L3N0cnVjdC5wcm90bxoWZ29vZ2xlL3R5cGUvZGF0ZS5wcm90bxoXZ29vZ2xlL3R5cGUvbW9u
+ZXkucHJvdG8ioQQKBkJ1ZGdldBIXCgRuYW1lGAEgASgJQgPgQQNSBG5hbWUSIQoMZGlzcGxh
+eV9uYW1lGAIgASgJUgtkaXNwbGF5TmFtZRJRCg1idWRnZXRfZmlsdGVyGAMgASgLMicuZ29v
+Z2xlLmNsb3VkLmJpbGxpbmcuYnVkZ2V0cy52MS5GaWx0ZXJCA+BBAVIMYnVkZ2V0RmlsdGVy
+EkoKBmFtb3VudBgEIAEoCzItLmdvb2dsZS5jbG91ZC5iaWxsaW5nLmJ1ZGdldHMudjEuQnVk
+Z2V0QW1vdW50QgPgQQJSBmFtb3VudBJcCg90aHJlc2hvbGRfcnVsZXMYBSADKAsyLi5nb29n
+bGUuY2xvdWQuYmlsbGluZy5idWRnZXRzLnYxLlRocmVzaG9sZFJ1bGVCA+BBAVIOdGhyZXNo
+b2xkUnVsZXMSZgoSbm90aWZpY2F0aW9uc19ydWxlGAYgASgLMjIuZ29vZ2xlLmNsb3VkLmJp
+bGxpbmcuYnVkZ2V0cy52MS5Ob3RpZmljYXRpb25zUnVsZUID4EEBUhFub3RpZmljYXRpb25z
+UnVsZRIXCgRldGFnGAcgASgJQgPgQQFSBGV0YWc6XepBWgokYmlsbGluZ2J1ZGdldHMuZ29v
+Z2xlYXBpcy5jb20vQnVkZ2V0EjJiaWxsaW5nQWNjb3VudHMve2JpbGxpbmdfYWNjb3VudH0v
+YnVkZ2V0cy97YnVkZ2V0fSLDAQoMQnVkZ2V0QW1vdW50Ej8KEHNwZWNpZmllZF9hbW91bnQY
+ASABKAsyEi5nb29nbGUudHlwZS5Nb25leUgAUg9zcGVjaWZpZWRBbW91bnQSYQoSbGFzdF9w
+ZXJpb2RfYW1vdW50GAIgASgLMjEuZ29vZ2xlLmNsb3VkLmJpbGxpbmcuYnVkZ2V0cy52MS5M
+YXN0UGVyaW9kQW1vdW50SABSEGxhc3RQZXJpb2RBbW91bnRCDwoNYnVkZ2V0X2Ftb3VudCIS
+ChBMYXN0UGVyaW9kQW1vdW50IuYBCg1UaHJlc2hvbGRSdWxlEjAKEXRocmVzaG9sZF9wZXJj
+ZW50GAEgASgBQgPgQQJSEHRocmVzaG9sZFBlcmNlbnQSWgoLc3BlbmRfYmFzaXMYAiABKA4y
+NC5nb29nbGUuY2xvdWQuYmlsbGluZy5idWRnZXRzLnYxLlRocmVzaG9sZFJ1bGUuQmFzaXNC
+A+BBAVIKc3BlbmRCYXNpcyJHCgVCYXNpcxIVChFCQVNJU19VTlNQRUNJRklFRBAAEhEKDUNV
+UlJFTlRfU1BFTkQQARIUChBGT1JFQ0FTVEVEX1NQRU5EEAIizAIKEU5vdGlmaWNhdGlvbnNS
+dWxlEiYKDHB1YnN1Yl90b3BpYxgBIAEoCUID4EEBUgtwdWJzdWJUb3BpYxIqCg5zY2hlbWFf
+dmVyc2lvbhgCIAEoCUID4EEBUg1zY2hlbWFWZXJzaW9uEk0KIG1vbml0b3Jpbmdfbm90aWZp
+Y2F0aW9uX2NoYW5uZWxzGAMgAygJQgPgQQFSHm1vbml0b3JpbmdOb3RpZmljYXRpb25DaGFu
+bmVscxJICh5kaXNhYmxlX2RlZmF1bHRfaWFtX3JlY2lwaWVudHMYBCABKAhCA+BBAVIbZGlz
+YWJsZURlZmF1bHRJYW1SZWNpcGllbnRzEkoKH2VuYWJsZV9wcm9qZWN0X2xldmVsX3JlY2lw
+aWVudHMYBSABKAhCA+BBAVIcZW5hYmxlUHJvamVjdExldmVsUmVjaXBpZW50cyLNBgoGRmls
+dGVyEh8KCHByb2plY3RzGAEgAygJQgPgQQFSCHByb2plY3RzEjIKEnJlc291cmNlX2FuY2Vz
+dG9ycxgCIAMoCUID4EEBUhFyZXNvdXJjZUFuY2VzdG9ycxImCgxjcmVkaXRfdHlwZXMYByAD
+KAlCA+BBAVILY3JlZGl0VHlwZXMSdwoWY3JlZGl0X3R5cGVzX3RyZWF0bWVudBgEIAEoDjI8
+Lmdvb2dsZS5jbG91ZC5iaWxsaW5nLmJ1ZGdldHMudjEuRmlsdGVyLkNyZWRpdFR5cGVzVHJl
+YXRtZW50QgPgQQFSFGNyZWRpdFR5cGVzVHJlYXRtZW50Eh8KCHNlcnZpY2VzGAMgAygJQgPg
+QQFSCHNlcnZpY2VzEiUKC3N1YmFjY291bnRzGAUgAygJQgPgQQFSC3N1YmFjY291bnRzElAK
+BmxhYmVscxgGIAMoCzIzLmdvb2dsZS5jbG91ZC5iaWxsaW5nLmJ1ZGdldHMudjEuRmlsdGVy
+LkxhYmVsc0VudHJ5QgPgQQFSBmxhYmVscxJfCg9jYWxlbmRhcl9wZXJpb2QYCCABKA4yLy5n
+b29nbGUuY2xvdWQuYmlsbGluZy5idWRnZXRzLnYxLkNhbGVuZGFyUGVyaW9kQgPgQQFIAFIO
+Y2FsZW5kYXJQZXJpb2QSWQoNY3VzdG9tX3BlcmlvZBgJIAEoCzItLmdvb2dsZS5jbG91ZC5i
+aWxsaW5nLmJ1ZGdldHMudjEuQ3VzdG9tUGVyaW9kQgPgQQFIAFIMY3VzdG9tUGVyaW9kGlUK
+C0xhYmVsc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5EjAKBXZhbHVlGAIgASgLMhouZ29vZ2xl
+LnByb3RvYnVmLkxpc3RWYWx1ZVIFdmFsdWU6AjgBIo8BChRDcmVkaXRUeXBlc1RyZWF0bWVu
+dBImCiJDUkVESVRfVFlQRVNfVFJFQVRNRU5UX1VOU1BFQ0lGSUVEEAASFwoTSU5DTFVERV9B
+TExfQ1JFRElUUxABEhcKE0VYQ0xVREVfQUxMX0NSRURJVFMQAhIdChlJTkNMVURFX1NQRUNJ
+RklFRF9DUkVESVRTEANCDgoMdXNhZ2VfcGVyaW9kIngKDEN1c3RvbVBlcmlvZBI1CgpzdGFy
+dF9kYXRlGAEgASgLMhEuZ29vZ2xlLnR5cGUuRGF0ZUID4EECUglzdGFydERhdGUSMQoIZW5k
+X2RhdGUYAiABKAsyES5nb29nbGUudHlwZS5EYXRlQgPgQQFSB2VuZERhdGUqUwoOQ2FsZW5k
+YXJQZXJpb2QSHwobQ0FMRU5EQVJfUEVSSU9EX1VOU1BFQ0lGSUVEEAASCQoFTU9OVEgQARIL
+CgdRVUFSVEVSEAISCAoEWUVBUhADQngKI2NvbS5nb29nbGUuY2xvdWQuYmlsbGluZy5idWRn
+ZXRzLnYxQhBCdWRnZXRNb2RlbFByb3RvUAFaPWNsb3VkLmdvb2dsZS5jb20vZ28vYmlsbGlu
+Zy9idWRnZXRzL2FwaXYxL2J1ZGdldHNwYjtidWRnZXRzcGJK3IQBCgcSBQ4A8wIBCrwECgEM
+EgMOABIysQQgQ29weXJpZ2h0IDIwMjUgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRo
+ZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1h
+eSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNl
+bnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0
+dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1
+aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdh
+cmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFu
+ICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBB
+TlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBm
+b3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxp
+bWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAoCgkKAgMAEgMSACkKCQoC
+AwESAxMAIwoJCgIDAhIDFAAmCgkKAgMDEgMVACAKCQoCAwQSAxYAIQoICgEIEgMYAFQKCQoC
+CAsSAxgAVAoICgEIEgMZACIKCQoCCAoSAxkAIgoICgEIEgMaADEKCQoCCAgSAxoAMQoICgEI
+EgMbADwKCQoCCAESAxsAPArXAgoCBAASBCIASwEaygIgQSBidWRnZXQgaXMgYSBwbGFuIHRo
+YXQgZGVzY3JpYmVzIHdoYXQgeW91IGV4cGVjdCB0byBzcGVuZCBvbiBDbG91ZAogcHJvamVj
+dHMsIHBsdXMgdGhlIHJ1bGVzIHRvIGV4ZWN1dGUgYXMgc3BlbmQgaXMgdHJhY2tlZCBhZ2Fp
+bnN0IHRoYXQgcGxhbiwKIChmb3IgZXhhbXBsZSwgc2VuZCBhbiBhbGVydCB3aGVuIDkwJSBv
+ZiB0aGUgdGFyZ2V0IHNwZW5kIGlzIG1ldCkuCiBUaGUgYnVkZ2V0IHRpbWUgcGVyaW9kIGlz
+IGNvbmZpZ3VyYWJsZSwgd2l0aCBvcHRpb25zIHN1Y2ggYXMgbW9udGggKGRlZmF1bHQpLAog
+cXVhcnRlciwgeWVhciwgb3IgY3VzdG9tIHRpbWUgcGVyaW9kLgoKCgoDBAABEgMiCA4KCwoD
+BAAHEgQjAiYECg0KBQQAB50IEgQjAiYECrwBCgQEAAIAEgMrAj4argEgT3V0cHV0IG9ubHku
+IFJlc291cmNlIG5hbWUgb2YgdGhlIGJ1ZGdldC4KIFRoZSByZXNvdXJjZSBuYW1lIGltcGxp
+ZXMgdGhlIHNjb3BlIG9mIGEgYnVkZ2V0LiBWYWx1ZXMgYXJlIG9mIHRoZSBmb3JtCiBgYmls
+bGluZ0FjY291bnRzL3tiaWxsaW5nQWNjb3VudElkfS9idWRnZXRzL3tidWRnZXRJZH1gLgoK
+DAoFBAACAAUSAysCCAoMCgUEAAIAARIDKwkNCgwKBQQAAgADEgMrEBEKDAoFBAACAAgSAysS
+PQoPCggEAAIACJwIABIDKxM8CmcKBAQAAgESAy8CGhpaIFVzZXIgZGF0YSBmb3IgZGlzcGxh
+eSBuYW1lIGluIFVJLiBUaGUgbmFtZSBtdXN0IGJlIGxlc3MgdGhhbiBvciBlcXVhbCB0byA2
+MAogY2hhcmFjdGVycy4KCgwKBQQAAgEFEgMvAggKDAoFBAACAQESAy8JFQoMCgUEAAIBAxID
+LxgZCtMBCgQEAAICEgM0AkQaxQEgT3B0aW9uYWwuIEZpbHRlcnMgdGhhdCBkZWZpbmUgd2hp
+Y2ggcmVzb3VyY2VzIGFyZSB1c2VkIHRvIGNvbXB1dGUgdGhlCiBhY3R1YWwgc3BlbmQgYWdh
+aW5zdCB0aGUgYnVkZ2V0IGFtb3VudCwgc3VjaCBhcyBwcm9qZWN0cywgc2VydmljZXMsIGFu
+ZCB0aGUKIGJ1ZGdldCdzIHRpbWUgcGVyaW9kLCBhcyB3ZWxsIGFzIG90aGVyIGZpbHRlcnMu
+CgoMCgUEAAICBhIDNAIICgwKBQQAAgIBEgM0CRYKDAoFBAACAgMSAzQZGgoMCgUEAAICCBID
+NBtDCg8KCAQAAgIInAgAEgM0HEIKKQoEBAACAxIDNwJDGhwgUmVxdWlyZWQuIEJ1ZGdldGVk
+IGFtb3VudC4KCgwKBQQAAgMGEgM3Ag4KDAoFBAACAwESAzcPFQoMCgUEAAIDAxIDNxgZCgwK
+BQQAAgMIEgM3GkIKDwoIBAACAwicCAASAzcbQQryAQoEBAACBBIEPwJALxrjASBPcHRpb25h
+bC4gUnVsZXMgdGhhdCB0cmlnZ2VyIGFsZXJ0cyAobm90aWZpY2F0aW9ucyBvZiB0aHJlc2hv
+bGRzCiBiZWluZyBjcm9zc2VkKSB3aGVuIHNwZW5kIGV4Y2VlZHMgdGhlIHNwZWNpZmllZCBw
+ZXJjZW50YWdlcyBvZiB0aGUgYnVkZ2V0LgoKIE9wdGlvbmFsIGZvciBgcHVic3ViVG9waWNg
+IG5vdGlmaWNhdGlvbnMuCgogUmVxdWlyZWQgaWYgdXNpbmcgZW1haWwgbm90aWZpY2F0aW9u
+cy4KCgwKBQQAAgQEEgM/AgoKDAoFBAACBAYSAz8LGAoMCgUEAAIEARIDPxkoCgwKBQQAAgQD
+EgM/KywKDAoFBAACBAgSA0AGLgoPCggEAAIECJwIABIDQActCmUKBAQAAgUSBEQCRS8aVyBP
+cHRpb25hbC4gUnVsZXMgdG8gYXBwbHkgdG8gbm90aWZpY2F0aW9ucyBzZW50IGJhc2VkIG9u
+IGJ1ZGdldCBzcGVuZCBhbmQKIHRocmVzaG9sZHMuCgoMCgUEAAIFBhIDRAITCgwKBQQAAgUB
+EgNEFCYKDAoFBAACBQMSA0QpKgoMCgUEAAIFCBIDRQYuCg8KCAQAAgUInAgAEgNFBy0KpwEK
+BAQAAgYSA0oCOxqZASBPcHRpb25hbC4gRXRhZyB0byB2YWxpZGF0ZSB0aGF0IHRoZSBvYmpl
+Y3QgaXMgdW5jaGFuZ2VkIGZvciBhCiByZWFkLW1vZGlmeS13cml0ZSBvcGVyYXRpb24uCiBB
+biBlbXB0eSBldGFnIGNhdXNlcyBhbiB1cGRhdGUgdG8gb3ZlcndyaXRlIG90aGVyIGNoYW5n
+ZXMuCgoMCgUEAAIGBRIDSgIICgwKBQQAAgYBEgNKCQ0KDAoFBAACBgMSA0oQEQoMCgUEAAIG
+CBIDShI6Cg8KCAQAAgYInAgAEgNKEzkKOAoCBAESBE4AXwEaLCBUaGUgYnVkZ2V0ZWQgYW1v
+dW50IGZvciBlYWNoIHVzYWdlIHBlcmlvZC4KCgoKAwQBARIDTggUCkMKBAQBCAASBFACXgMa
+NSBTcGVjaWZpY2F0aW9uIGZvciB3aGF0IGFtb3VudCB0byB1c2UgYXMgdGhlIGJ1ZGdldC4K
+CgwKBQQBCAABEgNQCBUKuQIKBAQBAgASA1YEKxqrAiBBIHNwZWNpZmllZCBhbW91bnQgdG8g
+dXNlIGFzIHRoZSBidWRnZXQuCiBgY3VycmVuY3lfY29kZWAgaXMgb3B0aW9uYWwuIElmIHNw
+ZWNpZmllZCB3aGVuIGNyZWF0aW5nIGEgYnVkZ2V0LCBpdCBtdXN0CiBtYXRjaCB0aGUgY3Vy
+cmVuY3kgb2YgdGhlIGJpbGxpbmcgYWNjb3VudC4gSWYgc3BlY2lmaWVkIHdoZW4gdXBkYXRp
+bmcgYQogYnVkZ2V0LCBpdCBtdXN0IG1hdGNoIHRoZSBjdXJyZW5jeV9jb2RlIG9mIHRoZSBl
+eGlzdGluZyBidWRnZXQuCiBUaGUgYGN1cnJlbmN5X2NvZGVgIGlzIHByb3ZpZGVkIG9uIG91
+dHB1dC4KCgwKBQQBAgAGEgNWBBUKDAoFBAECAAESA1YWJgoMCgUEAQIAAxIDVikqCuUCCgQE
+AQIBEgNdBCwa1wIgVXNlIHRoZSBsYXN0IHBlcmlvZCdzIGFjdHVhbCBzcGVuZCBhcyB0aGUg
+YnVkZ2V0IGZvciB0aGUgcHJlc2VudCBwZXJpb2QuCiBMYXN0UGVyaW9kQW1vdW50IGNhbiBv
+bmx5IGJlIHNldCB3aGVuIHRoZSBidWRnZXQncyB0aW1lIHBlcmlvZCBpcyBhCiBbRmlsdGVy
+LmNhbGVuZGFyX3BlcmlvZF1bZ29vZ2xlLmNsb3VkLmJpbGxpbmcuYnVkZ2V0cy52MS5GaWx0
+ZXIuY2FsZW5kYXJfcGVyaW9kXS4KIEl0IGNhbm5vdCBiZSBzZXQgaW4gY29tYmluYXRpb24g
+d2l0aAogW0ZpbHRlci5jdXN0b21fcGVyaW9kXVtnb29nbGUuY2xvdWQuYmlsbGluZy5idWRn
+ZXRzLnYxLkZpbHRlci5jdXN0b21fcGVyaW9kXS4KCgwKBQQBAgEGEgNdBBQKDAoFBAECAQES
+A10VJwoMCgUEAQIBAxIDXSorCqMDCgIEAhIDaAAbGpcDIERlc2NyaWJlcyBhIGJ1ZGdldCBh
+bW91bnQgdGFyZ2V0ZWQgdG8gdGhlIGxhc3QKIFtGaWx0ZXIuY2FsZW5kYXJfcGVyaW9kXVtn
+b29nbGUuY2xvdWQuYmlsbGluZy5idWRnZXRzLnYxLkZpbHRlci5jYWxlbmRhcl9wZXJpb2Rd
+CiBzcGVuZC4gQXQgdGhpcyB0aW1lLCB0aGUgYW1vdW50IGlzIGF1dG9tYXRpY2FsbHkgMTAw
+JSBvZiB0aGUgbGFzdCBjYWxlbmRhcgogcGVyaW9kJ3Mgc3BlbmQ7IHRoYXQgaXMsIHRoZXJl
+IGFyZSBubyBvdGhlciBvcHRpb25zIHlldC4KIExhc3RQZXJpb2RBbW91bnQgY2Fubm90IGJl
+IHNldCBmb3IgYSBidWRnZXQgY29uZmlndXJlZCB3aXRoCiBhCiBbRmlsdGVyLmN1c3RvbV9w
+ZXJpb2RdW2dvb2dsZS5jbG91ZC5iaWxsaW5nLmJ1ZGdldHMudjEuRmlsdGVyLmN1c3RvbV9w
+ZXJpb2RdLgoKCgoDBAIBEgNoCBgKxgcKAgQDEgaAAQCaAQEatwcgVGhyZXNob2xkUnVsZSBj
+b250YWlucyB0aGUgZGVmaW5pdGlvbiBvZiBhIHRocmVzaG9sZC4gVGhyZXNob2xkIHJ1bGVz
+IGRlZmluZQogdGhlIHRyaWdnZXJpbmcgZXZlbnRzIHVzZWQgdG8gZ2VuZXJhdGUgYSBidWRn
+ZXQgbm90aWZpY2F0aW9uIGVtYWlsLiBXaGVuIGEKIHRocmVzaG9sZCBpcyBjcm9zc2VkIChz
+cGVuZCBleGNlZWRzIHRoZSBzcGVjaWZpZWQgcGVyY2VudGFnZXMgb2YgdGhlCiBidWRnZXQp
+LCBidWRnZXQgYWxlcnQgZW1haWxzIGFyZSBzZW50IHRvIHRoZSBlbWFpbCByZWNpcGllbnRz
+IHlvdSBzcGVjaWZ5CiBpbiB0aGUKIFtOb3RpZmljYXRpb25zUnVsZV0oI25vdGlmaWNhdGlv
+bnNydWxlKS4KCiBUaHJlc2hvbGQgcnVsZXMgYWxzbyBhZmZlY3QgdGhlIGZpZWxkcyBpbmNs
+dWRlZCBpbiB0aGUKIFtKU09OIGRhdGEKIG9iamVjdF0oaHR0cHM6Ly9jbG91ZC5nb29nbGUu
+Y29tL2JpbGxpbmcvZG9jcy9ob3ctdG8vYnVkZ2V0cy1wcm9ncmFtbWF0aWMtbm90aWZpY2F0
+aW9ucyNub3RpZmljYXRpb25fZm9ybWF0KQogc2VudCB0byBhIFB1Yi9TdWIgdG9waWMuCgog
+VGhyZXNob2xkIHJ1bGVzIGFyZSBfcmVxdWlyZWRfIGlmIHVzaW5nIGVtYWlsIG5vdGlmaWNh
+dGlvbnMuCgogVGhyZXNob2xkIHJ1bGVzIGFyZSBfb3B0aW9uYWxfIGlmIG9ubHkgc2V0dGlu
+ZyBhCiBbYHB1YnN1YlRvcGljYCBOb3RpZmljYXRpb25zUnVsZV0oI05vdGlmaWNhdGlvbnNS
+dWxlKSwKIHVubGVzcyB5b3Ugd2FudCB5b3VyIEpTT04gZGF0YSBvYmplY3QgdG8gaW5jbHVk
+ZSBkYXRhIGFib3V0IHRoZSB0aHJlc2hvbGRzCiB5b3Ugc2V0LgoKIEZvciBtb3JlIGluZm9y
+bWF0aW9uLCBzZWUKIFtzZXQgYnVkZ2V0IHRocmVzaG9sZCBydWxlcyBhbmQKIGFjdGlvbnNd
+KGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9iaWxsaW5nL2RvY3MvaG93LXRvL2J1ZGdldHMj
+YnVkZ2V0LWFjdGlvbnMpLgoKCwoDBAMBEgSAAQgVClgKBAQDBAASBoIBApABAxpIIFRoZSB0
+eXBlIG9mIGJhc2lzIHVzZWQgdG8gZGV0ZXJtaW5lIGlmIHNwZW5kIGhhcyBwYXNzZWQgdGhl
+IHRocmVzaG9sZC4KCg0KBQQDBAABEgSCAQcMCi4KBgQDBAACABIEhAEEGhoeIFVuc3BlY2lm
+aWVkIHRocmVzaG9sZCBiYXNpcy4KCg8KBwQDBAACAAESBIQBBBUKDwoHBAMEAAIAAhIEhAEY
+GQpWCgYEAwQAAgESBIcBBBYaRiBVc2UgY3VycmVudCBzcGVuZCBhcyB0aGUgYmFzaXMgZm9y
+IGNvbXBhcmlzb24gYWdhaW5zdCB0aGUgdGhyZXNob2xkLgoKDwoHBAMEAAIBARIEhwEEEQoP
+CgcEAwQAAgECEgSHARQVCvcCCgYEAwQAAgISBI8BBBka5gIgVXNlIGZvcmVjYXN0ZWQgc3Bl
+bmQgZm9yIHRoZSBwZXJpb2QgYXMgdGhlIGJhc2lzIGZvciBjb21wYXJpc29uIGFnYWluc3QK
+IHRoZSB0aHJlc2hvbGQuCiBGT1JFQ0FTVEVEX1NQRU5EIGNhbiBvbmx5IGJlIHNldCB3aGVu
+IHRoZSBidWRnZXQncyB0aW1lIHBlcmlvZCBpcyBhCiBbRmlsdGVyLmNhbGVuZGFyX3Blcmlv
+ZF1bZ29vZ2xlLmNsb3VkLmJpbGxpbmcuYnVkZ2V0cy52MS5GaWx0ZXIuY2FsZW5kYXJfcGVy
+aW9kXS4KIEl0IGNhbm5vdCBiZSBzZXQgaW4gY29tYmluYXRpb24gd2l0aAogW0ZpbHRlci5j
+dXN0b21fcGVyaW9kXVtnb29nbGUuY2xvdWQuYmlsbGluZy5idWRnZXRzLnYxLkZpbHRlci5j
+dXN0b21fcGVyaW9kXS4KCg8KBwQDBAACAgESBI8BBBQKDwoHBAMEAAICAhIEjwEXGAqaAQoE
+BAMCABIElQECSBqLASBSZXF1aXJlZC4gU2VuZCBhbiBhbGVydCB3aGVuIHRoaXMgdGhyZXNo
+b2xkIGlzIGV4Y2VlZGVkLgogVGhpcyBpcyBhIDEuMC1iYXNlZCBwZXJjZW50YWdlLCBzbyAw
+LjUgPSA1MCUuCiBWYWxpZGF0aW9uOiBub24tbmVnYXRpdmUgbnVtYmVyLgoKDQoFBAMCAAUS
+BJUBAggKDQoFBAMCAAESBJUBCRoKDQoFBAMCAAMSBJUBHR4KDQoFBAMCAAgSBJUBH0cKEAoI
+BAMCAAicCAASBJUBIEYKkQEKBAQDAgESBJkBAkEaggEgT3B0aW9uYWwuIFRoZSB0eXBlIG9m
+IGJhc2lzIHVzZWQgdG8gZGV0ZXJtaW5lIGlmIHNwZW5kIGhhcyBwYXNzZWQgdGhlCiB0aHJl
+c2hvbGQuIEJlaGF2aW9yIGRlZmF1bHRzIHRvIENVUlJFTlRfU1BFTkQgaWYgbm90IHNldC4K
+Cg0KBQQDAgEGEgSZAQIHCg0KBQQDAgEBEgSZAQgTCg0KBQQDAgEDEgSZARYXCg0KBQQDAgEI
+EgSZARhAChAKCAQDAgEInAgAEgSZARk/CmwKAgQEEgaeAQDsAQEaXiBOb3RpZmljYXRpb25z
+UnVsZSBkZWZpbmVzIG5vdGlmaWNhdGlvbnMgdGhhdCBhcmUgc2VudCBiYXNlZCBvbiBidWRn
+ZXQgc3BlbmQKIGFuZCB0aHJlc2hvbGRzLgoKCwoDBAQBEgSeAQgZCoQLCgQEBAIAEgS5AQJD
+GvUKIE9wdGlvbmFsLiBUaGUgbmFtZSBvZiB0aGUgUHViL1N1YiB0b3BpYyB3aGVyZSBidWRn
+ZXQtcmVsYXRlZCBtZXNzYWdlcyBhcmUKIHB1Ymxpc2hlZCwgaW4gdGhlIGZvcm0gYHByb2pl
+Y3RzL3twcm9qZWN0X2lkfS90b3BpY3Mve3RvcGljX2lkfWAuIFVwZGF0ZXMKIGFyZSBzZW50
+IHRvIHRoZSB0b3BpYyBhdCByZWd1bGFyIGludGVydmFsczsgdGhlIHRpbWluZyBvZiB0aGUg
+dXBkYXRlcyBpcwogbm90IGRlcGVuZGVudCBvbiB0aGUgW3RocmVzaG9sZCBydWxlc10oI3Ro
+cmVzaG9sZHJ1bGUpIHlvdSd2ZSBzZXQuCgogTm90ZSB0aGF0IGlmIHlvdSB3YW50IHlvdXIK
+IFtQdWIvU3ViIEpTT04KIG9iamVjdF0oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2JpbGxp
+bmcvZG9jcy9ob3ctdG8vYnVkZ2V0cy1wcm9ncmFtbWF0aWMtbm90aWZpY2F0aW9ucyNub3Rp
+ZmljYXRpb25fZm9ybWF0KQogdG8gY29udGFpbiBkYXRhIGZvciBgYWxlcnRUaHJlc2hvbGRF
+eGNlZWRlZGAsIHlvdSBuZWVkIGF0IGxlYXN0IG9uZQogW2FsZXJ0IHRocmVzaG9sZCBydWxl
+XSgjdGhyZXNob2xkcnVsZSkuIFdoZW4geW91IHNldCB0aHJlc2hvbGQgcnVsZXMsIHlvdQog
+bXVzdCBhbHNvIGVuYWJsZSBhdCBsZWFzdCBvbmUgb2YgdGhlIGVtYWlsIG5vdGlmaWNhdGlv
+biBvcHRpb25zLCBlaXRoZXIKIHVzaW5nIHRoZSBkZWZhdWx0IElBTSByZWNpcGllbnRzIG9y
+IENsb3VkIE1vbml0b3JpbmcgZW1haWwgbm90aWZpY2F0aW9uCiBjaGFubmVscy4KCiBUbyB1
+c2UgUHViL1N1YiB0b3BpY3Mgd2l0aCBidWRnZXRzLCB5b3UgbXVzdCBkbyB0aGUgZm9sbG93
+aW5nOgoKIDEuIENyZWF0ZSB0aGUgUHViL1N1YiB0b3BpYwogYmVmb3JlIGNvbm5lY3Rpbmcg
+aXQgdG8geW91ciBidWRnZXQuIEZvciBndWlkYW5jZSwgc2VlCiBbTWFuYWdlIHByb2dyYW1t
+YXRpYyBidWRnZXQgYWxlcnQKIG5vdGlmaWNhdGlvbnNdKGh0dHBzOi8vY2xvdWQuZ29vZ2xl
+LmNvbS9iaWxsaW5nL2RvY3MvaG93LXRvL2J1ZGdldHMtcHJvZ3JhbW1hdGljLW5vdGlmaWNh
+dGlvbnMpLgoKIDIuIEdyYW50IHRoZSBBUEkgY2FsbGVyIHRoZSBgcHVic3ViLnRvcGljcy5z
+ZXRJYW1Qb2xpY3lgIHBlcm1pc3Npb24gb24KIHRoZSBQdWIvU3ViIHRvcGljLiBJZiBub3Qg
+c2V0LCB0aGUgQVBJIGNhbGwgZmFpbHMgd2l0aCBQRVJNSVNTSU9OX0RFTklFRC4KIEZvciBh
+ZGRpdGlvbmFsIGRldGFpbHMgb24gUHViL1N1YiByb2xlcyBhbmQgcGVybWlzc2lvbnMsIHNl
+ZQogW1Blcm1pc3Npb25zIHJlcXVpcmVkIGZvciB0aGlzCiB0YXNrXShodHRwczovL2Nsb3Vk
+Lmdvb2dsZS5jb20vYmlsbGluZy9kb2NzL2hvdy10by9idWRnZXRzLXByb2dyYW1tYXRpYy1u
+b3RpZmljYXRpb25zI3Blcm1pc3Npb25zX3JlcXVpcmVkX2Zvcl90aGlzX3Rhc2spLgoKDQoF
+BAQCAAUSBLkBAggKDQoFBAQCAAESBLkBCRUKDQoFBAQCAAMSBLkBGBkKDQoFBAQCAAgSBLkB
+GkIKEAoIBAQCAAicCAASBLkBG0EK0AMKBAQEAgESBMEBAkUawQMgT3B0aW9uYWwuIFJlcXVp
+cmVkIHdoZW4KIFtOb3RpZmljYXRpb25zUnVsZS5wdWJzdWJfdG9waWNdW2dvb2dsZS5jbG91
+ZC5iaWxsaW5nLmJ1ZGdldHMudjEuTm90aWZpY2F0aW9uc1J1bGUucHVic3ViX3RvcGljXQog
+aXMgc2V0LiBUaGUgc2NoZW1hIHZlcnNpb24gb2YgdGhlIG5vdGlmaWNhdGlvbiBzZW50IHRv
+CiBbTm90aWZpY2F0aW9uc1J1bGUucHVic3ViX3RvcGljXVtnb29nbGUuY2xvdWQuYmlsbGlu
+Zy5idWRnZXRzLnYxLk5vdGlmaWNhdGlvbnNSdWxlLnB1YnN1Yl90b3BpY10uCiBPbmx5ICIx
+LjAiIGlzIGFjY2VwdGVkLiBJdCByZXByZXNlbnRzIHRoZSBKU09OIHNjaGVtYSBhcyBkZWZp
+bmVkIGluCiBodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYmlsbGluZy9kb2NzL2hvdy10by9i
+dWRnZXRzLXByb2dyYW1tYXRpYy1ub3RpZmljYXRpb25zI25vdGlmaWNhdGlvbl9mb3JtYXQu
+CgoNCgUEBAIBBRIEwQECCAoNCgUEBAIBARIEwQEJFwoNCgUEBAIBAxIEwQEaGwoNCgUEBAIB
+CBIEwQEcRAoQCggEBAIBCJwIABIEwQEdQwrtCQoEBAQCAhIG2QEC2gEvGtwJIE9wdGlvbmFs
+LiBFbWFpbCB0YXJnZXRzIHRvIHNlbmQgbm90aWZpY2F0aW9ucyB0byB3aGVuIGEgdGhyZXNo
+b2xkIGlzCiBleGNlZWRlZC4gVGhpcyBpcyBpbiBhZGRpdGlvbiB0byB0aGUgYERlZmF1bHRJ
+YW1SZWNpcGllbnRzYCB3aG8gcmVjZWl2ZQogYWxlcnQgZW1haWxzIGJhc2VkIG9uIHRoZWly
+IGJpbGxpbmcgYWNjb3VudCBJQU0gcm9sZS4gVGhlIHZhbHVlIGlzIHRoZSBmdWxsCiBSRVNU
+IHJlc291cmNlIG5hbWUgb2YgYSBDbG91ZCBNb25pdG9yaW5nIGVtYWlsIG5vdGlmaWNhdGlv
+biBjaGFubmVsIHdpdGgKIHRoZSBmb3JtIGBwcm9qZWN0cy97cHJvamVjdF9pZH0vbm90aWZp
+Y2F0aW9uQ2hhbm5lbHMve2NoYW5uZWxfaWR9YC4gQQogbWF4aW11bSBvZiA1IGVtYWlsIG5v
+dGlmaWNhdGlvbnMgYXJlIGFsbG93ZWQuCgogVG8gY3VzdG9taXplIGJ1ZGdldCBhbGVydCBl
+bWFpbCByZWNpcGllbnRzIHdpdGggbW9uaXRvcmluZyBub3RpZmljYXRpb24KIGNoYW5uZWxz
+LCB5b3UgX211c3QgY3JlYXRlIHRoZSBtb25pdG9yaW5nIG5vdGlmaWNhdGlvbiBjaGFubmVs
+cyBiZWZvcmUKIHlvdSBsaW5rIHRoZW0gdG8gYSBidWRnZXRfLiBGb3IgZ3VpZGFuY2Ugb24g
+c2V0dGluZyB1cCBub3RpZmljYXRpb24KIGNoYW5uZWxzIHRvIHVzZSB3aXRoIGJ1ZGdldHMs
+IHNlZQogW0N1c3RvbWl6ZSBidWRnZXQgYWxlcnQgZW1haWwKIHJlY2lwaWVudHNdKGh0dHBz
+Oi8vY2xvdWQuZ29vZ2xlLmNvbS9iaWxsaW5nL2RvY3MvaG93LXRvL2J1ZGdldHMtbm90aWZp
+Y2F0aW9uLXJlY2lwaWVudHMpLgoKIEZvciBDbG91ZCBCaWxsaW5nIGJ1ZGdldCBhbGVydHMs
+IHlvdSBfbXVzdCB1c2UgZW1haWwgbm90aWZpY2F0aW9uCiBjaGFubmVsc18uIFRoZSBvdGhl
+ciB0eXBlcyBvZiBub3RpZmljYXRpb24gY2hhbm5lbHMgYXJlIF9ub3RfCiBzdXBwb3J0ZWQs
+IHN1Y2ggYXMgU2xhY2ssIFNNUywgb3IgUGFnZXJEdXR5LiBJZiB5b3Ugd2FudCB0bwogW3Nl
+bmQgYnVkZ2V0IG5vdGlmaWNhdGlvbnMgdG8KIFNsYWNrXShodHRwczovL2Nsb3VkLmdvb2ds
+ZS5jb20vYmlsbGluZy9kb2NzL2hvdy10by9ub3RpZnkjc2VuZF9ub3RpZmljYXRpb25zX3Rv
+X3NsYWNrKSwKIHVzZSBhIHB1YnN1YlRvcGljIGFuZCBjb25maWd1cmUKIFtwcm9ncmFtbWF0
+aWMKIG5vdGlmaWNhdGlvbnNdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9iaWxsaW5nL2Rv
+Y3MvaG93LXRvL2J1ZGdldHMtcHJvZ3JhbW1hdGljLW5vdGlmaWNhdGlvbnMpLgoKDQoFBAQC
+AgQSBNkBAgoKDQoFBAQCAgUSBNkBCxEKDQoFBAQCAgESBNkBEjIKDQoFBAQCAgMSBNkBNTYK
+DQoFBAQCAggSBNoBBi4KEAoIBAQCAgicCAASBNoBBy0K+QEKBAQEAgMSBuABAuEBLxroASBP
+cHRpb25hbC4gV2hlbiBzZXQgdG8gdHJ1ZSwgZGlzYWJsZXMgZGVmYXVsdCBub3RpZmljYXRp
+b25zIHNlbnQgd2hlbiBhCiB0aHJlc2hvbGQgaXMgZXhjZWVkZWQuIERlZmF1bHQgbm90aWZp
+Y2F0aW9ucyBhcmUgc2VudCB0byB0aG9zZSB3aXRoIEJpbGxpbmcKIEFjY291bnQgQWRtaW5p
+c3RyYXRvciBhbmQgQmlsbGluZyBBY2NvdW50IFVzZXIgSUFNIHJvbGVzIGZvciB0aGUgdGFy
+Z2V0CiBhY2NvdW50LgoKDQoFBAQCAwUSBOABAgYKDQoFBAQCAwESBOABByUKDQoFBAQCAwMS
+BOABKCkKDQoFBAQCAwgSBOEBBi4KEAoIBAQCAwicCAASBOEBBy0K2QIKBAQEAgQSBuoBAusB
+LxrIAiBPcHRpb25hbC4gV2hlbiBzZXQgdG8gdHJ1ZSwgYW5kIHdoZW4gdGhlIGJ1ZGdldCBo
+YXMgYSBzaW5nbGUgcHJvamVjdAogY29uZmlndXJlZCwgbm90aWZpY2F0aW9ucyB3aWxsIGJl
+IHNlbnQgdG8gcHJvamVjdCBsZXZlbCByZWNpcGllbnRzIG9mIHRoYXQKIHByb2plY3QuIFRo
+aXMgZmllbGQgd2lsbCBiZSBpZ25vcmVkIGlmIHRoZSBidWRnZXQgaGFzIG11bHRpcGxlIG9y
+IG5vCiBwcm9qZWN0IGNvbmZpZ3VyZWQuCgogQ3VycmVudGx5LCBwcm9qZWN0IGxldmVsIHJl
+Y2lwaWVudHMgYXJlIHRoZSB1c2VycyB3aXRoIGBPd25lcmAgcm9sZSBvbiBhCiBjbG91ZCBw
+cm9qZWN0LgoKDQoFBAQCBAUSBOoBAgYKDQoFBAQCBAESBOoBByYKDQoFBAQCBAMSBOoBKSoK
+DQoFBAQCBAgSBOsBBi4KEAoIBAQCBAicCAASBOsBBy0KUwoCBAUSBu8BANMCARpFIEEgZmls
+dGVyIGZvciBhIGJ1ZGdldCwgbGltaXRpbmcgdGhlIHNjb3BlIG9mIHRoZSBjb3N0IHRvIGNh
+bGN1bGF0ZS4KCgsKAwQFARIE7wEIDgq+AgoEBAUEABIG9QEChQIDGq0CIFNwZWNpZmllcyBo
+b3cgY3JlZGl0cyBhcmUgYXBwbGllZCB3aGVuIGRldGVybWluaW5nIHRoZSBzcGVuZCBmb3IK
+IHRocmVzaG9sZCBjYWxjdWxhdGlvbnMuIEJ1ZGdldHMgdHJhY2sgdGhlIHRvdGFsIGNvc3Qg
+bWludXMgYW55IGFwcGxpY2FibGUKIHNlbGVjdGVkIGNyZWRpdHMuCiBbU2VlIHRoZSBkb2N1
+bWVudGF0aW9uIGZvciBhIGxpc3Qgb2YgY3JlZGl0CiB0eXBlc10oaHR0cHM6Ly9jbG91ZC5n
+b29nbGUuY29tL2JpbGxpbmcvZG9jcy9ob3ctdG8vZXhwb3J0LWRhdGEtYmlncXVlcnktdGFi
+bGVzI2NyZWRpdHMtdHlwZSkuCgoNCgUEBQQAARIE9QEHGwoOCgYEBQQAAgASBPYBBCsKDwoH
+BAUEAAIAARIE9gEEJgoPCgcEBQQAAgACEgT2ASkqCnwKBgQFBAACARIE+gEEHBpsIEFsbCB0
+eXBlcyBvZiBjcmVkaXQgYXJlIHN1YnRyYWN0ZWQgZnJvbSB0aGUgZ3Jvc3MgY29zdCB0byBk
+ZXRlcm1pbmUgdGhlCiBzcGVuZCBmb3IgdGhyZXNob2xkIGNhbGN1bGF0aW9ucy4KCg8KBwQF
+BAACAQESBPoBBBcKDwoHBAUEAAIBAhIE+gEaGwpzCgYEBQQAAgISBP4BBBwaYyBBbGwgdHlw
+ZXMgb2YgY3JlZGl0IGFyZSBhZGRlZCB0byB0aGUgbmV0IGNvc3QgdG8gZGV0ZXJtaW5lIHRo
+ZSBzcGVuZCBmb3IKIHRocmVzaG9sZCBjYWxjdWxhdGlvbnMuCgoPCgcEBQQAAgIBEgT+AQQX
+Cg8KBwQFBAACAgISBP4BGhsK9QEKBgQFBAACAxIEhAIEIhrkASBbQ3JlZGl0CiB0eXBlc10o
+aHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2JpbGxpbmcvZG9jcy9ob3ctdG8vZXhwb3J0LWRh
+dGEtYmlncXVlcnktdGFibGVzI2NyZWRpdHMtdHlwZSkKIHNwZWNpZmllZCBpbiB0aGUgY3Jl
+ZGl0X3R5cGVzIGZpZWxkIGFyZSBzdWJ0cmFjdGVkIGZyb20gdGhlCiBncm9zcyBjb3N0IHRv
+IGRldGVybWluZSB0aGUgc3BlbmQgZm9yIHRocmVzaG9sZCBjYWxjdWxhdGlvbnMuCgoPCgcE
+BQQAAgMBEgSEAgQdCg8KBwQFBAACAwISBIQCICEKngIKBAQFAgASBIsCAkgajwIgT3B0aW9u
+YWwuIEEgc2V0IG9mIHByb2plY3RzIG9mIHRoZSBmb3JtIGBwcm9qZWN0cy97cHJvamVjdH1g
+LAogc3BlY2lmeWluZyB0aGF0IHVzYWdlIGZyb20gb25seSB0aGlzIHNldCBvZiBwcm9qZWN0
+cyBzaG91bGQgYmUKIGluY2x1ZGVkIGluIHRoZSBidWRnZXQuIElmIG9taXR0ZWQsIHRoZSBy
+ZXBvcnQgaW5jbHVkZXMgYWxsIHVzYWdlIGZvcgogdGhlIGJpbGxpbmcgYWNjb3VudCwgcmVn
+YXJkbGVzcyBvZiB3aGljaCBwcm9qZWN0IHRoZSB1c2FnZSBvY2N1cnJlZCBvbi4KCg0KBQQF
+AgAEEgSLAgIKCg0KBQQFAgAFEgSLAgsRCg0KBQQFAgABEgSLAhIaCg0KBQQFAgADEgSLAh0e
+Cg0KBQQFAgAIEgSLAh9HChAKCAQFAgAInAgAEgSLAiBGCtoDCgQEBQIBEgaUAgKVAi8ayQMg
+T3B0aW9uYWwuIEEgc2V0IG9mIGZvbGRlciBhbmQgb3JnYW5pemF0aW9uIG5hbWVzIG9mIHRo
+ZSBmb3JtCiBgZm9sZGVycy97Zm9sZGVySWR9YCBvciBgb3JnYW5pemF0aW9ucy97b3JnYW5p
+emF0aW9uSWR9YCwgc3BlY2lmeWluZyB0aGF0CiB1c2FnZSBmcm9tIG9ubHkgdGhpcyBzZXQg
+b2YgZm9sZGVycyBhbmQgb3JnYW5pemF0aW9ucyBzaG91bGQgYmUgaW5jbHVkZWQgaW4KIHRo
+ZSBidWRnZXQuIElmIG9taXR0ZWQsIHRoZSBidWRnZXQgaW5jbHVkZXMgYWxsIHVzYWdlIHRo
+YXQgdGhlIGJpbGxpbmcKIGFjY291bnQgcGF5cyBmb3IuIElmIHRoZSBmb2xkZXIgb3Igb3Jn
+YW5pemF0aW9uIGNvbnRhaW5zIHByb2plY3RzIHRoYXQgYXJlCiBwYWlkIGZvciBieSBhIGRp
+ZmZlcmVudCBDbG91ZCBCaWxsaW5nIGFjY291bnQsIHRoZSBidWRnZXQgKmRvZXNuJ3QqIGFw
+cGx5CiB0byB0aG9zZSBwcm9qZWN0cy4KCg0KBQQFAgEEEgSUAgIKCg0KBQQFAgEFEgSUAgsR
+Cg0KBQQFAgEBEgSUAhIkCg0KBQQFAgEDEgSUAicoCg0KBQQFAgEIEgSVAgYuChAKCAQFAgEI
+nAgAEgSVAgctCr4ECgQEBQICEgShAgJMGq8EIE9wdGlvbmFsLiBJZgogW0ZpbHRlci5jcmVk
+aXRfdHlwZXNfdHJlYXRtZW50XVtnb29nbGUuY2xvdWQuYmlsbGluZy5idWRnZXRzLnYxLkZp
+bHRlci5jcmVkaXRfdHlwZXNfdHJlYXRtZW50XQogaXMgSU5DTFVERV9TUEVDSUZJRURfQ1JF
+RElUUywgdGhpcyBpcyBhIGxpc3Qgb2YgY3JlZGl0IHR5cGVzIHRvIGJlCiBzdWJ0cmFjdGVk
+IGZyb20gZ3Jvc3MgY29zdCB0byBkZXRlcm1pbmUgdGhlIHNwZW5kIGZvciB0aHJlc2hvbGQK
+IGNhbGN1bGF0aW9ucy4gU2VlIFthIGxpc3Qgb2YgYWNjZXB0YWJsZSBjcmVkaXQgdHlwZQog
+dmFsdWVzXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYmlsbGluZy9kb2NzL2hvdy10by9l
+eHBvcnQtZGF0YS1iaWdxdWVyeS10YWJsZXMjY3JlZGl0cy10eXBlKS4KCiBJZgogW0ZpbHRl
+ci5jcmVkaXRfdHlwZXNfdHJlYXRtZW50XVtnb29nbGUuY2xvdWQuYmlsbGluZy5idWRnZXRz
+LnYxLkZpbHRlci5jcmVkaXRfdHlwZXNfdHJlYXRtZW50XQogaXMgKipub3QqKiBJTkNMVURF
+X1NQRUNJRklFRF9DUkVESVRTLCB0aGlzIGZpZWxkIG11c3QgYmUgZW1wdHkuCgoNCgUEBQIC
+BBIEoQICCgoNCgUEBQICBRIEoQILEQoNCgUEBQICARIEoQISHgoNCgUEBQICAxIEoQIhIgoN
+CgUEBQICCBIEoQIjSwoQCggEBQICCJwIABIEoQIkSgpSCgQEBQIDEgakAgKlAi8aQiBPcHRp
+b25hbC4gSWYgbm90IHNldCwgZGVmYXVsdCBiZWhhdmlvciBpcyBgSU5DTFVERV9BTExfQ1JF
+RElUU2AuCgoNCgUEBQIDBhIEpAICFgoNCgUEBQIDARIEpAIXLQoNCgUEBQIDAxIEpAIwMQoN
+CgUEBQIDCBIEpQIGLgoQCggEBQIDCJwIABIEpQIHLQrbAgoEBAUCBBIErQICSBrMAiBPcHRp
+b25hbC4gQSBzZXQgb2Ygc2VydmljZXMgb2YgdGhlIGZvcm0gYHNlcnZpY2VzL3tzZXJ2aWNl
+X2lkfWAsCiBzcGVjaWZ5aW5nIHRoYXQgdXNhZ2UgZnJvbSBvbmx5IHRoaXMgc2V0IG9mIHNl
+cnZpY2VzIHNob3VsZCBiZQogaW5jbHVkZWQgaW4gdGhlIGJ1ZGdldC4gSWYgb21pdHRlZCwg
+dGhlIHJlcG9ydCBpbmNsdWRlcyB1c2FnZSBmb3IKIGFsbCB0aGUgc2VydmljZXMuCiBUaGUg
+c2VydmljZSBuYW1lcyBhcmUgYXZhaWxhYmxlIHRocm91Z2ggdGhlIENhdGFsb2cgQVBJOgog
+aHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2JpbGxpbmcvdjEvaG93LXRvcy9jYXRhbG9nLWFw
+aS4KCg0KBQQFAgQEEgStAgIKCg0KBQQFAgQFEgStAgsRCg0KBQQFAgQBEgStAhIaCg0KBQQF
+AgQDEgStAh0eCg0KBQQFAgQIEgStAh9HChAKCAQFAgQInAgAEgStAiBGCo4DCgQEBQIFEgS1
+AgJLGv8CIE9wdGlvbmFsLiBBIHNldCBvZiBzdWJhY2NvdW50cyBvZiB0aGUgZm9ybSBgYmls
+bGluZ0FjY291bnRzL3thY2NvdW50X2lkfWAsCiBzcGVjaWZ5aW5nIHRoYXQgdXNhZ2UgZnJv
+bSBvbmx5IHRoaXMgc2V0IG9mIHN1YmFjY291bnRzIHNob3VsZCBiZSBpbmNsdWRlZAogaW4g
+dGhlIGJ1ZGdldC4gSWYgYSBzdWJhY2NvdW50IGlzIHNldCB0byB0aGUgbmFtZSBvZiB0aGUg
+cGFyZW50IGFjY291bnQsCiB1c2FnZSBmcm9tIHRoZSBwYXJlbnQgYWNjb3VudCBpcyBpbmNs
+dWRlZC4gSWYgdGhlIGZpZWxkIGlzIG9taXR0ZWQsCiB0aGUgcmVwb3J0IGluY2x1ZGVzIHVz
+YWdlIGZyb20gdGhlIHBhcmVudCBhY2NvdW50IGFuZCBhbGwgc3ViYWNjb3VudHMsCiBpZiB0
+aGV5IGV4aXN0LgoKDQoFBAUCBQQSBLUCAgoKDQoFBAUCBQUSBLUCCxEKDQoFBAUCBQESBLUC
+Eh0KDQoFBAUCBQMSBLUCICEKDQoFBAUCBQgSBLUCIkoKEAoIBAUCBQicCAASBLUCI0kKhQMK
+BAQFAgYSBsACAsECLxr0AiBPcHRpb25hbC4gQSBzaW5nbGUgbGFiZWwgYW5kIHZhbHVlIHBh
+aXIgc3BlY2lmeWluZyB0aGF0IHVzYWdlIGZyb20gb25seQogdGhpcyBzZXQgb2YgbGFiZWxl
+ZCByZXNvdXJjZXMgc2hvdWxkIGJlIGluY2x1ZGVkIGluIHRoZSBidWRnZXQuIElmIG9taXR0
+ZWQsCiB0aGUgcmVwb3J0IGluY2x1ZGVzIGFsbCBsYWJlbGVkIGFuZCB1bmxhYmVsZWQgdXNh
+Z2UuCgogQW4gb2JqZWN0IGNvbnRhaW5pbmcgYSBzaW5nbGUgYCJrZXkiOiB2YWx1ZWAgcGFp
+ci4gRXhhbXBsZTogYHsgIm5hbWUiOgogIndyZW5jaCIgfWAuCgogIF9DdXJyZW50bHksIG11
+bHRpcGxlIGVudHJpZXMgb3IgbXVsdGlwbGUgdmFsdWVzIHBlciBlbnRyeSBhcmUgbm90CiAg
+YWxsb3dlZC5fCgoNCgUEBQIGBhIEwAICKAoNCgUEBQIGARIEwAIpLwoNCgUEBQIGAxIEwAIy
+MwoNCgUEBQIGCBIEwQIGLgoQCggEBQIGCJwIABIEwQIHLQr2AQoEBAUIABIGxgIC0gIDGuUB
+IE11bHRpcGxlIG9wdGlvbnMgdG8gY2hvb3NlIHRoZSBidWRnZXQncyB0aW1lIHBlcmlvZCwg
+c3BlY2lmeWluZyB0aGF0IG9ubHkKIHVzYWdlIHRoYXQgb2NjdXJzIGR1cmluZyB0aGlzIHRp
+bWUgcGVyaW9kIHNob3VsZCBiZSBpbmNsdWRlZCBpbiB0aGUgYnVkZ2V0LgogSWYgbm90IHNl
+dCwgdGhlIDxjb2RlPnVzYWdlX3BlcmlvZDwvY29kZT4gZGVmYXVsdHMgdG8gQ2FsZW5kYXJQ
+ZXJpb2QuTU9OVEguCgoNCgUEBQgAARIExgIIFArwAgoEBAUCBxIEzQIEUBrhAiBPcHRpb25h
+bC4gU3BlY2lmaWVzIHRvIHRyYWNrIHVzYWdlIGZvciByZWN1cnJpbmcgY2FsZW5kYXIgcGVy
+aW9kLgogRm9yIGV4YW1wbGUsIGFzc3VtZSB0aGF0IENhbGVuZGFyUGVyaW9kLlFVQVJURVIg
+aXMgc2V0LiBUaGUgYnVkZ2V0CiB0cmFja3MgdXNhZ2UgZnJvbSBBcHJpbCAxIHRvIEp1bmUg
+MzAsIHdoZW4gdGhlIGN1cnJlbnQgY2FsZW5kYXIgbW9udGggaXMKIEFwcmlsLCBNYXksIEp1
+bmUuIEFmdGVyIHRoYXQsIGl0IHRyYWNrcyB1c2FnZSBmcm9tIEp1bHkgMSB0bwogU2VwdGVt
+YmVyIDMwIHdoZW4gdGhlIGN1cnJlbnQgY2FsZW5kYXIgbW9udGggaXMgSnVseSwgQXVndXN0
+LCBTZXB0ZW1iZXIsCiBzbyBvbi4KCg0KBQQFAgcGEgTNAgQSCg0KBQQFAgcBEgTNAhMiCg0K
+BQQFAgcDEgTNAiUmCg0KBQQFAgcIEgTNAidPChAKCAQFAgcInAgAEgTNAihOCp4BCgQEBQII
+EgTRAgRMGo8BIE9wdGlvbmFsLiBTcGVjaWZpZXMgdG8gdHJhY2sgdXNhZ2UgZnJvbSBhbnkg
+c3RhcnQgZGF0ZSAocmVxdWlyZWQpIHRvIGFueQogZW5kIGRhdGUgKG9wdGlvbmFsKS4gVGhp
+cyB0aW1lIHBlcmlvZCBpcyBzdGF0aWMsIGl0IGRvZXMgbm90IHJlY3VyLgoKDQoFBAUCCAYS
+BNECBBAKDQoFBAUCCAESBNECER4KDQoFBAUCCAMSBNECISIKDQoFBAUCCAgSBNECI0sKEAoI
+BAUCCAicCAASBNECJEoKUwoCBAYSBtYCAN4CARpFIEFsbCBkYXRlIHRpbWVzIGJlZ2luIGF0
+IDEyIEFNIFVTIGFuZCBDYW5hZGlhbiBQYWNpZmljIFRpbWUgKFVUQy04KS4KCgsKAwQGARIE
+1gIIFApHCgQEBgIAEgTYAgJLGjkgUmVxdWlyZWQuIFRoZSBzdGFydCBkYXRlIG11c3QgYmUg
+YWZ0ZXIgSmFudWFyeSAxLCAyMDE3LgoKDQoFBAYCAAYSBNgCAhIKDQoFBAYCAAESBNgCEx0K
+DQoFBAYCAAMSBNgCICEKDQoFBAYCAAgSBNgCIkoKEAoIBAYCAAicCAASBNgCI0kKtQEKBAQG
+AgESBN0CAkkapgEgT3B0aW9uYWwuIFRoZSBlbmQgZGF0ZSBvZiB0aGUgdGltZSBwZXJpb2Qu
+IEJ1ZGdldHMgd2l0aCBlbGFwc2VkIGVuZCBkYXRlCiB3b24ndCBiZSBwcm9jZXNzZWQuIElm
+IHVuc2V0LCBzcGVjaWZpZXMgdG8gdHJhY2sgYWxsIHVzYWdlIGluY3VycmVkIHNpbmNlCiB0
+aGUgc3RhcnRfZGF0ZS4KCg0KBQQGAgEGEgTdAgISCg0KBQQGAgEBEgTdAhMbCg0KBQQGAgED
+EgTdAh4fCg0KBQQGAgEIEgTdAiBIChAKCAQGAgEInAgAEgTdAiFHCvcBCgIFABIG5AIA8wIB
+GugBIEEgYENhbGVuZGFyUGVyaW9kYCByZXByZXNlbnRzIHRoZSBhYnN0cmFjdCBjb25jZXB0
+IG9mIGEgdGltZSBwZXJpb2QgdGhhdAogaGFzIGEgY2Fub25pY2FsIHN0YXJ0LiBHcmFtbWF0
+aWNhbGx5LCAidGhlIHN0YXJ0IG9mIHRoZSBjdXJyZW50CiBgQ2FsZW5kYXJQZXJpb2RgIi4g
+QWxsIGNhbGVuZGFyIHRpbWVzIGJlZ2luIGF0IDEyIEFNIFVTIGFuZCBDYW5hZGlhbgogUGFj
+aWZpYyBUaW1lIChVVEMtOCkuCgoLCgMFAAESBOQCBRMKeAoEBQACABIE5wICIhpqIENhbGVu
+ZGFyIHBlcmlvZCBpcyB1bnNldC4gVGhpcyBpcyB0aGUgZGVmYXVsdCBpZiB0aGUgYnVkZ2V0
+IGlzIGZvciBhCiBjdXN0b20gdGltZSBwZXJpb2QgKEN1c3RvbVBlcmlvZCkuCgoNCgUFAAIA
+ARIE5wICHQoNCgUFAAIAAhIE5wIgIQp5CgQFAAIBEgTrAgIMGmsgQSBtb250aC4gTW9udGgg
+c3RhcnRzIG9uIHRoZSBmaXJzdCBkYXkgb2YgZWFjaCBtb250aCwgc3VjaCBhcyBKYW51YXJ5
+IDEsCiBGZWJydWFyeSAxLCBNYXJjaCAxLCBhbmQgc28gb24uCgoNCgUFAAIBARIE6wICBwoN
+CgUFAAIBAhIE6wIKCwprCgQFAAICEgTvAgIOGl0gQSBxdWFydGVyLiBRdWFydGVycyBzdGFy
+dCBvbiBkYXRlcyBKYW51YXJ5IDEsIEFwcmlsIDEsIEp1bHkgMSwgYW5kIE9jdG9iZXIKIDEg
+b2YgZWFjaCB5ZWFyLgoKDQoFBQACAgESBO8CAgkKDQoFBQACAgISBO8CDA0KMQoEBQACAxIE
+8gICCxojIEEgeWVhci4gWWVhciBzdGFydHMgb24gSmFudWFyeSAxLgoKDQoFBQACAwESBPIC
+AgYKDQoFBQACAwISBPICCQpiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Billing::Budgets::V1::BudgetModel::Budget ===
+    # Fields for Budget
+    # Field: name Type: 9 ()
+    # Field: display_name Type: 9 ()
+    # Field: budget_filter Type: 11 (.google.cloud.billing.budgets.v1.Filter)
+    # Field: amount Type: 11 (.google.cloud.billing.budgets.v1.BudgetAmount)
+    # Field: threshold_rules Type: 11 (.google.cloud.billing.budgets.v1.ThresholdRule)
+    # Field: notifications_rule Type: 11 (.google.cloud.billing.budgets.v1.NotificationsRule)
+    # Field: etag Type: 9 ()
+
+# === Message: Google::Cloud::Billing::Budgets::V1::BudgetModel::BudgetAmount ===
+    # Fields for BudgetAmount
+    # Field: specified_amount Type: 11 (.google.type.Money)
+    # Field: last_period_amount Type: 11 (.google.cloud.billing.budgets.v1.LastPeriodAmount)
+
+# === Message: Google::Cloud::Billing::Budgets::V1::BudgetModel::LastPeriodAmount ===
+    # Fields for LastPeriodAmount
+
+# === Message: Google::Cloud::Billing::Budgets::V1::BudgetModel::ThresholdRule ===
+    # Fields for ThresholdRule
+    # Field: threshold_percent Type: 1 ()
+    # Field: spend_basis Type: 14 (.google.cloud.billing.budgets.v1.ThresholdRule.Basis)
+
+# Enum: ThresholdRule::Basis
+our $ThresholdRule_BASIS_UNSPECIFIED = 0;
+our $ThresholdRule_CURRENT_SPEND = 1;
+our $ThresholdRule_FORECASTED_SPEND = 2;
+
+# === Message: Google::Cloud::Billing::Budgets::V1::BudgetModel::NotificationsRule ===
+    # Fields for NotificationsRule
+    # Field: pubsub_topic Type: 9 ()
+    # Field: schema_version Type: 9 ()
+    # Field: monitoring_notification_channels Type: 9 ()
+    # Field: disable_default_iam_recipients Type: 8 ()
+    # Field: enable_project_level_recipients Type: 8 ()
+
+# === Message: Google::Cloud::Billing::Budgets::V1::BudgetModel::Filter ===
+    # Fields for Filter
+    # Field: projects Type: 9 ()
+    # Field: resource_ancestors Type: 9 ()
+    # Field: credit_types Type: 9 ()
+    # Field: credit_types_treatment Type: 14 (.google.cloud.billing.budgets.v1.Filter.CreditTypesTreatment)
+    # Field: services Type: 9 ()
+    # Field: subaccounts Type: 9 ()
+    # Field: labels Type: 11 (.google.cloud.billing.budgets.v1.Filter.LabelsEntry)
+    # Field: calendar_period Type: 14 (.google.cloud.billing.budgets.v1.CalendarPeriod)
+    # Field: custom_period Type: 11 (.google.cloud.billing.budgets.v1.CustomPeriod)
+
+# Enum: Filter::CreditTypesTreatment
+our $Filter_CREDIT_TYPES_TREATMENT_UNSPECIFIED = 0;
+our $Filter_INCLUDE_ALL_CREDITS = 1;
+our $Filter_EXCLUDE_ALL_CREDITS = 2;
+our $Filter_INCLUDE_SPECIFIED_CREDITS = 3;
+
+# === Message: Google::Cloud::Billing::Budgets::V1::BudgetModel::CustomPeriod ===
+    # Fields for CustomPeriod
+    # Field: start_date Type: 11 (.google.type.Date)
+    # Field: end_date Type: 11 (.google.type.Date)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Billing::Budgets::V1::BudgetModel - Compiled Protocol Buffers messages for google/cloud/billing/budgets/v1/budget_model.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Billing::Budgets::V1::BudgetModel;
+
+    my $msg = Google::Cloud::Billing::Budgets::V1::BudgetModel::Budget->new({
+        name => $name,
+        display_name => $display_name,
+        budget_filter => $budget_filter,
+        amount => $amount,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Billing::Budgets::V1::BudgetModel::Budget->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/billing/budgets/v1/budget_model.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Billing::Budgets::V1::BudgetModel::Budget
+
+A budget is a plan that describes what you expect to spend on Cloud
+projects, plus the rules to execute as spend is tracked against that plan,
+(for example, send an alert when 90% of the target spend is met).
+The budget time period is configurable, with options such as month (default),
+quarter, year, or custom time period.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Resource name of the budget.
+The resource name implies the scope of a budget. Values are of the form
+`billingAccounts/{billingAccountId}/budgets/{budgetId}`.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+User data for display name in UI. The name must be less than or equal to 60
+characters.
+
+=item * C<< $msg->budget_filter() >> / C<< $msg->budget_filter($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::Budgets::V1::BudgetModel::Filter>)
+
+Optional. Filters that define which resources are used to compute the
+actual spend against the budget amount, such as projects, services, and the
+budget's time period, as well as other filters.
+
+=item * C<< $msg->amount() >> / C<< $msg->amount($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::Budgets::V1::BudgetModel::BudgetAmount>)
+
+Required. Budgeted amount.
+
+=item * C<< $msg->threshold_rules() >> / C<< $msg->threshold_rules($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::Budgets::V1::BudgetModel::ThresholdRule>)
+
+Optional. Rules that trigger alerts (notifications of thresholds
+being crossed) when spend exceeds the specified percentages of the budget.
+
+Optional for `pubsubTopic` notifications.
+
+Required if using email notifications.
+
+=item * C<< $msg->notifications_rule() >> / C<< $msg->notifications_rule($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::Budgets::V1::BudgetModel::NotificationsRule>)
+
+Optional. Rules to apply to notifications sent based on budget spend and
+thresholds.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag to validate that the object is unchanged for a
+read-modify-write operation.
+An empty etag causes an update to overwrite other changes.
+
+=back
+
+=head2 Google::Cloud::Billing::Budgets::V1::BudgetModel::BudgetAmount
+
+The budgeted amount for each usage period.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->specified_amount() >> / C<< $msg->specified_amount($value) >>
+
+Type: C<Message> (L<Google::Type::Money::Money>)
+
+A specified amount to use as the budget.
+`currency_code` is optional. If specified when creating a budget, it must
+match the currency of the billing account. If specified when updating a
+budget, it must match the currency_code of the existing budget.
+The `currency_code` is provided on output.
+
+=item * C<< $msg->last_period_amount() >> / C<< $msg->last_period_amount($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::Budgets::V1::BudgetModel::LastPeriodAmount>)
+
+Use the last period's actual spend as the budget for the present period.
+LastPeriodAmount can only be set when the budget's time period is a
+[Filter.calendar_period][google.cloud.billing.budgets.v1.Filter.calendar_period].
+It cannot be set in combination with
+[Filter.custom_period][google.cloud.billing.budgets.v1.Filter.custom_period].
+
+=back
+
+=head2 Google::Cloud::Billing::Budgets::V1::BudgetModel::LastPeriodAmount
+
+Describes a budget amount targeted to the last
+[Filter.calendar_period][google.cloud.billing.budgets.v1.Filter.calendar_period]
+spend. At this time, the amount is automatically 100% of the last calendar
+period's spend; that is, there are no other options yet.
+LastPeriodAmount cannot be set for a budget configured with
+a
+[Filter.custom_period][google.cloud.billing.budgets.v1.Filter.custom_period].
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Billing::Budgets::V1::BudgetModel::ThresholdRule
+
+ThresholdRule contains the definition of a threshold. Threshold rules define
+the triggering events used to generate a budget notification email. When a
+threshold is crossed (spend exceeds the specified percentages of the
+budget), budget alert emails are sent to the email recipients you specify
+in the
+[NotificationsRule](#notificationsrule).
+
+Threshold rules also affect the fields included in the
+[JSON data
+object](https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications#notification_format)
+sent to a Pub/Sub topic.
+
+Threshold rules are _required_ if using email notifications.
+
+Threshold rules are _optional_ if only setting a
+[`pubsubTopic` NotificationsRule](#NotificationsRule),
+unless you want your JSON data object to include data about the thresholds
+you set.
+
+For more information, see
+[set budget threshold rules and
+actions](https://cloud.google.com/billing/docs/how-to/budgets#budget-actions).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->threshold_percent() >> / C<< $msg->threshold_percent($value) >>
+
+Type: C<Double>
+
+Required. Send an alert when this threshold is exceeded.
+This is a 1.0-based percentage, so 0.5 = 50%.
+Validation: non-negative number.
+
+=item * C<< $msg->spend_basis() >> / C<< $msg->spend_basis($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Billing::Budgets::V1::ThresholdRule::Basis>)
+
+Optional. The type of basis used to determine if spend has passed the
+threshold. Behavior defaults to CURRENT_SPEND if not set.
+
+=back
+
+=head3 Enum: ThresholdRule::Basis
+
+=over 4
+
+=item * C<BASIS_UNSPECIFIED> => C<0>
+
+=item * C<CURRENT_SPEND> => C<1>
+
+=item * C<FORECASTED_SPEND> => C<2>
+
+=back
+
+=head2 Google::Cloud::Billing::Budgets::V1::BudgetModel::NotificationsRule
+
+NotificationsRule defines notifications that are sent based on budget spend
+and thresholds.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->pubsub_topic() >> / C<< $msg->pubsub_topic($value) >>
+
+Type: C<String>
+
+Optional. The name of the Pub/Sub topic where budget-related messages are
+published, in the form `projects/{project_id}/topics/{topic_id}`. Updates
+are sent to the topic at regular intervals; the timing of the updates is
+not dependent on the [threshold rules](#thresholdrule) you've set.
+
+Note that if you want your
+[Pub/Sub JSON
+object](https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications#notification_format)
+to contain data for `alertThresholdExceeded`, you need at least one
+[alert threshold rule](#thresholdrule). When you set threshold rules, you
+must also enable at least one of the email notification options, either
+using the default IAM recipients or Cloud Monitoring email notification
+channels.
+
+To use Pub/Sub topics with budgets, you must do the following:
+
+1. Create the Pub/Sub topic
+before connecting it to your budget. For guidance, see
+[Manage programmatic budget alert
+notifications](https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications).
+
+2. Grant the API caller the `pubsub.topics.setIamPolicy` permission on
+the Pub/Sub topic. If not set, the API call fails with PERMISSION_DENIED.
+For additional details on Pub/Sub roles and permissions, see
+[Permissions required for this
+task](https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications#permissions_required_for_this_task).
+
+=item * C<< $msg->schema_version() >> / C<< $msg->schema_version($value) >>
+
+Type: C<String>
+
+Optional. Required when
+[NotificationsRule.pubsub_topic][google.cloud.billing.budgets.v1.NotificationsRule.pubsub_topic]
+is set. The schema version of the notification sent to
+[NotificationsRule.pubsub_topic][google.cloud.billing.budgets.v1.NotificationsRule.pubsub_topic].
+Only "1.0" is accepted. It represents the JSON schema as defined in
+https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications#notification_format.
+
+=item * C<< $msg->monitoring_notification_channels() >> / C<< $msg->monitoring_notification_channels($value) >>
+
+Type: C<String>
+
+Optional. Email targets to send notifications to when a threshold is
+exceeded. This is in addition to the `DefaultIamRecipients` who receive
+alert emails based on their billing account IAM role. The value is the full
+REST resource name of a Cloud Monitoring email notification channel with
+the form `projects/{project_id}/notificationChannels/{channel_id}`. A
+maximum of 5 email notifications are allowed.
+
+To customize budget alert email recipients with monitoring notification
+channels, you _must create the monitoring notification channels before
+you link them to a budget_. For guidance on setting up notification
+channels to use with budgets, see
+[Customize budget alert email
+recipients](https://cloud.google.com/billing/docs/how-to/budgets-notification-recipients).
+
+For Cloud Billing budget alerts, you _must use email notification
+channels_. The other types of notification channels are _not_
+supported, such as Slack, SMS, or PagerDuty. If you want to
+[send budget notifications to
+Slack](https://cloud.google.com/billing/docs/how-to/notify#send_notifications_to_slack),
+use a pubsubTopic and configure
+[programmatic
+notifications](https://cloud.google.com/billing/docs/how-to/budgets-programmatic-notifications).
+
+=item * C<< $msg->disable_default_iam_recipients() >> / C<< $msg->disable_default_iam_recipients($value) >>
+
+Type: C<Bool>
+
+Optional. When set to true, disables default notifications sent when a
+threshold is exceeded. Default notifications are sent to those with Billing
+Account Administrator and Billing Account User IAM roles for the target
+account.
+
+=item * C<< $msg->enable_project_level_recipients() >> / C<< $msg->enable_project_level_recipients($value) >>
+
+Type: C<Bool>
+
+Optional. When set to true, and when the budget has a single project
+configured, notifications will be sent to project level recipients of that
+project. This field will be ignored if the budget has multiple or no
+project configured.
+
+Currently, project level recipients are the users with `Owner` role on a
+cloud project.
+
+=back
+
+=head2 Google::Cloud::Billing::Budgets::V1::BudgetModel::Filter
+
+A filter for a budget, limiting the scope of the cost to calculate.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->projects() >> / C<< $msg->projects($value) >>
+
+Type: C<String>
+
+Optional. A set of projects of the form `projects/{project}`,
+specifying that usage from only this set of projects should be
+included in the budget. If omitted, the report includes all usage for
+the billing account, regardless of which project the usage occurred on.
+
+=item * C<< $msg->resource_ancestors() >> / C<< $msg->resource_ancestors($value) >>
+
+Type: C<String>
+
+Optional. A set of folder and organization names of the form
+`folders/{folderId}` or `organizations/{organizationId}`, specifying that
+usage from only this set of folders and organizations should be included in
+the budget. If omitted, the budget includes all usage that the billing
+account pays for. If the folder or organization contains projects that are
+paid for by a different Cloud Billing account, the budget *doesn't* apply
+to those projects.
+
+=item * C<< $msg->credit_types() >> / C<< $msg->credit_types($value) >>
+
+Type: C<String>
+
+Optional. If
+[Filter.credit_types_treatment][google.cloud.billing.budgets.v1.Filter.credit_types_treatment]
+is INCLUDE_SPECIFIED_CREDITS, this is a list of credit types to be
+subtracted from gross cost to determine the spend for threshold
+calculations. See [a list of acceptable credit type
+values](https://cloud.google.com/billing/docs/how-to/export-data-bigquery-tables#credits-type).
+
+If
+[Filter.credit_types_treatment][google.cloud.billing.budgets.v1.Filter.credit_types_treatment]
+is B<not> INCLUDE_SPECIFIED_CREDITS, this field must be empty.
+
+=item * C<< $msg->credit_types_treatment() >> / C<< $msg->credit_types_treatment($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Billing::Budgets::V1::Filter::CreditTypesTreatment>)
+
+Optional. If not set, default behavior is `INCLUDE_ALL_CREDITS`.
+
+=item * C<< $msg->services() >> / C<< $msg->services($value) >>
+
+Type: C<String>
+
+Optional. A set of services of the form `services/{service_id}`,
+specifying that usage from only this set of services should be
+included in the budget. If omitted, the report includes usage for
+all the services.
+The service names are available through the Catalog API:
+https://cloud.google.com/billing/v1/how-tos/catalog-api.
+
+=item * C<< $msg->subaccounts() >> / C<< $msg->subaccounts($value) >>
+
+Type: C<String>
+
+Optional. A set of subaccounts of the form `billingAccounts/{account_id}`,
+specifying that usage from only this set of subaccounts should be included
+in the budget. If a subaccount is set to the name of the parent account,
+usage from the parent account is included. If the field is omitted,
+the report includes usage from the parent account and all subaccounts,
+if they exist.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::Budgets::V1::BudgetModel::Filter::LabelsEntry>)
+
+Optional. A single label and value pair specifying that usage from only
+this set of labeled resources should be included in the budget. If omitted,
+the report includes all labeled and unlabeled usage.
+
+An object containing a single `"key": value` pair. Example: `{ "name":
+"wrench" }`.
+
+ _Currently, multiple entries or multiple values per entry are not
+ allowed._
+
+=item * C<< $msg->calendar_period() >> / C<< $msg->calendar_period($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Billing::Budgets::V1::CalendarPeriod>)
+
+Optional. Specifies to track usage for recurring calendar period.
+For example, assume that CalendarPeriod.QUARTER is set. The budget
+tracks usage from April 1 to June 30, when the current calendar month is
+April, May, June. After that, it tracks usage from July 1 to
+September 30 when the current calendar month is July, August, September,
+so on.
+
+=item * C<< $msg->custom_period() >> / C<< $msg->custom_period($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::Budgets::V1::BudgetModel::CustomPeriod>)
+
+Optional. Specifies to track usage from any start date (required) to any
+end date (optional). This time period is static, it does not recur.
+
+=back
+
+=head3 Enum: Filter::CreditTypesTreatment
+
+=over 4
+
+=item * C<CREDIT_TYPES_TREATMENT_UNSPECIFIED> => C<0>
+
+=item * C<INCLUDE_ALL_CREDITS> => C<1>
+
+=item * C<EXCLUDE_ALL_CREDITS> => C<2>
+
+=item * C<INCLUDE_SPECIFIED_CREDITS> => C<3>
+
+=back
+
+=head2 Google::Cloud::Billing::Budgets::V1::BudgetModel::CustomPeriod
+
+All date times begin at 12 AM US and Canadian Pacific Time (UTC-8).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_date() >> / C<< $msg->start_date($value) >>
+
+Type: C<Message> (L<Google::Type::Date::Date>)
+
+Required. The start date must be after January 1, 2017.
+
+=item * C<< $msg->end_date() >> / C<< $msg->end_date($value) >>
+
+Type: C<Message> (L<Google::Type::Date::Date>)
+
+Optional. The end date of the time period. Budgets with elapsed end date
+won't be processed. If unset, specifies to track all usage incurred since
+the start_date.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Billing::Budgets::V1::BudgetModel::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

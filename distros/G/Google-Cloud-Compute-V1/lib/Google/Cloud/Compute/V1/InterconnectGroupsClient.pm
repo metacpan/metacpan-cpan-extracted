@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -464,43 +464,269 @@ The following RPC methods are available in this client:
 
 =item * B<create_members>
 
-Calls the RPC method C<CreateMembers> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_members(
+        interconnect_group       => $interconnect_group,
+        interconnect_groups_create_members_request_resource => $interconnect_groups_create_members_request_resource,
+        project                  => $project,
+    );
+
+Calls the RPC method C<CreateMembers> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CreateMembersInterconnectGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect_group> - C<string>
+
+=item * C<interconnect_groups_create_members_request_resource> - L<Google::Cloud::Compute::V1::Compute::InterconnectGroupsCreateMembersRequest>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        interconnect_group       => $interconnect_group,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteInterconnectGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect_group> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        interconnect_group       => $interconnect_group,
+        project                  => $project,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetInterconnectGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InterconnectGroup>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect_group> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<get_iam_policy>
 
-Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_iam_policy(
+        options_requested_policy_version => $options_requested_policy_version,
+        project                  => $project,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<GetIamPolicy> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetIamPolicyInterconnectGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<options_requested_policy_version> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<get_operational_status>
 
-Calls the RPC method C<GetOperationalStatus> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_operational_status(
+        interconnect_group       => $interconnect_group,
+        project                  => $project,
+    );
+
+Calls the RPC method C<GetOperationalStatus> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetOperationalStatusInterconnectGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InterconnectGroupsGetOperationalStatusResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect_group> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        interconnect_group_resource => $interconnect_group_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertInterconnectGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect_group_resource> - L<Google::Cloud::Compute::V1::Compute::InterconnectGroup>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListInterconnectGroupsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InterconnectGroupsListResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        interconnect_group       => $interconnect_group,
+        interconnect_group_resource => $interconnect_group_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchInterconnectGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect_group> - C<string>
+
+=item * C<interconnect_group_resource> - L<Google::Cloud::Compute::V1::Compute::InterconnectGroup>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<update_mask> - C<string>
+
+=back
 
 =item * B<set_iam_policy>
 
-Calls the RPC method C<SetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_iam_policy(
+        global_set_policy_request_resource => $global_set_policy_request_resource,
+        project                  => $project,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<SetIamPolicy> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetIamPolicyInterconnectGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<global_set_policy_request_resource> - L<Google::Cloud::Compute::V1::Compute::GlobalSetPolicyRequest>
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.InterconnectGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsInterconnectGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=back
 
 =back
 

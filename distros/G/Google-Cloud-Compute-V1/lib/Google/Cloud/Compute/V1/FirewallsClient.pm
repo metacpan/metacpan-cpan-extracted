@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -362,31 +362,194 @@ The following RPC methods are available in this client:
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        firewall                 => $firewall,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.Firewalls>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteFirewallRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        firewall                 => $firewall,
+        project                  => $project,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.Firewalls>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetFirewallRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Firewall>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        firewall_resource        => $firewall_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.Firewalls>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertFirewallRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_resource> - L<Google::Cloud::Compute::V1::Compute::Firewall>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.Firewalls>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListFirewallsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::FirewallList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        firewall                 => $firewall,
+        firewall_resource        => $firewall_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.Firewalls>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchFirewallRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall> - C<string>
+
+=item * C<firewall_resource> - L<Google::Cloud::Compute::V1::Compute::Firewall>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.Firewalls>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsFirewallRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=back
 
 =item * B<update>
 
-Calls the RPC method C<Update> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update(
+        firewall                 => $firewall,
+        firewall_resource        => $firewall_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Update> on C<google.cloud.compute.v1.Firewalls>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateFirewallRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall> - C<string>
+
+=item * C<firewall_resource> - L<Google::Cloud::Compute::V1::Compute::Firewall>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =back
 

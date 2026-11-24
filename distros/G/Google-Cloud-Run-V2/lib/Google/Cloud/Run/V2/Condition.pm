@@ -1,0 +1,544 @@
+package Google::Cloud::Run::V2::Condition;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+CiNnb29nbGUvY2xvdWQvcnVuL3YyL2NvbmRpdGlvbi5wcm90bxITZ29vZ2xlLmNsb3VkLnJ1
+bi52MhofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90bxofZ29vZ2xlL3Byb3RvYnVm
+L3RpbWVzdGFtcC5wcm90byLmDwoJQ29uZGl0aW9uEhIKBHR5cGUYASABKAlSBHR5cGUSOgoF
+c3RhdGUYAiABKA4yJC5nb29nbGUuY2xvdWQucnVuLnYyLkNvbmRpdGlvbi5TdGF0ZVIFc3Rh
+dGUSGAoHbWVzc2FnZRgDIAEoCVIHbWVzc2FnZRJMChRsYXN0X3RyYW5zaXRpb25fdGltZRgE
+IAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSEmxhc3RUcmFuc2l0aW9uVGltZRJD
+CghzZXZlcml0eRgFIAEoDjInLmdvb2dsZS5jbG91ZC5ydW4udjIuQ29uZGl0aW9uLlNldmVy
+aXR5UghzZXZlcml0eRJKCgZyZWFzb24YBiABKA4yKy5nb29nbGUuY2xvdWQucnVuLnYyLkNv
+bmRpdGlvbi5Db21tb25SZWFzb25CA+BBA0gAUgZyZWFzb24SXQoPcmV2aXNpb25fcmVhc29u
+GAkgASgOMi0uZ29vZ2xlLmNsb3VkLnJ1bi52Mi5Db25kaXRpb24uUmV2aXNpb25SZWFzb25C
+A+BBA0gAUg5yZXZpc2lvblJlYXNvbhJgChBleGVjdXRpb25fcmVhc29uGAsgASgOMi4uZ29v
+Z2xlLmNsb3VkLnJ1bi52Mi5Db25kaXRpb24uRXhlY3V0aW9uUmVhc29uQgPgQQNIAFIPZXhl
+Y3V0aW9uUmVhc29uEl0KD2luc3RhbmNlX3JlYXNvbhgMIAEoDjItLmdvb2dsZS5jbG91ZC5y
+dW4udjIuQ29uZGl0aW9uLkluc3RhbmNlUmVhc29uQgPgQQNIAFIOaW5zdGFuY2VSZWFzb24i
+fwoFU3RhdGUSFQoRU1RBVEVfVU5TUEVDSUZJRUQQABIVChFDT05ESVRJT05fUEVORElORxAB
+EhkKFUNPTkRJVElPTl9SRUNPTkNJTElORxACEhQKEENPTkRJVElPTl9GQUlMRUQQAxIXChND
+T05ESVRJT05fU1VDQ0VFREVEEAQiRgoIU2V2ZXJpdHkSGAoUU0VWRVJJVFlfVU5TUEVDSUZJ
+RUQQABIJCgVFUlJPUhABEgsKB1dBUk5JTkcQAhIICgRJTkZPEAMizQMKDENvbW1vblJlYXNv
+bhIbChdDT01NT05fUkVBU09OX1VOREVGSU5FRBAAEgsKB1VOS05PV04QARITCg9SRVZJU0lP
+Tl9GQUlMRUQQAxIeChpQUk9HUkVTU19ERUFETElORV9FWENFRURFRBAEEhUKEUNPTlRBSU5F
+Ul9NSVNTSU5HEAYSHwobQ09OVEFJTkVSX1BFUk1JU1NJT05fREVOSUVEEAcSIAocQ09OVEFJ
+TkVSX0lNQUdFX1VOQVVUSE9SSVpFRBAIEi4KKkNPTlRBSU5FUl9JTUFHRV9BVVRIT1JJWkFU
+SU9OX0NIRUNLX0ZBSUxFRBAJEiQKIEVOQ1JZUFRJT05fS0VZX1BFUk1JU1NJT05fREVOSUVE
+EAoSHwobRU5DUllQVElPTl9LRVlfQ0hFQ0tfRkFJTEVEEAsSHwobU0VDUkVUU19BQ0NFU1Nf
+Q0hFQ0tfRkFJTEVEEAwSGQoVV0FJVElOR19GT1JfT1BFUkFUSU9OEA0SEwoPSU1NRURJQVRF
+X1JFVFJZEA4SEwoPUE9TVFBPTkVEX1JFVFJZEA8SDAoISU5URVJOQUwQEBIZChVWUENfTkVU
+V09SS19OT1RfRk9VTkQQESLKAgoOUmV2aXNpb25SZWFzb24SHQoZUkVWSVNJT05fUkVBU09O
+X1VOREVGSU5FRBAAEgsKB1BFTkRJTkcQARILCgdSRVNFUlZFEAISCwoHUkVUSVJFRBADEgwK
+CFJFVElSSU5HEAQSDgoKUkVDUkVBVElORxAFEiAKHEhFQUxUSF9DSEVDS19DT05UQUlORVJf
+RVJST1IQBhIkCiBDVVNUT01JWkVEX1BBVEhfUkVTUE9OU0VfUEVORElORxAHEiEKHU1JTl9J
+TlNUQU5DRVNfTk9UX1BST1ZJU0lPTkVEEAgSIQodQUNUSVZFX1JFVklTSU9OX0xJTUlUX1JF
+QUNIRUQQCRIRCg1OT19ERVBMT1lNRU5UEAoSGAoUSEVBTFRIX0NIRUNLX1NLSVBQRUQQCxIZ
+ChVNSU5fSU5TVEFOQ0VTX1dBUk1JTkcQDCLmAQoPRXhlY3V0aW9uUmVhc29uEh4KGkVYRUNV
+VElPTl9SRUFTT05fVU5ERUZJTkVEEAASJAogSk9CX1NUQVRVU19TRVJWSUNFX1BPTExJTkdf
+RVJST1IQARIWChJOT05fWkVST19FWElUX0NPREUQAhINCglDQU5DRUxMRUQQAxIOCgpDQU5D
+RUxMSU5HEAQSCwoHREVMRVRFRBAFEhkKFURFTEFZRURfU1RBUlRfUEVORElORxAGEi4KKkRF
+TEFZRURfRVhFQ1VUSU9OX0VYQ0VFRElOR19EVVJBVElPTl9MSU1JVBAHIpUBCg5JbnN0YW5j
+ZVJlYXNvbhIfChtJTlNUQU5DRV9SRUFTT05fVU5TUEVDSUZJRUQQABIUChBJTlNUQU5DRV9E
+RUxFVEVEEAESFAoQSU5TVEFOQ0VfU1RPUFBFRBACEhUKEUlOU1RBTkNFX1NUT1BQSU5HEAMS
+HwobSU5TVEFOQ0VfTk9OX1pFUk9fRVhJVF9DT0RFEARCCQoHcmVhc29uc0JWChdjb20uZ29v
+Z2xlLmNsb3VkLnJ1bi52MkIOQ29uZGl0aW9uUHJvdG9QAVopY2xvdWQuZ29vZ2xlLmNvbS9n
+by9ydW4vYXBpdjIvcnVucGI7cnVucGJK3z0KBxIFDgD1AQEKvAQKAQwSAw4AEjKxBCBDb3B5
+cmlnaHQgMjAyNiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNl
+bnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhp
+cyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5
+IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFj
+aGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxp
+Y2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0
+ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJ
+UywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRo
+ZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lm
+aWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5k
+ZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQABwKCQoCAwASAxIAKQoJCgIDARIDEwApCggKAQgS
+AxUAQAoJCgIICxIDFQBACggKAQgSAxYAIgoJCgIIChIDFgAiCggKAQgSAxcALwoJCgIICBID
+FwAvCggKAQgSAxgAMAoJCgIIARIDGAAwCjkKAgQAEgUbAPUBARosIERlZmluZXMgYSBzdGF0
+dXMgY29uZGl0aW9uIGZvciBhIHJlc291cmNlLgoKCgoDBAABEgMbCBEKOQoEBAAEABIEHQIs
+AxorIFJlcHJlc2VudHMgdGhlIHBvc3NpYmxlIENvbmRpdGlvbiBzdGF0ZXMuCgoMCgUEAAQA
+ARIDHQcMCk8KBgQABAACABIDHwQaGkAgVGhlIGRlZmF1bHQgdmFsdWUuIFRoaXMgdmFsdWUg
+aXMgdXNlZCBpZiB0aGUgc3RhdGUgaXMgb21pdHRlZC4KCg4KBwQABAACAAESAx8EFQoOCgcE
+AAQAAgACEgMfGBkKRQoGBAAEAAIBEgMiBBoaNiBUcmFuc2llbnQgc3RhdGU6IFJlY29uY2ls
+aWF0aW9uIGhhcyBub3Qgc3RhcnRlZCB5ZXQuCgoOCgcEAAQAAgEBEgMiBBUKDgoHBAAEAAIB
+AhIDIhgZCkYKBgQABAACAhIDJQQeGjcgVHJhbnNpZW50IHN0YXRlOiByZWNvbmNpbGlhdGlv
+biBpcyBzdGlsbCBpbiBwcm9ncmVzcy4KCg4KBwQABAACAgESAyUEGQoOCgcEAAQAAgICEgMl
+HB0KQAoGBAAEAAIDEgMoBBkaMSBUZXJtaW5hbCBzdGF0ZTogUmVjb25jaWxpYXRpb24gZGlk
+IG5vdCBzdWNjZWVkLgoKDgoHBAAEAAIDARIDKAQUCg4KBwQABAACAwISAygXGApHCgYEAAQA
+AgQSAysEHBo4IFRlcm1pbmFsIHN0YXRlOiBSZWNvbmNpbGlhdGlvbiBjb21wbGV0ZWQgc3Vj
+Y2Vzc2Z1bGx5LgoKDgoHBAAEAAIEARIDKwQXCg4KBwQABAACBAISAysaGwpCCgQEAAQBEgQv
+AjsDGjQgUmVwcmVzZW50cyB0aGUgc2V2ZXJpdHkgb2YgdGhlIGNvbmRpdGlvbiBmYWlsdXJl
+cy4KCgwKBQQABAEBEgMvBw8KJQoGBAAEAQIAEgMxBB0aFiBVbnNwZWNpZmllZCBzZXZlcml0
+eQoKDgoHBAAEAQIAARIDMQQYCg4KBwQABAECAAISAzEbHAogCgYEAAQBAgESAzQEDhoRIEVy
+cm9yIHNldmVyaXR5LgoKDgoHBAAEAQIBARIDNAQJCg4KBwQABAECAQISAzQMDQoiCgYEAAQB
+AgISAzcEEBoTIFdhcm5pbmcgc2V2ZXJpdHkuCgoOCgcEAAQBAgIBEgM3BAsKDgoHBAAEAQIC
+AhIDNw4PCh8KBgQABAECAxIDOgQNGhAgSW5mbyBzZXZlcml0eS4KCg4KBwQABAECAwESAzoE
+CAoOCgcEAAQBAgMCEgM6CwwKOgoEBAAEAhIEPgJuAxosIFJlYXNvbnMgY29tbW9uIHRvIGFs
+bCB0eXBlcyBvZiBjb25kaXRpb25zLgoKDAoFBAAEAgESAz4HEwofCgYEAAQCAgASA0AEIBoQ
+IERlZmF1bHQgdmFsdWUuCgoOCgcEAAQCAgABEgNABBsKDgoHBAAEAgIAAhIDQB4fCkQKBgQA
+BAICARIDQwQQGjUgUmVhc29uIHVua25vd24uIEZ1cnRoZXIgZGV0YWlscyB3aWxsIGJlIGlu
+IG1lc3NhZ2UuCgoOCgcEAAQCAgEBEgNDBAsKDgoHBAAEAgIBAhIDQw4PCjIKBgQABAICAhID
+RgQYGiMgUmV2aXNpb24gY3JlYXRpb24gcHJvY2VzcyBmYWlsZWQuCgoOCgcEAAQCAgIBEgNG
+BBMKDgoHBAAEAgICAhIDRhYXCjIKBgQABAICAxIDSQQjGiMgVGltZWQgb3V0IHdhaXRpbmcg
+Zm9yIGNvbXBsZXRpb24uCgoOCgcEAAQCAgMBEgNJBB4KDgoHBAAEAgIDAhIDSSEiCjcKBgQA
+BAICBBIDTAQaGiggVGhlIGNvbnRhaW5lciBpbWFnZSBwYXRoIGlzIGluY29ycmVjdC4KCg4K
+BwQABAICBAESA0wEFQoOCgcEAAQCAgQCEgNMGBkKQQoGBAAEAgIFEgNPBCQaMiBJbnN1ZmZp
+Y2llbnQgcGVybWlzc2lvbnMgb24gdGhlIGNvbnRhaW5lciBpbWFnZS4KCg4KBwQABAICBQES
+A08EHwoOCgcEAAQCAgUCEgNPIiMKPQoGBAAEAgIGEgNSBCUaLiBDb250YWluZXIgaW1hZ2Ug
+aXMgbm90IGF1dGhvcml6ZWQgYnkgcG9saWN5LgoKDgoHBAAEAgIGARIDUgQgCg4KBwQABAIC
+BgISA1IjJApDCgYEAAQCAgcSA1UEMxo0IENvbnRhaW5lciBpbWFnZSBwb2xpY3kgYXV0aG9y
+aXphdGlvbiBjaGVjayBmYWlsZWQuCgoOCgcEAAQCAgcBEgNVBC4KDgoHBAAEAgIHAhIDVTEy
+CjwKBgQABAICCBIDWAQqGi0gSW5zdWZmaWNpZW50IHBlcm1pc3Npb25zIG9uIGVuY3J5cHRp
+b24ga2V5LgoKDgoHBAAEAgIIARIDWAQkCg4KBwQABAICCAISA1gnKQo7CgYEAAQCAgkSA1sE
+JRosIFBlcm1pc3Npb24gY2hlY2sgb24gZW5jcnlwdGlvbiBrZXkgZmFpbGVkLgoKDgoHBAAE
+AgIJARIDWwQfCg4KBwQABAICCQISA1siJAo9CgYEAAQCAgoSA14EJRouIEF0IGxlYXN0IG9u
+ZSBBY2Nlc3MgY2hlY2sgb24gc2VjcmV0cyBmYWlsZWQuCgoOCgcEAAQCAgoBEgNeBB8KDgoH
+BAAEAgIKAhIDXiIkCjMKBgQABAICCxIDYQQfGiQgV2FpdGluZyBmb3Igb3BlcmF0aW9uIHRv
+IGNvbXBsZXRlLgoKDgoHBAAEAgILARIDYQQZCg4KBwQABAICCwISA2EcHgovCgYEAAQCAgwS
+A2QEGRogIFN5c3RlbSB3aWxsIHJldHJ5IGltbWVkaWF0ZWx5LgoKDgoHBAAEAgIMARIDZAQT
+Cg4KBwQABAICDAISA2QWGApBCgYEAAQCAg0SA2cEGRoyIFN5c3RlbSB3aWxsIHJldHJ5IGxh
+dGVyOyBjdXJyZW50IGF0dGVtcHQgZmFpbGVkLgoKDgoHBAAEAgINARIDZwQTCg4KBwQABAIC
+DQISA2cWGApXCgYEAAQCAg4SA2oEEhpIIEFuIGludGVybmFsIGVycm9yIG9jY3VycmVkLiBG
+dXJ0aGVyIGluZm9ybWF0aW9uIG1heSBiZSBpbiB0aGUgbWVzc2FnZS4KCg4KBwQABAICDgES
+A2oEDAoOCgcEAAQCAg4CEgNqDxEKOQoGBAAEAgIPEgNtBB8aKiBVc2VyLXByb3ZpZGVkIFZQ
+QyBuZXR3b3JrIHdhcyBub3QgZm91bmQuCgoOCgcEAAQCAg8BEgNtBBkKDgoHBAAEAgIPAhID
+bRweCjcKBAQABAMSBXECnwEDGiggUmVhc29ucyBzcGVjaWZpYyB0byBSZXZpc2lvbiByZXNv
+dXJjZS4KCgwKBQQABAMBEgNxBxUKHwoGBAAEAwIAEgNzBCIaECBEZWZhdWx0IHZhbHVlLgoK
+DgoHBAAEAwIAARIDcwQdCg4KBwQABAMCAAISA3MgIQorCgYEAAQDAgESA3YEEBocIFJldmlz
+aW9uIGluIFBlbmRpbmcgc3RhdGUuCgoOCgcEAAQDAgEBEgN2BAsKDgoHBAAEAwIBAhIDdg4P
+Ci4KBgQABAMCAhIDeQQQGh8gUmV2aXNpb24gaXMgaW4gUmVzZXJ2ZSBzdGF0ZS4KCg4KBwQA
+BAMCAgESA3kECwoOCgcEAAQDAgICEgN5Dg8KJQoGBAAEAwIDEgN8BBAaFiBSZXZpc2lvbiBp
+cyBSZXRpcmVkLgoKDgoHBAAEAwIDARIDfAQLCg4KBwQABAMCAwISA3wODworCgYEAAQDAgQS
+A38EERocIFJldmlzaW9uIGlzIGJlaW5nIHJldGlyZWQuCgoOCgcEAAQDAgQBEgN/BAwKDgoH
+BAAEAwIEAhIDfw8QCi4KBgQABAMCBRIEggEEExoeIFJldmlzaW9uIGlzIGJlaW5nIHJlY3Jl
+YXRlZC4KCg8KBwQABAMCBQESBIIBBA4KDwoHBAAEAwIFAhIEggEREgoxCgYEAAQDAgYSBIUB
+BCUaISBUaGVyZSB3YXMgYSBoZWFsdGggY2hlY2sgZXJyb3IuCgoPCgcEAAQDAgYBEgSFAQQg
+Cg8KBwQABAMCBgISBIUBIyQKcgoGBAAEAwIHEgSJAQQpGmIgSGVhbHRoIGNoZWNrIGZhaWxl
+ZCBkdWUgdG8gdXNlciBlcnJvciBmcm9tIGN1c3RvbWl6ZWQgcGF0aCBvZiB0aGUKIGNvbnRh
+aW5lci4gU3lzdGVtIHdpbGwgcmV0cnkuCgoPCgcEAAQDAgcBEgSJAQQkCg8KBwQABAMCBwIS
+BIkBJygK0QEKBgQABAMCCBIEjgEEJhrAASBBIHJldmlzaW9uIHdpdGggbWluX2luc3RhbmNl
+X2NvdW50ID4gMCB3YXMgY3JlYXRlZCBhbmQgaXMgcmVzZXJ2ZWQsIGJ1dAogaXQgd2FzIG5v
+dCBjb25maWd1cmVkIHRvIHNlcnZlIHRyYWZmaWMsIHNvIGl0J3Mgbm90IGxpdmUuIFRoaXMg
+Y2FuIGFsc28KIGhhcHBlbiBtb21lbnRhcmlseSBkdXJpbmcgdHJhZmZpYyBtaWdyYXRpb24u
+CgoPCgcEAAQDAggBEgSOAQQhCg8KBwQABAMCCAISBI4BJCUKUgoGBAAEAwIJEgSRAQQmGkIg
+VGhlIG1heGltdW0gYWxsb3dlZCBudW1iZXIgb2YgYWN0aXZlIHJldmlzaW9ucyBoYXMgYmVl
+biByZWFjaGVkLgoKDwoHBAAEAwIJARIEkQEEIQoPCgcEAAQDAgkCEgSRASQlCp8BCgYEAAQD
+AgoSBJYBBBcajgEgVGhlcmUgd2FzIG5vIGRlcGxveW1lbnQgZGVmaW5lZC4KIFRoaXMgdmFs
+dWUgaXMgbm8gbG9uZ2VyIHVzZWQsIGJ1dCBTZXJ2aWNlcyBjcmVhdGVkIGluIG9sZGVyIHZl
+cnNpb25zIG9mCiB0aGUgQVBJIG1pZ2h0IGNvbnRhaW4gdGhpcyB2YWx1ZS4KCg8KBwQABAMC
+CgESBJYBBBEKDwoHBAAEAwIKAhIElgEUFgqIAQoGBAAEAwILEgSaAQQeGnggQSByZXZpc2lv
+bidzIGNvbnRhaW5lciBoYXMgbm8gcG9ydCBzcGVjaWZpZWQgc2luY2UgdGhlIHJldmlzaW9u
+IGlzIG9mIGEKIG1hbnVhbGx5IHNjYWxlZCBzZXJ2aWNlIHdpdGggMCBpbnN0YW5jZSBjb3Vu
+dAoKDwoHBAAEAwILARIEmgEEGAoPCgcEAAQDAgsCEgSaARsdCocBCgYEAAQDAgwSBJ4BBB8a
+dyBBIHJldmlzaW9uIHdpdGggbWluX2luc3RhbmNlX2NvdW50ID4gMCB3YXMgY3JlYXRlZCBh
+bmQgaXMgd2FpdGluZyBmb3IKIGVub3VnaCBpbnN0YW5jZXMgdG8gYmVnaW4gYSB0cmFmZmlj
+IG1pZ3JhdGlvbi4KCg8KBwQABAMCDAESBJ4BBBkKDwoHBAAEAwIMAhIEngEcHgo5CgQEAAQE
+EgaiAQK7AQMaKSBSZWFzb25zIHNwZWNpZmljIHRvIEV4ZWN1dGlvbiByZXNvdXJjZS4KCg0K
+BQQABAQBEgSiAQcWCiAKBgQABAQCABIEpAEEIxoQIERlZmF1bHQgdmFsdWUuCgoPCgcEAAQE
+AgABEgSkAQQeCg8KBwQABAQCAAISBKQBISIKVAoGBAAEBAIBEgSnAQQpGkQgSW50ZXJuYWwg
+c3lzdGVtIGVycm9yIGdldHRpbmcgZXhlY3V0aW9uIHN0YXR1cy4gU3lzdGVtIHdpbGwgcmV0
+cnkuCgoPCgcEAAQEAgEBEgSnAQQkCg8KBwQABAQCAQISBKcBJygKigEKBgQABAQCAhIEqwEE
+Gxp6IEEgdGFzayByZWFjaGVkIGl0cyByZXRyeSBsaW1pdCBhbmQgdGhlIGxhc3QgYXR0ZW1w
+dCBmYWlsZWQgZHVlIHRvIHRoZQogdXNlciBjb250YWluZXIgZXhpdGluZyB3aXRoIGEgbm9u
+LXplcm8gZXhpdCBjb2RlLgoKDwoHBAAEBAICARIEqwEEFgoPCgcEAAQEAgICEgSrARkaCjcK
+BgQABAQCAxIErgEEEhonIFRoZSBleGVjdXRpb24gd2FzIGNhbmNlbGxlZCBieSB1c2Vycy4K
+Cg8KBwQABAQCAwESBK4BBA0KDwoHBAAEBAIDAhIErgEQEQpFCgYEAAQEAgQSBLEBBBMaNSBU
+aGUgZXhlY3V0aW9uIGlzIGluIHRoZSBwcm9jZXNzIG9mIGJlaW5nIGNhbmNlbGxlZC4KCg8K
+BwQABAQCBAESBLEBBA4KDwoHBAAEBAIEAhIEsQEREgosCgYEAAQEAgUSBLQBBBAaHCBUaGUg
+ZXhlY3V0aW9uIHdhcyBkZWxldGVkLgoKDwoHBAAEBAIFARIEtAEECwoPCgcEAAQEAgUCEgS0
+AQ4PCkIKBgQABAQCBhIEtwEEHhoyIEEgZGVsYXllZCBleGVjdXRpb24gaXMgd2FpdGluZyBm
+b3IgYSBzdGFydCB0aW1lLgoKDwoHBAAEBAIGARIEtwEEGQoPCgcEAAQEAgYCEgS3ARwdCkwK
+BgQABAQCBxIEugEEMxo8IEEgZGVsYXllZCBleGVjdXRpb24gZXhjZWVkZWQgdGhlIG1heGlt
+dW0gcnVudGltZSBkdXJhdGlvbi4KCg8KBwQABAQCBwESBLoBBC4KDwoHBAAEBAIHAhIEugEx
+Mgo4CgQEAAQFEga+AQLNAQMaKCBSZWFzb25zIHNwZWNpZmljIHRvIEluc3RhbmNlIHJlc291
+cmNlLgoKDQoFBAAEBQESBL4BBxUKIAoGBAAEBQIAEgTAAQQkGhAgRGVmYXVsdCB2YWx1ZS4K
+Cg8KBwQABAUCAAESBMABBB8KDwoHBAAEBQIAAhIEwAEiIwojCgYEAAQFAgESBMMBBBkaEyBJ
+bnN0YW5jZSBkZWxldGVkLgoKDwoHBAAEBQIBARIEwwEEFAoPCgcEAAQFAgECEgTDARcYCiMK
+BgQABAUCAhIExgEEGRoTIEluc3RhbmNlIHN0b3BwZWQuCgoPCgcEAAQFAgIBEgTGAQQUCg8K
+BwQABAUCAgISBMYBFxgKJAoGBAAEBQIDEgTJAQQaGhQgSW5zdGFuY2Ugc3RvcHBpbmcuCgoP
+CgcEAAQFAgMBEgTJAQQVCg8KBwQABAUCAwISBMkBGBkKPAoGBAAEBQIEEgTMAQQkGiwgSW5z
+dGFuY2UgZXhpdGVkIHdpdGggYSBub24temVybyBleGl0IGNvZGUuCgoPCgcEAAQFAgQBEgTM
+AQQfCg8KBwQABAUCBAISBMwBIiMKlwIKBAQAAgASBNQBAhIaiAIgdHlwZSBpcyB1c2VkIHRv
+IGNvbW11bmljYXRlIHRoZSBzdGF0dXMgb2YgdGhlIHJlY29uY2lsaWF0aW9uIHByb2Nlc3Mu
+CiBTZWUgYWxzbzoKIGh0dHBzOi8vZ2l0aHViLmNvbS9rbmF0aXZlL3NlcnZpbmcvYmxvYi9t
+YWluL2RvY3Mvc3BlYy9lcnJvcnMubWQjZXJyb3ItY29uZGl0aW9ucy1hbmQtcmVwb3J0aW5n
+CiBUeXBlcyBjb21tb24gdG8gYWxsIHJlc291cmNlcyBpbmNsdWRlOgogKiAiUmVhZHkiOiBU
+cnVlIHdoZW4gdGhlIFJlc291cmNlIGlzIHJlYWR5LgoKDQoFBAACAAUSBNQBAggKDQoFBAAC
+AAESBNQBCQ0KDQoFBAACAAMSBNQBEBEKJwoEBAACARIE1wECEhoZIFN0YXRlIG9mIHRoZSBj
+b25kaXRpb24uCgoNCgUEAAIBBhIE1wECBwoNCgUEAAIBARIE1wEIDQoNCgUEAAIBAxIE1wEQ
+EQpTCgQEAAICEgTaAQIVGkUgSHVtYW4gcmVhZGFibGUgbWVzc2FnZSBpbmRpY2F0aW5nIGRl
+dGFpbHMgYWJvdXQgdGhlIGN1cnJlbnQgc3RhdHVzLgoKDQoFBAACAgUSBNoBAggKDQoFBAAC
+AgESBNoBCRAKDQoFBAACAgMSBNoBExQKUAoEBAACAxIE3QECNRpCIExhc3QgdGltZSB0aGUg
+Y29uZGl0aW9uIHRyYW5zaXRpb25lZCBmcm9tIG9uZSBzdGF0dXMgdG8gYW5vdGhlci4KCg0K
+BQQAAgMGEgTdAQIbCg0KBQQAAgMBEgTdARwwCg0KBQQAAgMDEgTdATM0ClgKBAQAAgQSBOAB
+AhgaSiBIb3cgdG8gaW50ZXJwcmV0IGZhaWx1cmVzIG9mIHRoaXMgY29uZGl0aW9uLCBvbmUg
+b2YgRXJyb3IsIFdhcm5pbmcsIEluZm8KCg0KBQQAAgQGEgTgAQIKCg0KBQQAAgQBEgTgAQsT
+Cg0KBQQAAgQDEgTgARYXCqYBCgQEAAgAEgblAQL0AQMalQEgVGhlIHJlYXNvbiBmb3IgdGhp
+cyBjb25kaXRpb24uIERlcGVuZGluZyBvbiB0aGUgY29uZGl0aW9uIHR5cGUsCiBpdCB3aWxs
+IHBvcHVsYXRlIG9uZSBvZiB0aGVzZSBmaWVsZHMuCiBTdWNjZXNzZnVsIGNvbmRpdGlvbnMg
+Y2Fubm90IGhhdmUgYSByZWFzb24uCgoNCgUEAAgAARIE5QEIDwpQCgQEAAIFEgTnAQRIGkIg
+T3V0cHV0IG9ubHkuIEEgY29tbW9uIChzZXJ2aWNlLWxldmVsKSByZWFzb24gZm9yIHRoaXMg
+Y29uZGl0aW9uLgoKDQoFBAACBQYSBOcBBBAKDQoFBAACBQESBOcBERcKDQoFBAACBQMSBOcB
+GhsKDQoFBAACBQgSBOcBHEcKEAoIBAACBQicCAASBOcBHUYKQwoEBAACBhIG6gEE6wE0GjMg
+T3V0cHV0IG9ubHkuIEEgcmVhc29uIGZvciB0aGUgcmV2aXNpb24gY29uZGl0aW9uLgoKDQoF
+BAACBgYSBOoBBBIKDQoFBAACBgESBOoBEyIKDQoFBAACBgMSBOoBJSYKDQoFBAACBggSBOsB
+CDMKEAoIBAACBgicCAASBOsBCTIKRAoEBAACBxIG7gEE7wE0GjQgT3V0cHV0IG9ubHkuIEEg
+cmVhc29uIGZvciB0aGUgZXhlY3V0aW9uIGNvbmRpdGlvbi4KCg0KBQQAAgcGEgTuAQQTCg0K
+BQQAAgcBEgTuARQkCg0KBQQAAgcDEgTuAScpCg0KBQQAAgcIEgTvAQgzChAKCAQAAgcInAgA
+EgTvAQkyCkMKBAQAAggSBvIBBPMBNBozIE91dHB1dCBvbmx5LiBBIHJlYXNvbiBmb3IgdGhl
+IGluc3RhbmNlIGNvbmRpdGlvbi4KCg0KBQQAAggGEgTyAQQSCg0KBQQAAggBEgTyARMiCg0K
+BQQAAggDEgTyASUnCg0KBQQAAggIEgTzAQgzChAKCAQAAggInAgAEgTzAQkyYgZwcm90bzM=
+
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Run::V2::Condition::Condition ===
+    # Fields for Condition
+    # Field: type Type: 9 ()
+    # Field: state Type: 14 (.google.cloud.run.v2.Condition.State)
+    # Field: message Type: 9 ()
+    # Field: last_transition_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: severity Type: 14 (.google.cloud.run.v2.Condition.Severity)
+    # Field: reason Type: 14 (.google.cloud.run.v2.Condition.CommonReason)
+    # Field: revision_reason Type: 14 (.google.cloud.run.v2.Condition.RevisionReason)
+    # Field: execution_reason Type: 14 (.google.cloud.run.v2.Condition.ExecutionReason)
+    # Field: instance_reason Type: 14 (.google.cloud.run.v2.Condition.InstanceReason)
+
+# Enum: Condition::State
+our $Condition_STATE_UNSPECIFIED = 0;
+our $Condition_CONDITION_PENDING = 1;
+our $Condition_CONDITION_RECONCILING = 2;
+our $Condition_CONDITION_FAILED = 3;
+our $Condition_CONDITION_SUCCEEDED = 4;
+
+# Enum: Condition::Severity
+our $Condition_SEVERITY_UNSPECIFIED = 0;
+our $Condition_ERROR = 1;
+our $Condition_WARNING = 2;
+our $Condition_INFO = 3;
+
+# Enum: Condition::CommonReason
+our $Condition_COMMON_REASON_UNDEFINED = 0;
+our $Condition_UNKNOWN = 1;
+our $Condition_REVISION_FAILED = 3;
+our $Condition_PROGRESS_DEADLINE_EXCEEDED = 4;
+our $Condition_CONTAINER_MISSING = 6;
+our $Condition_CONTAINER_PERMISSION_DENIED = 7;
+our $Condition_CONTAINER_IMAGE_UNAUTHORIZED = 8;
+our $Condition_CONTAINER_IMAGE_AUTHORIZATION_CHECK_FAILED = 9;
+our $Condition_ENCRYPTION_KEY_PERMISSION_DENIED = 10;
+our $Condition_ENCRYPTION_KEY_CHECK_FAILED = 11;
+our $Condition_SECRETS_ACCESS_CHECK_FAILED = 12;
+our $Condition_WAITING_FOR_OPERATION = 13;
+our $Condition_IMMEDIATE_RETRY = 14;
+our $Condition_POSTPONED_RETRY = 15;
+our $Condition_INTERNAL = 16;
+our $Condition_VPC_NETWORK_NOT_FOUND = 17;
+
+# Enum: Condition::RevisionReason
+our $Condition_REVISION_REASON_UNDEFINED = 0;
+our $Condition_PENDING = 1;
+our $Condition_RESERVE = 2;
+our $Condition_RETIRED = 3;
+our $Condition_RETIRING = 4;
+our $Condition_RECREATING = 5;
+our $Condition_HEALTH_CHECK_CONTAINER_ERROR = 6;
+our $Condition_CUSTOMIZED_PATH_RESPONSE_PENDING = 7;
+our $Condition_MIN_INSTANCES_NOT_PROVISIONED = 8;
+our $Condition_ACTIVE_REVISION_LIMIT_REACHED = 9;
+our $Condition_NO_DEPLOYMENT = 10;
+our $Condition_HEALTH_CHECK_SKIPPED = 11;
+our $Condition_MIN_INSTANCES_WARMING = 12;
+
+# Enum: Condition::ExecutionReason
+our $Condition_EXECUTION_REASON_UNDEFINED = 0;
+our $Condition_JOB_STATUS_SERVICE_POLLING_ERROR = 1;
+our $Condition_NON_ZERO_EXIT_CODE = 2;
+our $Condition_CANCELLED = 3;
+our $Condition_CANCELLING = 4;
+our $Condition_DELETED = 5;
+our $Condition_DELAYED_START_PENDING = 6;
+our $Condition_DELAYED_EXECUTION_EXCEEDING_DURATION_LIMIT = 7;
+
+# Enum: Condition::InstanceReason
+our $Condition_INSTANCE_REASON_UNSPECIFIED = 0;
+our $Condition_INSTANCE_DELETED = 1;
+our $Condition_INSTANCE_STOPPED = 2;
+our $Condition_INSTANCE_STOPPING = 3;
+our $Condition_INSTANCE_NON_ZERO_EXIT_CODE = 4;
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Run::V2::Condition - Compiled Protocol Buffers messages for google/cloud/run/v2/condition.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Run::V2::Condition;
+
+    my $msg = Google::Cloud::Run::V2::Condition::Condition->new({
+        type => $type,
+        state => $state,
+        message => $message,
+        last_transition_time => $last_transition_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->type();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Run::V2::Condition::Condition->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/run/v2/condition.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Run::V2::Condition::Condition
+
+Defines a status condition for a resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+type is used to communicate the status of the reconciliation process.
+See also:
+https://github.com/knative/serving/blob/main/docs/spec/errors.md#error-conditions-and-reporting
+Types common to all resources include:
+* "Ready": True when the Resource is ready.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Run::V2::Condition::State>)
+
+State of the condition.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+Human readable message indicating details about the current status.
+
+=item * C<< $msg->last_transition_time() >> / C<< $msg->last_transition_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Last time the condition transitioned from one status to another.
+
+=item * C<< $msg->severity() >> / C<< $msg->severity($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Run::V2::Condition::Severity>)
+
+How to interpret failures of this condition, one of Error, Warning, Info
+
+=item * C<< $msg->reason() >> / C<< $msg->reason($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Run::V2::Condition::CommonReason>)
+
+Output only. A common (service-level) reason for this condition.
+
+=item * C<< $msg->revision_reason() >> / C<< $msg->revision_reason($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Run::V2::Condition::RevisionReason>)
+
+Output only. A reason for the revision condition.
+
+=item * C<< $msg->execution_reason() >> / C<< $msg->execution_reason($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Run::V2::Condition::ExecutionReason>)
+
+Output only. A reason for the execution condition.
+
+=item * C<< $msg->instance_reason() >> / C<< $msg->instance_reason($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Run::V2::Condition::InstanceReason>)
+
+Output only. A reason for the instance condition.
+
+=back
+
+=head3 Enum: Condition::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CONDITION_PENDING> => C<1>
+
+=item * C<CONDITION_RECONCILING> => C<2>
+
+=item * C<CONDITION_FAILED> => C<3>
+
+=item * C<CONDITION_SUCCEEDED> => C<4>
+
+=back
+
+=head3 Enum: Condition::Severity
+
+=over 4
+
+=item * C<SEVERITY_UNSPECIFIED> => C<0>
+
+=item * C<ERROR> => C<1>
+
+=item * C<WARNING> => C<2>
+
+=item * C<INFO> => C<3>
+
+=back
+
+=head3 Enum: Condition::CommonReason
+
+=over 4
+
+=item * C<COMMON_REASON_UNDEFINED> => C<0>
+
+=item * C<UNKNOWN> => C<1>
+
+=item * C<REVISION_FAILED> => C<3>
+
+=item * C<PROGRESS_DEADLINE_EXCEEDED> => C<4>
+
+=item * C<CONTAINER_MISSING> => C<6>
+
+=item * C<CONTAINER_PERMISSION_DENIED> => C<7>
+
+=item * C<CONTAINER_IMAGE_UNAUTHORIZED> => C<8>
+
+=item * C<CONTAINER_IMAGE_AUTHORIZATION_CHECK_FAILED> => C<9>
+
+=item * C<ENCRYPTION_KEY_PERMISSION_DENIED> => C<10>
+
+=item * C<ENCRYPTION_KEY_CHECK_FAILED> => C<11>
+
+=item * C<SECRETS_ACCESS_CHECK_FAILED> => C<12>
+
+=item * C<WAITING_FOR_OPERATION> => C<13>
+
+=item * C<IMMEDIATE_RETRY> => C<14>
+
+=item * C<POSTPONED_RETRY> => C<15>
+
+=item * C<INTERNAL> => C<16>
+
+=item * C<VPC_NETWORK_NOT_FOUND> => C<17>
+
+=back
+
+=head3 Enum: Condition::RevisionReason
+
+=over 4
+
+=item * C<REVISION_REASON_UNDEFINED> => C<0>
+
+=item * C<PENDING> => C<1>
+
+=item * C<RESERVE> => C<2>
+
+=item * C<RETIRED> => C<3>
+
+=item * C<RETIRING> => C<4>
+
+=item * C<RECREATING> => C<5>
+
+=item * C<HEALTH_CHECK_CONTAINER_ERROR> => C<6>
+
+=item * C<CUSTOMIZED_PATH_RESPONSE_PENDING> => C<7>
+
+=item * C<MIN_INSTANCES_NOT_PROVISIONED> => C<8>
+
+=item * C<ACTIVE_REVISION_LIMIT_REACHED> => C<9>
+
+=item * C<NO_DEPLOYMENT> => C<10>
+
+=item * C<HEALTH_CHECK_SKIPPED> => C<11>
+
+=item * C<MIN_INSTANCES_WARMING> => C<12>
+
+=back
+
+=head3 Enum: Condition::ExecutionReason
+
+=over 4
+
+=item * C<EXECUTION_REASON_UNDEFINED> => C<0>
+
+=item * C<JOB_STATUS_SERVICE_POLLING_ERROR> => C<1>
+
+=item * C<NON_ZERO_EXIT_CODE> => C<2>
+
+=item * C<CANCELLED> => C<3>
+
+=item * C<CANCELLING> => C<4>
+
+=item * C<DELETED> => C<5>
+
+=item * C<DELAYED_START_PENDING> => C<6>
+
+=item * C<DELAYED_EXECUTION_EXCEEDING_DURATION_LIMIT> => C<7>
+
+=back
+
+=head3 Enum: Condition::InstanceReason
+
+=over 4
+
+=item * C<INSTANCE_REASON_UNSPECIFIED> => C<0>
+
+=item * C<INSTANCE_DELETED> => C<1>
+
+=item * C<INSTANCE_STOPPED> => C<2>
+
+=item * C<INSTANCE_STOPPING> => C<3>
+
+=item * C<INSTANCE_NON_ZERO_EXIT_CODE> => C<4>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Run::V2::Condition::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

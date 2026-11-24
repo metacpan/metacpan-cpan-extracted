@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::DataProfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -375,78 +375,10 @@ EOF
     # Field: catalog_publishing_enabled Type: 8 ()
     # Field: mode Type: 14 (.google.cloud.dataplex.v1.DataProfileSpec.Mode)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProfile;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec->new(
-        sampling_percent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<sampling_percent>
-
-Type: Float
-
-=item * B<row_filter>
-
-Type: String
-
-=item * B<post_scan_actions>
-
-Type: Message (.google.cloud.dataplex.v1.DataProfileSpec.PostScanActions)
-
-=item * B<include_fields>
-
-Type: Message (.google.cloud.dataplex.v1.DataProfileSpec.SelectedFields)
-
-=item * B<exclude_fields>
-
-Type: Message (.google.cloud.dataplex.v1.DataProfileSpec.SelectedFields)
-
-=item * B<catalog_publishing_enabled>
-
-Type: Bool
-
-=item * B<mode>
-
-Type: Enum (.google.cloud.dataplex.v1.DataProfileSpec.Mode)
-
-=back
-
-=cut
-
 # Enum: DataProfileSpec::Mode
 our $DataProfileSpec_MODE_UNSPECIFIED = 0;
 our $DataProfileSpec_STANDARD = 1;
 our $DataProfileSpec_LIGHTWEIGHT = 2;
-
-=pod
-
-=head2 Enum: DataProfileSpec::Mode
-
-Values:
-
-=over 4
-
-=item * C<MODE_UNSPECIFIED> => 0
-
-=item * C<STANDARD> => 1
-
-=item * C<LIGHTWEIGHT> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataProfile::DataProfileResult ===
     # Fields for DataProfileResult
@@ -456,59 +388,174 @@ Values:
     # Field: post_scan_actions_result Type: 11 (.google.cloud.dataplex.v1.DataProfileResult.PostScanActionsResult)
     # Field: catalog_publishing_status Type: 11 (.google.cloud.dataplex.v1.DataScanCatalogPublishingStatus)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::DataProfile::DataProfileResult - Compiled Protocol Buffers message class
+Google::Cloud::Dataplex::V1::DataProfile - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/data_profile.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Dataplex::V1::DataProfile;
 
-    my $msg = Google::Cloud::Dataplex::V1::DataProfile::DataProfileResult->new(
-        row_count => $value,
-    );
+    my $msg = Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec->new({
+        sampling_percent => $sampling_percent,
+        row_filter => $row_filter,
+        post_scan_actions => $post_scan_actions,
+        include_fields => $include_fields,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->sampling_percent();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec->parse($bytes);
 
-=item * B<row_count>
-
-Type: Int64
-
-=item * B<profile>
-
-Type: Message (.google.cloud.dataplex.v1.DataProfileResult.Profile)
-
-=item * B<scanned_data>
-
-Type: Message (.google.cloud.dataplex.v1.ScannedData)
-
-=item * B<post_scan_actions_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataProfileResult.PostScanActionsResult)
-
-=item * B<catalog_publishing_status>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanCatalogPublishingStatus)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProfile - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/data_profile.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec
+
+DataProfileScan related setting.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->sampling_percent() >> / C<< $msg->sampling_percent($value) >>
+
+Type: C<Float>
+
+Optional. The percentage of the records to be selected from the dataset for
+DataScan.
+
+* Value can range between 0.0 and 100.0 with up to 3 significant decimal
+digits.
+* Sampling is not applied if `sampling_percent` is not specified, 0 or
+100.
+
+=item * C<< $msg->row_filter() >> / C<< $msg->row_filter($value) >>
+
+Type: C<String>
+
+Optional. A filter applied to all rows in a single DataScan job.
+The filter needs to be a valid SQL expression for a WHERE clause in
+BigQuery standard SQL syntax.
+Example: col1 >= 0 AND col2 < 10
+
+=item * C<< $msg->post_scan_actions() >> / C<< $msg->post_scan_actions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec::PostScanActions>)
+
+Optional. Actions to take upon job completion..
+
+=item * C<< $msg->include_fields() >> / C<< $msg->include_fields($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec::SelectedFields>)
+
+Optional. The fields to include in data profile.
+
+If not specified, all fields at the time of profile scan job execution are
+included, except for ones listed in `exclude_fields`.
+
+=item * C<< $msg->exclude_fields() >> / C<< $msg->exclude_fields($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec::SelectedFields>)
+
+Optional. The fields to exclude from data profile.
+
+If specified, the fields will be excluded from data profile, regardless of
+`include_fields` value.
+
+=item * C<< $msg->catalog_publishing_enabled() >> / C<< $msg->catalog_publishing_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. If set, the latest DataScan job result will be published as
+Dataplex Universal Catalog metadata.
+
+=item * C<< $msg->mode() >> / C<< $msg->mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataProfileSpec::Mode>)
+
+Optional. The execution mode for the profile scan.
+
+=back
+
+=head3 Enum: DataProfileSpec::Mode
+
+=over 4
+
+=item * C<MODE_UNSPECIFIED> => C<0>
+
+=item * C<STANDARD> => C<1>
+
+=item * C<LIGHTWEIGHT> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProfile::DataProfileResult
+
+DataProfileResult defines the output of DataProfileScan. Each field of the
+table will have field type specific profile result.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->row_count() >> / C<< $msg->row_count($value) >>
+
+Type: C<Int64>
+
+Output only. The count of rows scanned.
+
+=item * C<< $msg->profile() >> / C<< $msg->profile($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProfile::DataProfileResult::Profile>)
+
+Output only. The profile information per field.
+
+=item * C<< $msg->scanned_data() >> / C<< $msg->scanned_data($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Processing::ScannedData>)
+
+Output only. The data scanned for this result.
+
+=item * C<< $msg->post_scan_actions_result() >> / C<< $msg->post_scan_actions_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProfile::DataProfileResult::PostScanActionsResult>)
+
+Output only. The result of post scan actions.
+
+=item * C<< $msg->catalog_publishing_status() >> / C<< $msg->catalog_publishing_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DatascansCommon::DataScanCatalogPublishingStatus>)
+
+Output only. The status of publishing the data scan as Dataplex Universal
+Catalog metadata.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::DataProfile::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

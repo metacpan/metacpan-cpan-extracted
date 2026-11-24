@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::Clusters;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1966,64 +1966,6 @@ EOF
     # Field: cluster_uuid Type: 9 ()
     # Field: metrics Type: 11 (.google.cloud.dataproc.v1.ClusterMetrics)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::Cluster - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::Cluster->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<config>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterConfig)
-
-=item * B<virtual_cluster_config>
-
-Type: Message (.google.cloud.dataproc.v1.VirtualClusterConfig)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.Cluster.LabelsEntry)
-
-=item * B<status>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterStatus)
-
-=item * B<status_history>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterStatus)
-
-=item * B<cluster_uuid>
-
-Type: String
-
-=item * B<metrics>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterMetrics)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::ClusterConfig ===
     # Fields for ClusterConfig
     # Field: cluster_type Type: 14 (.google.cloud.dataproc.v1.ClusterConfig.ClusterType)
@@ -2049,187 +1991,21 @@ Type: Message (.google.cloud.dataproc.v1.ClusterMetrics)
     # Field: worker_flexible_config Type: 11 (.google.cloud.dataproc.v1.FlexibleInstanceGroupConfig)
     # Field: secondary_worker_flexible_config Type: 11 (.google.cloud.dataproc.v1.FlexibleInstanceGroupConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::ClusterConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::ClusterConfig->new(
-        cluster_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cluster_type>
-
-Type: Enum (.google.cloud.dataproc.v1.ClusterConfig.ClusterType)
-
-=item * B<cluster_tier>
-
-Type: Enum (.google.cloud.dataproc.v1.ClusterConfig.ClusterTier)
-
-=item * B<engine>
-
-Type: Enum (.google.cloud.dataproc.v1.ClusterConfig.Engine)
-
-=item * B<config_bucket>
-
-Type: String
-
-=item * B<temp_bucket>
-
-Type: String
-
-=item * B<gce_cluster_config>
-
-Type: Message (.google.cloud.dataproc.v1.GceClusterConfig)
-
-=item * B<master_config>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceGroupConfig)
-
-=item * B<worker_config>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceGroupConfig)
-
-=item * B<secondary_worker_config>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceGroupConfig)
-
-=item * B<software_config>
-
-Type: Message (.google.cloud.dataproc.v1.SoftwareConfig)
-
-=item * B<initialization_actions>
-
-Type: Message (.google.cloud.dataproc.v1.NodeInitializationAction)
-
-=item * B<encryption_config>
-
-Type: Message (.google.cloud.dataproc.v1.EncryptionConfig)
-
-=item * B<autoscaling_config>
-
-Type: Message (.google.cloud.dataproc.v1.AutoscalingConfig)
-
-=item * B<security_config>
-
-Type: Message (.google.cloud.dataproc.v1.SecurityConfig)
-
-=item * B<lifecycle_config>
-
-Type: Message (.google.cloud.dataproc.v1.LifecycleConfig)
-
-=item * B<endpoint_config>
-
-Type: Message (.google.cloud.dataproc.v1.EndpointConfig)
-
-=item * B<metastore_config>
-
-Type: Message (.google.cloud.dataproc.v1.MetastoreConfig)
-
-=item * B<dataproc_metric_config>
-
-Type: Message (.google.cloud.dataproc.v1.DataprocMetricConfig)
-
-=item * B<auxiliary_node_groups>
-
-Type: Message (.google.cloud.dataproc.v1.AuxiliaryNodeGroup)
-
-=item * B<master_flexible_config>
-
-Type: Message (.google.cloud.dataproc.v1.FlexibleInstanceGroupConfig)
-
-=item * B<worker_flexible_config>
-
-Type: Message (.google.cloud.dataproc.v1.FlexibleInstanceGroupConfig)
-
-=item * B<secondary_worker_flexible_config>
-
-Type: Message (.google.cloud.dataproc.v1.FlexibleInstanceGroupConfig)
-
-=back
-
-=cut
-
 # Enum: ClusterConfig::ClusterType
 our $ClusterConfig_CLUSTER_TYPE_UNSPECIFIED = 0;
 our $ClusterConfig_STANDARD = 1;
 our $ClusterConfig_SINGLE_NODE = 2;
 our $ClusterConfig_ZERO_SCALE = 3;
 
-=pod
-
-=head2 Enum: ClusterConfig::ClusterType
-
-Values:
-
-=over 4
-
-=item * C<CLUSTER_TYPE_UNSPECIFIED> => 0
-
-=item * C<STANDARD> => 1
-
-=item * C<SINGLE_NODE> => 2
-
-=item * C<ZERO_SCALE> => 3
-
-=back
-
-=cut
-
 # Enum: ClusterConfig::ClusterTier
 our $ClusterConfig_CLUSTER_TIER_UNSPECIFIED = 0;
 our $ClusterConfig_CLUSTER_TIER_STANDARD = 1;
 our $ClusterConfig_CLUSTER_TIER_PREMIUM = 2;
 
-=pod
-
-=head2 Enum: ClusterConfig::ClusterTier
-
-Values:
-
-=over 4
-
-=item * C<CLUSTER_TIER_UNSPECIFIED> => 0
-
-=item * C<CLUSTER_TIER_STANDARD> => 1
-
-=item * C<CLUSTER_TIER_PREMIUM> => 2
-
-=back
-
-=cut
-
 # Enum: ClusterConfig::Engine
 our $ClusterConfig_ENGINE_UNSPECIFIED = 0;
 our $ClusterConfig_DEFAULT = 1;
 our $ClusterConfig_LIGHTNING = 2;
-
-=pod
-
-=head2 Enum: ClusterConfig::Engine
-
-Values:
-
-=over 4
-
-=item * C<ENGINE_UNSPECIFIED> => 0
-
-=item * C<DEFAULT> => 1
-
-=item * C<LIGHTNING> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::VirtualClusterConfig ===
     # Fields for VirtualClusterConfig
@@ -2237,174 +2013,24 @@ Values:
     # Field: kubernetes_cluster_config Type: 11 (.google.cloud.dataproc.v1.KubernetesClusterConfig)
     # Field: auxiliary_services_config Type: 11 (.google.cloud.dataproc.v1.AuxiliaryServicesConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::VirtualClusterConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::VirtualClusterConfig->new(
-        staging_bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<staging_bucket>
-
-Type: String
-
-=item * B<kubernetes_cluster_config>
-
-Type: Message (.google.cloud.dataproc.v1.KubernetesClusterConfig)
-
-=item * B<auxiliary_services_config>
-
-Type: Message (.google.cloud.dataproc.v1.AuxiliaryServicesConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::AuxiliaryServicesConfig ===
     # Fields for AuxiliaryServicesConfig
     # Field: metastore_config Type: 11 (.google.cloud.dataproc.v1.MetastoreConfig)
     # Field: spark_history_server_config Type: 11 (.google.cloud.dataproc.v1.SparkHistoryServerConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::AuxiliaryServicesConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::AuxiliaryServicesConfig->new(
-        metastore_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<metastore_config>
-
-Type: Message (.google.cloud.dataproc.v1.MetastoreConfig)
-
-=item * B<spark_history_server_config>
-
-Type: Message (.google.cloud.dataproc.v1.SparkHistoryServerConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::EndpointConfig ===
     # Fields for EndpointConfig
     # Field: http_ports Type: 11 (.google.cloud.dataproc.v1.EndpointConfig.HttpPortsEntry)
     # Field: enable_http_port_access Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::EndpointConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::EndpointConfig->new(
-        http_ports => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<http_ports>
-
-Type: Message (.google.cloud.dataproc.v1.EndpointConfig.HttpPortsEntry)
-
-=item * B<enable_http_port_access>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::AutoscalingConfig ===
     # Fields for AutoscalingConfig
     # Field: policy_uri Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::AutoscalingConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::AutoscalingConfig->new(
-        policy_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<policy_uri>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::EncryptionConfig ===
     # Fields for EncryptionConfig
     # Field: gce_pd_kms_key_name Type: 9 ()
     # Field: kms_key Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::EncryptionConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::EncryptionConfig->new(
-        gce_pd_kms_key_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<gce_pd_kms_key_name>
-
-Type: String
-
-=item * B<kms_key>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::GceClusterConfig ===
     # Fields for GceClusterConfig
@@ -2424,193 +2050,23 @@ Type: String
     # Field: confidential_instance_config Type: 11 (.google.cloud.dataproc.v1.ConfidentialInstanceConfig)
     # Field: resource_manager_tags Type: 11 (.google.cloud.dataproc.v1.GceClusterConfig.ResourceManagerTagsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::GceClusterConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::GceClusterConfig->new(
-        zone_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<zone_uri>
-
-Type: String
-
-=item * B<multi_zone_config>
-
-Type: Message (.google.cloud.dataproc.v1.MultiZoneConfig)
-
-=item * B<network_uri>
-
-Type: String
-
-=item * B<subnetwork_uri>
-
-Type: String
-
-=item * B<internal_ip_only>
-
-Type: Bool
-
-=item * B<private_ipv6_google_access>
-
-Type: Enum (.google.cloud.dataproc.v1.GceClusterConfig.PrivateIpv6GoogleAccess)
-
-=item * B<service_account>
-
-Type: String
-
-=item * B<service_account_scopes>
-
-Type: String
-
-=item * B<tags>
-
-Type: String
-
-=item * B<metadata>
-
-Type: Message (.google.cloud.dataproc.v1.GceClusterConfig.MetadataEntry)
-
-=item * B<reservation_affinity>
-
-Type: Message (.google.cloud.dataproc.v1.ReservationAffinity)
-
-=item * B<node_group_affinity>
-
-Type: Message (.google.cloud.dataproc.v1.NodeGroupAffinity)
-
-=item * B<shielded_instance_config>
-
-Type: Message (.google.cloud.dataproc.v1.ShieldedInstanceConfig)
-
-=item * B<confidential_instance_config>
-
-Type: Message (.google.cloud.dataproc.v1.ConfidentialInstanceConfig)
-
-=item * B<resource_manager_tags>
-
-Type: Message (.google.cloud.dataproc.v1.GceClusterConfig.ResourceManagerTagsEntry)
-
-=back
-
-=cut
-
 # Enum: GceClusterConfig::PrivateIpv6GoogleAccess
 our $GceClusterConfig_PRIVATE_IPV6_GOOGLE_ACCESS_UNSPECIFIED = 0;
 our $GceClusterConfig_INHERIT_FROM_SUBNETWORK = 1;
 our $GceClusterConfig_OUTBOUND = 2;
 our $GceClusterConfig_BIDIRECTIONAL = 3;
 
-=pod
-
-=head2 Enum: GceClusterConfig::PrivateIpv6GoogleAccess
-
-Values:
-
-=over 4
-
-=item * C<PRIVATE_IPV6_GOOGLE_ACCESS_UNSPECIFIED> => 0
-
-=item * C<INHERIT_FROM_SUBNETWORK> => 1
-
-=item * C<OUTBOUND> => 2
-
-=item * C<BIDIRECTIONAL> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::MultiZoneConfig ===
     # Fields for MultiZoneConfig
     # Field: target_shape Type: 14 (.google.cloud.dataproc.v1.MultiZoneConfig.TargetShape)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::MultiZoneConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::MultiZoneConfig->new(
-        target_shape => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<target_shape>
-
-Type: Enum (.google.cloud.dataproc.v1.MultiZoneConfig.TargetShape)
-
-=back
-
-=cut
 
 # Enum: MultiZoneConfig::TargetShape
 our $MultiZoneConfig_TARGET_SHAPE_UNSPECIFIED = 0;
 our $MultiZoneConfig_ANY = 1;
 
-=pod
-
-=head2 Enum: MultiZoneConfig::TargetShape
-
-Values:
-
-=over 4
-
-=item * C<TARGET_SHAPE_UNSPECIFIED> => 0
-
-=item * C<ANY> => 1
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::NodeGroupAffinity ===
     # Fields for NodeGroupAffinity
     # Field: node_group_uri Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::NodeGroupAffinity - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::NodeGroupAffinity->new(
-        node_group_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<node_group_uri>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::ShieldedInstanceConfig ===
     # Fields for ShieldedInstanceConfig
@@ -2618,100 +2074,16 @@ Type: String
     # Field: enable_vtpm Type: 8 ()
     # Field: enable_integrity_monitoring Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::ShieldedInstanceConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::ShieldedInstanceConfig->new(
-        enable_secure_boot => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enable_secure_boot>
-
-Type: Bool
-
-=item * B<enable_vtpm>
-
-Type: Bool
-
-=item * B<enable_integrity_monitoring>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::ConfidentialInstanceConfig ===
     # Fields for ConfidentialInstanceConfig
     # Field: enable_confidential_compute Type: 8 ()
     # Field: confidential_instance_type Type: 14 (.google.cloud.dataproc.v1.ConfidentialInstanceConfig.ConfidentialInstanceType)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::ConfidentialInstanceConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::ConfidentialInstanceConfig->new(
-        enable_confidential_compute => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enable_confidential_compute>
-
-Type: Bool
-
-=item * B<confidential_instance_type>
-
-Type: Enum (.google.cloud.dataproc.v1.ConfidentialInstanceConfig.ConfidentialInstanceType)
-
-=back
-
-=cut
 
 # Enum: ConfidentialInstanceConfig::ConfidentialInstanceType
 our $ConfidentialInstanceConfig_CONFIDENTIAL_INSTANCE_TYPE_UNSPECIFIED = 0;
 our $ConfidentialInstanceConfig_SEV = 1;
 our $ConfidentialInstanceConfig_SEV_SNP = 2;
 our $ConfidentialInstanceConfig_TDX = 3;
-
-=pod
-
-=head2 Enum: ConfidentialInstanceConfig::ConfidentialInstanceType
-
-Values:
-
-=over 4
-
-=item * C<CONFIDENTIAL_INSTANCE_TYPE_UNSPECIFIED> => 0
-
-=item * C<SEV> => 1
-
-=item * C<SEV_SNP> => 2
-
-=item * C<TDX> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::InstanceGroupConfig ===
     # Fields for InstanceGroupConfig
@@ -2730,139 +2102,15 @@ Values:
     # Field: instance_flexibility_policy Type: 11 (.google.cloud.dataproc.v1.InstanceFlexibilityPolicy)
     # Field: startup_config Type: 11 (.google.cloud.dataproc.v1.StartupConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::InstanceGroupConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::InstanceGroupConfig->new(
-        num_instances => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<num_instances>
-
-Type: Int32
-
-=item * B<instance_names>
-
-Type: String
-
-=item * B<instance_references>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceReference)
-
-=item * B<image_uri>
-
-Type: String
-
-=item * B<machine_type_uri>
-
-Type: String
-
-=item * B<disk_config>
-
-Type: Message (.google.cloud.dataproc.v1.DiskConfig)
-
-=item * B<is_preemptible>
-
-Type: Bool
-
-=item * B<preemptibility>
-
-Type: Enum (.google.cloud.dataproc.v1.InstanceGroupConfig.Preemptibility)
-
-=item * B<managed_group_config>
-
-Type: Message (.google.cloud.dataproc.v1.ManagedGroupConfig)
-
-=item * B<accelerators>
-
-Type: Message (.google.cloud.dataproc.v1.AcceleratorConfig)
-
-=item * B<min_cpu_platform>
-
-Type: String
-
-=item * B<min_num_instances>
-
-Type: Int32
-
-=item * B<instance_flexibility_policy>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceFlexibilityPolicy)
-
-=item * B<startup_config>
-
-Type: Message (.google.cloud.dataproc.v1.StartupConfig)
-
-=back
-
-=cut
-
 # Enum: InstanceGroupConfig::Preemptibility
 our $InstanceGroupConfig_PREEMPTIBILITY_UNSPECIFIED = 0;
 our $InstanceGroupConfig_NON_PREEMPTIBLE = 1;
 our $InstanceGroupConfig_PREEMPTIBLE = 2;
 our $InstanceGroupConfig_SPOT = 3;
 
-=pod
-
-=head2 Enum: InstanceGroupConfig::Preemptibility
-
-Values:
-
-=over 4
-
-=item * C<PREEMPTIBILITY_UNSPECIFIED> => 0
-
-=item * C<NON_PREEMPTIBLE> => 1
-
-=item * C<PREEMPTIBLE> => 2
-
-=item * C<SPOT> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::StartupConfig ===
     # Fields for StartupConfig
     # Field: required_registration_fraction Type: 1 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::StartupConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::StartupConfig->new(
-        required_registration_fraction => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<required_registration_fraction>
-
-Type: Double
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::InstanceReference ===
     # Fields for InstanceReference
@@ -2871,123 +2119,17 @@ Type: Double
     # Field: public_key Type: 9 ()
     # Field: public_ecies_key Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::InstanceReference - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::InstanceReference->new(
-        instance_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance_name>
-
-Type: String
-
-=item * B<instance_id>
-
-Type: String
-
-=item * B<public_key>
-
-Type: String
-
-=item * B<public_ecies_key>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::ManagedGroupConfig ===
     # Fields for ManagedGroupConfig
     # Field: instance_template_name Type: 9 ()
     # Field: instance_group_manager_name Type: 9 ()
     # Field: instance_group_manager_uri Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::ManagedGroupConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::ManagedGroupConfig->new(
-        instance_template_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance_template_name>
-
-Type: String
-
-=item * B<instance_group_manager_name>
-
-Type: String
-
-=item * B<instance_group_manager_uri>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::InstanceFlexibilityPolicy ===
     # Fields for InstanceFlexibilityPolicy
     # Field: provisioning_model_mix Type: 11 (.google.cloud.dataproc.v1.InstanceFlexibilityPolicy.ProvisioningModelMix)
     # Field: instance_selection_list Type: 11 (.google.cloud.dataproc.v1.InstanceFlexibilityPolicy.InstanceSelection)
     # Field: instance_selection_results Type: 11 (.google.cloud.dataproc.v1.InstanceFlexibilityPolicy.InstanceSelectionResult)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::InstanceFlexibilityPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::InstanceFlexibilityPolicy->new(
-        provisioning_model_mix => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<provisioning_model_mix>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceFlexibilityPolicy.ProvisioningModelMix)
-
-=item * B<instance_selection_list>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceFlexibilityPolicy.InstanceSelection)
-
-=item * B<instance_selection_results>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceFlexibilityPolicy.InstanceSelectionResult)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig ===
     # Fields for FlexibleInstanceGroupConfig
@@ -2996,101 +2138,15 @@ Type: Message (.google.cloud.dataproc.v1.InstanceFlexibilityPolicy.InstanceSelec
     # Field: boot_disk_size_gb Type: 5 ()
     # Field: hardware_class Type: 14 (.google.cloud.dataproc.v1.FlexibleInstanceGroupConfig.HardwareClass)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig->new(
-        num_instances => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<num_instances>
-
-Type: Int32
-
-=item * B<core_count>
-
-Type: Int32
-
-=item * B<boot_disk_size_gb>
-
-Type: Int32
-
-=item * B<hardware_class>
-
-Type: Enum (.google.cloud.dataproc.v1.FlexibleInstanceGroupConfig.HardwareClass)
-
-=back
-
-=cut
-
 # Enum: FlexibleInstanceGroupConfig::HardwareClass
 our $FlexibleInstanceGroupConfig_HARDWARE_CLASS_UNSPECIFIED = 0;
 our $FlexibleInstanceGroupConfig_STANDARD = 1;
 our $FlexibleInstanceGroupConfig_PERFORMANCE = 2;
 
-=pod
-
-=head2 Enum: FlexibleInstanceGroupConfig::HardwareClass
-
-Values:
-
-=over 4
-
-=item * C<HARDWARE_CLASS_UNSPECIFIED> => 0
-
-=item * C<STANDARD> => 1
-
-=item * C<PERFORMANCE> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::AcceleratorConfig ===
     # Fields for AcceleratorConfig
     # Field: accelerator_type_uri Type: 9 ()
     # Field: accelerator_count Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::AcceleratorConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::AcceleratorConfig->new(
-        accelerator_type_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<accelerator_type_uri>
-
-Type: String
-
-=item * B<accelerator_count>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::DiskConfig ===
     # Fields for DiskConfig
@@ -3102,100 +2158,12 @@ Type: Int32
     # Field: boot_disk_provisioned_throughput Type: 3 ()
     # Field: attached_disk_configs Type: 11 (.google.cloud.dataproc.v1.AttachedDiskConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::DiskConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::DiskConfig->new(
-        boot_disk_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<boot_disk_type>
-
-Type: String
-
-=item * B<boot_disk_size_gb>
-
-Type: Int32
-
-=item * B<num_local_ssds>
-
-Type: Int32
-
-=item * B<local_ssd_interface>
-
-Type: String
-
-=item * B<boot_disk_provisioned_iops>
-
-Type: Int64
-
-=item * B<boot_disk_provisioned_throughput>
-
-Type: Int64
-
-=item * B<attached_disk_configs>
-
-Type: Message (.google.cloud.dataproc.v1.AttachedDiskConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::AttachedDiskConfig ===
     # Fields for AttachedDiskConfig
     # Field: disk_type Type: 14 (.google.cloud.dataproc.v1.AttachedDiskConfig.DiskType)
     # Field: disk_size_gb Type: 5 ()
     # Field: provisioned_iops Type: 3 ()
     # Field: provisioned_throughput Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::AttachedDiskConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::AttachedDiskConfig->new(
-        disk_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<disk_type>
-
-Type: Enum (.google.cloud.dataproc.v1.AttachedDiskConfig.DiskType)
-
-=item * B<disk_size_gb>
-
-Type: Int32
-
-=item * B<provisioned_iops>
-
-Type: Int64
-
-=item * B<provisioned_throughput>
-
-Type: Int64
-
-=back
-
-=cut
 
 # Enum: AttachedDiskConfig::DiskType
 our $AttachedDiskConfig_DISK_TYPE_UNSPECIFIED = 0;
@@ -3204,62 +2172,10 @@ our $AttachedDiskConfig_HYPERDISK_EXTREME = 2;
 our $AttachedDiskConfig_HYPERDISK_ML = 3;
 our $AttachedDiskConfig_HYPERDISK_THROUGHPUT = 4;
 
-=pod
-
-=head2 Enum: AttachedDiskConfig::DiskType
-
-Values:
-
-=over 4
-
-=item * C<DISK_TYPE_UNSPECIFIED> => 0
-
-=item * C<HYPERDISK_BALANCED> => 1
-
-=item * C<HYPERDISK_EXTREME> => 2
-
-=item * C<HYPERDISK_ML> => 3
-
-=item * C<HYPERDISK_THROUGHPUT> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::AuxiliaryNodeGroup ===
     # Fields for AuxiliaryNodeGroup
     # Field: node_group Type: 11 (.google.cloud.dataproc.v1.NodeGroup)
     # Field: node_group_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::AuxiliaryNodeGroup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::AuxiliaryNodeGroup->new(
-        node_group => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<node_group>
-
-Type: Message (.google.cloud.dataproc.v1.NodeGroup)
-
-=item * B<node_group_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::NodeGroup ===
     # Fields for NodeGroup
@@ -3268,98 +2184,14 @@ Type: String
     # Field: node_group_config Type: 11 (.google.cloud.dataproc.v1.InstanceGroupConfig)
     # Field: labels Type: 11 (.google.cloud.dataproc.v1.NodeGroup.LabelsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::NodeGroup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::NodeGroup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<roles>
-
-Type: Enum (.google.cloud.dataproc.v1.NodeGroup.Role)
-
-=item * B<node_group_config>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceGroupConfig)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.NodeGroup.LabelsEntry)
-
-=back
-
-=cut
-
 # Enum: NodeGroup::Role
 our $NodeGroup_ROLE_UNSPECIFIED = 0;
 our $NodeGroup_DRIVER = 1;
-
-=pod
-
-=head2 Enum: NodeGroup::Role
-
-Values:
-
-=over 4
-
-=item * C<ROLE_UNSPECIFIED> => 0
-
-=item * C<DRIVER> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::NodeInitializationAction ===
     # Fields for NodeInitializationAction
     # Field: executable_file Type: 9 ()
     # Field: execution_timeout Type: 11 (.google.protobuf.Duration)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::NodeInitializationAction - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::NodeInitializationAction->new(
-        executable_file => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<executable_file>
-
-Type: String
-
-=item * B<execution_timeout>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::ClusterStatus ===
     # Fields for ClusterStatus
@@ -3367,44 +2199,6 @@ Type: Message (.google.protobuf.Duration)
     # Field: detail Type: 9 ()
     # Field: state_start_time Type: 11 (.google.protobuf.Timestamp)
     # Field: substate Type: 14 (.google.cloud.dataproc.v1.ClusterStatus.Substate)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::ClusterStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::ClusterStatus->new(
-        state => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataproc.v1.ClusterStatus.State)
-
-=item * B<detail>
-
-Type: String
-
-=item * B<state_start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<substate>
-
-Type: Enum (.google.cloud.dataproc.v1.ClusterStatus.Substate)
-
-=back
-
-=cut
 
 # Enum: ClusterStatus::State
 our $ClusterStatus_UNKNOWN = 0;
@@ -3419,97 +2213,15 @@ our $ClusterStatus_STOPPED = 7;
 our $ClusterStatus_STARTING = 8;
 our $ClusterStatus_REPAIRING = 10;
 
-=pod
-
-=head2 Enum: ClusterStatus::State
-
-Values:
-
-=over 4
-
-=item * C<UNKNOWN> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<RUNNING> => 2
-
-=item * C<ERROR> => 3
-
-=item * C<ERROR_DUE_TO_UPDATE> => 9
-
-=item * C<DELETING> => 4
-
-=item * C<UPDATING> => 5
-
-=item * C<STOPPING> => 6
-
-=item * C<STOPPED> => 7
-
-=item * C<STARTING> => 8
-
-=item * C<REPAIRING> => 10
-
-=back
-
-=cut
-
 # Enum: ClusterStatus::Substate
 our $ClusterStatus_UNSPECIFIED = 0;
 our $ClusterStatus_UNHEALTHY = 1;
 our $ClusterStatus_STALE_STATUS = 2;
 
-=pod
-
-=head2 Enum: ClusterStatus::Substate
-
-Values:
-
-=over 4
-
-=item * C<UNSPECIFIED> => 0
-
-=item * C<UNHEALTHY> => 1
-
-=item * C<STALE_STATUS> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::SecurityConfig ===
     # Fields for SecurityConfig
     # Field: kerberos_config Type: 11 (.google.cloud.dataproc.v1.KerberosConfig)
     # Field: identity_config Type: 11 (.google.cloud.dataproc.v1.IdentityConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::SecurityConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::SecurityConfig->new(
-        kerberos_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kerberos_config>
-
-Type: Message (.google.cloud.dataproc.v1.KerberosConfig)
-
-=item * B<identity_config>
-
-Type: Message (.google.cloud.dataproc.v1.IdentityConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::KerberosConfig ===
     # Fields for KerberosConfig
@@ -3529,157 +2241,15 @@ Type: Message (.google.cloud.dataproc.v1.IdentityConfig)
     # Field: tgt_lifetime_hours Type: 5 ()
     # Field: realm Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::KerberosConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::KerberosConfig->new(
-        enable_kerberos => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enable_kerberos>
-
-Type: Bool
-
-=item * B<root_principal_password_uri>
-
-Type: String
-
-=item * B<kms_key_uri>
-
-Type: String
-
-=item * B<keystore_uri>
-
-Type: String
-
-=item * B<truststore_uri>
-
-Type: String
-
-=item * B<keystore_password_uri>
-
-Type: String
-
-=item * B<key_password_uri>
-
-Type: String
-
-=item * B<truststore_password_uri>
-
-Type: String
-
-=item * B<cross_realm_trust_realm>
-
-Type: String
-
-=item * B<cross_realm_trust_kdc>
-
-Type: String
-
-=item * B<cross_realm_trust_admin_server>
-
-Type: String
-
-=item * B<cross_realm_trust_shared_password_uri>
-
-Type: String
-
-=item * B<kdc_db_key_uri>
-
-Type: String
-
-=item * B<tgt_lifetime_hours>
-
-Type: Int32
-
-=item * B<realm>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::IdentityConfig ===
     # Fields for IdentityConfig
     # Field: user_service_account_mapping Type: 11 (.google.cloud.dataproc.v1.IdentityConfig.UserServiceAccountMappingEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::IdentityConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::IdentityConfig->new(
-        user_service_account_mapping => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<user_service_account_mapping>
-
-Type: Message (.google.cloud.dataproc.v1.IdentityConfig.UserServiceAccountMappingEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::SoftwareConfig ===
     # Fields for SoftwareConfig
     # Field: image_version Type: 9 ()
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.SoftwareConfig.PropertiesEntry)
     # Field: optional_components Type: 14 (.google.cloud.dataproc.v1.Component)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::SoftwareConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::SoftwareConfig->new(
-        image_version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<image_version>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.SoftwareConfig.PropertiesEntry)
-
-=item * B<optional_components>
-
-Type: Enum (.google.cloud.dataproc.v1.Component)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::LifecycleConfig ===
     # Fields for LifecycleConfig
@@ -3691,150 +2261,18 @@ Type: Enum (.google.cloud.dataproc.v1.Component)
     # Field: auto_stop_ttl Type: 11 (.google.protobuf.Duration)
     # Field: idle_start_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::LifecycleConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::LifecycleConfig->new(
-        idle_delete_ttl => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<idle_delete_ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<auto_delete_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<auto_delete_ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<idle_stop_ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<auto_stop_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<auto_stop_ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<idle_start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::MetastoreConfig ===
     # Fields for MetastoreConfig
     # Field: dataproc_metastore_service Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::MetastoreConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::MetastoreConfig->new(
-        dataproc_metastore_service => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dataproc_metastore_service>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::ClusterMetrics ===
     # Fields for ClusterMetrics
     # Field: hdfs_metrics Type: 11 (.google.cloud.dataproc.v1.ClusterMetrics.HdfsMetricsEntry)
     # Field: yarn_metrics Type: 11 (.google.cloud.dataproc.v1.ClusterMetrics.YarnMetricsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::ClusterMetrics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::ClusterMetrics->new(
-        hdfs_metrics => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<hdfs_metrics>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterMetrics.HdfsMetricsEntry)
-
-=item * B<yarn_metrics>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterMetrics.YarnMetricsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::DataprocMetricConfig ===
     # Fields for DataprocMetricConfig
     # Field: metrics Type: 11 (.google.cloud.dataproc.v1.DataprocMetricConfig.Metric)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::DataprocMetricConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::DataprocMetricConfig->new(
-        metrics => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<metrics>
-
-Type: Message (.google.cloud.dataproc.v1.DataprocMetricConfig.Metric)
-
-=back
-
-=cut
 
 # Enum: DataprocMetricConfig::MetricSource
 our $DataprocMetricConfig_METRIC_SOURCE_UNSPECIFIED = 0;
@@ -3847,36 +2285,6 @@ our $DataprocMetricConfig_HIVESERVER2 = 6;
 our $DataprocMetricConfig_HIVEMETASTORE = 7;
 our $DataprocMetricConfig_FLINK = 8;
 
-=pod
-
-=head2 Enum: DataprocMetricConfig::MetricSource
-
-Values:
-
-=over 4
-
-=item * C<METRIC_SOURCE_UNSPECIFIED> => 0
-
-=item * C<MONITORING_AGENT_DEFAULTS> => 1
-
-=item * C<HDFS> => 2
-
-=item * C<SPARK> => 3
-
-=item * C<YARN> => 4
-
-=item * C<SPARK_HISTORY_SERVER> => 5
-
-=item * C<HIVESERVER2> => 6
-
-=item * C<HIVEMETASTORE> => 7
-
-=item * C<FLINK> => 8
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::CreateClusterRequest ===
     # Fields for CreateClusterRequest
     # Field: project_id Type: 9 ()
@@ -3884,48 +2292,6 @@ Values:
     # Field: cluster Type: 11 (.google.cloud.dataproc.v1.Cluster)
     # Field: request_id Type: 9 ()
     # Field: action_on_failed_primary_workers Type: 14 (.google.cloud.dataproc.v1.FailureAction)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::CreateClusterRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::CreateClusterRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<cluster>
-
-Type: Message (.google.cloud.dataproc.v1.Cluster)
-
-=item * B<request_id>
-
-Type: String
-
-=item * B<action_on_failed_primary_workers>
-
-Type: Enum (.google.cloud.dataproc.v1.FailureAction)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::UpdateClusterRequest ===
     # Fields for UpdateClusterRequest
@@ -3937,56 +2303,6 @@ Type: Enum (.google.cloud.dataproc.v1.FailureAction)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::UpdateClusterRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::UpdateClusterRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<cluster>
-
-Type: Message (.google.cloud.dataproc.v1.Cluster)
-
-=item * B<graceful_decommission_timeout>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::StopClusterRequest ===
     # Fields for StopClusterRequest
     # Field: project_id Type: 9 ()
@@ -3994,48 +2310,6 @@ Type: String
     # Field: cluster_name Type: 9 ()
     # Field: cluster_uuid Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::StopClusterRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::StopClusterRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<cluster_uuid>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::StartClusterRequest ===
     # Fields for StartClusterRequest
@@ -4045,48 +2319,6 @@ Type: String
     # Field: cluster_uuid Type: 9 ()
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::StartClusterRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::StartClusterRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<cluster_uuid>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::DeleteClusterRequest ===
     # Fields for DeleteClusterRequest
     # Field: project_id Type: 9 ()
@@ -4095,87 +2327,11 @@ Type: String
     # Field: cluster_uuid Type: 9 ()
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::DeleteClusterRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::DeleteClusterRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<cluster_uuid>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::GetClusterRequest ===
     # Fields for GetClusterRequest
     # Field: project_id Type: 9 ()
     # Field: region Type: 9 ()
     # Field: cluster_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::GetClusterRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::GetClusterRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<cluster_name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::ListClustersRequest ===
     # Fields for ListClustersRequest
@@ -4185,82 +2341,10 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::ListClustersRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::ListClustersRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::ListClustersResponse ===
     # Fields for ListClustersResponse
     # Field: clusters Type: 11 (.google.cloud.dataproc.v1.Cluster)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::ListClustersResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::ListClustersResponse->new(
-        clusters => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<clusters>
-
-Type: Message (.google.cloud.dataproc.v1.Cluster)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterRequest ===
     # Fields for DiagnoseClusterRequest
@@ -4273,112 +2357,14 @@ Type: String
     # Field: jobs Type: 9 ()
     # Field: yarn_application_ids Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<tarball_gcs_dir>
-
-Type: String
-
-=item * B<tarball_access>
-
-Type: Enum (.google.cloud.dataproc.v1.DiagnoseClusterRequest.TarballAccess)
-
-=item * B<diagnosis_interval>
-
-Type: Message (.google.type.Interval)
-
-=item * B<jobs>
-
-Type: String
-
-=item * B<yarn_application_ids>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: DiagnoseClusterRequest::TarballAccess
 our $DiagnoseClusterRequest_TARBALL_ACCESS_UNSPECIFIED = 0;
 our $DiagnoseClusterRequest_GOOGLE_CLOUD_SUPPORT = 1;
 our $DiagnoseClusterRequest_GOOGLE_DATAPROC_DIAGNOSE = 2;
 
-=pod
-
-=head2 Enum: DiagnoseClusterRequest::TarballAccess
-
-Values:
-
-=over 4
-
-=item * C<TARBALL_ACCESS_UNSPECIFIED> => 0
-
-=item * C<GOOGLE_CLOUD_SUPPORT> => 1
-
-=item * C<GOOGLE_DATAPROC_DIAGNOSE> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterResults ===
     # Fields for DiagnoseClusterResults
     # Field: output_uri Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterResults - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterResults->new(
-        output_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<output_uri>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Clusters::ReservationAffinity ===
     # Fields for ReservationAffinity
@@ -4386,88 +2372,26 @@ Type: String
     # Field: key Type: 9 ()
     # Field: values Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Clusters::ReservationAffinity - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Clusters;
-
-    my $msg = Google::Cloud::Dataproc::V1::Clusters::ReservationAffinity->new(
-        consume_reservation_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<consume_reservation_type>
-
-Type: Enum (.google.cloud.dataproc.v1.ReservationAffinity.Type)
-
-=item * B<key>
-
-Type: String
-
-=item * B<values>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: ReservationAffinity::Type
 our $ReservationAffinity_TYPE_UNSPECIFIED = 0;
 our $ReservationAffinity_NO_RESERVATION = 1;
 our $ReservationAffinity_ANY_RESERVATION = 2;
 our $ReservationAffinity_SPECIFIC_RESERVATION = 3;
 
-=pod
-
-=head2 Enum: ReservationAffinity::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<NO_RESERVATION> => 1
-
-=item * C<ANY_RESERVATION> => 2
-
-=item * C<SPECIFIC_RESERVATION> => 3
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Dataproc::V1::Clusters::ClusterControllerClient ===
 package Google::Cloud::Dataproc::V1::Clusters::ClusterControllerClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataproc::V1::Clusters::ClusterControllerClient
 
-Google::Cloud::Dataproc::V1::Clusters::ClusterControllerClient - Client stub representing the remote ClusterController service
+Client stub representing the remote C<ClusterController> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataproc.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -4600,13 +2524,2610 @@ sub diagnose_cluster {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::Clusters - Protocol Buffers schema definition
+Google::Cloud::Dataproc::V1::Clusters - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/clusters.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataproc::V1::Clusters;
+
+    my $msg = Google::Cloud::Dataproc::V1::Clusters::Cluster->new({
+        project_id => $project_id,
+        cluster_name => $cluster_name,
+        config => $config,
+        virtual_cluster_config => $virtual_cluster_config,
+    });
+
+    # Read or update a field
+    my $val = $msg->project_id();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::Clusters::Cluster->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/clusters.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::Cluster
+
+Describes the identifying information, config, and status of
+a Dataproc cluster
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The Google Cloud Platform project ID that the cluster belongs to.
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Required. The cluster name, which must be unique within a project.
+The name must start with a lowercase letter, and can contain
+up to 51 lowercase letters, numbers, and hyphens. It cannot end
+with a hyphen. The name of a deleted cluster can be reused.
+
+=item * C<< $msg->config() >> / C<< $msg->config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ClusterConfig>)
+
+Optional. The cluster config for a cluster of Compute Engine Instances.
+Note that Dataproc may set default values, and values may change
+when clusters are updated.
+
+Exactly one of ClusterConfig or VirtualClusterConfig must be specified.
+
+=item * C<< $msg->virtual_cluster_config() >> / C<< $msg->virtual_cluster_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::VirtualClusterConfig>)
+
+Optional. The virtual cluster config is used when creating a Dataproc
+cluster that does not directly control the underlying compute resources,
+for example, when creating a [Dataproc-on-GKE
+cluster](https://cloud.google.com/dataproc/docs/guides/dpgke/dataproc-gke-overview).
+Dataproc may set default values, and values may change when
+clusters are updated. Exactly one of
+[config][google.cloud.dataproc.v1.Cluster.config] or
+[virtual_cluster_config][google.cloud.dataproc.v1.Cluster.virtual_cluster_config]
+must be specified.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::Cluster::LabelsEntry>)
+
+Optional. The labels to associate with this cluster.
+Label B<keys> must contain 1 to 63 characters, and must conform to
+[RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).
+Label B<values> may be empty, but, if present, must contain 1 to 63
+characters, and must conform to [RFC
+1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be
+associated with a cluster.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ClusterStatus>)
+
+Output only. Cluster status.
+
+=item * C<< $msg->status_history() >> / C<< $msg->status_history($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ClusterStatus>)
+
+Output only. The previous cluster status.
+
+=item * C<< $msg->cluster_uuid() >> / C<< $msg->cluster_uuid($value) >>
+
+Type: C<String>
+
+Output only. A cluster UUID (Unique Universal Identifier). Dataproc
+generates this value when it creates the cluster.
+
+=item * C<< $msg->metrics() >> / C<< $msg->metrics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ClusterMetrics>)
+
+Output only. Contains cluster daemon metrics such as HDFS and YARN stats.
+
+B<Beta Feature>: This report is available for testing purposes only. It
+may be changed before final release.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::ClusterConfig
+
+The cluster config.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cluster_type() >> / C<< $msg->cluster_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::ClusterConfig::ClusterType>)
+
+Optional. The type of the cluster.
+
+=item * C<< $msg->cluster_tier() >> / C<< $msg->cluster_tier($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::ClusterConfig::ClusterTier>)
+
+Optional. The cluster tier.
+
+=item * C<< $msg->engine() >> / C<< $msg->engine($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::ClusterConfig::Engine>)
+
+Optional. The cluster engine.
+
+=item * C<< $msg->config_bucket() >> / C<< $msg->config_bucket($value) >>
+
+Type: C<String>
+
+Optional. A Cloud Storage bucket used to stage job
+dependencies, config files, and job driver console output.
+If you do not specify a staging bucket, Cloud
+Dataproc will determine a Cloud Storage location (US,
+ASIA, or EU) for your cluster's staging bucket according to the
+Compute Engine zone where your cluster is deployed, and then create
+and manage this project-level, per-location bucket (see
+[Dataproc staging and temp
+buckets](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)).
+**This field requires a Cloud Storage bucket name, not a `gs://...` URI to
+a Cloud Storage bucket.**
+
+=item * C<< $msg->temp_bucket() >> / C<< $msg->temp_bucket($value) >>
+
+Type: C<String>
+
+Optional. A Cloud Storage bucket used to store ephemeral cluster and jobs
+data, such as Spark and MapReduce history files. If you do not specify a
+temp bucket, Dataproc will determine a Cloud Storage location (US, ASIA, or
+EU) for your cluster's temp bucket according to the Compute Engine zone
+where your cluster is deployed, and then create and manage this
+project-level, per-location bucket. The default bucket has a TTL of 90
+days, but you can use any TTL (or none) if you specify a bucket (see
+[Dataproc staging and temp
+buckets](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)).
+**This field requires a Cloud Storage bucket name, not a `gs://...` URI to
+a Cloud Storage bucket.**
+
+=item * C<< $msg->gce_cluster_config() >> / C<< $msg->gce_cluster_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::GceClusterConfig>)
+
+Optional. The shared Compute Engine config settings for
+all instances in a cluster.
+
+=item * C<< $msg->master_config() >> / C<< $msg->master_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::InstanceGroupConfig>)
+
+Optional. The Compute Engine config settings for
+the cluster's master instance.
+
+=item * C<< $msg->worker_config() >> / C<< $msg->worker_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::InstanceGroupConfig>)
+
+Optional. The Compute Engine config settings for
+the cluster's worker instances.
+
+=item * C<< $msg->secondary_worker_config() >> / C<< $msg->secondary_worker_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::InstanceGroupConfig>)
+
+Optional. The Compute Engine config settings for
+a cluster's secondary worker instances
+
+=item * C<< $msg->software_config() >> / C<< $msg->software_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::SoftwareConfig>)
+
+Optional. The config settings for cluster software.
+
+=item * C<< $msg->initialization_actions() >> / C<< $msg->initialization_actions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::NodeInitializationAction>)
+
+Optional. Commands to execute on each node after config is
+completed. By default, executables are run on master and all worker nodes.
+You can test a node's `role` metadata to run an executable on
+a master or worker node, as shown below using `curl` (you can also use
+`wget`):
+
+    ROLE=$(curl -H Metadata-Flavor:Google
+    http://metadata/computeMetadata/v1/instance/attributes/dataproc-role)
+    if [[ "${ROLE}" == 'Master' ]]; then
+      ... master specific actions ...
+    else
+      ... worker specific actions ...
+    fi
+
+=item * C<< $msg->encryption_config() >> / C<< $msg->encryption_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::EncryptionConfig>)
+
+Optional. Encryption settings for the cluster.
+
+=item * C<< $msg->autoscaling_config() >> / C<< $msg->autoscaling_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::AutoscalingConfig>)
+
+Optional. Autoscaling config for the policy associated with the cluster.
+Cluster does not autoscale if this field is unset.
+
+=item * C<< $msg->security_config() >> / C<< $msg->security_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::SecurityConfig>)
+
+Optional. Security settings for the cluster.
+
+=item * C<< $msg->lifecycle_config() >> / C<< $msg->lifecycle_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::LifecycleConfig>)
+
+Optional. Lifecycle setting for the cluster.
+
+=item * C<< $msg->endpoint_config() >> / C<< $msg->endpoint_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::EndpointConfig>)
+
+Optional. Port/endpoint configuration for this cluster
+
+=item * C<< $msg->metastore_config() >> / C<< $msg->metastore_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::MetastoreConfig>)
+
+Optional. Metastore configuration.
+
+=item * C<< $msg->dataproc_metric_config() >> / C<< $msg->dataproc_metric_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::DataprocMetricConfig>)
+
+Optional. The config for Dataproc metrics.
+
+=item * C<< $msg->auxiliary_node_groups() >> / C<< $msg->auxiliary_node_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::AuxiliaryNodeGroup>)
+
+Optional. The node group settings.
+
+=item * C<< $msg->master_flexible_config() >> / C<< $msg->master_flexible_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig>)
+
+Optional. The High Obtainability (HO) config settings for the cluster's
+master instances.
+
+In High Obtainability (HO) mode, flexible configs are the single source of
+truth for desired cluster configuration across node groups:
+* For single-node clusters: `master_flexible_config` must be specified, and
+  no worker configs should be set.
+* For multi-node (standard) clusters: both `master_flexible_config` and
+  [worker_flexible_config][google.cloud.dataproc.v1.ClusterConfig.worker_flexible_config]
+  must be specified. Mixing standard and flexible configs across node
+  groups is not allowed.
+
+Only one of
+[master_config][google.cloud.dataproc.v1.ClusterConfig.master_config] or
+`master_flexible_config` can be set.
+
+=item * C<< $msg->worker_flexible_config() >> / C<< $msg->worker_flexible_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig>)
+
+Optional. The High Obtainability (HO) config settings for the cluster's
+worker instances.
+
+In High Obtainability (HO) mode, flexible configs are the single source of
+truth for desired cluster configuration. `num_instances` represents the
+desired capacity of the worker group and is mutable via cluster updates and
+autoscaling.
+
+Only one of
+[worker_config][google.cloud.dataproc.v1.ClusterConfig.worker_config] or
+`worker_flexible_config` can be set.
+
+In High Obtainability (HO) mode, for multi-node (standard) clusters, both
+[master_flexible_config][google.cloud.dataproc.v1.ClusterConfig.master_flexible_config]
+and `worker_flexible_config` must be specified. Mixing standard and
+flexible configs across node groups is not allowed. Single-node clusters do
+not specify worker configs.
+
+=item * C<< $msg->secondary_worker_flexible_config() >> / C<< $msg->secondary_worker_flexible_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig>)
+
+Optional. The High Obtainability (HO) config settings for a cluster's
+secondary worker instances.
+
+In High Obtainability (HO) mode, flexible configs are the single source of
+truth for desired cluster configuration. `num_instances` represents the
+desired capacity of the secondary worker group and is mutable via cluster
+updates and autoscaling.
+
+Only one of
+[secondary_worker_config][google.cloud.dataproc.v1.ClusterConfig.secondary_worker_config]
+or `secondary_worker_flexible_config` can be set.
+
+In High Obtainability (HO) mode, secondary workers are optional. If
+secondary workers are used in an HO cluster, they must be configured using
+`secondary_worker_flexible_config` (not `secondary_worker_config`).
+
+=back
+
+=head3 Enum: ClusterConfig::ClusterType
+
+=over 4
+
+=item * C<CLUSTER_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<STANDARD> => C<1>
+
+=item * C<SINGLE_NODE> => C<2>
+
+=item * C<ZERO_SCALE> => C<3>
+
+=back
+
+=head3 Enum: ClusterConfig::ClusterTier
+
+=over 4
+
+=item * C<CLUSTER_TIER_UNSPECIFIED> => C<0>
+
+=item * C<CLUSTER_TIER_STANDARD> => C<1>
+
+=item * C<CLUSTER_TIER_PREMIUM> => C<2>
+
+=back
+
+=head3 Enum: ClusterConfig::Engine
+
+=over 4
+
+=item * C<ENGINE_UNSPECIFIED> => C<0>
+
+=item * C<DEFAULT> => C<1>
+
+=item * C<LIGHTNING> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::VirtualClusterConfig
+
+The Dataproc cluster config for a cluster that does not directly control the
+underlying compute resources, such as a [Dataproc-on-GKE
+cluster](https://cloud.google.com/dataproc/docs/guides/dpgke/dataproc-gke-overview).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->staging_bucket() >> / C<< $msg->staging_bucket($value) >>
+
+Type: C<String>
+
+Optional. A Cloud Storage bucket used to stage job
+dependencies, config files, and job driver console output.
+If you do not specify a staging bucket, Cloud
+Dataproc will determine a Cloud Storage location (US,
+ASIA, or EU) for your cluster's staging bucket according to the
+Compute Engine zone where your cluster is deployed, and then create
+and manage this project-level, per-location bucket (see
+[Dataproc staging and temp
+buckets](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/staging-bucket)).
+**This field requires a Cloud Storage bucket name, not a `gs://...` URI to
+a Cloud Storage bucket.**
+
+=item * C<< $msg->kubernetes_cluster_config() >> / C<< $msg->kubernetes_cluster_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::KubernetesClusterConfig>)
+
+Required. The configuration for running the Dataproc cluster on
+Kubernetes.
+
+=item * C<< $msg->auxiliary_services_config() >> / C<< $msg->auxiliary_services_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::AuxiliaryServicesConfig>)
+
+Optional. Configuration of auxiliary services used by this cluster.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::AuxiliaryServicesConfig
+
+Auxiliary services configuration for a Cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->metastore_config() >> / C<< $msg->metastore_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::MetastoreConfig>)
+
+Optional. The Hive Metastore configuration for this workload.
+
+=item * C<< $msg->spark_history_server_config() >> / C<< $msg->spark_history_server_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::SparkHistoryServerConfig>)
+
+Optional. The Spark History Server configuration for the workload.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::EndpointConfig
+
+Endpoint config for this cluster
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->http_ports() >> / C<< $msg->http_ports($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::EndpointConfig::HttpPortsEntry>)
+
+Output only. The map of port descriptions to URLs. Will only be populated
+if enable_http_port_access is true.
+
+=item * C<< $msg->enable_http_port_access() >> / C<< $msg->enable_http_port_access($value) >>
+
+Type: C<Bool>
+
+Optional. If true, enable http access to specific ports on the cluster
+from external sources. Defaults to false.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::AutoscalingConfig
+
+Autoscaling Policy config associated with the cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->policy_uri() >> / C<< $msg->policy_uri($value) >>
+
+Type: C<String>
+
+Optional. The autoscaling policy used by the cluster.
+
+Only resource names including projectid and location (region) are valid.
+Examples:
+
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/locations/[dataproc_region]/autoscalingPolicies/[policy_id]`
+* `projects/[project_id]/locations/[dataproc_region]/autoscalingPolicies/[policy_id]`
+
+Note that the policy must be in the same project and Dataproc region.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::EncryptionConfig
+
+Encryption settings for the cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->gce_pd_kms_key_name() >> / C<< $msg->gce_pd_kms_key_name($value) >>
+
+Type: C<String>
+
+Optional. The Cloud KMS key resource name to use for persistent disk
+encryption for all instances in the cluster. See [Use CMEK with cluster
+data]
+(https://cloud.google.com//dataproc/docs/concepts/configuring-clusters/customer-managed-encryption#use_cmek_with_cluster_data)
+for more information.
+
+=item * C<< $msg->kms_key() >> / C<< $msg->kms_key($value) >>
+
+Type: C<String>
+
+Optional. The Cloud KMS key resource name to use for cluster persistent
+disk and job argument encryption. See [Use CMEK with cluster data]
+(https://cloud.google.com//dataproc/docs/concepts/configuring-clusters/customer-managed-encryption#use_cmek_with_cluster_data)
+for more information.
+
+When this key resource name is provided, the following job arguments of
+the following job types submitted to the cluster are encrypted using CMEK:
+
+* [FlinkJob
+args](https://cloud.google.com/dataproc/docs/reference/rest/v1/FlinkJob)
+* [HadoopJob
+args](https://cloud.google.com/dataproc/docs/reference/rest/v1/HadoopJob)
+* [SparkJob
+args](https://cloud.google.com/dataproc/docs/reference/rest/v1/SparkJob)
+* [SparkRJob
+args](https://cloud.google.com/dataproc/docs/reference/rest/v1/SparkRJob)
+* [PySparkJob
+args](https://cloud.google.com/dataproc/docs/reference/rest/v1/PySparkJob)
+* [SparkSqlJob](https://cloud.google.com/dataproc/docs/reference/rest/v1/SparkSqlJob)
+  scriptVariables and queryList.queries
+* [HiveJob](https://cloud.google.com/dataproc/docs/reference/rest/v1/HiveJob)
+  scriptVariables and queryList.queries
+* [PigJob](https://cloud.google.com/dataproc/docs/reference/rest/v1/PigJob)
+  scriptVariables and queryList.queries
+* [PrestoJob](https://cloud.google.com/dataproc/docs/reference/rest/v1/PrestoJob)
+  scriptVariables and queryList.queries
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::GceClusterConfig
+
+Common config settings for resources of Compute Engine cluster
+instances, applicable to all instances in the cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->zone_uri() >> / C<< $msg->zone_uri($value) >>
+
+Type: C<String>
+
+Optional. The Compute Engine zone where the Dataproc cluster will be
+located. If omitted, the service will pick a zone in the cluster's Compute
+Engine region. On a get request, zone will always be present.
+
+A full URL, partial URI, or short name are valid. Examples:
+
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]`
+* `projects/[project_id]/zones/[zone]`
+* `[zone]`
+
+=item * C<< $msg->multi_zone_config() >> / C<< $msg->multi_zone_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::MultiZoneConfig>)
+
+Optional. Controls how instances within this Cluster are allowed to exist
+in multiple Zones within the Region. Only one of `zone_uri` or
+`multi_zone_config` must be set.
+
+=item * C<< $msg->network_uri() >> / C<< $msg->network_uri($value) >>
+
+Type: C<String>
+
+Optional. The Compute Engine network to be used for machine
+communications. Cannot be specified with subnetwork_uri. If neither
+`network_uri` nor `subnetwork_uri` is specified, the "default" network of
+the project is used, if it exists. Cannot be a "Custom Subnet Network" (see
+[Using Subnetworks](https://cloud.google.com/compute/docs/subnetworks) for
+more information).
+
+A full URL, partial URI, or short name are valid. Examples:
+
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/global/networks/default`
+* `projects/[project_id]/global/networks/default`
+* `default`
+
+=item * C<< $msg->subnetwork_uri() >> / C<< $msg->subnetwork_uri($value) >>
+
+Type: C<String>
+
+Optional. The Compute Engine subnetwork to be used for machine
+communications. Cannot be specified with network_uri.
+
+A full URL, partial URI, or short name are valid. Examples:
+
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/regions/[region]/subnetworks/sub0`
+* `projects/[project_id]/regions/[region]/subnetworks/sub0`
+* `sub0`
+
+=item * C<< $msg->internal_ip_only() >> / C<< $msg->internal_ip_only($value) >>
+
+Type: C<Bool>
+
+Optional. This setting applies to subnetwork-enabled networks. It is set to
+`true` by default in clusters created with image versions 2.2.x.
+
+When set to `true`:
+
+* All cluster VMs have internal IP addresses.
+* [Google Private Access]
+(https://cloud.google.com/vpc/docs/private-google-access)
+must be enabled to access Dataproc and other Google Cloud APIs.
+* Off-cluster dependencies must be configured to be accessible
+without external IP addresses.
+
+When set to `false`:
+
+* Cluster VMs are not restricted to internal IP addresses.
+* Ephemeral external IP addresses are assigned to each cluster VM.
+
+=item * C<< $msg->private_ipv6_google_access() >> / C<< $msg->private_ipv6_google_access($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::GceClusterConfig::PrivateIpv6GoogleAccess>)
+
+Optional. The type of IPv6 access for a cluster.
+
+=item * C<< $msg->service_account() >> / C<< $msg->service_account($value) >>
+
+Type: C<String>
+
+Optional. The [Dataproc service
+account](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/service-accounts#service_accounts_in_dataproc)
+(also see [VM Data Plane
+identity](https://cloud.google.com/dataproc/docs/concepts/iam/dataproc-principals#vm_service_account_data_plane_identity))
+used by Dataproc cluster VM instances to access Google Cloud Platform
+services.
+
+If not specified, the
+[Compute Engine default service
+account](https://cloud.google.com/compute/docs/access/service-accounts#default_service_account)
+is used.
+
+=item * C<< $msg->service_account_scopes() >> / C<< $msg->service_account_scopes($value) >>
+
+Type: C<String>
+
+Optional. The URIs of service account scopes to be included in
+Compute Engine instances. The following base set of scopes is always
+included:
+
+* https://www.googleapis.com/auth/cloud.useraccounts.readonly
+* https://www.googleapis.com/auth/devstorage.read_write
+* https://www.googleapis.com/auth/logging.write
+
+If no scopes are specified, the following defaults are also provided:
+
+* https://www.googleapis.com/auth/bigquery
+* https://www.googleapis.com/auth/bigtable.admin.table
+* https://www.googleapis.com/auth/bigtable.data
+* https://www.googleapis.com/auth/devstorage.full_control
+
+=item * C<< $msg->tags() >> / C<< $msg->tags($value) >>
+
+Type: C<String>
+
+The Compute Engine network tags to add to all instances (see [Tagging
+instances](https://cloud.google.com/vpc/docs/add-remove-network-tags)).
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::GceClusterConfig::MetadataEntry>)
+
+Optional. The Compute Engine metadata entries to add to all instances (see
+[Project and instance
+metadata](https://cloud.google.com/compute/docs/storing-retrieving-metadata#project_and_instance_metadata)).
+
+=item * C<< $msg->reservation_affinity() >> / C<< $msg->reservation_affinity($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ReservationAffinity>)
+
+Optional. Reservation Affinity for consuming Zonal reservation.
+
+=item * C<< $msg->node_group_affinity() >> / C<< $msg->node_group_affinity($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::NodeGroupAffinity>)
+
+Optional. Node Group Affinity for sole-tenant clusters.
+
+=item * C<< $msg->shielded_instance_config() >> / C<< $msg->shielded_instance_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ShieldedInstanceConfig>)
+
+Optional. Shielded Instance Config for clusters using [Compute Engine
+Shielded
+VMs](https://cloud.google.com/security/shielded-cloud/shielded-vm).
+
+=item * C<< $msg->confidential_instance_config() >> / C<< $msg->confidential_instance_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ConfidentialInstanceConfig>)
+
+Optional. Confidential Instance Config for clusters using [Confidential
+VMs](https://cloud.google.com/confidential-computing/confidential-vm/docs).
+
+=item * C<< $msg->resource_manager_tags() >> / C<< $msg->resource_manager_tags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::GceClusterConfig::ResourceManagerTagsEntry>)
+
+Optional. [Resource manager tags]
+(https://cloud.google.com/resource-manager/docs/tags/tags-creating-and-managing)
+to add to all instances (see [Use secure tags]
+(https://cloud.google.com/dataproc/docs/guides/use-secure-tags)).
+
+=back
+
+=head3 Enum: GceClusterConfig::PrivateIpv6GoogleAccess
+
+=over 4
+
+=item * C<PRIVATE_IPV6_GOOGLE_ACCESS_UNSPECIFIED> => C<0>
+
+=item * C<INHERIT_FROM_SUBNETWORK> => C<1>
+
+=item * C<OUTBOUND> => C<2>
+
+=item * C<BIDIRECTIONAL> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::MultiZoneConfig
+
+Configuration for multi-zonal clusters that can create instances across
+multiple Zones within the Region.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->target_shape() >> / C<< $msg->target_shape($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::MultiZoneConfig::TargetShape>)
+
+Optional. The distribution shape of the nodes in the multi-zonal cluster.
+
+=back
+
+=head3 Enum: MultiZoneConfig::TargetShape
+
+=over 4
+
+=item * C<TARGET_SHAPE_UNSPECIFIED> => C<0>
+
+=item * C<ANY> => C<1>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::NodeGroupAffinity
+
+Node Group Affinity for clusters using sole-tenant node groups.
+**The Dataproc `NodeGroupAffinity` resource is not related to the
+Dataproc [NodeGroup][google.cloud.dataproc.v1.NodeGroup] resource.**
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->node_group_uri() >> / C<< $msg->node_group_uri($value) >>
+
+Type: C<String>
+
+Required. The URI of a
+sole-tenant [node group
+resource](https://cloud.google.com/compute/docs/reference/rest/v1/nodeGroups)
+that the cluster will be created on.
+
+A full URL, partial URI, or node group name are valid. Examples:
+
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]/nodeGroups/node-group-1`
+* `projects/[project_id]/zones/[zone]/nodeGroups/node-group-1`
+* `node-group-1`
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::ShieldedInstanceConfig
+
+Shielded Instance Config for clusters using [Compute Engine Shielded
+VMs](https://cloud.google.com/security/shielded-cloud/shielded-vm).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enable_secure_boot() >> / C<< $msg->enable_secure_boot($value) >>
+
+Type: C<Bool>
+
+Optional. Defines whether instances have Secure Boot enabled.
+
+=item * C<< $msg->enable_vtpm() >> / C<< $msg->enable_vtpm($value) >>
+
+Type: C<Bool>
+
+Optional. Defines whether instances have the vTPM enabled.
+
+=item * C<< $msg->enable_integrity_monitoring() >> / C<< $msg->enable_integrity_monitoring($value) >>
+
+Type: C<Bool>
+
+Optional. Defines whether instances have integrity monitoring enabled.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::ConfidentialInstanceConfig
+
+Confidential Instance Config for clusters using [Confidential
+VMs](https://cloud.google.com/confidential-computing/confidential-vm/docs)
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enable_confidential_compute() >> / C<< $msg->enable_confidential_compute($value) >>
+
+Type: C<Bool>
+
+Optional. Deprecated: Use 'confidential_instance_type' instead.
+Defines whether the instance should have confidential compute enabled.
+
+=item * C<< $msg->confidential_instance_type() >> / C<< $msg->confidential_instance_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::ConfidentialInstanceConfig::ConfidentialInstanceType>)
+
+Optional. Defines the type of Confidential Compute technology to use.
+
+=back
+
+=head3 Enum: ConfidentialInstanceConfig::ConfidentialInstanceType
+
+=over 4
+
+=item * C<CONFIDENTIAL_INSTANCE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<SEV> => C<1>
+
+=item * C<SEV_SNP> => C<2>
+
+=item * C<TDX> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::InstanceGroupConfig
+
+The config settings for Compute Engine resources in
+an instance group, such as a master or worker group.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->num_instances() >> / C<< $msg->num_instances($value) >>
+
+Type: C<Int32>
+
+Optional. The number of VM instances in the instance group.
+For [HA
+cluster](/dataproc/docs/concepts/configuring-clusters/high-availability)
+[master_config](#FIELDS.master_config) groups, B<must be set to 3>.
+For standard cluster [master_config](#FIELDS.master_config) groups,
+B<must be set to 1>.
+
+=item * C<< $msg->instance_names() >> / C<< $msg->instance_names($value) >>
+
+Type: C<String>
+
+Output only. The list of instance names. Dataproc derives the names
+from `cluster_name`, `num_instances`, and the instance group.
+
+=item * C<< $msg->instance_references() >> / C<< $msg->instance_references($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::InstanceReference>)
+
+Output only. List of references to Compute Engine instances.
+
+=item * C<< $msg->image_uri() >> / C<< $msg->image_uri($value) >>
+
+Type: C<String>
+
+Optional. The Compute Engine image resource used for cluster instances.
+
+The URI can represent an image or image family.
+
+Image examples:
+
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/global/images/[image-id]`
+* `projects/[project_id]/global/images/[image-id]`
+* `image-id`
+
+Image family examples. Dataproc will use the most recent
+image from the family:
+
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/global/images/family/[custom-image-family-name]`
+* `projects/[project_id]/global/images/family/[custom-image-family-name]`
+
+If the URI is unspecified, it will be inferred from
+`SoftwareConfig.image_version` or the system default.
+
+=item * C<< $msg->machine_type_uri() >> / C<< $msg->machine_type_uri($value) >>
+
+Type: C<String>
+
+Optional. The Compute Engine machine type used for cluster instances.
+
+A full URL, partial URI, or short name are valid. Examples:
+
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]/machineTypes/n1-standard-2`
+* `projects/[project_id]/zones/[zone]/machineTypes/n1-standard-2`
+* `n1-standard-2`
+
+B<Auto Zone Exception>: If you are using the Dataproc
+[Auto Zone
+Placement](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement)
+feature, you must use the short name of the machine type
+resource, for example, `n1-standard-2`.
+
+=item * C<< $msg->disk_config() >> / C<< $msg->disk_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::DiskConfig>)
+
+Optional. Disk option config settings.
+
+=item * C<< $msg->is_preemptible() >> / C<< $msg->is_preemptible($value) >>
+
+Type: C<Bool>
+
+Output only. Specifies that this instance group contains preemptible
+instances.
+
+=item * C<< $msg->preemptibility() >> / C<< $msg->preemptibility($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::InstanceGroupConfig::Preemptibility>)
+
+Optional. Specifies the preemptibility of the instance group.
+
+The default value for master and worker groups is
+`NON_PREEMPTIBLE`. This default cannot be changed.
+
+The default value for secondary instances is
+`PREEMPTIBLE`.
+
+=item * C<< $msg->managed_group_config() >> / C<< $msg->managed_group_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ManagedGroupConfig>)
+
+Output only. The config for Compute Engine Instance Group
+Manager that manages this group.
+This is only used for preemptible instance groups.
+
+=item * C<< $msg->accelerators() >> / C<< $msg->accelerators($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::AcceleratorConfig>)
+
+Optional. The Compute Engine accelerator configuration for these
+instances.
+
+=item * C<< $msg->min_cpu_platform() >> / C<< $msg->min_cpu_platform($value) >>
+
+Type: C<String>
+
+Optional. Specifies the minimum cpu platform for the Instance Group.
+See [Dataproc -> Minimum CPU
+Platform](https://cloud.google.com/dataproc/docs/concepts/compute/dataproc-min-cpu).
+
+=item * C<< $msg->min_num_instances() >> / C<< $msg->min_num_instances($value) >>
+
+Type: C<Int32>
+
+Optional. The minimum number of primary worker instances to create.
+If `min_num_instances` is set, cluster creation will succeed if
+the number of primary workers created is at least equal to the
+`min_num_instances` number.
+
+Example: Cluster creation request with `num_instances` = `5` and
+`min_num_instances` = `3`:
+
+*  If 4 VMs are created and 1 instance fails,
+   the failed VM is deleted. The cluster is
+   resized to 4 instances and placed in a `RUNNING` state.
+*  If 2 instances are created and 3 instances fail,
+   the cluster in placed in an `ERROR` state. The failed VMs
+   are not deleted.
+
+=item * C<< $msg->instance_flexibility_policy() >> / C<< $msg->instance_flexibility_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::InstanceFlexibilityPolicy>)
+
+Optional. Instance flexibility Policy allowing a mixture of VM shapes and
+provisioning models.
+
+=item * C<< $msg->startup_config() >> / C<< $msg->startup_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::StartupConfig>)
+
+Optional. Configuration to handle the startup of instances during cluster
+create and update process.
+
+=back
+
+=head3 Enum: InstanceGroupConfig::Preemptibility
+
+=over 4
+
+=item * C<PREEMPTIBILITY_UNSPECIFIED> => C<0>
+
+=item * C<NON_PREEMPTIBLE> => C<1>
+
+=item * C<PREEMPTIBLE> => C<2>
+
+=item * C<SPOT> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::StartupConfig
+
+Configuration to handle the startup of instances during cluster create and
+update process.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->required_registration_fraction() >> / C<< $msg->required_registration_fraction($value) >>
+
+Type: C<Double>
+
+Optional. The config setting to enable cluster creation/ updation to be
+successful only after required_registration_fraction of instances are up
+and running. This configuration is applicable to only secondary workers for
+now. The cluster will fail if required_registration_fraction of instances
+are not available. This will include instance creation, agent registration,
+and service registration (if enabled).
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::InstanceReference
+
+A reference to a Compute Engine instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance_name() >> / C<< $msg->instance_name($value) >>
+
+Type: C<String>
+
+The user-friendly name of the Compute Engine instance.
+
+=item * C<< $msg->instance_id() >> / C<< $msg->instance_id($value) >>
+
+Type: C<String>
+
+The unique identifier of the Compute Engine instance.
+
+=item * C<< $msg->public_key() >> / C<< $msg->public_key($value) >>
+
+Type: C<String>
+
+The public RSA key used for sharing data with this instance.
+
+=item * C<< $msg->public_ecies_key() >> / C<< $msg->public_ecies_key($value) >>
+
+Type: C<String>
+
+The public ECIES key used for sharing data with this instance.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::ManagedGroupConfig
+
+Specifies the resources used to actively manage an instance group.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance_template_name() >> / C<< $msg->instance_template_name($value) >>
+
+Type: C<String>
+
+Output only. The name of the Instance Template used for the Managed
+Instance Group.
+
+=item * C<< $msg->instance_group_manager_name() >> / C<< $msg->instance_group_manager_name($value) >>
+
+Type: C<String>
+
+Output only. The name of the Instance Group Manager for this group.
+
+=item * C<< $msg->instance_group_manager_uri() >> / C<< $msg->instance_group_manager_uri($value) >>
+
+Type: C<String>
+
+Output only. The partial URI to the instance group manager for this group.
+E.g. projects/my-project/regions/us-central1/instanceGroupManagers/my-igm.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::InstanceFlexibilityPolicy
+
+Instance flexibility Policy allowing a mixture of VM shapes and provisioning
+models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->provisioning_model_mix() >> / C<< $msg->provisioning_model_mix($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::InstanceFlexibilityPolicy::ProvisioningModelMix>)
+
+Optional. Defines how the Group selects the provisioning model to ensure
+required reliability.
+
+=item * C<< $msg->instance_selection_list() >> / C<< $msg->instance_selection_list($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::InstanceFlexibilityPolicy::InstanceSelection>)
+
+Optional. List of instance selection options that the group will use when
+creating new VMs.
+
+=item * C<< $msg->instance_selection_results() >> / C<< $msg->instance_selection_results($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::InstanceFlexibilityPolicy::InstanceSelectionResult>)
+
+Output only. A list of instance selection results in the group.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::FlexibleInstanceGroupConfig
+
+The configuration for High Obtainability (HO) flexible instance groups.
+Flexible instance group configs serve as the single source of truth for
+desired state.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->num_instances() >> / C<< $msg->num_instances($value) >>
+
+Type: C<Int32>
+
+Optional. The number of VM instances requested.
+
+For master instances, this must be 1. For worker and secondary worker
+instances, this represents the desired capacity of the group and is mutable
+via cluster update operations and autoscaling.
+
+=item * C<< $msg->core_count() >> / C<< $msg->core_count($value) >>
+
+Type: C<Int32>
+
+Optional. The number of vCPUs per instance. Must be a power of 2
+(2, 4, 8, 16, 32). This is a create-time specification and is not currently
+mutable via update masks.
+
+=item * C<< $msg->boot_disk_size_gb() >> / C<< $msg->boot_disk_size_gb($value) >>
+
+Type: C<Int32>
+
+Optional. The boot disk size in GB. This is a create-time specification and
+is not currently mutable via update masks.
+
+=item * C<< $msg->hardware_class() >> / C<< $msg->hardware_class($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::FlexibleInstanceGroupConfig::HardwareClass>)
+
+Optional. The hardware class of the instances. This is a create-time
+specification and is not currently mutable via update masks.
+
+=back
+
+=head3 Enum: FlexibleInstanceGroupConfig::HardwareClass
+
+=over 4
+
+=item * C<HARDWARE_CLASS_UNSPECIFIED> => C<0>
+
+=item * C<STANDARD> => C<1>
+
+=item * C<PERFORMANCE> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::AcceleratorConfig
+
+Specifies the type and number of accelerator cards attached to the instances
+of an instance. See [GPUs on Compute
+Engine](https://cloud.google.com/compute/docs/gpus/).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->accelerator_type_uri() >> / C<< $msg->accelerator_type_uri($value) >>
+
+Type: C<String>
+
+Full URL, partial URI, or short name of the accelerator type resource to
+expose to this instance. See
+[Compute Engine
+AcceleratorTypes](https://cloud.google.com/compute/docs/reference/v1/acceleratorTypes).
+
+Examples:
+
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+* `projects/[project_id]/zones/[zone]/acceleratorTypes/nvidia-tesla-t4`
+* `nvidia-tesla-t4`
+
+B<Auto Zone Exception>: If you are using the Dataproc
+[Auto Zone
+Placement](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/auto-zone#using_auto_zone_placement)
+feature, you must use the short name of the accelerator type
+resource, for example, `nvidia-tesla-t4`.
+
+=item * C<< $msg->accelerator_count() >> / C<< $msg->accelerator_count($value) >>
+
+Type: C<Int32>
+
+The number of the accelerator cards of this type exposed to this instance.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::DiskConfig
+
+Specifies the config of boot disk and attached disk options for a group of VM
+instances.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->boot_disk_type() >> / C<< $msg->boot_disk_type($value) >>
+
+Type: C<String>
+
+Optional. Type of the boot disk (default is `pd-standard`).
+Valid values: `pd-balanced` (Persistent Disk Balanced Solid State Drive),
+`pd-ssd` (Persistent Disk Solid State Drive),
+or `pd-standard` (Persistent Disk Hard Disk Drive).
+See [Disk types](https://cloud.google.com/compute/docs/disks#disk-types).
+
+=item * C<< $msg->boot_disk_size_gb() >> / C<< $msg->boot_disk_size_gb($value) >>
+
+Type: C<Int32>
+
+Optional. Size in GB of the boot disk (default is 500GB).
+
+=item * C<< $msg->num_local_ssds() >> / C<< $msg->num_local_ssds($value) >>
+
+Type: C<Int32>
+
+Optional. Number of attached SSDs, from 0 to 8 (default is 0).
+If SSDs are not attached, the boot disk is used to store runtime logs and
+[HDFS](https://hadoop.apache.org/docs/r1.2.1/hdfs_user_guide.html) data.
+If one or more SSDs are attached, this runtime bulk
+data is spread across them, and the boot disk contains only basic
+config and installed binaries.
+
+Note: Local SSD options may vary by machine type and number of vCPUs
+selected.
+
+=item * C<< $msg->local_ssd_interface() >> / C<< $msg->local_ssd_interface($value) >>
+
+Type: C<String>
+
+Optional. Interface type of local SSDs (default is `scsi`).
+Valid values: `scsi` (Small Computer System Interface),
+`nvme` (Non-Volatile Memory Express).
+See [local SSD
+performance](https://cloud.google.com/compute/docs/disks/local-ssd#performance).
+
+=item * C<< $msg->boot_disk_provisioned_iops() >> / C<< $msg->boot_disk_provisioned_iops($value) >>
+
+Type: C<Int64>
+
+Optional. Indicates how many IOPS to provision for the disk. This sets the
+number of I/O operations per second that the disk can handle.
+**This field is supported only if
+[boot_disk_type][google.cloud.dataproc.v1.DiskConfig.boot_disk_type] is
+`hyperdisk-balanced`.**
+
+=item * C<< $msg->boot_disk_provisioned_throughput() >> / C<< $msg->boot_disk_provisioned_throughput($value) >>
+
+Type: C<Int64>
+
+Optional. Indicates how much throughput to provision for the disk. This
+sets the number of throughput mb per second that the disk can handle.
+Values must be greater than or equal to 1. **This field is supported only
+if [boot_disk_type][google.cloud.dataproc.v1.DiskConfig.boot_disk_type] is
+`hyperdisk-balanced`.**
+
+=item * C<< $msg->attached_disk_configs() >> / C<< $msg->attached_disk_configs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::AttachedDiskConfig>)
+
+Optional. A list of attached disk configs for a group of VM instances.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::AttachedDiskConfig
+
+Specifies the config of attached disk options for single VM instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->disk_type() >> / C<< $msg->disk_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::AttachedDiskConfig::DiskType>)
+
+Optional. Disk type.
+
+=item * C<< $msg->disk_size_gb() >> / C<< $msg->disk_size_gb($value) >>
+
+Type: C<Int32>
+
+Optional. Disk size in GB.
+
+=item * C<< $msg->provisioned_iops() >> / C<< $msg->provisioned_iops($value) >>
+
+Type: C<Int64>
+
+Optional. Indicates how many IOPS to provision for the attached disk. This
+sets the number of I/O operations per second that the disk can handle. See
+https://cloud.google.com/compute/docs/disks/hyperdisks#hyperdisk-features
+
+=item * C<< $msg->provisioned_throughput() >> / C<< $msg->provisioned_throughput($value) >>
+
+Type: C<Int64>
+
+Optional. Indicates how much throughput to provision for the attached
+disk. This sets the number of throughput mb per second that the disk can
+handle. See
+https://cloud.google.com/compute/docs/disks/hyperdisks#hyperdisk-features
+
+=back
+
+=head3 Enum: AttachedDiskConfig::DiskType
+
+=over 4
+
+=item * C<DISK_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<HYPERDISK_BALANCED> => C<1>
+
+=item * C<HYPERDISK_EXTREME> => C<2>
+
+=item * C<HYPERDISK_ML> => C<3>
+
+=item * C<HYPERDISK_THROUGHPUT> => C<4>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::AuxiliaryNodeGroup
+
+Node group identification and configuration information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->node_group() >> / C<< $msg->node_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::NodeGroup>)
+
+Required. Node group configuration.
+
+=item * C<< $msg->node_group_id() >> / C<< $msg->node_group_id($value) >>
+
+Type: C<String>
+
+Optional. A node group ID. Generated if not specified.
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). Cannot begin or end with underscore
+or hyphen. Must consist of from 3 to 33 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::NodeGroup
+
+Dataproc Node Group.
+**The Dataproc `NodeGroup` resource is not related to the
+Dataproc [NodeGroupAffinity][google.cloud.dataproc.v1.NodeGroupAffinity]
+resource.**
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The Node group [resource name](https://aip.dev/122).
+
+=item * C<< $msg->roles() >> / C<< $msg->roles($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::NodeGroup::Role>)
+
+Required. Node group roles.
+
+=item * C<< $msg->node_group_config() >> / C<< $msg->node_group_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::InstanceGroupConfig>)
+
+Optional. The node group instance group configuration.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::NodeGroup::LabelsEntry>)
+
+Optional. Node group labels.
+
+* Label B<keys> must consist of from 1 to 63 characters and conform to
+  [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).
+* Label B<values> can be empty. If specified, they must consist of from
+  1 to 63 characters and conform to [RFC 1035]
+  (https://www.ietf.org/rfc/rfc1035.txt).
+* The node group must have no more than 32 labels.
+
+=back
+
+=head3 Enum: NodeGroup::Role
+
+=over 4
+
+=item * C<ROLE_UNSPECIFIED> => C<0>
+
+=item * C<DRIVER> => C<1>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::NodeInitializationAction
+
+Specifies an executable to run on a fully configured node and a
+timeout period for executable completion.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->executable_file() >> / C<< $msg->executable_file($value) >>
+
+Type: C<String>
+
+Required. Cloud Storage URI of executable file.
+
+=item * C<< $msg->execution_timeout() >> / C<< $msg->execution_timeout($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Amount of time executable has to complete. Default is
+10 minutes (see JSON representation of
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+Cluster creation fails with an explanatory error message (the
+name of the executable that caused the error and the exceeded timeout
+period) if the executable is not completed at end of the timeout period.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::ClusterStatus
+
+The status of a cluster and its instances.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::ClusterStatus::State>)
+
+Output only. The cluster's state.
+
+=item * C<< $msg->detail() >> / C<< $msg->detail($value) >>
+
+Type: C<String>
+
+Optional. Output only. Details of cluster's state.
+
+=item * C<< $msg->state_start_time() >> / C<< $msg->state_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time when this state was entered (see JSON representation of
+[Timestamp](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+=item * C<< $msg->substate() >> / C<< $msg->substate($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::ClusterStatus::Substate>)
+
+Output only. Additional state information that includes
+status reported by the agent.
+
+=back
+
+=head3 Enum: ClusterStatus::State
+
+=over 4
+
+=item * C<UNKNOWN> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<RUNNING> => C<2>
+
+=item * C<ERROR> => C<3>
+
+=item * C<ERROR_DUE_TO_UPDATE> => C<9>
+
+=item * C<DELETING> => C<4>
+
+=item * C<UPDATING> => C<5>
+
+=item * C<STOPPING> => C<6>
+
+=item * C<STOPPED> => C<7>
+
+=item * C<STARTING> => C<8>
+
+=item * C<REPAIRING> => C<10>
+
+=back
+
+=head3 Enum: ClusterStatus::Substate
+
+=over 4
+
+=item * C<UNSPECIFIED> => C<0>
+
+=item * C<UNHEALTHY> => C<1>
+
+=item * C<STALE_STATUS> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::SecurityConfig
+
+Security related configuration, including encryption, Kerberos, etc.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kerberos_config() >> / C<< $msg->kerberos_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::KerberosConfig>)
+
+Optional. Kerberos related configuration.
+
+=item * C<< $msg->identity_config() >> / C<< $msg->identity_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::IdentityConfig>)
+
+Optional. Identity related configuration, including service account based
+secure multi-tenancy user mappings.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::KerberosConfig
+
+Specifies Kerberos related configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enable_kerberos() >> / C<< $msg->enable_kerberos($value) >>
+
+Type: C<Bool>
+
+Optional. Flag to indicate whether to Kerberize the cluster (default:
+false). Set this field to true to enable Kerberos on a cluster.
+
+=item * C<< $msg->root_principal_password_uri() >> / C<< $msg->root_principal_password_uri($value) >>
+
+Type: C<String>
+
+Optional. The Cloud Storage URI of a KMS encrypted file containing the root
+principal password.
+
+=item * C<< $msg->kms_key_uri() >> / C<< $msg->kms_key_uri($value) >>
+
+Type: C<String>
+
+Optional. The URI of the KMS key used to encrypt sensitive
+files.
+
+=item * C<< $msg->keystore_uri() >> / C<< $msg->keystore_uri($value) >>
+
+Type: C<String>
+
+Optional. The Cloud Storage URI of the keystore file used for SSL
+encryption. If not provided, Dataproc will provide a self-signed
+certificate.
+
+=item * C<< $msg->truststore_uri() >> / C<< $msg->truststore_uri($value) >>
+
+Type: C<String>
+
+Optional. The Cloud Storage URI of the truststore file used for SSL
+encryption. If not provided, Dataproc will provide a self-signed
+certificate.
+
+=item * C<< $msg->keystore_password_uri() >> / C<< $msg->keystore_password_uri($value) >>
+
+Type: C<String>
+
+Optional. The Cloud Storage URI of a KMS encrypted file containing the
+password to the user provided keystore. For the self-signed certificate,
+this password is generated by Dataproc.
+
+=item * C<< $msg->key_password_uri() >> / C<< $msg->key_password_uri($value) >>
+
+Type: C<String>
+
+Optional. The Cloud Storage URI of a KMS encrypted file containing the
+password to the user provided key. For the self-signed certificate, this
+password is generated by Dataproc.
+
+=item * C<< $msg->truststore_password_uri() >> / C<< $msg->truststore_password_uri($value) >>
+
+Type: C<String>
+
+Optional. The Cloud Storage URI of a KMS encrypted file containing the
+password to the user provided truststore. For the self-signed certificate,
+this password is generated by Dataproc.
+
+=item * C<< $msg->cross_realm_trust_realm() >> / C<< $msg->cross_realm_trust_realm($value) >>
+
+Type: C<String>
+
+Optional. The remote realm the Dataproc on-cluster KDC will trust, should
+the user enable cross realm trust.
+
+=item * C<< $msg->cross_realm_trust_kdc() >> / C<< $msg->cross_realm_trust_kdc($value) >>
+
+Type: C<String>
+
+Optional. The KDC (IP or hostname) for the remote trusted realm in a cross
+realm trust relationship.
+
+=item * C<< $msg->cross_realm_trust_admin_server() >> / C<< $msg->cross_realm_trust_admin_server($value) >>
+
+Type: C<String>
+
+Optional. The admin server (IP or hostname) for the remote trusted realm in
+a cross realm trust relationship.
+
+=item * C<< $msg->cross_realm_trust_shared_password_uri() >> / C<< $msg->cross_realm_trust_shared_password_uri($value) >>
+
+Type: C<String>
+
+Optional. The Cloud Storage URI of a KMS encrypted file containing the
+shared password between the on-cluster Kerberos realm and the remote
+trusted realm, in a cross realm trust relationship.
+
+=item * C<< $msg->kdc_db_key_uri() >> / C<< $msg->kdc_db_key_uri($value) >>
+
+Type: C<String>
+
+Optional. The Cloud Storage URI of a KMS encrypted file containing the
+master key of the KDC database.
+
+=item * C<< $msg->tgt_lifetime_hours() >> / C<< $msg->tgt_lifetime_hours($value) >>
+
+Type: C<Int32>
+
+Optional. The lifetime of the ticket granting ticket, in hours.
+If not specified, or user specifies 0, then default value 10
+will be used.
+
+=item * C<< $msg->realm() >> / C<< $msg->realm($value) >>
+
+Type: C<String>
+
+Optional. The name of the on-cluster Kerberos realm.
+If not specified, the uppercased domain of hostnames will be the realm.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::IdentityConfig
+
+Identity related configuration, including service account based
+secure multi-tenancy user mappings.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->user_service_account_mapping() >> / C<< $msg->user_service_account_mapping($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::IdentityConfig::UserServiceAccountMappingEntry>)
+
+Required. Map of user to service account.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::SoftwareConfig
+
+Specifies the selection and config of software inside the cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->image_version() >> / C<< $msg->image_version($value) >>
+
+Type: C<String>
+
+Optional. The version of software inside the cluster. It must be one of the
+supported [Dataproc
+Versions](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#supported-dataproc-image-versions),
+such as "1.2" (including a subminor version, such as "1.2.29"), or the
+["preview"
+version](https://cloud.google.com/dataproc/docs/concepts/versioning/dataproc-versions#other_versions).
+If unspecified, it defaults to the latest Debian version.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::SoftwareConfig::PropertiesEntry>)
+
+Optional. The properties to set on daemon config files.
+
+Property keys are specified in `prefix:property` format, for example
+`core:hadoop.tmp.dir`. The following are supported prefixes
+and their mappings:
+
+* capacity-scheduler: `capacity-scheduler.xml`
+* core:   `core-site.xml`
+* distcp: `distcp-default.xml`
+* hdfs:   `hdfs-site.xml`
+* hive:   `hive-site.xml`
+* mapred: `mapred-site.xml`
+* pig:    `pig.properties`
+* spark:  `spark-defaults.conf`
+* yarn:   `yarn-site.xml`
+
+For more information, see [Cluster
+properties](https://cloud.google.com/dataproc/docs/concepts/cluster-properties).
+
+=item * C<< $msg->optional_components() >> / C<< $msg->optional_components($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::Component>)
+
+Optional. The set of components to activate on the cluster.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::LifecycleConfig
+
+Specifies the cluster auto-delete schedule configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->idle_delete_ttl() >> / C<< $msg->idle_delete_ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The duration to keep the cluster alive while idling (when no jobs
+are running). Passing this threshold will cause the cluster to be
+deleted. Minimum value is 5 minutes; maximum value is 14 days (see JSON
+representation of
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+=item * C<< $msg->auto_delete_time() >> / C<< $msg->auto_delete_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. The time when cluster will be auto-deleted (see JSON
+representation of
+[Timestamp](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+=item * C<< $msg->auto_delete_ttl() >> / C<< $msg->auto_delete_ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The lifetime duration of cluster. The cluster will be
+auto-deleted at the end of this period. Minimum value is 10 minutes;
+maximum value is 14 days (see JSON representation of
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+=item * C<< $msg->idle_stop_ttl() >> / C<< $msg->idle_stop_ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The duration to keep the cluster started while idling (when no
+jobs are running). Passing this threshold will cause the cluster to be
+stopped. Minimum value is 5 minutes; maximum value is 14 days (see JSON
+representation of
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+=item * C<< $msg->auto_stop_time() >> / C<< $msg->auto_stop_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. The time when cluster will be auto-stopped (see JSON
+representation of
+[Timestamp](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+=item * C<< $msg->auto_stop_ttl() >> / C<< $msg->auto_stop_ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The lifetime duration of the cluster. The cluster will be
+auto-stopped at the end of this period, calculated from the time of
+submission of the create or update cluster request. Minimum value is 10
+minutes; maximum value is 14 days (see JSON representation of
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+=item * C<< $msg->idle_start_time() >> / C<< $msg->idle_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when cluster became idle (most recent job finished)
+and became eligible for deletion due to idleness (see JSON representation
+of
+[Timestamp](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::MetastoreConfig
+
+Specifies a Metastore configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataproc_metastore_service() >> / C<< $msg->dataproc_metastore_service($value) >>
+
+Type: C<String>
+
+Required. Resource name of an existing Dataproc Metastore service.
+
+Example:
+
+* `projects/[project_id]/locations/[dataproc_region]/services/[service-name]`
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::ClusterMetrics
+
+Contains cluster daemon metrics, such as HDFS and YARN stats.
+
+B<Beta Feature>: This report is available for testing purposes only. It may
+be changed before final release.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->hdfs_metrics() >> / C<< $msg->hdfs_metrics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ClusterMetrics::HdfsMetricsEntry>)
+
+The HDFS metrics.
+
+=item * C<< $msg->yarn_metrics() >> / C<< $msg->yarn_metrics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::ClusterMetrics::YarnMetricsEntry>)
+
+YARN metrics.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::DataprocMetricConfig
+
+Dataproc metric config.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->metrics() >> / C<< $msg->metrics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::DataprocMetricConfig::Metric>)
+
+Required. Metrics sources to enable.
+
+=back
+
+=head3 Enum: DataprocMetricConfig::MetricSource
+
+=over 4
+
+=item * C<METRIC_SOURCE_UNSPECIFIED> => C<0>
+
+=item * C<MONITORING_AGENT_DEFAULTS> => C<1>
+
+=item * C<HDFS> => C<2>
+
+=item * C<SPARK> => C<3>
+
+=item * C<YARN> => C<4>
+
+=item * C<SPARK_HISTORY_SERVER> => C<5>
+
+=item * C<HIVESERVER2> => C<6>
+
+=item * C<HIVEMETASTORE> => C<7>
+
+=item * C<FLINK> => C<8>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::CreateClusterRequest
+
+A request to create a cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the cluster
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->cluster() >> / C<< $msg->cluster($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::Cluster>)
+
+Required. The cluster to create.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the server receives
+two
+[CreateClusterRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.CreateClusterRequest)s
+with the same id, then the second request will be ignored and the
+first [google.longrunning.Operation][google.longrunning.Operation] created
+and stored in the backend is returned.
+
+It is recommended to always set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=item * C<< $msg->action_on_failed_primary_workers() >> / C<< $msg->action_on_failed_primary_workers($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::FailureAction>)
+
+Optional. Failure action when primary worker creation fails.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::UpdateClusterRequest
+
+A request to update a cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project the
+cluster belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Required. The cluster name.
+
+=item * C<< $msg->cluster() >> / C<< $msg->cluster($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::Cluster>)
+
+Required. The changes to the cluster.
+
+=item * C<< $msg->graceful_decommission_timeout() >> / C<< $msg->graceful_decommission_timeout($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Timeout for graceful YARN decommissioning. Graceful
+decommissioning allows removing nodes from the cluster without
+interrupting jobs in progress. Timeout specifies how long to wait for jobs
+in progress to finish before forcefully removing nodes (and potentially
+interrupting jobs). Default timeout is 0 (for forceful decommission), and
+the maximum allowed timeout is 1 day. (see JSON representation of
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+Only supported on Dataproc image versions 1.2 and higher.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Specifies the path, relative to `Cluster`, of
+the field to update. For example, to change the number of workers
+in a cluster to 5, the `update_mask` parameter would be
+specified as `config.worker_config.num_instances`,
+and the `PATCH` request body would specify the new value, as follows:
+
+    {
+      "config":{
+        "workerConfig":{
+          "numInstances":"5"
+        }
+      }
+    }
+Similarly, to change the number of preemptible workers in a cluster to 5,
+the `update_mask` parameter would be
+`config.secondary_worker_config.num_instances`, and the `PATCH` request
+body would be set as follows:
+
+    {
+      "config":{
+        "secondaryWorkerConfig":{
+          "numInstances":"5"
+        }
+      }
+    }
+<strong>Note:</strong> Currently, only the following fields can be updated:
+
+ <table>
+ <tbody>
+ <tr>
+ <td><strong>Mask</strong></td>
+ <td><strong>Purpose</strong></td>
+ </tr>
+ <tr>
+ <td><strong><em>labels</em></strong></td>
+ <td>Update labels</td>
+ </tr>
+ <tr>
+ <td><strong><em>config.worker_config.num_instances</em></strong></td>
+ <td>Resize primary worker group</td>
+ </tr>
+ <tr>
+ <td><strong><em>config.secondary_worker_config.num_instances</em></strong></td>
+ <td>Resize secondary worker group</td>
+ </tr>
+ <tr>
+ <td>config.autoscaling_config.policy_uri</td><td>Use, stop using, or
+ change autoscaling policies</td>
+ </tr>
+ </tbody>
+ </table>
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the server
+receives two
+[UpdateClusterRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.UpdateClusterRequest)s
+with the same id, then the second request will be ignored and the
+first [google.longrunning.Operation][google.longrunning.Operation] created
+and stored in the backend is returned.
+
+It is recommended to always set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::StopClusterRequest
+
+A request to stop a cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project the
+cluster belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Required. The cluster name.
+
+=item * C<< $msg->cluster_uuid() >> / C<< $msg->cluster_uuid($value) >>
+
+Type: C<String>
+
+Optional. Specifying the `cluster_uuid` means the RPC will fail
+(with error NOT_FOUND) if a cluster with the specified UUID does not exist.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the server
+receives two
+[StopClusterRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.StopClusterRequest)s
+with the same id, then the second request will be ignored and the
+first [google.longrunning.Operation][google.longrunning.Operation] created
+and stored in the backend is returned.
+
+Recommendation: Set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::StartClusterRequest
+
+A request to start a cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project the
+cluster belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Required. The cluster name.
+
+=item * C<< $msg->cluster_uuid() >> / C<< $msg->cluster_uuid($value) >>
+
+Type: C<String>
+
+Optional. Specifying the `cluster_uuid` means the RPC will fail
+(with error NOT_FOUND) if a cluster with the specified UUID does not exist.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the server
+receives two
+[StartClusterRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.StartClusterRequest)s
+with the same id, then the second request will be ignored and the
+first [google.longrunning.Operation][google.longrunning.Operation] created
+and stored in the backend is returned.
+
+Recommendation: Set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::DeleteClusterRequest
+
+A request to delete a cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the cluster
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Required. The cluster name.
+
+=item * C<< $msg->cluster_uuid() >> / C<< $msg->cluster_uuid($value) >>
+
+Type: C<String>
+
+Optional. Specifying the `cluster_uuid` means the RPC should fail
+(with error NOT_FOUND) if cluster with specified UUID does not exist.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the server
+receives two
+[DeleteClusterRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.DeleteClusterRequest)s
+with the same id, then the second request will be ignored and the
+first [google.longrunning.Operation][google.longrunning.Operation] created
+and stored in the backend is returned.
+
+It is recommended to always set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::GetClusterRequest
+
+Request to get the resource representation for a cluster in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the cluster
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Required. The cluster name.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::ListClustersRequest
+
+A request to list the clusters in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the cluster
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter constraining the clusters to list. Filters are
+case-sensitive and have the following syntax:
+
+field = value [AND [field = value]] ...
+
+where B<field> is one of `status.state`, `clusterName`, or `labels.[KEY]`,
+and `[KEY]` is a label key. B<value> can be `*` to match all values.
+`status.state` can be one of the following: `ACTIVE`, `INACTIVE`,
+`CREATING`, `RUNNING`, `ERROR`, `DELETING`, `UPDATING`, `STOPPING`, or
+`STOPPED`. `ACTIVE` contains the `CREATING`, `UPDATING`, and `RUNNING`
+states. `INACTIVE` contains the `DELETING`, `ERROR`, `STOPPING`, and
+`STOPPED` states. `clusterName` is the name of the cluster provided at
+creation time. Only the logical `AND` operator is supported;
+space-separated items are treated as having an implicit `AND` operator.
+
+Example filter:
+
+status.state = ACTIVE AND clusterName = mycluster
+AND labels.env = staging AND labels.starred = *
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The standard List page size.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The standard List page token.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::ListClustersResponse
+
+The list of all clusters in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->clusters() >> / C<< $msg->clusters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::Cluster>)
+
+Output only. The clusters in the project.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Output only. This token is included in the response if there are more
+results to fetch. To fetch additional results, provide this value as the
+`page_token` in a subsequent `ListClustersRequest`.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterRequest
+
+A request to collect cluster diagnostic information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the cluster
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Required. The cluster name.
+
+=item * C<< $msg->tarball_gcs_dir() >> / C<< $msg->tarball_gcs_dir($value) >>
+
+Type: C<String>
+
+Optional. (Optional) The output Cloud Storage directory for the diagnostic
+tarball. If not specified, a task-specific directory in the cluster's
+staging bucket will be used.
+
+=item * C<< $msg->tarball_access() >> / C<< $msg->tarball_access($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::DiagnoseClusterRequest::TarballAccess>)
+
+Optional. (Optional) The access type to the diagnostic tarball. If not
+specified, falls back to default access of the bucket
+
+=item * C<< $msg->diagnosis_interval() >> / C<< $msg->diagnosis_interval($value) >>
+
+Type: C<Message> (L<Google::Type::Interval::Interval>)
+
+Optional. Time interval in which diagnosis should be carried out on the
+cluster.
+
+=item * C<< $msg->jobs() >> / C<< $msg->jobs($value) >>
+
+Type: C<String>
+
+Optional. Specifies a list of jobs on which diagnosis is to be performed.
+Format: projects/{project}/regions/{region}/jobs/{job}
+
+=item * C<< $msg->yarn_application_ids() >> / C<< $msg->yarn_application_ids($value) >>
+
+Type: C<String>
+
+Optional. Specifies a list of yarn applications on which diagnosis is to be
+performed.
+
+=back
+
+=head3 Enum: DiagnoseClusterRequest::TarballAccess
+
+=over 4
+
+=item * C<TARBALL_ACCESS_UNSPECIFIED> => C<0>
+
+=item * C<GOOGLE_CLOUD_SUPPORT> => C<1>
+
+=item * C<GOOGLE_DATAPROC_DIAGNOSE> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterResults
+
+The location of diagnostic output.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->output_uri() >> / C<< $msg->output_uri($value) >>
+
+Type: C<String>
+
+Output only. The Cloud Storage URI of the diagnostic output.
+The output report is a plain text file with a summary of collected
+diagnostics.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Clusters::ReservationAffinity
+
+Reservation Affinity for consuming Zonal reservation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->consume_reservation_type() >> / C<< $msg->consume_reservation_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::ReservationAffinity::Type>)
+
+Optional. Type of reservation to consume
+
+=item * C<< $msg->key() >> / C<< $msg->key($value) >>
+
+Type: C<String>
+
+Optional. Corresponds to the label key of reservation resource.
+
+=item * C<< $msg->values() >> / C<< $msg->values($value) >>
+
+Type: C<String>
+
+Optional. Corresponds to the label values of reservation resource.
+
+=back
+
+=head3 Enum: ReservationAffinity::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<NO_RESERVATION> => C<1>
+
+=item * C<ANY_RESERVATION> => C<2>
+
+=item * C<SPECIFIC_RESERVATION> => C<3>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::Clusters::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,261 @@
+package Google::Cloud::Metastore::V1alpha::DataprocMetastoreClient;
+
+use strict;
+use warnings;
+use Moo;
+use Google::gRPC::Client;
+use Google::Cloud::REST::Client;
+use Google::Auth;
+use Carp qw(croak);
+
+use Protobuf;
+use Google::Api::Common;
+use Google::Cloud::Metastore::V1alpha::Metastore;
+use Google::Cloud::Metastore::V1alpha::MetastoreFederation;
+
+our $VERSION = '0.06';
+
+has credentials => ( is => 'ro', required => 0 );
+has transport   => ( is => 'rw' );
+
+sub BUILD {
+    my ($self) = @_;
+
+    my $auth = $self->credentials;
+    if (!defined $auth) {
+        $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
+    }
+    my $token = $auth->get_token();
+
+    my $target = 'metastore.googleapis.com:443';
+    my $t = $self->transport || 'grpc';
+
+    if (ref($t) && eval { $t->can('call') }) {
+        # Already a transport object
+    } elsif (lc($t) eq 'rest') {
+        my $client = Google::Cloud::REST::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    } else {
+        my $client = Google::gRPC::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    }
+}
+
+sub list_services {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Metastore::V1alpha::Metastore::ListServicesRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Metastore::V1alpha::Metastore::ListServicesResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.metastore.v1alpha.DataprocMetastore/ListServices',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.metastore.v1alpha.DataprocMetastore',
+        method         => 'ListServices',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub query_metadata {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Metastore::V1alpha::Metastore::QueryMetadataRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.metastore.v1alpha.DataprocMetastore/QueryMetadata',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.metastore.v1alpha.DataprocMetastore',
+        method         => 'QueryMetadata',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+1; # End of Google::Cloud::Metastore::V1alpha::DataprocMetastoreClient
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Metastore::V1alpha::DataprocMetastoreClient - Client library for Google Cloud Services
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Metastore::V1alpha::DataprocMetastoreClient;
+    use Google::Auth;
+
+    my $auth = Google::Auth->default();
+
+    # 1. High-performance gRPC Transport (Default)
+    my $grpc_client = Google::Cloud::Metastore::V1alpha::DataprocMetastoreClient->new(
+        credentials => $auth,
+        transport   => 'grpc', # Optional: 'grpc' is default
+    );
+
+    # 2. HTTP/REST Transport
+    my $rest_client = Google::Cloud::Metastore::V1alpha::DataprocMetastoreClient->new(
+        credentials => $auth,
+        transport   => 'rest',
+    );
+
+    # Execute service methods
+    my $res = $grpc_client->some_method( %params );
+
+=head1 DESCRIPTION
+
+C<Google::Cloud::Metastore::V1alpha::DataprocMetastoreClient> is an auto-generated client library for Google Cloud Services.
+
+It provides a unified client interface supporting both high-performance HTTP/2 gRPC and HTTP/REST transports, with automatic Google Cloud Application Default Credentials (ADC) resolution and typed Protocol Buffers message handling.
+
+=head1 SOURCE
+
+Generated from the following Protocol Buffers schemas:
+
+=over 4
+
+=item * C<googleapis/google/cloud/metastore/v1alpha/metastore.proto>
+
+=item * C<googleapis/google/cloud/metastore/v1alpha/metastore_federation.proto>
+
+
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $client = Google::Cloud::Metastore::V1alpha::DataprocMetastoreClient->new(
+        credentials => $auth,   # Optional: Google::Auth object (defaults to ADC)
+        transport   => 'grpc', # Optional: 'grpc' (default) or 'rest'
+    );
+
+=head1 ATTRIBUTES
+
+=head2 credentials
+
+Returns or accepts the L<Google::Auth> credentials object.
+
+=head2 transport
+
+Returns or accepts the active transport object (L<Google::gRPC::Client> or L<Google::Cloud::REST::Client>).
+
+=head1 METHODS
+
+=head2 METHODS
+
+The following RPC methods are available in this client:
+
+=over 4
+
+=item * B<list_services>
+
+    my $response = $client->list_services(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListServices> on C<google.cloud.metastore.v1alpha.DataprocMetastore>.
+
+Request: L<Google::Cloud::Metastore::V1alpha::Metastore::ListServicesRequest>
+
+Returns: L<Google::Cloud::Metastore::V1alpha::Metastore::ListServicesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
+
+=item * B<query_metadata>
+
+    my $response = $client->query_metadata(
+        service                  => $service,
+        query                    => $query,
+    );
+
+Calls the RPC method C<QueryMetadata> on C<google.cloud.metastore.v1alpha.DataprocMetastore>.
+
+Request: L<Google::Cloud::Metastore::V1alpha::Metastore::QueryMetadataRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<service> - C<string>
+
+=item * C<query> - C<string>
+
+=back
+
+=back
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

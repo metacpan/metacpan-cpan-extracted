@@ -1,0 +1,88 @@
+package Google::Cloud::Faulttesting::V1alpha::State;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Ci1nb29nbGUvY2xvdWQvZmF1bHR0ZXN0aW5nL3YxYWxwaGEvc3RhdGUucHJvdG8SIWdvb2ds
+ZS5jbG91ZC5mYXVsdHRlc3RpbmcudjFhbHBoYSp2CgVTdGF0ZRIVChFTVEFURV9VTlNQRUNJ
+RklFRBAAEg0KCVBSRVBBUklORxABEgwKCFBSRVBBUkVEEAISDQoJSU5KRUNUSU5HEAMSDAoI
+SU5KRUNURUQQBBINCglSRVZFUlRJTkcQBRINCglDT01QTEVURUQQBkKAAQolY29tLmdvb2ds
+ZS5jbG91ZC5mYXVsdHRlc3RpbmcudjFhbHBoYUIKU3RhdGVQcm90b1ABWkljbG91ZC5nb29n
+bGUuY29tL2dvL2ZhdWx0dGVzdGluZy9hcGl2MWFscGhhL2ZhdWx0dGVzdGluZ3BiO2ZhdWx0
+dGVzdGluZ3BiSqcOCgYSBA4AMwEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29n
+bGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIu
+MCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBp
+biBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkg
+b2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2Vz
+L0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFn
+cmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExp
+Y2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FS
+UkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBp
+bXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292
+ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2Uu
+CgoICgECEgMQACoKCAoBCBIDEgBgCgkKAggLEgMSAGAKCAoBCBIDEwAiCgkKAggKEgMTACIK
+CAoBCBIDFAArCgkKAggIEgMUACsKCAoBCBIDFQA+CgkKAggBEgMVAD4KdwoCBQASBBkAMwEa
+ayBSZXByZXNlbnRzIHRoZSBjdXJyZW50IHN0YXRlIG9mIGFuIGBFeHBlcmltZW50YCBvciBg
+VmFsaWRhdGlvbmAgZHJ5IHJ1bi4KIFN0cmluZyB2YWx1ZXMgYXJlIHVzZWQgaW4gSlNPTi4K
+CgoKAwUAARIDGQUKCjEKBAUAAgASAxsCGBokIFRoZSBzdGF0ZSBpcyBub3Qga25vd24gb3Ig
+bm90IHNldC4KCgwKBQUAAgABEgMbAhMKDAoFBQACAAISAxsWFwqVAQoEBQACARIDHwIQGocB
+IFRoZSBzeXN0ZW0gaXMgaWRlbnRpZnlpbmcgdGhlIHRhcmdldCBHb29nbGUgQ2xvdWQgcmVz
+b3VyY2VzIGZvciB0aGUKIGBFeHBlcmltZW50YCBvciBgVmFsaWRhdGlvbmAgYW5kIGNoZWNr
+aW5nIG5lY2Vzc2FyeSBwZXJtaXNzaW9ucy4KCgwKBQUAAgEBEgMfAgsKDAoFBQACAQISAx8O
+DwpBCgQFAAICEgMiAg8aNCBUaGUgZXhwZXJpbWVudCBpcyBmdWxseSBzZXQgdXAgYW5kIHJl
+YWR5IHRvIHN0YXJ0LgoKDAoFBQACAgESAyICCgoMCgUFAAICAhIDIg0OCogBCgQFAAIDEgMm
+AhAaeyBUaGUgc3lzdGVtIGlzIGFjdGl2ZWx5IGFwcGx5aW5nIHRoZSBmYXVsdCB0byB0aGUg
+dGFyZ2V0ZWQKIHJlc291cmNlcy4gRXhhbXBsZTogU2xvd2luZyBkb3duIHJlc3BvbnNlcywg
+dHJpZ2dlcmluZyBlcnJvcnMuCgoMCgUFAAIDARIDJgILCgwKBQUAAgMCEgMmDg8KeAoEBQAC
+BBIDKgIPGmsgVGhlIGZhdWx0IGlzIGFjdGl2ZSBvbiB0aGUgdGFyZ2V0ZWQgcmVzb3VyY2Vz
+LiBUaGUgYEV4cGVyaW1lbnRgIGlzCiBub3cgcnVubmluZyBmb3IgaXRzIHBsYW5uZWQgZHVy
+YXRpb24uCgoMCgUFAAIEARIDKgIKCgwKBQUAAgQCEgMqDQ4KkAEKBAUAAgUSAy4CEBqCASBU
+aGUgYEV4cGVyaW1lbnRgIGlzIGJlaW5nIHN0b3BwZWQsIGFuZCBGSVQgaXMgcmVtb3Zpbmcg
+dGhlIGZhdWx0CiBhbmQgcmVzdG9yaW5nIHRoZSByZXNvdXJjZXMgdG8gdGhlaXIgbm9ybWFs
+IG9wZXJhdGlvbmFsIHN0YXRlLgoKDAoFBQACBQESAy4CCwoMCgUFAAIFAhIDLg4PCpABCgQF
+AAIGEgMyAhAaggEgVGhlIGBFeHBlcmltZW50YCBvciBgVmFsaWRhdGlvbmAgaGFzIGZpbmlz
+aGVkLCBhbmQgdGhlIHJlc291cmNlcyBhcmUgYmFjawogdG8gdGhlaXIgbm9ybWFsIHN0YXRl
+LiBObyBmdXJ0aGVyIGFjdGlvbnMgd2lsbCBvY2N1ci4KCgwKBQUAAgYBEgMyAgsKDAoFBQAC
+BgISAzIOD2IGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Faulttesting::V1alpha::State - Compiled Protocol Buffers messages for google/cloud/faulttesting/v1alpha/state.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/faulttesting/v1alpha/state.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Faulttesting::V1alpha::State::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::Income::TaxYear;
-our $VERSION = '0.013';
+our $VERSION = '0.015';
 use Moose::Role;
 
 # ABSTRACT: A role that implements income tax logic
@@ -207,6 +207,12 @@ has azv_yearly_income => (
     builder => '_get_aov_yearly_income',
 );
 
+has reparatietoeslag_table => (
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+);
+
 has tax_brackets => (
     is      => 'ro',
     isa     => 'ArrayRef',
@@ -329,9 +335,64 @@ sub _get_tax_variable {
     return $self->get_cost($self->taxable_amount, $self->tax_rate);
 }
 
+sub gross_period_income {
+    my $self = shift;
+    return $self->yearly_income_gross / $self->months;
+}
+
+sub reparatietoeslag_monthly {
+    my $self   = shift;
+    my $income = $self->gross_period_income;
+
+    foreach (@{ $self->reparatietoeslag_table }) {
+        return $_->{amount} if $income >= $_->{min} && $income < $_->{max};
+    }
+    return 0;
+}
+
+sub reparatietoeslag {
+    my $self = shift;
+    return $self->reparatietoeslag_monthly * $self->months;
+}
+
 sub income_tax {
     my $self = shift;
     return int($self->tax_variable + $self->tax_fixed);
+}
+
+sub _credit_left {
+    my ($self, @used) = @_;
+    my $left = $self->reparatietoeslag;
+    $left -= $_ for @used;
+    return $left;
+}
+
+sub _min { return $_[0] < $_[1] ? $_[0] : $_[1] }
+
+sub reparatietoeslag_tax {
+    my $self = shift;
+    return _min($self->reparatietoeslag, $self->income_tax);
+}
+
+sub reparatietoeslag_aov_employer {
+    my $self = shift;
+    return _min($self->_credit_left($self->reparatietoeslag_tax),
+        $self->aov_employer);
+}
+
+sub reparatie_kosten {
+    my $self = shift;
+    return $self->reparatietoeslag;
+}
+
+sub reparatietoeslag_azv_employer {
+    my $self = shift;
+    return _min(
+        $self->_credit_left(
+            $self->reparatietoeslag_tax, $self->reparatietoeslag_aov_employer
+        ),
+        $self->azv_employer
+    );
 }
 
 sub _build_wervingskosten {
@@ -464,7 +525,8 @@ sub net_income {
           $self->tax_free_wage
         + $self->taxfree_amount
         + $self->wervingskosten
-        + $self->tax_free;
+        + $self->tax_free
+        + $self->reparatietoeslag;
 }
 
 sub company_costs {
@@ -479,6 +541,7 @@ sub company_costs {
 sub government_costs {
     my $self = shift;
     return $self->aov_premium + $self->azv_premium + $self->income_tax
+        - $self->reparatietoeslag;
 }
 
 sub social_costs {
@@ -584,7 +647,7 @@ Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax l
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -635,6 +698,32 @@ bracket.
 =head2 is_year
 
 This function should return true if the year is supported by the plugin
+
+=head1 METHODS
+
+=head2 reparatie_kosten
+
+Returns the reparatietoeslag of this employee as a number. It is paid to the
+employee and funded by the employer. A consumer sums it over all employees of a
+payroll run and decides there how to fund the total: less wage tax withheld
+first, then less AOV, then less AZV. The per-employee split of
+C<reparatietoeslag_tax>, C<reparatietoeslag_aov_employer> and
+C<reparatietoeslag_azv_employer> only holds for a single employee.
+
+=head1 OPTIONAL OVERRIDES
+
+=head2 reparatietoeslag_table
+
+An array reference of monthly gross income ranges (C<min> inclusive, C<max>
+exclusive) with the monthly tax credit (C<amount>) for that range. The credit
+is added to the net income. The employer funds it by withholding less income
+tax first, then by remitting less employer AOV, then less employer AZV (see
+C<reparatietoeslag_tax>, C<reparatietoeslag_aov_employer> and
+C<reparatietoeslag_azv_employer>). Empty by default, which means no credit.
+
+    [
+        { min => 2007.05, max => 2258, amount => 175 },
+    ]
 
 =head1 ATTRIBUTES
 

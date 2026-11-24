@@ -10,56 +10,56 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Bigquery::V2::JsonExtension;
-use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
-use Google::Cloud::Bigquery::V2::Clustering;
-use Google::Cloud::Bigquery::V2::Error;
 use Google::Cloud::Bigquery::V2::ManagedTableType;
-use Google::Cloud::Bigquery::V2::MapTargetType;
-use Google::Cloud::Bigquery::V2::LocationMetadata;
-use Google::Cloud::Bigquery::V2::GenAiStats;
 use Google::Cloud::Bigquery::V2::Arrow;
+use Google::Cloud::Bigquery::V2::Error;
+use Google::Cloud::Bigquery::V2::GenAiStats;
 use Google::Cloud::Bigquery::V2::DecimalTargetTypes;
+use Google::Cloud::Bigquery::V2::LocationMetadata;
+use Google::Cloud::Bigquery::V2::JsonExtension;
+use Google::Cloud::Bigquery::V2::Clustering;
+use Google::Cloud::Bigquery::V2::MapTargetType;
+use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
 use Google::Cloud::Bigquery::V2::UdfResource;
-use Google::Cloud::Bigquery::V2::EncryptionConfig;
-use Google::Cloud::Bigquery::V2::HivePartitioning;
-use Google::Cloud::Bigquery::V2::StandardSql;
-use Google::Cloud::Bigquery::V2::ModelReference;
-use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
-use Google::Cloud::Bigquery::V2::JobStatus;
-use Google::Cloud::Bigquery::V2::BiglakeConfig;
 use Google::Cloud::Bigquery::V2::RangePartitioning;
-use Google::Cloud::Bigquery::V2::TableReference;
-use Google::Cloud::Bigquery::V2::DatasetReference;
-use Google::Cloud::Bigquery::V2::PartitioningDefinition;
-use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
-use Google::Cloud::Bigquery::V2::DataFormatOptions;
-use Google::Cloud::Bigquery::V2::PropertyGraphReference;
-use Google::Cloud::Bigquery::V2::TableSchema;
-use Google::Cloud::Bigquery::V2::JobCreationReason;
-use Google::Cloud::Bigquery::V2::RoutineReference;
-use Google::Cloud::Bigquery::V2::JobReference;
-use Google::Cloud::Bigquery::V2::PrivacyPolicy;
-use Google::Cloud::Bigquery::V2::RestrictionConfig;
 use Google::Cloud::Bigquery::V2::TimePartitioning;
-use Google::Cloud::Bigquery::V2::QueryParameter;
-use Google::Cloud::Bigquery::V2::SessionInfo;
 use Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
-use Google::Cloud::Bigquery::V2::Project;
+use Google::Cloud::Bigquery::V2::HivePartitioning;
+use Google::Cloud::Bigquery::V2::PropertyGraphReference;
+use Google::Cloud::Bigquery::V2::PrivacyPolicy;
+use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
+use Google::Cloud::Bigquery::V2::ModelReference;
+use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
+use Google::Cloud::Bigquery::V2::RestrictionConfig;
+use Google::Cloud::Bigquery::V2::PartitioningDefinition;
+use Google::Cloud::Bigquery::V2::JobCreationReason;
+use Google::Cloud::Bigquery::V2::TableSchema;
+use Google::Cloud::Bigquery::V2::TableReference;
+use Google::Cloud::Bigquery::V2::JobStatus;
+use Google::Cloud::Bigquery::V2::EncryptionConfig;
+use Google::Cloud::Bigquery::V2::StandardSql;
+use Google::Cloud::Bigquery::V2::DataFormatOptions;
+use Google::Cloud::Bigquery::V2::RoutineReference;
+use Google::Cloud::Bigquery::V2::DatasetReference;
+use Google::Cloud::Bigquery::V2::JobReference;
+use Google::Cloud::Bigquery::V2::SessionInfo;
+use Google::Cloud::Bigquery::V2::BiglakeConfig;
+use Google::Cloud::Bigquery::V2::QueryParameter;
 use Google::Cloud::Bigquery::V2::ExternalDatasetReference;
-use Google::Cloud::Bigquery::V2::SystemVariable;
-use Google::Cloud::Bigquery::V2::Model;
-use Google::Cloud::Bigquery::V2::TableConstraints;
-use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-use Google::Cloud::Bigquery::V2::Routine;
+use Google::Cloud::Bigquery::V2::Project;
 use Google::Cloud::Bigquery::V2::RowAccessPolicy;
+use Google::Cloud::Bigquery::V2::ExternalDataConfig;
+use Google::Cloud::Bigquery::V2::TableConstraints;
+use Google::Cloud::Bigquery::V2::Model;
+use Google::Cloud::Bigquery::V2::SystemVariable;
+use Google::Cloud::Bigquery::V2::Routine;
 use Google::Cloud::Bigquery::V2::Dataset;
-use Google::Cloud::Bigquery::V2::JobStats;
 use Google::Cloud::Bigquery::V2::Table;
+use Google::Cloud::Bigquery::V2::JobStats;
 use Google::Cloud::Bigquery::V2::JobConfig;
 use Google::Cloud::Bigquery::V2::Job;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -406,11 +406,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/hive_partitioning.proto>
 
+=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
+
 =item * C<googleapis/google/cloud/bigquery/v2/job_config.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_creation_reason.proto>
-
-=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_reference.proto>
 
@@ -458,9 +458,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/system_variable.proto>
 
-=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
-
 =item * C<googleapis/google/cloud/bigquery/v2/table.proto>
+
+=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/table_reference.proto>
 
@@ -503,31 +503,206 @@ The following RPC methods are available in this client:
 
 =item * B<get_dataset>
 
-Calls the RPC method C<GetDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        dataset_view             => $dataset_view,
+        access_policy_version    => $access_policy_version,
+    );
+
+Calls the RPC method C<GetDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::GetDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<dataset_view> - L<Google::Cloud::Bigquery::V2::Dataset::DatasetView>
+
+=item * C<access_policy_version> - C<int32>
+
+=back
 
 =item * B<insert_dataset>
 
-Calls the RPC method C<InsertDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert_dataset(
+        project_id               => $project_id,
+        dataset                  => $dataset,
+        access_policy_version    => $access_policy_version,
+    );
+
+Calls the RPC method C<InsertDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::InsertDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset> - L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+=item * C<access_policy_version> - C<int32>
+
+=back
 
 =item * B<patch_dataset>
 
-Calls the RPC method C<PatchDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        dataset                  => $dataset,
+        update_mode              => $update_mode,
+        access_policy_version    => $access_policy_version,
+    );
+
+Calls the RPC method C<PatchDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::UpdateOrPatchDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<dataset> - L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+=item * C<update_mode> - L<Google::Cloud::Bigquery::V2::Dataset::UpdateMode>
+
+=item * C<access_policy_version> - C<int32>
+
+=back
 
 =item * B<update_dataset>
 
-Calls the RPC method C<UpdateDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        dataset                  => $dataset,
+        update_mode              => $update_mode,
+        access_policy_version    => $access_policy_version,
+    );
+
+Calls the RPC method C<UpdateDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::UpdateOrPatchDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<dataset> - L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+=item * C<update_mode> - L<Google::Cloud::Bigquery::V2::Dataset::UpdateMode>
+
+=item * C<access_policy_version> - C<int32>
+
+=back
 
 =item * B<delete_dataset>
 
-Calls the RPC method C<DeleteDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        delete_contents          => $delete_contents,
+    );
+
+Calls the RPC method C<DeleteDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::DeleteDatasetRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<delete_contents> - C<bool>
+
+=back
 
 =item * B<list_datasets>
 
-Calls the RPC method C<ListDatasets> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_datasets(
+        project_id               => $project_id,
+        max_results              => $max_results,
+        page_token               => $page_token,
+        all                      => $all,
+        filter                   => $filter,
+    );
+
+Calls the RPC method C<ListDatasets> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::ListDatasetsRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::DatasetList>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<max_results> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<page_token> - C<string>
+
+=item * C<all> - C<bool>
+
+=item * C<filter> - C<string>
+
+=back
 
 =item * B<undelete_dataset>
 
-Calls the RPC method C<UndeleteDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->undelete_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        deletion_time            => $deletion_time,
+    );
+
+Calls the RPC method C<UndeleteDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::UndeleteDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<deletion_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=back
 
 =back
 

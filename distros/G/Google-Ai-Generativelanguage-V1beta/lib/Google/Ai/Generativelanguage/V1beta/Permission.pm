@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::Permission;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -108,69 +108,11 @@ EOF
     # Field: email_address Type: 9 ()
     # Field: role Type: 14 (.google.ai.generativelanguage.v1beta.Permission.Role)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Permission::Permission - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Permission;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Permission::Permission->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<grantee_type>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.Permission.GranteeType)
-
-=item * B<email_address>
-
-Type: String
-
-=item * B<role>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.Permission.Role)
-
-=back
-
-=cut
-
 # Enum: Permission::GranteeType
 our $Permission_GRANTEE_TYPE_UNSPECIFIED = 0;
 our $Permission_USER = 1;
 our $Permission_GROUP = 2;
 our $Permission_EVERYONE = 3;
-
-=pod
-
-=head2 Enum: Permission::GranteeType
-
-Values:
-
-=over 4
-
-=item * C<GRANTEE_TYPE_UNSPECIFIED> => 0
-
-=item * C<USER> => 1
-
-=item * C<GROUP> => 2
-
-=item * C<EVERYONE> => 3
-
-=back
-
-=cut
 
 # Enum: Permission::Role
 our $Permission_ROLE_UNSPECIFIED = 0;
@@ -178,37 +120,131 @@ our $Permission_OWNER = 1;
 our $Permission_WRITER = 2;
 our $Permission_READER = 3;
 
-=pod
-
-=head2 Enum: Permission::Role
-
-Values:
-
-=over 4
-
-=item * C<ROLE_UNSPECIFIED> => 0
-
-=item * C<OWNER> => 1
-
-=item * C<WRITER> => 2
-
-=item * C<READER> => 3
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::Permission - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::Permission - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/permission.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::Permission;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::Permission::Permission->new({
+        name => $name,
+        grantee_type => $grantee_type,
+        email_address => $email_address,
+        role => $role,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::Permission::Permission->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/permission.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::Permission::Permission
+
+Permission resource grants user, group or the rest of the world access to the
+PaLM API resource (e.g. a tuned model, corpus).
+
+A role is a collection of permitted operations that allows users to perform
+specific actions on PaLM API resources. To make them available to users,
+groups, or service accounts, you assign roles. When you assign a role, you
+grant permissions that the role contains.
+
+There are three concentric roles. Each role is a superset of the previous
+role's permitted operations:
+
+- reader can use the resource (e.g. tuned model, corpus) for inference
+- writer has reader's permissions and additionally can edit and share
+- owner has writer's permissions and additionally can delete
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The permission name. A unique name will be
+generated on create. Examples:
+    tunedModels/{tuned_model}/permissions/{permission}
+    corpora/{corpus}/permissions/{permission}
+Output only.
+
+=item * C<< $msg->grantee_type() >> / C<< $msg->grantee_type($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::Permission::GranteeType>)
+
+Optional. Immutable. The type of the grantee.
+
+=item * C<< $msg->email_address() >> / C<< $msg->email_address($value) >>
+
+Type: C<String>
+
+Optional. Immutable. The email address of the user of group which this
+permission refers. Field is not set when permission's grantee type is
+EVERYONE.
+
+=item * C<< $msg->role() >> / C<< $msg->role($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::Permission::Role>)
+
+Required. The role granted by this permission.
+
+=back
+
+=head3 Enum: Permission::GranteeType
+
+=over 4
+
+=item * C<GRANTEE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<USER> => C<1>
+
+=item * C<GROUP> => C<2>
+
+=item * C<EVERYONE> => C<3>
+
+=back
+
+=head3 Enum: Permission::Role
+
+=over 4
+
+=item * C<ROLE_UNSPECIFIED> => C<0>
+
+=item * C<OWNER> => C<1>
+
+=item * C<WRITER> => C<2>
+
+=item * C<READER> => C<3>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::Permission::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

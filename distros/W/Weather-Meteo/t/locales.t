@@ -7,12 +7,14 @@
 # A sanity subtest runs first; BAIL_OUT fires if the coordinate table is broken.
 #
 # Section 2 -- POSIX system locale: verify that all carp/croak messages from
-# the module are always English regardless of LC_ALL.  errno strings ($!) are
+# the module are English by default, and exactly the caller's translation when
+# one is supplied through the 'messages' option, regardless of LC_ALL.  errno strings ($!) are
 # sourced directly from Perl's own layer (local $! = ENOENT; my $msg = "$!")
 # to avoid divergence between POSIX::strerror and the C library.
 
 use strict;
 use warnings;
+use utf8;
 
 use CHI;
 use HTTP::Response;
@@ -199,7 +201,7 @@ subtest 'POSIX sanity: Perl $! gives a non-empty errno string for ENOENT' => sub
 #   (a) A bad date warning from weather() is in English.
 #   (b) A missing-lat croak from weather() is in English.
 #   (c) The errno string sourced through Perl's $! layer is non-empty.
-my @locales = ('en_US.UTF-8', 'de_DE.UTF-8', 'zh_CN.UTF-8');
+my @locales = ('en_US.UTF-8', 'de_DE.UTF-8', 'zh_CN.UTF-8', 'ja_JP.UTF-8');
 
 for my $locale (@locales) {
 
@@ -244,6 +246,44 @@ for my $locale (@locales) {
 		diag("[$locale] croak: $error") if $ENV{TEST_VERBOSE};
 	};
 
+	subtest "POSIX [$locale]: translated messages are used verbatim" => sub {
+		unless(_locale_available($locale)) {
+			plan skip_all => "locale '$locale' not available on this system";
+			return;
+		}
+
+		# Non-ASCII text in three scripts: the module must neither mangle it
+		# nor depend on the process locale to choose it.
+		my %translation = (
+			usage_weather => 'Verwendung: weather(latitude => ..., longitude => ..., date => ...) äöü',
+			not_a_date    => '「{date}」は有効な日付ではありません',
+			ua_undef      => '必须提供有效的 ua',
+		);
+		my ($usage, @warnings, $ua_error);
+		{
+			local $ENV{LC_ALL} = $locale;
+			local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+			my $meteo = Weather::Meteo->new(cache => _fresh_cache(), messages => \%translation);
+
+			eval { $meteo->weather({ longitude => '-0.1', date => $DATE }) };
+			$usage = $@;
+			$meteo->weather({ latitude => '51.5', longitude => '-0.1', date => 'kein-datum' });
+			eval { $meteo->ua(undef) };
+			$ua_error = $@;
+		}
+
+		like($usage,       qr/\AVerwendung: weather\(.*äöü/, "[$locale] usage croak is the translation");
+		# Look for our warning rather than assuming it is the first: a
+		# configured logger (Log4perl, say) may emit warnings of its own, such as
+		# "Wide character in print", when it is handed non-ASCII text.
+		my ($warned) = grep { /「kein-datum」/ } @warnings;
+		like($warned // '', qr/\A「kein-datum」は有効な日付ではありません/, "[$locale] warning is the translation, placeholder filled");
+		unlike($usage . join('', @warnings), qr/Usage:|is not a valid date/,   "[$locale] no English leaks through");
+		ok(length($ua_error),                                                  "[$locale] ua(undef) still throws");
+
+		diag("[$locale] translated usage: $usage") if $ENV{TEST_VERBOSE};
+	};
+
 	subtest "POSIX [$locale]: errno string sourced via Perl \$! layer is non-empty" => sub {
 		unless(_locale_available($locale)) {
 			plan skip_all => "locale '$locale' not available on this system";
@@ -261,5 +301,30 @@ for my $locale (@locales) {
 		diag("[$locale] ENOENT: $msg") if $ENV{TEST_VERBOSE};
 	};
 }
+
+# The module never calls setlocale(), so LC_ALL must not matter even when the
+# named locale is not installed.  This runs everywhere, unlike the subtests
+# above that skip when the locale is missing.
+subtest 'LC_ALL has no effect on messages, installed or not' => sub {
+	my %translation = (ua_undef => '必须提供有效的 ua', usage_forecast => 'Utilisation : forecast(latitude, longitude)');
+	my %seen;
+
+	for my $locale (@locales, 'C', 'xx_XX.UTF-8') {
+		local $ENV{LC_ALL} = $locale;
+		my $english    = Weather::Meteo->new(cache => _fresh_cache());
+		my $translated = Weather::Meteo->new(cache => _fresh_cache(), messages => \%translation);
+
+		$seen{english}{ $english->i18n('ua_undef') }++;
+		$seen{translated}{ $translated->i18n('ua_undef') }++;
+
+		throws_ok { $english->forecast(longitude => 1) } qr/\AUsage: forecast/,
+			"[$locale] English croak";
+		throws_ok { $translated->forecast(longitude => 1) } qr/\AUtilisation : forecast/,
+			"[$locale] translated croak";
+	}
+
+	is_deeply([ keys %{ $seen{english} } ],    ['ua() requires a defined value'], 'one English text for every locale');
+	is_deeply([ keys %{ $seen{translated} } ], ['必须提供有效的 ua'],             'one translated text for every locale');
+};
 
 done_testing();

@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -113,40 +113,6 @@ EOF
     # Field: storage_descriptor Type: 11 (.google.cloud.bigquery.v2.StorageDescriptor)
     # Field: connection_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::ExternalCatalogTableOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::ExternalCatalogTableOptions->new(
-        parameters => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parameters>
-
-Type: Message (.google.cloud.bigquery.v2.ExternalCatalogTableOptions.ParametersEntry)
-
-=item * B<storage_descriptor>
-
-Type: Message (.google.cloud.bigquery.v2.StorageDescriptor)
-
-=item * B<connection_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::StorageDescriptor ===
     # Fields for StorageDescriptor
     # Field: location_uri Type: 9 ()
@@ -154,95 +120,172 @@ Type: String
     # Field: output_format Type: 9 ()
     # Field: serde_info Type: 11 (.google.cloud.bigquery.v2.SerDeInfo)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::StorageDescriptor - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::StorageDescriptor->new(
-        location_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<location_uri>
-
-Type: String
-
-=item * B<input_format>
-
-Type: String
-
-=item * B<output_format>
-
-Type: String
-
-=item * B<serde_info>
-
-Type: Message (.google.cloud.bigquery.v2.SerDeInfo)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::SerDeInfo ===
     # Fields for SerDeInfo
     # Field: name Type: 9 ()
     # Field: serialization_library Type: 9 ()
     # Field: parameters Type: 11 (.google.cloud.bigquery.v2.SerDeInfo.ParametersEntry)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::SerDeInfo - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/external_catalog_table_options.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
 
-    my $msg = Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::SerDeInfo->new(
-        name => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::ExternalCatalogTableOptions->new({
+        parameters => $parameters,
+        storage_descriptor => $storage_descriptor,
+        connection_id => $connection_id,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->parameters();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::ExternalCatalogTableOptions->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<serialization_library>
-
-Type: String
-
-=item * B<parameters>
-
-Type: Message (.google.cloud.bigquery.v2.SerDeInfo.ParametersEntry)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/external_catalog_table_options.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::ExternalCatalogTableOptions
+
+Metadata about open source compatible table. The fields contained in
+these options correspond to Hive metastore's table-level properties.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::ExternalCatalogTableOptions::ParametersEntry>)
+
+Optional. A map of the key-value pairs defining the parameters and
+properties of the open source table. Corresponds with Hive metastore table
+parameters. Maximum size of 4MiB.
+
+=item * C<< $msg->storage_descriptor() >> / C<< $msg->storage_descriptor($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::StorageDescriptor>)
+
+Optional. A storage descriptor containing information about the physical
+storage of this table.
+
+=item * C<< $msg->connection_id() >> / C<< $msg->connection_id($value) >>
+
+Type: C<String>
+
+Optional. A connection ID that specifies the credentials to be used to read
+external storage, such as Azure Blob, Cloud Storage, or Amazon S3. This
+connection is needed to read the open source table from BigQuery. The
+connection_id format must be either
+`<project_id>.<location_id>.<connection_id>` or
+`projects/<project_id>/locations/<location_id>/connections/<connection_id>`.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::StorageDescriptor
+
+Contains information about how a table's data is stored and accessed by open
+source query engines.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->location_uri() >> / C<< $msg->location_uri($value) >>
+
+Type: C<String>
+
+Optional. The physical location of the table
+(e.g. `gs://spark-dataproc-data/pangea-data/case_sensitive/` or
+`gs://spark-dataproc-data/pangea-data/*`).
+The maximum length is 2056 bytes.
+
+=item * C<< $msg->input_format() >> / C<< $msg->input_format($value) >>
+
+Type: C<String>
+
+Optional. Specifies the fully qualified class name of the InputFormat
+(e.g. "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat").
+The maximum length is 128 characters.
+
+=item * C<< $msg->output_format() >> / C<< $msg->output_format($value) >>
+
+Type: C<String>
+
+Optional. Specifies the fully qualified class name of the OutputFormat
+(e.g. "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat").
+The maximum length is 128 characters.
+
+=item * C<< $msg->serde_info() >> / C<< $msg->serde_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::SerDeInfo>)
+
+Optional. Serializer and deserializer information.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::SerDeInfo
+
+Serializer and deserializer information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. Name of the SerDe.
+The maximum length is 256 characters.
+
+=item * C<< $msg->serialization_library() >> / C<< $msg->serialization_library($value) >>
+
+Type: C<String>
+
+Required. Specifies a fully-qualified class name of the serialization
+library that is responsible for the translation of data between table
+representation and the underlying low-level input and output format
+structures. The maximum length is 256 characters.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::SerDeInfo::ParametersEntry>)
+
+Optional. Key-value pairs that define the initialization parameters for the
+serialization library.
+Maximum size 10 Kib.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -17,7 +17,7 @@ use Google::Ai::Generativelanguage::V1::Content;
 use Google::Ai::Generativelanguage::V1::ModelService;
 use Google::Ai::Generativelanguage::V1::GenerativeService;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -207,11 +207,46 @@ The following RPC methods are available in this client:
 
 =item * B<get_model>
 
-Calls the RPC method C<GetModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_model(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetModel> on C<google.ai.generativelanguage.v1.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1::ModelService::GetModelRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1::Model::Model>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<list_models>
 
-Calls the RPC method C<ListModels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_models(
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListModels> on C<google.ai.generativelanguage.v1.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1::ModelService::ListModelsRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1::ModelService::ListModelsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =back
 

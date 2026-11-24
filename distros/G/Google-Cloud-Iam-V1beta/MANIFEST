@@ -1,0 +1,20 @@
+Changes
+lib/Google/Cloud/Iam/V1beta.pm
+lib/Google/Cloud/Iam/V1beta/WorkloadIdentityPoolsClient.pm
+lib/Google/Iam/V1beta/WorkloadIdentityPool.pm
+lib/Google/Iam/V1beta/WorkloadIdentityPool/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-WorkloadIdentityPools.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-WorkloadIdentityPools.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

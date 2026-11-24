@@ -13,7 +13,7 @@ use Google::Api::Common;
 use Google::Cloud::Metastore::V1::Metastore;
 use Google::Cloud::Metastore::V1::MetastoreFederation;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -124,9 +124,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/cloud/metastore/v1/metastore_federation.proto>
-
 =item * C<googleapis/google/cloud/metastore/v1/metastore.proto>
+
+=item * C<googleapis/google/cloud/metastore/v1/metastore_federation.proto>
 
 
 
@@ -161,7 +161,35 @@ The following RPC methods are available in this client:
 
 =item * B<list_services>
 
-Calls the RPC method C<ListServices> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_services(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListServices> on C<google.cloud.metastore.v1.DataprocMetastore>.
+
+Request: L<Google::Cloud::Metastore::V1::Metastore::ListServicesRequest>
+
+Returns: L<Google::Cloud::Metastore::V1::Metastore::ListServicesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =back
 

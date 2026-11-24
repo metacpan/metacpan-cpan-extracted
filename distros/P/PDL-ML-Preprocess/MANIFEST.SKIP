@@ -1,0 +1,8 @@
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^PDL-ML-Preprocess-.*\.tar\.gz$
+\.bak$
+\.swp$

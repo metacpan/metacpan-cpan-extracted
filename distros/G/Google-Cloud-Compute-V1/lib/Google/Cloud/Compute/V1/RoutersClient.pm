@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -872,91 +872,728 @@ The following RPC methods are available in this client:
 
 =item * B<aggregated_list>
 
-Calls the RPC method C<AggregatedList> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list(
+        filter                   => $filter,
+        include_all_scopes       => $include_all_scopes,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        service_project_number   => $service_project_number,
+    );
+
+Calls the RPC method C<AggregatedList> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AggregatedListRoutersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RouterAggregatedList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<include_all_scopes> - C<bool>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<service_project_number> - C<int64>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        router                   => $router,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<delete_named_set>
 
-Calls the RPC method C<DeleteNamedSet> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_named_set(
+        named_set                => $named_set,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        router                   => $router,
+    );
+
+Calls the RPC method C<DeleteNamedSet> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteNamedSetRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<named_set> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<delete_route_policy>
 
-Calls the RPC method C<DeleteRoutePolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_route_policy(
+        policy                   => $policy,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        router                   => $router,
+    );
+
+Calls the RPC method C<DeleteRoutePolicy> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteRoutePolicyRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<policy> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        region                   => $region,
+        router                   => $router,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Router>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<get_named_set>
 
-Calls the RPC method C<GetNamedSet> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_named_set(
+        named_set                => $named_set,
+        project                  => $project,
+        region                   => $region,
+        router                   => $router,
+    );
+
+Calls the RPC method C<GetNamedSet> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetNamedSetRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RoutersGetNamedSetResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<named_set> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<get_nat_ip_info>
 
-Calls the RPC method C<GetNatIpInfo> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_nat_ip_info(
+        nat_name                 => $nat_name,
+        project                  => $project,
+        region                   => $region,
+        router                   => $router,
+    );
+
+Calls the RPC method C<GetNatIpInfo> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetNatIpInfoRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::NatIpInfoResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<nat_name> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<get_nat_mapping_info>
 
-Calls the RPC method C<GetNatMappingInfo> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_nat_mapping_info(
+        filter                   => $filter,
+        max_results              => $max_results,
+        nat_name                 => $nat_name,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+        router                   => $router,
+    );
+
+Calls the RPC method C<GetNatMappingInfo> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetNatMappingInfoRoutersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::VmEndpointNatMappingsList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<nat_name> - C<string>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<get_route_policy>
 
-Calls the RPC method C<GetRoutePolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_route_policy(
+        policy                   => $policy,
+        project                  => $project,
+        region                   => $region,
+        router                   => $router,
+    );
+
+Calls the RPC method C<GetRoutePolicy> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRoutePolicyRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RoutersGetRoutePolicyResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<policy> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<get_router_status>
 
-Calls the RPC method C<GetRouterStatus> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_router_status(
+        project                  => $project,
+        region                   => $region,
+        router                   => $router,
+    );
+
+Calls the RPC method C<GetRouterStatus> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRouterStatusRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RouterStatusResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        router_resource          => $router_resource,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<router_resource> - L<Google::Cloud::Compute::V1::Compute::Router>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListRoutersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RouterList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<list_bgp_routes>
 
-Calls the RPC method C<ListBgpRoutes> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_bgp_routes(
+        address_family           => $address_family,
+        destination_prefix       => $destination_prefix,
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        peer                     => $peer,
+        policy_applied           => $policy_applied,
+        project                  => $project,
+        region                   => $region,
+        route_type               => $route_type,
+        router                   => $router,
+    );
+
+Calls the RPC method C<ListBgpRoutes> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListBgpRoutesRoutersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RoutersListBgpRoutes>
+
+Parameters:
+
+=over 4
+
+=item * C<address_family> - C<string>
+
+=item * C<destination_prefix> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<peer> - C<string>
+
+=item * C<policy_applied> - C<bool>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<route_type> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<list_named_sets>
 
-Calls the RPC method C<ListNamedSets> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_named_sets(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+        router                   => $router,
+    );
+
+Calls the RPC method C<ListNamedSets> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListNamedSetsRoutersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RoutersListNamedSets>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<list_route_policies>
 
-Calls the RPC method C<ListRoutePolicies> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_route_policies(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+        router                   => $router,
+    );
+
+Calls the RPC method C<ListRoutePolicies> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListRoutePoliciesRoutersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RoutersListRoutePolicies>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        router                   => $router,
+        router_resource          => $router_resource,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<router> - C<string>
+
+=item * C<router_resource> - L<Google::Cloud::Compute::V1::Compute::Router>
+
+=back
 
 =item * B<patch_named_set>
 
-Calls the RPC method C<PatchNamedSet> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_named_set(
+        named_set_resource       => $named_set_resource,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        router                   => $router,
+    );
+
+Calls the RPC method C<PatchNamedSet> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchNamedSetRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<named_set_resource> - L<Google::Cloud::Compute::V1::Compute::NamedSet>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<patch_route_policy>
 
-Calls the RPC method C<PatchRoutePolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_route_policy(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        route_policy_resource    => $route_policy_resource,
+        router                   => $router,
+    );
+
+Calls the RPC method C<PatchRoutePolicy> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchRoutePolicyRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<route_policy_resource> - L<Google::Cloud::Compute::V1::Compute::RoutePolicy>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<preview>
 
-Calls the RPC method C<Preview> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->preview(
+        project                  => $project,
+        region                   => $region,
+        router                   => $router,
+        router_resource          => $router_resource,
+    );
+
+Calls the RPC method C<Preview> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PreviewRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RoutersPreviewResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<router> - C<string>
+
+=item * C<router_resource> - L<Google::Cloud::Compute::V1::Compute::Router>
+
+=back
 
 =item * B<update>
 
-Calls the RPC method C<Update> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        router                   => $router,
+        router_resource          => $router_resource,
+    );
+
+Calls the RPC method C<Update> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<router> - C<string>
+
+=item * C<router_resource> - L<Google::Cloud::Compute::V1::Compute::Router>
+
+=back
 
 =item * B<update_named_set>
 
-Calls the RPC method C<UpdateNamedSet> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_named_set(
+        named_set_resource       => $named_set_resource,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        router                   => $router,
+    );
+
+Calls the RPC method C<UpdateNamedSet> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateNamedSetRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<named_set_resource> - L<Google::Cloud::Compute::V1::Compute::NamedSet>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<router> - C<string>
+
+=back
 
 =item * B<update_route_policy>
 
-Calls the RPC method C<UpdateRoutePolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_route_policy(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        route_policy_resource    => $route_policy_resource,
+        router                   => $router,
+    );
+
+Calls the RPC method C<UpdateRoutePolicy> on C<google.cloud.compute.v1.Routers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateRoutePolicyRouterRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<route_policy_resource> - L<Google::Cloud::Compute::V1::Compute::RoutePolicy>
+
+=item * C<router> - C<string>
+
+=back
 
 =back
 

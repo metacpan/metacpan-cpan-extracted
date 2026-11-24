@@ -10,30 +10,30 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Dataplex::V1::DatascansCommon;
+use Google::Cloud::Dataplex::V1::Security;
 use Google::Cloud::Dataplex::V1::DataDiscovery;
 use Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
-use Google::Cloud::Dataplex::V1::Security;
-use Google::Cloud::Dataplex::V1::Content;
-use Google::Cloud::Dataplex::V1::Processing;
+use Google::Cloud::Dataplex::V1::DatascansCommon;
 use Google::Cloud::Dataplex::V1::DataDocumentation;
+use Google::Cloud::Dataplex::V1::Processing;
+use Google::Cloud::Dataplex::V1::Content;
 use Google::Cloud::Dataplex::V1::Metadata;
 use Google::Cloud::Dataplex::V1::Resources;
 use Google::Cloud::Dataplex::V1::Logs;
 use Google::Cloud::Dataplex::V1::DataProfile;
 use Google::Cloud::Dataplex::V1::DataQuality;
-use Google::Cloud::Dataplex::V1::Tasks;
 use Google::Cloud::Dataplex::V1::Analyze;
+use Google::Cloud::Dataplex::V1::Tasks;
 use Google::Cloud::Dataplex::V1::Service;
-use Google::Cloud::Dataplex::V1::Catalog;
+use Google::Cloud::Dataplex::V1::BusinessGlossary;
 use Google::Cloud::Dataplex::V1::DataTaxonomy;
+use Google::Cloud::Dataplex::V1::Catalog;
 use Google::Cloud::Dataplex::V1::Cmek;
 use Google::Cloud::Dataplex::V1::Datascans;
-use Google::Cloud::Dataplex::V1::BusinessGlossary;
 use Google::Cloud::Dataplex::V1::ApprovalWorkflow;
 use Google::Cloud::Dataplex::V1::DataProducts;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -205,40 +205,6 @@ sub create_data_product {
     return $response;
 }
 
-sub create_data_scan {
-    my ($self, %params) = @_;
-
-    my $request_class = 'Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest';
-    my $request = eval { $request_class->new(\%params) };
-    my $new_err = $@;
-    if (!$request) {
-        $request = eval { $request_class->new(%params) };
-        $new_err ||= $@;
-    }
-    if (!$request) {
-        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
-    }
-
-    my $response_class = 'Google::Longrunning::Operations::Operation';
-    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
-        return $self->transport->call({
-            http_method    => 'POST',
-            path           => '/google.cloud.dataplex.v1.DataScanService/CreateDataScan',
-            request        => $request,
-            response_class => $response_class,
-        });
-    }
-
-    my $response = $self->transport->call({
-        service        => 'google.cloud.dataplex.v1.DataScanService',
-        method         => 'CreateDataScan',
-        request        => $request,
-        response_class => $response_class,
-    });
-
-    return $response;
-}
-
 sub create_data_taxonomy {
     my ($self, %params) = @_;
 
@@ -266,6 +232,40 @@ sub create_data_taxonomy {
     my $response = $self->transport->call({
         service        => 'google.cloud.dataplex.v1.DataTaxonomyService',
         method         => 'CreateDataTaxonomy',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub create_data_scan {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataplex.v1.DataScanService/CreateDataScan',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.dataplex.v1.DataScanService',
+        method         => 'CreateDataScan',
         request        => $request,
         response_class => $response_class,
     });
@@ -406,11 +406,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/dataplex/v1/data_quality_rule_template.proto>
 
-=item * C<googleapis/google/cloud/dataplex/v1/datascans_common.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_taxonomy.proto>
 
 =item * C<googleapis/google/cloud/dataplex/v1/datascans.proto>
 
-=item * C<googleapis/google/cloud/dataplex/v1/data_taxonomy.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/datascans_common.proto>
 
 =item * C<googleapis/google/cloud/dataplex/v1/logs.proto>
 
@@ -459,35 +459,229 @@ The following RPC methods are available in this client:
 
 =item * B<create_glossary>
 
-Calls the RPC method C<CreateGlossary> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_glossary(
+        parent                   => $parent,
+        glossary_id              => $glossary_id,
+        glossary                 => $glossary,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<CreateGlossary> on C<google.cloud.dataplex.v1.BusinessGlossaryService>.
+
+Request: L<Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<glossary_id> - C<string>
+
+=item * C<glossary> - L<Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =item * B<create_entry_type>
 
-Calls the RPC method C<CreateEntryType> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_entry_type(
+        parent                   => $parent,
+        entry_type_id            => $entry_type_id,
+        entry_type               => $entry_type,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<CreateEntryType> on C<google.cloud.dataplex.v1.CatalogService>.
+
+Request: L<Google::Cloud::Dataplex::V1::Catalog::CreateEntryTypeRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<entry_type_id> - C<string>
+
+=item * C<entry_type> - L<Google::Cloud::Dataplex::V1::Catalog::EntryType>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =item * B<create_encryption_config>
 
-Calls the RPC method C<CreateEncryptionConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_encryption_config(
+        parent                   => $parent,
+        encryption_config_id     => $encryption_config_id,
+        encryption_config        => $encryption_config,
+    );
+
+Calls the RPC method C<CreateEncryptionConfig> on C<google.cloud.dataplex.v1.CmekService>.
+
+Request: L<Google::Cloud::Dataplex::V1::Cmek::CreateEncryptionConfigRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<encryption_config_id> - C<string>
+
+=item * C<encryption_config> - L<Google::Cloud::Dataplex::V1::Cmek::EncryptionConfig>
+
+=back
 
 =item * B<create_data_product>
 
-Calls the RPC method C<CreateDataProduct> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_data_product(
+        parent                   => $parent,
+        data_product_id          => $data_product_id,
+        data_product             => $data_product,
+        validate_only            => $validate_only,
+    );
 
-=item * B<create_data_scan>
+Calls the RPC method C<CreateDataProduct> on C<google.cloud.dataplex.v1.DataProductService>.
 
-Calls the RPC method C<CreateDataScan> on the service. Takes a hash of parameters representing the request.
+Request: L<Google::Cloud::Dataplex::V1::DataProducts::CreateDataProductRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<data_product_id> - C<string>
+
+=item * C<data_product> - L<Google::Cloud::Dataplex::V1::DataProducts::DataProduct>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =item * B<create_data_taxonomy>
 
-Calls the RPC method C<CreateDataTaxonomy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_data_taxonomy(
+        parent                   => $parent,
+        data_taxonomy_id         => $data_taxonomy_id,
+        data_taxonomy            => $data_taxonomy,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<CreateDataTaxonomy> on C<google.cloud.dataplex.v1.DataTaxonomyService>.
+
+Request: L<Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataTaxonomyRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<data_taxonomy_id> - C<string>
+
+=item * C<data_taxonomy> - L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy>
+
+=item * C<validate_only> - C<bool>
+
+=back
+
+=item * B<create_data_scan>
+
+    my $response = $client->create_data_scan(
+        parent                   => $parent,
+        data_scan                => $data_scan,
+        data_scan_id             => $data_scan_id,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<CreateDataScan> on C<google.cloud.dataplex.v1.DataScanService>.
+
+Request: L<Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<data_scan> - L<Google::Cloud::Dataplex::V1::Datascans::DataScan>
+
+=item * C<data_scan_id> - C<string>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =item * B<create_entity>
 
-Calls the RPC method C<CreateEntity> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_entity(
+        parent                   => $parent,
+        entity                   => $entity,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<CreateEntity> on C<google.cloud.dataplex.v1.MetadataService>.
+
+Request: L<Google::Cloud::Dataplex::V1::Metadata::CreateEntityRequest>
+
+Returns: L<Google::Cloud::Dataplex::V1::Metadata::Entity>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<entity> - L<Google::Cloud::Dataplex::V1::Metadata::Entity>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =item * B<create_lake>
 
-Calls the RPC method C<CreateLake> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_lake(
+        parent                   => $parent,
+        lake_id                  => $lake_id,
+        lake                     => $lake,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<CreateLake> on C<google.cloud.dataplex.v1.DataplexService>.
+
+Request: L<Google::Cloud::Dataplex::V1::Service::CreateLakeRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<lake_id> - C<string>
+
+=item * C<lake> - L<Google::Cloud::Dataplex::V1::Resources::Lake>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =back
 

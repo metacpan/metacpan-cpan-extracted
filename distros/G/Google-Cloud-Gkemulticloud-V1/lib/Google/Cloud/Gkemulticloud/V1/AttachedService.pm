@@ -1,0 +1,1235 @@
+package Google::Cloud::Gkemulticloud::V1::AttachedService;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Gkemulticloud::V1::AttachedResources };
+    eval { require Google::Cloud::Gkemulticloud::V1::CommonResources };
+    eval { require Google::Longrunning::Operations };
+    eval { require Google::Protobuf::Empty };
+    eval { require Google::Protobuf::FieldMask };
+    my $descriptor_b64 = <<'EOF';
+CjRnb29nbGUvY2xvdWQvZ2tlbXVsdGljbG91ZC92MS9hdHRhY2hlZF9zZXJ2aWNlLnByb3Rv
+Eh1nb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91ZC52MRocZ29vZ2xlL2FwaS9hbm5vdGF0aW9u
+cy5wcm90bxoXZ29vZ2xlL2FwaS9jbGllbnQucHJvdG8aH2dvb2dsZS9hcGkvZmllbGRfYmVo
+YXZpb3IucHJvdG8aGWdvb2dsZS9hcGkvcmVzb3VyY2UucHJvdG8aNmdvb2dsZS9jbG91ZC9n
+a2VtdWx0aWNsb3VkL3YxL2F0dGFjaGVkX3Jlc291cmNlcy5wcm90bxo0Z29vZ2xlL2Nsb3Vk
+L2drZW11bHRpY2xvdWQvdjEvY29tbW9uX3Jlc291cmNlcy5wcm90bxojZ29vZ2xlL2xvbmdy
+dW5uaW5nL29wZXJhdGlvbnMucHJvdG8aG2dvb2dsZS9wcm90b2J1Zi9lbXB0eS5wcm90bxog
+Z29vZ2xlL3Byb3RvYnVmL2ZpZWxkX21hc2sucHJvdG8ivgIKLUdlbmVyYXRlQXR0YWNoZWRD
+bHVzdGVySW5zdGFsbE1hbmlmZXN0UmVxdWVzdBJMCgZwYXJlbnQYASABKAlCNOBBAvpBLhIs
+Z2tlbXVsdGljbG91ZC5nb29nbGVhcGlzLmNvbS9BdHRhY2hlZENsdXN0ZXJSBnBhcmVudBIz
+ChNhdHRhY2hlZF9jbHVzdGVyX2lkGAIgASgJQgPgQQJSEWF0dGFjaGVkQ2x1c3RlcklkEi4K
+EHBsYXRmb3JtX3ZlcnNpb24YAyABKAlCA+BBAlIPcGxhdGZvcm1WZXJzaW9uEloKDHByb3h5
+X2NvbmZpZxgEIAEoCzIyLmdvb2dsZS5jbG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVk
+UHJveHlDb25maWdCA+BBAVILcHJveHlDb25maWciTAouR2VuZXJhdGVBdHRhY2hlZENsdXN0
+ZXJJbnN0YWxsTWFuaWZlc3RSZXNwb25zZRIaCghtYW5pZmVzdBgBIAEoCVIIbWFuaWZlc3Qi
+pgIKHENyZWF0ZUF0dGFjaGVkQ2x1c3RlclJlcXVlc3QSTAoGcGFyZW50GAEgASgJQjTgQQL6
+QS4SLGdrZW11bHRpY2xvdWQuZ29vZ2xlYXBpcy5jb20vQXR0YWNoZWRDbHVzdGVyUgZwYXJl
+bnQSXgoQYXR0YWNoZWRfY2x1c3RlchgCIAEoCzIuLmdvb2dsZS5jbG91ZC5na2VtdWx0aWNs
+b3VkLnYxLkF0dGFjaGVkQ2x1c3RlckID4EECUg9hdHRhY2hlZENsdXN0ZXISMwoTYXR0YWNo
+ZWRfY2x1c3Rlcl9pZBgDIAEoCUID4EECUhFhdHRhY2hlZENsdXN0ZXJJZBIjCg12YWxpZGF0
+ZV9vbmx5GAQgASgIUgx2YWxpZGF0ZU9ubHki9gIKHEltcG9ydEF0dGFjaGVkQ2x1c3RlclJl
+cXVlc3QSTAoGcGFyZW50GAEgASgJQjTgQQL6QS4SLGdrZW11bHRpY2xvdWQuZ29vZ2xlYXBp
+cy5jb20vQXR0YWNoZWRDbHVzdGVyUgZwYXJlbnQSIwoNdmFsaWRhdGVfb25seRgCIAEoCFIM
+dmFsaWRhdGVPbmx5Ei4KEGZsZWV0X21lbWJlcnNoaXAYAyABKAlCA+BBAlIPZmxlZXRNZW1i
+ZXJzaGlwEi4KEHBsYXRmb3JtX3ZlcnNpb24YBCABKAlCA+BBAlIPcGxhdGZvcm1WZXJzaW9u
+EicKDGRpc3RyaWJ1dGlvbhgFIAEoCUID4EECUgxkaXN0cmlidXRpb24SWgoMcHJveHlfY29u
+ZmlnGAYgASgLMjIuZ29vZ2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjEuQXR0YWNoZWRQcm94
+eUNvbmZpZ0ID4EEBUgtwcm94eUNvbmZpZyLlAQocVXBkYXRlQXR0YWNoZWRDbHVzdGVyUmVx
+dWVzdBJeChBhdHRhY2hlZF9jbHVzdGVyGAEgASgLMi4uZ29vZ2xlLmNsb3VkLmdrZW11bHRp
+Y2xvdWQudjEuQXR0YWNoZWRDbHVzdGVyQgPgQQJSD2F0dGFjaGVkQ2x1c3RlchIjCg12YWxp
+ZGF0ZV9vbmx5GAIgASgIUgx2YWxpZGF0ZU9ubHkSQAoLdXBkYXRlX21hc2sYAyABKAsyGi5n
+b29nbGUucHJvdG9idWYuRmllbGRNYXNrQgPgQQJSCnVwZGF0ZU1hc2siZQoZR2V0QXR0YWNo
+ZWRDbHVzdGVyUmVxdWVzdBJICgRuYW1lGAEgASgJQjTgQQL6QS4KLGdrZW11bHRpY2xvdWQu
+Z29vZ2xlYXBpcy5jb20vQXR0YWNoZWRDbHVzdGVyUgRuYW1lIqcBChtMaXN0QXR0YWNoZWRD
+bHVzdGVyc1JlcXVlc3QSTAoGcGFyZW50GAEgASgJQjTgQQL6QS4SLGdrZW11bHRpY2xvdWQu
+Z29vZ2xlYXBpcy5jb20vQXR0YWNoZWRDbHVzdGVyUgZwYXJlbnQSGwoJcGFnZV9zaXplGAIg
+ASgFUghwYWdlU2l6ZRIdCgpwYWdlX3Rva2VuGAMgASgJUglwYWdlVG9rZW4iowEKHExpc3RB
+dHRhY2hlZENsdXN0ZXJzUmVzcG9uc2USWwoRYXR0YWNoZWRfY2x1c3RlcnMYASADKAsyLi5n
+b29nbGUuY2xvdWQuZ2tlbXVsdGljbG91ZC52MS5BdHRhY2hlZENsdXN0ZXJSEGF0dGFjaGVk
+Q2x1c3RlcnMSJgoPbmV4dF9wYWdlX3Rva2VuGAIgASgJUg1uZXh0UGFnZVRva2VuIusBChxE
+ZWxldGVBdHRhY2hlZENsdXN0ZXJSZXF1ZXN0EkgKBG5hbWUYASABKAlCNOBBAvpBLgosZ2tl
+bXVsdGljbG91ZC5nb29nbGVhcGlzLmNvbS9BdHRhY2hlZENsdXN0ZXJSBG5hbWUSIwoNdmFs
+aWRhdGVfb25seRgCIAEoCFIMdmFsaWRhdGVPbmx5EiMKDWFsbG93X21pc3NpbmcYAyABKAhS
+DGFsbG93TWlzc2luZxIjCg1pZ25vcmVfZXJyb3JzGAUgASgIUgxpZ25vcmVFcnJvcnMSEgoE
+ZXRhZxgEIAEoCVIEZXRhZyJvCh5HZXRBdHRhY2hlZFNlcnZlckNvbmZpZ1JlcXVlc3QSTQoE
+bmFtZRgBIAEoCUI54EEC+kEzCjFna2VtdWx0aWNsb3VkLmdvb2dsZWFwaXMuY29tL0F0dGFj
+aGVkU2VydmVyQ29uZmlnUgRuYW1lIr0DCihHZW5lcmF0ZUF0dGFjaGVkQ2x1c3RlckFnZW50
+VG9rZW5SZXF1ZXN0El8KEGF0dGFjaGVkX2NsdXN0ZXIYASABKAlCNOBBAvpBLgosZ2tlbXVs
+dGljbG91ZC5nb29nbGVhcGlzLmNvbS9BdHRhY2hlZENsdXN0ZXJSD2F0dGFjaGVkQ2x1c3Rl
+chIoCg1zdWJqZWN0X3Rva2VuGAIgASgJQgPgQQJSDHN1YmplY3RUb2tlbhIxChJzdWJqZWN0
+X3Rva2VuX3R5cGUYAyABKAlCA+BBAlIQc3ViamVjdFRva2VuVHlwZRIdCgd2ZXJzaW9uGAQg
+ASgJQgPgQQJSB3ZlcnNpb24SIgoKZ3JhbnRfdHlwZRgGIAEoCUID4EEBUglncmFudFR5cGUS
+HwoIYXVkaWVuY2UYByABKAlCA+BBAVIIYXVkaWVuY2USGQoFc2NvcGUYCCABKAlCA+BBAVIF
+c2NvcGUSNQoUcmVxdWVzdGVkX3Rva2VuX3R5cGUYCSABKAlCA+BBAVIScmVxdWVzdGVkVG9r
+ZW5UeXBlEh0KB29wdGlvbnMYCiABKAlCA+BBAVIHb3B0aW9ucyKPAQopR2VuZXJhdGVBdHRh
+Y2hlZENsdXN0ZXJBZ2VudFRva2VuUmVzcG9uc2USIgoMYWNjZXNzX3Rva2VuGAEgASgJUgxh
+Y2Nlc3NfdG9rZW4SHgoKZXhwaXJlc19pbhgCIAEoBVIKZXhwaXJlc19pbhIeCgp0b2tlbl90
+eXBlGAMgASgJUgp0b2tlbl90eXBlMt0SChBBdHRhY2hlZENsdXN0ZXJzEpkCChVDcmVhdGVB
+dHRhY2hlZENsdXN0ZXISOy5nb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91ZC52MS5DcmVhdGVB
+dHRhY2hlZENsdXN0ZXJSZXF1ZXN0Gh0uZ29vZ2xlLmxvbmdydW5uaW5nLk9wZXJhdGlvbiKj
+AYLT5JMCSCI0L3YxL3twYXJlbnQ9cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vYXR0YWNoZWRD
+bHVzdGVyczoQYXR0YWNoZWRfY2x1c3RlctpBK3BhcmVudCxhdHRhY2hlZF9jbHVzdGVyLGF0
+dGFjaGVkX2NsdXN0ZXJfaWTKQSQKD0F0dGFjaGVkQ2x1c3RlchIRT3BlcmF0aW9uTWV0YWRh
+dGESmwIKFVVwZGF0ZUF0dGFjaGVkQ2x1c3RlchI7Lmdvb2dsZS5jbG91ZC5na2VtdWx0aWNs
+b3VkLnYxLlVwZGF0ZUF0dGFjaGVkQ2x1c3RlclJlcXVlc3QaHS5nb29nbGUubG9uZ3J1bm5p
+bmcuT3BlcmF0aW9uIqUBgtPkkwJZMkUvdjEve2F0dGFjaGVkX2NsdXN0ZXIubmFtZT1wcm9q
+ZWN0cy8qL2xvY2F0aW9ucy8qL2F0dGFjaGVkQ2x1c3RlcnMvKn06EGF0dGFjaGVkX2NsdXN0
+ZXLaQRxhdHRhY2hlZF9jbHVzdGVyLHVwZGF0ZV9tYXNrykEkCg9BdHRhY2hlZENsdXN0ZXIS
+EU9wZXJhdGlvbk1ldGFkYXRhEv0BChVJbXBvcnRBdHRhY2hlZENsdXN0ZXISOy5nb29nbGUu
+Y2xvdWQuZ2tlbXVsdGljbG91ZC52MS5JbXBvcnRBdHRhY2hlZENsdXN0ZXJSZXF1ZXN0Gh0u
+Z29vZ2xlLmxvbmdydW5uaW5nLk9wZXJhdGlvbiKHAYLT5JMCQCI7L3YxL3twYXJlbnQ9cHJv
+amVjdHMvKi9sb2NhdGlvbnMvKn0vYXR0YWNoZWRDbHVzdGVyczppbXBvcnQ6ASraQRdwYXJl
+bnQsZmxlZXRfbWVtYmVyc2hpcMpBJAoPQXR0YWNoZWRDbHVzdGVyEhFPcGVyYXRpb25NZXRh
+ZGF0YRLDAQoSR2V0QXR0YWNoZWRDbHVzdGVyEjguZ29vZ2xlLmNsb3VkLmdrZW11bHRpY2xv
+dWQudjEuR2V0QXR0YWNoZWRDbHVzdGVyUmVxdWVzdBouLmdvb2dsZS5jbG91ZC5na2VtdWx0
+aWNsb3VkLnYxLkF0dGFjaGVkQ2x1c3RlciJDgtPkkwI2EjQvdjEve25hbWU9cHJvamVjdHMv
+Ki9sb2NhdGlvbnMvKi9hdHRhY2hlZENsdXN0ZXJzLyp92kEEbmFtZRLWAQoUTGlzdEF0dGFj
+aGVkQ2x1c3RlcnMSOi5nb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91ZC52MS5MaXN0QXR0YWNo
+ZWRDbHVzdGVyc1JlcXVlc3QaOy5nb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91ZC52MS5MaXN0
+QXR0YWNoZWRDbHVzdGVyc1Jlc3BvbnNlIkWC0+STAjYSNC92MS97cGFyZW50PXByb2plY3Rz
+LyovbG9jYXRpb25zLyp9L2F0dGFjaGVkQ2x1c3RlcnPaQQZwYXJlbnQS5QEKFURlbGV0ZUF0
+dGFjaGVkQ2x1c3RlchI7Lmdvb2dsZS5jbG91ZC5na2VtdWx0aWNsb3VkLnYxLkRlbGV0ZUF0
+dGFjaGVkQ2x1c3RlclJlcXVlc3QaHS5nb29nbGUubG9uZ3J1bm5pbmcuT3BlcmF0aW9uInCC
+0+STAjYqNC92MS97bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL2F0dGFjaGVkQ2x1c3Rl
+cnMvKn3aQQRuYW1lykEqChVnb29nbGUucHJvdG9idWYuRW1wdHkSEU9wZXJhdGlvbk1ldGFk
+YXRhEtQBChdHZXRBdHRhY2hlZFNlcnZlckNvbmZpZxI9Lmdvb2dsZS5jbG91ZC5na2VtdWx0
+aWNsb3VkLnYxLkdldEF0dGFjaGVkU2VydmVyQ29uZmlnUmVxdWVzdBozLmdvb2dsZS5jbG91
+ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVkU2VydmVyQ29uZmlnIkWC0+STAjgSNi92MS97
+bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL2F0dGFjaGVkU2VydmVyQ29uZmlnfdpBBG5h
+bWUStgIKJkdlbmVyYXRlQXR0YWNoZWRDbHVzdGVySW5zdGFsbE1hbmlmZXN0EkwuZ29vZ2xl
+LmNsb3VkLmdrZW11bHRpY2xvdWQudjEuR2VuZXJhdGVBdHRhY2hlZENsdXN0ZXJJbnN0YWxs
+TWFuaWZlc3RSZXF1ZXN0Gk0uZ29vZ2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjEuR2VuZXJh
+dGVBdHRhY2hlZENsdXN0ZXJJbnN0YWxsTWFuaWZlc3RSZXNwb25zZSJvgtPkkwJMEkovdjEv
+e3BhcmVudD1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qfTpnZW5lcmF0ZUF0dGFjaGVkQ2x1c3Rl
+ckluc3RhbGxNYW5pZmVzdNpBGnBhcmVudCxhdHRhY2hlZF9jbHVzdGVyX2lkEqUCCiFHZW5l
+cmF0ZUF0dGFjaGVkQ2x1c3RlckFnZW50VG9rZW4SRy5nb29nbGUuY2xvdWQuZ2tlbXVsdGlj
+bG91ZC52MS5HZW5lcmF0ZUF0dGFjaGVkQ2x1c3RlckFnZW50VG9rZW5SZXF1ZXN0GkguZ29v
+Z2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjEuR2VuZXJhdGVBdHRhY2hlZENsdXN0ZXJBZ2Vu
+dFRva2VuUmVzcG9uc2UibYLT5JMCZyJiL3YxL3thdHRhY2hlZF9jbHVzdGVyPXByb2plY3Rz
+LyovbG9jYXRpb25zLyovYXR0YWNoZWRDbHVzdGVycy8qfTpnZW5lcmF0ZUF0dGFjaGVkQ2x1
+c3RlckFnZW50VG9rZW46ASoaUMpBHGdrZW11bHRpY2xvdWQuZ29vZ2xlYXBpcy5jb23SQS5o
+dHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9hdXRoL2Nsb3VkLXBsYXRmb3JtQucBCiFjb20u
+Z29vZ2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjFCFEF0dGFjaGVkU2VydmljZVByb3RvUAFa
+R2Nsb3VkLmdvb2dsZS5jb20vZ28vZ2tlbXVsdGljbG91ZC9hcGl2MS9na2VtdWx0aWNsb3Vk
+cGI7Z2tlbXVsdGljbG91ZHBiqgIdR29vZ2xlLkNsb3VkLkdrZU11bHRpQ2xvdWQuVjHKAh1H
+b29nbGVcQ2xvdWRcR2tlTXVsdGlDbG91ZFxWMeoCIEdvb2dsZTo6Q2xvdWQ6OkdrZU11bHRp
+Q2xvdWQ6OlYxSrd+CgcSBQ4A8QMBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29v
+Z2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAy
+LjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQg
+aW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5
+IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNl
+cy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBh
+Z3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBM
+aWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdB
+UlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3Ig
+aW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdv
+dmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNl
+LgoKCAoBAhIDEAAmCgkKAgMAEgMSACYKCQoCAwESAxMAIQoJCgIDAhIDFAApCgkKAgMDEgMV
+ACMKCQoCAwQSAxYAQAoJCgIDBRIDFwA+CgkKAgMGEgMYAC0KCQoCAwcSAxkAJQoJCgIDCBID
+GgAqCggKAQgSAxwAOgoJCgIIJRIDHAA6CggKAQgSAx0AXgoJCgIICxIDHQBeCggKAQgSAx4A
+IgoJCgIIChIDHgAiCggKAQgSAx8ANQoJCgIICBIDHwA1CggKAQgSAyAAOgoJCgIIARIDIAA6
+CggKAQgSAyEAOgoJCgIIKRIDIQA6CggKAQgSAyIAOQoJCgIILRIDIgA5CrMBCgIGABIFJwCp
+AQEapQEgVGhlIEF0dGFjaGVkQ2x1c3RlcnMgQVBJIHByb3ZpZGVzIGEgc2luZ2xlIGNlbnRy
+YWxseSBtYW5hZ2VkIHNlcnZpY2UKIHRvIHJlZ2lzdGVyIGFuZCBtYW5hZ2UgQW50aG9zIGF0
+dGFjaGVkIGNsdXN0ZXJzIHRoYXQgcnVuIG9uIGN1c3RvbWVyJ3Mgb3duZWQKIGluZnJhc3Ry
+dWN0dXJlLgoKCgoDBgABEgMnCBgKCgoDBgADEgMoAkQKDAoFBgADmQgSAygCRAoLCgMGAAMS
+BCkCKjcKDQoFBgADmggSBCkCKjcKxwIKBAYAAgASBDMCPwMauAIgQ3JlYXRlcyBhIG5ldwog
+W0F0dGFjaGVkQ2x1c3Rlcl1bZ29vZ2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjEuQXR0YWNo
+ZWRDbHVzdGVyXSByZXNvdXJjZQogb24gYSBnaXZlbiBHb29nbGUgQ2xvdWQgUGxhdGZvcm0g
+cHJvamVjdCBhbmQgcmVnaW9uLgoKIElmIHN1Y2Nlc3NmdWwsIHRoZSByZXNwb25zZSBjb250
+YWlucyBhIG5ld2x5IGNyZWF0ZWQKIFtPcGVyYXRpb25dW2dvb2dsZS5sb25ncnVubmluZy5P
+cGVyYXRpb25dIHJlc291cmNlIHRoYXQgY2FuIGJlCiBkZXNjcmliZWQgdG8gdHJhY2sgdGhl
+IHN0YXR1cyBvZiB0aGUgb3BlcmF0aW9uLgoKDAoFBgACAAESAzMGGwoMCgUGAAIAAhIDMxw4
+CgwKBQYAAgADEgM0DysKDQoFBgACAAQSBDUEOAYKEQoJBgACAASwyrwiEgQ1BDgGCg0KBQYA
+AgAEEgQ5BDo2ChAKCAYAAgAEmwgAEgQ5BDo2Cg0KBQYAAgAEEgQ7BD4GCg8KBwYAAgAEmQgS
+BDsEPgYKXQoEBgACARIEQwJOAxpPIFVwZGF0ZXMgYW4KIFtBdHRhY2hlZENsdXN0ZXJdW2dv
+b2dsZS5jbG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVkQ2x1c3Rlcl0uCgoMCgUGAAIB
+ARIDQwYbCgwKBQYAAgECEgNDHDgKDAoFBgACAQMSA0QPKwoNCgUGAAIBBBIERQRIBgoRCgkG
+AAIBBLDKvCISBEUESAYKDAoFBgACAQQSA0kESgoPCggGAAIBBJsIABIDSQRKCg0KBQYAAgEE
+EgRKBE0GCg8KBwYAAgEEmQgSBEoETQYKxgMKBAYAAgISBFoCZQMatwMgSW1wb3J0cyBjcmVh
+dGVzIGEgbmV3CiBbQXR0YWNoZWRDbHVzdGVyXVtnb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91
+ZC52MS5BdHRhY2hlZENsdXN0ZXJdIHJlc291cmNlCiBieSBpbXBvcnRpbmcgYW4gZXhpc3Rp
+bmcgRmxlZXQgTWVtYmVyc2hpcCByZXNvdXJjZS4KCiBBdHRhY2hlZCBDbHVzdGVycyBjcmVh
+dGVkIGJlZm9yZSB0aGUgaW50cm9kdWN0aW9uIG9mIHRoZSBBbnRob3MgTXVsdGktQ2xvdWQK
+IEFQSSBjYW4gYmUgaW1wb3J0ZWQgdGhyb3VnaCB0aGlzIG1ldGhvZC4KCiBJZiBzdWNjZXNz
+ZnVsLCB0aGUgcmVzcG9uc2UgY29udGFpbnMgYSBuZXdseSBjcmVhdGVkCiBbT3BlcmF0aW9u
+XVtnb29nbGUubG9uZ3J1bm5pbmcuT3BlcmF0aW9uXSByZXNvdXJjZSB0aGF0IGNhbiBiZQog
+ZGVzY3JpYmVkIHRvIHRyYWNrIHRoZSBzdGF0dXMgb2YgdGhlIG9wZXJhdGlvbi4KCgwKBQYA
+AgIBEgNaBhsKDAoFBgACAgISA1ocOAoMCgUGAAICAxIDWw8rCg0KBQYAAgIEEgRcBF8GChEK
+CQYAAgIEsMq8IhIEXARfBgoMCgUGAAICBBIDYARFCg8KCAYAAgIEmwgAEgNgBEUKDQoFBgAC
+AgQSBGEEZAYKDwoHBgACAgSZCBIEYQRkBgpwCgQGAAIDEgRpAm4DGmIgRGVzY3JpYmVzIGEg
+c3BlY2lmaWMKIFtBdHRhY2hlZENsdXN0ZXJdW2dvb2dsZS5jbG91ZC5na2VtdWx0aWNsb3Vk
+LnYxLkF0dGFjaGVkQ2x1c3Rlcl0gcmVzb3VyY2UuCgoMCgUGAAIDARIDaQYYCgwKBQYAAgMC
+EgNpGTIKDAoFBgACAwMSA2k9TAoNCgUGAAIDBBIEagRsBgoRCgkGAAIDBLDKvCISBGoEbAYK
+DAoFBgACAwQSA20EMgoPCggGAAIDBJsIABIDbQQyCpIBCgQGAAIEEgRyAngDGoMBIExpc3Rz
+IGFsbCBbQXR0YWNoZWRDbHVzdGVyXVtnb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91ZC52MS5B
+dHRhY2hlZENsdXN0ZXJdCiByZXNvdXJjZXMgb24gYSBnaXZlbiBHb29nbGUgQ2xvdWQgcHJv
+amVjdCBhbmQgcmVnaW9uLgoKDAoFBgACBAESA3IGGgoMCgUGAAIEAhIDchs2CgwKBQYAAgQD
+EgNzDysKDQoFBgACBAQSBHQEdgYKEQoJBgACBASwyrwiEgR0BHYGCgwKBQYAAgQEEgN3BDQK
+DwoIBgACBASbCAASA3cENAqZAgoEBgACBRIGgAECigEDGogCIERlbGV0ZXMgYSBzcGVjaWZp
+YwogW0F0dGFjaGVkQ2x1c3Rlcl1bZ29vZ2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjEuQXR0
+YWNoZWRDbHVzdGVyXSByZXNvdXJjZS4KCiBJZiBzdWNjZXNzZnVsLCB0aGUgcmVzcG9uc2Ug
+Y29udGFpbnMgYSBuZXdseSBjcmVhdGVkCiBbT3BlcmF0aW9uXVtnb29nbGUubG9uZ3J1bm5p
+bmcuT3BlcmF0aW9uXSByZXNvdXJjZSB0aGF0IGNhbiBiZQogZGVzY3JpYmVkIHRvIHRyYWNr
+IHRoZSBzdGF0dXMgb2YgdGhlIG9wZXJhdGlvbi4KCg0KBQYAAgUBEgSAAQYbCg0KBQYAAgUC
+EgSAARw4Cg0KBQYAAgUDEgSBAQ8rCg8KBQYAAgUEEgaCAQSEAQYKEwoJBgACBQSwyrwiEgaC
+AQSEAQYKDQoFBgACBQQSBIUBBDIKEAoIBgACBQSbCAASBIUBBDIKDwoFBgACBQQSBoYBBIkB
+BgoRCgcGAAIFBJkIEgaGAQSJAQYKcAoEBgACBhIGjgEClAEDGmAgUmV0dXJucyBpbmZvcm1h
+dGlvbiwgc3VjaCBhcyBzdXBwb3J0ZWQgS3ViZXJuZXRlcyB2ZXJzaW9ucywgb24gYSBnaXZl
+bgogR29vZ2xlIENsb3VkIGxvY2F0aW9uLgoKDQoFBgACBgESBI4BBh0KDQoFBgACBgISBI4B
+HjwKDQoFBgACBgMSBI8BDyMKDwoFBgACBgQSBpABBJIBBgoTCgkGAAIGBLDKvCISBpABBJIB
+BgoNCgUGAAIGBBIEkwEEMgoQCggGAAIGBJsIABIEkwEEMgpXCgQGAAIHEgaXAQKeAQMaRyBH
+ZW5lcmF0ZXMgdGhlIGluc3RhbGwgbWFuaWZlc3QgdG8gYmUgaW5zdGFsbGVkIG9uIHRoZSB0
+YXJnZXQgY2x1c3Rlci4KCg0KBQYAAgcBEgSXAQYsCg0KBQYAAgcCEgSYAQYzCg0KBQYAAgcD
+EgSZAQ89Cg8KBQYAAgcEEgaaAQScAQYKEwoJBgACBwSwyrwiEgaaAQScAQYKDQoFBgACBwQS
+BJ0BBEgKEAoIBgACBwSbCAASBJ0BBEgKQAoEBgACCBIGoQECqAEDGjAgR2VuZXJhdGVzIGFu
+IGFjY2VzcyB0b2tlbiBmb3IgYSBjbHVzdGVyIGFnZW50LgoKDQoFBgACCAESBKEBBicKDQoF
+BgACCAISBKIBBi4KDQoFBgACCAMSBKMBDzgKDwoFBgACCAQSBqQBBKcBBgoTCgkGAAIIBLDK
+vCISBqQBBKcBBgpmCgIEABIGrQEA1wEBGlggUmVxdWVzdCBtZXNzYWdlIGZvciBgQXR0YWNo
+ZWRDbHVzdGVycy5HZW5lcmF0ZUF0dGFjaGVkQ2x1c3Rlckluc3RhbGxNYW5pZmVzdGAKIG1l
+dGhvZC4KCgsKAwQAARIErQEINQrkAgoEBAACABIGtgECuwEEGtMCIFJlcXVpcmVkLiBUaGUg
+cGFyZW50IGxvY2F0aW9uIHdoZXJlIHRoaXMKIFtBdHRhY2hlZENsdXN0ZXJdW2dvb2dsZS5j
+bG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVkQ2x1c3Rlcl0gcmVzb3VyY2UKIHdpbGwg
+YmUgY3JlYXRlZC4KCiBMb2NhdGlvbiBuYW1lcyBhcmUgZm9ybWF0dGVkIGFzIGBwcm9qZWN0
+cy88cHJvamVjdC1pZD4vbG9jYXRpb25zLzxyZWdpb24+YC4KCiBTZWUgW1Jlc291cmNlIE5h
+bWVzXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYXBpcy9kZXNpZ24vcmVzb3VyY2VfbmFt
+ZXMpCiBmb3IgbW9yZSBkZXRhaWxzIG9uIEdvb2dsZSBDbG91ZCByZXNvdXJjZSBuYW1lcy4K
+Cg0KBQQAAgAFEgS2AQIICg0KBQQAAgABEgS2AQkPCg0KBQQAAgADEgS2ARITCg8KBQQAAgAI
+Ega2ARS7AQMKEAoIBAACAAicCAASBLcBBCoKEQoHBAACAAifCBIGuAEEugEFCoQFCgQEAAIB
+EgTMAQJKGvUEIFJlcXVpcmVkLiBBIGNsaWVudCBwcm92aWRlZCBJRCBvZiB0aGUgcmVzb3Vy
+Y2UuIE11c3QgYmUgdW5pcXVlIHdpdGhpbiB0aGUKIHBhcmVudCByZXNvdXJjZS4KCiBUaGUg
+cHJvdmlkZWQgSUQgd2lsbCBiZSBwYXJ0IG9mIHRoZQogW0F0dGFjaGVkQ2x1c3Rlcl1bZ29v
+Z2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjEuQXR0YWNoZWRDbHVzdGVyXSByZXNvdXJjZQog
+bmFtZSBmb3JtYXR0ZWQgYXMKIGBwcm9qZWN0cy88cHJvamVjdC1pZD4vbG9jYXRpb25zLzxy
+ZWdpb24+L2F0dGFjaGVkQ2x1c3RlcnMvPGNsdXN0ZXItaWQ+YC4KCiBWYWxpZCBjaGFyYWN0
+ZXJzIGFyZSBgL1thLXpdWzAtOV0tL2AuIENhbm5vdCBiZSBsb25nZXIgdGhhbiA2MyBjaGFy
+YWN0ZXJzLgoKIFdoZW4gZ2VuZXJhdGluZyBhbiBpbnN0YWxsIG1hbmlmZXN0IGZvciBpbXBv
+cnRpbmcgYW4gZXhpc3RpbmcgTWVtYmVyc2hpcAogcmVzb3VyY2UsIHRoZSBhdHRhY2hlZF9j
+bHVzdGVyX2lkIGZpZWxkIG11c3QgYmUgdGhlIE1lbWJlcnNoaXAgaWQuCgogTWVtYmVyc2hp
+cCBuYW1lcyBhcmUgZm9ybWF0dGVkIGFzCiBgcHJvamVjdHMvPHByb2plY3QtaWQ+L2xvY2F0
+aW9ucy88cmVnaW9uPi9tZW1iZXJzaGlwcy88bWVtYmVyc2hpcC1pZD5gLgoKDQoFBAACAQUS
+BMwBAggKDQoFBAACAQESBMwBCRwKDQoFBAACAQMSBMwBHyAKDQoFBAACAQgSBMwBIUkKEAoI
+BAACAQicCAASBMwBIkgKjgIKBAQAAgISBNMBAkca/wEgUmVxdWlyZWQuIFRoZSBwbGF0Zm9y
+bSB2ZXJzaW9uIGZvciB0aGUgY2x1c3RlciAoZS5nLiBgMS4xOS4wLWdrZS4xMDAwYCkuCgog
+WW91IGNhbiBsaXN0IGFsbCBzdXBwb3J0ZWQgdmVyc2lvbnMgb24gYSBnaXZlbiBHb29nbGUg
+Q2xvdWQgcmVnaW9uIGJ5CiBjYWxsaW5nCiBbR2V0QXR0YWNoZWRTZXJ2ZXJDb25maWddW2dv
+b2dsZS5jbG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVkQ2x1c3RlcnMuR2V0QXR0YWNo
+ZWRTZXJ2ZXJDb25maWddLgoKDQoFBAACAgUSBNMBAggKDQoFBAACAgESBNMBCRkKDQoFBAAC
+AgMSBNMBHB0KDQoFBAACAggSBNMBHkYKEAoIBAACAgicCAASBNMBH0UKSwoEBAACAxIE1gEC
+UBo9IE9wdGlvbmFsLiBQcm94eSBjb25maWd1cmF0aW9uIGZvciBvdXRib3VuZCBIVFRQKFMp
+IHRyYWZmaWMuCgoNCgUEAAIDBhIE1gECFQoNCgUEAAIDARIE1gEWIgoNCgUEAAIDAxIE1gEl
+JgoNCgUEAAIDCBIE1gEnTwoQCggEAAIDCJwIABIE1gEoTgpnCgIEARIG2wEA3wEBGlkgUmVz
+cG9uc2UgbWVzc2FnZSBmb3IKIGBBdHRhY2hlZENsdXN0ZXJzLkdlbmVyYXRlQXR0YWNoZWRD
+bHVzdGVySW5zdGFsbE1hbmlmZXN0YCBtZXRob2QuCgoLCgMEAQESBNsBCDYKbAoEBAECABIE
+3gECFhpeIEEgc2V0IG9mIEt1YmVybmV0ZXMgcmVzb3VyY2VzIChpbiBZQU1MIGZvcm1hdCkg
+dG8gYmUgYXBwbGllZAogdG8gdGhlIGNsdXN0ZXIgdG8gYmUgYXR0YWNoZWQuCgoNCgUEAQIA
+BRIE3gECCAoNCgUEAQIAARIE3gEJEQoNCgUEAQIAAxIE3gEUFQpUCgIEAhIG4gEAgwIBGkYg
+UmVxdWVzdCBtZXNzYWdlIGZvciBgQXR0YWNoZWRDbHVzdGVycy5DcmVhdGVBdHRhY2hlZENs
+dXN0ZXJgIG1ldGhvZC4KCgsKAwQCARIE4gEIJArkAgoEBAICABIG6wEC8AEEGtMCIFJlcXVp
+cmVkLiBUaGUgcGFyZW50IGxvY2F0aW9uIHdoZXJlIHRoaXMKIFtBdHRhY2hlZENsdXN0ZXJd
+W2dvb2dsZS5jbG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVkQ2x1c3Rlcl0gcmVzb3Vy
+Y2UKIHdpbGwgYmUgY3JlYXRlZC4KCiBMb2NhdGlvbiBuYW1lcyBhcmUgZm9ybWF0dGVkIGFz
+IGBwcm9qZWN0cy88cHJvamVjdC1pZD4vbG9jYXRpb25zLzxyZWdpb24+YC4KCiBTZWUgW1Jl
+c291cmNlIE5hbWVzXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYXBpcy9kZXNpZ24vcmVz
+b3VyY2VfbmFtZXMpCiBmb3IgbW9yZSBkZXRhaWxzIG9uIEdvb2dsZSBDbG91ZCByZXNvdXJj
+ZSBuYW1lcy4KCg0KBQQCAgAFEgTrAQIICg0KBQQCAgABEgTrAQkPCg0KBQQCAgADEgTrARIT
+Cg8KBQQCAgAIEgbrARTwAQMKEAoIBAICAAicCAASBOwBBCoKEQoHBAICAAifCBIG7QEE7wEF
+Cn8KBAQCAgESBPQBAlAacSBSZXF1aXJlZC4gVGhlIHNwZWNpZmljYXRpb24gb2YgdGhlCiBb
+QXR0YWNoZWRDbHVzdGVyXVtnb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91ZC52MS5BdHRhY2hl
+ZENsdXN0ZXJdIHRvIGNyZWF0ZS4KCg0KBQQCAgEGEgT0AQIRCg0KBQQCAgEBEgT0ARIiCg0K
+BQQCAgEDEgT0ASUmCg0KBQQCAgEIEgT0ASdPChAKCAQCAgEInAgAEgT0AShOCoUDCgQEAgIC
+EgT/AQJKGvYCIFJlcXVpcmVkLiBBIGNsaWVudCBwcm92aWRlZCBJRCB0aGUgcmVzb3VyY2Uu
+IE11c3QgYmUgdW5pcXVlIHdpdGhpbiB0aGUKIHBhcmVudCByZXNvdXJjZS4KCiBUaGUgcHJv
+dmlkZWQgSUQgd2lsbCBiZSBwYXJ0IG9mIHRoZQogW0F0dGFjaGVkQ2x1c3Rlcl1bZ29vZ2xl
+LmNsb3VkLmdrZW11bHRpY2xvdWQudjEuQXR0YWNoZWRDbHVzdGVyXSByZXNvdXJjZQogbmFt
+ZSBmb3JtYXR0ZWQgYXMKIGBwcm9qZWN0cy88cHJvamVjdC1pZD4vbG9jYXRpb25zLzxyZWdp
+b24+L2F0dGFjaGVkQ2x1c3RlcnMvPGNsdXN0ZXItaWQ+YC4KCiBWYWxpZCBjaGFyYWN0ZXJz
+IGFyZSBgL1thLXpdWzAtOV0tL2AuIENhbm5vdCBiZSBsb25nZXIgdGhhbiA2MyBjaGFyYWN0
+ZXJzLgoKDQoFBAICAgUSBP8BAggKDQoFBAICAgESBP8BCRwKDQoFBAICAgMSBP8BHyAKDQoF
+BAICAggSBP8BIUkKEAoIBAICAgicCAASBP8BIkgKWgoEBAICAxIEggICGRpMIElmIHNldCwg
+b25seSB2YWxpZGF0ZSB0aGUgcmVxdWVzdCwgYnV0IGRvIG5vdCBhY3R1YWxseSBjcmVhdGUg
+dGhlIGNsdXN0ZXIuCgoNCgUEAgIDBRIEggICBgoNCgUEAgIDARIEggIHFAoNCgUEAgIDAxIE
+ggIXGApUCgIEAxIGhgIAqgIBGkYgUmVxdWVzdCBtZXNzYWdlIGZvciBgQXR0YWNoZWRDbHVz
+dGVycy5JbXBvcnRBdHRhY2hlZENsdXN0ZXJgIG1ldGhvZC4KCgsKAwQDARIEhgIIJArkAgoE
+BAMCABIGjwIClAIEGtMCIFJlcXVpcmVkLiBUaGUgcGFyZW50IGxvY2F0aW9uIHdoZXJlIHRo
+aXMKIFtBdHRhY2hlZENsdXN0ZXJdW2dvb2dsZS5jbG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0
+dGFjaGVkQ2x1c3Rlcl0gcmVzb3VyY2UKIHdpbGwgYmUgY3JlYXRlZC4KCiBMb2NhdGlvbiBu
+YW1lcyBhcmUgZm9ybWF0dGVkIGFzIGBwcm9qZWN0cy88cHJvamVjdC1pZD4vbG9jYXRpb25z
+LzxyZWdpb24+YC4KCiBTZWUgW1Jlc291cmNlIE5hbWVzXShodHRwczovL2Nsb3VkLmdvb2ds
+ZS5jb20vYXBpcy9kZXNpZ24vcmVzb3VyY2VfbmFtZXMpCiBmb3IgbW9yZSBkZXRhaWxzIG9u
+IEdvb2dsZSBDbG91ZCByZXNvdXJjZSBuYW1lcy4KCg0KBQQDAgAFEgSPAgIICg0KBQQDAgAB
+EgSPAgkPCg0KBQQDAgADEgSPAhITCg8KBQQDAgAIEgaPAhSUAgMKEAoIBAMCAAicCAASBJAC
+BCoKEQoHBAMCAAifCBIGkQIEkwIFCloKBAQDAgESBJcCAhkaTCBJZiBzZXQsIG9ubHkgdmFs
+aWRhdGUgdGhlIHJlcXVlc3QsIGJ1dCBkbyBub3QgYWN0dWFsbHkgaW1wb3J0IHRoZSBjbHVz
+dGVyLgoKDQoFBAMCAQUSBJcCAgYKDQoFBAMCAQESBJcCBxQKDQoFBAMCAQMSBJcCFxgKTgoE
+BAMCAhIEmgICRxpAIFJlcXVpcmVkLiBUaGUgbmFtZSBvZiB0aGUgZmxlZXQgbWVtYmVyc2hp
+cCByZXNvdXJjZSB0byBpbXBvcnQuCgoNCgUEAwICBRIEmgICCAoNCgUEAwICARIEmgIJGQoN
+CgUEAwICAxIEmgIcHQoNCgUEAwICCBIEmgIeRgoQCggEAwICCJwIABIEmgIfRQqOAgoEBAMC
+AxIEoQICRxr/ASBSZXF1aXJlZC4gVGhlIHBsYXRmb3JtIHZlcnNpb24gZm9yIHRoZSBjbHVz
+dGVyIChlLmcuIGAxLjE5LjAtZ2tlLjEwMDBgKS4KCiBZb3UgY2FuIGxpc3QgYWxsIHN1cHBv
+cnRlZCB2ZXJzaW9ucyBvbiBhIGdpdmVuIEdvb2dsZSBDbG91ZCByZWdpb24gYnkKIGNhbGxp
+bmcKIFtHZXRBdHRhY2hlZFNlcnZlckNvbmZpZ11bZ29vZ2xlLmNsb3VkLmdrZW11bHRpY2xv
+dWQudjEuQXR0YWNoZWRDbHVzdGVycy5HZXRBdHRhY2hlZFNlcnZlckNvbmZpZ10uCgoNCgUE
+AwIDBRIEoQICCAoNCgUEAwIDARIEoQIJGQoNCgUEAwIDAxIEoQIcHQoNCgUEAwIDCBIEoQIe
+RgoQCggEAwIDCJwIABIEoQIfRQqIAQoEBAMCBBIEpgICQxp6IFJlcXVpcmVkLiBUaGUgS3Vi
+ZXJuZXRlcyBkaXN0cmlidXRpb24gb2YgdGhlIHVuZGVybHlpbmcgYXR0YWNoZWQgY2x1c3Rl
+ci4KCiBTdXBwb3J0ZWQgdmFsdWVzOiBbImVrcyIsICJha3MiLCAiZ2VuZXJpYyJdLgoKDQoF
+BAMCBAUSBKYCAggKDQoFBAMCBAESBKYCCRUKDQoFBAMCBAMSBKYCGBkKDQoFBAMCBAgSBKYC
+GkIKEAoIBAMCBAicCAASBKYCG0EKSwoEBAMCBRIEqQICUBo9IE9wdGlvbmFsLiBQcm94eSBj
+b25maWd1cmF0aW9uIGZvciBvdXRib3VuZCBIVFRQKFMpIHRyYWZmaWMuCgoNCgUEAwIFBhIE
+qQICFQoNCgUEAwIFARIEqQIWIgoNCgUEAwIFAxIEqQIlJgoNCgUEAwIFCBIEqQInTwoQCggE
+AwIFCJwIABIEqQIoTgpUCgIEBBIGrQIAyQIBGkYgUmVxdWVzdCBtZXNzYWdlIGZvciBgQXR0
+YWNoZWRDbHVzdGVycy5VcGRhdGVBdHRhY2hlZENsdXN0ZXJgIG1ldGhvZC4KCgsKAwQEARIE
+rQIIJAp0CgQEBAIAEgSxAgJQGmYgUmVxdWlyZWQuIFRoZQogW0F0dGFjaGVkQ2x1c3Rlcl1b
+Z29vZ2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjEuQXR0YWNoZWRDbHVzdGVyXSByZXNvdXJj
+ZQogdG8gdXBkYXRlLgoKDQoFBAQCAAYSBLECAhEKDQoFBAQCAAESBLECEiIKDQoFBAQCAAMS
+BLECJSYKDQoFBAQCAAgSBLECJ08KEAoIBAQCAAicCAASBLECKE4KWgoEBAQCARIEtAICGRpM
+IElmIHNldCwgb25seSB2YWxpZGF0ZSB0aGUgcmVxdWVzdCwgYnV0IGRvIG5vdCBhY3R1YWxs
+eSB1cGRhdGUgdGhlIGNsdXN0ZXIuCgoNCgUEBAIBBRIEtAICBgoNCgUEBAIBARIEtAIHFAoN
+CgUEBAIBAxIEtAIXGAr3BQoEBAQCAhIGxwICyAIvGuYFIFJlcXVpcmVkLiBNYXNrIG9mIGZp
+ZWxkcyB0byB1cGRhdGUuIEF0IGxlYXN0IG9uZSBwYXRoIG11c3QgYmUgc3VwcGxpZWQgaW4K
+IHRoaXMgZmllbGQuIFRoZSBlbGVtZW50cyBvZiB0aGUgcmVwZWF0ZWQgcGF0aHMgZmllbGQg
+Y2FuIG9ubHkgaW5jbHVkZSB0aGVzZQogZmllbGRzIGZyb20KIFtBdHRhY2hlZENsdXN0ZXJd
+W2dvb2dsZS5jbG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVkQ2x1c3Rlcl06CgogICog
+ICBgYW5ub3RhdGlvbnNgLgogICogICBgYXV0aG9yaXphdGlvbi5hZG1pbl9ncm91cHNgLgog
+ICogICBgYXV0aG9yaXphdGlvbi5hZG1pbl91c2Vyc2AuCiAgKiAgIGBiaW5hcnlfYXV0aG9y
+aXphdGlvbi5ldmFsdWF0aW9uX21vZGVgLgogICogICBgZGVzY3JpcHRpb25gLgogICogICBg
+bG9nZ2luZ19jb25maWcuY29tcG9uZW50X2NvbmZpZy5lbmFibGVfY29tcG9uZW50c2AuCiAg
+KiAgIGBtb25pdG9yaW5nX2NvbmZpZy5tYW5hZ2VkX3Byb21ldGhldXNfY29uZmlnLmVuYWJs
+ZWRgLgogICogICBgcGxhdGZvcm1fdmVyc2lvbmAuCiAgKiAgIGBwcm94eV9jb25maWcua3Vi
+ZXJuZXRlc19zZWNyZXQubmFtZWAuCiAgKiAgIGBwcm94eV9jb25maWcua3ViZXJuZXRlc19z
+ZWNyZXQubmFtZXNwYWNlYC4KICAqICAgYHNlY3VyaXR5X3Bvc3R1cmVfY29uZmlnLnZ1bG5l
+cmFiaWxpdHlfbW9kZWAKICAqICAgYG1vbml0b3JpbmdfY29uZmlnLmNsb3VkX21vbml0b3Jp
+bmdfY29uZmlnLmVuYWJsZWRgCgoNCgUEBAICBhIExwICGwoNCgUEBAICARIExwIcJwoNCgUE
+BAICAxIExwIqKwoNCgUEBAICCBIEyAIGLgoQCggEBAICCJwIABIEyAIHLQpRCgIEBRIGzAIA
+3AIBGkMgUmVxdWVzdCBtZXNzYWdlIGZvciBgQXR0YWNoZWRDbHVzdGVycy5HZXRBdHRhY2hl
+ZENsdXN0ZXJgIG1ldGhvZC4KCgsKAwQFARIEzAIIIQqCAwoEBAUCABIG1gIC2wIEGvECIFJl
+cXVpcmVkLiBUaGUgbmFtZSBvZiB0aGUKIFtBdHRhY2hlZENsdXN0ZXJdW2dvb2dsZS5jbG91
+ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVkQ2x1c3Rlcl0gcmVzb3VyY2UKIHRvIGRlc2Ny
+aWJlLgoKIGBBdHRhY2hlZENsdXN0ZXJgIG5hbWVzIGFyZSBmb3JtYXR0ZWQgYXMKIGBwcm9q
+ZWN0cy88cHJvamVjdC1pZD4vbG9jYXRpb25zLzxyZWdpb24+L2F0dGFjaGVkQ2x1c3RlcnMv
+PGNsdXN0ZXItaWQ+YC4KCiBTZWUgW1Jlc291cmNlIE5hbWVzXShodHRwczovL2Nsb3VkLmdv
+b2dsZS5jb20vYXBpcy9kZXNpZ24vcmVzb3VyY2VfbmFtZXMpCiBmb3IgbW9yZSBkZXRhaWxz
+IG9uIEdvb2dsZSBDbG91ZCBQbGF0Zm9ybSByZXNvdXJjZSBuYW1lcy4KCg0KBQQFAgAFEgTW
+AgIICg0KBQQFAgABEgTWAgkNCg0KBQQFAgADEgTWAhARCg8KBQQFAgAIEgbWAhLbAgMKEAoI
+BAUCAAicCAASBNcCBCoKEQoHBAUCAAifCBIG2AIE2gIFClMKAgQGEgbfAgD7AgEaRSBSZXF1
+ZXN0IG1lc3NhZ2UgZm9yIGBBdHRhY2hlZENsdXN0ZXJzLkxpc3RBdHRhY2hlZENsdXN0ZXJz
+YCBtZXRob2QuCgoLCgMEBgESBN8CCCMK8AIKBAQGAgASBucCAuwCBBrfAiBSZXF1aXJlZC4g
+VGhlIHBhcmVudCBsb2NhdGlvbiB3aGljaCBvd25zIHRoaXMgY29sbGVjdGlvbiBvZgogW0F0
+dGFjaGVkQ2x1c3Rlcl1bZ29vZ2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjEuQXR0YWNoZWRD
+bHVzdGVyXSByZXNvdXJjZXMuCgogTG9jYXRpb24gbmFtZXMgYXJlIGZvcm1hdHRlZCBhcyBg
+cHJvamVjdHMvPHByb2plY3QtaWQ+L2xvY2F0aW9ucy88cmVnaW9uPmAuCgogU2VlIFtSZXNv
+dXJjZSBOYW1lc10oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2FwaXMvZGVzaWduL3Jlc291
+cmNlX25hbWVzKQogZm9yIG1vcmUgZGV0YWlscyBvbiBHb29nbGUgQ2xvdWQgUGxhdGZvcm0g
+cmVzb3VyY2UgbmFtZXMuCgoNCgUEBgIABRIE5wICCAoNCgUEBgIAARIE5wIJDwoNCgUEBgIA
+AxIE5wISEwoPCgUEBgIACBIG5wIU7AIDChAKCAQGAgAInAgAEgToAgQqChEKBwQGAgAInwgS
+BukCBOsCBQqRAwoEBAYCARIE9QICFhqCAyBUaGUgbWF4aW11bSBudW1iZXIgb2YgaXRlbXMg
+dG8gcmV0dXJuLgoKIElmIG5vdCBzcGVjaWZpZWQsIGEgZGVmYXVsdCB2YWx1ZSBvZiA1MCB3
+aWxsIGJlIHVzZWQgYnkgdGhlIHNlcnZpY2UuCiBSZWdhcmRsZXNzIG9mIHRoZSBwYWdlU2l6
+ZSB2YWx1ZSwgdGhlIHJlc3BvbnNlIGNhbiBpbmNsdWRlIGEgcGFydGlhbCBsaXN0CiBhbmQg
+YSBjYWxsZXIgc2hvdWxkIG9ubHkgcmVseSBvbiByZXNwb25zZSdzCiBbbmV4dFBhZ2VUb2tl
+bl1bZ29vZ2xlLmNsb3VkLmdrZW11bHRpY2xvdWQudjEuTGlzdEF0dGFjaGVkQ2x1c3RlcnNS
+ZXNwb25zZS5uZXh0X3BhZ2VfdG9rZW5dCiB0byBkZXRlcm1pbmUgaWYgdGhlcmUgYXJlIG1v
+cmUgaW5zdGFuY2VzIGxlZnQgdG8gYmUgcXVlcmllZC4KCg0KBQQGAgEFEgT1AgIHCg0KBQQG
+AgEBEgT1AggRCg0KBQQGAgEDEgT1AhQVCrMBCgQEBgICEgT6AgIYGqQBIFRoZSBgbmV4dFBh
+Z2VUb2tlbmAgdmFsdWUgcmV0dXJuZWQgZnJvbSBhIHByZXZpb3VzCiBbYXR0YWNoZWRDbHVz
+dGVycy5saXN0XVtnb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91ZC52MS5BdHRhY2hlZENsdXN0
+ZXJzLkxpc3RBdHRhY2hlZENsdXN0ZXJzXQogcmVxdWVzdCwgaWYgYW55LgoKDQoFBAYCAgUS
+BPoCAggKDQoFBAYCAgESBPoCCRMKDQoFBAYCAgMSBPoCFhcKVAoCBAcSBv4CAIYDARpGIFJl
+c3BvbnNlIG1lc3NhZ2UgZm9yIGBBdHRhY2hlZENsdXN0ZXJzLkxpc3RBdHRhY2hlZENsdXN0
+ZXJzYCBtZXRob2QuCgoLCgMEBwESBP4CCCQKqAEKBAQHAgASBIEDAjEamQEgQSBsaXN0IG9m
+IFtBdHRhY2hlZENsdXN0ZXJdW2dvb2dsZS5jbG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFj
+aGVkQ2x1c3Rlcl0KIHJlc291cmNlcyBpbiB0aGUgc3BlY2lmaWVkIEdvb2dsZSBDbG91ZCBQ
+bGF0Zm9ybSBwcm9qZWN0IGFuZCByZWdpb24gcmVnaW9uLgoKDQoFBAcCAAQSBIEDAgoKDQoF
+BAcCAAYSBIEDCxoKDQoFBAcCAAESBIEDGywKDQoFBAcCAAMSBIEDLzAKbwoEBAcCARIEhQMC
+HRphIFRva2VuIHRvIHJldHJpZXZlIHRoZSBuZXh0IHBhZ2Ugb2YgcmVzdWx0cywgb3IgZW1w
+dHkgaWYgdGhlcmUgYXJlIG5vIG1vcmUKIHJlc3VsdHMgaW4gdGhlIGxpc3QuCgoNCgUEBwIB
+BRIEhQMCCAoNCgUEBwIBARIEhQMJGAoNCgUEBwIBAxIEhQMbHApUCgIECBIGiQMAswMBGkYg
+UmVxdWVzdCBtZXNzYWdlIGZvciBgQXR0YWNoZWRDbHVzdGVycy5EZWxldGVBdHRhY2hlZENs
+dXN0ZXJgIG1ldGhvZC4KCgsKAwQIARIEiQMIJAr8AgoEBAgCABIGkgMClwMEGusCIFJlcXVp
+cmVkLiBUaGUgcmVzb3VyY2UgbmFtZSB0aGUKIFtBdHRhY2hlZENsdXN0ZXJdW2dvb2dsZS5j
+bG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVkQ2x1c3Rlcl0gdG8gZGVsZXRlLgoKIGBB
+dHRhY2hlZENsdXN0ZXJgIG5hbWVzIGFyZSBmb3JtYXR0ZWQgYXMKIGBwcm9qZWN0cy88cHJv
+amVjdC1pZD4vbG9jYXRpb25zLzxyZWdpb24+L2F0dGFjaGVkQ2x1c3RlcnMvPGNsdXN0ZXIt
+aWQ+YC4KCiBTZWUgW1Jlc291cmNlIE5hbWVzXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20v
+YXBpcy9kZXNpZ24vcmVzb3VyY2VfbmFtZXMpCiBmb3IgbW9yZSBkZXRhaWxzIG9uIEdvb2ds
+ZSBDbG91ZCBQbGF0Zm9ybSByZXNvdXJjZSBuYW1lcy4KCg0KBQQIAgAFEgSSAwIICg0KBQQI
+AgABEgSSAwkNCg0KBQQIAgADEgSSAxARCg8KBQQIAgAIEgaSAxKXAwMKEAoIBAgCAAicCAAS
+BJMDBCoKEQoHBAgCAAifCBIGlAMElgMFClsKBAQIAgESBJoDAhkaTSBJZiBzZXQsIG9ubHkg
+dmFsaWRhdGUgdGhlIHJlcXVlc3QsIGJ1dCBkbyBub3QgYWN0dWFsbHkgZGVsZXRlIHRoZSBy
+ZXNvdXJjZS4KCg0KBQQIAgEFEgSaAwIGCg0KBQQIAgEBEgSaAwcUCg0KBQQIAgEDEgSaAxcY
+CrUCCgQECAICEgSjAwIZGqYCIElmIHNldCB0byB0cnVlLCBhbmQgdGhlCiBbQXR0YWNoZWRD
+bHVzdGVyXVtnb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91ZC52MS5BdHRhY2hlZENsdXN0ZXJd
+IHJlc291cmNlCiBpcyBub3QgZm91bmQsIHRoZSByZXF1ZXN0IHdpbGwgc3VjY2VlZCBidXQg
+bm8gYWN0aW9uIHdpbGwgYmUgdGFrZW4gb24gdGhlCiBzZXJ2ZXIgYW5kIGEgY29tcGxldGVk
+IFtPcGVyYXRpb25dW2dvb2dsZS5sb25ncnVubmluZy5PcGVyYXRpb25dIHdpbGwgYmUKIHJl
+dHVybmVkLgoKIFVzZWZ1bCBmb3IgaWRlbXBvdGVudCBkZWxldGlvbi4KCg0KBQQIAgIFEgSj
+AwIGCg0KBQQIAgIBEgSjAwcUCg0KBQQIAgIDEgSjAxcYCosCCgQECAIDEgSpAwIZGvwBIElm
+IHNldCB0byB0cnVlLCB0aGUgZGVsZXRpb24gb2YKIFtBdHRhY2hlZENsdXN0ZXJdW2dvb2ds
+ZS5jbG91ZC5na2VtdWx0aWNsb3VkLnYxLkF0dGFjaGVkQ2x1c3Rlcl0gcmVzb3VyY2UKIHdp
+bGwgc3VjY2VlZCBldmVuIGlmIGVycm9ycyBvY2N1ciBkdXJpbmcgZGVsZXRpbmcgaW4gY2x1
+c3RlciByZXNvdXJjZXMuCiBVc2luZyB0aGlzIHBhcmFtZXRlciBtYXkgcmVzdWx0IGluIG9y
+cGhhbmVkIHJlc291cmNlcyBpbiB0aGUgY2x1c3Rlci4KCg0KBQQIAgMFEgSpAwIGCg0KBQQI
+AgMBEgSpAwcUCg0KBQQIAgMDEgSpAxcYCr4CCgQECAIEEgSyAwISGq8CIFRoZSBjdXJyZW50
+IGV0YWcgb2YgdGhlCiBbQXR0YWNoZWRDbHVzdGVyXVtnb29nbGUuY2xvdWQuZ2tlbXVsdGlj
+bG91ZC52MS5BdHRhY2hlZENsdXN0ZXJdLgoKIEFsbG93cyBjbGllbnRzIHRvIHBlcmZvcm0g
+ZGVsZXRpb25zIHRocm91Z2ggb3B0aW1pc3RpYyBjb25jdXJyZW5jeSBjb250cm9sLgoKIElm
+IHRoZSBwcm92aWRlZCBldGFnIGRvZXMgbm90IG1hdGNoIHRoZSBjdXJyZW50IGV0YWcgb2Yg
+dGhlIGNsdXN0ZXIsCiB0aGUgcmVxdWVzdCB3aWxsIGZhaWwgYW5kIGFuIEFCT1JURUQgZXJy
+b3Igd2lsbCBiZSByZXR1cm5lZC4KCg0KBQQIAgQFEgSyAwIICg0KBQQIAgQBEgSyAwkNCg0K
+BQQIAgQDEgSyAxARCl0KAgQJEga3AwDHAwEaTyBHZXRBdHRhY2hlZFNlcnZlckNvbmZpZ1Jl
+cXVlc3QgZ2V0cyB0aGUgc2VydmVyIGNvbmZpZyBmb3IgYXR0YWNoZWQKIGNsdXN0ZXJzLgoK
+CwoDBAkBEgS3AwgmCv8CCgQECQIAEgbBAwLGAwQa7gIgUmVxdWlyZWQuIFRoZSBuYW1lIG9m
+IHRoZQogW0F0dGFjaGVkU2VydmVyQ29uZmlnXVtnb29nbGUuY2xvdWQuZ2tlbXVsdGljbG91
+ZC52MS5BdHRhY2hlZFNlcnZlckNvbmZpZ10KIHJlc291cmNlIHRvIGRlc2NyaWJlLgoKIGBB
+dHRhY2hlZFNlcnZlckNvbmZpZ2AgbmFtZXMgYXJlIGZvcm1hdHRlZCBhcwogYHByb2plY3Rz
+Lzxwcm9qZWN0LWlkPi9sb2NhdGlvbnMvPHJlZ2lvbj4vYXR0YWNoZWRTZXJ2ZXJDb25maWdg
+LgoKIFNlZSBbUmVzb3VyY2UgTmFtZXNdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9hcGlz
+L2Rlc2lnbi9yZXNvdXJjZV9uYW1lcykKIGZvciBtb3JlIGRldGFpbHMgb24gR29vZ2xlIENs
+b3VkIHJlc291cmNlIG5hbWVzLgoKDQoFBAkCAAUSBMEDAggKDQoFBAkCAAESBMEDCQ0KDQoF
+BAkCAAMSBMEDEBEKDwoFBAkCAAgSBsEDEsYDAwoQCggECQIACJwIABIEwgMEKgoRCgcECQIA
+CJ8IEgbDAwTFAwUKDAoCBAoSBskDAOkDAQoLCgMECgESBMkDCDAKGwoEBAoCABIGywMC0AME
+GgsgUmVxdWlyZWQuCgoNCgUECgIABRIEywMCCAoNCgUECgIAARIEywMJGQoNCgUECgIAAxIE
+ywMcHQoPCgUECgIACBIGywMe0AMDChAKCAQKAgAInAgAEgTMAwQqChEKBwQKAgAInwgSBs0D
+BM8DBQoZCgQECgIBEgTTAwJEGgsgUmVxdWlyZWQuCgoNCgUECgIBBRIE0wMCCAoNCgUECgIB
+ARIE0wMJFgoNCgUECgIBAxIE0wMZGgoNCgUECgIBCBIE0wMbQwoQCggECgIBCJwIABIE0wMc
+QgoZCgQECgICEgTWAwJJGgsgUmVxdWlyZWQuCgoNCgUECgICBRIE1gMCCAoNCgUECgICARIE
+1gMJGwoNCgUECgICAxIE1gMeHwoNCgUECgICCBIE1gMgSAoQCggECgICCJwIABIE1gMhRwoZ
+CgQECgIDEgTZAwI+GgsgUmVxdWlyZWQuCgoNCgUECgIDBRIE2QMCCAoNCgUECgIDARIE2QMJ
+EAoNCgUECgIDAxIE2QMTFAoNCgUECgIDCBIE2QMVPQoQCggECgIDCJwIABIE2QMWPAoZCgQE
+CgIEEgTcAwJBGgsgT3B0aW9uYWwuCgoNCgUECgIEBRIE3AMCCAoNCgUECgIEARIE3AMJEwoN
+CgUECgIEAxIE3AMWFwoNCgUECgIECBIE3AMYQAoQCggECgIECJwIABIE3AMZPwoZCgQECgIF
+EgTfAwI/GgsgT3B0aW9uYWwuCgoNCgUECgIFBRIE3wMCCAoNCgUECgIFARIE3wMJEQoNCgUE
+CgIFAxIE3wMUFQoNCgUECgIFCBIE3wMWPgoQCggECgIFCJwIABIE3wMXPQoZCgQECgIGEgTi
+AwI8GgsgT3B0aW9uYWwuCgoNCgUECgIGBRIE4gMCCAoNCgUECgIGARIE4gMJDgoNCgUECgIG
+AxIE4gMREgoNCgUECgIGCBIE4gMTOwoQCggECgIGCJwIABIE4gMUOgoZCgQECgIHEgTlAwJL
+GgsgT3B0aW9uYWwuCgoNCgUECgIHBRIE5QMCCAoNCgUECgIHARIE5QMJHQoNCgUECgIHAxIE
+5QMgIQoNCgUECgIHCBIE5QMiSgoQCggECgIHCJwIABIE5QMjSQoZCgQECgIIEgToAwI/Ggsg
+T3B0aW9uYWwuCgoNCgUECgIIBRIE6AMCCAoNCgUECgIIARIE6AMJEAoNCgUECgIIAxIE6AMT
+FQoNCgUECgIICBIE6AMWPgoQCggECgIICJwIABIE6AMXPQoMCgIECxIG6wMA8QMBCgsKAwQL
+ARIE6wMIMQoMCgQECwIAEgTsAwI3Cg0KBQQLAgAFEgTsAwIICg0KBQQLAgABEgTsAwkVCg0K
+BQQLAgADEgTsAxgZCg0KBQQLAgAIEgTsAxo2Cg0KBQQLAgAKEgTsAxs1Cg0KBQQLAgAKEgTs
+Ayc1CgwKBAQLAgESBO4DAjIKDQoFBAsCAQUSBO4DAgcKDQoFBAsCAQESBO4DCBIKDQoFBAsC
+AQMSBO4DFRYKDQoFBAsCAQgSBO4DFzEKDQoFBAsCAQoSBO4DGDAKDQoFBAsCAQoSBO4DJDAK
+DAoEBAsCAhIE8AMCMwoNCgUECwICBRIE8AMCCAoNCgUECwICARIE8AMJEwoNCgUECwICAxIE
+8AMWFwoNCgUECwICCBIE8AMYMgoNCgUECwICChIE8AMZMQoNCgUECwICChIE8AMlMWIGcHJv
+dG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterInstallManifestRequest ===
+    # Fields for GenerateAttachedClusterInstallManifestRequest
+    # Field: parent Type: 9 ()
+    # Field: attached_cluster_id Type: 9 ()
+    # Field: platform_version Type: 9 ()
+    # Field: proxy_config Type: 11 (.google.cloud.gkemulticloud.v1.AttachedProxyConfig)
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterInstallManifestResponse ===
+    # Fields for GenerateAttachedClusterInstallManifestResponse
+    # Field: manifest Type: 9 ()
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::CreateAttachedClusterRequest ===
+    # Fields for CreateAttachedClusterRequest
+    # Field: parent Type: 9 ()
+    # Field: attached_cluster Type: 11 (.google.cloud.gkemulticloud.v1.AttachedCluster)
+    # Field: attached_cluster_id Type: 9 ()
+    # Field: validate_only Type: 8 ()
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::ImportAttachedClusterRequest ===
+    # Fields for ImportAttachedClusterRequest
+    # Field: parent Type: 9 ()
+    # Field: validate_only Type: 8 ()
+    # Field: fleet_membership Type: 9 ()
+    # Field: platform_version Type: 9 ()
+    # Field: distribution Type: 9 ()
+    # Field: proxy_config Type: 11 (.google.cloud.gkemulticloud.v1.AttachedProxyConfig)
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::UpdateAttachedClusterRequest ===
+    # Fields for UpdateAttachedClusterRequest
+    # Field: attached_cluster Type: 11 (.google.cloud.gkemulticloud.v1.AttachedCluster)
+    # Field: validate_only Type: 8 ()
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::GetAttachedClusterRequest ===
+    # Fields for GetAttachedClusterRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::ListAttachedClustersRequest ===
+    # Fields for ListAttachedClustersRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::ListAttachedClustersResponse ===
+    # Fields for ListAttachedClustersResponse
+    # Field: attached_clusters Type: 11 (.google.cloud.gkemulticloud.v1.AttachedCluster)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::DeleteAttachedClusterRequest ===
+    # Fields for DeleteAttachedClusterRequest
+    # Field: name Type: 9 ()
+    # Field: validate_only Type: 8 ()
+    # Field: allow_missing Type: 8 ()
+    # Field: ignore_errors Type: 8 ()
+    # Field: etag Type: 9 ()
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::GetAttachedServerConfigRequest ===
+    # Fields for GetAttachedServerConfigRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterAgentTokenRequest ===
+    # Fields for GenerateAttachedClusterAgentTokenRequest
+    # Field: attached_cluster Type: 9 ()
+    # Field: subject_token Type: 9 ()
+    # Field: subject_token_type Type: 9 ()
+    # Field: version Type: 9 ()
+    # Field: grant_type Type: 9 ()
+    # Field: audience Type: 9 ()
+    # Field: scope Type: 9 ()
+    # Field: requested_token_type Type: 9 ()
+    # Field: options Type: 9 ()
+
+# === Message: Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterAgentTokenResponse ===
+    # Fields for GenerateAttachedClusterAgentTokenResponse
+    # Field: access_token Type: 9 ()
+    # Field: expires_in Type: 5 ()
+    # Field: token_type Type: 9 ()
+
+# === Service Client: Google::Cloud::Gkemulticloud::V1::AttachedService::AttachedClustersClient ===
+package Google::Cloud::Gkemulticloud::V1::AttachedService::AttachedClustersClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Gkemulticloud::V1::AttachedService::AttachedClustersClient
+
+Client stub representing the remote C<AttachedClusters> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<gkemulticloud.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'gkemulticloud.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub create_attached_cluster {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Gkemulticloud::V1::AttachedService::CreateAttachedClusterRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.gkemulticloud.v1.AttachedClusters',
+        method         => 'CreateAttachedCluster',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub update_attached_cluster {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Gkemulticloud::V1::AttachedService::UpdateAttachedClusterRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.gkemulticloud.v1.AttachedClusters',
+        method         => 'UpdateAttachedCluster',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub import_attached_cluster {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Gkemulticloud::V1::AttachedService::ImportAttachedClusterRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.gkemulticloud.v1.AttachedClusters',
+        method         => 'ImportAttachedCluster',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub get_attached_cluster {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Gkemulticloud::V1::AttachedService::GetAttachedClusterRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.gkemulticloud.v1.AttachedClusters',
+        method         => 'GetAttachedCluster',
+        request        => $req,
+        response_class => 'Google::Cloud::Gkemulticloud::V1::AttachedResources::AttachedCluster',
+    });
+}
+
+sub list_attached_clusters {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Gkemulticloud::V1::AttachedService::ListAttachedClustersRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.gkemulticloud.v1.AttachedClusters',
+        method         => 'ListAttachedClusters',
+        request        => $req,
+        response_class => 'Google::Cloud::Gkemulticloud::V1::AttachedService::ListAttachedClustersResponse',
+    });
+}
+
+sub delete_attached_cluster {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Gkemulticloud::V1::AttachedService::DeleteAttachedClusterRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.gkemulticloud.v1.AttachedClusters',
+        method         => 'DeleteAttachedCluster',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub get_attached_server_config {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Gkemulticloud::V1::AttachedService::GetAttachedServerConfigRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.gkemulticloud.v1.AttachedClusters',
+        method         => 'GetAttachedServerConfig',
+        request        => $req,
+        response_class => 'Google::Cloud::Gkemulticloud::V1::AttachedResources::AttachedServerConfig',
+    });
+}
+
+sub generate_attached_cluster_install_manifest {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterInstallManifestRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.gkemulticloud.v1.AttachedClusters',
+        method         => 'GenerateAttachedClusterInstallManifest',
+        request        => $req,
+        response_class => 'Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterInstallManifestResponse',
+    });
+}
+
+sub generate_attached_cluster_agent_token {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterAgentTokenRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.gkemulticloud.v1.AttachedClusters',
+        method         => 'GenerateAttachedClusterAgentToken',
+        request        => $req,
+        response_class => 'Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterAgentTokenResponse',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Gkemulticloud::V1::AttachedService - Compiled Protocol Buffers messages for google/cloud/gkemulticloud/v1/attached_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Gkemulticloud::V1::AttachedService;
+
+    my $msg = Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterInstallManifestRequest->new({
+        parent => $parent,
+        attached_cluster_id => $attached_cluster_id,
+        platform_version => $platform_version,
+        proxy_config => $proxy_config,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterInstallManifestRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/gkemulticloud/v1/attached_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterInstallManifestRequest
+
+Request message for `AttachedClusters.GenerateAttachedClusterInstallManifest`
+method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent location where this
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resource
+will be created.
+
+Location names are formatted as `projects/<project-id>/locations/<region>`.
+
+See [Resource Names](https://cloud.google.com/apis/design/resource_names)
+for more details on Google Cloud resource names.
+
+=item * C<< $msg->attached_cluster_id() >> / C<< $msg->attached_cluster_id($value) >>
+
+Type: C<String>
+
+Required. A client provided ID of the resource. Must be unique within the
+parent resource.
+
+The provided ID will be part of the
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resource
+name formatted as
+`projects/<project-id>/locations/<region>/attachedClusters/<cluster-id>`.
+
+Valid characters are `/[a-z][0-9]-/`. Cannot be longer than 63 characters.
+
+When generating an install manifest for importing an existing Membership
+resource, the attached_cluster_id field must be the Membership id.
+
+Membership names are formatted as
+`projects/<project-id>/locations/<region>/memberships/<membership-id>`.
+
+=item * C<< $msg->platform_version() >> / C<< $msg->platform_version($value) >>
+
+Type: C<String>
+
+Required. The platform version for the cluster (e.g. `1.19.0-gke.1000`).
+
+You can list all supported versions on a given Google Cloud region by
+calling
+[GetAttachedServerConfig][google.cloud.gkemulticloud.v1.AttachedClusters.GetAttachedServerConfig].
+
+=item * C<< $msg->proxy_config() >> / C<< $msg->proxy_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkemulticloud::V1::AttachedResources::AttachedProxyConfig>)
+
+Optional. Proxy configuration for outbound HTTP(S) traffic.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterInstallManifestResponse
+
+Response message for
+`AttachedClusters.GenerateAttachedClusterInstallManifest` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->manifest() >> / C<< $msg->manifest($value) >>
+
+Type: C<String>
+
+A set of Kubernetes resources (in YAML format) to be applied
+to the cluster to be attached.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::CreateAttachedClusterRequest
+
+Request message for `AttachedClusters.CreateAttachedCluster` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent location where this
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resource
+will be created.
+
+Location names are formatted as `projects/<project-id>/locations/<region>`.
+
+See [Resource Names](https://cloud.google.com/apis/design/resource_names)
+for more details on Google Cloud resource names.
+
+=item * C<< $msg->attached_cluster() >> / C<< $msg->attached_cluster($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkemulticloud::V1::AttachedResources::AttachedCluster>)
+
+Required. The specification of the
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] to create.
+
+=item * C<< $msg->attached_cluster_id() >> / C<< $msg->attached_cluster_id($value) >>
+
+Type: C<String>
+
+Required. A client provided ID the resource. Must be unique within the
+parent resource.
+
+The provided ID will be part of the
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resource
+name formatted as
+`projects/<project-id>/locations/<region>/attachedClusters/<cluster-id>`.
+
+Valid characters are `/[a-z][0-9]-/`. Cannot be longer than 63 characters.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+If set, only validate the request, but do not actually create the cluster.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::ImportAttachedClusterRequest
+
+Request message for `AttachedClusters.ImportAttachedCluster` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent location where this
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resource
+will be created.
+
+Location names are formatted as `projects/<project-id>/locations/<region>`.
+
+See [Resource Names](https://cloud.google.com/apis/design/resource_names)
+for more details on Google Cloud resource names.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+If set, only validate the request, but do not actually import the cluster.
+
+=item * C<< $msg->fleet_membership() >> / C<< $msg->fleet_membership($value) >>
+
+Type: C<String>
+
+Required. The name of the fleet membership resource to import.
+
+=item * C<< $msg->platform_version() >> / C<< $msg->platform_version($value) >>
+
+Type: C<String>
+
+Required. The platform version for the cluster (e.g. `1.19.0-gke.1000`).
+
+You can list all supported versions on a given Google Cloud region by
+calling
+[GetAttachedServerConfig][google.cloud.gkemulticloud.v1.AttachedClusters.GetAttachedServerConfig].
+
+=item * C<< $msg->distribution() >> / C<< $msg->distribution($value) >>
+
+Type: C<String>
+
+Required. The Kubernetes distribution of the underlying attached cluster.
+
+Supported values: ["eks", "aks", "generic"].
+
+=item * C<< $msg->proxy_config() >> / C<< $msg->proxy_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkemulticloud::V1::AttachedResources::AttachedProxyConfig>)
+
+Optional. Proxy configuration for outbound HTTP(S) traffic.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::UpdateAttachedClusterRequest
+
+Request message for `AttachedClusters.UpdateAttachedCluster` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->attached_cluster() >> / C<< $msg->attached_cluster($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkemulticloud::V1::AttachedResources::AttachedCluster>)
+
+Required. The
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resource
+to update.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+If set, only validate the request, but do not actually update the cluster.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update. At least one path must be supplied in
+this field. The elements of the repeated paths field can only include these
+fields from
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster]:
+
+ *   `annotations`.
+ *   `authorization.admin_groups`.
+ *   `authorization.admin_users`.
+ *   `binary_authorization.evaluation_mode`.
+ *   `description`.
+ *   `logging_config.component_config.enable_components`.
+ *   `monitoring_config.managed_prometheus_config.enabled`.
+ *   `platform_version`.
+ *   `proxy_config.kubernetes_secret.name`.
+ *   `proxy_config.kubernetes_secret.namespace`.
+ *   `security_posture_config.vulnerability_mode`
+ *   `monitoring_config.cloud_monitoring_config.enabled`
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::GetAttachedClusterRequest
+
+Request message for `AttachedClusters.GetAttachedCluster` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resource
+to describe.
+
+`AttachedCluster` names are formatted as
+`projects/<project-id>/locations/<region>/attachedClusters/<cluster-id>`.
+
+See [Resource Names](https://cloud.google.com/apis/design/resource_names)
+for more details on Google Cloud Platform resource names.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::ListAttachedClustersRequest
+
+Request message for `AttachedClusters.ListAttachedClusters` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent location which owns this collection of
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resources.
+
+Location names are formatted as `projects/<project-id>/locations/<region>`.
+
+See [Resource Names](https://cloud.google.com/apis/design/resource_names)
+for more details on Google Cloud Platform resource names.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of items to return.
+
+If not specified, a default value of 50 will be used by the service.
+Regardless of the pageSize value, the response can include a partial list
+and a caller should only rely on response's
+[nextPageToken][google.cloud.gkemulticloud.v1.ListAttachedClustersResponse.next_page_token]
+to determine if there are more instances left to be queried.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The `nextPageToken` value returned from a previous
+[attachedClusters.list][google.cloud.gkemulticloud.v1.AttachedClusters.ListAttachedClusters]
+request, if any.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::ListAttachedClustersResponse
+
+Response message for `AttachedClusters.ListAttachedClusters` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->attached_clusters() >> / C<< $msg->attached_clusters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkemulticloud::V1::AttachedResources::AttachedCluster>)
+
+A list of [AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster]
+resources in the specified Google Cloud Platform project and region region.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::DeleteAttachedClusterRequest
+
+Request message for `AttachedClusters.DeleteAttachedCluster` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name the
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] to delete.
+
+`AttachedCluster` names are formatted as
+`projects/<project-id>/locations/<region>/attachedClusters/<cluster-id>`.
+
+See [Resource Names](https://cloud.google.com/apis/design/resource_names)
+for more details on Google Cloud Platform resource names.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+If set, only validate the request, but do not actually delete the resource.
+
+=item * C<< $msg->allow_missing() >> / C<< $msg->allow_missing($value) >>
+
+Type: C<Bool>
+
+If set to true, and the
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resource
+is not found, the request will succeed but no action will be taken on the
+server and a completed [Operation][google.longrunning.Operation] will be
+returned.
+
+Useful for idempotent deletion.
+
+=item * C<< $msg->ignore_errors() >> / C<< $msg->ignore_errors($value) >>
+
+Type: C<Bool>
+
+If set to true, the deletion of
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster] resource
+will succeed even if errors occur during deleting in cluster resources.
+Using this parameter may result in orphaned resources in the cluster.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+The current etag of the
+[AttachedCluster][google.cloud.gkemulticloud.v1.AttachedCluster].
+
+Allows clients to perform deletions through optimistic concurrency control.
+
+If the provided etag does not match the current etag of the cluster,
+the request will fail and an ABORTED error will be returned.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::GetAttachedServerConfigRequest
+
+GetAttachedServerConfigRequest gets the server config for attached
+clusters.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the
+[AttachedServerConfig][google.cloud.gkemulticloud.v1.AttachedServerConfig]
+resource to describe.
+
+`AttachedServerConfig` names are formatted as
+`projects/<project-id>/locations/<region>/attachedServerConfig`.
+
+See [Resource Names](https://cloud.google.com/apis/design/resource_names)
+for more details on Google Cloud resource names.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterAgentTokenRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->attached_cluster() >> / C<< $msg->attached_cluster($value) >>
+
+Type: C<String>
+
+Required.
+
+=item * C<< $msg->subject_token() >> / C<< $msg->subject_token($value) >>
+
+Type: C<String>
+
+Required.
+
+=item * C<< $msg->subject_token_type() >> / C<< $msg->subject_token_type($value) >>
+
+Type: C<String>
+
+Required.
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Required.
+
+=item * C<< $msg->grant_type() >> / C<< $msg->grant_type($value) >>
+
+Type: C<String>
+
+Optional.
+
+=item * C<< $msg->audience() >> / C<< $msg->audience($value) >>
+
+Type: C<String>
+
+Optional.
+
+=item * C<< $msg->scope() >> / C<< $msg->scope($value) >>
+
+Type: C<String>
+
+Optional.
+
+=item * C<< $msg->requested_token_type() >> / C<< $msg->requested_token_type($value) >>
+
+Type: C<String>
+
+Optional.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<String>
+
+Optional.
+
+=back
+
+=head2 Google::Cloud::Gkemulticloud::V1::AttachedService::GenerateAttachedClusterAgentTokenResponse
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->access_token() >> / C<< $msg->access_token($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->expires_in() >> / C<< $msg->expires_in($value) >>
+
+Type: C<Int32>
+
+=item * C<< $msg->token_type() >> / C<< $msg->token_type($value) >>
+
+Type: C<String>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Gkemulticloud::V1::AttachedService::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

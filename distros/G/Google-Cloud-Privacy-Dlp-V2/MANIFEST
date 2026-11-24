@@ -1,0 +1,22 @@
+Changes
+lib/Google/Cloud/Privacy/Dlp/V2.pm
+lib/Google/Cloud/Privacy/Dlp/V2/DlpServiceClient.pm
+lib/Google/Privacy/Dlp/V2/Dlp.pm
+lib/Google/Privacy/Dlp/V2/Dlp/Types.pm
+lib/Google/Privacy/Dlp/V2/Storage.pm
+lib/Google/Privacy/Dlp/V2/Storage/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-DlpService.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-DlpService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

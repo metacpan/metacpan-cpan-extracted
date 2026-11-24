@@ -1,0 +1,61 @@
+package Google::Cloud::Designcenter::V1::Enums::Types;
+
+use strict;
+use warnings;
+
+use Type::Library -base;
+use Type::Utils -all;
+use Types::Standard -types;
+
+declare 'ApplicationOperation',
+    as (Int | Str);
+
+declare 'ApplicationTemplateOperation',
+    as (Int | Str);
+
+declare 'TemplateCategory',
+    as (Int | Str);
+
+declare 'ApplicationCompositionType',
+    as (Int | Str);
+
+declare 'TemplateType',
+    as (Int | Str);
+
+declare 'DisplayVariableAlternateType',
+    as (Int | Str);
+
+declare 'DisplayVariableVisibility',
+    as (Int | Str);
+
+declare 'IACFormat',
+    as (Int | Str);
+
+declare 'ApplicationType',
+    as (Int | Str);
+
+declare 'IACSource',
+    as (Int | Str);
+
+declare 'ConnectionDependencyType',
+    as (Int | Str);
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Designcenter::V1::Enums::Types - Type definitions and coercions
+
+=head1 DESCRIPTION
+
+Auto-generated Type::Tiny definitions and coercions for Protocol Buffers.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

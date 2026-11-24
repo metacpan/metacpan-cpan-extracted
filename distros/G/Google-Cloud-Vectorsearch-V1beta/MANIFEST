@@ -1,0 +1,38 @@
+Changes
+lib/Google/Cloud/Vectorsearch/V1beta.pm
+lib/Google/Cloud/Vectorsearch/V1beta/Common.pm
+lib/Google/Cloud/Vectorsearch/V1beta/Common/Types.pm
+lib/Google/Cloud/Vectorsearch/V1beta/DataObject.pm
+lib/Google/Cloud/Vectorsearch/V1beta/DataObject/Types.pm
+lib/Google/Cloud/Vectorsearch/V1beta/DataObjectSearchService.pm
+lib/Google/Cloud/Vectorsearch/V1beta/DataObjectSearchService/Types.pm
+lib/Google/Cloud/Vectorsearch/V1beta/DataObjectSearchServiceClient.pm
+lib/Google/Cloud/Vectorsearch/V1beta/DataObjectService.pm
+lib/Google/Cloud/Vectorsearch/V1beta/DataObjectService/Types.pm
+lib/Google/Cloud/Vectorsearch/V1beta/DataObjectServiceClient.pm
+lib/Google/Cloud/Vectorsearch/V1beta/EmbeddingConfig.pm
+lib/Google/Cloud/Vectorsearch/V1beta/EmbeddingConfig/Types.pm
+lib/Google/Cloud/Vectorsearch/V1beta/EncryptionSpec.pm
+lib/Google/Cloud/Vectorsearch/V1beta/EncryptionSpec/Types.pm
+lib/Google/Cloud/Vectorsearch/V1beta/VectorsearchService.pm
+lib/Google/Cloud/Vectorsearch/V1beta/VectorsearchService/Types.pm
+lib/Google/Cloud/Vectorsearch/V1beta/VectorSearchServiceClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-DataObjectSearchService.t
+t/01-service-DataObjectService.t
+t/01-service-Default.t
+t/01-service-VectorSearchService.t
+t/02-rest-transport-DataObjectSearchService.t
+t/02-rest-transport-DataObjectService.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-VectorSearchService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

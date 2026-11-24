@@ -140,7 +140,7 @@ subtest 'get_iam_policy method' => sub {
         my ($args) = @_;
         is($args->{service}, 'google.storage.v2.Storage', 'Correct service path');
         is($args->{method}, 'GetIamPolicy', 'Correct RPC method');
-        isa_ok($args->{request}, 'Google::Iam::V1::GetIamPolicyRequest::GetIamPolicyRequest', 'Request object');
+        isa_ok($args->{request}, 'Google::Iam::V1::IamPolicy::GetIamPolicyRequest', 'Request object');
         
         my $response = 'Google::Iam::V1::Policy::Policy'->new();
         return $response;

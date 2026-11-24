@@ -1,0 +1,4 @@
+Revision history for PDL-XGBoost
+
+0.01    2026-11-24
+    - Initial release: XGBoost C API (xgboost/c_api.h) bindings for PDL with DMatrix, Booster training, prediction, and model save/load.

@@ -22,6 +22,8 @@ t/04-live.t
 t/05-download.t
 t/06-oauth.t
 t/07-cache-life.t
+t/08-day-members.t
+t/09-user-agent.t
 t/lib/VPNDetectionTest.pm
 t/lib/VPNDetectionTest/Origin.pm
 testdata/testdata.json

@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::Storage::V1::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -808,143 +808,19 @@ EOF
     # Field: max_stream_count Type: 5 ()
     # Field: preferred_min_stream_count Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::CreateReadSessionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::CreateReadSessionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<read_session>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ReadSession)
-
-=item * B<max_stream_count>
-
-Type: Int32
-
-=item * B<preferred_min_stream_count>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::ReadRowsRequest ===
     # Fields for ReadRowsRequest
     # Field: read_stream Type: 9 ()
     # Field: offset Type: 3 ()
     # Field: arrow_serialization_options Type: 11 (.google.cloud.bigquery.storage.v1.ArrowSerializationOptions)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::ReadRowsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::ReadRowsRequest->new(
-        read_stream => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<read_stream>
-
-Type: String
-
-=item * B<offset>
-
-Type: Int64
-
-=item * B<arrow_serialization_options>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ArrowSerializationOptions)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::ThrottleState ===
     # Fields for ThrottleState
     # Field: throttle_percent Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::ThrottleState - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::ThrottleState->new(
-        throttle_percent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<throttle_percent>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::StreamStats ===
     # Fields for StreamStats
     # Field: progress Type: 11 (.google.cloud.bigquery.storage.v1.StreamStats.Progress)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::StreamStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::StreamStats->new(
-        progress => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<progress>
-
-Type: Message (.google.cloud.bigquery.storage.v1.StreamStats.Progress)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::ReadRowsResponse ===
     # Fields for ReadRowsResponse
@@ -958,168 +834,20 @@ Type: Message (.google.cloud.bigquery.storage.v1.StreamStats.Progress)
     # Field: uncompressed_byte_size Type: 3 ()
     # Field: total_estimated_row_count Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::ReadRowsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::ReadRowsResponse->new(
-        avro_rows => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<avro_rows>
-
-Type: Message (.google.cloud.bigquery.storage.v1.AvroRows)
-
-=item * B<arrow_record_batch>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ArrowRecordBatch)
-
-=item * B<row_count>
-
-Type: Int64
-
-=item * B<stats>
-
-Type: Message (.google.cloud.bigquery.storage.v1.StreamStats)
-
-=item * B<throttle_state>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ThrottleState)
-
-=item * B<avro_schema>
-
-Type: Message (.google.cloud.bigquery.storage.v1.AvroSchema)
-
-=item * B<arrow_schema>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ArrowSchema)
-
-=item * B<uncompressed_byte_size>
-
-Type: Int64
-
-=item * B<total_estimated_row_count>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::SplitReadStreamRequest ===
     # Fields for SplitReadStreamRequest
     # Field: name Type: 9 ()
     # Field: fraction Type: 1 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::SplitReadStreamRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::SplitReadStreamRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<fraction>
-
-Type: Double
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::SplitReadStreamResponse ===
     # Fields for SplitReadStreamResponse
     # Field: primary_stream Type: 11 (.google.cloud.bigquery.storage.v1.ReadStream)
     # Field: remainder_stream Type: 11 (.google.cloud.bigquery.storage.v1.ReadStream)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::SplitReadStreamResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::SplitReadStreamResponse->new(
-        primary_stream => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<primary_stream>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ReadStream)
-
-=item * B<remainder_stream>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ReadStream)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::CreateWriteStreamRequest ===
     # Fields for CreateWriteStreamRequest
     # Field: parent Type: 9 ()
     # Field: write_stream Type: 11 (.google.cloud.bigquery.storage.v1.WriteStream)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::CreateWriteStreamRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::CreateWriteStreamRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<write_stream>
-
-Type: Message (.google.cloud.bigquery.storage.v1.WriteStream)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsRequest ===
     # Fields for AppendRowsRequest
@@ -1132,82 +860,10 @@ Type: Message (.google.cloud.bigquery.storage.v1.WriteStream)
     # Field: default_missing_value_interpretation Type: 14 (.google.cloud.bigquery.storage.v1.AppendRowsRequest.MissingValueInterpretation)
     # Field: client_stats Type: 11 (.google.cloud.bigquery.storage.v1.ClientStats)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsRequest->new(
-        write_stream => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<write_stream>
-
-Type: String
-
-=item * B<offset>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<proto_rows>
-
-Type: Message (.google.cloud.bigquery.storage.v1.AppendRowsRequest.ProtoData)
-
-=item * B<arrow_rows>
-
-Type: Message (.google.cloud.bigquery.storage.v1.AppendRowsRequest.ArrowData)
-
-=item * B<trace_id>
-
-Type: String
-
-=item * B<missing_value_interpretations>
-
-Type: Message (.google.cloud.bigquery.storage.v1.AppendRowsRequest.MissingValueInterpretationsEntry)
-
-=item * B<default_missing_value_interpretation>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.AppendRowsRequest.MissingValueInterpretation)
-
-=item * B<client_stats>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ClientStats)
-
-=back
-
-=cut
-
 # Enum: AppendRowsRequest::MissingValueInterpretation
 our $AppendRowsRequest_MISSING_VALUE_INTERPRETATION_UNSPECIFIED = 0;
 our $AppendRowsRequest_NULL_VALUE = 1;
 our $AppendRowsRequest_DEFAULT_VALUE = 2;
-
-=pod
-
-=head2 Enum: AppendRowsRequest::MissingValueInterpretation
-
-Values:
-
-=over 4
-
-=item * C<MISSING_VALUE_INTERPRETATION_UNSPECIFIED> => 0
-
-=item * C<NULL_VALUE> => 1
-
-=item * C<DEFAULT_VALUE> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsResponse ===
     # Fields for AppendRowsResponse
@@ -1217,317 +873,43 @@ Values:
     # Field: row_errors Type: 11 (.google.cloud.bigquery.storage.v1.RowError)
     # Field: write_stream Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsResponse->new(
-        append_result => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<append_result>
-
-Type: Message (.google.cloud.bigquery.storage.v1.AppendRowsResponse.AppendResult)
-
-=item * B<error>
-
-Type: Message (.google.rpc.Status)
-
-=item * B<updated_schema>
-
-Type: Message (.google.cloud.bigquery.storage.v1.TableSchema)
-
-=item * B<row_errors>
-
-Type: Message (.google.cloud.bigquery.storage.v1.RowError)
-
-=item * B<write_stream>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::GetWriteStreamRequest ===
     # Fields for GetWriteStreamRequest
     # Field: name Type: 9 ()
     # Field: view Type: 14 (.google.cloud.bigquery.storage.v1.WriteStreamView)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::GetWriteStreamRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::GetWriteStreamRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.WriteStreamView)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::BatchCommitWriteStreamsRequest ===
     # Fields for BatchCommitWriteStreamsRequest
     # Field: parent Type: 9 ()
     # Field: write_streams Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::BatchCommitWriteStreamsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::BatchCommitWriteStreamsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<write_streams>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::BatchCommitWriteStreamsResponse ===
     # Fields for BatchCommitWriteStreamsResponse
     # Field: commit_time Type: 11 (.google.protobuf.Timestamp)
     # Field: stream_errors Type: 11 (.google.cloud.bigquery.storage.v1.StorageError)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::BatchCommitWriteStreamsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::BatchCommitWriteStreamsResponse->new(
-        commit_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<commit_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<stream_errors>
-
-Type: Message (.google.cloud.bigquery.storage.v1.StorageError)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::FinalizeWriteStreamRequest ===
     # Fields for FinalizeWriteStreamRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::FinalizeWriteStreamRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::FinalizeWriteStreamRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::FinalizeWriteStreamResponse ===
     # Fields for FinalizeWriteStreamResponse
     # Field: row_count Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::FinalizeWriteStreamResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::FinalizeWriteStreamResponse->new(
-        row_count => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<row_count>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::FlushRowsRequest ===
     # Fields for FlushRowsRequest
     # Field: write_stream Type: 9 ()
     # Field: offset Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::FlushRowsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::FlushRowsRequest->new(
-        write_stream => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<write_stream>
-
-Type: String
-
-=item * B<offset>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::FlushRowsResponse ===
     # Fields for FlushRowsResponse
     # Field: offset Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::FlushRowsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::FlushRowsResponse->new(
-        offset => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<offset>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::StorageError ===
     # Fields for StorageError
     # Field: code Type: 14 (.google.cloud.bigquery.storage.v1.StorageError.StorageErrorCode)
     # Field: entity Type: 9 ()
     # Field: error_message Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::StorageError - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::StorageError->new(
-        code => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<code>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.StorageError.StorageErrorCode)
-
-=item * B<entity>
-
-Type: String
-
-=item * B<error_message>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: StorageError::StorageErrorCode
 our $StorageError_STORAGE_ERROR_CODE_UNSPECIFIED = 0;
@@ -1546,165 +928,35 @@ our $StorageError_CMEK_ENCRYPTION_ERROR = 12;
 our $StorageError_KMS_SERVICE_ERROR = 13;
 our $StorageError_KMS_PERMISSION_DENIED = 14;
 
-=pod
-
-=head2 Enum: StorageError::StorageErrorCode
-
-Values:
-
-=over 4
-
-=item * C<STORAGE_ERROR_CODE_UNSPECIFIED> => 0
-
-=item * C<TABLE_NOT_FOUND> => 1
-
-=item * C<STREAM_ALREADY_COMMITTED> => 2
-
-=item * C<STREAM_NOT_FOUND> => 3
-
-=item * C<INVALID_STREAM_TYPE> => 4
-
-=item * C<INVALID_STREAM_STATE> => 5
-
-=item * C<STREAM_FINALIZED> => 6
-
-=item * C<SCHEMA_MISMATCH_EXTRA_FIELDS> => 7
-
-=item * C<OFFSET_ALREADY_EXISTS> => 8
-
-=item * C<OFFSET_OUT_OF_RANGE> => 9
-
-=item * C<CMEK_NOT_PROVIDED> => 10
-
-=item * C<INVALID_CMEK_PROVIDED> => 11
-
-=item * C<CMEK_ENCRYPTION_ERROR> => 12
-
-=item * C<KMS_SERVICE_ERROR> => 13
-
-=item * C<KMS_PERMISSION_DENIED> => 14
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::RowError ===
     # Fields for RowError
     # Field: index Type: 3 ()
     # Field: code Type: 14 (.google.cloud.bigquery.storage.v1.RowError.RowErrorCode)
     # Field: message Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::RowError - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::RowError->new(
-        index => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<index>
-
-Type: Int64
-
-=item * B<code>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.RowError.RowErrorCode)
-
-=item * B<message>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: RowError::RowErrorCode
 our $RowError_ROW_ERROR_CODE_UNSPECIFIED = 0;
 our $RowError_FIELDS_ERROR = 1;
-
-=pod
-
-=head2 Enum: RowError::RowErrorCode
-
-Values:
-
-=over 4
-
-=item * C<ROW_ERROR_CODE_UNSPECIFIED> => 0
-
-=item * C<FIELDS_ERROR> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats ===
     # Fields for ClientStats
     # Field: request_stats Type: 11 (.google.cloud.bigquery.storage.v1.ClientStats.RequestStats)
     # Field: window_stats Type: 11 (.google.cloud.bigquery.storage.v1.ClientStats.WindowStats)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Storage;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats->new(
-        request_stats => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<request_stats>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ClientStats.RequestStats)
-
-=item * B<window_stats>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ClientStats.WindowStats)
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Bigquery::Storage::V1::Storage::BigQueryReadClient ===
 package Google::Cloud::Bigquery::Storage::V1::Storage::BigQueryReadClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Bigquery::Storage::V1::Storage::BigQueryReadClient
 
-Google::Cloud::Bigquery::Storage::V1::Storage::BigQueryReadClient - Client stub representing the remote BigQueryRead service
+Client stub representing the remote C<BigQueryRead> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1773,23 +1025,15 @@ package Google::Cloud::Bigquery::Storage::V1::Storage::BigQueryWriteClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Bigquery::Storage::V1::Storage::BigQueryWriteClient
 
-Google::Cloud::Bigquery::Storage::V1::Storage::BigQueryWriteClient - Client stub representing the remote BigQueryWrite service
+Client stub representing the remote C<BigQueryWrite> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1896,13 +1140,835 @@ sub flush_rows {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::Storage::V1::Storage - Protocol Buffers schema definition
+Google::Cloud::Bigquery::Storage::V1::Storage - Compiled Protocol Buffers messages for google/cloud/bigquery/storage/v1/storage.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::Storage::V1::Storage;
+
+    my $msg = Google::Cloud::Bigquery::Storage::V1::Storage::CreateReadSessionRequest->new({
+        parent => $parent,
+        read_session => $read_session,
+        max_stream_count => $max_stream_count,
+        preferred_min_stream_count => $preferred_min_stream_count,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::Storage::V1::Storage::CreateReadSessionRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/storage/v1/storage.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::CreateReadSessionRequest
+
+Request message for `CreateReadSession`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The request project that owns the session, in the form of
+`projects/{project_id}`.
+
+=item * C<< $msg->read_session() >> / C<< $msg->read_session($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession>)
+
+Required. Session to be created.
+
+=item * C<< $msg->max_stream_count() >> / C<< $msg->max_stream_count($value) >>
+
+Type: C<Int32>
+
+Max initial number of streams. If unset or zero, the server will
+provide a value of streams so as to produce reasonable throughput. Must be
+non-negative. The number of streams may be lower than the requested number,
+depending on the amount parallelism that is reasonable for the table.
+There is a default system max limit of 1,000.
+
+This must be greater than or equal to preferred_min_stream_count.
+Typically, clients should either leave this unset to let the system to
+determine an upper bound OR set this a size for the maximum "units of work"
+it can gracefully handle.
+
+=item * C<< $msg->preferred_min_stream_count() >> / C<< $msg->preferred_min_stream_count($value) >>
+
+Type: C<Int32>
+
+The minimum preferred stream count. This parameter can be used to inform
+the service that there is a desired lower bound on the number of streams.
+This is typically a target parallelism of the client (e.g. a Spark
+cluster with N-workers would set this to a low multiple of N to ensure
+good cluster utilization).
+
+The system will make a best effort to provide at least this number of
+streams, but in some cases might provide less.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::ReadRowsRequest
+
+Request message for `ReadRows`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->read_stream() >> / C<< $msg->read_stream($value) >>
+
+Type: C<String>
+
+Required. Stream to read rows from.
+
+=item * C<< $msg->offset() >> / C<< $msg->offset($value) >>
+
+Type: C<Int64>
+
+The offset requested must be less than the last row read from Read.
+Requesting a larger offset is undefined. If not specified, start reading
+from offset zero.
+
+=item * C<< $msg->arrow_serialization_options() >> / C<< $msg->arrow_serialization_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSerializationOptions>)
+
+Optional. Options specific to the Apache Arrow output format.
+
+This feature is not yet available.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::ThrottleState
+
+Information on if the current connection is being throttled.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->throttle_percent() >> / C<< $msg->throttle_percent($value) >>
+
+Type: C<Int32>
+
+How much this connection is being throttled. Zero means no throttling,
+100 means fully throttled.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::StreamStats
+
+Estimated stream statistics for a given read Stream.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->progress() >> / C<< $msg->progress($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::StreamStats::Progress>)
+
+Represents the progress of the current stream.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::ReadRowsResponse
+
+Response from calling `ReadRows` may include row data, progress and
+throttling information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->avro_rows() >> / C<< $msg->avro_rows($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Avro::AvroRows>)
+
+Serialized row data in AVRO format.
+
+=item * C<< $msg->arrow_record_batch() >> / C<< $msg->arrow_record_batch($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowRecordBatch>)
+
+Serialized row data in Arrow RecordBatch format.
+
+=item * C<< $msg->row_count() >> / C<< $msg->row_count($value) >>
+
+Type: C<Int64>
+
+Number of serialized rows in the rows block.
+
+=item * C<< $msg->stats() >> / C<< $msg->stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::StreamStats>)
+
+Statistics for the stream.
+
+=item * C<< $msg->throttle_state() >> / C<< $msg->throttle_state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::ThrottleState>)
+
+Throttling state. If unset, the latest response still describes
+the current throttling status.
+
+=item * C<< $msg->avro_schema() >> / C<< $msg->avro_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Avro::AvroSchema>)
+
+Output only. Avro schema.
+
+=item * C<< $msg->arrow_schema() >> / C<< $msg->arrow_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSchema>)
+
+Output only. Arrow schema.
+
+=item * C<< $msg->uncompressed_byte_size() >> / C<< $msg->uncompressed_byte_size($value) >>
+
+Type: C<Int64>
+
+Optional. If the row data in this ReadRowsResponse is compressed, then
+uncompressed byte size is the original size of the uncompressed row data.
+If it is set to a value greater than 0, then decompress into a buffer of
+size uncompressed_byte_size using the compression codec that was requested
+during session creation time and which is specified in
+TableReadOptions.response_compression_codec in ReadSession.
+This value is not set if no response_compression_codec was not requested
+and it is -1 if the requested compression would not have reduced the size
+of this ReadRowsResponse's row data. This attempts to match Apache Arrow's
+behavior described here https://github.com/apache/arrow/issues/15102 where
+the uncompressed length may be set to -1 to indicate that the data that
+follows is not compressed, which can be useful for cases where compression
+does not yield appreciable savings. When uncompressed_byte_size is not
+greater than 0, the client should skip decompression.
+
+=item * C<< $msg->total_estimated_row_count() >> / C<< $msg->total_estimated_row_count($value) >>
+
+Type: C<Int64>
+
+Output only. The total estimated number of rows in the query results.
+Only populated when reading data from a BigQuery job.
+
+This feature is not yet available.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::SplitReadStreamRequest
+
+Request message for `SplitReadStream`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the stream to split.
+
+=item * C<< $msg->fraction() >> / C<< $msg->fraction($value) >>
+
+Type: C<Double>
+
+A value in the range (0.0, 1.0) that specifies the fractional point at
+which the original stream should be split. The actual split point is
+evaluated on pre-filtered rows, so if a filter is provided, then there is
+no guarantee that the division of the rows between the new child streams
+will be proportional to this fractional value. Additionally, because the
+server-side unit for assigning data is collections of rows, this fraction
+will always map to a data storage boundary on the server side.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::SplitReadStreamResponse
+
+Response message for `SplitReadStream`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->primary_stream() >> / C<< $msg->primary_stream($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Stream::ReadStream>)
+
+Primary stream, which contains the beginning portion of
+|original_stream|. An empty value indicates that the original stream can no
+longer be split.
+
+=item * C<< $msg->remainder_stream() >> / C<< $msg->remainder_stream($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Stream::ReadStream>)
+
+Remainder stream, which contains the tail of |original_stream|. An empty
+value indicates that the original stream can no longer be split.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::CreateWriteStreamRequest
+
+Request message for `CreateWriteStream`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Reference to the table to which the stream belongs, in the format
+of `projects/{project}/datasets/{dataset}/tables/{table}`.
+
+=item * C<< $msg->write_stream() >> / C<< $msg->write_stream($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Stream::WriteStream>)
+
+Required. Stream to be created.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsRequest
+
+Request message for `AppendRows`.
+
+Because AppendRows is a bidirectional streaming RPC, certain parts of the
+AppendRowsRequest need only be specified for the first request before
+switching table destinations. You can also switch table destinations within
+the same connection for the default stream.
+
+The size of a single AppendRowsRequest must be less than 20 MB in size.
+Requests larger than this return an error, typically `INVALID_ARGUMENT`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->write_stream() >> / C<< $msg->write_stream($value) >>
+
+Type: C<String>
+
+Required. The write_stream identifies the append operation. It must be
+provided in the following scenarios:
+
+* In the first request to an AppendRows connection.
+
+* In all subsequent requests to an AppendRows connection, if you use the
+same connection to write to multiple tables or change the input schema for
+default streams.
+
+For explicitly created write streams, the format is:
+
+* `projects/{project}/datasets/{dataset}/tables/{table}/streams/{id}`
+
+For the special default stream, the format is:
+
+* `projects/{project}/datasets/{dataset}/tables/{table}/streams/_default`.
+
+An example of a possible sequence of requests with write_stream fields
+within a single connection:
+
+* r1: {write_stream: stream_name_1}
+
+* r2: {write_stream: /*omit*/}
+
+* r3: {write_stream: /*omit*/}
+
+* r4: {write_stream: stream_name_2}
+
+* r5: {write_stream: stream_name_2}
+
+The destination changed in request_4, so the write_stream field must be
+populated in all subsequent requests in this stream.
+
+=item * C<< $msg->offset() >> / C<< $msg->offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+If present, the write is only performed if the next append offset is same
+as the provided value. If not present, the write is performed at the
+current end of stream. Specifying a value for this field is not allowed
+when calling AppendRows for the '_default' stream.
+
+=item * C<< $msg->proto_rows() >> / C<< $msg->proto_rows($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsRequest::ProtoData>)
+
+Rows in proto format.
+
+=item * C<< $msg->arrow_rows() >> / C<< $msg->arrow_rows($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsRequest::ArrowData>)
+
+Rows in arrow format.
+
+=item * C<< $msg->trace_id() >> / C<< $msg->trace_id($value) >>
+
+Type: C<String>
+
+Id set by client to annotate its identity. Only initial request setting is
+respected.
+
+=item * C<< $msg->missing_value_interpretations() >> / C<< $msg->missing_value_interpretations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsRequest::MissingValueInterpretationsEntry>)
+
+A map to indicate how to interpret missing value for some fields. Missing
+values are fields present in user schema but missing in rows. The key is
+the field name. The value is the interpretation of missing values for the
+field.
+
+For example, a map {'foo': NULL_VALUE, 'bar': DEFAULT_VALUE} means all
+missing values in field foo are interpreted as NULL, all missing values in
+field bar are interpreted as the default value of field bar in table
+schema.
+
+If a field is not in this map and has missing values, the missing values
+in this field are interpreted as NULL.
+
+This field only applies to the current request, it won't affect other
+requests on the connection.
+
+Currently, field name can only be top-level column name, can't be a struct
+field path like 'foo.bar'.
+
+=item * C<< $msg->default_missing_value_interpretation() >> / C<< $msg->default_missing_value_interpretation($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::AppendRowsRequest::MissingValueInterpretation>)
+
+Optional. Default missing value interpretation for all columns in the
+table. When a value is specified on an `AppendRowsRequest`, it is applied
+to all requests from that point forward, until a subsequent
+`AppendRowsRequest` sets it to a different value.
+`missing_value_interpretation` can override
+`default_missing_value_interpretation`. For example, if you want to write
+`NULL` instead of using default values for some columns, you can set
+`default_missing_value_interpretation` to `DEFAULT_VALUE` and at the same
+time, set `missing_value_interpretations` to `NULL_VALUE` on those columns.
+
+=item * C<< $msg->client_stats() >> / C<< $msg->client_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats>)
+
+Optional. Stats and telemetry data gathered on the client side.
+
+=back
+
+=head3 Enum: AppendRowsRequest::MissingValueInterpretation
+
+=over 4
+
+=item * C<MISSING_VALUE_INTERPRETATION_UNSPECIFIED> => C<0>
+
+=item * C<NULL_VALUE> => C<1>
+
+=item * C<DEFAULT_VALUE> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsResponse
+
+Response message for `AppendRows`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->append_result() >> / C<< $msg->append_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::AppendRowsResponse::AppendResult>)
+
+Result if the append is successful.
+
+=item * C<< $msg->error() >> / C<< $msg->error($value) >>
+
+Type: C<Message> (L<Google::Rpc::Status::Status>)
+
+Error returned when problems were encountered.  If present,
+it indicates rows were not accepted into the system.
+Users can retry or continue with other append requests within the
+same connection.
+
+Additional information about error signalling:
+
+ALREADY_EXISTS: Happens when an append specified an offset, and the
+backend already has received data at this offset.  Typically encountered
+in retry scenarios, and can be ignored.
+
+OUT_OF_RANGE: Returned when the specified offset in the stream is beyond
+the current end of the stream.
+
+INVALID_ARGUMENT: Indicates a malformed request or data.
+
+ABORTED: Request processing is aborted because of prior failures.  The
+request can be retried if previous failure is addressed.
+
+INTERNAL: Indicates server side error(s) that can be retried.
+
+=item * C<< $msg->updated_schema() >> / C<< $msg->updated_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Table::TableSchema>)
+
+If backend detects a schema update, pass it to user so that user can
+use it to input new type of message. It will be empty when no schema
+updates have occurred.
+
+=item * C<< $msg->row_errors() >> / C<< $msg->row_errors($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::RowError>)
+
+If a request failed due to corrupted rows, no rows in the batch will be
+appended. The API will return row level error info, so that the caller can
+remove the bad rows and retry the request.
+
+=item * C<< $msg->write_stream() >> / C<< $msg->write_stream($value) >>
+
+Type: C<String>
+
+The target of the append operation. Matches the write_stream in the
+corresponding request.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::GetWriteStreamRequest
+
+Request message for `GetWriteStreamRequest`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the stream to get, in the form of
+`projects/{project}/datasets/{dataset}/tables/{table}/streams/{stream}`.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::WriteStreamView>)
+
+Indicates whether to get full or partial view of the WriteStream. If
+not set, view returned will be basic.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::BatchCommitWriteStreamsRequest
+
+Request message for `BatchCommitWriteStreams`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Parent table that all the streams should belong to, in the form
+of `projects/{project}/datasets/{dataset}/tables/{table}`.
+
+=item * C<< $msg->write_streams() >> / C<< $msg->write_streams($value) >>
+
+Type: C<String>
+
+Required. The group of streams that will be committed atomically.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::BatchCommitWriteStreamsResponse
+
+Response message for `BatchCommitWriteStreams`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->commit_time() >> / C<< $msg->commit_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time at which streams were committed in microseconds granularity.
+This field will only exist when there are no stream errors.
+B<Note> if this field is not set, it means the commit was not successful.
+
+=item * C<< $msg->stream_errors() >> / C<< $msg->stream_errors($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::StorageError>)
+
+Stream level error if commit failed. Only streams with error will be in
+the list.
+If empty, there is no error and all streams are committed successfully.
+If non empty, certain streams have errors and ZERO stream is committed due
+to atomicity guarantee.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::FinalizeWriteStreamRequest
+
+Request message for invoking `FinalizeWriteStream`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the stream to finalize, in the form of
+`projects/{project}/datasets/{dataset}/tables/{table}/streams/{stream}`.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::FinalizeWriteStreamResponse
+
+Response message for `FinalizeWriteStream`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->row_count() >> / C<< $msg->row_count($value) >>
+
+Type: C<Int64>
+
+Number of rows in the finalized stream.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::FlushRowsRequest
+
+Request message for `FlushRows`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->write_stream() >> / C<< $msg->write_stream($value) >>
+
+Type: C<String>
+
+Required. The stream that is the target of the flush operation.
+
+=item * C<< $msg->offset() >> / C<< $msg->offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Ending offset of the flush operation. Rows before this offset(including
+this offset) will be flushed.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::FlushRowsResponse
+
+Respond message for `FlushRows`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->offset() >> / C<< $msg->offset($value) >>
+
+Type: C<Int64>
+
+The rows before this offset (including this offset) are flushed.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::StorageError
+
+Structured custom BigQuery Storage error message. The error can be attached
+as error details in the returned rpc Status. In particular, the use of error
+codes allows more structured error handling, and reduces the need to evaluate
+unstructured error text strings.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::StorageError::StorageErrorCode>)
+
+BigQuery Storage specific error code.
+
+=item * C<< $msg->entity() >> / C<< $msg->entity($value) >>
+
+Type: C<String>
+
+Name of the failed entity.
+
+=item * C<< $msg->error_message() >> / C<< $msg->error_message($value) >>
+
+Type: C<String>
+
+Message that describes the error.
+
+=back
+
+=head3 Enum: StorageError::StorageErrorCode
+
+=over 4
+
+=item * C<STORAGE_ERROR_CODE_UNSPECIFIED> => C<0>
+
+=item * C<TABLE_NOT_FOUND> => C<1>
+
+=item * C<STREAM_ALREADY_COMMITTED> => C<2>
+
+=item * C<STREAM_NOT_FOUND> => C<3>
+
+=item * C<INVALID_STREAM_TYPE> => C<4>
+
+=item * C<INVALID_STREAM_STATE> => C<5>
+
+=item * C<STREAM_FINALIZED> => C<6>
+
+=item * C<SCHEMA_MISMATCH_EXTRA_FIELDS> => C<7>
+
+=item * C<OFFSET_ALREADY_EXISTS> => C<8>
+
+=item * C<OFFSET_OUT_OF_RANGE> => C<9>
+
+=item * C<CMEK_NOT_PROVIDED> => C<10>
+
+=item * C<INVALID_CMEK_PROVIDED> => C<11>
+
+=item * C<CMEK_ENCRYPTION_ERROR> => C<12>
+
+=item * C<KMS_SERVICE_ERROR> => C<13>
+
+=item * C<KMS_PERMISSION_DENIED> => C<14>
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::RowError
+
+The message that presents row level error info in a request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->index() >> / C<< $msg->index($value) >>
+
+Type: C<Int64>
+
+Index of the malformed row in the request.
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::RowError::RowErrorCode>)
+
+Structured error reason for a row error.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+Description of the issue encountered when processing the row.
+
+=back
+
+=head3 Enum: RowError::RowErrorCode
+
+=over 4
+
+=item * C<ROW_ERROR_CODE_UNSPECIFIED> => C<0>
+
+=item * C<FIELDS_ERROR> => C<1>
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats
+
+Stats and telemetry data gathered on the client side about requests
+being sent to the BigQuery Storage service, for internal use only.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->request_stats() >> / C<< $msg->request_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats::RequestStats>)
+
+Optional. Per-request stats.
+
+=item * C<< $msg->window_stats() >> / C<< $msg->window_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Storage::ClientStats::WindowStats>)
+
+Optional. Windowed stats.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::Storage::V1::Storage::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

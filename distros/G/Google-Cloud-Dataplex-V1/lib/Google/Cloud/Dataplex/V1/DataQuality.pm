@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::DataQuality;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -774,56 +774,6 @@ EOF
     # Field: enable_catalog_based_rules Type: 8 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataQuality::DataQualitySpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataQuality;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataQuality::DataQualitySpec->new(
-        rules => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<rules>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule)
-
-=item * B<sampling_percent>
-
-Type: Float
-
-=item * B<row_filter>
-
-Type: String
-
-=item * B<post_scan_actions>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualitySpec.PostScanActions)
-
-=item * B<catalog_publishing_enabled>
-
-Type: Bool
-
-=item * B<enable_catalog_based_rules>
-
-Type: Bool
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataQuality::DataQualityResult ===
     # Fields for DataQualityResult
     # Field: passed Type: 8 ()
@@ -837,68 +787,6 @@ Type: String
     # Field: catalog_publishing_status Type: 11 (.google.cloud.dataplex.v1.DataScanCatalogPublishingStatus)
     # Field: anomaly_detection_generated_assets Type: 11 (.google.cloud.dataplex.v1.DataQualityResult.AnomalyDetectionGeneratedAssets)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataQuality::DataQualityResult - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataQuality;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataQuality::DataQualityResult->new(
-        passed => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<passed>
-
-Type: Bool
-
-=item * B<score>
-
-Type: Float
-
-=item * B<dimensions>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityDimensionResult)
-
-=item * B<columns>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityColumnResult)
-
-=item * B<rules>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRuleResult)
-
-=item * B<row_count>
-
-Type: Int64
-
-=item * B<scanned_data>
-
-Type: Message (.google.cloud.dataplex.v1.ScannedData)
-
-=item * B<post_scan_actions_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityResult.PostScanActionsResult)
-
-=item * B<catalog_publishing_status>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanCatalogPublishingStatus)
-
-=item * B<anomaly_detection_generated_assets>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityResult.AnomalyDetectionGeneratedAssets)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataQuality::DataQualityRuleResult ===
     # Fields for DataQualityRuleResult
     # Field: rule Type: 11 (.google.cloud.dataplex.v1.DataQualityRule)
@@ -911,133 +799,15 @@ Type: Message (.google.cloud.dataplex.v1.DataQualityResult.AnomalyDetectionGener
     # Field: assertion_row_count Type: 3 ()
     # Field: debug_queries_result_sets Type: 11 (.google.cloud.dataplex.v1.DataQualityRuleResult.DebugQueryResultSet)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataQuality::DataQualityRuleResult - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataQuality;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataQuality::DataQualityRuleResult->new(
-        rule => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<rule>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule)
-
-=item * B<passed>
-
-Type: Bool
-
-=item * B<evaluated_count>
-
-Type: Int64
-
-=item * B<passed_count>
-
-Type: Int64
-
-=item * B<null_count>
-
-Type: Int64
-
-=item * B<pass_ratio>
-
-Type: Double
-
-=item * B<failing_rows_query>
-
-Type: String
-
-=item * B<assertion_row_count>
-
-Type: Int64
-
-=item * B<debug_queries_result_sets>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRuleResult.DebugQueryResultSet)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimensionResult ===
     # Fields for DataQualityDimensionResult
     # Field: dimension Type: 11 (.google.cloud.dataplex.v1.DataQualityDimension)
     # Field: passed Type: 8 ()
     # Field: score Type: 2 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimensionResult - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataQuality;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimensionResult->new(
-        dimension => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dimension>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityDimension)
-
-=item * B<passed>
-
-Type: Bool
-
-=item * B<score>
-
-Type: Float
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimension ===
     # Fields for DataQualityDimension
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimension - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataQuality;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimension->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule ===
     # Fields for DataQualityRule
@@ -1062,108 +832,6 @@ Type: String
     # Field: rule_source Type: 11 (.google.cloud.dataplex.v1.DataQualityRule.RuleSource)
     # Field: debug_queries Type: 11 (.google.cloud.dataplex.v1.DataQualityRule.DebugQuery)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataQuality;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule->new(
-        range_expectation => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<range_expectation>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.RangeExpectation)
-
-=item * B<non_null_expectation>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.NonNullExpectation)
-
-=item * B<set_expectation>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.SetExpectation)
-
-=item * B<regex_expectation>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.RegexExpectation)
-
-=item * B<uniqueness_expectation>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.UniquenessExpectation)
-
-=item * B<statistic_range_expectation>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.StatisticRangeExpectation)
-
-=item * B<row_condition_expectation>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.RowConditionExpectation)
-
-=item * B<table_condition_expectation>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.TableConditionExpectation)
-
-=item * B<sql_assertion>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.SqlAssertion)
-
-=item * B<template_reference>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.TemplateReference)
-
-=item * B<column>
-
-Type: String
-
-=item * B<ignore_null>
-
-Type: Bool
-
-=item * B<dimension>
-
-Type: String
-
-=item * B<threshold>
-
-Type: Double
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<suspended>
-
-Type: Bool
-
-=item * B<attributes>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.AttributesEntry)
-
-=item * B<rule_source>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.RuleSource)
-
-=item * B<debug_queries>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule.DebugQuery)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataQuality::DataQualityColumnResult ===
     # Fields for DataQualityColumnResult
     # Field: column Type: 9 ()
@@ -1171,55 +839,569 @@ Type: Message (.google.cloud.dataplex.v1.DataQualityRule.DebugQuery)
     # Field: passed Type: 8 ()
     # Field: dimensions Type: 11 (.google.cloud.dataplex.v1.DataQualityDimensionResult)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::DataQuality::DataQualityColumnResult - Compiled Protocol Buffers message class
+Google::Cloud::Dataplex::V1::DataQuality - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/data_quality.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Dataplex::V1::DataQuality;
 
-    my $msg = Google::Cloud::Dataplex::V1::DataQuality::DataQualityColumnResult->new(
-        column => $value,
-    );
+    my $msg = Google::Cloud::Dataplex::V1::DataQuality::DataQualitySpec->new({
+        rules => $rules,
+        sampling_percent => $sampling_percent,
+        row_filter => $row_filter,
+        post_scan_actions => $post_scan_actions,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->rules();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::DataQuality::DataQualitySpec->parse($bytes);
 
-=item * B<column>
-
-Type: String
-
-=item * B<score>
-
-Type: Float
-
-=item * B<passed>
-
-Type: Bool
-
-=item * B<dimensions>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityDimensionResult)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataQuality - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/data_quality.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::DataQuality::DataQualitySpec
+
+DataQualityScan related setting.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->rules() >> / C<< $msg->rules($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule>)
+
+Required. The list of rules to evaluate against a data source. At least one
+rule is required.
+
+=item * C<< $msg->sampling_percent() >> / C<< $msg->sampling_percent($value) >>
+
+Type: C<Float>
+
+Optional. The percentage of the records to be selected from the dataset for
+DataScan.
+
+* Value can range between 0.0 and 100.0 with up to 3 significant decimal
+digits.
+* Sampling is not applied if `sampling_percent` is not specified, 0 or
+100.
+
+=item * C<< $msg->row_filter() >> / C<< $msg->row_filter($value) >>
+
+Type: C<String>
+
+Optional. A filter applied to all rows in a single DataScan job.
+The filter needs to be a valid SQL expression for a [WHERE clause in
+GoogleSQL
+syntax](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#where_clause).
+
+Example: col1 >= 0 AND col2 < 10
+
+=item * C<< $msg->post_scan_actions() >> / C<< $msg->post_scan_actions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualitySpec::PostScanActions>)
+
+Optional. Actions to take upon job completion.
+
+=item * C<< $msg->catalog_publishing_enabled() >> / C<< $msg->catalog_publishing_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. If set, the latest DataScan job result will be published as
+Dataplex Universal Catalog metadata.
+
+=item * C<< $msg->enable_catalog_based_rules() >> / C<< $msg->enable_catalog_based_rules($value) >>
+
+Type: C<Bool>
+
+Optional. If enabled, the data scan will retrieve rules defined in the
+dataplex-types.global.data-rules aspect on all paths of the catalog entry
+corresponding to the BigQuery table resource and all attached glossary
+terms. The path that data-rules aspect is attached on the table entry
+defines the column that the rule will be evaluated against. For glossary
+terms, the path that the terms are attached on the table entry defines the
+column that the rule will be evaluated against. At the start of scan
+execution, the rules reflect the latest state retrieved from the catalog
+entry and any updates on the rules thereafter are ignored for that
+execution. The updates will be reflected from the next execution. Rules
+defined in the datascan must be empty if this field is enabled.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter for selectively running a subset of rules. You can filter
+the request by the name or attribute key-value pairs defined on the rule.
+If not specified, all rules are run. The filter is applicable to both, the
+rules retrieved from catalog and explicitly defined rules in the scan.
+Please see [filter
+syntax](https://docs.cloud.google.com/dataplex/docs/auto-data-quality-overview#rule-filtering)
+for more details.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataQuality::DataQualityResult
+
+The output of a DataQualityScan.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->passed() >> / C<< $msg->passed($value) >>
+
+Type: C<Bool>
+
+Output only. Overall data quality result -- `true` if all rules passed.
+
+=item * C<< $msg->score() >> / C<< $msg->score($value) >>
+
+Type: C<Float>
+
+Output only. The overall data quality score.
+
+The score ranges between [0, 100] (up to two decimal points).
+
+=item * C<< $msg->dimensions() >> / C<< $msg->dimensions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimensionResult>)
+
+Output only. A list of results at the dimension level.
+
+A dimension will have a corresponding `DataQualityDimensionResult` if and
+only if there is at least one rule with the 'dimension' field set to it.
+
+=item * C<< $msg->columns() >> / C<< $msg->columns($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityColumnResult>)
+
+Output only. A list of results at the column level.
+
+A column will have a corresponding `DataQualityColumnResult` if and only if
+there is at least one rule with the 'column' field set to it.
+
+=item * C<< $msg->rules() >> / C<< $msg->rules($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRuleResult>)
+
+Output only. A list of all the rules in a job, and their results.
+
+=item * C<< $msg->row_count() >> / C<< $msg->row_count($value) >>
+
+Type: C<Int64>
+
+Output only. The count of rows processed.
+
+=item * C<< $msg->scanned_data() >> / C<< $msg->scanned_data($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Processing::ScannedData>)
+
+Output only. The data scanned for this result.
+
+=item * C<< $msg->post_scan_actions_result() >> / C<< $msg->post_scan_actions_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityResult::PostScanActionsResult>)
+
+Output only. The result of post scan actions.
+
+=item * C<< $msg->catalog_publishing_status() >> / C<< $msg->catalog_publishing_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DatascansCommon::DataScanCatalogPublishingStatus>)
+
+Output only. The status of publishing the data scan as Dataplex Universal
+Catalog metadata.
+
+=item * C<< $msg->anomaly_detection_generated_assets() >> / C<< $msg->anomaly_detection_generated_assets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityResult::AnomalyDetectionGeneratedAssets>)
+
+Output only. The generated assets for anomaly detection.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataQuality::DataQualityRuleResult
+
+DataQualityRuleResult provides a more detailed, per-rule view of the results.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->rule() >> / C<< $msg->rule($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule>)
+
+Output only. The rule specified in the DataQualitySpec, as is.
+
+=item * C<< $msg->passed() >> / C<< $msg->passed($value) >>
+
+Type: C<Bool>
+
+Output only. Whether the rule passed or failed.
+
+=item * C<< $msg->evaluated_count() >> / C<< $msg->evaluated_count($value) >>
+
+Type: C<Int64>
+
+Output only. The number of rows a rule was evaluated against.
+
+This field is only valid for row-level type rules.
+
+Evaluated count can be configured to either
+
+* include all rows (default) - with `null` rows automatically failing rule
+evaluation, or
+* exclude `null` rows from the `evaluated_count`, by setting
+`ignore_nulls = true`.
+
+This field is not set for rule SqlAssertion.
+
+=item * C<< $msg->passed_count() >> / C<< $msg->passed_count($value) >>
+
+Type: C<Int64>
+
+Output only. The number of rows which passed a rule evaluation.
+
+This field is only valid for row-level type rules.
+
+This field is not set for rule SqlAssertion.
+
+=item * C<< $msg->null_count() >> / C<< $msg->null_count($value) >>
+
+Type: C<Int64>
+
+Output only. The number of rows with null values in the specified column.
+
+=item * C<< $msg->pass_ratio() >> / C<< $msg->pass_ratio($value) >>
+
+Type: C<Double>
+
+Output only. The ratio of B<passed_count / evaluated_count>.
+
+This field is only valid for row-level type rules.
+
+=item * C<< $msg->failing_rows_query() >> / C<< $msg->failing_rows_query($value) >>
+
+Type: C<String>
+
+Output only. The query to find rows that did not pass this rule.
+
+This field is only valid for row-level type rules.
+
+=item * C<< $msg->assertion_row_count() >> / C<< $msg->assertion_row_count($value) >>
+
+Type: C<Int64>
+
+Output only. The number of rows returned by the SQL statement in a SQL
+assertion rule.
+
+This field is only valid for SQL assertion rules.
+
+=item * C<< $msg->debug_queries_result_sets() >> / C<< $msg->debug_queries_result_sets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRuleResult::DebugQueryResultSet>)
+
+Output only. Contains the results of all debug queries for this rule.
+The number of result sets will correspond to the number of
+[debug_queries][google.cloud.dataplex.v1.DataQualityRule.debug_queries].
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimensionResult
+
+DataQualityDimensionResult provides a more detailed, per-dimension view of
+the results.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dimension() >> / C<< $msg->dimension($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimension>)
+
+Output only. The dimension config specified in the DataQualitySpec, as is.
+
+=item * C<< $msg->passed() >> / C<< $msg->passed($value) >>
+
+Type: C<Bool>
+
+Output only. Whether the dimension passed or failed.
+
+=item * C<< $msg->score() >> / C<< $msg->score($value) >>
+
+Type: C<Float>
+
+Output only. The dimension-level data quality score for this data scan job
+if and only if the 'dimension' field is set.
+
+The score ranges between [0, 100] (up to two decimal
+points).
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimension
+
+A dimension captures data quality intent about a defined subset of the rules
+specified.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The dimension name a rule belongs to. Custom dimension name is
+supported with all uppercase letters and maximum length of 30 characters.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule
+
+A rule captures data quality intent about a data source.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->range_expectation() >> / C<< $msg->range_expectation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::RangeExpectation>)
+
+Row-level rule which evaluates whether each column value lies between a
+specified range.
+
+=item * C<< $msg->non_null_expectation() >> / C<< $msg->non_null_expectation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::NonNullExpectation>)
+
+Row-level rule which evaluates whether each column value is null.
+
+=item * C<< $msg->set_expectation() >> / C<< $msg->set_expectation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::SetExpectation>)
+
+Row-level rule which evaluates whether each column value is contained by
+a specified set.
+
+=item * C<< $msg->regex_expectation() >> / C<< $msg->regex_expectation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::RegexExpectation>)
+
+Row-level rule which evaluates whether each column value matches a
+specified regex.
+
+=item * C<< $msg->uniqueness_expectation() >> / C<< $msg->uniqueness_expectation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::UniquenessExpectation>)
+
+Row-level rule which evaluates whether each column value is unique.
+
+=item * C<< $msg->statistic_range_expectation() >> / C<< $msg->statistic_range_expectation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::StatisticRangeExpectation>)
+
+Aggregate rule which evaluates whether the column aggregate
+statistic lies between a specified range.
+
+=item * C<< $msg->row_condition_expectation() >> / C<< $msg->row_condition_expectation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::RowConditionExpectation>)
+
+Row-level rule which evaluates whether each row in a table passes the
+specified condition.
+
+=item * C<< $msg->table_condition_expectation() >> / C<< $msg->table_condition_expectation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::TableConditionExpectation>)
+
+Aggregate rule which evaluates whether the provided expression is true
+for a table.
+
+=item * C<< $msg->sql_assertion() >> / C<< $msg->sql_assertion($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::SqlAssertion>)
+
+Aggregate rule which evaluates the number of rows returned for the
+provided statement. If any rows are returned, this rule fails.
+
+=item * C<< $msg->template_reference() >> / C<< $msg->template_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::TemplateReference>)
+
+Aggregate rule which references a rule template and provides the
+parameters to be substituted in the template. If any rows are returned,
+this rule fails.
+
+=item * C<< $msg->column() >> / C<< $msg->column($value) >>
+
+Type: C<String>
+
+Optional. The unnested column which this rule is evaluated against.
+
+=item * C<< $msg->ignore_null() >> / C<< $msg->ignore_null($value) >>
+
+Type: C<Bool>
+
+Optional. Rows with `null` values will automatically fail a rule, unless
+`ignore_null` is `true`. In that case, such `null` rows are trivially
+considered passing.
+
+This field is only valid for the following type of rules:
+
+* RangeExpectation
+* RegexExpectation
+* SetExpectation
+* UniquenessExpectation
+
+=item * C<< $msg->dimension() >> / C<< $msg->dimension($value) >>
+
+Type: C<String>
+
+Optional. The dimension a rule belongs to. Results are also aggregated at
+the dimension level. Custom dimension name is supported with all uppercase
+letters and maximum length of 30 characters.
+
+=item * C<< $msg->threshold() >> / C<< $msg->threshold($value) >>
+
+Type: C<Double>
+
+Optional. The minimum ratio of B<passing_rows / total_rows> required to
+pass this rule, with a range of [0.0, 1.0].
+
+0 indicates default value (i.e. 1.0).
+
+This field is only valid for row-level type rules.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. A mutable name for the rule.
+
+* The name must contain only letters (a-z, A-Z), numbers (0-9), or
+hyphens (-).
+* The maximum length is 63 characters.
+* Must start with a letter.
+* Must end with a number or a letter.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the rule.
+
+* The maximum length is 1,024 characters.
+
+=item * C<< $msg->suspended() >> / C<< $msg->suspended($value) >>
+
+Type: C<Bool>
+
+Optional. Whether the Rule is active or suspended.
+Default is false.
+
+=item * C<< $msg->attributes() >> / C<< $msg->attributes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::AttributesEntry>)
+
+Optional. Map of attribute name and value linked to the rule. The rules to
+evaluate can be filtered based on attributes provided here and a filter
+expression provided in the DataQualitySpec.filter field.
+
+=item * C<< $msg->rule_source() >> / C<< $msg->rule_source($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::RuleSource>)
+
+Output only. Contains information about the source of the rule and its
+relationship with the BigQuery table, where applicable.
+
+=item * C<< $msg->debug_queries() >> / C<< $msg->debug_queries($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule::DebugQuery>)
+
+Optional. Specifies the debug queries for this rule.
+Currently, only one query is supported, but this may be expanded in the
+future.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataQuality::DataQualityColumnResult
+
+DataQualityColumnResult provides a more detailed, per-column view of
+the results.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->column() >> / C<< $msg->column($value) >>
+
+Type: C<String>
+
+Output only. The column specified in the DataQualityRule.
+
+=item * C<< $msg->score() >> / C<< $msg->score($value) >>
+
+Type: C<Float>
+
+Output only. The column-level data quality score for this data scan job if
+and only if the 'column' field is set.
+
+The score ranges between between [0, 100] (up to two decimal
+points).
+
+=item * C<< $msg->passed() >> / C<< $msg->passed($value) >>
+
+Type: C<Bool>
+
+Output only. Whether the column passed or failed.
+
+=item * C<< $msg->dimensions() >> / C<< $msg->dimensions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityDimensionResult>)
+
+Output only. The dimension-level results for this column.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::DataQuality::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

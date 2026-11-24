@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::Tls;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -95,143 +95,157 @@ EOF
     # Fields for GrpcEndpoint
     # Field: target_uri Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Tls::GrpcEndpoint - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Tls;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Tls::GrpcEndpoint->new(
-        target_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<target_uri>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Tls::ValidationCA ===
     # Fields for ValidationCA
     # Field: grpc_endpoint Type: 11 (.google.cloud.networksecurity.v1.GrpcEndpoint)
     # Field: certificate_provider_instance Type: 11 (.google.cloud.networksecurity.v1.CertificateProviderInstance)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Tls::ValidationCA - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Tls;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Tls::ValidationCA->new(
-        grpc_endpoint => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<grpc_endpoint>
-
-Type: Message (.google.cloud.networksecurity.v1.GrpcEndpoint)
-
-=item * B<certificate_provider_instance>
-
-Type: Message (.google.cloud.networksecurity.v1.CertificateProviderInstance)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Tls::CertificateProviderInstance ===
     # Fields for CertificateProviderInstance
     # Field: plugin_instance Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Tls::CertificateProviderInstance - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Tls;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Tls::CertificateProviderInstance->new(
-        plugin_instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<plugin_instance>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Tls::CertificateProvider ===
     # Fields for CertificateProvider
     # Field: grpc_endpoint Type: 11 (.google.cloud.networksecurity.v1.GrpcEndpoint)
     # Field: certificate_provider_instance Type: 11 (.google.cloud.networksecurity.v1.CertificateProviderInstance)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::Tls::CertificateProvider - Compiled Protocol Buffers message class
+Google::Cloud::Networksecurity::V1::Tls - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/tls.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networksecurity::V1::Tls;
 
-    my $msg = Google::Cloud::Networksecurity::V1::Tls::CertificateProvider->new(
-        grpc_endpoint => $value,
-    );
+    my $msg = Google::Cloud::Networksecurity::V1::Tls::GrpcEndpoint->new({
+        target_uri => $target_uri,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->target_uri();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::Tls::GrpcEndpoint->parse($bytes);
 
-=item * B<grpc_endpoint>
-
-Type: Message (.google.cloud.networksecurity.v1.GrpcEndpoint)
-
-=item * B<certificate_provider_instance>
-
-Type: Message (.google.cloud.networksecurity.v1.CertificateProviderInstance)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Tls - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/tls.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::Tls::GrpcEndpoint
+
+Specification of the GRPC Endpoint.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->target_uri() >> / C<< $msg->target_uri($value) >>
+
+Type: C<String>
+
+Required. The target URI of the gRPC endpoint. Only UDS path is supported,
+and should start with "unix:".
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Tls::ValidationCA
+
+Specification of ValidationCA. Defines the mechanism to obtain the
+Certificate Authority certificate to validate the peer certificate.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->grpc_endpoint() >> / C<< $msg->grpc_endpoint($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Tls::GrpcEndpoint>)
+
+gRPC specific configuration to access the gRPC server to
+obtain the CA certificate.
+
+=item * C<< $msg->certificate_provider_instance() >> / C<< $msg->certificate_provider_instance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Tls::CertificateProviderInstance>)
+
+The certificate provider instance specification that will be passed to
+the data plane, which will be used to load necessary credential
+information.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Tls::CertificateProviderInstance
+
+Specification of a TLS certificate provider instance. Workloads may have one
+or more CertificateProvider instances (plugins) and one of them is enabled
+and configured by specifying this message. Workloads use the values from this
+message to locate and load the CertificateProvider instance configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->plugin_instance() >> / C<< $msg->plugin_instance($value) >>
+
+Type: C<String>
+
+Required. Plugin instance name, used to locate and load CertificateProvider
+instance configuration. Set to "google_cloud_private_spiffe" to use
+Certificate Authority Service certificate provider instance.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Tls::CertificateProvider
+
+Specification of certificate provider. Defines the mechanism to obtain the
+certificate and private key for peer to peer authentication.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->grpc_endpoint() >> / C<< $msg->grpc_endpoint($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Tls::GrpcEndpoint>)
+
+gRPC specific configuration to access the gRPC server to
+obtain the cert and private key.
+
+=item * C<< $msg->certificate_provider_instance() >> / C<< $msg->certificate_provider_instance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Tls::CertificateProviderInstance>)
+
+The certificate provider instance specification that will be passed to
+the data plane, which will be used to load necessary credential
+information.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::Tls::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

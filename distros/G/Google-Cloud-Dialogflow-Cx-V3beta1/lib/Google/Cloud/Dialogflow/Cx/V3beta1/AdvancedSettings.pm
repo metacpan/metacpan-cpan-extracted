@@ -1,0 +1,261 @@
+package Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Cloud::Dialogflow::Cx::V3beta1::Gcs };
+    eval { require Google::Protobuf::Duration };
+    my $descriptor_b64 = <<'EOF';
+Cjpnb29nbGUvY2xvdWQvZGlhbG9nZmxvdy9jeC92M2JldGExL2FkdmFuY2VkX3NldHRpbmdz
+LnByb3RvEiJnb29nbGUuY2xvdWQuZGlhbG9nZmxvdy5jeC52M2JldGExGh9nb29nbGUvYXBp
+L2ZpZWxkX2JlaGF2aW9yLnByb3RvGixnb29nbGUvY2xvdWQvZGlhbG9nZmxvdy9jeC92M2Jl
+dGExL2djcy5wcm90bxoeZ29vZ2xlL3Byb3RvYnVmL2R1cmF0aW9uLnByb3RvIsAKChBBZHZh
+bmNlZFNldHRpbmdzEnMKHGF1ZGlvX2V4cG9ydF9nY3NfZGVzdGluYXRpb24YAiABKAsyMi5n
+b29nbGUuY2xvdWQuZGlhbG9nZmxvdy5jeC52M2JldGExLkdjc0Rlc3RpbmF0aW9uUhlhdWRp
+b0V4cG9ydEdjc0Rlc3RpbmF0aW9uEmwKD3NwZWVjaF9zZXR0aW5ncxgDIAEoCzJDLmdvb2ds
+ZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzYmV0YTEuQWR2YW5jZWRTZXR0aW5ncy5TcGVlY2hT
+ZXR0aW5nc1IOc3BlZWNoU2V0dGluZ3MSZgoNZHRtZl9zZXR0aW5ncxgFIAEoCzJBLmdvb2ds
+ZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzYmV0YTEuQWR2YW5jZWRTZXR0aW5ncy5EdG1mU2V0
+dGluZ3NSDGR0bWZTZXR0aW5ncxJvChBsb2dnaW5nX3NldHRpbmdzGAYgASgLMkQuZ29vZ2xl
+LmNsb3VkLmRpYWxvZ2Zsb3cuY3gudjNiZXRhMS5BZHZhbmNlZFNldHRpbmdzLkxvZ2dpbmdT
+ZXR0aW5nc1IPbG9nZ2luZ1NldHRpbmdzGvUCCg5TcGVlY2hTZXR0aW5ncxI1ChZlbmRwb2lu
+dGVyX3NlbnNpdGl2aXR5GAEgASgFUhVlbmRwb2ludGVyU2Vuc2l0aXZpdHkSRQoRbm9fc3Bl
+ZWNoX3RpbWVvdXQYAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25SD25vU3BlZWNo
+VGltZW91dBJBCh11c2VfdGltZW91dF9iYXNlZF9lbmRwb2ludGluZxgDIAEoCFIadXNlVGlt
+ZW91dEJhc2VkRW5kcG9pbnRpbmcSZwoGbW9kZWxzGAUgAygLMk8uZ29vZ2xlLmNsb3VkLmRp
+YWxvZ2Zsb3cuY3gudjNiZXRhMS5BZHZhbmNlZFNldHRpbmdzLlNwZWVjaFNldHRpbmdzLk1v
+ZGVsc0VudHJ5UgZtb2RlbHMaOQoLTW9kZWxzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoF
+dmFsdWUYAiABKAlSBXZhbHVlOgI4ARqiAgoMRHRtZlNldHRpbmdzEhgKB2VuYWJsZWQYASAB
+KAhSB2VuYWJsZWQSHQoKbWF4X2RpZ2l0cxgCIAEoBVIJbWF4RGlnaXRzEiEKDGZpbmlzaF9k
+aWdpdBgDIAEoCVILZmluaXNoRGlnaXQSWQobaW50ZXJkaWdpdF90aW1lb3V0X2R1cmF0aW9u
+GAYgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uUhlpbnRlcmRpZ2l0VGltZW91dER1
+cmF0aW9uElsKHGVuZHBvaW50aW5nX3RpbWVvdXRfZHVyYXRpb24YByABKAsyGS5nb29nbGUu
+cHJvdG9idWYuRHVyYXRpb25SGmVuZHBvaW50aW5nVGltZW91dER1cmF0aW9uGtIBCg9Mb2dn
+aW5nU2V0dGluZ3MSPAoaZW5hYmxlX3N0YWNrZHJpdmVyX2xvZ2dpbmcYAiABKAhSGGVuYWJs
+ZVN0YWNrZHJpdmVyTG9nZ2luZxI8ChplbmFibGVfaW50ZXJhY3Rpb25fbG9nZ2luZxgDIAEo
+CFIYZW5hYmxlSW50ZXJhY3Rpb25Mb2dnaW5nEkMKHmVuYWJsZV9jb25zZW50X2Jhc2VkX3Jl
+ZGFjdGlvbhgEIAEoCFIbZW5hYmxlQ29uc2VudEJhc2VkUmVkYWN0aW9uQswBCiZjb20uZ29v
+Z2xlLmNsb3VkLmRpYWxvZ2Zsb3cuY3gudjNiZXRhMUIVQWR2YW5jZWRTZXR0aW5nc1Byb3Rv
+UAFaNmNsb3VkLmdvb2dsZS5jb20vZ28vZGlhbG9nZmxvdy9jeC9hcGl2M2JldGExL2N4cGI7
+Y3hwYqICAkRGqgIiR29vZ2xlLkNsb3VkLkRpYWxvZ2Zsb3cuQ3guVjNCZXRhMeoCJkdvb2ds
+ZTo6Q2xvdWQ6OkRpYWxvZ2Zsb3c6OkNYOjpWM2JldGExSr4jCgcSBQ4AgQEBCrwECgEMEgMO
+ABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBB
+cGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBu
+b3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNl
+LgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6
+Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJl
+ZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUK
+IGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJB
+UyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkg
+S0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3Ig
+dGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0
+YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAArCgkKAgMAEgMSACkKCQoCAwES
+AxMANgoJCgIDAhIDFAAoCggKAQgSAxYAPwoJCgIIJRIDFgA/CggKAQgSAxcATQoJCgIICxID
+FwBNCggKAQgSAxgAIgoJCgIIChIDGAAiCggKAQgSAxkANgoJCgIICBIDGQA2CggKAQgSAxoA
+PwoJCgIIARIDGgA/CggKAQgSAxsAIAoJCgIIJBIDGwAgCggKAQgSAxwAPwoJCgIILRIDHAA/
+CtIECgIEABIFKQCBAQEaxAQgSGllcmFyY2hpY2FsIGFkdmFuY2VkIHNldHRpbmdzIGZvciBh
+Z2VudC9mbG93L3BhZ2UvZnVsZmlsbG1lbnQvcGFyYW1ldGVyLgogU2V0dGluZ3MgZXhwb3Nl
+ZCBhdCBsb3dlciBsZXZlbCBvdmVycmlkZXMgdGhlIHNldHRpbmdzIGV4cG9zZWQgYXQgaGln
+aGVyCiBsZXZlbC4gT3ZlcnJpZGluZyBvY2N1cnMgYXQgdGhlIHN1Yi1zZXR0aW5nIGxldmVs
+LiBGb3IgZXhhbXBsZSwgdGhlCiBwbGF5YmFja19pbnRlcnJ1cHRpb25fc2V0dGluZ3MgYXQg
+ZnVsZmlsbG1lbnQgbGV2ZWwgb25seSBvdmVycmlkZXMgdGhlCiBwbGF5YmFja19pbnRlcnJ1
+cHRpb25fc2V0dGluZ3MgYXQgdGhlIGFnZW50IGxldmVsLCBsZWF2aW5nIG90aGVyIHNldHRp
+bmdzCiBhdCB0aGUgYWdlbnQgbGV2ZWwgdW5jaGFuZ2VkLgoKIERUTUYgc2V0dGluZ3MgZG9l
+cyBub3Qgb3ZlcnJpZGUgZWFjaCBvdGhlci4gRFRNRiBzZXR0aW5ncyBzZXQgYXQgZGlmZmVy
+ZW50CiBsZXZlbHMgZGVmaW5lIERUTUYgZGV0ZWN0aW9ucyBydW5uaW5nIGluIHBhcmFsbGVs
+LgoKIEhpZXJhcmNoeTogQWdlbnQtPkZsb3ctPlBhZ2UtPkZ1bGZpbGxtZW50L1BhcmFtZXRl
+ci4KCgoKAwQAARIDKQgYCj0KBAQAAwASBCsCPQMaLyBEZWZpbmUgYmVoYXZpb3JzIG9mIHNw
+ZWVjaCB0byB0ZXh0IGRldGVjdGlvbi4KCgwKBQQAAwABEgMrChgKZgoGBAADAAIAEgMuBCUa
+VyBTZW5zaXRpdml0eSBvZiB0aGUgc3BlZWNoIG1vZGVsIHRoYXQgZGV0ZWN0cyB0aGUgZW5k
+IG9mIHNwZWVjaC4KIFNjYWxlIGZyb20gMCB0byAxMDAuCgoOCgcEAAMAAgAFEgMuBAkKDgoH
+BAADAAIAARIDLgogCg4KBwQAAwACAAMSAy4jJAo0CgYEAAMAAgESAzEEMxolIFRpbWVvdXQg
+YmVmb3JlIGRldGVjdGluZyBubyBzcGVlY2guCgoOCgcEAAMAAgEGEgMxBBwKDgoHBAADAAIB
+ARIDMR0uCg4KBwQAAwACAQMSAzExMgpxCgYEAAMAAgISAzUEKxpiIFVzZSB0aW1lb3V0IGJh
+c2VkIGVuZHBvaW50aW5nLCBpbnRlcnByZXRpbmcgZW5kcG9pbnRlciBzZW5zaXRpdml0eSBh
+cwogc2Vjb25kcyBvZiB0aW1lb3V0IHZhbHVlLgoKDgoHBAADAAICBRIDNQQICg4KBwQAAwAC
+AgESAzUJJgoOCgcEAAMAAgIDEgM1KSoKkQIKBgQAAwACAxIDPAQjGoECIE1hcHBpbmcgZnJv
+bSBsYW5ndWFnZSB0byBTcGVlY2gtdG8tVGV4dCBtb2RlbC4gVGhlIG1hcHBlZCBTcGVlY2gt
+dG8tVGV4dAogbW9kZWwgd2lsbCBiZSBzZWxlY3RlZCBmb3IgcmVxdWVzdHMgZnJvbSBpdHMg
+Y29ycmVzcG9uZGluZyBsYW5ndWFnZS4KIEZvciBtb3JlIGluZm9ybWF0aW9uLCBzZWUKIFtT
+cGVlY2gKIG1vZGVsc10oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2RpYWxvZ2Zsb3cvY3gv
+ZG9jcy9jb25jZXB0L3NwZWVjaC1tb2RlbHMpLgoKDgoHBAADAAIDBhIDPAQXCg4KBwQAAwAC
+AwESAzwYHgoOCgcEAAMAAgMDEgM8ISIKRgoEBAADARIEQAJUAxo4IERlZmluZSBiZWhhdmlv
+cnMgZm9yIERUTUYgKGR1YWwgdG9uZSBtdWx0aSBmcmVxdWVuY3kpLgoKDAoFBAADAQESA0AK
+FgqKAwoGBAADAQIAEgNHBBUa+gIgSWYgdHJ1ZSwgaW5jb21pbmcgYXVkaW8gaXMgcHJvY2Vz
+c2VkIGZvciBEVE1GIChkdWFsIHRvbmUgbXVsdGkgZnJlcXVlbmN5KQogZXZlbnRzLiBGb3Ig
+ZXhhbXBsZSwgaWYgdGhlIGNhbGxlciBwcmVzc2VzIGEgYnV0dG9uIG9uIHRoZWlyIHRlbGVw
+aG9uZQoga2V5cGFkIGFuZCBEVE1GIHByb2Nlc3NpbmcgaXMgZW5hYmxlZCwgRGlhbG9nZmxv
+dyB3aWxsIGRldGVjdCB0aGUKIGV2ZW50IChlLmcuIGEgIjMiIHdhcyBwcmVzc2VkKSBpbiB0
+aGUgaW5jb21pbmcgYXVkaW8gYW5kIHBhc3MgdGhlIGV2ZW50CiB0byB0aGUgYm90IHRvIGRy
+aXZlIGJ1c2luZXNzIGxvZ2ljIChlLmcuIHdoZW4gMyBpcyBwcmVzc2VkLCByZXR1cm4gdGhl
+CiBhY2NvdW50IGJhbGFuY2UpLgoKDgoHBAADAQIABRIDRwQICg4KBwQAAwECAAESA0cJEAoO
+CgcEAAMBAgADEgNHExQKKwoGBAADAQIBEgNKBBkaHCBNYXggbGVuZ3RoIG9mIERUTUYgZGln
+aXRzLgoKDgoHBAADAQIBBRIDSgQJCg4KBwQAAwECAQESA0oKFAoOCgcEAAMBAgEDEgNKFxgK
+QQoGBAADAQICEgNNBBwaMiBUaGUgZGlnaXQgdGhhdCB0ZXJtaW5hdGVzIGEgRFRNRiBkaWdp
+dCBzZXF1ZW5jZS4KCg4KBwQAAwECAgUSA00ECgoOCgcEAAMBAgIBEgNNCxcKDgoHBAADAQIC
+AxIDTRobCk0KBgQAAwECAxIDUAQ9Gj4gSW50ZXJkaWdpdCB0aW1lb3V0IHNldHRpbmcgZm9y
+IG1hdGNoaW5nIGR0bWYgaW5wdXQgdG8gcmVnZXguCgoOCgcEAAMBAgMGEgNQBBwKDgoHBAAD
+AQIDARIDUB04Cg4KBwQAAwECAwMSA1A7PApLCgYEAAMBAgQSA1MEPho8IEVuZHBvaW50IHRp
+bWVvdXQgc2V0dGluZyBmb3IgbWF0Y2hpbmcgZHRtZiBpbnB1dCB0byByZWdleC4KCg4KBwQA
+AwECBAYSA1MEHAoOCgcEAAMBAgQBEgNTHTkKDgoHBAADAQIEAxIDUzw9CiwKBAQAAwISBFcC
+YgMaHiBEZWZpbmUgYmVoYXZpb3JzIG9uIGxvZ2dpbmcuCgoMCgUEAAMCARIDVwoZCi4KBgQA
+AwICABIDWQQoGh8gRW5hYmxlcyBHb29nbGUgQ2xvdWQgTG9nZ2luZy4KCg4KBwQAAwICAAUS
+A1kECAoOCgcEAAMCAgABEgNZCSMKDgoHBAADAgIAAxIDWSYnCjAKBgQAAwICARIDXAQoGiEg
+RW5hYmxlcyBERiBJbnRlcmFjdGlvbiBsb2dnaW5nLgoKDgoHBAADAgIBBRIDXAQICg4KBwQA
+AwICAQESA1wJIwoOCgcEAAMCAgEDEgNcJicK1AEKBgQAAwICAhIDYQQsGsQBIEVuYWJsZXMg
+Y29uc2VudC1iYXNlZCBlbmQtdXNlciBpbnB1dCByZWRhY3Rpb24sIGlmIHRydWUsIGEgcHJl
+LWRlZmluZWQKIHNlc3Npb24gcGFyYW1ldGVyIGAkc2Vzc2lvbi5wYXJhbXMuY29udmVyc2F0
+aW9uLXJlZGFjdGlvbmAgd2lsbCBiZQogdXNlZCB0byBkZXRlcm1pbmUgaWYgdGhlIHV0dGVy
+YW5jZSBzaG91bGQgYmUgcmVkYWN0ZWQuCgoOCgcEAAMCAgIFEgNhBAgKDgoHBAADAgICARID
+YQknCg4KBwQAAwICAgMSA2EqKwq4AQoEBAACABIDaQIyGqoBIElmIHByZXNlbnQsIGluY29t
+aW5nIGF1ZGlvIGlzIGV4cG9ydGVkIGJ5IERpYWxvZ2Zsb3cgdG8gdGhlIGNvbmZpZ3VyZWQK
+IEdvb2dsZSBDbG91ZCBTdG9yYWdlIGRlc3RpbmF0aW9uLgogRXhwb3NlZCBhdCB0aGUgZm9s
+bG93aW5nIGxldmVsczoKIC0gQWdlbnQgbGV2ZWwKIC0gRmxvdyBsZXZlbAoKDAoFBAACAAYS
+A2kCEAoMCgUEAAIAARIDaREtCgwKBQQAAgADEgNpMDEKlgEKBAQAAgESA3ECJRqIASBTZXR0
+aW5ncyBmb3Igc3BlZWNoIHRvIHRleHQgZGV0ZWN0aW9uLgogRXhwb3NlZCBhdCB0aGUgZm9s
+bG93aW5nIGxldmVsczoKIC0gQWdlbnQgbGV2ZWwKIC0gRmxvdyBsZXZlbAogLSBQYWdlIGxl
+dmVsCiAtIFBhcmFtZXRlciBsZXZlbAoKDAoFBAACAQYSA3ECEAoMCgUEAAIBARIDcREgCgwK
+BQQAAgEDEgNxIyQKggEKBAQAAgISA3kCIRp1IFNldHRpbmdzIGZvciBEVE1GLgogRXhwb3Nl
+ZCBhdCB0aGUgZm9sbG93aW5nIGxldmVsczoKIC0gQWdlbnQgbGV2ZWwKIC0gRmxvdyBsZXZl
+bAogLSBQYWdlIGxldmVsCiAtIFBhcmFtZXRlciBsZXZlbC4KCgwKBQQAAgIGEgN5Ag4KDAoF
+BAACAgESA3kPHAoMCgUEAAICAxIDeR8gCroBCgQEAAIDEgSAAQInGqsBIFNldHRpbmdzIGZv
+ciBsb2dnaW5nLgogU2V0dGluZ3MgZm9yIERpYWxvZ2Zsb3cgSGlzdG9yeSwgQ29udGFjdCBD
+ZW50ZXIgbWVzc2FnZXMsIFN0YWNrRHJpdmVyIGxvZ3MsCiBhbmQgc3BlZWNoIGxvZ2dpbmcu
+CiBFeHBvc2VkIGF0IHRoZSBmb2xsb3dpbmcgbGV2ZWxzOgogLSBBZ2VudCBsZXZlbC4KCg0K
+BQQAAgMGEgSAAQIRCg0KBQQAAgMBEgSAARIiCg0KBQQAAgMDEgSAASUmYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings::AdvancedSettings ===
+    # Fields for AdvancedSettings
+    # Field: audio_export_gcs_destination Type: 11 (.google.cloud.dialogflow.cx.v3beta1.GcsDestination)
+    # Field: speech_settings Type: 11 (.google.cloud.dialogflow.cx.v3beta1.AdvancedSettings.SpeechSettings)
+    # Field: dtmf_settings Type: 11 (.google.cloud.dialogflow.cx.v3beta1.AdvancedSettings.DtmfSettings)
+    # Field: logging_settings Type: 11 (.google.cloud.dialogflow.cx.v3beta1.AdvancedSettings.LoggingSettings)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings - Compiled Protocol Buffers messages for google/cloud/dialogflow/cx/v3beta1/advanced_settings.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings;
+
+    my $msg = Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings::AdvancedSettings->new({
+        audio_export_gcs_destination => $audio_export_gcs_destination,
+        speech_settings => $speech_settings,
+        dtmf_settings => $dtmf_settings,
+        logging_settings => $logging_settings,
+    });
+
+    # Read or update a field
+    my $val = $msg->audio_export_gcs_destination();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings::AdvancedSettings->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dialogflow/cx/v3beta1/advanced_settings.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings::AdvancedSettings
+
+Hierarchical advanced settings for agent/flow/page/fulfillment/parameter.
+Settings exposed at lower level overrides the settings exposed at higher
+level. Overriding occurs at the sub-setting level. For example, the
+playback_interruption_settings at fulfillment level only overrides the
+playback_interruption_settings at the agent level, leaving other settings
+at the agent level unchanged.
+
+DTMF settings does not override each other. DTMF settings set at different
+levels define DTMF detections running in parallel.
+
+Hierarchy: Agent->Flow->Page->Fulfillment/Parameter.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->audio_export_gcs_destination() >> / C<< $msg->audio_export_gcs_destination($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3beta1::Gcs::GcsDestination>)
+
+If present, incoming audio is exported by Dialogflow to the configured
+Google Cloud Storage destination.
+Exposed at the following levels:
+- Agent level
+- Flow level
+
+=item * C<< $msg->speech_settings() >> / C<< $msg->speech_settings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings::AdvancedSettings::SpeechSettings>)
+
+Settings for speech to text detection.
+Exposed at the following levels:
+- Agent level
+- Flow level
+- Page level
+- Parameter level
+
+=item * C<< $msg->dtmf_settings() >> / C<< $msg->dtmf_settings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings::AdvancedSettings::DtmfSettings>)
+
+Settings for DTMF.
+Exposed at the following levels:
+- Agent level
+- Flow level
+- Page level
+- Parameter level.
+
+=item * C<< $msg->logging_settings() >> / C<< $msg->logging_settings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings::AdvancedSettings::LoggingSettings>)
+
+Settings for logging.
+Settings for Dialogflow History, Contact Center messages, StackDriver logs,
+and speech logging.
+Exposed at the following levels:
+- Agent level.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dialogflow::Cx::V3beta1::AdvancedSettings::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

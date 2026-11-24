@@ -12,6 +12,7 @@ my %WriteMakefileArgs = (
   "BUILD_REQUIRES" => {
     "Alien::Build" => "0.32",
     "Alien::Build::MM" => "0.32",
+    "Archive::Tar" => "3.12",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.018",
+  "VERSION" => "0.019",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Alien::Base" => "0.038",
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
+  "Archive::Tar" => "3.12",
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,
   "Test::Alien" => 0,

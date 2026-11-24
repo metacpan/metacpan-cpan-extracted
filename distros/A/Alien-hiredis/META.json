@@ -28,6 +28,7 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
+            "Archive::Tar" : "3.12",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -67,7 +68,7 @@
    "provides" : {
       "Alien::hiredis" : {
          "file" : "lib/Alien/hiredis.pm",
-         "version" : "0.018"
+         "version" : "0.019"
       }
    },
    "release_status" : "stable",
@@ -85,7 +86,7 @@
          "url" : "irc://irc.perl.org/#redis"
       }
    },
-   "version" : "0.018",
+   "version" : "0.019",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.33",
       "requires" : {

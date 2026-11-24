@@ -1,0 +1,1275 @@
+package Google::Cloud::Videointelligence::V1beta2::VideoIntelligence;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Longrunning::Operations };
+    eval { require Google::Protobuf::Duration };
+    eval { require Google::Protobuf::Timestamp };
+    eval { require Google::Rpc::Status };
+    my $descriptor_b64 = <<'EOF';
+Cj9nb29nbGUvY2xvdWQvdmlkZW9pbnRlbGxpZ2VuY2UvdjFiZXRhMi92aWRlb19pbnRlbGxp
+Z2VuY2UucHJvdG8SJmdvb2dsZS5jbG91ZC52aWRlb2ludGVsbGlnZW5jZS52MWJldGEyGhxn
+b29nbGUvYXBpL2Fubm90YXRpb25zLnByb3RvGhdnb29nbGUvYXBpL2NsaWVudC5wcm90bxof
+Z29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90bxojZ29vZ2xlL2xvbmdydW5uaW5nL29w
+ZXJhdGlvbnMucHJvdG8aHmdvb2dsZS9wcm90b2J1Zi9kdXJhdGlvbi5wcm90bxofZ29vZ2xl
+L3Byb3RvYnVmL3RpbWVzdGFtcC5wcm90bxoXZ29vZ2xlL3JwYy9zdGF0dXMucHJvdG8izwIK
+FEFubm90YXRlVmlkZW9SZXF1ZXN0EhsKCWlucHV0X3VyaRgBIAEoCVIIaW5wdXRVcmkSIwoN
+aW5wdXRfY29udGVudBgGIAEoDFIMaW5wdXRDb250ZW50ElAKCGZlYXR1cmVzGAIgAygOMi8u
+Z29vZ2xlLmNsb3VkLnZpZGVvaW50ZWxsaWdlbmNlLnYxYmV0YTIuRmVhdHVyZUID4EECUghm
+ZWF0dXJlcxJZCg12aWRlb19jb250ZXh0GAMgASgLMjQuZ29vZ2xlLmNsb3VkLnZpZGVvaW50
+ZWxsaWdlbmNlLnYxYmV0YTIuVmlkZW9Db250ZXh0Ugx2aWRlb0NvbnRleHQSIgoKb3V0cHV0
+X3VyaRgEIAEoCUID4EEBUglvdXRwdXRVcmkSJAoLbG9jYXRpb25faWQYBSABKAlCA+BBAVIK
+bG9jYXRpb25JZCLeBAoMVmlkZW9Db250ZXh0ElAKCHNlZ21lbnRzGAEgAygLMjQuZ29vZ2xl
+LmNsb3VkLnZpZGVvaW50ZWxsaWdlbmNlLnYxYmV0YTIuVmlkZW9TZWdtZW50UghzZWdtZW50
+cxJyChZsYWJlbF9kZXRlY3Rpb25fY29uZmlnGAIgASgLMjwuZ29vZ2xlLmNsb3VkLnZpZGVv
+aW50ZWxsaWdlbmNlLnYxYmV0YTIuTGFiZWxEZXRlY3Rpb25Db25maWdSFGxhYmVsRGV0ZWN0
+aW9uQ29uZmlnEoIBChxzaG90X2NoYW5nZV9kZXRlY3Rpb25fY29uZmlnGAMgASgLMkEuZ29v
+Z2xlLmNsb3VkLnZpZGVvaW50ZWxsaWdlbmNlLnYxYmV0YTIuU2hvdENoYW5nZURldGVjdGlv
+bkNvbmZpZ1IZc2hvdENoYW5nZURldGVjdGlvbkNvbmZpZxKRAQohZXhwbGljaXRfY29udGVu
+dF9kZXRlY3Rpb25fY29uZmlnGAQgASgLMkYuZ29vZ2xlLmNsb3VkLnZpZGVvaW50ZWxsaWdl
+bmNlLnYxYmV0YTIuRXhwbGljaXRDb250ZW50RGV0ZWN0aW9uQ29uZmlnUh5leHBsaWNpdENv
+bnRlbnREZXRlY3Rpb25Db25maWcSbwoVZmFjZV9kZXRlY3Rpb25fY29uZmlnGAUgASgLMjsu
+Z29vZ2xlLmNsb3VkLnZpZGVvaW50ZWxsaWdlbmNlLnYxYmV0YTIuRmFjZURldGVjdGlvbkNv
+bmZpZ1ITZmFjZURldGVjdGlvbkNvbmZpZyLHAQoUTGFiZWxEZXRlY3Rpb25Db25maWcSbAoU
+bGFiZWxfZGV0ZWN0aW9uX21vZGUYASABKA4yOi5nb29nbGUuY2xvdWQudmlkZW9pbnRlbGxp
+Z2VuY2UudjFiZXRhMi5MYWJlbERldGVjdGlvbk1vZGVSEmxhYmVsRGV0ZWN0aW9uTW9kZRIr
+ChFzdGF0aW9uYXJ5X2NhbWVyYRgCIAEoCFIQc3RhdGlvbmFyeUNhbWVyYRIUCgVtb2RlbBgD
+IAEoCVIFbW9kZWwiMQoZU2hvdENoYW5nZURldGVjdGlvbkNvbmZpZxIUCgVtb2RlbBgBIAEo
+CVIFbW9kZWwiNgoeRXhwbGljaXRDb250ZW50RGV0ZWN0aW9uQ29uZmlnEhQKBW1vZGVsGAEg
+ASgJUgVtb2RlbCJhChNGYWNlRGV0ZWN0aW9uQ29uZmlnEhQKBW1vZGVsGAEgASgJUgVtb2Rl
+bBI0ChZpbmNsdWRlX2JvdW5kaW5nX2JveGVzGAIgASgIUhRpbmNsdWRlQm91bmRpbmdCb3hl
+cyKYAQoMVmlkZW9TZWdtZW50EkUKEXN0YXJ0X3RpbWVfb2Zmc2V0GAEgASgLMhkuZ29vZ2xl
+LnByb3RvYnVmLkR1cmF0aW9uUg9zdGFydFRpbWVPZmZzZXQSQQoPZW5kX3RpbWVfb2Zmc2V0
+GAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uUg1lbmRUaW1lT2Zmc2V0In4KDExh
+YmVsU2VnbWVudBJOCgdzZWdtZW50GAEgASgLMjQuZ29vZ2xlLmNsb3VkLnZpZGVvaW50ZWxs
+aWdlbmNlLnYxYmV0YTIuVmlkZW9TZWdtZW50UgdzZWdtZW50Eh4KCmNvbmZpZGVuY2UYAiAB
+KAJSCmNvbmZpZGVuY2UiaAoKTGFiZWxGcmFtZRI6Cgt0aW1lX29mZnNldBgBIAEoCzIZLmdv
+b2dsZS5wcm90b2J1Zi5EdXJhdGlvblIKdGltZU9mZnNldBIeCgpjb25maWRlbmNlGAIgASgC
+Ugpjb25maWRlbmNlImwKBkVudGl0eRIbCgllbnRpdHlfaWQYASABKAlSCGVudGl0eUlkEiAK
+C2Rlc2NyaXB0aW9uGAIgASgJUgtkZXNjcmlwdGlvbhIjCg1sYW5ndWFnZV9jb2RlGAMgASgJ
+UgxsYW5ndWFnZUNvZGUi1AIKD0xhYmVsQW5ub3RhdGlvbhJGCgZlbnRpdHkYASABKAsyLi5n
+b29nbGUuY2xvdWQudmlkZW9pbnRlbGxpZ2VuY2UudjFiZXRhMi5FbnRpdHlSBmVudGl0eRJb
+ChFjYXRlZ29yeV9lbnRpdGllcxgCIAMoCzIuLmdvb2dsZS5jbG91ZC52aWRlb2ludGVsbGln
+ZW5jZS52MWJldGEyLkVudGl0eVIQY2F0ZWdvcnlFbnRpdGllcxJQCghzZWdtZW50cxgDIAMo
+CzI0Lmdvb2dsZS5jbG91ZC52aWRlb2ludGVsbGlnZW5jZS52MWJldGEyLkxhYmVsU2VnbWVu
+dFIIc2VnbWVudHMSSgoGZnJhbWVzGAQgAygLMjIuZ29vZ2xlLmNsb3VkLnZpZGVvaW50ZWxs
+aWdlbmNlLnYxYmV0YTIuTGFiZWxGcmFtZVIGZnJhbWVzIr0BChRFeHBsaWNpdENvbnRlbnRG
+cmFtZRI6Cgt0aW1lX29mZnNldBgBIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvblIK
+dGltZU9mZnNldBJpChZwb3Jub2dyYXBoeV9saWtlbGlob29kGAIgASgOMjIuZ29vZ2xlLmNs
+b3VkLnZpZGVvaW50ZWxsaWdlbmNlLnYxYmV0YTIuTGlrZWxpaG9vZFIVcG9ybm9ncmFwaHlM
+aWtlbGlob29kInEKGUV4cGxpY2l0Q29udGVudEFubm90YXRpb24SVAoGZnJhbWVzGAEgAygL
+MjwuZ29vZ2xlLmNsb3VkLnZpZGVvaW50ZWxsaWdlbmNlLnYxYmV0YTIuRXhwbGljaXRDb250
+ZW50RnJhbWVSBmZyYW1lcyJrChVOb3JtYWxpemVkQm91bmRpbmdCb3gSEgoEbGVmdBgBIAEo
+AlIEbGVmdBIQCgN0b3AYAiABKAJSA3RvcBIUCgVyaWdodBgDIAEoAlIFcmlnaHQSFgoGYm90
+dG9tGAQgASgCUgZib3R0b20iXQoLRmFjZVNlZ21lbnQSTgoHc2VnbWVudBgBIAEoCzI0Lmdv
+b2dsZS5jbG91ZC52aWRlb2ludGVsbGlnZW5jZS52MWJldGEyLlZpZGVvU2VnbWVudFIHc2Vn
+bWVudCLCAQoJRmFjZUZyYW1lEnkKGW5vcm1hbGl6ZWRfYm91bmRpbmdfYm94ZXMYASADKAsy
+PS5nb29nbGUuY2xvdWQudmlkZW9pbnRlbGxpZ2VuY2UudjFiZXRhMi5Ob3JtYWxpemVkQm91
+bmRpbmdCb3hSF25vcm1hbGl6ZWRCb3VuZGluZ0JveGVzEjoKC3RpbWVfb2Zmc2V0GAIgASgL
+MhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uUgp0aW1lT2Zmc2V0IsoBCg5GYWNlQW5ub3Rh
+dGlvbhIcCgl0aHVtYm5haWwYASABKAxSCXRodW1ibmFpbBJPCghzZWdtZW50cxgCIAMoCzIz
+Lmdvb2dsZS5jbG91ZC52aWRlb2ludGVsbGlnZW5jZS52MWJldGEyLkZhY2VTZWdtZW50Ughz
+ZWdtZW50cxJJCgZmcmFtZXMYAyADKAsyMS5nb29nbGUuY2xvdWQudmlkZW9pbnRlbGxpZ2Vu
+Y2UudjFiZXRhMi5GYWNlRnJhbWVSBmZyYW1lcyLsBQoWVmlkZW9Bbm5vdGF0aW9uUmVzdWx0
+cxIbCglpbnB1dF91cmkYASABKAlSCGlucHV0VXJpEnMKGXNlZ21lbnRfbGFiZWxfYW5ub3Rh
+dGlvbnMYAiADKAsyNy5nb29nbGUuY2xvdWQudmlkZW9pbnRlbGxpZ2VuY2UudjFiZXRhMi5M
+YWJlbEFubm90YXRpb25SF3NlZ21lbnRMYWJlbEFubm90YXRpb25zEm0KFnNob3RfbGFiZWxf
+YW5ub3RhdGlvbnMYAyADKAsyNy5nb29nbGUuY2xvdWQudmlkZW9pbnRlbGxpZ2VuY2UudjFi
+ZXRhMi5MYWJlbEFubm90YXRpb25SFHNob3RMYWJlbEFubm90YXRpb25zEm8KF2ZyYW1lX2xh
+YmVsX2Fubm90YXRpb25zGAQgAygLMjcuZ29vZ2xlLmNsb3VkLnZpZGVvaW50ZWxsaWdlbmNl
+LnYxYmV0YTIuTGFiZWxBbm5vdGF0aW9uUhVmcmFtZUxhYmVsQW5ub3RhdGlvbnMSYQoQZmFj
+ZV9hbm5vdGF0aW9ucxgFIAMoCzI2Lmdvb2dsZS5jbG91ZC52aWRlb2ludGVsbGlnZW5jZS52
+MWJldGEyLkZhY2VBbm5vdGF0aW9uUg9mYWNlQW5ub3RhdGlvbnMSXwoQc2hvdF9hbm5vdGF0
+aW9ucxgGIAMoCzI0Lmdvb2dsZS5jbG91ZC52aWRlb2ludGVsbGlnZW5jZS52MWJldGEyLlZp
+ZGVvU2VnbWVudFIPc2hvdEFubm90YXRpb25zEnIKE2V4cGxpY2l0X2Fubm90YXRpb24YByAB
+KAsyQS5nb29nbGUuY2xvdWQudmlkZW9pbnRlbGxpZ2VuY2UudjFiZXRhMi5FeHBsaWNpdENv
+bnRlbnRBbm5vdGF0aW9uUhJleHBsaWNpdEFubm90YXRpb24SKAoFZXJyb3IYCSABKAsyEi5n
+b29nbGUucnBjLlN0YXR1c1IFZXJyb3IihgEKFUFubm90YXRlVmlkZW9SZXNwb25zZRJtChJh
+bm5vdGF0aW9uX3Jlc3VsdHMYASADKAsyPi5nb29nbGUuY2xvdWQudmlkZW9pbnRlbGxpZ2Vu
+Y2UudjFiZXRhMi5WaWRlb0Fubm90YXRpb25SZXN1bHRzUhFhbm5vdGF0aW9uUmVzdWx0cyLZ
+AQoXVmlkZW9Bbm5vdGF0aW9uUHJvZ3Jlc3MSGwoJaW5wdXRfdXJpGAEgASgJUghpbnB1dFVy
+aRIpChBwcm9ncmVzc19wZXJjZW50GAIgASgFUg9wcm9ncmVzc1BlcmNlbnQSOQoKc3RhcnRf
+dGltZRgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCXN0YXJ0VGltZRI7Cgt1
+cGRhdGVfdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCnVwZGF0ZVRp
+bWUiiQEKFUFubm90YXRlVmlkZW9Qcm9ncmVzcxJwChNhbm5vdGF0aW9uX3Byb2dyZXNzGAEg
+AygLMj8uZ29vZ2xlLmNsb3VkLnZpZGVvaW50ZWxsaWdlbmNlLnYxYmV0YTIuVmlkZW9Bbm5v
+dGF0aW9uUHJvZ3Jlc3NSEmFubm90YXRpb25Qcm9ncmVzcyqGAQoHRmVhdHVyZRIXChNGRUFU
+VVJFX1VOU1BFQ0lGSUVEEAASEwoPTEFCRUxfREVURUNUSU9OEAESGQoVU0hPVF9DSEFOR0Vf
+REVURUNUSU9OEAISHgoaRVhQTElDSVRfQ09OVEVOVF9ERVRFQ1RJT04QAxISCg5GQUNFX0RF
+VEVDVElPThAEKnIKEkxhYmVsRGV0ZWN0aW9uTW9kZRIkCiBMQUJFTF9ERVRFQ1RJT05fTU9E
+RV9VTlNQRUNJRklFRBAAEg0KCVNIT1RfTU9ERRABEg4KCkZSQU1FX01PREUQAhIXChNTSE9U
+X0FORF9GUkFNRV9NT0RFEAMqdAoKTGlrZWxpaG9vZBIaChZMSUtFTElIT09EX1VOU1BFQ0lG
+SUVEEAASEQoNVkVSWV9VTkxJS0VMWRABEgwKCFVOTElLRUxZEAISDAoIUE9TU0lCTEUQAxIK
+CgZMSUtFTFkQBBIPCgtWRVJZX0xJS0VMWRAFMsoCChhWaWRlb0ludGVsbGlnZW5jZVNlcnZp
+Y2US1wEKDUFubm90YXRlVmlkZW8SPC5nb29nbGUuY2xvdWQudmlkZW9pbnRlbGxpZ2VuY2Uu
+djFiZXRhMi5Bbm5vdGF0ZVZpZGVvUmVxdWVzdBodLmdvb2dsZS5sb25ncnVubmluZy5PcGVy
+YXRpb24iaYLT5JMCHSIYL3YxYmV0YTIvdmlkZW9zOmFubm90YXRlOgEq2kESaW5wdXRfdXJp
+LGZlYXR1cmVzykEuChVBbm5vdGF0ZVZpZGVvUmVzcG9uc2USFUFubm90YXRlVmlkZW9Qcm9n
+cmVzcxpUykEgdmlkZW9pbnRlbGxpZ2VuY2UuZ29vZ2xlYXBpcy5jb23SQS5odHRwczovL3d3
+dy5nb29nbGVhcGlzLmNvbS9hdXRoL2Nsb3VkLXBsYXRmb3JtQqUCCipjb20uZ29vZ2xlLmNs
+b3VkLnZpZGVvaW50ZWxsaWdlbmNlLnYxYmV0YTJCHVZpZGVvSW50ZWxsaWdlbmNlU2Vydmlj
+ZVByb3RvUAFaWGNsb3VkLmdvb2dsZS5jb20vZ28vdmlkZW9pbnRlbGxpZ2VuY2UvYXBpdjFi
+ZXRhMi92aWRlb2ludGVsbGlnZW5jZXBiO3ZpZGVvaW50ZWxsaWdlbmNlcGKqAiZHb29nbGUu
+Q2xvdWQuVmlkZW9JbnRlbGxpZ2VuY2UuVjFCZXRhMsoCJkdvb2dsZVxDbG91ZFxWaWRlb0lu
+dGVsbGlnZW5jZVxWMWJldGEy6gIpR29vZ2xlOjpDbG91ZDo6VmlkZW9JbnRlbGxpZ2VuY2U6
+OlYxYmV0YTJKrm0KBxIFDwCZAwEKvQQKAQwSAw8AEjKyBCBDb3B5cmlnaHQgMjAyNSBHb29n
+bGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIu
+MCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBp
+biBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkg
+b2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2Vz
+L0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFn
+cmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExp
+Y2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FS
+UkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBp
+bXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292
+ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2Uu
+CgoKCAoBAhIDEQAvCgkKAgMAEgMTACYKCQoCAwESAxQAIQoJCgIDAhIDFQApCgkKAgMDEgMW
+AC0KCQoCAwQSAxcAKAoJCgIDBRIDGAApCgkKAgMGEgMZACEKCAoBCBIDGwBDCgkKAgglEgMb
+AEMKCAoBCBIDHABvCgkKAggLEgMcAG8KCAoBCBIDHQAiCgkKAggKEgMdACIKCAoBCBIDHgA+
+CgkKAggIEgMeAD4KCAoBCBIDHwBDCgkKAggBEgMfAEMKCAoBCBIDIABDCgkKAggpEgMgAEMK
+CAoBCBIDIQBCCgkKAggtEgMhAEIKSgoCBgASBCQAOQEaPiBTZXJ2aWNlIHRoYXQgaW1wbGVt
+ZW50cyBHb29nbGUgQ2xvdWQgVmlkZW8gSW50ZWxsaWdlbmNlIEFQSS4KCgoKAwYAARIDJAgg
+CgoKAwYAAxIDJQJICgwKBQYAA5kIEgMlAkgKCwoDBgADEgQmAic3Cg0KBQYAA5oIEgQmAic3
+CpsCCgQGAAIAEgQtAjgDGowCIFBlcmZvcm1zIGFzeW5jaHJvbm91cyB2aWRlbyBhbm5vdGF0
+aW9uLiBQcm9ncmVzcyBhbmQgcmVzdWx0cyBjYW4gYmUKIHJldHJpZXZlZCB0aHJvdWdoIHRo
+ZSBgZ29vZ2xlLmxvbmdydW5uaW5nLk9wZXJhdGlvbnNgIGludGVyZmFjZS4KIGBPcGVyYXRp
+b24ubWV0YWRhdGFgIGNvbnRhaW5zIGBBbm5vdGF0ZVZpZGVvUHJvZ3Jlc3NgIChwcm9ncmVz
+cykuCiBgT3BlcmF0aW9uLnJlc3BvbnNlYCBjb250YWlucyBgQW5ub3RhdGVWaWRlb1Jlc3Bv
+bnNlYCAocmVzdWx0cykuCgoMCgUGAAIAARIDLQYTCgwKBQYAAgACEgMtFCgKDAoFBgACAAMS
+Ay4PKwoNCgUGAAIABBIELwQyBgoRCgkGAAIABLDKvCISBC8EMgYKDAoFBgACAAQSAzMEQAoP
+CggGAAIABJsIABIDMwRACg0KBQYAAgAEEgQ0BDcGCg8KBwYAAgAEmQgSBDQENwYKJwoCBAAS
+BDwAYgEaGyBWaWRlbyBhbm5vdGF0aW9uIHJlcXVlc3QuCgoKCgMEAAESAzwIHAq9BQoEBAAC
+ABIDSAIXGq8FIElucHV0IHZpZGVvIGxvY2F0aW9uLiBDdXJyZW50bHksIG9ubHkKIFtHb29n
+bGUgQ2xvdWQgU3RvcmFnZV0oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL3N0b3JhZ2UvKSBV
+UklzIGFyZQogc3VwcG9ydGVkLCB3aGljaCBtdXN0IGJlIHNwZWNpZmllZCBpbiB0aGUgZm9s
+bG93aW5nIGZvcm1hdDoKIGBnczovL2J1Y2tldC1pZC9vYmplY3QtaWRgIChvdGhlciBVUkkg
+Zm9ybWF0cyByZXR1cm4KIFtnb29nbGUucnBjLkNvZGUuSU5WQUxJRF9BUkdVTUVOVF1bZ29v
+Z2xlLnJwYy5Db2RlLklOVkFMSURfQVJHVU1FTlRdKS4gRm9yCiBtb3JlIGluZm9ybWF0aW9u
+LCBzZWUgW1JlcXVlc3QKIFVSSXNdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9zdG9yYWdl
+L2RvY3MvcmVxdWVzdC1lbmRwb2ludHMpLiBBIHZpZGVvIFVSSQogbWF5IGluY2x1ZGUgd2ls
+ZGNhcmRzIGluIGBvYmplY3QtaWRgLCBhbmQgdGh1cyBpZGVudGlmeSBtdWx0aXBsZSB2aWRl
+b3MuCiBTdXBwb3J0ZWQgd2lsZGNhcmRzOiAnKicgdG8gbWF0Y2ggMCBvciBtb3JlIGNoYXJh
+Y3RlcnM7CiAnPycgdG8gbWF0Y2ggMSBjaGFyYWN0ZXIuIElmIHVuc2V0LCB0aGUgaW5wdXQg
+dmlkZW8gc2hvdWxkIGJlIGVtYmVkZGVkCiBpbiB0aGUgcmVxdWVzdCBhcyBgaW5wdXRfY29u
+dGVudGAuIElmIHNldCwgYGlucHV0X2NvbnRlbnRgIHNob3VsZCBiZSB1bnNldC4KCgwKBQQA
+AgAFEgNIAggKDAoFBAACAAESA0gJEgoMCgUEAAIAAxIDSBUWCo4BCgQEAAIBEgNNAhoagAEg
+VGhlIHZpZGVvIGRhdGEgYnl0ZXMuCiBJZiB1bnNldCwgdGhlIGlucHV0IHZpZGVvKHMpIHNo
+b3VsZCBiZSBzcGVjaWZpZWQgdmlhIGBpbnB1dF91cmlgLgogSWYgc2V0LCBgaW5wdXRfdXJp
+YCBzaG91bGQgYmUgdW5zZXQuCgoMCgUEAAIBBRIDTQIHCgwKBQQAAgEBEgNNCBUKDAoFBAAC
+AQMSA00YGQo9CgQEAAICEgNQAkkaMCBSZXF1aXJlZC4gUmVxdWVzdGVkIHZpZGVvIGFubm90
+YXRpb24gZmVhdHVyZXMuCgoMCgUEAAICBBIDUAIKCgwKBQQAAgIGEgNQCxIKDAoFBAACAgES
+A1ATGwoMCgUEAAICAxIDUB4fCgwKBQQAAgIIEgNQIEgKDwoIBAACAgicCAASA1AhRwpLCgQE
+AAIDEgNTAiEaPiBBZGRpdGlvbmFsIHZpZGVvIGNvbnRleHQgYW5kL29yIGZlYXR1cmUtc3Bl
+Y2lmaWMgcGFyYW1ldGVycy4KCgwKBQQAAgMGEgNTAg4KDAoFBAACAwESA1MPHAoMCgUEAAID
+AxIDUx8gCsoDCgQEAAIEEgNcAkEavAMgT3B0aW9uYWwuIExvY2F0aW9uIHdoZXJlIHRoZSBv
+dXRwdXQgKGluIEpTT04gZm9ybWF0KSBzaG91bGQgYmUgc3RvcmVkLgogQ3VycmVudGx5LCBv
+bmx5IFtHb29nbGUgQ2xvdWQgU3RvcmFnZV0oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL3N0
+b3JhZ2UvKQogVVJJcyBhcmUgc3VwcG9ydGVkLCB3aGljaCBtdXN0IGJlIHNwZWNpZmllZCBp
+biB0aGUgZm9sbG93aW5nIGZvcm1hdDoKIGBnczovL2J1Y2tldC1pZC9vYmplY3QtaWRgIChv
+dGhlciBVUkkgZm9ybWF0cyByZXR1cm4KIFtnb29nbGUucnBjLkNvZGUuSU5WQUxJRF9BUkdV
+TUVOVF1bZ29vZ2xlLnJwYy5Db2RlLklOVkFMSURfQVJHVU1FTlRdKS4gRm9yCiBtb3JlIGlu
+Zm9ybWF0aW9uLCBzZWUgW1JlcXVlc3QKIFVSSXNdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNv
+bS9zdG9yYWdlL2RvY3MvcmVxdWVzdC1lbmRwb2ludHMpLgoKDAoFBAACBAUSA1wCCAoMCgUE
+AAIEARIDXAkTCgwKBQQAAgQDEgNcFhcKDAoFBAACBAgSA1wYQAoPCggEAAIECJwIABIDXBk/
+CvABCgQEAAIFEgNhAkIa4gEgT3B0aW9uYWwuIENsb3VkIHJlZ2lvbiB3aGVyZSBhbm5vdGF0
+aW9uIHNob3VsZCB0YWtlIHBsYWNlLiBTdXBwb3J0ZWQgY2xvdWQKIHJlZ2lvbnM6IGB1cy1l
+YXN0MWAsIGB1cy13ZXN0MWAsIGBldXJvcGUtd2VzdDFgLCBgYXNpYS1lYXN0MWAuIElmIG5v
+IHJlZ2lvbgogaXMgc3BlY2lmaWVkLCBhIHJlZ2lvbiB3aWxsIGJlIGRldGVybWluZWQgYmFz
+ZWQgb24gdmlkZW8gZmlsZSBsb2NhdGlvbi4KCgwKBQQAAgUFEgNhAggKDAoFBAACBQESA2EJ
+FAoMCgUEAAIFAxIDYRcYCgwKBQQAAgUIEgNhGUEKDwoIBAACBQicCAASA2EaQAo/CgIEARIE
+ZQB2ARozIFZpZGVvIGNvbnRleHQgYW5kL29yIGZlYXR1cmUtc3BlY2lmaWMgcGFyYW1ldGVy
+cy4KCgoKAwQBARIDZQgUCsABCgQEAQIAEgNpAiUasgEgVmlkZW8gc2VnbWVudHMgdG8gYW5u
+b3RhdGUuIFRoZSBzZWdtZW50cyBtYXkgb3ZlcmxhcCBhbmQgYXJlIG5vdCByZXF1aXJlZAog
+dG8gYmUgY29udGlndW91cyBvciBzcGFuIHRoZSB3aG9sZSB2aWRlby4gSWYgdW5zcGVjaWZp
+ZWQsIGVhY2ggdmlkZW8gaXMKIHRyZWF0ZWQgYXMgYSBzaW5nbGUgc2VnbWVudC4KCgwKBQQB
+AgAEEgNpAgoKDAoFBAECAAYSA2kLFwoMCgUEAQIAARIDaRggCgwKBQQBAgADEgNpIyQKKgoE
+BAECARIDbAIyGh0gQ29uZmlnIGZvciBMQUJFTF9ERVRFQ1RJT04uCgoMCgUEAQIBBhIDbAIW
+CgwKBQQBAgEBEgNsFy0KDAoFBAECAQMSA2wwMQowCgQEAQICEgNvAj0aIyBDb25maWcgZm9y
+IFNIT1RfQ0hBTkdFX0RFVEVDVElPTi4KCgwKBQQBAgIGEgNvAhsKDAoFBAECAgESA28cOAoM
+CgUEAQICAxIDbzs8CjUKBAQBAgMSA3ICRxooIENvbmZpZyBmb3IgRVhQTElDSVRfQ09OVEVO
+VF9ERVRFQ1RJT04uCgoMCgUEAQIDBhIDcgIgCgwKBQQBAgMBEgNyIUIKDAoFBAECAwMSA3JF
+RgopCgQEAQIEEgN1AjAaHCBDb25maWcgZm9yIEZBQ0VfREVURUNUSU9OLgoKDAoFBAECBAYS
+A3UCFQoMCgUEAQIEARIDdRYrCgwKBQQBAgQDEgN1Li8KKgoCBAISBXkAiAEBGh0gQ29uZmln
+IGZvciBMQUJFTF9ERVRFQ1RJT04uCgoKCgMEAgESA3kIHAqqAQoEBAICABIDfQIuGpwBIFdo
+YXQgbGFiZWxzIHNob3VsZCBiZSBkZXRlY3RlZCB3aXRoIExBQkVMX0RFVEVDVElPTiwgaW4g
+YWRkaXRpb24gdG8KIHZpZGVvLWxldmVsIGxhYmVscyBvciBzZWdtZW50LWxldmVsIGxhYmVs
+cy4KIElmIHVuc3BlY2lmaWVkLCBkZWZhdWx0cyB0byBgU0hPVF9NT0RFYC4KCgwKBQQCAgAG
+EgN9AhQKDAoFBAICAAESA30VKQoMCgUEAgIAAxIDfSwtCtgBCgQEAgIBEgSCAQIdGskBIFdo
+ZXRoZXIgdGhlIHZpZGVvIGhhcyBiZWVuIHNob3QgZnJvbSBhIHN0YXRpb25hcnkgKGkuZS4g
+bm9uLW1vdmluZykgY2FtZXJhLgogV2hlbiBzZXQgdG8gdHJ1ZSwgbWlnaHQgaW1wcm92ZSBk
+ZXRlY3Rpb24gYWNjdXJhY3kgZm9yIG1vdmluZyBvYmplY3RzLgogU2hvdWxkIGJlIHVzZWQg
+d2l0aCBgU0hPVF9BTkRfRlJBTUVfTU9ERWAgZW5hYmxlZC4KCg0KBQQCAgEFEgSCAQIGCg0K
+BQQCAgEBEgSCAQcYCg0KBQQCAgEDEgSCARscCoMBCgQEAgICEgSHAQITGnUgTW9kZWwgdG8g
+dXNlIGZvciBsYWJlbCBkZXRlY3Rpb24uCiBTdXBwb3J0ZWQgdmFsdWVzOiAiYnVpbHRpbi9z
+dGFibGUiICh0aGUgZGVmYXVsdCBpZiB1bnNldCkgYW5kCiAiYnVpbHRpbi9sYXRlc3QiLgoK
+DQoFBAICAgUSBIcBAggKDQoFBAICAgESBIcBCQ4KDQoFBAICAgMSBIcBERIKMQoCBAMSBosB
+AJABARojIENvbmZpZyBmb3IgU0hPVF9DSEFOR0VfREVURUNUSU9OLgoKCwoDBAMBEgSLAQgh
+CokBCgQEAwIAEgSPAQITGnsgTW9kZWwgdG8gdXNlIGZvciBzaG90IGNoYW5nZSBkZXRlY3Rp
+b24uCiBTdXBwb3J0ZWQgdmFsdWVzOiAiYnVpbHRpbi9zdGFibGUiICh0aGUgZGVmYXVsdCBp
+ZiB1bnNldCkgYW5kCiAiYnVpbHRpbi9sYXRlc3QiLgoKDQoFBAMCAAUSBI8BAggKDQoFBAMC
+AAESBI8BCQ4KDQoFBAMCAAMSBI8BERIKNgoCBAQSBpMBAJgBARooIENvbmZpZyBmb3IgRVhQ
+TElDSVRfQ09OVEVOVF9ERVRFQ1RJT04uCgoLCgMEBAESBJMBCCYKjwEKBAQEAgASBJcBAhMa
+gAEgTW9kZWwgdG8gdXNlIGZvciBleHBsaWNpdCBjb250ZW50IGRldGVjdGlvbi4KIFN1cHBv
+cnRlZCB2YWx1ZXM6ICJidWlsdGluL3N0YWJsZSIgKHRoZSBkZWZhdWx0IGlmIHVuc2V0KSBh
+bmQKICJidWlsdGluL2xhdGVzdCIuCgoNCgUEBAIABRIElwECCAoNCgUEBAIAARIElwEJDgoN
+CgUEBAIAAxIElwEREgoqCgIEBRIGmwEAowEBGhwgQ29uZmlnIGZvciBGQUNFX0RFVEVDVElP
+Ti4KCgsKAwQFARIEmwEIGwqCAQoEBAUCABIEnwECExp0IE1vZGVsIHRvIHVzZSBmb3IgZmFj
+ZSBkZXRlY3Rpb24uCiBTdXBwb3J0ZWQgdmFsdWVzOiAiYnVpbHRpbi9zdGFibGUiICh0aGUg
+ZGVmYXVsdCBpZiB1bnNldCkgYW5kCiAiYnVpbHRpbi9sYXRlc3QiLgoKDQoFBAUCAAUSBJ8B
+AggKDQoFBAUCAAESBJ8BCQ4KDQoFBAUCAAMSBJ8BERIKUQoEBAUCARIEogECIhpDIFdoZXRo
+ZXIgYm91bmRpbmcgYm94ZXMgYmUgaW5jbHVkZWQgaW4gdGhlIGZhY2UgYW5ub3RhdGlvbiBv
+dXRwdXQuCgoNCgUEBQIBBRIEogECBgoNCgUEBQIBARIEogEHHQoNCgUEBQIBAxIEogEgIQoe
+CgIEBhIGpgEArgEBGhAgVmlkZW8gc2VnbWVudC4KCgsKAwQGARIEpgEIFAp8CgQEBgIAEgSp
+AQIxGm4gVGltZS1vZmZzZXQsIHJlbGF0aXZlIHRvIHRoZSBiZWdpbm5pbmcgb2YgdGhlIHZp
+ZGVvLAogY29ycmVzcG9uZGluZyB0byB0aGUgc3RhcnQgb2YgdGhlIHNlZ21lbnQgKGluY2x1
+c2l2ZSkuCgoNCgUEBgIABhIEqQECGgoNCgUEBgIAARIEqQEbLAoNCgUEBgIAAxIEqQEvMAp6
+CgQEBgIBEgStAQIvGmwgVGltZS1vZmZzZXQsIHJlbGF0aXZlIHRvIHRoZSBiZWdpbm5pbmcg
+b2YgdGhlIHZpZGVvLAogY29ycmVzcG9uZGluZyB0byB0aGUgZW5kIG9mIHRoZSBzZWdtZW50
+IChpbmNsdXNpdmUpLgoKDQoFBAYCAQYSBK0BAhoKDQoFBAYCAQESBK0BGyoKDQoFBAYCAQMS
+BK0BLS4KSwoCBAcSBrEBALcBARo9IFZpZGVvIHNlZ21lbnQgbGV2ZWwgYW5ub3RhdGlvbiBy
+ZXN1bHRzIGZvciBsYWJlbCBkZXRlY3Rpb24uCgoLCgMEBwESBLEBCBQKOQoEBAcCABIEswEC
+GxorIFZpZGVvIHNlZ21lbnQgd2hlcmUgYSBsYWJlbCB3YXMgZGV0ZWN0ZWQuCgoNCgUEBwIA
+BhIEswECDgoNCgUEBwIAARIEswEPFgoNCgUEBwIAAxIEswEZGgpFCgQEBwIBEgS2AQIXGjcg
+Q29uZmlkZW5jZSB0aGF0IHRoZSBsYWJlbCBpcyBhY2N1cmF0ZS4gUmFuZ2U6IFswLCAxXS4K
+Cg0KBQQHAgEFEgS2AQIHCg0KBQQHAgEBEgS2AQgSCg0KBQQHAgEDEgS2ARUWCkkKAgQIEga6
+AQDBAQEaOyBWaWRlbyBmcmFtZSBsZXZlbCBhbm5vdGF0aW9uIHJlc3VsdHMgZm9yIGxhYmVs
+IGRldGVjdGlvbi4KCgsKAwQIARIEugEIEgp5CgQECAIAEgS9AQIrGmsgVGltZS1vZmZzZXQs
+IHJlbGF0aXZlIHRvIHRoZSBiZWdpbm5pbmcgb2YgdGhlIHZpZGVvLCBjb3JyZXNwb25kaW5n
+IHRvIHRoZQogdmlkZW8gZnJhbWUgZm9yIHRoaXMgbG9jYXRpb24uCgoNCgUECAIABhIEvQEC
+GgoNCgUECAIAARIEvQEbJgoNCgUECAIAAxIEvQEpKgpFCgQECAIBEgTAAQIXGjcgQ29uZmlk
+ZW5jZSB0aGF0IHRoZSBsYWJlbCBpcyBhY2N1cmF0ZS4gUmFuZ2U6IFswLCAxXS4KCg0KBQQI
+AgEFEgTAAQIHCg0KBQQIAgEBEgTAAQgSCg0KBQQIAgEDEgTAARUWCjQKAgQJEgbEAQDPAQEa
+JiBEZXRlY3RlZCBlbnRpdHkgZnJvbSB2aWRlbyBhbmFseXNpcy4KCgsKAwQJARIExAEIDgqW
+AQoEBAkCABIEyAECFxqHASBPcGFxdWUgZW50aXR5IElELiBTb21lIElEcyBtYXkgYmUgYXZh
+aWxhYmxlIGluCiBbR29vZ2xlIEtub3dsZWRnZSBHcmFwaCBTZWFyY2gKIEFQSV0oaHR0cHM6
+Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20va25vd2xlZGdlLWdyYXBoLykuCgoNCgUECQIABRIE
+yAECCAoNCgUECQIAARIEyAEJEgoNCgUECQIAAxIEyAEVFgo/CgQECQIBEgTLAQIZGjEgVGV4
+dHVhbCBkZXNjcmlwdGlvbiwgZS5nLiBgRml4ZWQtZ2VhciBiaWN5Y2xlYC4KCg0KBQQJAgEF
+EgTLAQIICg0KBQQJAgEBEgTLAQkUCg0KBQQJAgEDEgTLARcYCkEKBAQJAgISBM4BAhsaMyBM
+YW5ndWFnZSBjb2RlIGZvciBgZGVzY3JpcHRpb25gIGluIEJDUC00NyBmb3JtYXQuCgoNCgUE
+CQICBRIEzgECCAoNCgUECQICARIEzgEJFgoNCgUECQICAxIEzgEZGgohCgIEChIG0gEA4QEB
+GhMgTGFiZWwgYW5ub3RhdGlvbi4KCgsKAwQKARIE0gEIFwogCgQECgIAEgTUAQIUGhIgRGV0
+ZWN0ZWQgZW50aXR5LgoKDQoFBAoCAAYSBNQBAggKDQoFBAoCAAESBNQBCQ8KDQoFBAoCAAMS
+BNQBEhMK3QEKBAQKAgESBNoBAigazgEgQ29tbW9uIGNhdGVnb3JpZXMgZm9yIHRoZSBkZXRl
+Y3RlZCBlbnRpdHkuCiBFLmcuIHdoZW4gdGhlIGxhYmVsIGlzIGBUZXJyaWVyYCB0aGUgY2F0
+ZWdvcnkgaXMgbGlrZWx5IGBkb2dgLiBBbmQgaW4gc29tZQogY2FzZXMgdGhlcmUgbWlnaHQg
+YmUgbW9yZSB0aGFuIG9uZSBjYXRlZ29yaWVzIGUuZy4gYFRlcnJpZXJgIGNvdWxkIGFsc28g
+YmUKIGEgYHBldGAuCgoNCgUECgIBBBIE2gECCgoNCgUECgIBBhIE2gELEQoNCgUECgIBARIE
+2gESIwoNCgUECgIBAxIE2gEmJwo+CgQECgICEgTdAQIlGjAgQWxsIHZpZGVvIHNlZ21lbnRz
+IHdoZXJlIGEgbGFiZWwgd2FzIGRldGVjdGVkLgoKDQoFBAoCAgQSBN0BAgoKDQoFBAoCAgYS
+BN0BCxcKDQoFBAoCAgESBN0BGCAKDQoFBAoCAgMSBN0BIyQKPAoEBAoCAxIE4AECIRouIEFs
+bCB2aWRlbyBmcmFtZXMgd2hlcmUgYSBsYWJlbCB3YXMgZGV0ZWN0ZWQuCgoNCgUECgIDBBIE
+4AECCgoNCgUECgIDBhIE4AELFQoNCgUECgIDARIE4AEWHAoNCgUECgIDAxIE4AEfIApKCgIE
+CxIG5AEA6wEBGjwgVmlkZW8gZnJhbWUgbGV2ZWwgYW5ub3RhdGlvbiByZXN1bHRzIGZvciBl
+eHBsaWNpdCBjb250ZW50LgoKCwoDBAsBEgTkAQgcCnkKBAQLAgASBOcBAisaayBUaW1lLW9m
+ZnNldCwgcmVsYXRpdmUgdG8gdGhlIGJlZ2lubmluZyBvZiB0aGUgdmlkZW8sIGNvcnJlc3Bv
+bmRpbmcgdG8gdGhlCiB2aWRlbyBmcmFtZSBmb3IgdGhpcyBsb2NhdGlvbi4KCg0KBQQLAgAG
+EgTnAQIaCg0KBQQLAgABEgTnARsmCg0KBQQLAgADEgTnASkqCjcKBAQLAgESBOoBAigaKSBM
+aWtlbGlob29kIG9mIHRoZSBwb3Jub2dyYXBoeSBjb250ZW50Li4KCg0KBQQLAgEGEgTqAQIM
+Cg0KBQQLAgEBEgTqAQ0jCg0KBQQLAgEDEgTqASYnCrgBCgIEDBIG8AEA8wEBGqkBIEV4cGxp
+Y2l0IGNvbnRlbnQgYW5ub3RhdGlvbiAoYmFzZWQgb24gcGVyLWZyYW1lIHZpc3VhbCBzaWdu
+YWxzIG9ubHkpLgogSWYgbm8gZXhwbGljaXQgY29udGVudCBoYXMgYmVlbiBkZXRlY3RlZCBp
+biBhIGZyYW1lLCBubyBhbm5vdGF0aW9ucyBhcmUKIHByZXNlbnQgZm9yIHRoYXQgZnJhbWUu
+CgoLCgMEDAESBPABCCEKRQoEBAwCABIE8gECKxo3IEFsbCB2aWRlbyBmcmFtZXMgd2hlcmUg
+ZXhwbGljaXQgY29udGVudCB3YXMgZGV0ZWN0ZWQuCgoNCgUEDAIABBIE8gECCgoNCgUEDAIA
+BhIE8gELHwoNCgUEDAIAARIE8gEgJgoNCgUEDAIAAxIE8gEpKgp/CgIEDRIG+AEAhAIBGnEg
+Tm9ybWFsaXplZCBib3VuZGluZyBib3guCiBUaGUgbm9ybWFsaXplZCB2ZXJ0ZXggY29vcmRp
+bmF0ZXMgYXJlIHJlbGF0aXZlIHRvIHRoZSBvcmlnaW5hbCBpbWFnZS4KIFJhbmdlOiBbMCwg
+MV0uCgoLCgMEDQESBPgBCB0KIgoEBA0CABIE+gECERoUIExlZnQgWCBjb29yZGluYXRlLgoK
+DQoFBA0CAAUSBPoBAgcKDQoFBA0CAAESBPoBCAwKDQoFBA0CAAMSBPoBDxAKIQoEBA0CARIE
+/QECEBoTIFRvcCBZIGNvb3JkaW5hdGUuCgoNCgUEDQIBBRIE/QECBwoNCgUEDQIBARIE/QEI
+CwoNCgUEDQIBAxIE/QEODwojCgQEDQICEgSAAgISGhUgUmlnaHQgWCBjb29yZGluYXRlLgoK
+DQoFBA0CAgUSBIACAgcKDQoFBA0CAgESBIACCA0KDQoFBA0CAgMSBIACEBEKJAoEBA0CAxIE
+gwICExoWIEJvdHRvbSBZIGNvb3JkaW5hdGUuCgoNCgUEDQIDBRIEgwICBwoNCgUEDQIDARIE
+gwIIDgoNCgUEDQIDAxIEgwIREgpKCgIEDhIGhwIAigIBGjwgVmlkZW8gc2VnbWVudCBsZXZl
+bCBhbm5vdGF0aW9uIHJlc3VsdHMgZm9yIGZhY2UgZGV0ZWN0aW9uLgoKCwoDBA4BEgSHAggT
+CjgKBAQOAgASBIkCAhsaKiBWaWRlbyBzZWdtZW50IHdoZXJlIGEgZmFjZSB3YXMgZGV0ZWN0
+ZWQuCgoNCgUEDgIABhIEiQICDgoNCgUEDgIAARIEiQIPFgoNCgUEDgIAAxIEiQIZGgpICgIE
+DxIGjQIAlgIBGjogVmlkZW8gZnJhbWUgbGV2ZWwgYW5ub3RhdGlvbiByZXN1bHRzIGZvciBm
+YWNlIGRldGVjdGlvbi4KCgsKAwQPARIEjQIIEQqmAQoEBA8CABIEkQICPxqXASBOb3JtYWxp
+emVkIEJvdW5kaW5nIGJveGVzIGluIGEgZnJhbWUuCiBUaGVyZSBjYW4gYmUgbW9yZSB0aGFu
+IG9uZSBib3hlcyBpZiB0aGUgc2FtZSBmYWNlIGlzIGRldGVjdGVkIGluIG11bHRpcGxlCiBs
+b2NhdGlvbnMgd2l0aGluIHRoZSBjdXJyZW50IGZyYW1lLgoKDQoFBA8CAAQSBJECAgoKDQoF
+BA8CAAYSBJECCyAKDQoFBA8CAAESBJECIToKDQoFBA8CAAMSBJECPT4KeQoEBA8CARIElQIC
+KxprIFRpbWUtb2Zmc2V0LCByZWxhdGl2ZSB0byB0aGUgYmVnaW5uaW5nIG9mIHRoZSB2aWRl
+bywKIGNvcnJlc3BvbmRpbmcgdG8gdGhlIHZpZGVvIGZyYW1lIGZvciB0aGlzIGxvY2F0aW9u
+LgoKDQoFBA8CAQYSBJUCAhoKDQoFBA8CAQESBJUCGyYKDQoFBA8CAQMSBJUCKSoKIAoCBBAS
+BpkCAKICARoSIEZhY2UgYW5ub3RhdGlvbi4KCgsKAwQQARIEmQIIFgpJCgQEEAIAEgSbAgIW
+GjsgVGh1bWJuYWlsIG9mIGEgcmVwcmVzZW50YXRpdmUgZmFjZSB2aWV3IChpbiBKUEVHIGZv
+cm1hdCkuCgoNCgUEEAIABRIEmwICBwoNCgUEEAIAARIEmwIIEQoNCgUEEAIAAxIEmwIUFQo9
+CgQEEAIBEgSeAgIkGi8gQWxsIHZpZGVvIHNlZ21lbnRzIHdoZXJlIGEgZmFjZSB3YXMgZGV0
+ZWN0ZWQuCgoNCgUEEAIBBBIEngICCgoNCgUEEAIBBhIEngILFgoNCgUEEAIBARIEngIXHwoN
+CgUEEAIBAxIEngIiIwo7CgQEEAICEgShAgIgGi0gQWxsIHZpZGVvIGZyYW1lcyB3aGVyZSBh
+IGZhY2Ugd2FzIGRldGVjdGVkLgoKDQoFBBACAgQSBKECAgoKDQoFBBACAgYSBKECCxQKDQoF
+BBACAgESBKECFRsKDQoFBBACAgMSBKECHh8KNgoCBBESBqUCAMICARooIEFubm90YXRpb24g
+cmVzdWx0cyBmb3IgYSBzaW5nbGUgdmlkZW8uCgoLCgMEEQESBKUCCB4KYgoEBBECABIEqAIC
+FxpUIFZpZGVvIGZpbGUgbG9jYXRpb24gaW4KIFtHb29nbGUgQ2xvdWQgU3RvcmFnZV0oaHR0
+cHM6Ly9jbG91ZC5nb29nbGUuY29tL3N0b3JhZ2UvKS4KCg0KBQQRAgAFEgSoAgIICg0KBQQR
+AgABEgSoAgkSCg0KBQQRAgADEgSoAhUWCoYBCgQEEQIBEgSsAgI5GnggTGFiZWwgYW5ub3Rh
+dGlvbnMgb24gdmlkZW8gbGV2ZWwgb3IgdXNlciBzcGVjaWZpZWQgc2VnbWVudCBsZXZlbC4K
+IFRoZXJlIGlzIGV4YWN0bHkgb25lIGVsZW1lbnQgZm9yIGVhY2ggdW5pcXVlIGxhYmVsLgoK
+DQoFBBECAQQSBKwCAgoKDQoFBBECAQYSBKwCCxoKDQoFBBECAQESBKwCGzQKDQoFBBECAQMS
+BKwCNzgKZQoEBBECAhIEsAICNhpXIExhYmVsIGFubm90YXRpb25zIG9uIHNob3QgbGV2ZWwu
+CiBUaGVyZSBpcyBleGFjdGx5IG9uZSBlbGVtZW50IGZvciBlYWNoIHVuaXF1ZSBsYWJlbC4K
+Cg0KBQQRAgIEEgSwAgIKCg0KBQQRAgIGEgSwAgsaCg0KBQQRAgIBEgSwAhsxCg0KBQQRAgID
+EgSwAjQ1CmYKBAQRAgMSBLQCAjcaWCBMYWJlbCBhbm5vdGF0aW9ucyBvbiBmcmFtZSBsZXZl
+bC4KIFRoZXJlIGlzIGV4YWN0bHkgb25lIGVsZW1lbnQgZm9yIGVhY2ggdW5pcXVlIGxhYmVs
+LgoKDQoFBBECAwQSBLQCAgoKDQoFBBECAwYSBLQCCxoKDQoFBBECAwESBLQCGzIKDQoFBBEC
+AwMSBLQCNTYKVAoEBBECBBIEtwICLxpGIEZhY2UgYW5ub3RhdGlvbnMuIFRoZXJlIGlzIGV4
+YWN0bHkgb25lIGVsZW1lbnQgZm9yIGVhY2ggdW5pcXVlIGZhY2UuCgoNCgUEEQIEBBIEtwIC
+CgoNCgUEEQIEBhIEtwILGQoNCgUEEQIEARIEtwIaKgoNCgUEEQIEAxIEtwItLgpOCgQEEQIF
+EgS6AgItGkAgU2hvdCBhbm5vdGF0aW9ucy4gRWFjaCBzaG90IGlzIHJlcHJlc2VudGVkIGFz
+IGEgdmlkZW8gc2VnbWVudC4KCg0KBQQRAgUEEgS6AgIKCg0KBQQRAgUGEgS6AgsXCg0KBQQR
+AgUBEgS6AhgoCg0KBQQRAgUDEgS6AissCiwKBAQRAgYSBL0CAjQaHiBFeHBsaWNpdCBjb250
+ZW50IGFubm90YXRpb24uCgoNCgUEEQIGBhIEvQICGwoNCgUEEQIGARIEvQIcLwoNCgUEEQIG
+AxIEvQIyMwqFAQoEBBECBxIEwQICHhp3IElmIHNldCwgaW5kaWNhdGVzIGFuIGVycm9yLiBO
+b3RlIHRoYXQgZm9yIGEgc2luZ2xlIGBBbm5vdGF0ZVZpZGVvUmVxdWVzdGAKIHNvbWUgdmlk
+ZW9zIG1heSBzdWNjZWVkIGFuZCBzb21lIG1heSBmYWlsLgoKDQoFBBECBwYSBMECAhMKDQoF
+BBECBwESBMECFBkKDQoFBBECBwMSBMECHB0KtwEKAgQSEgbHAgDKAgEaqAEgVmlkZW8gYW5u
+b3RhdGlvbiByZXNwb25zZS4gSW5jbHVkZWQgaW4gdGhlIGByZXNwb25zZWAKIGZpZWxkIG9m
+IHRoZSBgT3BlcmF0aW9uYCByZXR1cm5lZCBieSB0aGUgYEdldE9wZXJhdGlvbmAKIGNhbGwg
+b2YgdGhlIGBnb29nbGU6OmxvbmdydW5uaW5nOjpPcGVyYXRpb25zYCBzZXJ2aWNlLgoKCwoD
+BBIBEgTHAggdClYKBAQSAgASBMkCAjkaSCBBbm5vdGF0aW9uIHJlc3VsdHMgZm9yIGFsbCB2
+aWRlb3Mgc3BlY2lmaWVkIGluIGBBbm5vdGF0ZVZpZGVvUmVxdWVzdGAuCgoNCgUEEgIABBIE
+yQICCgoNCgUEEgIABhIEyQILIQoNCgUEEgIAARIEyQIiNAoNCgUEEgIAAxIEyQI3OAo3CgIE
+ExIGzQIA2wIBGikgQW5ub3RhdGlvbiBwcm9ncmVzcyBmb3IgYSBzaW5nbGUgdmlkZW8uCgoL
+CgMEEwESBM0CCB8KYgoEBBMCABIE0AICFxpUIFZpZGVvIGZpbGUgbG9jYXRpb24gaW4KIFtH
+b29nbGUgQ2xvdWQgU3RvcmFnZV0oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL3N0b3JhZ2Uv
+KS4KCg0KBQQTAgAFEgTQAgIICg0KBQQTAgABEgTQAgkSCg0KBQQTAgADEgTQAhUWCmYKBAQT
+AgESBNQCAh0aWCBBcHByb3hpbWF0ZSBwZXJjZW50YWdlIHByb2Nlc3NlZCB0aHVzIGZhci4K
+IEd1YXJhbnRlZWQgdG8gYmUgMTAwIHdoZW4gZnVsbHkgcHJvY2Vzc2VkLgoKDQoFBBMCAQUS
+BNQCAgcKDQoFBBMCAQESBNQCCBgKDQoFBBMCAQMSBNQCGxwKMwoEBBMCAhIE1wICKxolIFRp
+bWUgd2hlbiB0aGUgcmVxdWVzdCB3YXMgcmVjZWl2ZWQuCgoNCgUEEwICBhIE1wICGwoNCgUE
+EwICARIE1wIcJgoNCgUEEwICAxIE1wIpKgovCgQEEwIDEgTaAgIsGiEgVGltZSBvZiB0aGUg
+bW9zdCByZWNlbnQgdXBkYXRlLgoKDQoFBBMCAwYSBNoCAhsKDQoFBBMCAwESBNoCHCcKDQoF
+BBMCAwMSBNoCKisKtwEKAgQUEgbgAgDjAgEaqAEgVmlkZW8gYW5ub3RhdGlvbiBwcm9ncmVz
+cy4gSW5jbHVkZWQgaW4gdGhlIGBtZXRhZGF0YWAKIGZpZWxkIG9mIHRoZSBgT3BlcmF0aW9u
+YCByZXR1cm5lZCBieSB0aGUgYEdldE9wZXJhdGlvbmAKIGNhbGwgb2YgdGhlIGBnb29nbGU6
+OmxvbmdydW5uaW5nOjpPcGVyYXRpb25zYCBzZXJ2aWNlLgoKCwoDBBQBEgTgAggdClUKBAQU
+AgASBOICAjsaRyBQcm9ncmVzcyBtZXRhZGF0YSBmb3IgYWxsIHZpZGVvcyBzcGVjaWZpZWQg
+aW4gYEFubm90YXRlVmlkZW9SZXF1ZXN0YC4KCg0KBQQUAgAEEgTiAgIKCg0KBQQUAgAGEgTi
+AgsiCg0KBQQUAgABEgTiAiM2Cg0KBQQUAgADEgTiAjk6CikKAgUAEgbmAgD1AgEaGyBWaWRl
+byBhbm5vdGF0aW9uIGZlYXR1cmUuCgoLCgMFAAESBOYCBQwKHAoEBQACABIE6AICGhoOIFVu
+c3BlY2lmaWVkLgoKDQoFBQACAAESBOgCAhUKDQoFBQACAAISBOgCGBkKRwoEBQACARIE6wIC
+Fho5IExhYmVsIGRldGVjdGlvbi4gRGV0ZWN0IG9iamVjdHMsIHN1Y2ggYXMgZG9nIG9yIGZs
+b3dlci4KCg0KBQUAAgEBEgTrAgIRCg0KBQUAAgECEgTrAhQVCiYKBAUAAgISBO4CAhwaGCBT
+aG90IGNoYW5nZSBkZXRlY3Rpb24uCgoNCgUFAAICARIE7gICFwoNCgUFAAICAhIE7gIaGwor
+CgQFAAIDEgTxAgIhGh0gRXhwbGljaXQgY29udGVudCBkZXRlY3Rpb24uCgoNCgUFAAIDARIE
+8QICHAoNCgUFAAIDAhIE8QIfIAoyCgQFAAIEEgT0AgIVGiQgSHVtYW4gZmFjZSBkZXRlY3Rp
+b24gYW5kIHRyYWNraW5nLgoKDQoFBQACBAESBPQCAhAKDQoFBQACBAISBPQCExQKJQoCBQES
+BvgCAIQDARoXIExhYmVsIGRldGVjdGlvbiBtb2RlLgoKCwoDBQEBEgT4AgUXChwKBAUBAgAS
+BPoCAicaDiBVbnNwZWNpZmllZC4KCg0KBQUBAgABEgT6AgIiCg0KBQUBAgACEgT6AiUmCikK
+BAUBAgESBP0CAhAaGyBEZXRlY3Qgc2hvdC1sZXZlbCBsYWJlbHMuCgoNCgUFAQIBARIE/QIC
+CwoNCgUFAQIBAhIE/QIODwoqCgQFAQICEgSAAwIRGhwgRGV0ZWN0IGZyYW1lLWxldmVsIGxh
+YmVscy4KCg0KBQUBAgIBEgSAAwIMCg0KBQUBAgICEgSAAw8QCj4KBAUBAgMSBIMDAhoaMCBE
+ZXRlY3QgYm90aCBzaG90LWxldmVsIGFuZCBmcmFtZS1sZXZlbCBsYWJlbHMuCgoNCgUFAQID
+ARIEgwMCFQoNCgUFAQIDAhIEgwMYGQo4CgIFAhIGhwMAmQMBGiogQnVja2V0aXplZCByZXBy
+ZXNlbnRhdGlvbiBvZiBsaWtlbGlob29kLgoKCwoDBQIBEgSHAwUPCicKBAUCAgASBIkDAh0a
+GSBVbnNwZWNpZmllZCBsaWtlbGlob29kLgoKDQoFBQICAAESBIkDAhgKDQoFBQICAAISBIkD
+GxwKHgoEBQICARIEjAMCFBoQIFZlcnkgdW5saWtlbHkuCgoNCgUFAgIBARIEjAMCDwoNCgUF
+AgIBAhIEjAMSEwoZCgQFAgICEgSPAwIPGgsgVW5saWtlbHkuCgoNCgUFAgICARIEjwMCCgoN
+CgUFAgICAhIEjwMNDgoZCgQFAgIDEgSSAwIPGgsgUG9zc2libGUuCgoNCgUFAgIDARIEkgMC
+CgoNCgUFAgIDAhIEkgMNDgoXCgQFAgIEEgSVAwINGgkgTGlrZWx5LgoKDQoFBQICBAESBJUD
+AggKDQoFBQICBAISBJUDCwwKHAoEBQICBRIEmAMCEhoOIFZlcnkgbGlrZWx5LgoKDQoFBQIC
+BQESBJgDAg0KDQoFBQICBQISBJgDEBFiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::AnnotateVideoRequest ===
+    # Fields for AnnotateVideoRequest
+    # Field: input_uri Type: 9 ()
+    # Field: input_content Type: 12 ()
+    # Field: features Type: 14 (.google.cloud.videointelligence.v1beta2.Feature)
+    # Field: video_context Type: 11 (.google.cloud.videointelligence.v1beta2.VideoContext)
+    # Field: output_uri Type: 9 ()
+    # Field: location_id Type: 9 ()
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoContext ===
+    # Fields for VideoContext
+    # Field: segments Type: 11 (.google.cloud.videointelligence.v1beta2.VideoSegment)
+    # Field: label_detection_config Type: 11 (.google.cloud.videointelligence.v1beta2.LabelDetectionConfig)
+    # Field: shot_change_detection_config Type: 11 (.google.cloud.videointelligence.v1beta2.ShotChangeDetectionConfig)
+    # Field: explicit_content_detection_config Type: 11 (.google.cloud.videointelligence.v1beta2.ExplicitContentDetectionConfig)
+    # Field: face_detection_config Type: 11 (.google.cloud.videointelligence.v1beta2.FaceDetectionConfig)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelDetectionConfig ===
+    # Fields for LabelDetectionConfig
+    # Field: label_detection_mode Type: 14 (.google.cloud.videointelligence.v1beta2.LabelDetectionMode)
+    # Field: stationary_camera Type: 8 ()
+    # Field: model Type: 9 ()
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ShotChangeDetectionConfig ===
+    # Fields for ShotChangeDetectionConfig
+    # Field: model Type: 9 ()
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ExplicitContentDetectionConfig ===
+    # Fields for ExplicitContentDetectionConfig
+    # Field: model Type: 9 ()
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceDetectionConfig ===
+    # Fields for FaceDetectionConfig
+    # Field: model Type: 9 ()
+    # Field: include_bounding_boxes Type: 8 ()
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoSegment ===
+    # Fields for VideoSegment
+    # Field: start_time_offset Type: 11 (.google.protobuf.Duration)
+    # Field: end_time_offset Type: 11 (.google.protobuf.Duration)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelSegment ===
+    # Fields for LabelSegment
+    # Field: segment Type: 11 (.google.cloud.videointelligence.v1beta2.VideoSegment)
+    # Field: confidence Type: 2 ()
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelFrame ===
+    # Fields for LabelFrame
+    # Field: time_offset Type: 11 (.google.protobuf.Duration)
+    # Field: confidence Type: 2 ()
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::Entity ===
+    # Fields for Entity
+    # Field: entity_id Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: language_code Type: 9 ()
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelAnnotation ===
+    # Fields for LabelAnnotation
+    # Field: entity Type: 11 (.google.cloud.videointelligence.v1beta2.Entity)
+    # Field: category_entities Type: 11 (.google.cloud.videointelligence.v1beta2.Entity)
+    # Field: segments Type: 11 (.google.cloud.videointelligence.v1beta2.LabelSegment)
+    # Field: frames Type: 11 (.google.cloud.videointelligence.v1beta2.LabelFrame)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ExplicitContentFrame ===
+    # Fields for ExplicitContentFrame
+    # Field: time_offset Type: 11 (.google.protobuf.Duration)
+    # Field: pornography_likelihood Type: 14 (.google.cloud.videointelligence.v1beta2.Likelihood)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ExplicitContentAnnotation ===
+    # Fields for ExplicitContentAnnotation
+    # Field: frames Type: 11 (.google.cloud.videointelligence.v1beta2.ExplicitContentFrame)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::NormalizedBoundingBox ===
+    # Fields for NormalizedBoundingBox
+    # Field: left Type: 2 ()
+    # Field: top Type: 2 ()
+    # Field: right Type: 2 ()
+    # Field: bottom Type: 2 ()
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceSegment ===
+    # Fields for FaceSegment
+    # Field: segment Type: 11 (.google.cloud.videointelligence.v1beta2.VideoSegment)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceFrame ===
+    # Fields for FaceFrame
+    # Field: normalized_bounding_boxes Type: 11 (.google.cloud.videointelligence.v1beta2.NormalizedBoundingBox)
+    # Field: time_offset Type: 11 (.google.protobuf.Duration)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceAnnotation ===
+    # Fields for FaceAnnotation
+    # Field: thumbnail Type: 12 ()
+    # Field: segments Type: 11 (.google.cloud.videointelligence.v1beta2.FaceSegment)
+    # Field: frames Type: 11 (.google.cloud.videointelligence.v1beta2.FaceFrame)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoAnnotationResults ===
+    # Fields for VideoAnnotationResults
+    # Field: input_uri Type: 9 ()
+    # Field: segment_label_annotations Type: 11 (.google.cloud.videointelligence.v1beta2.LabelAnnotation)
+    # Field: shot_label_annotations Type: 11 (.google.cloud.videointelligence.v1beta2.LabelAnnotation)
+    # Field: frame_label_annotations Type: 11 (.google.cloud.videointelligence.v1beta2.LabelAnnotation)
+    # Field: face_annotations Type: 11 (.google.cloud.videointelligence.v1beta2.FaceAnnotation)
+    # Field: shot_annotations Type: 11 (.google.cloud.videointelligence.v1beta2.VideoSegment)
+    # Field: explicit_annotation Type: 11 (.google.cloud.videointelligence.v1beta2.ExplicitContentAnnotation)
+    # Field: error Type: 11 (.google.rpc.Status)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::AnnotateVideoResponse ===
+    # Fields for AnnotateVideoResponse
+    # Field: annotation_results Type: 11 (.google.cloud.videointelligence.v1beta2.VideoAnnotationResults)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoAnnotationProgress ===
+    # Fields for VideoAnnotationProgress
+    # Field: input_uri Type: 9 ()
+    # Field: progress_percent Type: 5 ()
+    # Field: start_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+
+# === Message: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::AnnotateVideoProgress ===
+    # Fields for AnnotateVideoProgress
+    # Field: annotation_progress Type: 11 (.google.cloud.videointelligence.v1beta2.VideoAnnotationProgress)
+
+# === Service Client: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoIntelligenceServiceClient ===
+package Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoIntelligenceServiceClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoIntelligenceServiceClient
+
+Client stub representing the remote C<VideoIntelligenceService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<videointelligence.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'videointelligence.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub annotate_video {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::AnnotateVideoRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.videointelligence.v1beta2.VideoIntelligenceService',
+        method         => 'AnnotateVideo',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Videointelligence::V1beta2::VideoIntelligence - Compiled Protocol Buffers messages for google/cloud/videointelligence/v1beta2/video_intelligence.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Videointelligence::V1beta2::VideoIntelligence;
+
+    my $msg = Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::AnnotateVideoRequest->new({
+        input_uri => $input_uri,
+        input_content => $input_content,
+        features => $features,
+        video_context => $video_context,
+    });
+
+    # Read or update a field
+    my $val = $msg->input_uri();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::AnnotateVideoRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/videointelligence/v1beta2/video_intelligence.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::AnnotateVideoRequest
+
+Video annotation request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->input_uri() >> / C<< $msg->input_uri($value) >>
+
+Type: C<String>
+
+Input video location. Currently, only
+[Google Cloud Storage](https://cloud.google.com/storage/) URIs are
+supported, which must be specified in the following format:
+`gs://bucket-id/object-id` (other URI formats return
+[google.rpc.Code.INVALID_ARGUMENT][google.rpc.Code.INVALID_ARGUMENT]). For
+more information, see [Request
+URIs](https://cloud.google.com/storage/docs/request-endpoints). A video URI
+may include wildcards in `object-id`, and thus identify multiple videos.
+Supported wildcards: '*' to match 0 or more characters;
+'?' to match 1 character. If unset, the input video should be embedded
+in the request as `input_content`. If set, `input_content` should be unset.
+
+=item * C<< $msg->input_content() >> / C<< $msg->input_content($value) >>
+
+Type: C<Bytes>
+
+The video data bytes.
+If unset, the input video(s) should be specified via `input_uri`.
+If set, `input_uri` should be unset.
+
+=item * C<< $msg->features() >> / C<< $msg->features($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Videointelligence::V1beta2::Feature>)
+
+Required. Requested video annotation features.
+
+=item * C<< $msg->video_context() >> / C<< $msg->video_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoContext>)
+
+Additional video context and/or feature-specific parameters.
+
+=item * C<< $msg->output_uri() >> / C<< $msg->output_uri($value) >>
+
+Type: C<String>
+
+Optional. Location where the output (in JSON format) should be stored.
+Currently, only [Google Cloud Storage](https://cloud.google.com/storage/)
+URIs are supported, which must be specified in the following format:
+`gs://bucket-id/object-id` (other URI formats return
+[google.rpc.Code.INVALID_ARGUMENT][google.rpc.Code.INVALID_ARGUMENT]). For
+more information, see [Request
+URIs](https://cloud.google.com/storage/docs/request-endpoints).
+
+=item * C<< $msg->location_id() >> / C<< $msg->location_id($value) >>
+
+Type: C<String>
+
+Optional. Cloud region where annotation should take place. Supported cloud
+regions: `us-east1`, `us-west1`, `europe-west1`, `asia-east1`. If no region
+is specified, a region will be determined based on video file location.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoContext
+
+Video context and/or feature-specific parameters.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->segments() >> / C<< $msg->segments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoSegment>)
+
+Video segments to annotate. The segments may overlap and are not required
+to be contiguous or span the whole video. If unspecified, each video is
+treated as a single segment.
+
+=item * C<< $msg->label_detection_config() >> / C<< $msg->label_detection_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelDetectionConfig>)
+
+Config for LABEL_DETECTION.
+
+=item * C<< $msg->shot_change_detection_config() >> / C<< $msg->shot_change_detection_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ShotChangeDetectionConfig>)
+
+Config for SHOT_CHANGE_DETECTION.
+
+=item * C<< $msg->explicit_content_detection_config() >> / C<< $msg->explicit_content_detection_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ExplicitContentDetectionConfig>)
+
+Config for EXPLICIT_CONTENT_DETECTION.
+
+=item * C<< $msg->face_detection_config() >> / C<< $msg->face_detection_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceDetectionConfig>)
+
+Config for FACE_DETECTION.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelDetectionConfig
+
+Config for LABEL_DETECTION.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->label_detection_mode() >> / C<< $msg->label_detection_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Videointelligence::V1beta2::LabelDetectionMode>)
+
+What labels should be detected with LABEL_DETECTION, in addition to
+video-level labels or segment-level labels.
+If unspecified, defaults to `SHOT_MODE`.
+
+=item * C<< $msg->stationary_camera() >> / C<< $msg->stationary_camera($value) >>
+
+Type: C<Bool>
+
+Whether the video has been shot from a stationary (i.e. non-moving) camera.
+When set to true, might improve detection accuracy for moving objects.
+Should be used with `SHOT_AND_FRAME_MODE` enabled.
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Model to use for label detection.
+Supported values: "builtin/stable" (the default if unset) and
+"builtin/latest".
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ShotChangeDetectionConfig
+
+Config for SHOT_CHANGE_DETECTION.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Model to use for shot change detection.
+Supported values: "builtin/stable" (the default if unset) and
+"builtin/latest".
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ExplicitContentDetectionConfig
+
+Config for EXPLICIT_CONTENT_DETECTION.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Model to use for explicit content detection.
+Supported values: "builtin/stable" (the default if unset) and
+"builtin/latest".
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceDetectionConfig
+
+Config for FACE_DETECTION.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Model to use for face detection.
+Supported values: "builtin/stable" (the default if unset) and
+"builtin/latest".
+
+=item * C<< $msg->include_bounding_boxes() >> / C<< $msg->include_bounding_boxes($value) >>
+
+Type: C<Bool>
+
+Whether bounding boxes be included in the face annotation output.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoSegment
+
+Video segment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_time_offset() >> / C<< $msg->start_time_offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Time-offset, relative to the beginning of the video,
+corresponding to the start of the segment (inclusive).
+
+=item * C<< $msg->end_time_offset() >> / C<< $msg->end_time_offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Time-offset, relative to the beginning of the video,
+corresponding to the end of the segment (inclusive).
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelSegment
+
+Video segment level annotation results for label detection.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->segment() >> / C<< $msg->segment($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoSegment>)
+
+Video segment where a label was detected.
+
+=item * C<< $msg->confidence() >> / C<< $msg->confidence($value) >>
+
+Type: C<Float>
+
+Confidence that the label is accurate. Range: [0, 1].
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelFrame
+
+Video frame level annotation results for label detection.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->time_offset() >> / C<< $msg->time_offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Time-offset, relative to the beginning of the video, corresponding to the
+video frame for this location.
+
+=item * C<< $msg->confidence() >> / C<< $msg->confidence($value) >>
+
+Type: C<Float>
+
+Confidence that the label is accurate. Range: [0, 1].
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::Entity
+
+Detected entity from video analysis.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entity_id() >> / C<< $msg->entity_id($value) >>
+
+Type: C<String>
+
+Opaque entity ID. Some IDs may be available in
+[Google Knowledge Graph Search
+API](https://developers.google.com/knowledge-graph/).
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Textual description, e.g. `Fixed-gear bicycle`.
+
+=item * C<< $msg->language_code() >> / C<< $msg->language_code($value) >>
+
+Type: C<String>
+
+Language code for `description` in BCP-47 format.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelAnnotation
+
+Label annotation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entity() >> / C<< $msg->entity($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::Entity>)
+
+Detected entity.
+
+=item * C<< $msg->category_entities() >> / C<< $msg->category_entities($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::Entity>)
+
+Common categories for the detected entity.
+E.g. when the label is `Terrier` the category is likely `dog`. And in some
+cases there might be more than one categories e.g. `Terrier` could also be
+a `pet`.
+
+=item * C<< $msg->segments() >> / C<< $msg->segments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelSegment>)
+
+All video segments where a label was detected.
+
+=item * C<< $msg->frames() >> / C<< $msg->frames($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelFrame>)
+
+All video frames where a label was detected.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ExplicitContentFrame
+
+Video frame level annotation results for explicit content.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->time_offset() >> / C<< $msg->time_offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Time-offset, relative to the beginning of the video, corresponding to the
+video frame for this location.
+
+=item * C<< $msg->pornography_likelihood() >> / C<< $msg->pornography_likelihood($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Videointelligence::V1beta2::Likelihood>)
+
+Likelihood of the pornography content..
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ExplicitContentAnnotation
+
+Explicit content annotation (based on per-frame visual signals only).
+If no explicit content has been detected in a frame, no annotations are
+present for that frame.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->frames() >> / C<< $msg->frames($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ExplicitContentFrame>)
+
+All video frames where explicit content was detected.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::NormalizedBoundingBox
+
+Normalized bounding box.
+The normalized vertex coordinates are relative to the original image.
+Range: [0, 1].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->left() >> / C<< $msg->left($value) >>
+
+Type: C<Float>
+
+Left X coordinate.
+
+=item * C<< $msg->top() >> / C<< $msg->top($value) >>
+
+Type: C<Float>
+
+Top Y coordinate.
+
+=item * C<< $msg->right() >> / C<< $msg->right($value) >>
+
+Type: C<Float>
+
+Right X coordinate.
+
+=item * C<< $msg->bottom() >> / C<< $msg->bottom($value) >>
+
+Type: C<Float>
+
+Bottom Y coordinate.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceSegment
+
+Video segment level annotation results for face detection.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->segment() >> / C<< $msg->segment($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoSegment>)
+
+Video segment where a face was detected.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceFrame
+
+Video frame level annotation results for face detection.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->normalized_bounding_boxes() >> / C<< $msg->normalized_bounding_boxes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::NormalizedBoundingBox>)
+
+Normalized Bounding boxes in a frame.
+There can be more than one boxes if the same face is detected in multiple
+locations within the current frame.
+
+=item * C<< $msg->time_offset() >> / C<< $msg->time_offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Time-offset, relative to the beginning of the video,
+corresponding to the video frame for this location.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceAnnotation
+
+Face annotation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->thumbnail() >> / C<< $msg->thumbnail($value) >>
+
+Type: C<Bytes>
+
+Thumbnail of a representative face view (in JPEG format).
+
+=item * C<< $msg->segments() >> / C<< $msg->segments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceSegment>)
+
+All video segments where a face was detected.
+
+=item * C<< $msg->frames() >> / C<< $msg->frames($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceFrame>)
+
+All video frames where a face was detected.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoAnnotationResults
+
+Annotation results for a single video.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->input_uri() >> / C<< $msg->input_uri($value) >>
+
+Type: C<String>
+
+Video file location in
+[Google Cloud Storage](https://cloud.google.com/storage/).
+
+=item * C<< $msg->segment_label_annotations() >> / C<< $msg->segment_label_annotations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelAnnotation>)
+
+Label annotations on video level or user specified segment level.
+There is exactly one element for each unique label.
+
+=item * C<< $msg->shot_label_annotations() >> / C<< $msg->shot_label_annotations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelAnnotation>)
+
+Label annotations on shot level.
+There is exactly one element for each unique label.
+
+=item * C<< $msg->frame_label_annotations() >> / C<< $msg->frame_label_annotations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::LabelAnnotation>)
+
+Label annotations on frame level.
+There is exactly one element for each unique label.
+
+=item * C<< $msg->face_annotations() >> / C<< $msg->face_annotations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::FaceAnnotation>)
+
+Face annotations. There is exactly one element for each unique face.
+
+=item * C<< $msg->shot_annotations() >> / C<< $msg->shot_annotations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoSegment>)
+
+Shot annotations. Each shot is represented as a video segment.
+
+=item * C<< $msg->explicit_annotation() >> / C<< $msg->explicit_annotation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::ExplicitContentAnnotation>)
+
+Explicit content annotation.
+
+=item * C<< $msg->error() >> / C<< $msg->error($value) >>
+
+Type: C<Message> (L<Google::Rpc::Status::Status>)
+
+If set, indicates an error. Note that for a single `AnnotateVideoRequest`
+some videos may succeed and some may fail.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::AnnotateVideoResponse
+
+Video annotation response. Included in the `response`
+field of the `Operation` returned by the `GetOperation`
+call of the `google::longrunning::Operations` service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->annotation_results() >> / C<< $msg->annotation_results($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoAnnotationResults>)
+
+Annotation results for all videos specified in `AnnotateVideoRequest`.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoAnnotationProgress
+
+Annotation progress for a single video.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->input_uri() >> / C<< $msg->input_uri($value) >>
+
+Type: C<String>
+
+Video file location in
+[Google Cloud Storage](https://cloud.google.com/storage/).
+
+=item * C<< $msg->progress_percent() >> / C<< $msg->progress_percent($value) >>
+
+Type: C<Int32>
+
+Approximate percentage processed thus far.
+Guaranteed to be 100 when fully processed.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Time when the request was received.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Time of the most recent update.
+
+=back
+
+=head2 Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::AnnotateVideoProgress
+
+Video annotation progress. Included in the `metadata`
+field of the `Operation` returned by the `GetOperation`
+call of the `google::longrunning::Operations` service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->annotation_progress() >> / C<< $msg->annotation_progress($value) >>
+
+Type: C<Message> (L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::VideoAnnotationProgress>)
+
+Progress metadata for all videos specified in `AnnotateVideoRequest`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Videointelligence::V1beta2::VideoIntelligence::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

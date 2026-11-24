@@ -79,9 +79,12 @@ is_approx( pnorm(-1,   log => 1), log(pnorm(-1)),    'log=>1 for a left-tail val
 is_approx( pnorm(6,    log => 1), log(pnorm(6)),     'log=>1 for a right value');
 is_approx( pnorm(2, 'log_p' => 1), pnorm(2, log => 1),
 	"'log_p' alias matches 'log'");
-# deep left tail: underflows to 0 without log, finite with log
+# deep left tail: underflows to 0 without log, finite with log.  Phi(-40) is
+# 3.7e-350, which is 0 on a double perl (R's cut-off) but a number on a long
+# double or __float128 one since 0.3429 (t/pnorm.qnorm.mpmath.t pins it);
+# Phi(-200), about 1e-8700, is below every NV's smallest subnormal.
 is_approx( pnorm(-40, log => 1), -804.6084420, 'log=>1 deep tail stays finite', 1e-4);
-ok( pnorm(-40) == 0,             'without log the deep tail underflows to 0');
+ok( pnorm(-200) == 0,            'without log the deep tail underflows to 0');
 ok( pnorm(-40, log => 1) < -800, 'with log the deep tail is a large negative number');
 
 # lower_tail = 0 combined with log_p

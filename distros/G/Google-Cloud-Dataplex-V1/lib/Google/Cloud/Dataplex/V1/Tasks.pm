@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Tasks;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -446,80 +446,6 @@ EOF
     # Field: spark Type: 11 (.google.cloud.dataplex.v1.Task.SparkTaskConfig)
     # Field: notebook Type: 11 (.google.cloud.dataplex.v1.Task.NotebookTaskConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Tasks::Task - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Tasks;
-
-    my $msg = Google::Cloud::Dataplex::V1::Tasks::Task->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.State)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.Task.LabelsEntry)
-
-=item * B<trigger_spec>
-
-Type: Message (.google.cloud.dataplex.v1.Task.TriggerSpec)
-
-=item * B<execution_spec>
-
-Type: Message (.google.cloud.dataplex.v1.Task.ExecutionSpec)
-
-=item * B<execution_status>
-
-Type: Message (.google.cloud.dataplex.v1.Task.ExecutionStatus)
-
-=item * B<spark>
-
-Type: Message (.google.cloud.dataplex.v1.Task.SparkTaskConfig)
-
-=item * B<notebook>
-
-Type: Message (.google.cloud.dataplex.v1.Task.NotebookTaskConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Tasks::Job ===
     # Fields for Job
     # Field: name Type: 9 ()
@@ -535,95 +461,9 @@ Type: Message (.google.cloud.dataplex.v1.Task.NotebookTaskConfig)
     # Field: trigger Type: 14 (.google.cloud.dataplex.v1.Job.Trigger)
     # Field: execution_spec Type: 11 (.google.cloud.dataplex.v1.Task.ExecutionSpec)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Tasks::Job - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Tasks;
-
-    my $msg = Google::Cloud::Dataplex::V1::Tasks::Job->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.Job.State)
-
-=item * B<retry_count>
-
-Type: UInt32
-
-=item * B<service>
-
-Type: Enum (.google.cloud.dataplex.v1.Job.Service)
-
-=item * B<service_job>
-
-Type: String
-
-=item * B<message>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.Job.LabelsEntry)
-
-=item * B<trigger>
-
-Type: Enum (.google.cloud.dataplex.v1.Job.Trigger)
-
-=item * B<execution_spec>
-
-Type: Message (.google.cloud.dataplex.v1.Task.ExecutionSpec)
-
-=back
-
-=cut
-
 # Enum: Job::Service
 our $Job_SERVICE_UNSPECIFIED = 0;
 our $Job_DATAPROC = 1;
-
-=pod
-
-=head2 Enum: Job::Service
-
-Values:
-
-=over 4
-
-=item * C<SERVICE_UNSPECIFIED> => 0
-
-=item * C<DATAPROC> => 1
-
-=back
-
-=cut
 
 # Enum: Job::State
 our $Job_STATE_UNSPECIFIED = 0;
@@ -634,66 +474,275 @@ our $Job_SUCCEEDED = 4;
 our $Job_FAILED = 5;
 our $Job_ABORTED = 6;
 
-=pod
-
-=head2 Enum: Job::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<RUNNING> => 1
-
-=item * C<CANCELLING> => 2
-
-=item * C<CANCELLED> => 3
-
-=item * C<SUCCEEDED> => 4
-
-=item * C<FAILED> => 5
-
-=item * C<ABORTED> => 6
-
-=back
-
-=cut
-
 # Enum: Job::Trigger
 our $Job_TRIGGER_UNSPECIFIED = 0;
 our $Job_TASK_CONFIG = 1;
 our $Job_RUN_REQUEST = 2;
 
-=pod
-
-=head2 Enum: Job::Trigger
-
-Values:
-
-=over 4
-
-=item * C<TRIGGER_UNSPECIFIED> => 0
-
-=item * C<TASK_CONFIG> => 1
-
-=item * C<RUN_REQUEST> => 2
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Tasks - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::Tasks - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/tasks.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Tasks;
+
+    my $msg = Google::Cloud::Dataplex::V1::Tasks::Task->new({
+        name => $name,
+        uid => $uid,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Tasks::Task->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/tasks.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Tasks::Task
+
+A task represents a user-visible job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the task, of the form:
+projects/{project_number}/locations/{location_id}/lakes/{lake_id}/
+tasks/{task_id}.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the task. This ID will
+be different if the task is deleted and re-created with the same name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the task was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the task was last updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the task.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::State>)
+
+Output only. Current state of the task.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task::LabelsEntry>)
+
+Optional. User-defined labels for the task.
+
+=item * C<< $msg->trigger_spec() >> / C<< $msg->trigger_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task::TriggerSpec>)
+
+Required. Spec related to how often and when a task should be triggered.
+
+=item * C<< $msg->execution_spec() >> / C<< $msg->execution_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task::ExecutionSpec>)
+
+Required. Spec related to how a task is executed.
+
+=item * C<< $msg->execution_status() >> / C<< $msg->execution_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task::ExecutionStatus>)
+
+Output only. Status of the latest task executions.
+
+=item * C<< $msg->spark() >> / C<< $msg->spark($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task::SparkTaskConfig>)
+
+Config related to running custom Spark tasks.
+
+=item * C<< $msg->notebook() >> / C<< $msg->notebook($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task::NotebookTaskConfig>)
+
+Config related to running scheduled Notebooks.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Tasks::Job
+
+A job represents an instance of a task.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the job, of the form:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/tasks/{task_id}/jobs/{job_id}`.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the job.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the job was started.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the job ended.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::Job::State>)
+
+Output only. Execution state for the job.
+
+=item * C<< $msg->retry_count() >> / C<< $msg->retry_count($value) >>
+
+Type: C<UInt32>
+
+Output only. The number of times the job has been retried (excluding the
+initial attempt).
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::Job::Service>)
+
+Output only. The underlying service running a job.
+
+=item * C<< $msg->service_job() >> / C<< $msg->service_job($value) >>
+
+Type: C<String>
+
+Output only. The full resource name for the job run under a particular
+service.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+Output only. Additional information about the current state.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Job::LabelsEntry>)
+
+Output only. User-defined labels for the task.
+
+=item * C<< $msg->trigger() >> / C<< $msg->trigger($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::Job::Trigger>)
+
+Output only. Job execution trigger.
+
+=item * C<< $msg->execution_spec() >> / C<< $msg->execution_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task::ExecutionSpec>)
+
+Output only. Spec related to how a task is executed.
+
+=back
+
+=head3 Enum: Job::Service
+
+=over 4
+
+=item * C<SERVICE_UNSPECIFIED> => C<0>
+
+=item * C<DATAPROC> => C<1>
+
+=back
+
+=head3 Enum: Job::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<RUNNING> => C<1>
+
+=item * C<CANCELLING> => C<2>
+
+=item * C<CANCELLED> => C<3>
+
+=item * C<SUCCEEDED> => C<4>
+
+=item * C<FAILED> => C<5>
+
+=item * C<ABORTED> => C<6>
+
+=back
+
+=head3 Enum: Job::Trigger
+
+=over 4
+
+=item * C<TRIGGER_UNSPECIFIED> => C<0>
+
+=item * C<TASK_CONFIG> => C<1>
+
+=item * C<RUN_REQUEST> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Tasks::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

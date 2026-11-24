@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -362,31 +362,200 @@ The following RPC methods are available in this client:
 
 =item * B<advance>
 
-Calls the RPC method C<Advance> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->advance(
+        current_wave_number      => $current_wave_number,
+        project                  => $project,
+        request_id               => $request_id,
+        rollout                  => $rollout,
+    );
+
+Calls the RPC method C<Advance> on C<google.cloud.compute.v1.Rollouts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AdvanceRolloutRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<current_wave_number> - C<int64>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<rollout> - C<string>
+
+=back
 
 =item * B<cancel>
 
-Calls the RPC method C<Cancel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->cancel(
+        project                  => $project,
+        request_id               => $request_id,
+        rollback                 => $rollback,
+        rollout                  => $rollout,
+    );
+
+Calls the RPC method C<Cancel> on C<google.cloud.compute.v1.Rollouts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CancelRolloutRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<rollback> - C<bool>
+
+=item * C<rollout> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        project                  => $project,
+        request_id               => $request_id,
+        rollout                  => $rollout,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.Rollouts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteRolloutRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<rollout> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        rollout                  => $rollout,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.Rollouts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRolloutRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Rollout>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<rollout> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.Rollouts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListRolloutsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RolloutsListResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<pause>
 
-Calls the RPC method C<Pause> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->pause(
+        etag                     => $etag,
+        project                  => $project,
+        request_id               => $request_id,
+        rollout                  => $rollout,
+    );
+
+Calls the RPC method C<Pause> on C<google.cloud.compute.v1.Rollouts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PauseRolloutRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<etag> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<rollout> - C<string>
+
+=back
 
 =item * B<resume>
 
-Calls the RPC method C<Resume> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->resume(
+        etag                     => $etag,
+        project                  => $project,
+        request_id               => $request_id,
+        rollout                  => $rollout,
+    );
+
+Calls the RPC method C<Resume> on C<google.cloud.compute.v1.Rollouts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ResumeRolloutRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<etag> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<rollout> - C<string>
+
+=back
 
 =back
 

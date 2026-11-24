@@ -1,0 +1,872 @@
+package Grafeas::V1::Cvss;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+ChVncmFmZWFzL3YxL2N2c3MucHJvdG8SCmdyYWZlYXMudjEi+goKBkNWU1N2MxIdCgpiYXNl
+X3Njb3JlGAEgASgCUgliYXNlU2NvcmUSMQoUZXhwbG9pdGFiaWxpdHlfc2NvcmUYAiABKAJS
+E2V4cGxvaXRhYmlsaXR5U2NvcmUSIQoMaW1wYWN0X3Njb3JlGAMgASgCUgtpbXBhY3RTY29y
+ZRJECg1hdHRhY2tfdmVjdG9yGAUgASgOMh8uZ3JhZmVhcy52MS5DVlNTdjMuQXR0YWNrVmVj
+dG9yUgxhdHRhY2tWZWN0b3ISUAoRYXR0YWNrX2NvbXBsZXhpdHkYBiABKA4yIy5ncmFmZWFz
+LnYxLkNWU1N2My5BdHRhY2tDb21wbGV4aXR5UhBhdHRhY2tDb21wbGV4aXR5ElYKE3ByaXZp
+bGVnZXNfcmVxdWlyZWQYByABKA4yJS5ncmFmZWFzLnYxLkNWU1N2My5Qcml2aWxlZ2VzUmVx
+dWlyZWRSEnByaXZpbGVnZXNSZXF1aXJlZBJNChB1c2VyX2ludGVyYWN0aW9uGAggASgOMiIu
+Z3JhZmVhcy52MS5DVlNTdjMuVXNlckludGVyYWN0aW9uUg91c2VySW50ZXJhY3Rpb24SLgoF
+c2NvcGUYCSABKA4yGC5ncmFmZWFzLnYxLkNWU1N2My5TY29wZVIFc2NvcGUSUAoWY29uZmlk
+ZW50aWFsaXR5X2ltcGFjdBgKIAEoDjIZLmdyYWZlYXMudjEuQ1ZTU3YzLkltcGFjdFIVY29u
+ZmlkZW50aWFsaXR5SW1wYWN0EkQKEGludGVncml0eV9pbXBhY3QYCyABKA4yGS5ncmFmZWFz
+LnYxLkNWU1N2My5JbXBhY3RSD2ludGVncml0eUltcGFjdBJKChNhdmFpbGFiaWxpdHlfaW1w
+YWN0GAwgASgOMhkuZ3JhZmVhcy52MS5DVlNTdjMuSW1wYWN0UhJhdmFpbGFiaWxpdHlJbXBh
+Y3QimQEKDEF0dGFja1ZlY3RvchIdChlBVFRBQ0tfVkVDVE9SX1VOU1BFQ0lGSUVEEAASGQoV
+QVRUQUNLX1ZFQ1RPUl9ORVRXT1JLEAESGgoWQVRUQUNLX1ZFQ1RPUl9BREpBQ0VOVBACEhcK
+E0FUVEFDS19WRUNUT1JfTE9DQUwQAxIaChZBVFRBQ0tfVkVDVE9SX1BIWVNJQ0FMEAQibAoQ
+QXR0YWNrQ29tcGxleGl0eRIhCh1BVFRBQ0tfQ09NUExFWElUWV9VTlNQRUNJRklFRBAAEhkK
+FUFUVEFDS19DT01QTEVYSVRZX0xPVxABEhoKFkFUVEFDS19DT01QTEVYSVRZX0hJR0gQAiKS
+AQoSUHJpdmlsZWdlc1JlcXVpcmVkEiMKH1BSSVZJTEVHRVNfUkVRVUlSRURfVU5TUEVDSUZJ
+RUQQABIcChhQUklWSUxFR0VTX1JFUVVJUkVEX05PTkUQARIbChdQUklWSUxFR0VTX1JFUVVJ
+UkVEX0xPVxACEhwKGFBSSVZJTEVHRVNfUkVRVUlSRURfSElHSBADIm0KD1VzZXJJbnRlcmFj
+dGlvbhIgChxVU0VSX0lOVEVSQUNUSU9OX1VOU1BFQ0lGSUVEEAASGQoVVVNFUl9JTlRFUkFD
+VElPTl9OT05FEAESHQoZVVNFUl9JTlRFUkFDVElPTl9SRVFVSVJFRBACIkYKBVNjb3BlEhUK
+EVNDT1BFX1VOU1BFQ0lGSUVEEAASEwoPU0NPUEVfVU5DSEFOR0VEEAESEQoNU0NPUEVfQ0hB
+TkdFRBACIlIKBkltcGFjdBIWChJJTVBBQ1RfVU5TUEVDSUZJRUQQABIPCgtJTVBBQ1RfSElH
+SBABEg4KCklNUEFDVF9MT1cQAhIPCgtJTVBBQ1RfTk9ORRADIpAWCgRDVlNTEh0KCmJhc2Vf
+c2NvcmUYASABKAJSCWJhc2VTY29yZRIxChRleHBsb2l0YWJpbGl0eV9zY29yZRgCIAEoAlIT
+ZXhwbG9pdGFiaWxpdHlTY29yZRIhCgxpbXBhY3Rfc2NvcmUYAyABKAJSC2ltcGFjdFNjb3Jl
+EkIKDWF0dGFja192ZWN0b3IYBCABKA4yHS5ncmFmZWFzLnYxLkNWU1MuQXR0YWNrVmVjdG9y
+UgxhdHRhY2tWZWN0b3ISTgoRYXR0YWNrX2NvbXBsZXhpdHkYBSABKA4yIS5ncmFmZWFzLnYx
+LkNWU1MuQXR0YWNrQ29tcGxleGl0eVIQYXR0YWNrQ29tcGxleGl0eRJHCg5hdXRoZW50aWNh
+dGlvbhgGIAEoDjIfLmdyYWZlYXMudjEuQ1ZTUy5BdXRoZW50aWNhdGlvblIOYXV0aGVudGlj
+YXRpb24SVAoTcHJpdmlsZWdlc19yZXF1aXJlZBgHIAEoDjIjLmdyYWZlYXMudjEuQ1ZTUy5Q
+cml2aWxlZ2VzUmVxdWlyZWRSEnByaXZpbGVnZXNSZXF1aXJlZBJLChB1c2VyX2ludGVyYWN0
+aW9uGAggASgOMiAuZ3JhZmVhcy52MS5DVlNTLlVzZXJJbnRlcmFjdGlvblIPdXNlckludGVy
+YWN0aW9uEiwKBXNjb3BlGAkgASgOMhYuZ3JhZmVhcy52MS5DVlNTLlNjb3BlUgVzY29wZRJO
+ChZjb25maWRlbnRpYWxpdHlfaW1wYWN0GAogASgOMhcuZ3JhZmVhcy52MS5DVlNTLkltcGFj
+dFIVY29uZmlkZW50aWFsaXR5SW1wYWN0EkIKEGludGVncml0eV9pbXBhY3QYCyABKA4yFy5n
+cmFmZWFzLnYxLkNWU1MuSW1wYWN0Ug9pbnRlZ3JpdHlJbXBhY3QSSAoTYXZhaWxhYmlsaXR5
+X2ltcGFjdBgMIAEoDjIXLmdyYWZlYXMudjEuQ1ZTUy5JbXBhY3RSEmF2YWlsYWJpbGl0eUlt
+cGFjdBJUChNhdHRhY2tfcmVxdWlyZW1lbnRzGA0gASgOMiMuZ3JhZmVhcy52MS5DVlNTLkF0
+dGFja1JlcXVpcmVtZW50c1ISYXR0YWNrUmVxdWlyZW1lbnRzEnAKKHZ1bG5lcmFibGVfc3lz
+dGVtX2NvbmZpZGVudGlhbGl0eV9pbXBhY3QYDiABKA4yFy5ncmFmZWFzLnYxLkNWU1MuSW1w
+YWN0UiV2dWxuZXJhYmxlU3lzdGVtQ29uZmlkZW50aWFsaXR5SW1wYWN0EmQKInZ1bG5lcmFi
+bGVfc3lzdGVtX2ludGVncml0eV9pbXBhY3QYDyABKA4yFy5ncmFmZWFzLnYxLkNWU1MuSW1w
+YWN0Uh92dWxuZXJhYmxlU3lzdGVtSW50ZWdyaXR5SW1wYWN0EmoKJXZ1bG5lcmFibGVfc3lz
+dGVtX2F2YWlsYWJpbGl0eV9pbXBhY3QYECABKA4yFy5ncmFmZWFzLnYxLkNWU1MuSW1wYWN0
+UiJ2dWxuZXJhYmxlU3lzdGVtQXZhaWxhYmlsaXR5SW1wYWN0EnAKKHN1YnNlcXVlbnRfc3lz
+dGVtX2NvbmZpZGVudGlhbGl0eV9pbXBhY3QYESABKA4yFy5ncmFmZWFzLnYxLkNWU1MuSW1w
+YWN0UiVzdWJzZXF1ZW50U3lzdGVtQ29uZmlkZW50aWFsaXR5SW1wYWN0EmQKInN1YnNlcXVl
+bnRfc3lzdGVtX2ludGVncml0eV9pbXBhY3QYEiABKA4yFy5ncmFmZWFzLnYxLkNWU1MuSW1w
+YWN0Uh9zdWJzZXF1ZW50U3lzdGVtSW50ZWdyaXR5SW1wYWN0EmoKJXN1YnNlcXVlbnRfc3lz
+dGVtX2F2YWlsYWJpbGl0eV9pbXBhY3QYEyABKA4yFy5ncmFmZWFzLnYxLkNWU1MuSW1wYWN0
+UiJzdWJzZXF1ZW50U3lzdGVtQXZhaWxhYmlsaXR5SW1wYWN0EksKEGV4cGxvaXRfbWF0dXJp
+dHkYFCABKA4yIC5ncmFmZWFzLnYxLkNWU1MuRXhwbG9pdE1hdHVyaXR5Ug9leHBsb2l0TWF0
+dXJpdHkimQEKDEF0dGFja1ZlY3RvchIdChlBVFRBQ0tfVkVDVE9SX1VOU1BFQ0lGSUVEEAAS
+GQoVQVRUQUNLX1ZFQ1RPUl9ORVRXT1JLEAESGgoWQVRUQUNLX1ZFQ1RPUl9BREpBQ0VOVBAC
+EhcKE0FUVEFDS19WRUNUT1JfTE9DQUwQAxIaChZBVFRBQ0tfVkVDVE9SX1BIWVNJQ0FMEAQi
+igEKEEF0dGFja0NvbXBsZXhpdHkSIQodQVRUQUNLX0NPTVBMRVhJVFlfVU5TUEVDSUZJRUQQ
+ABIZChVBVFRBQ0tfQ09NUExFWElUWV9MT1cQARIaChZBVFRBQ0tfQ09NUExFWElUWV9ISUdI
+EAISHAoYQVRUQUNLX0NPTVBMRVhJVFlfTUVESVVNEAMigQEKDkF1dGhlbnRpY2F0aW9uEh4K
+GkFVVEhFTlRJQ0FUSU9OX1VOU1BFQ0lGSUVEEAASGwoXQVVUSEVOVElDQVRJT05fTVVMVElQ
+TEUQARIZChVBVVRIRU5USUNBVElPTl9TSU5HTEUQAhIXChNBVVRIRU5USUNBVElPTl9OT05F
+EAMikgEKElByaXZpbGVnZXNSZXF1aXJlZBIjCh9QUklWSUxFR0VTX1JFUVVJUkVEX1VOU1BF
+Q0lGSUVEEAASHAoYUFJJVklMRUdFU19SRVFVSVJFRF9OT05FEAESGwoXUFJJVklMRUdFU19S
+RVFVSVJFRF9MT1cQAhIcChhQUklWSUxFR0VTX1JFUVVJUkVEX0hJR0gQAyKoAQoPVXNlcklu
+dGVyYWN0aW9uEiAKHFVTRVJfSU5URVJBQ1RJT05fVU5TUEVDSUZJRUQQABIZChVVU0VSX0lO
+VEVSQUNUSU9OX05PTkUQARIdChlVU0VSX0lOVEVSQUNUSU9OX1JFUVVJUkVEEAISHAoYVVNF
+Ul9JTlRFUkFDVElPTl9QQVNTSVZFEAMSGwoXVVNFUl9JTlRFUkFDVElPTl9BQ1RJVkUQBCJG
+CgVTY29wZRIVChFTQ09QRV9VTlNQRUNJRklFRBAAEhMKD1NDT1BFX1VOQ0hBTkdFRBABEhEK
+DVNDT1BFX0NIQU5HRUQQAiJ7CgZJbXBhY3QSFgoSSU1QQUNUX1VOU1BFQ0lGSUVEEAASDwoL
+SU1QQUNUX0hJR0gQARIOCgpJTVBBQ1RfTE9XEAISDwoLSU1QQUNUX05PTkUQAxISCg5JTVBB
+Q1RfUEFSVElBTBAEEhMKD0lNUEFDVF9DT01QTEVURRAFIngKEkF0dGFja1JlcXVpcmVtZW50
+cxIjCh9BVFRBQ0tfUkVRVUlSRU1FTlRTX1VOU1BFQ0lGSUVEEAASHAoYQVRUQUNLX1JFUVVJ
+UkVNRU5UU19OT05FEAESHwobQVRUQUNLX1JFUVVJUkVNRU5UU19QUkVTRU5UEAIirwEKD0V4
+cGxvaXRNYXR1cml0eRIgChxFWFBMT0lUX01BVFVSSVRZX1VOU1BFQ0lGSUVEEAASIAocRVhQ
+TE9JVF9NQVRVUklUWV9OT1RfREVGSU5FRBABEh0KGUVYUExPSVRfTUFUVVJJVFlfQVRUQUNL
+RUQQAhIYChRFWFBMT0lUX01BVFVSSVRZX1BPQxADEh8KG0VYUExPSVRfTUFUVVJJVFlfVU5S
+RVBPUlRFRBAEKmcKC0NWU1NWZXJzaW9uEhwKGENWU1NfVkVSU0lPTl9VTlNQRUNJRklFRBAA
+EhIKDkNWU1NfVkVSU0lPTl8yEAESEgoOQ1ZTU19WRVJTSU9OXzMQAhISCg5DVlNTX1ZFUlNJ
+T05fNBADQlwKDWlvLmdyYWZlYXMudjFCCUNWU1NQcm90b1ABWjhnb29nbGUuZ29sYW5nLm9y
+Zy9nZW5wcm90by9nb29nbGVhcGlzL2dyYWZlYXMvdjE7Z3JhZmVhc6ICA0dSQUrgTQoHEgUO
+AIcCAQraBAoBDBIDDgASMs8EIENvcHlyaWdodCAyMDE5IFRoZSBHcmFmZWFzIEF1dGhvcnMu
+IEFsbCByaWdodHMgcmVzZXJ2ZWQuCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNl
+bnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhp
+cyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5
+IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICBodHRwOi8vd3d3LmFwYWNo
+ZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGlj
+YWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0cmlidXRl
+ZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lT
+LAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhl
+ciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZp
+YyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRl
+ciB0aGUgTGljZW5zZS4KCggKAQISAxAAEwoICgEIEgMSAE8KCQoCCAsSAxIATwoICgEIEgMT
+ACIKCQoCCAoSAxMAIgoICgEIEgMUACYKCQoCCAESAxQAJgoICgEIEgMVACEKCQoCCCQSAxUA
+IQoICgEIEgMWACoKCQoCCAgSAxYAKgqAAQoCBAASBBoAVQEadCBDb21tb24gVnVsbmVyYWJp
+bGl0eSBTY29yaW5nIFN5c3RlbSB2ZXJzaW9uIDMuCiBGb3IgZGV0YWlscywgc2VlIGh0dHBz
+Oi8vd3d3LmZpcnN0Lm9yZy9jdnNzL3NwZWNpZmljYXRpb24tZG9jdW1lbnQKCgoKAwQAARID
+GggOCkYKBAQAAgASAxwCFxo5IFRoZSBiYXNlIHNjb3JlIGlzIGEgZnVuY3Rpb24gb2YgdGhl
+IGJhc2UgbWV0cmljIHNjb3Jlcy4KCgwKBQQAAgAFEgMcAgcKDAoFBAACAAESAxwIEgoMCgUE
+AAIAAxIDHBUWCgsKBAQAAgESAx4CIQoMCgUEAAIBBRIDHgIHCgwKBQQAAgEBEgMeCBwKDAoF
+BAACAQMSAx4fIAoLCgQEAAICEgMgAhkKDAoFBAACAgUSAyACBwoMCgUEAAICARIDIAgUCgwK
+BQQAAgIDEgMgFxgKlAEKBAQAAgMSAyUCIRqGASBCYXNlIE1ldHJpY3MKIFJlcHJlc2VudHMg
+dGhlIGludHJpbnNpYyBjaGFyYWN0ZXJpc3RpY3Mgb2YgYSB2dWxuZXJhYmlsaXR5IHRoYXQg
+YXJlCiBjb25zdGFudCBvdmVyIHRpbWUgYW5kIGFjcm9zcyB1c2VyIGVudmlyb25tZW50cy4K
+CgwKBQQAAgMGEgMlAg4KDAoFBAACAwESAyUPHAoMCgUEAAIDAxIDJR8gCgsKBAQAAgQSAyYC
+KQoMCgUEAAIEBhIDJgISCgwKBQQAAgQBEgMmEyQKDAoFBAACBAMSAyYnKAoLCgQEAAIFEgMn
+Ai0KDAoFBAACBQYSAycCFAoMCgUEAAIFARIDJxUoCgwKBQQAAgUDEgMnKywKCwoEBAACBhID
+KAInCgwKBQQAAgYGEgMoAhEKDAoFBAACBgESAygSIgoMCgUEAAIGAxIDKCUmCgsKBAQAAgcS
+AykCEgoMCgUEAAIHBhIDKQIHCgwKBQQAAgcBEgMpCA0KDAoFBAACBwMSAykQEQoLCgQEAAII
+EgMqAiUKDAoFBAACCAYSAyoCCAoMCgUEAAIIARIDKgkfCgwKBQQAAggDEgMqIiQKCwoEBAAC
+CRIDKwIfCgwKBQQAAgkGEgMrAggKDAoFBAACCQESAysJGQoMCgUEAAIJAxIDKxweCgsKBAQA
+AgoSAywCIgoMCgUEAAIKBhIDLAIICgwKBQQAAgoBEgMsCRwKDAoFBAACCgMSAywfIQoMCgQE
+AAQAEgQuAjQDCgwKBQQABAABEgMuBxMKDQoGBAAEAAIAEgMvBCIKDgoHBAAEAAIAARIDLwQd
+Cg4KBwQABAACAAISAy8gIQoNCgYEAAQAAgESAzAEHgoOCgcEAAQAAgEBEgMwBBkKDgoHBAAE
+AAIBAhIDMBwdCg0KBgQABAACAhIDMQQfCg4KBwQABAACAgESAzEEGgoOCgcEAAQAAgICEgMx
+HR4KDQoGBAAEAAIDEgMyBBwKDgoHBAAEAAIDARIDMgQXCg4KBwQABAACAwISAzIaGwoNCgYE
+AAQAAgQSAzMEHwoOCgcEAAQAAgQBEgMzBBoKDgoHBAAEAAIEAhIDMx0eCgwKBAQABAESBDYC
+OgMKDAoFBAAEAQESAzYHFwoNCgYEAAQBAgASAzcEJgoOCgcEAAQBAgABEgM3BCEKDgoHBAAE
+AQIAAhIDNyQlCg0KBgQABAECARIDOAQeCg4KBwQABAECAQESAzgEGQoOCgcEAAQBAgECEgM4
+HB0KDQoGBAAEAQICEgM5BB8KDgoHBAAEAQICARIDOQQaCg4KBwQABAECAgISAzkdHgoMCgQE
+AAQCEgQ8AkEDCgwKBQQABAIBEgM8BxkKDQoGBAAEAgIAEgM9BCgKDgoHBAAEAgIAARIDPQQj
+Cg4KBwQABAICAAISAz0mJwoNCgYEAAQCAgESAz4EIQoOCgcEAAQCAgEBEgM+BBwKDgoHBAAE
+AgIBAhIDPh8gCg0KBgQABAICAhIDPwQgCg4KBwQABAICAgESAz8EGwoOCgcEAAQCAgICEgM/
+Hh8KDQoGBAAEAgIDEgNABCEKDgoHBAAEAgIDARIDQAQcCg4KBwQABAICAwISA0AfIAoMCgQE
+AAQDEgRDAkcDCgwKBQQABAMBEgNDBxYKDQoGBAAEAwIAEgNEBCUKDgoHBAAEAwIAARIDRAQg
+Cg4KBwQABAMCAAISA0QjJAoNCgYEAAQDAgESA0UEHgoOCgcEAAQDAgEBEgNFBBkKDgoHBAAE
+AwIBAhIDRRwdCg0KBgQABAMCAhIDRgQiCg4KBwQABAMCAgESA0YEHQoOCgcEAAQDAgICEgNG
+ICEKDAoEBAAEBBIESQJNAwoMCgUEAAQEARIDSQcMCg0KBgQABAQCABIDSgQaCg4KBwQABAQC
+AAESA0oEFQoOCgcEAAQEAgACEgNKGBkKDQoGBAAEBAIBEgNLBBgKDgoHBAAEBAIBARIDSwQT
+Cg4KBwQABAQCAQISA0sWFwoNCgYEAAQEAgISA0wEFgoOCgcEAAQEAgIBEgNMBBEKDgoHBAAE
+BAICAhIDTBQVCgwKBAQABAUSBE8CVAMKDAoFBAAEBQESA08HDQoNCgYEAAQFAgASA1AEGwoO
+CgcEAAQFAgABEgNQBBYKDgoHBAAEBQIAAhIDUBkaCg0KBgQABAUCARIDUQQUCg4KBwQABAUC
+AQESA1EEDwoOCgcEAAQFAgECEgNREhMKDQoGBAAEBQICEgNSBBMKDgoHBAAEBQICARIDUgQO
+Cg4KBwQABAUCAgISA1IREgoNCgYEAAQFAgMSA1MEFAoOCgcEAAQFAgMBEgNTBA8KDgoHBAAE
+BQIDAhIDUxITCogCCgIEARIFWwD7AQEa+gEgQ29tbW9uIFZ1bG5lcmFiaWxpdHkgU2Nvcmlu
+ZyBTeXN0ZW0uCiBGb3IgZGV0YWlscywgc2VlIGh0dHBzOi8vd3d3LmZpcnN0Lm9yZy9jdnNz
+L3NwZWNpZmljYXRpb24tZG9jdW1lbnQKIFRoaXMgaXMgYSBtZXNzYWdlIHdlIHdpbGwgdHJ5
+IHRvIHVzZSBmb3Igc3RvcmluZyB2YXJpb3VzIHZlcnNpb25zIG9mIENWU1MKIHJhdGhlciB0
+aGFuIG1ha2luZyBhIHNlcGFyYXRlIHByb3RvIGZvciBzdG9yaW5nIGEgc3BlY2lmaWMgdmVy
+c2lvbi4KCgoKAwQBARIDWwgMCkYKBAQBAgASA10CFxo5IFRoZSBiYXNlIHNjb3JlIGlzIGEg
+ZnVuY3Rpb24gb2YgdGhlIGJhc2UgbWV0cmljIHNjb3Jlcy4KCgwKBQQBAgAFEgNdAgcKDAoF
+BAECAAESA10IEgoMCgUEAQIAAxIDXRUWCgsKBAQBAgESA18CIQoMCgUEAQIBBRIDXwIHCgwK
+BQQBAgEBEgNfCBwKDAoFBAECAQMSA18fIAoLCgQEAQICEgNhAhkKDAoFBAECAgUSA2ECBwoM
+CgUEAQICARIDYQgUCgwKBQQBAgIDEgNhFxgKxwEKBAQBAgMSA2gCIRoxIEF0dGFjayBWZWN0
+b3IgKEFWKS4gRGVmaW5lZCBpbiBDVlNTIHYyLCB2MywgdjQuCjKGASBCYXNlIE1ldHJpY3MK
+IFJlcHJlc2VudHMgdGhlIGludHJpbnNpYyBjaGFyYWN0ZXJpc3RpY3Mgb2YgYSB2dWxuZXJh
+YmlsaXR5IHRoYXQgYXJlCiBjb25zdGFudCBvdmVyIHRpbWUgYW5kIGFjcm9zcyB1c2VyIGVu
+dmlyb25tZW50cy4KCgwKBQQBAgMGEgNoAg4KDAoFBAECAwESA2gPHAoMCgUEAQIDAxIDaB8g
+CkIKBAQBAgQSA2oCKRo1IEF0dGFjayBDb21wbGV4aXR5IChBQykuIERlZmluZWQgaW4gQ1ZT
+UyB2MiwgdjMsIHY0LgoKDAoFBAECBAYSA2oCEgoMCgUEAQIEARIDahMkCgwKBQQBAgQDEgNq
+JygKNwoEBAECBRIDbAIkGiogQXV0aGVudGljYXRpb24gKEF1KS4gRGVmaW5lZCBpbiBDVlNT
+IHYyLgoKDAoFBAECBQYSA2wCEAoMCgUEAQIFARIDbBEfCgwKBQQBAgUDEgNsIiMKQAoEBAEC
+BhIDbgItGjMgUHJpdmlsZWdlcyBSZXF1aXJlZCAoUFIpLiBEZWZpbmVkIGluIENWU1MgdjMs
+IHY0LgoKDAoFBAECBgYSA24CFAoMCgUEAQIGARIDbhUoCgwKBQQBAgYDEgNuKywKPQoEBAEC
+BxIDcAInGjAgVXNlciBJbnRlcmFjdGlvbiAoVUkpLiBEZWZpbmVkIGluIENWU1MgdjMsIHY0
+LgoKDAoFBAECBwYSA3ACEQoMCgUEAQIHARIDcBIiCgwKBQQBAgcDEgNwJSYKLQoEBAECCBID
+cgISGiAgU2NvcGUgKFMpLiBEZWZpbmVkIGluIENWU1MgdjMuCgoMCgUEAQIIBhIDcgIHCgwK
+BQQBAggBEgNyCA0KDAoFBAECCAMSA3IQEQpCCgQEAQIJEgN0AiUaNSBDb25maWRlbnRpYWxp
+dHkgSW1wYWN0IChDKS4gRGVmaW5lZCBpbiBDVlNTIHYyLCB2My4KCgwKBQQBAgkGEgN0AggK
+DAoFBAECCQESA3QJHwoMCgUEAQIJAxIDdCIkCjwKBAQBAgoSA3YCHxovIEludGVncml0eSBJ
+bXBhY3QgKEkpLiBEZWZpbmVkIGluIENWU1MgdjIsIHYzLgoKDAoFBAECCgYSA3YCCAoMCgUE
+AQIKARIDdgkZCgwKBQQBAgoDEgN2HB4KPwoEBAECCxIDeAIiGjIgQXZhaWxhYmlsaXR5IElt
+cGFjdCAoQSkuIERlZmluZWQgaW4gQ1ZTUyB2MiwgdjMuCgoMCgUEAQILBhIDeAIICgwKBQQB
+AgsBEgN4CRwKDAoFBAECCwMSA3gfIQo8CgQEAQIMEgN6Ai4aLyBBdHRhY2sgUmVxdWlyZW1l
+bnRzIChBVCkuIERlZmluZWQgaW4gQ1ZTUyB2NC4KCgwKBQQBAgwGEgN6AhQKDAoFBAECDAES
+A3oVKAoMCgUEAQIMAxIDeistClEKBAQBAg0SA3wCNxpEIFZ1bG5lcmFibGUgU3lzdGVtIENv
+bmZpZGVudGlhbGl0eSBJbXBhY3QgKFZDKS4gRGVmaW5lZCBpbiBDVlNTIHY0LgoKDAoFBAEC
+DQYSA3wCCAoMCgUEAQINARIDfAkxCgwKBQQBAg0DEgN8NDYKSwoEBAECDhIDfgIxGj4gVnVs
+bmVyYWJsZSBTeXN0ZW0gSW50ZWdyaXR5IEltcGFjdCAoVkkpLiBEZWZpbmVkIGluIENWU1Mg
+djQuCgoMCgUEAQIOBhIDfgIICgwKBQQBAg4BEgN+CSsKDAoFBAECDgMSA34uMApPCgQEAQIP
+EgSAAQI0GkEgVnVsbmVyYWJsZSBTeXN0ZW0gQXZhaWxhYmlsaXR5IEltcGFjdCAoVkEpLiBE
+ZWZpbmVkIGluIENWU1MgdjQuCgoNCgUEAQIPBhIEgAECCAoNCgUEAQIPARIEgAEJLgoNCgUE
+AQIPAxIEgAExMwpSCgQEAQIQEgSCAQI3GkQgU3Vic2VxdWVudCBTeXN0ZW0gQ29uZmlkZW50
+aWFsaXR5IEltcGFjdCAoU0MpLiBEZWZpbmVkIGluIENWU1MgdjQuCgoNCgUEAQIQBhIEggEC
+CAoNCgUEAQIQARIEggEJMQoNCgUEAQIQAxIEggE0NgpMCgQEAQIREgSEAQIxGj4gU3Vic2Vx
+dWVudCBTeXN0ZW0gSW50ZWdyaXR5IEltcGFjdCAoU0kpLiBEZWZpbmVkIGluIENWU1MgdjQu
+CgoNCgUEAQIRBhIEhAECCAoNCgUEAQIRARIEhAEJKwoNCgUEAQIRAxIEhAEuMApPCgQEAQIS
+EgSGAQI0GkEgU3Vic2VxdWVudCBTeXN0ZW0gQXZhaWxhYmlsaXR5IEltcGFjdCAoU0EpLiBE
+ZWZpbmVkIGluIENWU1MgdjQuCgoNCgUEAQISBhIEhgECCAoNCgUEAQISARIEhgEJLgoNCgUE
+AQISAxIEhgExMwo5CgQEAQITEgSIAQIoGisgRXhwbG9pdCBNYXR1cml0eSAoRSkuIERlZmlu
+ZWQgaW4gQ1ZTUyB2NC4KCg0KBQQBAhMGEgSIAQIRCg0KBQQBAhMBEgSIARIiCg0KBQQBAhMD
+EgSIASUnCiAKBAQBBAASBosBApYBAxoQIEF0dGFjayBWZWN0b3IuCgoNCgUEAQQAARIEiwEH
+EwoeCgYEAQQAAgASBI0BBCIaDiBVbnNwZWNpZmllZC4KCg8KBwQBBAACAAESBI0BBB0KDwoH
+BAEEAAIAAhIEjQEgIQpMCgYEAQQAAgESBI8BBB4aPCBBdHRhY2sgVmVjdG9yOiBOZXR3b3Jr
+IChBVjpOKS4gRGVmaW5lZCBpbiBDVlNTIHYyLCB2MywgdjQuCgoPCgcEAQQAAgEBEgSPAQQZ
+Cg8KBwQBBAACAQISBI8BHB0KTQoGBAEEAAICEgSRAQQfGj0gQXR0YWNrIFZlY3RvcjogQWRq
+YWNlbnQgKEFWOkEpLiBEZWZpbmVkIGluIENWU1MgdjIsIHYzLCB2NC4KCg8KBwQBBAACAgES
+BJEBBBoKDwoHBAEEAAICAhIEkQEdHgpLCgYEAQQAAgMSBJMBBBwaOyAgQXR0YWNrIFZlY3Rv
+cjogTG9jYWwgKEFWOkwpLiBEZWZpbmVkIGluIENWU1MgdjIsIHYzLCB2NC4KCg8KBwQBBAAC
+AwESBJMBBBcKDwoHBAEEAAIDAhIEkwEaGwpJCgYEAQQAAgQSBJUBBB8aOSBBdHRhY2sgVmVj
+dG9yOiBQaHlzaWNhbCAoQVY6UCkuIERlZmluZWQgaW4gQ1ZTUyB2MywgdjQuCgoPCgcEAQQA
+AgQBEgSVAQQaCg8KBwQBBAACBAISBJUBHR4KJAoEBAEEARIGmQECogEDGhQgQXR0YWNrIENv
+bXBsZXhpdHkuCgoNCgUEAQQBARIEmQEHFwoeCgYEAQQBAgASBJsBBCYaDiBVbnNwZWNpZmll
+ZC4KCg8KBwQBBAECAAESBJsBBCEKDwoHBAEEAQIAAhIEmwEkJQpLCgYEAQQBAgESBJ0BBB4a
+OyBMb3cgYXR0YWNrIGNvbXBsZXhpdHkgKEFDOkwpLiBEZWZpbmVkIGluIENWU1MgdjIsIHYz
+LCB2NC4KCg8KBwQBBAECAQESBJ0BBBkKDwoHBAEEAQIBAhIEnQEcHQpMCgYEAQQBAgISBJ8B
+BB8aPCBIaWdoIGF0dGFjayBjb21wbGV4aXR5IChBQzpIKS4gRGVmaW5lZCBpbiBDVlNTIHYy
+LCB2MywgdjQuCgoPCgcEAQQBAgIBEgSfAQQaCg8KBwQBBAECAgISBJ8BHR4KRgoGBAEEAQID
+EgShAQQhGjYgTWVkaXVtIGF0dGFjayBjb21wbGV4aXR5IChBQzpNKS4gRGVmaW5lZCBpbiBD
+VlNTIHYyLgoKDwoHBAEEAQIDARIEoQEEHAoPCgcEAQQBAgMCEgShAR8gCiEKBAQBBAISBqUB
+Aq4BAxoRIEF1dGhlbnRpY2F0aW9uLgoKDQoFBAEEAgESBKUBBxUKHgoGBAEEAgIAEgSnAQQj
+Gg4gVW5zcGVjaWZpZWQuCgoPCgcEAQQCAgABEgSnAQQeCg8KBwQBBAICAAISBKcBISIKTgoG
+BAEEAgIBEgSpAQQgGj4gTXVsdGlwbGUgYXV0aGVudGljYXRpb24gcmVxdWlyZWQgKEF1Ok0p
+LiBEZWZpbmVkIGluIENWU1MgdjIuCgoPCgcEAQQCAgEBEgSpAQQbCg8KBwQBBAICAQISBKkB
+Hh8KTAoGBAEEAgICEgSrAQQeGjwgU2luZ2xlIGF1dGhlbnRpY2F0aW9uIHJlcXVpcmVkIChB
+dTpTKS4gRGVmaW5lZCBpbiBDVlNTIHYyLgoKDwoHBAEEAgICARIEqwEEGQoPCgcEAQQCAgIC
+EgSrARwdCkgKBgQBBAICAxIErQEEHBo4IE5vIGF1dGhlbnRpY2F0aW9uIHJlcXVpcmVkIChB
+dTpOKS4gRGVmaW5lZCBpbiBDVlNTIHYyLgoKDwoHBAEEAgIDARIErQEEFwoPCgcEAQQCAgMC
+EgStARobCiYKBAQBBAMSBrEBAroBAxoWIFByaXZpbGVnZXMgUmVxdWlyZWQuCgoNCgUEAQQD
+ARIEsQEHGQoeCgYEAQQDAgASBLMBBCgaDiBVbnNwZWNpZmllZC4KCg8KBwQBBAMCAAESBLMB
+BCMKDwoHBAEEAwIAAhIEswEmJwpICgYEAQQDAgESBLUBBCEaOCBObyBwcml2aWxlZ2VzIHJl
+cXVpcmVkIChQUjpOKS4gRGVmaW5lZCBpbiBDVlNTIHYzLCB2NC4KCg8KBwQBBAMCAQESBLUB
+BBwKDwoHBAEEAwIBAhIEtQEfIApJCgYEAQQDAgISBLcBBCAaOSBMb3cgcHJpdmlsZWdlcyBy
+ZXF1aXJlZCAoUFI6TCkuIERlZmluZWQgaW4gQ1ZTUyB2MywgdjQuCgoPCgcEAQQDAgIBEgS3
+AQQbCg8KBwQBBAMCAgISBLcBHh8KSgoGBAEEAwIDEgS5AQQhGjogSGlnaCBwcml2aWxlZ2Vz
+IHJlcXVpcmVkIChQUjpIKS4gRGVmaW5lZCBpbiBDVlNTIHYzLCB2NC4KCg8KBwQBBAMCAwES
+BLkBBBwKDwoHBAEEAwIDAhIEuQEfIAojCgQEAQQEEga9AQLIAQMaEyBVc2VyIEludGVyYWN0
+aW9uLgoKDQoFBAEEBAESBL0BBxYKHgoGBAEEBAIAEgS/AQQlGg4gVW5zcGVjaWZpZWQuCgoP
+CgcEAQQEAgABEgS/AQQgCg8KBwQBBAQCAAISBL8BIyQKTgoGBAEEBAIBEgTBAQQeGj4gTm8g
+dXNlciBpbnRlcmFjdGlvbiByZXF1aXJlZCAoVUk6TikuIERlZmluZWQgaW4gQ1ZTUyB2Mywg
+djQuCgoPCgcEAQQEAgEBEgTBAQQZCg8KBwQBBAQCAQISBMEBHB0KRwoGBAEEBAICEgTDAQQi
+GjcgVXNlciBpbnRlcmFjdGlvbiByZXF1aXJlZCAoVUk6UikuIERlZmluZWQgaW4gQ1ZTUyB2
+My4KCg8KBwQBBAQCAgESBMMBBB0KDwoHBAEEBAICAhIEwwEgIQpPCgYEAQQEAgMSBMUBBCEa
+PyBQYXNzaXZlIHVzZXIgaW50ZXJhY3Rpb24gcmVxdWlyZWQgKFVJOlApLiBEZWZpbmVkIGlu
+IENWU1MgdjQuCgoPCgcEAQQEAgMBEgTFAQQcCg8KBwQBBAQCAwISBMUBHyAKTgoGBAEEBAIE
+EgTHAQQgGj4gQWN0aXZlIHVzZXIgaW50ZXJhY3Rpb24gcmVxdWlyZWQgKFVJOkEpLiBEZWZp
+bmVkIGluIENWU1MgdjQuCgoPCgcEAQQEAgQBEgTHAQQbCg8KBwQBBAQCBAISBMcBHh8KGAoE
+BAEEBRIGywEC0gEDGgggU2NvcGUuCgoNCgUEAQQFARIEywEHDAoeCgYEAQQFAgASBM0BBBoa
+DiBVbnNwZWNpZmllZC4KCg8KBwQBBAUCAAESBM0BBBUKDwoHBAEEBQIAAhIEzQEYGQo9CgYE
+AQQFAgESBM8BBBgaLSBTY29wZTogVW5jaGFuZ2VkIChTOlUpLiBEZWZpbmVkIGluIENWU1Mg
+djMuCgoPCgcEAQQFAgEBEgTPAQQTCg8KBwQBBAUCAQISBM8BFhcKOwoGBAEEBQICEgTRAQQW
+GisgU2NvcGU6IENoYW5nZWQgKFM6QykuIERlZmluZWQgaW4gQ1ZTUyB2My4KCg8KBwQBBAUC
+AgESBNEBBBEKDwoHBAEEBQICAhIE0QEUFQoZCgQEAQQGEgbVAQLiAQMaCSBJbXBhY3QuCgoN
+CgUEAQQGARIE1QEHDQoeCgYEAQQGAgASBNcBBBsaDiBVbnNwZWNpZmllZC4KCg8KBwQBBAYC
+AAESBNcBBBYKDwoHBAEEBgIAAhIE1wEZGgo6CgYEAQQGAgESBNkBBBQaKiBIaWdoIGltcGFj
+dCAoSCkuIERlZmluZWQgaW4gQ1ZTUyB2MywgdjQuCgoPCgcEAQQGAgEBEgTZAQQPCg8KBwQB
+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
+BQACAwISBIYCExRiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Grafeas::V1::Cvss::CVSSv3 ===
+    # Fields for CVSSv3
+    # Field: base_score Type: 2 ()
+    # Field: exploitability_score Type: 2 ()
+    # Field: impact_score Type: 2 ()
+    # Field: attack_vector Type: 14 (.grafeas.v1.CVSSv3.AttackVector)
+    # Field: attack_complexity Type: 14 (.grafeas.v1.CVSSv3.AttackComplexity)
+    # Field: privileges_required Type: 14 (.grafeas.v1.CVSSv3.PrivilegesRequired)
+    # Field: user_interaction Type: 14 (.grafeas.v1.CVSSv3.UserInteraction)
+    # Field: scope Type: 14 (.grafeas.v1.CVSSv3.Scope)
+    # Field: confidentiality_impact Type: 14 (.grafeas.v1.CVSSv3.Impact)
+    # Field: integrity_impact Type: 14 (.grafeas.v1.CVSSv3.Impact)
+    # Field: availability_impact Type: 14 (.grafeas.v1.CVSSv3.Impact)
+
+# Enum: CVSSv3::AttackVector
+our $CVSSv3_ATTACK_VECTOR_UNSPECIFIED = 0;
+our $CVSSv3_ATTACK_VECTOR_NETWORK = 1;
+our $CVSSv3_ATTACK_VECTOR_ADJACENT = 2;
+our $CVSSv3_ATTACK_VECTOR_LOCAL = 3;
+our $CVSSv3_ATTACK_VECTOR_PHYSICAL = 4;
+
+# Enum: CVSSv3::AttackComplexity
+our $CVSSv3_ATTACK_COMPLEXITY_UNSPECIFIED = 0;
+our $CVSSv3_ATTACK_COMPLEXITY_LOW = 1;
+our $CVSSv3_ATTACK_COMPLEXITY_HIGH = 2;
+
+# Enum: CVSSv3::PrivilegesRequired
+our $CVSSv3_PRIVILEGES_REQUIRED_UNSPECIFIED = 0;
+our $CVSSv3_PRIVILEGES_REQUIRED_NONE = 1;
+our $CVSSv3_PRIVILEGES_REQUIRED_LOW = 2;
+our $CVSSv3_PRIVILEGES_REQUIRED_HIGH = 3;
+
+# Enum: CVSSv3::UserInteraction
+our $CVSSv3_USER_INTERACTION_UNSPECIFIED = 0;
+our $CVSSv3_USER_INTERACTION_NONE = 1;
+our $CVSSv3_USER_INTERACTION_REQUIRED = 2;
+
+# Enum: CVSSv3::Scope
+our $CVSSv3_SCOPE_UNSPECIFIED = 0;
+our $CVSSv3_SCOPE_UNCHANGED = 1;
+our $CVSSv3_SCOPE_CHANGED = 2;
+
+# Enum: CVSSv3::Impact
+our $CVSSv3_IMPACT_UNSPECIFIED = 0;
+our $CVSSv3_IMPACT_HIGH = 1;
+our $CVSSv3_IMPACT_LOW = 2;
+our $CVSSv3_IMPACT_NONE = 3;
+
+# === Message: Grafeas::V1::Cvss::CVSS ===
+    # Fields for CVSS
+    # Field: base_score Type: 2 ()
+    # Field: exploitability_score Type: 2 ()
+    # Field: impact_score Type: 2 ()
+    # Field: attack_vector Type: 14 (.grafeas.v1.CVSS.AttackVector)
+    # Field: attack_complexity Type: 14 (.grafeas.v1.CVSS.AttackComplexity)
+    # Field: authentication Type: 14 (.grafeas.v1.CVSS.Authentication)
+    # Field: privileges_required Type: 14 (.grafeas.v1.CVSS.PrivilegesRequired)
+    # Field: user_interaction Type: 14 (.grafeas.v1.CVSS.UserInteraction)
+    # Field: scope Type: 14 (.grafeas.v1.CVSS.Scope)
+    # Field: confidentiality_impact Type: 14 (.grafeas.v1.CVSS.Impact)
+    # Field: integrity_impact Type: 14 (.grafeas.v1.CVSS.Impact)
+    # Field: availability_impact Type: 14 (.grafeas.v1.CVSS.Impact)
+    # Field: attack_requirements Type: 14 (.grafeas.v1.CVSS.AttackRequirements)
+    # Field: vulnerable_system_confidentiality_impact Type: 14 (.grafeas.v1.CVSS.Impact)
+    # Field: vulnerable_system_integrity_impact Type: 14 (.grafeas.v1.CVSS.Impact)
+    # Field: vulnerable_system_availability_impact Type: 14 (.grafeas.v1.CVSS.Impact)
+    # Field: subsequent_system_confidentiality_impact Type: 14 (.grafeas.v1.CVSS.Impact)
+    # Field: subsequent_system_integrity_impact Type: 14 (.grafeas.v1.CVSS.Impact)
+    # Field: subsequent_system_availability_impact Type: 14 (.grafeas.v1.CVSS.Impact)
+    # Field: exploit_maturity Type: 14 (.grafeas.v1.CVSS.ExploitMaturity)
+
+# Enum: CVSS::AttackVector
+our $CVSS_ATTACK_VECTOR_UNSPECIFIED = 0;
+our $CVSS_ATTACK_VECTOR_NETWORK = 1;
+our $CVSS_ATTACK_VECTOR_ADJACENT = 2;
+our $CVSS_ATTACK_VECTOR_LOCAL = 3;
+our $CVSS_ATTACK_VECTOR_PHYSICAL = 4;
+
+# Enum: CVSS::AttackComplexity
+our $CVSS_ATTACK_COMPLEXITY_UNSPECIFIED = 0;
+our $CVSS_ATTACK_COMPLEXITY_LOW = 1;
+our $CVSS_ATTACK_COMPLEXITY_HIGH = 2;
+our $CVSS_ATTACK_COMPLEXITY_MEDIUM = 3;
+
+# Enum: CVSS::Authentication
+our $CVSS_AUTHENTICATION_UNSPECIFIED = 0;
+our $CVSS_AUTHENTICATION_MULTIPLE = 1;
+our $CVSS_AUTHENTICATION_SINGLE = 2;
+our $CVSS_AUTHENTICATION_NONE = 3;
+
+# Enum: CVSS::PrivilegesRequired
+our $CVSS_PRIVILEGES_REQUIRED_UNSPECIFIED = 0;
+our $CVSS_PRIVILEGES_REQUIRED_NONE = 1;
+our $CVSS_PRIVILEGES_REQUIRED_LOW = 2;
+our $CVSS_PRIVILEGES_REQUIRED_HIGH = 3;
+
+# Enum: CVSS::UserInteraction
+our $CVSS_USER_INTERACTION_UNSPECIFIED = 0;
+our $CVSS_USER_INTERACTION_NONE = 1;
+our $CVSS_USER_INTERACTION_REQUIRED = 2;
+our $CVSS_USER_INTERACTION_PASSIVE = 3;
+our $CVSS_USER_INTERACTION_ACTIVE = 4;
+
+# Enum: CVSS::Scope
+our $CVSS_SCOPE_UNSPECIFIED = 0;
+our $CVSS_SCOPE_UNCHANGED = 1;
+our $CVSS_SCOPE_CHANGED = 2;
+
+# Enum: CVSS::Impact
+our $CVSS_IMPACT_UNSPECIFIED = 0;
+our $CVSS_IMPACT_HIGH = 1;
+our $CVSS_IMPACT_LOW = 2;
+our $CVSS_IMPACT_NONE = 3;
+our $CVSS_IMPACT_PARTIAL = 4;
+our $CVSS_IMPACT_COMPLETE = 5;
+
+# Enum: CVSS::AttackRequirements
+our $CVSS_ATTACK_REQUIREMENTS_UNSPECIFIED = 0;
+our $CVSS_ATTACK_REQUIREMENTS_NONE = 1;
+our $CVSS_ATTACK_REQUIREMENTS_PRESENT = 2;
+
+# Enum: CVSS::ExploitMaturity
+our $CVSS_EXPLOIT_MATURITY_UNSPECIFIED = 0;
+our $CVSS_EXPLOIT_MATURITY_NOT_DEFINED = 1;
+our $CVSS_EXPLOIT_MATURITY_ATTACKED = 2;
+our $CVSS_EXPLOIT_MATURITY_POC = 3;
+our $CVSS_EXPLOIT_MATURITY_UNREPORTED = 4;
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Grafeas::V1::Cvss - Compiled Protocol Buffers messages for grafeas/v1/cvss.proto
+
+=head1 SYNOPSIS
+
+    use Grafeas::V1::Cvss;
+
+    my $msg = Grafeas::V1::Cvss::CVSSv3->new({
+        base_score => $base_score,
+        exploitability_score => $exploitability_score,
+        impact_score => $impact_score,
+        attack_vector => $attack_vector,
+    });
+
+    # Read or update a field
+    my $val = $msg->base_score();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Grafeas::V1::Cvss::CVSSv3->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<grafeas/v1/cvss.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Grafeas::V1::Cvss::CVSSv3
+
+Common Vulnerability Scoring System version 3.
+For details, see https://www.first.org/cvss/specification-document
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->base_score() >> / C<< $msg->base_score($value) >>
+
+Type: C<Float>
+
+The base score is a function of the base metric scores.
+
+=item * C<< $msg->exploitability_score() >> / C<< $msg->exploitability_score($value) >>
+
+Type: C<Float>
+
+=item * C<< $msg->impact_score() >> / C<< $msg->impact_score($value) >>
+
+Type: C<Float>
+
+=item * C<< $msg->attack_vector() >> / C<< $msg->attack_vector($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSSv3::AttackVector>)
+
+Base Metrics
+Represents the intrinsic characteristics of a vulnerability that are
+constant over time and across user environments.
+
+=item * C<< $msg->attack_complexity() >> / C<< $msg->attack_complexity($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSSv3::AttackComplexity>)
+
+=item * C<< $msg->privileges_required() >> / C<< $msg->privileges_required($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSSv3::PrivilegesRequired>)
+
+=item * C<< $msg->user_interaction() >> / C<< $msg->user_interaction($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSSv3::UserInteraction>)
+
+=item * C<< $msg->scope() >> / C<< $msg->scope($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSSv3::Scope>)
+
+=item * C<< $msg->confidentiality_impact() >> / C<< $msg->confidentiality_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSSv3::Impact>)
+
+=item * C<< $msg->integrity_impact() >> / C<< $msg->integrity_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSSv3::Impact>)
+
+=item * C<< $msg->availability_impact() >> / C<< $msg->availability_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSSv3::Impact>)
+
+=back
+
+=head3 Enum: CVSSv3::AttackVector
+
+=over 4
+
+=item * C<ATTACK_VECTOR_UNSPECIFIED> => C<0>
+
+=item * C<ATTACK_VECTOR_NETWORK> => C<1>
+
+=item * C<ATTACK_VECTOR_ADJACENT> => C<2>
+
+=item * C<ATTACK_VECTOR_LOCAL> => C<3>
+
+=item * C<ATTACK_VECTOR_PHYSICAL> => C<4>
+
+=back
+
+=head3 Enum: CVSSv3::AttackComplexity
+
+=over 4
+
+=item * C<ATTACK_COMPLEXITY_UNSPECIFIED> => C<0>
+
+=item * C<ATTACK_COMPLEXITY_LOW> => C<1>
+
+=item * C<ATTACK_COMPLEXITY_HIGH> => C<2>
+
+=back
+
+=head3 Enum: CVSSv3::PrivilegesRequired
+
+=over 4
+
+=item * C<PRIVILEGES_REQUIRED_UNSPECIFIED> => C<0>
+
+=item * C<PRIVILEGES_REQUIRED_NONE> => C<1>
+
+=item * C<PRIVILEGES_REQUIRED_LOW> => C<2>
+
+=item * C<PRIVILEGES_REQUIRED_HIGH> => C<3>
+
+=back
+
+=head3 Enum: CVSSv3::UserInteraction
+
+=over 4
+
+=item * C<USER_INTERACTION_UNSPECIFIED> => C<0>
+
+=item * C<USER_INTERACTION_NONE> => C<1>
+
+=item * C<USER_INTERACTION_REQUIRED> => C<2>
+
+=back
+
+=head3 Enum: CVSSv3::Scope
+
+=over 4
+
+=item * C<SCOPE_UNSPECIFIED> => C<0>
+
+=item * C<SCOPE_UNCHANGED> => C<1>
+
+=item * C<SCOPE_CHANGED> => C<2>
+
+=back
+
+=head3 Enum: CVSSv3::Impact
+
+=over 4
+
+=item * C<IMPACT_UNSPECIFIED> => C<0>
+
+=item * C<IMPACT_HIGH> => C<1>
+
+=item * C<IMPACT_LOW> => C<2>
+
+=item * C<IMPACT_NONE> => C<3>
+
+=back
+
+=head2 Grafeas::V1::Cvss::CVSS
+
+Common Vulnerability Scoring System.
+For details, see https://www.first.org/cvss/specification-document
+This is a message we will try to use for storing various versions of CVSS
+rather than making a separate proto for storing a specific version.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->base_score() >> / C<< $msg->base_score($value) >>
+
+Type: C<Float>
+
+The base score is a function of the base metric scores.
+
+=item * C<< $msg->exploitability_score() >> / C<< $msg->exploitability_score($value) >>
+
+Type: C<Float>
+
+=item * C<< $msg->impact_score() >> / C<< $msg->impact_score($value) >>
+
+Type: C<Float>
+
+=item * C<< $msg->attack_vector() >> / C<< $msg->attack_vector($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::AttackVector>)
+
+Attack Vector (AV). Defined in CVSS v2, v3, v4.
+
+=item * C<< $msg->attack_complexity() >> / C<< $msg->attack_complexity($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::AttackComplexity>)
+
+Attack Complexity (AC). Defined in CVSS v2, v3, v4.
+
+=item * C<< $msg->authentication() >> / C<< $msg->authentication($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Authentication>)
+
+Authentication (Au). Defined in CVSS v2.
+
+=item * C<< $msg->privileges_required() >> / C<< $msg->privileges_required($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::PrivilegesRequired>)
+
+Privileges Required (PR). Defined in CVSS v3, v4.
+
+=item * C<< $msg->user_interaction() >> / C<< $msg->user_interaction($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::UserInteraction>)
+
+User Interaction (UI). Defined in CVSS v3, v4.
+
+=item * C<< $msg->scope() >> / C<< $msg->scope($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Scope>)
+
+Scope (S). Defined in CVSS v3.
+
+=item * C<< $msg->confidentiality_impact() >> / C<< $msg->confidentiality_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Impact>)
+
+Confidentiality Impact (C). Defined in CVSS v2, v3.
+
+=item * C<< $msg->integrity_impact() >> / C<< $msg->integrity_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Impact>)
+
+Integrity Impact (I). Defined in CVSS v2, v3.
+
+=item * C<< $msg->availability_impact() >> / C<< $msg->availability_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Impact>)
+
+Availability Impact (A). Defined in CVSS v2, v3.
+
+=item * C<< $msg->attack_requirements() >> / C<< $msg->attack_requirements($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::AttackRequirements>)
+
+Attack Requirements (AT). Defined in CVSS v4.
+
+=item * C<< $msg->vulnerable_system_confidentiality_impact() >> / C<< $msg->vulnerable_system_confidentiality_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Impact>)
+
+Vulnerable System Confidentiality Impact (VC). Defined in CVSS v4.
+
+=item * C<< $msg->vulnerable_system_integrity_impact() >> / C<< $msg->vulnerable_system_integrity_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Impact>)
+
+Vulnerable System Integrity Impact (VI). Defined in CVSS v4.
+
+=item * C<< $msg->vulnerable_system_availability_impact() >> / C<< $msg->vulnerable_system_availability_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Impact>)
+
+Vulnerable System Availability Impact (VA). Defined in CVSS v4.
+
+=item * C<< $msg->subsequent_system_confidentiality_impact() >> / C<< $msg->subsequent_system_confidentiality_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Impact>)
+
+Subsequent System Confidentiality Impact (SC). Defined in CVSS v4.
+
+=item * C<< $msg->subsequent_system_integrity_impact() >> / C<< $msg->subsequent_system_integrity_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Impact>)
+
+Subsequent System Integrity Impact (SI). Defined in CVSS v4.
+
+=item * C<< $msg->subsequent_system_availability_impact() >> / C<< $msg->subsequent_system_availability_impact($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::Impact>)
+
+Subsequent System Availability Impact (SA). Defined in CVSS v4.
+
+=item * C<< $msg->exploit_maturity() >> / C<< $msg->exploit_maturity($value) >>
+
+Type: C<Enum> (L<Grafeas::V1::CVSS::ExploitMaturity>)
+
+Exploit Maturity (E). Defined in CVSS v4.
+
+=back
+
+=head3 Enum: CVSS::AttackVector
+
+=over 4
+
+=item * C<ATTACK_VECTOR_UNSPECIFIED> => C<0>
+
+=item * C<ATTACK_VECTOR_NETWORK> => C<1>
+
+=item * C<ATTACK_VECTOR_ADJACENT> => C<2>
+
+=item * C<ATTACK_VECTOR_LOCAL> => C<3>
+
+=item * C<ATTACK_VECTOR_PHYSICAL> => C<4>
+
+=back
+
+=head3 Enum: CVSS::AttackComplexity
+
+=over 4
+
+=item * C<ATTACK_COMPLEXITY_UNSPECIFIED> => C<0>
+
+=item * C<ATTACK_COMPLEXITY_LOW> => C<1>
+
+=item * C<ATTACK_COMPLEXITY_HIGH> => C<2>
+
+=item * C<ATTACK_COMPLEXITY_MEDIUM> => C<3>
+
+=back
+
+=head3 Enum: CVSS::Authentication
+
+=over 4
+
+=item * C<AUTHENTICATION_UNSPECIFIED> => C<0>
+
+=item * C<AUTHENTICATION_MULTIPLE> => C<1>
+
+=item * C<AUTHENTICATION_SINGLE> => C<2>
+
+=item * C<AUTHENTICATION_NONE> => C<3>
+
+=back
+
+=head3 Enum: CVSS::PrivilegesRequired
+
+=over 4
+
+=item * C<PRIVILEGES_REQUIRED_UNSPECIFIED> => C<0>
+
+=item * C<PRIVILEGES_REQUIRED_NONE> => C<1>
+
+=item * C<PRIVILEGES_REQUIRED_LOW> => C<2>
+
+=item * C<PRIVILEGES_REQUIRED_HIGH> => C<3>
+
+=back
+
+=head3 Enum: CVSS::UserInteraction
+
+=over 4
+
+=item * C<USER_INTERACTION_UNSPECIFIED> => C<0>
+
+=item * C<USER_INTERACTION_NONE> => C<1>
+
+=item * C<USER_INTERACTION_REQUIRED> => C<2>
+
+=item * C<USER_INTERACTION_PASSIVE> => C<3>
+
+=item * C<USER_INTERACTION_ACTIVE> => C<4>
+
+=back
+
+=head3 Enum: CVSS::Scope
+
+=over 4
+
+=item * C<SCOPE_UNSPECIFIED> => C<0>
+
+=item * C<SCOPE_UNCHANGED> => C<1>
+
+=item * C<SCOPE_CHANGED> => C<2>
+
+=back
+
+=head3 Enum: CVSS::Impact
+
+=over 4
+
+=item * C<IMPACT_UNSPECIFIED> => C<0>
+
+=item * C<IMPACT_HIGH> => C<1>
+
+=item * C<IMPACT_LOW> => C<2>
+
+=item * C<IMPACT_NONE> => C<3>
+
+=item * C<IMPACT_PARTIAL> => C<4>
+
+=item * C<IMPACT_COMPLETE> => C<5>
+
+=back
+
+=head3 Enum: CVSS::AttackRequirements
+
+=over 4
+
+=item * C<ATTACK_REQUIREMENTS_UNSPECIFIED> => C<0>
+
+=item * C<ATTACK_REQUIREMENTS_NONE> => C<1>
+
+=item * C<ATTACK_REQUIREMENTS_PRESENT> => C<2>
+
+=back
+
+=head3 Enum: CVSS::ExploitMaturity
+
+=over 4
+
+=item * C<EXPLOIT_MATURITY_UNSPECIFIED> => C<0>
+
+=item * C<EXPLOIT_MATURITY_NOT_DEFINED> => C<1>
+
+=item * C<EXPLOIT_MATURITY_ATTACKED> => C<2>
+
+=item * C<EXPLOIT_MATURITY_POC> => C<3>
+
+=item * C<EXPLOIT_MATURITY_UNREPORTED> => C<4>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Grafeas::V1::Cvss::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -2815,19 +2815,54 @@ example:
 
 END
 
+$SCREEN{glmer} = <<'END';
+usage: glmer(formula => FORMULA, data => DF [, family => FAMILY]
+             [, theta => THETA] [, nAGQ => N] [, offset => OFFSET]
+             [, weights => W] [, conf_level => LEVEL])
+
+Generalized linear mixed models, as lme4::glmer() and glmer.nb().
+
+options:
+  formula => FORMULA     fixed effects, offset() terms, and one or more
+                         (terms | group) random-effects terms (required)
+  data => DF             the data: a HoA, AoH or HoH (required)
+  family => FAMILY       {binomial,poisson,negbin} (default: binomial)
+  theta => THETA         negbin dispersion, held fixed; also nb_theta
+                         (default: estimated)
+  nAGQ => N              1 for Laplace, 2 to 100 for Gauss-Hermite with one
+                         scalar random effect, 0 for the first stage only
+                         (default: 1)
+  offset => OFFSET       a column, an expression such as 'log(t)', or an array
+                         ref of one value per row (default: none)
+  weights => W           prior weights, the trials of a binomial proportion: a
+                         column or an array ref (default: none)
+  conf_level => LEVEL    level of the confidence intervals (default: 0.95)
+
+example:
+  glmer(formula => 'incidence ~ period + (1 | herd)', weights => 'size',
+        family => 'binomial', data => \%cbpp)
+      # returns { coefficients, summary, vcov, conf_int, exp, varcor, theta,
+      #           loglik, AIC, BIC, nobs, converged, singular, ... }
+
+END
+
 $SCREEN{lmer} = <<'END';
 usage: lmer(formula => FORMULA, data => DF [, REML => BOOL]
-            [, conf_level => LEVEL])
+            [, conf_level => LEVEL] [, offset => OFFSET] [, weights => W])
 
 Linear mixed-effects regression, as lme4::lmer() with lmerTest's t tests.
 
 options:
-  formula => FORMULA     fixed effects plus one or more (terms | group)
-                         random-effects terms (required)
+  formula => FORMULA     fixed effects, offset() terms, and one or more
+                         (terms | group) random-effects terms (required)
   data => DF             the data: a HoA, AoH or HoH (required)
   REML => BOOL           1 for REML, 0 for maximum likelihood; also reml
                          (default: 1)
   conf_level => LEVEL    level of the confidence intervals (default: 0.95)
+  offset => OFFSET       a column, an expression such as 'log(t)', or an array
+                         ref of one value per row (default: none)
+  weights => W           prior weights, the residual variance being sigma^2/w:
+                         a column or an array ref (default: none)
 
 example:
   lmer(formula => 'Reaction ~ Days + (Days | Subject)', data => \%sleepstudy)
@@ -3074,7 +3109,7 @@ Stats::LikeR::Usage
 
 =head1 VERSION
 
-version 0.3428
+version 0.3430
 
 =head1 AUTHOR
 

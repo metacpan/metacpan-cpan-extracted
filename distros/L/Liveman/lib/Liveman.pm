@@ -1,7 +1,7 @@
 package Liveman;
 use common::sense;
 
-our $VERSION = "4.1";
+our $VERSION = "4.2";
 
 use File::Basename qw/dirname/;
 use File::Find::Wanted qw/find_wanted/;
@@ -116,7 +116,7 @@ sub _to_testing {
 	elsif(exists $x{is}) { "local (\$::_g0 = do {$code}, \$::_e0 = do {$expected}); ::ok defined(\$::_g0) == defined(\$::_e0) && \$::_g0 eq \$::_e0, '$q' or ::diag ::_struct_diff(\$::_g0, \$::_e0); $clear\n" }
 	elsif(exists $x{qqis}) { "local (\$::_g0 = do {$code}, \$::_e0 = \"${\_qq_esc $expected}\"); ::ok \$::_g0 eq \$::_e0, '$q' or ::diag ::_string_diff(\$::_g0, \$::_e0); $clear\n" }
 	elsif(exists $x{qis}) { "local (\$::_g0 = do {$code}, \$::_e0 = '${\_q_esc $expected}'); ::ok \$::_g0 eq \$::_e0, '$q' or ::diag ::_string_diff(\$::_g0, \$::_e0); $clear\n" }
-	elsif(exists $x{file}) { "{ my \$s = '${\_q_esc $x{file}}'; open my \$__f__, '<:utf8', \$s or die \"Read \$s: \$!\"; my \$got = join '', <\$__f__>; close \$__f__; my \$expected = '${\_q_esc $expected}'; ::ok \$got eq \$expected, '$q' or ::diag ::_string_diff(\$got, \$expected) }\n" }
+	elsif(exists $x{file}) { "{ my \$s = '${\_q_esc $x{file}}'; open my \$__f__, '<:encoding(UTF-8)', \$s or die \"Read \$s: \$!\"; my \$got = join '', <\$__f__>; close \$__f__; my \$expected = '${\_q_esc $expected}'; ::ok \$got eq \$expected, '$q' or ::diag ::_string_diff(\$got, \$expected) }\n" }
 	elsif(exists $x{like}) { "::like scalar do {$code}, qr{${\_qr_esc $expected}}, '$q'; $clear\n" }
 	elsif(exists $x{unlike}) { "::unlike scalar do {$code}, qr{${\_qr_esc $expected}}, '$q'; $clear\n" }
 	elsif(exists $x{qqbegins}) { "local (\$::_g0 = do {$code}, \$::_e0 = \"${\_qq_esc $expected}\"); ::ok \$::_g0 =~ /^\${\\quotemeta \$::_e0}/, '$q' or ::diag ::_string_diff(\$::_g0, \$::_e0, 1); $clear\n" }
@@ -388,11 +388,11 @@ sub transform {
 		if($infile) {
 			my $real_code = $code =~ s/^\\(```\w*[\t ]*$)/$1/mgro;
 			if($is) { # тестируем, что текст совпадает
-				#push @test, "\n{ my \$s = '${\_q_esc($infile)}'; open my \$__f__, '<:utf8', \$s or die \"Read \$s: \$!\"; my \$n = join '', <\$__f__>; close \$__f__; ::is \$n, '${\_q_esc($real_code)}', \"File \$s\"; }\n";
+				#push @test, "\n{ my \$s = '${\_q_esc($infile)}'; open my \$__f__, '<:encoding(UTF-8)', \$s or die \"Read \$s: \$!\"; my \$n = join '', <\$__f__>; close \$__f__; ::is \$n, '${\_q_esc($real_code)}', \"File \$s\"; }\n";
 				push @test, _to_testing("File $infile", file => $infile, expected => $real_code);
 			}
 			else { # записываем тект в файл
-				#push @test, "\n{ my \$s = main::_mkpath_('${\_q_esc($infile)}'); open my \$__f__, '>:utf8', \$s or die \"Read \$s: \$!\"; print \$__f__ '${\_q_esc($real_code)}'; close \$__f__ }\n";
+				#push @test, "\n{ my \$s = main::_mkpath_('${\_q_esc($infile)}'); open my \$__f__, '>:encoding(UTF-8)', \$s or die \"Read \$s: \$!\"; print \$__f__ '${\_q_esc($real_code)}'; close \$__f__ }\n";
 				push @test, "#\@> $infile\n", $real_code =~ s/^/#>> /rgm, "#\@< EOF\n";
 			}
 		} elsif($sec1 =~ /^```(?:perl)?[ \t]*$/) {
@@ -543,7 +543,7 @@ Liveman - compiler from Markdown to tests and documentation
 
 =head1 VERSION
 
-4.1
+4.2
 
 =head1 SYNOPSIS
 

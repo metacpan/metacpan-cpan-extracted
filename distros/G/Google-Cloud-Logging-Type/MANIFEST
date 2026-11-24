@@ -1,0 +1,17 @@
+Changes
+lib/Google/Cloud/Logging/Type.pm
+lib/Google/Logging/Type/HttpRequest.pm
+lib/Google/Logging/Type/HttpRequest/Types.pm
+lib/Google/Logging/Type/LogSeverity.pm
+lib/Google/Logging/Type/LogSeverity/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

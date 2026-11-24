@@ -1,6 +1,212 @@
 Revision history for Stats-LikeR
 
-0.3428 2026-11-22 CST (Claude Opus 5.5 helped)
+0.3430 2026-11-23 CST
+
+ [Bug fixes]
+
+ - On a double perl the incomplete beta with one shape at most 1 and the
+   other below 1e3 (pt() below 2000 degrees of freedom, pf() with either
+   df at most 2, pbinom() at the ends of its range, and the qt() and qf()
+   that invert them) now takes R's own TOMS 708 dispatch, bup(), bgrat(),
+   bpser(), apser() and fpser(), which long-double and __float128 perls
+   have taken since 0.3429. It used the Numerical Recipes continued
+   fraction there, whose tail near 0 is 1 minus a value near 1, so a
+   single rounding of the C library's lgamma() moved it by thousands of
+   epsilons. 0.3429 failed 2 subtests
+   of t/incomplete.gamma.beta.mpmath.t (559-560, I_x(1/1024, 7.5) at
+   x = 0.1, 5e-12 relative) on eight reports from one tester: perl 5.24.4
+   and 5.44.0 on Solaris, Hurd, and aarch64 and x86_64 Linux, whose
+   lgamma() rounds differently from glibc 2.39's, with which the test's
+   tolerance had been measured. Replacing lgamma() with lgammal() rounded
+   to a double reproduced the reports to the last digit. The module was at
+   fault, not the test. The same cases are now within 5 of the test's
+   units with either lgamma(), against 668 and 2.5e3 before, and
+   pt(-2^30, 30, log) in t/distributions.limits.R.t, 2.3e-13 from R's
+   value, is now R's to the last bit. No test's worst error rose past its
+   tolerance; the largest rise, qf() at log p = -64 against mpmath (7.7e-15
+   to 2.4e-14), is within one ulp of log p. The 40 "eps" subtests (shapes
+   of 2^-70 and 2^-130), skipped on a double perl because that fraction
+   was 1e17 epsilons out there, now run on every perl; they and the
+   tightened tolerances fail 36 subtests on 0.3429's code.
+ - The load-time check of whether fma() rounds once, new in 0.3429,
+   missed an fma() that forms the product in an x87 long double, as
+   Strawberry Perl 5.24's mingw-w64 (gcc 4.9.2) evidently does: its
+   probe's product needed 55 bits, which a long double holds. The
+   incomplete beta near the mean of two shapes of 1e15 was then 3e-11 out
+   in the log, and t/incomplete.gamma.beta.mpmath.t failed 6 subtests
+   (680-682 and 684-686) on perl 5.24.4 MSWin32-x64-multi-thread. The
+   probe now uses a product that needs every bit of a true fma (105 for a
+   double), so such a libm takes the exact software product instead.
+   Defining fma() that way on Linux reproduced the report to the last
+   digit, and the fixed module gives the same results there as with a
+   correct fma(). Strawberry 5.42.3 passed and is unchanged.
+
+0.3429 2026-11-23 CST 
+
+ [Bug fixes]
+
+ - write_table() could not write to a file that something still held open
+   on Windows. Since 0.3428 it writes a temporary file and renames it over
+   the target, and Windows refuses that rename while any handle has the
+   target open, so it croaked "could not replace '...': Permission denied".
+   A File::Temp object keeps its handle, and so does a tempfile() made with
+   UNLINK, so t/numeric.options.t (test 108), t/write_table.t and
+   t/write_table.tex.rownames.t failed on both Windows reports of 0.3428
+   (Strawberry 5.24.4 and 5.42.3, MSWin32-x64-multi-thread). The module was
+   at fault, not the tests: 0.3427 wrote such a file in place. Where the
+   rename is refused, the finished table is now copied into the file in
+   place. t/xlsx.files.robustness.t has 9 new subtests that write an
+   .xlsx, .csv and .tex target held open, longer than the new table, and
+   check the bytes and that no temporary file is left.
+ - pbinom() at n = 1.8e13 was 2.5e-10 off on Cygwin (t/numeric.fixes.t
+   test 38, perl 5.44.0 x86_64-cygwin-threads-multi). 0.3428's fix for the
+   incomplete beta near its mean relies on fma() rounding once, and the
+   fma() of newlib, Cygwin's libm, is x * y + z with two roundings. The
+   module now checks at load time whether fma() really rounds once. Where
+   it does not, the product is formed exactly in software (Dekker's
+   two-product), which gives the same result as a correct fma(). A libm
+   whose fma() is correct takes the same path as before.
+
+ [New function: glmer()]
+
+ - glmer() fits generalized linear mixed models, lme4::glmer() and
+   glmer.nb(): a binomial (logit), Poisson or negative-binomial (log)
+   response with lmer()'s random effects and formula, offset() terms,
+   offset and weights arguments, and glm()'s rate and odds ratios (exp)
+   with their Wald intervals. It is lme4's method: the Laplace
+   approximation, penalized IRLS for the conditional modes, and lme4's two
+   stages (the covariance parameters with the fixed effects inside the
+   IRLS, then everything), each by Nelder-Mead and a Newton polish on
+   Richardson differences, as lmer() fits. Standard errors are lme4's
+   vcov.merMod(use.hessian = TRUE), from the Hessian of the deviance.
+ - nAGQ from 2 to 100 fits a single scalar random effect by adaptive
+   Gauss-Hermite quadrature, with nodes computed at the NV's width, and
+   nAGQ => 0 stops after lme4's first stage. family => 'negbin' is
+   glmer.nb(): theta starts from MASS::theta.ml() on a Poisson fit, as
+   lme4 starts it, and is then estimated with the rest, where lme4
+   optimize()s it to 5e-5 on the log scale; theta => holds it fixed.
+ - One grouping factor is fitted a level at a time, so any number of
+   levels is practical; several are one dense matrix, factored at every
+   IRLS step, which is quick at 71 random effects and took 13 minutes at
+   584 (grouseticks' three crossed factors), where lme4's sparse Cholesky
+   takes about a second; more than 1000 croaks (lmer() takes 4000). As in
+   lme4 (glFormula's allow.n), a grouping factor may have a level per
+   row.
+ - The estimates are those of a tightly converged lme4, which lme4's
+   defaults are not: its penalized IRLS stops on a relative change of
+   1e-7 in the penalized deviance, which leaves cbpp's log-likelihood
+   2.8e-4 below the optimum and its standard errors 0.5% out, and it
+   factors log|L|^2 with the working weights of the step before the mode,
+   which no setting of tolPwrss removes (1.1e-5 in the deviance on
+   grouseticks). glmer() takes the weights at the mode, as the Laplace
+   approximation is defined.
+ - t/glmer.binomial.R.t, t/glmer.poisson.R.t, t/glmer.negbin.R.t and
+   t/glmer.negbin_epil.R.t check 17 fits from lme4 2.0-6's own examples
+   and tests (cbpp by Laplace, nAGQ = 0 and nAGQ = 9 and with an
+   observation-level effect; its simulated Bernoulli, binomial and
+   Poisson data with and without weights; its offset test; grouseticks;
+   MASS's epilepsy data with a random slope, Poisson and negative
+   binomial; glmer.nb's examples) against lme4's deviance made exact as
+   above and minimized tightly, with their generator t/glmer.R.R. All
+   four take 3 s on a double perl and 184 s on a __float128 one, split
+   so that none is longer than about a minute.
+
+ [lmer()]
+
+ - lmer() takes offset() terms in the formula, which croaked "offset() is
+   not supported", and offset and weights arguments, as lme4::lmer() does:
+   an offset is subtracted from the response and added back into the
+   fitted values, and a prior weight w makes a row's residual variance
+   sigma^2/w, with the criterion subtracting the sum of log w as lme4's
+   does. A row with weight 0 is left out, as glm() leaves it out; lme4
+   keeps it, and its criterion is then infinite. t/lmer.offset.weights.R.t
+   checks lme4's tests/priorWeights.R (six weighted fits of a 1000-row
+   simulation, a weighted sleepstudy and its 40-row example),
+   tests/offset.R and tests/modFormula.R's offset(0.5*Days) against
+   lme4 2.0-6 and lmerTest 3.2-1.
+ - lmer()'s formula and data handling is now shared with glmer(), and its
+   optimizers take the objective as an argument; its results are
+   unchanged to the bit on every corpus in t/.
+
+ [Incomplete gamma and beta on a long-double or __float128 perl]
+
+ - The three places 0.3426 left short of the NV's epsilon are closed.
+   The incomplete gamma's continued fraction for a shape below 1 with x
+   between 1 and 3, and TOMS 708's bfrac() for a small shape against one
+   of 1e2 and up, ran 150 to 400 terms forward and carried one rounding
+   per term: 47 and 56 epsilons of a __float128. Both are now evaluated
+   backward from the depth the forward pass converges at, where a
+   rounding made deep in shrinks on its way up. The wide-only series
+   0.3426 put in front of the gamma fraction for 1 <= x < 3/2 is gone;
+   the fraction is now the better of the two.
+ - TOMS 708's bup(), apser() and fpser() are ported, so a wide build
+   takes every branch of R's bratio() where a shape is at most 1, and
+   never the Numerical Recipes fraction. Where R uses bup(), 0.3426 took
+   bpser() (59 epsilons of a __float128 at I_0.8(15/2, 1/1024)) or the
+   fraction; where R uses apser() or fpser() it took bpser(), whose
+   answer is 1 minus a near-1 tail: 5.8e31 epsilons of a __float128 at a
+   shape of 2^-130, and 1.9e17 of a long double at 2^-70.
+ - basym() formed 2/3 as a double, which left I_x(3e11, 1e12) 1e-23 off
+   on a __float128 (3.5e12 of its epsilons) wherever the two shapes were
+   unequal and past 1e5. The asymptotic coefficients of digamma() and
+   trigamma() were double quotients too, 3e-22 off on a __float128;
+   digamma feeds apser(), glm()'s negative binomial theta and
+   zerotrunc().
+ - Against mpmath at 110 digits, counted as 0.3426 counts, the worst
+   error is now 4 epsilons of a __float128 and 3 of a long double for
+   the gamma (47 and 18 on the same cases before) and 10 and 11 for the
+   beta (3.5e12 and 1.9e17), shapes from 2^-130 to 1e15. A double perl
+   is unchanged, to the last bit over 81234 values.
+ - On a __float128 perl qt() is up to twice as slow where its pt() calls
+   take bup() and bgrat() (qt(0.975, 12): 1.0 ms, was 0.53 ms), and a
+   continued fraction about 1.3 times; on a long double, 1.8 and 1.1.
+ - t/incomplete.gamma.beta.mpmath.t has 239 more cases, 861 tests in
+   all: gamma shapes 1e11 to 1e15 (Temme's expansion) and beta shapes to
+   1e15, whose references are mpmath's integral of the density, checked
+   against the series and fractions where both reach (they agree to
+   1e-101); a < 1 with x from 1 to 3; the region of bup() and bgrat();
+   and shapes of 2^-70 and 2^-130, which a double build skips. Its
+   tolerances are tightened to the new errors (the long double's gamma
+   from 32 to 8 units, the __float128's from 144 to 16).
+
+ [pnorm() and qnorm() on long-double and __float128 perls]
+
+ - pnorm() was R's double-precision port of Cody's algorithm on every
+   build, so on a long-double or __float128 perl it agreed with the truth
+   to about 1e-16 however wide the NV, and was 0 below z = -38.47, R's
+   cut-off for a double, although such an NV holds the tail down to
+   z = -150. On an x87 long double or a __float128 perl with the matching
+   libm (the builds whose incomplete gamma and beta 0.3426 widened) it now
+   computes from that NV's erfc(), with the far tail taken from erfcx()
+   so that nothing underflows before the answer does, and forms
+   (x - mean) / sd at the NV's width. pnorm(-40) is 3.655893540915e-350
+   there, where it was 0. pt() with df = Inf, which is pnorm(), follows.
+ - qnorm() used a double literal for 1/sqrt(2 pi) in its series near the
+   median, which put that literal's 1e-17 error into every quantile from
+   p = 0.2 to 0.8 (qnorm(0.25) was 3e17 epsilons of a __float128 out); it
+   now takes that constant at the NV's width. Its tail stopped after four
+   Newton passes on the linear scale, not enough from Moro's start below
+   p = 1e-200 at a __float128's width, and below p = 1e-300 it polished
+   against the double pnorm() and stopped polishing altogether past
+   log p = -1.3e9. On those builds every lower-tail quantile is now
+   finished by Newton on log Phi(z) = log p at the NV's width, with the
+   Mills ratio Phi/phi taken from erfcx() rather than as the exp() of a
+   difference of two large logs, which is what limited R's polish. The
+   same quantile serves every confidence interval and critical value in
+   the module, so those gain the digits too.
+ - Against mpmath at 110 digits, over 85 z from 0 to 1e150 (both tails and
+   their logs) and 100 quantiles (p from 2^-1074 to 1 - 2^-53, log p to
+   -1e100), the worst error, in t/incomplete.gamma.beta.mpmath.t's units,
+   is now 1.3 epsilons of a long double and 1.1 of a __float128 for
+   pnorm() (it was 1.2e16 and 7e30), and 2 for qnorm() on both (2.3e4 and
+   1.3e19). t/pnorm.qnorm.mpmath.t pins those cases, with its generator
+   t/pnorm.qnorm.mpmath.py. A double perl is unchanged, and so is the
+   cut-off at z = -38.47 of the p-values the tests in the module report
+   (approx_pnorm()), which keeps those the same on every build, as R's.
+ - t/pnorm.t checked that pnorm(-40) is 0, which is true only of a double;
+   it now checks pnorm(-200), which underflows on every NV.
+
+0.3428 2026-11-22 CST 
 
  [Behavior change: rank() of strings]
 
@@ -358,7 +564,7 @@ Revision history for Stats-LikeR
    t/write_table.compressed.pandas.t and t/write_table.tex.stream.t that a
    croaking write leaves no file.
 
-0.3427 2026-11-20 CST (Claude Opus 5.5 helped)
+0.3427 2026-11-20 CST 
 
  [Tests]
 
@@ -373,7 +579,7 @@ Revision history for Stats-LikeR
    as it is. A build with the row end forced to CR LF fails the same 120
    subtests with the old test and passes with the new one.
 
-0.3426 2026-11-19 CST (Claude Opus 5.5 helped)
+0.3426 2026-11-19 CST 
 
  [Behavior change: read_table() of an .xlsx]
 
@@ -619,7 +825,7 @@ Revision history for Stats-LikeR
    written; t/read_table.xlsx.blank_rows.pandas.py checks that pandas
    reads them so.
 
-0.3425 2026-11-18 CST (Claude Opus 5.5 helped)
+0.3425 2026-11-18 CST 
 
  [Data frames]
 
@@ -695,7 +901,7 @@ Revision history for Stats-LikeR
    in "melt: row 1 is not a HASH reference", instead of with perl's
    "Not a HASH reference" from a line of LikeR.pm.
 
-0.3424 2026-11-16 CST (Claude Opus 5.5 helped)
+0.3424 2026-11-16 CST 
 
  [read_table()]
 
@@ -752,7 +958,7 @@ Revision history for Stats-LikeR
    array's length has changed, instead of skipping the element or
    reading a different number of values and dividing by the first count.
 
-0.3423 2026-11-15 CST (Claude Opus 5.5 helped)
+0.3423 2026-11-15 CST 
 
  [Distribution]
 
@@ -824,7 +1030,7 @@ Revision history for Stats-LikeR
  - aoh2hoh()'s errors for a row that is no hash and for a missing key
    now name the function, as its other errors do.
 
-0.3422 2026-11-13 CST (Claude Fable 5.2 helped)
+0.3422 2026-11-13 CST
 
  [view()]
 
@@ -1021,7 +1227,7 @@ Revision history for Stats-LikeR
    cfilter()'s regex selector and read_table()'s qr// separator match
    in C, where there is no such rule, and are unchanged.
 
-0.3421 2026-11-13 CST (Claude Fable 5.2 helped)
+0.3421 2026-11-13 CST
 
  [qnorm(), qt(), qchisq()]
 
@@ -1061,7 +1267,7 @@ Revision history for Stats-LikeR
    TestMode, and inputs on both sides of each point where the count
    array grows, with leak checks, one of them through a croak.
 
-0.342 2026-11-10 CST (Claude Fable 5.2 helped)
+0.342 2026-11-10 CST
 
  [Out-of-memory guards: 11 failing reports of 0.3419]
 
@@ -1096,7 +1302,7 @@ Revision history for Stats-LikeR
    every machine; against a probe that always says yes they exit with
    "Out of memory". t/alloc.guards.t now has 23 subtests.
 
-0.3419 2026-11-10 CST (Claude Fable 5.2 helped)
+0.3419 2026-11-10 CST
 
  [lm(), glm() and the formula models]
 
@@ -1420,7 +1626,7 @@ Revision history for Stats-LikeR
    installed 0.3418 fails the same subtests, and with this change all
    three pass.
 
-0.3418 2026-11-08 CST (Claude Opus 5.5 helped)
+0.3418 2026-11-08 CST 
 
  [read_table(), write_table()]
 
@@ -1445,7 +1651,7 @@ Revision history for Stats-LikeR
    the smoker did; this build passes all of them but the row-end check,
    which needs a perl built with PERLIO_USING_CRLF.
 
-0.3417 2026-11-07 CST (Claude Opus 5.5 helped)
+0.3417 2026-11-07 CST 
 
  [read_table()]
 
@@ -1493,7 +1699,7 @@ Revision history for Stats-LikeR
    one non-literal format, the NV helper that keeps gcc from misreading
    quadmath's %Qg, now says so to the compiler.
 
-0.3416 2026-11-05 CST (Claude Opus 5.5 helped)
+0.3416 2026-11-05 CST 
 
  [dunn_test()]
 
@@ -1534,7 +1740,7 @@ Revision history for Stats-LikeR
    recorded in statsmodels' test suite, and checks each way of raising
    the "Chi-squared approximation may be incorrect" warning.
 
-0.3415 2026-11-04 CST (Claude Opus 5.5 helped)
+0.3415 2026-11-04 CST 
 
  [Windows: build]
 
@@ -1552,7 +1758,7 @@ Revision history for Stats-LikeR
    threaded perl's headers. Against 0.3414 that reports the smoker's error
    and nothing else.
 
-0.3414 2026-11-02 CST (Claude Opus 5.5 helped)
+0.3414 2026-11-02 CST 
 
  [Distribution metadata]
 
@@ -1853,7 +2059,7 @@ Revision history for Stats-LikeR
    INFINITY, and formats row numbers with perl's UVuf rather than a C
    "%lu", which is 32 bits wide on Windows.
 
-0.3413 2026-10-29 CDT (Claude Opus 5.5 helped)
+0.3413 2026-10-29 CDT 
 
  [Build: gcc 13 and 14 at -O3]
 
@@ -1878,7 +2084,7 @@ Revision history for Stats-LikeR
    0.3412. None of them miscompiles under gcc 13 or 14 at -O3 here, but each
    has the shape that did, and the next gcc need not spare them.
 
-0.3412 2026-10-29 CDT (Claude Opus 5.5 helped)
+0.3412 2026-10-29 CDT 
 
  [Build: gcc 15.2.0]
 
@@ -1893,7 +2099,7 @@ Revision history for Stats-LikeR
    back from it to nu; the arithmetic is R's as before. The fault was
    reproduced with the function extracted, on Compiler Explorer's gcc 15.2.
 
-0.3411 2026-10-28 CDT (Claude Opus 5.5 helped)
+0.3411 2026-10-28 CDT 
 
  [Build]
 
@@ -1921,7 +2127,7 @@ Revision history for Stats-LikeR
    from perl's own %g rather than hardcoding it, since that message is
    formatted by perl and reads 1e+007 on the same perls.
 
-0.341 2026-10-26 CDT (Claude Opus 5.5 helped)
+0.341 2026-10-26 CDT 
 
  [write_table: workbooks of several worksheets]
 
@@ -2034,7 +2240,7 @@ Revision history for Stats-LikeR
    call, measured on 4 million calls of mean() of three numbers and
    dftype(); a call doing real work does not show it.
 
-0.34 2026-10-21 CDT (Claude Opus 5.5 helped)
+0.34 2026-10-21 CDT 
 
  [New function: dftype]
 
@@ -2066,7 +2272,7 @@ Revision history for Stats-LikeR
    is left where it was instead of being reset. A tied hash's still is, as
    the walk has to call its FIRSTKEY.
 
-0.331 2026-10-20 CDT (Claude Opus 5.5 helped)
+0.331 2026-10-20 CDT 
 
  [survfit(), logrank_test() and coxph()]
 
@@ -2655,7 +2861,7 @@ Revision history for Stats-LikeR
    the rounding warning, the croaks for bad cells and counts, the all-zero
    tables, chisq_test's cell names and the leaks.
 
-0.33 2026-10-17 CDT (Claude Opus 5.5 helped)
+0.33 2026-10-17 CDT 
 
  [usage]
  - when given an incorrect series of arguments, a menu resembling the help
@@ -2706,7 +2912,7 @@ Revision history for Stats-LikeR
  - t/help.t checks that df2h has a documentation section of its own, and
    that h('aoh2h') shows it.
 
-0.3218 2026-10-16 CDT (Claude Opus 5.5 helped)
+0.3218 2026-10-16 CDT 
 
  [read_table()]
 
@@ -3021,7 +3227,7 @@ Revision history for Stats-LikeR
    t/vif_hoslem.t passes a one-sided formula where it passed a response
    its data did not have, and expects car's "fewer than 2 terms".
 
-0.3217 2026-10-12 CDT (Claude Opus 5.5 helped)
+0.3217 2026-10-12 CDT 
 
  [cor()]
 
@@ -3436,7 +3642,7 @@ Revision history for Stats-LikeR
    t/friedman_mcnemar_prop_cmh.R.t gains R 4.6.1 rows for the cmh_test(),
    mcnemar_test() and prop_test() cases.
 
-0.3216 2026-10-09 CDT (Claude Opus 5.5 helped)
+0.3216 2026-10-09 CDT 
 
  [merge()]
 
@@ -3457,7 +3663,7 @@ Revision history for Stats-LikeR
    columns are now filled in blocks of 1024 rows, which keeps a HoA input
    at its old speed and each output column's values together in memory.
 
-0.3215 2026-10-06 CDT (Claude Opus 5.5 helped)
+0.3215 2026-10-06 CDT 
 
  [read_table(): Excel workbooks]
 
@@ -7269,9 +7475,8 @@ Revision history for Stats-LikeR
 
  [Correctness and portability fixes]
 
- - Nine defects found by cross-validating against R 4.6.1 and mpmath, by running
-   the suite under UBSan and AddressSanitizer, and by reading for the conventions
-   in `CLAUDE.md`. Each is pinned by a test that fails without the fix:
+ - 9 defects found by cross-validating against R 4.6.1 and mpmath, by running
+   the suite under UBSan and AddressSanitizer. Each is pinned by a test that fails without the fix:
    `t/cor_test.spearman.R.t`, `t/pt_qt.tails.R.t`, `t/minmax.nan.R.t`,
    `t/var_test.ci.R.t` and `t/portability.bugs.t`.
 
@@ -7698,8 +7903,7 @@ Revision history for Stats-LikeR
  - 1,495 lines that were nothing but a comment marker and a run of dashes, and 380
    comments whose text trailed off into one, are gone from `LikeR.xs`,
    `lib/Stats/LikeR.pm` and `t/`. `/* ===== WILCOXON EXACT NULL DISTRIBUTIONS =====`
-   is now `/* WILCOXON EXACT NULL DISTRIBUTIONS`, which is what the house style in
-   `CLAUDE.md` asks for anyway. Nothing after `__DATA__` was touched, no POD
+   is now `/* WILCOXON EXACT NULL DISTRIBUTIONS`. Nothing after `__DATA__` was touched, no POD
    region, and no line holding a `/*` or `*/` was deleted, so no comment can have
    been left unterminated. The suite is unchanged at 28,485 tests either side of it.
 

@@ -12,24 +12,24 @@ use warnings;
 use utf8;
 
 # use Test::More 'no_plan';
-use Test::More tests => 54;
+use Test::More tests => 58;
 use Test::More::UTF8;
 use Test::Exception;
 use Test::Warn;
-use Storable qw(nstore retrieve);
 use Data::Dumper;
 use Text::Hyphen;
 use Text::Hyphen::RU;
 
-BEGIN { use_ok('LaTeX::Replicase') }; ### Test 1
+### Test 1.1
+BEGIN { use_ok('LaTeX::Replicase') };
 use LaTeX::Replicase qw(font_metrics onecell); # :all
 
-##### Test unicellular() #####
+##### Test onecell() #####
 
 ### Test 2
 my $AFMfile = 't/PTC55F.afm';
-my $glyphlist = 't/glyphlist.txt';
-my $op = { glyphlist =>$glyphlist, noBbox =>1 }; #, noBbox =>1, noKPX =>1, mate =>'glyph'|'symbol'|'hex'
+
+my $op = { noBbox =>1 }; # glyphlist =>$glyphlist, noKPX =>1, mate =>'glyph'|'symbol'|'hex'
 
 my $font_metrics;
 
@@ -62,8 +62,8 @@ $op = {
 #	font_metrics => font_metrics('PTC55F.afm', { glyphlist => 'glyphlist.txt', noBbox =>1 }),
 	base_font_size => 10, # depending on the document's base font size (pt), see \documentclass[...pt]
 #	font_size => 'normalsize', # TeX-font size of text in cell/box, e.g. 'small', 'normalsize', 'large', etc.
-	space => 2.43, # Regular space between words (pt), see fontdimen 2
-	shrink => 0.81, # whitespace shrink (pt), see fontdimen 4
+	space => 2.91, # 2.43, # Regular space between words (pt), see fontdimen 2
+	shrink => 0.97, # 0.81, # whitespace shrink (pt), see fontdimen 4
 	# merge => 1,
 	# offset => 0,
 	# limit => 25,
@@ -81,34 +81,35 @@ warnings_are {
 } [], 'Checked carp warning for Test #4.1';
 
 my $cell_ref = {
-	'lines' => [ # arrays of no empty lines
+	lines => [ # arrays of no empty lines
                        'I was going to do ', #0
                        'something today ', #1
-                       'but I haven\'t finis\\-',
-                       'hed doing nothin\\-',
-                       'g from yesterday. ',
-                       "\x{42f} \x{441}\x{43e}\x{431}\x{438}\x{440}\x{430}\x{43b}\x{441}\x{44f} \x{43a}\x{43e}\x{435}-{\\hskip0pt plus .02em}",
-                       "\x{447}\x{442}\x{43e} \x{441}\x{434}\x{435}\x{43b}\x{430}\x{442}\x{44c} \x{441}\x{435}\x{433}\x{43e}\\-",
-                       "\x{434}\x{43d}\x{44f}, \x{43d}\x{43e} \x{435}\x{449}\x{435} \x{43d}\x{435} \x{437}\x{430}\\-",
-                       "\x{43a}\x{43e}\x{43d}\x{447}\x{438}\x{43b} \x{43d}\x{438}\x{447}\x{435}\x{433}\x{43e}\x{43d}\x{435}\\-",
-                       "\x{434}\x{435}\x{43b}\x{430}\x{43d}\x{438}\x{435} \x{441}\x{43e} \x{432}\x{447}\x{435}\x{440}\\-",
-                       "\x{430}\x{448}\x{43d}\x{435}\x{433}\x{43e} \x{434}\x{43d}\x{44f}"
+                       'but I haven\'t finis\\-', #2
+                       'hed doing nothin\\-', #3
+                       'g from yesterday. ', #4
+                       "Я собирался кое-\\hskip0pt plus.02em\\/", #5
+                       "что сделать сего\\-", #6
+                       "дня, но еще не за\\-", #7
+                       "кончил ничегоне\\-", #8
+                       "делание со вчер\\-", #9
+                       "ашнего дня" #10
                      ],
-	'stop' => 176, # position in $string where the extraction of symbols into cell stopped
-	'wxL' => [ # arrays of line widths (*100pt) for 'lines'
-                     8257, #0  Ok: 398 +(space=243-81)=162 +840 +582 +499 +(space)=162 +627 +631 +317 +641 +627 +(space)=162 +405+631-11 +(space)=162 +629 +631 +(space)=162
-                     8398, #1  Ok: 499 +631 +948 +598 +405 +641 +317 +641 +627 +(space)=162 +405+631-11 +629 +582 +531+(space)=162 -36?
-                     8346,
-                     8313,
-                     8344,
-                     8413,
-                     7964,
-                     8342,
-                     8432,
-                     8053,
-                     5684
+	stop => 176, # position in $string where the extraction of symbols into cell stopped
+	wxL => [ # arrays of line widths (*100pt) for 'lines'
+                     8417, #0  Ok: 398 +(space=291-97)=194 +840 +582 +499 +(space)=194 +627 +631 +317 +641 +627 +(space)=194 +405+631-11 +(space)=194 +629 +631 +(space)=194
+                     8462, #1  Ok: 499 +631 +948 +598 +405 +641 +317 +641 +627 +(space)=162 +405+631-11 +629 +582 +531+(space)=162 -36?
+                     8442,
+                     8377,
+                     8440,
+                     8477,
+                     8028,
+                     8470,
+                     8464,
+                     8117,
+                     5716
                    ],
-	'numL' => 11 # number of no empty lines
+	scale => 1,
+	numL => 11 # number of no empty lines
 };
 
 is_deeply( $cell, $cell_ref, "Test #4.1: 'onecell()' without 'hyphenation' option");
@@ -123,12 +124,8 @@ $op->{hyphenation} = [];
 
 is_deeply( $cell, $cell_ref, "Test #4.5: 'onecell()' with EMPTY ARRAY of 'hyphenation' option");
 
-###DEL###
-# open F, ">test.log";
-# print F Dumper($cell);
-# close F;
-# exit;
 
+### Test 4.2
 
 $op->{hyphenation} = [
 		{ name =>'en', action => $hyp_en, }, # English
@@ -140,23 +137,27 @@ $op->{hyphenation} = [
 		{ name =>'Blah', action => $hyp_en, },
 	];
 
+$op->{documentclass} = 'article'; # 'classic';
+$op->{base_font_size} = 100; # BAD size
+
 my $nLines;
 warnings_are {
 	$nLines = onecell( $string, $op );
-} [], 'Checked carp warning for Test #3';
+} [], 'Checked carp warning for Test #4.2';
 
 is( $nLines, 12, "Test #4.2: 'onecell()' returns SCALAR number of lines");
 undef $nLines;
 
 
-### Test 4.2
+### Test 4.3
+$op->{documentclass} = 'blah-blah';
 
 warnings_are {
 	( $cell ) = onecell( $string, $op );
 } [], 'Checked carp warning for Test #4.3';
 
 $cell_ref = {
-	'lines' => [ # arrays of no empty lines
+	lines => [ # arrays of no empty lines
                        'I was going to do ', #0
                        'something today ', #1
                        'but I haven\'t fin\\-', #2
@@ -170,31 +171,28 @@ $cell_ref = {
                        'со вчерашнего ', #10
                        'дня' #11
                      ],
-	'stop' => 176, # position in $string where the extraction of symbols into cell stopped
-	'wxL' => [ # arrays of line widths (*100pt) for 'lines'
-                     8257, #0  Ok: 398 +(space=243-81)=162 +840 +582 +499 +(space)=162 +627 +631 +317 +641 +627 +(space)=162 +405+631-11 +(space)=162 +629 +631 +(space)=162
-                     8398, #1  Ok: 499 +631 +948 +598 +405 +641 +317 +641 +627 +(space)=162 +405+631-11 +629 +582 +531+(space)=162 -36?
-                     7530, #2
-                     8171, #3
-                     7232, #4  Ok: 317 +641 +627 +162 +364 +380 +631 +948 +162 +531 +598 +499 +('\-')=0 +405+598-11 +380 +('\-')=0
-                     8324, #5  Ok: 629 +582 +531+(period)238-72 +(space)=162 -30? +(Я=afii10049)=624 +(space)=162 +(с=afii10083)=529+(о=afii10080)=631-23 +(б=afii10066)=635 +(и=afii10074)=631 +(р=afii10082)=630 +(а=afii10065)=582 +(л=afii10077)=584 +(с=afii10083)=529 +(я=afii10097)=578 +(space)=162
-                     7989, #6 
-                     8000, #7 
-                     7479, #8 
-                     7794, #9  
-                     7546, #10 Ok: +(с=afii10083)=529+(о=afii10080)=631-23 +(space)=162 +(в=afii10067)=582 +(ч=afii10089)=574 +(е=afii10070)=598 +(р=afii10082)=630 +(а=afii10065)=582 +(ш=afii10090)=856 +(н=afii10079)=624 +(е=afii10070)=598 +(г=afii10068)=426 +(о=afii10080)=631 +(space)=162
+	stop => 176, # position in $string where the extraction of symbols into cell stopped
+	wxL => [ # arrays of line widths (*100pt) for 'lines'
+                     8417, #0  Ok: 398 +(space=291-97)=194 +840 +582 +499 +(space)=194 +627 +631 +317 +641 +627 +(space)=194 +405+631-11 +(space)=194 +629 +631 +(space)=194
+                     8462, #1  Ok: 499 +631 +948 +598 +405 +641 +317 +641 +627 +(space)=194 +405+631-11 +629 +582 +531+(space)=194 -36?
+                     7626, #2
+                     8235, #3
+                     7296, #4  Ok: 317 +641 +627 +(space)=194 +364 +380 +631 +948 +(space)=194 +531 +598 +499 +('\-')=0 +405+598-11 +380 +('\-')=0
+                     8420, #5  Ok: 629 +582 +531+(period)238-72 +(space)=194 -30? +(Я=afii10049)=624 +(space)=194 +(с=afii10083)=529+(о=afii10080)=631-23 +(б=afii10066)=635 +(и=afii10074)=631 +(р=afii10082)=630 +(а=afii10065)=582 +(л=afii10077)=584 +(с=afii10083)=529 +(я=afii10097)=578 +(space)=194
+                     8053, #6
+                     8096, #7
+                     7543, #8
+                     7826, #9
+                     7610, #10 Ok: +(с=afii10083)=529+(о=afii10080)=631-23 +(space)=194 +(в=afii10067)=582 +(ч=afii10089)=574 +(е=afii10070)=598 +(р=afii10082)=630 +(а=afii10065)=582 +(ш=afii10090)=856 +(н=afii10079)=624 +(е=afii10070)=598 +(г=afii10068)=426 +(о=afii10080)=631 +(space)=194
                      1826  #11 Ok: +(д=afii10069)=624 +(н=afii10079)=624 +(я=afii10097)=578
                    ],
-	'numL' => 12 # number of no empty lines
+	scale => 1,
+	numL => 12 # number of no empty lines
 };
 
-is_deeply( $cell, $cell_ref, "Test #4.3: 'onecell()' returns HASH.ARRAYS");
+is_deeply( $cell, $cell_ref, "Test #4.3: 'onecell()' with TRUE 'hyphenation' option and FALSE 'base_font_size' & 'documentclass' options");
 
-
-### Test 3 ???
-
-
-### Test 5
+### Test 3
 $op->{merge} = 1;
 $op->{offset} = 0;
 $op->{limit} = 0;
@@ -203,16 +201,17 @@ delete $op->{base_font_size};
 
 warnings_are {
 	( $cell ) = onecell( $string, $op );
-} [], 'Checked carp warning for Test #5';
+} [], 'Checked carp warning for Test #3';
 
-my $cell_ref5 = {
-	'wxL' => [ 88546 ],
-	'lines' => ["I was going to do something today but I haven't fin\\-ished doing noth\\-ing from yes\\-ter\\-day. Я собирался кое-что сделать сегодня, но еще не закончил ни\\-че\\-го\\-не\\-де\\-ла\\-ние со вчерашнего дня"],
-	'numL' => 12,
-	'stop' => 176
+my $cell_ref3 = {
+	wxL => [ 89410 ],
+	lines => ["I was going to do something today but I haven't fin\\-ished doing noth\\-ing from yes\\-ter\\-day. Я собирался кое-что сделать сегодня, но еще не закончил ни\\-че\\-го\\-не\\-де\\-ла\\-ние со вчерашнего дня"],
+	numL => 12,
+	stop => 176,
+	scale => 1,
 };
 
-is_deeply( $cell, $cell_ref5, "Test #5: 'onecell()' with 'merge' option");
+is_deeply( $cell, $cell_ref3, "Test #3: 'onecell()' with 'merge' option");
 
 
 ### Test 16
@@ -231,7 +230,7 @@ $op->{limit} = 6;
 ( $cell ) = onecell( $string, $op );
 
 my $cell_ref16 = {
-	'lines' => [ # arrays of no empty lines
+	lines => [ # arrays of no empty lines
                        'I was going to do ', #0
                        'something today ', #1
                        'but I haven\'t fin\\-', #2
@@ -239,16 +238,17 @@ my $cell_ref16 = {
                        'ing from yes\\-ter\\-', #4
                        'day. Я собирался', #5
                      ],
-	'wxL' => [ # arrays of line widths (*100pt) for 'lines'
-                     8257, #0  Ok: 398 +(space=243-81)=162 +840 +582 +499 +(space)=162 +627 +631 +317 +641 +627 +(space)=162 +405+631-11 +(space)=162 +629 +631 +(space)=162
-                     8398, #1  Ok: 499 +631 +948 +598 +405 +641 +317 +641 +627 +(space)=162 +405+631-11 +629 +582 +531+(space)=162 -36?
-                     7530, #2
-                     8171, #3
-                     7232, #4  Ok: 317 +641 +627 +162 +364 +380 +631 +948 +162 +531 +598 +499 +('\-')=0 +405+598-11 +380 +('\-')=0
-                     8162, #5  Ok: 629 +582 +531+(period)238-72 +(space)=162 -30? +(Я=afii10049)=624 +(space)=162 +(с=afii10083)=529+(о=afii10080)=631-23 +(б=afii10066)=635 +(и=afii10074)=631 +(р=afii10082)=630 +(а=afii10065)=582 +(л=afii10077)=584 +(с=afii10083)=529 +(я=afii10097)=578
+	wxL => [ # arrays of line widths (*100pt) for 'lines'
+                     8417, #0  Ok: 398 +(space)=194 +840 +582 +499 +(space) +627 +631 +317 +641 +627 +(space) +405+631-11 +(space) +629 +631 +(space)
+                     8462, #1  Ok: 499 +631 +948 +598 +405 +641 +317 +641 +627 +(space) +405+631-11 +629 +582 +531+(space) -36?
+                     7626, #2
+                     8235, #3
+                     7296, #4  Ok: 317 +641 +627 +162 +364 +380 +631 +948 +162 +531 +598 +499 +('\-')=0 +405+598-11 +380 +('\-')=0
+                     8226, #5  Ok: 629 +582 +531+(period)238-72 +(space)=194 -30? +(Я=afii10049)=624 +(space)=194 +(с=afii10083)=529+(о=afii10080)=631-23 +(б=afii10066)=635 +(и=afii10074)=631 +(р=afii10082)=630 +(а=afii10065)=582 +(л=afii10077)=584 +(с=afii10083)=529 +(я=afii10097)=578
                    ],
-	'stop' => 99,
-	'numL' => 6
+	stop => 99,
+	numL => 6,
+	scale => 1,
 };
 
 is_deeply( $cell, $cell_ref16, "Test #16.2: 'onecell()' with option 'limit'(6) < MAX line (12)");
@@ -289,18 +289,17 @@ warnings_are {
 is( $nLines, undef, "Test #9: 'onecell()' returns undef for NOT HASH options");
 undef $nLines;
 
+
 ### Test 10
 warnings_are {
 	$nLines = onecell(' ', $op );
-} [
-#	qr//,
-], 'Checked carp warning for Test #10';
+} [], 'Checked carp warning for Test #10';
 
 is( $nLines, 0, "Test #10.1: 'onecell()' returns 0 for EMPTY string");
 undef $nLines;
 
 ( $cell ) = onecell(' ', $op );
-is_deeply( $cell, {lines => [' '], wxL => [0], numL => 0, stop => 0,}, "Test #10.2: 'onecell()' returns HASH for EMPTY string");
+is_deeply( $cell, {lines => [' '], wxL =>[0], numL =>0, stop =>0, scale =>undef, }, "Test #10.2: 'onecell()' returns HASH for EMPTY string");
 
 
 ### Test 11
@@ -347,7 +346,7 @@ $cell_ref = {
                      653,
                      610,
                      617,
-                     387,
+                     419,
                      747,
                      913,
                      585,
@@ -359,9 +358,10 @@ $cell_ref = {
                      594,
                      594
                    ],
-          'numL' => 17,
-          'stop' => 18,
-          'lines' => [
+          numL => 17,
+          stop => 18,
+          scale => 1,
+          lines => [
                        'Q\\-',
                        'W\\-',
                        'E\\-',
@@ -374,15 +374,16 @@ $cell_ref = {
                        'E\\-',
                        'R\\-',
                        'T\\-',
-                       'Y{\hskip0pt plus .02em}',
-                       '~{\\hskip0pt plus .02em}',
-                       '1{\\hskip0pt plus .02em}',
-                       '2{\\hskip0pt plus .02em}',
+                       'Y\\hskip0pt plus.02em\\/',
+                       '~\\hskip0pt plus.02em\\/',
+                       '1\\hskip0pt plus.02em\\/',
+                       '2\\hskip0pt plus.02em\\/',
                        '3'
                      ]
 };
 
 is_deeply( $cell, $cell_ref, "Test #13: 'onecell()' option 'cell_width' < symbol size and limit < 0");
+
 
 ### Test 14
 $op->{cell_width} = 12; # (pt)
@@ -398,7 +399,7 @@ $cell_ref = {
                      585,
                      653,
                      610,
-                     '889',
+                     921,
                      747,
                      893,
                      585,
@@ -421,11 +422,12 @@ $cell_ref = {
                        'E\\-',
                        'R\\-',
                        'T\\-',
-                       'Y~{\\hskip0pt plus .02em}',
-                       '12{\\hskip0pt plus .02em}',
+                       'Y~\\hskip0pt plus.02em\\/',
+                       '12\\hskip0pt plus.02em\\/',
                        '3'
                      ],
-          'stop' => 18
+          stop => 18,
+          scale => 1,
 };
 
 is_deeply( $cell, $cell_ref, "Test #14: 'onecell()' option 'cell_width' < symbol size");
@@ -445,14 +447,14 @@ $cell_ref = {
                      907, # 'W' +KPX{W}{W} = 913-6
                      907,
                      907,
-                     '1069', # 'W' +KPX{W}{W} +'space' = 913-6+162
+                     1101, # 'W' -KPX{W}{W} +'space' = 913-6+194
                      1163,
                      913,
                      1163,
-                     '1226',
+                     1258,
                      1163,
                      1163,
-                     '1163'
+                     1163
                    ],
           'lines' => [
                        'W\\-',
@@ -460,15 +462,16 @@ $cell_ref = {
                        'W\\-',
                        'W\\-',
                        'W ',
-                       '@{\\hskip0pt plus .02em}',
+                       '@\\hskip0pt plus.02em\\/',
                        'W\\-',
-                       '@{\\hskip0pt plus .02em}',
+                       '@\\hskip0pt plus.02em\\/',
                        'W, ',
-                       '@{\\hskip0pt plus .02em}',
-                       '@{\\hskip0pt plus .02em}',
+                       '@\\hskip0pt plus.02em\\/',
+                       '@\\hskip0pt plus.02em\\/',
                        '@'
                      ],
-          'stop' => 15
+          stop => 15,
+          scale => 1,
 };
 
 is_deeply( $cell, $cell_ref, "Test #15: 'onecell()' option 'cell_width' = 11 < symbol size");
@@ -479,7 +482,7 @@ warnings_exist {
 	( $cell ) = onecell("A\x{3400} ", $op );
 } [ qr/Undefined width for symbol with hexcode:/ ], 'Checked carp warning for Test #97.1';
 
-is_deeply( $cell, { lines => [ 'A\\-', "\x{3400}" ], stop => 2, wxL => [ 645, 1163 ], numL => 2 }, "Test #97.1 onecell(): chinese character");
+is_deeply( $cell, { lines => [ 'A\\-', "\x{3400}" ], stop => 2, wxL => [ 645, 1163 ], scale => 1, numL => 2 }, "Test #97.1 onecell(): chinese character");
 
 warnings_exist {
 	$nLines = onecell("A\x{3400}", $op );
@@ -495,7 +498,8 @@ warnings_exist {
 
 delete $op->{limit};
 
-is_deeply( $cell, { lines => [ 'A\\-', ], stop => 1, wxL => [ 645, ], numL => 1 }, "Test #97.3 onecell(): chinese character");
+is_deeply( $cell, { lines => [ 'A\\-', ], stop => 1, wxL => [ 645, ], scale => 1, numL => 1 }, "Test #97.3 onecell(): chinese character");
+
 
 ### Test 98
 $op->{cell_width} = 10; # (pt)
@@ -506,14 +510,15 @@ warnings_are {
 } [], 'Checked carp warning for Test #98.1';
 
 $cell_ref = {
-          'stop' => 5,
-          'numL' => 3,
-          'wxL' => [
-                     855, # +645 +('space')291 -(shrink)81
-                     851, # +641 +('space')291 -(shrink)81
+          stop => 5,
+          scale => 1,
+          numL => 3,
+          wxL => [
+                     839, # +645 +('space')291 -(shrink)97
+                     835, # +641 +('space')291 -(shrink)97
                      598 # Ok
                    ],
-          'lines' => [
+          lines => [
                        'A ',
                        'B ',
                        'C'
@@ -522,7 +527,6 @@ $cell_ref = {
 
 is_deeply( $cell, $cell_ref, "Test #98.1 onecell(): for UNDEFINED 'space' option");
 
-
 my $shrink = $op->{shrink}; delete $op->{shrink};
 
 warnings_are {
@@ -530,6 +534,7 @@ warnings_are {
 } [], 'Checked carp warning for Test #98.2';
 
 my $cell_ref2 = {
+          scale => 1,
           'numL' => 3,
           'stop' => 5,
           'lines' => [
@@ -569,7 +574,7 @@ warnings_are {
 	( $cell ) = onecell('WA', $op );
 } [], 'Checked carp warning for Test #99.1';
 
-is_deeply( $cell,  { 'numL' => 1, 'lines' => ['WA'], 'wxL' => [1530], 'stop' => 2 }, "Test #99.1: 'onecell()' with 'font_metrics'->'KPX' option");
+is_deeply( $cell,  { 'numL' => 1, 'lines' => ['WA'], 'wxL' => [1530], 'stop' => 2, scale =>1 }, "Test #99.1: 'onecell()' with 'font_metrics'->'KPX' option");
 
 delete $op->{font_metrics}{KPX};
 
@@ -577,7 +582,7 @@ warnings_are {
 	( $cell ) = onecell('WA', $op );
 } [], 'Checked carp warning for Test #99.2';
 
-is_deeply( $cell,  { 'numL' => 1, 'lines' => ['WA'], 'wxL' => [1558], 'stop' => 2 }, "Test #99.2: 'onecell()' without 'font_metrics'->'KPX' option");
+is_deeply( $cell,  { 'numL' => 1, 'lines' => ['WA'], 'wxL' => [1558], 'stop' => 2, scale =>1 }, "Test #99.2: 'onecell()' without 'font_metrics'->'KPX' option");
 
 delete $op->{font_metrics};
 
@@ -587,6 +592,122 @@ throws_ok {
 
 is( $nLines, undef, "Test #99.3: 'onecell()' returns undef for UNDEFINED 'font_metrics' option");
 undef $nLines;
+
+
+### Test 100
+$op = {
+	cell_width => 30*$mm2pt, # width of cell/box, (pt)
+	font_metrics => $font_metrics, # table of font metrics for decimal Unicode number
+	base_font_size => 10, # depending on the document's base font size (pt), see \documentclass[...pt]
+	font_size => 'tiny', # TeX-font size of text in cell/box,
+	space => 2.43, # Regular space between words (pt), see fontdimen 2
+	shrink => 0.81, # whitespace shrink (pt), see fontdimen 4
+	hyphenation => [
+		{ name =>'en', action => $hyp_en, }, # English
+		{ name =>'ru', action => $hyp_ru, }, # Russian
+	],
+};
+
+$string = "I was going to do something today but I haven't finished doing nothing from yesterday.
+Я собирался кое-что сделать сегодня, но еще не закончил ничегонеделание со вчерашнего дня    ";
+
+warnings_are {
+	( $cell ) = onecell( $string, $op );
+} [], 'Checked carp warning for Test #100';
+
+$cell_ref = {
+	stop => 176, # position in $string where the extraction of symbols into cell stopped
+	wxL => [ # arrays of line widths (*100pt) for 'lines'
+                     16677,
+                     15701,
+                     15662,
+                     16107,
+                     16666,
+                     8089
+             ],
+	numL => 6, # number of no empty lines
+	scale => 2,
+	lines => [ # arrays of no empty lines
+                       'I was going to do something today ',
+                       'but I haven\'t finished doing noth\\-',
+                       "ing from yesterday. Я собирался ",
+                       "кое-что сделать сегодня, но еще ",
+                       "не закончил ничегонеделание со ",
+                       "вчерашнего дня"
+              ]
+};
+
+is_deeply( $cell, $cell_ref, "Test #100: 'onecell()' with font_size => 'tiny' option");
+
+### Test 101
+$op->{font_size} = 'LARGE'; # TeX-font size of text in cell/box,
+
+( $cell ) = onecell( $string, $op );
+
+$cell_ref = {
+	stop => 176, # position in $string where the extraction of symbols into cell stopped
+	wxL => [ # arrays of line widths (*100pt) for 'lines'
+                     3901, #1
+                     4367, #2
+                     2676, #3
+                     3829, #4
+                     4304, #5
+                     3808, #6
+                     4168, #7
+                     3007, #8
+                     4809, #9
+                     3369, #10
+                     4311, #11
+                     4222, #12
+                     3439, #13
+                     3574, #14
+                     4503, #15
+                     3630,
+                     3614,
+                     4851,
+                     3484,
+                     3610,
+                     3337,
+                     3822,
+                     4267
+             ],
+	numL => 23, # number of no empty lines
+	scale => 0.578703703703704, # 10/17.28,
+	lines => [ # arrays of no empty lines
+                       'I was go\\-', #1
+                       'ing to do ', #2
+                       'some\\-', #3
+                       'thing to\\-', #4
+                       'day but I ', #5
+                       'haven\'t ', #6
+                       'finished ', #7
+                       'doing ', #8
+                       'nothing fr\\-', #9
+                       'om yes\\-', #10
+                       "terday. Я ", #11
+                       "со\\-би\\-рал\\-", #12
+                       "ся ко\\-е-\\hskip0pt plus.02em\\/",
+                       "что сде\\-",
+                       "лать се\\-го\\-",
+                       "дня, но ",
+                       "еще не ",
+                       "закончил ",
+                       "ни\\-че\\-го\\-",
+                       "не\\-де\\-ла\\-",
+                       "ние со ",
+                       "вче\\-раш\\-",
+                       "него дня"
+              ]
+};
+
+is_deeply( $cell, $cell_ref, "Test #101: 'onecell()' with font_size => 'LARGE' option");
+
+### Test 102
+$op->{documentclass} = 'extarticle'; # 'extsizes';
+
+( $cell ) = onecell( $string, $op );
+
+is_deeply( $cell, $cell_ref, "Test #102: 'onecell()' with 'documentclass = extarticle' option");
 
 
 ###DEL###

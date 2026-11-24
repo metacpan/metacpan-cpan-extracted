@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -940,99 +940,792 @@ The following RPC methods are available in this client:
 
 =item * B<abandon_instances>
 
-Calls the RPC method C<AbandonInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->abandon_instances(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_abandon_instances_request_resource => $instance_group_managers_abandon_instances_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<AbandonInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AbandonInstancesInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_abandon_instances_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersAbandonInstancesRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<aggregated_list>
 
-Calls the RPC method C<AggregatedList> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list(
+        filter                   => $filter,
+        include_all_scopes       => $include_all_scopes,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        service_project_number   => $service_project_number,
+    );
+
+Calls the RPC method C<AggregatedList> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AggregatedListInstanceGroupManagersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagerAggregatedList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<include_all_scopes> - C<bool>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<service_project_number> - C<int64>
+
+=back
 
 =item * B<apply_updates_to_instances>
 
-Calls the RPC method C<ApplyUpdatesToInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->apply_updates_to_instances(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_apply_updates_request_resource => $instance_group_managers_apply_updates_request_resource,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<ApplyUpdatesToInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ApplyUpdatesToInstancesInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_apply_updates_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersApplyUpdatesRequest>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<create_instances>
 
-Calls the RPC method C<CreateInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_instances(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_create_instances_request_resource => $instance_group_managers_create_instances_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<CreateInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CreateInstancesInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_create_instances_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersCreateInstancesRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        instance_group_manager   => $instance_group_manager,
+        no_graceful_shutdown     => $no_graceful_shutdown,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<no_graceful_shutdown> - C<bool>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<delete_instances>
 
-Calls the RPC method C<DeleteInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_instances(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_delete_instances_request_resource => $instance_group_managers_delete_instances_request_resource,
+        no_graceful_shutdown     => $no_graceful_shutdown,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<DeleteInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteInstancesInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_delete_instances_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersDeleteInstancesRequest>
+
+=item * C<no_graceful_shutdown> - C<bool>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<delete_per_instance_configs>
 
-Calls the RPC method C<DeletePerInstanceConfigs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_per_instance_configs(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_delete_per_instance_configs_req_resource => $instance_group_managers_delete_per_instance_configs_req_resource,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<DeletePerInstanceConfigs> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeletePerInstanceConfigsInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_delete_per_instance_configs_req_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersDeletePerInstanceConfigsReq>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        instance_group_manager   => $instance_group_manager,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceGroupManager>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        instance_group_manager_resource => $instance_group_manager_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManager>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListInstanceGroupManagersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagerList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<list_errors>
 
-Calls the RPC method C<ListErrors> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_errors(
+        filter                   => $filter,
+        instance_group_manager   => $instance_group_manager,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<ListErrors> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListErrorsInstanceGroupManagersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersListErrorsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<list_managed_instances>
 
-Calls the RPC method C<ListManagedInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_managed_instances(
+        filter                   => $filter,
+        instance_group_manager   => $instance_group_manager,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<ListManagedInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListManagedInstancesInstanceGroupManagersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersListManagedInstancesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<list_per_instance_configs>
 
-Calls the RPC method C<ListPerInstanceConfigs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_per_instance_configs(
+        filter                   => $filter,
+        instance_group_manager   => $instance_group_manager,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<ListPerInstanceConfigs> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListPerInstanceConfigsInstanceGroupManagersRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersListPerInstanceConfigsResp>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_manager_resource => $instance_group_manager_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_manager_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManager>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<patch_per_instance_configs>
 
-Calls the RPC method C<PatchPerInstanceConfigs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_per_instance_configs(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_patch_per_instance_configs_req_resource => $instance_group_managers_patch_per_instance_configs_req_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<PatchPerInstanceConfigs> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchPerInstanceConfigsInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_patch_per_instance_configs_req_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersPatchPerInstanceConfigsReq>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<recreate_instances>
 
-Calls the RPC method C<RecreateInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->recreate_instances(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_recreate_instances_request_resource => $instance_group_managers_recreate_instances_request_resource,
+        no_graceful_shutdown     => $no_graceful_shutdown,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<RecreateInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RecreateInstancesInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_recreate_instances_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersRecreateInstancesRequest>
+
+=item * C<no_graceful_shutdown> - C<bool>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<resize>
 
-Calls the RPC method C<Resize> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->resize(
+        instance_group_manager   => $instance_group_manager,
+        project                  => $project,
+        request_id               => $request_id,
+        size                     => $size,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Resize> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ResizeInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<size> - C<int32>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<resume_instances>
 
-Calls the RPC method C<ResumeInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->resume_instances(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_resume_instances_request_resource => $instance_group_managers_resume_instances_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<ResumeInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ResumeInstancesInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_resume_instances_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersResumeInstancesRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_instance_template>
 
-Calls the RPC method C<SetInstanceTemplate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_instance_template(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_set_instance_template_request_resource => $instance_group_managers_set_instance_template_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetInstanceTemplate> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetInstanceTemplateInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_set_instance_template_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersSetInstanceTemplateRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_target_pools>
 
-Calls the RPC method C<SetTargetPools> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_target_pools(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_set_target_pools_request_resource => $instance_group_managers_set_target_pools_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetTargetPools> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetTargetPoolsInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_set_target_pools_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersSetTargetPoolsRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<start_instances>
 
-Calls the RPC method C<StartInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start_instances(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_start_instances_request_resource => $instance_group_managers_start_instances_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<StartInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::StartInstancesInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_start_instances_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersStartInstancesRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<stop_instances>
 
-Calls the RPC method C<StopInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stop_instances(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_stop_instances_request_resource => $instance_group_managers_stop_instances_request_resource,
+        no_graceful_shutdown     => $no_graceful_shutdown,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<StopInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::StopInstancesInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_stop_instances_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersStopInstancesRequest>
+
+=item * C<no_graceful_shutdown> - C<bool>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<suspend_instances>
 
-Calls the RPC method C<SuspendInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->suspend_instances(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_suspend_instances_request_resource => $instance_group_managers_suspend_instances_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SuspendInstances> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SuspendInstancesInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_suspend_instances_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersSuspendInstancesRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<update_per_instance_configs>
 
-Calls the RPC method C<UpdatePerInstanceConfigs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_per_instance_configs(
+        instance_group_manager   => $instance_group_manager,
+        instance_group_managers_update_per_instance_configs_req_resource => $instance_group_managers_update_per_instance_configs_req_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<UpdatePerInstanceConfigs> on C<google.cloud.compute.v1.InstanceGroupManagers>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdatePerInstanceConfigsInstanceGroupManagerRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group_manager> - C<string>
+
+=item * C<instance_group_managers_update_per_instance_configs_req_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceGroupManagersUpdatePerInstanceConfigsReq>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =back
 

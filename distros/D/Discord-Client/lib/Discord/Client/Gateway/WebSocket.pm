@@ -10,7 +10,7 @@ use Protocol::WebSocket::Frame;
 use Scalar::Util qw(weaken);
 use URI;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub new {
     my ( $class, %args ) = @_;

@@ -10,27 +10,27 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
-use Google::Cloud::Sql::V1::CloudSqlTiers;
-use Google::Cloud::Sql::V1::CloudSqlResources;
-use Google::Cloud::Sql::V1::CloudSqlEvents;
-use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
-use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
-use Google::Cloud::Sql::V1::CloudSqlRegions;
 use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
-use Google::Cloud::Sql::V1::CloudSqlFlags;
-use Google::Cloud::Sql::V1::CloudSqlDatabases;
-use Google::Cloud::Sql::V1::CloudSqlInstances;
-use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-use Google::Cloud::Sql::V1::CloudSqlUsers;
+use Google::Cloud::Sql::V1::CloudSqlTiers;
+use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
+use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
+use Google::Cloud::Sql::V1::CloudSqlEvents;
+use Google::Cloud::Sql::V1::CloudSqlRegions;
+use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
+use Google::Cloud::Sql::V1::CloudSqlResources;
 use Google::Cloud::Sql::V1::CloudSqlOperations;
-use Google::Cloud::Sql::V1::CloudSqlConnect;
-use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
+use Google::Cloud::Sql::V1::CloudSqlFlags;
+use Google::Cloud::Sql::V1::CloudSqlUsers;
+use Google::Cloud::Sql::V1::CloudSqlSslCerts;
 use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
+use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+use Google::Cloud::Sql::V1::CloudSqlConnect;
+use Google::Cloud::Sql::V1::CloudSqlDatabases;
+use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
+use Google::Cloud::Sql::V1::CloudSqlInstances;
 use Google::Cloud::Sql::V1::CloudSqlBackups;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -280,15 +280,87 @@ The following RPC methods are available in this client:
 
 =item * B<get_connect_settings>
 
-Calls the RPC method C<GetConnectSettings> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_connect_settings(
+        instance                 => $instance,
+        project                  => $project,
+        read_time                => $read_time,
+    );
+
+Calls the RPC method C<GetConnectSettings> on C<google.cloud.sql.v1.SqlConnectService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlConnect::GetConnectSettingsRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlConnect::ConnectSettings>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<read_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=back
 
 =item * B<resolve_connect_settings>
 
-Calls the RPC method C<ResolveConnectSettings> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->resolve_connect_settings(
+        dns_name                 => $dns_name,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ResolveConnectSettings> on C<google.cloud.sql.v1.SqlConnectService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlConnect::ResolveConnectSettingsRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlConnect::ConnectSettings>
+
+Parameters:
+
+=over 4
+
+=item * C<dns_name> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<generate_ephemeral_cert>
 
-Calls the RPC method C<GenerateEphemeralCert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->generate_ephemeral_cert(
+        instance                 => $instance,
+        project                  => $project,
+        public_key               => $public_key,
+        access_token             => $access_token,
+        read_time                => $read_time,
+        valid_duration           => $valid_duration,
+    );
+
+Calls the RPC method C<GenerateEphemeralCert> on C<google.cloud.sql.v1.SqlConnectService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<public_key> - C<string>
+
+=item * C<access_token> - C<string>
+
+=item * C<read_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=item * C<valid_duration> - L<Google::Protobuf::Duration::Duration>
+
+=back
 
 =back
 

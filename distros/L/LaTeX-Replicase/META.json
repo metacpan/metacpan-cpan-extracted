@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.14"
          }
       },
       "runtime" : {
@@ -37,16 +38,25 @@
             "File::Basename" : "2.00",
             "File::Compare" : "1.00",
             "File::Path" : "2.18",
+            "File::ShareDir" : "1.10",
+            "File::ShareDir::Install" : "0.14",
+            "Storable" : "2.00",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "2.183",
             "Storable" : "2.00",
             "Test::Exception" : "0.43",
-            "Test::More" : "0.98",
+            "Test::File::ShareDir" : "1.001000",
+            "Test::More" : "0.96",
             "Test::More::UTF8" : "0.05",
             "Test::Output" : "1.01",
             "Test::Pod" : "1.22",
             "Test::Warn" : "0.30",
             "Text::Hyphen" : "0.12",
-            "Text::Hyphen::RU" : "0.12",
-            "perl" : "5.010000"
+            "Text::Hyphen::RU" : "0.12"
          }
       }
    },
@@ -61,6 +71,6 @@
          "web" : "https://github.com/AlessandroGorohovski/LaTeX-Replicase"
       }
    },
-   "version" : "0.803",
+   "version" : "0.815",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

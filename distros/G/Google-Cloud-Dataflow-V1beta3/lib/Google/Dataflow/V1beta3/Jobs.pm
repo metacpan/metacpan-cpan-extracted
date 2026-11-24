@@ -3,7 +3,7 @@ package Google::Dataflow::V1beta3::Jobs;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1022,173 +1022,9 @@ EOF
     # Field: service_resources Type: 11 (.google.dataflow.v1beta3.ServiceResources)
     # Field: pausable Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::Job - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::Job->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: String
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.dataflow.v1beta3.JobType)
-
-=item * B<environment>
-
-Type: Message (.google.dataflow.v1beta3.Environment)
-
-=item * B<steps>
-
-Type: Message (.google.dataflow.v1beta3.Step)
-
-=item * B<steps_location>
-
-Type: String
-
-=item * B<current_state>
-
-Type: Enum (.google.dataflow.v1beta3.JobState)
-
-=item * B<current_state_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<requested_state>
-
-Type: Enum (.google.dataflow.v1beta3.JobState)
-
-=item * B<execution_info>
-
-Type: Message (.google.dataflow.v1beta3.JobExecutionInfo)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<replace_job_id>
-
-Type: String
-
-=item * B<transform_name_mapping>
-
-Type: Message (.google.dataflow.v1beta3.Job.TransformNameMappingEntry)
-
-=item * B<client_request_id>
-
-Type: String
-
-=item * B<replaced_by_job_id>
-
-Type: String
-
-=item * B<temp_files>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.dataflow.v1beta3.Job.LabelsEntry)
-
-=item * B<location>
-
-Type: String
-
-=item * B<pipeline_description>
-
-Type: Message (.google.dataflow.v1beta3.PipelineDescription)
-
-=item * B<stage_states>
-
-Type: Message (.google.dataflow.v1beta3.ExecutionStageState)
-
-=item * B<job_metadata>
-
-Type: Message (.google.dataflow.v1beta3.JobMetadata)
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<created_from_snapshot_id>
-
-Type: String
-
-=item * B<satisfies_pzs>
-
-Type: Bool
-
-=item * B<runtime_updatable_params>
-
-Type: Message (.google.dataflow.v1beta3.RuntimeUpdatableParams)
-
-=item * B<satisfies_pzi>
-
-Type: Bool
-
-=item * B<service_resources>
-
-Type: Message (.google.dataflow.v1beta3.ServiceResources)
-
-=item * B<pausable>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::ServiceResources ===
     # Fields for ServiceResources
     # Field: zones Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::ServiceResources - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::ServiceResources->new(
-        zones => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<zones>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::RuntimeUpdatableParams ===
     # Fields for RuntimeUpdatableParams
@@ -1198,187 +1034,25 @@ Type: String
     # Field: acceptable_backlog_duration Type: 11 (.google.protobuf.Duration)
     # Field: autoscaling_tier Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::RuntimeUpdatableParams - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::RuntimeUpdatableParams->new(
-        max_num_workers => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<max_num_workers>
-
-Type: Int32
-
-=item * B<min_num_workers>
-
-Type: Int32
-
-=item * B<worker_utilization_hint>
-
-Type: Double
-
-=item * B<acceptable_backlog_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<autoscaling_tier>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::DatastoreIODetails ===
     # Fields for DatastoreIODetails
     # Field: namespace Type: 9 ()
     # Field: project_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::DatastoreIODetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::DatastoreIODetails->new(
-        namespace => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<namespace>
-
-Type: String
-
-=item * B<project_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::PubSubIODetails ===
     # Fields for PubSubIODetails
     # Field: topic Type: 9 ()
     # Field: subscription Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::PubSubIODetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::PubSubIODetails->new(
-        topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic>
-
-Type: String
-
-=item * B<subscription>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::FileIODetails ===
     # Fields for FileIODetails
     # Field: file_pattern Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::FileIODetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::FileIODetails->new(
-        file_pattern => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<file_pattern>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::BigTableIODetails ===
     # Fields for BigTableIODetails
     # Field: project_id Type: 9 ()
     # Field: instance_id Type: 9 ()
     # Field: table_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::BigTableIODetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::BigTableIODetails->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<instance_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::BigQueryIODetails ===
     # Fields for BigQueryIODetails
@@ -1387,83 +1061,11 @@ Type: String
     # Field: project_id Type: 9 ()
     # Field: query Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::BigQueryIODetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::BigQueryIODetails->new(
-        table => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<table>
-
-Type: String
-
-=item * B<dataset>
-
-Type: String
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<query>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::SpannerIODetails ===
     # Fields for SpannerIODetails
     # Field: project_id Type: 9 ()
     # Field: instance_id Type: 9 ()
     # Field: database_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::SpannerIODetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::SpannerIODetails->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<instance_id>
-
-Type: String
-
-=item * B<database_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::SdkVersion ===
     # Fields for SdkVersion
@@ -1472,44 +1074,6 @@ Type: String
     # Field: sdk_support_status Type: 14 (.google.dataflow.v1beta3.SdkVersion.SdkSupportStatus)
     # Field: bugs Type: 11 (.google.dataflow.v1beta3.SdkBug)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::SdkVersion - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::SdkVersion->new(
-        version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<version>
-
-Type: String
-
-=item * B<version_display_name>
-
-Type: String
-
-=item * B<sdk_support_status>
-
-Type: Enum (.google.dataflow.v1beta3.SdkVersion.SdkSupportStatus)
-
-=item * B<bugs>
-
-Type: Message (.google.dataflow.v1beta3.SdkBug)
-
-=back
-
-=cut
-
 # Enum: SdkVersion::SdkSupportStatus
 our $SdkVersion_UNKNOWN = 0;
 our $SdkVersion_SUPPORTED = 1;
@@ -1517,67 +1081,11 @@ our $SdkVersion_STALE = 2;
 our $SdkVersion_DEPRECATED = 3;
 our $SdkVersion_UNSUPPORTED = 4;
 
-=pod
-
-=head2 Enum: SdkVersion::SdkSupportStatus
-
-Values:
-
-=over 4
-
-=item * C<UNKNOWN> => 0
-
-=item * C<SUPPORTED> => 1
-
-=item * C<STALE> => 2
-
-=item * C<DEPRECATED> => 3
-
-=item * C<UNSUPPORTED> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::SdkBug ===
     # Fields for SdkBug
     # Field: type Type: 14 (.google.dataflow.v1beta3.SdkBug.Type)
     # Field: severity Type: 14 (.google.dataflow.v1beta3.SdkBug.Severity)
     # Field: uri Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::SdkBug - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::SdkBug->new(
-        type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<type>
-
-Type: Enum (.google.dataflow.v1beta3.SdkBug.Type)
-
-=item * B<severity>
-
-Type: Enum (.google.dataflow.v1beta3.SdkBug.Severity)
-
-=item * B<uri>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: SdkBug::Type
 our $SdkBug_TYPE_UNSPECIFIED = 0;
@@ -1585,51 +1093,11 @@ our $SdkBug_GENERAL = 1;
 our $SdkBug_PERFORMANCE = 2;
 our $SdkBug_DATALOSS = 3;
 
-=pod
-
-=head2 Enum: SdkBug::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<GENERAL> => 1
-
-=item * C<PERFORMANCE> => 2
-
-=item * C<DATALOSS> => 3
-
-=back
-
-=cut
-
 # Enum: SdkBug::Severity
 our $SdkBug_SEVERITY_UNSPECIFIED = 0;
 our $SdkBug_NOTICE = 1;
 our $SdkBug_WARNING = 2;
 our $SdkBug_SEVERE = 3;
-
-=pod
-
-=head2 Enum: SdkBug::Severity
-
-Values:
-
-=over 4
-
-=item * C<SEVERITY_UNSPECIFIED> => 0
-
-=item * C<NOTICE> => 1
-
-=item * C<WARNING> => 2
-
-=item * C<SEVERE> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::JobMetadata ===
     # Fields for JobMetadata
@@ -1642,99 +1110,11 @@ Values:
     # Field: datastore_details Type: 11 (.google.dataflow.v1beta3.DatastoreIODetails)
     # Field: user_display_properties Type: 11 (.google.dataflow.v1beta3.JobMetadata.UserDisplayPropertiesEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::JobMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::JobMetadata->new(
-        sdk_version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<sdk_version>
-
-Type: Message (.google.dataflow.v1beta3.SdkVersion)
-
-=item * B<spanner_details>
-
-Type: Message (.google.dataflow.v1beta3.SpannerIODetails)
-
-=item * B<bigquery_details>
-
-Type: Message (.google.dataflow.v1beta3.BigQueryIODetails)
-
-=item * B<big_table_details>
-
-Type: Message (.google.dataflow.v1beta3.BigTableIODetails)
-
-=item * B<pubsub_details>
-
-Type: Message (.google.dataflow.v1beta3.PubSubIODetails)
-
-=item * B<file_details>
-
-Type: Message (.google.dataflow.v1beta3.FileIODetails)
-
-=item * B<datastore_details>
-
-Type: Message (.google.dataflow.v1beta3.DatastoreIODetails)
-
-=item * B<user_display_properties>
-
-Type: Message (.google.dataflow.v1beta3.JobMetadata.UserDisplayPropertiesEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::ExecutionStageState ===
     # Fields for ExecutionStageState
     # Field: execution_stage_name Type: 9 ()
     # Field: execution_stage_state Type: 14 (.google.dataflow.v1beta3.JobState)
     # Field: current_state_time Type: 11 (.google.protobuf.Timestamp)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::ExecutionStageState - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::ExecutionStageState->new(
-        execution_stage_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<execution_stage_name>
-
-Type: String
-
-=item * B<execution_stage_state>
-
-Type: Enum (.google.dataflow.v1beta3.JobState)
-
-=item * B<current_state_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::PipelineDescription ===
     # Fields for PipelineDescription
@@ -1742,44 +1122,6 @@ Type: Message (.google.protobuf.Timestamp)
     # Field: execution_pipeline_stage Type: 11 (.google.dataflow.v1beta3.ExecutionStageSummary)
     # Field: display_data Type: 11 (.google.dataflow.v1beta3.DisplayData)
     # Field: step_names_hash Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::PipelineDescription - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::PipelineDescription->new(
-        original_pipeline_transform => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<original_pipeline_transform>
-
-Type: Message (.google.dataflow.v1beta3.TransformSummary)
-
-=item * B<execution_pipeline_stage>
-
-Type: Message (.google.dataflow.v1beta3.ExecutionStageSummary)
-
-=item * B<display_data>
-
-Type: Message (.google.dataflow.v1beta3.DisplayData)
-
-=item * B<step_names_hash>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::TransformSummary ===
     # Fields for TransformSummary
@@ -1789,52 +1131,6 @@ Type: String
     # Field: display_data Type: 11 (.google.dataflow.v1beta3.DisplayData)
     # Field: output_collection_name Type: 9 ()
     # Field: input_collection_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::TransformSummary - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::TransformSummary->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: Enum (.google.dataflow.v1beta3.KindType)
-
-=item * B<id>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<display_data>
-
-Type: Message (.google.dataflow.v1beta3.DisplayData)
-
-=item * B<output_collection_name>
-
-Type: String
-
-=item * B<input_collection_name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::ExecutionStageSummary ===
     # Fields for ExecutionStageSummary
@@ -1846,60 +1142,6 @@ Type: String
     # Field: prerequisite_stage Type: 9 ()
     # Field: component_transform Type: 11 (.google.dataflow.v1beta3.ExecutionStageSummary.ComponentTransform)
     # Field: component_source Type: 11 (.google.dataflow.v1beta3.ExecutionStageSummary.ComponentSource)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::ExecutionStageSummary - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::ExecutionStageSummary->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<id>
-
-Type: String
-
-=item * B<kind>
-
-Type: Enum (.google.dataflow.v1beta3.KindType)
-
-=item * B<input_source>
-
-Type: Message (.google.dataflow.v1beta3.ExecutionStageSummary.StageSource)
-
-=item * B<output_source>
-
-Type: Message (.google.dataflow.v1beta3.ExecutionStageSummary.StageSource)
-
-=item * B<prerequisite_stage>
-
-Type: String
-
-=item * B<component_transform>
-
-Type: Message (.google.dataflow.v1beta3.ExecutionStageSummary.ComponentTransform)
-
-=item * B<component_source>
-
-Type: Message (.google.dataflow.v1beta3.ExecutionStageSummary.ComponentSource)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::DisplayData ===
     # Fields for DisplayData
@@ -1916,175 +1158,19 @@ Type: Message (.google.dataflow.v1beta3.ExecutionStageSummary.ComponentSource)
     # Field: url Type: 9 ()
     # Field: label Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::DisplayData - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::DisplayData->new(
-        key => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<key>
-
-Type: String
-
-=item * B<namespace>
-
-Type: String
-
-=item * B<str_value>
-
-Type: String
-
-=item * B<int64_value>
-
-Type: Int64
-
-=item * B<float_value>
-
-Type: Float
-
-=item * B<java_class_value>
-
-Type: String
-
-=item * B<timestamp_value>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<duration_value>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<bool_value>
-
-Type: Bool
-
-=item * B<short_str_value>
-
-Type: String
-
-=item * B<url>
-
-Type: String
-
-=item * B<label>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::Step ===
     # Fields for Step
     # Field: kind Type: 9 ()
     # Field: name Type: 9 ()
     # Field: properties Type: 11 (.google.protobuf.Struct)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::Step - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::Step->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.protobuf.Struct)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::JobExecutionInfo ===
     # Fields for JobExecutionInfo
     # Field: stages Type: 11 (.google.dataflow.v1beta3.JobExecutionInfo.StagesEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::JobExecutionInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::JobExecutionInfo->new(
-        stages => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<stages>
-
-Type: Message (.google.dataflow.v1beta3.JobExecutionInfo.StagesEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::JobExecutionStageInfo ===
     # Fields for JobExecutionStageInfo
     # Field: step_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::JobExecutionStageInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::JobExecutionStageInfo->new(
-        step_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<step_name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::CreateJobRequest ===
     # Fields for CreateJobRequest
@@ -2094,92 +1180,12 @@ Type: String
     # Field: replace_job_id Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::CreateJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::CreateJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job>
-
-Type: Message (.google.dataflow.v1beta3.Job)
-
-=item * B<view>
-
-Type: Enum (.google.dataflow.v1beta3.JobView)
-
-=item * B<replace_job_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::GetJobRequest ===
     # Fields for GetJobRequest
     # Field: project_id Type: 9 ()
     # Field: job_id Type: 9 ()
     # Field: view Type: 14 (.google.dataflow.v1beta3.JobView)
     # Field: location Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::GetJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::GetJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.dataflow.v1beta3.JobView)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::UpdateJobRequest ===
     # Fields for UpdateJobRequest
@@ -2188,48 +1194,6 @@ Type: String
     # Field: job Type: 11 (.google.dataflow.v1beta3.Job)
     # Field: location Type: 9 ()
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::UpdateJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::UpdateJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<job>
-
-Type: Message (.google.dataflow.v1beta3.Job)
-
-=item * B<location>
-
-Type: String
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::ListJobsRequest ===
     # Fields for ListJobsRequest
@@ -2241,151 +1205,21 @@ Type: Message (.google.protobuf.FieldMask)
     # Field: location Type: 9 ()
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::ListJobsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::ListJobsRequest->new(
-        filter => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<filter>
-
-Type: Enum (.google.dataflow.v1beta3.ListJobsRequest.Filter)
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.dataflow.v1beta3.JobView)
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: ListJobsRequest::Filter
 our $ListJobsRequest_UNKNOWN = 0;
 our $ListJobsRequest_ALL = 1;
 our $ListJobsRequest_TERMINATED = 2;
 our $ListJobsRequest_ACTIVE = 3;
 
-=pod
-
-=head2 Enum: ListJobsRequest::Filter
-
-Values:
-
-=over 4
-
-=item * C<UNKNOWN> => 0
-
-=item * C<ALL> => 1
-
-=item * C<TERMINATED> => 2
-
-=item * C<ACTIVE> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::FailedLocation ===
     # Fields for FailedLocation
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::FailedLocation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::FailedLocation->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::ListJobsResponse ===
     # Fields for ListJobsResponse
     # Field: jobs Type: 11 (.google.dataflow.v1beta3.Job)
     # Field: next_page_token Type: 9 ()
     # Field: failed_location Type: 11 (.google.dataflow.v1beta3.FailedLocation)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::ListJobsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::ListJobsResponse->new(
-        jobs => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<jobs>
-
-Type: Message (.google.dataflow.v1beta3.Job)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<failed_location>
-
-Type: Message (.google.dataflow.v1beta3.FailedLocation)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Jobs::SnapshotJobRequest ===
     # Fields for SnapshotJobRequest
@@ -2396,134 +1230,28 @@ Type: Message (.google.dataflow.v1beta3.FailedLocation)
     # Field: snapshot_sources Type: 8 ()
     # Field: description Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::SnapshotJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::SnapshotJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<location>
-
-Type: String
-
-=item * B<snapshot_sources>
-
-Type: Bool
-
-=item * B<description>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::CheckActiveJobsRequest ===
     # Fields for CheckActiveJobsRequest
     # Field: project_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::CheckActiveJobsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::CheckActiveJobsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Jobs::CheckActiveJobsResponse ===
     # Fields for CheckActiveJobsResponse
     # Field: active_jobs_exist Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Jobs::CheckActiveJobsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Jobs;
-
-    my $msg = Google::Dataflow::V1beta3::Jobs::CheckActiveJobsResponse->new(
-        active_jobs_exist => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<active_jobs_exist>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Service Client: Google::Dataflow::V1beta3::Jobs::JobsV1Beta3Client ===
 package Google::Dataflow::V1beta3::Jobs::JobsV1Beta3Client;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Dataflow::V1beta3::Jobs::JobsV1Beta3Client
 
-Google::Dataflow::V1beta3::Jobs::JobsV1Beta3Client - Client stub representing the remote JobsV1Beta3 service
+Client stub representing the remote C<JobsV1Beta3> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataflow.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2643,13 +1371,1443 @@ sub snapshot_job {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Dataflow::V1beta3::Jobs - Protocol Buffers schema definition
+Google::Dataflow::V1beta3::Jobs - Compiled Protocol Buffers messages for google/dataflow/v1beta3/jobs.proto
+
+=head1 SYNOPSIS
+
+    use Google::Dataflow::V1beta3::Jobs;
+
+    my $msg = Google::Dataflow::V1beta3::Jobs::Job->new({
+        id => $id,
+        project_id => $project_id,
+        name => $name,
+        type => $type,
+    });
+
+    # Read or update a field
+    my $val = $msg->id();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Dataflow::V1beta3::Jobs::Job->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/dataflow/v1beta3/jobs.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Dataflow::V1beta3::Jobs::Job
+
+Defines a job to be run by the Cloud Dataflow service. Do not enter
+confidential information when you supply string values using the API.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+The unique ID of this job.
+
+This field is set by the Dataflow service when the job is
+created, and is immutable for the life of the job.
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The ID of the Google Cloud project that the job belongs to.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. The user-specified Dataflow job name.
+
+Only one active job with a given name can exist in a project within one
+region at
+any given time. Jobs in different regions can have the same name.
+If a caller attempts to create a job with the same
+name as an active job that already exists, the attempt returns the
+existing job.
+
+The name must match the regular expression
+`[a-z]([-a-z0-9]{0,1022}[a-z0-9])?`
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::JobType>)
+
+Optional. The type of Dataflow job.
+
+=item * C<< $msg->environment() >> / C<< $msg->environment($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::Environment>)
+
+Optional. The environment for the job.
+
+=item * C<< $msg->steps() >> / C<< $msg->steps($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::Step>)
+
+Exactly one of step or steps_location should be specified.
+
+The top-level steps that constitute the entire job. Only retrieved with
+JOB_VIEW_ALL.
+
+=item * C<< $msg->steps_location() >> / C<< $msg->steps_location($value) >>
+
+Type: C<String>
+
+The Cloud Storage location where the steps are stored.
+
+=item * C<< $msg->current_state() >> / C<< $msg->current_state($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::JobState>)
+
+The current state of the job.
+
+Jobs are created in the `JOB_STATE_STOPPED` state unless otherwise
+specified.
+
+A job in the `JOB_STATE_RUNNING` state may asynchronously enter a
+terminal state. After a job has reached a terminal state, no
+further state updates may be made.
+
+This field might be mutated by the Dataflow service;
+callers cannot mutate it.
+
+=item * C<< $msg->current_state_time() >> / C<< $msg->current_state_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The timestamp associated with the current state.
+
+=item * C<< $msg->requested_state() >> / C<< $msg->requested_state($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::JobState>)
+
+The job's requested state. Applies to `UpdateJob` requests.
+
+Set `requested_state` with `UpdateJob` requests to switch between the
+states `JOB_STATE_STOPPED` and `JOB_STATE_RUNNING`. You can also use
+`UpdateJob` requests to change a job's
+state from `JOB_STATE_RUNNING` to `JOB_STATE_CANCELLED`,
+`JOB_STATE_DONE`,  or `JOB_STATE_DRAINED`. These states irrevocably
+terminate the job if it hasn't already reached a terminal state.
+
+This field has no effect on `CreateJob` requests.
+
+=item * C<< $msg->execution_info() >> / C<< $msg->execution_info($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::JobExecutionInfo>)
+
+Deprecated.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The timestamp when the job was initially created. Immutable and set by the
+Cloud Dataflow service.
+
+=item * C<< $msg->replace_job_id() >> / C<< $msg->replace_job_id($value) >>
+
+Type: C<String>
+
+If this job is an update of an existing job, this field is the job ID
+of the job it replaced.
+
+When sending a `CreateJobRequest`, you can update a job by specifying it
+here. The job named here is stopped, and its intermediate state is
+transferred to this job.
+
+=item * C<< $msg->transform_name_mapping() >> / C<< $msg->transform_name_mapping($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::Job::TransformNameMappingEntry>)
+
+Optional. The map of transform name prefixes of the job to be replaced to
+the corresponding name prefixes of the new job.
+
+=item * C<< $msg->client_request_id() >> / C<< $msg->client_request_id($value) >>
+
+Type: C<String>
+
+The client's unique identifier of the job, re-used across retried attempts.
+If this field is set, the service will ensure its uniqueness.
+The request to create a job will fail if the service has knowledge of a
+previously submitted job with the same client's ID and job name.
+The caller may use this field to ensure idempotence of job
+creation across retried attempts to create a job.
+By default, the field is empty and, in that case, the service ignores it.
+
+=item * C<< $msg->replaced_by_job_id() >> / C<< $msg->replaced_by_job_id($value) >>
+
+Type: C<String>
+
+If another job is an update of this job (and thus, this job is in
+`JOB_STATE_UPDATED`), this field contains the ID of that job.
+
+=item * C<< $msg->temp_files() >> / C<< $msg->temp_files($value) >>
+
+Type: C<String>
+
+A set of files the system should be aware of that are used
+for temporary storage. These temporary files will be
+removed on job completion.
+No duplicates are allowed.
+No file patterns are supported.
+
+The supported files are:
+
+Google Cloud Storage:
+
+   storage.googleapis.com/{bucket}/{object}
+   bucket.storage.googleapis.com/{object}
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::Job::LabelsEntry>)
+
+User-defined labels for this job.
+
+The labels map can contain no more than 64 entries.  Entries of the labels
+map are UTF8 strings that comply with the following restrictions:
+
+* Keys must conform to regexp:  [\p{Ll}\p{Lo}][\p{Ll}\p{Lo}\p{N}_-]{0,62}
+* Values must conform to regexp:  [\p{Ll}\p{Lo}\p{N}_-]{0,63}
+* Both keys and values are additionally constrained to be <= 128 bytes in
+size.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+contains this job.
+
+=item * C<< $msg->pipeline_description() >> / C<< $msg->pipeline_description($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::PipelineDescription>)
+
+Preliminary field: The format of this data may change at any time.
+A description of the user pipeline and stages through which it is executed.
+Created by Cloud Dataflow service.  Only retrieved with
+JOB_VIEW_DESCRIPTION or JOB_VIEW_ALL.
+
+=item * C<< $msg->stage_states() >> / C<< $msg->stage_states($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::ExecutionStageState>)
+
+This field may be mutated by the Cloud Dataflow service;
+callers cannot mutate it.
+
+=item * C<< $msg->job_metadata() >> / C<< $msg->job_metadata($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::JobMetadata>)
+
+This field is populated by the Dataflow service to support filtering jobs
+by the metadata values provided here. Populated for ListJobs and all GetJob
+views SUMMARY and higher.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The timestamp when the job was started (transitioned to JOB_STATE_PENDING).
+Flexible resource scheduling jobs are started with some delay after job
+creation, so start_time is unset before start and is updated when the
+job is started by the Cloud Dataflow service. For other jobs, start_time
+always equals to create_time and is immutable and set by the Cloud Dataflow
+service.
+
+=item * C<< $msg->created_from_snapshot_id() >> / C<< $msg->created_from_snapshot_id($value) >>
+
+Type: C<String>
+
+If this is specified, the job's initial state is populated from the given
+snapshot.
+
+=item * C<< $msg->satisfies_pzs() >> / C<< $msg->satisfies_pzs($value) >>
+
+Type: C<Bool>
+
+Reserved for future use. This field is set only in responses from the
+server; it is ignored if it is set in any requests.
+
+=item * C<< $msg->runtime_updatable_params() >> / C<< $msg->runtime_updatable_params($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::RuntimeUpdatableParams>)
+
+This field may ONLY be modified at runtime using the projects.jobs.update
+method to adjust job behavior. This field has no effect when specified at
+job creation.
+
+=item * C<< $msg->satisfies_pzi() >> / C<< $msg->satisfies_pzi($value) >>
+
+Type: C<Bool>
+
+Output only. Reserved for future use. This field is set only in responses
+from the server; it is ignored if it is set in any requests.
+
+=item * C<< $msg->service_resources() >> / C<< $msg->service_resources($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::ServiceResources>)
+
+Output only. Resources used by the Dataflow Service to run the job.
+
+=item * C<< $msg->pausable() >> / C<< $msg->pausable($value) >>
+
+Type: C<Bool>
+
+Output only. Indicates whether the job can be paused.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::ServiceResources
+
+Resources used by the Dataflow Service to run the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->zones() >> / C<< $msg->zones($value) >>
+
+Type: C<String>
+
+Output only. List of Cloud Zones being used by the Dataflow Service for
+this job. Example: us-central1-c
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::RuntimeUpdatableParams
+
+Additional job parameters that can only be updated during runtime using the
+projects.jobs.update method. These fields have no effect when specified
+during job creation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->max_num_workers() >> / C<< $msg->max_num_workers($value) >>
+
+Type: C<Int32>
+
+The maximum number of workers to cap autoscaling at. This field is
+currently only supported for Streaming Engine jobs.
+
+=item * C<< $msg->min_num_workers() >> / C<< $msg->min_num_workers($value) >>
+
+Type: C<Int32>
+
+The minimum number of workers to scale down to. This field is currently
+only supported for Streaming Engine jobs.
+
+=item * C<< $msg->worker_utilization_hint() >> / C<< $msg->worker_utilization_hint($value) >>
+
+Type: C<Double>
+
+Target worker utilization, compared against the aggregate utilization of
+the worker pool by autoscaler, to determine upscaling and downscaling when
+absent other constraints such as backlog.
+For more information, see
+[Update an existing
+pipeline](https://cloud.google.com/dataflow/docs/guides/updating-a-pipeline).
+
+=item * C<< $msg->acceptable_backlog_duration() >> / C<< $msg->acceptable_backlog_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Deprecated: Use `autoscaling_tier` instead.
+The backlog threshold duration in seconds for autoscaling. Value must be
+non-negative.
+
+=item * C<< $msg->autoscaling_tier() >> / C<< $msg->autoscaling_tier($value) >>
+
+Type: C<String>
+
+Optional. The backlog threshold tier for autoscaling. Value must be one of
+"low-latency", "medium-latency", or "high-latency".
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::DatastoreIODetails
+
+Metadata for a Datastore connector used by the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->namespace() >> / C<< $msg->namespace($value) >>
+
+Type: C<String>
+
+Namespace used in the connection.
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+ProjectId accessed in the connection.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::PubSubIODetails
+
+Metadata for a Pub/Sub connector used by the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+Topic accessed in the connection.
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Subscription used in the connection.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::FileIODetails
+
+Metadata for a File connector used by the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->file_pattern() >> / C<< $msg->file_pattern($value) >>
+
+Type: C<String>
+
+File Pattern used to access files by the connector.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::BigTableIODetails
+
+Metadata for a Cloud Bigtable connector used by the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+ProjectId accessed in the connection.
+
+=item * C<< $msg->instance_id() >> / C<< $msg->instance_id($value) >>
+
+Type: C<String>
+
+InstanceId accessed in the connection.
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+TableId accessed in the connection.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::BigQueryIODetails
+
+Metadata for a BigQuery connector used by the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->table() >> / C<< $msg->table($value) >>
+
+Type: C<String>
+
+Table accessed in the connection.
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<String>
+
+Dataset accessed in the connection.
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Project accessed in the connection.
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Query used to access data in the connection.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::SpannerIODetails
+
+Metadata for a Spanner connector used by the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+ProjectId accessed in the connection.
+
+=item * C<< $msg->instance_id() >> / C<< $msg->instance_id($value) >>
+
+Type: C<String>
+
+InstanceId accessed in the connection.
+
+=item * C<< $msg->database_id() >> / C<< $msg->database_id($value) >>
+
+Type: C<String>
+
+DatabaseId accessed in the connection.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::SdkVersion
+
+The version of the SDK used to run the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+The version of the SDK used to run the job.
+
+=item * C<< $msg->version_display_name() >> / C<< $msg->version_display_name($value) >>
+
+Type: C<String>
+
+A readable string describing the version of the SDK.
+
+=item * C<< $msg->sdk_support_status() >> / C<< $msg->sdk_support_status($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::SdkVersion::SdkSupportStatus>)
+
+The support status for this SDK version.
+
+=item * C<< $msg->bugs() >> / C<< $msg->bugs($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::SdkBug>)
+
+Output only. Known bugs found in this SDK version.
+
+=back
+
+=head3 Enum: SdkVersion::SdkSupportStatus
+
+=over 4
+
+=item * C<UNKNOWN> => C<0>
+
+=item * C<SUPPORTED> => C<1>
+
+=item * C<STALE> => C<2>
+
+=item * C<DEPRECATED> => C<3>
+
+=item * C<UNSUPPORTED> => C<4>
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::SdkBug
+
+A bug found in the Dataflow SDK.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::SdkBug::Type>)
+
+Output only. Describes the impact of this SDK bug.
+
+=item * C<< $msg->severity() >> / C<< $msg->severity($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::SdkBug::Severity>)
+
+Output only. How severe the SDK bug is.
+
+=item * C<< $msg->uri() >> / C<< $msg->uri($value) >>
+
+Type: C<String>
+
+Output only. Link to more information on the bug.
+
+=back
+
+=head3 Enum: SdkBug::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<GENERAL> => C<1>
+
+=item * C<PERFORMANCE> => C<2>
+
+=item * C<DATALOSS> => C<3>
+
+=back
+
+=head3 Enum: SdkBug::Severity
+
+=over 4
+
+=item * C<SEVERITY_UNSPECIFIED> => C<0>
+
+=item * C<NOTICE> => C<1>
+
+=item * C<WARNING> => C<2>
+
+=item * C<SEVERE> => C<3>
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::JobMetadata
+
+Metadata available primarily for filtering jobs. Will be included in the
+ListJob response and Job SUMMARY view.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->sdk_version() >> / C<< $msg->sdk_version($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::SdkVersion>)
+
+The SDK version used to run the job.
+
+=item * C<< $msg->spanner_details() >> / C<< $msg->spanner_details($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::SpannerIODetails>)
+
+Identification of a Spanner source used in the Dataflow job.
+
+=item * C<< $msg->bigquery_details() >> / C<< $msg->bigquery_details($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::BigQueryIODetails>)
+
+Identification of a BigQuery source used in the Dataflow job.
+
+=item * C<< $msg->big_table_details() >> / C<< $msg->big_table_details($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::BigTableIODetails>)
+
+Identification of a Cloud Bigtable source used in the Dataflow job.
+
+=item * C<< $msg->pubsub_details() >> / C<< $msg->pubsub_details($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::PubSubIODetails>)
+
+Identification of a Pub/Sub source used in the Dataflow job.
+
+=item * C<< $msg->file_details() >> / C<< $msg->file_details($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::FileIODetails>)
+
+Identification of a File source used in the Dataflow job.
+
+=item * C<< $msg->datastore_details() >> / C<< $msg->datastore_details($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::DatastoreIODetails>)
+
+Identification of a Datastore source used in the Dataflow job.
+
+=item * C<< $msg->user_display_properties() >> / C<< $msg->user_display_properties($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::JobMetadata::UserDisplayPropertiesEntry>)
+
+List of display properties to help UI filter jobs.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::ExecutionStageState
+
+A message describing the state of a particular execution stage.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->execution_stage_name() >> / C<< $msg->execution_stage_name($value) >>
+
+Type: C<String>
+
+The name of the execution stage.
+
+=item * C<< $msg->execution_stage_state() >> / C<< $msg->execution_stage_state($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::JobState>)
+
+Executions stage states allow the same set of values as JobState.
+
+=item * C<< $msg->current_state_time() >> / C<< $msg->current_state_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time at which the stage transitioned to this state.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::PipelineDescription
+
+A descriptive representation of submitted pipeline as well as the executed
+form.  This data is provided by the Dataflow service for ease of visualizing
+the pipeline and interpreting Dataflow provided metrics.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->original_pipeline_transform() >> / C<< $msg->original_pipeline_transform($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::TransformSummary>)
+
+Description of each transform in the pipeline and collections between them.
+
+=item * C<< $msg->execution_pipeline_stage() >> / C<< $msg->execution_pipeline_stage($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::ExecutionStageSummary>)
+
+Description of each stage of execution of the pipeline.
+
+=item * C<< $msg->display_data() >> / C<< $msg->display_data($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::DisplayData>)
+
+Pipeline level display data.
+
+=item * C<< $msg->step_names_hash() >> / C<< $msg->step_names_hash($value) >>
+
+Type: C<String>
+
+A hash value of the submitted pipeline portable graph step names if exists.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::TransformSummary
+
+Description of the type, names/ids, and input/outputs for a transform.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::KindType>)
+
+Type of transform.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+SDK generated id of this transform instance.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+User provided name for this transform instance.
+
+=item * C<< $msg->display_data() >> / C<< $msg->display_data($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::DisplayData>)
+
+Transform-specific display data.
+
+=item * C<< $msg->output_collection_name() >> / C<< $msg->output_collection_name($value) >>
+
+Type: C<String>
+
+User  names for all collection outputs to this transform.
+
+=item * C<< $msg->input_collection_name() >> / C<< $msg->input_collection_name($value) >>
+
+Type: C<String>
+
+User names for all collection inputs to this transform.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::ExecutionStageSummary
+
+Description of the composing transforms, names/ids, and input/outputs of a
+stage of execution.  Some composing transforms and sources may have been
+generated by the Dataflow service during execution planning.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Dataflow service generated name for this stage.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Dataflow service generated id for this stage.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::KindType>)
+
+Type of transform this stage is executing.
+
+=item * C<< $msg->input_source() >> / C<< $msg->input_source($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::ExecutionStageSummary::StageSource>)
+
+Input sources for this stage.
+
+=item * C<< $msg->output_source() >> / C<< $msg->output_source($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::ExecutionStageSummary::StageSource>)
+
+Output sources for this stage.
+
+=item * C<< $msg->prerequisite_stage() >> / C<< $msg->prerequisite_stage($value) >>
+
+Type: C<String>
+
+Other stages that must complete before this stage can run.
+
+=item * C<< $msg->component_transform() >> / C<< $msg->component_transform($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::ExecutionStageSummary::ComponentTransform>)
+
+Transforms that comprise this execution stage.
+
+=item * C<< $msg->component_source() >> / C<< $msg->component_source($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::ExecutionStageSummary::ComponentSource>)
+
+Collections produced and consumed by component transforms of this stage.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::DisplayData
+
+Data provided with a pipeline or transform to provide descriptive info.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->key() >> / C<< $msg->key($value) >>
+
+Type: C<String>
+
+The key identifying the display data.
+This is intended to be used as a label for the display data
+when viewed in a dax monitoring system.
+
+=item * C<< $msg->namespace() >> / C<< $msg->namespace($value) >>
+
+Type: C<String>
+
+The namespace for the key. This is usually a class name or programming
+language namespace (i.e. python module) which defines the display data.
+This allows a dax monitoring system to specially handle the data
+and perform custom rendering.
+
+=item * C<< $msg->str_value() >> / C<< $msg->str_value($value) >>
+
+Type: C<String>
+
+Contains value if the data is of string type.
+
+=item * C<< $msg->int64_value() >> / C<< $msg->int64_value($value) >>
+
+Type: C<Int64>
+
+Contains value if the data is of int64 type.
+
+=item * C<< $msg->float_value() >> / C<< $msg->float_value($value) >>
+
+Type: C<Float>
+
+Contains value if the data is of float type.
+
+=item * C<< $msg->java_class_value() >> / C<< $msg->java_class_value($value) >>
+
+Type: C<String>
+
+Contains value if the data is of java class type.
+
+=item * C<< $msg->timestamp_value() >> / C<< $msg->timestamp_value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Contains value if the data is of timestamp type.
+
+=item * C<< $msg->duration_value() >> / C<< $msg->duration_value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Contains value if the data is of duration type.
+
+=item * C<< $msg->bool_value() >> / C<< $msg->bool_value($value) >>
+
+Type: C<Bool>
+
+Contains value if the data is of a boolean type.
+
+=item * C<< $msg->short_str_value() >> / C<< $msg->short_str_value($value) >>
+
+Type: C<String>
+
+A possible additional shorter value to display.
+For example a java_class_name_value of com.mypackage.MyDoFn
+will be stored with MyDoFn as the short_str_value and
+com.mypackage.MyDoFn as the java_class_name value.
+short_str_value can be displayed and java_class_name_value
+will be displayed as a tooltip.
+
+=item * C<< $msg->url() >> / C<< $msg->url($value) >>
+
+Type: C<String>
+
+An optional full URL.
+
+=item * C<< $msg->label() >> / C<< $msg->label($value) >>
+
+Type: C<String>
+
+An optional label to display in a dax UI for the element.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::Step
+
+Defines a particular step within a Cloud Dataflow job.
+
+A job consists of multiple steps, each of which performs some
+specific operation as part of the overall job.  Data is typically
+passed from one step to another as part of the job.
+
+B<Note:> The properties of this object are not stable and might change.
+
+Here's an example of a sequence of steps which together implement a
+Map-Reduce job:
+
+  * Read a collection of data from some source, parsing the
+    collection's elements.
+
+  * Validate the elements.
+
+  * Apply a user-defined function to map each element to some value
+    and extract an element-specific key value.
+
+  * Group elements with the same key into a single element with
+    that key, transforming a multiply-keyed collection into a
+    uniquely-keyed collection.
+
+  * Write the elements out to some data sink.
+
+Note that the Cloud Dataflow service may be used to run many different
+types of jobs, not just Map-Reduce.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The kind of step in the Cloud Dataflow job.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The name that identifies the step. This must be unique for each
+step with respect to all other steps in the Cloud Dataflow job.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Named properties associated with the step. Each kind of
+predefined step has its own required set of properties.
+Must be provided on Create.  Only retrieved with JOB_VIEW_ALL.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::JobExecutionInfo
+
+Additional information about how a Cloud Dataflow job will be executed that
+isn't contained in the submitted job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->stages() >> / C<< $msg->stages($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::JobExecutionInfo::StagesEntry>)
+
+A mapping from each stage to the information about that stage.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::JobExecutionStageInfo
+
+Contains information about how a particular
+[google.dataflow.v1beta3.Step][google.dataflow.v1beta3.Step] will be
+executed.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->step_name() >> / C<< $msg->step_name($value) >>
+
+Type: C<String>
+
+The steps associated with the execution stage.
+Note that stages may have several steps, and that a given step
+might be run by more than one stage.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::CreateJobRequest
+
+Request to create a Cloud Dataflow job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The ID of the Cloud Platform project that the job belongs to.
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::Job>)
+
+The job to create.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::JobView>)
+
+The level of information requested in response.
+
+=item * C<< $msg->replace_job_id() >> / C<< $msg->replace_job_id($value) >>
+
+Type: C<String>
+
+Deprecated. This field is now in the Job message.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+contains this job.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::GetJobRequest
+
+Request to get the state of a Cloud Dataflow job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The ID of the Cloud Platform project that the job belongs to.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+The job ID.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::JobView>)
+
+The level of information requested in response.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+contains this job.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::UpdateJobRequest
+
+Request to update a Cloud Dataflow job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The ID of the Cloud Platform project that the job belongs to.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+The job ID.
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::Job>)
+
+The updated job.
+Only the job state is updatable; other fields will be ignored.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+contains this job.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+The list of fields to update relative to Job. If empty, only
+RequestedJobState will be considered for update. If the FieldMask is not
+empty and RequestedJobState is none/empty, The fields specified in the
+update mask will be the only ones considered for update. If both
+RequestedJobState and update_mask are specified, an error will be returned
+as we cannot update both state and mask.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::ListJobsRequest
+
+Request to list Cloud Dataflow jobs.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::ListJobsRequest::Filter>)
+
+The kind of filter to use.
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The project which owns the jobs.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::JobView>)
+
+Deprecated. ListJobs always returns summaries now.
+Use GetJob for other JobViews.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+If there are many jobs, limit response to at most this many.
+The actual number of jobs returned will be the lesser of max_responses
+and an unspecified server-defined limit.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Set this to the 'next_page_token' field of a previous response
+to request additional results in a long list.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+contains this job.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. The job name.
+
+=back
+
+=head3 Enum: ListJobsRequest::Filter
+
+=over 4
+
+=item * C<UNKNOWN> => C<0>
+
+=item * C<ALL> => C<1>
+
+=item * C<TERMINATED> => C<2>
+
+=item * C<ACTIVE> => C<3>
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::FailedLocation
+
+Indicates which [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) failed
+to respond to a request for data.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The name of the [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+failed to respond.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::ListJobsResponse
+
+Response to a request to list Cloud Dataflow jobs in a project. This might
+be a partial response, depending on the page size in the ListJobsRequest.
+However, if the project does not have any jobs, an instance of
+ListJobsResponse is not returned and the requests's response
+body is empty {}.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->jobs() >> / C<< $msg->jobs($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::Job>)
+
+A subset of the requested job information.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Set if there may be more results than fit in this response.
+
+=item * C<< $msg->failed_location() >> / C<< $msg->failed_location($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::FailedLocation>)
+
+Zero or more messages describing the [regional endpoints]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+failed to respond.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::SnapshotJobRequest
+
+Request to create a snapshot of a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The project which owns the job to be snapshotted.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+The job to be snapshotted.
+
+=item * C<< $msg->ttl() >> / C<< $msg->ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+TTL for the snapshot.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The location that contains this job.
+
+=item * C<< $msg->snapshot_sources() >> / C<< $msg->snapshot_sources($value) >>
+
+Type: C<Bool>
+
+If true, perform snapshots for sources which support this.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+User specified description of the snapshot. Maybe empty.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::CheckActiveJobsRequest
+
+Request to check is active jobs exists for a project
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The project which owns the jobs.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Jobs::CheckActiveJobsResponse
+
+Response for CheckActiveJobsRequest.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->active_jobs_exist() >> / C<< $msg->active_jobs_exist($value) >>
+
+Type: C<Bool>
+
+If True, active jobs exists for project. False otherwise.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Dataflow::V1beta3::Jobs::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

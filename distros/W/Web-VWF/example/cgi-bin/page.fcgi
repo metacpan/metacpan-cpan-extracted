@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 # Can be tested at the command line, e.g.:
 #	LANG=en_GB CONFIG_DIR=example/conf perl -Ilib example/cgi-bin/page.fcgi page=index

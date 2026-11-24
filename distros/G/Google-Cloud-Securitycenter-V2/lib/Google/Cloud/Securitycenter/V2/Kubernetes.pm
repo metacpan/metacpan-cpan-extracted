@@ -1,0 +1,333 @@
+package Google::Cloud::Securitycenter::V2::Kubernetes;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Cloud::Securitycenter::V2::Container };
+    eval { require Google::Cloud::Securitycenter::V2::Label };
+    my $descriptor_b64 = <<'EOF';
+Ci9nb29nbGUvY2xvdWQvc2VjdXJpdHljZW50ZXIvdjIva3ViZXJuZXRlcy5wcm90bxIeZ29v
+Z2xlLmNsb3VkLnNlY3VyaXR5Y2VudGVyLnYyGi5nb29nbGUvY2xvdWQvc2VjdXJpdHljZW50
+ZXIvdjIvY29udGFpbmVyLnByb3RvGipnb29nbGUvY2xvdWQvc2VjdXJpdHljZW50ZXIvdjIv
+bGFiZWwucHJvdG8iig4KCkt1YmVybmV0ZXMSQgoEcG9kcxgBIAMoCzIuLmdvb2dsZS5jbG91
+ZC5zZWN1cml0eWNlbnRlci52Mi5LdWJlcm5ldGVzLlBvZFIEcG9kcxJFCgVub2RlcxgCIAMo
+CzIvLmdvb2dsZS5jbG91ZC5zZWN1cml0eWNlbnRlci52Mi5LdWJlcm5ldGVzLk5vZGVSBW5v
+ZGVzElIKCm5vZGVfcG9vbHMYAyADKAsyMy5nb29nbGUuY2xvdWQuc2VjdXJpdHljZW50ZXIu
+djIuS3ViZXJuZXRlcy5Ob2RlUG9vbFIJbm9kZVBvb2xzEkUKBXJvbGVzGAQgAygLMi8uZ29v
+Z2xlLmNsb3VkLnNlY3VyaXR5Y2VudGVyLnYyLkt1YmVybmV0ZXMuUm9sZVIFcm9sZXMSTgoI
+YmluZGluZ3MYBSADKAsyMi5nb29nbGUuY2xvdWQuc2VjdXJpdHljZW50ZXIudjIuS3ViZXJu
+ZXRlcy5CaW5kaW5nUghiaW5kaW5ncxJeCg5hY2Nlc3NfcmV2aWV3cxgGIAMoCzI3Lmdvb2ds
+ZS5jbG91ZC5zZWN1cml0eWNlbnRlci52Mi5LdWJlcm5ldGVzLkFjY2Vzc1Jldmlld1INYWNj
+ZXNzUmV2aWV3cxJLCgdvYmplY3RzGAcgAygLMjEuZ29vZ2xlLmNsb3VkLnNlY3VyaXR5Y2Vu
+dGVyLnYyLkt1YmVybmV0ZXMuT2JqZWN0UgdvYmplY3RzGrMBCgNQb2QSDgoCbnMYASABKAlS
+Am5zEhIKBG5hbWUYAiABKAlSBG5hbWUSPQoGbGFiZWxzGAMgAygLMiUuZ29vZ2xlLmNsb3Vk
+LnNlY3VyaXR5Y2VudGVyLnYyLkxhYmVsUgZsYWJlbHMSSQoKY29udGFpbmVycxgEIAMoCzIp
+Lmdvb2dsZS5jbG91ZC5zZWN1cml0eWNlbnRlci52Mi5Db250YWluZXJSCmNvbnRhaW5lcnMa
+GgoETm9kZRISCgRuYW1lGAEgASgJUgRuYW1lGmUKCE5vZGVQb29sEhIKBG5hbWUYASABKAlS
+BG5hbWUSRQoFbm9kZXMYAiADKAsyLy5nb29nbGUuY2xvdWQuc2VjdXJpdHljZW50ZXIudjIu
+S3ViZXJuZXRlcy5Ob2RlUgVub2RlcxquAQoEUm9sZRJICgRraW5kGAEgASgOMjQuZ29vZ2xl
+LmNsb3VkLnNlY3VyaXR5Y2VudGVyLnYyLkt1YmVybmV0ZXMuUm9sZS5LaW5kUgRraW5kEg4K
+Am5zGAIgASgJUgJucxISCgRuYW1lGAMgASgJUgRuYW1lIjgKBEtpbmQSFAoQS0lORF9VTlNQ
+RUNJRklFRBAAEggKBFJPTEUQARIQCgxDTFVTVEVSX1JPTEUQAhrCAQoHQmluZGluZxIOCgJu
+cxgBIAEoCVICbnMSEgoEbmFtZRgCIAEoCVIEbmFtZRJDCgRyb2xlGAMgASgLMi8uZ29vZ2xl
+LmNsb3VkLnNlY3VyaXR5Y2VudGVyLnYyLkt1YmVybmV0ZXMuUm9sZVIEcm9sZRJOCghzdWJq
+ZWN0cxgEIAMoCzIyLmdvb2dsZS5jbG91ZC5zZWN1cml0eWNlbnRlci52Mi5LdWJlcm5ldGVz
+LlN1YmplY3RSCHN1YmplY3RzGs4BCgdTdWJqZWN0Ek8KBGtpbmQYASABKA4yOy5nb29nbGUu
+Y2xvdWQuc2VjdXJpdHljZW50ZXIudjIuS3ViZXJuZXRlcy5TdWJqZWN0LkF1dGhUeXBlUgRr
+aW5kEg4KAm5zGAIgASgJUgJucxISCgRuYW1lGAMgASgJUgRuYW1lIk4KCEF1dGhUeXBlEhkK
+FUFVVEhfVFlQRV9VTlNQRUNJRklFRBAAEggKBFVTRVIQARISCg5TRVJWSUNFQUNDT1VOVBAC
+EgkKBUdST1VQEAMatAEKDEFjY2Vzc1JldmlldxIUCgVncm91cBgBIAEoCVIFZ3JvdXASDgoC
+bnMYAiABKAlSAm5zEhIKBG5hbWUYAyABKAlSBG5hbWUSGgoIcmVzb3VyY2UYBCABKAlSCHJl
+c291cmNlEiAKC3N1YnJlc291cmNlGAUgASgJUgtzdWJyZXNvdXJjZRISCgR2ZXJiGAYgASgJ
+UgR2ZXJiEhgKB3ZlcnNpb24YByABKAlSB3ZlcnNpb24aoQEKBk9iamVjdBIUCgVncm91cBgB
+IAEoCVIFZ3JvdXASEgoEa2luZBgCIAEoCVIEa2luZBIOCgJucxgDIAEoCVICbnMSEgoEbmFt
+ZRgEIAEoCVIEbmFtZRJJCgpjb250YWluZXJzGAUgAygLMikuZ29vZ2xlLmNsb3VkLnNlY3Vy
+aXR5Y2VudGVyLnYyLkNvbnRhaW5lclIKY29udGFpbmVyc0LpAQoiY29tLmdvb2dsZS5jbG91
+ZC5zZWN1cml0eWNlbnRlci52MkIPS3ViZXJuZXRlc1Byb3RvUAFaSmNsb3VkLmdvb2dsZS5j
+b20vZ28vc2VjdXJpdHljZW50ZXIvYXBpdjIvc2VjdXJpdHljZW50ZXJwYjtzZWN1cml0eWNl
+bnRlcnBiqgIeR29vZ2xlLkNsb3VkLlNlY3VyaXR5Q2VudGVyLlYyygIeR29vZ2xlXENsb3Vk
+XFNlY3VyaXR5Q2VudGVyXFYy6gIhR29vZ2xlOjpDbG91ZDo6U2VjdXJpdHlDZW50ZXI6OlYy
+SrE8CgcSBQ4A1wEBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjUgR29vZ2xlIExMQwoK
+IExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAi
+TGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxp
+YW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBM
+aWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNF
+LTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8g
+aW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlz
+IGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMg
+T1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4K
+IFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBw
+ZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhID
+EAAnCgkKAgMAEgMSADgKCQoCAwESAxMANAoICgEIEgMVADsKCQoCCCUSAxUAOwoICgEIEgMW
+AGEKCQoCCAsSAxYAYQoICgEIEgMXACIKCQoCCAoSAxcAIgoICgEIEgMYADAKCQoCCAgSAxgA
+MAoICgEIEgMZADsKCQoCCAESAxkAOwoICgEIEgMaADsKCQoCCCkSAxoAOwoICgEIEgMbADoK
+CQoCCC0SAxsAOgotCgIEABIFHgDXAQEaICBLdWJlcm5ldGVzLXJlbGF0ZWQgYXR0cmlidXRl
+cy4KCgoKAwQAARIDHggSCiEKBAQAAwASBCACLQMaEyBBIEt1YmVybmV0ZXMgUG9kLgoKDAoF
+BAADAAESAyAKDQoqCgYEAAMAAgASAyIEEhobIEt1YmVybmV0ZXMgUG9kIG5hbWVzcGFjZS4K
+Cg4KBwQAAwACAAUSAyIECgoOCgcEAAMAAgABEgMiCw0KDgoHBAADAAIAAxIDIhARCiUKBgQA
+AwACARIDJQQUGhYgS3ViZXJuZXRlcyBQb2QgbmFtZS4KCg4KBwQAAwACAQUSAyUECgoOCgcE
+AAMAAgEBEgMlCw8KDgoHBAADAAIBAxIDJRITCl0KBgQAAwACAhIDKQQeGk4gUG9kIGxhYmVs
+cy4gIEZvciBLdWJlcm5ldGVzIGNvbnRhaW5lcnMsIHRoZXNlIGFyZSBhcHBsaWVkIHRvIHRo
+ZQogY29udGFpbmVyLgoKDgoHBAADAAICBBIDKQQMCg4KBwQAAwACAgYSAykNEgoOCgcEAAMA
+AgIBEgMpExkKDgoHBAADAAICAxIDKRwdCkUKBgQAAwACAxIDLAQmGjYgUG9kIGNvbnRhaW5l
+cnMgYXNzb2NpYXRlZCB3aXRoIHRoaXMgZmluZGluZywgaWYgYW55LgoKDgoHBAADAAIDBBID
+LAQMCg4KBwQAAwACAwYSAywNFgoOCgcEAAMAAgMBEgMsFyEKDgoHBAADAAIDAxIDLCQlCj0K
+BAQAAwESBDACNAMaLyBLdWJlcm5ldGVzIG5vZGVzIGFzc29jaWF0ZWQgd2l0aCB0aGUgZmlu
+ZGluZy4KCgwKBQQAAwEBEgMwCg4KiQEKBgQAAwECABIDMwQUGnogW0Z1bGwgcmVzb3VyY2Ug
+bmFtZV0oaHR0cHM6Ly9nb29nbGUuYWlwLmRldi8xMjIjZnVsbC1yZXNvdXJjZS1uYW1lcykg
+b2YKIHRoZSBDb21wdXRlIEVuZ2luZSBWTSBydW5uaW5nIHRoZSBjbHVzdGVyIG5vZGUuCgoO
+CgcEAAMBAgAFEgMzBAoKDgoHBAADAQIAARIDMwsPCg4KBwQAAwECAAMSAzMSEwozCgQEAAMC
+EgQ3Aj0DGiUgUHJvdmlkZXMgR0tFIG5vZGUgcG9vbCBpbmZvcm1hdGlvbi4KCgwKBQQAAwIB
+EgM3ChIKKwoGBAADAgIAEgM5BBQaHCBLdWJlcm5ldGVzIG5vZGUgcG9vbCBuYW1lLgoKDgoH
+BAADAgIABRIDOQQKCg4KBwQAAwICAAESAzkLDwoOCgcEAAMCAgADEgM5EhMKMwoGBAADAgIB
+EgM8BBwaJCBOb2RlcyBhc3NvY2lhdGVkIHdpdGggdGhlIGZpbmRpbmcuCgoOCgcEAAMCAgEE
+EgM8BAwKDgoHBAADAgIBBhIDPA0RCg4KBwQAAwICAQESAzwSFwoOCgcEAAMCAgEDEgM8GhsK
+LwoEBAADAxIEQAJVAxohIEt1YmVybmV0ZXMgUm9sZSBvciBDbHVzdGVyUm9sZS4KCgwKBQQA
+AwMBEgNACg4KLAoGBAADAwQAEgRCBEsFGhwgVHlwZXMgb2YgS3ViZXJuZXRlcyByb2xlcy4K
+Cg4KBwQAAwMEAAESA0IJDQouCggEAAMDBAACABIDRAYbGh0gUm9sZSB0eXBlIGlzIG5vdCBz
+cGVjaWZpZWQuCgoQCgkEAAMDBAACAAESA0QGFgoQCgkEAAMDBAACAAISA0QZGgojCggEAAMD
+BAACARIDRwYPGhIgS3ViZXJuZXRlcyBSb2xlLgoKEAoJBAADAwQAAgEBEgNHBgoKEAoJBAAD
+AwQAAgECEgNHDQ4KKgoIBAADAwQAAgISA0oGFxoZIEt1YmVybmV0ZXMgQ2x1c3RlclJvbGUu
+CgoQCgkEAAMDBAACAgESA0oGEgoQCgkEAAMDBAACAgISA0oVFgobCgYEAAMDAgASA04EEhoM
+IFJvbGUgdHlwZS4KCg4KBwQAAwMCAAYSA04ECAoOCgcEAAMDAgABEgNOCQ0KDgoHBAADAwIA
+AxIDThARCiAKBgQAAwMCARIDUQQSGhEgUm9sZSBuYW1lc3BhY2UuCgoOCgcEAAMDAgEFEgNR
+BAoKDgoHBAADAwIBARIDUQsNCg4KBwQAAwMCAQMSA1EQEQobCgYEAAMDAgISA1QEFBoMIFJv
+bGUgbmFtZS4KCg4KBwQAAwMCAgUSA1QECgoOCgcEAAMDAgIBEgNUCw8KDgoHBAADAwICAxID
+VBITCkoKBAQAAwQSBFgCZQMaPCBSZXByZXNlbnRzIGEgS3ViZXJuZXRlcyBSb2xlQmluZGlu
+ZyBvciBDbHVzdGVyUm9sZUJpbmRpbmcuCgoMCgUEAAMEARIDWAoRCisKBgQAAwQCABIDWgQS
+GhwgTmFtZXNwYWNlIGZvciB0aGUgYmluZGluZy4KCg4KBwQAAwQCAAUSA1oECgoOCgcEAAME
+AgABEgNaCw0KDgoHBAADBAIAAxIDWhARCiYKBgQAAwQCARIDXQQUGhcgTmFtZSBmb3IgdGhl
+IGJpbmRpbmcuCgoOCgcEAAMEAgEFEgNdBAoKDgoHBAADBAIBARIDXQsPCg4KBwQAAwQCAQMS
+A10SEwpDCgYEAAMEAgISA2AEEho0IFRoZSBSb2xlIG9yIENsdXN0ZXJSb2xlIHJlZmVyZW5j
+ZWQgYnkgdGhlIGJpbmRpbmcuCgoOCgcEAAMEAgIGEgNgBAgKDgoHBAADBAICARIDYAkNCg4K
+BwQAAwQCAgMSA2AQEQp2CgYEAAMEAgMSA2QEIhpnIFJlcHJlc2VudHMgb25lIG9yIG1vcmUg
+c3ViamVjdHMgdGhhdCBhcmUgYm91bmQgdG8gdGhlIHJvbGUuIE5vdCBhbHdheXMKIGF2YWls
+YWJsZSBmb3IgUEFUQ0ggcmVxdWVzdHMuCgoOCgcEAAMEAgMEEgNkBAwKDgoHBAADBAIDBhID
+ZA0UCg4KBwQAAwQCAwESA2QVHQoOCgcEAAMEAgMDEgNkICEKMQoEBAADBRIFaAKAAQMaIiBS
+ZXByZXNlbnRzIGEgS3ViZXJuZXRlcyBzdWJqZWN0LgoKDAoFBAADBQESA2gKEQpLCgYEAAMF
+BAASBGoEdgUaOyBBdXRoIHR5cGVzIHRoYXQgY2FuIGJlIHVzZWQgZm9yIHRoZSBzdWJqZWN0
+J3Mga2luZCBmaWVsZC4KCg4KBwQAAwUEAAESA2oJEQozCggEAAMFBAACABIDbAYgGiIgQXV0
+aGVudGljYXRpb24gaXMgbm90IHNwZWNpZmllZC4KChAKCQQAAwUEAAIAARIDbAYbChAKCQQA
+AwUEAAIAAhIDbB4fCi8KCAQAAwUEAAIBEgNvBg8aHiBVc2VyIHdpdGggdmFsaWQgY2VydGlm
+aWNhdGUuCgoQCgkEAAMFBAACAQESA28GCgoQCgkEAAMFBAACAQISA28NDgpWCggEAAMFBAAC
+AhIDcgYZGkUgVXNlcnMgbWFuYWdlZCBieSBLdWJlcm5ldGVzIEFQSSB3aXRoIGNyZWRlbnRp
+YWxzIHN0b3JlZCBhcyBzZWNyZXRzLgoKEAoJBAADBQQAAgIBEgNyBhQKEAoJBAADBQQAAgIC
+EgNyFxgKJwoIBAADBQQAAgMSA3UGEBoWIENvbGxlY3Rpb24gb2YgdXNlcnMuCgoQCgkEAAMF
+BAACAwESA3UGCwoQCgkEAAMFBAACAwISA3UODwo1CgYEAAMFAgASA3kEFhomIEF1dGhlbnRp
+Y2F0aW9uIHR5cGUgZm9yIHRoZSBzdWJqZWN0LgoKDgoHBAADBQIABhIDeQQMCg4KBwQAAwUC
+AAESA3kNEQoOCgcEAAMFAgADEgN5FBUKKwoGBAADBQIBEgN8BBIaHCBOYW1lc3BhY2UgZm9y
+IHRoZSBzdWJqZWN0LgoKDgoHBAADBQIBBRIDfAQKCg4KBwQAAwUCAQESA3wLDQoOCgcEAAMF
+AgEDEgN8EBEKJgoGBAADBQICEgN/BBQaFyBOYW1lIGZvciB0aGUgc3ViamVjdC4KCg4KBwQA
+AwUCAgUSA38ECgoOCgcEAAMFAgIBEgN/Cw8KDgoHBAADBQICAxIDfxITCoECCgQEAAMGEgaG
+AQKeAQMa8AEgQ29udmV5cyBpbmZvcm1hdGlvbiBhYm91dCBhIEt1YmVybmV0ZXMgYWNjZXNz
+IHJldmlldyAoc3VjaCBhcyBvbmUgcmV0dXJuZWQKIGJ5IGEgW2BrdWJlY3RsIGF1dGgKIGNh
+bi1pYF0oaHR0cHM6Ly9rdWJlcm5ldGVzLmlvL2RvY3MvcmVmZXJlbmNlL2FjY2Vzcy1hdXRo
+bi1hdXRoei9hdXRob3JpemF0aW9uLyNjaGVja2luZy1hcGktYWNjZXNzKQogY29tbWFuZCkg
+dGhhdCB3YXMgaW52b2x2ZWQgaW4gYSBmaW5kaW5nLgoKDQoFBAADBgESBIYBChYKPwoGBAAD
+BgIAEgSIAQQVGi8gVGhlIEFQSSBncm91cCBvZiB0aGUgcmVzb3VyY2UuICIqIiBtZWFucyBh
+bGwuCgoPCgcEAAMGAgAFEgSIAQQKCg8KBwQAAwYCAAESBIgBCxAKDwoHBAADBgIAAxIEiAET
+FAquAQoGBAADBgIBEgSNAQQSGp0BIE5hbWVzcGFjZSBvZiB0aGUgYWN0aW9uIGJlaW5nIHJl
+cXVlc3RlZC4gQ3VycmVudGx5LCB0aGVyZSBpcyBubwogZGlzdGluY3Rpb24gYmV0d2VlbiBu
+byBuYW1lc3BhY2UgYW5kIGFsbCBuYW1lc3BhY2VzLiAgQm90aAogYXJlIHJlcHJlc2VudGVk
+IGJ5ICIiIChlbXB0eSkuCgoPCgcEAAMGAgEFEgSNAQQKCg8KBwQAAwYCAQESBI0BCw0KDwoH
+BAADBgIBAxIEjQEQEQpMCgYEAAMGAgISBJABBBQaPCBUaGUgbmFtZSBvZiB0aGUgcmVzb3Vy
+Y2UgYmVpbmcgcmVxdWVzdGVkLiBFbXB0eSBtZWFucyBhbGwuCgoPCgcEAAMGAgIFEgSQAQQK
+Cg8KBwQAAwYCAgESBJABCw8KDwoHBAADBgICAxIEkAESEwpGCgYEAAMGAgMSBJMBBBgaNiBU
+aGUgb3B0aW9uYWwgcmVzb3VyY2UgdHlwZSByZXF1ZXN0ZWQuICIqIiBtZWFucyBhbGwuCgoP
+CgcEAAMGAgMFEgSTAQQKCg8KBwQAAwYCAwESBJMBCxMKDwoHBAADBgIDAxIEkwEWFwowCgYE
+AAMGAgQSBJYBBBsaICBUaGUgb3B0aW9uYWwgc3VicmVzb3VyY2UgdHlwZS4KCg8KBwQAAwYC
+BAUSBJYBBAoKDwoHBAADBgIEARIElgELFgoPCgcEAAMGAgQDEgSWARkaCncKBgQAAwYCBRIE
+mgEEFBpnIEEgS3ViZXJuZXRlcyByZXNvdXJjZSBBUEkgdmVyYiwgbGlrZSBnZXQsIGxpc3Qs
+IHdhdGNoLCBjcmVhdGUsIHVwZGF0ZSwKIGRlbGV0ZSwgcHJveHkuICIqIiBtZWFucyBhbGwu
+CgoPCgcEAAMGAgUFEgSaAQQKCg8KBwQAAwYCBQESBJoBCw8KDwoHBAADBgIFAxIEmgESEwpB
+CgYEAAMGAgYSBJ0BBBcaMSBUaGUgQVBJIHZlcnNpb24gb2YgdGhlIHJlc291cmNlLiAiKiIg
+bWVhbnMgYWxsLgoKDwoHBAADBgIGBRIEnQEECgoPCgcEAAMGAgYBEgSdAQsSCg8KBwQAAwYC
+BgMSBJ0BFRYKsAEKBAQAAwcSBqMBArUBAxqfASBLdWJlcm5ldGVzIG9iamVjdCByZWxhdGVk
+IHRvIHRoZSBmaW5kaW5nLCB1bmlxdWVseSBpZGVudGlmaWVkIGJ5IEdLTk4uCiBVc2VkIGlm
+IHRoZSBvYmplY3QgS2luZCBpcyBub3Qgb25lIG9mIFBvZCwgTm9kZSwgTm9kZVBvb2wsIEJp
+bmRpbmcsIG9yCiBBY2Nlc3NSZXZpZXcuCgoNCgUEAAMHARIEowEKEApGCgYEAAMHAgASBKUB
+BBUaNiBLdWJlcm5ldGVzIG9iamVjdCBncm91cCwgc3VjaCBhcyAicG9saWN5Lms4cy5pby92
+MSIuCgoPCgcEAAMHAgAFEgSlAQQKCg8KBwQAAwcCAAESBKUBCxAKDwoHBAADBwIAAxIEpQET
+FAo+CgYEAAMHAgESBKgBBBQaLiBLdWJlcm5ldGVzIG9iamVjdCBraW5kLCBzdWNoIGFzICJO
+YW1lc3BhY2UiLgoKDwoHBAADBwIBBRIEqAEECgoPCgcEAAMHAgEBEgSoAQsPCg8KBwQAAwcC
+AQMSBKgBEhMK1wEKBgQAAwcCAhIErQEEEhrGASBLdWJlcm5ldGVzIG9iamVjdCBuYW1lc3Bh
+Y2UuIE11c3QgYmUgYSB2YWxpZCBETlMgbGFiZWwuIE5hbWVkCiAibnMiIHRvIGF2b2lkIGNv
+bGxpc2lvbiB3aXRoIEMrKyBuYW1lc3BhY2Uga2V5d29yZC4gRm9yIGRldGFpbHMgc2VlCiBo
+dHRwczovL2t1YmVybmV0ZXMuaW8vZG9jcy90YXNrcy9hZG1pbmlzdGVyLWNsdXN0ZXIvbmFt
+ZXNwYWNlcy8uCgoPCgcEAAMHAgIFEgStAQQKCg8KBwQAAwcCAgESBK0BCw0KDwoHBAADBwIC
+AxIErQEQEQqEAQoGBAADBwIDEgSxAQQUGnQgS3ViZXJuZXRlcyBvYmplY3QgbmFtZS4gRm9y
+IGRldGFpbHMgc2VlCiBodHRwczovL2t1YmVybmV0ZXMuaW8vZG9jcy9jb25jZXB0cy9vdmVy
+dmlldy93b3JraW5nLXdpdGgtb2JqZWN0cy9uYW1lcy8uCgoPCgcEAAMHAgMFEgSxAQQKCg8K
+BwQAAwcCAwESBLEBCw8KDwoHBAADBwIDAxIEsQESEwpGCgYEAAMHAgQSBLQBBCYaNiBQb2Qg
+Y29udGFpbmVycyBhc3NvY2lhdGVkIHdpdGggdGhpcyBmaW5kaW5nLCBpZiBhbnkuCgoPCgcE
+AAMHAgQEEgS0AQQMCg8KBwQAAwcCBAYSBLQBDRYKDwoHBAADBwIEARIEtAEXIQoPCgcEAAMH
+AgQDEgS0ASQlCssBCgQEAAIAEgS7AQIYGrwBIEt1YmVybmV0ZXMKIFtQb2RzXShodHRwczov
+L2Nsb3VkLmdvb2dsZS5jb20va3ViZXJuZXRlcy1lbmdpbmUvZG9jcy9jb25jZXB0cy9wb2Qp
+CiBhc3NvY2lhdGVkIHdpdGggdGhlIGZpbmRpbmcuIFRoaXMgZmllbGQgY29udGFpbnMgUG9k
+IHJlY29yZHMgZm9yIGVhY2gKIGNvbnRhaW5lciB0aGF0IGlzIG93bmVkIGJ5IGEgUG9kLgoK
+DQoFBAACAAQSBLsBAgoKDQoFBAACAAYSBLsBCw4KDQoFBAACAAESBLsBDxMKDQoFBAACAAMS
+BLsBFhcKjwEKBAQAAgESBMABAhoagAEgUHJvdmlkZXMgS3ViZXJuZXRlcwogW25vZGVdKGh0
+dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9rdWJlcm5ldGVzLWVuZ2luZS9kb2NzL2NvbmNlcHRz
+L2NsdXN0ZXItYXJjaGl0ZWN0dXJlI25vZGVzKQogaW5mb3JtYXRpb24uCgoNCgUEAAIBBBIE
+wAECCgoNCgUEAAIBBhIEwAELDwoNCgUEAAIBARIEwAEQFQoNCgUEAAIBAxIEwAEYGQrVAQoE
+BAACAhIExgECIxrGASBHS0UgW25vZGUKIHBvb2xzXShodHRwczovL2Nsb3VkLmdvb2dsZS5j
+b20va3ViZXJuZXRlcy1lbmdpbmUvZG9jcy9jb25jZXB0cy9ub2RlLXBvb2xzKQogYXNzb2Np
+YXRlZCB3aXRoIHRoZSBmaW5kaW5nLiBUaGlzIGZpZWxkIGNvbnRhaW5zIG5vZGUgcG9vbCBp
+bmZvcm1hdGlvbiBmb3IKIGVhY2ggbm9kZSwgd2hlbiBpdCBpcyBhdmFpbGFibGUuCgoNCgUE
+AAICBBIExgECCgoNCgUEAAICBhIExgELEwoNCgUEAAICARIExgEUHgoNCgUEAAICAxIExgEh
+Igq7AQoEBAACAxIEygECGhqsASBQcm92aWRlcyBLdWJlcm5ldGVzIHJvbGUgaW5mb3JtYXRp
+b24gZm9yIGZpbmRpbmdzIHRoYXQgaW52b2x2ZSBbUm9sZXMgb3IKIENsdXN0ZXJSb2xlc10o
+aHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2t1YmVybmV0ZXMtZW5naW5lL2RvY3MvaG93LXRv
+L3JvbGUtYmFzZWQtYWNjZXNzLWNvbnRyb2wpLgoKDQoFBAACAwQSBMoBAgoKDQoFBAACAwYS
+BMoBCw8KDQoFBAACAwESBMoBEBUKDQoFBAACAwMSBMoBGBkK0gEKBAQAAgQSBM8BAiAawwEg
+UHJvdmlkZXMgS3ViZXJuZXRlcyByb2xlIGJpbmRpbmcgaW5mb3JtYXRpb24gZm9yIGZpbmRp
+bmdzIHRoYXQgaW52b2x2ZQogW1JvbGVCaW5kaW5ncyBvcgogQ2x1c3RlclJvbGVCaW5kaW5n
+c10oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2t1YmVybmV0ZXMtZW5naW5lL2RvY3MvaG93
+LXRvL3JvbGUtYmFzZWQtYWNjZXNzLWNvbnRyb2wpLgoKDQoFBAACBAQSBM8BAgoKDQoFBAAC
+BAYSBM8BCxIKDQoFBAACBAESBM8BExsKDQoFBAACBAMSBM8BHh8KcgoEBAACBRIE0wECKxpk
+IFByb3ZpZGVzIGluZm9ybWF0aW9uIG9uIGFueSBLdWJlcm5ldGVzIGFjY2VzcyByZXZpZXdz
+IChwcml2aWxlZ2UgY2hlY2tzKQogcmVsZXZhbnQgdG8gdGhlIGZpbmRpbmcuCgoNCgUEAAIF
+BBIE0wECCgoNCgUEAAIFBhIE0wELFwoNCgUEAAIFARIE0wEYJgoNCgUEAAIFAxIE0wEpKgo6
+CgQEAAIGEgTWAQIeGiwgS3ViZXJuZXRlcyBvYmplY3RzIHJlbGF0ZWQgdG8gdGhlIGZpbmRp
+bmcuCgoNCgUEAAIGBBIE1gECCgoNCgUEAAIGBhIE1gELEQoNCgUEAAIGARIE1gESGQoNCgUE
+AAIGAxIE1gEcHWIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes ===
+    # Fields for Kubernetes
+    # Field: pods Type: 11 (.google.cloud.securitycenter.v2.Kubernetes.Pod)
+    # Field: nodes Type: 11 (.google.cloud.securitycenter.v2.Kubernetes.Node)
+    # Field: node_pools Type: 11 (.google.cloud.securitycenter.v2.Kubernetes.NodePool)
+    # Field: roles Type: 11 (.google.cloud.securitycenter.v2.Kubernetes.Role)
+    # Field: bindings Type: 11 (.google.cloud.securitycenter.v2.Kubernetes.Binding)
+    # Field: access_reviews Type: 11 (.google.cloud.securitycenter.v2.Kubernetes.AccessReview)
+    # Field: objects Type: 11 (.google.cloud.securitycenter.v2.Kubernetes.Object)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Securitycenter::V2::Kubernetes - Compiled Protocol Buffers messages for google/cloud/securitycenter/v2/kubernetes.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Securitycenter::V2::Kubernetes;
+
+    my $msg = Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes->new({
+        pods => $pods,
+        nodes => $nodes,
+        node_pools => $node_pools,
+        roles => $roles,
+    });
+
+    # Read or update a field
+    my $val = $msg->pods();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/securitycenter/v2/kubernetes.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes
+
+Kubernetes-related attributes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->pods() >> / C<< $msg->pods($value) >>
+
+Type: C<Message> (L<Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes::Pod>)
+
+Kubernetes
+[Pods](https://cloud.google.com/kubernetes-engine/docs/concepts/pod)
+associated with the finding. This field contains Pod records for each
+container that is owned by a Pod.
+
+=item * C<< $msg->nodes() >> / C<< $msg->nodes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes::Node>)
+
+Provides Kubernetes
+[node](https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-architecture#nodes)
+information.
+
+=item * C<< $msg->node_pools() >> / C<< $msg->node_pools($value) >>
+
+Type: C<Message> (L<Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes::NodePool>)
+
+GKE [node
+pools](https://cloud.google.com/kubernetes-engine/docs/concepts/node-pools)
+associated with the finding. This field contains node pool information for
+each node, when it is available.
+
+=item * C<< $msg->roles() >> / C<< $msg->roles($value) >>
+
+Type: C<Message> (L<Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes::Role>)
+
+Provides Kubernetes role information for findings that involve [Roles or
+ClusterRoles](https://cloud.google.com/kubernetes-engine/docs/how-to/role-based-access-control).
+
+=item * C<< $msg->bindings() >> / C<< $msg->bindings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes::Binding>)
+
+Provides Kubernetes role binding information for findings that involve
+[RoleBindings or
+ClusterRoleBindings](https://cloud.google.com/kubernetes-engine/docs/how-to/role-based-access-control).
+
+=item * C<< $msg->access_reviews() >> / C<< $msg->access_reviews($value) >>
+
+Type: C<Message> (L<Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes::AccessReview>)
+
+Provides information on any Kubernetes access reviews (privilege checks)
+relevant to the finding.
+
+=item * C<< $msg->objects() >> / C<< $msg->objects($value) >>
+
+Type: C<Message> (L<Google::Cloud::Securitycenter::V2::Kubernetes::Kubernetes::Object>)
+
+Kubernetes objects related to the finding.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Securitycenter::V2::Kubernetes::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

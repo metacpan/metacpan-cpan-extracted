@@ -79,7 +79,7 @@ B<Or:>
 
 =head1 VERSION
 
-1.5.0
+2.0.0
 
 =head1 DESCRIPTION
 
@@ -297,12 +297,23 @@ C<?!>, C<@!>, C<%!>).
 
 =head2 REGISTRATION
 
-Register callbacks with C<getoptlong callback>. If function name is
-omitted or C<->, uses option name (hyphens to underscores). Additional
-C<args> are passed to the callback function after the option name and value.
+Register a callback with C<getoptlong callback>.  If function name is
+omitted or C<->, uses option name (hyphens to underscores).  The
+option can be given by its alias name.  An undefined option is an
+error.
 
-    getoptlong callback <option> [function] [args...]
-    getoptlong callback --before <option> [function] [args...]
+    getoptlong callback <option> [function [args...]]
+    getoptlong callback --before <option> [function [args...]]
+
+The arguments after the function are fixed arguments.  They are
+passed before the option name and value, so that a common function
+can be called from several options and behave differently by the
+arguments.  The function name and the arguments must be words
+without white space.
+
+    set_level() { level=$1 ; }
+    getoptlong callback quiet   set_level 0
+    getoptlong callback verbose set_level 2
 
 =head2 CALLBACK TIMING
 
@@ -310,8 +321,8 @@ Normal callbacks are called B<after> value is set, receiving the option
 name and value. Pre-processing callbacks (C<--before>/C<-b>) are called
 B<before> value is set, without the value argument.
 
-    callback_func "option_name" "value" [args...]   # normal
-    callback_func "option_name" [args...]           # --before
+    callback_func [args...] "option_name" "value"   # normal
+    callback_func [args...] "option_name"           # --before
 
 =head2 ERROR HANDLING
 
@@ -319,7 +330,7 @@ Callbacks must handle their own errors. C<EXIT_ON_ERROR> only applies
 to parsing errors, not callback failures. Use explicit C<exit> if needed.
 
     validate_file() {
-        [[ -r "$2" ]] || { echo "Cannot read: $2" >&2; exit 1; }
+        [[ -r $2 ]] || { echo "Cannot read: $2" >&2; exit 1; }
     }
     getoptlong callback input-file validate_file
 
@@ -369,10 +380,11 @@ B<Note:> For regex, the pattern extends to the last C<)> in the
 definition, including any C<)> in the description. Avoid using C<)>
 in comments when using regex validation.
 
-Validation occurs before the value is stored or callbacks are invoked.
+Validation occurs before the value is stored and normal callbacks are
+invoked; C<--before> callbacks are called before validation.
 For array options, each element is validated; for hash options, each
-C<key=value> pair is matched as a whole. Error on validation failure
-(see L<EXIT_ON_ERROR|/CONFIGURATION>).
+C<key=value> pair is matched as a whole. A validation failure exits
+the script with an error message, regardless of C<EXIT_ON_ERROR>.
 
 =head1 HELP MESSAGE
 
@@ -416,19 +428,21 @@ See L</CONFIGURATION> for available parameters.
 
 =head2 getoptlong parse
 
-Parse arguments. Returns 0 on success, non-zero on error. Always
-quote C<"$@">. By default, script exits on error.
+Parse arguments. Always quote C<"$@">. On a parse error, such as an
+undefined option or a missing required argument, the script exits
+with an error message.
 
     getoptlong parse "$@"
 
-To handle errors manually, disable C<EXIT_ON_ERROR>
-(see L</CONFIGURATION>) and check return value:
+To leave undefined options in the arguments instead, disable
+C<EXIT_ON_ERROR> (see L</CONFIGURATION>).  They are kept with the
+non-option arguments, and C<parse> returns 0.  A short option without
+its required argument is left as well.  A long option without its
+required argument and a validation failure still exit the script.
+Set C<SILENT> to suppress the error messages of B<getopts>.
 
-    getoptlong configure EXIT_ON_ERROR=
-    if ! getoptlong parse "$@"; then
-        echo "Parse error" >&2
-        exit 1
-    fi
+    getoptlong configure EXIT_ON_ERROR= SILENT=1
+    getoptlong parse "$@"
 
 =head2 getoptlong set
 
@@ -440,10 +454,11 @@ Variables are actually set during C<parse>; this updates C<$@>.
 =head2 getoptlong callback
 
 Register callback function for option. Use C<-b>/C<--before> to call
-before value is set. If C<func> is omitted, uses option name (hyphens
-to underscores). Additional C<args> are passed to the callback.
+before value is set. If C<func> is omitted or C<->, uses option name
+(hyphens to underscores). C<args> are fixed arguments passed before
+the option name and value.
 
-    getoptlong callback [-b|--before] <opt> [func] [args...]
+    getoptlong callback [-b|--before] <opt> [func [args...]]
 
 =head2 getoptlong configure
 
@@ -510,8 +525,9 @@ Default: C<scriptname [ options ] args>.
 =item B<EXIT_ON_ERROR>
 
 Exit immediately on parse error. Default: enabled.
-Set to empty string to disable and handle errors manually by checking
-return value.
+Set to empty string to disable: undefined options are left in the
+arguments (see L</getoptlong parse>).  Note that C<0> is not empty,
+and does not disable it.
 
 =item B<SILENT>
 
@@ -584,7 +600,7 @@ Term::ANSIColor::Concise.
 
 =item * L<Getopt::Long> - Perl module inspiration
 
-=item * L<https://github.com/tecolicom/getoptlong> - repository
+=item * L<https://github.com/tecolicom/getoptlong-bash> - repository
 
 =item * L<https://qiita.com/kaz-utashiro/items/75a7df9e1a1e92797376> - introduction article (Japanese)
 

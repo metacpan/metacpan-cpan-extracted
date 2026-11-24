@@ -9,6 +9,7 @@ lib/Google/gRPC/Engine.pm
 lib/Google/gRPC/Engine/NGHTTP2.pm
 lib/Google/gRPC/Engine/PP.pm
 lib/Google/gRPC/Framing.pm
+lib/Google/gRPC/Server.pm
 lib/Google/gRPC/Status.pm
 lib/Google/gRPC/Stream.pm
 Makefile.PL
@@ -27,6 +28,7 @@ t/06-channel-pool.t
 t/07-deadlines.t
 t/08-retries.t
 t/09-keepalive.t
+t/10-server.t
 t/99-pod-coverage.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

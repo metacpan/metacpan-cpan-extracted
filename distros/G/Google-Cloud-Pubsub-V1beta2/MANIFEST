@@ -1,0 +1,23 @@
+Changes
+lib/Google/Cloud/Pubsub/V1beta2.pm
+lib/Google/Cloud/Pubsub/V1beta2/PublisherClient.pm
+lib/Google/Cloud/Pubsub/V1beta2/SubscriberClient.pm
+lib/Google/Pubsub/V1beta2/Pubsub.pm
+lib/Google/Pubsub/V1beta2/Pubsub/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-Publisher.t
+t/01-service-Subscriber.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-Publisher.t
+t/02-rest-transport-Subscriber.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

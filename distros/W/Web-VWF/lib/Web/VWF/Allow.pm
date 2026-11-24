@@ -10,7 +10,7 @@ use Web::VWF::Utils;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.003.1');
+use version; our $VERSION = version->declare('0.004.1');
 use Carp;
 use Error;
 use File::Spec;
@@ -329,7 +329,7 @@ Web::VWF::Allow - The last access check a request must pass
 
 =head1 VERSION
 
-Version 0.003.1
+Version 0.004.1
 
 =head1 SYNOPSIS
 

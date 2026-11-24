@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlDatabases;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -161,88 +161,12 @@ EOF
     # Field: project Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesDeleteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlDatabases;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesDeleteRequest->new(
-        database => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesGetRequest ===
     # Fields for SqlDatabasesGetRequest
     # Field: database Type: 9 ()
     # Field: instance Type: 9 ()
     # Field: project Type: 9 ()
     # Field: location Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesGetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlDatabases;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesGetRequest->new(
-        database => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesInsertRequest ===
     # Fields for SqlDatabasesInsertRequest
@@ -251,83 +175,11 @@ Type: String
     # Field: body Type: 11 (.google.cloud.sql.v1.Database)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesInsertRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlDatabases;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesInsertRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<body>
-
-Type: Message (.google.cloud.sql.v1.Database)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesListRequest ===
     # Fields for SqlDatabasesListRequest
     # Field: instance Type: 9 ()
     # Field: project Type: 9 ()
     # Field: location Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlDatabases;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesListRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesUpdateRequest ===
     # Fields for SqlDatabasesUpdateRequest
@@ -337,105 +189,25 @@ Type: String
     # Field: body Type: 11 (.google.cloud.sql.v1.Database)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesUpdateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlDatabases;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesUpdateRequest->new(
-        database => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<body>
-
-Type: Message (.google.cloud.sql.v1.Database)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlDatabases::DatabasesListResponse ===
     # Fields for DatabasesListResponse
     # Field: kind Type: 9 ()
     # Field: items Type: 11 (.google.cloud.sql.v1.Database)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlDatabases::DatabasesListResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlDatabases;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlDatabases::DatabasesListResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<items>
-
-Type: Message (.google.cloud.sql.v1.Database)
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesServiceClient - Client stub representing the remote SqlDatabasesService service
+Client stub representing the remote C<SqlDatabasesService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -542,13 +314,244 @@ sub update {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlDatabases - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlDatabases - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_databases.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlDatabases;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesDeleteRequest->new({
+        database => $database,
+        instance => $instance,
+        project => $project,
+        location => $location,
+    });
+
+    # Read or update a field
+    my $val = $msg->database();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesDeleteRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_databases.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesDeleteRequest
+
+Database delete request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database() >> / C<< $msg->database($value) >>
+
+Type: C<String>
+
+Name of the database to be deleted in the instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Database instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesGetRequest
+
+Database get request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database() >> / C<< $msg->database($value) >>
+
+Type: C<String>
+
+Name of the database in the instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Database instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesInsertRequest
+
+Database insert request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Database instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->body() >> / C<< $msg->body($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::Database>)
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesListRequest
+
+Database list request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlDatabases::SqlDatabasesUpdateRequest
+
+Database update request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database() >> / C<< $msg->database($value) >>
+
+Type: C<String>
+
+Name of the database to be updated in the instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Database instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->body() >> / C<< $msg->body($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::Database>)
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlDatabases::DatabasesListResponse
+
+Database list response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#databasesList`.
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::Database>)
+
+List of database resources in the instance.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlDatabases::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

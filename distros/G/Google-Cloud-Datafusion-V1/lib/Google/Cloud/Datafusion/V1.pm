@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Datafusion::V1::Datafusion;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -158,7 +158,32 @@ The following RPC methods are available in this client:
 
 =item * B<list_available_versions>
 
-Calls the RPC method C<ListAvailableVersions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_available_versions(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        latest_patch_only        => $latest_patch_only,
+    );
+
+Calls the RPC method C<ListAvailableVersions> on C<google.cloud.datafusion.v1.DataFusion>.
+
+Request: L<Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsRequest>
+
+Returns: L<Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<latest_patch_only> - C<bool>
+
+=back
 
 =back
 

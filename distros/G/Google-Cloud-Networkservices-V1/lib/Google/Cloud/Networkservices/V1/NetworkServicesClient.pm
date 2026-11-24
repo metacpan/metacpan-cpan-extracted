@@ -10,23 +10,23 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Networkservices::V1::Common;
-use Google::Cloud::Networkservices::V1::GrpcRoute;
+use Google::Cloud::Networkservices::V1::RouteView;
+use Google::Cloud::Networkservices::V1::AgentGateway;
 use Google::Cloud::Networkservices::V1::Extensibility;
 use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
+use Google::Cloud::Networkservices::V1::GrpcRoute;
+use Google::Cloud::Networkservices::V1::TcpRoute;
+use Google::Cloud::Networkservices::V1::Common;
 use Google::Cloud::Networkservices::V1::TlsRoute;
-use Google::Cloud::Networkservices::V1::RouteView;
 use Google::Cloud::Networkservices::V1::HttpRoute;
 use Google::Cloud::Networkservices::V1::ServiceBinding;
-use Google::Cloud::Networkservices::V1::AgentGateway;
-use Google::Cloud::Networkservices::V1::TcpRoute;
 use Google::Cloud::Networkservices::V1::Mesh;
-use Google::Cloud::Networkservices::V1::Dep;
-use Google::Cloud::Networkservices::V1::Gateway;
 use Google::Cloud::Networkservices::V1::EndpointPolicy;
+use Google::Cloud::Networkservices::V1::Gateway;
+use Google::Cloud::Networkservices::V1::Dep;
 use Google::Cloud::Networkservices::V1::NetworkServices;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -200,7 +200,32 @@ The following RPC methods are available in this client:
 
 =item * B<list_endpoint_policies>
 
-Calls the RPC method C<ListEndpointPolicies> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_endpoint_policies(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        return_partial_success   => $return_partial_success,
+    );
+
+Calls the RPC method C<ListEndpointPolicies> on C<google.cloud.networkservices.v1.NetworkServices>.
+
+Request: L<Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesRequest>
+
+Returns: L<Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<return_partial_success> - C<bool>
+
+=back
 
 =back
 

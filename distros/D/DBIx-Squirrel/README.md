@@ -1,5 +1,6 @@
 [![Actions Status](https://github.com/nukopian/DBIx-Squirrel/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/nukopian/DBIx-Squirrel/actions?workflow=test)
 [![CPAN](https://img.shields.io/cpan/v/DBIx-Squirrel)](https://metacpan.org/release/DBIx-Squirrel) [![Kwalitee](https://cpants.cpanauthors.org/dist/DBIx-Squirrel.svg)](https://cpants.cpanauthors.org/dist/DBIx-Squirrel)
+<img align="right" src="logo/dbix-squirrel-128.png" alt="DBIx::Squirrel logo" width="128">
 
 # DBIx-Squirrel
 

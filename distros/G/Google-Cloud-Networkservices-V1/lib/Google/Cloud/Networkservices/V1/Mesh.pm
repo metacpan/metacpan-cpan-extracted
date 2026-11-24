@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::Mesh;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -189,60 +189,6 @@ EOF
     # Field: interception_port Type: 5 ()
     # Field: envoy_headers Type: 14 (.google.cloud.networkservices.v1.EnvoyHeaders)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Mesh::Mesh - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Mesh;
-
-    my $msg = Google::Cloud::Networkservices::V1::Mesh::Mesh->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.Mesh.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<interception_port>
-
-Type: Int32
-
-=item * B<envoy_headers>
-
-Type: Enum (.google.cloud.networkservices.v1.EnvoyHeaders)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Mesh::ListMeshesRequest ===
     # Fields for ListMeshesRequest
     # Field: parent Type: 9 ()
@@ -250,113 +196,15 @@ Type: Enum (.google.cloud.networkservices.v1.EnvoyHeaders)
     # Field: page_token Type: 9 ()
     # Field: return_partial_success Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Mesh::ListMeshesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Mesh;
-
-    my $msg = Google::Cloud::Networkservices::V1::Mesh::ListMeshesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<return_partial_success>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Mesh::ListMeshesResponse ===
     # Fields for ListMeshesResponse
     # Field: meshes Type: 11 (.google.cloud.networkservices.v1.Mesh)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Mesh::ListMeshesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Mesh;
-
-    my $msg = Google::Cloud::Networkservices::V1::Mesh::ListMeshesResponse->new(
-        meshes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<meshes>
-
-Type: Message (.google.cloud.networkservices.v1.Mesh)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Mesh::GetMeshRequest ===
     # Fields for GetMeshRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Mesh::GetMeshRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Mesh;
-
-    my $msg = Google::Cloud::Networkservices::V1::Mesh::GetMeshRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Mesh::CreateMeshRequest ===
     # Fields for CreateMeshRequest
@@ -364,116 +212,300 @@ Type: String
     # Field: mesh_id Type: 9 ()
     # Field: mesh Type: 11 (.google.cloud.networkservices.v1.Mesh)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Mesh::CreateMeshRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Mesh;
-
-    my $msg = Google::Cloud::Networkservices::V1::Mesh::CreateMeshRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<mesh_id>
-
-Type: String
-
-=item * B<mesh>
-
-Type: Message (.google.cloud.networkservices.v1.Mesh)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Mesh::UpdateMeshRequest ===
     # Fields for UpdateMeshRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: mesh Type: 11 (.google.cloud.networkservices.v1.Mesh)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Mesh::UpdateMeshRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Mesh;
-
-    my $msg = Google::Cloud::Networkservices::V1::Mesh::UpdateMeshRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<mesh>
-
-Type: Message (.google.cloud.networkservices.v1.Mesh)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Mesh::DeleteMeshRequest ===
     # Fields for DeleteMeshRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Mesh::DeleteMeshRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Mesh;
-
-    my $msg = Google::Cloud::Networkservices::V1::Mesh::DeleteMeshRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::Mesh - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::Mesh - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/mesh.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networkservices::V1::Mesh;
+
+    my $msg = Google::Cloud::Networkservices::V1::Mesh::Mesh->new({
+        name => $name,
+        self_link => $self_link,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::Mesh::Mesh->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/mesh.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::Mesh::Mesh
+
+Mesh represents a logical configuration grouping for workload to workload
+communication within a service mesh. Routes that point to mesh dictate how
+requests are routed within this logical mesh boundary.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the Mesh resource. It matches pattern
+`projects/*/locations/*/meshes/<mesh_name>`.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+Output only. Server-defined URL of this resource
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Mesh::Mesh::LabelsEntry>)
+
+Optional. Set of label tags associated with the Mesh resource.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A free-text description of the resource. Max length 1024
+characters.
+
+=item * C<< $msg->interception_port() >> / C<< $msg->interception_port($value) >>
+
+Type: C<Int32>
+
+Optional. If set to a valid TCP port (1-65535), instructs the SIDECAR proxy
+to listen on the specified port of localhost (127.0.0.1) address. The
+SIDECAR proxy will expect all traffic to be redirected to this port
+regardless of its actual ip:port destination. If unset, a port '15001' is
+used as the interception port. This is applicable only for sidecar proxy
+deployments.
+
+=item * C<< $msg->envoy_headers() >> / C<< $msg->envoy_headers($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::EnvoyHeaders>)
+
+Optional. Determines if envoy will insert internal debug headers into
+upstream requests. Other Envoy headers may still be injected. By default,
+envoy will not insert any debug headers.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Mesh::ListMeshesRequest
+
+Request used with the ListMeshes method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the Meshes should be
+listed, specified in the format `projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of Meshes to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListMeshesResponse`
+Indicates that this is a continuation of a prior `ListMeshes` call,
+and that the system should return the next page of data.
+
+=item * C<< $msg->return_partial_success() >> / C<< $msg->return_partial_success($value) >>
+
+Type: C<Bool>
+
+Optional. If true, allow partial responses for multi-regional Aggregated
+List requests. Otherwise if one of the locations is down or unreachable,
+the Aggregated List request will fail.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Mesh::ListMeshesResponse
+
+Response returned by the ListMeshes method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->meshes() >> / C<< $msg->meshes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Mesh::Mesh>)
+
+List of Mesh resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request opts into
+`return_partial_success` and reading across collections e.g. when
+attempting to list all resources across all supported locations.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Mesh::GetMeshRequest
+
+Request used by the GetMesh method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the Mesh to get. Must be in the format
+`projects/*/locations/*/meshes/*`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Mesh::CreateMeshRequest
+
+Request used by the CreateMesh method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the Mesh. Must be in the
+format `projects/*/locations/*`.
+
+=item * C<< $msg->mesh_id() >> / C<< $msg->mesh_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the Mesh resource to be created.
+
+=item * C<< $msg->mesh() >> / C<< $msg->mesh($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Mesh::Mesh>)
+
+Required. Mesh resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Mesh::UpdateMeshRequest
+
+Request used by the UpdateMesh method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+Mesh resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->mesh() >> / C<< $msg->mesh($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Mesh::Mesh>)
+
+Required. Updated Mesh resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Mesh::DeleteMeshRequest
+
+Request used by the DeleteMesh method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the Mesh to delete. Must be in the format
+`projects/*/locations/*/meshes/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::Mesh::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

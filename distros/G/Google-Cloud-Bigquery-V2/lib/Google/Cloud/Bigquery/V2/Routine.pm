@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::Routine;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -644,140 +644,12 @@ EOF
     # Field: external_runtime_options Type: 11 (.google.cloud.bigquery.v2.ExternalRuntimeOptions)
     # Field: build_status Type: 11 (.google.cloud.bigquery.v2.RoutineBuildStatus)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::Routine - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::Routine->new(
-        etag => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<etag>
-
-Type: String
-
-=item * B<routine_reference>
-
-Type: Message (.google.cloud.bigquery.v2.RoutineReference)
-
-=item * B<routine_type>
-
-Type: Enum (.google.cloud.bigquery.v2.Routine.RoutineType)
-
-=item * B<creation_time>
-
-Type: Int64
-
-=item * B<last_modified_time>
-
-Type: Int64
-
-=item * B<language>
-
-Type: Enum (.google.cloud.bigquery.v2.Routine.Language)
-
-=item * B<arguments>
-
-Type: Message (.google.cloud.bigquery.v2.Routine.Argument)
-
-=item * B<return_type>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlDataType)
-
-=item * B<return_table_type>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlTableType)
-
-=item * B<imported_libraries>
-
-Type: String
-
-=item * B<definition_body>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<determinism_level>
-
-Type: Enum (.google.cloud.bigquery.v2.Routine.DeterminismLevel)
-
-=item * B<security_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.Routine.SecurityMode)
-
-=item * B<strict_mode>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<remote_function_options>
-
-Type: Message (.google.cloud.bigquery.v2.Routine.RemoteFunctionOptions)
-
-=item * B<spark_options>
-
-Type: Message (.google.cloud.bigquery.v2.SparkOptions)
-
-=item * B<data_governance_type>
-
-Type: Enum (.google.cloud.bigquery.v2.Routine.DataGovernanceType)
-
-=item * B<python_options>
-
-Type: Message (.google.cloud.bigquery.v2.PythonOptions)
-
-=item * B<external_runtime_options>
-
-Type: Message (.google.cloud.bigquery.v2.ExternalRuntimeOptions)
-
-=item * B<build_status>
-
-Type: Message (.google.cloud.bigquery.v2.RoutineBuildStatus)
-
-=back
-
-=cut
-
 # Enum: Routine::RoutineType
 our $Routine_ROUTINE_TYPE_UNSPECIFIED = 0;
 our $Routine_SCALAR_FUNCTION = 1;
 our $Routine_PROCEDURE = 2;
 our $Routine_TABLE_VALUED_FUNCTION = 3;
 our $Routine_AGGREGATE_FUNCTION = 4;
-
-=pod
-
-=head2 Enum: Routine::RoutineType
-
-Values:
-
-=over 4
-
-=item * C<ROUTINE_TYPE_UNSPECIFIED> => 0
-
-=item * C<SCALAR_FUNCTION> => 1
-
-=item * C<PROCEDURE> => 2
-
-=item * C<TABLE_VALUED_FUNCTION> => 3
-
-=item * C<AGGREGATE_FUNCTION> => 4
-
-=back
-
-=cut
 
 # Enum: Routine::Language
 our $Routine_LANGUAGE_UNSPECIFIED = 0;
@@ -787,130 +659,24 @@ our $Routine_PYTHON = 3;
 our $Routine_JAVA = 4;
 our $Routine_SCALA = 5;
 
-=pod
-
-=head2 Enum: Routine::Language
-
-Values:
-
-=over 4
-
-=item * C<LANGUAGE_UNSPECIFIED> => 0
-
-=item * C<SQL> => 1
-
-=item * C<JAVASCRIPT> => 2
-
-=item * C<PYTHON> => 3
-
-=item * C<JAVA> => 4
-
-=item * C<SCALA> => 5
-
-=back
-
-=cut
-
 # Enum: Routine::DeterminismLevel
 our $Routine_DETERMINISM_LEVEL_UNSPECIFIED = 0;
 our $Routine_DETERMINISTIC = 1;
 our $Routine_NOT_DETERMINISTIC = 2;
-
-=pod
-
-=head2 Enum: Routine::DeterminismLevel
-
-Values:
-
-=over 4
-
-=item * C<DETERMINISM_LEVEL_UNSPECIFIED> => 0
-
-=item * C<DETERMINISTIC> => 1
-
-=item * C<NOT_DETERMINISTIC> => 2
-
-=back
-
-=cut
 
 # Enum: Routine::SecurityMode
 our $Routine_SECURITY_MODE_UNSPECIFIED = 0;
 our $Routine_DEFINER = 1;
 our $Routine_INVOKER = 2;
 
-=pod
-
-=head2 Enum: Routine::SecurityMode
-
-Values:
-
-=over 4
-
-=item * C<SECURITY_MODE_UNSPECIFIED> => 0
-
-=item * C<DEFINER> => 1
-
-=item * C<INVOKER> => 2
-
-=back
-
-=cut
-
 # Enum: Routine::DataGovernanceType
 our $Routine_DATA_GOVERNANCE_TYPE_UNSPECIFIED = 0;
 our $Routine_DATA_MASKING = 1;
-
-=pod
-
-=head2 Enum: Routine::DataGovernanceType
-
-Values:
-
-=over 4
-
-=item * C<DATA_GOVERNANCE_TYPE_UNSPECIFIED> => 0
-
-=item * C<DATA_MASKING> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Routine::PythonOptions ===
     # Fields for PythonOptions
     # Field: entry_point Type: 9 ()
     # Field: packages Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::PythonOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::PythonOptions->new(
-        entry_point => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entry_point>
-
-Type: String
-
-=item * B<packages>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Routine::ExternalRuntimeOptions ===
     # Fields for ExternalRuntimeOptions
@@ -920,52 +686,6 @@ Type: String
     # Field: max_batching_rows Type: 3 ()
     # Field: runtime_version Type: 9 ()
     # Field: container_request_concurrency Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::ExternalRuntimeOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::ExternalRuntimeOptions->new(
-        container_memory => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<container_memory>
-
-Type: String
-
-=item * B<container_cpu>
-
-Type: Double
-
-=item * B<runtime_connection>
-
-Type: String
-
-=item * B<max_batching_rows>
-
-Type: Int64
-
-=item * B<runtime_version>
-
-Type: String
-
-=item * B<container_request_concurrency>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Routine::SparkOptions ===
     # Fields for SparkOptions
@@ -980,68 +700,6 @@ Type: Int64
     # Field: archive_uris Type: 9 ()
     # Field: main_class Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::SparkOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::SparkOptions->new(
-        connection => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<connection>
-
-Type: String
-
-=item * B<runtime_version>
-
-Type: String
-
-=item * B<container_image>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.bigquery.v2.SparkOptions.PropertiesEntry)
-
-=item * B<main_file_uri>
-
-Type: String
-
-=item * B<py_file_uris>
-
-Type: String
-
-=item * B<jar_uris>
-
-Type: String
-
-=item * B<file_uris>
-
-Type: String
-
-=item * B<archive_uris>
-
-Type: String
-
-=item * B<main_class>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Routine::RoutineBuildStatus ===
     # Fields for RoutineBuildStatus
     # Field: build_state Type: 14 (.google.cloud.bigquery.v2.RoutineBuildStatus.BuildState)
@@ -1050,73 +708,11 @@ Type: String
     # Field: build_duration Type: 11 (.google.protobuf.Duration)
     # Field: image_size_bytes Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::RoutineBuildStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::RoutineBuildStatus->new(
-        build_state => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<build_state>
-
-Type: Enum (.google.cloud.bigquery.v2.RoutineBuildStatus.BuildState)
-
-=item * B<error_result>
-
-Type: Message (.google.cloud.bigquery.v2.ErrorProto)
-
-=item * B<build_state_update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<build_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<image_size_bytes>
-
-Type: Int64
-
-=back
-
-=cut
-
 # Enum: RoutineBuildStatus::BuildState
 our $RoutineBuildStatus_BUILD_STATE_UNSPECIFIED = 0;
 our $RoutineBuildStatus_IN_PROGRESS = 1;
 our $RoutineBuildStatus_SUCCEEDED = 2;
 our $RoutineBuildStatus_FAILED = 3;
-
-=pod
-
-=head2 Enum: RoutineBuildStatus::BuildState
-
-Values:
-
-=over 4
-
-=item * C<BUILD_STATE_UNSPECIFIED> => 0
-
-=item * C<IN_PROGRESS> => 1
-
-=item * C<SUCCEEDED> => 2
-
-=item * C<FAILED> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Routine::GetRoutineRequest ===
     # Fields for GetRoutineRequest
@@ -1124,79 +720,11 @@ Values:
     # Field: dataset_id Type: 9 ()
     # Field: routine_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::GetRoutineRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::GetRoutineRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<routine_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Routine::InsertRoutineRequest ===
     # Fields for InsertRoutineRequest
     # Field: project_id Type: 9 ()
     # Field: dataset_id Type: 9 ()
     # Field: routine Type: 11 (.google.cloud.bigquery.v2.Routine)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::InsertRoutineRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::InsertRoutineRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<routine>
-
-Type: Message (.google.cloud.bigquery.v2.Routine)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Routine::UpdateRoutineRequest ===
     # Fields for UpdateRoutineRequest
@@ -1205,83 +733,11 @@ Type: Message (.google.cloud.bigquery.v2.Routine)
     # Field: routine_id Type: 9 ()
     # Field: routine Type: 11 (.google.cloud.bigquery.v2.Routine)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::UpdateRoutineRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::UpdateRoutineRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<routine_id>
-
-Type: String
-
-=item * B<routine>
-
-Type: Message (.google.cloud.bigquery.v2.Routine)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Routine::DeleteRoutineRequest ===
     # Fields for DeleteRoutineRequest
     # Field: project_id Type: 9 ()
     # Field: dataset_id Type: 9 ()
     # Field: routine_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::DeleteRoutineRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::DeleteRoutineRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<routine_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Routine::ListRoutinesRequest ===
     # Fields for ListRoutinesRequest
@@ -1291,105 +747,25 @@ Type: String
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::ListRoutinesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::ListRoutinesRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<max_results>
-
-Type: Message (.google.protobuf.UInt32Value)
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Routine::ListRoutinesResponse ===
     # Fields for ListRoutinesResponse
     # Field: routines Type: 11 (.google.cloud.bigquery.v2.Routine)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Routine::ListRoutinesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Routine;
-
-    my $msg = Google::Cloud::Bigquery::V2::Routine::ListRoutinesResponse->new(
-        routines => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<routines>
-
-Type: Message (.google.cloud.bigquery.v2.Routine)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Bigquery::V2::Routine::RoutineServiceClient ===
 package Google::Cloud::Bigquery::V2::Routine::RoutineServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Bigquery::V2::Routine::RoutineServiceClient
 
-Google::Cloud::Bigquery::V2::Routine::RoutineServiceClient - Client stub representing the remote RoutineService service
+Client stub representing the remote C<RoutineService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1483,13 +859,765 @@ sub list_routines {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::Routine - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::Routine - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/routine.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::Routine;
+
+    my $msg = Google::Cloud::Bigquery::V2::Routine::Routine->new({
+        etag => $etag,
+        routine_reference => $routine_reference,
+        routine_type => $routine_type,
+        creation_time => $creation_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->etag();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::Routine::Routine->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/routine.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::Routine::Routine
+
+A user-defined function or a stored procedure.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. A hash of this resource.
+
+=item * C<< $msg->routine_reference() >> / C<< $msg->routine_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RoutineReference::RoutineReference>)
+
+Required. Reference describing the ID of this routine.
+
+=item * C<< $msg->routine_type() >> / C<< $msg->routine_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::Routine::RoutineType>)
+
+Required. The type of routine.
+
+=item * C<< $msg->creation_time() >> / C<< $msg->creation_time($value) >>
+
+Type: C<Int64>
+
+Output only. The time when this routine was created, in milliseconds since
+the epoch.
+
+=item * C<< $msg->last_modified_time() >> / C<< $msg->last_modified_time($value) >>
+
+Type: C<Int64>
+
+Output only. The time when this routine was last modified, in milliseconds
+since the epoch.
+
+=item * C<< $msg->language() >> / C<< $msg->language($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::Routine::Language>)
+
+Optional. Defaults to "SQL" if remote_function_options field is absent, not
+set otherwise.
+
+=item * C<< $msg->arguments() >> / C<< $msg->arguments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::Routine::Argument>)
+
+Optional.
+
+=item * C<< $msg->return_type() >> / C<< $msg->return_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType>)
+
+Optional if language = "SQL"; required otherwise.
+Cannot be set if routine_type = "TABLE_VALUED_FUNCTION".
+
+If absent, the return type is inferred from definition_body at query time
+in each query that references this routine. If present, then the evaluated
+result will be cast to the specified returned type at query time.
+
+For example, for the functions created with the following statements:
+
+* `CREATE FUNCTION Add(x FLOAT64, y FLOAT64) RETURNS FLOAT64 AS (x + y);`
+
+* `CREATE FUNCTION Increment(x FLOAT64) AS (Add(x, 1));`
+
+* `CREATE FUNCTION Decrement(x FLOAT64) RETURNS FLOAT64 AS (Add(x, -1));`
+
+The return_type is `{type_kind: "FLOAT64"}` for `Add` and `Decrement`, and
+is absent for `Increment` (inferred as FLOAT64 at query time).
+
+Suppose the function `Add` is replaced by
+  `CREATE OR REPLACE FUNCTION Add(x INT64, y INT64) AS (x + y);`
+
+Then the inferred return type of `Increment` is automatically changed to
+INT64 at query time, while the return type of `Decrement` remains FLOAT64.
+
+=item * C<< $msg->return_table_type() >> / C<< $msg->return_table_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlTableType>)
+
+Optional. Can be set only if routine_type = "TABLE_VALUED_FUNCTION".
+
+If absent, the return table type is inferred from definition_body at query
+time in each query that references this routine. If present, then the
+columns in the evaluated table result will be cast to match the column
+types specified in return table type, at query time.
+
+=item * C<< $msg->imported_libraries() >> / C<< $msg->imported_libraries($value) >>
+
+Type: C<String>
+
+Optional. If language = "JAVASCRIPT", this field stores the path of the
+imported JAVASCRIPT libraries.
+
+=item * C<< $msg->definition_body() >> / C<< $msg->definition_body($value) >>
+
+Type: C<String>
+
+Required. The body of the routine.
+
+For functions, this is the expression in the AS clause.
+
+If `language = "SQL"`, it is the substring inside (but excluding) the
+parentheses. For example, for the function created with the following
+statement:
+
+`CREATE FUNCTION JoinLines(x string, y string) as (concat(x, "\n", y))`
+
+The definition_body is `concat(x, "\n", y)` (\n is not replaced with
+linebreak).
+
+If `language="JAVASCRIPT"`, it is the evaluated string in the AS clause.
+For example, for the function created with the following statement:
+
+`CREATE FUNCTION f() RETURNS STRING LANGUAGE js AS 'return "\n";\n'`
+
+The definition_body is
+
+`return "\n";\n`
+
+Note that both \n are replaced with linebreaks.
+
+If `definition_body` references another routine, then that routine must
+be fully qualified with its project ID.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. The description of the routine, if defined.
+
+=item * C<< $msg->determinism_level() >> / C<< $msg->determinism_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::Routine::DeterminismLevel>)
+
+Optional. The determinism level of the JavaScript UDF, if defined.
+
+=item * C<< $msg->security_mode() >> / C<< $msg->security_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::Routine::SecurityMode>)
+
+Optional. The security mode of the routine, if defined. If not defined, the
+security mode is automatically determined from the routine's configuration.
+
+=item * C<< $msg->strict_mode() >> / C<< $msg->strict_mode($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Use this option to catch many common errors. Error checking is
+not exhaustive, and successfully creating a procedure doesn't guarantee
+that the procedure will successfully execute at runtime. If `strictMode` is
+set to `TRUE`, the procedure body is further checked for errors such as
+non-existent tables or columns. The `CREATE PROCEDURE` statement fails if
+the body fails any of these checks.
+
+If `strictMode` is set to `FALSE`, the procedure body is checked only for
+syntax. For procedures that invoke themselves recursively, specify
+`strictMode=FALSE` to avoid non-existent procedure errors during
+validation.
+
+Default value is `TRUE`.
+
+=item * C<< $msg->remote_function_options() >> / C<< $msg->remote_function_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::Routine::RemoteFunctionOptions>)
+
+Optional. Remote function specific options.
+
+=item * C<< $msg->spark_options() >> / C<< $msg->spark_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::SparkOptions>)
+
+Optional. Spark specific options.
+
+=item * C<< $msg->data_governance_type() >> / C<< $msg->data_governance_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::Routine::DataGovernanceType>)
+
+Optional. If set to `DATA_MASKING`, the function is validated and made
+available as a masking function. For more information, see [Create custom
+masking
+routines](https://cloud.google.com/bigquery/docs/user-defined-functions#custom-mask).
+
+=item * C<< $msg->python_options() >> / C<< $msg->python_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::PythonOptions>)
+
+Optional. Options for the Python UDF.
+[Preview](https://cloud.google.com/products/#product-launch-stages)
+
+=item * C<< $msg->external_runtime_options() >> / C<< $msg->external_runtime_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::ExternalRuntimeOptions>)
+
+Optional. Options for the runtime of the external system executing the
+routine. This field is only applicable for Python UDFs.
+[Preview](https://cloud.google.com/products/#product-launch-stages)
+
+=item * C<< $msg->build_status() >> / C<< $msg->build_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::RoutineBuildStatus>)
+
+Output only. The build status of the routine. This field is only applicable
+to Python UDFs.
+[Preview](https://cloud.google.com/products/#product-launch-stages)
+
+=back
+
+=head3 Enum: Routine::RoutineType
+
+=over 4
+
+=item * C<ROUTINE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<SCALAR_FUNCTION> => C<1>
+
+=item * C<PROCEDURE> => C<2>
+
+=item * C<TABLE_VALUED_FUNCTION> => C<3>
+
+=item * C<AGGREGATE_FUNCTION> => C<4>
+
+=back
+
+=head3 Enum: Routine::Language
+
+=over 4
+
+=item * C<LANGUAGE_UNSPECIFIED> => C<0>
+
+=item * C<SQL> => C<1>
+
+=item * C<JAVASCRIPT> => C<2>
+
+=item * C<PYTHON> => C<3>
+
+=item * C<JAVA> => C<4>
+
+=item * C<SCALA> => C<5>
+
+=back
+
+=head3 Enum: Routine::DeterminismLevel
+
+=over 4
+
+=item * C<DETERMINISM_LEVEL_UNSPECIFIED> => C<0>
+
+=item * C<DETERMINISTIC> => C<1>
+
+=item * C<NOT_DETERMINISTIC> => C<2>
+
+=back
+
+=head3 Enum: Routine::SecurityMode
+
+=over 4
+
+=item * C<SECURITY_MODE_UNSPECIFIED> => C<0>
+
+=item * C<DEFINER> => C<1>
+
+=item * C<INVOKER> => C<2>
+
+=back
+
+=head3 Enum: Routine::DataGovernanceType
+
+=over 4
+
+=item * C<DATA_GOVERNANCE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<DATA_MASKING> => C<1>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::PythonOptions
+
+Options for a user-defined Python function.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entry_point() >> / C<< $msg->entry_point($value) >>
+
+Type: C<String>
+
+Required. The name of the function defined in Python code as the entry
+point when the Python UDF is invoked.
+
+=item * C<< $msg->packages() >> / C<< $msg->packages($value) >>
+
+Type: C<String>
+
+Optional. A list of Python package names along with versions to be
+installed. Example: ["pandas>=2.1", "google-cloud-translate==3.11"]. For
+more information, see [Use third-party
+packages](https://cloud.google.com/bigquery/docs/user-defined-functions-python#third-party-packages).
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::ExternalRuntimeOptions
+
+Options for the runtime of the external system.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->container_memory() >> / C<< $msg->container_memory($value) >>
+
+Type: C<String>
+
+Optional. Amount of memory provisioned for a Python UDF container instance.
+Format: {number}{unit} where unit is one of "M", "G", "Mi" and "Gi" (e.g.
+1G, 512Mi). If not specified, the default value is 512Mi. For more
+information, see [Configure container limits for Python
+UDFs](https://cloud.google.com/bigquery/docs/user-defined-functions-python#configure-container-limits)
+
+=item * C<< $msg->container_cpu() >> / C<< $msg->container_cpu($value) >>
+
+Type: C<Double>
+
+Optional. Amount of CPU provisioned for a Python UDF container instance.
+For more information, see [Configure container limits for Python
+UDFs](https://cloud.google.com/bigquery/docs/user-defined-functions-python#configure-container-limits)
+
+=item * C<< $msg->runtime_connection() >> / C<< $msg->runtime_connection($value) >>
+
+Type: C<String>
+
+Optional. Fully qualified name of the connection whose service account will
+be used to execute the code in the container. Format:
+```"projects/{project_id}/locations/{location_id}/connections/{connection_id}"```
+
+=item * C<< $msg->max_batching_rows() >> / C<< $msg->max_batching_rows($value) >>
+
+Type: C<Int64>
+
+Optional. Maximum number of rows in each batch sent to the external
+runtime. If absent or if 0, BigQuery dynamically decides the number of rows
+in a batch.
+
+=item * C<< $msg->runtime_version() >> / C<< $msg->runtime_version($value) >>
+
+Type: C<String>
+
+Optional. Language runtime version. Example: `python-3.11`.
+
+=item * C<< $msg->container_request_concurrency() >> / C<< $msg->container_request_concurrency($value) >>
+
+Type: C<Int64>
+
+Optional. Maximum number of requests that a Python UDF instance can handle
+concurrently. If absent or if `0`, the default concurrency value is used.
+For more information, see [Configure container limits for Python
+UDFs](https://cloud.google.com/bigquery/docs/user-defined-functions-python#configure-container-limits).
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::SparkOptions
+
+Options for a user-defined Spark routine.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->connection() >> / C<< $msg->connection($value) >>
+
+Type: C<String>
+
+Fully qualified name of the user-provided Spark connection object. Format:
+```"projects/{project_id}/locations/{location_id}/connections/{connection_id}"```
+
+=item * C<< $msg->runtime_version() >> / C<< $msg->runtime_version($value) >>
+
+Type: C<String>
+
+Runtime version. If not specified, the default runtime version is used.
+
+=item * C<< $msg->container_image() >> / C<< $msg->container_image($value) >>
+
+Type: C<String>
+
+Custom container image for the runtime environment.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::SparkOptions::PropertiesEntry>)
+
+Configuration properties as a set of key/value pairs, which will be passed
+on to the Spark application. For more information, see
+[Apache Spark](https://spark.apache.org/docs/latest/index.html) and the
+[procedure option
+list](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#procedure_option_list).
+
+=item * C<< $msg->main_file_uri() >> / C<< $msg->main_file_uri($value) >>
+
+Type: C<String>
+
+The main file/jar URI of the Spark application. Exactly one of the
+definition_body field and the main_file_uri field must be set for Python.
+Exactly one of main_class and main_file_uri field
+should be set for Java/Scala language type.
+
+=item * C<< $msg->py_file_uris() >> / C<< $msg->py_file_uris($value) >>
+
+Type: C<String>
+
+Python files to be placed on the PYTHONPATH for PySpark application.
+Supported file types: `.py`, `.egg`, and `.zip`. For more information
+about Apache Spark, see
+[Apache Spark](https://spark.apache.org/docs/latest/index.html).
+
+=item * C<< $msg->jar_uris() >> / C<< $msg->jar_uris($value) >>
+
+Type: C<String>
+
+JARs to include on the driver and executor CLASSPATH.
+For more information about Apache Spark, see
+[Apache Spark](https://spark.apache.org/docs/latest/index.html).
+
+=item * C<< $msg->file_uris() >> / C<< $msg->file_uris($value) >>
+
+Type: C<String>
+
+Files to be placed in the working directory of each executor.
+For more information about Apache Spark, see
+[Apache Spark](https://spark.apache.org/docs/latest/index.html).
+
+=item * C<< $msg->archive_uris() >> / C<< $msg->archive_uris($value) >>
+
+Type: C<String>
+
+Archive files to be extracted into the working directory of each executor.
+For more information about Apache Spark, see
+[Apache Spark](https://spark.apache.org/docs/latest/index.html).
+
+=item * C<< $msg->main_class() >> / C<< $msg->main_class($value) >>
+
+Type: C<String>
+
+The fully qualified name of a class in jar_uris, for example,
+com.example.wordcount. Exactly one of main_class and main_jar_uri field
+ should be set for Java/Scala language type.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::RoutineBuildStatus
+
+The status of a routine build.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->build_state() >> / C<< $msg->build_state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::RoutineBuildStatus::BuildState>)
+
+Output only. The current build state of the routine.
+
+=item * C<< $msg->error_result() >> / C<< $msg->error_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Error::ErrorProto>)
+
+Output only. A result object that will be present only if the build has
+failed.
+
+=item * C<< $msg->build_state_update_time() >> / C<< $msg->build_state_update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the build state was updated last.
+
+=item * C<< $msg->build_duration() >> / C<< $msg->build_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Output only. The time taken for the image build. Populated only after the
+build succeeds or fails.
+
+=item * C<< $msg->image_size_bytes() >> / C<< $msg->image_size_bytes($value) >>
+
+Type: C<Int64>
+
+Output only. The size of the image in bytes. Populated only after the build
+succeeds.
+
+=back
+
+=head3 Enum: RoutineBuildStatus::BuildState
+
+=over 4
+
+=item * C<BUILD_STATE_UNSPECIFIED> => C<0>
+
+=item * C<IN_PROGRESS> => C<1>
+
+=item * C<SUCCEEDED> => C<2>
+
+=item * C<FAILED> => C<3>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::GetRoutineRequest
+
+Describes the format for getting information about a routine.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the requested routine
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the requested routine
+
+=item * C<< $msg->routine_id() >> / C<< $msg->routine_id($value) >>
+
+Type: C<String>
+
+Required. Routine ID of the requested routine
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::InsertRoutineRequest
+
+Describes the format for inserting a routine.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the new routine
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the new routine
+
+=item * C<< $msg->routine() >> / C<< $msg->routine($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::Routine>)
+
+Required. A routine resource to insert
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::UpdateRoutineRequest
+
+Describes the format for updating a routine.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the routine to update
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the routine to update
+
+=item * C<< $msg->routine_id() >> / C<< $msg->routine_id($value) >>
+
+Type: C<String>
+
+Required. Routine ID of the routine to update
+
+=item * C<< $msg->routine() >> / C<< $msg->routine($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::Routine>)
+
+Required. A routine resource which will replace the specified routine
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::DeleteRoutineRequest
+
+Describes the format for deleting a routine.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the routine to delete
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the routine to delete
+
+=item * C<< $msg->routine_id() >> / C<< $msg->routine_id($value) >>
+
+Type: C<String>
+
+Required. Routine ID of the routine to delete
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::ListRoutinesRequest
+
+Describes the format for listing routines.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the routines to list
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the routines to list
+
+=item * C<< $msg->max_results() >> / C<< $msg->max_results($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt32Value>)
+
+The maximum number of results to return in a single response page.
+Leverage the page tokens to iterate through the entire collection.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Page token, returned by a previous call, to request the next page of
+results
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+If set, then only the Routines matching this filter are returned.
+The supported format is `routineType:{RoutineType}`, where `{RoutineType}`
+is a RoutineType enum. For example: `routineType:SCALAR_FUNCTION`.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Routine::ListRoutinesResponse
+
+Describes the format of a single result page when listing routines.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->routines() >> / C<< $msg->routines($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Routine::Routine>)
+
+Routines in the requested dataset. Unless read_mask is set in the request,
+only the following fields are populated:
+etag, project_id, dataset_id, routine_id, routine_type, creation_time,
+last_modified_time, language, and remote_function_options.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to request the next page of results.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::Routine::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

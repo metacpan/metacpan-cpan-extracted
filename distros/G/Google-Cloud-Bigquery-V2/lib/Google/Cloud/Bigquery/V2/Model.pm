@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::Model;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -2042,52 +2042,6 @@ EOF
     # Field: remote_model_version Type: 9 ()
     # Field: speech_recognizer Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Model::RemoteModelInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Model;
-
-    my $msg = Google::Cloud::Bigquery::V2::Model::RemoteModelInfo->new(
-        endpoint => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<endpoint>
-
-Type: String
-
-=item * B<remote_service_type>
-
-Type: Enum (.google.cloud.bigquery.v2.RemoteModelInfo.RemoteServiceType)
-
-=item * B<connection>
-
-Type: String
-
-=item * B<max_batching_rows>
-
-Type: Int64
-
-=item * B<remote_model_version>
-
-Type: String
-
-=item * B<speech_recognizer>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: RemoteModelInfo::RemoteServiceType
 our $RemoteModelInfo_REMOTE_SERVICE_TYPE_UNSPECIFIED = 0;
 our $RemoteModelInfo_CLOUD_AI_TRANSLATE_V3 = 1;
@@ -2095,67 +2049,11 @@ our $RemoteModelInfo_CLOUD_AI_VISION_V1 = 2;
 our $RemoteModelInfo_CLOUD_AI_NATURAL_LANGUAGE_V1 = 3;
 our $RemoteModelInfo_CLOUD_AI_SPEECH_TO_TEXT_V2 = 7;
 
-=pod
-
-=head2 Enum: RemoteModelInfo::RemoteServiceType
-
-Values:
-
-=over 4
-
-=item * C<REMOTE_SERVICE_TYPE_UNSPECIFIED> => 0
-
-=item * C<CLOUD_AI_TRANSLATE_V3> => 1
-
-=item * C<CLOUD_AI_VISION_V1> => 2
-
-=item * C<CLOUD_AI_NATURAL_LANGUAGE_V1> => 3
-
-=item * C<CLOUD_AI_SPEECH_TO_TEXT_V2> => 7
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Model::TransformColumn ===
     # Fields for TransformColumn
     # Field: name Type: 9 ()
     # Field: type Type: 11 (.google.cloud.bigquery.v2.StandardSqlDataType)
     # Field: transform_sql Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Model::TransformColumn - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Model;
-
-    my $msg = Google::Cloud::Bigquery::V2::Model::TransformColumn->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<type>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlDataType)
-
-=item * B<transform_sql>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Model::Model ===
     # Fields for Model
@@ -2179,108 +2077,6 @@ Type: String
     # Field: hparam_trials Type: 11 (.google.cloud.bigquery.v2.Model.HparamTuningTrial)
     # Field: optimal_trial_ids Type: 3 ()
     # Field: remote_model_info Type: 11 (.google.cloud.bigquery.v2.RemoteModelInfo)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Model::Model - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Model;
-
-    my $msg = Google::Cloud::Bigquery::V2::Model::Model->new(
-        etag => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<etag>
-
-Type: String
-
-=item * B<model_reference>
-
-Type: Message (.google.cloud.bigquery.v2.ModelReference)
-
-=item * B<creation_time>
-
-Type: Int64
-
-=item * B<last_modified_time>
-
-Type: Int64
-
-=item * B<description>
-
-Type: String
-
-=item * B<friendly_name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.bigquery.v2.Model.LabelsEntry)
-
-=item * B<expiration_time>
-
-Type: Int64
-
-=item * B<location>
-
-Type: String
-
-=item * B<encryption_configuration>
-
-Type: Message (.google.cloud.bigquery.v2.EncryptionConfiguration)
-
-=item * B<model_type>
-
-Type: Enum (.google.cloud.bigquery.v2.Model.ModelType)
-
-=item * B<training_runs>
-
-Type: Message (.google.cloud.bigquery.v2.Model.TrainingRun)
-
-=item * B<feature_columns>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlField)
-
-=item * B<label_columns>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlField)
-
-=item * B<transform_columns>
-
-Type: Message (.google.cloud.bigquery.v2.TransformColumn)
-
-=item * B<hparam_search_spaces>
-
-Type: Message (.google.cloud.bigquery.v2.Model.HparamSearchSpaces)
-
-=item * B<default_trial_id>
-
-Type: Int64
-
-=item * B<hparam_trials>
-
-Type: Message (.google.cloud.bigquery.v2.Model.HparamTuningTrial)
-
-=item * B<optimal_trial_ids>
-
-Type: Int64
-
-=item * B<remote_model_info>
-
-Type: Message (.google.cloud.bigquery.v2.RemoteModelInfo)
-
-=back
-
-=cut
 
 # Enum: Model::ModelType
 our $Model_MODEL_TYPE_UNSPECIFIED = 0;
@@ -2310,115 +2106,15 @@ our $Model_ONNX = 28;
 our $Model_TRANSFORM_ONLY = 29;
 our $Model_CONTRIBUTION_ANALYSIS = 37;
 
-=pod
-
-=head2 Enum: Model::ModelType
-
-Values:
-
-=over 4
-
-=item * C<MODEL_TYPE_UNSPECIFIED> => 0
-
-=item * C<LINEAR_REGRESSION> => 1
-
-=item * C<LOGISTIC_REGRESSION> => 2
-
-=item * C<KMEANS> => 3
-
-=item * C<MATRIX_FACTORIZATION> => 4
-
-=item * C<DNN_CLASSIFIER> => 5
-
-=item * C<TENSORFLOW> => 6
-
-=item * C<DNN_REGRESSOR> => 7
-
-=item * C<XGBOOST> => 8
-
-=item * C<BOOSTED_TREE_REGRESSOR> => 9
-
-=item * C<BOOSTED_TREE_CLASSIFIER> => 10
-
-=item * C<ARIMA> => 11
-
-=item * C<AUTOML_REGRESSOR> => 12
-
-=item * C<AUTOML_CLASSIFIER> => 13
-
-=item * C<PCA> => 14
-
-=item * C<DNN_LINEAR_COMBINED_CLASSIFIER> => 16
-
-=item * C<DNN_LINEAR_COMBINED_REGRESSOR> => 17
-
-=item * C<AUTOENCODER> => 18
-
-=item * C<ARIMA_PLUS> => 19
-
-=item * C<ARIMA_PLUS_XREG> => 23
-
-=item * C<RANDOM_FOREST_REGRESSOR> => 24
-
-=item * C<RANDOM_FOREST_CLASSIFIER> => 25
-
-=item * C<TENSORFLOW_LITE> => 26
-
-=item * C<ONNX> => 28
-
-=item * C<TRANSFORM_ONLY> => 29
-
-=item * C<CONTRIBUTION_ANALYSIS> => 37
-
-=back
-
-=cut
-
 # Enum: Model::LossType
 our $Model_LOSS_TYPE_UNSPECIFIED = 0;
 our $Model_MEAN_SQUARED_LOSS = 1;
 our $Model_MEAN_LOG_LOSS = 2;
 
-=pod
-
-=head2 Enum: Model::LossType
-
-Values:
-
-=over 4
-
-=item * C<LOSS_TYPE_UNSPECIFIED> => 0
-
-=item * C<MEAN_SQUARED_LOSS> => 1
-
-=item * C<MEAN_LOG_LOSS> => 2
-
-=back
-
-=cut
-
 # Enum: Model::DistanceType
 our $Model_DISTANCE_TYPE_UNSPECIFIED = 0;
 our $Model_EUCLIDEAN = 1;
 our $Model_COSINE = 2;
-
-=pod
-
-=head2 Enum: Model::DistanceType
-
-Values:
-
-=over 4
-
-=item * C<DISTANCE_TYPE_UNSPECIFIED> => 0
-
-=item * C<EUCLIDEAN> => 1
-
-=item * C<COSINE> => 2
-
-=back
-
-=cut
 
 # Enum: Model::DataSplitMethod
 our $Model_DATA_SPLIT_METHOD_UNSPECIFIED = 0;
@@ -2427,30 +2123,6 @@ our $Model_CUSTOM = 2;
 our $Model_SEQUENTIAL = 3;
 our $Model_NO_SPLIT = 4;
 our $Model_AUTO_SPLIT = 5;
-
-=pod
-
-=head2 Enum: Model::DataSplitMethod
-
-Values:
-
-=over 4
-
-=item * C<DATA_SPLIT_METHOD_UNSPECIFIED> => 0
-
-=item * C<RANDOM> => 1
-
-=item * C<CUSTOM> => 2
-
-=item * C<SEQUENTIAL> => 3
-
-=item * C<NO_SPLIT> => 4
-
-=item * C<AUTO_SPLIT> => 5
-
-=back
-
-=cut
 
 # Enum: Model::DataFrequency
 our $Model_DATA_FREQUENCY_UNSPECIFIED = 0;
@@ -2462,36 +2134,6 @@ our $Model_WEEKLY = 5;
 our $Model_DAILY = 6;
 our $Model_HOURLY = 7;
 our $Model_PER_MINUTE = 8;
-
-=pod
-
-=head2 Enum: Model::DataFrequency
-
-Values:
-
-=over 4
-
-=item * C<DATA_FREQUENCY_UNSPECIFIED> => 0
-
-=item * C<AUTO_FREQUENCY> => 1
-
-=item * C<YEARLY> => 2
-
-=item * C<QUARTERLY> => 3
-
-=item * C<MONTHLY> => 4
-
-=item * C<WEEKLY> => 5
-
-=item * C<DAILY> => 6
-
-=item * C<HOURLY> => 7
-
-=item * C<PER_MINUTE> => 8
-
-=back
-
-=cut
 
 # Enum: Model::HolidayRegion
 our $Model_HOLIDAY_REGION_UNSPECIFIED = 0;
@@ -2564,156 +2206,6 @@ our $Model_VE = 66;
 our $Model_VN = 67;
 our $Model_ZA = 68;
 
-=pod
-
-=head2 Enum: Model::HolidayRegion
-
-Values:
-
-=over 4
-
-=item * C<HOLIDAY_REGION_UNSPECIFIED> => 0
-
-=item * C<GLOBAL> => 1
-
-=item * C<NA> => 2
-
-=item * C<JAPAC> => 3
-
-=item * C<EMEA> => 4
-
-=item * C<LAC> => 5
-
-=item * C<AE> => 6
-
-=item * C<AR> => 7
-
-=item * C<AT> => 8
-
-=item * C<AU> => 9
-
-=item * C<BE> => 10
-
-=item * C<BR> => 11
-
-=item * C<CA> => 12
-
-=item * C<CH> => 13
-
-=item * C<CL> => 14
-
-=item * C<CN> => 15
-
-=item * C<CO> => 16
-
-=item * C<CS> => 17
-
-=item * C<CZ> => 18
-
-=item * C<DE> => 19
-
-=item * C<DK> => 20
-
-=item * C<DZ> => 21
-
-=item * C<EC> => 22
-
-=item * C<EE> => 23
-
-=item * C<EG> => 24
-
-=item * C<ES> => 25
-
-=item * C<FI> => 26
-
-=item * C<FR> => 27
-
-=item * C<GB> => 28
-
-=item * C<GR> => 29
-
-=item * C<HK> => 30
-
-=item * C<HU> => 31
-
-=item * C<ID> => 32
-
-=item * C<IE> => 33
-
-=item * C<IL> => 34
-
-=item * C<IN> => 35
-
-=item * C<IR> => 36
-
-=item * C<IT> => 37
-
-=item * C<JP> => 38
-
-=item * C<KR> => 39
-
-=item * C<LV> => 40
-
-=item * C<MA> => 41
-
-=item * C<MX> => 42
-
-=item * C<MY> => 43
-
-=item * C<NG> => 44
-
-=item * C<NL> => 45
-
-=item * C<NO> => 46
-
-=item * C<NZ> => 47
-
-=item * C<PE> => 48
-
-=item * C<PH> => 49
-
-=item * C<PK> => 50
-
-=item * C<PL> => 51
-
-=item * C<PT> => 52
-
-=item * C<RO> => 53
-
-=item * C<RS> => 54
-
-=item * C<RU> => 55
-
-=item * C<SA> => 56
-
-=item * C<SE> => 57
-
-=item * C<SG> => 58
-
-=item * C<SI> => 59
-
-=item * C<SK> => 60
-
-=item * C<TH> => 61
-
-=item * C<TR> => 62
-
-=item * C<TW> => 63
-
-=item * C<UA> => 64
-
-=item * C<US> => 65
-
-=item * C<VE> => 66
-
-=item * C<VN> => 67
-
-=item * C<ZA> => 68
-
-=back
-
-=cut
-
 # Enum: Model::ColorSpace
 our $Model_COLOR_SPACE_UNSPECIFIED = 0;
 our $Model_RGB = 1;
@@ -2722,138 +2214,26 @@ our $Model_YIQ = 3;
 our $Model_YUV = 4;
 our $Model_GRAYSCALE = 5;
 
-=pod
-
-=head2 Enum: Model::ColorSpace
-
-Values:
-
-=over 4
-
-=item * C<COLOR_SPACE_UNSPECIFIED> => 0
-
-=item * C<RGB> => 1
-
-=item * C<HSV> => 2
-
-=item * C<YIQ> => 3
-
-=item * C<YUV> => 4
-
-=item * C<GRAYSCALE> => 5
-
-=back
-
-=cut
-
 # Enum: Model::LearnRateStrategy
 our $Model_LEARN_RATE_STRATEGY_UNSPECIFIED = 0;
 our $Model_LINE_SEARCH = 1;
 our $Model_CONSTANT = 2;
-
-=pod
-
-=head2 Enum: Model::LearnRateStrategy
-
-Values:
-
-=over 4
-
-=item * C<LEARN_RATE_STRATEGY_UNSPECIFIED> => 0
-
-=item * C<LINE_SEARCH> => 1
-
-=item * C<CONSTANT> => 2
-
-=back
-
-=cut
 
 # Enum: Model::OptimizationStrategy
 our $Model_OPTIMIZATION_STRATEGY_UNSPECIFIED = 0;
 our $Model_BATCH_GRADIENT_DESCENT = 1;
 our $Model_NORMAL_EQUATION = 2;
 
-=pod
-
-=head2 Enum: Model::OptimizationStrategy
-
-Values:
-
-=over 4
-
-=item * C<OPTIMIZATION_STRATEGY_UNSPECIFIED> => 0
-
-=item * C<BATCH_GRADIENT_DESCENT> => 1
-
-=item * C<NORMAL_EQUATION> => 2
-
-=back
-
-=cut
-
 # Enum: Model::FeedbackType
 our $Model_FEEDBACK_TYPE_UNSPECIFIED = 0;
 our $Model_IMPLICIT = 1;
 our $Model_EXPLICIT = 2;
-
-=pod
-
-=head2 Enum: Model::FeedbackType
-
-Values:
-
-=over 4
-
-=item * C<FEEDBACK_TYPE_UNSPECIFIED> => 0
-
-=item * C<IMPLICIT> => 1
-
-=item * C<EXPLICIT> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Model::GetModelRequest ===
     # Fields for GetModelRequest
     # Field: project_id Type: 9 ()
     # Field: dataset_id Type: 9 ()
     # Field: model_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Model::GetModelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Model;
-
-    my $msg = Google::Cloud::Bigquery::V2::Model::GetModelRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<model_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Model::PatchModelRequest ===
     # Fields for PatchModelRequest
@@ -2862,83 +2242,11 @@ Type: String
     # Field: model_id Type: 9 ()
     # Field: model Type: 11 (.google.cloud.bigquery.v2.Model)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Model::PatchModelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Model;
-
-    my $msg = Google::Cloud::Bigquery::V2::Model::PatchModelRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<model_id>
-
-Type: String
-
-=item * B<model>
-
-Type: Message (.google.cloud.bigquery.v2.Model)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Model::DeleteModelRequest ===
     # Fields for DeleteModelRequest
     # Field: project_id Type: 9 ()
     # Field: dataset_id Type: 9 ()
     # Field: model_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Model::DeleteModelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Model;
-
-    my $msg = Google::Cloud::Bigquery::V2::Model::DeleteModelRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<model_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Model::ListModelsRequest ===
     # Fields for ListModelsRequest
@@ -2947,101 +2255,25 @@ Type: String
     # Field: max_results Type: 11 (.google.protobuf.UInt32Value)
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Model::ListModelsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Model;
-
-    my $msg = Google::Cloud::Bigquery::V2::Model::ListModelsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<max_results>
-
-Type: Message (.google.protobuf.UInt32Value)
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Model::ListModelsResponse ===
     # Fields for ListModelsResponse
     # Field: models Type: 11 (.google.cloud.bigquery.v2.Model)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Model::ListModelsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Model;
-
-    my $msg = Google::Cloud::Bigquery::V2::Model::ListModelsResponse->new(
-        models => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<models>
-
-Type: Message (.google.cloud.bigquery.v2.Model)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Bigquery::V2::Model::ModelServiceClient ===
 package Google::Cloud::Bigquery::V2::Model::ModelServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Bigquery::V2::Model::ModelServiceClient
 
-Google::Cloud::Bigquery::V2::Model::ModelServiceClient - Client stub representing the remote ModelService service
+Client stub representing the remote C<ModelService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -3122,13 +2354,791 @@ sub delete_model {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::Model - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::Model - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/model.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::Model;
+
+    my $msg = Google::Cloud::Bigquery::V2::Model::RemoteModelInfo->new({
+        endpoint => $endpoint,
+        remote_service_type => $remote_service_type,
+        connection => $connection,
+        max_batching_rows => $max_batching_rows,
+    });
+
+    # Read or update a field
+    my $val = $msg->endpoint();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::Model::RemoteModelInfo->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/model.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::Model::RemoteModelInfo
+
+Remote Model Info
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->endpoint() >> / C<< $msg->endpoint($value) >>
+
+Type: C<String>
+
+Output only. The endpoint for remote model.
+
+=item * C<< $msg->remote_service_type() >> / C<< $msg->remote_service_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::RemoteModelInfo::RemoteServiceType>)
+
+Output only. The remote service type for remote model.
+
+=item * C<< $msg->connection() >> / C<< $msg->connection($value) >>
+
+Type: C<String>
+
+Output only. Fully qualified name of the user-provided connection object of
+the remote model. Format:
+```"projects/{project_id}/locations/{location_id}/connections/{connection_id}"```
+
+=item * C<< $msg->max_batching_rows() >> / C<< $msg->max_batching_rows($value) >>
+
+Type: C<Int64>
+
+Output only. Max number of rows in each batch sent to the remote service.
+If unset, the number of rows in each batch is set dynamically.
+
+=item * C<< $msg->remote_model_version() >> / C<< $msg->remote_model_version($value) >>
+
+Type: C<String>
+
+Output only. The model version for LLM.
+
+=item * C<< $msg->speech_recognizer() >> / C<< $msg->speech_recognizer($value) >>
+
+Type: C<String>
+
+Output only. The name of the speech recognizer to use for speech
+recognition. The expected format is
+`projects/{project}/locations/{location}/recognizers/{recognizer}`.
+Customers can specify this field at model creation. If not specified, a
+default recognizer `projects/{model
+project}/locations/global/recognizers/_` will be used. See more details at
+[recognizers](https://cloud.google.com/speech-to-text/v2/docs/reference/rest/v2/projects.locations.recognizers)
+
+=back
+
+=head3 Enum: RemoteModelInfo::RemoteServiceType
+
+=over 4
+
+=item * C<REMOTE_SERVICE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<CLOUD_AI_TRANSLATE_V3> => C<1>
+
+=item * C<CLOUD_AI_VISION_V1> => C<2>
+
+=item * C<CLOUD_AI_NATURAL_LANGUAGE_V1> => C<3>
+
+=item * C<CLOUD_AI_SPEECH_TO_TEXT_V2> => C<7>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Model::TransformColumn
+
+Information about a single transform column.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Name of the column.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType>)
+
+Output only. Data type of the column after the transform.
+
+=item * C<< $msg->transform_sql() >> / C<< $msg->transform_sql($value) >>
+
+Type: C<String>
+
+Output only. The SQL expression used in the column transform.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Model::Model
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. A hash of this resource.
+
+=item * C<< $msg->model_reference() >> / C<< $msg->model_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ModelReference::ModelReference>)
+
+Required. Unique identifier for this model.
+
+=item * C<< $msg->creation_time() >> / C<< $msg->creation_time($value) >>
+
+Type: C<Int64>
+
+Output only. The time when this model was created, in millisecs since the
+epoch.
+
+=item * C<< $msg->last_modified_time() >> / C<< $msg->last_modified_time($value) >>
+
+Type: C<Int64>
+
+Output only. The time when this model was last modified, in millisecs since
+the epoch.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A user-friendly description of this model.
+
+=item * C<< $msg->friendly_name() >> / C<< $msg->friendly_name($value) >>
+
+Type: C<String>
+
+Optional. A descriptive name for this model.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::Model::LabelsEntry>)
+
+The labels associated with this model. You can use these to organize
+and group your models. Label keys and values can be no longer
+than 63 characters, can only contain lowercase letters, numeric
+characters, underscores and dashes. International characters are allowed.
+Label values are optional. Label keys must start with a letter and each
+label in the list must have a different key.
+
+=item * C<< $msg->expiration_time() >> / C<< $msg->expiration_time($value) >>
+
+Type: C<Int64>
+
+Optional. The time when this model expires, in milliseconds since the
+epoch. If not present, the model will persist indefinitely. Expired models
+will be deleted and their storage reclaimed.  The defaultTableExpirationMs
+property of the encapsulating dataset can be used to set a default
+expirationTime on newly created models.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Output only. The geographic location where the model resides. This value
+is inherited from the dataset.
+
+=item * C<< $msg->encryption_configuration() >> / C<< $msg->encryption_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration>)
+
+Custom encryption configuration (e.g., Cloud KMS keys). This shows the
+encryption configuration of the model data while stored in BigQuery
+storage. This field can be used with PatchModel to update encryption key
+for an already encrypted model.
+
+=item * C<< $msg->model_type() >> / C<< $msg->model_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::Model::ModelType>)
+
+Output only. Type of the model resource.
+
+=item * C<< $msg->training_runs() >> / C<< $msg->training_runs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::Model::TrainingRun>)
+
+Information for all training runs in increasing order of start_time.
+
+=item * C<< $msg->feature_columns() >> / C<< $msg->feature_columns($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlField>)
+
+Output only. Input feature columns for the model inference. If the model is
+trained with TRANSFORM clause, these are the input of the TRANSFORM clause.
+
+=item * C<< $msg->label_columns() >> / C<< $msg->label_columns($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlField>)
+
+Output only. Label columns that were used to train this model.
+The output of the model will have a "predicted_" prefix to these columns.
+
+=item * C<< $msg->transform_columns() >> / C<< $msg->transform_columns($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::TransformColumn>)
+
+Output only. This field will be populated if a TRANSFORM clause was used to
+train a model. TRANSFORM clause (if used) takes feature_columns as input
+and outputs transform_columns. transform_columns then are used to train the
+model.
+
+=item * C<< $msg->hparam_search_spaces() >> / C<< $msg->hparam_search_spaces($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::Model::HparamSearchSpaces>)
+
+Output only. All hyperparameter search spaces in this model.
+
+=item * C<< $msg->default_trial_id() >> / C<< $msg->default_trial_id($value) >>
+
+Type: C<Int64>
+
+Output only. The default trial_id to use in TVFs when the trial_id is not
+passed in. For single-objective [hyperparameter
+tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview)
+models, this is the best trial ID. For multi-objective [hyperparameter
+tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview)
+models, this is the smallest trial ID among all Pareto optimal trials.
+
+=item * C<< $msg->hparam_trials() >> / C<< $msg->hparam_trials($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::Model::HparamTuningTrial>)
+
+Output only. Trials of a [hyperparameter
+tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview)
+model sorted by trial_id.
+
+=item * C<< $msg->optimal_trial_ids() >> / C<< $msg->optimal_trial_ids($value) >>
+
+Type: C<Int64>
+
+Output only. For single-objective [hyperparameter
+tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview)
+models, it only contains the best trial. For multi-objective
+[hyperparameter
+tuning](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-hp-tuning-overview)
+models, it contains all Pareto optimal trials sorted by trial_id.
+
+=item * C<< $msg->remote_model_info() >> / C<< $msg->remote_model_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::RemoteModelInfo>)
+
+Output only. Remote model info
+
+=back
+
+=head3 Enum: Model::ModelType
+
+=over 4
+
+=item * C<MODEL_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<LINEAR_REGRESSION> => C<1>
+
+=item * C<LOGISTIC_REGRESSION> => C<2>
+
+=item * C<KMEANS> => C<3>
+
+=item * C<MATRIX_FACTORIZATION> => C<4>
+
+=item * C<DNN_CLASSIFIER> => C<5>
+
+=item * C<TENSORFLOW> => C<6>
+
+=item * C<DNN_REGRESSOR> => C<7>
+
+=item * C<XGBOOST> => C<8>
+
+=item * C<BOOSTED_TREE_REGRESSOR> => C<9>
+
+=item * C<BOOSTED_TREE_CLASSIFIER> => C<10>
+
+=item * C<ARIMA> => C<11>
+
+=item * C<AUTOML_REGRESSOR> => C<12>
+
+=item * C<AUTOML_CLASSIFIER> => C<13>
+
+=item * C<PCA> => C<14>
+
+=item * C<DNN_LINEAR_COMBINED_CLASSIFIER> => C<16>
+
+=item * C<DNN_LINEAR_COMBINED_REGRESSOR> => C<17>
+
+=item * C<AUTOENCODER> => C<18>
+
+=item * C<ARIMA_PLUS> => C<19>
+
+=item * C<ARIMA_PLUS_XREG> => C<23>
+
+=item * C<RANDOM_FOREST_REGRESSOR> => C<24>
+
+=item * C<RANDOM_FOREST_CLASSIFIER> => C<25>
+
+=item * C<TENSORFLOW_LITE> => C<26>
+
+=item * C<ONNX> => C<28>
+
+=item * C<TRANSFORM_ONLY> => C<29>
+
+=item * C<CONTRIBUTION_ANALYSIS> => C<37>
+
+=back
+
+=head3 Enum: Model::LossType
+
+=over 4
+
+=item * C<LOSS_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<MEAN_SQUARED_LOSS> => C<1>
+
+=item * C<MEAN_LOG_LOSS> => C<2>
+
+=back
+
+=head3 Enum: Model::DistanceType
+
+=over 4
+
+=item * C<DISTANCE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<EUCLIDEAN> => C<1>
+
+=item * C<COSINE> => C<2>
+
+=back
+
+=head3 Enum: Model::DataSplitMethod
+
+=over 4
+
+=item * C<DATA_SPLIT_METHOD_UNSPECIFIED> => C<0>
+
+=item * C<RANDOM> => C<1>
+
+=item * C<CUSTOM> => C<2>
+
+=item * C<SEQUENTIAL> => C<3>
+
+=item * C<NO_SPLIT> => C<4>
+
+=item * C<AUTO_SPLIT> => C<5>
+
+=back
+
+=head3 Enum: Model::DataFrequency
+
+=over 4
+
+=item * C<DATA_FREQUENCY_UNSPECIFIED> => C<0>
+
+=item * C<AUTO_FREQUENCY> => C<1>
+
+=item * C<YEARLY> => C<2>
+
+=item * C<QUARTERLY> => C<3>
+
+=item * C<MONTHLY> => C<4>
+
+=item * C<WEEKLY> => C<5>
+
+=item * C<DAILY> => C<6>
+
+=item * C<HOURLY> => C<7>
+
+=item * C<PER_MINUTE> => C<8>
+
+=back
+
+=head3 Enum: Model::HolidayRegion
+
+=over 4
+
+=item * C<HOLIDAY_REGION_UNSPECIFIED> => C<0>
+
+=item * C<GLOBAL> => C<1>
+
+=item * C<NA> => C<2>
+
+=item * C<JAPAC> => C<3>
+
+=item * C<EMEA> => C<4>
+
+=item * C<LAC> => C<5>
+
+=item * C<AE> => C<6>
+
+=item * C<AR> => C<7>
+
+=item * C<AT> => C<8>
+
+=item * C<AU> => C<9>
+
+=item * C<BE> => C<10>
+
+=item * C<BR> => C<11>
+
+=item * C<CA> => C<12>
+
+=item * C<CH> => C<13>
+
+=item * C<CL> => C<14>
+
+=item * C<CN> => C<15>
+
+=item * C<CO> => C<16>
+
+=item * C<CS> => C<17>
+
+=item * C<CZ> => C<18>
+
+=item * C<DE> => C<19>
+
+=item * C<DK> => C<20>
+
+=item * C<DZ> => C<21>
+
+=item * C<EC> => C<22>
+
+=item * C<EE> => C<23>
+
+=item * C<EG> => C<24>
+
+=item * C<ES> => C<25>
+
+=item * C<FI> => C<26>
+
+=item * C<FR> => C<27>
+
+=item * C<GB> => C<28>
+
+=item * C<GR> => C<29>
+
+=item * C<HK> => C<30>
+
+=item * C<HU> => C<31>
+
+=item * C<ID> => C<32>
+
+=item * C<IE> => C<33>
+
+=item * C<IL> => C<34>
+
+=item * C<IN> => C<35>
+
+=item * C<IR> => C<36>
+
+=item * C<IT> => C<37>
+
+=item * C<JP> => C<38>
+
+=item * C<KR> => C<39>
+
+=item * C<LV> => C<40>
+
+=item * C<MA> => C<41>
+
+=item * C<MX> => C<42>
+
+=item * C<MY> => C<43>
+
+=item * C<NG> => C<44>
+
+=item * C<NL> => C<45>
+
+=item * C<NO> => C<46>
+
+=item * C<NZ> => C<47>
+
+=item * C<PE> => C<48>
+
+=item * C<PH> => C<49>
+
+=item * C<PK> => C<50>
+
+=item * C<PL> => C<51>
+
+=item * C<PT> => C<52>
+
+=item * C<RO> => C<53>
+
+=item * C<RS> => C<54>
+
+=item * C<RU> => C<55>
+
+=item * C<SA> => C<56>
+
+=item * C<SE> => C<57>
+
+=item * C<SG> => C<58>
+
+=item * C<SI> => C<59>
+
+=item * C<SK> => C<60>
+
+=item * C<TH> => C<61>
+
+=item * C<TR> => C<62>
+
+=item * C<TW> => C<63>
+
+=item * C<UA> => C<64>
+
+=item * C<US> => C<65>
+
+=item * C<VE> => C<66>
+
+=item * C<VN> => C<67>
+
+=item * C<ZA> => C<68>
+
+=back
+
+=head3 Enum: Model::ColorSpace
+
+=over 4
+
+=item * C<COLOR_SPACE_UNSPECIFIED> => C<0>
+
+=item * C<RGB> => C<1>
+
+=item * C<HSV> => C<2>
+
+=item * C<YIQ> => C<3>
+
+=item * C<YUV> => C<4>
+
+=item * C<GRAYSCALE> => C<5>
+
+=back
+
+=head3 Enum: Model::LearnRateStrategy
+
+=over 4
+
+=item * C<LEARN_RATE_STRATEGY_UNSPECIFIED> => C<0>
+
+=item * C<LINE_SEARCH> => C<1>
+
+=item * C<CONSTANT> => C<2>
+
+=back
+
+=head3 Enum: Model::OptimizationStrategy
+
+=over 4
+
+=item * C<OPTIMIZATION_STRATEGY_UNSPECIFIED> => C<0>
+
+=item * C<BATCH_GRADIENT_DESCENT> => C<1>
+
+=item * C<NORMAL_EQUATION> => C<2>
+
+=back
+
+=head3 Enum: Model::FeedbackType
+
+=over 4
+
+=item * C<FEEDBACK_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<IMPLICIT> => C<1>
+
+=item * C<EXPLICIT> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Model::GetModelRequest
+
+Request format for getting information about a BigQuery ML model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the requested model.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the requested model.
+
+=item * C<< $msg->model_id() >> / C<< $msg->model_id($value) >>
+
+Type: C<String>
+
+Required. Model ID of the requested model.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Model::PatchModelRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the model to patch.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the model to patch.
+
+=item * C<< $msg->model_id() >> / C<< $msg->model_id($value) >>
+
+Type: C<String>
+
+Required. Model ID of the model to patch.
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::Model>)
+
+Required. Patched model.
+Follows RFC5789 patch semantics. Missing fields are not updated.
+To clear a field, explicitly set to default value.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Model::DeleteModelRequest
+
+Request format for deleting BigQuery ML models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the model to delete.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the model to delete.
+
+=item * C<< $msg->model_id() >> / C<< $msg->model_id($value) >>
+
+Type: C<String>
+
+Required. Model ID of the model to delete.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Model::ListModelsRequest
+
+Request format for listing BigQuery ML models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the models to list.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the models to list.
+
+=item * C<< $msg->max_results() >> / C<< $msg->max_results($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt32Value>)
+
+The maximum number of results to return in a single response page.
+Leverage the page tokens to iterate through the entire collection.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Page token, returned by a previous call to request the next page of
+results
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Model::ListModelsResponse
+
+Response format for a single page when listing BigQuery ML models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->models() >> / C<< $msg->models($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Model::Model>)
+
+Models in the requested dataset. Only the following fields are populated:
+model_reference, model_type, creation_time, last_modified_time and
+labels.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to request the next page of results.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::Model::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

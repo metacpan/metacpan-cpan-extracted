@@ -66,10 +66,11 @@
   - [7.1. `getoptlong init <opts_array_name> [CONFIGURATIONS...]`](#71-getoptlong-init-opts_array_name-configurations)
   - [7.2. `getoptlong parse "$@"`](#72-getoptlong-parse--)
   - [7.3. `getoptlong set`](#73-getoptlong-set)
-  - [7.4. `getoptlong callback [-b|--before] <opt_name> [callback_function] ...`](#74-getoptlong-callback--b---before-opt_name-callback_function--)
+  - [7.4. `getoptlong callback [-b|--before] <opt_name> [callback_function [args...]]`](#74-getoptlong-callback--b--before-opt_name-callback_function-args)
   - [7.5. `getoptlong configure <CONFIG_PARAM=VALUE> ...`](#75-getoptlong-configure-config_paramvalue--)
   - [7.6. `getoptlong dump [-a|--all]`](#76-getoptlong-dump--a---all)
-  - [7.7. `getoptlong help <SYNOPSIS>`](#77-getoptlong-help-synopsis)
+  - [7.7. `getoptlong help [SYNOPSIS]`](#77-getoptlong-help-synopsis)
+  - [7.8. `getoptlong version`](#78-getoptlong-version)
 - [8. Practical Examples](#8-practical-examples)
   - [8.1. Combining Required Options and Optional Arguments](#81-combining-required-options-and-optional-arguments)
   - [8.2. Script with Subcommands (Simple Version)](#82-script-with-subcommands-simple-version)
@@ -89,13 +90,13 @@ You can use `getoptlong.sh` by sourcing it directly from GitHub without download
 
 ```bash
 # Latest stable version (recommended)
-source <(curl -fsSL https://raw.githubusercontent.com/tecolicom/getoptlong/dist/getoptlong.sh)
+source <(curl -fsSL https://raw.githubusercontent.com/tecolicom/getoptlong-bash/dist/getoptlong.sh)
 
 # Specific version
-source <(curl -fsSL https://raw.githubusercontent.com/tecolicom/getoptlong/v0.2/getoptlong.sh)
+source <(curl -fsSL https://raw.githubusercontent.com/tecolicom/getoptlong-bash/v0.2/getoptlong.sh)
 
 # Latest major version (always gets the newest 0.x release)
-source <(curl -fsSL https://raw.githubusercontent.com/tecolicom/getoptlong/v0/getoptlong.sh)
+source <(curl -fsSL https://raw.githubusercontent.com/tecolicom/getoptlong-bash/v0/getoptlong.sh)
 ```
 
 ### Local Installation
@@ -104,7 +105,7 @@ You can also download and use it locally:
 
 ```bash
 # Download to your project
-curl -fsSL https://raw.githubusercontent.com/tecolicom/getoptlong/dist/getoptlong.sh -o getoptlong.sh
+curl -fsSL https://raw.githubusercontent.com/tecolicom/getoptlong-bash/dist/getoptlong.sh -o getoptlong.sh
 
 # Source from your script
 . ./getoptlong.sh -
@@ -214,11 +215,11 @@ getoptlong init OPTS
 
 During initialization, you can also specify various configuration parameters that control option parsing behavior. See Section "7.1. `getoptlong init ...`" for details.
 
-Example: Store non-option arguments in the `ARGS` array and prevent the script from exiting on a parse error.
+Example: Store non-option arguments in the `ARGS` array, and leave undefined options in it instead of exiting with an error.
 
 ```bash
 declare -a ARGS # It's good practice to declare the array specified by PERMUTE beforehand
-getoptlong init OPTS PERMUTE=ARGS EXIT_ON_ERROR=0
+getoptlong init OPTS PERMUTE=ARGS EXIT_ON_ERROR=
 ```
 
 #### 3.2.4. Parsing Command-Line Arguments
@@ -226,15 +227,10 @@ getoptlong init OPTS PERMUTE=ARGS EXIT_ON_ERROR=0
 Pass all script arguments (`"$@"`) to the `getoptlong parse` command to parse them based on your definitions.
 
 ```bash
-if ! getoptlong parse "$@"; then
-    # Handle parse error (if EXIT_ON_ERROR=0)
-    echo "Failed to parse arguments." >&2
-    getoptlong help "Usage: $(basename "$0") [options] arguments..." # Display help on error
-    exit 1
-fi
+getoptlong parse "$@"
 ```
 
-`getoptlong parse` returns an exit code of `0` on successful parsing and non-zero otherwise. If `EXIT_ON_ERROR` is `1` (default), the script will automatically exit on a parse error.
+On a parse error, such as an undefined option or a missing required argument, `getoptlong parse` displays an error message and exits the script (`EXIT_ON_ERROR`, enabled by default).  If `EXIT_ON_ERROR` is disabled, undefined options are left in the arguments instead.  See Section "7.2. `getoptlong parse`" for details.
 
 #### 3.2.5. Setting Positional Parameters
 
@@ -260,7 +256,7 @@ Option variables are automatically set during `getoptlong parse`. Use these vari
 # If the help option was processed (automatically or manually),
 # the script usually exits during 'getoptlong parse' or 'getoptlong set',
 # but you can also check explicitly (e.g., for custom help processing).
-if [[ -n "${help:-}" ]]; then
+if [[ -n ${help:-} ]]; then
     # (Usually not reached if 'getoptlong help' was called)
     # Custom help display processing, etc.
     exit 0
@@ -268,11 +264,11 @@ fi
 
 echo "Verbose output level: ${verbose:-0}" # Display 0 if not set
 
-if [[ "$output" != "/dev/stdout" ]]; then
+if [[ $output != "/dev/stdout" ]]; then
     echo "Output destination: $output"
 fi
 
-if [[ -n "${config:-}" ]]; then # Check if config is not an empty string or unset
+if [[ -n ${config:-} ]]; then # Check if config is not an empty string or unset
     echo "Loading configuration file: $config..."
     # source "$config" or other processing
 elif [[ -v config ]]; then # If config option was specified but has no value (set to empty string)
@@ -491,7 +487,7 @@ When the option is parsed, the specified callback function is called. This `!` s
 *   **Behavior:**
     *   When the option is specified on the command line, the associated callback function is executed.
     *   By default, the callback function name is the same as the option's long name (hyphens converted to underscores). An arbitrary function name can be specified using the `getoptlong callback` command.
-    *   For callback function invocation timing and arguments, see Section "7.4. `getoptlong callback ...`" and "5.1. Callback Function Details".
+    *   For callback function invocation timing and arguments, see Section "7.4. `getoptlong callback ...`" and "6.1. Callback Function Details".
 
 *   **Use Cases:** Executing custom actions during option parsing, complex value processing, immediate configuration changes.
 
@@ -542,7 +538,7 @@ Validates if the argument is an integer.
 
 *   **Definition Example:** `[count|c:COUNT=i # Number of iterations]` (assuming COUNT is the destination variable) or `[count|c:=i # Number of iterations]` (if using default variable name).
 
-*   **Behavior:** If the argument is not an integer, an error message is displayed, and the script exits (default behavior, if `EXIT_ON_ERROR=1`).
+*   **Behavior:** If the argument is not an integer, an error message is displayed, and the script exits.  This does not depend on `EXIT_ON_ERROR`.
 
 *   Applicable to array options (`@...=i`) and the value part of hash options (`%...=i`).
 
@@ -563,7 +559,7 @@ Validates if the argument matches the specified Bash extended regular expression
 *   **Definition Examples:**
     *   `[mode|m:=(^(fast|slow|debug)$)]` (one of fast, slow, debug)
     *   `[name|N@=(^[A-Za-z_]+$)]` (each element contains only letters and underscores)
-    *   `[param|P%:=(^[a-z_]+=[0-9]+$)]` (key is lowercase letters and _, value is numbers)
+    *   `[param|P%=(^[a-z_]+=[0-9]+$)]` (key is lowercase letters and _, value is numbers)
 
 *   **Behavior:** If the argument does not match the regex, an error message is displayed, and the script exits.
 
@@ -711,7 +707,7 @@ You can manually display the help message from anywhere in your script using the
     *   **`[SYNOPSIS_ARGUMENT]`:** (Optional) If provided, this string is used as the synopsis line for this specific invocation of the help message. It takes precedence over any `&USAGE` or `USAGE` settings.
 
         ```bash
-        if [[ "$some_error_condition" == "true" ]]; then
+        if [[ $some_error_condition == "true" ]]; then
             getoptlong help "Error: Invalid input. Usage: $(basename "$0") --input <file>" >&2
             exit 1
         fi
@@ -766,13 +762,13 @@ Callback functions allow you to execute arbitrary shell functions when specific 
 
 By default, callback functions are called **after** the option's value has been internally set.
 
-*   **Call Format:** `callback_function "option_name" "option_value" [registered_arg1 registered_arg2 ...]`
+*   **Call Format:** `callback_function [registered_arg1 registered_arg2 ...] "option_name" "option_value"`
 
-    *   `$1`: The long name of the option (e.g., `my-option`).
+    *   Registered arguments: If fixed arguments were registered after the function, as `getoptlong callback <opt_name> <func_name> arg1 arg2...`, they are passed first.  See Section "7.4. `getoptlong callback ...`".
 
-    *   `$2`: The parsed value of the option. For flags, it's `1` (or an empty string if specified with `no-`). For options taking arguments, it's the argument value. For arrays or hashes, it's the last parsed element or pair.
+    *   Then the long name of the option (e.g., `my-option`).  Without registered arguments, it is `$1`.
 
-    *   `$3...`: If additional arguments were specified during registration with `getoptlong callback <opt_name> <func_name> arg1 arg2...`, they are passed here.
+    *   Then the parsed value of the option. For flags, it's `1` (or an empty string if specified with `no-`). For options taking arguments, it's the argument value. For arrays or hashes, it's the last parsed element or pair.  Without registered arguments, it is `$2`.
 
 *   **Example:**
 
@@ -786,13 +782,13 @@ By default, callback functions are called **after** the option's value has been 
         local item_id="$2"
         echo "Callback: Option '$opt_name' was specified with value '$item_id'."
         # Perform processing using item_id here
-        if [[ ! -f "$item_id" ]]; then
+        if [[ ! -f $item_id ]]; then
             echo "Error: File '$item_id' not found." >&2
             # exit 1 # Exit with error if necessary
         fi
     }
     # getoptlong callback process-item process_item_callback # Registered by default, but can be explicit
-    # getoptlong callback process-item process_item_callback "Additional arg 1" # Can also pass extra args
+    # getoptlong callback process-item process_item_callback arg1 # Fixed arguments come before $1 and $2
 
     getoptlong init OPTS
     getoptlong parse "$@" && eval "$(getoptlong set)"
@@ -802,11 +798,11 @@ By default, callback functions are called **after** the option's value has been 
 
 By specifying the `--before` (or `-b`) option with the `getoptlong callback` command, you can call the callback function **before** the option's value is internally set.
 
-*   **Call Format:** `callback_function "option_name" [registered_arg1 registered_arg2 ...]`
+*   **Call Format:** `callback_function [registered_arg1 registered_arg2 ...] "option_name"`
 
-    *   `$1`: The long name of the option.
+    *   Registered arguments: If fixed arguments were registered after the function, as `getoptlong callback -b <opt_name> <func_name> arg1 arg2...`, they are passed first.
 
-    *   `$2...`: If additional arguments were specified during registration with `getoptlong callback -b <opt_name> <func_name> arg1 arg2...`, they are passed here.
+    *   Then the long name of the option.  Without registered arguments, it is `$1`.
 
     *   **Note:** The option's value is not passed to pre-processing callbacks. They are not intended for value processing but are suitable for state changes or preparation before the value is set.
 
@@ -867,9 +863,9 @@ This method is suitable when you want to pass all arguments after a certain poin
 
 *   **Handling Undefined Options:**
 
-    *   By default, if an option not defined in the `OPTS` array is passed, it results in an error (if `EXIT_ON_ERROR=1`).
+    *   By default, if an option not defined in the `OPTS` array is passed, it is an error, and the script exits.
 
-    *   By setting `EXIT_ON_ERROR=0` and checking the return value of `getoptlong parse`, you can process an argument list containing undefined options. `getoptlong.sh` does not have a direct feature to "ignore undefined options and collect them into a specific array." In this case, you need to use `PERMUTE` and `--`, or preprocess the argument list yourself.
+    *   If `EXIT_ON_ERROR` is disabled (`EXIT_ON_ERROR=`), undefined options are not errors: they are left in the arguments, together with the non-option arguments, in the array specified by `PERMUTE` (or `GOL_ARGV`), and `getoptlong parse` returns `0`.  An undefined short option is still reported by `getopts`; set `SILENT` to suppress it.  An argument given to an undefined option as a separate word is left as another argument.  See `ex/silent.sh` for an example.
 
 *   **How to Achieve Pass-through (General Approaches):**
 
@@ -948,16 +944,13 @@ Some parameters set with `getoptlong init` can be changed later using the `getop
 *   **Example:**
 
     ```bash
-    getoptlong init OPTS EXIT_ON_ERROR=1
+    getoptlong init OPTS
     # ... some processing ...
-    # Temporarily prevent exiting on error
-    getoptlong configure EXIT_ON_ERROR=0
-    # The following parse will not exit on error (check return value of parse for success)
-    if ! getoptlong parse "${some_args[@]}"; then
-        echo "Warning: Parsing some_args failed but script continues." >&2
-    fi
+    # Temporarily leave undefined options in the arguments instead of exiting
+    getoptlong configure EXIT_ON_ERROR= SILENT=1
+    getoptlong parse "${some_args[@]}"
     # Revert
-    getoptlong configure EXIT_ON_ERROR=1
+    getoptlong configure EXIT_ON_ERROR=1 SILENT=
     ```
 
 *   **Note:** Not all parameters are suitable for runtime changes. It's safest to use this for changing flags that control parsing behavior (`EXIT_ON_ERROR`, `SILENT`, `DEBUG`, `DELIM`). Parameters like `PREFIX` or those affecting option definitions themselves might not work as expected if changed after `init`.
@@ -1014,13 +1007,15 @@ Initializes the library, loading option definitions and settings. This command m
 
     *   **`USAGE=<string>`**: Specifies the synopsis string for the help message. See Section "4.3.1. Customizing Synopsis (`USAGE` Setting)" for details. If not set, the synopsis is typically not displayed unless `getoptlong help` is called with an argument.
 
-    *   **`EXIT_ON_ERROR=<BOOL>`**: Whether to exit the script on a parse error (`1` to exit, `0` not to exit).  Default is `1` (exit). If `0`, you must check the return value of `getoptlong parse` to detect errors.
+    *   **`EXIT_ON_ERROR=<BOOL>`**: Whether to exit the script on a parse error.  Default is enabled (exit).  If disabled, undefined options are left in the arguments instead of being errors.  See Section "7.2. `getoptlong parse`" for details.
 
     *   **`DELIM=<string>`**: Specifies the set of characters used to delimit multiple values or pairs within a single argument string for array (`@`) or hash (`%`) options.  Default is space, tab, comma (behavior similar to Bash's IFS). For example, `DELIM=,:` would delimit by comma and colon.
 
-    *   **`SILENT=<BOOL>`**: Whether to suppress error messages (`1` to suppress, `0` to display).  Default is `0` (display).
+    *   **`SILENT=<BOOL>`**: Whether to suppress error messages of `getopts`.  Default is disabled (display).
 
-    *   **`DEBUG=<BOOL>`**: Whether to enable debug messages (`1` to enable, `0` to disable).  Default is `0` (disable).
+    *   **`DEBUG=<BOOL>`**: Whether to enable debug messages.  Default is disabled.
+
+    A `<BOOL>` parameter is enabled by a non-empty value, such as `1`, and disabled by an empty string, such as `EXIT_ON_ERROR=`.  Note that `0` is a non-empty value, and enables it.
 
 ### 7.2. `getoptlong parse "$@"`
 
@@ -1030,10 +1025,9 @@ Parses command-line arguments according to the defined options.
 
 *   **Return Value**:
 
-    *   Returns exit code `0` on successful parsing.
-    *   Returns a non-zero exit code on parsing failure (undefined option, missing required argument, etc.).
-    *   If `EXIT_ON_ERROR=1` (default), this command will cause the script to exit on a parse error, so checking the return value is usually unnecessary.
-    *   If `EXIT_ON_ERROR=0`, you must check the return value of this command to handle errors.
+    *   Returns exit code `0`.  On a parse error, such as an undefined option or a missing required argument, it displays an error message and exits the script, as `EXIT_ON_ERROR` is enabled by default.  There is no need to check the return value.
+    *   If `EXIT_ON_ERROR` is disabled, an undefined option and a short option without its required argument are not errors: they are left in the arguments, and the command returns `0`.  An error message of `getopts` is displayed for a short option unless `SILENT` is set.
+    *   A long option without its required argument and a validation error exit the script regardless of `EXIT_ON_ERROR`.
 
 ### 7.3. `getoptlong set`
 
@@ -1041,27 +1035,33 @@ Generates a series of `eval`-able shell command strings to standard output, whic
 
 *   Typically used as `eval "$(getoptlong set)"`. This sets variables corresponding to options in the current shell environment.  (e.g., `--file /tmp/f` → `file="/tmp/f"`)
 
-### 7.4. `getoptlong callback [-b|--before] <opt_name> [callback_function] ...`
+### 7.4. `getoptlong callback [-b|--before] <opt_name> [callback_function [args...]]`
 
 Registers a callback function for a specified option or modifies the settings of an already registered callback.
 
 *   **`-b` or `--before`**:
 
-    If this flag is specified, the callback function is called **before** the option's value is internally set.  The option's value is not passed to pre-processing callbacks. See Section "5.1.2. Pre-processing Callbacks" for details.
+    If this flag is specified, the callback function is called **before** the option's value is internally set.  The option's value is not passed to pre-processing callbacks. See Section "6.1.2. Pre-processing Callbacks" for details.
 
-*   **`<opt_name>`**: (Required) The long name of the option to register the callback for (e.g., `my-option`).
+*   **`<opt_name>`**: (Required) The name of the option to register the callback for (e.g., `my-option`).  An alias name can also be used.  An undefined option is an error.
 
 *   **`[callback_function]`**:
 
     The name of the shell function to call.  If omitted or if `-` is specified, a function name is automatically generated from `<opt_name>` (hyphens `-` converted to underscores `_`, e.g., `my_option`) and becomes the default callback function name.  If the `!` suffix was used in the option definition, the callback is automatically registered with this default name.
 
-*   **`[...]`**: (Optional) Additional fixed arguments to be passed to the callback function. These arguments are passed after the option name and option value (for normal callbacks) when the callback function is invoked.
+*   **`[args...]`**: (Optional) Fixed arguments for the function.  They are passed **before** the option name and the option value, so that a common function can be called from several options and behave differently by the arguments.  Each argument must be a word without white space; an argument with white space or an empty argument is an error.  To give fixed arguments to the default function, specify `-` as the function name.
+
+    ```bash
+    set_level() { level=$1 ; }   # $1: fixed argument, $2: option name, $3: value
+    getoptlong callback quiet   set_level 0
+    getoptlong callback verbose set_level 2
+    ```
 
 ### 7.5. `getoptlong configure <CONFIG_PARAM=VALUE> ...`
 
 Dynamically changes global configuration parameter values (set by `getoptlong init`) during parsing or at other points.
 
-*   **`<CONFIG_PARAM=VALUE>`**: (Required) Specifies a configuration parameter available in `getoptlong init` and its new value (e.g., `EXIT_ON_ERROR=0`).
+*   **`<CONFIG_PARAM=VALUE>`**: (Required) Specifies a configuration parameter available in `getoptlong init` and its new value (e.g., `EXIT_ON_ERROR=`).
 
 *   **Note**: Not all parameters are suitable for runtime modification. It's safest to change flags controlling parsing behavior (`EXIT_ON_ERROR`, `SILENT`, `DEBUG`, `DELIM`). Parameters like `PREFIX` or those related to option definitions themselves might not work as expected if changed after `init`.
 
@@ -1076,6 +1076,22 @@ Dumps (displays) the internal state of `getoptlong.sh` (option definitions, curr
 Manually displays the generated help message based on the current option definitions and configurations.  See Section "4.3.2. Manual Display with `getoptlong help`" for full details on its behavior, including how the optional `SYNOPSIS` argument is handled.
 
 This command is also executed internally when the automatic help option (e.g., `--help`) is invoked.
+
+### 7.8. `getoptlong version`
+
+Prints the version of the library.
+
+```bash
+getoptlong version
+```
+
+The `getoptlong` command also prints it with the `--version` option.
+
+```console
+$ getoptlong --version
+```
+
+To require a minimum version of the library, use the `REQUIRE` configuration (see Section "9. Configuration Keys").
 
 ## 8. Practical Examples
 
@@ -1106,7 +1122,7 @@ declare -A OPTS=(
 format_callback() {
     local opt_name="$1"
     local val="$2"
-    if [[ -n "$val" ]]; then
+    if [[ -n $val ]]; then
         format="${val^^}" # Directly modify the global 'format' variable
         (( verbose > 0 )) && echo "Debug: Format set to '$format' via callback." >&2
     else
@@ -1125,7 +1141,7 @@ fi
 eval "$(getoptlong set)"
 
 # Check for required options
-if [[ -z "$input" ]] || [[ -z "$output" ]]; then
+if [[ -z $input ]] || [[ -z $output ]]; then
     echo "Error: Input file (-i) and output file (-o) are required." >&2
     getoptlong help # Display help on error
     exit 1
@@ -1136,14 +1152,14 @@ echo "Input file: $input"
 echo "Output file: $output"
 
 if [[ -v format ]]; then # If format option was used (with value or empty string)
-    if [[ -n "$format" ]]; then
+    if [[ -n $format ]]; then
         echo "Output format: $format"
     else
         echo "Output format: (not specified)" # Case of --format only
     fi
 fi
 
-if [[ -n "$compress" ]]; then
+if [[ -n $compress ]]; then
     echo "Compression: Enabled (Level: $level)"
     # Compression processing...
 else
@@ -1182,13 +1198,14 @@ declare -A GlobalOPTS=(
 )
 getoptlong init GlobalOPTS
 declare -a RemainingArgs
-# Parse only global options. Do not exit on error, store the rest in RemainingArgs.
-getoptlong configure EXIT_ON_ERROR=0 PERMUTE=RemainingArgs
+# Parse only global options. Leave the rest, including the options of
+# the subcommand, in RemainingArgs without error messages.
+getoptlong configure EXIT_ON_ERROR= SILENT=1 PERMUTE=RemainingArgs
 getoptlong parse "$@"
 eval "$(getoptlong set)" # Set variables for global options
 
 # If global help requested or no subcommand, show overall help
-if [[ -n "$help" ]] || (( ${#RemainingArgs[@]} == 0 )); then
+if [[ -n $help ]] || (( ${#RemainingArgs[@]} == 0 )); then
     echo "Usage: $(basename "$0") [global_options] <subcommand> [subcommand_options]"
     echo ""
     echo "Global Options:"
@@ -1216,14 +1233,14 @@ case "$subcommand" in
         if ! getoptlong parse "${SubcommandArgs[@]}"; then exit 1; fi
         eval "$(getoptlong set)" # Set variables for commit
 
-        if [[ -n "$help" ]]; then # Subcommand help
+        if [[ -n $help ]]; then # Subcommand help
              getoptlong help "Usage: $(basename "$0") commit [options]"
              exit 0
         fi
 
         echo "Subcommand: commit"
-        [[ -n "$message" ]] && echo "  Message: $message"
-        [[ -n "$all" ]] && echo "  All: enabled"
+        [[ -n $message ]] && echo "  Message: $message"
+        [[ -n $all ]] && echo "  All: enabled"
         (( verbose > 0 )) && echo "  Verbose (global): $verbose"
         # e.g., execute git commit
         ;;
@@ -1237,14 +1254,14 @@ case "$subcommand" in
         if ! getoptlong parse "${SubcommandArgs[@]}"; then exit 1; fi
         eval "$(getoptlong set)"
 
-        if [[ -n "$help" ]]; then
+        if [[ -n $help ]]; then
              getoptlong help "Usage: $(basename "$0") push [options]"
              exit 0
         fi
 
         echo "Subcommand: push"
         echo "  Remote: ${remote}"
-        [[ -n "$force" ]] && echo "  Force: enabled"
+        [[ -n $force ]] && echo "  Force: enabled"
         (( verbose > 0 )) && echo "  Verbose (global): $verbose"
         # e.g., execute git push
         ;;

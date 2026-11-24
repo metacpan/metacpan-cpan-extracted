@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::GrpcRoute;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -473,68 +473,6 @@ EOF
     # Field: gateways Type: 9 ()
     # Field: rules Type: 11 (.google.cloud.networkservices.v1.GrpcRoute.RouteRule)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::GrpcRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.GrpcRoute.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<hostnames>
-
-Type: String
-
-=item * B<meshes>
-
-Type: String
-
-=item * B<gateways>
-
-Type: String
-
-=item * B<rules>
-
-Type: Message (.google.cloud.networkservices.v1.GrpcRoute.RouteRule)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::GrpcRoute::ListGrpcRoutesRequest ===
     # Fields for ListGrpcRoutesRequest
     # Field: parent Type: 9 ()
@@ -542,113 +480,15 @@ Type: Message (.google.cloud.networkservices.v1.GrpcRoute.RouteRule)
     # Field: page_token Type: 9 ()
     # Field: return_partial_success Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::GrpcRoute::ListGrpcRoutesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::GrpcRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::GrpcRoute::ListGrpcRoutesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<return_partial_success>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::GrpcRoute::ListGrpcRoutesResponse ===
     # Fields for ListGrpcRoutesResponse
     # Field: grpc_routes Type: 11 (.google.cloud.networkservices.v1.GrpcRoute)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::GrpcRoute::ListGrpcRoutesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::GrpcRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::GrpcRoute::ListGrpcRoutesResponse->new(
-        grpc_routes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<grpc_routes>
-
-Type: Message (.google.cloud.networkservices.v1.GrpcRoute)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::GrpcRoute::GetGrpcRouteRequest ===
     # Fields for GetGrpcRouteRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::GrpcRoute::GetGrpcRouteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::GrpcRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::GrpcRoute::GetGrpcRouteRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::GrpcRoute::CreateGrpcRouteRequest ===
     # Fields for CreateGrpcRouteRequest
@@ -656,116 +496,348 @@ Type: String
     # Field: grpc_route_id Type: 9 ()
     # Field: grpc_route Type: 11 (.google.cloud.networkservices.v1.GrpcRoute)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::GrpcRoute::CreateGrpcRouteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::GrpcRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::GrpcRoute::CreateGrpcRouteRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<grpc_route_id>
-
-Type: String
-
-=item * B<grpc_route>
-
-Type: Message (.google.cloud.networkservices.v1.GrpcRoute)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::GrpcRoute::UpdateGrpcRouteRequest ===
     # Fields for UpdateGrpcRouteRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: grpc_route Type: 11 (.google.cloud.networkservices.v1.GrpcRoute)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::GrpcRoute::UpdateGrpcRouteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::GrpcRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::GrpcRoute::UpdateGrpcRouteRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<grpc_route>
-
-Type: Message (.google.cloud.networkservices.v1.GrpcRoute)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::GrpcRoute::DeleteGrpcRouteRequest ===
     # Fields for DeleteGrpcRouteRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::GrpcRoute::DeleteGrpcRouteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::GrpcRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::GrpcRoute::DeleteGrpcRouteRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::GrpcRoute - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::GrpcRoute - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/grpc_route.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networkservices::V1::GrpcRoute;
+
+    my $msg = Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute->new({
+        name => $name,
+        self_link => $self_link,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/grpc_route.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute
+
+GrpcRoute is the resource defining how gRPC traffic routed by a Mesh
+or Gateway resource is routed.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the GrpcRoute resource. It matches pattern
+`projects/*/locations/*/grpcRoutes/<grpc_route_name>`
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+Output only. Server-defined URL of this resource
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute::LabelsEntry>)
+
+Optional. Set of label tags associated with the GrpcRoute resource.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A free-text description of the resource. Max length 1024
+characters.
+
+=item * C<< $msg->hostnames() >> / C<< $msg->hostnames($value) >>
+
+Type: C<String>
+
+Required. Service hostnames with an optional port for which this route
+describes traffic.
+
+Format: <hostname>[:<port>]
+
+Hostname is the fully qualified domain name of a network host. This matches
+the RFC 1123 definition of a hostname with 2 notable exceptions:
+ - IPs are not allowed.
+ - A hostname may be prefixed with a wildcard label (`*.`). The wildcard
+   label must appear by itself as the first label.
+
+Hostname can be "precise" which is a domain name without the terminating
+dot of a network host (e.g. `foo.example.com`) or "wildcard", which is a
+domain name prefixed with a single wildcard label (e.g. `*.example.com`).
+
+Note that as per RFC1035 and RFC1123, a label must consist of lower case
+alphanumeric characters or '-', and must start and end with an alphanumeric
+character. No other punctuation is allowed.
+
+The routes associated with a Mesh or Gateway must have unique hostnames. If
+you attempt to attach multiple routes with conflicting hostnames, the
+configuration will be rejected.
+
+For example, while it is acceptable for routes for the hostnames
+`*.foo.bar.com` and `*.bar.com` to be associated with the same route, it is
+not possible to associate two routes both with `*.bar.com` or both with
+`bar.com`.
+
+If a port is specified, then gRPC clients must use the channel URI with the
+port to match this rule (i.e. "xds:///service:123"), otherwise they must
+supply the URI without a port (i.e. "xds:///service").
+
+=item * C<< $msg->meshes() >> / C<< $msg->meshes($value) >>
+
+Type: C<String>
+
+Optional. Meshes defines a list of meshes this GrpcRoute is attached to, as
+one of the routing rules to route the requests served by the mesh.
+
+Each mesh reference should match the pattern:
+`projects/*/locations/*/meshes/<mesh_name>`
+
+=item * C<< $msg->gateways() >> / C<< $msg->gateways($value) >>
+
+Type: C<String>
+
+Optional. Gateways defines a list of gateways this GrpcRoute is attached
+to, as one of the routing rules to route the requests served by the
+gateway.
+
+Each gateway reference should match the pattern:
+`projects/*/locations/*/gateways/<gateway_name>`
+
+=item * C<< $msg->rules() >> / C<< $msg->rules($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute::RouteRule>)
+
+Required. A list of detailed rules defining how to route traffic.
+
+Within a single GrpcRoute, the GrpcRoute.RouteAction associated with the
+first matching GrpcRoute.RouteRule will be executed. At least one rule
+must be supplied.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::GrpcRoute::ListGrpcRoutesRequest
+
+Request used with the ListGrpcRoutes method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the GrpcRoutes should be
+listed, specified in the format `projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of GrpcRoutes to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListGrpcRoutesResponse`
+Indicates that this is a continuation of a prior `ListGrpcRoutes` call,
+and that the system should return the next page of data.
+
+=item * C<< $msg->return_partial_success() >> / C<< $msg->return_partial_success($value) >>
+
+Type: C<Bool>
+
+Optional. If true, allow partial responses for multi-regional Aggregated
+List requests. Otherwise if one of the locations is down or unreachable,
+the Aggregated List request will fail.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::GrpcRoute::ListGrpcRoutesResponse
+
+Response returned by the ListGrpcRoutes method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->grpc_routes() >> / C<< $msg->grpc_routes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute>)
+
+List of GrpcRoute resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request opts into
+[return_partial_success][google.cloud.networkservices.v1.ListGrpcRoutesRequest.return_partial_success]
+and reading across collections e.g. when attempting to list all resources
+across all supported locations.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::GrpcRoute::GetGrpcRouteRequest
+
+Request used by the GetGrpcRoute method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the GrpcRoute to get. Must be in the format
+`projects/*/locations/*/grpcRoutes/*`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::GrpcRoute::CreateGrpcRouteRequest
+
+Request used by the CreateGrpcRoute method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the GrpcRoute. Must be in the
+format `projects/*/locations/*`.
+
+=item * C<< $msg->grpc_route_id() >> / C<< $msg->grpc_route_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the GrpcRoute resource to be created.
+
+=item * C<< $msg->grpc_route() >> / C<< $msg->grpc_route($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute>)
+
+Required. GrpcRoute resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::GrpcRoute::UpdateGrpcRouteRequest
+
+Request used by the UpdateGrpcRoute method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+GrpcRoute resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->grpc_route() >> / C<< $msg->grpc_route($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::GrpcRoute::GrpcRoute>)
+
+Required. Updated GrpcRoute resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::GrpcRoute::DeleteGrpcRouteRequest
+
+Request used by the DeleteGrpcRoute method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the GrpcRoute to delete. Must be in the format
+`projects/*/locations/*/grpcRoutes/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::GrpcRoute::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

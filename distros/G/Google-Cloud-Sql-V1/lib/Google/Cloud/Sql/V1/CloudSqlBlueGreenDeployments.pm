@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -452,68 +452,6 @@ EOF
     # Field: deployment_tasks Type: 11 (.google.cloud.sql.v1.BlueGreenDeployment.DeploymentTasks)
     # Field: requested_config Type: 11 (.google.cloud.sql.v1.BlueGreenDeployment.RequestedConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.sql.v1.BlueGreenDeployment.State)
-
-=item * B<source_instance>
-
-Type: String
-
-=item * B<switchover_target_instance>
-
-Type: String
-
-=item * B<error_detail>
-
-Type: String
-
-=item * B<deployment_mappings>
-
-Type: Message (.google.cloud.sql.v1.BlueGreenDeployment.SourceTargetPairedNode)
-
-=item * B<deployment_tasks>
-
-Type: Message (.google.cloud.sql.v1.BlueGreenDeployment.DeploymentTasks)
-
-=item * B<requested_config>
-
-Type: Message (.google.cloud.sql.v1.BlueGreenDeployment.RequestedConfig)
-
-=back
-
-=cut
-
 # Enum: BlueGreenDeployment::State
 our $BlueGreenDeployment_STATE_UNSPECIFIED = 0;
 our $BlueGreenDeployment_PROVISIONING = 1;
@@ -523,159 +461,25 @@ our $BlueGreenDeployment_SWITCHOVER_IN_PROGRESS = 4;
 our $BlueGreenDeployment_SWITCHOVER_COMPLETED = 5;
 our $BlueGreenDeployment_DELETING = 6;
 
-=pod
-
-=head2 Enum: BlueGreenDeployment::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<PROVISIONING> => 1
-
-=item * C<SWITCHOVER_READY> => 2
-
-=item * C<SWITCHOVER_NOT_READY> => 3
-
-=item * C<SWITCHOVER_IN_PROGRESS> => 4
-
-=item * C<SWITCHOVER_COMPLETED> => 5
-
-=item * C<DELETING> => 6
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::CreateBlueGreenDeploymentRequest ===
     # Fields for CreateBlueGreenDeploymentRequest
     # Field: parent Type: 9 ()
     # Field: blue_green_deployment_id Type: 9 ()
     # Field: blue_green_deployment Type: 11 (.google.cloud.sql.v1.BlueGreenDeployment)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::CreateBlueGreenDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::CreateBlueGreenDeploymentRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<blue_green_deployment_id>
-
-Type: String
-
-=item * B<blue_green_deployment>
-
-Type: Message (.google.cloud.sql.v1.BlueGreenDeployment)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::GetBlueGreenDeploymentRequest ===
     # Fields for GetBlueGreenDeploymentRequest
     # Field: name Type: 9 ()
     # Field: view Type: 14 (.google.cloud.sql.v1.GetBlueGreenDeploymentRequest.BlueGreenDeploymentView)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::GetBlueGreenDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::GetBlueGreenDeploymentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.cloud.sql.v1.GetBlueGreenDeploymentRequest.BlueGreenDeploymentView)
-
-=back
-
-=cut
 
 # Enum: GetBlueGreenDeploymentRequest::BlueGreenDeploymentView
 our $GetBlueGreenDeploymentRequest_BLUE_GREEN_DEPLOYMENT_VIEW_UNSPECIFIED = 0;
 our $GetBlueGreenDeploymentRequest_BASIC = 1;
 our $GetBlueGreenDeploymentRequest_DETAILED = 2;
 
-=pod
-
-=head2 Enum: GetBlueGreenDeploymentRequest::BlueGreenDeploymentView
-
-Values:
-
-=over 4
-
-=item * C<BLUE_GREEN_DEPLOYMENT_VIEW_UNSPECIFIED> => 0
-
-=item * C<BASIC> => 1
-
-=item * C<DETAILED> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::SwitchoverBlueGreenDeploymentRequest ===
     # Fields for SwitchoverBlueGreenDeploymentRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::SwitchoverBlueGreenDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::SwitchoverBlueGreenDeploymentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::ListBlueGreenDeploymentsRequest ===
     # Fields for ListBlueGreenDeploymentsRequest
@@ -685,140 +489,30 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::ListBlueGreenDeploymentsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::ListBlueGreenDeploymentsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::ListBlueGreenDeploymentsResponse ===
     # Fields for ListBlueGreenDeploymentsResponse
     # Field: blue_green_deployments Type: 11 (.google.cloud.sql.v1.BlueGreenDeployment)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::ListBlueGreenDeploymentsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::ListBlueGreenDeploymentsResponse->new(
-        blue_green_deployments => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<blue_green_deployments>
-
-Type: Message (.google.cloud.sql.v1.BlueGreenDeployment)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::DeleteBlueGreenDeploymentRequest ===
     # Fields for DeleteBlueGreenDeploymentRequest
     # Field: name Type: 9 ()
     # Field: delete_old_source Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::DeleteBlueGreenDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::DeleteBlueGreenDeploymentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<delete_old_source>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeploymentsServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeploymentsServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeploymentsServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeploymentsServiceClient - Client stub representing the remote BlueGreenDeploymentsService service
+Client stub representing the remote C<BlueGreenDeploymentsService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -912,13 +606,343 @@ sub delete_blue_green_deployment {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_blue_green_deployments.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment->new({
+        name => $name,
+        description => $description,
+        create_time => $create_time,
+        state => $state,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_blue_green_deployments.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment
+
+A `BlueGreenDeployment` resource represents a Cloud SQL blue-green deployment
+setup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The full resource name of the deployment.
+Format:
+projects/{project}/locations/{location}/blueGreenDeployments/{deployment_id}
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. User-provided description for the deployment.
+The description can be up to 255 characters long.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the deployment was created.
+Example: `2024-01-01T00:00:00Z`
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::BlueGreenDeployment::State>)
+
+Output only. The current state of the blue-green deployment.
+
+=item * C<< $msg->source_instance() >> / C<< $msg->source_instance($value) >>
+
+Type: C<String>
+
+Required. Immutable. Required on create, and immutable. The full resource
+name of the source instance (the "blue" instance). Format:
+projects/{project}/instances/{instance}
+
+=item * C<< $msg->switchover_target_instance() >> / C<< $msg->switchover_target_instance($value) >>
+
+Type: C<String>
+
+Output only. The full resource name of the primary target instance (the
+"green" instance) that will be promoted during switchover. This field is
+always populated once the deployment is created. Format:
+projects/{project}/instances/{instance}
+
+=item * C<< $msg->error_detail() >> / C<< $msg->error_detail($value) >>
+
+Type: C<String>
+
+Output only. Provides details on why switchover is not possible.
+This field is empty unless a switchover attempt failed or the state is
+`SWITCHOVER_NOT_READY`.
+Example: "The target database version does not match the source instance
+database version."
+
+=item * C<< $msg->deployment_mappings() >> / C<< $msg->deployment_mappings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment::SourceTargetPairedNode>)
+
+Output only. A list representing the pairs of source and target instances
+in the deployment.
+
+=item * C<< $msg->deployment_tasks() >> / C<< $msg->deployment_tasks($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment::DeploymentTasks>)
+
+Output only. Combined list of tasks for all paired nodes.
+
+=item * C<< $msg->requested_config() >> / C<< $msg->requested_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment::RequestedConfig>)
+
+Optional. Immutable. Optional on create, and immutable. The configuration
+intended for the target instance(s) when the deployment was created.
+
+=back
+
+=head3 Enum: BlueGreenDeployment::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<PROVISIONING> => C<1>
+
+=item * C<SWITCHOVER_READY> => C<2>
+
+=item * C<SWITCHOVER_NOT_READY> => C<3>
+
+=item * C<SWITCHOVER_IN_PROGRESS> => C<4>
+
+=item * C<SWITCHOVER_COMPLETED> => C<5>
+
+=item * C<DELETING> => C<6>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::CreateBlueGreenDeploymentRequest
+
+The request message for creating a `BlueGreenDeployment` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this blue-green deployment will be
+created. Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->blue_green_deployment_id() >> / C<< $msg->blue_green_deployment_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for the blue-green deployment, which will become
+the final component of the deployment's resource name. The ID must be
+unique within the given project and location and between 2-63 characters.
+
+=item * C<< $msg->blue_green_deployment() >> / C<< $msg->blue_green_deployment($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment>)
+
+Required. The `BlueGreenDeployment` resource to create.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::GetBlueGreenDeploymentRequest
+
+The request message for getting a BlueGreenDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the blue-green deployment to retrieve.
+Format:
+projects/{project}/locations/{location}/blueGreenDeployments/{blue_green_deployment}
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::GetBlueGreenDeploymentRequest::BlueGreenDeploymentView>)
+
+Optional. Specifies whether to return the basic or detailed view of the
+resource in the response.
+
+=back
+
+=head3 Enum: GetBlueGreenDeploymentRequest::BlueGreenDeploymentView
+
+=over 4
+
+=item * C<BLUE_GREEN_DEPLOYMENT_VIEW_UNSPECIFIED> => C<0>
+
+=item * C<BASIC> => C<1>
+
+=item * C<DETAILED> => C<2>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::SwitchoverBlueGreenDeploymentRequest
+
+Request message for switching over a `BlueGreenDeployment` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the blue-green deployment to switch over.
+Format:
+projects/{project}/locations/{location}/blueGreenDeployments/{blue_green_deployment}
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::ListBlueGreenDeploymentsRequest
+
+The request message for listing blue-green deployment resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource whose blue-green deployments are to be
+listed. Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of deployments to return. The service may
+return fewer deployments than this value. If unspecified, at most 500
+deployments are returned. The maximum value is 1000; values above 1000
+are treated as 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListBlueGreenDeployments`
+call. Provide this to retrieve the subsequent page.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter expression that filters the results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. A comma-separated list of fields to order the results by.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::ListBlueGreenDeploymentsResponse
+
+The response message for listing blue-green deployment resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->blue_green_deployments() >> / C<< $msg->blue_green_deployments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::BlueGreenDeployment>)
+
+The list of blue-green deployment resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve the next page of results, or empty if there are no
+more results.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::DeleteBlueGreenDeploymentRequest
+
+Request message for deleting a BlueGreenDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the blue-green deployment to delete.
+Format:
+projects/{project}/locations/{location}/blueGreenDeployments/{blue_green_deployment}
+
+=item * C<< $msg->delete_old_source() >> / C<< $msg->delete_old_source($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, and the switchover is complete, this deletes the
+old source instance along with the deployment.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

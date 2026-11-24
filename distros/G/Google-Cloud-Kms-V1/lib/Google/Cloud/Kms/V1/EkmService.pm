@@ -3,7 +3,7 @@ package Google::Cloud::Kms::V1::EkmService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -444,117 +444,15 @@ EOF
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse ===
     # Fields for ListEkmConnectionsResponse
     # Field: ekm_connections Type: 11 (.google.cloud.kms.v1.EkmConnection)
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse->new(
-        ekm_connections => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<ekm_connections>
-
-Type: Message (.google.cloud.kms.v1.EkmConnection)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::EkmService::GetEkmConnectionRequest ===
     # Fields for GetEkmConnectionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::GetEkmConnectionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::GetEkmConnectionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::EkmService::CreateEkmConnectionRequest ===
     # Fields for CreateEkmConnectionRequest
@@ -562,139 +460,19 @@ Type: String
     # Field: ekm_connection_id Type: 9 ()
     # Field: ekm_connection Type: 11 (.google.cloud.kms.v1.EkmConnection)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::CreateEkmConnectionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::CreateEkmConnectionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<ekm_connection_id>
-
-Type: String
-
-=item * B<ekm_connection>
-
-Type: Message (.google.cloud.kms.v1.EkmConnection)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::EkmService::UpdateEkmConnectionRequest ===
     # Fields for UpdateEkmConnectionRequest
     # Field: ekm_connection Type: 11 (.google.cloud.kms.v1.EkmConnection)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::UpdateEkmConnectionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::UpdateEkmConnectionRequest->new(
-        ekm_connection => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<ekm_connection>
-
-Type: Message (.google.cloud.kms.v1.EkmConnection)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::EkmService::GetEkmConfigRequest ===
     # Fields for GetEkmConfigRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::GetEkmConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::GetEkmConfigRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::EkmService::UpdateEkmConfigRequest ===
     # Fields for UpdateEkmConfigRequest
     # Field: ekm_config Type: 11 (.google.cloud.kms.v1.EkmConfig)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::UpdateEkmConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::UpdateEkmConfigRequest->new(
-        ekm_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<ekm_config>
-
-Type: Message (.google.cloud.kms.v1.EkmConfig)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::EkmService::Certificate ===
     # Fields for Certificate
@@ -708,64 +486,6 @@ Type: Message (.google.protobuf.FieldMask)
     # Field: serial_number Type: 9 ()
     # Field: sha256_fingerprint Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::Certificate - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::Certificate->new(
-        raw_der => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<raw_der>
-
-Type: Bytes
-
-=item * B<parsed>
-
-Type: Bool
-
-=item * B<issuer>
-
-Type: String
-
-=item * B<subject>
-
-Type: String
-
-=item * B<subject_alternative_dns_names>
-
-Type: String
-
-=item * B<not_before_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<not_after_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<serial_number>
-
-Type: String
-
-=item * B<sha256_fingerprint>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::EkmService::EkmConnection ===
     # Fields for EkmConnection
     # Field: name Type: 9 ()
@@ -775,186 +495,37 @@ Type: String
     # Field: key_management_mode Type: 14 (.google.cloud.kms.v1.EkmConnection.KeyManagementMode)
     # Field: crypto_space_path Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::EkmConnection - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::EkmConnection->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<service_resolvers>
-
-Type: Message (.google.cloud.kms.v1.EkmConnection.ServiceResolver)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<key_management_mode>
-
-Type: Enum (.google.cloud.kms.v1.EkmConnection.KeyManagementMode)
-
-=item * B<crypto_space_path>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: EkmConnection::KeyManagementMode
 our $EkmConnection_KEY_MANAGEMENT_MODE_UNSPECIFIED = 0;
 our $EkmConnection_MANUAL = 1;
 our $EkmConnection_CLOUD_KMS = 2;
-
-=pod
-
-=head2 Enum: EkmConnection::KeyManagementMode
-
-Values:
-
-=over 4
-
-=item * C<KEY_MANAGEMENT_MODE_UNSPECIFIED> => 0
-
-=item * C<MANUAL> => 1
-
-=item * C<CLOUD_KMS> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::EkmService::EkmConfig ===
     # Fields for EkmConfig
     # Field: name Type: 9 ()
     # Field: default_ekm_connection Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::EkmConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::EkmConfig->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<default_ekm_connection>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::EkmService::VerifyConnectivityRequest ===
     # Fields for VerifyConnectivityRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::VerifyConnectivityRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::VerifyConnectivityRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::EkmService::VerifyConnectivityResponse ===
     # Fields for VerifyConnectivityResponse
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::EkmService::VerifyConnectivityResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::EkmService;
-
-    my $msg = Google::Cloud::Kms::V1::EkmService::VerifyConnectivityResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Kms::V1::EkmService::EkmServiceClient ===
 package Google::Cloud::Kms::V1::EkmService::EkmServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Kms::V1::EkmService::EkmServiceClient
 
-Google::Cloud::Kms::V1::EkmService::EkmServiceClient - Client stub representing the remote EkmService service
+Client stub representing the remote C<EkmService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<kms.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1074,13 +645,483 @@ sub verify_connectivity {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Kms::V1::EkmService - Protocol Buffers schema definition
+Google::Cloud::Kms::V1::EkmService - Compiled Protocol Buffers messages for google/cloud/kms/v1/ekm_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::EkmService;
+
+    my $msg = Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest->new({
+        parent => $parent,
+        page_size => $page_size,
+        page_token => $page_token,
+        filter => $filter,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/kms/v1/ekm_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest
+
+Request message for
+[EkmService.ListEkmConnections][google.cloud.kms.v1.EkmService.ListEkmConnections].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the location associated with the
+[EkmConnections][google.cloud.kms.v1.EkmConnection] to list, in the format
+`projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Optional limit on the number of
+[EkmConnections][google.cloud.kms.v1.EkmConnection] to include in the
+response. Further [EkmConnections][google.cloud.kms.v1.EkmConnection] can
+subsequently be obtained by including the
+[ListEkmConnectionsResponse.next_page_token][google.cloud.kms.v1.ListEkmConnectionsResponse.next_page_token]
+in a subsequent request. If unspecified, the server will pick an
+appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Optional pagination token, returned earlier via
+[ListEkmConnectionsResponse.next_page_token][google.cloud.kms.v1.ListEkmConnectionsResponse.next_page_token].
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Only include resources that match the filter in the response. For
+more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify how the results should be sorted. If not specified, the
+results will be sorted in the default order.  For more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse
+
+Response message for
+[EkmService.ListEkmConnections][google.cloud.kms.v1.EkmService.ListEkmConnections].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->ekm_connections() >> / C<< $msg->ekm_connections($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::EkmService::EkmConnection>)
+
+The list of [EkmConnections][google.cloud.kms.v1.EkmConnection].
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve next page of results. Pass this value in
+[ListEkmConnectionsRequest.page_token][google.cloud.kms.v1.ListEkmConnectionsRequest.page_token]
+to retrieve the next page of results.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The total number of [EkmConnections][google.cloud.kms.v1.EkmConnection]
+that matched the query.
+
+This field is not populated if
+[ListEkmConnectionsRequest.filter][google.cloud.kms.v1.ListEkmConnectionsRequest.filter]
+is applied.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::GetEkmConnectionRequest
+
+Request message for
+[EkmService.GetEkmConnection][google.cloud.kms.v1.EkmService.GetEkmConnection].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.EkmConnection.name] of the
+[EkmConnection][google.cloud.kms.v1.EkmConnection] to get.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::CreateEkmConnectionRequest
+
+Request message for
+[EkmService.CreateEkmConnection][google.cloud.kms.v1.EkmService.CreateEkmConnection].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the location associated with the
+[EkmConnection][google.cloud.kms.v1.EkmConnection], in the format
+`projects/*/locations/*`.
+
+=item * C<< $msg->ekm_connection_id() >> / C<< $msg->ekm_connection_id($value) >>
+
+Type: C<String>
+
+Required. It must be unique within a location and match the regular
+expression `[a-zA-Z0-9_-]{1,63}`.
+
+=item * C<< $msg->ekm_connection() >> / C<< $msg->ekm_connection($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::EkmService::EkmConnection>)
+
+Required. An [EkmConnection][google.cloud.kms.v1.EkmConnection] with
+initial field values.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::UpdateEkmConnectionRequest
+
+Request message for
+[EkmService.UpdateEkmConnection][google.cloud.kms.v1.EkmService.UpdateEkmConnection].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->ekm_connection() >> / C<< $msg->ekm_connection($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::EkmService::EkmConnection>)
+
+Required. [EkmConnection][google.cloud.kms.v1.EkmConnection] with updated
+values.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. List of fields to be updated in this request.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::GetEkmConfigRequest
+
+Request message for
+[EkmService.GetEkmConfig][google.cloud.kms.v1.EkmService.GetEkmConfig].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.EkmConfig.name] of the
+[EkmConfig][google.cloud.kms.v1.EkmConfig] to get.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::UpdateEkmConfigRequest
+
+Request message for
+[EkmService.UpdateEkmConfig][google.cloud.kms.v1.EkmService.UpdateEkmConfig].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->ekm_config() >> / C<< $msg->ekm_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::EkmService::EkmConfig>)
+
+Required. [EkmConfig][google.cloud.kms.v1.EkmConfig] with updated values.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. List of fields to be updated in this request.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::Certificate
+
+A [Certificate][google.cloud.kms.v1.Certificate] represents an X.509
+certificate used to authenticate HTTPS connections to EKM replicas.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->raw_der() >> / C<< $msg->raw_der($value) >>
+
+Type: C<Bytes>
+
+Required. The raw certificate bytes in DER format.
+
+=item * C<< $msg->parsed() >> / C<< $msg->parsed($value) >>
+
+Type: C<Bool>
+
+Output only. True if the certificate was parsed successfully.
+
+=item * C<< $msg->issuer() >> / C<< $msg->issuer($value) >>
+
+Type: C<String>
+
+Output only. The issuer distinguished name in RFC 2253 format. Only present
+if [parsed][google.cloud.kms.v1.Certificate.parsed] is true.
+
+=item * C<< $msg->subject() >> / C<< $msg->subject($value) >>
+
+Type: C<String>
+
+Output only. The subject distinguished name in RFC 2253 format. Only
+present if [parsed][google.cloud.kms.v1.Certificate.parsed] is true.
+
+=item * C<< $msg->subject_alternative_dns_names() >> / C<< $msg->subject_alternative_dns_names($value) >>
+
+Type: C<String>
+
+Output only. The subject Alternative DNS names. Only present if
+[parsed][google.cloud.kms.v1.Certificate.parsed] is true.
+
+=item * C<< $msg->not_before_time() >> / C<< $msg->not_before_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The certificate is not valid before this time. Only present if
+[parsed][google.cloud.kms.v1.Certificate.parsed] is true.
+
+=item * C<< $msg->not_after_time() >> / C<< $msg->not_after_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The certificate is not valid after this time. Only present if
+[parsed][google.cloud.kms.v1.Certificate.parsed] is true.
+
+=item * C<< $msg->serial_number() >> / C<< $msg->serial_number($value) >>
+
+Type: C<String>
+
+Output only. The certificate serial number as a hex string. Only present if
+[parsed][google.cloud.kms.v1.Certificate.parsed] is true.
+
+=item * C<< $msg->sha256_fingerprint() >> / C<< $msg->sha256_fingerprint($value) >>
+
+Type: C<String>
+
+Output only. The SHA-256 certificate fingerprint as a hex string. Only
+present if [parsed][google.cloud.kms.v1.Certificate.parsed] is true.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::EkmConnection
+
+An [EkmConnection][google.cloud.kms.v1.EkmConnection] represents an
+individual EKM connection. It can be used for creating
+[CryptoKeys][google.cloud.kms.v1.CryptoKey] and
+[CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] with a
+[ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of
+[EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC], as well as
+performing cryptographic operations using keys created within the
+[EkmConnection][google.cloud.kms.v1.EkmConnection].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name for the
+[EkmConnection][google.cloud.kms.v1.EkmConnection] in the format
+`projects/*/locations/*/ekmConnections/*`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the
+[EkmConnection][google.cloud.kms.v1.EkmConnection] was created.
+
+=item * C<< $msg->service_resolvers() >> / C<< $msg->service_resolvers($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::EkmService::EkmConnection::ServiceResolver>)
+
+Optional. A list of
+[ServiceResolvers][google.cloud.kms.v1.EkmConnection.ServiceResolver] where
+the EKM can be reached. There should be one ServiceResolver per EKM
+replica. Currently, only a single
+[ServiceResolver][google.cloud.kms.v1.EkmConnection.ServiceResolver] is
+supported.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag of the currently stored
+[EkmConnection][google.cloud.kms.v1.EkmConnection].
+
+=item * C<< $msg->key_management_mode() >> / C<< $msg->key_management_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::EkmConnection::KeyManagementMode>)
+
+Optional. Describes who can perform control plane operations on the EKM. If
+unset, this defaults to
+[MANUAL][google.cloud.kms.v1.EkmConnection.KeyManagementMode.MANUAL].
+
+=item * C<< $msg->crypto_space_path() >> / C<< $msg->crypto_space_path($value) >>
+
+Type: C<String>
+
+Optional. Identifies the EKM Crypto Space that this
+[EkmConnection][google.cloud.kms.v1.EkmConnection] maps to. Note: This
+field is required if
+[KeyManagementMode][google.cloud.kms.v1.EkmConnection.KeyManagementMode] is
+[CLOUD_KMS][google.cloud.kms.v1.EkmConnection.KeyManagementMode.CLOUD_KMS].
+
+=back
+
+=head3 Enum: EkmConnection::KeyManagementMode
+
+=over 4
+
+=item * C<KEY_MANAGEMENT_MODE_UNSPECIFIED> => C<0>
+
+=item * C<MANUAL> => C<1>
+
+=item * C<CLOUD_KMS> => C<2>
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::EkmConfig
+
+An [EkmConfig][google.cloud.kms.v1.EkmConfig] is a singleton resource that
+represents configuration parameters that apply to all
+[CryptoKeys][google.cloud.kms.v1.CryptoKey] and
+[CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] with a
+[ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of
+[EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] in a given
+project and location.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name for the
+[EkmConfig][google.cloud.kms.v1.EkmConfig] in the format
+`projects/*/locations/*/ekmConfig`.
+
+=item * C<< $msg->default_ekm_connection() >> / C<< $msg->default_ekm_connection($value) >>
+
+Type: C<String>
+
+Optional. Resource name of the default
+[EkmConnection][google.cloud.kms.v1.EkmConnection]. Setting this field to
+the empty string removes the default.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::VerifyConnectivityRequest
+
+Request message for
+[EkmService.VerifyConnectivity][google.cloud.kms.v1.EkmService.VerifyConnectivity].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.EkmConnection.name] of the
+[EkmConnection][google.cloud.kms.v1.EkmConnection] to verify.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::EkmService::VerifyConnectivityResponse
+
+Response message for
+[EkmService.VerifyConnectivity][google.cloud.kms.v1.EkmService.VerifyConnectivity].
+
+Inherits from L<Protobuf::Message>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Kms::V1::EkmService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

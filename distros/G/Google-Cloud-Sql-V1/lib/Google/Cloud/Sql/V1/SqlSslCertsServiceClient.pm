@@ -10,27 +10,27 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Sql::V1::CloudSqlResources;
+use Google::Cloud::Sql::V1::CloudSqlTiers;
 use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
 use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
-use Google::Cloud::Sql::V1::CloudSqlRegions;
+use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
 use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
 use Google::Cloud::Sql::V1::CloudSqlEvents;
-use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
-use Google::Cloud::Sql::V1::CloudSqlTiers;
+use Google::Cloud::Sql::V1::CloudSqlRegions;
+use Google::Cloud::Sql::V1::CloudSqlResources;
 use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-use Google::Cloud::Sql::V1::CloudSqlOperations;
+use Google::Cloud::Sql::V1::CloudSqlInstances;
+use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
 use Google::Cloud::Sql::V1::CloudSqlConnect;
+use Google::Cloud::Sql::V1::CloudSqlDatabases;
 use Google::Cloud::Sql::V1::CloudSqlUsers;
 use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-use Google::Cloud::Sql::V1::CloudSqlInstances;
-use Google::Cloud::Sql::V1::CloudSqlDatabases;
+use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
+use Google::Cloud::Sql::V1::CloudSqlOperations;
 use Google::Cloud::Sql::V1::CloudSqlFlags;
 use Google::Cloud::Sql::V1::CloudSqlBackups;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -416,31 +416,188 @@ The following RPC methods are available in this client:
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        instance                 => $instance,
+        project                  => $project,
+        sha1_fingerprint         => $sha1_fingerprint,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.sql.v1.SqlSslCertsService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsDeleteRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<sha1_fingerprint> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        instance                 => $instance,
+        project                  => $project,
+        sha1_fingerprint         => $sha1_fingerprint,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.sql.v1.SqlSslCertsService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsGetRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::SslCert>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<sha1_fingerprint> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.sql.v1.SqlSslCertsService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsInsertRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertRequest>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        instance                 => $instance,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.sql.v1.SqlSslCertsService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsListRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsListResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<update_customer_managed_certificate>
 
-Calls the RPC method C<UpdateCustomerManagedCertificate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_customer_managed_certificate(
+        instance                 => $instance,
+        project                  => $project,
+        customer_managed_certificate_config => $customer_managed_certificate_config,
+        update_mask              => $update_mask,
+        allow_missing            => $allow_missing,
+        certificate_bundle       => $certificate_bundle,
+    );
+
+Calls the RPC method C<UpdateCustomerManagedCertificate> on C<google.cloud.sql.v1.SqlSslCertsService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::UpdateCustomerManagedCertificateRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<customer_managed_certificate_config> - L<Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=item * C<allow_missing> - C<bool>
+
+=item * C<certificate_bundle> - C<string>
+
+=back
 
 =item * B<delete_customer_managed_certificate>
 
-Calls the RPC method C<DeleteCustomerManagedCertificate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_customer_managed_certificate(
+        instance                 => $instance,
+        project                  => $project,
+        certificate_bundle       => $certificate_bundle,
+    );
+
+Calls the RPC method C<DeleteCustomerManagedCertificate> on C<google.cloud.sql.v1.SqlSslCertsService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::DeleteCustomerManagedCertificateRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<certificate_bundle> - C<string>
+
+=back
 
 =item * B<list_customer_managed_certificates>
 
-Calls the RPC method C<ListCustomerManagedCertificates> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_customer_managed_certificates(
+        instance                 => $instance,
+        project                  => $project,
+    );
+
+Calls the RPC method C<ListCustomerManagedCertificates> on C<google.cloud.sql.v1.SqlSslCertsService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =back
 

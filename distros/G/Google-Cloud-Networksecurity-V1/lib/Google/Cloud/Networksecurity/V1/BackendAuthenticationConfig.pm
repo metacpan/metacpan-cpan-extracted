@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -245,86 +245,10 @@ EOF
     # Field: well_known_roots Type: 14 (.google.cloud.networksecurity.v1.BackendAuthenticationConfig.WellKnownRoots)
     # Field: etag Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
-
-    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.BackendAuthenticationConfig.LabelsEntry)
-
-=item * B<client_certificate>
-
-Type: String
-
-=item * B<trust_config>
-
-Type: String
-
-=item * B<well_known_roots>
-
-Type: Enum (.google.cloud.networksecurity.v1.BackendAuthenticationConfig.WellKnownRoots)
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: BackendAuthenticationConfig::WellKnownRoots
 our $BackendAuthenticationConfig_WELL_KNOWN_ROOTS_UNSPECIFIED = 0;
 our $BackendAuthenticationConfig_NONE = 1;
 our $BackendAuthenticationConfig_PUBLIC_ROOTS = 2;
-
-=pod
-
-=head2 Enum: BackendAuthenticationConfig::WellKnownRoots
-
-Values:
-
-=over 4
-
-=item * C<WELL_KNOWN_ROOTS_UNSPECIFIED> => 0
-
-=item * C<NONE> => 1
-
-=item * C<PUBLIC_ROOTS> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsRequest ===
     # Fields for ListBackendAuthenticationConfigsRequest
@@ -332,109 +256,15 @@ Values:
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
-
-    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsResponse ===
     # Fields for ListBackendAuthenticationConfigsResponse
     # Field: backend_authentication_configs Type: 11 (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
-
-    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsResponse->new(
-        backend_authentication_configs => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<backend_authentication_configs>
-
-Type: Message (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::GetBackendAuthenticationConfigRequest ===
     # Fields for GetBackendAuthenticationConfigRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::GetBackendAuthenticationConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
-
-    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::GetBackendAuthenticationConfigRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::CreateBackendAuthenticationConfigRequest ===
     # Fields for CreateBackendAuthenticationConfigRequest
@@ -442,121 +272,342 @@ Type: String
     # Field: backend_authentication_config_id Type: 9 ()
     # Field: backend_authentication_config Type: 11 (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::CreateBackendAuthenticationConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
-
-    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::CreateBackendAuthenticationConfigRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<backend_authentication_config_id>
-
-Type: String
-
-=item * B<backend_authentication_config>
-
-Type: Message (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::UpdateBackendAuthenticationConfigRequest ===
     # Fields for UpdateBackendAuthenticationConfigRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: backend_authentication_config Type: 11 (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::UpdateBackendAuthenticationConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
-
-    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::UpdateBackendAuthenticationConfigRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<backend_authentication_config>
-
-Type: Message (.google.cloud.networksecurity.v1.BackendAuthenticationConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::DeleteBackendAuthenticationConfigRequest ===
     # Fields for DeleteBackendAuthenticationConfigRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::DeleteBackendAuthenticationConfigRequest - Compiled Protocol Buffers message class
+Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/backend_authentication_config.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
 
-    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::DeleteBackendAuthenticationConfigRequest->new(
-        name => $value,
-    );
+    my $msg = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig->new({
+        name => $name,
+        description => $description,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/backend_authentication_config.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig
+
+BackendAuthenticationConfig message groups the TrustConfig together with
+other settings that control how the load balancer authenticates, and
+expresses its identity to, the backend:
+
+* `trustConfig` is the attached TrustConfig.
+
+* `wellKnownRoots` indicates whether the load balance should trust backend
+server certificates that are issued by public certificate authorities, in
+addition to certificates trusted by the TrustConfig.
+
+* `clientCertificate` is a client certificate that the load balancer uses to
+express its identity to the backend, if the connection to the backend uses
+mTLS.
+
+You can attach the BackendAuthenticationConfig to the load balancer's
+BackendService directly determining how that BackendService negotiates TLS.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the BackendAuthenticationConfig resource. It matches the
+pattern
+`projects/*/locations/{location}/backendAuthenticationConfigs/{backend_authentication_config}`
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Free-text description of the resource.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig::LabelsEntry>)
+
+Set of label tags associated with the resource.
+
+=item * C<< $msg->client_certificate() >> / C<< $msg->client_certificate($value) >>
+
+Type: C<String>
+
+Optional. A reference to a certificatemanager.googleapis.com.Certificate
+resource. This is a relative resource path following the form
+"projects/{project}/locations/{location}/certificates/{certificate}".
+
+Used by a BackendService to negotiate mTLS when the backend connection uses
+TLS and the backend requests a client certificate. Must have a CLIENT_AUTH
+scope.
+
+=item * C<< $msg->trust_config() >> / C<< $msg->trust_config($value) >>
+
+Type: C<String>
+
+Optional. A reference to a TrustConfig resource from the
+certificatemanager.googleapis.com namespace. This is a relative resource
+path following the form
+"projects/{project}/locations/{location}/trustConfigs/{trust_config}".
+
+A BackendService uses the chain of trust represented by this TrustConfig,
+if specified, to validate the server certificates presented by the backend.
+Required unless wellKnownRoots is set to PUBLIC_ROOTS.
+
+=item * C<< $msg->well_known_roots() >> / C<< $msg->well_known_roots($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::WellKnownRoots>)
+
+Well known roots to use for server certificate validation.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. Etag of the resource.
+
+=back
+
+=head3 Enum: BackendAuthenticationConfig::WellKnownRoots
+
+=over 4
+
+=item * C<WELL_KNOWN_ROOTS_UNSPECIFIED> => C<0>
+
+=item * C<NONE> => C<1>
+
+=item * C<PUBLIC_ROOTS> => C<2>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsRequest
+
+Request used by the ListBackendAuthenticationConfigs method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the
+BackendAuthenticationConfigs should be listed, specified in the format
+`projects/*/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of BackendAuthenticationConfigs to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListBackendAuthenticationConfigsResponse`
+Indicates that this is a continuation of a prior
+`ListBackendAuthenticationConfigs` call, and that the system
+should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::ListBackendAuthenticationConfigsResponse
+
+Response returned by the ListBackendAuthenticationConfigs method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->backend_authentication_configs() >> / C<< $msg->backend_authentication_configs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig>)
+
+List of BackendAuthenticationConfig resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::GetBackendAuthenticationConfigRequest
+
+Request used by the GetBackendAuthenticationConfig method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the BackendAuthenticationConfig to get. Must be in the
+format `projects/*/locations/{location}/backendAuthenticationConfigs/*`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::CreateBackendAuthenticationConfigRequest
+
+Request used by the CreateBackendAuthenticationConfig method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the BackendAuthenticationConfig. Must be
+in the format `projects/*/locations/{location}`.
+
+=item * C<< $msg->backend_authentication_config_id() >> / C<< $msg->backend_authentication_config_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the BackendAuthenticationConfig resource to be
+created. This value should be 1-63 characters long, containing only
+letters, numbers, hyphens, and underscores, and should not start with a
+number. E.g. "backend-auth-config".
+
+=item * C<< $msg->backend_authentication_config() >> / C<< $msg->backend_authentication_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig>)
+
+Required. BackendAuthenticationConfig resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::UpdateBackendAuthenticationConfigRequest
+
+Request used by UpdateBackendAuthenticationConfig method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+BackendAuthenticationConfig resource by the update.  The fields
+specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the
+mask. If the user does not provide a mask then all fields will be
+overwritten.
+
+=item * C<< $msg->backend_authentication_config() >> / C<< $msg->backend_authentication_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::BackendAuthenticationConfig>)
+
+Required. Updated BackendAuthenticationConfig resource.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::DeleteBackendAuthenticationConfigRequest
+
+Request used by the DeleteBackendAuthenticationConfig method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the BackendAuthenticationConfig to delete. Must be in
+the format
+`projects/*/locations/{location}/backendAuthenticationConfigs/*`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag of the resource.
+If this is provided, it must match the server's etag.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

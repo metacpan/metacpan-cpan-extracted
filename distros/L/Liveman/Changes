@@ -1,5 +1,12 @@
 Revision history for Perl extension Liveman
 
+4.2 2026-11-24T10:26:46Z
+
+    - append - remove section INSTALL and feature without test
+    - fix :utf8 to :encoding(UTF-8)
+    - print cpanfile with package version
+    - added parameter -V, who added version to requires
+
 4.1 2026-02-06T08:53:12Z
 
     - fix new dist (-A pkg)

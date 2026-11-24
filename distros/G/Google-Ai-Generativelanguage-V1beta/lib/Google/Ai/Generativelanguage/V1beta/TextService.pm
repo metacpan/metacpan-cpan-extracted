@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::TextService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -291,133 +291,15 @@ EOF
     # Field: safety_settings Type: 11 (.google.ai.generativelanguage.v1beta.SafetySetting)
     # Field: stop_sequences Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextRequest->new(
-        model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<model>
-
-Type: String
-
-=item * B<prompt>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TextPrompt)
-
-=item * B<temperature>
-
-Type: Float
-
-=item * B<candidate_count>
-
-Type: Int32
-
-=item * B<max_output_tokens>
-
-Type: Int32
-
-=item * B<top_p>
-
-Type: Float
-
-=item * B<top_k>
-
-Type: Int32
-
-=item * B<safety_settings>
-
-Type: Message (.google.ai.generativelanguage.v1beta.SafetySetting)
-
-=item * B<stop_sequences>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextResponse ===
     # Fields for GenerateTextResponse
     # Field: candidates Type: 11 (.google.ai.generativelanguage.v1beta.TextCompletion)
     # Field: filters Type: 11 (.google.ai.generativelanguage.v1beta.ContentFilter)
     # Field: safety_feedback Type: 11 (.google.ai.generativelanguage.v1beta.SafetyFeedback)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextResponse->new(
-        candidates => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<candidates>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TextCompletion)
-
-=item * B<filters>
-
-Type: Message (.google.ai.generativelanguage.v1beta.ContentFilter)
-
-=item * B<safety_feedback>
-
-Type: Message (.google.ai.generativelanguage.v1beta.SafetyFeedback)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt ===
     # Fields for TextPrompt
     # Field: text Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt->new(
-        text => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<text>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::TextCompletion ===
     # Fields for TextCompletion
@@ -425,104 +307,14 @@ Type: String
     # Field: safety_ratings Type: 11 (.google.ai.generativelanguage.v1beta.SafetyRating)
     # Field: citation_metadata Type: 11 (.google.ai.generativelanguage.v1beta.CitationMetadata)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::TextCompletion - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::TextCompletion->new(
-        output => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<output>
-
-Type: String
-
-=item * B<safety_ratings>
-
-Type: Message (.google.ai.generativelanguage.v1beta.SafetyRating)
-
-=item * B<citation_metadata>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CitationMetadata)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextRequest ===
     # Fields for EmbedTextRequest
     # Field: model Type: 9 ()
     # Field: text Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextRequest->new(
-        model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<model>
-
-Type: String
-
-=item * B<text>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextResponse ===
     # Fields for EmbedTextResponse
     # Field: embedding Type: 11 (.google.ai.generativelanguage.v1beta.Embedding)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextResponse->new(
-        embedding => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<embedding>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Embedding)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextRequest ===
     # Fields for BatchEmbedTextRequest
@@ -530,187 +322,37 @@ Type: Message (.google.ai.generativelanguage.v1beta.Embedding)
     # Field: texts Type: 9 ()
     # Field: requests Type: 11 (.google.ai.generativelanguage.v1beta.EmbedTextRequest)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextRequest->new(
-        model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<model>
-
-Type: String
-
-=item * B<texts>
-
-Type: String
-
-=item * B<requests>
-
-Type: Message (.google.ai.generativelanguage.v1beta.EmbedTextRequest)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextResponse ===
     # Fields for BatchEmbedTextResponse
     # Field: embeddings Type: 11 (.google.ai.generativelanguage.v1beta.Embedding)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextResponse->new(
-        embeddings => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<embeddings>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Embedding)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::Embedding ===
     # Fields for Embedding
     # Field: value Type: 2 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::Embedding - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::Embedding->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: Float
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensRequest ===
     # Fields for CountTextTokensRequest
     # Field: model Type: 9 ()
     # Field: prompt Type: 11 (.google.ai.generativelanguage.v1beta.TextPrompt)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensRequest->new(
-        model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<model>
-
-Type: String
-
-=item * B<prompt>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TextPrompt)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensResponse ===
     # Fields for CountTextTokensResponse
     # Field: token_count Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TextService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensResponse->new(
-        token_count => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<token_count>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Service Client: Google::Ai::Generativelanguage::V1beta::TextService::TextServiceClient ===
 package Google::Ai::Generativelanguage::V1beta::TextService::TextServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Ai::Generativelanguage::V1beta::TextService::TextServiceClient
 
-Google::Ai::Generativelanguage::V1beta::TextService::TextServiceClient - Client stub representing the remote TextService service
+Client stub representing the remote C<TextService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<ai.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -791,13 +433,428 @@ sub count_text_tokens {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::TextService - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::TextService - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/text_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::TextService;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextRequest->new({
+        model => $model,
+        prompt => $prompt,
+        temperature => $temperature,
+        candidate_count => $candidate_count,
+    });
+
+    # Read or update a field
+    my $val = $msg->model();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/text_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextRequest
+
+Request to generate a text completion response from the model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Required. The name of the `Model` or `TunedModel` to use for generating the
+completion.
+Examples:
+ models/text-bison-001
+ tunedModels/sentence-translator-u3b7m
+
+=item * C<< $msg->prompt() >> / C<< $msg->prompt($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt>)
+
+Required. The free-form input text given to the model as a prompt.
+
+Given a prompt, the model will generate a TextCompletion response it
+predicts as the completion of the input text.
+
+=item * C<< $msg->temperature() >> / C<< $msg->temperature($value) >>
+
+Type: C<Float>
+
+Optional. Controls the randomness of the output.
+Note: The default value varies by model, see the `Model.temperature`
+attribute of the `Model` returned the `getModel` function.
+
+Values can range from [0.0,1.0],
+inclusive. A value closer to 1.0 will produce responses that are more
+varied and creative, while a value closer to 0.0 will typically result in
+more straightforward responses from the model.
+
+=item * C<< $msg->candidate_count() >> / C<< $msg->candidate_count($value) >>
+
+Type: C<Int32>
+
+Optional. Number of generated responses to return.
+
+This value must be between [1, 8], inclusive. If unset, this will default
+to 1.
+
+=item * C<< $msg->max_output_tokens() >> / C<< $msg->max_output_tokens($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of tokens to include in a candidate.
+
+If unset, this will default to output_token_limit specified in the `Model`
+specification.
+
+=item * C<< $msg->top_p() >> / C<< $msg->top_p($value) >>
+
+Type: C<Float>
+
+Optional. The maximum cumulative probability of tokens to consider when
+sampling.
+
+The model uses combined Top-k and nucleus sampling.
+
+Tokens are sorted based on their assigned probabilities so that only the
+most likely tokens are considered. Top-k sampling directly limits the
+maximum number of tokens to consider, while Nucleus sampling limits number
+of tokens based on the cumulative probability.
+
+Note: The default value varies by model, see the `Model.top_p`
+attribute of the `Model` returned the `getModel` function.
+
+=item * C<< $msg->top_k() >> / C<< $msg->top_k($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of tokens to consider when sampling.
+
+The model uses combined Top-k and nucleus sampling.
+
+Top-k sampling considers the set of `top_k` most probable tokens.
+Defaults to 40.
+
+Note: The default value varies by model, see the `Model.top_k`
+attribute of the `Model` returned the `getModel` function.
+
+=item * C<< $msg->safety_settings() >> / C<< $msg->safety_settings($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Safety::SafetySetting>)
+
+Optional. A list of unique `SafetySetting` instances for blocking unsafe
+content.
+
+that will be enforced on the `GenerateTextRequest.prompt` and
+`GenerateTextResponse.candidates`. There should not be more than one
+setting for each `SafetyCategory` type. The API will block any prompts and
+responses that fail to meet the thresholds set by these settings. This list
+overrides the default settings for each `SafetyCategory` specified in the
+safety_settings. If there is no `SafetySetting` for a given
+`SafetyCategory` provided in the list, the API will use the default safety
+setting for that category. Harm categories HARM_CATEGORY_DEROGATORY,
+HARM_CATEGORY_TOXICITY, HARM_CATEGORY_VIOLENCE, HARM_CATEGORY_SEXUAL,
+HARM_CATEGORY_MEDICAL, HARM_CATEGORY_DANGEROUS are supported in text
+service.
+
+=item * C<< $msg->stop_sequences() >> / C<< $msg->stop_sequences($value) >>
+
+Type: C<String>
+
+The set of character sequences (up to 5) that will stop output generation.
+If specified, the API will stop at the first appearance of a stop
+sequence. The stop sequence will not be included as part of the response.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextResponse
+
+The response from the model, including candidate completions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->candidates() >> / C<< $msg->candidates($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TextService::TextCompletion>)
+
+Candidate responses from the model.
+
+=item * C<< $msg->filters() >> / C<< $msg->filters($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Safety::ContentFilter>)
+
+A set of content filtering metadata for the prompt and response
+text.
+
+This indicates which `SafetyCategory`(s) blocked a
+candidate from this response, the lowest `HarmProbability`
+that triggered a block, and the HarmThreshold setting for that category.
+This indicates the smallest change to the `SafetySettings` that would be
+necessary to unblock at least 1 response.
+
+The blocking is configured by the `SafetySettings` in the request (or the
+default `SafetySettings` of the API).
+
+=item * C<< $msg->safety_feedback() >> / C<< $msg->safety_feedback($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Safety::SafetyFeedback>)
+
+Returns any safety feedback related to content filtering.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt
+
+Text given to the model as a prompt.
+
+The Model will use this TextPrompt to Generate a text completion.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->text() >> / C<< $msg->text($value) >>
+
+Type: C<String>
+
+Required. The prompt text.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::TextCompletion
+
+Output text returned from a model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->output() >> / C<< $msg->output($value) >>
+
+Type: C<String>
+
+Output only. The generated text returned from the model.
+
+=item * C<< $msg->safety_ratings() >> / C<< $msg->safety_ratings($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Safety::SafetyRating>)
+
+Ratings for the safety of a response.
+
+There is at most one rating per category.
+
+=item * C<< $msg->citation_metadata() >> / C<< $msg->citation_metadata($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Citation::CitationMetadata>)
+
+Output only. Citation information for model-generated `output` in this
+`TextCompletion`.
+
+This field may be populated with attribution information for any text
+included in the `output`.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextRequest
+
+Request to get a text embedding from the model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Required. The model name to use with the format model=models/{model}.
+
+=item * C<< $msg->text() >> / C<< $msg->text($value) >>
+
+Type: C<String>
+
+Optional. The free-form input text that the model will turn into an
+embedding.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextResponse
+
+The response to a EmbedTextRequest.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->embedding() >> / C<< $msg->embedding($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TextService::Embedding>)
+
+Output only. The embedding generated from the input text.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextRequest
+
+Batch request to get a text embedding from the model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Required. The name of the `Model` to use for generating the embedding.
+Examples:
+ models/embedding-gecko-001
+
+=item * C<< $msg->texts() >> / C<< $msg->texts($value) >>
+
+Type: C<String>
+
+Optional. The free-form input texts that the model will turn into an
+embedding. The current limit is 100 texts, over which an error will be
+thrown.
+
+=item * C<< $msg->requests() >> / C<< $msg->requests($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextRequest>)
+
+Optional. Embed requests for the batch. Only one of `texts` or `requests`
+can be set.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextResponse
+
+The response to a EmbedTextRequest.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->embeddings() >> / C<< $msg->embeddings($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TextService::Embedding>)
+
+Output only. The embeddings generated from the input text.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::Embedding
+
+A list of floats representing the embedding.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Float>
+
+The embedding values.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensRequest
+
+Counts the number of tokens in the `prompt` sent to a model.
+
+Models may tokenize text differently, so each model may return a different
+`token_count`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Required. The model's resource name. This serves as an ID for the Model to
+use.
+
+This name should match a model name returned by the `ListModels` method.
+
+Format: `models/{model}`
+
+=item * C<< $msg->prompt() >> / C<< $msg->prompt($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt>)
+
+Required. The free-form input text given to the model as a prompt.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensResponse
+
+A response from `CountTextTokens`.
+
+It returns the model's `token_count` for the `prompt`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->token_count() >> / C<< $msg->token_count($value) >>
+
+Type: C<Int32>
+
+The number of tokens that the `model` tokenizes the `prompt` into.
+
+Always non-negative.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::TextService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

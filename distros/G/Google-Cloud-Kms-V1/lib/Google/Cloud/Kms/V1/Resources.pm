@@ -3,7 +3,7 @@ package Google::Cloud::Kms::V1::Resources;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1276,36 +1276,6 @@ EOF
     # Field: name Type: 9 ()
     # Field: create_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::KeyRing - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::KeyRing->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Resources::CryptoKey ===
     # Fields for CryptoKey
     # Field: name Type: 9 ()
@@ -1321,76 +1291,6 @@ Type: Message (.google.protobuf.Timestamp)
     # Field: crypto_key_backend Type: 9 ()
     # Field: key_access_justifications_policy Type: 11 (.google.cloud.kms.v1.KeyAccessJustificationsPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::CryptoKey - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::CryptoKey->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<primary>
-
-Type: Message (.google.cloud.kms.v1.CryptoKeyVersion)
-
-=item * B<purpose>
-
-Type: Enum (.google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<next_rotation_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<rotation_period>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<version_template>
-
-Type: Message (.google.cloud.kms.v1.CryptoKeyVersionTemplate)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.kms.v1.CryptoKey.LabelsEntry)
-
-=item * B<import_only>
-
-Type: Bool
-
-=item * B<destroy_scheduled_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<crypto_key_backend>
-
-Type: String
-
-=item * B<key_access_justifications_policy>
-
-Type: Message (.google.cloud.kms.v1.KeyAccessJustificationsPolicy)
-
-=back
-
-=cut
-
 # Enum: CryptoKey::CryptoKeyPurpose
 our $CryptoKey_CRYPTO_KEY_PURPOSE_UNSPECIFIED = 0;
 our $CryptoKey_ENCRYPT_DECRYPT = 1;
@@ -1401,68 +1301,10 @@ our $CryptoKey_MAC = 9;
 our $CryptoKey_KEY_ENCAPSULATION = 10;
 our $CryptoKey_AES_WRAPPING = 11;
 
-=pod
-
-=head2 Enum: CryptoKey::CryptoKeyPurpose
-
-Values:
-
-=over 4
-
-=item * C<CRYPTO_KEY_PURPOSE_UNSPECIFIED> => 0
-
-=item * C<ENCRYPT_DECRYPT> => 1
-
-=item * C<ASYMMETRIC_SIGN> => 5
-
-=item * C<ASYMMETRIC_DECRYPT> => 6
-
-=item * C<RAW_ENCRYPT_DECRYPT> => 7
-
-=item * C<MAC> => 9
-
-=item * C<KEY_ENCAPSULATION> => 10
-
-=item * C<AES_WRAPPING> => 11
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Resources::CryptoKeyVersionTemplate ===
     # Fields for CryptoKeyVersionTemplate
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
     # Field: algorithm Type: 14 (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::CryptoKeyVersionTemplate - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::CryptoKeyVersionTemplate->new(
-        protection_level => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=item * B<algorithm>
-
-Type: Enum (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Resources::KeyOperationAttestation ===
     # Fields for KeyOperationAttestation
@@ -1470,65 +1312,11 @@ Type: Enum (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm)
     # Field: content Type: 12 ()
     # Field: cert_chains Type: 11 (.google.cloud.kms.v1.KeyOperationAttestation.CertificateChains)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::KeyOperationAttestation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::KeyOperationAttestation->new(
-        format => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<format>
-
-Type: Enum (.google.cloud.kms.v1.KeyOperationAttestation.AttestationFormat)
-
-=item * B<content>
-
-Type: Bytes
-
-=item * B<cert_chains>
-
-Type: Message (.google.cloud.kms.v1.KeyOperationAttestation.CertificateChains)
-
-=back
-
-=cut
-
 # Enum: KeyOperationAttestation::AttestationFormat
 our $KeyOperationAttestation_ATTESTATION_FORMAT_UNSPECIFIED = 0;
 our $KeyOperationAttestation_CAVIUM_V1_COMPRESSED = 3;
 our $KeyOperationAttestation_CAVIUM_V2_COMPRESSED = 4;
 our $KeyOperationAttestation_CAVIUM_V209 = 5;
-
-=pod
-
-=head2 Enum: KeyOperationAttestation::AttestationFormat
-
-Values:
-
-=over 4
-
-=item * C<ATTESTATION_FORMAT_UNSPECIFIED> => 0
-
-=item * C<CAVIUM_V1_COMPRESSED> => 3
-
-=item * C<CAVIUM_V2_COMPRESSED> => 4
-
-=item * C<CAVIUM_V209> => 5
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Resources::CryptoKeyVersion ===
     # Fields for CryptoKeyVersion
@@ -1550,100 +1338,6 @@ Values:
     # Field: reimport_eligible Type: 8 ()
     # Field: trusted_wrapping_enabled Type: 8 ()
     # Field: hsm_trusted Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::CryptoKeyVersion - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::CryptoKeyVersion->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState)
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=item * B<algorithm>
-
-Type: Enum (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm)
-
-=item * B<attestation>
-
-Type: Message (.google.cloud.kms.v1.KeyOperationAttestation)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<generate_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<destroy_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<destroy_event_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<import_job>
-
-Type: String
-
-=item * B<import_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<import_failure_reason>
-
-Type: String
-
-=item * B<generation_failure_reason>
-
-Type: String
-
-=item * B<external_destruction_failure_reason>
-
-Type: String
-
-=item * B<external_protection_level_options>
-
-Type: Message (.google.cloud.kms.v1.ExternalProtectionLevelOptions)
-
-=item * B<reimport_eligible>
-
-Type: Bool
-
-=item * B<trusted_wrapping_enabled>
-
-Type: Bool
-
-=item * B<hsm_trusted>
-
-Type: Bool
-
-=back
-
-=cut
 
 # Enum: CryptoKeyVersion::CryptoKeyVersionAlgorithm
 our $CryptoKeyVersion_CRYPTO_KEY_VERSION_ALGORITHM_UNSPECIFIED = 0;
@@ -1695,114 +1389,6 @@ our $CryptoKeyVersion_PQ_SIGN_ML_DSA_65_EXTERNAL_MU = 67;
 our $CryptoKeyVersion_PQ_SIGN_ML_DSA_87_EXTERNAL_MU = 71;
 our $CryptoKeyVersion_AES_256_KWP = 73;
 
-=pod
-
-=head2 Enum: CryptoKeyVersion::CryptoKeyVersionAlgorithm
-
-Values:
-
-=over 4
-
-=item * C<CRYPTO_KEY_VERSION_ALGORITHM_UNSPECIFIED> => 0
-
-=item * C<GOOGLE_SYMMETRIC_ENCRYPTION> => 1
-
-=item * C<AES_128_GCM> => 41
-
-=item * C<AES_256_GCM> => 19
-
-=item * C<AES_128_CBC> => 42
-
-=item * C<AES_256_CBC> => 43
-
-=item * C<AES_128_CTR> => 44
-
-=item * C<AES_256_CTR> => 45
-
-=item * C<RSA_SIGN_PSS_2048_SHA256> => 2
-
-=item * C<RSA_SIGN_PSS_3072_SHA256> => 3
-
-=item * C<RSA_SIGN_PSS_4096_SHA256> => 4
-
-=item * C<RSA_SIGN_PSS_4096_SHA512> => 15
-
-=item * C<RSA_SIGN_PKCS1_2048_SHA256> => 5
-
-=item * C<RSA_SIGN_PKCS1_3072_SHA256> => 6
-
-=item * C<RSA_SIGN_PKCS1_4096_SHA256> => 7
-
-=item * C<RSA_SIGN_PKCS1_4096_SHA512> => 16
-
-=item * C<RSA_SIGN_RAW_PKCS1_2048> => 28
-
-=item * C<RSA_SIGN_RAW_PKCS1_3072> => 29
-
-=item * C<RSA_SIGN_RAW_PKCS1_4096> => 30
-
-=item * C<RSA_DECRYPT_OAEP_2048_SHA256> => 8
-
-=item * C<RSA_DECRYPT_OAEP_3072_SHA256> => 9
-
-=item * C<RSA_DECRYPT_OAEP_4096_SHA256> => 10
-
-=item * C<RSA_DECRYPT_OAEP_4096_SHA512> => 17
-
-=item * C<RSA_DECRYPT_OAEP_2048_SHA1> => 37
-
-=item * C<RSA_DECRYPT_OAEP_3072_SHA1> => 38
-
-=item * C<RSA_DECRYPT_OAEP_4096_SHA1> => 39
-
-=item * C<EC_SIGN_P256_SHA256> => 12
-
-=item * C<EC_SIGN_P384_SHA384> => 13
-
-=item * C<EC_SIGN_SECP256K1_SHA256> => 31
-
-=item * C<EC_SIGN_ED25519> => 40
-
-=item * C<HMAC_SHA256> => 32
-
-=item * C<HMAC_SHA1> => 33
-
-=item * C<HMAC_SHA384> => 34
-
-=item * C<HMAC_SHA512> => 35
-
-=item * C<HMAC_SHA224> => 36
-
-=item * C<EXTERNAL_SYMMETRIC_ENCRYPTION> => 18
-
-=item * C<ML_KEM_768> => 47
-
-=item * C<ML_KEM_1024> => 48
-
-=item * C<KEM_XWING> => 63
-
-=item * C<PQ_SIGN_ML_DSA_44> => 68
-
-=item * C<PQ_SIGN_ML_DSA_65> => 56
-
-=item * C<PQ_SIGN_ML_DSA_87> => 69
-
-=item * C<PQ_SIGN_SLH_DSA_SHA2_128S> => 57
-
-=item * C<PQ_SIGN_HASH_SLH_DSA_SHA2_128S_SHA256> => 60
-
-=item * C<PQ_SIGN_ML_DSA_44_EXTERNAL_MU> => 70
-
-=item * C<PQ_SIGN_ML_DSA_65_EXTERNAL_MU> => 67
-
-=item * C<PQ_SIGN_ML_DSA_87_EXTERNAL_MU> => 71
-
-=item * C<AES_256_KWP> => 73
-
-=back
-
-=cut
-
 # Enum: CryptoKeyVersion::CryptoKeyVersionState
 our $CryptoKeyVersion_CRYPTO_KEY_VERSION_STATE_UNSPECIFIED = 0;
 our $CryptoKeyVersion_PENDING_GENERATION = 5;
@@ -1816,94 +1402,14 @@ our $CryptoKeyVersion_GENERATION_FAILED = 8;
 our $CryptoKeyVersion_PENDING_EXTERNAL_DESTRUCTION = 9;
 our $CryptoKeyVersion_EXTERNAL_DESTRUCTION_FAILED = 10;
 
-=pod
-
-=head2 Enum: CryptoKeyVersion::CryptoKeyVersionState
-
-Values:
-
-=over 4
-
-=item * C<CRYPTO_KEY_VERSION_STATE_UNSPECIFIED> => 0
-
-=item * C<PENDING_GENERATION> => 5
-
-=item * C<ENABLED> => 1
-
-=item * C<DISABLED> => 2
-
-=item * C<DESTROYED> => 3
-
-=item * C<DESTROY_SCHEDULED> => 4
-
-=item * C<PENDING_IMPORT> => 6
-
-=item * C<IMPORT_FAILED> => 7
-
-=item * C<GENERATION_FAILED> => 8
-
-=item * C<PENDING_EXTERNAL_DESTRUCTION> => 9
-
-=item * C<EXTERNAL_DESTRUCTION_FAILED> => 10
-
-=back
-
-=cut
-
 # Enum: CryptoKeyVersion::CryptoKeyVersionView
 our $CryptoKeyVersion_CRYPTO_KEY_VERSION_VIEW_UNSPECIFIED = 0;
 our $CryptoKeyVersion_FULL = 1;
-
-=pod
-
-=head2 Enum: CryptoKeyVersion::CryptoKeyVersionView
-
-Values:
-
-=over 4
-
-=item * C<CRYPTO_KEY_VERSION_VIEW_UNSPECIFIED> => 0
-
-=item * C<FULL> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Resources::ChecksummedData ===
     # Fields for ChecksummedData
     # Field: data Type: 12 ()
     # Field: crc32c_checksum Type: 11 (.google.protobuf.Int64Value)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::ChecksummedData - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::ChecksummedData->new(
-        data => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data>
-
-Type: Bytes
-
-=item * B<crc32c_checksum>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Resources::PublicKey ===
     # Fields for PublicKey
@@ -1915,84 +1421,12 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: public_key_format Type: 14 (.google.cloud.kms.v1.PublicKey.PublicKeyFormat)
     # Field: public_key Type: 11 (.google.cloud.kms.v1.ChecksummedData)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::PublicKey - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::PublicKey->new(
-        pem => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<pem>
-
-Type: String
-
-=item * B<algorithm>
-
-Type: Enum (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm)
-
-=item * B<pem_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<name>
-
-Type: String
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=item * B<public_key_format>
-
-Type: Enum (.google.cloud.kms.v1.PublicKey.PublicKeyFormat)
-
-=item * B<public_key>
-
-Type: Message (.google.cloud.kms.v1.ChecksummedData)
-
-=back
-
-=cut
-
 # Enum: PublicKey::PublicKeyFormat
 our $PublicKey_PUBLIC_KEY_FORMAT_UNSPECIFIED = 0;
 our $PublicKey_PEM = 1;
 our $PublicKey_DER = 2;
 our $PublicKey_NIST_PQC = 3;
 our $PublicKey_XWING_RAW_BYTES = 4;
-
-=pod
-
-=head2 Enum: PublicKey::PublicKeyFormat
-
-Values:
-
-=over 4
-
-=item * C<PUBLIC_KEY_FORMAT_UNSPECIFIED> => 0
-
-=item * C<PEM> => 1
-
-=item * C<DER> => 2
-
-=item * C<NIST_PQC> => 3
-
-=item * C<XWING_RAW_BYTES> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Resources::ImportJob ===
     # Fields for ImportJob
@@ -2009,76 +1443,6 @@ Values:
     # Field: attestation Type: 11 (.google.cloud.kms.v1.KeyOperationAttestation)
     # Field: crypto_key_backend Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::ImportJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::ImportJob->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<import_method>
-
-Type: Enum (.google.cloud.kms.v1.ImportJob.ImportMethod)
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<generate_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<expire_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<expire_event_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.kms.v1.ImportJob.ImportJobState)
-
-=item * B<public_key>
-
-Type: Message (.google.cloud.kms.v1.ImportJob.WrappingPublicKey)
-
-=item * B<public_key_format>
-
-Type: Enum (.google.cloud.kms.v1.PublicKey.PublicKeyFormat)
-
-=item * B<attestation>
-
-Type: Message (.google.cloud.kms.v1.KeyOperationAttestation)
-
-=item * B<crypto_key_backend>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: ImportJob::ImportMethod
 our $ImportJob_IMPORT_METHOD_UNSPECIFIED = 0;
 our $ImportJob_RSA_OAEP_3072_SHA1_AES_256 = 1;
@@ -2091,63 +1455,11 @@ our $ImportJob_HPKE_KEM_ML_KEM_768_HKDF_SHA256_AES_256_GCM = 8;
 our $ImportJob_HPKE_KEM_ML_KEM_1024_HKDF_SHA256_AES_256_GCM = 9;
 our $ImportJob_HPKE_KEM_XWING_HKDF_SHA256_AES_256_GCM = 10;
 
-=pod
-
-=head2 Enum: ImportJob::ImportMethod
-
-Values:
-
-=over 4
-
-=item * C<IMPORT_METHOD_UNSPECIFIED> => 0
-
-=item * C<RSA_OAEP_3072_SHA1_AES_256> => 1
-
-=item * C<RSA_OAEP_4096_SHA1_AES_256> => 2
-
-=item * C<RSA_OAEP_3072_SHA256_AES_256> => 3
-
-=item * C<RSA_OAEP_4096_SHA256_AES_256> => 4
-
-=item * C<RSA_OAEP_3072_SHA256> => 5
-
-=item * C<RSA_OAEP_4096_SHA256> => 6
-
-=item * C<HPKE_KEM_ML_KEM_768_HKDF_SHA256_AES_256_GCM> => 8
-
-=item * C<HPKE_KEM_ML_KEM_1024_HKDF_SHA256_AES_256_GCM> => 9
-
-=item * C<HPKE_KEM_XWING_HKDF_SHA256_AES_256_GCM> => 10
-
-=back
-
-=cut
-
 # Enum: ImportJob::ImportJobState
 our $ImportJob_IMPORT_JOB_STATE_UNSPECIFIED = 0;
 our $ImportJob_PENDING_GENERATION = 1;
 our $ImportJob_ACTIVE = 2;
 our $ImportJob_EXPIRED = 3;
-
-=pod
-
-=head2 Enum: ImportJob::ImportJobState
-
-Values:
-
-=over 4
-
-=item * C<IMPORT_JOB_STATE_UNSPECIFIED> => 0
-
-=item * C<PENDING_GENERATION> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<EXPIRED> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Resources::ExternalProtectionLevelOptions ===
     # Fields for ExternalProtectionLevelOptions
@@ -2155,69 +1467,9 @@ Values:
     # Field: ekm_connection_key_path Type: 9 ()
     # Field: ekm_connection_backend_override Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::ExternalProtectionLevelOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::ExternalProtectionLevelOptions->new(
-        external_key_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<external_key_uri>
-
-Type: String
-
-=item * B<ekm_connection_key_path>
-
-Type: String
-
-=item * B<ekm_connection_backend_override>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Resources::KeyAccessJustificationsPolicy ===
     # Fields for KeyAccessJustificationsPolicy
     # Field: allowed_access_reasons Type: 14 (.google.cloud.kms.v1.AccessReason)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources::KeyAccessJustificationsPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Resources;
-
-    my $msg = Google::Cloud::Kms::V1::Resources::KeyAccessJustificationsPolicy->new(
-        allowed_access_reasons => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<allowed_access_reasons>
-
-Type: Enum (.google.cloud.kms.v1.AccessReason)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Resources::RetiredResource ===
     # Fields for RetiredResource
@@ -2226,55 +1478,1118 @@ Type: Enum (.google.cloud.kms.v1.AccessReason)
     # Field: resource_type Type: 9 ()
     # Field: delete_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Kms::V1::Resources::RetiredResource - Compiled Protocol Buffers message class
+Google::Cloud::Kms::V1::Resources - Compiled Protocol Buffers messages for google/cloud/kms/v1/resources.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Kms::V1::Resources;
 
-    my $msg = Google::Cloud::Kms::V1::Resources::RetiredResource->new(
-        name => $value,
-    );
+    my $msg = Google::Cloud::Kms::V1::Resources::KeyRing->new({
+        name => $name,
+        create_time => $create_time,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Kms::V1::Resources::KeyRing->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<original_resource>
-
-Type: String
-
-=item * B<resource_type>
-
-Type: String
-
-=item * B<delete_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Resources - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/kms/v1/resources.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Kms::V1::Resources::KeyRing
+
+A [KeyRing][google.cloud.kms.v1.KeyRing] is a toplevel logical grouping of
+[CryptoKeys][google.cloud.kms.v1.CryptoKey].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name for the
+[KeyRing][google.cloud.kms.v1.KeyRing] in the format
+`projects/*/locations/*/keyRings/*`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which this [KeyRing][google.cloud.kms.v1.KeyRing]
+was created.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::CryptoKey
+
+A [CryptoKey][google.cloud.kms.v1.CryptoKey] represents a logical key that
+can be used for cryptographic operations.
+
+A [CryptoKey][google.cloud.kms.v1.CryptoKey] is made up of zero or more
+[versions][google.cloud.kms.v1.CryptoKeyVersion], which represent the actual
+key material used in cryptographic operations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name for this
+[CryptoKey][google.cloud.kms.v1.CryptoKey] in the format
+`projects/*/locations/*/keyRings/*/cryptoKeys/*`.
+
+=item * C<< $msg->primary() >> / C<< $msg->primary($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::CryptoKeyVersion>)
+
+Output only. A copy of the "primary"
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] that will be used
+by [Encrypt][google.cloud.kms.v1.KeyManagementService.Encrypt] when this
+[CryptoKey][google.cloud.kms.v1.CryptoKey] is given in
+[EncryptRequest.name][google.cloud.kms.v1.EncryptRequest.name].
+
+The [CryptoKey][google.cloud.kms.v1.CryptoKey]'s primary version can be
+updated via
+[UpdateCryptoKeyPrimaryVersion][google.cloud.kms.v1.KeyManagementService.UpdateCryptoKeyPrimaryVersion].
+
+Keys with [purpose][google.cloud.kms.v1.CryptoKey.purpose]
+[ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT]
+may have a primary. For other keys, this field will be omitted.
+
+=item * C<< $msg->purpose() >> / C<< $msg->purpose($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::CryptoKey::CryptoKeyPurpose>)
+
+Immutable. The immutable purpose of this
+[CryptoKey][google.cloud.kms.v1.CryptoKey].
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which this
+[CryptoKey][google.cloud.kms.v1.CryptoKey] was created.
+
+=item * C<< $msg->next_rotation_time() >> / C<< $msg->next_rotation_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+At [next_rotation_time][google.cloud.kms.v1.CryptoKey.next_rotation_time],
+the Key Management Service will automatically:
+
+1. Create a new version of this [CryptoKey][google.cloud.kms.v1.CryptoKey].
+2. Mark the new version as primary.
+
+Key rotations performed manually via
+[CreateCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.CreateCryptoKeyVersion]
+and
+[UpdateCryptoKeyPrimaryVersion][google.cloud.kms.v1.KeyManagementService.UpdateCryptoKeyPrimaryVersion]
+do not affect
+[next_rotation_time][google.cloud.kms.v1.CryptoKey.next_rotation_time].
+
+Keys with [purpose][google.cloud.kms.v1.CryptoKey.purpose]
+[ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT]
+support automatic rotation. For other keys, this field must be omitted.
+
+=item * C<< $msg->rotation_period() >> / C<< $msg->rotation_period($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+[next_rotation_time][google.cloud.kms.v1.CryptoKey.next_rotation_time]
+will be advanced by this period when the service automatically rotates a
+key. Must be at least 24 hours and at most 876,000 hours.
+
+If [rotation_period][google.cloud.kms.v1.CryptoKey.rotation_period] is
+set,
+[next_rotation_time][google.cloud.kms.v1.CryptoKey.next_rotation_time]
+must also be set.
+
+Keys with [purpose][google.cloud.kms.v1.CryptoKey.purpose]
+[ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT]
+support automatic rotation. For other keys, this field must be omitted.
+
+=item * C<< $msg->version_template() >> / C<< $msg->version_template($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::CryptoKeyVersionTemplate>)
+
+A template describing settings for new
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] instances. The
+properties of new [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]
+instances created by either
+[CreateCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.CreateCryptoKeyVersion]
+or auto-rotation are controlled by this template.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::CryptoKey::LabelsEntry>)
+
+Labels with user-defined metadata. For more information, see
+[Labeling Keys](https://cloud.google.com/kms/docs/labeling-keys).
+
+=item * C<< $msg->import_only() >> / C<< $msg->import_only($value) >>
+
+Type: C<Bool>
+
+Immutable. Whether this key may contain imported versions only.
+
+=item * C<< $msg->destroy_scheduled_duration() >> / C<< $msg->destroy_scheduled_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Immutable. The period of time that versions of this key spend in the
+[DESTROY_SCHEDULED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROY_SCHEDULED]
+state before transitioning to
+[DESTROYED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROYED].
+If not specified at creation time, the default duration is 30 days.
+
+=item * C<< $msg->crypto_key_backend() >> / C<< $msg->crypto_key_backend($value) >>
+
+Type: C<String>
+
+Immutable. The resource name of the backend environment where the key
+material for all [CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion]
+associated with this [CryptoKey][google.cloud.kms.v1.CryptoKey] reside and
+where all related cryptographic operations are performed. Only applicable
+if [CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] have a
+[ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of
+[EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC], with the
+resource name in the format `projects/*/locations/*/ekmConnections/*`. Only
+applicable if [CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion]
+have a [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of
+[HSM_SINGLE_TENANT][google.cloud.kms.v1.ProtectionLevel.HSM_SINGLE_TENANT],
+with the resource name in the format
+`projects/*/locations/*/singleTenantHsmInstances/*`.
+Note, this list is non-exhaustive and may apply to additional
+[ProtectionLevels][google.cloud.kms.v1.ProtectionLevel] in the future.
+
+=item * C<< $msg->key_access_justifications_policy() >> / C<< $msg->key_access_justifications_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::KeyAccessJustificationsPolicy>)
+
+Optional. The policy used for Key Access Justifications Policy Enforcement.
+If this field is present and this key is enrolled in Key Access
+Justifications Policy Enforcement, the policy will be evaluated in encrypt,
+decrypt, and sign operations, and the operation will fail if rejected by
+the policy. The policy is defined by specifying zero or more allowed
+justification codes.
+https://cloud.google.com/assured-workloads/key-access-justifications/docs/justification-codes
+By default, this field is absent, and all justification codes are allowed.
+If the
+`key_access_justifications_policy.allowed_access_reasons`
+is empty (zero allowed justification code), all encrypt, decrypt, and sign
+operations will fail.
+
+=back
+
+=head3 Enum: CryptoKey::CryptoKeyPurpose
+
+=over 4
+
+=item * C<CRYPTO_KEY_PURPOSE_UNSPECIFIED> => C<0>
+
+=item * C<ENCRYPT_DECRYPT> => C<1>
+
+=item * C<ASYMMETRIC_SIGN> => C<5>
+
+=item * C<ASYMMETRIC_DECRYPT> => C<6>
+
+=item * C<RAW_ENCRYPT_DECRYPT> => C<7>
+
+=item * C<MAC> => C<9>
+
+=item * C<KEY_ENCAPSULATION> => C<10>
+
+=item * C<AES_WRAPPING> => C<11>
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::CryptoKeyVersionTemplate
+
+A [CryptoKeyVersionTemplate][google.cloud.kms.v1.CryptoKeyVersionTemplate]
+specifies the properties to use when creating a new
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion], either manually
+with
+[CreateCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.CreateCryptoKeyVersion]
+or automatically as a result of auto-rotation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+[ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] to use when creating
+a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] based on this
+template. Immutable. Defaults to
+[SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE].
+
+=item * C<< $msg->algorithm() >> / C<< $msg->algorithm($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::CryptoKeyVersion::CryptoKeyVersionAlgorithm>)
+
+Required.
+[Algorithm][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm]
+to use when creating a
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] based on this
+template.
+
+For backwards compatibility, GOOGLE_SYMMETRIC_ENCRYPTION is implied if both
+this field is omitted and
+[CryptoKey.purpose][google.cloud.kms.v1.CryptoKey.purpose] is
+[ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT].
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::KeyOperationAttestation
+
+Contains an HSM-generated attestation about a key operation. For more
+information, see [Verifying attestations]
+(https://cloud.google.com/kms/docs/attest-key).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->format() >> / C<< $msg->format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::KeyOperationAttestation::AttestationFormat>)
+
+Output only. The format of the attestation data.
+
+=item * C<< $msg->content() >> / C<< $msg->content($value) >>
+
+Type: C<Bytes>
+
+Output only. The attestation data provided by the HSM when the key
+operation was performed.
+
+=item * C<< $msg->cert_chains() >> / C<< $msg->cert_chains($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::KeyOperationAttestation::CertificateChains>)
+
+Output only. The certificate chains needed to validate the attestation
+
+=back
+
+=head3 Enum: KeyOperationAttestation::AttestationFormat
+
+=over 4
+
+=item * C<ATTESTATION_FORMAT_UNSPECIFIED> => C<0>
+
+=item * C<CAVIUM_V1_COMPRESSED> => C<3>
+
+=item * C<CAVIUM_V2_COMPRESSED> => C<4>
+
+=item * C<CAVIUM_V209> => C<5>
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::CryptoKeyVersion
+
+A [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] represents an
+individual cryptographic key, and the associated key material.
+
+An
+[ENABLED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.ENABLED]
+version can be used for cryptographic operations.
+
+For security reasons, the raw cryptographic key material represented by a
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] can never be viewed
+or exported. It can only be used to encrypt, decrypt, or sign data when an
+authorized user or application invokes Cloud KMS.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name for this
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] in the format
+`projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::CryptoKeyVersion::CryptoKeyVersionState>)
+
+The current state of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion].
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+Output only. The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel]
+describing how crypto operations are performed with this
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion].
+
+=item * C<< $msg->algorithm() >> / C<< $msg->algorithm($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::CryptoKeyVersion::CryptoKeyVersionAlgorithm>)
+
+Output only. The
+[CryptoKeyVersionAlgorithm][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm]
+that this [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]
+supports.
+
+=item * C<< $msg->attestation() >> / C<< $msg->attestation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::KeyOperationAttestation>)
+
+Output only. Statement that was generated and signed by the HSM at key
+creation time. Use this statement to verify attributes of the key as stored
+on the HSM, independently of Google. Only provided for key versions with
+[protection_level][google.cloud.kms.v1.CryptoKeyVersion.protection_level]
+[HSM][google.cloud.kms.v1.ProtectionLevel.HSM].
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which this
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] was created.
+
+=item * C<< $msg->generate_time() >> / C<< $msg->generate_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time this
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]'s key material was
+generated.
+
+=item * C<< $msg->destroy_time() >> / C<< $msg->destroy_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time this
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]'s key material is
+scheduled for destruction. Only present if
+[state][google.cloud.kms.v1.CryptoKeyVersion.state] is
+[DESTROY_SCHEDULED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROY_SCHEDULED].
+
+=item * C<< $msg->destroy_event_time() >> / C<< $msg->destroy_event_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time this CryptoKeyVersion's key material was
+destroyed. Only present if
+[state][google.cloud.kms.v1.CryptoKeyVersion.state] is
+[DESTROYED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROYED].
+
+=item * C<< $msg->import_job() >> / C<< $msg->import_job($value) >>
+
+Type: C<String>
+
+Output only. The name of the [ImportJob][google.cloud.kms.v1.ImportJob]
+used in the most recent import of this
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]. Only present if
+the underlying key material was imported.
+
+=item * C<< $msg->import_time() >> / C<< $msg->import_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which this
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]'s key material was
+most recently imported.
+
+=item * C<< $msg->import_failure_reason() >> / C<< $msg->import_failure_reason($value) >>
+
+Type: C<String>
+
+Output only. The root cause of the most recent import failure. Only present
+if [state][google.cloud.kms.v1.CryptoKeyVersion.state] is
+[IMPORT_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.IMPORT_FAILED].
+
+=item * C<< $msg->generation_failure_reason() >> / C<< $msg->generation_failure_reason($value) >>
+
+Type: C<String>
+
+Output only. The root cause of the most recent generation failure. Only
+present if [state][google.cloud.kms.v1.CryptoKeyVersion.state] is
+[GENERATION_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.GENERATION_FAILED].
+
+=item * C<< $msg->external_destruction_failure_reason() >> / C<< $msg->external_destruction_failure_reason($value) >>
+
+Type: C<String>
+
+Output only. The root cause of the most recent external destruction
+failure. Only present if
+[state][google.cloud.kms.v1.CryptoKeyVersion.state] is
+[EXTERNAL_DESTRUCTION_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.EXTERNAL_DESTRUCTION_FAILED].
+
+=item * C<< $msg->external_protection_level_options() >> / C<< $msg->external_protection_level_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::ExternalProtectionLevelOptions>)
+
+ExternalProtectionLevelOptions stores a group of additional fields for
+configuring a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] that
+are specific to the
+[EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL] protection level
+and [EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC]
+protection levels.
+
+=item * C<< $msg->reimport_eligible() >> / C<< $msg->reimport_eligible($value) >>
+
+Type: C<Bool>
+
+Output only. Whether or not this key version is eligible for reimport, by
+being specified as a target in
+[ImportCryptoKeyVersionRequest.crypto_key_version][google.cloud.kms.v1.ImportCryptoKeyVersionRequest.crypto_key_version].
+
+=item * C<< $msg->trusted_wrapping_enabled() >> / C<< $msg->trusted_wrapping_enabled($value) >>
+
+Type: C<Bool>
+
+Immutable. Field indicating that the key may be wrapped by a trusted key.
+This field can be set for all key purposes except
+[ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT],
+and is only valid for keys with protection level
+[HSM_SINGLE_TENANT][google.cloud.kms.v1.ProtectionLevel.HSM_SINGLE_TENANT].
+This field can only be set at creation or import time via
+[CreateCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.CreateCryptoKeyVersion],
+or
+[ImportCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ImportCryptoKeyVersion].
+
+=item * C<< $msg->hsm_trusted() >> / C<< $msg->hsm_trusted($value) >>
+
+Type: C<Bool>
+
+Output only. Field indicating that the key wrapping key is trusted.
+This field is only valid for key purpose
+[AES_256_WRAPPING][CryptoKey.CryptoKeyPurpose.AES_256_WRAPPING], and
+protection level
+[HSM_SINGLE_TENANT][google.cloud.kms.v1.ProtectionLevel.HSM_SINGLE_TENANT].
+
+=back
+
+=head3 Enum: CryptoKeyVersion::CryptoKeyVersionAlgorithm
+
+=over 4
+
+=item * C<CRYPTO_KEY_VERSION_ALGORITHM_UNSPECIFIED> => C<0>
+
+=item * C<GOOGLE_SYMMETRIC_ENCRYPTION> => C<1>
+
+=item * C<AES_128_GCM> => C<41>
+
+=item * C<AES_256_GCM> => C<19>
+
+=item * C<AES_128_CBC> => C<42>
+
+=item * C<AES_256_CBC> => C<43>
+
+=item * C<AES_128_CTR> => C<44>
+
+=item * C<AES_256_CTR> => C<45>
+
+=item * C<RSA_SIGN_PSS_2048_SHA256> => C<2>
+
+=item * C<RSA_SIGN_PSS_3072_SHA256> => C<3>
+
+=item * C<RSA_SIGN_PSS_4096_SHA256> => C<4>
+
+=item * C<RSA_SIGN_PSS_4096_SHA512> => C<15>
+
+=item * C<RSA_SIGN_PKCS1_2048_SHA256> => C<5>
+
+=item * C<RSA_SIGN_PKCS1_3072_SHA256> => C<6>
+
+=item * C<RSA_SIGN_PKCS1_4096_SHA256> => C<7>
+
+=item * C<RSA_SIGN_PKCS1_4096_SHA512> => C<16>
+
+=item * C<RSA_SIGN_RAW_PKCS1_2048> => C<28>
+
+=item * C<RSA_SIGN_RAW_PKCS1_3072> => C<29>
+
+=item * C<RSA_SIGN_RAW_PKCS1_4096> => C<30>
+
+=item * C<RSA_DECRYPT_OAEP_2048_SHA256> => C<8>
+
+=item * C<RSA_DECRYPT_OAEP_3072_SHA256> => C<9>
+
+=item * C<RSA_DECRYPT_OAEP_4096_SHA256> => C<10>
+
+=item * C<RSA_DECRYPT_OAEP_4096_SHA512> => C<17>
+
+=item * C<RSA_DECRYPT_OAEP_2048_SHA1> => C<37>
+
+=item * C<RSA_DECRYPT_OAEP_3072_SHA1> => C<38>
+
+=item * C<RSA_DECRYPT_OAEP_4096_SHA1> => C<39>
+
+=item * C<EC_SIGN_P256_SHA256> => C<12>
+
+=item * C<EC_SIGN_P384_SHA384> => C<13>
+
+=item * C<EC_SIGN_SECP256K1_SHA256> => C<31>
+
+=item * C<EC_SIGN_ED25519> => C<40>
+
+=item * C<HMAC_SHA256> => C<32>
+
+=item * C<HMAC_SHA1> => C<33>
+
+=item * C<HMAC_SHA384> => C<34>
+
+=item * C<HMAC_SHA512> => C<35>
+
+=item * C<HMAC_SHA224> => C<36>
+
+=item * C<EXTERNAL_SYMMETRIC_ENCRYPTION> => C<18>
+
+=item * C<ML_KEM_768> => C<47>
+
+=item * C<ML_KEM_1024> => C<48>
+
+=item * C<KEM_XWING> => C<63>
+
+=item * C<PQ_SIGN_ML_DSA_44> => C<68>
+
+=item * C<PQ_SIGN_ML_DSA_65> => C<56>
+
+=item * C<PQ_SIGN_ML_DSA_87> => C<69>
+
+=item * C<PQ_SIGN_SLH_DSA_SHA2_128S> => C<57>
+
+=item * C<PQ_SIGN_HASH_SLH_DSA_SHA2_128S_SHA256> => C<60>
+
+=item * C<PQ_SIGN_ML_DSA_44_EXTERNAL_MU> => C<70>
+
+=item * C<PQ_SIGN_ML_DSA_65_EXTERNAL_MU> => C<67>
+
+=item * C<PQ_SIGN_ML_DSA_87_EXTERNAL_MU> => C<71>
+
+=item * C<AES_256_KWP> => C<73>
+
+=back
+
+=head3 Enum: CryptoKeyVersion::CryptoKeyVersionState
+
+=over 4
+
+=item * C<CRYPTO_KEY_VERSION_STATE_UNSPECIFIED> => C<0>
+
+=item * C<PENDING_GENERATION> => C<5>
+
+=item * C<ENABLED> => C<1>
+
+=item * C<DISABLED> => C<2>
+
+=item * C<DESTROYED> => C<3>
+
+=item * C<DESTROY_SCHEDULED> => C<4>
+
+=item * C<PENDING_IMPORT> => C<6>
+
+=item * C<IMPORT_FAILED> => C<7>
+
+=item * C<GENERATION_FAILED> => C<8>
+
+=item * C<PENDING_EXTERNAL_DESTRUCTION> => C<9>
+
+=item * C<EXTERNAL_DESTRUCTION_FAILED> => C<10>
+
+=back
+
+=head3 Enum: CryptoKeyVersion::CryptoKeyVersionView
+
+=over 4
+
+=item * C<CRYPTO_KEY_VERSION_VIEW_UNSPECIFIED> => C<0>
+
+=item * C<FULL> => C<1>
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::ChecksummedData
+
+Data with integrity verification field.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+Raw Data.
+
+=item * C<< $msg->crc32c_checksum() >> / C<< $msg->crc32c_checksum($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C
+checksum of the returned
+[ChecksummedData.data][google.cloud.kms.v1.ChecksummedData.data]. An
+integrity check of
+[ChecksummedData.data][google.cloud.kms.v1.ChecksummedData.data] can be
+performed by computing the CRC32C checksum of
+[ChecksummedData.data][google.cloud.kms.v1.ChecksummedData.data] and
+comparing your results to this field. Discard the response in case of
+non-matching checksum values, and perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: This field is defined as int64 for reasons of compatibility
+across different languages. However, it is a non-negative integer, which
+will never exceed `2^32-1`, and can be safely downconverted to uint32 in
+languages that support this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::PublicKey
+
+The public keys for a given
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]. Obtained via
+[GetPublicKey][google.cloud.kms.v1.KeyManagementService.GetPublicKey].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->pem() >> / C<< $msg->pem($value) >>
+
+Type: C<String>
+
+The public key, encoded in PEM format. For more information, see the
+[RFC 7468](https://tools.ietf.org/html/rfc7468) sections for
+[General Considerations](https://tools.ietf.org/html/rfc7468#section-2) and
+[Textual Encoding of Subject Public Key Info]
+(https://tools.ietf.org/html/rfc7468#section-13).
+
+=item * C<< $msg->algorithm() >> / C<< $msg->algorithm($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::CryptoKeyVersion::CryptoKeyVersionAlgorithm>)
+
+The
+[Algorithm][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm]
+associated with this key.
+
+=item * C<< $msg->pem_crc32c() >> / C<< $msg->pem_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[PublicKey.pem][google.cloud.kms.v1.PublicKey.pem]. An integrity check of
+[PublicKey.pem][google.cloud.kms.v1.PublicKey.pem] can be performed by
+computing the CRC32C checksum of
+[PublicKey.pem][google.cloud.kms.v1.PublicKey.pem] and comparing your
+results to this field. Discard the response in case of non-matching
+checksum values, and perform a limited number of retries. A persistent
+mismatch may indicate an issue in your computation of the CRC32C checksum.
+Note: This field is defined as int64 for reasons of compatibility across
+different languages. However, it is a non-negative integer, which will
+never exceed `2^32-1`, and can be safely downconverted to uint32 in
+languages that support this type.
+
+NOTE: This field is in Beta.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The [name][google.cloud.kms.v1.CryptoKeyVersion.name] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] public key.
+Provided here for verification.
+
+NOTE: This field is in Beta.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] public key.
+
+=item * C<< $msg->public_key_format() >> / C<< $msg->public_key_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::PublicKey::PublicKeyFormat>)
+
+The [PublicKey][google.cloud.kms.v1.PublicKey] format specified by the
+customer through the
+[public_key_format][google.cloud.kms.v1.GetPublicKeyRequest.public_key_format]
+field.
+
+=item * C<< $msg->public_key() >> / C<< $msg->public_key($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::ChecksummedData>)
+
+This field contains the public key (with integrity verification), formatted
+according to the
+[public_key_format][google.cloud.kms.v1.PublicKey.public_key_format] field.
+
+=back
+
+=head3 Enum: PublicKey::PublicKeyFormat
+
+=over 4
+
+=item * C<PUBLIC_KEY_FORMAT_UNSPECIFIED> => C<0>
+
+=item * C<PEM> => C<1>
+
+=item * C<DER> => C<2>
+
+=item * C<NIST_PQC> => C<3>
+
+=item * C<XWING_RAW_BYTES> => C<4>
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::ImportJob
+
+An [ImportJob][google.cloud.kms.v1.ImportJob] can be used to create
+[CryptoKeys][google.cloud.kms.v1.CryptoKey] and
+[CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] using pre-existing
+key material, generated outside of Cloud KMS.
+
+When an [ImportJob][google.cloud.kms.v1.ImportJob] is created, Cloud KMS will
+generate a "wrapping key", which is a public/private key pair. You use the
+wrapping key to encrypt (also known as wrap) the pre-existing key material to
+protect it during the import process. The nature of the wrapping key depends
+on the choice of
+[import_method][google.cloud.kms.v1.ImportJob.import_method]. When the
+wrapping key generation is complete, the
+[state][google.cloud.kms.v1.ImportJob.state] will be set to
+[ACTIVE][google.cloud.kms.v1.ImportJob.ImportJobState.ACTIVE] and the
+[public_key][google.cloud.kms.v1.ImportJob.public_key] can be fetched. The
+fetched public key can then be used to wrap your pre-existing key material.
+
+Once the key material is wrapped, it can be imported into a new
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] in an existing
+[CryptoKey][google.cloud.kms.v1.CryptoKey] by calling
+[ImportCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ImportCryptoKeyVersion].
+Multiple [CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] can be
+imported with a single [ImportJob][google.cloud.kms.v1.ImportJob]. Cloud KMS
+uses the private key portion of the wrapping key to unwrap the key material.
+Only Cloud KMS has access to the private key.
+
+An [ImportJob][google.cloud.kms.v1.ImportJob] expires 3 days after it is
+created. Once expired, Cloud KMS will no longer be able to import or unwrap
+any key material that was wrapped with the
+[ImportJob][google.cloud.kms.v1.ImportJob]'s public key.
+
+For more information, see
+[Importing a key](https://cloud.google.com/kms/docs/importing-a-key).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name for this
+[ImportJob][google.cloud.kms.v1.ImportJob] in the format
+`projects/*/locations/*/keyRings/*/importJobs/*`.
+
+=item * C<< $msg->import_method() >> / C<< $msg->import_method($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ImportJob::ImportMethod>)
+
+Required. Immutable. The wrapping method to be used for incoming key
+material.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+Required. Immutable. The protection level of the
+[ImportJob][google.cloud.kms.v1.ImportJob]. This must match the
+[protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level]
+of the [version_template][google.cloud.kms.v1.CryptoKey.version_template]
+on the [CryptoKey][google.cloud.kms.v1.CryptoKey] you attempt to import
+into.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which this
+[ImportJob][google.cloud.kms.v1.ImportJob] was created.
+
+=item * C<< $msg->generate_time() >> / C<< $msg->generate_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time this [ImportJob][google.cloud.kms.v1.ImportJob]'s key
+material was generated.
+
+=item * C<< $msg->expire_time() >> / C<< $msg->expire_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which this
+[ImportJob][google.cloud.kms.v1.ImportJob] is scheduled for expiration and
+can no longer be used to import key material.
+
+=item * C<< $msg->expire_event_time() >> / C<< $msg->expire_event_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time this [ImportJob][google.cloud.kms.v1.ImportJob]
+expired. Only present if [state][google.cloud.kms.v1.ImportJob.state] is
+[EXPIRED][google.cloud.kms.v1.ImportJob.ImportJobState.EXPIRED].
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ImportJob::ImportJobState>)
+
+Output only. The current state of the
+[ImportJob][google.cloud.kms.v1.ImportJob], indicating if it can be used.
+
+=item * C<< $msg->public_key() >> / C<< $msg->public_key($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::ImportJob::WrappingPublicKey>)
+
+Output only. The public key with which to wrap key material prior to
+import. Only returned if [state][google.cloud.kms.v1.ImportJob.state] is
+[ACTIVE][google.cloud.kms.v1.ImportJob.ImportJobState.ACTIVE].
+
+=item * C<< $msg->public_key_format() >> / C<< $msg->public_key_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::PublicKey::PublicKeyFormat>)
+
+Output only. Specifies the
+[WrappingPublicKey][google.cloud.kms.v1.ImportJob.WrappingPublicKey] format
+provided by the customer in the
+[KeyManagementService.GetImportJob][google.cloud.kms.v1.KeyManagementService.GetImportJob]
+request.
+
+=item * C<< $msg->attestation() >> / C<< $msg->attestation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::KeyOperationAttestation>)
+
+Output only. Statement that was generated and signed by the key creator
+(for example, an HSM) at key creation time. Use this statement to verify
+attributes of the key as stored on the HSM, independently of Google.
+Only present if the chosen
+[ImportMethod][google.cloud.kms.v1.ImportJob.ImportMethod] is one with a
+protection level of [HSM][google.cloud.kms.v1.ProtectionLevel.HSM].
+
+=item * C<< $msg->crypto_key_backend() >> / C<< $msg->crypto_key_backend($value) >>
+
+Type: C<String>
+
+Immutable. The resource name of the backend environment where the key
+material for the wrapping key resides and where all related cryptographic
+operations are performed. Currently, this field is only populated for keys
+stored in HSM_SINGLE_TENANT. Note, this list is non-exhaustive and may
+apply to additional [ProtectionLevels][google.cloud.kms.v1.ProtectionLevel]
+in the future. Supported resources:
+* `"projects/*/locations/*/singleTenantHsmInstances/*"`
+
+=back
+
+=head3 Enum: ImportJob::ImportMethod
+
+=over 4
+
+=item * C<IMPORT_METHOD_UNSPECIFIED> => C<0>
+
+=item * C<RSA_OAEP_3072_SHA1_AES_256> => C<1>
+
+=item * C<RSA_OAEP_4096_SHA1_AES_256> => C<2>
+
+=item * C<RSA_OAEP_3072_SHA256_AES_256> => C<3>
+
+=item * C<RSA_OAEP_4096_SHA256_AES_256> => C<4>
+
+=item * C<RSA_OAEP_3072_SHA256> => C<5>
+
+=item * C<RSA_OAEP_4096_SHA256> => C<6>
+
+=item * C<HPKE_KEM_ML_KEM_768_HKDF_SHA256_AES_256_GCM> => C<8>
+
+=item * C<HPKE_KEM_ML_KEM_1024_HKDF_SHA256_AES_256_GCM> => C<9>
+
+=item * C<HPKE_KEM_XWING_HKDF_SHA256_AES_256_GCM> => C<10>
+
+=back
+
+=head3 Enum: ImportJob::ImportJobState
+
+=over 4
+
+=item * C<IMPORT_JOB_STATE_UNSPECIFIED> => C<0>
+
+=item * C<PENDING_GENERATION> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<EXPIRED> => C<3>
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::ExternalProtectionLevelOptions
+
+ExternalProtectionLevelOptions stores a group of additional fields for
+configuring a [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] that
+are specific to the [EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL]
+protection level and
+[EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] protection
+levels.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->external_key_uri() >> / C<< $msg->external_key_uri($value) >>
+
+Type: C<String>
+
+Optional. The URI for an external resource that this
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] represents.
+
+=item * C<< $msg->ekm_connection_key_path() >> / C<< $msg->ekm_connection_key_path($value) >>
+
+Type: C<String>
+
+Optional. The path to the external key material on the EKM when using
+[EkmConnection][google.cloud.kms.v1.EkmConnection] e.g., "v0/my/key". Set
+this field instead of external_key_uri when using an
+[EkmConnection][google.cloud.kms.v1.EkmConnection].
+
+=item * C<< $msg->ekm_connection_backend_override() >> / C<< $msg->ekm_connection_backend_override($value) >>
+
+Type: C<String>
+
+Optional. The resource name of the backend environment where the key
+material of [CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] is
+associated with. Setting this field overrides the [CryptoKeyBackend][].
+This field may be set when
+[CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] is set to
+[EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC]. Format:
+`projects/*/locations/*/ekmConnections/*`.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::KeyAccessJustificationsPolicy
+
+A
+[KeyAccessJustificationsPolicy][google.cloud.kms.v1.KeyAccessJustificationsPolicy]
+specifies zero or more allowed
+[AccessReason][google.cloud.kms.v1.AccessReason] values for encrypt, decrypt,
+and sign operations on a [CryptoKey][google.cloud.kms.v1.CryptoKey] or
+[KeyAccessJustificationsPolicyConfig][google.cloud.kms.v1.KeyAccessJustificationsPolicyConfig]
+(the default Key Access Justifications policy).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->allowed_access_reasons() >> / C<< $msg->allowed_access_reasons($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::AccessReason>)
+
+The list of allowed reasons for access to a
+[CryptoKey][google.cloud.kms.v1.CryptoKey]. Note that empty
+allowed_access_reasons has a different meaning depending on where this
+message appears. If this is under
+[KeyAccessJustificationsPolicyConfig][google.cloud.kms.v1.KeyAccessJustificationsPolicyConfig],
+it means allow-all. If this is under
+[CryptoKey][google.cloud.kms.v1.CryptoKey], it means deny-all.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Resources::RetiredResource
+
+A RetiredResource resource represents the record of a deleted
+[CryptoKey][google.cloud.kms.v1.CryptoKey]. Its purpose is to provide
+visibility into retained user data and to prevent reuse of these names for
+new [CryptoKeys][google.cloud.kms.v1.CryptoKey].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The resource name for this
+[RetiredResource][google.cloud.kms.v1.RetiredResource] in the format
+`projects/*/locations/*/retiredResources/*`.
+
+=item * C<< $msg->original_resource() >> / C<< $msg->original_resource($value) >>
+
+Type: C<String>
+
+Output only. The full resource name of the original
+[CryptoKey][google.cloud.kms.v1.CryptoKey] that was deleted in the format
+`projects/*/locations/*/keyRings/*/cryptoKeys/*`.
+
+=item * C<< $msg->resource_type() >> / C<< $msg->resource_type($value) >>
+
+Type: C<String>
+
+Output only. The resource type of the original deleted resource.
+
+=item * C<< $msg->delete_time() >> / C<< $msg->delete_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the original resource was deleted and this
+RetiredResource record was created.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Kms::V1::Resources::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,1134 @@
+package Google::Cloud::Bigquery::Storage::V1beta1::Storage;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Bigquery::Storage::V1beta1::Arrow };
+    eval { require Google::Cloud::Bigquery::Storage::V1beta1::Avro };
+    eval { require Google::Cloud::Bigquery::Storage::V1beta1::ReadOptions };
+    eval { require Google::Cloud::Bigquery::Storage::V1beta1::TableReference };
+    eval { require Google::Protobuf::Empty };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+CjNnb29nbGUvY2xvdWQvYmlncXVlcnkvc3RvcmFnZS92MWJldGExL3N0b3JhZ2UucHJvdG8S
+JWdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEaHGdvb2dsZS9hcGkvYW5u
+b3RhdGlvbnMucHJvdG8aF2dvb2dsZS9hcGkvY2xpZW50LnByb3RvGh9nb29nbGUvYXBpL2Zp
+ZWxkX2JlaGF2aW9yLnByb3RvGhlnb29nbGUvYXBpL3Jlc291cmNlLnByb3RvGjFnb29nbGUv
+Y2xvdWQvYmlncXVlcnkvc3RvcmFnZS92MWJldGExL2Fycm93LnByb3RvGjBnb29nbGUvY2xv
+dWQvYmlncXVlcnkvc3RvcmFnZS92MWJldGExL2F2cm8ucHJvdG8aOGdvb2dsZS9jbG91ZC9i
+aWdxdWVyeS9zdG9yYWdlL3YxYmV0YTEvcmVhZF9vcHRpb25zLnByb3RvGjtnb29nbGUvY2xv
+dWQvYmlncXVlcnkvc3RvcmFnZS92MWJldGExL3RhYmxlX3JlZmVyZW5jZS5wcm90bxobZ29v
+Z2xlL3Byb3RvYnVmL2VtcHR5LnByb3RvGh9nb29nbGUvcHJvdG9idWYvdGltZXN0YW1wLnBy
+b3RvIoIBCgZTdHJlYW0SEgoEbmFtZRgBIAEoCVIEbmFtZTpk6kFhCiViaWdxdWVyeXN0b3Jh
+Z2UuZ29vZ2xlYXBpcy5jb20vU3RyZWFtEjhwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25z
+L3tsb2NhdGlvbn0vc3RyZWFtcy97c3RyZWFtfSJvCg5TdHJlYW1Qb3NpdGlvbhJFCgZzdHJl
+YW0YASABKAsyLS5nb29nbGUuY2xvdWQuYmlncXVlcnkuc3RvcmFnZS52MWJldGExLlN0cmVh
+bVIGc3RyZWFtEhYKBm9mZnNldBgCIAEoA1IGb2Zmc2V0IvMFCgtSZWFkU2Vzc2lvbhISCgRu
+YW1lGAEgASgJUgRuYW1lEjsKC2V4cGlyZV90aW1lGAIgASgLMhouZ29vZ2xlLnByb3RvYnVm
+LlRpbWVzdGFtcFIKZXhwaXJlVGltZRJUCgthdnJvX3NjaGVtYRgFIAEoCzIxLmdvb2dsZS5j
+bG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEuQXZyb1NjaGVtYUgAUgphdnJvU2NoZW1h
+ElcKDGFycm93X3NjaGVtYRgGIAEoCzIyLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9yYWdl
+LnYxYmV0YTEuQXJyb3dTY2hlbWFIAFILYXJyb3dTY2hlbWESRwoHc3RyZWFtcxgEIAMoCzIt
+Lmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEuU3RyZWFtUgdzdHJlYW1z
+El4KD3RhYmxlX3JlZmVyZW5jZRgHIAEoCzI1Lmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9y
+YWdlLnYxYmV0YTEuVGFibGVSZWZlcmVuY2VSDnRhYmxlUmVmZXJlbmNlEl4KD3RhYmxlX21v
+ZGlmaWVycxgIIAEoCzI1Lmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEu
+VGFibGVNb2RpZmllcnNSDnRhYmxlTW9kaWZpZXJzEmQKEXNoYXJkaW5nX3N0cmF0ZWd5GAkg
+ASgOMjcuZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnN0b3JhZ2UudjFiZXRhMS5TaGFyZGluZ1N0
+cmF0ZWd5UhBzaGFyZGluZ1N0cmF0ZWd5OmvqQWgKKmJpZ3F1ZXJ5c3RvcmFnZS5nb29nbGVh
+cGlzLmNvbS9SZWFkU2Vzc2lvbhI6cHJvamVjdHMve3Byb2plY3R9L2xvY2F0aW9ucy97bG9j
+YXRpb259L3Nlc3Npb25zL3tzZXNzaW9ufUIICgZzY2hlbWEi5gQKGENyZWF0ZVJlYWRTZXNz
+aW9uUmVxdWVzdBJjCg90YWJsZV9yZWZlcmVuY2UYASABKAsyNS5nb29nbGUuY2xvdWQuYmln
+cXVlcnkuc3RvcmFnZS52MWJldGExLlRhYmxlUmVmZXJlbmNlQgPgQQJSDnRhYmxlUmVmZXJl
+bmNlEksKBnBhcmVudBgGIAEoCUIz4EEC+kEtCitjbG91ZHJlc291cmNlbWFuYWdlci5nb29n
+bGVhcGlzLmNvbS9Qcm9qZWN0UgZwYXJlbnQSXgoPdGFibGVfbW9kaWZpZXJzGAIgASgLMjUu
+Z29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnN0b3JhZ2UudjFiZXRhMS5UYWJsZU1vZGlmaWVyc1IO
+dGFibGVNb2RpZmllcnMSKwoRcmVxdWVzdGVkX3N0cmVhbXMYAyABKAVSEHJlcXVlc3RlZFN0
+cmVhbXMSWgoMcmVhZF9vcHRpb25zGAQgASgLMjcuZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnN0
+b3JhZ2UudjFiZXRhMS5UYWJsZVJlYWRPcHRpb25zUgtyZWFkT3B0aW9ucxJJCgZmb3JtYXQY
+BSABKA4yMS5nb29nbGUuY2xvdWQuYmlncXVlcnkuc3RvcmFnZS52MWJldGExLkRhdGFGb3Jt
+YXRSBmZvcm1hdBJkChFzaGFyZGluZ19zdHJhdGVneRgHIAEoDjI3Lmdvb2dsZS5jbG91ZC5i
+aWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEuU2hhcmRpbmdTdHJhdGVneVIQc2hhcmRpbmdTdHJh
+dGVneSJyCg9SZWFkUm93c1JlcXVlc3QSXwoNcmVhZF9wb3NpdGlvbhgBIAEoCzI1Lmdvb2ds
+ZS5jbG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEuU3RyZWFtUG9zaXRpb25CA+BBAlIM
+cmVhZFBvc2l0aW9uIt0BCgxTdHJlYW1TdGF0dXMSLgoTZXN0aW1hdGVkX3Jvd19jb3VudBgB
+IAEoA1IRZXN0aW1hdGVkUm93Q291bnQSKwoRZnJhY3Rpb25fY29uc3VtZWQYAiABKAJSEGZy
+YWN0aW9uQ29uc3VtZWQSSwoIcHJvZ3Jlc3MYBCABKAsyLy5nb29nbGUuY2xvdWQuYmlncXVl
+cnkuc3RvcmFnZS52MWJldGExLlByb2dyZXNzUghwcm9ncmVzcxIjCg1pc19zcGxpdHRhYmxl
+GAMgASgIUgxpc1NwbGl0dGFibGUiXgoIUHJvZ3Jlc3MSKgoRYXRfcmVzcG9uc2Vfc3RhcnQY
+ASABKAJSD2F0UmVzcG9uc2VTdGFydBImCg9hdF9yZXNwb25zZV9lbmQYAiABKAJSDWF0UmVz
+cG9uc2VFbmQiOwoOVGhyb3R0bGVTdGF0dXMSKQoQdGhyb3R0bGVfcGVyY2VudBgBIAEoBVIP
+dGhyb3R0bGVQZXJjZW50IuAEChBSZWFkUm93c1Jlc3BvbnNlEk4KCWF2cm9fcm93cxgDIAEo
+CzIvLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEuQXZyb1Jvd3NIAFII
+YXZyb1Jvd3MSZwoSYXJyb3dfcmVjb3JkX2JhdGNoGAQgASgLMjcuZ29vZ2xlLmNsb3VkLmJp
+Z3F1ZXJ5LnN0b3JhZ2UudjFiZXRhMS5BcnJvd1JlY29yZEJhdGNoSABSEGFycm93UmVjb3Jk
+QmF0Y2gSGwoJcm93X2NvdW50GAYgASgDUghyb3dDb3VudBJLCgZzdGF0dXMYAiABKAsyMy5n
+b29nbGUuY2xvdWQuYmlncXVlcnkuc3RvcmFnZS52MWJldGExLlN0cmVhbVN0YXR1c1IGc3Rh
+dHVzEl4KD3Rocm90dGxlX3N0YXR1cxgFIAEoCzI1Lmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5z
+dG9yYWdlLnYxYmV0YTEuVGhyb3R0bGVTdGF0dXNSDnRocm90dGxlU3RhdHVzElkKC2F2cm9f
+c2NoZW1hGAcgASgLMjEuZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnN0b3JhZ2UudjFiZXRhMS5B
+dnJvU2NoZW1hQgPgQQNIAVIKYXZyb1NjaGVtYRJcCgxhcnJvd19zY2hlbWEYCCABKAsyMi5n
+b29nbGUuY2xvdWQuYmlncXVlcnkuc3RvcmFnZS52MWJldGExLkFycm93U2NoZW1hQgPgQQNI
+AVILYXJyb3dTY2hlbWFCBgoEcm93c0IICgZzY2hlbWEiqwEKJEJhdGNoQ3JlYXRlUmVhZFNl
+c3Npb25TdHJlYW1zUmVxdWVzdBJRCgdzZXNzaW9uGAEgASgLMjIuZ29vZ2xlLmNsb3VkLmJp
+Z3F1ZXJ5LnN0b3JhZ2UudjFiZXRhMS5SZWFkU2Vzc2lvbkID4EECUgdzZXNzaW9uEjAKEXJl
+cXVlc3RlZF9zdHJlYW1zGAIgASgFQgPgQQJSEHJlcXVlc3RlZFN0cmVhbXMicAolQmF0Y2hD
+cmVhdGVSZWFkU2Vzc2lvblN0cmVhbXNSZXNwb25zZRJHCgdzdHJlYW1zGAEgAygLMi0uZ29v
+Z2xlLmNsb3VkLmJpZ3F1ZXJ5LnN0b3JhZ2UudjFiZXRhMS5TdHJlYW1SB3N0cmVhbXMiYwoV
+RmluYWxpemVTdHJlYW1SZXF1ZXN0EkoKBnN0cmVhbRgCIAEoCzItLmdvb2dsZS5jbG91ZC5i
+aWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEuU3RyZWFtQgPgQQJSBnN0cmVhbSKRAQoWU3BsaXRS
+ZWFkU3RyZWFtUmVxdWVzdBJbCg9vcmlnaW5hbF9zdHJlYW0YASABKAsyLS5nb29nbGUuY2xv
+dWQuYmlncXVlcnkuc3RvcmFnZS52MWJldGExLlN0cmVhbUID4EECUg5vcmlnaW5hbFN0cmVh
+bRIaCghmcmFjdGlvbhgCIAEoAlIIZnJhY3Rpb24iyQEKF1NwbGl0UmVhZFN0cmVhbVJlc3Bv
+bnNlElQKDnByaW1hcnlfc3RyZWFtGAEgASgLMi0uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnN0
+b3JhZ2UudjFiZXRhMS5TdHJlYW1SDXByaW1hcnlTdHJlYW0SWAoQcmVtYWluZGVyX3N0cmVh
+bRgCIAEoCzItLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEuU3RyZWFt
+Ug9yZW1haW5kZXJTdHJlYW0qPgoKRGF0YUZvcm1hdBIbChdEQVRBX0ZPUk1BVF9VTlNQRUNJ
+RklFRBAAEggKBEFWUk8QARIJCgVBUlJPVxADKk8KEFNoYXJkaW5nU3RyYXRlZ3kSIQodU0hB
+UkRJTkdfU1RSQVRFR1lfVU5TUEVDSUZJRUQQABIKCgZMSVFVSUQQARIMCghCQUxBTkNFRBAC
+MrcKCg9CaWdRdWVyeVN0b3JhZ2USswIKEUNyZWF0ZVJlYWRTZXNzaW9uEj8uZ29vZ2xlLmNs
+b3VkLmJpZ3F1ZXJ5LnN0b3JhZ2UudjFiZXRhMS5DcmVhdGVSZWFkU2Vzc2lvblJlcXVlc3Qa
+Mi5nb29nbGUuY2xvdWQuYmlncXVlcnkuc3RvcmFnZS52MWJldGExLlJlYWRTZXNzaW9uIqgB
+gtPkkwJ3IjAvdjFiZXRhMS97dGFibGVfcmVmZXJlbmNlLnByb2plY3RfaWQ9cHJvamVjdHMv
+Kn06ASpaQCI7L3YxYmV0YTEve3RhYmxlX3JlZmVyZW5jZS5kYXRhc2V0X2lkPXByb2plY3Rz
+LyovZGF0YXNldHMvKn06ASraQSh0YWJsZV9yZWZlcmVuY2UscGFyZW50LHJlcXVlc3RlZF9z
+dHJlYW1zEtABCghSZWFkUm93cxI2Lmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYx
+YmV0YTEuUmVhZFJvd3NSZXF1ZXN0GjcuZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LnN0b3JhZ2Uu
+djFiZXRhMS5SZWFkUm93c1Jlc3BvbnNlIlGC0+STAjsSOS92MWJldGExL3tyZWFkX3Bvc2l0
+aW9uLnN0cmVhbS5uYW1lPXByb2plY3RzLyovc3RyZWFtcy8qfdpBDXJlYWRfcG9zaXRpb24w
+ARKQAgodQmF0Y2hDcmVhdGVSZWFkU2Vzc2lvblN0cmVhbXMSSy5nb29nbGUuY2xvdWQuYmln
+cXVlcnkuc3RvcmFnZS52MWJldGExLkJhdGNoQ3JlYXRlUmVhZFNlc3Npb25TdHJlYW1zUmVx
+dWVzdBpMLmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEuQmF0Y2hDcmVh
+dGVSZWFkU2Vzc2lvblN0cmVhbXNSZXNwb25zZSJUgtPkkwIyIi0vdjFiZXRhMS97c2Vzc2lv
+bi5uYW1lPXByb2plY3RzLyovc2Vzc2lvbnMvKn06ASraQRlzZXNzaW9uLHJlcXVlc3RlZF9z
+dHJlYW1zEqcBCg5GaW5hbGl6ZVN0cmVhbRI8Lmdvb2dsZS5jbG91ZC5iaWdxdWVyeS5zdG9y
+YWdlLnYxYmV0YTEuRmluYWxpemVTdHJlYW1SZXF1ZXN0GhYuZ29vZ2xlLnByb3RvYnVmLkVt
+cHR5Ij+C0+STAjAiKy92MWJldGExL3tzdHJlYW0ubmFtZT1wcm9qZWN0cy8qL3N0cmVhbXMv
+Kn06ASraQQZzdHJlYW0S4AEKD1NwbGl0UmVhZFN0cmVhbRI9Lmdvb2dsZS5jbG91ZC5iaWdx
+dWVyeS5zdG9yYWdlLnYxYmV0YTEuU3BsaXRSZWFkU3RyZWFtUmVxdWVzdBo+Lmdvb2dsZS5j
+bG91ZC5iaWdxdWVyeS5zdG9yYWdlLnYxYmV0YTEuU3BsaXRSZWFkU3RyZWFtUmVzcG9uc2Ui
+ToLT5JMCNhI0L3YxYmV0YTEve29yaWdpbmFsX3N0cmVhbS5uYW1lPXByb2plY3RzLyovc3Ry
+ZWFtcy8qfdpBD29yaWdpbmFsX3N0cmVhbRp7ykEeYmlncXVlcnlzdG9yYWdlLmdvb2dsZWFw
+aXMuY29t0kFXaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vYXV0aC9iaWdxdWVyeSxodHRw
+czovL3d3dy5nb29nbGVhcGlzLmNvbS9hdXRoL2Nsb3VkLXBsYXRmb3JtQnAKKWNvbS5nb29n
+bGUuY2xvdWQuYmlncXVlcnkuc3RvcmFnZS52MWJldGExWkNjbG91ZC5nb29nbGUuY29tL2dv
+L2JpZ3F1ZXJ5L3N0b3JhZ2UvYXBpdjFiZXRhMS9zdG9yYWdlcGI7c3RvcmFnZXBiSox9CgcS
+BQ4ArAMBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjUgR29vZ2xlIExMQwoKIExpY2Vu
+c2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5z
+ZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3
+aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNl
+IGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoK
+IFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3Jp
+dGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3Ry
+aWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09O
+RElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0
+aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNz
+aW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAuCgkK
+AgMAEgMSACYKCQoCAwESAxMAIQoJCgIDAhIDFAApCgkKAgMDEgMVACMKCQoCAwQSAxYAOwoJ
+CgIDBRIDFwA6CgkKAgMGEgMYAEIKCQoCAwcSAxkARQoJCgIDCBIDGgAlCgkKAgMJEgMbACkK
+CAoBCBIDHQBaCgkKAggLEgMdAFoKCAoBCBIDHgBCCgkKAggBEgMeAEIK5QIKAgYAEgUoAI0B
+ARrXAiBCaWdRdWVyeSBzdG9yYWdlIEFQSS4KCiBUaGUgQmlnUXVlcnkgc3RvcmFnZSBBUEkg
+Y2FuIGJlIHVzZWQgdG8gcmVhZCBkYXRhIHN0b3JlZCBpbiBCaWdRdWVyeS4KCiBUaGUgdjFi
+ZXRhMSBBUEkgaXMgbm90IHlldCBvZmZpY2lhbGx5IGRlcHJlY2F0ZWQsIGFuZCB3aWxsIGdv
+IHRocm91Z2ggYSBmdWxsCiBkZXByZWNhdGlvbiBjeWNsZSAoaHR0cHM6Ly9jbG91ZC5nb29n
+bGUuY29tL3Byb2R1Y3RzI3Byb2R1Y3QtbGF1bmNoLXN0YWdlcykKIGJlZm9yZSB0aGUgc2Vy
+dmljZSBpcyB0dXJuZWQgZG93bi4gSG93ZXZlciwgbmV3IGNvZGUgc2hvdWxkIHVzZSB0aGUg
+djEgQVBJCiBnb2luZyBmb3J3YXJkLgoKCgoDBgABEgMoCBcKCgoDBgADEgMpAkYKDAoFBgAD
+mQgSAykCRgoLCgMGAAMSBCoCLDcKDQoFBgADmggSBCoCLDcK7QQKBAYAAgASBDoCRQMa3gQg
+Q3JlYXRlcyBhIG5ldyByZWFkIHNlc3Npb24uIEEgcmVhZCBzZXNzaW9uIGRpdmlkZXMgdGhl
+IGNvbnRlbnRzIG9mIGEKIEJpZ1F1ZXJ5IHRhYmxlIGludG8gb25lIG9yIG1vcmUgc3RyZWFt
+cywgd2hpY2ggY2FuIHRoZW4gYmUgdXNlZCB0byByZWFkCiBkYXRhIGZyb20gdGhlIHRhYmxl
+LiBUaGUgcmVhZCBzZXNzaW9uIGFsc28gc3BlY2lmaWVzIHByb3BlcnRpZXMgb2YgdGhlCiBk
+YXRhIHRvIGJlIHJlYWQsIHN1Y2ggYXMgYSBsaXN0IG9mIGNvbHVtbnMgb3IgYSBwdXNoLWRv
+d24gZmlsdGVyIGRlc2NyaWJpbmcKIHRoZSByb3dzIHRvIGJlIHJldHVybmVkLgoKIEEgcGFy
+dGljdWxhciByb3cgY2FuIGJlIHJlYWQgYnkgYXQgbW9zdCBvbmUgc3RyZWFtLiBXaGVuIHRo
+ZSBjYWxsZXIgaGFzCiByZWFjaGVkIHRoZSBlbmQgb2YgZWFjaCBzdHJlYW0gaW4gdGhlIHNl
+c3Npb24sIHRoZW4gYWxsIHRoZSBkYXRhIGluIHRoZQogdGFibGUgaGFzIGJlZW4gcmVhZC4K
+CiBSZWFkIHNlc3Npb25zIGF1dG9tYXRpY2FsbHkgZXhwaXJlIDYgaG91cnMgYWZ0ZXIgdGhl
+eSBhcmUgY3JlYXRlZCBhbmQgZG8KIG5vdCByZXF1aXJlIG1hbnVhbCBjbGVhbi11cCBieSB0
+aGUgY2FsbGVyLgoKDAoFBgACAAESAzoGFwoMCgUGAAIAAhIDOhgwCgwKBQYAAgADEgM6O0YK
+DQoFBgACAAQSBDsEQgYKEQoJBgACAASwyrwiEgQ7BEIGCg0KBQYAAgAEEgRDBEQzChAKCAYA
+AgAEmwgAEgRDBEQzCqEECgQGAAIBEgRQAlUDGpIEIFJlYWRzIHJvd3MgZnJvbSB0aGUgdGFi
+bGUgaW4gdGhlIGZvcm1hdCBwcmVzY3JpYmVkIGJ5IHRoZSByZWFkIHNlc3Npb24uCiBFYWNo
+IHJlc3BvbnNlIGNvbnRhaW5zIG9uZSBvciBtb3JlIHRhYmxlIHJvd3MsIHVwIHRvIGEgbWF4
+aW11bSBvZiAxMCBNaUIKIHBlciByZXNwb25zZTsgcmVhZCByZXF1ZXN0cyB3aGljaCBhdHRl
+bXB0IHRvIHJlYWQgaW5kaXZpZHVhbCByb3dzIGxhcmdlcgogdGhhbiB0aGlzIHdpbGwgZmFp
+bC4KCiBFYWNoIHJlcXVlc3QgYWxzbyByZXR1cm5zIGEgc2V0IG9mIHN0cmVhbSBzdGF0aXN0
+aWNzIHJlZmxlY3RpbmcgdGhlCiBlc3RpbWF0ZWQgdG90YWwgbnVtYmVyIG9mIHJvd3MgaW4g
+dGhlIHJlYWQgc3RyZWFtLiBUaGlzIG51bWJlciBpcyBjb21wdXRlZAogYmFzZWQgb24gdGhl
+IHRvdGFsIHRhYmxlIHNpemUgYW5kIHRoZSBudW1iZXIgb2YgYWN0aXZlIHN0cmVhbXMgaW4g
+dGhlIHJlYWQKIHNlc3Npb24sIGFuZCBtYXkgY2hhbmdlIGFzIG90aGVyIHN0cmVhbXMgY29u
+dGludWUgdG8gcmVhZCBkYXRhLgoKDAoFBgACAQESA1AGDgoMCgUGAAIBAhIDUA8eCgwKBQYA
+AgEGEgNQKS8KDAoFBgACAQMSA1AwQAoNCgUGAAIBBBIEUQRTBgoRCgkGAAIBBLDKvCISBFEE
+UwYKDAoFBgACAQQSA1QEOwoPCggGAAIBBJsIABIDVAQ7CrwBCgQGAAICEgRaAmEDGq0BIENy
+ZWF0ZXMgYWRkaXRpb25hbCBzdHJlYW1zIGZvciBhIFJlYWRTZXNzaW9uLiBUaGlzIEFQSSBj
+YW4gYmUgdXNlZCB0bwogZHluYW1pY2FsbHkgYWRqdXN0IHRoZSBwYXJhbGxlbGlzbSBvZiBh
+IGJhdGNoIHByb2Nlc3NpbmcgdGFzayB1cHdhcmRzIGJ5CiBhZGRpbmcgYWRkaXRpb25hbCB3
+b3JrZXJzLgoKDAoFBgACAgESA1oGIwoMCgUGAAICAhIDWiRICgwKBQYAAgIDEgNbDzQKDQoF
+BgACAgQSBFwEXwYKEQoJBgACAgSwyrwiEgRcBF8GCgwKBQYAAgIEEgNgBEcKDwoIBgACAgSb
+CAASA2AERwrvBQoEBgACAxIEcQJ3AxrgBSBDYXVzZXMgYSBzaW5nbGUgc3RyZWFtIGluIGEg
+UmVhZFNlc3Npb24gdG8gZ3JhY2VmdWxseSBzdG9wLiBUaGlzCiBBUEkgY2FuIGJlIHVzZWQg
+dG8gZHluYW1pY2FsbHkgYWRqdXN0IHRoZSBwYXJhbGxlbGlzbSBvZiBhIGJhdGNoIHByb2Nl
+c3NpbmcKIHRhc2sgZG93bndhcmRzIHdpdGhvdXQgbG9zaW5nIGRhdGEuCgogVGhpcyBBUEkg
+ZG9lcyBub3QgZGVsZXRlIHRoZSBzdHJlYW0gLS0gaXQgcmVtYWlucyB2aXNpYmxlIGluIHRo
+ZQogUmVhZFNlc3Npb24sIGFuZCBhbnkgZGF0YSBwcm9jZXNzZWQgYnkgdGhlIHN0cmVhbSBp
+cyBub3QgcmVsZWFzZWQgdG8gb3RoZXIKIHN0cmVhbXMuIEhvd2V2ZXIsIG5vIGFkZGl0aW9u
+YWwgZGF0YSB3aWxsIGJlIGFzc2lnbmVkIHRvIHRoZSBzdHJlYW0gb25jZQogdGhpcyBjYWxs
+IGNvbXBsZXRlcy4gQ2FsbGVycyBtdXN0IGNvbnRpbnVlIHJlYWRpbmcgZGF0YSBvbiB0aGUg
+c3RyZWFtIHVudGlsCiB0aGUgZW5kIG9mIHRoZSBzdHJlYW0gaXMgcmVhY2hlZCBzbyB0aGF0
+IGRhdGEgd2hpY2ggaGFzIGFscmVhZHkgYmVlbgogYXNzaWduZWQgdG8gdGhlIHN0cmVhbSB3
+aWxsIGJlIHByb2Nlc3NlZC4KCiBUaGlzIG1ldGhvZCB3aWxsIHJldHVybiBhbiBlcnJvciBp
+ZiB0aGVyZSBhcmUgbm8gb3RoZXIgbGl2ZSBzdHJlYW1zCiBpbiB0aGUgU2Vzc2lvbiwgb3Ig
+aWYgU3BsaXRSZWFkU3RyZWFtKCkgaGFzIGJlZW4gY2FsbGVkIG9uIHRoZSBnaXZlbgogU3Ry
+ZWFtLgoKDAoFBgACAwESA3EGFAoMCgUGAAIDAhIDcRUqCgwKBQYAAgMDEgNxNUoKDQoFBgAC
+AwQSBHIEdQYKEQoJBgACAwSwyrwiEgRyBHUGCgwKBQYAAgMEEgN2BDQKDwoIBgACAwSbCAAS
+A3YENArFBQoEBgACBBIGhgECjAEDGrQFIFNwbGl0cyBhIGdpdmVuIHJlYWQgc3RyZWFtIGlu
+dG8gdHdvIFN0cmVhbXMuIFRoZXNlIHN0cmVhbXMgYXJlIHJlZmVycmVkIHRvCiBhcyB0aGUg
+cHJpbWFyeSBhbmQgdGhlIHJlc2lkdWFsIG9mIHRoZSBzcGxpdC4gVGhlIG9yaWdpbmFsIHN0
+cmVhbSBjYW4gc3RpbGwKIGJlIHJlYWQgZnJvbSBpbiB0aGUgc2FtZSBtYW5uZXIgYXMgYmVm
+b3JlLiBCb3RoIG9mIHRoZSByZXR1cm5lZCBzdHJlYW1zIGNhbgogYWxzbyBiZSByZWFkIGZy
+b20sIGFuZCB0aGUgdG90YWwgcm93cyByZXR1cm4gYnkgYm90aCBjaGlsZCBzdHJlYW1zIHdp
+bGwgYmUKIHRoZSBzYW1lIGFzIHRoZSByb3dzIHJlYWQgZnJvbSB0aGUgb3JpZ2luYWwgc3Ry
+ZWFtLgoKIE1vcmVvdmVyLCB0aGUgdHdvIGNoaWxkIHN0cmVhbXMgd2lsbCBiZSBhbGxvY2F0
+ZWQgYmFjayB0byBiYWNrIGluIHRoZQogb3JpZ2luYWwgU3RyZWFtLiBDb25jcmV0ZWx5LCBp
+dCBpcyBndWFyYW50ZWVkIHRoYXQgZm9yIHN0cmVhbXMgT3JpZ2luYWwsCiBQcmltYXJ5LCBh
+bmQgUmVzaWR1YWwsIHRoYXQgT3JpZ2luYWxbMC1qXSA9IFByaW1hcnlbMC1qXSBhbmQKIE9y
+aWdpbmFsW2otbl0gPSBSZXNpZHVhbFswLW1dIG9uY2UgdGhlIHN0cmVhbXMgaGF2ZSBiZWVu
+IHJlYWQgdG8KIGNvbXBsZXRpb24uCgogVGhpcyBtZXRob2QgaXMgZ3VhcmFudGVlZCB0byBi
+ZSBpZGVtcG90ZW50LgoKDQoFBgACBAESBIYBBhUKDQoFBgACBAISBIYBFiwKDQoFBgACBAMS
+BIcBDyYKDwoFBgACBAQSBogBBIoBBgoTCgkGAAIEBLDKvCISBogBBIoBBgoNCgUGAAIEBBIE
+iwEEPQoQCggGAAIEBJsIABIEiwEEPQpNCgIEABIGkAEAmQEBGj8gSW5mb3JtYXRpb24gYWJv
+dXQgYSBzaW5nbGUgZGF0YSBzdHJlYW0gd2l0aGluIGEgcmVhZCBzZXNzaW9uLgoKCwoDBAAB
+EgSQAQgOCg0KAwQABxIGkQEClAEECg8KBQQAB50IEgaRAQKUAQQKcgoEBAACABIEmAECEhpk
+IE5hbWUgb2YgdGhlIHN0cmVhbSwgaW4gdGhlIGZvcm0KIGBwcm9qZWN0cy97cHJvamVjdF9p
+ZH0vbG9jYXRpb25zL3tsb2NhdGlvbn0vc3RyZWFtcy97c3RyZWFtX2lkfWAuCgoNCgUEAAIA
+BRIEmAECCAoNCgUEAAIAARIEmAEJDQoNCgUEAAIAAxIEmAEQEQpRCgIEARIGnAEAogEBGkMg
+RXhwcmVzc2VzIGEgcG9pbnQgd2l0aGluIGEgZ2l2ZW4gc3RyZWFtIHVzaW5nIGFuIG9mZnNl
+dCBwb3NpdGlvbi4KCgsKAwQBARIEnAEIFgouCgQEAQIAEgSeAQIUGiAgSWRlbnRpZmllciBm
+b3IgYSBnaXZlbiBTdHJlYW0uCgoNCgUEAQIABhIEngECCAoNCgUEAQIAARIEngEJDwoNCgUE
+AQIAAxIEngESEwonCgQEAQIBEgShAQITGhkgUG9zaXRpb24gaW4gdGhlIHN0cmVhbS4KCg0K
+BQQBAgEFEgShAQIHCg0KBQQBAgEBEgShAQgOCg0KBQQBAgEDEgShARESCkgKAgQCEgalAQDJ
+AQEaOiBJbmZvcm1hdGlvbiByZXR1cm5lZCBmcm9tIGEgYENyZWF0ZVJlYWRTZXNzaW9uYCBy
+ZXF1ZXN0LgoKCwoDBAIBEgSlAQgTCg0KAwQCBxIGpgECqQEECg8KBQQCB50IEgamAQKpAQQK
+gwEKBAQCAgASBK0BAhIadSBVbmlxdWUgaWRlbnRpZmllciBmb3IgdGhlIHNlc3Npb24sIGlu
+IHRoZSBmb3JtCiBgcHJvamVjdHMve3Byb2plY3RfaWR9L2xvY2F0aW9ucy97bG9jYXRpb259
+L3Nlc3Npb25zL3tzZXNzaW9uX2lkfWAuCgoNCgUEAgIABRIErQECCAoNCgUEAgIAARIErQEJ
+DQoNCgUEAgIAAxIErQEQEQqJAQoEBAICARIEsQECLBp7IFRpbWUgYXQgd2hpY2ggdGhlIHNl
+c3Npb24gYmVjb21lcyBpbnZhbGlkLiBBZnRlciB0aGlzIHRpbWUsIHN1YnNlcXVlbnQKIHJl
+cXVlc3RzIHRvIHJlYWQgdGhpcyBTZXNzaW9uIHdpbGwgcmV0dXJuIGVycm9ycy4KCg0KBQQC
+AgEGEgSxAQIbCg0KBQQCAgEBEgSxARwnCg0KBQQCAgEDEgSxASorCrQBCgQEAggAEga2AQK8
+AQMaowEgVGhlIHNjaGVtYSBmb3IgdGhlIHJlYWQuIElmIHJlYWRfb3B0aW9ucy5zZWxlY3Rl
+ZF9maWVsZHMgaXMgc2V0LCB0aGUKIHNjaGVtYSBtYXkgYmUgZGlmZmVyZW50IGZyb20gdGhl
+IHRhYmxlIHNjaGVtYSBhcyBpdCB3aWxsIG9ubHkgY29udGFpbgogdGhlIHNlbGVjdGVkIGZp
+ZWxkcy4KCg0KBQQCCAABEgS2AQgOChwKBAQCAgISBLgBBB8aDiBBdnJvIHNjaGVtYS4KCg0K
+BQQCAgIGEgS4AQQOCg0KBQQCAgIBEgS4AQ8aCg0KBQQCAgIDEgS4AR0eCh0KBAQCAgMSBLsB
+BCEaDyBBcnJvdyBzY2hlbWEuCgoNCgUEAgIDBhIEuwEEDwoNCgUEAgIDARIEuwEQHAoNCgUE
+AgIDAxIEuwEfIAo1CgQEAgIEEgS/AQIeGicgU3RyZWFtcyBhc3NvY2lhdGVkIHdpdGggdGhp
+cyBzZXNzaW9uLgoKDQoFBAICBAQSBL8BAgoKDQoFBAICBAYSBL8BCxEKDQoFBAICBAESBL8B
+EhkKDQoFBAICBAMSBL8BHB0KPAoEBAICBRIEwgECJRouIFRhYmxlIHRoYXQgdGhpcyBSZWFk
+U2Vzc2lvbiBpcyByZWFkaW5nIGZyb20uCgoNCgUEAgIFBhIEwgECEAoNCgUEAgIFARIEwgER
+IAoNCgUEAgIFAxIEwgEjJApWCgQEAgIGEgTFAQIlGkggQW55IG1vZGlmaWVycyB3aGljaCBh
+cmUgYXBwbGllZCB3aGVuIHJlYWRpbmcgZnJvbSB0aGUgc3BlY2lmaWVkIHRhYmxlLgoKDQoF
+BAICBgYSBMUBAhAKDQoFBAICBgESBMUBESAKDQoFBAICBgMSBMUBIyQKTAoEBAICBxIEyAEC
+KRo+IFRoZSBzdHJhdGVneSB0byB1c2UgZm9yIGRpc3RyaWJ1dGluZyBkYXRhIGFtb25nIHRo
+ZSBzdHJlYW1zLgoKDQoFBAICBwYSBMgBAhIKDQoFBAICBwESBMgBEyQKDQoFBAICBwMSBMgB
+JygKNQoCBQASBswBANcBARonIERhdGEgZm9ybWF0IGZvciBpbnB1dCBvciBvdXRwdXQgZGF0
+YS4KCgsKAwUAARIEzAEFDworCgQFAAIAEgTOAQIeGh0gRGF0YSBmb3JtYXQgaXMgdW5zcGVj
+aWZpZWQuCgoNCgUFAAIAARIEzgECGQoNCgUFAAIAAhIEzgEcHQp1CgQFAAIBEgTSAQILGmcg
+QXZybyBpcyBhIHN0YW5kYXJkIG9wZW4gc291cmNlIHJvdyBiYXNlZCBmaWxlIGZvcm1hdC4K
+IFNlZSBodHRwczovL2F2cm8uYXBhY2hlLm9yZy8gZm9yIG1vcmUgZGV0YWlscy4KCg0KBQUA
+AgEBEgTSAQIGCg0KBQUAAgECEgTSAQkKCn0KBAUAAgISBNYBAgwabyBBcnJvdyBpcyBhIHN0
+YW5kYXJkIG9wZW4gc291cmNlIGNvbHVtbi1iYXNlZCBtZXNzYWdlIGZvcm1hdC4KIFNlZSBo
+dHRwczovL2Fycm93LmFwYWNoZS5vcmcvIGZvciBtb3JlIGRldGFpbHMuCgoNCgUFAAICARIE
+1gECBwoNCgUFAAICAhIE1gEKCwpYCgIFARIG2gEA6wEBGkogU3RyYXRlZ3kgZm9yIGRpc3Ry
+aWJ1dGluZyBkYXRhIGFtb25nIG11bHRpcGxlIHN0cmVhbXMgaW4gYSByZWFkIHNlc3Npb24u
+CgoLCgMFAQESBNoBBRUKHwoEBQECABIE3AECJBoRIFNhbWUgYXMgTElRVUlELgoKDQoFBQEC
+AAESBNwBAh8KDQoFBQECAAISBNwBIiMKkwIKBAUBAgESBOIBAg0ahAIgQXNzaWducyBkYXRh
+IHRvIGVhY2ggc3RyZWFtIGJhc2VkIG9uIHRoZSBjbGllbnQncyByZWFkIHJhdGUuIFRoZSBm
+YXN0ZXIgdGhlCiBjbGllbnQgcmVhZHMgZnJvbSBhIHN0cmVhbSwgdGhlIG1vcmUgZGF0YSBp
+cyBhc3NpZ25lZCB0byB0aGUgc3RyZWFtLiBJbgogdGhpcyBzdHJhdGVneSwgaXQncyBwb3Nz
+aWJsZSB0byByZWFkIGFsbCBkYXRhIGZyb20gYSBzaW5nbGUgc3RyZWFtIGV2ZW4gaWYKIHRo
+ZXJlIGFyZSBvdGhlciBzdHJlYW1zIHByZXNlbnQuCgoNCgUFAQIBARIE4gECCAoNCgUFAQIB
+AhIE4gELDAqVAwoEBQECAhIE6gECDxqGAyBBc3NpZ25zIGRhdGEgdG8gZWFjaCBzdHJlYW0g
+c3VjaCB0aGF0IHJvdWdobHkgdGhlIHNhbWUgbnVtYmVyIG9mIHJvd3MgY2FuCiBiZSByZWFk
+IGZyb20gZWFjaCBzdHJlYW0uIEJlY2F1c2UgdGhlIHNlcnZlci1zaWRlIHVuaXQgZm9yIGFz
+c2lnbmluZyBkYXRhCiBpcyBjb2xsZWN0aW9ucyBvZiByb3dzLCB0aGUgQVBJIGRvZXMgbm90
+IGd1YXJhbnRlZSB0aGF0IGVhY2ggc3RyZWFtIHdpbGwKIHJldHVybiB0aGUgc2FtZSBudW1i
+ZXIgb3Igcm93cy4gQWRkaXRpb25hbGx5LCB0aGUgbGltaXRzIGFyZSBlbmZvcmNlZCBiYXNl
+ZAogb24gdGhlIG51bWJlciBvZiBwcmUtZmlsdGVyaW5nIHJvd3MsIHNvIHNvbWUgZmlsdGVy
+cyBjYW4gbGVhZCB0byBsb3BzaWRlZAogYXNzaWdubWVudHMuCgoNCgUFAQICARIE6gECCgoN
+CgUFAQICAhIE6gENDgqVAQoCBAMSBu8BAJMCARqGASBDcmVhdGVzIGEgbmV3IHJlYWQgc2Vz
+c2lvbiwgd2hpY2ggbWF5IGluY2x1ZGUgYWRkaXRpb25hbCBvcHRpb25zIHN1Y2ggYXMKIHJl
+cXVlc3RlZCBwYXJhbGxlbGlzbSwgcHJvamVjdGlvbiBmaWx0ZXJzIGFuZCBjb25zdHJhaW50
+cy4KCgsKAwQDARIE7wEIIAo5CgQEAwIAEgTxAQJOGisgUmVxdWlyZWQuIFJlZmVyZW5jZSB0
+byB0aGUgdGFibGUgdG8gcmVhZC4KCg0KBQQDAgAGEgTxAQIQCg0KBQQDAgABEgTxAREgCg0K
+BQQDAgADEgTxASMkCg0KBQQDAgAIEgTxASVNChAKCAQDAgAInAgAEgTxASZMCrgBCgQEAwIB
+Egb2AQL7AQQapwEgUmVxdWlyZWQuIFN0cmluZyBvZiB0aGUgZm9ybSBgcHJvamVjdHMve3By
+b2plY3RfaWR9YCBpbmRpY2F0aW5nIHRoZQogcHJvamVjdCB0aGlzIFJlYWRTZXNzaW9uIGlz
+IGFzc29jaWF0ZWQgd2l0aC4gVGhpcyBpcyB0aGUgcHJvamVjdCB0aGF0IHdpbGwKIGJlIGJp
+bGxlZCBmb3IgdXNhZ2UuCgoNCgUEAwIBBRIE9gECCAoNCgUEAwIBARIE9gEJDwoNCgUEAwIB
+AxIE9gESEwoPCgUEAwIBCBIG9gEU+wEDChAKCAQDAgEInAgAEgT3AQQqChEKBwQDAgEInwgS
+BvgBBPoBBQpFCgQEAwICEgT+AQIlGjcgQW55IG1vZGlmaWVycyB0byB0aGUgVGFibGUgKGUu
+Zy4gc25hcHNob3QgdGltZXN0YW1wKS4KCg0KBQQDAgIGEgT+AQIQCg0KBQQDAgIBEgT+AREg
+Cg0KBQQDAgIDEgT+ASMkCo4DCgQEAwIDEgSHAgIeGv8CIEluaXRpYWwgbnVtYmVyIG9mIHN0
+cmVhbXMuIElmIHVuc2V0IG9yIDAsIHdlIHdpbGwKIHByb3ZpZGUgYSB2YWx1ZSBvZiBzdHJl
+YW1zIHNvIGFzIHRvIHByb2R1Y2UgcmVhc29uYWJsZSB0aHJvdWdocHV0LiBNdXN0IGJlCiBu
+b24tbmVnYXRpdmUuIFRoZSBudW1iZXIgb2Ygc3RyZWFtcyBtYXkgYmUgbG93ZXIgdGhhbiB0
+aGUgcmVxdWVzdGVkIG51bWJlciwKIGRlcGVuZGluZyBvbiB0aGUgYW1vdW50IHBhcmFsbGVs
+aXNtIHRoYXQgaXMgcmVhc29uYWJsZSBmb3IgdGhlIHRhYmxlIGFuZAogdGhlIG1heGltdW0g
+YW1vdW50IG9mIHBhcmFsbGVsaXNtIGFsbG93ZWQgYnkgdGhlIHN5c3RlbS4KCiBTdHJlYW1z
+IG11c3QgYmUgcmVhZCBzdGFydGluZyBmcm9tIG9mZnNldCAwLgoKDQoFBAMCAwUSBIcCAgcK
+DQoFBAMCAwESBIcCCBkKDQoFBAMCAwMSBIcCHB0KTwoEBAMCBBIEigICJBpBIFJlYWQgb3B0
+aW9ucyBmb3IgdGhpcyBzZXNzaW9uIChlLmcuIGNvbHVtbiBzZWxlY3Rpb24sIGZpbHRlcnMp
+LgoKDQoFBAMCBAYSBIoCAhIKDQoFBAMCBAESBIoCEx8KDQoFBAMCBAMSBIoCIiMKZgoEBAMC
+BRIEjgICGBpYIERhdGEgb3V0cHV0IGZvcm1hdC4gQ3VycmVudGx5IGRlZmF1bHQgdG8gQXZy
+by4KIERBVEFfRk9STUFUX1VOU1BFQ0lGSUVEIG5vdCBzdXBwb3J0ZWQuCgoNCgUEAwIFBhIE
+jgICDAoNCgUEAwIFARIEjgINEwoNCgUEAwIFAxIEjgIWFwp5CgQEAwIGEgSSAgIpGmsgVGhl
+IHN0cmF0ZWd5IHRvIHVzZSBmb3IgZGlzdHJpYnV0aW5nIGRhdGEgYW1vbmcgbXVsdGlwbGUg
+c3RyZWFtcy4gQ3VycmVudGx5CiBkZWZhdWx0cyB0byBsaXF1aWQgc2hhcmRpbmcuCgoNCgUE
+AwIGBhIEkgICEgoNCgUEAwIGARIEkgITJAoNCgUEAwIGAxIEkgInKApcCgIEBBIGlgIAmwIB
+Gk4gUmVxdWVzdGluZyByb3cgZGF0YSB2aWEgYFJlYWRSb3dzYCBtdXN0IHByb3ZpZGUgU3Ry
+ZWFtIHBvc2l0aW9uIGluZm9ybWF0aW9uLgoKCwoDBAQBEgSWAggXCs0BCgQEBAIAEgSaAgJM
+Gr4BIFJlcXVpcmVkLiBJZGVudGlmaWVyIG9mIHRoZSBwb3NpdGlvbiBpbiB0aGUgc3RyZWFt
+IHRvIHN0YXJ0IHJlYWRpbmcgZnJvbS4KIFRoZSBvZmZzZXQgcmVxdWVzdGVkIG11c3QgYmUg
+bGVzcyB0aGFuIHRoZSBsYXN0IHJvdyByZWFkIGZyb20gUmVhZFJvd3MuCiBSZXF1ZXN0aW5n
+IGEgbGFyZ2VyIG9mZnNldCBpcyB1bmRlZmluZWQuCgoNCgUEBAIABhIEmgICEAoNCgUEBAIA
+ARIEmgIRHgoNCgUEBAIAAxIEmgIhIgoNCgUEBAIACBIEmgIjSwoQCggEBAIACJwIABIEmgIk
+Sgo4CgIEBRIGngIAtgIBGiogUHJvZ3Jlc3MgaW5mb3JtYXRpb24gZm9yIGEgZ2l2ZW4gU3Ry
+ZWFtLgoKCwoDBAUBEgSeAggUCq8BCgQEBQIAEgSiAgIgGqABIE51bWJlciBvZiBlc3RpbWF0
+ZWQgcm93cyBpbiB0aGUgY3VycmVudCBzdHJlYW0uIE1heSBjaGFuZ2Ugb3ZlciB0aW1lIGFz
+CiBkaWZmZXJlbnQgcmVhZGVycyBpbiB0aGUgc3RyZWFtIHByb2dyZXNzIGF0IHJhdGVzIHdo
+aWNoIGFyZSByZWxhdGl2ZWx5IGZhc3QKIG9yIHNsb3cuCgoNCgUEBQIABRIEogICBwoNCgUE
+BQIAARIEogIIGwoNCgUEBQIAAxIEogIeHwqIAwoEBAUCARIEqwICHhr5AiBBIHZhbHVlIGlu
+IHRoZSByYW5nZSBbMC4wLCAxLjBdIHRoYXQgcmVwcmVzZW50cyB0aGUgZnJhY3Rpb24gb2Yg
+cm93cwogYXNzaWduZWQgdG8gdGhpcyBzdHJlYW0gdGhhdCBoYXZlIGJlZW4gcHJvY2Vzc2Vk
+IGJ5IHRoZSBzZXJ2ZXIuIEluIHRoZQogcHJlc2VuY2Ugb2YgcmVhZCBmaWx0ZXJzLCB0aGUg
+c2VydmVyIG1heSBwcm9jZXNzIG1vcmUgcm93cyB0aGFuIGl0IHJldHVybnMsCiBzbyB0aGlz
+IHZhbHVlIHJlZmxlY3RzIHByb2dyZXNzIHRocm91Z2ggdGhlIHByZS1maWx0ZXJpbmcgcm93
+cy4KCiBUaGlzIHZhbHVlIGlzIG9ubHkgcG9wdWxhdGVkIGZvciBzZXNzaW9ucyBjcmVhdGVk
+IHRocm91Z2ggdGhlIEJBTEFOQ0VECiBzaGFyZGluZyBzdHJhdGVneS4KCg0KBQQFAgEFEgSr
+AgIHCg0KBQQFAgEBEgSrAggZCg0KBQQFAgEDEgSrAhwdCj4KBAQFAgISBK4CAhgaMCBSZXBy
+ZXNlbnRzIHRoZSBwcm9ncmVzcyBvZiB0aGUgY3VycmVudCBzdHJlYW0uCgoNCgUEBQICBhIE
+rgICCgoNCgUEBQICARIErgILEwoNCgUEBQICAxIErgIWFwr0AgoEBAUCAxIEtQICGRrlAiBX
+aGV0aGVyIHRoaXMgc3RyZWFtIGNhbiBiZSBzcGxpdC4gRm9yIHNlc3Npb25zIHRoYXQgdXNl
+IHRoZSBMSVFVSUQgc2hhcmRpbmcKIHN0cmF0ZWd5LCB0aGlzIHZhbHVlIGlzIGFsd2F5cyBm
+YWxzZS4gRm9yIEJBTEFOQ0VEIHNlc3Npb25zLCB0aGlzIHZhbHVlIGlzCiBmYWxzZSB3aGVu
+IGVub3VnaCBkYXRhIGhhdmUgYmVlbiByZWFkIHN1Y2ggdGhhdCBubyBtb3JlIHNwbGl0cyBh
+cmUgcG9zc2libGUKIGF0IHRoYXQgcG9pbnQgb3IgYmV5b25kLiBGb3Igc21hbGwgdGFibGVz
+IG9yIHN0cmVhbXMgdGhhdCBhcmUgdGhlIHJlc3VsdCBvZgogYSBjaGFpbiBvZiBzcGxpdHMs
+IHRoaXMgdmFsdWUgbWF5IG5ldmVyIGJlIHRydWUuCgoNCgUEBQIDBRIEtQICBgoNCgUEBQID
+ARIEtQIHFAoNCgUEBQIDAxIEtQIXGAoMCgIEBhIGuAIAyQIBCgsKAwQGARIEuAIIEAruBAoE
+BAYCABIExAICHhrfBCBUaGUgZnJhY3Rpb24gb2Ygcm93cyBhc3NpZ25lZCB0byB0aGUgc3Ry
+ZWFtIHRoYXQgaGF2ZSBiZWVuIHByb2Nlc3NlZCBieSB0aGUKIHNlcnZlciBzbyBmYXIsIG5v
+dCBpbmNsdWRpbmcgdGhlIHJvd3MgaW4gdGhlIGN1cnJlbnQgcmVzcG9uc2UgbWVzc2FnZS4K
+CiBUaGlzIHZhbHVlLCBhbG9uZyB3aXRoIGBhdF9yZXNwb25zZV9lbmRgLCBjYW4gYmUgdXNl
+ZCB0byBpbnRlcnBvbGF0ZSB0aGUKIHByb2dyZXNzIG1hZGUgYXMgdGhlIHJvd3MgaW4gdGhl
+IG1lc3NhZ2UgYXJlIGJlaW5nIHByb2Nlc3NlZCB1c2luZyB0aGUKIGZvbGxvd2luZyBmb3Jt
+dWxhOiBgYXRfcmVzcG9uc2Vfc3RhcnQgKyAoYXRfcmVzcG9uc2VfZW5kIC0KIGF0X3Jlc3Bv
+bnNlX3N0YXJ0KSAqIHJvd3NfcHJvY2Vzc2VkX2Zyb21fcmVzcG9uc2UgLyByb3dzX2luX3Jl
+c3BvbnNlYC4KCiBOb3RlIHRoYXQgaWYgYSBmaWx0ZXIgaXMgcHJvdmlkZWQsIHRoZSBgYXRf
+cmVzcG9uc2VfZW5kYCB2YWx1ZSBvZiB0aGUKIHByZXZpb3VzIHJlc3BvbnNlIG1heSBub3Qg
+bmVjZXNzYXJpbHkgYmUgZXF1YWwgdG8gdGhlIGBhdF9yZXNwb25zZV9zdGFydGAKIHZhbHVl
+IG9mIHRoZSBjdXJyZW50IHJlc3BvbnNlLgoKDQoFBAYCAAUSBMQCAgcKDQoFBAYCAAESBMQC
+CBkKDQoFBAYCAAMSBMQCHB0KcgoEBAYCARIEyAICHBpkIFNpbWlsYXIgdG8gYGF0X3Jlc3Bv
+bnNlX3N0YXJ0YCwgZXhjZXB0IHRoYXQgdGhpcyB2YWx1ZSBpbmNsdWRlcyB0aGUgcm93cyBp
+bgogdGhlIGN1cnJlbnQgcmVzcG9uc2UuCgoNCgUEBgIBBRIEyAICBwoNCgUEBgIBARIEyAII
+FwoNCgUEBgIBAxIEyAIaGwpMCgIEBxIGzAIA0AIBGj4gSW5mb3JtYXRpb24gb24gaWYgdGhl
+IGN1cnJlbnQgY29ubmVjdGlvbiBpcyBiZWluZyB0aHJvdHRsZWQuCgoLCgMEBwESBMwCCBYK
+bgoEBAcCABIEzwICHRpgIEhvdyBtdWNoIHRoaXMgY29ubmVjdGlvbiBpcyBiZWluZyB0aHJv
+dHRsZWQuCiAwIGlzIG5vIHRocm90dGxpbmcsIDEwMCBpcyBjb21wbGV0ZWx5IHRocm90dGxl
+ZC4KCg0KBQQHAgAFEgTPAgIHCg0KBQQHAgABEgTPAggYCg0KBQQHAgADEgTPAhscCmwKAgQI
+EgbUAgD3AgEaXiBSZXNwb25zZSBmcm9tIGNhbGxpbmcgYFJlYWRSb3dzYCBtYXkgaW5jbHVk
+ZSByb3cgZGF0YSwgcHJvZ3Jlc3MgYW5kCiB0aHJvdHRsaW5nIGluZm9ybWF0aW9uLgoKCwoD
+BAgBEgTUAggYClMKBAQICAASBtYCAtwCAxpDIFJvdyBkYXRhIGlzIHJldHVybmVkIGluIGZv
+cm1hdCBzcGVjaWZpZWQgZHVyaW5nIHNlc3Npb24gY3JlYXRpb24uCgoNCgUECAgAARIE1gII
+DAozCgQECAIAEgTYAgQbGiUgU2VyaWFsaXplZCByb3cgZGF0YSBpbiBBVlJPIGZvcm1hdC4K
+Cg0KBQQIAgAGEgTYAgQMCg0KBQQIAgABEgTYAg0WCg0KBQQIAgADEgTYAhkaCkAKBAQIAgES
+BNsCBCwaMiBTZXJpYWxpemVkIHJvdyBkYXRhIGluIEFycm93IFJlY29yZEJhdGNoIGZvcm1h
+dC4KCg0KBQQIAgEGEgTbAgQUCg0KBQQIAgEBEgTbAhUnCg0KBQQIAgEDEgTbAiorCpoCCgQE
+CAICEgTiAgIWGosCIE51bWJlciBvZiBzZXJpYWxpemVkIHJvd3MgaW4gdGhlIHJvd3MgYmxv
+Y2suIFRoaXMgdmFsdWUgaXMgcmVjb3JkZWQgaGVyZSwKIGluIGFkZGl0aW9uIHRvIHRoZSBy
+b3dfY291bnQgdmFsdWVzIGluIHRoZSBvdXRwdXQtc3BlY2lmaWMgbWVzc2FnZXMgaW4KIGBy
+b3dzYCwgc28gdGhhdCBjb2RlIHdoaWNoIG5lZWRzIHRvIHJlY29yZCBwcm9ncmVzcyB0aHJv
+dWdoIHRoZSBzdHJlYW0gY2FuCiBkbyBzbyBpbiBhbiBvdXRwdXQgZm9ybWF0LWluZGVwZW5k
+ZW50IHdheS4KCg0KBQQIAgIFEgTiAgIHCg0KBQQIAgIBEgTiAggRCg0KBQQIAgIDEgTiAhQV
+CiwKBAQIAgMSBOUCAhoaHiBFc3RpbWF0ZWQgc3RyZWFtIHN0YXRpc3RpY3MuCgoNCgUECAID
+BhIE5QICDgoNCgUECAIDARIE5QIPFQoNCgUECAIDAxIE5QIYGQpwCgQECAIEEgTpAgIlGmIg
+VGhyb3R0bGluZyBzdGF0dXMuIElmIHVuc2V0LCB0aGUgbGF0ZXN0IHJlc3BvbnNlIHN0aWxs
+IGRlc2NyaWJlcwogdGhlIGN1cnJlbnQgdGhyb3R0bGluZyBzdGF0dXMuCgoNCgUECAIEBhIE
+6QICEAoNCgUECAIEARIE6QIRIAoNCgUECAIEAxIE6QIjJAq2AgoEBAgIARIG8AIC9gIDGqUC
+IFRoZSBzY2hlbWEgZm9yIHRoZSByZWFkLiBJZiByZWFkX29wdGlvbnMuc2VsZWN0ZWRfZmll
+bGRzIGlzIHNldCwgdGhlCiBzY2hlbWEgbWF5IGJlIGRpZmZlcmVudCBmcm9tIHRoZSB0YWJs
+ZSBzY2hlbWEgYXMgaXQgd2lsbCBvbmx5IGNvbnRhaW4KIHRoZSBzZWxlY3RlZCBmaWVsZHMu
+IFRoaXMgc2NoZW1hIGlzIGVxdWl2YWxlbnQgdG8gdGhlIG9uZSByZXR1cm5lZCBieQogQ3Jl
+YXRlU2Vzc2lvbi4gVGhpcyBmaWVsZCBpcyBvbmx5IHBvcHVsYXRlZCBpbiB0aGUgZmlyc3Qg
+UmVhZFJvd3NSZXNwb25zZQogUlBDLgoKDQoFBAgIAQESBPACCA4KKQoEBAgCBRIE8gIESxob
+IE91dHB1dCBvbmx5LiBBdnJvIHNjaGVtYS4KCg0KBQQIAgUGEgTyAgQOCg0KBQQIAgUBEgTy
+Ag8aCg0KBQQIAgUDEgTyAh0eCg0KBQQIAgUIEgTyAh9KChAKCAQIAgUInAgAEgTyAiBJCioK
+BAQIAgYSBPUCBE0aHCBPdXRwdXQgb25seS4gQXJyb3cgc2NoZW1hLgoKDQoFBAgCBgYSBPUC
+BA8KDQoFBAgCBgESBPUCEBwKDQoFBAgCBgMSBPUCHyAKDQoFBAgCBggSBPUCIUwKEAoIBAgC
+BgicCAASBPUCIksKYgoCBAkSBvsCAIQDARpUIEluZm9ybWF0aW9uIG5lZWRlZCB0byByZXF1
+ZXN0IGFkZGl0aW9uYWwgc3RyZWFtcyBmb3IgYW4gZXN0YWJsaXNoZWQgcmVhZAogc2Vzc2lv
+bi4KCgsKAwQJARIE+wIILAqIAQoEBAkCABIE/gICQxp6IFJlcXVpcmVkLiBNdXN0IGJlIGEg
+bm9uLWV4cGlyZWQgc2Vzc2lvbiBvYnRhaW5lZCBmcm9tIGEgY2FsbCB0bwogQ3JlYXRlUmVh
+ZFNlc3Npb24uIE9ubHkgdGhlIG5hbWUgZmllbGQgbmVlZHMgdG8gYmUgc2V0LgoKDQoFBAkC
+AAYSBP4CAg0KDQoFBAkCAAESBP4CDhUKDQoFBAkCAAMSBP4CGBkKDQoFBAkCAAgSBP4CGkIK
+EAoIBAkCAAicCAASBP4CG0EKsQEKBAQJAgESBIMDAkcaogEgUmVxdWlyZWQuIE51bWJlciBv
+ZiBuZXcgc3RyZWFtcyByZXF1ZXN0ZWQuIE11c3QgYmUgcG9zaXRpdmUuCiBOdW1iZXIgb2Yg
+YWRkZWQgc3RyZWFtcyBtYXkgYmUgbGVzcyB0aGFuIHRoaXMsIHNlZSBDcmVhdGVSZWFkU2Vz
+c2lvblJlcXVlc3QKIGZvciBtb3JlIGluZm9ybWF0aW9uLgoKDQoFBAkCAQUSBIMDAgcKDQoF
+BAkCAQESBIMDCBkKDQoFBAkCAQMSBIMDHB0KDQoFBAkCAQgSBIMDHkYKEAoIBAkCAQicCAAS
+BIMDH0UKgAEKAgQKEgaIAwCLAwEaciBUaGUgcmVzcG9uc2UgZnJvbSBgQmF0Y2hDcmVhdGVS
+ZWFkU2Vzc2lvblN0cmVhbXNgIHJldHVybnMgdGhlIHN0cmVhbQogaWRlbnRpZmllcnMgZm9y
+IHRoZSBuZXdseSBjcmVhdGVkIHN0cmVhbXMuCgoLCgMECgESBIgDCC0KJAoEBAoCABIEigMC
+HhoWIE5ld2x5IGFkZGVkIHN0cmVhbXMuCgoNCgUECgIABBIEigMCCgoNCgUECgIABhIEigML
+EQoNCgUECgIAARIEigMSGQoNCgUECgIAAxIEigMcHQpCCgIECxIGjgMAkQMBGjQgUmVxdWVz
+dCBpbmZvcm1hdGlvbiBmb3IgaW52b2tpbmcgYEZpbmFsaXplU3RyZWFtYC4KCgsKAwQLARIE
+jgMIHQotCgQECwIAEgSQAwI9Gh8gUmVxdWlyZWQuIFN0cmVhbSB0byBmaW5hbGl6ZS4KCg0K
+BQQLAgAGEgSQAwIICg0KBQQLAgABEgSQAwkPCg0KBQQLAgADEgSQAxITCg0KBQQLAgAIEgSQ
+AxQ8ChAKCAQLAgAInAgAEgSQAxU7CjoKAgQMEgaUAwCgAwEaLCBSZXF1ZXN0IGluZm9ybWF0
+aW9uIGZvciBgU3BsaXRSZWFkU3RyZWFtYC4KCgsKAwQMARIElAMIHgoqCgQEDAIAEgSWAwJG
+GhwgUmVxdWlyZWQuIFN0cmVhbSB0byBzcGxpdC4KCg0KBQQMAgAGEgSWAwIICg0KBQQMAgAB
+EgSWAwkYCg0KBQQMAgADEgSWAxscCg0KBQQMAgAIEgSWAx1FChAKCAQMAgAInAgAEgSWAx5E
+CooECgQEDAIBEgSfAwIVGvsDIEEgdmFsdWUgaW4gdGhlIHJhbmdlICgwLjAsIDEuMCkgdGhh
+dCBzcGVjaWZpZXMgdGhlIGZyYWN0aW9uYWwgcG9pbnQgYXQKIHdoaWNoIHRoZSBvcmlnaW5h
+bCBzdHJlYW0gc2hvdWxkIGJlIHNwbGl0LiBUaGUgYWN0dWFsIHNwbGl0IHBvaW50IGlzCiBl
+dmFsdWF0ZWQgb24gcHJlLWZpbHRlcmVkIHJvd3MsIHNvIGlmIGEgZmlsdGVyIGlzIHByb3Zp
+ZGVkLCB0aGVuIHRoZXJlIGlzCiBubyBndWFyYW50ZWUgdGhhdCB0aGUgZGl2aXNpb24gb2Yg
+dGhlIHJvd3MgYmV0d2VlbiB0aGUgbmV3IGNoaWxkIHN0cmVhbXMKIHdpbGwgYmUgcHJvcG9y
+dGlvbmFsIHRvIHRoaXMgZnJhY3Rpb25hbCB2YWx1ZS4gQWRkaXRpb25hbGx5LCBiZWNhdXNl
+IHRoZQogc2VydmVyLXNpZGUgdW5pdCBmb3IgYXNzaWduaW5nIGRhdGEgaXMgY29sbGVjdGlv
+bnMgb2Ygcm93cywgdGhpcyBmcmFjdGlvbgogd2lsbCBhbHdheXMgbWFwIHRvIHRvIGEgZGF0
+YSBzdG9yYWdlIGJvdW5kYXJ5IG9uIHRoZSBzZXJ2ZXIgc2lkZS4KCg0KBQQMAgEFEgSfAwIH
+Cg0KBQQMAgEBEgSfAwgQCg0KBQQMAgEDEgSfAxMUCjAKAgQNEgajAwCsAwEaIiBSZXNwb25z
+ZSBmcm9tIGBTcGxpdFJlYWRTdHJlYW1gLgoKCwoDBA0BEgSjAwgfCqcBCgQEDQIAEgSnAwIc
+GpgBIFByaW1hcnkgc3RyZWFtLCB3aGljaCBjb250YWlucyB0aGUgYmVnaW5uaW5nIHBvcnRp
+b24gb2YKIHxvcmlnaW5hbF9zdHJlYW18LiBBbiBlbXB0eSB2YWx1ZSBpbmRpY2F0ZXMgdGhh
+dCB0aGUgb3JpZ2luYWwgc3RyZWFtIGNhbiBubwogbG9uZ2VyIGJlIHNwbGl0LgoKDQoFBA0C
+AAYSBKcDAggKDQoFBA0CAAESBKcDCRcKDQoFBA0CAAMSBKcDGhsKmwEKBAQNAgESBKsDAh4a
+jAEgUmVtYWluZGVyIHN0cmVhbSwgd2hpY2ggY29udGFpbnMgdGhlIHRhaWwgb2YgfG9yaWdp
+bmFsX3N0cmVhbXwuIEFuIGVtcHR5CiB2YWx1ZSBpbmRpY2F0ZXMgdGhhdCB0aGUgb3JpZ2lu
+YWwgc3RyZWFtIGNhbiBubyBsb25nZXIgYmUgc3BsaXQuCgoNCgUEDQIBBhIEqwMCCAoNCgUE
+DQIBARIEqwMJGQoNCgUEDQIBAxIEqwMcHWIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream ===
+    # Fields for Stream
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::StreamPosition ===
+    # Fields for StreamPosition
+    # Field: stream Type: 11 (.google.cloud.bigquery.storage.v1beta1.Stream)
+    # Field: offset Type: 3 ()
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadSession ===
+    # Fields for ReadSession
+    # Field: name Type: 9 ()
+    # Field: expire_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: avro_schema Type: 11 (.google.cloud.bigquery.storage.v1beta1.AvroSchema)
+    # Field: arrow_schema Type: 11 (.google.cloud.bigquery.storage.v1beta1.ArrowSchema)
+    # Field: streams Type: 11 (.google.cloud.bigquery.storage.v1beta1.Stream)
+    # Field: table_reference Type: 11 (.google.cloud.bigquery.storage.v1beta1.TableReference)
+    # Field: table_modifiers Type: 11 (.google.cloud.bigquery.storage.v1beta1.TableModifiers)
+    # Field: sharding_strategy Type: 14 (.google.cloud.bigquery.storage.v1beta1.ShardingStrategy)
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::CreateReadSessionRequest ===
+    # Fields for CreateReadSessionRequest
+    # Field: table_reference Type: 11 (.google.cloud.bigquery.storage.v1beta1.TableReference)
+    # Field: parent Type: 9 ()
+    # Field: table_modifiers Type: 11 (.google.cloud.bigquery.storage.v1beta1.TableModifiers)
+    # Field: requested_streams Type: 5 ()
+    # Field: read_options Type: 11 (.google.cloud.bigquery.storage.v1beta1.TableReadOptions)
+    # Field: format Type: 14 (.google.cloud.bigquery.storage.v1beta1.DataFormat)
+    # Field: sharding_strategy Type: 14 (.google.cloud.bigquery.storage.v1beta1.ShardingStrategy)
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadRowsRequest ===
+    # Fields for ReadRowsRequest
+    # Field: read_position Type: 11 (.google.cloud.bigquery.storage.v1beta1.StreamPosition)
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::StreamStatus ===
+    # Fields for StreamStatus
+    # Field: estimated_row_count Type: 3 ()
+    # Field: fraction_consumed Type: 2 ()
+    # Field: progress Type: 11 (.google.cloud.bigquery.storage.v1beta1.Progress)
+    # Field: is_splittable Type: 8 ()
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::Progress ===
+    # Fields for Progress
+    # Field: at_response_start Type: 2 ()
+    # Field: at_response_end Type: 2 ()
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::ThrottleStatus ===
+    # Fields for ThrottleStatus
+    # Field: throttle_percent Type: 5 ()
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadRowsResponse ===
+    # Fields for ReadRowsResponse
+    # Field: avro_rows Type: 11 (.google.cloud.bigquery.storage.v1beta1.AvroRows)
+    # Field: arrow_record_batch Type: 11 (.google.cloud.bigquery.storage.v1beta1.ArrowRecordBatch)
+    # Field: row_count Type: 3 ()
+    # Field: status Type: 11 (.google.cloud.bigquery.storage.v1beta1.StreamStatus)
+    # Field: throttle_status Type: 11 (.google.cloud.bigquery.storage.v1beta1.ThrottleStatus)
+    # Field: avro_schema Type: 11 (.google.cloud.bigquery.storage.v1beta1.AvroSchema)
+    # Field: arrow_schema Type: 11 (.google.cloud.bigquery.storage.v1beta1.ArrowSchema)
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::BatchCreateReadSessionStreamsRequest ===
+    # Fields for BatchCreateReadSessionStreamsRequest
+    # Field: session Type: 11 (.google.cloud.bigquery.storage.v1beta1.ReadSession)
+    # Field: requested_streams Type: 5 ()
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::BatchCreateReadSessionStreamsResponse ===
+    # Fields for BatchCreateReadSessionStreamsResponse
+    # Field: streams Type: 11 (.google.cloud.bigquery.storage.v1beta1.Stream)
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::FinalizeStreamRequest ===
+    # Fields for FinalizeStreamRequest
+    # Field: stream Type: 11 (.google.cloud.bigquery.storage.v1beta1.Stream)
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::SplitReadStreamRequest ===
+    # Fields for SplitReadStreamRequest
+    # Field: original_stream Type: 11 (.google.cloud.bigquery.storage.v1beta1.Stream)
+    # Field: fraction Type: 2 ()
+
+# === Message: Google::Cloud::Bigquery::Storage::V1beta1::Storage::SplitReadStreamResponse ===
+    # Fields for SplitReadStreamResponse
+    # Field: primary_stream Type: 11 (.google.cloud.bigquery.storage.v1beta1.Stream)
+    # Field: remainder_stream Type: 11 (.google.cloud.bigquery.storage.v1beta1.Stream)
+
+# === Service Client: Google::Cloud::Bigquery::Storage::V1beta1::Storage::BigQueryStorageClient ===
+package Google::Cloud::Bigquery::Storage::V1beta1::Storage::BigQueryStorageClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Bigquery::Storage::V1beta1::Storage::BigQueryStorageClient
+
+Client stub representing the remote C<BigQueryStorage> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'bigquery.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub create_read_session {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Bigquery::Storage::V1beta1::Storage::CreateReadSessionRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.bigquery.storage.v1beta1.BigQueryStorage',
+        method         => 'CreateReadSession',
+        request        => $req,
+        response_class => 'Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadSession',
+    });
+}
+
+sub read_rows {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadRowsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.bigquery.storage.v1beta1.BigQueryStorage',
+        method         => 'ReadRows',
+        request        => $req,
+        response_class => 'Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadRowsResponse',
+    });
+}
+
+sub batch_create_read_session_streams {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Bigquery::Storage::V1beta1::Storage::BatchCreateReadSessionStreamsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.bigquery.storage.v1beta1.BigQueryStorage',
+        method         => 'BatchCreateReadSessionStreams',
+        request        => $req,
+        response_class => 'Google::Cloud::Bigquery::Storage::V1beta1::Storage::BatchCreateReadSessionStreamsResponse',
+    });
+}
+
+sub finalize_stream {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Bigquery::Storage::V1beta1::Storage::FinalizeStreamRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.bigquery.storage.v1beta1.BigQueryStorage',
+        method         => 'FinalizeStream',
+        request        => $req,
+        response_class => 'Google::Protobuf::Empty::Empty',
+    });
+}
+
+sub split_read_stream {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Bigquery::Storage::V1beta1::Storage::SplitReadStreamRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.bigquery.storage.v1beta1.BigQueryStorage',
+        method         => 'SplitReadStream',
+        request        => $req,
+        response_class => 'Google::Cloud::Bigquery::Storage::V1beta1::Storage::SplitReadStreamResponse',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Bigquery::Storage::V1beta1::Storage - Compiled Protocol Buffers messages for google/cloud/bigquery/storage/v1beta1/storage.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::Storage::V1beta1::Storage;
+
+    my $msg = Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream->new({
+        name => $name,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/storage/v1beta1/storage.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream
+
+Information about a single data stream within a read session.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Name of the stream, in the form
+`projects/{project_id}/locations/{location}/streams/{stream_id}`.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::StreamPosition
+
+Expresses a point within a given stream using an offset position.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->stream() >> / C<< $msg->stream($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream>)
+
+Identifier for a given Stream.
+
+=item * C<< $msg->offset() >> / C<< $msg->offset($value) >>
+
+Type: C<Int64>
+
+Position in the stream.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadSession
+
+Information returned from a `CreateReadSession` request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Unique identifier for the session, in the form
+`projects/{project_id}/locations/{location}/sessions/{session_id}`.
+
+=item * C<< $msg->expire_time() >> / C<< $msg->expire_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Time at which the session becomes invalid. After this time, subsequent
+requests to read this Session will return errors.
+
+=item * C<< $msg->avro_schema() >> / C<< $msg->avro_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Avro::AvroSchema>)
+
+Avro schema.
+
+=item * C<< $msg->arrow_schema() >> / C<< $msg->arrow_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Arrow::ArrowSchema>)
+
+Arrow schema.
+
+=item * C<< $msg->streams() >> / C<< $msg->streams($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream>)
+
+Streams associated with this session.
+
+=item * C<< $msg->table_reference() >> / C<< $msg->table_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::TableReference::TableReference>)
+
+Table that this ReadSession is reading from.
+
+=item * C<< $msg->table_modifiers() >> / C<< $msg->table_modifiers($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::TableReference::TableModifiers>)
+
+Any modifiers which are applied when reading from the specified table.
+
+=item * C<< $msg->sharding_strategy() >> / C<< $msg->sharding_strategy($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1beta1::ShardingStrategy>)
+
+The strategy to use for distributing data among the streams.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::CreateReadSessionRequest
+
+Creates a new read session, which may include additional options such as
+requested parallelism, projection filters and constraints.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->table_reference() >> / C<< $msg->table_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::TableReference::TableReference>)
+
+Required. Reference to the table to read.
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. String of the form `projects/{project_id}` indicating the
+project this ReadSession is associated with. This is the project that will
+be billed for usage.
+
+=item * C<< $msg->table_modifiers() >> / C<< $msg->table_modifiers($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::TableReference::TableModifiers>)
+
+Any modifiers to the Table (e.g. snapshot timestamp).
+
+=item * C<< $msg->requested_streams() >> / C<< $msg->requested_streams($value) >>
+
+Type: C<Int32>
+
+Initial number of streams. If unset or 0, we will
+provide a value of streams so as to produce reasonable throughput. Must be
+non-negative. The number of streams may be lower than the requested number,
+depending on the amount parallelism that is reasonable for the table and
+the maximum amount of parallelism allowed by the system.
+
+Streams must be read starting from offset 0.
+
+=item * C<< $msg->read_options() >> / C<< $msg->read_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::ReadOptions::TableReadOptions>)
+
+Read options for this session (e.g. column selection, filters).
+
+=item * C<< $msg->format() >> / C<< $msg->format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1beta1::DataFormat>)
+
+Data output format. Currently default to Avro.
+DATA_FORMAT_UNSPECIFIED not supported.
+
+=item * C<< $msg->sharding_strategy() >> / C<< $msg->sharding_strategy($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1beta1::ShardingStrategy>)
+
+The strategy to use for distributing data among multiple streams. Currently
+defaults to liquid sharding.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadRowsRequest
+
+Requesting row data via `ReadRows` must provide Stream position information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->read_position() >> / C<< $msg->read_position($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::StreamPosition>)
+
+Required. Identifier of the position in the stream to start reading from.
+The offset requested must be less than the last row read from ReadRows.
+Requesting a larger offset is undefined.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::StreamStatus
+
+Progress information for a given Stream.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->estimated_row_count() >> / C<< $msg->estimated_row_count($value) >>
+
+Type: C<Int64>
+
+Number of estimated rows in the current stream. May change over time as
+different readers in the stream progress at rates which are relatively fast
+or slow.
+
+=item * C<< $msg->fraction_consumed() >> / C<< $msg->fraction_consumed($value) >>
+
+Type: C<Float>
+
+A value in the range [0.0, 1.0] that represents the fraction of rows
+assigned to this stream that have been processed by the server. In the
+presence of read filters, the server may process more rows than it returns,
+so this value reflects progress through the pre-filtering rows.
+
+This value is only populated for sessions created through the BALANCED
+sharding strategy.
+
+=item * C<< $msg->progress() >> / C<< $msg->progress($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::Progress>)
+
+Represents the progress of the current stream.
+
+=item * C<< $msg->is_splittable() >> / C<< $msg->is_splittable($value) >>
+
+Type: C<Bool>
+
+Whether this stream can be split. For sessions that use the LIQUID sharding
+strategy, this value is always false. For BALANCED sessions, this value is
+false when enough data have been read such that no more splits are possible
+at that point or beyond. For small tables or streams that are the result of
+a chain of splits, this value may never be true.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::Progress
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->at_response_start() >> / C<< $msg->at_response_start($value) >>
+
+Type: C<Float>
+
+The fraction of rows assigned to the stream that have been processed by the
+server so far, not including the rows in the current response message.
+
+This value, along with `at_response_end`, can be used to interpolate the
+progress made as the rows in the message are being processed using the
+following formula: `at_response_start + (at_response_end -
+at_response_start) * rows_processed_from_response / rows_in_response`.
+
+Note that if a filter is provided, the `at_response_end` value of the
+previous response may not necessarily be equal to the `at_response_start`
+value of the current response.
+
+=item * C<< $msg->at_response_end() >> / C<< $msg->at_response_end($value) >>
+
+Type: C<Float>
+
+Similar to `at_response_start`, except that this value includes the rows in
+the current response.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::ThrottleStatus
+
+Information on if the current connection is being throttled.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->throttle_percent() >> / C<< $msg->throttle_percent($value) >>
+
+Type: C<Int32>
+
+How much this connection is being throttled.
+0 is no throttling, 100 is completely throttled.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadRowsResponse
+
+Response from calling `ReadRows` may include row data, progress and
+throttling information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->avro_rows() >> / C<< $msg->avro_rows($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Avro::AvroRows>)
+
+Serialized row data in AVRO format.
+
+=item * C<< $msg->arrow_record_batch() >> / C<< $msg->arrow_record_batch($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Arrow::ArrowRecordBatch>)
+
+Serialized row data in Arrow RecordBatch format.
+
+=item * C<< $msg->row_count() >> / C<< $msg->row_count($value) >>
+
+Type: C<Int64>
+
+Number of serialized rows in the rows block. This value is recorded here,
+in addition to the row_count values in the output-specific messages in
+`rows`, so that code which needs to record progress through the stream can
+do so in an output format-independent way.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::StreamStatus>)
+
+Estimated stream statistics.
+
+=item * C<< $msg->throttle_status() >> / C<< $msg->throttle_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::ThrottleStatus>)
+
+Throttling status. If unset, the latest response still describes
+the current throttling status.
+
+=item * C<< $msg->avro_schema() >> / C<< $msg->avro_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Avro::AvroSchema>)
+
+Output only. Avro schema.
+
+=item * C<< $msg->arrow_schema() >> / C<< $msg->arrow_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Arrow::ArrowSchema>)
+
+Output only. Arrow schema.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::BatchCreateReadSessionStreamsRequest
+
+Information needed to request additional streams for an established read
+session.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::ReadSession>)
+
+Required. Must be a non-expired session obtained from a call to
+CreateReadSession. Only the name field needs to be set.
+
+=item * C<< $msg->requested_streams() >> / C<< $msg->requested_streams($value) >>
+
+Type: C<Int32>
+
+Required. Number of new streams requested. Must be positive.
+Number of added streams may be less than this, see CreateReadSessionRequest
+for more information.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::BatchCreateReadSessionStreamsResponse
+
+The response from `BatchCreateReadSessionStreams` returns the stream
+identifiers for the newly created streams.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->streams() >> / C<< $msg->streams($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream>)
+
+Newly added streams.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::FinalizeStreamRequest
+
+Request information for invoking `FinalizeStream`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->stream() >> / C<< $msg->stream($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream>)
+
+Required. Stream to finalize.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::SplitReadStreamRequest
+
+Request information for `SplitReadStream`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->original_stream() >> / C<< $msg->original_stream($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream>)
+
+Required. Stream to split.
+
+=item * C<< $msg->fraction() >> / C<< $msg->fraction($value) >>
+
+Type: C<Float>
+
+A value in the range (0.0, 1.0) that specifies the fractional point at
+which the original stream should be split. The actual split point is
+evaluated on pre-filtered rows, so if a filter is provided, then there is
+no guarantee that the division of the rows between the new child streams
+will be proportional to this fractional value. Additionally, because the
+server-side unit for assigning data is collections of rows, this fraction
+will always map to to a data storage boundary on the server side.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1beta1::Storage::SplitReadStreamResponse
+
+Response from `SplitReadStream`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->primary_stream() >> / C<< $msg->primary_stream($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream>)
+
+Primary stream, which contains the beginning portion of
+|original_stream|. An empty value indicates that the original stream can no
+longer be split.
+
+=item * C<< $msg->remainder_stream() >> / C<< $msg->remainder_stream($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::Stream>)
+
+Remainder stream, which contains the tail of |original_stream|. An empty
+value indicates that the original stream can no longer be split.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::Storage::V1beta1::Storage::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

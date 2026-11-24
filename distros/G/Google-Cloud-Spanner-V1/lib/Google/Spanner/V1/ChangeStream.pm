@@ -3,7 +3,7 @@ package Google::Spanner::V1::ChangeStream;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -451,59 +451,103 @@ EOF
     # Field: partition_end_record Type: 11 (.google.spanner.v1.ChangeStreamRecord.PartitionEndRecord)
     # Field: partition_event_record Type: 11 (.google.spanner.v1.ChangeStreamRecord.PartitionEventRecord)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Spanner::V1::ChangeStream::ChangeStreamRecord - Compiled Protocol Buffers message class
+Google::Spanner::V1::ChangeStream - Compiled Protocol Buffers messages for google/spanner/v1/change_stream.proto
 
 =head1 SYNOPSIS
 
     use Google::Spanner::V1::ChangeStream;
 
-    my $msg = Google::Spanner::V1::ChangeStream::ChangeStreamRecord->new(
-        data_change_record => $value,
-    );
+    my $msg = Google::Spanner::V1::ChangeStream::ChangeStreamRecord->new({
+        data_change_record => $data_change_record,
+        heartbeat_record => $heartbeat_record,
+        partition_start_record => $partition_start_record,
+        partition_end_record => $partition_end_record,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->data_change_record();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Spanner::V1::ChangeStream::ChangeStreamRecord->parse($bytes);
 
-=item * B<data_change_record>
-
-Type: Message (.google.spanner.v1.ChangeStreamRecord.DataChangeRecord)
-
-=item * B<heartbeat_record>
-
-Type: Message (.google.spanner.v1.ChangeStreamRecord.HeartbeatRecord)
-
-=item * B<partition_start_record>
-
-Type: Message (.google.spanner.v1.ChangeStreamRecord.PartitionStartRecord)
-
-=item * B<partition_end_record>
-
-Type: Message (.google.spanner.v1.ChangeStreamRecord.PartitionEndRecord)
-
-=item * B<partition_event_record>
-
-Type: Message (.google.spanner.v1.ChangeStreamRecord.PartitionEventRecord)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Spanner::V1::ChangeStream - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/spanner/v1/change_stream.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Spanner::V1::ChangeStream::ChangeStreamRecord
+
+Spanner Change Streams enable customers to capture and stream out changes to
+their Spanner databases in real-time. A change stream
+can be created with option partition_mode='IMMUTABLE_KEY_RANGE' or
+partition_mode='MUTABLE_KEY_RANGE'.
+
+This message is only used in Change Streams created with the option
+partition_mode='MUTABLE_KEY_RANGE'. Spanner automatically creates a special
+Table-Valued Function (TVF) along with each Change Streams. The function
+provides access to the change stream's records. The function is named
+READ_<change_stream_name> (where <change_stream_name> is the
+name of the change stream), and it returns a table with only one column
+called ChangeRecord.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_change_record() >> / C<< $msg->data_change_record($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::ChangeStream::ChangeStreamRecord::DataChangeRecord>)
+
+Data change record describing a data change for a change stream
+partition.
+
+=item * C<< $msg->heartbeat_record() >> / C<< $msg->heartbeat_record($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::ChangeStream::ChangeStreamRecord::HeartbeatRecord>)
+
+Heartbeat record describing a heartbeat for a change stream partition.
+
+=item * C<< $msg->partition_start_record() >> / C<< $msg->partition_start_record($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::ChangeStream::ChangeStreamRecord::PartitionStartRecord>)
+
+Partition start record describing a new change stream partition.
+
+=item * C<< $msg->partition_end_record() >> / C<< $msg->partition_end_record($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::ChangeStream::ChangeStreamRecord::PartitionEndRecord>)
+
+Partition end record describing a terminated change stream partition.
+
+=item * C<< $msg->partition_event_record() >> / C<< $msg->partition_event_record($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::ChangeStream::ChangeStreamRecord::PartitionEventRecord>)
+
+Partition event record describing key range changes for a change stream
+partition.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Spanner::V1::ChangeStream::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

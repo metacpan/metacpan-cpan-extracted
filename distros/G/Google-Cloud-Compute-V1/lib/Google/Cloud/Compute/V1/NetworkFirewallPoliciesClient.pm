@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -838,87 +838,615 @@ The following RPC methods are available in this client:
 
 =item * B<add_association>
 
-Calls the RPC method C<AddAssociation> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_association(
+        firewall_policy          => $firewall_policy,
+        firewall_policy_association_resource => $firewall_policy_association_resource,
+        project                  => $project,
+        replace_existing_association => $replace_existing_association,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<AddAssociation> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddAssociationNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<firewall_policy_association_resource> - L<Google::Cloud::Compute::V1::Compute::FirewallPolicyAssociation>
+
+=item * C<project> - C<string>
+
+=item * C<replace_existing_association> - C<bool>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<add_packet_mirroring_rule>
 
-Calls the RPC method C<AddPacketMirroringRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_packet_mirroring_rule(
+        firewall_policy          => $firewall_policy,
+        firewall_policy_rule_resource => $firewall_policy_rule_resource,
+        max_priority             => $max_priority,
+        min_priority             => $min_priority,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<AddPacketMirroringRule> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddPacketMirroringRuleNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<firewall_policy_rule_resource> - L<Google::Cloud::Compute::V1::Compute::FirewallPolicyRule>
+
+=item * C<max_priority> - C<int32>
+
+=item * C<min_priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<add_rule>
 
-Calls the RPC method C<AddRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_rule(
+        firewall_policy          => $firewall_policy,
+        firewall_policy_rule_resource => $firewall_policy_rule_resource,
+        max_priority             => $max_priority,
+        min_priority             => $min_priority,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<AddRule> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddRuleNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<firewall_policy_rule_resource> - L<Google::Cloud::Compute::V1::Compute::FirewallPolicyRule>
+
+=item * C<max_priority> - C<int32>
+
+=item * C<min_priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<aggregated_list>
 
-Calls the RPC method C<AggregatedList> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list(
+        filter                   => $filter,
+        include_all_scopes       => $include_all_scopes,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        service_project_number   => $service_project_number,
+    );
+
+Calls the RPC method C<AggregatedList> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AggregatedListNetworkFirewallPoliciesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::NetworkFirewallPolicyAggregatedList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<include_all_scopes> - C<bool>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<service_project_number> - C<int64>
+
+=back
 
 =item * B<clone_rules>
 
-Calls the RPC method C<CloneRules> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->clone_rules(
+        firewall_policy          => $firewall_policy,
+        project                  => $project,
+        request_id               => $request_id,
+        source_firewall_policy   => $source_firewall_policy,
+    );
+
+Calls the RPC method C<CloneRules> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CloneRulesNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<source_firewall_policy> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        firewall_policy          => $firewall_policy,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        firewall_policy          => $firewall_policy,
+        project                  => $project,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::FirewallPolicy>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<get_association>
 
-Calls the RPC method C<GetAssociation> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_association(
+        firewall_policy          => $firewall_policy,
+        name                     => $name,
+        project                  => $project,
+    );
+
+Calls the RPC method C<GetAssociation> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetAssociationNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::FirewallPolicyAssociation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<name> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<get_iam_policy>
 
-Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_iam_policy(
+        options_requested_policy_version => $options_requested_policy_version,
+        project                  => $project,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<GetIamPolicy> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetIamPolicyNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<options_requested_policy_version> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<get_packet_mirroring_rule>
 
-Calls the RPC method C<GetPacketMirroringRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_packet_mirroring_rule(
+        firewall_policy          => $firewall_policy,
+        priority                 => $priority,
+        project                  => $project,
+    );
+
+Calls the RPC method C<GetPacketMirroringRule> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetPacketMirroringRuleNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::FirewallPolicyRule>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<get_rule>
 
-Calls the RPC method C<GetRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_rule(
+        firewall_policy          => $firewall_policy,
+        priority                 => $priority,
+        project                  => $project,
+    );
+
+Calls the RPC method C<GetRule> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRuleNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::FirewallPolicyRule>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        firewall_policy_resource => $firewall_policy_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy_resource> - L<Google::Cloud::Compute::V1::Compute::FirewallPolicy>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListNetworkFirewallPoliciesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::FirewallPolicyList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        firewall_policy          => $firewall_policy,
+        firewall_policy_resource => $firewall_policy_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<firewall_policy_resource> - L<Google::Cloud::Compute::V1::Compute::FirewallPolicy>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<patch_packet_mirroring_rule>
 
-Calls the RPC method C<PatchPacketMirroringRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_packet_mirroring_rule(
+        firewall_policy          => $firewall_policy,
+        firewall_policy_rule_resource => $firewall_policy_rule_resource,
+        priority                 => $priority,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<PatchPacketMirroringRule> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchPacketMirroringRuleNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<firewall_policy_rule_resource> - L<Google::Cloud::Compute::V1::Compute::FirewallPolicyRule>
+
+=item * C<priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<patch_rule>
 
-Calls the RPC method C<PatchRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_rule(
+        firewall_policy          => $firewall_policy,
+        firewall_policy_rule_resource => $firewall_policy_rule_resource,
+        priority                 => $priority,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<PatchRule> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchRuleNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<firewall_policy_rule_resource> - L<Google::Cloud::Compute::V1::Compute::FirewallPolicyRule>
+
+=item * C<priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<remove_association>
 
-Calls the RPC method C<RemoveAssociation> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->remove_association(
+        firewall_policy          => $firewall_policy,
+        name                     => $name,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<RemoveAssociation> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RemoveAssociationNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<name> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<remove_packet_mirroring_rule>
 
-Calls the RPC method C<RemovePacketMirroringRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->remove_packet_mirroring_rule(
+        firewall_policy          => $firewall_policy,
+        priority                 => $priority,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<RemovePacketMirroringRule> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RemovePacketMirroringRuleNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<remove_rule>
 
-Calls the RPC method C<RemoveRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->remove_rule(
+        firewall_policy          => $firewall_policy,
+        priority                 => $priority,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<RemoveRule> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RemoveRuleNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<firewall_policy> - C<string>
+
+=item * C<priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<set_iam_policy>
 
-Calls the RPC method C<SetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_iam_policy(
+        global_set_policy_request_resource => $global_set_policy_request_resource,
+        project                  => $project,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<SetIamPolicy> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetIamPolicyNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<global_set_policy_request_resource> - L<Google::Cloud::Compute::V1::Compute::GlobalSetPolicyRequest>
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.NetworkFirewallPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsNetworkFirewallPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=back
 
 =back
 

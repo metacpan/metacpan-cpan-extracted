@@ -183,7 +183,7 @@ is_deeply( [$_, $mflag], [ $r, 0b0010], 'Test #'.$t. ": '$v' to '$r' with option
 
 ###Test #46
 $v = $_ = '1---2';
-$r = '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}2';
+$r = '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/2';
 $op = 'REase';
 $mflag = tex_escape( $_, $op );
 is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
@@ -192,7 +192,7 @@ is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option
 
 ###Test #47
 $v = $_ = '%%%:1---2';
-$r = '{\hskip0pt plus .02em}\%\%\%{\hskip0pt plus .02em}:{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}2';
+$r = '\\hskip0pt plus.02em\\/\%\%\%\\hskip0pt plus.02em\\/:\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/2';
 $op = '!stag REase';
 $mflag = tex_escape( $_, $op );
 is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
@@ -201,7 +201,7 @@ is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option
 
 ###Test #48
 $v = $_ = '%%%:%%%:1---2';
-$r = '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}2';
+$r = '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/2';
 $op = '-stag +stag REase';
 $mflag = tex_escape( $_, $op );
 is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
@@ -250,30 +250,30 @@ for( @arr ) {
 $op = '~ REase hyphen';
 $v = $_ = '~$&,%,$,#,_,{,},^,\2qw\ea-sdf-124-590\\\\\\>>>>---1';
 
-$r = '{\hskip0pt plus .02em}\~\\/\$\&'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\%,\$'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\#,\_'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\{,\}'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\^\\/'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\char92'.
-'{\hskip0pt plus .02em}2'.
-'{\hskip0pt plus .02em}qw\char92'.
-'{\hskip0pt plus .02em}ea"=sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}5'.
-'{\hskip0pt plus .02em}9'.
-'{\hskip0pt plus .02em}0\char92\char92\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1';
+$r = '\\hskip0pt plus.02em\\/\~\\/\$\&'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\%,\$'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\#,\_'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\{,\}'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\^\\/'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\char92'.
+'\\hskip0pt plus.02em\\/2'.
+'\\hskip0pt plus.02em\\/qw\char92'.
+'\\hskip0pt plus.02em\\/ea"=sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/5'.
+'\\hskip0pt plus.02em\\/9'.
+'\\hskip0pt plus.02em\\/0\char92\char92\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1';
 
 $mflag = tex_escape( $_, $op ); # by default, tile = 3
 is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
@@ -283,34 +283,34 @@ is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option
 $op = { esc => 'REase', tile => 5 };
 $_ = $v;
 
-$r = '{\hskip0pt plus .02em}~\$\&'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\%,\$'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\#,\_'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\{,\}'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\^\\/'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\char92'.
-'{\hskip0pt plus .02em}2'.
-'{\hskip0pt plus .02em}qw\char92'.
-'{\hskip0pt plus .02em}ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}59'.
-'{\hskip0pt plus .02em}0'.
-'{\hskip0pt plus .02em}\char92'.
-'{\hskip0pt plus .02em}\char92'.
-'{\hskip0pt plus .02em}\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1';
+$r = '\\hskip0pt plus.02em\\/~\$\&'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\%,\$'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\#,\_'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\{,\}'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\^\\/'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\char92'.
+'\\hskip0pt plus.02em\\/2'.
+'\\hskip0pt plus.02em\\/qw\char92'.
+'\\hskip0pt plus.02em\\/ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/59'.
+'\\hskip0pt plus.02em\\/0'.
+'\\hskip0pt plus.02em\\/\char92'.
+'\\hskip0pt plus.02em\\/\char92'.
+'\\hskip0pt plus.02em\\/\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1';
 
 $mflag = tex_escape( $_, $op );
 is_deeply( [$_, $mflag], [$r, 0b0111 ], 'Test #'.$t. ": '$v' to '$r' with options esc = '$op->{esc}', tile = '$op->{tile}'");
@@ -327,7 +327,7 @@ is_deeply( [$_, $mflag], [$r, 0 ], 'Test #'.$t. ": '$v' to '$r' with options _MF
 
 ###Test #64
 $v = $_ = '%%%:%%%:%%%:%%%:%%%:1---2';
-$r = '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}2';
+$r = '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/2';
 $op = '-stag REase';
 $mflag = tex_escape( $_, $op );
 is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
@@ -336,27 +336,27 @@ is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option
 
 ###Test #65
 $op = '~';
-$v = $_ = q{\	,\ ,\$,\%,\&,\},\{,\-,\*,\/,\=,\.,\_,\^,\~,\#,\\',\`,\",\,,\;,\!,\>,\textbackslash,\hskip 0pt,\relax,\\\\\command}; # active symbols allowed in LaTeX
-$r = q{\	,\char92 ,\$,\%,\&,\},\{,\-,\*,\/,\=,\.,\_,\^,\~,\#,\\',\`,\",\,,\;,\!,\>,\textbackslash,\hskip 0pt,\relax,\char92\char92\char92\\/command};
+$v = $_ = q(\	,\ ,\$$,\%%,\&&,}\},\{{,\-,\*,\/,\=,\.,\__,\^^,\~~,\#,\\',\`,\",\,,\;,\!,\>,\textbackslash,\hskip 0pt,\relax,\\\\\command); # active symbols allowed in LaTeX
+$r = q(\	,\char92 ,\$\$,\%\%,\&\&,\}\},\{\{,\-,\*,\/,\=,\.,\_\_,\^\^\\/,\~\~\\/,\#,\\',\`,\",\,,\;,\!,\>,\textbackslash,\hskip 0pt,\relax,\char92\char92\char92\\/command);
 $mflag = tex_escape( $_, $op );
 is_deeply( [$_, $mflag], [ $r, 0b0010], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
 ++$t;
 
 ###Test #66
 $mflag = tex_escape( $_, $op );
-is_deeply( [$_, $mflag], [ $r, 0], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
+is_deeply( [$_, $mflag], [ $r, 0], 'Test #'.$t. ": '$v' to '$r' 2nd execution with a same string and option '$op'");
 ++$t;
 
 ###Test #67
 tex_escape( $_, $op );
-is( $_, $r, 'Test #'.$t. ": '$v' to '$r' with option '$op' without check output 'mflag'");
+is( $_, $r, 'Test #'.$t. ": '$v' to '$r' with option '$op' 3rd execution, but without check output 'mflag'");
 ++$t;
 
 
 ###Test #68
 $op = '~ mutual';
-$v = $_ = q(\	,\ ,\$,\%,\&,\},\{,\-,\*,\/,\=,\.,\_,\^,\~,\#,\\',\`,\",\,,\;,\!,\>,\textbackslash,\hskip 0pt,\relax,\\\\\command);
-$r = q(\	,\char92 ,\$,\%,\&,\},\{,\-,\*,\/,\=,\.,\_,\^,\~,\#,\\',\`,\",\char92,,\char92;,\char92!,\char92>,\textbackslash,\hskip 0pt,\relax,\char92\char92\char92\\/command);
+$v = $_ = q(\	,\ ,\$,\%,\&\},\{,\-,\*,\/,\=,\.,\_,\^,\~,\#,\\',\`,\",\,,\;,\!,\>,\textbackslash,\hskip 0pt,\relax,\\\\\command);
+$r = q(\	,\char92 ,\$,\%,\&\},\{,\-,\*,\/,\=,\.,\_,\^,\~,\#,\\',\`,\",\char92,,\char92;,\char92!,\char92>,\textbackslash,\hskip 0pt,\relax,\char92\char92\char92\\/command);
 
 $mflag = tex_escape( $_, $op );
 is_deeply( [$_, $mflag], [ $r, 0b0010], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
@@ -370,6 +370,6 @@ q(\char92=,\char92.,\char92\_,\char92\^\/,\char92\~\/,\char92\#,\char92',\char92
 q(\char92;,\char92!,\char92>,\textbackslash,\hskip 0pt,\relax,\char92\char92\char92\/command);
 
 $mflag = tex_escape( $_, $op );
-is_deeply( [$_, $mflag], [ $r, 0b0010], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
+is_deeply( [$_, $mflag], [ $r, 0b0010], 'Test #'.$t. ": '$v' to '$r' 2nd execution with option '$op'");
 ++$t;
 

@@ -1,0 +1,19 @@
+Changes
+lib/Google/Apps/Script/Type/AddonWidgetSet.pm
+lib/Google/Apps/Script/Type/AddonWidgetSet/Types.pm
+lib/Google/Apps/Script/Type/ExtensionPoint.pm
+lib/Google/Apps/Script/Type/ExtensionPoint/Types.pm
+lib/Google/Apps/Script/Type/ScriptManifest.pm
+lib/Google/Apps/Script/Type/ScriptManifest/Types.pm
+lib/Google/Cloud/Apps/Script/Type.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

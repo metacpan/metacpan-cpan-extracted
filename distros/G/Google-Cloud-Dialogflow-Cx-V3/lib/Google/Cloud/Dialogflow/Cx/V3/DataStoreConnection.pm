@@ -1,0 +1,430 @@
+package Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Protobuf::Struct };
+    my $descriptor_b64 = <<'EOF';
+Cjlnb29nbGUvY2xvdWQvZGlhbG9nZmxvdy9jeC92My9kYXRhX3N0b3JlX2Nvbm5lY3Rpb24u
+cHJvdG8SHWdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzGh9nb29nbGUvYXBpL2ZpZWxk
+X2JlaGF2aW9yLnByb3RvGhxnb29nbGUvcHJvdG9idWYvc3RydWN0LnByb3RvIvsBChNEYXRh
+U3RvcmVDb25uZWN0aW9uElQKD2RhdGFfc3RvcmVfdHlwZRgBIAEoDjIsLmdvb2dsZS5jbG91
+ZC5kaWFsb2dmbG93LmN4LnYzLkRhdGFTdG9yZVR5cGVSDWRhdGFTdG9yZVR5cGUSHQoKZGF0
+YV9zdG9yZRgCIAEoCVIJZGF0YVN0b3JlEm8KGGRvY3VtZW50X3Byb2Nlc3NpbmdfbW9kZRgE
+IAEoDjI1Lmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzLkRvY3VtZW50UHJvY2Vzc2lu
+Z01vZGVSFmRvY3VtZW50UHJvY2Vzc2luZ01vZGUi3xUKGkRhdGFTdG9yZUNvbm5lY3Rpb25T
+aWduYWxzEpYBChtyZXdyaXRlcl9tb2RlbF9jYWxsX3NpZ25hbHMYASABKAsyUi5nb29nbGUu
+Y2xvdWQuZGlhbG9nZmxvdy5jeC52My5EYXRhU3RvcmVDb25uZWN0aW9uU2lnbmFscy5SZXdy
+aXRlck1vZGVsQ2FsbFNpZ25hbHNCA+BBAVIYcmV3cml0ZXJNb2RlbENhbGxTaWduYWxzEiwK
+D3Jld3JpdHRlbl9xdWVyeRgCIAEoCUID4EEBUg5yZXdyaXR0ZW5RdWVyeRJ1Cg9zZWFyY2hf
+c25pcHBldHMYAyADKAsyRy5nb29nbGUuY2xvdWQuZGlhbG9nZmxvdy5jeC52My5EYXRhU3Rv
+cmVDb25uZWN0aW9uU2lnbmFscy5TZWFyY2hTbmlwcGV0QgPgQQFSDnNlYXJjaFNuaXBwZXRz
+Eq8BCiRhbnN3ZXJfZ2VuZXJhdGlvbl9tb2RlbF9jYWxsX3NpZ25hbHMYBCABKAsyWi5nb29n
+bGUuY2xvdWQuZGlhbG9nZmxvdy5jeC52My5EYXRhU3RvcmVDb25uZWN0aW9uU2lnbmFscy5B
+bnN3ZXJHZW5lcmF0aW9uTW9kZWxDYWxsU2lnbmFsc0ID4EEBUiBhbnN3ZXJHZW5lcmF0aW9u
+TW9kZWxDYWxsU2lnbmFscxIbCgZhbnN3ZXIYBSABKAlCA+BBAVIGYW5zd2VyEmwKDGFuc3dl
+cl9wYXJ0cxgGIAMoCzJELmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzLkRhdGFTdG9y
+ZUNvbm5lY3Rpb25TaWduYWxzLkFuc3dlclBhcnRCA+BBAVILYW5zd2VyUGFydHMScgoOY2l0
+ZWRfc25pcHBldHMYByADKAsyRi5nb29nbGUuY2xvdWQuZGlhbG9nZmxvdy5jeC52My5EYXRh
+U3RvcmVDb25uZWN0aW9uU2lnbmFscy5DaXRlZFNuaXBwZXRCA+BBAVINY2l0ZWRTbmlwcGV0
+cxJ8ChFncm91bmRpbmdfc2lnbmFscxgIIAEoCzJKLmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93
+LmN4LnYzLkRhdGFTdG9yZUNvbm5lY3Rpb25TaWduYWxzLkdyb3VuZGluZ1NpZ25hbHNCA+BB
+AVIQZ3JvdW5kaW5nU2lnbmFscxJzCg5zYWZldHlfc2lnbmFscxgJIAEoCzJHLmdvb2dsZS5j
+bG91ZC5kaWFsb2dmbG93LmN4LnYzLkRhdGFTdG9yZUNvbm5lY3Rpb25TaWduYWxzLlNhZmV0
+eVNpZ25hbHNCA+BBAVINc2FmZXR5U2lnbmFscxp8ChhSZXdyaXRlck1vZGVsQ2FsbFNpZ25h
+bHMSJwoPcmVuZGVyZWRfcHJvbXB0GAEgASgJUg5yZW5kZXJlZFByb21wdBIhCgxtb2RlbF9v
+dXRwdXQYAiABKAlSC21vZGVsT3V0cHV0EhQKBW1vZGVsGAMgASgJUgVtb2RlbBqiAQoNU2Vh
+cmNoU25pcHBldBIlCg5kb2N1bWVudF90aXRsZRgBIAEoCVINZG9jdW1lbnRUaXRsZRIhCgxk
+b2N1bWVudF91cmkYAiABKAlSC2RvY3VtZW50VXJpEhIKBHRleHQYAyABKAlSBHRleHQSMwoI
+bWV0YWRhdGEYBSABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0UghtZXRhZGF0YRqEAQog
+QW5zd2VyR2VuZXJhdGlvbk1vZGVsQ2FsbFNpZ25hbHMSJwoPcmVuZGVyZWRfcHJvbXB0GAEg
+ASgJUg5yZW5kZXJlZFByb21wdBIhCgxtb2RlbF9vdXRwdXQYAiABKAlSC21vZGVsT3V0cHV0
+EhQKBW1vZGVsGAMgASgJUgVtb2RlbBpPCgpBbnN3ZXJQYXJ0EhIKBHRleHQYASABKAlSBHRl
+eHQSLQoSc3VwcG9ydGluZ19pbmRpY2VzGAIgAygFUhFzdXBwb3J0aW5nSW5kaWNlcxqjAQoM
+Q2l0ZWRTbmlwcGV0Em4KDnNlYXJjaF9zbmlwcGV0GAEgASgLMkcuZ29vZ2xlLmNsb3VkLmRp
+YWxvZ2Zsb3cuY3gudjMuRGF0YVN0b3JlQ29ubmVjdGlvblNpZ25hbHMuU2VhcmNoU25pcHBl
+dFINc2VhcmNoU25pcHBldBIjCg1zbmlwcGV0X2luZGV4GAIgASgFUgxzbmlwcGV0SW5kZXga
+7gMKEEdyb3VuZGluZ1NpZ25hbHMSeAoIZGVjaXNpb24YASABKA4yXC5nb29nbGUuY2xvdWQu
+ZGlhbG9nZmxvdy5jeC52My5EYXRhU3RvcmVDb25uZWN0aW9uU2lnbmFscy5Hcm91bmRpbmdT
+aWduYWxzLkdyb3VuZGluZ0RlY2lzaW9uUghkZWNpc2lvbhJ1CgVzY29yZRgCIAEoDjJfLmdv
+b2dsZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzLkRhdGFTdG9yZUNvbm5lY3Rpb25TaWduYWxz
+Lkdyb3VuZGluZ1NpZ25hbHMuR3JvdW5kaW5nU2NvcmVCdWNrZXRSBXNjb3JlIm0KEUdyb3Vu
+ZGluZ0RlY2lzaW9uEiIKHkdST1VORElOR19ERUNJU0lPTl9VTlNQRUNJRklFRBAAEhkKFUFD
+Q0VQVEVEX0JZX0dST1VORElORxABEhkKFVJFSkVDVEVEX0JZX0dST1VORElORxACInoKFEdy
+b3VuZGluZ1Njb3JlQnVja2V0EiYKIkdST1VORElOR19TQ09SRV9CVUNLRVRfVU5TUEVDSUZJ
+RUQQABIMCghWRVJZX0xPVxABEgcKA0xPVxADEgoKBk1FRElVTRAEEggKBEhJR0gQBRINCglW
+RVJZX0hJR0gQBhrMBAoNU2FmZXR5U2lnbmFscxJyCghkZWNpc2lvbhgBIAEoDjJWLmdvb2ds
+ZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzLkRhdGFTdG9yZUNvbm5lY3Rpb25TaWduYWxzLlNh
+ZmV0eVNpZ25hbHMuU2FmZXR5RGVjaXNpb25SCGRlY2lzaW9uEokBChNiYW5uZWRfcGhyYXNl
+X21hdGNoGAIgASgOMlkuZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zsb3cuY3gudjMuRGF0YVN0b3Jl
+Q29ubmVjdGlvblNpZ25hbHMuU2FmZXR5U2lnbmFscy5CYW5uZWRQaHJhc2VNYXRjaFIRYmFu
+bmVkUGhyYXNlTWF0Y2gSMgoVbWF0Y2hlZF9iYW5uZWRfcGhyYXNlGAMgASgJUhNtYXRjaGVk
+QmFubmVkUGhyYXNlIm0KDlNhZmV0eURlY2lzaW9uEh8KG1NBRkVUWV9ERUNJU0lPTl9VTlNQ
+RUNJRklFRBAAEhwKGEFDQ0VQVEVEX0JZX1NBRkVUWV9DSEVDSxABEhwKGFJFSkVDVEVEX0JZ
+X1NBRkVUWV9DSEVDSxACIpcBChFCYW5uZWRQaHJhc2VNYXRjaBIjCh9CQU5ORURfUEhSQVNF
+X01BVENIX1VOU1BFQ0lGSUVEEAASHAoYQkFOTkVEX1BIUkFTRV9NQVRDSF9OT05FEAESHQoZ
+QkFOTkVEX1BIUkFTRV9NQVRDSF9RVUVSWRACEiAKHEJBTk5FRF9QSFJBU0VfTUFUQ0hfUkVT
+UE9OU0UQAypiCg1EYXRhU3RvcmVUeXBlEh8KG0RBVEFfU1RPUkVfVFlQRV9VTlNQRUNJRklF
+RBAAEg4KClBVQkxJQ19XRUIQARIQCgxVTlNUUlVDVFVSRUQQAhIOCgpTVFJVQ1RVUkVEEAMq
+XQoWRG9jdW1lbnRQcm9jZXNzaW5nTW9kZRIoCiRET0NVTUVOVF9QUk9DRVNTSU5HX01PREVf
+VU5TUEVDSUZJRUQQABINCglET0NVTUVOVFMQARIKCgZDSFVOS1MQAkK7AQohY29tLmdvb2ds
+ZS5jbG91ZC5kaWFsb2dmbG93LmN4LnYzQhhEYXRhU3RvcmVDb25uZWN0aW9uUHJvdG9QAVox
+Y2xvdWQuZ29vZ2xlLmNvbS9nby9kaWFsb2dmbG93L2N4L2FwaXYzL2N4cGI7Y3hwYqICAkRG
+qgIdR29vZ2xlLkNsb3VkLkRpYWxvZ2Zsb3cuQ3guVjPqAiFHb29nbGU6OkNsb3VkOjpEaWFs
+b2dmbG93OjpDWDo6VjNK/0UKBxIFDgCDAgEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAy
+NiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJz
+aW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4
+Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBh
+IGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xp
+Y2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3
+IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIg
+dGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhP
+VVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVz
+cyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3Vh
+Z2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExp
+Y2Vuc2UuCgoICgECEgMQACYKCQoCAwASAxIAKQoJCgIDARIDEwAmCggKAQgSAxUAOgoJCgII
+JRIDFQA6CggKAQgSAxYASAoJCgIICxIDFgBICggKAQgSAxcAIgoJCgIIChIDFwAiCggKAQgS
+AxgAOQoJCgIICBIDGAA5CggKAQgSAxkAOgoJCgIIARIDGQA6CggKAQgSAxoAIAoJCgIIJBID
+GgAgCggKAQgSAxsAOgoJCgIILRIDGwA6CoABCgIEABIEHwAtARp0IEEgZGF0YSBzdG9yZSBj
+b25uZWN0aW9uLiBJdCByZXByZXNlbnRzIGEgZGF0YSBzdG9yZSBpbiBEaXNjb3ZlcnkgRW5n
+aW5lIGFuZAogdGhlIHR5cGUgb2YgdGhlIGNvbnRlbnRzIGl0IGNvbnRhaW5zLgoKCgoDBAAB
+EgMfCBsKNAoEBAACABIDIQIkGicgVGhlIHR5cGUgb2YgdGhlIGNvbm5lY3RlZCBkYXRhIHN0
+b3JlLgoKDAoFBAACAAYSAyECDwoMCgUEAAIAARIDIRAfCgwKBQQAAgADEgMhIiMK5AEKBAQA
+AgESAycCGBrWASBUaGUgZnVsbCBuYW1lIG9mIHRoZSByZWZlcmVuY2VkIGRhdGEgc3RvcmUu
+CiBGb3JtYXRzOgogYHByb2plY3RzL3twcm9qZWN0fS9sb2NhdGlvbnMve2xvY2F0aW9ufS9j
+b2xsZWN0aW9ucy97Y29sbGVjdGlvbn0vZGF0YVN0b3Jlcy97ZGF0YV9zdG9yZX1gCiBgcHJv
+amVjdHMve3Byb2plY3R9L2xvY2F0aW9ucy97bG9jYXRpb259L2RhdGFTdG9yZXMve2RhdGFf
+c3RvcmV9YAoKDAoFBAACAQUSAycCCAoMCgUEAAIBARIDJwkTCgwKBQQAAgEDEgMnFhcK0wEK
+BAQAAgISAywCNhrFASBUaGUgZG9jdW1lbnQgcHJvY2Vzc2luZyBtb2RlIGZvciB0aGUgZGF0
+YSBzdG9yZSBjb25uZWN0aW9uLiBTaG91bGQgb25seSBiZQogc2V0IGZvciBQVUJMSUNfV0VC
+IGFuZCBVTlNUUlVDVFVSRUQgZGF0YSBzdG9yZXMuIElmIG5vdCBzZXQgaXQgaXMKIGNvbnNp
+ZGVyZWQgYXMgRE9DVU1FTlRTLCBhcyB0aGlzIGlzIHRoZSBsZWdhY3kgbW9kZS4KCgwKBQQA
+AgIGEgMsAhgKDAoFBAACAgESAywZMQoMCgUEAAICAxIDLDQ1CloKAgUAEgQxAD4BGk4gVHlw
+ZSBvZiBhIGRhdGEgc3RvcmUuCiBEZXRlcm1pbmVzIGhvdyBzZWFyY2ggaXMgcGVyZm9ybWVk
+IGluIHRoZSBkYXRhIHN0b3JlLgoKCgoDBQABEgMxBRIKhAEKBAUAAgASAzQCIhp3IE5vdCBz
+cGVjaWZpZWQuIFRoaXMgdmFsdWUgaW5kaWNhdGVzIHRoYXQgdGhlIGRhdGEgc3RvcmUgdHlw
+ZSBpcyBub3QKIHNwZWNpZmllZCwgc28gaXQgd2lsbCBub3QgYmUgdXNlZCBkdXJpbmcgc2Vh
+cmNoLgoKDAoFBQACAAESAzQCHQoMCgUFAAIAAhIDNCAhCj0KBAUAAgESAzcCERowIEEgZGF0
+YSBzdG9yZSB0aGF0IGNvbnRhaW5zIHB1YmxpYyB3ZWIgY29udGVudC4KCgwKBQUAAgEBEgM3
+AgwKDAoFBQACAQISAzcPEApECgQFAAICEgM6AhMaNyBBIGRhdGEgc3RvcmUgdGhhdCBjb250
+YWlucyB1bnN0cnVjdHVyZWQgcHJpdmF0ZSBkYXRhLgoKDAoFBQACAgESAzoCDgoMCgUFAAIC
+AhIDOhESCkwKBAUAAgMSAz0CERo/IEEgZGF0YSBzdG9yZSB0aGF0IGNvbnRhaW5zIHN0cnVj
+dHVyZWQgZGF0YSAoZm9yIGV4YW1wbGUgRkFRKS4KCgwKBQUAAgMBEgM9AgwKDAoFBQACAwIS
+Az0PEAqIAgoCBAESBUQA9QEBGvoBIERhdGEgc3RvcmUgY29ubmVjdGlvbiBmZWF0dXJlIG91
+dHB1dCBzaWduYWxzLgogTWlnaHQgYmUgb25seSBwYXJ0aWFsbHkgZmllbGQgaWYgcHJvY2Vz
+c2luZyBzdG9wIGJlZm9yZSB0aGUgZmluYWwgYW5zd2VyLgogUmVhc29ucyBmb3IgdGhpcyBj
+YW4gYmUsIGJ1dCBhcmUgbm90IGxpbWl0ZWQgdG86IGVtcHR5IFVDUyBzZWFyY2ggcmVzdWx0
+cywKIHBvc2l0aXZlIFJBSSBjaGVjayBvdXRjb21lLCBncm91bmRpbmcgZmFpbHVyZSwgLi4u
+CgoKCgMEAQESA0QIIgpDCgQEAQMAEgRGAlADGjUgRGlhZ25vc3RpYyBpbmZvIHJlbGF0ZWQg
+dG8gdGhlIHJld3JpdGVyIG1vZGVsIGNhbGwuCgoMCgUEAQMAARIDRgoiCi0KBgQBAwACABID
+SAQfGh4gUHJvbXB0IGFzIHNlbnQgdG8gdGhlIG1vZGVsLgoKDgoHBAEDAAIABRIDSAQKCg4K
+BwQBAwACAAESA0gLGgoOCgcEAQMAAgADEgNIHR4KMAoGBAEDAAIBEgNLBBwaISBPdXRwdXQg
+b2YgdGhlIGdlbmVyYXRpdmUgbW9kZWwuCgoOCgcEAQMAAgEFEgNLBAoKDgoHBAEDAAIBARID
+SwsXCg4KBwQBAwACAQMSA0saGwqgAQoGBAEDAAICEgNPBBUakAEgTmFtZSBvZiB0aGUgZ2Vu
+ZXJhdGl2ZSBtb2RlbC4gRm9yIGV4YW1wbGUsICJnZW1pbmktdWx0cmEiLCAiZ2VtaW5pLXBy
+byIsCiAiZ2VtaW5pLTEuNS1mbGFzaCIgZXRjLiBEZWZhdWx0cyB0byAiT3RoZXIiIGlmIHRo
+ZSBtb2RlbCBpcyB1bmtub3duLgoKDgoHBAEDAAICBRIDTwQKCg4KBwQBAwACAgESA08LEAoO
+CgcEAQMAAgIDEgNPExQKJwoEBAEDARIEUwJfAxoZIFNlYXJjaCBzbmlwcGV0IGRldGFpbHMu
+CgoMCgUEAQMBARIDUwoXCjEKBgQBAwECABIDVQQeGiIgVGl0bGUgb2YgdGhlIGVuY2xvc2lu
+ZyBkb2N1bWVudC4KCg4KBwQBAwECAAUSA1UECgoOCgcEAQMBAgABEgNVCxkKDgoHBAEDAQIA
+AxIDVRwdCk0KBgQBAwECARIDWAQcGj4gVXJpIGZvciB0aGUgZG9jdW1lbnQuIFByZXNlbnQg
+aWYgc3BlY2lmaWVkIGZvciB0aGUgZG9jdW1lbnQuCgoOCgcEAQMBAgEFEgNYBAoKDgoHBAED
+AQIBARIDWAsXCg4KBwQBAwECAQMSA1gaGwotCgYEAQMBAgISA1sEFBoeIFRleHQgaW5jbHVk
+ZWQgaW4gdGhlIHByb21wdC4KCg4KBwQBAwECAgUSA1sECgoOCgcEAQMBAgIBEgNbCw8KDgoH
+BAEDAQICAxIDWxITCjcKBgQBAwECAxIDXgQoGiggTWV0YWRhdGEgYXNzb2NpYXRlZCB3aXRo
+IHRoZSBkb2N1bWVudC4KCg4KBwQBAwECAwYSA14EGgoOCgcEAQMBAgMBEgNeGyMKDgoHBAED
+AQIDAxIDXiYnCkwKBAQBAwISBGICbAMaPiBEaWFnbm9zdGljIGluZm8gcmVsYXRlZCB0byB0
+aGUgYW5zd2VyIGdlbmVyYXRpb24gbW9kZWwgY2FsbC4KCgwKBQQBAwIBEgNiCioKLQoGBAED
+AgIAEgNkBB8aHiBQcm9tcHQgYXMgc2VudCB0byB0aGUgbW9kZWwuCgoOCgcEAQMCAgAFEgNk
+BAoKDgoHBAEDAgIAARIDZAsaCg4KBwQBAwICAAMSA2QdHgowCgYEAQMCAgESA2cEHBohIE91
+dHB1dCBvZiB0aGUgZ2VuZXJhdGl2ZSBtb2RlbC4KCg4KBwQBAwICAQUSA2cECgoOCgcEAQMC
+AgEBEgNnCxcKDgoHBAEDAgIBAxIDZxobCqABCgYEAQMCAgISA2sEFRqQASBOYW1lIG9mIHRo
+ZSBnZW5lcmF0aXZlIG1vZGVsLiBGb3IgZXhhbXBsZSwgImdlbWluaS11bHRyYSIsICJnZW1p
+bmktcHJvIiwKICJnZW1pbmktMS41LWZsYXNoIiBldGMuIERlZmF1bHRzIHRvICJPdGhlciIg
+aWYgdGhlIG1vZGVsIGlzIHVua25vd24uCgoOCgcEAQMCAgIFEgNrBAoKDgoHBAEDAgICARID
+awsQCg4KBwQBAwICAgMSA2sTFAoqCgQEAQMDEgRvAnUDGhwgQW5zd2VyIHBhcnQgd2l0aCBj
+aXRhdGlvbi4KCgwKBQQBAwMBEgNvChQKKQoGBAEDAwIAEgNxBBQaGiBTdWJzdHJpbmcgb2Yg
+dGhlIGFuc3dlci4KCg4KBwQBAwMCAAUSA3EECgoOCgcEAQMDAgABEgNxCw8KDgoHBAEDAwIA
+AxIDcRITCk4KBgQBAwMCARIDdAQqGj8gQ2l0YXRpb25zIGZvciB0aGlzIGFuc3dlciBwYXJ0
+LiBJbmRpY2VzIG9mIGBzZWFyY2hfc25pcHBldHNgLgoKDgoHBAEDAwIBBBIDdAQMCg4KBwQB
+AwMCAQUSA3QNEgoOCgcEAQMDAgEBEgN0EyUKDgoHBAEDAwIBAxIDdCgpCj0KBAQBAwQSBHgC
+fgMaLyBTbmlwcGV0IGNpdGVkIGJ5IHRoZSBhbnN3ZXIgZ2VuZXJhdGlvbiBtb2RlbC4KCgwK
+BQQBAwQBEgN4ChYKKAoGBAEDBAIAEgN6BCUaGSBEZXRhaWxzIG9mIHRoZSBzbmlwcGV0LgoK
+DgoHBAEDBAIABhIDegQRCg4KBwQBAwQCAAESA3oSIAoOCgcEAQMEAgADEgN6IyQKQQoGBAED
+BAIBEgN9BBwaMiBJbmRleCBvZiB0aGUgc25pcHBldCBpbiBgc2VhcmNoX3NuaXBwZXRzYCBm
+aWVsZC4KCg4KBwQBAwQCAQUSA30ECQoOCgcEAQMEAgEBEgN9ChcKDgoHBAEDBAIBAxIDfRob
+CiQKBAQBAwUSBoEBAqgBAxoUIEdyb3VuZGluZyBzaWduYWxzLgoKDQoFBAEDBQESBIEBChoK
+QwoGBAEDBQQAEgaDAQSMAQUaMSBSZXByZXNlbnRzIHRoZSBkZWNpc2lvbiBvZiB0aGUgZ3Jv
+dW5kaW5nIGNoZWNrLgoKDwoHBAEDBQQAARIEgwEJGgorCggEAQMFBAACABIEhQEGKRoZIERl
+Y2lzaW9uIG5vdCBzcGVjaWZpZWQuCgoRCgkEAQMFBAACAAESBIUBBiQKEQoJBAEDBQQAAgAC
+EgSFAScoCjcKCAQBAwUEAAIBEgSIAQYgGiUgR3JvdW5kaW5nIGhhdmUgYWNjZXB0ZWQgdGhl
+IGFuc3dlci4KChEKCQQBAwUEAAIBARIEiAEGGwoRCgkEAQMFBAACAQISBIgBHh8KNwoIBAED
+BQQAAgISBIsBBiAaJSBHcm91bmRpbmcgaGF2ZSByZWplY3RlZCB0aGUgYW5zd2VyLgoKEQoJ
+BAEDBQQAAgIBEgSLAQYbChEKCQQBAwUEAAICAhIEiwEeHwosCgYEAQMFBAESBo8BBKEBBRoa
+IEdyb3VuZGluZyBzY29yZSBidWNrZXRzLgoKDwoHBAEDBQQBARIEjwEJHQooCggEAQMFBAEC
+ABIEkQEGLRoWIFNjb3JlIG5vdCBzcGVjaWZpZWQuCgoRCgkEAQMFBAECAAESBJEBBigKEQoJ
+BAEDBQQBAgACEgSRASssCkwKCAQBAwUEAQIBEgSUAQYTGjogV2UgaGF2ZSB2ZXJ5IGxvdyBj
+b25maWRlbmNlIHRoYXQgdGhlIGFuc3dlciBpcyBncm91bmRlZC4KChEKCQQBAwUEAQIBARIE
+lAEGDgoRCgkEAQMFBAECAQISBJQBERIKRwoIBAEDBQQBAgISBJcBBg4aNSBXZSBoYXZlIGxv
+dyBjb25maWRlbmNlIHRoYXQgdGhlIGFuc3dlciBpcyBncm91bmRlZC4KChEKCQQBAwUEAQIC
+ARIElwEGCQoRCgkEAQMFBAECAgISBJcBDA0KSgoIBAEDBQQBAgMSBJoBBhEaOCBXZSBoYXZl
+IG1lZGl1bSBjb25maWRlbmNlIHRoYXQgdGhlIGFuc3dlciBpcyBncm91bmRlZC4KChEKCQQB
+AwUEAQIDARIEmgEGDAoRCgkEAQMFBAECAwISBJoBDxAKSAoIBAEDBQQBAgQSBJ0BBg8aNiBX
+ZSBoYXZlIGhpZ2ggY29uZmlkZW5jZSB0aGF0IHRoZSBhbnN3ZXIgaXMgZ3JvdW5kZWQuCgoR
+CgkEAQMFBAECBAESBJ0BBgoKEQoJBAEDBQQBAgQCEgSdAQ0OCk0KCAQBAwUEAQIFEgSgAQYU
+GjsgV2UgaGF2ZSB2ZXJ5IGhpZ2ggY29uZmlkZW5jZSB0aGF0IHRoZSBhbnN3ZXIgaXMgZ3Jv
+dW5kZWQuCgoRCgkEAQMFBAECBQESBKABBg8KEQoJBAEDBQQBAgUCEgSgARITCkEKBgQBAwUC
+ABIEpAEEIxoxIFJlcHJlc2VudHMgdGhlIGRlY2lzaW9uIG9mIHRoZSBncm91bmRpbmcgY2hl
+Y2suCgoPCgcEAQMFAgAGEgSkAQQVCg8KBwQBAwUCAAESBKQBFh4KDwoHBAEDBQIAAxIEpAEh
+IgoxCgYEAQMFAgESBKcBBCMaISBHcm91bmRpbmcgc2NvcmUgYnVja2V0IHNldHRpbmcuCgoP
+CgcEAQMFAgEGEgSnAQQYCg8KBwQBAwUCAQESBKcBGR4KDwoHBAEDBQIBAxIEpwEhIgonCgQE
+AQMGEgarAQLRAQMaFyBTYWZldHkgY2hlY2sgcmVzdWx0cy4KCg0KBQQBAwYBEgSrAQoXCoQB
+CgYEAQMGBAASBq8BBLgBBRpyIFNhZmV0eSBkZWNpc2lvbi4KIEFsbCBraW5kcyBvZiBjaGVj
+ayBhcmUgaW5jb3Jwb3JhdGVkIGludG8gdGhpcyBmaW5hbCBkZWNpc2lvbiwgaW5jbHVkaW5n
+CiBiYW5uZWQgcGhyYXNlcyBjaGVjay4KCg8KBwQBAwYEAAESBK8BCRcKKwoIBAEDBgQAAgAS
+BLEBBiYaGSBEZWNpc2lvbiBub3Qgc3BlY2lmaWVkLgoKEQoJBAEDBgQAAgABEgSxAQYhChEK
+CQQBAwYEAAIAAhIEsQEkJQo+CggEAQMGBAACARIEtAEGIxosIE5vIG1hbnVhbCBvciBhdXRv
+bWF0aWMgc2FmZXR5IGNoZWNrIGZpcmVkLgoKEQoJBAEDBgQAAgEBEgS0AQYeChEKCQQBAwYE
+AAIBAhIEtAEhIgo1CggEAQMGBAACAhIEtwEGIxojIE9uZSBvcmUgbW9yZSBzYWZldHkgY2hl
+Y2tzIGZpcmVkLgoKEQoJBAEDBgQAAgIBEgS3AQYeChEKCQQBAwYEAAICAhIEtwEhIgo6CgYE
+AQMGBAESBrsBBMcBBRooIFNwZWNpZmllcyBiYW5uZWQgcGhyYXNlIG1hdGNoIHN1YmplY3Qu
+CgoPCgcEAQMGBAEBEgS7AQkaCjgKCAQBAwYEAQIAEgS9AQYqGiYgTm8gYmFubmVkIHBocmFz
+ZSBjaGVjayB3YXMgZXhlY3V0ZWQuCgoRCgkEAQMGBAECAAESBL0BBiUKEQoJBAEDBgQBAgAC
+EgS9ASgpCj0KCAQBAwYEAQIBEgTAAQYjGisgQWxsIGJhbm5lZCBwaHJhc2UgY2hlY2tzIGxl
+ZCB0byBubyBtYXRjaC4KChEKCQQBAwYEAQIBARIEwAEGHgoRCgkEAQMGBAECAQISBMABISIK
+NgoIBAEDBgQBAgISBMMBBiQaJCBBIGJhbm5lZCBwaHJhc2UgbWF0Y2hlZCB0aGUgcXVlcnku
+CgoRCgkEAQMGBAECAgESBMMBBh8KEQoJBAEDBgQBAgICEgTDASIjCjkKCAQBAwYEAQIDEgTG
+AQYnGicgQSBiYW5uZWQgcGhyYXNlIG1hdGNoZWQgdGhlIHJlc3BvbnNlLgoKEQoJBAEDBgQB
+AgMBEgTGAQYiChEKCQQBAwYEAQIDAhIExgElJgoiCgYEAQMGAgASBMoBBCAaEiBTYWZldHkg
+ZGVjaXNpb24uCgoPCgcEAQMGAgAGEgTKAQQSCg8KBwQBAwYCAAESBMoBExsKDwoHBAEDBgIA
+AxIEygEeHwo4CgYEAQMGAgESBM0BBC4aKCBTcGVjaWZpZXMgYmFubmVkIHBocmFzZSBtYXRj
+aCBzdWJqZWN0LgoKDwoHBAEDBgIBBhIEzQEEFQoPCgcEAQMGAgEBEgTNARYpCg8KBwQBAwYC
+AQMSBM0BLC0KQQoGBAEDBgICEgTQAQQlGjEgVGhlIG1hdGNoZWQgYmFubmVkIHBocmFzZSBp
+ZiB0aGVyZSB3YXMgYSBtYXRjaC4KCg8KBwQBAwYCAgUSBNABBAoKDwoHBAEDBgICARIE0AEL
+IAoPCgcEAQMGAgIDEgTQASMkCk8KBAQBAgASBtQBAtUBLxo/IE9wdGlvbmFsLiBEaWFnbm9z
+dGljIGluZm8gcmVsYXRlZCB0byB0aGUgcmV3cml0ZXIgbW9kZWwgY2FsbC4KCg0KBQQBAgAG
+EgTUAQIaCg0KBQQBAgABEgTUARs2Cg0KBQQBAgADEgTUATk6Cg0KBQQBAgAIEgTVAQYuChAK
+CAQBAgAInAgAEgTVAQctCkEKBAQBAgESBNgBAkYaMyBPcHRpb25hbC4gUmV3cml0dGVuIHN0
+cmluZyBxdWVyeSB1c2VkIGZvciBzZWFyY2guCgoNCgUEAQIBBRIE2AECCAoNCgUEAQIBARIE
+2AEJGAoNCgUEAQIBAxIE2AEbHAoNCgUEAQIBCBIE2AEdRQoQCggEAQIBCJwIABIE2AEeRApV
+CgQEAQICEgbbAQLcAS8aRSBPcHRpb25hbC4gU2VhcmNoIHNuaXBwZXRzIGluY2x1ZGVkIGlu
+IHRoZSBhbnN3ZXIgZ2VuZXJhdGlvbiBwcm9tcHQuCgoNCgUEAQICBBIE2wECCgoNCgUEAQIC
+BhIE2wELGAoNCgUEAQICARIE2wEZKAoNCgUEAQICAxIE2wErLAoNCgUEAQICCBIE3AEGLgoQ
+CggEAQICCJwIABIE3AEHLQpYCgQEAQIDEgbfAQLgAS8aSCBPcHRpb25hbC4gRGlhZ25vc3Rp
+YyBpbmZvIHJlbGF0ZWQgdG8gdGhlIGFuc3dlciBnZW5lcmF0aW9uIG1vZGVsIGNhbGwuCgoN
+CgUEAQIDBhIE3wECIgoNCgUEAQIDARIE3wEjRwoNCgUEAQIDAxIE3wFKSwoNCgUEAQIDCBIE
+4AEGLgoQCggEAQIDCJwIABIE4AEHLQo0CgQEAQIEEgTjAQI9GiYgT3B0aW9uYWwuIFRoZSBm
+aW5hbCBjb21waWxlZCBhbnN3ZXIuCgoNCgUEAQIEBRIE4wECCAoNCgUEAQIEARIE4wEJDwoN
+CgUEAQIEAxIE4wESEwoNCgUEAQIECBIE4wEUPAoQCggEAQIECJwIABIE4wEVOwqQAQoEBAEC
+BRIE6AECUBqBASBPcHRpb25hbC4gQW5zd2VyIHBhcnRzIHdpdGggcmVsZXZhbnQgY2l0YXRp
+b25zLgogQ29uY2F0ZW5hdGlvbiBvZiB0ZXh0cyBzaG91bGQgYWRkIHVwIHRoZSBgYW5zd2Vy
+YCAobm90IGNvdW50aW5nCiB3aGl0ZXNwYWNlcykuCgoNCgUEAQIFBBIE6AECCgoNCgUEAQIF
+BhIE6AELFQoNCgUEAQIFARIE6AEWIgoNCgUEAQIFAxIE6AElJgoNCgUEAQIFCBIE6AEnTwoQ
+CggEAQIFCJwIABIE6AEoTgprCgQEAQIGEgbsAQLtAS8aWyBPcHRpb25hbC4gU25pcHBldHMg
+Y2l0ZWQgYnkgdGhlIGFuc3dlciBnZW5lcmF0aW9uIG1vZGVsIGZyb20gdGhlIG1vc3QgdG8K
+IGxlYXN0IHJlbGV2YW50LgoKDQoFBAECBgQSBOwBAgoKDQoFBAECBgYSBOwBCxcKDQoFBAEC
+BgESBOwBGCYKDQoFBAECBgMSBOwBKSoKDQoFBAECBggSBO0BBi4KEAoIBAECBgicCAASBO0B
+By0KLgoEBAECBxIG8AEC8QEvGh4gT3B0aW9uYWwuIEdyb3VuZGluZyBzaWduYWxzLgoKDQoF
+BAECBwYSBPABAhIKDQoFBAECBwESBPABEyQKDQoFBAECBwMSBPABJygKDQoFBAECBwgSBPEB
+Bi4KEAoIBAECBwicCAASBPEBBy0KLgoEBAECCBIE9AECTBogIE9wdGlvbmFsLiBTYWZldHkg
+Y2hlY2sgcmVzdWx0LgoKDQoFBAECCAYSBPQBAg8KDQoFBAECCAESBPQBEB4KDQoFBAECCAMS
+BPQBISIKDQoFBAECCAgSBPQBI0sKEAoIBAECCAicCAASBPQBJEoKPwoCBQESBvgBAIMCARox
+IFRoZSBkb2N1bWVudCBwcm9jZXNzaW5nIG1vZGUgb2YgdGhlIGRhdGEgc3RvcmUuCgoLCgMF
+AQESBPgBBRsKtgEKBAUBAgASBPwBAisapwEgTm90IHNwZWNpZmllZC4gVGhpcyBzaG91bGQg
+YmUgc2V0IGZvciBTVFJVQ1RVUkVEIHR5cGUgZGF0YSBzdG9yZXMuIER1ZSB0bwogbGVnYWN5
+IHJlYXNvbnMgdGhpcyBpcyBjb25zaWRlcmVkIGFzIERPQ1VNRU5UUyBmb3IgU1RSVUNUVVJF
+RCBhbmQKIFBVQkxJQ19XRUIgZGF0YSBzdG9yZXMuCgoNCgUFAQIAARIE/AECJgoNCgUFAQIA
+AhIE/AEpKgo1CgQFAQIBEgT/AQIQGicgRG9jdW1lbnRzIGFyZSBwcm9jZXNzZWQgYXMgZG9j
+dW1lbnRzLgoKDQoFBQECAQESBP8BAgsKDQoFBQECAQISBP8BDg8KMgoEBQECAhIEggICDRok
+IERvY3VtZW50cyBhcmUgY29udmVydGVkIHRvIGNodW5rcy4KCg0KBQUBAgIBEgSCAgIICg0K
+BQUBAgICEgSCAgsMYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnection ===
+    # Fields for DataStoreConnection
+    # Field: data_store_type Type: 14 (.google.cloud.dialogflow.cx.v3.DataStoreType)
+    # Field: data_store Type: 9 ()
+    # Field: document_processing_mode Type: 14 (.google.cloud.dialogflow.cx.v3.DocumentProcessingMode)
+
+# === Message: Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnectionSignals ===
+    # Fields for DataStoreConnectionSignals
+    # Field: rewriter_model_call_signals Type: 11 (.google.cloud.dialogflow.cx.v3.DataStoreConnectionSignals.RewriterModelCallSignals)
+    # Field: rewritten_query Type: 9 ()
+    # Field: search_snippets Type: 11 (.google.cloud.dialogflow.cx.v3.DataStoreConnectionSignals.SearchSnippet)
+    # Field: answer_generation_model_call_signals Type: 11 (.google.cloud.dialogflow.cx.v3.DataStoreConnectionSignals.AnswerGenerationModelCallSignals)
+    # Field: answer Type: 9 ()
+    # Field: answer_parts Type: 11 (.google.cloud.dialogflow.cx.v3.DataStoreConnectionSignals.AnswerPart)
+    # Field: cited_snippets Type: 11 (.google.cloud.dialogflow.cx.v3.DataStoreConnectionSignals.CitedSnippet)
+    # Field: grounding_signals Type: 11 (.google.cloud.dialogflow.cx.v3.DataStoreConnectionSignals.GroundingSignals)
+    # Field: safety_signals Type: 11 (.google.cloud.dialogflow.cx.v3.DataStoreConnectionSignals.SafetySignals)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection - Compiled Protocol Buffers messages for google/cloud/dialogflow/cx/v3/data_store_connection.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection;
+
+    my $msg = Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnection->new({
+        data_store_type => $data_store_type,
+        data_store => $data_store,
+        document_processing_mode => $document_processing_mode,
+    });
+
+    # Read or update a field
+    my $val = $msg->data_store_type();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnection->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dialogflow/cx/v3/data_store_connection.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnection
+
+A data store connection. It represents a data store in Discovery Engine and
+the type of the contents it contains.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_store_type() >> / C<< $msg->data_store_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dialogflow::Cx::V3::DataStoreType>)
+
+The type of the connected data store.
+
+=item * C<< $msg->data_store() >> / C<< $msg->data_store($value) >>
+
+Type: C<String>
+
+The full name of the referenced data store.
+Formats:
+`projects/{project}/locations/{location}/collections/{collection}/dataStores/{data_store}`
+`projects/{project}/locations/{location}/dataStores/{data_store}`
+
+=item * C<< $msg->document_processing_mode() >> / C<< $msg->document_processing_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dialogflow::Cx::V3::DocumentProcessingMode>)
+
+The document processing mode for the data store connection. Should only be
+set for PUBLIC_WEB and UNSTRUCTURED data stores. If not set it is
+considered as DOCUMENTS, as this is the legacy mode.
+
+=back
+
+=head2 Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnectionSignals
+
+Data store connection feature output signals.
+Might be only partially field if processing stop before the final answer.
+Reasons for this can be, but are not limited to: empty UCS search results,
+positive RAI check outcome, grounding failure, ...
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->rewriter_model_call_signals() >> / C<< $msg->rewriter_model_call_signals($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnectionSignals::RewriterModelCallSignals>)
+
+Optional. Diagnostic info related to the rewriter model call.
+
+=item * C<< $msg->rewritten_query() >> / C<< $msg->rewritten_query($value) >>
+
+Type: C<String>
+
+Optional. Rewritten string query used for search.
+
+=item * C<< $msg->search_snippets() >> / C<< $msg->search_snippets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnectionSignals::SearchSnippet>)
+
+Optional. Search snippets included in the answer generation prompt.
+
+=item * C<< $msg->answer_generation_model_call_signals() >> / C<< $msg->answer_generation_model_call_signals($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnectionSignals::AnswerGenerationModelCallSignals>)
+
+Optional. Diagnostic info related to the answer generation model call.
+
+=item * C<< $msg->answer() >> / C<< $msg->answer($value) >>
+
+Type: C<String>
+
+Optional. The final compiled answer.
+
+=item * C<< $msg->answer_parts() >> / C<< $msg->answer_parts($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnectionSignals::AnswerPart>)
+
+Optional. Answer parts with relevant citations.
+Concatenation of texts should add up the `answer` (not counting
+whitespaces).
+
+=item * C<< $msg->cited_snippets() >> / C<< $msg->cited_snippets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnectionSignals::CitedSnippet>)
+
+Optional. Snippets cited by the answer generation model from the most to
+least relevant.
+
+=item * C<< $msg->grounding_signals() >> / C<< $msg->grounding_signals($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnectionSignals::GroundingSignals>)
+
+Optional. Grounding signals.
+
+=item * C<< $msg->safety_signals() >> / C<< $msg->safety_signals($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::DataStoreConnectionSignals::SafetySignals>)
+
+Optional. Safety check result.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dialogflow::Cx::V3::DataStoreConnection::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

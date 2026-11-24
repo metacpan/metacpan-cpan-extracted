@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::StandardSql;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -139,44 +139,6 @@ EOF
     # Field: struct_type Type: 11 (.google.cloud.bigquery.v2.StandardSqlStructType)
     # Field: range_element_type Type: 11 (.google.cloud.bigquery.v2.StandardSqlDataType)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::StandardSql;
-
-    my $msg = Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType->new(
-        type_kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<type_kind>
-
-Type: Enum (.google.cloud.bigquery.v2.StandardSqlDataType.TypeKind)
-
-=item * B<array_element_type>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlDataType)
-
-=item * B<struct_type>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlStructType)
-
-=item * B<range_element_type>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlDataType)
-
-=back
-
-=cut
-
 # Enum: StandardSqlDataType::TypeKind
 our $StandardSqlDataType_TYPE_KIND_UNSPECIFIED = 0;
 our $StandardSqlDataType_INT64 = 2;
@@ -197,160 +159,243 @@ our $StandardSqlDataType_ARRAY = 16;
 our $StandardSqlDataType_STRUCT = 17;
 our $StandardSqlDataType_RANGE = 29;
 
-=pod
-
-=head2 Enum: StandardSqlDataType::TypeKind
-
-Values:
-
-=over 4
-
-=item * C<TYPE_KIND_UNSPECIFIED> => 0
-
-=item * C<INT64> => 2
-
-=item * C<BOOL> => 5
-
-=item * C<FLOAT64> => 7
-
-=item * C<STRING> => 8
-
-=item * C<BYTES> => 9
-
-=item * C<TIMESTAMP> => 19
-
-=item * C<DATE> => 10
-
-=item * C<TIME> => 20
-
-=item * C<DATETIME> => 21
-
-=item * C<INTERVAL> => 26
-
-=item * C<GEOGRAPHY> => 22
-
-=item * C<NUMERIC> => 23
-
-=item * C<BIGNUMERIC> => 24
-
-=item * C<JSON> => 25
-
-=item * C<ARRAY> => 16
-
-=item * C<STRUCT> => 17
-
-=item * C<RANGE> => 29
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::StandardSql::StandardSqlField ===
     # Fields for StandardSqlField
     # Field: name Type: 9 ()
     # Field: type Type: 11 (.google.cloud.bigquery.v2.StandardSqlDataType)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::StandardSql::StandardSqlField - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::StandardSql;
-
-    my $msg = Google::Cloud::Bigquery::V2::StandardSql::StandardSqlField->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<type>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlDataType)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::StandardSql::StandardSqlStructType ===
     # Fields for StandardSqlStructType
     # Field: fields Type: 11 (.google.cloud.bigquery.v2.StandardSqlField)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::StandardSql::StandardSqlStructType - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::StandardSql;
-
-    my $msg = Google::Cloud::Bigquery::V2::StandardSql::StandardSqlStructType->new(
-        fields => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<fields>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlField)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::StandardSql::StandardSqlTableType ===
     # Fields for StandardSqlTableType
     # Field: columns Type: 11 (.google.cloud.bigquery.v2.StandardSqlField)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::StandardSql::StandardSqlTableType - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::StandardSql - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/standard_sql.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::StandardSql;
 
-    my $msg = Google::Cloud::Bigquery::V2::StandardSql::StandardSqlTableType->new(
-        columns => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType->new({
+        type_kind => $type_kind,
+        array_element_type => $array_element_type,
+        struct_type => $struct_type,
+        range_element_type => $range_element_type,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->type_kind();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType->parse($bytes);
 
-=item * B<columns>
-
-Type: Message (.google.cloud.bigquery.v2.StandardSqlField)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::StandardSql - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/standard_sql.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType
+
+The data type of a variable such as a function argument.
+Examples include:
+
+* INT64: `{"typeKind": "INT64"}`
+
+* ARRAY<STRING>:
+
+    {
+      "typeKind": "ARRAY",
+      "arrayElementType": {"typeKind": "STRING"}
+    }
+
+* STRUCT<x STRING, y ARRAY<DATE>>:
+
+    {
+      "typeKind": "STRUCT",
+      "structType":
+      {
+        "fields":
+        [
+          {
+            "name": "x",
+            "type": {"typeKind": "STRING"}
+          },
+          {
+            "name": "y",
+            "type":
+            {
+              "typeKind": "ARRAY",
+              "arrayElementType": {"typeKind": "DATE"}
+            }
+          }
+        ]
+      }
+    }
+
+* RANGE<DATE>:
+
+    {
+      "typeKind": "RANGE",
+      "rangeElementType": {"typeKind": "DATE"}
+    }
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type_kind() >> / C<< $msg->type_kind($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::StandardSqlDataType::TypeKind>)
+
+Required. The top level type of this field.
+Can be any GoogleSQL data type (e.g., "INT64", "DATE", "ARRAY").
+
+=item * C<< $msg->array_element_type() >> / C<< $msg->array_element_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType>)
+
+The type of the array's elements, if type_kind = "ARRAY".
+
+=item * C<< $msg->struct_type() >> / C<< $msg->struct_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlStructType>)
+
+The fields of this struct, in order, if type_kind = "STRUCT".
+
+=item * C<< $msg->range_element_type() >> / C<< $msg->range_element_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType>)
+
+The type of the range's elements, if type_kind = "RANGE".
+
+=back
+
+=head3 Enum: StandardSqlDataType::TypeKind
+
+=over 4
+
+=item * C<TYPE_KIND_UNSPECIFIED> => C<0>
+
+=item * C<INT64> => C<2>
+
+=item * C<BOOL> => C<5>
+
+=item * C<FLOAT64> => C<7>
+
+=item * C<STRING> => C<8>
+
+=item * C<BYTES> => C<9>
+
+=item * C<TIMESTAMP> => C<19>
+
+=item * C<DATE> => C<10>
+
+=item * C<TIME> => C<20>
+
+=item * C<DATETIME> => C<21>
+
+=item * C<INTERVAL> => C<26>
+
+=item * C<GEOGRAPHY> => C<22>
+
+=item * C<NUMERIC> => C<23>
+
+=item * C<BIGNUMERIC> => C<24>
+
+=item * C<JSON> => C<25>
+
+=item * C<ARRAY> => C<16>
+
+=item * C<STRUCT> => C<17>
+
+=item * C<RANGE> => C<29>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::StandardSql::StandardSqlField
+
+A field or a column.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. The name of this field. Can be absent for struct fields.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlDataType>)
+
+Optional. The type of this parameter. Absent if not explicitly
+specified (e.g., CREATE FUNCTION statement can omit the return type;
+in this case the output parameter does not have this "type" field).
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::StandardSql::StandardSqlStructType
+
+The representation of a SQL STRUCT type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlField>)
+
+Fields within the struct.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::StandardSql::StandardSqlTableType
+
+A table type
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->columns() >> / C<< $msg->columns($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::StandardSql::StandardSqlField>)
+
+The columns in this table type
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::StandardSql::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

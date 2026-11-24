@@ -10,56 +10,56 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Bigquery::V2::GenAiStats;
-use Google::Cloud::Bigquery::V2::Arrow;
 use Google::Cloud::Bigquery::V2::DecimalTargetTypes;
-use Google::Cloud::Bigquery::V2::JsonExtension;
-use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
-use Google::Cloud::Bigquery::V2::Clustering;
-use Google::Cloud::Bigquery::V2::Error;
 use Google::Cloud::Bigquery::V2::MapTargetType;
-use Google::Cloud::Bigquery::V2::ManagedTableType;
+use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
 use Google::Cloud::Bigquery::V2::LocationMetadata;
+use Google::Cloud::Bigquery::V2::JsonExtension;
+use Google::Cloud::Bigquery::V2::Clustering;
+use Google::Cloud::Bigquery::V2::Arrow;
+use Google::Cloud::Bigquery::V2::Error;
+use Google::Cloud::Bigquery::V2::ManagedTableType;
+use Google::Cloud::Bigquery::V2::GenAiStats;
 use Google::Cloud::Bigquery::V2::UdfResource;
-use Google::Cloud::Bigquery::V2::PropertyGraphReference;
-use Google::Cloud::Bigquery::V2::DataFormatOptions;
-use Google::Cloud::Bigquery::V2::PartitioningDefinition;
-use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
-use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
+use Google::Cloud::Bigquery::V2::TableSchema;
+use Google::Cloud::Bigquery::V2::RestrictionConfig;
 use Google::Cloud::Bigquery::V2::ModelReference;
-use Google::Cloud::Bigquery::V2::StandardSql;
-use Google::Cloud::Bigquery::V2::HivePartitioning;
-use Google::Cloud::Bigquery::V2::EncryptionConfig;
-use Google::Cloud::Bigquery::V2::TableReference;
-use Google::Cloud::Bigquery::V2::DatasetReference;
-use Google::Cloud::Bigquery::V2::RangePartitioning;
-use Google::Cloud::Bigquery::V2::BiglakeConfig;
+use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
 use Google::Cloud::Bigquery::V2::QueryParameter;
+use Google::Cloud::Bigquery::V2::ExternalDatasetReference;
+use Google::Cloud::Bigquery::V2::JobCreationReason;
+use Google::Cloud::Bigquery::V2::PartitioningDefinition;
+use Google::Cloud::Bigquery::V2::PropertyGraphReference;
+use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
+use Google::Cloud::Bigquery::V2::PrivacyPolicy;
 use Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
+use Google::Cloud::Bigquery::V2::TimePartitioning;
+use Google::Cloud::Bigquery::V2::RangePartitioning;
+use Google::Cloud::Bigquery::V2::HivePartitioning;
+use Google::Cloud::Bigquery::V2::Project;
 use Google::Cloud::Bigquery::V2::SessionInfo;
 use Google::Cloud::Bigquery::V2::JobReference;
+use Google::Cloud::Bigquery::V2::BiglakeConfig;
+use Google::Cloud::Bigquery::V2::StandardSql;
+use Google::Cloud::Bigquery::V2::DatasetReference;
+use Google::Cloud::Bigquery::V2::DataFormatOptions;
 use Google::Cloud::Bigquery::V2::RoutineReference;
-use Google::Cloud::Bigquery::V2::JobCreationReason;
-use Google::Cloud::Bigquery::V2::TableSchema;
-use Google::Cloud::Bigquery::V2::TimePartitioning;
-use Google::Cloud::Bigquery::V2::RestrictionConfig;
-use Google::Cloud::Bigquery::V2::PrivacyPolicy;
-use Google::Cloud::Bigquery::V2::ExternalDatasetReference;
-use Google::Cloud::Bigquery::V2::Project;
 use Google::Cloud::Bigquery::V2::JobStatus;
-use Google::Cloud::Bigquery::V2::SystemVariable;
-use Google::Cloud::Bigquery::V2::Model;
-use Google::Cloud::Bigquery::V2::TableConstraints;
+use Google::Cloud::Bigquery::V2::TableReference;
+use Google::Cloud::Bigquery::V2::EncryptionConfig;
 use Google::Cloud::Bigquery::V2::RowAccessPolicy;
-use Google::Cloud::Bigquery::V2::Routine;
 use Google::Cloud::Bigquery::V2::ExternalDataConfig;
+use Google::Cloud::Bigquery::V2::SystemVariable;
+use Google::Cloud::Bigquery::V2::Routine;
+use Google::Cloud::Bigquery::V2::TableConstraints;
+use Google::Cloud::Bigquery::V2::Model;
 use Google::Cloud::Bigquery::V2::Dataset;
-use Google::Cloud::Bigquery::V2::JobStats;
 use Google::Cloud::Bigquery::V2::JobConfig;
 use Google::Cloud::Bigquery::V2::Table;
+use Google::Cloud::Bigquery::V2::JobStats;
 use Google::Cloud::Bigquery::V2::Job;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -406,11 +406,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/hive_partitioning.proto>
 
+=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
+
 =item * C<googleapis/google/cloud/bigquery/v2/job_config.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_creation_reason.proto>
-
-=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_reference.proto>
 
@@ -458,9 +458,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/system_variable.proto>
 
-=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
-
 =item * C<googleapis/google/cloud/bigquery/v2/table.proto>
+
+=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/table_reference.proto>
 
@@ -503,31 +503,212 @@ The following RPC methods are available in this client:
 
 =item * B<cancel_job>
 
-Calls the RPC method C<CancelJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->cancel_job(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<CancelJob> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::CancelJobRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::JobCancelResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<get_job>
 
-Calls the RPC method C<GetJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_job(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<GetJob> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::GetJobRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<insert_job>
 
-Calls the RPC method C<InsertJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert_job(
+        project_id               => $project_id,
+        job                      => $job,
+    );
+
+Calls the RPC method C<InsertJob> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::InsertJobRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job> - L<Google::Cloud::Bigquery::V2::Job::Job>
+
+=back
 
 =item * B<delete_job>
 
-Calls the RPC method C<DeleteJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_job(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<DeleteJob> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::DeleteJobRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<list_jobs>
 
-Calls the RPC method C<ListJobs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_jobs(
+        project_id               => $project_id,
+        all_users                => $all_users,
+        max_results              => $max_results,
+        min_creation_time        => $min_creation_time,
+        max_creation_time        => $max_creation_time,
+        page_token               => $page_token,
+        projection               => $projection,
+        state_filter             => [ ... ],
+        parent_job_id            => $parent_job_id,
+    );
+
+Calls the RPC method C<ListJobs> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::ListJobsRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::JobList>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<all_users> - C<bool>
+
+=item * C<max_results> - L<Google::Protobuf::Int32Value::Int32Value>
+
+=item * C<min_creation_time> - C<uint64>
+
+=item * C<max_creation_time> - L<Google::Protobuf::UInt64Value::UInt64Value>
+
+=item * C<page_token> - C<string>
+
+=item * C<projection> - L<Google::Cloud::Bigquery::V2::Job::Projection>
+
+=item * C<state_filter> - ArrayRef of L<Google::Cloud::Bigquery::V2::Job::StateFilter>
+
+=item * C<parent_job_id> - C<string>
+
+=back
 
 =item * B<get_query_results>
 
-Calls the RPC method C<GetQueryResults> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_query_results(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        start_index              => $start_index,
+        page_token               => $page_token,
+        max_results              => $max_results,
+        timeout_ms               => $timeout_ms,
+        location                 => $location,
+        format_options           => $format_options,
+    );
+
+Calls the RPC method C<GetQueryResults> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::GetQueryResultsRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::GetQueryResultsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<start_index> - L<Google::Protobuf::UInt64Value::UInt64Value>
+
+=item * C<page_token> - C<string>
+
+=item * C<max_results> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<timeout_ms> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<location> - C<string>
+
+=item * C<format_options> - L<Google::Cloud::Bigquery::V2::DataFormatOptions::DataFormatOptions>
+
+=back
 
 =item * B<query>
 
-Calls the RPC method C<Query> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->query(
+        project_id               => $project_id,
+        query_request            => $query_request,
+    );
+
+Calls the RPC method C<Query> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::PostQueryRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::QueryResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<query_request> - L<Google::Cloud::Bigquery::V2::Job::QueryRequest>
+
+=back
 
 =back
 

@@ -3,7 +3,7 @@ package Google::Dataflow::V1beta3::Messages;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -235,83 +235,11 @@ EOF
     # Field: message_text Type: 9 ()
     # Field: message_importance Type: 14 (.google.dataflow.v1beta3.JobMessageImportance)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Messages::JobMessage - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Messages;
-
-    my $msg = Google::Dataflow::V1beta3::Messages::JobMessage->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: String
-
-=item * B<time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<message_text>
-
-Type: String
-
-=item * B<message_importance>
-
-Type: Enum (.google.dataflow.v1beta3.JobMessageImportance)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Messages::StructuredMessage ===
     # Fields for StructuredMessage
     # Field: message_text Type: 9 ()
     # Field: message_key Type: 9 ()
     # Field: parameters Type: 11 (.google.dataflow.v1beta3.StructuredMessage.Parameter)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Messages::StructuredMessage - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Messages;
-
-    my $msg = Google::Dataflow::V1beta3::Messages::StructuredMessage->new(
-        message_text => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message_text>
-
-Type: String
-
-=item * B<message_key>
-
-Type: String
-
-=item * B<parameters>
-
-Type: Message (.google.dataflow.v1beta3.StructuredMessage.Parameter)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Messages::AutoscalingEvent ===
     # Fields for AutoscalingEvent
@@ -322,80 +250,12 @@ Type: Message (.google.dataflow.v1beta3.StructuredMessage.Parameter)
     # Field: time Type: 11 (.google.protobuf.Timestamp)
     # Field: worker_pool Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Messages::AutoscalingEvent - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Messages;
-
-    my $msg = Google::Dataflow::V1beta3::Messages::AutoscalingEvent->new(
-        current_num_workers => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<current_num_workers>
-
-Type: Int64
-
-=item * B<target_num_workers>
-
-Type: Int64
-
-=item * B<event_type>
-
-Type: Enum (.google.dataflow.v1beta3.AutoscalingEvent.AutoscalingEventType)
-
-=item * B<description>
-
-Type: Message (.google.dataflow.v1beta3.StructuredMessage)
-
-=item * B<time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<worker_pool>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: AutoscalingEvent::AutoscalingEventType
 our $AutoscalingEvent_TYPE_UNKNOWN = 0;
 our $AutoscalingEvent_TARGET_NUM_WORKERS_CHANGED = 1;
 our $AutoscalingEvent_CURRENT_NUM_WORKERS_CHANGED = 2;
 our $AutoscalingEvent_ACTUATION_FAILURE = 3;
 our $AutoscalingEvent_NO_CHANGE = 4;
-
-=pod
-
-=head2 Enum: AutoscalingEvent::AutoscalingEventType
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNKNOWN> => 0
-
-=item * C<TARGET_NUM_WORKERS_CHANGED> => 1
-
-=item * C<CURRENT_NUM_WORKERS_CHANGED> => 2
-
-=item * C<ACTUATION_FAILURE> => 3
-
-=item * C<NO_CHANGE> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Messages::ListJobMessagesRequest ===
     # Fields for ListJobMessagesRequest
@@ -408,122 +268,26 @@ Values:
     # Field: end_time Type: 11 (.google.protobuf.Timestamp)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Messages::ListJobMessagesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Messages;
-
-    my $msg = Google::Dataflow::V1beta3::Messages::ListJobMessagesRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<minimum_importance>
-
-Type: Enum (.google.dataflow.v1beta3.JobMessageImportance)
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Messages::ListJobMessagesResponse ===
     # Fields for ListJobMessagesResponse
     # Field: job_messages Type: 11 (.google.dataflow.v1beta3.JobMessage)
     # Field: next_page_token Type: 9 ()
     # Field: autoscaling_events Type: 11 (.google.dataflow.v1beta3.AutoscalingEvent)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Messages::ListJobMessagesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Messages;
-
-    my $msg = Google::Dataflow::V1beta3::Messages::ListJobMessagesResponse->new(
-        job_messages => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<job_messages>
-
-Type: Message (.google.dataflow.v1beta3.JobMessage)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<autoscaling_events>
-
-Type: Message (.google.dataflow.v1beta3.AutoscalingEvent)
-
-=back
-
-=cut
-
 # === Service Client: Google::Dataflow::V1beta3::Messages::MessagesV1Beta3Client ===
 package Google::Dataflow::V1beta3::Messages::MessagesV1Beta3Client;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Dataflow::V1beta3::Messages::MessagesV1Beta3Client
 
-Google::Dataflow::V1beta3::Messages::MessagesV1Beta3Client - Client stub representing the remote MessagesV1Beta3 service
+Client stub representing the remote C<MessagesV1Beta3> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataflow.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -565,13 +329,282 @@ sub list_job_messages {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Dataflow::V1beta3::Messages - Protocol Buffers schema definition
+Google::Dataflow::V1beta3::Messages - Compiled Protocol Buffers messages for google/dataflow/v1beta3/messages.proto
+
+=head1 SYNOPSIS
+
+    use Google::Dataflow::V1beta3::Messages;
+
+    my $msg = Google::Dataflow::V1beta3::Messages::JobMessage->new({
+        id => $id,
+        time => $time,
+        message_text => $message_text,
+        message_importance => $message_importance,
+    });
+
+    # Read or update a field
+    my $val = $msg->id();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Dataflow::V1beta3::Messages::JobMessage->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/dataflow/v1beta3/messages.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Dataflow::V1beta3::Messages::JobMessage
+
+A particular message pertaining to a Dataflow job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Deprecated.
+
+=item * C<< $msg->time() >> / C<< $msg->time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The timestamp of the message.
+
+=item * C<< $msg->message_text() >> / C<< $msg->message_text($value) >>
+
+Type: C<String>
+
+The text of the message.
+
+=item * C<< $msg->message_importance() >> / C<< $msg->message_importance($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::JobMessageImportance>)
+
+Importance level of the message.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Messages::StructuredMessage
+
+A rich message format, including a human readable string, a key for
+identifying the message, and structured data associated with the message for
+programmatic consumption.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message_text() >> / C<< $msg->message_text($value) >>
+
+Type: C<String>
+
+Human-readable version of message.
+
+=item * C<< $msg->message_key() >> / C<< $msg->message_key($value) >>
+
+Type: C<String>
+
+Identifier for this message type.  Used by external systems to
+internationalize or personalize message.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Messages::StructuredMessage::Parameter>)
+
+The structured data associated with this message.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Messages::AutoscalingEvent
+
+A structured message reporting an autoscaling decision made by the Dataflow
+service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->current_num_workers() >> / C<< $msg->current_num_workers($value) >>
+
+Type: C<Int64>
+
+The current number of workers the job has.
+
+=item * C<< $msg->target_num_workers() >> / C<< $msg->target_num_workers($value) >>
+
+Type: C<Int64>
+
+The target number of workers the worker pool wants to resize to use.
+
+=item * C<< $msg->event_type() >> / C<< $msg->event_type($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::AutoscalingEvent::AutoscalingEventType>)
+
+The type of autoscaling event to report.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Messages::StructuredMessage>)
+
+A message describing why the system decided to adjust the current
+number of workers, why it failed, or why the system decided to
+not make any changes to the number of workers.
+
+=item * C<< $msg->time() >> / C<< $msg->time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time this event was emitted to indicate a new target or current
+num_workers value.
+
+=item * C<< $msg->worker_pool() >> / C<< $msg->worker_pool($value) >>
+
+Type: C<String>
+
+A short and friendly name for the worker pool this event refers to.
+
+=back
+
+=head3 Enum: AutoscalingEvent::AutoscalingEventType
+
+=over 4
+
+=item * C<TYPE_UNKNOWN> => C<0>
+
+=item * C<TARGET_NUM_WORKERS_CHANGED> => C<1>
+
+=item * C<CURRENT_NUM_WORKERS_CHANGED> => C<2>
+
+=item * C<ACTUATION_FAILURE> => C<3>
+
+=item * C<NO_CHANGE> => C<4>
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Messages::ListJobMessagesRequest
+
+Request to list job messages.
+Up to max_results messages will be returned in the time range specified
+starting with the oldest messages first. If no time range is specified
+the results with start with the oldest message.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+A project id.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+The job to get messages about.
+
+=item * C<< $msg->minimum_importance() >> / C<< $msg->minimum_importance($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::JobMessageImportance>)
+
+Filter to only get messages with importance >= level
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+If specified, determines the maximum number of messages to
+return.  If unspecified, the service may choose an appropriate
+default, or may return an arbitrarily large number of results.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+If supplied, this should be the value of next_page_token returned
+by an earlier call. This will cause the next page of results to
+be returned.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+If specified, return only messages with timestamps >= start_time.
+The default is the job creation time (i.e. beginning of messages).
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Return only messages with timestamps < end_time. The default is now
+(i.e. return up to the latest messages available).
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+contains the job specified by job_id.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Messages::ListJobMessagesResponse
+
+Response to a request to list job messages.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job_messages() >> / C<< $msg->job_messages($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Messages::JobMessage>)
+
+Messages in ascending timestamp order.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+The token to obtain the next page of results if there are more.
+
+=item * C<< $msg->autoscaling_events() >> / C<< $msg->autoscaling_events($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Messages::AutoscalingEvent>)
+
+Autoscaling events in ascending timestamp order.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Dataflow::V1beta3::Messages::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

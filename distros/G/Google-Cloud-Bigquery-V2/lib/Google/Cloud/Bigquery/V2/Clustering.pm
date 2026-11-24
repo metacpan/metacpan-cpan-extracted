@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::Clustering;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -48,43 +48,70 @@ EOF
     # Fields for Clustering
     # Field: fields Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::Clustering::Clustering - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::Clustering - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/clustering.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::Clustering;
 
-    my $msg = Google::Cloud::Bigquery::V2::Clustering::Clustering->new(
-        fields => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::Clustering::Clustering->new({
+        fields => $fields,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->fields();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::Clustering::Clustering->parse($bytes);
 
-=item * B<fields>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Clustering - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/clustering.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::Clustering::Clustering
+
+Configures table clustering.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<String>
+
+One or more fields on which data should be clustered. Only top-level,
+non-repeated, simple-type fields are supported. The ordering of the
+clustering fields should be prioritized from most to least important
+for filtering purposes.
+
+For additional information, see
+[Introduction to clustered
+tables](https://cloud.google.com/bigquery/docs/clustered-tables#limitations).
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::Clustering::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

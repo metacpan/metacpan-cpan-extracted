@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -158,7 +158,32 @@ The following RPC methods are available in this client:
 
 =item * B<bulk_insert>
 
-Calls the RPC method C<BulkInsert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->bulk_insert(
+        bulk_insert_instance_resource_resource => $bulk_insert_instance_resource_resource,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<BulkInsert> on C<google.cloud.compute.v1.RegionInstances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::BulkInsertRegionInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<bulk_insert_instance_resource_resource> - L<Google::Cloud::Compute::V1::Compute::BulkInsertInstanceResource>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =back
 

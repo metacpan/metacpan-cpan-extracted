@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::CachedContent;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -135,87 +135,143 @@ EOF
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
     # Field: usage_metadata Type: 11 (.google.ai.generativelanguage.v1beta.CachedContent.UsageMetadata)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent - Compiled Protocol Buffers message class
+Google::Ai::Generativelanguage::V1beta::CachedContent - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/cached_content.proto
 
 =head1 SYNOPSIS
 
     use Google::Ai::Generativelanguage::V1beta::CachedContent;
 
-    my $msg = Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent->new(
-        expire_time => $value,
-    );
+    my $msg = Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent->new({
+        expire_time => $expire_time,
+        ttl => $ttl,
+        name => $name,
+        display_name => $display_name,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->expire_time();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent->parse($bytes);
 
-=item * B<expire_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<name>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<model>
-
-Type: String
-
-=item * B<system_instruction>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Content)
-
-=item * B<contents>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Content)
-
-=item * B<tools>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Tool)
-
-=item * B<tool_config>
-
-Type: Message (.google.ai.generativelanguage.v1beta.ToolConfig)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<usage_metadata>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CachedContent.UsageMetadata)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::CachedContent - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/cached_content.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent
+
+Content that has been preprocessed and can be used in subsequent request
+to GenerativeService.
+
+Cached content can be only used with model it was created for.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->expire_time() >> / C<< $msg->expire_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Timestamp in UTC of when this resource is considered expired.
+This is *always* provided on output, regardless of what was sent
+on input.
+
+=item * C<< $msg->ttl() >> / C<< $msg->ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Input only. New TTL for this resource, input only.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The resource name referring to the cached content.
+Format: `cachedContents/{id}`
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. Immutable. The user-generated meaningful display name of the
+cached content. Maximum 128 Unicode characters.
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Required. Immutable. The name of the `Model` to use for cached content
+Format: `models/{model}`
+
+=item * C<< $msg->system_instruction() >> / C<< $msg->system_instruction($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Content>)
+
+Optional. Input only. Immutable. Developer set system instruction.
+Currently text only.
+
+=item * C<< $msg->contents() >> / C<< $msg->contents($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Content>)
+
+Optional. Input only. Immutable. The content to cache.
+
+=item * C<< $msg->tools() >> / C<< $msg->tools($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Tool>)
+
+Optional. Input only. Immutable. A list of `Tools` the model may use to
+generate the next response
+
+=item * C<< $msg->tool_config() >> / C<< $msg->tool_config($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::ToolConfig>)
+
+Optional. Input only. Immutable. Tool config. This config is shared for all
+tools.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Creation time of the cache entry.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. When the cache entry was last updated in UTC time.
+
+=item * C<< $msg->usage_metadata() >> / C<< $msg->usage_metadata($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent::UsageMetadata>)
+
+Output only. Metadata on the usage of the cached content.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::CachedContent::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

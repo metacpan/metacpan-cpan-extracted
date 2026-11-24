@@ -40,17 +40,17 @@ on 'test' => sub {
 	requires 'File::Path';
 	requires 'File::Slurper';
 	requires 'File::Spec';
+	requires 'open';
 	requires 'Scalar::Util';
 	requires 'String::Diff';
 	requires 'Term::ANSIColor';
 	requires 'Test::More';
 	requires 'Turbin';
-	requires 'open';
 };
 
+requires 'common::sense';
 requires 'Data::Printer';
 requires 'List::Util';
-requires 'common::sense';
 requires 'strict';
 requires 'warnings';
 END
@@ -162,7 +162,7 @@ local ($::_g0 = do {[$::cpanfile->md_mod]}, $::_e0 = do {[qw!My My::Third!]}); :
 # Список зависимостей явно указанных в скриптах и модулях без пакетов проекта.
 # 
 ::done_testing; }; subtest 'deps ()' => sub { 
-local ($::_g0 = do {[$::cpanfile->deps]}, $::_e0 = do {[qw!Data::Printer List::Util common::sense strict warnings!]}); ::is_deeply $::_g0, $::_e0, '[$::cpanfile->deps]  # --> [qw!Data::Printer List::Util common::sense strict warnings!]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[$::cpanfile->deps]}, $::_e0 = do {[qw!common::sense Data::Printer List::Util strict warnings!]}); ::is_deeply $::_g0, $::_e0, '[$::cpanfile->deps]  # --> [qw!common::sense Data::Printer List::Util strict warnings!]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## t_deps ()
@@ -174,7 +174,7 @@ local ($::_g0 = do {[$::cpanfile->deps]}, $::_e0 = do {[qw!Data::Printer List::U
 # 3. Внедрённых в `*.md` пакетов.
 # 
 ::done_testing; }; subtest 't_deps ()' => sub { 
-local ($::_g0 = do {[$::cpanfile->t_deps]}, $::_e0 = do {[qw!Car::Auto Carp Cwd Data::Dumper File::Basename File::Find File::Path File::Slurper File::Spec Scalar::Util String::Diff Term::ANSIColor Test::More Turbin open!]}); ::is_deeply $::_g0, $::_e0, '[$::cpanfile->t_deps]  # --> [qw!Car::Auto Carp Cwd Data::Dumper File::Basename File::Find File::Path File::Slurper File::Spec Scalar::Util String::Diff Term::ANSIColor Test::More Turbin open!]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+local ($::_g0 = do {[$::cpanfile->t_deps]}, $::_e0 = do {[qw!Car::Auto Carp Cwd Data::Dumper File::Basename File::Find File::Path File::Slurper File::Spec open Scalar::Util String::Diff Term::ANSIColor Test::More Turbin!]}); ::is_deeply $::_g0, $::_e0, '[$::cpanfile->t_deps]  # --> [qw!Car::Auto Carp Cwd Data::Dumper File::Basename File::Find File::Path File::Slurper File::Spec open Scalar::Util String::Diff Term::ANSIColor Test::More Turbin!]' or ::diag ::_struct_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
 
 # 
 # ## cpanfile ()

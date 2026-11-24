@@ -1,0 +1,45 @@
+Changes
+lib/Google/Cloud/Pubsublite/V1.pm
+lib/Google/Cloud/Pubsublite/V1/Admin.pm
+lib/Google/Cloud/Pubsublite/V1/Admin/Types.pm
+lib/Google/Cloud/Pubsublite/V1/AdminServiceClient.pm
+lib/Google/Cloud/Pubsublite/V1/Common.pm
+lib/Google/Cloud/Pubsublite/V1/Common/Types.pm
+lib/Google/Cloud/Pubsublite/V1/Cursor.pm
+lib/Google/Cloud/Pubsublite/V1/Cursor/Types.pm
+lib/Google/Cloud/Pubsublite/V1/CursorServiceClient.pm
+lib/Google/Cloud/Pubsublite/V1/PartitionAssignmentServiceClient.pm
+lib/Google/Cloud/Pubsublite/V1/Publisher.pm
+lib/Google/Cloud/Pubsublite/V1/Publisher/Types.pm
+lib/Google/Cloud/Pubsublite/V1/PublisherServiceClient.pm
+lib/Google/Cloud/Pubsublite/V1/Subscriber.pm
+lib/Google/Cloud/Pubsublite/V1/Subscriber/Types.pm
+lib/Google/Cloud/Pubsublite/V1/SubscriberServiceClient.pm
+lib/Google/Cloud/Pubsublite/V1/TopicStats.pm
+lib/Google/Cloud/Pubsublite/V1/TopicStats/Types.pm
+lib/Google/Cloud/Pubsublite/V1/TopicStatsServiceClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-AdminService.t
+t/01-service-CursorService.t
+t/01-service-Default.t
+t/01-service-PartitionAssignmentService.t
+t/01-service-PublisherService.t
+t/01-service-SubscriberService.t
+t/01-service-TopicStatsService.t
+t/02-rest-transport-AdminService.t
+t/02-rest-transport-CursorService.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-PartitionAssignmentService.t
+t/02-rest-transport-PublisherService.t
+t/02-rest-transport-SubscriberService.t
+t/02-rest-transport-TopicStatsService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

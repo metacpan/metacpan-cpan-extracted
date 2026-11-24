@@ -34,6 +34,8 @@ my $test_requires = {
 	'File::stat' => 0,
 	'File::Slurp' => 0,
 	'Geo::Location::Point' => 0.09,
+	'HTTP::Response' => 0,
+	'IPC::Run3' => 0,	# t/fuzz.t
 	'IPC::System::Simple' => 0,	# http://www.cpantesters.org/cpan/report/0b994acc-7a03-11e8-a944-5f7713bf8fb6
 	'POSIX' => 0,
 	'Readonly' => 0,
@@ -45,6 +47,7 @@ my $test_requires = {
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
+	'Test::RequiresInternet' => 0,
 	'Test::Returns' => 0,
 	'Test::Which' => 0,
 	'WWW::RT::CPAN' => 0
@@ -84,27 +87,39 @@ WriteMakefile(
 	PL_FILES	=> {},
 	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
-		'constant' => 0,
+		'autodie' => 0,
 		'CHI' => 0,
 		'Cwd' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
-		'File::HomeDir' => 0,
-		'Geo::Coder::Free' => 0,
+		'File::Path' => 0,
 		'JSON::MaybeXS' => 0,
 		'LWP::UserAgent' => 0,
 		'LWP::Protocol::https' => 0,
-		'LWP::UserAgent::Cached' => 0,
 		'Object::Configure' => 0,
 		'Params::Get' => 0.13,
 		'Params::Validate::Strict' => 0,
+		'POSIX' => 0,
+		'Readonly' => 0,
 		'Return::Set' => 0,
 		'Scalar::Util' => 0,
+		'Sub::Private' => 0.09,	# 0.07 added { mode => 'enforce' }; 0.09 is the version tested
+		'Sub::Protected' => 0.03,	# 0.03 is the version tested (wraps after CHECK; needs perl 5.14 for run-time loading)
 		'Time::HiRes' => 0,
 		'URI' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Weather-Meteo-*' },
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
+		# Needed only by bin/weather; Geo::Coder::Free has a large dependency tree
+		prereqs => {
+			runtime => {
+				recommends => {
+					'File::HomeDir' => 0,
+					'Geo::Coder::Free' => 0,
+					'LWP::UserAgent::Cached' => 0,
+				},
+			},
+		},
 		resources => {
 			repository => {
 				type => 'git',

@@ -3,7 +3,7 @@ package Google::Spanner::V1::CommitResponse;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -111,67 +111,113 @@ EOF
     # Field: isolation_level Type: 14 (.google.spanner.v1.TransactionOptions.IsolationLevel)
     # Field: read_lock_mode Type: 14 (.google.spanner.v1.TransactionOptions.ReadWrite.ReadLockMode)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Spanner::V1::CommitResponse::CommitResponse - Compiled Protocol Buffers message class
+Google::Spanner::V1::CommitResponse - Compiled Protocol Buffers messages for google/spanner/v1/commit_response.proto
 
 =head1 SYNOPSIS
 
     use Google::Spanner::V1::CommitResponse;
 
-    my $msg = Google::Spanner::V1::CommitResponse::CommitResponse->new(
-        commit_timestamp => $value,
-    );
+    my $msg = Google::Spanner::V1::CommitResponse::CommitResponse->new({
+        commit_timestamp => $commit_timestamp,
+        commit_stats => $commit_stats,
+        precommit_token => $precommit_token,
+        snapshot_timestamp => $snapshot_timestamp,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->commit_timestamp();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Spanner::V1::CommitResponse::CommitResponse->parse($bytes);
 
-=item * B<commit_timestamp>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<commit_stats>
-
-Type: Message (.google.spanner.v1.CommitResponse.CommitStats)
-
-=item * B<precommit_token>
-
-Type: Message (.google.spanner.v1.MultiplexedSessionPrecommitToken)
-
-=item * B<snapshot_timestamp>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<cache_update>
-
-Type: Message (.google.spanner.v1.CacheUpdate)
-
-=item * B<isolation_level>
-
-Type: Enum (.google.spanner.v1.TransactionOptions.IsolationLevel)
-
-=item * B<read_lock_mode>
-
-Type: Enum (.google.spanner.v1.TransactionOptions.ReadWrite.ReadLockMode)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Spanner::V1::CommitResponse - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/spanner/v1/commit_response.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Spanner::V1::CommitResponse::CommitResponse
+
+The response for [Commit][google.spanner.v1.Spanner.Commit].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->commit_timestamp() >> / C<< $msg->commit_timestamp($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The Cloud Spanner timestamp at which the transaction committed.
+
+=item * C<< $msg->commit_stats() >> / C<< $msg->commit_stats($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::CommitResponse::CommitResponse::CommitStats>)
+
+The statistics about this `Commit`. Not returned by default.
+For more information, see
+[CommitRequest.return_commit_stats][google.spanner.v1.CommitRequest.return_commit_stats].
+
+=item * C<< $msg->precommit_token() >> / C<< $msg->precommit_token($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::MultiplexedSessionPrecommitToken>)
+
+If specified, transaction has not committed yet.
+You must retry the commit with the new precommit token.
+
+=item * C<< $msg->snapshot_timestamp() >> / C<< $msg->snapshot_timestamp($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+If `TransactionOptions.isolation_level` is set to
+`IsolationLevel.REPEATABLE_READ`, then the snapshot timestamp is the
+timestamp at which all reads in the transaction ran. This timestamp is
+never returned.
+
+=item * C<< $msg->cache_update() >> / C<< $msg->cache_update($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::CacheUpdate>)
+
+Optional. A cache update expresses a set of changes the client should
+incorporate into its location cache. The client should discard the changes
+if they are older than the data it already has. This data can be obtained
+in response to requests that included a `RoutingHint` field, but may also
+be obtained by explicit location-fetching RPCs which may be added in the
+future.
+
+=item * C<< $msg->isolation_level() >> / C<< $msg->isolation_level($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::TransactionOptions::IsolationLevel>)
+
+The isolation level used for the read-write transaction.
+
+=item * C<< $msg->read_lock_mode() >> / C<< $msg->read_lock_mode($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::TransactionOptions::ReadWrite::ReadLockMode>)
+
+The read lock mode used for the read-write transaction.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Spanner::V1::CommitResponse::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

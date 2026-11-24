@@ -1,0 +1,28 @@
+Changes
+lib/Google/Cloud/Datastore/V1.pm
+lib/Google/Cloud/Datastore/V1/DatastoreClient.pm
+lib/Google/Datastore/V1/AggregationResult.pm
+lib/Google/Datastore/V1/AggregationResult/Types.pm
+lib/Google/Datastore/V1/Datastore.pm
+lib/Google/Datastore/V1/Datastore/Types.pm
+lib/Google/Datastore/V1/Entity.pm
+lib/Google/Datastore/V1/Entity/Types.pm
+lib/Google/Datastore/V1/Query.pm
+lib/Google/Datastore/V1/Query/Types.pm
+lib/Google/Datastore/V1/QueryProfile.pm
+lib/Google/Datastore/V1/QueryProfile/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Datastore.t
+t/01-service-Default.t
+t/02-rest-transport-Datastore.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

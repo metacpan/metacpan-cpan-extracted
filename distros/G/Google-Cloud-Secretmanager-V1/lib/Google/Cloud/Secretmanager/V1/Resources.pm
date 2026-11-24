@@ -3,7 +3,7 @@ package Google::Cloud::Secretmanager::V1::Resources;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -606,118 +606,10 @@ EOF
     # Field: policy_member Type: 11 (.google.iam.v1.ResourcePolicyMember)
     # Field: state Type: 14 (.google.cloud.secretmanager.v1.Secret.State)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources::Secret - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Resources;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::Secret->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<replication>
-
-Type: Message (.google.cloud.secretmanager.v1.Replication)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.secretmanager.v1.Secret.LabelsEntry)
-
-=item * B<topics>
-
-Type: Message (.google.cloud.secretmanager.v1.Topic)
-
-=item * B<expire_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<rotation>
-
-Type: Message (.google.cloud.secretmanager.v1.Rotation)
-
-=item * B<version_aliases>
-
-Type: Message (.google.cloud.secretmanager.v1.Secret.VersionAliasesEntry)
-
-=item * B<annotations>
-
-Type: Message (.google.cloud.secretmanager.v1.Secret.AnnotationsEntry)
-
-=item * B<version_destroy_ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<customer_managed_encryption>
-
-Type: Message (.google.cloud.secretmanager.v1.CustomerManagedEncryption)
-
-=item * B<tags>
-
-Type: Message (.google.cloud.secretmanager.v1.Secret.TagsEntry)
-
-=item * B<secret_type>
-
-Type: Enum (.google.cloud.secretmanager.v1.Secret.SecretType)
-
-=item * B<policy_member>
-
-Type: Message (.google.iam.v1.ResourcePolicyMember)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.secretmanager.v1.Secret.State)
-
-=back
-
-=cut
-
 # Enum: Secret::State
 our $Secret_STATE_UNSPECIFIED = 0;
 our $Secret_STATE_ACTIVE = 1;
 our $Secret_STATE_RESTORING = 2;
-
-=pod
-
-=head2 Enum: Secret::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<STATE_ACTIVE> => 1
-
-=item * C<STATE_RESTORING> => 2
-
-=back
-
-=cut
 
 # Enum: Secret::SecretType
 our $Secret_SECRET_TYPE_UNSPECIFIED = 0;
@@ -726,30 +618,6 @@ our $Secret_ACCESS_KEY = 2;
 our $Secret_CERTIFICATE = 3;
 our $Secret_OTHER_DB_CREDENTIALS = 4;
 our $Secret_OTHER = 50;
-
-=pod
-
-=head2 Enum: Secret::SecretType
-
-Values:
-
-=over 4
-
-=item * C<SECRET_TYPE_UNSPECIFIED> => 0
-
-=item * C<CLOUD_SQL_DB_CREDENTIALS> => 1
-
-=item * C<ACCESS_KEY> => 2
-
-=item * C<CERTIFICATE> => 3
-
-=item * C<OTHER_DB_CREDENTIALS> => 4
-
-=item * C<OTHER> => 50
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Resources::SecretVersion ===
     # Fields for SecretVersion
@@ -763,249 +631,33 @@ Values:
     # Field: scheduled_destroy_time Type: 11 (.google.protobuf.Timestamp)
     # Field: customer_managed_encryption Type: 11 (.google.cloud.secretmanager.v1.CustomerManagedEncryptionStatus)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources::SecretVersion - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Resources;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::SecretVersion->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<destroy_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.secretmanager.v1.SecretVersion.State)
-
-=item * B<replication_status>
-
-Type: Message (.google.cloud.secretmanager.v1.ReplicationStatus)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<client_specified_payload_checksum>
-
-Type: Bool
-
-=item * B<scheduled_destroy_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<customer_managed_encryption>
-
-Type: Message (.google.cloud.secretmanager.v1.CustomerManagedEncryptionStatus)
-
-=back
-
-=cut
-
 # Enum: SecretVersion::State
 our $SecretVersion_STATE_UNSPECIFIED = 0;
 our $SecretVersion_ENABLED = 1;
 our $SecretVersion_DISABLED = 2;
 our $SecretVersion_DESTROYED = 3;
 
-=pod
-
-=head2 Enum: SecretVersion::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ENABLED> => 1
-
-=item * C<DISABLED> => 2
-
-=item * C<DESTROYED> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Resources::Replication ===
     # Fields for Replication
     # Field: automatic Type: 11 (.google.cloud.secretmanager.v1.Replication.Automatic)
     # Field: user_managed Type: 11 (.google.cloud.secretmanager.v1.Replication.UserManaged)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources::Replication - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Resources;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::Replication->new(
-        automatic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<automatic>
-
-Type: Message (.google.cloud.secretmanager.v1.Replication.Automatic)
-
-=item * B<user_managed>
-
-Type: Message (.google.cloud.secretmanager.v1.Replication.UserManaged)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryption ===
     # Fields for CustomerManagedEncryption
     # Field: kms_key_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryption - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Resources;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryption->new(
-        kms_key_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kms_key_name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Resources::ReplicationStatus ===
     # Fields for ReplicationStatus
     # Field: automatic Type: 11 (.google.cloud.secretmanager.v1.ReplicationStatus.AutomaticStatus)
     # Field: user_managed Type: 11 (.google.cloud.secretmanager.v1.ReplicationStatus.UserManagedStatus)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources::ReplicationStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Resources;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::ReplicationStatus->new(
-        automatic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<automatic>
-
-Type: Message (.google.cloud.secretmanager.v1.ReplicationStatus.AutomaticStatus)
-
-=item * B<user_managed>
-
-Type: Message (.google.cloud.secretmanager.v1.ReplicationStatus.UserManagedStatus)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryptionStatus ===
     # Fields for CustomerManagedEncryptionStatus
     # Field: kms_key_version_name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryptionStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Resources;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryptionStatus->new(
-        kms_key_version_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kms_key_version_name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Resources::Topic ===
     # Fields for Topic
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources::Topic - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Resources;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::Topic->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Resources::Rotation ===
     # Fields for Rotation
@@ -1013,74 +665,10 @@ Type: String
     # Field: rotation_period Type: 11 (.google.protobuf.Duration)
     # Field: managed_rotation_status Type: 11 (.google.cloud.secretmanager.v1.Rotation.ManagedRotationStatus)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources::Rotation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Resources;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::Rotation->new(
-        next_rotation_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<next_rotation_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<rotation_period>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<managed_rotation_status>
-
-Type: Message (.google.cloud.secretmanager.v1.Rotation.ManagedRotationStatus)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Resources::SecretPayload ===
     # Fields for SecretPayload
     # Field: data Type: 12 ()
     # Field: data_crc32c Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources::SecretPayload - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Resources;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::SecretPayload->new(
-        data => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data>
-
-Type: Bytes
-
-=item * B<data_crc32c>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Resources::CloudSqlSingleUserCredentials ===
     # Fields for CloudSqlSingleUserCredentials
@@ -1088,51 +676,636 @@ Type: Int64
     # Field: username Type: 9 ()
     # Field: password Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Secretmanager::V1::Resources::CloudSqlSingleUserCredentials - Compiled Protocol Buffers message class
+Google::Cloud::Secretmanager::V1::Resources - Compiled Protocol Buffers messages for google/cloud/secretmanager/v1/resources.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Secretmanager::V1::Resources;
 
-    my $msg = Google::Cloud::Secretmanager::V1::Resources::CloudSqlSingleUserCredentials->new(
-        instance_id => $value,
-    );
+    my $msg = Google::Cloud::Secretmanager::V1::Resources::Secret->new({
+        name => $name,
+        replication => $replication,
+        create_time => $create_time,
+        labels => $labels,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Secretmanager::V1::Resources::Secret->parse($bytes);
 
-=item * B<instance_id>
-
-Type: String
-
-=item * B<username>
-
-Type: String
-
-=item * B<password>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Resources - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/secretmanager/v1/resources.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::Secret
+
+A [Secret][google.cloud.secretmanager.v1.Secret] is a logical secret whose
+value and versions can be accessed.
+
+A [Secret][google.cloud.secretmanager.v1.Secret] is made up of zero or more
+[SecretVersions][google.cloud.secretmanager.v1.SecretVersion] that represent
+the secret data.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name of the
+[Secret][google.cloud.secretmanager.v1.Secret] in the format
+`projects/*/secrets/*`.
+
+=item * C<< $msg->replication() >> / C<< $msg->replication($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Replication>)
+
+Optional. Immutable. The replication policy of the secret data attached to
+the [Secret][google.cloud.secretmanager.v1.Secret].
+
+The replication policy cannot be changed after the Secret has been created.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the
+[Secret][google.cloud.secretmanager.v1.Secret] was created.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Secret::LabelsEntry>)
+
+The labels assigned to this Secret.
+
+Label keys must be between 1 and 63 characters long, have a UTF-8 encoding
+of maximum 128 bytes, and must conform to the following PCRE regular
+expression: `[\p{Ll}\p{Lo}][\p{Ll}\p{Lo}\p{N}_-]{0,62}`
+
+Label values must be between 0 and 63 characters long, have a UTF-8
+encoding of maximum 128 bytes, and must conform to the following PCRE
+regular expression: `[\p{Ll}\p{Lo}\p{N}_-]{0,63}`
+
+No more than 64 labels can be assigned to a given resource.
+
+=item * C<< $msg->topics() >> / C<< $msg->topics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Topic>)
+
+Optional. A list of up to 10 Pub/Sub topics to which messages are published
+when control plane operations are called on the secret or its versions.
+
+=item * C<< $msg->expire_time() >> / C<< $msg->expire_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. Timestamp in UTC when the
+[Secret][google.cloud.secretmanager.v1.Secret] is scheduled to expire.
+This is always provided on output, regardless of what was sent on input.
+
+=item * C<< $msg->ttl() >> / C<< $msg->ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Input only. The TTL for the
+[Secret][google.cloud.secretmanager.v1.Secret].
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag of the currently stored
+[Secret][google.cloud.secretmanager.v1.Secret].
+
+=item * C<< $msg->rotation() >> / C<< $msg->rotation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Rotation>)
+
+Optional. Rotation policy attached to the
+[Secret][google.cloud.secretmanager.v1.Secret]. May be excluded if there is
+no rotation policy.
+
+=item * C<< $msg->version_aliases() >> / C<< $msg->version_aliases($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Secret::VersionAliasesEntry>)
+
+Optional. Mapping from version alias to version name.
+
+A version alias is a string with a maximum length of 63 characters and can
+contain uppercase and lowercase letters, numerals, and the hyphen (`-`)
+and underscore ('_') characters. An alias string must start with a
+letter and cannot be the string 'latest' or 'NEW'.
+No more than 50 aliases can be assigned to a given secret.
+
+Version-Alias pairs will be viewable via GetSecret and modifiable via
+UpdateSecret. Access by alias is only be supported on
+GetSecretVersion and AccessSecretVersion.
+
+=item * C<< $msg->annotations() >> / C<< $msg->annotations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Secret::AnnotationsEntry>)
+
+Optional. Custom metadata about the secret.
+
+Annotations are distinct from various forms of labels.
+Annotations exist to allow client tools to store their own state
+information without requiring a database.
+
+Annotation keys must be between 1 and 63 characters long, have a UTF-8
+encoding of maximum 128 bytes, begin and end with an alphanumeric character
+([a-z0-9A-Z]), and may have dashes (-), underscores (_), dots (.), and
+alphanumerics in between these symbols.
+
+The total size of annotation keys and values must be less than 16KiB.
+
+=item * C<< $msg->version_destroy_ttl() >> / C<< $msg->version_destroy_ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Secret Version TTL after destruction request
+
+This is a part of the Delayed secret version destroy feature.
+For secret with TTL>0, version destruction doesn't happen immediately
+on calling destroy instead the version goes to a disabled state and
+destruction happens after the TTL expires.
+
+=item * C<< $msg->customer_managed_encryption() >> / C<< $msg->customer_managed_encryption($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryption>)
+
+Optional. The customer-managed encryption configuration of the regionalized
+secrets. If no configuration is provided, Google-managed default encryption
+is used.
+
+Updates to the [Secret][google.cloud.secretmanager.v1.Secret] encryption
+configuration only apply to
+[SecretVersions][google.cloud.secretmanager.v1.SecretVersion] added
+afterwards. They do not apply retroactively to existing
+[SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
+
+=item * C<< $msg->tags() >> / C<< $msg->tags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Secret::TagsEntry>)
+
+Optional. Input only. Immutable. Mapping of Tag keys/values directly bound
+to this resource. For example:
+  "123/environment": "production",
+  "123/costCenter": "marketing"
+
+Tags are used to organize and group resources.
+
+Tags can be used to control policy evaluation for the resource.
+
+=item * C<< $msg->secret_type() >> / C<< $msg->secret_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Secretmanager::V1::Secret::SecretType>)
+
+Optional. Immutable. This defines the type of the secret.
+Enforces certain structural requirements on the
+[SecretVersions][google.cloud.secretmanager.v1.SecretVersion].
+For secret of type UNSPECIFIED, the SecretVersions can be of any type.
+
+=item * C<< $msg->policy_member() >> / C<< $msg->policy_member($value) >>
+
+Type: C<Message> (L<Google::Iam::V1::ResourcePolicyMember::ResourcePolicyMember>)
+
+Output only. Defines the policy member for the secret.
+This will be used to check if the caller has the permission to perform
+certain operations on the typed secret.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Secretmanager::V1::Secret::State>)
+
+Output only. The current state of the Secret.
+
+=back
+
+=head3 Enum: Secret::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<STATE_ACTIVE> => C<1>
+
+=item * C<STATE_RESTORING> => C<2>
+
+=back
+
+=head3 Enum: Secret::SecretType
+
+=over 4
+
+=item * C<SECRET_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<CLOUD_SQL_DB_CREDENTIALS> => C<1>
+
+=item * C<ACCESS_KEY> => C<2>
+
+=item * C<CERTIFICATE> => C<3>
+
+=item * C<OTHER_DB_CREDENTIALS> => C<4>
+
+=item * C<OTHER> => C<50>
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::SecretVersion
+
+A secret version resource in the Secret Manager API.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+`projects/*/secrets/*/versions/*`.
+
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] IDs in a
+[Secret][google.cloud.secretmanager.v1.Secret] start at 1 and are
+incremented for each subsequent version of the secret.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was created.
+
+=item * C<< $msg->destroy_time() >> / C<< $msg->destroy_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time this
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] was destroyed.
+Only present if [state][google.cloud.secretmanager.v1.SecretVersion.state]
+is
+[DESTROYED][google.cloud.secretmanager.v1.SecretVersion.State.DESTROYED].
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Secretmanager::V1::SecretVersion::State>)
+
+Output only. The current state of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+
+=item * C<< $msg->replication_status() >> / C<< $msg->replication_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::ReplicationStatus>)
+
+The replication status of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. Etag of the currently stored
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+
+=item * C<< $msg->client_specified_payload_checksum() >> / C<< $msg->client_specified_payload_checksum($value) >>
+
+Type: C<Bool>
+
+Output only. True if payload checksum specified in
+[SecretPayload][google.cloud.secretmanager.v1.SecretPayload] object has
+been received by
+[SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService]
+on
+[SecretManagerService.AddSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AddSecretVersion].
+
+=item * C<< $msg->scheduled_destroy_time() >> / C<< $msg->scheduled_destroy_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. Output only. Scheduled destroy time for secret version.
+This is a part of the Delayed secret version destroy feature. For a
+Secret with a valid version destroy TTL, when a secert version is
+destroyed, version is moved to disabled state and it is scheduled for
+destruction Version is destroyed only after the scheduled_destroy_time.
+
+=item * C<< $msg->customer_managed_encryption() >> / C<< $msg->customer_managed_encryption($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryptionStatus>)
+
+Output only. The customer-managed encryption status of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. Only
+populated if customer-managed encryption is used and
+[Secret][google.cloud.secretmanager.v1.Secret] is a regionalized secret.
+
+=back
+
+=head3 Enum: SecretVersion::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ENABLED> => C<1>
+
+=item * C<DISABLED> => C<2>
+
+=item * C<DESTROYED> => C<3>
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::Replication
+
+A policy that defines the replication and encryption configuration of data.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->automatic() >> / C<< $msg->automatic($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Replication::Automatic>)
+
+The [Secret][google.cloud.secretmanager.v1.Secret] will automatically be
+replicated without any restrictions.
+
+=item * C<< $msg->user_managed() >> / C<< $msg->user_managed($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Replication::UserManaged>)
+
+The [Secret][google.cloud.secretmanager.v1.Secret] will only be
+replicated into the locations specified.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryption
+
+Configuration for encrypting secret payloads using customer-managed
+encryption keys (CMEK).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the Cloud KMS CryptoKey used to encrypt
+secret payloads.
+
+For secrets using the
+[UserManaged][google.cloud.secretmanager.v1.Replication.UserManaged]
+replication policy type, Cloud KMS CryptoKeys must reside in the same
+location as the [replica location][Secret.UserManaged.Replica.location].
+
+For secrets using the
+[Automatic][google.cloud.secretmanager.v1.Replication.Automatic]
+replication policy type, Cloud KMS CryptoKeys must reside in `global`.
+
+The expected format is `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::ReplicationStatus
+
+The replication status of a
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->automatic() >> / C<< $msg->automatic($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::ReplicationStatus::AutomaticStatus>)
+
+Describes the replication status of a
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] with
+automatic replication.
+
+Only populated if the parent
+[Secret][google.cloud.secretmanager.v1.Secret] has an automatic
+replication policy.
+
+=item * C<< $msg->user_managed() >> / C<< $msg->user_managed($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::ReplicationStatus::UserManagedStatus>)
+
+Describes the replication status of a
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] with
+user-managed replication.
+
+Only populated if the parent
+[Secret][google.cloud.secretmanager.v1.Secret] has a user-managed
+replication policy.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::CustomerManagedEncryptionStatus
+
+Describes the status of customer-managed encryption.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kms_key_version_name() >> / C<< $msg->kms_key_version_name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the Cloud KMS CryptoKeyVersion used to
+encrypt the secret payload, in the following format:
+`projects/*/locations/*/keyRings/*/cryptoKeys/*/versions/*`.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::Topic
+
+A Pub/Sub topic which Secret Manager will publish to when control plane
+events occur on this secret.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The resource name of the Pub/Sub topic that will be published
+to, in the following format: `projects/*/topics/*`. For publication to
+succeed, the Secret Manager service agent must have the
+`pubsub.topic.publish` permission on the topic. The Pub/Sub Publisher role
+(`roles/pubsub.publisher`) includes this permission.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::Rotation
+
+The rotation time and period for a
+[Secret][google.cloud.secretmanager.v1.Secret]. At next_rotation_time, Secret
+Manager will send a Pub/Sub notification to the topics configured on the
+Secret. [Secret.topics][google.cloud.secretmanager.v1.Secret.topics] must be
+set to configure rotation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->next_rotation_time() >> / C<< $msg->next_rotation_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. Timestamp in UTC at which the
+[Secret][google.cloud.secretmanager.v1.Secret] is scheduled to rotate.
+Cannot be set to less than 300s (5 min) in the future and at most
+3153600000s (100 years).
+
+[next_rotation_time][google.cloud.secretmanager.v1.Rotation.next_rotation_time]
+MUST  be set if
+[rotation_period][google.cloud.secretmanager.v1.Rotation.rotation_period]
+is set.
+
+=item * C<< $msg->rotation_period() >> / C<< $msg->rotation_period($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Input only. The Duration between rotation notifications. Must be in seconds
+and at least 3600s (1h) and at most 3153600000s (100 years).
+
+If
+[rotation_period][google.cloud.secretmanager.v1.Rotation.rotation_period]
+is set,
+[next_rotation_time][google.cloud.secretmanager.v1.Rotation.next_rotation_time]
+must be set.
+[next_rotation_time][google.cloud.secretmanager.v1.Rotation.next_rotation_time]
+will be advanced by this period when the service automatically sends
+rotation notifications.
+
+=item * C<< $msg->managed_rotation_status() >> / C<< $msg->managed_rotation_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Rotation::ManagedRotationStatus>)
+
+Output only. The current status of the managed rotation.
+This field is only applicable to Typed Secrets.
+This field is set by the service and cannot be set by the user.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::SecretPayload
+
+A secret payload resource in the Secret Manager API. This contains the
+sensitive secret payload that is associated with a
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+The secret data. Must be no larger than 64KiB.
+
+=item * C<< $msg->data_crc32c() >> / C<< $msg->data_crc32c($value) >>
+
+Type: C<Int64>
+
+Optional. If specified,
+[SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService]
+will verify the integrity of the received
+[data][google.cloud.secretmanager.v1.SecretPayload.data] on
+[SecretManagerService.AddSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AddSecretVersion]
+calls using the crc32c checksum and store it to include in future
+[SecretManagerService.AccessSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AccessSecretVersion]
+responses. If a checksum is not provided in the
+[SecretManagerService.AddSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AddSecretVersion]
+request, the
+[SecretManagerService][google.cloud.secretmanager.v1.SecretManagerService]
+will generate and store one for you.
+
+The CRC32C value is encoded as a Int64 for compatibility, and can be
+safely downconverted to uint32 in languages that support this type.
+https://cloud.google.com/apis/design/design_patterns#integer_types
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Resources::CloudSqlSingleUserCredentials
+
+These are the credentials required for Cloud SQL DB for Single user
+Managed Rotation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance_id() >> / C<< $msg->instance_id($value) >>
+
+Type: C<String>
+
+Required. Instance ID of the Cloud SQL instance.
+
+=item * C<< $msg->username() >> / C<< $msg->username($value) >>
+
+Type: C<String>
+
+Required. Username of the Cloud SQL instance.
+
+=item * C<< $msg->password() >> / C<< $msg->password($value) >>
+
+Type: C<String>
+
+Optional. Password of the Cloud SQL instance. If this is not provided,
+a random password will be generated.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Secretmanager::V1::Resources::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

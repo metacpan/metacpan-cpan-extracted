@@ -3,7 +3,7 @@ package Google::Spanner::V1::Spanner;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1410,105 +1410,15 @@ EOF
     # Field: database Type: 9 ()
     # Field: session Type: 11 (.google.spanner.v1.Session)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::CreateSessionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::CreateSessionRequest->new(
-        database => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database>
-
-Type: String
-
-=item * B<session>
-
-Type: Message (.google.spanner.v1.Session)
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::BatchCreateSessionsRequest ===
     # Fields for BatchCreateSessionsRequest
     # Field: database Type: 9 ()
     # Field: session_template Type: 11 (.google.spanner.v1.Session)
     # Field: session_count Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::BatchCreateSessionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::BatchCreateSessionsRequest->new(
-        database => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database>
-
-Type: String
-
-=item * B<session_template>
-
-Type: Message (.google.spanner.v1.Session)
-
-=item * B<session_count>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::BatchCreateSessionsResponse ===
     # Fields for BatchCreateSessionsResponse
     # Field: session Type: 11 (.google.spanner.v1.Session)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::BatchCreateSessionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::BatchCreateSessionsResponse->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: Message (.google.spanner.v1.Session)
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::Session ===
     # Fields for Session
@@ -1519,81 +1429,9 @@ Type: Message (.google.spanner.v1.Session)
     # Field: creator_role Type: 9 ()
     # Field: multiplexed Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::Session - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::Session->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.spanner.v1.Session.LabelsEntry)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<approximate_last_use_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<creator_role>
-
-Type: String
-
-=item * B<multiplexed>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::GetSessionRequest ===
     # Fields for GetSessionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::GetSessionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::GetSessionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::ListSessionsRequest ===
     # Fields for ListSessionsRequest
@@ -1602,108 +1440,14 @@ Type: String
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::ListSessionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::ListSessionsRequest->new(
-        database => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::ListSessionsResponse ===
     # Fields for ListSessionsResponse
     # Field: sessions Type: 11 (.google.spanner.v1.Session)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::ListSessionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::ListSessionsResponse->new(
-        sessions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<sessions>
-
-Type: Message (.google.spanner.v1.Session)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::DeleteSessionRequest ===
     # Fields for DeleteSessionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::DeleteSessionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::DeleteSessionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::RequestOptions ===
     # Fields for RequestOptions
@@ -1712,104 +1456,16 @@ Type: String
     # Field: transaction_tag Type: 9 ()
     # Field: client_context Type: 11 (.google.spanner.v1.RequestOptions.ClientContext)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::RequestOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::RequestOptions->new(
-        priority => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<priority>
-
-Type: Enum (.google.spanner.v1.RequestOptions.Priority)
-
-=item * B<request_tag>
-
-Type: String
-
-=item * B<transaction_tag>
-
-Type: String
-
-=item * B<client_context>
-
-Type: Message (.google.spanner.v1.RequestOptions.ClientContext)
-
-=back
-
-=cut
-
 # Enum: RequestOptions::Priority
 our $RequestOptions_PRIORITY_UNSPECIFIED = 0;
 our $RequestOptions_PRIORITY_LOW = 1;
 our $RequestOptions_PRIORITY_MEDIUM = 2;
 our $RequestOptions_PRIORITY_HIGH = 3;
 
-=pod
-
-=head2 Enum: RequestOptions::Priority
-
-Values:
-
-=over 4
-
-=item * C<PRIORITY_UNSPECIFIED> => 0
-
-=item * C<PRIORITY_LOW> => 1
-
-=item * C<PRIORITY_MEDIUM> => 2
-
-=item * C<PRIORITY_HIGH> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::DirectedReadOptions ===
     # Fields for DirectedReadOptions
     # Field: include_replicas Type: 11 (.google.spanner.v1.DirectedReadOptions.IncludeReplicas)
     # Field: exclude_replicas Type: 11 (.google.spanner.v1.DirectedReadOptions.ExcludeReplicas)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::DirectedReadOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::DirectedReadOptions->new(
-        include_replicas => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<include_replicas>
-
-Type: Message (.google.spanner.v1.DirectedReadOptions.IncludeReplicas)
-
-=item * B<exclude_replicas>
-
-Type: Message (.google.spanner.v1.DirectedReadOptions.ExcludeReplicas)
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::ExecuteSqlRequest ===
     # Fields for ExecuteSqlRequest
@@ -1829,116 +1485,12 @@ Type: Message (.google.spanner.v1.DirectedReadOptions.ExcludeReplicas)
     # Field: last_statement Type: 8 ()
     # Field: routing_hint Type: 11 (.google.spanner.v1.RoutingHint)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::ExecuteSqlRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::ExecuteSqlRequest->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<transaction>
-
-Type: Message (.google.spanner.v1.TransactionSelector)
-
-=item * B<sql>
-
-Type: String
-
-=item * B<params>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<param_types>
-
-Type: Message (.google.spanner.v1.ExecuteSqlRequest.ParamTypesEntry)
-
-=item * B<resume_token>
-
-Type: Bytes
-
-=item * B<query_mode>
-
-Type: Enum (.google.spanner.v1.ExecuteSqlRequest.QueryMode)
-
-=item * B<partition_token>
-
-Type: Bytes
-
-=item * B<seqno>
-
-Type: Int64
-
-=item * B<query_options>
-
-Type: Message (.google.spanner.v1.ExecuteSqlRequest.QueryOptions)
-
-=item * B<request_options>
-
-Type: Message (.google.spanner.v1.RequestOptions)
-
-=item * B<directed_read_options>
-
-Type: Message (.google.spanner.v1.DirectedReadOptions)
-
-=item * B<data_boost_enabled>
-
-Type: Bool
-
-=item * B<last_statement>
-
-Type: Bool
-
-=item * B<routing_hint>
-
-Type: Message (.google.spanner.v1.RoutingHint)
-
-=back
-
-=cut
-
 # Enum: ExecuteSqlRequest::QueryMode
 our $ExecuteSqlRequest_NORMAL = 0;
 our $ExecuteSqlRequest_PLAN = 1;
 our $ExecuteSqlRequest_PROFILE = 2;
 our $ExecuteSqlRequest_WITH_STATS = 3;
 our $ExecuteSqlRequest_WITH_PLAN_AND_STATS = 4;
-
-=pod
-
-=head2 Enum: ExecuteSqlRequest::QueryMode
-
-Values:
-
-=over 4
-
-=item * C<NORMAL> => 0
-
-=item * C<PLAN> => 1
-
-=item * C<PROFILE> => 2
-
-=item * C<WITH_STATS> => 3
-
-=item * C<WITH_PLAN_AND_STATS> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::ExecuteBatchDmlRequest ===
     # Fields for ExecuteBatchDmlRequest
@@ -1949,126 +1501,16 @@ Values:
     # Field: request_options Type: 11 (.google.spanner.v1.RequestOptions)
     # Field: last_statements Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::ExecuteBatchDmlRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::ExecuteBatchDmlRequest->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<transaction>
-
-Type: Message (.google.spanner.v1.TransactionSelector)
-
-=item * B<statements>
-
-Type: Message (.google.spanner.v1.ExecuteBatchDmlRequest.Statement)
-
-=item * B<seqno>
-
-Type: Int64
-
-=item * B<request_options>
-
-Type: Message (.google.spanner.v1.RequestOptions)
-
-=item * B<last_statements>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::ExecuteBatchDmlResponse ===
     # Fields for ExecuteBatchDmlResponse
     # Field: result_sets Type: 11 (.google.spanner.v1.ResultSet)
     # Field: status Type: 11 (.google.rpc.Status)
     # Field: precommit_token Type: 11 (.google.spanner.v1.MultiplexedSessionPrecommitToken)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::ExecuteBatchDmlResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::ExecuteBatchDmlResponse->new(
-        result_sets => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<result_sets>
-
-Type: Message (.google.spanner.v1.ResultSet)
-
-=item * B<status>
-
-Type: Message (.google.rpc.Status)
-
-=item * B<precommit_token>
-
-Type: Message (.google.spanner.v1.MultiplexedSessionPrecommitToken)
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::PartitionOptions ===
     # Fields for PartitionOptions
     # Field: partition_size_bytes Type: 3 ()
     # Field: max_partitions Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::PartitionOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::PartitionOptions->new(
-        partition_size_bytes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<partition_size_bytes>
-
-Type: Int64
-
-=item * B<max_partitions>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::PartitionQueryRequest ===
     # Fields for PartitionQueryRequest
@@ -2078,52 +1520,6 @@ Type: Int64
     # Field: params Type: 11 (.google.protobuf.Struct)
     # Field: param_types Type: 11 (.google.spanner.v1.PartitionQueryRequest.ParamTypesEntry)
     # Field: partition_options Type: 11 (.google.spanner.v1.PartitionOptions)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::PartitionQueryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::PartitionQueryRequest->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<transaction>
-
-Type: Message (.google.spanner.v1.TransactionSelector)
-
-=item * B<sql>
-
-Type: String
-
-=item * B<params>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<param_types>
-
-Type: Message (.google.spanner.v1.PartitionQueryRequest.ParamTypesEntry)
-
-=item * B<partition_options>
-
-Type: Message (.google.spanner.v1.PartitionOptions)
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::PartitionReadRequest ===
     # Fields for PartitionReadRequest
@@ -2135,120 +1531,14 @@ Type: Message (.google.spanner.v1.PartitionOptions)
     # Field: key_set Type: 11 (.google.spanner.v1.KeySet)
     # Field: partition_options Type: 11 (.google.spanner.v1.PartitionOptions)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::PartitionReadRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::PartitionReadRequest->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<transaction>
-
-Type: Message (.google.spanner.v1.TransactionSelector)
-
-=item * B<table>
-
-Type: String
-
-=item * B<index>
-
-Type: String
-
-=item * B<columns>
-
-Type: String
-
-=item * B<key_set>
-
-Type: Message (.google.spanner.v1.KeySet)
-
-=item * B<partition_options>
-
-Type: Message (.google.spanner.v1.PartitionOptions)
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::Partition ===
     # Fields for Partition
     # Field: partition_token Type: 12 ()
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::Partition - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::Partition->new(
-        partition_token => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<partition_token>
-
-Type: Bytes
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::PartitionResponse ===
     # Fields for PartitionResponse
     # Field: partitions Type: 11 (.google.spanner.v1.Partition)
     # Field: transaction Type: 11 (.google.spanner.v1.Transaction)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::PartitionResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::PartitionResponse->new(
-        partitions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<partitions>
-
-Type: Message (.google.spanner.v1.Partition)
-
-=item * B<transaction>
-
-Type: Message (.google.spanner.v1.Transaction)
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::ReadRequest ===
     # Fields for ReadRequest
@@ -2268,133 +1558,15 @@ Type: Message (.google.spanner.v1.Transaction)
     # Field: lock_hint Type: 14 (.google.spanner.v1.ReadRequest.LockHint)
     # Field: routing_hint Type: 11 (.google.spanner.v1.RoutingHint)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::ReadRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::ReadRequest->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<transaction>
-
-Type: Message (.google.spanner.v1.TransactionSelector)
-
-=item * B<table>
-
-Type: String
-
-=item * B<index>
-
-Type: String
-
-=item * B<columns>
-
-Type: String
-
-=item * B<key_set>
-
-Type: Message (.google.spanner.v1.KeySet)
-
-=item * B<limit>
-
-Type: Int64
-
-=item * B<resume_token>
-
-Type: Bytes
-
-=item * B<partition_token>
-
-Type: Bytes
-
-=item * B<request_options>
-
-Type: Message (.google.spanner.v1.RequestOptions)
-
-=item * B<directed_read_options>
-
-Type: Message (.google.spanner.v1.DirectedReadOptions)
-
-=item * B<data_boost_enabled>
-
-Type: Bool
-
-=item * B<order_by>
-
-Type: Enum (.google.spanner.v1.ReadRequest.OrderBy)
-
-=item * B<lock_hint>
-
-Type: Enum (.google.spanner.v1.ReadRequest.LockHint)
-
-=item * B<routing_hint>
-
-Type: Message (.google.spanner.v1.RoutingHint)
-
-=back
-
-=cut
-
 # Enum: ReadRequest::OrderBy
 our $ReadRequest_ORDER_BY_UNSPECIFIED = 0;
 our $ReadRequest_ORDER_BY_PRIMARY_KEY = 1;
 our $ReadRequest_ORDER_BY_NO_ORDER = 2;
 
-=pod
-
-=head2 Enum: ReadRequest::OrderBy
-
-Values:
-
-=over 4
-
-=item * C<ORDER_BY_UNSPECIFIED> => 0
-
-=item * C<ORDER_BY_PRIMARY_KEY> => 1
-
-=item * C<ORDER_BY_NO_ORDER> => 2
-
-=back
-
-=cut
-
 # Enum: ReadRequest::LockHint
 our $ReadRequest_LOCK_HINT_UNSPECIFIED = 0;
 our $ReadRequest_LOCK_HINT_SHARED = 1;
 our $ReadRequest_LOCK_HINT_EXCLUSIVE = 2;
-
-=pod
-
-=head2 Enum: ReadRequest::LockHint
-
-Values:
-
-=over 4
-
-=item * C<LOCK_HINT_UNSPECIFIED> => 0
-
-=item * C<LOCK_HINT_SHARED> => 1
-
-=item * C<LOCK_HINT_EXCLUSIVE> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::BeginTransactionRequest ===
     # Fields for BeginTransactionRequest
@@ -2403,48 +1575,6 @@ Values:
     # Field: request_options Type: 11 (.google.spanner.v1.RequestOptions)
     # Field: mutation_key Type: 11 (.google.spanner.v1.Mutation)
     # Field: routing_hint Type: 11 (.google.spanner.v1.RoutingHint)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::BeginTransactionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::BeginTransactionRequest->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<options>
-
-Type: Message (.google.spanner.v1.TransactionOptions)
-
-=item * B<request_options>
-
-Type: Message (.google.spanner.v1.RequestOptions)
-
-=item * B<mutation_key>
-
-Type: Message (.google.spanner.v1.Mutation)
-
-=item * B<routing_hint>
-
-Type: Message (.google.spanner.v1.RoutingHint)
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::CommitRequest ===
     # Fields for CommitRequest
@@ -2458,98 +1588,10 @@ Type: Message (.google.spanner.v1.RoutingHint)
     # Field: precommit_token Type: 11 (.google.spanner.v1.MultiplexedSessionPrecommitToken)
     # Field: routing_hint Type: 11 (.google.spanner.v1.RoutingHint)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::CommitRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::CommitRequest->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<transaction_id>
-
-Type: Bytes
-
-=item * B<single_use_transaction>
-
-Type: Message (.google.spanner.v1.TransactionOptions)
-
-=item * B<mutations>
-
-Type: Message (.google.spanner.v1.Mutation)
-
-=item * B<return_commit_stats>
-
-Type: Bool
-
-=item * B<max_commit_delay>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<request_options>
-
-Type: Message (.google.spanner.v1.RequestOptions)
-
-=item * B<precommit_token>
-
-Type: Message (.google.spanner.v1.MultiplexedSessionPrecommitToken)
-
-=item * B<routing_hint>
-
-Type: Message (.google.spanner.v1.RoutingHint)
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::RollbackRequest ===
     # Fields for RollbackRequest
     # Field: session Type: 9 ()
     # Field: transaction_id Type: 12 ()
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::RollbackRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::RollbackRequest->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<transaction_id>
-
-Type: Bytes
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::BatchWriteRequest ===
     # Fields for BatchWriteRequest
@@ -2558,83 +1600,11 @@ Type: Bytes
     # Field: mutation_groups Type: 11 (.google.spanner.v1.BatchWriteRequest.MutationGroup)
     # Field: exclude_txn_from_change_streams Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::BatchWriteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::BatchWriteRequest->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<request_options>
-
-Type: Message (.google.spanner.v1.RequestOptions)
-
-=item * B<mutation_groups>
-
-Type: Message (.google.spanner.v1.BatchWriteRequest.MutationGroup)
-
-=item * B<exclude_txn_from_change_streams>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Spanner::BatchWriteResponse ===
     # Fields for BatchWriteResponse
     # Field: indexes Type: 5 ()
     # Field: status Type: 11 (.google.rpc.Status)
     # Field: commit_timestamp Type: 11 (.google.protobuf.Timestamp)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::BatchWriteResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::BatchWriteResponse->new(
-        indexes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<indexes>
-
-Type: Int32
-
-=item * B<status>
-
-Type: Message (.google.rpc.Status)
-
-=item * B<commit_timestamp>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Spanner::FetchCacheUpdateRequest ===
     # Fields for FetchCacheUpdateRequest
@@ -2642,62 +1612,20 @@ Type: Message (.google.protobuf.Timestamp)
     # Field: max_recipe_count Type: 5 ()
     # Field: max_range_count Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Spanner::FetchCacheUpdateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Spanner;
-
-    my $msg = Google::Spanner::V1::Spanner::FetchCacheUpdateRequest->new(
-        database => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database>
-
-Type: String
-
-=item * B<max_recipe_count>
-
-Type: Int32
-
-=item * B<max_range_count>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Service Client: Google::Spanner::V1::Spanner::SpannerClient ===
 package Google::Spanner::V1::Spanner::SpannerClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Spanner::V1::Spanner::SpannerClient
 
-Google::Spanner::V1::Spanner::SpannerClient - Client stub representing the remote Spanner service
+Client stub representing the remote C<Spanner> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<spanner.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2947,13 +1875,1417 @@ sub fetch_cache_update {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Spanner::V1::Spanner - Protocol Buffers schema definition
+Google::Spanner::V1::Spanner - Compiled Protocol Buffers messages for google/spanner/v1/spanner.proto
+
+=head1 SYNOPSIS
+
+    use Google::Spanner::V1::Spanner;
+
+    my $msg = Google::Spanner::V1::Spanner::CreateSessionRequest->new({
+        database => $database,
+        session => $session,
+    });
+
+    # Read or update a field
+    my $val = $msg->database();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Spanner::V1::Spanner::CreateSessionRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/spanner/v1/spanner.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Spanner::V1::Spanner::CreateSessionRequest
+
+The request for [CreateSession][google.spanner.v1.Spanner.CreateSession].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database() >> / C<< $msg->database($value) >>
+
+Type: C<String>
+
+Required. The database in which the new session is created.
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::Session>)
+
+Required. The session to create.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::BatchCreateSessionsRequest
+
+The request for
+[BatchCreateSessions][google.spanner.v1.Spanner.BatchCreateSessions].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database() >> / C<< $msg->database($value) >>
+
+Type: C<String>
+
+Required. The database in which the new sessions are created.
+
+=item * C<< $msg->session_template() >> / C<< $msg->session_template($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::Session>)
+
+Parameters to apply to each created session.
+
+=item * C<< $msg->session_count() >> / C<< $msg->session_count($value) >>
+
+Type: C<Int32>
+
+Required. The number of sessions to be created in this batch call. At least
+one session is created. The API can return fewer than the requested number
+of sessions. If a specific number of sessions are desired, the client can
+make additional calls to `BatchCreateSessions` (adjusting
+[session_count][google.spanner.v1.BatchCreateSessionsRequest.session_count]
+as necessary).
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::BatchCreateSessionsResponse
+
+The response for
+[BatchCreateSessions][google.spanner.v1.Spanner.BatchCreateSessions].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::Session>)
+
+The freshly created sessions.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::Session
+
+A session in the Cloud Spanner API.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The name of the session. This is always system-assigned.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::Session::LabelsEntry>)
+
+The labels for the session.
+
+ * Label keys must be between 1 and 63 characters long and must conform to
+   the following regular expression: `[a-z]([-a-z0-9]*[a-z0-9])?`.
+ * Label values must be between 0 and 63 characters long and must conform
+   to the regular expression `([a-z]([-a-z0-9]*[a-z0-9])?)?`.
+ * No more than 64 labels can be associated with a given session.
+
+See https://goo.gl/xmQnxf for more information on and examples of labels.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the session is created.
+
+=item * C<< $msg->approximate_last_use_time() >> / C<< $msg->approximate_last_use_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The approximate timestamp when the session is last used. It's
+typically earlier than the actual last use time.
+
+=item * C<< $msg->creator_role() >> / C<< $msg->creator_role($value) >>
+
+Type: C<String>
+
+The database role which created this session.
+
+=item * C<< $msg->multiplexed() >> / C<< $msg->multiplexed($value) >>
+
+Type: C<Bool>
+
+Optional. If `true`, specifies a multiplexed session. Use a multiplexed
+session for multiple, concurrent operations including any combination of
+read-only and read-write transactions. Use
+[`sessions.create`][google.spanner.v1.Spanner.CreateSession] to create
+multiplexed sessions. Don't use
+[BatchCreateSessions][google.spanner.v1.Spanner.BatchCreateSessions] to
+create a multiplexed session. You can't delete or list multiplexed
+sessions.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::GetSessionRequest
+
+The request for [GetSession][google.spanner.v1.Spanner.GetSession].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the session to retrieve.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::ListSessionsRequest
+
+The request for [ListSessions][google.spanner.v1.Spanner.ListSessions].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database() >> / C<< $msg->database($value) >>
+
+Type: C<String>
+
+Required. The database in which to list sessions.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Number of sessions to be returned in the response. If 0 or less, defaults
+to the server's maximum allowed page size.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+If non-empty, `page_token` should contain a
+[next_page_token][google.spanner.v1.ListSessionsResponse.next_page_token]
+from a previous
+[ListSessionsResponse][google.spanner.v1.ListSessionsResponse].
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+An expression for filtering the results of the request. Filter rules are
+case insensitive. The fields eligible for filtering are:
+
+  * `labels.key` where key is the name of a label
+
+Some examples of using filters are:
+
+  * `labels.env:*` --> The session has the label "env".
+  * `labels.env:dev` --> The session has the label "env" and the value of
+                       the label contains the string "dev".
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::ListSessionsResponse
+
+The response for [ListSessions][google.spanner.v1.Spanner.ListSessions].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->sessions() >> / C<< $msg->sessions($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::Session>)
+
+The list of requested sessions.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+`next_page_token` can be sent in a subsequent
+[ListSessions][google.spanner.v1.Spanner.ListSessions] call to fetch more
+of the matching sessions.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::DeleteSessionRequest
+
+The request for [DeleteSession][google.spanner.v1.Spanner.DeleteSession].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the session to delete.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::RequestOptions
+
+Common request options for various APIs.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->priority() >> / C<< $msg->priority($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::RequestOptions::Priority>)
+
+Priority for the request.
+
+=item * C<< $msg->request_tag() >> / C<< $msg->request_tag($value) >>
+
+Type: C<String>
+
+A per-request tag which can be applied to queries or reads, used for
+statistics collection.
+Both `request_tag` and `transaction_tag` can be specified for a read or
+query that belongs to a transaction.
+This field is ignored for requests where it's not applicable (for example,
+`CommitRequest`).
+Legal characters for `request_tag` values are all printable characters
+(ASCII 32 - 126) and the length of a request_tag is limited to 50
+characters. Values that exceed this limit are truncated.
+Any leading underscore (_) characters are removed from the string.
+
+=item * C<< $msg->transaction_tag() >> / C<< $msg->transaction_tag($value) >>
+
+Type: C<String>
+
+A tag used for statistics collection about this transaction.
+Both `request_tag` and `transaction_tag` can be specified for a read or
+query that belongs to a transaction.
+To enable tagging on a transaction, `transaction_tag` must be set to the
+same value for all requests belonging to the same transaction, including
+[BeginTransaction][google.spanner.v1.Spanner.BeginTransaction].
+If this request doesn't belong to any transaction, `transaction_tag` is
+ignored.
+Legal characters for `transaction_tag` values are all printable characters
+(ASCII 32 - 126) and the length of a `transaction_tag` is limited to 50
+characters. Values that exceed this limit are truncated.
+Any leading underscore (_) characters are removed from the string.
+
+=item * C<< $msg->client_context() >> / C<< $msg->client_context($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::RequestOptions::ClientContext>)
+
+Optional. Optional context that may be needed for some requests.
+
+=back
+
+=head3 Enum: RequestOptions::Priority
+
+=over 4
+
+=item * C<PRIORITY_UNSPECIFIED> => C<0>
+
+=item * C<PRIORITY_LOW> => C<1>
+
+=item * C<PRIORITY_MEDIUM> => C<2>
+
+=item * C<PRIORITY_HIGH> => C<3>
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::DirectedReadOptions
+
+The `DirectedReadOptions` can be used to indicate which replicas or regions
+should be used for non-transactional reads or queries.
+
+`DirectedReadOptions` can only be specified for a read-only transaction,
+otherwise the API returns an `INVALID_ARGUMENT` error.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->include_replicas() >> / C<< $msg->include_replicas($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::DirectedReadOptions::IncludeReplicas>)
+
+`Include_replicas` indicates the order of replicas (as they appear in
+this list) to process the request. If `auto_failover_disabled` is set to
+`true` and all replicas are exhausted without finding a healthy replica,
+Spanner waits for a replica in the list to become available, requests
+might fail due to `DEADLINE_EXCEEDED` errors.
+
+=item * C<< $msg->exclude_replicas() >> / C<< $msg->exclude_replicas($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::DirectedReadOptions::ExcludeReplicas>)
+
+`Exclude_replicas` indicates that specified replicas should be excluded
+from serving requests. Spanner doesn't route requests to the replicas
+in this list.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::ExecuteSqlRequest
+
+The request for [ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] and
+[ExecuteStreamingSql][google.spanner.v1.Spanner.ExecuteStreamingSql].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Required. The session in which the SQL query should be performed.
+
+=item * C<< $msg->transaction() >> / C<< $msg->transaction($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionSelector>)
+
+The transaction to use.
+
+For queries, if none is provided, the default is a temporary read-only
+transaction with strong concurrency.
+
+Standard DML statements require a read-write transaction. To protect
+against replays, single-use transactions are not supported. The caller
+must either supply an existing transaction ID or begin a new transaction.
+
+Partitioned DML requires an existing Partitioned DML transaction ID.
+
+=item * C<< $msg->sql() >> / C<< $msg->sql($value) >>
+
+Type: C<String>
+
+Required. The SQL string.
+
+=item * C<< $msg->params() >> / C<< $msg->params($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Parameter names and values that bind to placeholders in the SQL string.
+
+A parameter placeholder consists of the `@` character followed by the
+parameter name (for example, `@firstName`). Parameter names must conform
+to the naming requirements of identifiers as specified at
+https://cloud.google.com/spanner/docs/lexical#identifiers.
+
+Parameters can appear anywhere that a literal value is expected. The same
+parameter name can be used more than once, for example:
+
+`"WHERE id > @msg_id AND id < @msg_id + 100"`
+
+It's an error to execute a SQL statement with unbound parameters.
+
+=item * C<< $msg->param_types() >> / C<< $msg->param_types($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::ExecuteSqlRequest::ParamTypesEntry>)
+
+It isn't always possible for Cloud Spanner to infer the right SQL type
+from a JSON value. For example, values of type `BYTES` and values
+of type `STRING` both appear in
+[params][google.spanner.v1.ExecuteSqlRequest.params] as JSON strings.
+
+In these cases, you can use `param_types` to specify the exact
+SQL type for some or all of the SQL statement parameters. See the
+definition of [Type][google.spanner.v1.Type] for more information
+about SQL types.
+
+=item * C<< $msg->resume_token() >> / C<< $msg->resume_token($value) >>
+
+Type: C<Bytes>
+
+If this request is resuming a previously interrupted SQL statement
+execution, `resume_token` should be copied from the last
+[PartialResultSet][google.spanner.v1.PartialResultSet] yielded before the
+interruption. Doing this enables the new SQL statement execution to resume
+where the last one left off. The rest of the request parameters must
+exactly match the request that yielded this token.
+
+=item * C<< $msg->query_mode() >> / C<< $msg->query_mode($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::ExecuteSqlRequest::QueryMode>)
+
+Used to control the amount of debugging information returned in
+[ResultSetStats][google.spanner.v1.ResultSetStats]. If
+[partition_token][google.spanner.v1.ExecuteSqlRequest.partition_token] is
+set, [query_mode][google.spanner.v1.ExecuteSqlRequest.query_mode] can only
+be set to
+[QueryMode.NORMAL][google.spanner.v1.ExecuteSqlRequest.QueryMode.NORMAL].
+
+=item * C<< $msg->partition_token() >> / C<< $msg->partition_token($value) >>
+
+Type: C<Bytes>
+
+If present, results are restricted to the specified partition
+previously created using `PartitionQuery`. There must be an exact
+match for the values of fields common to this message and the
+`PartitionQueryRequest` message used to create this `partition_token`.
+
+=item * C<< $msg->seqno() >> / C<< $msg->seqno($value) >>
+
+Type: C<Int64>
+
+A per-transaction sequence number used to identify this request. This field
+makes each request idempotent such that if the request is received multiple
+times, at most one succeeds.
+
+The sequence number must be monotonically increasing within the
+transaction. If a request arrives for the first time with an out-of-order
+sequence number, the transaction can be aborted. Replays of previously
+handled requests yield the same response as the first execution.
+
+Required for DML statements. Ignored for queries.
+
+=item * C<< $msg->query_options() >> / C<< $msg->query_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::ExecuteSqlRequest::QueryOptions>)
+
+Query optimizer configuration to use for the given query.
+
+=item * C<< $msg->request_options() >> / C<< $msg->request_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::RequestOptions>)
+
+Common options for this request.
+
+=item * C<< $msg->directed_read_options() >> / C<< $msg->directed_read_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::DirectedReadOptions>)
+
+Directed read options for this request.
+
+=item * C<< $msg->data_boost_enabled() >> / C<< $msg->data_boost_enabled($value) >>
+
+Type: C<Bool>
+
+If this is for a partitioned query and this field is set to `true`, the
+request is executed with Spanner Data Boost independent compute resources.
+
+If the field is set to `true` but the request doesn't set
+`partition_token`, the API returns an `INVALID_ARGUMENT` error.
+
+=item * C<< $msg->last_statement() >> / C<< $msg->last_statement($value) >>
+
+Type: C<Bool>
+
+Optional. If set to `true`, this statement marks the end of the
+transaction. After this statement executes, you must commit or abort the
+transaction. Attempts to execute any other requests against this
+transaction (including reads and queries) are rejected.
+
+For DML statements, setting this option might cause some error reporting to
+be deferred until commit time (for example, validation of unique
+constraints). Given this, successful execution of a DML statement shouldn't
+be assumed until a subsequent `Commit` call completes successfully.
+
+=item * C<< $msg->routing_hint() >> / C<< $msg->routing_hint($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::RoutingHint>)
+
+Optional. Makes the Spanner requests location-aware if present.
+
+It gives the server hints that can be used to route the request
+to an appropriate server, potentially significantly decreasing latency and
+improving throughput. To achieve improved performance, most fields must be
+filled in with accurate values.
+
+=back
+
+=head3 Enum: ExecuteSqlRequest::QueryMode
+
+=over 4
+
+=item * C<NORMAL> => C<0>
+
+=item * C<PLAN> => C<1>
+
+=item * C<PROFILE> => C<2>
+
+=item * C<WITH_STATS> => C<3>
+
+=item * C<WITH_PLAN_AND_STATS> => C<4>
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::ExecuteBatchDmlRequest
+
+The request for [ExecuteBatchDml][google.spanner.v1.Spanner.ExecuteBatchDml].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Required. The session in which the DML statements should be performed.
+
+=item * C<< $msg->transaction() >> / C<< $msg->transaction($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionSelector>)
+
+Required. The transaction to use. Must be a read-write transaction.
+
+To protect against replays, single-use transactions are not supported. The
+caller must either supply an existing transaction ID or begin a new
+transaction.
+
+=item * C<< $msg->statements() >> / C<< $msg->statements($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::ExecuteBatchDmlRequest::Statement>)
+
+Required. The list of statements to execute in this batch. Statements are
+executed serially, such that the effects of statement `i` are visible to
+statement `i+1`. Each statement must be a DML statement. Execution stops at
+the first failed statement; the remaining statements are not executed.
+
+Callers must provide at least one statement.
+
+=item * C<< $msg->seqno() >> / C<< $msg->seqno($value) >>
+
+Type: C<Int64>
+
+Required. A per-transaction sequence number used to identify this request.
+This field makes each request idempotent such that if the request is
+received multiple times, at most one succeeds.
+
+The sequence number must be monotonically increasing within the
+transaction. If a request arrives for the first time with an out-of-order
+sequence number, the transaction might be aborted. Replays of previously
+handled requests yield the same response as the first execution.
+
+=item * C<< $msg->request_options() >> / C<< $msg->request_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::RequestOptions>)
+
+Common options for this request.
+
+=item * C<< $msg->last_statements() >> / C<< $msg->last_statements($value) >>
+
+Type: C<Bool>
+
+Optional. If set to `true`, this request marks the end of the transaction.
+After these statements execute, you must commit or abort the transaction.
+Attempts to execute any other requests against this transaction
+(including reads and queries) are rejected.
+
+Setting this option might cause some error reporting to be deferred until
+commit time (for example, validation of unique constraints). Given this,
+successful execution of statements shouldn't be assumed until a subsequent
+`Commit` call completes successfully.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::ExecuteBatchDmlResponse
+
+The response for
+[ExecuteBatchDml][google.spanner.v1.Spanner.ExecuteBatchDml]. Contains a list
+of [ResultSet][google.spanner.v1.ResultSet] messages, one for each DML
+statement that has successfully executed, in the same order as the statements
+in the request. If a statement fails, the status in the response body
+identifies the cause of the failure.
+
+To check for DML statements that failed, use the following approach:
+
+1. Check the status in the response message. The
+[google.rpc.Code][google.rpc.Code] enum
+   value `OK` indicates that all statements were executed successfully.
+2. If the status was not `OK`, check the number of result sets in the
+   response. If the response contains `N`
+   [ResultSet][google.spanner.v1.ResultSet] messages, then statement `N+1` in
+   the request failed.
+
+Example 1:
+
+* Request: 5 DML statements, all executed successfully.
+* Response: 5 [ResultSet][google.spanner.v1.ResultSet] messages, with the
+status `OK`.
+
+Example 2:
+
+* Request: 5 DML statements. The third statement has a syntax error.
+* Response: 2 [ResultSet][google.spanner.v1.ResultSet] messages, and a syntax
+error (`INVALID_ARGUMENT`)
+  status. The number of [ResultSet][google.spanner.v1.ResultSet] messages
+  indicates that the third statement failed, and the fourth and fifth
+  statements were not executed.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->result_sets() >> / C<< $msg->result_sets($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::ResultSet::ResultSet>)
+
+One [ResultSet][google.spanner.v1.ResultSet] for each statement in the
+request that ran successfully, in the same order as the statements in the
+request. Each [ResultSet][google.spanner.v1.ResultSet] does not contain any
+rows. The [ResultSetStats][google.spanner.v1.ResultSetStats] in each
+[ResultSet][google.spanner.v1.ResultSet] contain the number of rows
+modified by the statement.
+
+Only the first [ResultSet][google.spanner.v1.ResultSet] in the response
+contains valid [ResultSetMetadata][google.spanner.v1.ResultSetMetadata].
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Rpc::Status::Status>)
+
+If all DML statements are executed successfully, the status is `OK`.
+Otherwise, the error status of the first failed statement.
+
+=item * C<< $msg->precommit_token() >> / C<< $msg->precommit_token($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::MultiplexedSessionPrecommitToken>)
+
+Optional. A precommit token is included if the read-write transaction
+is on a multiplexed session. Pass the precommit token with the highest
+sequence number from this transaction attempt should be passed to the
+[Commit][google.spanner.v1.Spanner.Commit] request for this transaction.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::PartitionOptions
+
+Options for a `PartitionQueryRequest` and `PartitionReadRequest`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->partition_size_bytes() >> / C<< $msg->partition_size_bytes($value) >>
+
+Type: C<Int64>
+
+B<Note:> This hint is currently ignored by `PartitionQuery` and
+`PartitionRead` requests.
+
+The desired data size for each partition generated. The default for this
+option is currently 1 GiB. This is only a hint. The actual size of each
+partition can be smaller or larger than this size request.
+
+=item * C<< $msg->max_partitions() >> / C<< $msg->max_partitions($value) >>
+
+Type: C<Int64>
+
+B<Note:> This hint is currently ignored by `PartitionQuery` and
+`PartitionRead` requests.
+
+The desired maximum number of partitions to return. For example, this
+might be set to the number of workers available. The default for this
+option is currently 10,000. The maximum value is currently 200,000. This
+is only a hint. The actual number of partitions returned can be smaller or
+larger than this maximum count request.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::PartitionQueryRequest
+
+The request for [PartitionQuery][google.spanner.v1.Spanner.PartitionQuery]
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Required. The session used to create the partitions.
+
+=item * C<< $msg->transaction() >> / C<< $msg->transaction($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionSelector>)
+
+Read-only snapshot transactions are supported, read and write and
+single-use transactions are not.
+
+=item * C<< $msg->sql() >> / C<< $msg->sql($value) >>
+
+Type: C<String>
+
+Required. The query request to generate partitions for. The request fails
+if the query isn't root partitionable. For a query to be root
+partitionable, it needs to satisfy a few conditions. For example, if the
+query execution plan contains a distributed union operator, then it must be
+the first operator in the plan. For more information about other
+conditions, see [Read data in
+parallel](https://cloud.google.com/spanner/docs/reads#read_data_in_parallel).
+
+The query request must not contain DML commands, such as `INSERT`,
+`UPDATE`, or `DELETE`. Use
+[`ExecuteStreamingSql`][google.spanner.v1.Spanner.ExecuteStreamingSql] with
+a `PartitionedDml` transaction for large, partition-friendly DML
+operations.
+
+=item * C<< $msg->params() >> / C<< $msg->params($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Optional. Parameter names and values that bind to placeholders in the SQL
+string.
+
+A parameter placeholder consists of the `@` character followed by the
+parameter name (for example, `@firstName`). Parameter names can contain
+letters, numbers, and underscores.
+
+Parameters can appear anywhere that a literal value is expected. The same
+parameter name can be used more than once, for example:
+
+`"WHERE id > @msg_id AND id < @msg_id + 100"`
+
+It's an error to execute a SQL statement with unbound parameters.
+
+=item * C<< $msg->param_types() >> / C<< $msg->param_types($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::PartitionQueryRequest::ParamTypesEntry>)
+
+Optional. It isn't always possible for Cloud Spanner to infer the right SQL
+type from a JSON value. For example, values of type `BYTES` and values of
+type `STRING` both appear in
+[params][google.spanner.v1.PartitionQueryRequest.params] as JSON strings.
+
+In these cases, `param_types` can be used to specify the exact
+SQL type for some or all of the SQL query parameters. See the
+definition of [Type][google.spanner.v1.Type] for more information
+about SQL types.
+
+=item * C<< $msg->partition_options() >> / C<< $msg->partition_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::PartitionOptions>)
+
+Additional options that affect how many partitions are created.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::PartitionReadRequest
+
+The request for [PartitionRead][google.spanner.v1.Spanner.PartitionRead]
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Required. The session used to create the partitions.
+
+=item * C<< $msg->transaction() >> / C<< $msg->transaction($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionSelector>)
+
+Read only snapshot transactions are supported, read/write and single use
+transactions are not.
+
+=item * C<< $msg->table() >> / C<< $msg->table($value) >>
+
+Type: C<String>
+
+Required. The name of the table in the database to be read.
+
+=item * C<< $msg->index() >> / C<< $msg->index($value) >>
+
+Type: C<String>
+
+If non-empty, the name of an index on
+[table][google.spanner.v1.PartitionReadRequest.table]. This index is used
+instead of the table primary key when interpreting
+[key_set][google.spanner.v1.PartitionReadRequest.key_set] and sorting
+result rows. See [key_set][google.spanner.v1.PartitionReadRequest.key_set]
+for further information.
+
+=item * C<< $msg->columns() >> / C<< $msg->columns($value) >>
+
+Type: C<String>
+
+The columns of [table][google.spanner.v1.PartitionReadRequest.table] to be
+returned for each row matching this request.
+
+=item * C<< $msg->key_set() >> / C<< $msg->key_set($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Keys::KeySet>)
+
+Required. `key_set` identifies the rows to be yielded. `key_set` names the
+primary keys of the rows in
+[table][google.spanner.v1.PartitionReadRequest.table] to be yielded, unless
+[index][google.spanner.v1.PartitionReadRequest.index] is present. If
+[index][google.spanner.v1.PartitionReadRequest.index] is present, then
+[key_set][google.spanner.v1.PartitionReadRequest.key_set] instead names
+index keys in [index][google.spanner.v1.PartitionReadRequest.index].
+
+It isn't an error for the `key_set` to name rows that don't
+exist in the database. Read yields nothing for nonexistent rows.
+
+=item * C<< $msg->partition_options() >> / C<< $msg->partition_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::PartitionOptions>)
+
+Additional options that affect how many partitions are created.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::Partition
+
+Information returned for each partition returned in a
+PartitionResponse.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->partition_token() >> / C<< $msg->partition_token($value) >>
+
+Type: C<Bytes>
+
+This token can be passed to `Read`, `StreamingRead`, `ExecuteSql`, or
+`ExecuteStreamingSql` requests to restrict the results to those identified
+by this partition token.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::PartitionResponse
+
+The response for [PartitionQuery][google.spanner.v1.Spanner.PartitionQuery]
+or [PartitionRead][google.spanner.v1.Spanner.PartitionRead]
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->partitions() >> / C<< $msg->partitions($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::Partition>)
+
+Partitions created by this request.
+
+=item * C<< $msg->transaction() >> / C<< $msg->transaction($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::Transaction>)
+
+Transaction created by this request.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::ReadRequest
+
+The request for [Read][google.spanner.v1.Spanner.Read] and
+[StreamingRead][google.spanner.v1.Spanner.StreamingRead].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Required. The session in which the read should be performed.
+
+=item * C<< $msg->transaction() >> / C<< $msg->transaction($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionSelector>)
+
+The transaction to use. If none is provided, the default is a
+temporary read-only transaction with strong concurrency.
+
+=item * C<< $msg->table() >> / C<< $msg->table($value) >>
+
+Type: C<String>
+
+Required. The name of the table in the database to be read.
+
+=item * C<< $msg->index() >> / C<< $msg->index($value) >>
+
+Type: C<String>
+
+If non-empty, the name of an index on
+[table][google.spanner.v1.ReadRequest.table]. This index is used instead of
+the table primary key when interpreting
+[key_set][google.spanner.v1.ReadRequest.key_set] and sorting result rows.
+See [key_set][google.spanner.v1.ReadRequest.key_set] for further
+information.
+
+=item * C<< $msg->columns() >> / C<< $msg->columns($value) >>
+
+Type: C<String>
+
+Required. The columns of [table][google.spanner.v1.ReadRequest.table] to be
+returned for each row matching this request.
+
+=item * C<< $msg->key_set() >> / C<< $msg->key_set($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Keys::KeySet>)
+
+Required. `key_set` identifies the rows to be yielded. `key_set` names the
+primary keys of the rows in [table][google.spanner.v1.ReadRequest.table] to
+be yielded, unless [index][google.spanner.v1.ReadRequest.index] is present.
+If [index][google.spanner.v1.ReadRequest.index] is present, then
+[key_set][google.spanner.v1.ReadRequest.key_set] instead names index keys
+in [index][google.spanner.v1.ReadRequest.index].
+
+If the [partition_token][google.spanner.v1.ReadRequest.partition_token]
+field is empty, rows are yielded in table primary key order (if
+[index][google.spanner.v1.ReadRequest.index] is empty) or index key order
+(if [index][google.spanner.v1.ReadRequest.index] is non-empty). If the
+[partition_token][google.spanner.v1.ReadRequest.partition_token] field
+isn't empty, rows are yielded in an unspecified order.
+
+It isn't an error for the `key_set` to name rows that don't
+exist in the database. Read yields nothing for nonexistent rows.
+
+=item * C<< $msg->limit() >> / C<< $msg->limit($value) >>
+
+Type: C<Int64>
+
+If greater than zero, only the first `limit` rows are yielded. If `limit`
+is zero, the default is no limit. A limit can't be specified if
+`partition_token` is set.
+
+=item * C<< $msg->resume_token() >> / C<< $msg->resume_token($value) >>
+
+Type: C<Bytes>
+
+If this request is resuming a previously interrupted read,
+`resume_token` should be copied from the last
+[PartialResultSet][google.spanner.v1.PartialResultSet] yielded before the
+interruption. Doing this enables the new read to resume where the last read
+left off. The rest of the request parameters must exactly match the request
+that yielded this token.
+
+=item * C<< $msg->partition_token() >> / C<< $msg->partition_token($value) >>
+
+Type: C<Bytes>
+
+If present, results are restricted to the specified partition
+previously created using `PartitionRead`. There must be an exact
+match for the values of fields common to this message and the
+PartitionReadRequest message used to create this partition_token.
+
+=item * C<< $msg->request_options() >> / C<< $msg->request_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::RequestOptions>)
+
+Common options for this request.
+
+=item * C<< $msg->directed_read_options() >> / C<< $msg->directed_read_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::DirectedReadOptions>)
+
+Directed read options for this request.
+
+=item * C<< $msg->data_boost_enabled() >> / C<< $msg->data_boost_enabled($value) >>
+
+Type: C<Bool>
+
+If this is for a partitioned read and this field is set to `true`, the
+request is executed with Spanner Data Boost independent compute resources.
+
+If the field is set to `true` but the request doesn't set
+`partition_token`, the API returns an `INVALID_ARGUMENT` error.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::ReadRequest::OrderBy>)
+
+Optional. Order for the returned rows.
+
+By default, Spanner returns result rows in primary key order except for
+PartitionRead requests. For applications that don't require rows to be
+returned in primary key (`ORDER_BY_PRIMARY_KEY`) order, setting
+`ORDER_BY_NO_ORDER` option allows Spanner to optimize row retrieval,
+resulting in lower latencies in certain cases (for example, bulk point
+lookups).
+
+=item * C<< $msg->lock_hint() >> / C<< $msg->lock_hint($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::ReadRequest::LockHint>)
+
+Optional. Lock Hint for the request, it can only be used with read-write
+transactions.
+
+=item * C<< $msg->routing_hint() >> / C<< $msg->routing_hint($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::RoutingHint>)
+
+Optional. Makes the Spanner requests location-aware if present.
+
+It gives the server hints that can be used to route the request
+to an appropriate server, potentially significantly decreasing latency and
+improving throughput. To achieve improved performance, most fields must be
+filled in with accurate values.
+
+=back
+
+=head3 Enum: ReadRequest::OrderBy
+
+=over 4
+
+=item * C<ORDER_BY_UNSPECIFIED> => C<0>
+
+=item * C<ORDER_BY_PRIMARY_KEY> => C<1>
+
+=item * C<ORDER_BY_NO_ORDER> => C<2>
+
+=back
+
+=head3 Enum: ReadRequest::LockHint
+
+=over 4
+
+=item * C<LOCK_HINT_UNSPECIFIED> => C<0>
+
+=item * C<LOCK_HINT_SHARED> => C<1>
+
+=item * C<LOCK_HINT_EXCLUSIVE> => C<2>
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::BeginTransactionRequest
+
+The request for
+[BeginTransaction][google.spanner.v1.Spanner.BeginTransaction].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Required. The session in which the transaction runs.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionOptions>)
+
+Required. Options for the new transaction.
+
+=item * C<< $msg->request_options() >> / C<< $msg->request_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::RequestOptions>)
+
+Common options for this request.
+Priority is ignored for this request. Setting the priority in this
+`request_options` struct doesn't do anything. To set the priority for a
+transaction, set it on the reads and writes that are part of this
+transaction instead.
+
+=item * C<< $msg->mutation_key() >> / C<< $msg->mutation_key($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Mutation::Mutation>)
+
+Optional. Required for read-write transactions on a multiplexed session
+that commit mutations but don't perform any reads or queries. You must
+randomly select one of the mutations from the mutation set and send it as a
+part of this request.
+
+=item * C<< $msg->routing_hint() >> / C<< $msg->routing_hint($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::RoutingHint>)
+
+Optional. Makes the Spanner requests location-aware if present.
+
+It gives the server hints that can be used to route the request
+to an appropriate server, potentially significantly decreasing latency and
+improving throughput. To achieve improved performance, most fields must be
+filled in with accurate values.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::CommitRequest
+
+The request for [Commit][google.spanner.v1.Spanner.Commit].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Required. The session in which the transaction to be committed is running.
+
+=item * C<< $msg->transaction_id() >> / C<< $msg->transaction_id($value) >>
+
+Type: C<Bytes>
+
+Commit a previously-started transaction.
+
+=item * C<< $msg->single_use_transaction() >> / C<< $msg->single_use_transaction($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionOptions>)
+
+Execute mutations in a temporary transaction. Note that unlike
+commit of a previously-started transaction, commit with a
+temporary transaction is non-idempotent. That is, if the
+`CommitRequest` is sent to Cloud Spanner more than once (for
+instance, due to retries in the application, or in the
+transport library), it's possible that the mutations are
+executed more than once. If this is undesirable, use
+[BeginTransaction][google.spanner.v1.Spanner.BeginTransaction] and
+[Commit][google.spanner.v1.Spanner.Commit] instead.
+
+=item * C<< $msg->mutations() >> / C<< $msg->mutations($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Mutation::Mutation>)
+
+The mutations to be executed when this transaction commits. All
+mutations are applied atomically, in the order they appear in
+this list.
+
+=item * C<< $msg->return_commit_stats() >> / C<< $msg->return_commit_stats($value) >>
+
+Type: C<Bool>
+
+If `true`, then statistics related to the transaction is included in
+the [CommitResponse][google.spanner.v1.CommitResponse.commit_stats].
+Default value is `false`.
+
+=item * C<< $msg->max_commit_delay() >> / C<< $msg->max_commit_delay($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The amount of latency this request is configured to incur in
+order to improve throughput. If this field isn't set, Spanner assumes
+requests are relatively latency sensitive and automatically determines an
+appropriate delay time. You can specify a commit delay value between 0 and
+500 ms.
+
+=item * C<< $msg->request_options() >> / C<< $msg->request_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::RequestOptions>)
+
+Common options for this request.
+
+=item * C<< $msg->precommit_token() >> / C<< $msg->precommit_token($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::MultiplexedSessionPrecommitToken>)
+
+Optional. If the read-write transaction was executed on a multiplexed
+session, then you must include the precommit token with the highest
+sequence number received in this transaction attempt. Failing to do so
+results in a `FailedPrecondition` error.
+
+=item * C<< $msg->routing_hint() >> / C<< $msg->routing_hint($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::RoutingHint>)
+
+Optional. Makes the Spanner requests location-aware if present.
+
+It gives the server hints that can be used to route the request
+to an appropriate server, potentially significantly decreasing latency and
+improving throughput. To achieve improved performance, most fields must be
+filled in with accurate values.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::RollbackRequest
+
+The request for [Rollback][google.spanner.v1.Spanner.Rollback].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Required. The session in which the transaction to roll back is running.
+
+=item * C<< $msg->transaction_id() >> / C<< $msg->transaction_id($value) >>
+
+Type: C<Bytes>
+
+Required. The transaction to roll back.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::BatchWriteRequest
+
+The request for [BatchWrite][google.spanner.v1.Spanner.BatchWrite].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Required. The session in which the batch request is to be run.
+
+=item * C<< $msg->request_options() >> / C<< $msg->request_options($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::RequestOptions>)
+
+Common options for this request.
+
+=item * C<< $msg->mutation_groups() >> / C<< $msg->mutation_groups($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Spanner::BatchWriteRequest::MutationGroup>)
+
+Required. The groups of mutations to be applied.
+
+=item * C<< $msg->exclude_txn_from_change_streams() >> / C<< $msg->exclude_txn_from_change_streams($value) >>
+
+Type: C<Bool>
+
+Optional. If you don't set the `exclude_txn_from_change_streams` option or
+if it's set to `false`, then any change streams monitoring columns modified
+by transactions will capture the updates made within that transaction.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::BatchWriteResponse
+
+The result of applying a batch of mutations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->indexes() >> / C<< $msg->indexes($value) >>
+
+Type: C<Int32>
+
+The mutation groups applied in this batch. The values index into the
+`mutation_groups` field in the corresponding `BatchWriteRequest`.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Rpc::Status::Status>)
+
+An `OK` status indicates success. Any other status indicates a failure.
+
+=item * C<< $msg->commit_timestamp() >> / C<< $msg->commit_timestamp($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The commit timestamp of the transaction that applied this batch.
+Present if status is OK and the mutation groups were applied, absent
+otherwise.
+
+For mutation groups with conditions, a status=OK and missing
+commit_timestamp means that the mutation groups were not applied due to the
+condition not being satisfied after evaluation.
+
+=back
+
+=head2 Google::Spanner::V1::Spanner::FetchCacheUpdateRequest
+
+The request for
+[FetchCacheUpdate][google.spanner.v1.Spanner.FetchCacheUpdate].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database() >> / C<< $msg->database($value) >>
+
+Type: C<String>
+
+Required. The database for which to retrieve the cache update.
+
+=item * C<< $msg->max_recipe_count() >> / C<< $msg->max_recipe_count($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of key recipes to return in the response.
+If not set, a default limit of 100 will be used.
+
+=item * C<< $msg->max_range_count() >> / C<< $msg->max_range_count($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of ranges to return in the response.
+If not set, a default limit of 10000 will be used.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Spanner::V1::Spanner::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

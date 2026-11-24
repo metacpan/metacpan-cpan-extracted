@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::RestrictionConfig;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -54,63 +54,75 @@ EOF
     # Fields for RestrictionConfig
     # Field: type Type: 14 (.google.cloud.bigquery.v2.RestrictionConfig.RestrictionType)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::RestrictionConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig->new(
-        type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<type>
-
-Type: Enum (.google.cloud.bigquery.v2.RestrictionConfig.RestrictionType)
-
-=back
-
-=cut
-
 # Enum: RestrictionConfig::RestrictionType
 our $RestrictionConfig_RESTRICTION_TYPE_UNSPECIFIED = 0;
 our $RestrictionConfig_RESTRICTED_DATA_EGRESS = 1;
-
-=pod
-
-=head2 Enum: RestrictionConfig::RestrictionType
-
-Values:
-
-=over 4
-
-=item * C<RESTRICTION_TYPE_UNSPECIFIED> => 0
-
-=item * C<RESTRICTED_DATA_EGRESS> => 1
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::RestrictionConfig - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::RestrictionConfig - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/restriction_config.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::RestrictionConfig;
+
+    my $msg = Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig->new({
+        type => $type,
+    });
+
+    # Read or update a field
+    my $val = $msg->type();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/restriction_config.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionType>)
+
+Output only. Specifies the type of dataset/table restriction.
+
+=back
+
+=head3 Enum: RestrictionConfig::RestrictionType
+
+=over 4
+
+=item * C<RESTRICTION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<RESTRICTED_DATA_EGRESS> => C<1>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::RestrictionConfig::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

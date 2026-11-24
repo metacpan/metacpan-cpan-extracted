@@ -1,0 +1,4 @@
+Revision history for PDL-ML-Metrics
+
+0.01    2026-11-24
+        - Initial release: accuracy, precision_recall_f1, confusion_matrix, mse, rmse, mae, r2_score, cosine_similarity, roc_auc.

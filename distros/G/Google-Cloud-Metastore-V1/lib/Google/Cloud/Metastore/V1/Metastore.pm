@@ -3,7 +3,7 @@ package Google::Cloud::Metastore::V1::Metastore;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1444,112 +1444,6 @@ EOF
     # Field: telemetry_config Type: 11 (.google.cloud.metastore.v1.TelemetryConfig)
     # Field: scaling_config Type: 11 (.google.cloud.metastore.v1.ScalingConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::Service - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::Service->new(
-        hive_metastore_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<hive_metastore_config>
-
-Type: Message (.google.cloud.metastore.v1.HiveMetastoreConfig)
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.metastore.v1.Service.LabelsEntry)
-
-=item * B<network>
-
-Type: String
-
-=item * B<endpoint_uri>
-
-Type: String
-
-=item * B<port>
-
-Type: Int32
-
-=item * B<state>
-
-Type: Enum (.google.cloud.metastore.v1.Service.State)
-
-=item * B<state_message>
-
-Type: String
-
-=item * B<artifact_gcs_uri>
-
-Type: String
-
-=item * B<tier>
-
-Type: Enum (.google.cloud.metastore.v1.Service.Tier)
-
-=item * B<maintenance_window>
-
-Type: Message (.google.cloud.metastore.v1.MaintenanceWindow)
-
-=item * B<uid>
-
-Type: String
-
-=item * B<metadata_management_activity>
-
-Type: Message (.google.cloud.metastore.v1.MetadataManagementActivity)
-
-=item * B<release_channel>
-
-Type: Enum (.google.cloud.metastore.v1.Service.ReleaseChannel)
-
-=item * B<encryption_config>
-
-Type: Message (.google.cloud.metastore.v1.EncryptionConfig)
-
-=item * B<network_config>
-
-Type: Message (.google.cloud.metastore.v1.NetworkConfig)
-
-=item * B<database_type>
-
-Type: Enum (.google.cloud.metastore.v1.Service.DatabaseType)
-
-=item * B<telemetry_config>
-
-Type: Message (.google.cloud.metastore.v1.TelemetryConfig)
-
-=item * B<scaling_config>
-
-Type: Message (.google.cloud.metastore.v1.ScalingConfig)
-
-=back
-
-=cut
-
 # Enum: Service::State
 our $Service_STATE_UNSPECIFIED = 0;
 our $Service_CREATING = 1;
@@ -1560,137 +1454,25 @@ our $Service_UPDATING = 5;
 our $Service_DELETING = 6;
 our $Service_ERROR = 7;
 
-=pod
-
-=head2 Enum: Service::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<SUSPENDING> => 3
-
-=item * C<SUSPENDED> => 4
-
-=item * C<UPDATING> => 5
-
-=item * C<DELETING> => 6
-
-=item * C<ERROR> => 7
-
-=back
-
-=cut
-
 # Enum: Service::Tier
 our $Service_TIER_UNSPECIFIED = 0;
 our $Service_DEVELOPER = 1;
 our $Service_ENTERPRISE = 3;
-
-=pod
-
-=head2 Enum: Service::Tier
-
-Values:
-
-=over 4
-
-=item * C<TIER_UNSPECIFIED> => 0
-
-=item * C<DEVELOPER> => 1
-
-=item * C<ENTERPRISE> => 3
-
-=back
-
-=cut
 
 # Enum: Service::ReleaseChannel
 our $Service_RELEASE_CHANNEL_UNSPECIFIED = 0;
 our $Service_CANARY = 1;
 our $Service_STABLE = 2;
 
-=pod
-
-=head2 Enum: Service::ReleaseChannel
-
-Values:
-
-=over 4
-
-=item * C<RELEASE_CHANNEL_UNSPECIFIED> => 0
-
-=item * C<CANARY> => 1
-
-=item * C<STABLE> => 2
-
-=back
-
-=cut
-
 # Enum: Service::DatabaseType
 our $Service_DATABASE_TYPE_UNSPECIFIED = 0;
 our $Service_MYSQL = 1;
 our $Service_SPANNER = 2;
 
-=pod
-
-=head2 Enum: Service::DatabaseType
-
-Values:
-
-=over 4
-
-=item * C<DATABASE_TYPE_UNSPECIFIED> => 0
-
-=item * C<MYSQL> => 1
-
-=item * C<SPANNER> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::MaintenanceWindow ===
     # Fields for MaintenanceWindow
     # Field: hour_of_day Type: 11 (.google.protobuf.Int32Value)
     # Field: day_of_week Type: 14 (.google.type.DayOfWeek)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::MaintenanceWindow - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::MaintenanceWindow->new(
-        hour_of_day => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<hour_of_day>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<day_of_week>
-
-Type: Enum (.google.type.DayOfWeek)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::HiveMetastoreConfig ===
     # Fields for HiveMetastoreConfig
@@ -1700,70 +1482,10 @@ Type: Enum (.google.type.DayOfWeek)
     # Field: endpoint_protocol Type: 14 (.google.cloud.metastore.v1.HiveMetastoreConfig.EndpointProtocol)
     # Field: auxiliary_versions Type: 11 (.google.cloud.metastore.v1.HiveMetastoreConfig.AuxiliaryVersionsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::HiveMetastoreConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::HiveMetastoreConfig->new(
-        version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<version>
-
-Type: String
-
-=item * B<config_overrides>
-
-Type: Message (.google.cloud.metastore.v1.HiveMetastoreConfig.ConfigOverridesEntry)
-
-=item * B<kerberos_config>
-
-Type: Message (.google.cloud.metastore.v1.KerberosConfig)
-
-=item * B<endpoint_protocol>
-
-Type: Enum (.google.cloud.metastore.v1.HiveMetastoreConfig.EndpointProtocol)
-
-=item * B<auxiliary_versions>
-
-Type: Message (.google.cloud.metastore.v1.HiveMetastoreConfig.AuxiliaryVersionsEntry)
-
-=back
-
-=cut
-
 # Enum: HiveMetastoreConfig::EndpointProtocol
 our $HiveMetastoreConfig_ENDPOINT_PROTOCOL_UNSPECIFIED = 0;
 our $HiveMetastoreConfig_THRIFT = 1;
 our $HiveMetastoreConfig_GRPC = 2;
-
-=pod
-
-=head2 Enum: HiveMetastoreConfig::EndpointProtocol
-
-Values:
-
-=over 4
-
-=item * C<ENDPOINT_PROTOCOL_UNSPECIFIED> => 0
-
-=item * C<THRIFT> => 1
-
-=item * C<GRPC> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::KerberosConfig ===
     # Fields for KerberosConfig
@@ -1771,99 +1493,13 @@ Values:
     # Field: principal Type: 9 ()
     # Field: krb5_config_gcs_uri Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::KerberosConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::KerberosConfig->new(
-        keytab => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<keytab>
-
-Type: Message (.google.cloud.metastore.v1.Secret)
-
-=item * B<principal>
-
-Type: String
-
-=item * B<krb5_config_gcs_uri>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::Secret ===
     # Fields for Secret
     # Field: cloud_secret Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::Secret - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::Secret->new(
-        cloud_secret => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cloud_secret>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::EncryptionConfig ===
     # Fields for EncryptionConfig
     # Field: kms_key Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::EncryptionConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::EncryptionConfig->new(
-        kms_key => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kms_key>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::AuxiliaryVersionConfig ===
     # Fields for AuxiliaryVersionConfig
@@ -1871,157 +1507,23 @@ Type: String
     # Field: config_overrides Type: 11 (.google.cloud.metastore.v1.AuxiliaryVersionConfig.ConfigOverridesEntry)
     # Field: network_config Type: 11 (.google.cloud.metastore.v1.NetworkConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::AuxiliaryVersionConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::AuxiliaryVersionConfig->new(
-        version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<version>
-
-Type: String
-
-=item * B<config_overrides>
-
-Type: Message (.google.cloud.metastore.v1.AuxiliaryVersionConfig.ConfigOverridesEntry)
-
-=item * B<network_config>
-
-Type: Message (.google.cloud.metastore.v1.NetworkConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::NetworkConfig ===
     # Fields for NetworkConfig
     # Field: consumers Type: 11 (.google.cloud.metastore.v1.NetworkConfig.Consumer)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::NetworkConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::NetworkConfig->new(
-        consumers => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<consumers>
-
-Type: Message (.google.cloud.metastore.v1.NetworkConfig.Consumer)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::TelemetryConfig ===
     # Fields for TelemetryConfig
     # Field: log_format Type: 14 (.google.cloud.metastore.v1.TelemetryConfig.LogFormat)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::TelemetryConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::TelemetryConfig->new(
-        log_format => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<log_format>
-
-Type: Enum (.google.cloud.metastore.v1.TelemetryConfig.LogFormat)
-
-=back
-
-=cut
 
 # Enum: TelemetryConfig::LogFormat
 our $TelemetryConfig_LOG_FORMAT_UNSPECIFIED = 0;
 our $TelemetryConfig_LEGACY = 1;
 our $TelemetryConfig_JSON = 2;
 
-=pod
-
-=head2 Enum: TelemetryConfig::LogFormat
-
-Values:
-
-=over 4
-
-=item * C<LOG_FORMAT_UNSPECIFIED> => 0
-
-=item * C<LEGACY> => 1
-
-=item * C<JSON> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::MetadataManagementActivity ===
     # Fields for MetadataManagementActivity
     # Field: metadata_exports Type: 11 (.google.cloud.metastore.v1.MetadataExport)
     # Field: restores Type: 11 (.google.cloud.metastore.v1.Restore)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::MetadataManagementActivity - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::MetadataManagementActivity->new(
-        metadata_exports => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<metadata_exports>
-
-Type: Message (.google.cloud.metastore.v1.MetadataExport)
-
-=item * B<restores>
-
-Type: Message (.google.cloud.metastore.v1.Restore)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::MetadataImport ===
     # Fields for MetadataImport
@@ -2033,84 +1535,12 @@ Type: Message (.google.cloud.metastore.v1.Restore)
     # Field: end_time Type: 11 (.google.protobuf.Timestamp)
     # Field: state Type: 14 (.google.cloud.metastore.v1.MetadataImport.State)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::MetadataImport - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::MetadataImport->new(
-        database_dump => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database_dump>
-
-Type: Message (.google.cloud.metastore.v1.MetadataImport.DatabaseDump)
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.metastore.v1.MetadataImport.State)
-
-=back
-
-=cut
-
 # Enum: MetadataImport::State
 our $MetadataImport_STATE_UNSPECIFIED = 0;
 our $MetadataImport_RUNNING = 1;
 our $MetadataImport_SUCCEEDED = 2;
 our $MetadataImport_UPDATING = 3;
 our $MetadataImport_FAILED = 4;
-
-=pod
-
-=head2 Enum: MetadataImport::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<RUNNING> => 1
-
-=item * C<SUCCEEDED> => 2
-
-=item * C<UPDATING> => 3
-
-=item * C<FAILED> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::MetadataExport ===
     # Fields for MetadataExport
@@ -2120,76 +1550,12 @@ Values:
     # Field: state Type: 14 (.google.cloud.metastore.v1.MetadataExport.State)
     # Field: database_dump_type Type: 14 (.google.cloud.metastore.v1.DatabaseDumpSpec.Type)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::MetadataExport - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::MetadataExport->new(
-        destination_gcs_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<destination_gcs_uri>
-
-Type: String
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.metastore.v1.MetadataExport.State)
-
-=item * B<database_dump_type>
-
-Type: Enum (.google.cloud.metastore.v1.DatabaseDumpSpec.Type)
-
-=back
-
-=cut
-
 # Enum: MetadataExport::State
 our $MetadataExport_STATE_UNSPECIFIED = 0;
 our $MetadataExport_RUNNING = 1;
 our $MetadataExport_SUCCEEDED = 2;
 our $MetadataExport_FAILED = 3;
 our $MetadataExport_CANCELLED = 4;
-
-=pod
-
-=head2 Enum: MetadataExport::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<RUNNING> => 1
-
-=item * C<SUCCEEDED> => 2
-
-=item * C<FAILED> => 3
-
-=item * C<CANCELLED> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::Backup ===
     # Fields for Backup
@@ -2201,56 +1567,6 @@ Values:
     # Field: description Type: 9 ()
     # Field: restoring_services Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::Backup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::Backup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.metastore.v1.Backup.State)
-
-=item * B<service_revision>
-
-Type: Message (.google.cloud.metastore.v1.Service)
-
-=item * B<description>
-
-Type: String
-
-=item * B<restoring_services>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: Backup::State
 our $Backup_STATE_UNSPECIFIED = 0;
 our $Backup_CREATING = 1;
@@ -2258,30 +1574,6 @@ our $Backup_DELETING = 2;
 our $Backup_ACTIVE = 3;
 our $Backup_FAILED = 4;
 our $Backup_RESTORING = 5;
-
-=pod
-
-=head2 Enum: Backup::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<DELETING> => 2
-
-=item * C<ACTIVE> => 3
-
-=item * C<FAILED> => 4
-
-=item * C<RESTORING> => 5
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::Restore ===
     # Fields for Restore
@@ -2292,52 +1584,6 @@ Values:
     # Field: type Type: 14 (.google.cloud.metastore.v1.Restore.RestoreType)
     # Field: details Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::Restore - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::Restore->new(
-        start_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.metastore.v1.Restore.State)
-
-=item * B<backup>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.metastore.v1.Restore.RestoreType)
-
-=item * B<details>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: Restore::State
 our $Restore_STATE_UNSPECIFIED = 0;
 our $Restore_RUNNING = 1;
@@ -2345,85 +1591,15 @@ our $Restore_SUCCEEDED = 2;
 our $Restore_FAILED = 3;
 our $Restore_CANCELLED = 4;
 
-=pod
-
-=head2 Enum: Restore::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<RUNNING> => 1
-
-=item * C<SUCCEEDED> => 2
-
-=item * C<FAILED> => 3
-
-=item * C<CANCELLED> => 4
-
-=back
-
-=cut
-
 # Enum: Restore::RestoreType
 our $Restore_RESTORE_TYPE_UNSPECIFIED = 0;
 our $Restore_FULL = 1;
 our $Restore_METADATA_ONLY = 2;
 
-=pod
-
-=head2 Enum: Restore::RestoreType
-
-Values:
-
-=over 4
-
-=item * C<RESTORE_TYPE_UNSPECIFIED> => 0
-
-=item * C<FULL> => 1
-
-=item * C<METADATA_ONLY> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::ScalingConfig ===
     # Fields for ScalingConfig
     # Field: instance_size Type: 14 (.google.cloud.metastore.v1.ScalingConfig.InstanceSize)
     # Field: scaling_factor Type: 2 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::ScalingConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::ScalingConfig->new(
-        instance_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance_size>
-
-Type: Enum (.google.cloud.metastore.v1.ScalingConfig.InstanceSize)
-
-=item * B<scaling_factor>
-
-Type: Float
-
-=back
-
-=cut
 
 # Enum: ScalingConfig::InstanceSize
 our $ScalingConfig_INSTANCE_SIZE_UNSPECIFIED = 0;
@@ -2433,30 +1609,6 @@ our $ScalingConfig_MEDIUM = 3;
 our $ScalingConfig_LARGE = 4;
 our $ScalingConfig_EXTRA_LARGE = 5;
 
-=pod
-
-=head2 Enum: ScalingConfig::InstanceSize
-
-Values:
-
-=over 4
-
-=item * C<INSTANCE_SIZE_UNSPECIFIED> => 0
-
-=item * C<EXTRA_SMALL> => 1
-
-=item * C<SMALL> => 2
-
-=item * C<MEDIUM> => 3
-
-=item * C<LARGE> => 4
-
-=item * C<EXTRA_LARGE> => 5
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::ListServicesRequest ===
     # Fields for ListServicesRequest
     # Field: parent Type: 9 ()
@@ -2465,117 +1617,15 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::ListServicesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::ListServicesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::ListServicesResponse ===
     # Fields for ListServicesResponse
     # Field: services Type: 11 (.google.cloud.metastore.v1.Service)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::ListServicesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::ListServicesResponse->new(
-        services => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<services>
-
-Type: Message (.google.cloud.metastore.v1.Service)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::GetServiceRequest ===
     # Fields for GetServiceRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::GetServiceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::GetServiceRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::CreateServiceRequest ===
     # Fields for CreateServiceRequest
@@ -2584,118 +1634,16 @@ Type: String
     # Field: service Type: 11 (.google.cloud.metastore.v1.Service)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::CreateServiceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::CreateServiceRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<service_id>
-
-Type: String
-
-=item * B<service>
-
-Type: Message (.google.cloud.metastore.v1.Service)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::UpdateServiceRequest ===
     # Fields for UpdateServiceRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: service Type: 11 (.google.cloud.metastore.v1.Service)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::UpdateServiceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::UpdateServiceRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<service>
-
-Type: Message (.google.cloud.metastore.v1.Service)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::DeleteServiceRequest ===
     # Fields for DeleteServiceRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::DeleteServiceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::DeleteServiceRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::ListMetadataImportsRequest ===
     # Fields for ListMetadataImportsRequest
@@ -2705,117 +1653,15 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::ListMetadataImportsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::ListMetadataImportsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::ListMetadataImportsResponse ===
     # Fields for ListMetadataImportsResponse
     # Field: metadata_imports Type: 11 (.google.cloud.metastore.v1.MetadataImport)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::ListMetadataImportsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::ListMetadataImportsResponse->new(
-        metadata_imports => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<metadata_imports>
-
-Type: Message (.google.cloud.metastore.v1.MetadataImport)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::GetMetadataImportRequest ===
     # Fields for GetMetadataImportRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::GetMetadataImportRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::GetMetadataImportRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::CreateMetadataImportRequest ===
     # Fields for CreateMetadataImportRequest
@@ -2824,83 +1670,11 @@ Type: String
     # Field: metadata_import Type: 11 (.google.cloud.metastore.v1.MetadataImport)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::CreateMetadataImportRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::CreateMetadataImportRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<metadata_import_id>
-
-Type: String
-
-=item * B<metadata_import>
-
-Type: Message (.google.cloud.metastore.v1.MetadataImport)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::UpdateMetadataImportRequest ===
     # Fields for UpdateMetadataImportRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: metadata_import Type: 11 (.google.cloud.metastore.v1.MetadataImport)
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::UpdateMetadataImportRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::UpdateMetadataImportRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<metadata_import>
-
-Type: Message (.google.cloud.metastore.v1.MetadataImport)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::ListBackupsRequest ===
     # Fields for ListBackupsRequest
@@ -2910,117 +1684,15 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::ListBackupsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::ListBackupsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::ListBackupsResponse ===
     # Fields for ListBackupsResponse
     # Field: backups Type: 11 (.google.cloud.metastore.v1.Backup)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::ListBackupsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::ListBackupsResponse->new(
-        backups => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<backups>
-
-Type: Message (.google.cloud.metastore.v1.Backup)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::GetBackupRequest ===
     # Fields for GetBackupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::GetBackupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::GetBackupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::CreateBackupRequest ===
     # Fields for CreateBackupRequest
@@ -3029,78 +1701,10 @@ Type: String
     # Field: backup Type: 11 (.google.cloud.metastore.v1.Backup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::CreateBackupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::CreateBackupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<backup_id>
-
-Type: String
-
-=item * B<backup>
-
-Type: Message (.google.cloud.metastore.v1.Backup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::DeleteBackupRequest ===
     # Fields for DeleteBackupRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::DeleteBackupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::DeleteBackupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::ExportMetadataRequest ===
     # Fields for ExportMetadataRequest
@@ -3109,88 +1713,12 @@ Type: String
     # Field: request_id Type: 9 ()
     # Field: database_dump_type Type: 14 (.google.cloud.metastore.v1.DatabaseDumpSpec.Type)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::ExportMetadataRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::ExportMetadataRequest->new(
-        destination_gcs_folder => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<destination_gcs_folder>
-
-Type: String
-
-=item * B<service>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=item * B<database_dump_type>
-
-Type: Enum (.google.cloud.metastore.v1.DatabaseDumpSpec.Type)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::RestoreServiceRequest ===
     # Fields for RestoreServiceRequest
     # Field: service Type: 9 ()
     # Field: backup Type: 9 ()
     # Field: restore_type Type: 14 (.google.cloud.metastore.v1.Restore.RestoreType)
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::RestoreServiceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::RestoreServiceRequest->new(
-        service => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<service>
-
-Type: String
-
-=item * B<backup>
-
-Type: String
-
-=item * B<restore_type>
-
-Type: Enum (.google.cloud.metastore.v1.Restore.RestoreType)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::OperationMetadata ===
     # Fields for OperationMetadata
@@ -3202,227 +1730,30 @@ Type: String
     # Field: requested_cancellation Type: 8 ()
     # Field: api_version Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::OperationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::OperationMetadata->new(
-        create_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<target>
-
-Type: String
-
-=item * B<verb>
-
-Type: String
-
-=item * B<status_message>
-
-Type: String
-
-=item * B<requested_cancellation>
-
-Type: Bool
-
-=item * B<api_version>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::LocationMetadata ===
     # Fields for LocationMetadata
     # Field: supported_hive_metastore_versions Type: 11 (.google.cloud.metastore.v1.LocationMetadata.HiveMetastoreVersion)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::LocationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::LocationMetadata->new(
-        supported_hive_metastore_versions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<supported_hive_metastore_versions>
-
-Type: Message (.google.cloud.metastore.v1.LocationMetadata.HiveMetastoreVersion)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::DatabaseDumpSpec ===
     # Fields for DatabaseDumpSpec
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::DatabaseDumpSpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::DatabaseDumpSpec->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # Enum: DatabaseDumpSpec::Type
 our $DatabaseDumpSpec_TYPE_UNSPECIFIED = 0;
 our $DatabaseDumpSpec_MYSQL = 1;
 our $DatabaseDumpSpec_AVRO = 2;
 
-=pod
-
-=head2 Enum: DatabaseDumpSpec::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<MYSQL> => 1
-
-=item * C<AVRO> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::QueryMetadataRequest ===
     # Fields for QueryMetadataRequest
     # Field: service Type: 9 ()
     # Field: query Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::QueryMetadataRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::QueryMetadataRequest->new(
-        service => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<service>
-
-Type: String
-
-=item * B<query>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::QueryMetadataResponse ===
     # Fields for QueryMetadataResponse
     # Field: result_manifest_uri Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::QueryMetadataResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::QueryMetadataResponse->new(
-        result_manifest_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<result_manifest_uri>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::ErrorDetails ===
     # Fields for ErrorDetails
     # Field: details Type: 11 (.google.cloud.metastore.v1.ErrorDetails.DetailsEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::ErrorDetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::ErrorDetails->new(
-        details => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<details>
-
-Type: Message (.google.cloud.metastore.v1.ErrorDetails.DetailsEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::MoveTableToDatabaseRequest ===
     # Fields for MoveTableToDatabaseRequest
@@ -3431,67 +1762,8 @@ Type: Message (.google.cloud.metastore.v1.ErrorDetails.DetailsEntry)
     # Field: db_name Type: 9 ()
     # Field: destination_db_name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::MoveTableToDatabaseRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::MoveTableToDatabaseRequest->new(
-        service => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<service>
-
-Type: String
-
-=item * B<table_name>
-
-Type: String
-
-=item * B<db_name>
-
-Type: String
-
-=item * B<destination_db_name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::MoveTableToDatabaseResponse ===
     # Fields for MoveTableToDatabaseResponse
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::MoveTableToDatabaseResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::MoveTableToDatabaseResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::Metastore::AlterMetadataResourceLocationRequest ===
     # Fields for AlterMetadataResourceLocationRequest
@@ -3499,86 +1771,23 @@ Google::Cloud::Metastore::V1::Metastore::MoveTableToDatabaseResponse - Compiled 
     # Field: resource_name Type: 9 ()
     # Field: location_uri Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::AlterMetadataResourceLocationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::AlterMetadataResourceLocationRequest->new(
-        service => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<service>
-
-Type: String
-
-=item * B<resource_name>
-
-Type: String
-
-=item * B<location_uri>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::Metastore::AlterMetadataResourceLocationResponse ===
     # Fields for AlterMetadataResourceLocationResponse
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::Metastore::AlterMetadataResourceLocationResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::Metastore;
-
-    my $msg = Google::Cloud::Metastore::V1::Metastore::AlterMetadataResourceLocationResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Metastore::V1::Metastore::DataprocMetastoreClient ===
 package Google::Cloud::Metastore::V1::Metastore::DataprocMetastoreClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Metastore::V1::Metastore::DataprocMetastoreClient
 
-Google::Cloud::Metastore::V1::Metastore::DataprocMetastoreClient - Client stub representing the remote DataprocMetastore service
+Client stub representing the remote C<DataprocMetastore> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<metastore.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -3841,13 +2050,1928 @@ sub alter_metadata_resource_location {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Metastore::V1::Metastore - Protocol Buffers schema definition
+Google::Cloud::Metastore::V1::Metastore - Compiled Protocol Buffers messages for google/cloud/metastore/v1/metastore.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Metastore::V1::Metastore;
+
+    my $msg = Google::Cloud::Metastore::V1::Metastore::Service->new({
+        hive_metastore_config => $hive_metastore_config,
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->hive_metastore_config();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Metastore::V1::Metastore::Service->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/metastore/v1/metastore.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Metastore::V1::Metastore::Service
+
+A managed metastore service that serves metadata queries.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->hive_metastore_config() >> / C<< $msg->hive_metastore_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::HiveMetastoreConfig>)
+
+Configuration information specific to running Hive metastore
+software as the metastore service.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. The relative resource name of the metastore service, in the
+following format:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the metastore service was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the metastore service was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::Service::LabelsEntry>)
+
+User-defined labels for the metastore service.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Immutable. The relative resource name of the VPC network on which the
+instance can be accessed. It is specified in the following form:
+
+`projects/{project_number}/global/networks/{network_id}`.
+
+=item * C<< $msg->endpoint_uri() >> / C<< $msg->endpoint_uri($value) >>
+
+Type: C<String>
+
+Output only. The URI of the endpoint used to access the metastore service.
+
+=item * C<< $msg->port() >> / C<< $msg->port($value) >>
+
+Type: C<Int32>
+
+The TCP port at which the metastore service is reached. Default: 9083.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::Service::State>)
+
+Output only. The current state of the metastore service.
+
+=item * C<< $msg->state_message() >> / C<< $msg->state_message($value) >>
+
+Type: C<String>
+
+Output only. Additional information about the current state of the
+metastore service, if available.
+
+=item * C<< $msg->artifact_gcs_uri() >> / C<< $msg->artifact_gcs_uri($value) >>
+
+Type: C<String>
+
+Output only. A Cloud Storage URI (starting with `gs://`) that specifies
+where artifacts related to the metastore service are stored.
+
+=item * C<< $msg->tier() >> / C<< $msg->tier($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::Service::Tier>)
+
+The tier of the service.
+
+=item * C<< $msg->maintenance_window() >> / C<< $msg->maintenance_window($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::MaintenanceWindow>)
+
+The one hour maintenance window of the metastore service. This specifies
+when the service can be restarted for maintenance purposes in UTC time.
+Maintenance window is not needed for services with the SPANNER
+database type.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. The globally unique resource identifier of the metastore
+service.
+
+=item * C<< $msg->metadata_management_activity() >> / C<< $msg->metadata_management_activity($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::MetadataManagementActivity>)
+
+Output only. The metadata management activities of the metastore service.
+
+=item * C<< $msg->release_channel() >> / C<< $msg->release_channel($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::Service::ReleaseChannel>)
+
+Immutable. The release channel of the service.
+If unspecified, defaults to `STABLE`.
+
+=item * C<< $msg->encryption_config() >> / C<< $msg->encryption_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::EncryptionConfig>)
+
+Immutable. Information used to configure the Dataproc Metastore service to
+encrypt customer data at rest. Cannot be updated.
+
+=item * C<< $msg->network_config() >> / C<< $msg->network_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::NetworkConfig>)
+
+The configuration specifying the network settings for the
+Dataproc Metastore service.
+
+=item * C<< $msg->database_type() >> / C<< $msg->database_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::Service::DatabaseType>)
+
+Immutable. The database type that the Metastore service stores its data.
+
+=item * C<< $msg->telemetry_config() >> / C<< $msg->telemetry_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::TelemetryConfig>)
+
+The configuration specifying telemetry settings for the Dataproc Metastore
+service. If unspecified defaults to `JSON`.
+
+=item * C<< $msg->scaling_config() >> / C<< $msg->scaling_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::ScalingConfig>)
+
+Scaling configuration of the metastore service.
+
+=back
+
+=head3 Enum: Service::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<SUSPENDING> => C<3>
+
+=item * C<SUSPENDED> => C<4>
+
+=item * C<UPDATING> => C<5>
+
+=item * C<DELETING> => C<6>
+
+=item * C<ERROR> => C<7>
+
+=back
+
+=head3 Enum: Service::Tier
+
+=over 4
+
+=item * C<TIER_UNSPECIFIED> => C<0>
+
+=item * C<DEVELOPER> => C<1>
+
+=item * C<ENTERPRISE> => C<3>
+
+=back
+
+=head3 Enum: Service::ReleaseChannel
+
+=over 4
+
+=item * C<RELEASE_CHANNEL_UNSPECIFIED> => C<0>
+
+=item * C<CANARY> => C<1>
+
+=item * C<STABLE> => C<2>
+
+=back
+
+=head3 Enum: Service::DatabaseType
+
+=over 4
+
+=item * C<DATABASE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<MYSQL> => C<1>
+
+=item * C<SPANNER> => C<2>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::MaintenanceWindow
+
+Maintenance window. This specifies when Dataproc Metastore
+may perform system maintenance operation to the service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->hour_of_day() >> / C<< $msg->hour_of_day($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+The hour of day (0-23) when the window starts.
+
+=item * C<< $msg->day_of_week() >> / C<< $msg->day_of_week($value) >>
+
+Type: C<Enum> (L<Google::Type::DayOfWeek>)
+
+The day of week, when the window starts.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::HiveMetastoreConfig
+
+Specifies configuration information specific to running Hive metastore
+software as the metastore service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Immutable. The Hive metastore schema version.
+
+=item * C<< $msg->config_overrides() >> / C<< $msg->config_overrides($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::HiveMetastoreConfig::ConfigOverridesEntry>)
+
+A mapping of Hive metastore configuration key-value pairs to apply to the
+Hive metastore (configured in `hive-site.xml`). The mappings
+override system defaults (some keys cannot be overridden). These
+overrides are also applied to auxiliary versions and can be further
+customized in the auxiliary version's `AuxiliaryVersionConfig`.
+
+=item * C<< $msg->kerberos_config() >> / C<< $msg->kerberos_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::KerberosConfig>)
+
+Information used to configure the Hive metastore service as a service
+principal in a Kerberos realm. To disable Kerberos, use the `UpdateService`
+method and specify this field's path
+(`hive_metastore_config.kerberos_config`) in the request's `update_mask`
+while omitting this field from the request's `service`.
+
+=item * C<< $msg->endpoint_protocol() >> / C<< $msg->endpoint_protocol($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::HiveMetastoreConfig::EndpointProtocol>)
+
+The protocol to use for the metastore service endpoint. If unspecified,
+defaults to `THRIFT`.
+
+=item * C<< $msg->auxiliary_versions() >> / C<< $msg->auxiliary_versions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::HiveMetastoreConfig::AuxiliaryVersionsEntry>)
+
+A mapping of Hive metastore version to the auxiliary version
+configuration. When specified, a secondary Hive metastore service is
+created along with the primary service. All auxiliary versions must be less
+than the service's primary version. The key is the auxiliary service name
+and it must match the regular expression [a-z]([-a-z0-9]*[a-z0-9])?. This
+means that the first character must be a lowercase letter, and all the
+following characters must be hyphens, lowercase letters, or digits, except
+the last character, which cannot be a hyphen.
+
+=back
+
+=head3 Enum: HiveMetastoreConfig::EndpointProtocol
+
+=over 4
+
+=item * C<ENDPOINT_PROTOCOL_UNSPECIFIED> => C<0>
+
+=item * C<THRIFT> => C<1>
+
+=item * C<GRPC> => C<2>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::KerberosConfig
+
+Configuration information for a Kerberos principal.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->keytab() >> / C<< $msg->keytab($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::Secret>)
+
+A Kerberos keytab file that can be used to authenticate a service principal
+with a Kerberos Key Distribution Center (KDC).
+
+=item * C<< $msg->principal() >> / C<< $msg->principal($value) >>
+
+Type: C<String>
+
+A Kerberos principal that exists in the both the keytab the KDC
+to authenticate as. A typical principal is of the form
+`primary/instance@REALM`, but there is no exact format.
+
+=item * C<< $msg->krb5_config_gcs_uri() >> / C<< $msg->krb5_config_gcs_uri($value) >>
+
+Type: C<String>
+
+A Cloud Storage URI that specifies the path to a
+krb5.conf file. It is of the form `gs://{bucket_name}/path/to/krb5.conf`,
+although the file does not need to be named krb5.conf explicitly.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::Secret
+
+A securely stored value.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cloud_secret() >> / C<< $msg->cloud_secret($value) >>
+
+Type: C<String>
+
+The relative resource name of a Secret Manager secret version, in the
+following form:
+
+`projects/{project_number}/secrets/{secret_id}/versions/{version_id}`.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::EncryptionConfig
+
+Encryption settings for the service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kms_key() >> / C<< $msg->kms_key($value) >>
+
+Type: C<String>
+
+The fully qualified customer provided Cloud KMS key name to use for
+customer data encryption, in the following form:
+
+`projects/{project_number}/locations/{location_id}/keyRings/{key_ring_id}/cryptoKeys/{crypto_key_id}`.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::AuxiliaryVersionConfig
+
+Configuration information for the auxiliary service versions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+The Hive metastore version of the auxiliary service. It must be less
+than the primary Hive metastore service's version.
+
+=item * C<< $msg->config_overrides() >> / C<< $msg->config_overrides($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::AuxiliaryVersionConfig::ConfigOverridesEntry>)
+
+A mapping of Hive metastore configuration key-value pairs to apply to the
+auxiliary Hive metastore (configured in `hive-site.xml`) in addition to
+the primary version's overrides. If keys are present in both the auxiliary
+version's overrides and the primary version's overrides, the value from
+the auxiliary version's overrides takes precedence.
+
+=item * C<< $msg->network_config() >> / C<< $msg->network_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::NetworkConfig>)
+
+Output only. The network configuration contains the endpoint URI(s) of the
+auxiliary Hive metastore service.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::NetworkConfig
+
+Network configuration for the Dataproc Metastore service.
+
+Next available ID: 4
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->consumers() >> / C<< $msg->consumers($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::NetworkConfig::Consumer>)
+
+Immutable. The consumer-side network configuration for the Dataproc
+Metastore instance.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::TelemetryConfig
+
+Telemetry Configuration for the Dataproc Metastore service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->log_format() >> / C<< $msg->log_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::TelemetryConfig::LogFormat>)
+
+The output format of the Dataproc Metastore service's logs.
+
+=back
+
+=head3 Enum: TelemetryConfig::LogFormat
+
+=over 4
+
+=item * C<LOG_FORMAT_UNSPECIFIED> => C<0>
+
+=item * C<LEGACY> => C<1>
+
+=item * C<JSON> => C<2>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::MetadataManagementActivity
+
+The metadata management activities of the metastore service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->metadata_exports() >> / C<< $msg->metadata_exports($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::MetadataExport>)
+
+Output only. The latest metadata exports of the metastore service.
+
+=item * C<< $msg->restores() >> / C<< $msg->restores($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::Restore>)
+
+Output only. The latest restores of the metastore service.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::MetadataImport
+
+A metastore resource that imports metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database_dump() >> / C<< $msg->database_dump($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::MetadataImport::DatabaseDump>)
+
+Immutable. A database dump from a pre-existing metastore's database.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. The relative resource name of the metadata import, of the form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}/metadataImports/{metadata_import_id}`.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+The description of the metadata import.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the metadata import was started.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the metadata import was last updated.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the metadata import finished.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::MetadataImport::State>)
+
+Output only. The current state of the metadata import.
+
+=back
+
+=head3 Enum: MetadataImport::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<RUNNING> => C<1>
+
+=item * C<SUCCEEDED> => C<2>
+
+=item * C<UPDATING> => C<3>
+
+=item * C<FAILED> => C<4>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::MetadataExport
+
+The details of a metadata export operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->destination_gcs_uri() >> / C<< $msg->destination_gcs_uri($value) >>
+
+Type: C<String>
+
+Output only. A Cloud Storage URI of a folder that metadata are exported
+to, in the form of
+`gs://<bucket_name>/<path_inside_bucket>/<export_folder>`, where
+`<export_folder>` is automatically generated.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the export started.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the export ended.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::MetadataExport::State>)
+
+Output only. The current state of the export.
+
+=item * C<< $msg->database_dump_type() >> / C<< $msg->database_dump_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::DatabaseDumpSpec::Type>)
+
+Output only. The type of the database dump.
+
+=back
+
+=head3 Enum: MetadataExport::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<RUNNING> => C<1>
+
+=item * C<SUCCEEDED> => C<2>
+
+=item * C<FAILED> => C<3>
+
+=item * C<CANCELLED> => C<4>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::Backup
+
+The details of a backup resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. The relative resource name of the backup, in the following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}/backups/{backup_id}`
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the backup was started.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the backup finished creating.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::Backup::State>)
+
+Output only. The current state of the backup.
+
+=item * C<< $msg->service_revision() >> / C<< $msg->service_revision($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::Service>)
+
+Output only. The revision of the service at the time of backup.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+The description of the backup.
+
+=item * C<< $msg->restoring_services() >> / C<< $msg->restoring_services($value) >>
+
+Type: C<String>
+
+Output only. Services that are restoring from the backup.
+
+=back
+
+=head3 Enum: Backup::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<DELETING> => C<2>
+
+=item * C<ACTIVE> => C<3>
+
+=item * C<FAILED> => C<4>
+
+=item * C<RESTORING> => C<5>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::Restore
+
+The details of a metadata restore operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the restore started.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the restore ended.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::Restore::State>)
+
+Output only. The current state of the restore.
+
+=item * C<< $msg->backup() >> / C<< $msg->backup($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the metastore service backup to
+restore from, in the following form:
+
+`projects/{project_id}/locations/{location_id}/services/{service_id}/backups/{backup_id}`.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::Restore::RestoreType>)
+
+Output only. The type of restore.
+
+=item * C<< $msg->details() >> / C<< $msg->details($value) >>
+
+Type: C<String>
+
+Output only. The restore details containing the revision of the service to
+be restored to, in format of JSON.
+
+=back
+
+=head3 Enum: Restore::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<RUNNING> => C<1>
+
+=item * C<SUCCEEDED> => C<2>
+
+=item * C<FAILED> => C<3>
+
+=item * C<CANCELLED> => C<4>
+
+=back
+
+=head3 Enum: Restore::RestoreType
+
+=over 4
+
+=item * C<RESTORE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<FULL> => C<1>
+
+=item * C<METADATA_ONLY> => C<2>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::ScalingConfig
+
+Represents the scaling configuration of a metastore service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance_size() >> / C<< $msg->instance_size($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::ScalingConfig::InstanceSize>)
+
+An enum of readable instance sizes, with each instance size mapping to a
+float value (e.g. InstanceSize.EXTRA_SMALL = scaling_factor(0.1))
+
+=item * C<< $msg->scaling_factor() >> / C<< $msg->scaling_factor($value) >>
+
+Type: C<Float>
+
+Scaling factor, increments of 0.1 for values less than 1.0, and
+increments of 1.0 for values greater than 1.0.
+
+=back
+
+=head3 Enum: ScalingConfig::InstanceSize
+
+=over 4
+
+=item * C<INSTANCE_SIZE_UNSPECIFIED> => C<0>
+
+=item * C<EXTRA_SMALL> => C<1>
+
+=item * C<SMALL> => C<2>
+
+=item * C<MEDIUM> => C<3>
+
+=item * C<LARGE> => C<4>
+
+=item * C<EXTRA_LARGE> => C<5>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::ListServicesRequest
+
+Request message for
+[DataprocMetastore.ListServices][google.cloud.metastore.v1.DataprocMetastore.ListServices].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the location of metastore services
+to list, in the following form:
+
+`projects/{project_number}/locations/{location_id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of services to return. The response may
+contain less than the maximum number. If unspecified, no more than 500
+services are returned. The maximum value is 1000; values above 1000 are
+changed to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous
+[DataprocMetastore.ListServices][google.cloud.metastore.v1.DataprocMetastore.ListServices]
+call. Provide this token to retrieve the subsequent page.
+
+To retrieve the first page, supply an empty page token.
+
+When paginating, other parameters provided to
+[DataprocMetastore.ListServices][google.cloud.metastore.v1.DataprocMetastore.ListServices]
+must match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. The filter to apply to list results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify the ordering of results as described in [Sorting
+Order](https://cloud.google.com/apis/design/design_patterns#sorting_order).
+If not specified, the results will be sorted in the default order.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::ListServicesResponse
+
+Response message for
+[DataprocMetastore.ListServices][google.cloud.metastore.v1.DataprocMetastore.ListServices].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->services() >> / C<< $msg->services($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::Service>)
+
+The services in the specified location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page. If this
+field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::GetServiceRequest
+
+Request message for
+[DataprocMetastore.GetService][google.cloud.metastore.v1.DataprocMetastore.GetService].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore service to retrieve,
+in the following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}`.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::CreateServiceRequest
+
+Request message for
+[DataprocMetastore.CreateService][google.cloud.metastore.v1.DataprocMetastore.CreateService].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the location in which to create a
+metastore service, in the following form:
+
+`projects/{project_number}/locations/{location_id}`.
+
+=item * C<< $msg->service_id() >> / C<< $msg->service_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the metastore service, which is used as the final
+component of the metastore service's name.
+
+This value must be between 2 and 63 characters long inclusive, begin with a
+letter, end with a letter or number, and consist of alpha-numeric
+ASCII characters or hyphens.
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::Service>)
+
+Required. The Metastore service to create. The `name` field is
+ignored. The ID of the created metastore service must be provided in
+the request's `service_id` field.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::UpdateServiceRequest
+
+Request message for
+[DataprocMetastore.UpdateService][google.cloud.metastore.v1.DataprocMetastore.UpdateService].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. A field mask used to specify the fields to be overwritten in the
+metastore service resource by the update.
+Fields specified in the `update_mask` are relative to the resource (not
+to the full request). A field is overwritten if it is in the mask.
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::Service>)
+
+Required. The metastore service to update. The server only merges fields
+in the service if they are specified in `update_mask`.
+
+The metastore service's `name` field is used to identify the metastore
+service to be updated.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::DeleteServiceRequest
+
+Request message for
+[DataprocMetastore.DeleteService][google.cloud.metastore.v1.DataprocMetastore.DeleteService].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore service to delete, in
+the following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::ListMetadataImportsRequest
+
+Request message for
+[DataprocMetastore.ListMetadataImports][google.cloud.metastore.v1.DataprocMetastore.ListMetadataImports].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the service whose metadata imports
+to list, in the following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}/metadataImports`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of imports to return. The response may contain
+less than the maximum number. If unspecified, no more than 500 imports are
+returned. The maximum value is 1000; values above 1000 are changed to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous
+[DataprocMetastore.ListServices][google.cloud.metastore.v1.DataprocMetastore.ListServices]
+call. Provide this token to retrieve the subsequent page.
+
+To retrieve the first page, supply an empty page token.
+
+When paginating, other parameters provided to
+[DataprocMetastore.ListServices][google.cloud.metastore.v1.DataprocMetastore.ListServices]
+must match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. The filter to apply to list results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify the ordering of results as described in [Sorting
+Order](https://cloud.google.com/apis/design/design_patterns#sorting_order).
+If not specified, the results will be sorted in the default order.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::ListMetadataImportsResponse
+
+Response message for
+[DataprocMetastore.ListMetadataImports][google.cloud.metastore.v1.DataprocMetastore.ListMetadataImports].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->metadata_imports() >> / C<< $msg->metadata_imports($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::MetadataImport>)
+
+The imports in the specified service.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page. If this
+field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::GetMetadataImportRequest
+
+Request message for
+[DataprocMetastore.GetMetadataImport][google.cloud.metastore.v1.DataprocMetastore.GetMetadataImport].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metadata import to retrieve, in
+the following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}/metadataImports/{import_id}`.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::CreateMetadataImportRequest
+
+Request message for
+[DataprocMetastore.CreateMetadataImport][google.cloud.metastore.v1.DataprocMetastore.CreateMetadataImport].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the service in which to create a
+metastore import, in the following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}`.
+
+=item * C<< $msg->metadata_import_id() >> / C<< $msg->metadata_import_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the metadata import, which is used as the final
+component of the metadata import's name.
+
+This value must be between 1 and 64 characters long, begin with a letter,
+end with a letter or number, and consist of alpha-numeric ASCII characters
+or hyphens.
+
+=item * C<< $msg->metadata_import() >> / C<< $msg->metadata_import($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::MetadataImport>)
+
+Required. The metadata import to create. The `name` field is ignored. The
+ID of the created metadata import must be provided in the request's
+`metadata_import_id` field.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::UpdateMetadataImportRequest
+
+Request message for
+[DataprocMetastore.UpdateMetadataImport][google.cloud.metastore.v1.DataprocMetastore.UpdateMetadataImport].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. A field mask used to specify the fields to be overwritten in the
+metadata import resource by the update.
+Fields specified in the `update_mask` are relative to the resource (not
+to the full request). A field is overwritten if it is in the mask.
+
+=item * C<< $msg->metadata_import() >> / C<< $msg->metadata_import($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::MetadataImport>)
+
+Required. The metadata import to update. The server only merges fields
+in the import if they are specified in `update_mask`.
+
+The metadata import's `name` field is used to identify the metastore
+import to be updated.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::ListBackupsRequest
+
+Request message for
+[DataprocMetastore.ListBackups][google.cloud.metastore.v1.DataprocMetastore.ListBackups].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the service whose backups to
+list, in the following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}/backups`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of backups to return. The response may contain
+less than the maximum number. If unspecified, no more than 500 backups are
+returned. The maximum value is 1000; values above 1000 are changed to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous
+[DataprocMetastore.ListBackups][google.cloud.metastore.v1.DataprocMetastore.ListBackups]
+call. Provide this token to retrieve the subsequent page.
+
+To retrieve the first page, supply an empty page token.
+
+When paginating, other parameters provided to
+[DataprocMetastore.ListBackups][google.cloud.metastore.v1.DataprocMetastore.ListBackups]
+must match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. The filter to apply to list results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify the ordering of results as described in [Sorting
+Order](https://cloud.google.com/apis/design/design_patterns#sorting_order).
+If not specified, the results will be sorted in the default order.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::ListBackupsResponse
+
+Response message for
+[DataprocMetastore.ListBackups][google.cloud.metastore.v1.DataprocMetastore.ListBackups].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->backups() >> / C<< $msg->backups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::Backup>)
+
+The backups of the specified service.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page. If this
+field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::GetBackupRequest
+
+Request message for
+[DataprocMetastore.GetBackup][google.cloud.metastore.v1.DataprocMetastore.GetBackup].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the backup to retrieve, in the
+following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}/backups/{backup_id}`.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::CreateBackupRequest
+
+Request message for
+[DataprocMetastore.CreateBackup][google.cloud.metastore.v1.DataprocMetastore.CreateBackup].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the service in which to create a
+backup of the following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}`.
+
+=item * C<< $msg->backup_id() >> / C<< $msg->backup_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the backup, which is used as the final component of the
+backup's name.
+
+This value must be between 1 and 64 characters long, begin with a letter,
+end with a letter or number, and consist of alpha-numeric ASCII characters
+or hyphens.
+
+=item * C<< $msg->backup() >> / C<< $msg->backup($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::Backup>)
+
+Required. The backup to create. The `name` field is ignored. The ID of the
+created backup must be provided in the request's `backup_id` field.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::DeleteBackupRequest
+
+Request message for
+[DataprocMetastore.DeleteBackup][google.cloud.metastore.v1.DataprocMetastore.DeleteBackup].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the backup to delete, in the
+following form:
+
+`projects/{project_number}/locations/{location_id}/services/{service_id}/backups/{backup_id}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::ExportMetadataRequest
+
+Request message for
+[DataprocMetastore.ExportMetadata][google.cloud.metastore.v1.DataprocMetastore.ExportMetadata].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->destination_gcs_folder() >> / C<< $msg->destination_gcs_folder($value) >>
+
+Type: C<String>
+
+A Cloud Storage URI of a folder, in the format
+`gs://<bucket_name>/<path_inside_bucket>`. A sub-folder
+`<export_folder>` containing exported files will be created below it.
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore service to run
+export, in the following form:
+
+`projects/{project_id}/locations/{location_id}/services/{service_id}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format).
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=item * C<< $msg->database_dump_type() >> / C<< $msg->database_dump_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::DatabaseDumpSpec::Type>)
+
+Optional. The type of the database dump. If unspecified, defaults to
+`MYSQL`.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::RestoreServiceRequest
+
+Request message for [DataprocMetastore.Restore][].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore service to run
+restore, in the following form:
+
+`projects/{project_id}/locations/{location_id}/services/{service_id}`.
+
+=item * C<< $msg->backup() >> / C<< $msg->backup($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore service backup to
+restore from, in the following form:
+
+`projects/{project_id}/locations/{location_id}/services/{service_id}/backups/{backup_id}`.
+
+=item * C<< $msg->restore_type() >> / C<< $msg->restore_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::Restore::RestoreType>)
+
+Optional. The type of restore. If unspecified, defaults to `METADATA_ONLY`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format).
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::OperationMetadata
+
+Represents the metadata of a long-running operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the operation was created.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the operation finished running.
+
+=item * C<< $msg->target() >> / C<< $msg->target($value) >>
+
+Type: C<String>
+
+Output only. Server-defined resource path for the target of the operation.
+
+=item * C<< $msg->verb() >> / C<< $msg->verb($value) >>
+
+Type: C<String>
+
+Output only. Name of the verb executed by the operation.
+
+=item * C<< $msg->status_message() >> / C<< $msg->status_message($value) >>
+
+Type: C<String>
+
+Output only. Human-readable status of the operation, if any.
+
+=item * C<< $msg->requested_cancellation() >> / C<< $msg->requested_cancellation($value) >>
+
+Type: C<Bool>
+
+Output only. Identifies whether the caller has requested cancellation
+of the operation. Operations that have successfully been cancelled
+have [Operation.error][] value with a
+[google.rpc.Status.code][google.rpc.Status.code] of 1, corresponding to
+`Code.CANCELLED`.
+
+=item * C<< $msg->api_version() >> / C<< $msg->api_version($value) >>
+
+Type: C<String>
+
+Output only. API version used to start the operation.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::LocationMetadata
+
+Metadata about the service in a location.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->supported_hive_metastore_versions() >> / C<< $msg->supported_hive_metastore_versions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::LocationMetadata::HiveMetastoreVersion>)
+
+The versions of Hive Metastore that can be used when creating a new
+metastore service in this location. The server guarantees that exactly one
+`HiveMetastoreVersion` in the list will set `is_default`.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::DatabaseDumpSpec
+
+The specification of database dump to import from or export to.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Enum: DatabaseDumpSpec::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<MYSQL> => C<1>
+
+=item * C<AVRO> => C<2>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::QueryMetadataRequest
+
+Request message for
+[DataprocMetastore.QueryMetadata][google.cloud.metastore.v1.DataprocMetastore.QueryMetadata].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore service to query
+metadata, in the following format:
+
+`projects/{project_id}/locations/{location_id}/services/{service_id}`.
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Required. A read-only SQL query to execute against the metadata database.
+The query cannot change or mutate the data.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::QueryMetadataResponse
+
+Response message for
+[DataprocMetastore.QueryMetadata][google.cloud.metastore.v1.DataprocMetastore.QueryMetadata].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->result_manifest_uri() >> / C<< $msg->result_manifest_uri($value) >>
+
+Type: C<String>
+
+The manifest URI  is link to a JSON instance in Cloud Storage.
+This instance manifests immediately along with QueryMetadataResponse. The
+content of the URI is not retriable until the long-running operation query
+against the metadata finishes.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::ErrorDetails
+
+Error details in public error message for
+[DataprocMetastore.QueryMetadata][google.cloud.metastore.v1.DataprocMetastore.QueryMetadata].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->details() >> / C<< $msg->details($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::Metastore::ErrorDetails::DetailsEntry>)
+
+Additional structured details about this error.
+
+Keys define the failure items.
+Value describes the exception or details of the item.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::MoveTableToDatabaseRequest
+
+Request message for
+[DataprocMetastore.MoveTableToDatabase][google.cloud.metastore.v1.DataprocMetastore.MoveTableToDatabase].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore service to mutate
+metadata, in the following format:
+
+`projects/{project_id}/locations/{location_id}/services/{service_id}`.
+
+=item * C<< $msg->table_name() >> / C<< $msg->table_name($value) >>
+
+Type: C<String>
+
+Required. The name of the table to be moved.
+
+=item * C<< $msg->db_name() >> / C<< $msg->db_name($value) >>
+
+Type: C<String>
+
+Required. The name of the database where the table resides.
+
+=item * C<< $msg->destination_db_name() >> / C<< $msg->destination_db_name($value) >>
+
+Type: C<String>
+
+Required. The name of the database where the table should be moved.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::MoveTableToDatabaseResponse
+
+Response message for
+[DataprocMetastore.MoveTableToDatabase][google.cloud.metastore.v1.DataprocMetastore.MoveTableToDatabase].
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Metastore::V1::Metastore::AlterMetadataResourceLocationRequest
+
+Request message for
+[DataprocMetastore.AlterMetadataResourceLocation][google.cloud.metastore.v1.DataprocMetastore.AlterMetadataResourceLocation].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore service to mutate
+metadata, in the following format:
+
+`projects/{project_id}/locations/{location_id}/services/{service_id}`.
+
+=item * C<< $msg->resource_name() >> / C<< $msg->resource_name($value) >>
+
+Type: C<String>
+
+Required. The relative metadata resource name in the following format.
+
+`databases/{database_id}`
+or
+`databases/{database_id}/tables/{table_id}`
+or
+`databases/{database_id}/tables/{table_id}/partitions/{partition_id}`
+
+=item * C<< $msg->location_uri() >> / C<< $msg->location_uri($value) >>
+
+Type: C<String>
+
+Required. The new location URI for the metadata resource.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::Metastore::AlterMetadataResourceLocationResponse
+
+Response message for
+[DataprocMetastore.AlterMetadataResourceLocation][google.cloud.metastore.v1.DataprocMetastore.AlterMetadataResourceLocation].
+
+Inherits from L<Protobuf::Message>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Metastore::V1::Metastore::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

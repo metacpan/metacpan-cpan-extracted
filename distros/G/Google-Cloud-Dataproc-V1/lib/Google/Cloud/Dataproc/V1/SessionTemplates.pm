@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::SessionTemplates;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -216,95 +216,13 @@ EOF
     # Field: parent Type: 9 ()
     # Field: session_template Type: 11 (.google.cloud.dataproc.v1.SessionTemplate)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::SessionTemplates::CreateSessionTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::SessionTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::SessionTemplates::CreateSessionTemplateRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<session_template>
-
-Type: Message (.google.cloud.dataproc.v1.SessionTemplate)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::SessionTemplates::UpdateSessionTemplateRequest ===
     # Fields for UpdateSessionTemplateRequest
     # Field: session_template Type: 11 (.google.cloud.dataproc.v1.SessionTemplate)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::SessionTemplates::UpdateSessionTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::SessionTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::SessionTemplates::UpdateSessionTemplateRequest->new(
-        session_template => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session_template>
-
-Type: Message (.google.cloud.dataproc.v1.SessionTemplate)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::SessionTemplates::GetSessionTemplateRequest ===
     # Fields for GetSessionTemplateRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::SessionTemplates::GetSessionTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::SessionTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::SessionTemplates::GetSessionTemplateRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::SessionTemplates::ListSessionTemplatesRequest ===
     # Fields for ListSessionTemplatesRequest
@@ -313,108 +231,14 @@ Type: String
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::SessionTemplates::ListSessionTemplatesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::SessionTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::SessionTemplates::ListSessionTemplatesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::SessionTemplates::ListSessionTemplatesResponse ===
     # Fields for ListSessionTemplatesResponse
     # Field: session_templates Type: 11 (.google.cloud.dataproc.v1.SessionTemplate)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::SessionTemplates::ListSessionTemplatesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::SessionTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::SessionTemplates::ListSessionTemplatesResponse->new(
-        session_templates => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session_templates>
-
-Type: Message (.google.cloud.dataproc.v1.SessionTemplate)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::SessionTemplates::DeleteSessionTemplateRequest ===
     # Fields for DeleteSessionTemplateRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::SessionTemplates::DeleteSessionTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::SessionTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::SessionTemplates::DeleteSessionTemplateRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate ===
     # Fields for SessionTemplate
@@ -430,94 +254,20 @@ Type: String
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
     # Field: uuid Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::SessionTemplates;
-
-    my $msg = Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<jupyter_session>
-
-Type: Message (.google.cloud.dataproc.v1.JupyterConfig)
-
-=item * B<spark_connect_session>
-
-Type: Message (.google.cloud.dataproc.v1.SparkConnectConfig)
-
-=item * B<creator>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.SessionTemplate.LabelsEntry)
-
-=item * B<runtime_config>
-
-Type: Message (.google.cloud.dataproc.v1.RuntimeConfig)
-
-=item * B<environment_config>
-
-Type: Message (.google.cloud.dataproc.v1.EnvironmentConfig)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<uuid>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplateControllerClient ===
 package Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplateControllerClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplateControllerClient
 
-Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplateControllerClient - Client stub representing the remote SessionTemplateController service
+Client stub representing the remote C<SessionTemplateController> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataproc.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -611,13 +361,271 @@ sub delete_session_template {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::SessionTemplates - Protocol Buffers schema definition
+Google::Cloud::Dataproc::V1::SessionTemplates - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/session_templates.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataproc::V1::SessionTemplates;
+
+    my $msg = Google::Cloud::Dataproc::V1::SessionTemplates::CreateSessionTemplateRequest->new({
+        parent => $parent,
+        session_template => $session_template,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::SessionTemplates::CreateSessionTemplateRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/session_templates.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::SessionTemplates::CreateSessionTemplateRequest
+
+A request to create a session template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this session template will be created.
+
+=item * C<< $msg->session_template() >> / C<< $msg->session_template($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate>)
+
+Required. The session template to create.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::SessionTemplates::UpdateSessionTemplateRequest
+
+A request to update a session template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session_template() >> / C<< $msg->session_template($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate>)
+
+Required. The updated session template.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::SessionTemplates::GetSessionTemplateRequest
+
+A request to get the resource representation for a session template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the session template to retrieve.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::SessionTemplates::ListSessionTemplatesRequest
+
+A request to list session templates in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent that owns this collection of session templates.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of sessions to return in each response.
+The service may return fewer than this value.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token received from a previous `ListSessions` call.
+Provide this token to retrieve the subsequent page.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter for the session templates to return in the response.
+Filters are case sensitive and have the following syntax:
+
+[field = value] AND [field [= value]] ...
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::SessionTemplates::ListSessionTemplatesResponse
+
+A list of session templates.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session_templates() >> / C<< $msg->session_templates($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate>)
+
+Output only. Session template list
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::SessionTemplates::DeleteSessionTemplateRequest
+
+A request to delete a session template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the session template resource to delete.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate
+
+A representation of a session template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Identifier. The resource name of the session template.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Brief description of the template.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the template was created.
+
+=item * C<< $msg->jupyter_session() >> / C<< $msg->jupyter_session($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Sessions::JupyterConfig>)
+
+Optional. Jupyter session config.
+
+=item * C<< $msg->spark_connect_session() >> / C<< $msg->spark_connect_session($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Sessions::SparkConnectConfig>)
+
+Optional. Spark connect session config.
+
+=item * C<< $msg->creator() >> / C<< $msg->creator($value) >>
+
+Type: C<String>
+
+Output only. The email address of the user who created the template.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate::LabelsEntry>)
+
+Optional. Labels to associate with sessions created using this template.
+Label B<keys> must contain 1 to 63 characters, and must conform to
+[RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).
+Label B<values> can be empty, but, if present, must contain 1 to 63
+characters and conform to [RFC
+1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be
+associated with a session.
+
+=item * C<< $msg->runtime_config() >> / C<< $msg->runtime_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::RuntimeConfig>)
+
+Optional. Runtime configuration for session execution.
+
+=item * C<< $msg->environment_config() >> / C<< $msg->environment_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::EnvironmentConfig>)
+
+Optional. Environment configuration for session execution.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the template was last updated.
+
+=item * C<< $msg->uuid() >> / C<< $msg->uuid($value) >>
+
+Type: C<String>
+
+Output only. A session template UUID (Unique Universal Identifier). The
+service generates this value when it creates the session template.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::SessionTemplates::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,5 +1,26 @@
 Revision history for Getopt-Long-Bash
 
+2.0.0 2026-11-23T11:38:05Z
+
+    - INCOMPATIBLE CHANGES in getoptlong callback.  Scripts which
+      register a callback with fixed arguments, or two or more
+      callbacks in one call, have to be updated.  The former gets an
+      error when the callback is registered:
+    - INCOMPATIBLE: fixed arguments of a callback are passed before
+      the option name and value, so that a common function can be
+      called from several options and behave differently by the
+      arguments: "getoptlong callback quiet set_level 0" calls
+      "set_level 0 quiet 1".  They were passed between the option
+      name and the value
+    - INCOMPATIBLE: getoptlong callback registers one callback at a
+      time, and takes the arguments after the function as fixed
+      arguments, as the document says.  They were taken as more pairs
+      of an option and a function.  A fixed argument or a function
+      name with white space, such as "func arg" of 1.5.0, is an error
+    - getoptlong callback gives an error for an undefined option, and
+      takes an alias name as the option it stands for.  They were
+      silently ignored
+
 1.5.0 2026-11-23T01:29:03Z
 
     - Security fix: the value given to an option with a regex

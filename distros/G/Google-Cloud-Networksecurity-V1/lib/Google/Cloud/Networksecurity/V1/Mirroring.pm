@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::Mirroring;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1211,72 +1211,6 @@ EOF
     # Field: associations Type: 11 (.google.cloud.networksecurity.v1.MirroringEndpointGroup.AssociationDetails)
     # Field: description Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroup.LabelsEntry)
-
-=item * B<mirroring_deployment_group>
-
-Type: String
-
-=item * B<connected_deployment_groups>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroup.ConnectedDeploymentGroup)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.MirroringEndpointGroup.State)
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<type>
-
-Type: Enum (.google.cloud.networksecurity.v1.MirroringEndpointGroup.Type)
-
-=item * B<associations>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroup.AssociationDetails)
-
-=item * B<description>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: MirroringEndpointGroup::State
 our $MirroringEndpointGroup_STATE_UNSPECIFIED = 0;
 our $MirroringEndpointGroup_ACTIVE = 1;
@@ -1286,51 +1220,9 @@ our $MirroringEndpointGroup_DELETING = 4;
 our $MirroringEndpointGroup_OUT_OF_SYNC = 5;
 our $MirroringEndpointGroup_DELETE_FAILED = 6;
 
-=pod
-
-=head2 Enum: MirroringEndpointGroup::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<CLOSED> => 2
-
-=item * C<CREATING> => 3
-
-=item * C<DELETING> => 4
-
-=item * C<OUT_OF_SYNC> => 5
-
-=item * C<DELETE_FAILED> => 6
-
-=back
-
-=cut
-
 # Enum: MirroringEndpointGroup::Type
 our $MirroringEndpointGroup_TYPE_UNSPECIFIED = 0;
 our $MirroringEndpointGroup_DIRECT = 1;
-
-=pod
-
-=head2 Enum: MirroringEndpointGroup::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<DIRECT> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsRequest ===
     # Fields for ListMirroringEndpointGroupsRequest
@@ -1340,112 +1232,14 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsResponse ===
     # Fields for ListMirroringEndpointGroupsResponse
     # Field: mirroring_endpoint_groups Type: 11 (.google.cloud.networksecurity.v1.MirroringEndpointGroup)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsResponse->new(
-        mirroring_endpoint_groups => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mirroring_endpoint_groups>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroup)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringEndpointGroupRequest ===
     # Fields for GetMirroringEndpointGroupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringEndpointGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringEndpointGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringEndpointGroupRequest ===
     # Fields for CreateMirroringEndpointGroupRequest
@@ -1454,118 +1248,16 @@ Type: String
     # Field: mirroring_endpoint_group Type: 11 (.google.cloud.networksecurity.v1.MirroringEndpointGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringEndpointGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringEndpointGroupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<mirroring_endpoint_group_id>
-
-Type: String
-
-=item * B<mirroring_endpoint_group>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringEndpointGroupRequest ===
     # Fields for UpdateMirroringEndpointGroupRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: mirroring_endpoint_group Type: 11 (.google.cloud.networksecurity.v1.MirroringEndpointGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringEndpointGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringEndpointGroupRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<mirroring_endpoint_group>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringEndpointGroupRequest ===
     # Fields for DeleteMirroringEndpointGroupRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringEndpointGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringEndpointGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroupAssociation ===
     # Fields for MirroringEndpointGroupAssociation
@@ -1580,68 +1272,6 @@ Type: String
     # Field: reconciling Type: 8 ()
     # Field: locations Type: 11 (.google.cloud.networksecurity.v1.MirroringLocation)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroupAssociation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroupAssociation->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroupAssociation.LabelsEntry)
-
-=item * B<mirroring_endpoint_group>
-
-Type: String
-
-=item * B<network>
-
-Type: String
-
-=item * B<locations_details>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroupAssociation.LocationDetails)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.MirroringEndpointGroupAssociation.State)
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<locations>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringLocation)
-
-=back
-
-=cut
-
 # Enum: MirroringEndpointGroupAssociation::State
 our $MirroringEndpointGroupAssociation_STATE_UNSPECIFIED = 0;
 our $MirroringEndpointGroupAssociation_ACTIVE = 1;
@@ -1651,32 +1281,6 @@ our $MirroringEndpointGroupAssociation_CLOSED = 5;
 our $MirroringEndpointGroupAssociation_OUT_OF_SYNC = 6;
 our $MirroringEndpointGroupAssociation_DELETE_FAILED = 7;
 
-=pod
-
-=head2 Enum: MirroringEndpointGroupAssociation::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<CREATING> => 3
-
-=item * C<DELETING> => 4
-
-=item * C<CLOSED> => 5
-
-=item * C<OUT_OF_SYNC> => 6
-
-=item * C<DELETE_FAILED> => 7
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupAssociationsRequest ===
     # Fields for ListMirroringEndpointGroupAssociationsRequest
     # Field: parent Type: 9 ()
@@ -1685,112 +1289,14 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupAssociationsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupAssociationsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupAssociationsResponse ===
     # Fields for ListMirroringEndpointGroupAssociationsResponse
     # Field: mirroring_endpoint_group_associations Type: 11 (.google.cloud.networksecurity.v1.MirroringEndpointGroupAssociation)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupAssociationsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupAssociationsResponse->new(
-        mirroring_endpoint_group_associations => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mirroring_endpoint_group_associations>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroupAssociation)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringEndpointGroupAssociationRequest ===
     # Fields for GetMirroringEndpointGroupAssociationRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringEndpointGroupAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringEndpointGroupAssociationRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringEndpointGroupAssociationRequest ===
     # Fields for CreateMirroringEndpointGroupAssociationRequest
@@ -1799,118 +1305,16 @@ Type: String
     # Field: mirroring_endpoint_group_association Type: 11 (.google.cloud.networksecurity.v1.MirroringEndpointGroupAssociation)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringEndpointGroupAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringEndpointGroupAssociationRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<mirroring_endpoint_group_association_id>
-
-Type: String
-
-=item * B<mirroring_endpoint_group_association>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroupAssociation)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringEndpointGroupAssociationRequest ===
     # Fields for UpdateMirroringEndpointGroupAssociationRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: mirroring_endpoint_group_association Type: 11 (.google.cloud.networksecurity.v1.MirroringEndpointGroupAssociation)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringEndpointGroupAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringEndpointGroupAssociationRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<mirroring_endpoint_group_association>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringEndpointGroupAssociation)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringEndpointGroupAssociationRequest ===
     # Fields for DeleteMirroringEndpointGroupAssociationRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringEndpointGroupAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringEndpointGroupAssociationRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup ===
     # Fields for MirroringDeploymentGroup
@@ -1926,100 +1330,12 @@ Type: String
     # Field: description Type: 9 ()
     # Field: locations Type: 11 (.google.cloud.networksecurity.v1.MirroringLocation)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeploymentGroup.LabelsEntry)
-
-=item * B<network>
-
-Type: String
-
-=item * B<connected_endpoint_groups>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeploymentGroup.ConnectedEndpointGroup)
-
-=item * B<nested_deployments>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeploymentGroup.Deployment)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.MirroringDeploymentGroup.State)
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<description>
-
-Type: String
-
-=item * B<locations>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringLocation)
-
-=back
-
-=cut
-
 # Enum: MirroringDeploymentGroup::State
 our $MirroringDeploymentGroup_STATE_UNSPECIFIED = 0;
 our $MirroringDeploymentGroup_ACTIVE = 1;
 our $MirroringDeploymentGroup_CREATING = 2;
 our $MirroringDeploymentGroup_DELETING = 3;
 our $MirroringDeploymentGroup_CLOSED = 4;
-
-=pod
-
-=head2 Enum: MirroringDeploymentGroup::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<CREATING> => 2
-
-=item * C<DELETING> => 3
-
-=item * C<CLOSED> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentGroupsRequest ===
     # Fields for ListMirroringDeploymentGroupsRequest
@@ -2029,112 +1345,14 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentGroupsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentGroupsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentGroupsResponse ===
     # Fields for ListMirroringDeploymentGroupsResponse
     # Field: mirroring_deployment_groups Type: 11 (.google.cloud.networksecurity.v1.MirroringDeploymentGroup)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentGroupsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentGroupsResponse->new(
-        mirroring_deployment_groups => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mirroring_deployment_groups>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeploymentGroup)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringDeploymentGroupRequest ===
     # Fields for GetMirroringDeploymentGroupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringDeploymentGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringDeploymentGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringDeploymentGroupRequest ===
     # Fields for CreateMirroringDeploymentGroupRequest
@@ -2143,118 +1361,16 @@ Type: String
     # Field: mirroring_deployment_group Type: 11 (.google.cloud.networksecurity.v1.MirroringDeploymentGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringDeploymentGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringDeploymentGroupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<mirroring_deployment_group_id>
-
-Type: String
-
-=item * B<mirroring_deployment_group>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeploymentGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringDeploymentGroupRequest ===
     # Fields for UpdateMirroringDeploymentGroupRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: mirroring_deployment_group Type: 11 (.google.cloud.networksecurity.v1.MirroringDeploymentGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringDeploymentGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringDeploymentGroupRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<mirroring_deployment_group>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeploymentGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringDeploymentGroupRequest ===
     # Fields for DeleteMirroringDeploymentGroupRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringDeploymentGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringDeploymentGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeployment ===
     # Fields for MirroringDeployment
@@ -2268,64 +1384,6 @@ Type: String
     # Field: reconciling Type: 8 ()
     # Field: description Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeployment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeployment->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeployment.LabelsEntry)
-
-=item * B<forwarding_rule>
-
-Type: String
-
-=item * B<mirroring_deployment_group>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.MirroringDeployment.State)
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<description>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: MirroringDeployment::State
 our $MirroringDeployment_STATE_UNSPECIFIED = 0;
 our $MirroringDeployment_ACTIVE = 1;
@@ -2333,30 +1391,6 @@ our $MirroringDeployment_CREATING = 2;
 our $MirroringDeployment_DELETING = 3;
 our $MirroringDeployment_OUT_OF_SYNC = 4;
 our $MirroringDeployment_DELETE_FAILED = 5;
-
-=pod
-
-=head2 Enum: MirroringDeployment::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<CREATING> => 2
-
-=item * C<DELETING> => 3
-
-=item * C<OUT_OF_SYNC> => 4
-
-=item * C<DELETE_FAILED> => 5
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentsRequest ===
     # Fields for ListMirroringDeploymentsRequest
@@ -2366,117 +1400,15 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentsResponse ===
     # Fields for ListMirroringDeploymentsResponse
     # Field: mirroring_deployments Type: 11 (.google.cloud.networksecurity.v1.MirroringDeployment)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentsResponse->new(
-        mirroring_deployments => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mirroring_deployments>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeployment)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringDeploymentRequest ===
     # Fields for GetMirroringDeploymentRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringDeploymentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringDeploymentRequest ===
     # Fields for CreateMirroringDeploymentRequest
@@ -2485,199 +1417,41 @@ Type: String
     # Field: mirroring_deployment Type: 11 (.google.cloud.networksecurity.v1.MirroringDeployment)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringDeploymentRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<mirroring_deployment_id>
-
-Type: String
-
-=item * B<mirroring_deployment>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeployment)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringDeploymentRequest ===
     # Fields for UpdateMirroringDeploymentRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: mirroring_deployment Type: 11 (.google.cloud.networksecurity.v1.MirroringDeployment)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringDeploymentRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<mirroring_deployment>
-
-Type: Message (.google.cloud.networksecurity.v1.MirroringDeployment)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringDeploymentRequest ===
     # Fields for DeleteMirroringDeploymentRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringDeploymentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Mirroring::MirroringLocation ===
     # Fields for MirroringLocation
     # Field: location Type: 9 ()
     # Field: state Type: 14 (.google.cloud.networksecurity.v1.MirroringLocation.State)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Mirroring::MirroringLocation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Mirroring;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::MirroringLocation->new(
-        location => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<location>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.MirroringLocation.State)
-
-=back
-
-=cut
-
 # Enum: MirroringLocation::State
 our $MirroringLocation_STATE_UNSPECIFIED = 0;
 our $MirroringLocation_ACTIVE = 1;
 our $MirroringLocation_OUT_OF_SYNC = 2;
-
-=pod
-
-=head2 Enum: MirroringLocation::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<OUT_OF_SYNC> => 2
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Networksecurity::V1::Mirroring::MirroringClient ===
 package Google::Cloud::Networksecurity::V1::Mirroring::MirroringClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networksecurity::V1::Mirroring::MirroringClient
 
-Google::Cloud::Networksecurity::V1::Mirroring::MirroringClient - Client stub representing the remote Mirroring service
+Client stub representing the remote C<Mirroring> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networksecurity.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2966,13 +1740,1342 @@ sub delete_mirroring_deployment {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::Mirroring - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::Mirroring - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/mirroring.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::Mirroring;
+
+    my $msg = Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        labels => $labels,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/mirroring.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup
+
+An endpoint group is a consumer frontend for a deployment group (backend).
+In order to configure mirroring for a network, consumers must create:
+- An association between their network and the endpoint group.
+- A security profile that points to the endpoint group.
+- A mirroring rule that references the security profile (group).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The resource name of this endpoint group, for
+example:
+`projects/123456789/locations/global/mirroringEndpointGroups/my-eg`.
+See https://google.aip.dev/122 for more details.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was most recently updated.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup::LabelsEntry>)
+
+Optional. Labels are key/value pairs that help to organize and filter
+resources.
+
+=item * C<< $msg->mirroring_deployment_group() >> / C<< $msg->mirroring_deployment_group($value) >>
+
+Type: C<String>
+
+Immutable. The deployment group that this DIRECT endpoint group is
+connected to, for example:
+`projects/123456789/locations/global/mirroringDeploymentGroups/my-dg`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->connected_deployment_groups() >> / C<< $msg->connected_deployment_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup::ConnectedDeploymentGroup>)
+
+Output only. List of details about the connected deployment groups to this
+endpoint group.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::MirroringEndpointGroup::State>)
+
+Output only. The current state of the endpoint group.
+See https://google.aip.dev/216.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. The current state of the resource does not match the user's
+intended state, and the system is working to reconcile them. This is part
+of the normal operation (e.g. adding a new association to the group). See
+https://google.aip.dev/128.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::MirroringEndpointGroup::Type>)
+
+Immutable. The type of the endpoint group.
+If left unspecified, defaults to DIRECT.
+
+=item * C<< $msg->associations() >> / C<< $msg->associations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup::AssociationDetails>)
+
+Output only. List of associations to this endpoint group.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. User-provided description of the endpoint group.
+Used as additional context for the endpoint group.
+
+=back
+
+=head3 Enum: MirroringEndpointGroup::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<CLOSED> => C<2>
+
+=item * C<CREATING> => C<3>
+
+=item * C<DELETING> => C<4>
+
+=item * C<OUT_OF_SYNC> => C<5>
+
+=item * C<DELETE_FAILED> => C<6>
+
+=back
+
+=head3 Enum: MirroringEndpointGroup::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<DIRECT> => C<1>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsRequest
+
+Request message for ListMirroringEndpointGroups.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of endpoint groups.
+Example: `projects/123456789/locations/global`.
+See https://google.aip.dev/132 for more details.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default. See
+https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous
+`ListMirroringEndpointGroups` call. Provide this to retrieve the subsequent
+page. When paginating, all other parameters provided to
+`ListMirroringEndpointGroups` must match the call that provided the page
+token.
+See https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression.
+See https://google.aip.dev/160#filtering for more details.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort expression.
+See https://google.aip.dev/132#ordering for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupsResponse
+
+Response message for ListMirroringEndpointGroups.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mirroring_endpoint_groups() >> / C<< $msg->mirroring_endpoint_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup>)
+
+The endpoint groups from the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+See https://google.aip.dev/158 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringEndpointGroupRequest
+
+Request message for GetMirroringEndpointGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the endpoint group to retrieve.
+Format:
+projects/{project}/locations/{location}/mirroringEndpointGroups/{mirroring_endpoint_group}
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringEndpointGroupRequest
+
+Request message for CreateMirroringEndpointGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this endpoint group will be created.
+Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->mirroring_endpoint_group_id() >> / C<< $msg->mirroring_endpoint_group_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for the endpoint group, which will become the final
+component of the endpoint group's resource name.
+
+=item * C<< $msg->mirroring_endpoint_group() >> / C<< $msg->mirroring_endpoint_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup>)
+
+Required. The endpoint group to create.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringEndpointGroupRequest
+
+Request message for UpdateMirroringEndpointGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+Fields are specified relative to the endpoint group
+(e.g. `description`; *not* `mirroring_endpoint_group.description`).
+See https://google.aip.dev/161 for more details.
+
+=item * C<< $msg->mirroring_endpoint_group() >> / C<< $msg->mirroring_endpoint_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroup>)
+
+Required. The endpoint group to update.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringEndpointGroupRequest
+
+Request message for DeleteMirroringEndpointGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The endpoint group to delete.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroupAssociation
+
+An endpoint group association represents a link between a network and an
+endpoint group in the organization.
+
+Creating an association creates the networking infrastructure linking the
+network to the endpoint group, but does not enable mirroring by itself.
+To enable mirroring, the user must also create a network firewall policy
+containing mirroring rules and associate it with the network.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The resource name of this endpoint group
+association, for example:
+`projects/123456789/locations/global/mirroringEndpointGroupAssociations/my-eg-association`.
+See https://google.aip.dev/122 for more details.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was most recently updated.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroupAssociation::LabelsEntry>)
+
+Optional. Labels are key/value pairs that help to organize and filter
+resources.
+
+=item * C<< $msg->mirroring_endpoint_group() >> / C<< $msg->mirroring_endpoint_group($value) >>
+
+Type: C<String>
+
+Immutable. The endpoint group that this association is connected to, for
+example:
+`projects/123456789/locations/global/mirroringEndpointGroups/my-eg`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Immutable. The VPC network that is associated. for example:
+`projects/123456789/global/networks/my-network`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->locations_details() >> / C<< $msg->locations_details($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroupAssociation::LocationDetails>)
+
+Output only. The list of locations where the association is present. This
+information is retrieved from the linked endpoint group, and not configured
+as part of the association itself.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::MirroringEndpointGroupAssociation::State>)
+
+Output only. Current state of the endpoint group association.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. The current state of the resource does not match the user's
+intended state, and the system is working to reconcile them. This part of
+the normal operation (e.g. adding a new location to the target deployment
+group). See https://google.aip.dev/128.
+
+=item * C<< $msg->locations() >> / C<< $msg->locations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringLocation>)
+
+Output only. The list of locations where the association is configured.
+This information is retrieved from the linked endpoint group.
+
+=back
+
+=head3 Enum: MirroringEndpointGroupAssociation::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<CREATING> => C<3>
+
+=item * C<DELETING> => C<4>
+
+=item * C<CLOSED> => C<5>
+
+=item * C<OUT_OF_SYNC> => C<6>
+
+=item * C<DELETE_FAILED> => C<7>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupAssociationsRequest
+
+Request message for ListMirroringEndpointGroupAssociations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of associations.
+Example: `projects/123456789/locations/global`.
+See https://google.aip.dev/132 for more details.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default. See
+https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous
+`ListMirroringEndpointGroups` call. Provide this to retrieve the subsequent
+page. When paginating, all other parameters provided to
+`ListMirroringEndpointGroups` must match the call that provided the page
+token. See https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression.
+See https://google.aip.dev/160#filtering for more details.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort expression.
+See https://google.aip.dev/132#ordering for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringEndpointGroupAssociationsResponse
+
+Response message for ListMirroringEndpointGroupAssociations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mirroring_endpoint_group_associations() >> / C<< $msg->mirroring_endpoint_group_associations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroupAssociation>)
+
+The associations from the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+See https://google.aip.dev/158 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringEndpointGroupAssociationRequest
+
+Request message for GetMirroringEndpointGroupAssociation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the association to retrieve.
+Format:
+projects/{project}/locations/{location}/mirroringEndpointGroupAssociations/{mirroring_endpoint_group_association}
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringEndpointGroupAssociationRequest
+
+Request message for CreateMirroringEndpointGroupAssociation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this association will be created.
+Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->mirroring_endpoint_group_association_id() >> / C<< $msg->mirroring_endpoint_group_association_id($value) >>
+
+Type: C<String>
+
+Optional. The ID to use for the new association, which will become the
+final component of the endpoint group's resource name. If not provided, the
+server will generate a unique ID.
+
+=item * C<< $msg->mirroring_endpoint_group_association() >> / C<< $msg->mirroring_endpoint_group_association($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroupAssociation>)
+
+Required. The association to create.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringEndpointGroupAssociationRequest
+
+Request message for UpdateMirroringEndpointGroupAssociation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+Fields are specified relative to the association
+(e.g. `description`; *not*
+`mirroring_endpoint_group_association.description`). See
+https://google.aip.dev/161 for more details.
+
+=item * C<< $msg->mirroring_endpoint_group_association() >> / C<< $msg->mirroring_endpoint_group_association($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringEndpointGroupAssociation>)
+
+Required. The association to update.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringEndpointGroupAssociationRequest
+
+Request message for DeleteMirroringEndpointGroupAssociation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The association to delete.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup
+
+A deployment group aggregates many zonal mirroring backends (deployments)
+into a single global mirroring service. Consumers can connect this service
+using an endpoint group.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The resource name of this deployment group, for
+example:
+`projects/123456789/locations/global/mirroringDeploymentGroups/my-dg`.
+See https://google.aip.dev/122 for more details.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was most recently updated.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup::LabelsEntry>)
+
+Optional. Labels are key/value pairs that help to organize and filter
+resources.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Required. Immutable. The network that will be used for all child
+deployments, for example: `projects/{project}/global/networks/{network}`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->connected_endpoint_groups() >> / C<< $msg->connected_endpoint_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup::ConnectedEndpointGroup>)
+
+Output only. The list of endpoint groups that are connected to this
+resource.
+
+=item * C<< $msg->nested_deployments() >> / C<< $msg->nested_deployments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup::Deployment>)
+
+Output only. The list of Mirroring Deployments that belong to this group.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::MirroringDeploymentGroup::State>)
+
+Output only. The current state of the deployment group.
+See https://google.aip.dev/216.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. The current state of the resource does not match the user's
+intended state, and the system is working to reconcile them. This is part
+of the normal operation (e.g. adding a new deployment to the group) See
+https://google.aip.dev/128.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. User-provided description of the deployment group.
+Used as additional context for the deployment group.
+
+=item * C<< $msg->locations() >> / C<< $msg->locations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringLocation>)
+
+Output only. The list of locations where the deployment group is present.
+
+=back
+
+=head3 Enum: MirroringDeploymentGroup::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<CREATING> => C<2>
+
+=item * C<DELETING> => C<3>
+
+=item * C<CLOSED> => C<4>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentGroupsRequest
+
+Request message for ListMirroringDeploymentGroups.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of deployment groups.
+Example: `projects/123456789/locations/global`.
+See https://google.aip.dev/132 for more details.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default. See
+https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous
+`ListMirroringDeploymentGroups` call. Provide this to retrieve the
+subsequent page. When paginating, all other parameters provided to
+`ListMirroringDeploymentGroups` must match the call that provided the page
+token. See https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression.
+See https://google.aip.dev/160#filtering for more details.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort expression.
+See https://google.aip.dev/132#ordering for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentGroupsResponse
+
+Response message for ListMirroringDeploymentGroups.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mirroring_deployment_groups() >> / C<< $msg->mirroring_deployment_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup>)
+
+The deployment groups from the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+See https://google.aip.dev/158 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringDeploymentGroupRequest
+
+Request message for GetMirroringDeploymentGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the deployment group to retrieve.
+Format:
+projects/{project}/locations/{location}/mirroringDeploymentGroups/{mirroring_deployment_group}
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringDeploymentGroupRequest
+
+Request message for CreateMirroringDeploymentGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this deployment group will be created.
+Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->mirroring_deployment_group_id() >> / C<< $msg->mirroring_deployment_group_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for the new deployment group, which will become the
+final component of the deployment group's resource name.
+
+=item * C<< $msg->mirroring_deployment_group() >> / C<< $msg->mirroring_deployment_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup>)
+
+Required. The deployment group to create.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringDeploymentGroupRequest
+
+Request message for UpdateMirroringDeploymentGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+Fields are specified relative to the deployment group
+(e.g. `description`; *not*
+`mirroring_deployment_group.description`). See
+https://google.aip.dev/161 for more details.
+
+=item * C<< $msg->mirroring_deployment_group() >> / C<< $msg->mirroring_deployment_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeploymentGroup>)
+
+Required. The deployment group to update.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringDeploymentGroupRequest
+
+Request message for DeleteMirroringDeploymentGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The deployment group to delete.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeployment
+
+A deployment represents a zonal mirroring backend ready to accept
+GENEVE-encapsulated replica traffic, e.g. a zonal instance group fronted by
+an internal passthrough load balancer. Deployments are always part of a
+global deployment group which represents a global mirroring service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The resource name of this deployment, for example:
+`projects/123456789/locations/us-central1-a/mirroringDeployments/my-dep`.
+See https://google.aip.dev/122 for more details.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was most recently updated.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeployment::LabelsEntry>)
+
+Optional. Labels are key/value pairs that help to organize and filter
+resources.
+
+=item * C<< $msg->forwarding_rule() >> / C<< $msg->forwarding_rule($value) >>
+
+Type: C<String>
+
+Required. Immutable. The regional forwarding rule that fronts the mirroring
+collectors, for example:
+`projects/123456789/regions/us-central1/forwardingRules/my-rule`. See
+https://google.aip.dev/124.
+
+=item * C<< $msg->mirroring_deployment_group() >> / C<< $msg->mirroring_deployment_group($value) >>
+
+Type: C<String>
+
+Required. Immutable. The deployment group that this deployment is a part
+of, for example:
+`projects/123456789/locations/global/mirroringDeploymentGroups/my-dg`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::MirroringDeployment::State>)
+
+Output only. The current state of the deployment.
+See https://google.aip.dev/216.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. The current state of the resource does not match the user's
+intended state, and the system is working to reconcile them. This part of
+the normal operation (e.g. linking a new association to the parent group).
+See https://google.aip.dev/128.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. User-provided description of the deployment.
+Used as additional context for the deployment.
+
+=back
+
+=head3 Enum: MirroringDeployment::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<CREATING> => C<2>
+
+=item * C<DELETING> => C<3>
+
+=item * C<OUT_OF_SYNC> => C<4>
+
+=item * C<DELETE_FAILED> => C<5>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentsRequest
+
+Request message for ListMirroringDeployments.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of deployments.
+Example: `projects/123456789/locations/us-central1-a`.
+See https://google.aip.dev/132 for more details.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default. See
+https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListMirroringDeployments`
+call. Provide this to retrieve the subsequent page. When paginating, all
+other parameters provided to `ListMirroringDeployments` must match the call
+that provided the page token. See https://google.aip.dev/158 for more
+details.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression.
+See https://google.aip.dev/160#filtering for more details.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort expression.
+See https://google.aip.dev/132#ordering for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::ListMirroringDeploymentsResponse
+
+Response message for ListMirroringDeployments.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mirroring_deployments() >> / C<< $msg->mirroring_deployments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeployment>)
+
+The deployments from the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+See https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::GetMirroringDeploymentRequest
+
+Request message for GetMirroringDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the deployment to retrieve.
+Format:
+projects/{project}/locations/{location}/mirroringDeployments/{mirroring_deployment}
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::CreateMirroringDeploymentRequest
+
+Request message for CreateMirroringDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this deployment will be created.
+Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->mirroring_deployment_id() >> / C<< $msg->mirroring_deployment_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for the new deployment, which will become the final
+component of the deployment's resource name.
+
+=item * C<< $msg->mirroring_deployment() >> / C<< $msg->mirroring_deployment($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeployment>)
+
+Required. The deployment to create.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::UpdateMirroringDeploymentRequest
+
+Request message for UpdateMirroringDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+Fields are specified relative to the deployment
+(e.g. `description`; *not* `mirroring_deployment.description`).
+See https://google.aip.dev/161 for more details.
+
+=item * C<< $msg->mirroring_deployment() >> / C<< $msg->mirroring_deployment($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Mirroring::MirroringDeployment>)
+
+Required. The deployment to update.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::DeleteMirroringDeploymentRequest
+
+Request message for DeleteMirroringDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Mirroring::MirroringLocation
+
+Details about mirroring in a specific cloud location.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Output only. The cloud location, e.g. "us-central1-a" or "asia-south1".
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::MirroringLocation::State>)
+
+Output only. The current state of the association in this location.
+
+=back
+
+=head3 Enum: MirroringLocation::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<OUT_OF_SYNC> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::Mirroring::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::TcpRoute;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -279,64 +279,6 @@ EOF
     # Field: gateways Type: 9 ()
     # Field: labels Type: 11 (.google.cloud.networkservices.v1.TcpRoute.LabelsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::TcpRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<rules>
-
-Type: Message (.google.cloud.networkservices.v1.TcpRoute.RouteRule)
-
-=item * B<meshes>
-
-Type: String
-
-=item * B<gateways>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.TcpRoute.LabelsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::TcpRoute::ListTcpRoutesRequest ===
     # Fields for ListTcpRoutesRequest
     # Field: parent Type: 9 ()
@@ -344,113 +286,15 @@ Type: Message (.google.cloud.networkservices.v1.TcpRoute.LabelsEntry)
     # Field: page_token Type: 9 ()
     # Field: return_partial_success Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::TcpRoute::ListTcpRoutesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::TcpRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::TcpRoute::ListTcpRoutesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<return_partial_success>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::TcpRoute::ListTcpRoutesResponse ===
     # Fields for ListTcpRoutesResponse
     # Field: tcp_routes Type: 11 (.google.cloud.networkservices.v1.TcpRoute)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::TcpRoute::ListTcpRoutesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::TcpRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::TcpRoute::ListTcpRoutesResponse->new(
-        tcp_routes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tcp_routes>
-
-Type: Message (.google.cloud.networkservices.v1.TcpRoute)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::TcpRoute::GetTcpRouteRequest ===
     # Fields for GetTcpRouteRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::TcpRoute::GetTcpRouteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::TcpRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::TcpRoute::GetTcpRouteRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::TcpRoute::CreateTcpRouteRequest ===
     # Fields for CreateTcpRouteRequest
@@ -458,116 +302,311 @@ Type: String
     # Field: tcp_route_id Type: 9 ()
     # Field: tcp_route Type: 11 (.google.cloud.networkservices.v1.TcpRoute)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::TcpRoute::CreateTcpRouteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::TcpRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::TcpRoute::CreateTcpRouteRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<tcp_route_id>
-
-Type: String
-
-=item * B<tcp_route>
-
-Type: Message (.google.cloud.networkservices.v1.TcpRoute)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::TcpRoute::UpdateTcpRouteRequest ===
     # Fields for UpdateTcpRouteRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: tcp_route Type: 11 (.google.cloud.networkservices.v1.TcpRoute)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::TcpRoute::UpdateTcpRouteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::TcpRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::TcpRoute::UpdateTcpRouteRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<tcp_route>
-
-Type: Message (.google.cloud.networkservices.v1.TcpRoute)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::TcpRoute::DeleteTcpRouteRequest ===
     # Fields for DeleteTcpRouteRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::TcpRoute::DeleteTcpRouteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::TcpRoute;
-
-    my $msg = Google::Cloud::Networkservices::V1::TcpRoute::DeleteTcpRouteRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::TcpRoute - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::TcpRoute - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/tcp_route.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networkservices::V1::TcpRoute;
+
+    my $msg = Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute->new({
+        name => $name,
+        self_link => $self_link,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/tcp_route.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute
+
+TcpRoute is the resource defining how TCP traffic should be routed by a
+Mesh/Gateway resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the TcpRoute resource. It matches pattern
+`projects/*/locations/*/tcpRoutes/tcp_route_name>`.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+Output only. Server-defined URL of this resource
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A free-text description of the resource. Max length 1024
+characters.
+
+=item * C<< $msg->rules() >> / C<< $msg->rules($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute::RouteRule>)
+
+Required. Rules that define how traffic is routed and handled. At least one
+RouteRule must be supplied. If there are multiple rules then the action
+taken will be the first rule to match.
+
+=item * C<< $msg->meshes() >> / C<< $msg->meshes($value) >>
+
+Type: C<String>
+
+Optional. Meshes defines a list of meshes this TcpRoute is attached to, as
+one of the routing rules to route the requests served by the mesh.
+
+Each mesh reference should match the pattern:
+`projects/*/locations/*/meshes/<mesh_name>`
+
+The attached Mesh should be of a type SIDECAR
+
+=item * C<< $msg->gateways() >> / C<< $msg->gateways($value) >>
+
+Type: C<String>
+
+Optional. Gateways defines a list of gateways this TcpRoute is attached to,
+as one of the routing rules to route the requests served by the gateway.
+
+Each gateway reference should match the pattern:
+`projects/*/locations/*/gateways/<gateway_name>`
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute::LabelsEntry>)
+
+Optional. Set of label tags associated with the TcpRoute resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::TcpRoute::ListTcpRoutesRequest
+
+Request used with the ListTcpRoutes method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the TcpRoutes should be
+listed, specified in the format `projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of TcpRoutes to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListTcpRoutesResponse`
+Indicates that this is a continuation of a prior `ListTcpRoutes` call,
+and that the system should return the next page of data.
+
+=item * C<< $msg->return_partial_success() >> / C<< $msg->return_partial_success($value) >>
+
+Type: C<Bool>
+
+Optional. If true, allow partial responses for multi-regional Aggregated
+List requests. Otherwise if one of the locations is down or unreachable,
+the Aggregated List request will fail.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::TcpRoute::ListTcpRoutesResponse
+
+Response returned by the ListTcpRoutes method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tcp_routes() >> / C<< $msg->tcp_routes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute>)
+
+List of TcpRoute resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request opts into
+[return_partial_success][google.cloud.networkservices.v1.ListTcpRoutesRequest.return_partial_success]
+and reading across collections e.g. when attempting to list all resources
+across all supported locations.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::TcpRoute::GetTcpRouteRequest
+
+Request used by the GetTcpRoute method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the TcpRoute to get. Must be in the format
+`projects/*/locations/*/tcpRoutes/*`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::TcpRoute::CreateTcpRouteRequest
+
+Request used by the TcpRoute method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the TcpRoute. Must be in the
+format `projects/*/locations/*`.
+
+=item * C<< $msg->tcp_route_id() >> / C<< $msg->tcp_route_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the TcpRoute resource to be created.
+
+=item * C<< $msg->tcp_route() >> / C<< $msg->tcp_route($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute>)
+
+Required. TcpRoute resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::TcpRoute::UpdateTcpRouteRequest
+
+Request used by the UpdateTcpRoute method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+TcpRoute resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->tcp_route() >> / C<< $msg->tcp_route($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::TcpRoute::TcpRoute>)
+
+Required. Updated TcpRoute resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::TcpRoute::DeleteTcpRouteRequest
+
+Request used by the DeleteTcpRoute method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the TcpRoute to delete. Must be in the format
+`projects/*/locations/*/tcpRoutes/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::TcpRoute::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

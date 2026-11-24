@@ -1,0 +1,645 @@
+package Google::Cloud::Orgpolicy::V2::Constraint;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Protobuf::Struct };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+Cipnb29nbGUvY2xvdWQvb3JncG9saWN5L3YyL2NvbnN0cmFpbnQucHJvdG8SGWdvb2dsZS5j
+bG91ZC5vcmdwb2xpY3kudjIaH2dvb2dsZS9hcGkvZmllbGRfYmVoYXZpb3IucHJvdG8aGWdv
+b2dsZS9hcGkvcmVzb3VyY2UucHJvdG8aHGdvb2dsZS9wcm90b2J1Zi9zdHJ1Y3QucHJvdG8a
+H2dvb2dsZS9wcm90b2J1Zi90aW1lc3RhbXAucHJvdG8i0RIKCkNvbnN0cmFpbnQSFwoEbmFt
+ZRgBIAEoCUID4EEFUgRuYW1lEiEKDGRpc3BsYXlfbmFtZRgCIAEoCVILZGlzcGxheU5hbWUS
+IAoLZGVzY3JpcHRpb24YAyABKAlSC2Rlc2NyaXB0aW9uEmYKEmNvbnN0cmFpbnRfZGVmYXVs
+dBgEIAEoDjI3Lmdvb2dsZS5jbG91ZC5vcmdwb2xpY3kudjIuQ29uc3RyYWludC5Db25zdHJh
+aW50RGVmYXVsdFIRY29uc3RyYWludERlZmF1bHQSXwoPbGlzdF9jb25zdHJhaW50GAUgASgL
+MjQuZ29vZ2xlLmNsb3VkLm9yZ3BvbGljeS52Mi5Db25zdHJhaW50Lkxpc3RDb25zdHJhaW50
+SABSDmxpc3RDb25zdHJhaW50EmgKEmJvb2xlYW5fY29uc3RyYWludBgGIAEoCzI3Lmdvb2ds
+ZS5jbG91ZC5vcmdwb2xpY3kudjIuQ29uc3RyYWludC5Cb29sZWFuQ29uc3RyYWludEgAUhFi
+b29sZWFuQ29uc3RyYWludBIoChBzdXBwb3J0c19kcnlfcnVuGAcgASgIUg5zdXBwb3J0c0Ry
+eVJ1bhIzChVlcXVpdmFsZW50X2NvbnN0cmFpbnQYCCABKAlSFGVxdWl2YWxlbnRDb25zdHJh
+aW50Ei8KE3N1cHBvcnRzX3NpbXVsYXRpb24YCSABKAhSEnN1cHBvcnRzU2ltdWxhdGlvbhpY
+Cg5MaXN0Q29uc3RyYWludBIfCgtzdXBwb3J0c19pbhgBIAEoCFIKc3VwcG9ydHNJbhIlCg5z
+dXBwb3J0c191bmRlchgCIAEoCFINc3VwcG9ydHNVbmRlchqQCgoaQ3VzdG9tQ29uc3RyYWlu
+dERlZmluaXRpb24SJQoOcmVzb3VyY2VfdHlwZXMYASADKAlSDXJlc291cmNlVHlwZXMSbgoM
+bWV0aG9kX3R5cGVzGAIgAygOMksuZ29vZ2xlLmNsb3VkLm9yZ3BvbGljeS52Mi5Db25zdHJh
+aW50LkN1c3RvbUNvbnN0cmFpbnREZWZpbml0aW9uLk1ldGhvZFR5cGVSC21ldGhvZFR5cGVz
+EhwKCWNvbmRpdGlvbhgDIAEoCVIJY29uZGl0aW9uEmwKC2FjdGlvbl90eXBlGAQgASgOMksu
+Z29vZ2xlLmNsb3VkLm9yZ3BvbGljeS52Mi5Db25zdHJhaW50LkN1c3RvbUNvbnN0cmFpbnRE
+ZWZpbml0aW9uLkFjdGlvblR5cGVSCmFjdGlvblR5cGUScAoKcGFyYW1ldGVycxgFIAMoCzJQ
+Lmdvb2dsZS5jbG91ZC5vcmdwb2xpY3kudjIuQ29uc3RyYWludC5DdXN0b21Db25zdHJhaW50
+RGVmaW5pdGlvbi5QYXJhbWV0ZXJzRW50cnlSCnBhcmFtZXRlcnMangQKCVBhcmFtZXRlchJj
+CgR0eXBlGAEgASgOMk8uZ29vZ2xlLmNsb3VkLm9yZ3BvbGljeS52Mi5Db25zdHJhaW50LkN1
+c3RvbUNvbnN0cmFpbnREZWZpbml0aW9uLlBhcmFtZXRlci5UeXBlUgR0eXBlEjsKDWRlZmF1
+bHRfdmFsdWUYAiABKAsyFi5nb29nbGUucHJvdG9idWYuVmFsdWVSDGRlZmF1bHRWYWx1ZRIq
+ChF2YWxpZF92YWx1ZXNfZXhwchgDIAEoCVIPdmFsaWRWYWx1ZXNFeHByEm8KCG1ldGFkYXRh
+GAQgASgLMlMuZ29vZ2xlLmNsb3VkLm9yZ3BvbGljeS52Mi5Db25zdHJhaW50LkN1c3RvbUNv
+bnN0cmFpbnREZWZpbml0aW9uLlBhcmFtZXRlci5NZXRhZGF0YVIIbWV0YWRhdGESYwoEaXRl
+bRgFIAEoDjJPLmdvb2dsZS5jbG91ZC5vcmdwb2xpY3kudjIuQ29uc3RyYWludC5DdXN0b21D
+b25zdHJhaW50RGVmaW5pdGlvbi5QYXJhbWV0ZXIuVHlwZVIEaXRlbRosCghNZXRhZGF0YRIg
+CgtkZXNjcmlwdGlvbhgBIAEoCVILZGVzY3JpcHRpb24iPwoEVHlwZRIUChBUWVBFX1VOU1BF
+Q0lGSUVEEAASCAoETElTVBABEgoKBlNUUklORxACEgsKB0JPT0xFQU4QAxqJAQoPUGFyYW1l
+dGVyc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5EmAKBXZhbHVlGAIgASgLMkouZ29vZ2xlLmNs
+b3VkLm9yZ3BvbGljeS52Mi5Db25zdHJhaW50LkN1c3RvbUNvbnN0cmFpbnREZWZpbml0aW9u
+LlBhcmFtZXRlclIFdmFsdWU6AjgBInAKCk1ldGhvZFR5cGUSGwoXTUVUSE9EX1RZUEVfVU5T
+UEVDSUZJRUQQABIKCgZDUkVBVEUQARIKCgZVUERBVEUQAhIKCgZERUxFVEUQAxIQCgxSRU1P
+VkVfR1JBTlQQBBIPCgtHT1ZFUk5fVEFHUxAFIj4KCkFjdGlvblR5cGUSGwoXQUNUSU9OX1RZ
+UEVfVU5TUEVDSUZJRUQQABIJCgVBTExPVxABEggKBERFTlkQAhqYAQoRQm9vbGVhbkNvbnN0
+cmFpbnQSggEKHGN1c3RvbV9jb25zdHJhaW50X2RlZmluaXRpb24YASABKAsyQC5nb29nbGUu
+Y2xvdWQub3JncG9saWN5LnYyLkNvbnN0cmFpbnQuQ3VzdG9tQ29uc3RyYWludERlZmluaXRp
+b25SGmN1c3RvbUNvbnN0cmFpbnREZWZpbml0aW9uIkwKEUNvbnN0cmFpbnREZWZhdWx0EiIK
+HkNPTlNUUkFJTlRfREVGQVVMVF9VTlNQRUNJRklFRBAAEgkKBUFMTE9XEAESCAoEREVOWRAC
+OrgB6kG0AQojb3JncG9saWN5Lmdvb2dsZWFwaXMuY29tL0NvbnN0cmFpbnQSK3Byb2plY3Rz
+L3twcm9qZWN0fS9jb25zdHJhaW50cy97Y29uc3RyYWludH0SKWZvbGRlcnMve2ZvbGRlcn0v
+Y29uc3RyYWludHMve2NvbnN0cmFpbnR9EjVvcmdhbml6YXRpb25zL3tvcmdhbml6YXRpb259
+L2NvbnN0cmFpbnRzL3tjb25zdHJhaW50fUIRCg9jb25zdHJhaW50X3R5cGUi1gUKEEN1c3Rv
+bUNvbnN0cmFpbnQSFwoEbmFtZRgBIAEoCUID4EEFUgRuYW1lEioKDnJlc291cmNlX3R5cGVz
+GAIgAygJQgPgQQVSDXJlc291cmNlVHlwZXMSWQoMbWV0aG9kX3R5cGVzGAMgAygOMjYuZ29v
+Z2xlLmNsb3VkLm9yZ3BvbGljeS52Mi5DdXN0b21Db25zdHJhaW50Lk1ldGhvZFR5cGVSC21l
+dGhvZFR5cGVzEhwKCWNvbmRpdGlvbhgEIAEoCVIJY29uZGl0aW9uElcKC2FjdGlvbl90eXBl
+GAUgASgOMjYuZ29vZ2xlLmNsb3VkLm9yZ3BvbGljeS52Mi5DdXN0b21Db25zdHJhaW50LkFj
+dGlvblR5cGVSCmFjdGlvblR5cGUSIQoMZGlzcGxheV9uYW1lGAYgASgJUgtkaXNwbGF5TmFt
+ZRIgCgtkZXNjcmlwdGlvbhgHIAEoCVILZGVzY3JpcHRpb24SQAoLdXBkYXRlX3RpbWUYCCAB
+KAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNSCnVwZGF0ZVRpbWUicAoKTWV0
+aG9kVHlwZRIbChdNRVRIT0RfVFlQRV9VTlNQRUNJRklFRBAAEgoKBkNSRUFURRABEgoKBlVQ
+REFURRACEgoKBkRFTEVURRADEhAKDFJFTU9WRV9HUkFOVBAEEg8KC0dPVkVSTl9UQUdTEAUi
+PgoKQWN0aW9uVHlwZRIbChdBQ1RJT05fVFlQRV9VTlNQRUNJRklFRBAAEgkKBUFMTE9XEAES
+CAoEREVOWRACOnLqQW8KKW9yZ3BvbGljeS5nb29nbGVhcGlzLmNvbS9DdXN0b21Db25zdHJh
+aW50EkJvcmdhbml6YXRpb25zL3tvcmdhbml6YXRpb259L2N1c3RvbUNvbnN0cmFpbnRzL3tj
+dXN0b21fY29uc3RyYWludH1CxgEKHWNvbS5nb29nbGUuY2xvdWQub3JncG9saWN5LnYyQg9D
+b25zdHJhaW50UHJvdG9QAVo7Y2xvdWQuZ29vZ2xlLmNvbS9nby9vcmdwb2xpY3kvYXBpdjIv
+b3JncG9saWN5cGI7b3JncG9saWN5cGKqAhlHb29nbGUuQ2xvdWQuT3JnUG9saWN5LlYyygIZ
+R29vZ2xlXENsb3VkXE9yZ1BvbGljeVxWMuoCHEdvb2dsZTo6Q2xvdWQ6Ok9yZ1BvbGljeTo6
+VjJKpGcKBxIFDgDlAgEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNSBHb29nbGUgTExD
+CgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhl
+ICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21w
+bGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhl
+IExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VO
+U0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0
+byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2Ug
+aXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElF
+UyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVk
+LgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5n
+IHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgEC
+EgMQACIKCQoCAwASAxIAKQoJCgIDARIDEwAjCgkKAgMCEgMUACYKCQoCAwMSAxUAKQoICgEI
+EgMXADYKCQoCCCUSAxcANgoICgEIEgMYAFIKCQoCCAsSAxgAUgoICgEIEgMZACIKCQoCCAoS
+AxkAIgoICgEIEgMaADAKCQoCCAgSAxoAMAoICgEIEgMbADYKCQoCCAESAxsANgoICgEIEgMc
+ADYKCQoCCCkSAxwANgoICgEIEgMdADUKCQoCCC0SAx0ANQqfBwoCBAASBS0AgQIBGpEHIEEg
+Y29uc3RyYWludCBkZXNjcmliZXMgYSB3YXkgdG8gcmVzdHJpY3QgcmVzb3VyY2UncyBjb25m
+aWd1cmF0aW9uLiBGb3IKIGV4YW1wbGUsIHlvdSBjb3VsZCBlbmZvcmNlIGEgY29uc3RyYWlu
+dCB0aGF0IGNvbnRyb2xzIHdoaWNoIEdvb2dsZSBDbG91ZAogc2VydmljZXMgY2FuIGJlIGFj
+dGl2YXRlZCBhY3Jvc3MgYW4gb3JnYW5pemF0aW9uLCBvciB3aGV0aGVyIGEgQ29tcHV0ZSBF
+bmdpbmUKIGluc3RhbmNlIGNhbiBoYXZlIHNlcmlhbCBwb3J0IGNvbm5lY3Rpb25zIGVzdGFi
+bGlzaGVkLiBDb25zdHJhaW50cyBjYW4gYmUKIGNvbmZpZ3VyZWQgYnkgdGhlIG9yZ2FuaXph
+dGlvbiBwb2xpY3kgYWRtaW5pc3RyYXRvciB0byBmaXQgdGhlIG5lZWRzIG9mIHRoZQogb3Jn
+YW5pemF0aW9uIGJ5IHNldHRpbmcgYSBwb2xpY3kgdGhhdCBpbmNsdWRlcyBjb25zdHJhaW50
+cyBhdCBkaWZmZXJlbnQKIGxvY2F0aW9ucyBpbiB0aGUgb3JnYW5pemF0aW9uJ3MgcmVzb3Vy
+Y2UgaGllcmFyY2h5LiBQb2xpY2llcyBhcmUgaW5oZXJpdGVkCiBkb3duIHRoZSByZXNvdXJj
+ZSBoaWVyYXJjaHkgZnJvbSBoaWdoZXIgbGV2ZWxzLCBidXQgY2FuIGFsc28gYmUgb3ZlcnJp
+ZGRlbi4KIEZvciBkZXRhaWxzIGFib3V0IHRoZSBpbmhlcml0YW5jZSBydWxlcywgc2VlCiBb
+YFBvbGljeWBdW2dvb2dsZS5jbG91ZC5vcmdwb2xpY3kudjIuUG9saWN5XS4KCiBDb25zdHJh
+aW50cyBoYXZlIGEgZGVmYXVsdCBiZWhhdmlvciBkZXRlcm1pbmVkIGJ5IHRoZSBgY29uc3Ry
+YWludF9kZWZhdWx0YAogZmllbGQsIHdoaWNoIGlzIHRoZSBlbmZvcmNlbWVudCBiZWhhdmlv
+ciB0aGF0IGlzIHVzZWQgaW4gdGhlIGFic2VuY2Ugb2YgYQogcG9saWN5IGJlaW5nIGRlZmlu
+ZWQgb3IgaW5oZXJpdGVkIGZvciB0aGUgcmVzb3VyY2UgaW4gcXVlc3Rpb24uCgoKCgMEAAES
+Ay0IEgoLCgMEAAcSBC4CMwQKDQoFBAAHnQgSBC4CMwQKsAEKBAQABAASBDkCRQMaoQEgU3Bl
+Y2lmaWVzIHRoZSBkZWZhdWx0IGJlaGF2aW9yIGluIHRoZSBhYnNlbmNlIG9mIGFueSBwb2xp
+Y3kgZm9yIHRoZQogY29uc3RyYWludC4gVGhpcyBtdXN0IG5vdCBiZSBgQ09OU1RSQUlOVF9E
+RUZBVUxUX1VOU1BFQ0lGSUVEYC4KCiBJbW11dGFibGUgYWZ0ZXIgY3JlYXRpb24uCgoMCgUE
+AAQAARIDOQcYCnIKBgQABAACABIDPAQnGmMgVGhpcyBpcyBvbmx5IHVzZWQgZm9yIGRpc3Rp
+bmd1aXNoaW5nIHVuc2V0IHZhbHVlcyBhbmQgc2hvdWxkIG5ldmVyIGJlCiB1c2VkLiBSZXN1
+bHRzIGluIGFuIGVycm9yLgoKDgoHBAAEAAIAARIDPAQiCg4KBwQABAACAAISAzwlJgqGAQoG
+BAAEAAIBEgNABA4adyBJbmRpY2F0ZSB0aGF0IGFsbCB2YWx1ZXMgYXJlIGFsbG93ZWQgZm9y
+IGxpc3QgY29uc3RyYWludHMuCiBJbmRpY2F0ZSB0aGF0IGVuZm9yY2VtZW50IGlzIG9mZiBm
+b3IgYm9vbGVhbiBjb25zdHJhaW50cy4KCg4KBwQABAACAQESA0AECQoOCgcEAAQAAgECEgNA
+DA0KhAEKBgQABAACAhIDRAQNGnUgSW5kaWNhdGUgdGhhdCBhbGwgdmFsdWVzIGFyZSBkZW5p
+ZWQgZm9yIGxpc3QgY29uc3RyYWludHMuCiBJbmRpY2F0ZSB0aGF0IGVuZm9yY2VtZW50IGlz
+IG9uIGZvciBib29sZWFuIGNvbnN0cmFpbnRzLgoKDgoHBAAEAAICARIDRAQICg4KBwQABAAC
+AgISA0QLDAqzAQoEBAADABIESgJVAxqkASBBIGNvbnN0cmFpbnQgdHlwZSB0aGF0IGFsbG93
+cyBvciBkaXNhbGxvd3MgYSBsaXN0IG9mIHN0cmluZyB2YWx1ZXMsIHdoaWNoCiBhcmUgY29u
+ZmlndXJlZCBpbiB0aGUKIFtgUG9saWN5UnVsZWBdW2dvb2dsZS5jbG91ZC5vcmdwb2xpY3ku
+djIuUG9saWN5U3BlYy5Qb2xpY3lSdWxlXS4KCgwKBQQAAwABEgNKChgKzwEKBgQAAwACABID
+TgQZGr8BIEluZGljYXRlcyB3aGV0aGVyIHZhbHVlcyBncm91cGVkIGludG8gY2F0ZWdvcmll
+cyBjYW4gYmUgdXNlZCBpbgogYFBvbGljeS5hbGxvd2VkX3ZhbHVlc2AgYW5kIGBQb2xpY3ku
+ZGVuaWVkX3ZhbHVlc2AuIEZvciBleGFtcGxlLAogYCJpbjpQeXRob24iYCB3b3VsZCBtYXRj
+aCBhbnkgdmFsdWUgaW4gdGhlICdQeXRob24nIGdyb3VwLgoKDgoHBAADAAIABRIDTgQICg4K
+BwQAAwACAAESA04JFAoOCgcEAAMAAgADEgNOFxgK+QEKBgQAAwACARIDVAQcGukBIEluZGlj
+YXRlcyB3aGV0aGVyIHN1YnRyZWVzIG9mIHRoZSBSZXNvdXJjZSBNYW5hZ2VyIHJlc291cmNl
+IGhpZXJhcmNoeQogY2FuIGJlIHVzZWQgaW4gYFBvbGljeS5hbGxvd2VkX3ZhbHVlc2AgYW5k
+IGBQb2xpY3kuZGVuaWVkX3ZhbHVlc2AuIEZvcgogZXhhbXBsZSwgYCJ1bmRlcjpmb2xkZXJz
+LzEyMyJgIHdvdWxkIG1hdGNoIGFueSByZXNvdXJjZSB1bmRlciB0aGUKICdmb2xkZXJzLzEy
+MycgZm9sZGVyLgoKDgoHBAADAAIBBRIDVAQICg4KBwQAAwACAQESA1QJFwoOCgcEAAMAAgED
+EgNUGhsKVAoEBAADARIFWALJAQMaRSBDdXN0b20gY29uc3RyYWludCBkZWZpbml0aW9uLiBE
+ZWZpbmVzIHRoaXMgYXMgYSBtYW5hZ2VkIGNvbnN0cmFpbnQuCgoMCgUEAAMBARIDWAokCoAD
+CgYEAAMBBAASBGAEdAUa7wIgVGhlIG9wZXJhdGlvbiBmb3Igd2hpY2ggdGhpcyBjb25zdHJh
+aW50IHdpbGwgYmUgYXBwbGllZC4gVG8gYXBwbHkgdGhpcwogY29uc3RyYWludCBvbmx5IHdo
+ZW4gY3JlYXRpbmcgbmV3IHJlc291cmNlcywgdGhlIGBtZXRob2RfdHlwZXNgIHNob3VsZCBi
+ZQogYENSRUFURWAgb25seS4gVG8gYXBwbHkgdGhpcyBjb25zdHJhaW50IHdoZW4gY3JlYXRp
+bmcgb3IgZGVsZXRpbmcKIHJlc291cmNlcywgdGhlIGBtZXRob2RfdHlwZXNgIHNob3VsZCBi
+ZSBgQ1JFQVRFYCBhbmQgYERFTEVURWAuCgogYFVQREFURWAtb25seSBjdXN0b20gY29uc3Ry
+YWludHMgYXJlIG5vdCBzdXBwb3J0ZWQuIFVzZSBgQ1JFQVRFYCBvcgogYENSRUFURSwgVVBE
+QVRFYC4KCg4KBwQAAwEEAAESA2AJEwp0CggEAAMBBAACABIDYwYiGmMgVGhpcyBpcyBvbmx5
+IHVzZWQgZm9yIGRpc3Rpbmd1aXNoaW5nIHVuc2V0IHZhbHVlcyBhbmQgc2hvdWxkIG5ldmVy
+IGJlCiB1c2VkLiBSZXN1bHRzIGluIGFuIGVycm9yLgoKEAoJBAADAQQAAgABEgNjBh0KEAoJ
+BAADAQQAAgACEgNjICEKQQoIBAADAQQAAgESA2YGERowIENvbnN0cmFpbnQgYXBwbGllZCB3
+aGVuIGNyZWF0aW5nIHRoZSByZXNvdXJjZS4KChAKCQQAAwEEAAIBARIDZgYMChAKCQQAAwEE
+AAIBAhIDZg8QCkEKCAQAAwEEAAICEgNpBhEaMCBDb25zdHJhaW50IGFwcGxpZWQgd2hlbiB1
+cGRhdGluZyB0aGUgcmVzb3VyY2UuCgoQCgkEAAMBBAACAgESA2kGDAoQCgkEAAMBBAACAgIS
+A2kPEApbCggEAAMBBAACAxIDbQYRGkogQ29uc3RyYWludCBhcHBsaWVkIHdoZW4gZGVsZXRp
+bmcgdGhlIHJlc291cmNlLgogTm90IGN1cnJlbnRseSBzdXBwb3J0ZWQuCgoQCgkEAAMBBAAC
+AwESA20GDAoQCgkEAAMBBAACAwISA20PEApBCggEAAMBBAACBBIDcAYXGjAgQ29uc3RyYWlu
+dCBhcHBsaWVkIHdoZW4gcmVtb3ZpbmcgYW4gSUFNIGdyYW50LgoKEAoJBAADAQQAAgQBEgNw
+BhIKEAoJBAADAQQAAgQCEgNwFRYKRAoIBAADAQQAAgUSA3MGFhozIENvbnN0cmFpbnQgYXBw
+bGllZCB3aGVuIGVuZm9yY2luZyBmb3JjZWQgdGFnZ2luZy4KChAKCQQAAwEEAAIFARIDcwYR
+ChAKCQQAAwEEAAIFAhIDcxQVCiYKBgQAAwEEARIFdwSBAQUaFSBBbGxvdyBvciBkZW55IHR5
+cGUuCgoOCgcEAAMBBAEBEgN3CRMKdAoIBAADAQQBAgASA3oGIhpjIFRoaXMgaXMgb25seSB1
+c2VkIGZvciBkaXN0aW5ndWlzaGluZyB1bnNldCB2YWx1ZXMgYW5kIHNob3VsZCBuZXZlciBi
+ZQogdXNlZC4gUmVzdWx0cyBpbiBhbiBlcnJvci4KChAKCQQAAwEEAQIAARIDegYdChAKCQQA
+AwEEAQIAAhIDeiAhCicKCAQAAwEEAQIBEgN9BhAaFiBBbGxvd2VkIGFjdGlvbiB0eXBlLgoK
+EAoJBAADAQQBAgEBEgN9BgsKEAoJBAADAQQBAgECEgN9Dg8KJQoIBAADAQQBAgISBIABBg8a
+EyBEZW55IGFjdGlvbiB0eXBlLgoKEQoJBAADAQQBAgIBEgSAAQYKChEKCQQAAwEEAQICAhIE
+gAENDgoyCgYEAAMBAwASBoQBBK8BBRogIERlZmluZXMgYSBwYXJhbWV0ZXIgc3RydWN0dXJl
+LgoKDwoHBAADAQMAARIEhAEMFQozCggEAAMBAwAEABIGhgEGkwEHGh8gQWxsIHZhbGlkIHR5
+cGVzIG9mIHBhcmFtZXRlci4KChEKCQQAAwEDAAQAARIEhgELDwp3CgoEAAMBAwAEAAIAEgSJ
+AQgdGmMgVGhpcyBpcyBvbmx5IHVzZWQgZm9yIGRpc3Rpbmd1aXNoaW5nIHVuc2V0IHZhbHVl
+cyBhbmQgc2hvdWxkIG5ldmVyIGJlCiB1c2VkLiBSZXN1bHRzIGluIGFuIGVycm9yLgoKEwoL
+BAADAQMABAACAAESBIkBCBgKEwoLBAADAQMABAACAAISBIkBGxwKKgoKBAADAQMABAACARIE
+jAEIERoWIExpc3QgcGFyYW1ldGVyIHR5cGUuCgoTCgsEAAMBAwAEAAIBARIEjAEIDAoTCgsE
+AAMBAwAEAAIBAhIEjAEPEAosCgoEAAMBAwAEAAICEgSPAQgTGhggU3RyaW5nIHBhcmFtZXRl
+ciB0eXBlLgoKEwoLBAADAQMABAACAgESBI8BCA4KEwoLBAADAQMABAACAgISBI8BERIKLQoK
+BAADAQMABAACAxIEkgEIFBoZIEJvb2xlYW4gcGFyYW1ldGVyIHR5cGUuCgoTCgsEAAMBAwAE
+AAIDARIEkgEIDwoTCgsEAAMBAwAEAAIDAhIEkgESEwoxCggEAAMBAwADABIGlgEGmgEHGh0g
+RGVmaW5lcyBNZXRhZGF0YSBzdHJ1Y3R1cmUuCgoRCgkEAAMBAwADAAESBJYBDhYKXwoKBAAD
+AQMAAwACABIEmQEIHxpLIERldGFpbGVkIGRlc2NyaXB0aW9uIG9mIHdoYXQgdGhpcyBgcGFy
+YW1ldGVyYCBpcyBhbmQgdXNlIG9mIGl0LgogTXV0YWJsZS4KChMKCwQAAwEDAAMAAgAFEgSZ
+AQgOChMKCwQAAwEDAAMAAgABEgSZAQ8aChMKCwQAAwEDAAMAAgADEgSZAR0eCioKCAQAAwED
+AAIAEgSdAQYUGhggVHlwZSBvZiB0aGUgcGFyYW1ldGVyLgoKEQoJBAADAQMAAgAGEgSdAQYK
+ChEKCQQAAwEDAAIAARIEnQELDwoRCgkEAAMBAwACAAMSBJ0BEhMKWgoIBAADAQMAAgESBKAB
+Bi4aSCBTZXRzIHRoZSB2YWx1ZSBvZiB0aGUgcGFyYW1ldGVyIGluIGFuIGFzc2lnbm1lbnQg
+aWYgbm8gdmFsdWUgaXMgZ2l2ZW4uCgoRCgkEAAMBAwACAQYSBKABBhsKEQoJBAADAQMAAgEB
+EgSgARwpChEKCQQAAwEDAAIBAxIEoAEsLQqzAQoIBAADAQMAAgISBKUBBiMaoAEgUHJvdmlk
+ZXMgYSBDRUwgZXhwcmVzc2lvbiB0byBzcGVjaWZ5IHRoZSBhY2NlcHRhYmxlIHBhcmFtZXRl
+ciB2YWx1ZXMKIGR1cmluZyBhc3NpZ25tZW50LgogRm9yIGV4YW1wbGUsIHBhcmFtZXRlck5h
+bWUgaW4gKCJwYXJhbWV0ZXJWYWx1ZTEiLCAicGFyYW1ldGVyVmFsdWUyIikKChEKCQQAAwED
+AAICBRIEpQEGDAoRCgkEAAMBAwACAgESBKUBDR4KEQoJBAADAQMAAgIDEgSlASEiCmkKCAQA
+AwEDAAIDEgSpAQYcGlcgRGVmaW5lcyBzdWJwcm9wZXJ0aWVzIHByaW1hcmlseSB1c2VkIGJ5
+IHRoZSBVSSB0byBkaXNwbGF5IHVzZXItZnJpZW5kbHkKIGluZm9ybWF0aW9uLgoKEQoJBAAD
+AQMAAgMGEgSpAQYOChEKCQQAAwEDAAIDARIEqQEPFwoRCgkEAAMBAwACAwMSBKkBGhsKnQEK
+CAQAAwEDAAIEEgSuAQYUGooBIERldGVybWluZXMgdGhlIHBhcmFtZXRlcidzIHZhbHVlIHN0
+cnVjdHVyZS4KIEZvciBleGFtcGxlLCBgTElTVDxTVFJJTkc+YCBjYW4gYmUgc3BlY2lmaWVk
+IGJ5IGRlZmluaW5nIGB0eXBlOiBMSVNUYCwKIGFuZCBgaXRlbTogU1RSSU5HYC4KChEKCQQA
+AwEDAAIEBhIErgEGCgoRCgkEAAMBAwACBAESBK4BCw8KEQoJBAADAQMAAgQDEgSuARITCrIB
+CgYEAAMBAgASBLUBBCcaoQEgVGhlIHJlc291cmNlIGluc3RhbmNlIHR5cGUgb24gd2hpY2gg
+dGhpcyBwb2xpY3kgYXBwbGllcy4gRm9ybWF0IHdpbGwgYmUKIG9mIHRoZSBmb3JtIDogYDxz
+ZXJ2aWNlIG5hbWU+Lzx0eXBlPmAgRXhhbXBsZToKCiAgKiBgY29tcHV0ZS5nb29nbGVhcGlz
+LmNvbS9JbnN0YW5jZWAuCgoPCgcEAAMBAgAEEgS1AQQMCg8KBwQAAwECAAUSBLUBDRMKDwoH
+BAADAQIAARIEtQEUIgoPCgcEAAMBAgADEgS1ASUmCkcKBgQAAwECARIEuAEEKRo3IEFsbCB0
+aGUgb3BlcmF0aW9ucyBiZWluZyBhcHBsaWVkIGZvciB0aGlzIGNvbnN0cmFpbnQuCgoPCgcE
+AAMBAgEEEgS4AQQMCg8KBwQAAwECAQYSBLgBDRcKDwoHBAADAQIBARIEuAEYJAoPCgcEAAMB
+AgEDEgS4AScoCuUBCgYEAAMBAgISBL8BBBka1AEgT3JnIHBvbGljeSBjb25kaXRpb24vZXhw
+cmVzc2lvbi4gRm9yIGV4YW1wbGU6CiBgcmVzb3VyY2UuaW5zdGFuY2VOYW1lLm1hdGNoZXMo
+Iltwcm9kdWN0aW9ufHRlc3RdXy4qXyhcZCkrIilgIG9yLAogYHJlc291cmNlLm1hbmFnZW1l
+bnQuYXV0b191cGdyYWRlID09IHRydWVgCgogVGhlIG1heCBsZW5ndGggb2YgdGhlIGNvbmRp
+dGlvbiBpcyAxMDAwIGNoYXJhY3RlcnMuCgoPCgcEAAMBAgIFEgS/AQQKCg8KBwQAAwECAgES
+BL8BCxQKDwoHBAADAQICAxIEvwEXGAolCgYEAAMBAgMSBMIBBB8aFSBBbGxvdyBvciBkZW55
+IHR5cGUuCgoPCgcEAAMBAgMGEgTCAQQOCg8KBwQAAwECAwESBMIBDxoKDwoHBAADAQIDAxIE
+wgEdHgrgAQoGBAADAQIEEgTIAQQqGs8BIFN0b3JlcyB0aGUgc3RydWN0dXJlIG9mCiBbYFBh
+cmFtZXRlcnNgXVtnb29nbGUuY2xvdWQub3JncG9saWN5LnYyLkNvbnN0cmFpbnQuQ3VzdG9t
+Q29uc3RyYWludERlZmluaXRpb24uUGFyYW1ldGVyXQogdXNlZCBieSB0aGUgY29uc3RyYWlu
+dCBjb25kaXRpb24uIFRoZSBrZXkgb2YgYG1hcGAgcmVwcmVzZW50cyB0aGUgbmFtZSBvZgog
+dGhlIHBhcmFtZXRlci4KCg8KBwQAAwECBAYSBMgBBBoKDwoHBAADAQIEARIEyAEbJQoPCgcE
+AAMBAgQDEgTIASgpCvYBCgQEAAMCEgbQAQLTAQMa5QEgQSBjb25zdHJhaW50IHR5cGUgaXMg
+ZW5mb3JjZWQgb3Igbm90IGVuZm9yY2VkLCB3aGljaCBpcyBjb25maWd1cmVkIGluIHRoZQog
+W2BQb2xpY3lSdWxlYF1bZ29vZ2xlLmNsb3VkLm9yZ3BvbGljeS52Mi5Qb2xpY3lTcGVjLlBv
+bGljeVJ1bGVdLgoKIElmIGBjdXN0b21Db25zdHJhaW50RGVmaW5pdGlvbmAgaXMgZGVmaW5l
+ZCwgdGhpcyBjb25zdHJhaW50IGlzIGEgbWFuYWdlZAogY29uc3RyYWludC4KCg0KBQQAAwIB
+EgTQAQobClUKBgQAAwICABIE0gEEQBpFIEN1c3RvbSBjb25zdHJhaW50IGRlZmluaXRpb24u
+IERlZmluZXMgdGhpcyBhcyBhIG1hbmFnZWQgY29uc3RyYWludC4KCg8KBwQAAwICAAYSBNIB
+BB4KDwoHBAADAgIAARIE0gEfOwoPCgcEAAMCAgADEgTSAT4/CuwCCgQEAAIAEgTdAQI8Gt0C
+IEltbXV0YWJsZS4gVGhlIHJlc291cmNlIG5hbWUgb2YgdGhlIGNvbnN0cmFpbnQuIE11c3Qg
+YmUgaW4gb25lIG9mCiB0aGUgZm9sbG93aW5nIGZvcm1zOgoKICogYHByb2plY3RzL3twcm9q
+ZWN0X251bWJlcn0vY29uc3RyYWludHMve2NvbnN0cmFpbnRfbmFtZX1gCiAqIGBmb2xkZXJz
+L3tmb2xkZXJfaWR9L2NvbnN0cmFpbnRzL3tjb25zdHJhaW50X25hbWV9YAogKiBgb3JnYW5p
+emF0aW9ucy97b3JnYW5pemF0aW9uX2lkfS9jb25zdHJhaW50cy97Y29uc3RyYWludF9uYW1l
+fWAKCiBGb3IgZXhhbXBsZSwgIi9wcm9qZWN0cy8xMjMvY29uc3RyYWludHMvY29tcHV0ZS5k
+aXNhYmxlU2VyaWFsUG9ydEFjY2VzcyIuCgoNCgUEAAIABRIE3QECCAoNCgUEAAIAARIE3QEJ
+DQoNCgUEAAIAAxIE3QEQEQoNCgUEAAIACBIE3QESOwoQCggEAAIACJwIABIE3QETOgozCgQE
+AAIBEgTiAQIaGiUgVGhlIGh1bWFuIHJlYWRhYmxlIG5hbWUuCgogTXV0YWJsZS4KCg0KBQQA
+AgEFEgTiAQIICg0KBQQAAgEBEgTiAQkVCg0KBQQAAgEDEgTiARgZCnoKBAQAAgISBOgBAhka
+bCBEZXRhaWxlZCBkZXNjcmlwdGlvbiBvZiB3aGF0IHRoaXMgY29uc3RyYWludCBjb250cm9s
+cyBhcyB3ZWxsIGFzIGhvdyBhbmQKIHdoZXJlIGl0IGlzIGVuZm9yY2VkLgoKIE11dGFibGUu
+CgoNCgUEAAICBRIE6AECCAoNCgUEAAICARIE6AEJFAoNCgUEAAICAxIE6AEXGApWCgQEAAID
+EgTrAQIrGkggVGhlIGV2YWx1YXRpb24gYmVoYXZpb3Igb2YgdGhpcyBjb25zdHJhaW50IGlu
+IHRoZSBhYnNlbmNlIG9mIGEgcG9saWN5LgoKDQoFBAACAwYSBOsBAhMKDQoFBAACAwESBOsB
+FCYKDQoFBAACAwMSBOsBKSoKXQoEBAAIABIG8AEC9gEDGk0gVGhlIHR5cGUgb2YgcmVzdHJp
+Y3Rpb25zIGZvciB0aGlzIGBDb25zdHJhaW50YC4KCiBJbW11dGFibGUgYWZ0ZXIgY3JlYXRp
+b24uCgoNCgUEAAgAARIE8AEIFwpDCgQEAAIEEgTyAQQnGjUgRGVmaW5lcyB0aGlzIGNvbnN0
+cmFpbnQgYXMgYmVpbmcgYSBsaXN0IGNvbnN0cmFpbnQuCgoNCgUEAAIEBhIE8gEEEgoNCgUE
+AAIEARIE8gETIgoNCgUEAAIEAxIE8gElJgpGCgQEAAIFEgT1AQQtGjggRGVmaW5lcyB0aGlz
+IGNvbnN0cmFpbnQgYXMgYmVpbmcgYSBib29sZWFuIGNvbnN0cmFpbnQuCgoNCgUEAAIFBhIE
+9QEEFQoNCgUEAAIFARIE9QEWKAoNCgUEAAIFAxIE9QErLApJCgQEAAIGEgT5AQIcGjsgU2hv
+d3MgaWYgZHJ5IHJ1biBpcyBzdXBwb3J0ZWQgZm9yIHRoaXMgY29uc3RyYWludCBvciBub3Qu
+CgoNCgUEAAIGBRIE+QECBgoNCgUEAAIGARIE+QEHFwoNCgUEAAIGAxIE+QEaGwqWAQoEBAAC
+BxIE/QECIxqHASBNYW5hZ2VkIGNvbnN0cmFpbnQgYW5kIGNhbm5lZCBjb25zdHJhaW50IHNv
+bWV0aW1lcyBjYW4gaGF2ZQogZXF1aXZhbGVudHMuIFRoaXMgZmllbGQgaXMgdXNlZCB0byBz
+dG9yZSB0aGUgZXF1aXZhbGVudCBjb25zdHJhaW50IG5hbWUuCgoNCgUEAAIHBRIE/QECCAoN
+CgUEAAIHARIE/QEJHgoNCgUEAAIHAxIE/QEhIgpMCgQEAAIIEgSAAgIfGj4gU2hvd3MgaWYg
+c2ltdWxhdGlvbiBpcyBzdXBwb3J0ZWQgZm9yIHRoaXMgY29uc3RyYWludCBvciBub3QuCgoN
+CgUEAAIIBRIEgAICBgoNCgUEAAIIARIEgAIHGgoNCgUEAAIIAxIEgAIdHgquAgoCBAESBokC
+AOUCARqfAiBBIGN1c3RvbSBjb25zdHJhaW50IGRlZmluZWQgYnkgY3VzdG9tZXJzIHdoaWNo
+IGNhbiAqb25seSogYmUgYXBwbGllZCB0byB0aGUKIGdpdmVuIHJlc291cmNlIHR5cGVzIGFu
+ZCBvcmdhbml6YXRpb24uCgogQnkgY3JlYXRpbmcgYSBjdXN0b20gY29uc3RyYWludCwgY3Vz
+dG9tZXJzIGNhbiBhcHBseSBwb2xpY2llcyBvZiB0aGlzCiBjdXN0b20gY29uc3RyYWludC4g
+KkNyZWF0aW5nIGEgY3VzdG9tIGNvbnN0cmFpbnQgaXRzZWxmIGRvZXMgTk9UIGFwcGx5IGFu
+eQogcG9saWN5IGVuZm9yY2VtZW50Ki4KCgsKAwQBARIEiQIIGAoNCgMEAQcSBooCAo0CBAoP
+CgUEAQedCBIGigICjQIECoADCgQEAQQAEgaWAgKqAgMa7wIgVGhlIG9wZXJhdGlvbiBmb3Ig
+d2hpY2ggdGhpcyBjb25zdHJhaW50IHdpbGwgYmUgYXBwbGllZC4gVG8gYXBwbHkgdGhpcwog
+Y29uc3RyYWludCBvbmx5IHdoZW4gY3JlYXRpbmcgbmV3IHJlc291cmNlcywgdGhlIGBtZXRo
+b2RfdHlwZXNgIHNob3VsZCBiZQogYENSRUFURWAgb25seS4gVG8gYXBwbHkgdGhpcyBjb25z
+dHJhaW50IHdoZW4gY3JlYXRpbmcgb3IgZGVsZXRpbmcKIHJlc291cmNlcywgdGhlIGBtZXRo
+b2RfdHlwZXNgIHNob3VsZCBiZSBgQ1JFQVRFYCBhbmQgYERFTEVURWAuCgogYFVQREFURWAg
+b25seSBjdXN0b20gY29uc3RyYWludHMgYXJlIG5vdCBzdXBwb3J0ZWQuIFVzZSBgQ1JFQVRF
+YCBvcgogYENSRUFURSwgVVBEQVRFYC4KCg0KBQQBBAABEgSWAgcRCnMKBgQBBAACABIEmQIE
+IBpjIFRoaXMgaXMgb25seSB1c2VkIGZvciBkaXN0aW5ndWlzaGluZyB1bnNldCB2YWx1ZXMg
+YW5kIHNob3VsZCBuZXZlciBiZQogdXNlZC4gUmVzdWx0cyBpbiBhbiBlcnJvci4KCg8KBwQB
+BAACAAESBJkCBBsKDwoHBAEEAAIAAhIEmQIeHwpACgYEAQQAAgESBJwCBA8aMCBDb25zdHJh
+aW50IGFwcGxpZWQgd2hlbiBjcmVhdGluZyB0aGUgcmVzb3VyY2UuCgoPCgcEAQQAAgEBEgSc
+AgQKCg8KBwQBBAACAQISBJwCDQ4KQAoGBAEEAAICEgSfAgQPGjAgQ29uc3RyYWludCBhcHBs
+aWVkIHdoZW4gdXBkYXRpbmcgdGhlIHJlc291cmNlLgoKDwoHBAEEAAICARIEnwIECgoPCgcE
+AQQAAgICEgSfAg0OCloKBgQBBAACAxIEowIEDxpKIENvbnN0cmFpbnQgYXBwbGllZCB3aGVu
+IGRlbGV0aW5nIHRoZSByZXNvdXJjZS4KIE5vdCBjdXJyZW50bHkgc3VwcG9ydGVkLgoKDwoH
+BAEEAAIDARIEowIECgoPCgcEAQQAAgMCEgSjAg0OCkAKBgQBBAACBBIEpgIEFRowIENvbnN0
+cmFpbnQgYXBwbGllZCB3aGVuIHJlbW92aW5nIGFuIElBTSBncmFudC4KCg8KBwQBBAACBAES
+BKYCBBAKDwoHBAEEAAIEAhIEpgITFApDCgYEAQQAAgUSBKkCBBQaMyBDb25zdHJhaW50IGFw
+cGxpZWQgd2hlbiBlbmZvcmNpbmcgZm9yY2VkIHRhZ2dpbmcuCgoPCgcEAQQAAgUBEgSpAgQP
+Cg8KBwQBBAACBQISBKkCEhMKJQoEBAEEARIGrQICtwIDGhUgQWxsb3cgb3IgZGVueSB0eXBl
+LgoKDQoFBAEEAQESBK0CBxEKcwoGBAEEAQIAEgSwAgQgGmMgVGhpcyBpcyBvbmx5IHVzZWQg
+Zm9yIGRpc3Rpbmd1aXNoaW5nIHVuc2V0IHZhbHVlcyBhbmQgc2hvdWxkIG5ldmVyIGJlCiB1
+c2VkLiBSZXN1bHRzIGluIGFuIGVycm9yLgoKDwoHBAEEAQIAARIEsAIEGwoPCgcEAQQBAgAC
+EgSwAh4fCiYKBgQBBAECARIEswIEDhoWIEFsbG93ZWQgYWN0aW9uIHR5cGUuCgoPCgcEAQQB
+AgEBEgSzAgQJCg8KBwQBBAECAQISBLMCDA0KIwoGBAEEAQICEgS2AgQNGhMgRGVueSBhY3Rp
+b24gdHlwZS4KCg8KBwQBBAECAgESBLYCBAgKDwoHBAEEAQICAhIEtgILDAquAwoEBAECABIE
+wgICPBqfAyBJbW11dGFibGUuIE5hbWUgb2YgdGhlIGNvbnN0cmFpbnQuIFRoaXMgaXMgdW5p
+cXVlIHdpdGhpbiB0aGUgb3JnYW5pemF0aW9uLgogRm9ybWF0IG9mIHRoZSBuYW1lIHNob3Vs
+ZCBiZQoKICogYG9yZ2FuaXphdGlvbnMve29yZ2FuaXphdGlvbl9pZH0vY3VzdG9tQ29uc3Ry
+YWludHMve2N1c3RvbV9jb25zdHJhaW50X2lkfWAKCiBFeGFtcGxlOiBgb3JnYW5pemF0aW9u
+cy8xMjMvY3VzdG9tQ29uc3RyYWludHMvY3VzdG9tLmNyZWF0ZU9ubHlFMlR5cGVWbXNgCgog
+VGhlIG1heCBsZW5ndGggaXMgNzAgY2hhcmFjdGVycyBhbmQgdGhlIG1pbmltdW0gbGVuZ3Ro
+IGlzIDEuIE5vdGUgdGhhdCB0aGUKIHByZWZpeCBgb3JnYW5pemF0aW9ucy97b3JnYW5pemF0
+aW9uX2lkfS9jdXN0b21Db25zdHJhaW50cy9gIGlzIG5vdCBjb3VudGVkLgoKDQoFBAECAAUS
+BMICAggKDQoFBAECAAESBMICCQ0KDQoFBAECAAMSBMICEBEKDQoFBAECAAgSBMICEjsKEAoI
+BAECAAicCAASBMICEzoKuwEKBAQBAgESBMgCAk8arAEgSW1tdXRhYmxlLiBUaGUgcmVzb3Vy
+Y2UgaW5zdGFuY2UgdHlwZSBvbiB3aGljaCB0aGlzIHBvbGljeSBhcHBsaWVzLiBGb3JtYXQK
+IHdpbGwgYmUgb2YgdGhlIGZvcm0gOiBgPHNlcnZpY2UgbmFtZT4vPHR5cGU+YCBFeGFtcGxl
+OgoKICAqIGBjb21wdXRlLmdvb2dsZWFwaXMuY29tL0luc3RhbmNlYC4KCg0KBQQBAgEEEgTI
+AgIKCg0KBQQBAgEFEgTIAgsRCg0KBQQBAgEBEgTIAhIgCg0KBQQBAgEDEgTIAiMkCg0KBQQB
+AgEIEgTIAiVOChAKCAQBAgEInAgAEgTIAiZNCkUKBAQBAgISBMsCAicaNyBBbGwgdGhlIG9w
+ZXJhdGlvbnMgYmVpbmcgYXBwbGllZCBmb3IgdGhpcyBjb25zdHJhaW50LgoKDQoFBAECAgQS
+BMsCAgoKDQoFBAECAgYSBMsCCxUKDQoFBAECAgESBMsCFiIKDQoFBAECAgMSBMsCJSYKowIK
+BAQBAgMSBNMCAhcalAIgQSBDb21tb24gRXhwcmVzc2lvbiBMYW5ndWFnZSAoQ0VMKSBjb25k
+aXRpb24gd2hpY2ggaXMgdXNlZCBpbiB0aGUKIGV2YWx1YXRpb24gb2YgdGhlIGNvbnN0cmFp
+bnQuIEZvciBleGFtcGxlOgogYHJlc291cmNlLmluc3RhbmNlTmFtZS5tYXRjaGVzKCJbcHJv
+ZHVjdGlvbnx0ZXN0XV8uKl8oXGQpKyIpYCBvciwKIGByZXNvdXJjZS5tYW5hZ2VtZW50LmF1
+dG9fdXBncmFkZSA9PSB0cnVlYAoKIFRoZSBtYXggbGVuZ3RoIG9mIHRoZSBjb25kaXRpb24g
+aXMgMTAwMCBjaGFyYWN0ZXJzLgoKDQoFBAECAwUSBNMCAggKDQoFBAECAwESBNMCCRIKDQoF
+BAECAwMSBNMCFRYKIwoEBAECBBIE1gICHRoVIEFsbG93IG9yIGRlbnkgdHlwZS4KCg0KBQQB
+AgQGEgTWAgIMCg0KBQQBAgQBEgTWAg0YCg0KBQQBAgQDEgTWAhscCmgKBAQBAgUSBNoCAhoa
+WiBPbmUgbGluZSBkaXNwbGF5IG5hbWUgZm9yIHRoZSBVSS4KIFRoZSBtYXggbGVuZ3RoIG9m
+IHRoZSBkaXNwbGF5X25hbWUgaXMgMjAwIGNoYXJhY3RlcnMuCgoNCgUEAQIFBRIE2gICCAoN
+CgUEAQIFARIE2gIJFQoNCgUEAQIFAxIE2gIYGQqAAQoEBAECBhIE3gICGRpyIERldGFpbGVk
+IGluZm9ybWF0aW9uIGFib3V0IHRoaXMgY3VzdG9tIHBvbGljeSBjb25zdHJhaW50LgogVGhl
+IG1heCBsZW5ndGggb2YgdGhlIGRlc2NyaXB0aW9uIGlzIDIwMDAgY2hhcmFjdGVycy4KCg0K
+BQQBAgYFEgTeAgIICg0KBQQBAgYBEgTeAgkUCg0KBQQBAgYDEgTeAhcYCsQBCgQEAQIHEgbj
+AgLkAjIaswEgT3V0cHV0IG9ubHkuIFRoZSBsYXN0IHRpbWUgdGhpcyBjdXN0b20gY29uc3Ry
+YWludCB3YXMgdXBkYXRlZC4gVGhpcwogcmVwcmVzZW50cyB0aGUgbGFzdCB0aW1lIHRoYXQg
+dGhlIGBDcmVhdGVDdXN0b21Db25zdHJhaW50YCBvcgogYFVwZGF0ZUN1c3RvbUNvbnN0cmFp
+bnRgIG1ldGhvZHMgd2VyZSBjYWxsZWQuCgoNCgUEAQIHBhIE4wICGwoNCgUEAQIHARIE4wIc
+JwoNCgUEAQIHAxIE4wIqKwoNCgUEAQIHCBIE5AIGMQoQCggEAQIHCJwIABIE5AIHMGIGcHJv
+dG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Orgpolicy::V2::Constraint::Constraint ===
+    # Fields for Constraint
+    # Field: name Type: 9 ()
+    # Field: display_name Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: constraint_default Type: 14 (.google.cloud.orgpolicy.v2.Constraint.ConstraintDefault)
+    # Field: list_constraint Type: 11 (.google.cloud.orgpolicy.v2.Constraint.ListConstraint)
+    # Field: boolean_constraint Type: 11 (.google.cloud.orgpolicy.v2.Constraint.BooleanConstraint)
+    # Field: supports_dry_run Type: 8 ()
+    # Field: equivalent_constraint Type: 9 ()
+    # Field: supports_simulation Type: 8 ()
+
+# Enum: Constraint::ConstraintDefault
+our $Constraint_CONSTRAINT_DEFAULT_UNSPECIFIED = 0;
+our $Constraint_ALLOW = 1;
+our $Constraint_DENY = 2;
+
+# === Message: Google::Cloud::Orgpolicy::V2::Constraint::CustomConstraint ===
+    # Fields for CustomConstraint
+    # Field: name Type: 9 ()
+    # Field: resource_types Type: 9 ()
+    # Field: method_types Type: 14 (.google.cloud.orgpolicy.v2.CustomConstraint.MethodType)
+    # Field: condition Type: 9 ()
+    # Field: action_type Type: 14 (.google.cloud.orgpolicy.v2.CustomConstraint.ActionType)
+    # Field: display_name Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+
+# Enum: CustomConstraint::MethodType
+our $CustomConstraint_METHOD_TYPE_UNSPECIFIED = 0;
+our $CustomConstraint_CREATE = 1;
+our $CustomConstraint_UPDATE = 2;
+our $CustomConstraint_DELETE = 3;
+our $CustomConstraint_REMOVE_GRANT = 4;
+our $CustomConstraint_GOVERN_TAGS = 5;
+
+# Enum: CustomConstraint::ActionType
+our $CustomConstraint_ACTION_TYPE_UNSPECIFIED = 0;
+our $CustomConstraint_ALLOW = 1;
+our $CustomConstraint_DENY = 2;
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Orgpolicy::V2::Constraint - Compiled Protocol Buffers messages for google/cloud/orgpolicy/v2/constraint.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Orgpolicy::V2::Constraint;
+
+    my $msg = Google::Cloud::Orgpolicy::V2::Constraint::Constraint->new({
+        name => $name,
+        display_name => $display_name,
+        description => $description,
+        constraint_default => $constraint_default,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Orgpolicy::V2::Constraint::Constraint->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/orgpolicy/v2/constraint.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Orgpolicy::V2::Constraint::Constraint
+
+A constraint describes a way to restrict resource's configuration. For
+example, you could enforce a constraint that controls which Google Cloud
+services can be activated across an organization, or whether a Compute Engine
+instance can have serial port connections established. Constraints can be
+configured by the organization policy administrator to fit the needs of the
+organization by setting a policy that includes constraints at different
+locations in the organization's resource hierarchy. Policies are inherited
+down the resource hierarchy from higher levels, but can also be overridden.
+For details about the inheritance rules, see
+[`Policy`][google.cloud.orgpolicy.v2.Policy].
+
+Constraints have a default behavior determined by the `constraint_default`
+field, which is the enforcement behavior that is used in the absence of a
+policy being defined or inherited for the resource in question.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. The resource name of the constraint. Must be in one of
+the following forms:
+
+* `projects/{project_number}/constraints/{constraint_name}`
+* `folders/{folder_id}/constraints/{constraint_name}`
+* `organizations/{organization_id}/constraints/{constraint_name}`
+
+For example, "/projects/123/constraints/compute.disableSerialPortAccess".
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+The human readable name.
+
+Mutable.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Detailed description of what this constraint controls as well as how and
+where it is enforced.
+
+Mutable.
+
+=item * C<< $msg->constraint_default() >> / C<< $msg->constraint_default($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Orgpolicy::V2::Constraint::ConstraintDefault>)
+
+The evaluation behavior of this constraint in the absence of a policy.
+
+=item * C<< $msg->list_constraint() >> / C<< $msg->list_constraint($value) >>
+
+Type: C<Message> (L<Google::Cloud::Orgpolicy::V2::Constraint::Constraint::ListConstraint>)
+
+Defines this constraint as being a list constraint.
+
+=item * C<< $msg->boolean_constraint() >> / C<< $msg->boolean_constraint($value) >>
+
+Type: C<Message> (L<Google::Cloud::Orgpolicy::V2::Constraint::Constraint::BooleanConstraint>)
+
+Defines this constraint as being a boolean constraint.
+
+=item * C<< $msg->supports_dry_run() >> / C<< $msg->supports_dry_run($value) >>
+
+Type: C<Bool>
+
+Shows if dry run is supported for this constraint or not.
+
+=item * C<< $msg->equivalent_constraint() >> / C<< $msg->equivalent_constraint($value) >>
+
+Type: C<String>
+
+Managed constraint and canned constraint sometimes can have
+equivalents. This field is used to store the equivalent constraint name.
+
+=item * C<< $msg->supports_simulation() >> / C<< $msg->supports_simulation($value) >>
+
+Type: C<Bool>
+
+Shows if simulation is supported for this constraint or not.
+
+=back
+
+=head3 Enum: Constraint::ConstraintDefault
+
+=over 4
+
+=item * C<CONSTRAINT_DEFAULT_UNSPECIFIED> => C<0>
+
+=item * C<ALLOW> => C<1>
+
+=item * C<DENY> => C<2>
+
+=back
+
+=head2 Google::Cloud::Orgpolicy::V2::Constraint::CustomConstraint
+
+A custom constraint defined by customers which can *only* be applied to the
+given resource types and organization.
+
+By creating a custom constraint, customers can apply policies of this
+custom constraint. *Creating a custom constraint itself does NOT apply any
+policy enforcement*.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Name of the constraint. This is unique within the organization.
+Format of the name should be
+
+* `organizations/{organization_id}/customConstraints/{custom_constraint_id}`
+
+Example: `organizations/123/customConstraints/custom.createOnlyE2TypeVms`
+
+The max length is 70 characters and the minimum length is 1. Note that the
+prefix `organizations/{organization_id}/customConstraints/` is not counted.
+
+=item * C<< $msg->resource_types() >> / C<< $msg->resource_types($value) >>
+
+Type: C<String>
+
+Immutable. The resource instance type on which this policy applies. Format
+will be of the form : `<service name>/<type>` Example:
+
+ * `compute.googleapis.com/Instance`.
+
+=item * C<< $msg->method_types() >> / C<< $msg->method_types($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Orgpolicy::V2::CustomConstraint::MethodType>)
+
+All the operations being applied for this constraint.
+
+=item * C<< $msg->condition() >> / C<< $msg->condition($value) >>
+
+Type: C<String>
+
+A Common Expression Language (CEL) condition which is used in the
+evaluation of the constraint. For example:
+`resource.instanceName.matches("[production|test]_.*_(\d)+")` or,
+`resource.management.auto_upgrade == true`
+
+The max length of the condition is 1000 characters.
+
+=item * C<< $msg->action_type() >> / C<< $msg->action_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Orgpolicy::V2::CustomConstraint::ActionType>)
+
+Allow or deny type.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+One line display name for the UI.
+The max length of the display_name is 200 characters.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Detailed information about this custom policy constraint.
+The max length of the description is 2000 characters.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The last time this custom constraint was updated. This
+represents the last time that the `CreateCustomConstraint` or
+`UpdateCustomConstraint` methods were called.
+
+=back
+
+=head3 Enum: CustomConstraint::MethodType
+
+=over 4
+
+=item * C<METHOD_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<CREATE> => C<1>
+
+=item * C<UPDATE> => C<2>
+
+=item * C<DELETE> => C<3>
+
+=item * C<REMOVE_GRANT> => C<4>
+
+=item * C<GOVERN_TAGS> => C<5>
+
+=back
+
+=head3 Enum: CustomConstraint::ActionType
+
+=over 4
+
+=item * C<ACTION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<ALLOW> => C<1>
+
+=item * C<DENY> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Orgpolicy::V2::Constraint::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

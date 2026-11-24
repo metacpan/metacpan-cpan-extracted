@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -600,59 +600,364 @@ The following RPC methods are available in this client:
 
 =item * B<disable_xpn_host>
 
-Calls the RPC method C<DisableXpnHost> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->disable_xpn_host(
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<DisableXpnHost> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DisableXpnHostProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<disable_xpn_resource>
 
-Calls the RPC method C<DisableXpnResource> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->disable_xpn_resource(
+        project                  => $project,
+        projects_disable_xpn_resource_request_resource => $projects_disable_xpn_resource_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<DisableXpnResource> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DisableXpnResourceProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<projects_disable_xpn_resource_request_resource> - L<Google::Cloud::Compute::V1::Compute::ProjectsDisableXpnResourceRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<enable_xpn_host>
 
-Calls the RPC method C<EnableXpnHost> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->enable_xpn_host(
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<EnableXpnHost> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::EnableXpnHostProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<enable_xpn_resource>
 
-Calls the RPC method C<EnableXpnResource> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->enable_xpn_resource(
+        project                  => $project,
+        projects_enable_xpn_resource_request_resource => $projects_enable_xpn_resource_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<EnableXpnResource> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::EnableXpnResourceProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<projects_enable_xpn_resource_request_resource> - L<Google::Cloud::Compute::V1::Compute::ProjectsEnableXpnResourceRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Project>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<get_xpn_host>
 
-Calls the RPC method C<GetXpnHost> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_xpn_host(
+        project                  => $project,
+    );
+
+Calls the RPC method C<GetXpnHost> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetXpnHostProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Project>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<get_xpn_resources>
 
-Calls the RPC method C<GetXpnResources> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_xpn_resources(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<GetXpnResources> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetXpnResourcesProjectsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ProjectsGetXpnResources>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<list_xpn_hosts>
 
-Calls the RPC method C<ListXpnHosts> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_xpn_hosts(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        projects_list_xpn_hosts_request_resource => $projects_list_xpn_hosts_request_resource,
+    );
+
+Calls the RPC method C<ListXpnHosts> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListXpnHostsProjectsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::XpnHostList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<projects_list_xpn_hosts_request_resource> - L<Google::Cloud::Compute::V1::Compute::ProjectsListXpnHostsRequest>
+
+=back
 
 =item * B<move_disk>
 
-Calls the RPC method C<MoveDisk> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->move_disk(
+        disk_move_request_resource => $disk_move_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<MoveDisk> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::MoveDiskProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk_move_request_resource> - L<Google::Cloud::Compute::V1::Compute::DiskMoveRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<move_instance>
 
-Calls the RPC method C<MoveInstance> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->move_instance(
+        instance_move_request_resource => $instance_move_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<MoveInstance> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::MoveInstanceProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_move_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstanceMoveRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<set_cloud_armor_tier>
 
-Calls the RPC method C<SetCloudArmorTier> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_cloud_armor_tier(
+        project                  => $project,
+        projects_set_cloud_armor_tier_request_resource => $projects_set_cloud_armor_tier_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SetCloudArmorTier> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetCloudArmorTierProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<projects_set_cloud_armor_tier_request_resource> - L<Google::Cloud::Compute::V1::Compute::ProjectsSetCloudArmorTierRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<set_common_instance_metadata>
 
-Calls the RPC method C<SetCommonInstanceMetadata> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_common_instance_metadata(
+        metadata_resource        => $metadata_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SetCommonInstanceMetadata> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetCommonInstanceMetadataProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<metadata_resource> - L<Google::Cloud::Compute::V1::Compute::Metadata>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<set_default_network_tier>
 
-Calls the RPC method C<SetDefaultNetworkTier> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_default_network_tier(
+        project                  => $project,
+        projects_set_default_network_tier_request_resource => $projects_set_default_network_tier_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SetDefaultNetworkTier> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetDefaultNetworkTierProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<projects_set_default_network_tier_request_resource> - L<Google::Cloud::Compute::V1::Compute::ProjectsSetDefaultNetworkTierRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<set_usage_export_bucket>
 
-Calls the RPC method C<SetUsageExportBucket> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_usage_export_bucket(
+        project                  => $project,
+        request_id               => $request_id,
+        usage_export_location_resource => $usage_export_location_resource,
+    );
+
+Calls the RPC method C<SetUsageExportBucket> on C<google.cloud.compute.v1.Projects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetUsageExportBucketProjectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<usage_export_location_resource> - L<Google::Cloud::Compute::V1::Compute::UsageExportLocation>
+
+=back
 
 =back
 

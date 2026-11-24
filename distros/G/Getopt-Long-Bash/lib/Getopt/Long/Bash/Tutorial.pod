@@ -115,8 +115,8 @@ Use C<[[ -v var ]]> to check if the option was specified.
     fi
 
     for file in "$@"; do
-        [[ -n "$verbose" ]] && echo "Backing up: $file"
-        if [[ -z "$dry_run" ]]; then
+        [[ -n $verbose ]] && echo "Backing up: $file"
+        if [[ -z $dry_run ]]; then
             cp "$file" "$dest/"
         else
             echo "[DRY RUN] Would copy $file to $dest/"
@@ -297,7 +297,7 @@ L<getoptlong> - Complete reference manual
 
 L<Getopt::Long::Bash>
 
-L<https://github.com/tecolicom/getoptlong>
+L<https://github.com/tecolicom/getoptlong-bash>
 
 =head1 AUTHOR
 

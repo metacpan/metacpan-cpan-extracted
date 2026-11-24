@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlSslCerts;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -234,79 +234,11 @@ EOF
     # Field: project Type: 9 ()
     # Field: sha1_fingerprint Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsDeleteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsDeleteRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<sha1_fingerprint>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsGetRequest ===
     # Fields for SqlSslCertsGetRequest
     # Field: instance Type: 9 ()
     # Field: project Type: 9 ()
     # Field: sha1_fingerprint Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsGetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsGetRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<sha1_fingerprint>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsInsertRequest ===
     # Fields for SqlSslCertsInsertRequest
@@ -314,104 +246,14 @@ Type: String
     # Field: project Type: 9 ()
     # Field: body Type: 11 (.google.cloud.sql.v1.SslCertsInsertRequest)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsInsertRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsInsertRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<body>
-
-Type: Message (.google.cloud.sql.v1.SslCertsInsertRequest)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsListRequest ===
     # Fields for SqlSslCertsListRequest
     # Field: instance Type: 9 ()
     # Field: project Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsListRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertRequest ===
     # Fields for SslCertsInsertRequest
     # Field: common_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertRequest->new(
-        common_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<common_name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertResponse ===
     # Fields for SslCertsInsertResponse
@@ -420,78 +262,10 @@ Type: String
     # Field: server_ca_cert Type: 11 (.google.cloud.sql.v1.SslCert)
     # Field: client_cert Type: 11 (.google.cloud.sql.v1.SslCertDetail)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<operation>
-
-Type: Message (.google.cloud.sql.v1.Operation)
-
-=item * B<server_ca_cert>
-
-Type: Message (.google.cloud.sql.v1.SslCert)
-
-=item * B<client_cert>
-
-Type: Message (.google.cloud.sql.v1.SslCertDetail)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsListResponse ===
     # Fields for SslCertsListResponse
     # Field: kind Type: 9 ()
     # Field: items Type: 11 (.google.cloud.sql.v1.SslCert)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsListResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsListResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<items>
-
-Type: Message (.google.cloud.sql.v1.SslCert)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::UpdateCustomerManagedCertificateRequest ===
     # Fields for UpdateCustomerManagedCertificateRequest
@@ -502,179 +276,35 @@ Type: Message (.google.cloud.sql.v1.SslCert)
     # Field: allow_missing Type: 8 ()
     # Field: certificate_bundle Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::UpdateCustomerManagedCertificateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::UpdateCustomerManagedCertificateRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<customer_managed_certificate_config>
-
-Type: Message (.google.cloud.sql.v1.CustomerManagedCertificateConfig)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<allow_missing>
-
-Type: Bool
-
-=item * B<certificate_bundle>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::DeleteCustomerManagedCertificateRequest ===
     # Fields for DeleteCustomerManagedCertificateRequest
     # Field: instance Type: 9 ()
     # Field: project Type: 9 ()
     # Field: certificate_bundle Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::DeleteCustomerManagedCertificateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::DeleteCustomerManagedCertificateRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<certificate_bundle>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesRequest ===
     # Fields for ListCustomerManagedCertificatesRequest
     # Field: instance Type: 9 ()
     # Field: project Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse ===
     # Fields for ListCustomerManagedCertificatesResponse
     # Field: customer_managed_certificates Type: 11 (.google.cloud.sql.v1.CustomerManagedCertificateConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse->new(
-        customer_managed_certificates => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<customer_managed_certificates>
-
-Type: Message (.google.cloud.sql.v1.CustomerManagedCertificateConfig)
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsServiceClient - Client stub representing the remote SqlSslCertsService service
+Client stub representing the remote C<SqlSslCertsService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -794,13 +424,357 @@ sub list_customer_managed_certificates {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlSslCerts - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlSslCerts - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_ssl_certs.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlSslCerts;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsDeleteRequest->new({
+        instance => $instance,
+        project => $project,
+        sha1_fingerprint => $sha1_fingerprint,
+    });
+
+    # Read or update a field
+    my $val = $msg->instance();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsDeleteRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_ssl_certs.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsDeleteRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->sha1_fingerprint() >> / C<< $msg->sha1_fingerprint($value) >>
+
+Type: C<String>
+
+Sha1 FingerPrint.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsGetRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->sha1_fingerprint() >> / C<< $msg->sha1_fingerprint($value) >>
+
+Type: C<String>
+
+Sha1 FingerPrint.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsInsertRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->body() >> / C<< $msg->body($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertRequest>)
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::SqlSslCertsListRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertRequest
+
+SslCerts insert request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->common_name() >> / C<< $msg->common_name($value) >>
+
+Type: C<String>
+
+User supplied name.  Must be a distinct name from the other certificates
+for this instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsInsertResponse
+
+SslCert insert response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#sslCertsInsert`.
+
+=item * C<< $msg->operation() >> / C<< $msg->operation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>)
+
+The operation to track the ssl certs insert request.
+
+=item * C<< $msg->server_ca_cert() >> / C<< $msg->server_ca_cert($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SslCert>)
+
+The server Certificate Authority's certificate.  If this is missing you can
+force a new one to be generated by calling resetSslConfig method on
+instances resource.
+
+=item * C<< $msg->client_cert() >> / C<< $msg->client_cert($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SslCertDetail>)
+
+The new client certificate and private key.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::SslCertsListResponse
+
+SslCerts list response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#sslCertsList`.
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SslCert>)
+
+List of client certificates for the instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::UpdateCustomerManagedCertificateRequest
+
+Request message for SqlSslCertsService.UpdateCustomerManagedCertificate.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Required. Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. Project ID of the project that contains the instance.
+
+=item * C<< $msg->customer_managed_certificate_config() >> / C<< $msg->customer_managed_certificate_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig>)
+
+Required. The customer managed certificate bundle SSL configuration to
+update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to be updated.
+
+=item * C<< $msg->allow_missing() >> / C<< $msg->allow_missing($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, and the customer managed certificate bundle
+configuration is not found, a new customer managed certificate bundle
+configuration will be created. In this situation, `update_mask` is ignored.
+
+=item * C<< $msg->certificate_bundle() >> / C<< $msg->certificate_bundle($value) >>
+
+Type: C<String>
+
+Required. Name tag of the customer managed certificate bundle to update. It
+must start with a letter, be alphanumeric, and have a maximum length of 10
+characters.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::DeleteCustomerManagedCertificateRequest
+
+Request message for SqlSslCertsService.DeleteCustomerManagedCertificate.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Required. Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. Project ID of the project that contains the instance.
+
+=item * C<< $msg->certificate_bundle() >> / C<< $msg->certificate_bundle($value) >>
+
+Type: C<String>
+
+Required. Name tag of the customer managed certificate bundle to delete. It
+must start with a letter, be alphanumeric, and have a maximum length of 10
+characters.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesRequest
+
+Request message for SqlSslCertsService.ListCustomerManagedCertificates.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Required. Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. Project ID of the project that contains the instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlSslCerts::ListCustomerManagedCertificatesResponse
+
+Response message for SqlSslCertsService.ListCustomerManagedCertificates.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->customer_managed_certificates() >> / C<< $msg->customer_managed_certificates($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig>)
+
+Required. List of customer managed SSL configurations for the instance.
+Note: Sensitive private keys (e.g., PEER_CLIENT_KEY) are redacted in this
+response.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlSslCerts::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

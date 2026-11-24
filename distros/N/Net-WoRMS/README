@@ -1,10 +1,11 @@
 NAME
 
-    Net::WoRMS bundles functionalities for the tool query-worms.
+    Net::WoRMS provides functions to query the "World Register of Marine
+    Species".
 
 VERSION
 
-    version 1.5
+    version 1.7
 
 SYNOPSIS
 
@@ -12,7 +13,7 @@ SYNOPSIS
     the tool query-worms <https://metacpan.org>, to harvest information
     form the "World Register of Marine Species" --
     http://www.marinespecies.org. The module was built around the module
-    SOAP::Lite and is implemented by a Moo object.
+    SOAP::Lite and is OO implemented using Moo.
 
 MODULE DEPENDENCIES
 
@@ -35,7 +36,9 @@ MODULE DEPENDENCIES
       is used for the WEB access and parsing capabilities to retrieve data
       from http://www.marinespecies.org.
 
-    Syntax::Keyword::Match, to end the switch-case/while-given madness
+    Syntax::Keyword::Match
+
+      to end the switch-case/while-given madness
 
 GLOBAL VARIABLES and CONSTANTS
 
@@ -50,7 +53,7 @@ GLOBAL VARIABLES and CONSTANTS
       variables are considered as a constants. There are methods to change
       these values but never tested.
 
-    $FORMAT ='TEXT'
+    $FORMAT = 'TEXT'
 
       FORMAT defines the default output format.
 
@@ -62,7 +65,7 @@ GLOBAL VARIABLES and CONSTANTS
 
       The array holds field names for TEXT and CSV related output.
 
-    %FORMATS = ( TEXT = 1, SQL => 2, CSV => 3)>
+    %FORMATS = ( TEXT => 1, SQL => 2, CSV => 3)
 
       The format hash mostly for validation.
 

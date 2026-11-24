@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.18.1';
+our $VERSION = '3.19.0';
 
 our @FLAGS = qw(
     is_vpn is_hosting is_relay is_tor is_cdn is_bot is_resproxy is_dcproxy is_mobproxy
@@ -39,8 +39,12 @@ our @ABUSE = qw(email name phone address country network validated unvalidated_s
 # same on a paid plan's answers: false while the answer has every field, true
 # once its organization's overage cap is reached.
 our @MARKERS = qw(trial_expired cap_reached);
+# What the user agent sent with the lookup names, and whether the address bears
+# it out: on an answer with every field to a lookup that sent one, and on no
+# other, so never on a bogon's.
+our @VERDICTS = qw(user_agent);
 
-my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @MARKERS;
+my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @VERDICTS, @MARKERS;
 
 # The one place a wire body becomes a result. Every field is copied on key
 # PRESENCE and never on truthiness: a plan that includes `is_hosting` and
@@ -56,7 +60,7 @@ sub from_wire {
         next unless exists $body->{$flag};
         $answer{$flag} = defined $body->{$flag} ? ($body->{$flag} ? 1 : 0) : undef;
     }
-    for my $detail (@DETAILS, @OBJECTS) {
+    for my $detail (@DETAILS, @OBJECTS, @VERDICTS) {
         $answer{$detail} = $body->{$detail} if exists $body->{$detail};
     }
     return $class->_new(\%answer, $body);
@@ -75,7 +79,7 @@ sub has {
 # a key is entitled to without reading the plan table.
 sub fields {
     my ($self) = @_;
-    return grep { exists $self->{$_} } @FLAGS, @DETAILS, @OBJECTS, @MARKERS;
+    return grep { exists $self->{$_} } @FLAGS, @DETAILS, @OBJECTS, @VERDICTS, @MARKERS;
 }
 
 # The response exactly as it came off the wire, with its original names and its
@@ -92,7 +96,7 @@ sub _new {
 
 # One reader per field rather than AUTOLOAD, so a typo is a compile-adjacent
 # "Can't locate object method" rather than a silent undef.
-for my $field ('ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @MARKERS) {
+for my $field ('ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @VERDICTS, @MARKERS) {
     no strict 'refs';
     *{__PACKAGE__ . "::$field"} = sub { $_[0]->{$field} };
 }
@@ -239,6 +243,23 @@ C<country>. C<abuse> is where to report abuse from it: C<email>, C<name>,
 C<phone>, C<address>, C<country>, C<network>, C<validated> and
 C<unvalidated_since>. Every key is present whenever the object is: empty strings
 where no record covers the address.
+
+=head2 user_agent
+
+What the user agent sent with the lookup names, and whether the address bears it
+out, as a plain hash reference, or C<undef> on an answer that does not carry it:
+one to a lookup that sent no C<user_agent>, one without every field, and a
+bogon's, which is answered locally. It carries C<agent> (the agent the user agent
+names, such as C<Googlebot> or C<Chrome>, C<Unknown> where it names none),
+C<kind> (C<browser>, C<inapp>, C<automation>, C<bot>, C<ai-bot>, C<http-client>
+or C<unknown>) and C<verdict>: C<verified> when the agent's operator vouches for
+the address as it, C<spoofed> when the operator of a bot that publishes its
+addresses does not vouch for this one, C<unverifiable> for a bot nothing can
+confirm, and C<not_bot> for a browser, an app or a script.
+
+    my $r = $client->lookup($ip, user_agent => $request->headers->user_agent);
+    my $verdict = ($r->user_agent // {})->{verdict} // '';
+    deny() if $verdict eq 'spoofed';
 
 =head2 trial_expired
 

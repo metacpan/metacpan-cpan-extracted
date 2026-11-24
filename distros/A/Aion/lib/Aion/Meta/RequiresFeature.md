@@ -59,6 +59,35 @@ $req->stringify  # => req name => (is => 'rw', isa => Str) of My::Package
 
 Сравнивает с фичей, но только указанные аспекты.
 
+```perl
+package Float { use Aion }
+
+package Fpu { use Aion -role;
+	req float => (is => 'ro');
+}
+
+package Cpu { use Aion; with 'Fpu';
+	has float => (is => 'ro', isa => Object['Float']);
+}
+
+ref Cpu->new(float => Float->new)->float # => Float
+```
+
+И выбрасывает исключение, если они не подходят:
+
+```perl
+package Fpu { use Aion -role;
+	req int => (is => 'ro', isa => Object['Int']);
+}
+
+eval {
+	package Cpu { use Aion; with 'Fpu';
+		has int => (is => 'ro', isa => Object['Float']);
+	}
+};
+$@ # ^=> Feature mismatch (isa => Object['Int'] != Object['Float']) with req int => (is => 'ro', isa => Object['Int']) of Fpu
+```
+
 # AUTHOR
 
 Yaroslav O. Kosmina <dart@cpan.org>

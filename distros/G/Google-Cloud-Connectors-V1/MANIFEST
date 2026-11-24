@@ -1,0 +1,40 @@
+Changes
+lib/Google/Cloud/Connectors/V1.pm
+lib/Google/Cloud/Connectors/V1/Authconfig.pm
+lib/Google/Cloud/Connectors/V1/Authconfig/Types.pm
+lib/Google/Cloud/Connectors/V1/Common.pm
+lib/Google/Cloud/Connectors/V1/Common/Types.pm
+lib/Google/Cloud/Connectors/V1/Connection.pm
+lib/Google/Cloud/Connectors/V1/Connection/Types.pm
+lib/Google/Cloud/Connectors/V1/Connector.pm
+lib/Google/Cloud/Connectors/V1/Connector/Types.pm
+lib/Google/Cloud/Connectors/V1/ConnectorsClient.pm
+lib/Google/Cloud/Connectors/V1/ConnectorsService.pm
+lib/Google/Cloud/Connectors/V1/ConnectorsService/Types.pm
+lib/Google/Cloud/Connectors/V1/ConnectorVersion.pm
+lib/Google/Cloud/Connectors/V1/ConnectorVersion/Types.pm
+lib/Google/Cloud/Connectors/V1/DestinationConfig.pm
+lib/Google/Cloud/Connectors/V1/DestinationConfig/Types.pm
+lib/Google/Cloud/Connectors/V1/Provider.pm
+lib/Google/Cloud/Connectors/V1/Provider/Types.pm
+lib/Google/Cloud/Connectors/V1/Runtime.pm
+lib/Google/Cloud/Connectors/V1/Runtime/Types.pm
+lib/Google/Cloud/Connectors/V1/Settings.pm
+lib/Google/Cloud/Connectors/V1/Settings/Types.pm
+lib/Google/Cloud/Connectors/V1/SslConfig.pm
+lib/Google/Cloud/Connectors/V1/SslConfig/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Connectors.t
+t/01-service-Default.t
+t/02-rest-transport-Connectors.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

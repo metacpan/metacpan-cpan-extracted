@@ -3,7 +3,7 @@ package Web::VWF::Display::table;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.003.1');
+use version; our $VERSION = version->declare('0.004.1');
 
 use CGI::Info;
 use Config::Auto;
@@ -190,7 +190,7 @@ Web::VWF::Display::table - Read a small flat file for a page or its template
 
 =head1 VERSION
 
-Version 0.003.1
+Version 0.004.1
 
 =head1 DESCRIPTION
 

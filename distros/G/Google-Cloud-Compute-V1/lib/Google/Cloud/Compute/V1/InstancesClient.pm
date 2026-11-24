@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -1858,207 +1858,1632 @@ The following RPC methods are available in this client:
 
 =item * B<add_access_config>
 
-Calls the RPC method C<AddAccessConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_access_config(
+        access_config_resource   => $access_config_resource,
+        instance                 => $instance,
+        network_interface        => $network_interface,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<AddAccessConfig> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddAccessConfigInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<access_config_resource> - L<Google::Cloud::Compute::V1::Compute::AccessConfig>
+
+=item * C<instance> - C<string>
+
+=item * C<network_interface> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<add_network_interface>
 
-Calls the RPC method C<AddNetworkInterface> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_network_interface(
+        instance                 => $instance,
+        network_interface_resource => $network_interface_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<AddNetworkInterface> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddNetworkInterfaceInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<network_interface_resource> - L<Google::Cloud::Compute::V1::Compute::NetworkInterface>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<add_resource_policies>
 
-Calls the RPC method C<AddResourcePolicies> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_resource_policies(
+        instance                 => $instance,
+        instances_add_resource_policies_request_resource => $instances_add_resource_policies_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<AddResourcePolicies> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddResourcePoliciesInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_add_resource_policies_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesAddResourcePoliciesRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<aggregated_list>
 
-Calls the RPC method C<AggregatedList> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list(
+        filter                   => $filter,
+        include_all_scopes       => $include_all_scopes,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        service_project_number   => $service_project_number,
+    );
+
+Calls the RPC method C<AggregatedList> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AggregatedListInstancesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceAggregatedList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<include_all_scopes> - C<bool>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<service_project_number> - C<int64>
+
+=back
 
 =item * B<attach_disk>
 
-Calls the RPC method C<AttachDisk> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->attach_disk(
+        attached_disk_resource   => $attached_disk_resource,
+        force_attach             => $force_attach,
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<AttachDisk> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AttachDiskInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<attached_disk_resource> - L<Google::Cloud::Compute::V1::Compute::AttachedDisk>
+
+=item * C<force_attach> - C<bool>
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<bulk_insert>
 
-Calls the RPC method C<BulkInsert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->bulk_insert(
+        bulk_insert_instance_resource_resource => $bulk_insert_instance_resource_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<BulkInsert> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::BulkInsertInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<bulk_insert_instance_resource_resource> - L<Google::Cloud::Compute::V1::Compute::BulkInsertInstanceResource>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        instance                 => $instance,
+        no_graceful_shutdown     => $no_graceful_shutdown,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<no_graceful_shutdown> - C<bool>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<delete_access_config>
 
-Calls the RPC method C<DeleteAccessConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_access_config(
+        access_config            => $access_config,
+        instance                 => $instance,
+        network_interface        => $network_interface,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<DeleteAccessConfig> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteAccessConfigInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<access_config> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<network_interface> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<delete_network_interface>
 
-Calls the RPC method C<DeleteNetworkInterface> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_network_interface(
+        instance                 => $instance,
+        network_interface_name   => $network_interface_name,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<DeleteNetworkInterface> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteNetworkInterfaceInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<network_interface_name> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<detach_disk>
 
-Calls the RPC method C<DetachDisk> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->detach_disk(
+        device_name              => $device_name,
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<DetachDisk> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DetachDiskInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<device_name> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        instance                 => $instance,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Instance>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get_effective_firewalls>
 
-Calls the RPC method C<GetEffectiveFirewalls> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_effective_firewalls(
+        instance                 => $instance,
+        network_interface        => $network_interface,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<GetEffectiveFirewalls> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetEffectiveFirewallsInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstancesGetEffectiveFirewallsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<network_interface> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get_guest_attributes>
 
-Calls the RPC method C<GetGuestAttributes> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_guest_attributes(
+        instance                 => $instance,
+        project                  => $project,
+        query_path               => $query_path,
+        variable_key             => $variable_key,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<GetGuestAttributes> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetGuestAttributesInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::GuestAttributes>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<query_path> - C<string>
+
+=item * C<variable_key> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get_iam_policy>
 
-Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_iam_policy(
+        options_requested_policy_version => $options_requested_policy_version,
+        project                  => $project,
+        resource                 => $resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<GetIamPolicy> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetIamPolicyInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<options_requested_policy_version> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get_screenshot>
 
-Calls the RPC method C<GetScreenshot> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_screenshot(
+        instance                 => $instance,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<GetScreenshot> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetScreenshotInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Screenshot>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get_serial_port_output>
 
-Calls the RPC method C<GetSerialPortOutput> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_serial_port_output(
+        instance                 => $instance,
+        port                     => $port,
+        project                  => $project,
+        start                    => $start,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<GetSerialPortOutput> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetSerialPortOutputInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SerialPortOutput>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<port> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<start> - C<int64>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get_shielded_instance_identity>
 
-Calls the RPC method C<GetShieldedInstanceIdentity> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_shielded_instance_identity(
+        instance                 => $instance,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<GetShieldedInstanceIdentity> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetShieldedInstanceIdentityInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ShieldedInstanceIdentity>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        instance_resource        => $instance_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        source_instance_template => $source_instance_template,
+        source_machine_image     => $source_machine_image,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_resource> - L<Google::Cloud::Compute::V1::Compute::Instance>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<source_instance_template> - C<string>
+
+=item * C<source_machine_image> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListInstancesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<list_referrers>
 
-Calls the RPC method C<ListReferrers> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_referrers(
+        filter                   => $filter,
+        instance                 => $instance,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<ListReferrers> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListReferrersInstancesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceListReferrers>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<perform_maintenance>
 
-Calls the RPC method C<PerformMaintenance> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->perform_maintenance(
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<PerformMaintenance> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PerformMaintenanceInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<remove_resource_policies>
 
-Calls the RPC method C<RemoveResourcePolicies> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->remove_resource_policies(
+        instance                 => $instance,
+        instances_remove_resource_policies_request_resource => $instances_remove_resource_policies_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<RemoveResourcePolicies> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RemoveResourcePoliciesInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_remove_resource_policies_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesRemoveResourcePoliciesRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<report_host_as_faulty>
 
-Calls the RPC method C<ReportHostAsFaulty> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->report_host_as_faulty(
+        instance                 => $instance,
+        instances_report_host_as_faulty_request_resource => $instances_report_host_as_faulty_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<ReportHostAsFaulty> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ReportHostAsFaultyInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_report_host_as_faulty_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesReportHostAsFaultyRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<reset>
 
-Calls the RPC method C<Reset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->reset(
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Reset> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ResetInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<resume>
 
-Calls the RPC method C<Resume> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->resume(
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Resume> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ResumeInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<send_diagnostic_interrupt>
 
-Calls the RPC method C<SendDiagnosticInterrupt> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->send_diagnostic_interrupt(
+        instance                 => $instance,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SendDiagnosticInterrupt> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SendDiagnosticInterruptInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SendDiagnosticInterruptInstanceResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_deletion_protection>
 
-Calls the RPC method C<SetDeletionProtection> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_deletion_protection(
+        deletion_protection      => $deletion_protection,
+        project                  => $project,
+        request_id               => $request_id,
+        resource                 => $resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetDeletionProtection> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetDeletionProtectionInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<deletion_protection> - C<bool>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_disk_auto_delete>
 
-Calls the RPC method C<SetDiskAutoDelete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_disk_auto_delete(
+        auto_delete              => $auto_delete,
+        device_name              => $device_name,
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetDiskAutoDelete> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetDiskAutoDeleteInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<auto_delete> - C<bool>
+
+=item * C<device_name> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_iam_policy>
 
-Calls the RPC method C<SetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_iam_policy(
+        project                  => $project,
+        resource                 => $resource,
+        zone                     => $zone,
+        zone_set_policy_request_resource => $zone_set_policy_request_resource,
+    );
+
+Calls the RPC method C<SetIamPolicy> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetIamPolicyInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<zone> - C<string>
+
+=item * C<zone_set_policy_request_resource> - L<Google::Cloud::Compute::V1::Compute::ZoneSetPolicyRequest>
+
+=back
 
 =item * B<set_labels>
 
-Calls the RPC method C<SetLabels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_labels(
+        instance                 => $instance,
+        instances_set_labels_request_resource => $instances_set_labels_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetLabels> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetLabelsInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_set_labels_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesSetLabelsRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_machine_resources>
 
-Calls the RPC method C<SetMachineResources> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_machine_resources(
+        instance                 => $instance,
+        instances_set_machine_resources_request_resource => $instances_set_machine_resources_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetMachineResources> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetMachineResourcesInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_set_machine_resources_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesSetMachineResourcesRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_machine_type>
 
-Calls the RPC method C<SetMachineType> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_machine_type(
+        instance                 => $instance,
+        instances_set_machine_type_request_resource => $instances_set_machine_type_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetMachineType> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetMachineTypeInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_set_machine_type_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesSetMachineTypeRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_metadata>
 
-Calls the RPC method C<SetMetadata> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_metadata(
+        instance                 => $instance,
+        metadata_resource        => $metadata_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetMetadata> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetMetadataInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<metadata_resource> - L<Google::Cloud::Compute::V1::Compute::Metadata>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_min_cpu_platform>
 
-Calls the RPC method C<SetMinCpuPlatform> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_min_cpu_platform(
+        instance                 => $instance,
+        instances_set_min_cpu_platform_request_resource => $instances_set_min_cpu_platform_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetMinCpuPlatform> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetMinCpuPlatformInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_set_min_cpu_platform_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesSetMinCpuPlatformRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_name>
 
-Calls the RPC method C<SetName> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_name(
+        instance                 => $instance,
+        instances_set_name_request_resource => $instances_set_name_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetName> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetNameInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_set_name_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesSetNameRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_scheduling>
 
-Calls the RPC method C<SetScheduling> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_scheduling(
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        scheduling_resource      => $scheduling_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetScheduling> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetSchedulingInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<scheduling_resource> - L<Google::Cloud::Compute::V1::Compute::Scheduling>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_security_policy>
 
-Calls the RPC method C<SetSecurityPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_security_policy(
+        instance                 => $instance,
+        instances_set_security_policy_request_resource => $instances_set_security_policy_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetSecurityPolicy> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetSecurityPolicyInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_set_security_policy_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesSetSecurityPolicyRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_service_account>
 
-Calls the RPC method C<SetServiceAccount> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_service_account(
+        instance                 => $instance,
+        instances_set_service_account_request_resource => $instances_set_service_account_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetServiceAccount> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetServiceAccountInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_set_service_account_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesSetServiceAccountRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_shielded_instance_integrity_policy>
 
-Calls the RPC method C<SetShieldedInstanceIntegrityPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_shielded_instance_integrity_policy(
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        shielded_instance_integrity_policy_resource => $shielded_instance_integrity_policy_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetShieldedInstanceIntegrityPolicy> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetShieldedInstanceIntegrityPolicyInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<shielded_instance_integrity_policy_resource> - L<Google::Cloud::Compute::V1::Compute::ShieldedInstanceIntegrityPolicy>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_tags>
 
-Calls the RPC method C<SetTags> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_tags(
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        tags_resource            => $tags_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SetTags> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetTagsInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<tags_resource> - L<Google::Cloud::Compute::V1::Compute::Tags>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<simulate_maintenance_event>
 
-Calls the RPC method C<SimulateMaintenanceEvent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->simulate_maintenance_event(
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        with_extended_notifications => $with_extended_notifications,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<SimulateMaintenanceEvent> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SimulateMaintenanceEventInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<with_extended_notifications> - C<bool>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<start>
 
-Calls the RPC method C<Start> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start(
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Start> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::StartInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<start_with_encryption_key>
 
-Calls the RPC method C<StartWithEncryptionKey> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start_with_encryption_key(
+        instance                 => $instance,
+        instances_start_with_encryption_key_request_resource => $instances_start_with_encryption_key_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<StartWithEncryptionKey> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::StartWithEncryptionKeyInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<instances_start_with_encryption_key_request_resource> - L<Google::Cloud::Compute::V1::Compute::InstancesStartWithEncryptionKeyRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<stop>
 
-Calls the RPC method C<Stop> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stop(
+        discard_local_ssd        => $discard_local_ssd,
+        instance                 => $instance,
+        no_graceful_shutdown     => $no_graceful_shutdown,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Stop> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::StopInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<discard_local_ssd> - C<bool>
+
+=item * C<instance> - C<string>
+
+=item * C<no_graceful_shutdown> - C<bool>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<suspend>
 
-Calls the RPC method C<Suspend> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->suspend(
+        discard_local_ssd        => $discard_local_ssd,
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Suspend> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SuspendInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<discard_local_ssd> - C<bool>
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<update>
 
-Calls the RPC method C<Update> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update(
+        discard_local_ssd        => $discard_local_ssd,
+        instance                 => $instance,
+        instance_resource        => $instance_resource,
+        minimal_action           => $minimal_action,
+        most_disruptive_allowed_action => $most_disruptive_allowed_action,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Update> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<discard_local_ssd> - C<bool>
+
+=item * C<instance> - C<string>
+
+=item * C<instance_resource> - L<Google::Cloud::Compute::V1::Compute::Instance>
+
+=item * C<minimal_action> - C<string>
+
+=item * C<most_disruptive_allowed_action> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<update_access_config>
 
-Calls the RPC method C<UpdateAccessConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_access_config(
+        access_config_resource   => $access_config_resource,
+        instance                 => $instance,
+        network_interface        => $network_interface,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<UpdateAccessConfig> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateAccessConfigInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<access_config_resource> - L<Google::Cloud::Compute::V1::Compute::AccessConfig>
+
+=item * C<instance> - C<string>
+
+=item * C<network_interface> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<update_display_device>
 
-Calls the RPC method C<UpdateDisplayDevice> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_display_device(
+        display_device_resource  => $display_device_resource,
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<UpdateDisplayDevice> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateDisplayDeviceInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<display_device_resource> - L<Google::Cloud::Compute::V1::Compute::DisplayDevice>
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<update_network_interface>
 
-Calls the RPC method C<UpdateNetworkInterface> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_network_interface(
+        instance                 => $instance,
+        network_interface        => $network_interface,
+        network_interface_resource => $network_interface_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<UpdateNetworkInterface> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateNetworkInterfaceInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<network_interface> - C<string>
+
+=item * C<network_interface_resource> - L<Google::Cloud::Compute::V1::Compute::NetworkInterface>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<update_shielded_instance_config>
 
-Calls the RPC method C<UpdateShieldedInstanceConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_shielded_instance_config(
+        instance                 => $instance,
+        project                  => $project,
+        request_id               => $request_id,
+        shielded_instance_config_resource => $shielded_instance_config_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<UpdateShieldedInstanceConfig> on C<google.cloud.compute.v1.Instances>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateShieldedInstanceConfigInstanceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<shielded_instance_config_resource> - L<Google::Cloud::Compute::V1::Compute::ShieldedInstanceConfig>
+
+=item * C<zone> - C<string>
+
+=back
 
 =back
 

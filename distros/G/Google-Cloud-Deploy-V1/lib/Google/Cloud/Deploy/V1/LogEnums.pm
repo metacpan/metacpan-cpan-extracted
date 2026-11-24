@@ -1,0 +1,83 @@
+package Google::Cloud::Deploy::V1::LogEnums;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+CiZnb29nbGUvY2xvdWQvZGVwbG95L3YxL2xvZ19lbnVtcy5wcm90bxIWZ29vZ2xlLmNsb3Vk
+LmRlcGxveS52MSqWAgoEVHlwZRIUChBUWVBFX1VOU1BFQ0lGSUVEEAASJAogVFlQRV9QVUJT
+VUJfTk9USUZJQ0FUSU9OX0ZBSUxVUkUQARIeChpUWVBFX1JFU09VUkNFX1NUQVRFX0NIQU5H
+RRADEhgKFFRZUEVfUFJPQ0VTU19BQk9SVEVEEAQSHQoZVFlQRV9SRVNUUklDVElPTl9WSU9M
+QVRFRBAFEhkKFVRZUEVfUkVTT1VSQ0VfREVMRVRFRBAGEhcKE1RZUEVfUk9MTE9VVF9VUERB
+VEUQBxIhCh1UWVBFX0RFUExPWV9QT0xJQ1lfRVZBTFVBVElPThAIEiIKGlRZUEVfUkVOREVS
+X1NUQVRVRVNfQ0hBTkdFEAIaAggBQmEKGmNvbS5nb29nbGUuY2xvdWQuZGVwbG95LnYxQg1M
+b2dFbnVtc1Byb3RvUAFaMmNsb3VkLmdvb2dsZS5jb20vZ28vZGVwbG95L2FwaXYxL2RlcGxv
+eXBiO2RlcGxveXBiSrsLCgYSBA4AMwEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNSBH
+b29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9u
+IDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2Vw
+dCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNv
+cHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vu
+c2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9y
+IGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhl
+IExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQg
+V0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBv
+ciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2Ug
+Z292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vu
+c2UuCgoICgECEgMQAB8KCAoBCBIDEgBJCgkKAggLEgMSAEkKCAoBCBIDEwAiCgkKAggKEgMT
+ACIKCAoBCBIDFAAuCgkKAggIEgMUAC4KCAoBCBIDFQAzCgkKAggBEgMVADMKUwoCBQASBBgA
+MwEaRyBUeXBlIGluZGljYXRlcyB0aGUgdHlwZSBvZiB0aGUgbG9nIGVudHJ5IGFuZCBjYW4g
+YmUgdXNlZCBhcyBhIGZpbHRlci4KCgoKAwUAARIDGAUJCiMKBAUAAgASAxoCFxoWIFR5cGUg
+aXMgdW5zcGVjaWZpZWQuCgoMCgUFAAIAARIDGgISCgwKBQUAAgACEgMaFRYKOAoEBQACARID
+HQInGisgQSBQdWIvU3ViIG5vdGlmaWNhdGlvbiBmYWlsZWQgdG8gYmUgc2VudC4KCgwKBQUA
+AgEBEgMdAiIKDAoFBQACAQISAx0lJgomCgQFAAICEgMgAiEaGSBSZXNvdXJjZSBzdGF0ZSBj
+aGFuZ2VkLgoKDAoFBQACAgESAyACHAoMCgUFAAICAhIDIB8gCiEKBAUAAgMSAyMCGxoUIEEg
+cHJvY2VzcyBhYm9ydGVkLgoKDAoFBQACAwESAyMCFgoMCgUFAAIDAhIDIxkaCigKBAUAAgQS
+AyYCIBobIFJlc3RyaWN0aW9uIGNoZWNrIGZhaWxlZC4KCgwKBQUAAgQBEgMmAhsKDAoFBQAC
+BAISAyYeHwogCgQFAAIFEgMpAhwaEyBSZXNvdXJjZSBkZWxldGVkLgoKDAoFBQACBQESAykC
+FwoMCgUFAAIFAhIDKRobCh8KBAUAAgYSAywCGhoSIFJvbGxvdXQgdXBkYXRlZC4KCgwKBQUA
+AgYBEgMsAhUKDAoFBQACBgISAywYGQooCgQFAAIHEgMvAiQaGyBEZXBsb3kgUG9saWN5IGV2
+YWx1YXRpb24uCgoMCgUFAAIHARIDLwIfCgwKBQUAAgcCEgMvIiMKWQoEBQACCBIDMgI1Gkwg
+RGVwcmVjYXRlZDogVGhpcyBmaWVsZCBpcyBuZXZlciB1c2VkLiBVc2UgcmVsZWFzZV9yZW5k
+ZXIgbG9nIHR5cGUgaW5zdGVhZC4KCgwKBQUAAggBEgMyAhwKDAoFBQACCAISAzIfIAoMCgUF
+AAIIAxIDMiE0Cg0KBgUAAggDARIDMiIzYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Deploy::V1::LogEnums - Compiled Protocol Buffers messages for google/cloud/deploy/v1/log_enums.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/deploy/v1/log_enums.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Deploy::V1::LogEnums::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

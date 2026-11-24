@@ -1,0 +1,338 @@
+package Google::Cloud::Ces::V1::WidgetTool;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Cloud::Ces::V1::PythonFunction };
+    eval { require Google::Cloud::Ces::V1::Schema };
+    eval { require Google::Protobuf::Struct };
+    my $descriptor_b64 = <<'EOF';
+CiVnb29nbGUvY2xvdWQvY2VzL3YxL3dpZGdldF90b29sLnByb3RvEhNnb29nbGUuY2xvdWQu
+Y2VzLnYxGh9nb29nbGUvYXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvGilnb29nbGUvY2xvdWQv
+Y2VzL3YxL3B5dGhvbl9mdW5jdGlvbi5wcm90bxogZ29vZ2xlL2Nsb3VkL2Nlcy92MS9zY2hl
+bWEucHJvdG8aHGdvb2dsZS9wcm90b2J1Zi9zdHJ1Y3QucHJvdG8ipAwKCldpZGdldFRvb2wS
+QgoKcGFyYW1ldGVycxgEIAEoCzIbLmdvb2dsZS5jbG91ZC5jZXMudjEuU2NoZW1hQgPgQQFI
+AFIKcGFyYW1ldGVycxIXCgRuYW1lGAEgASgJQgPgQQJSBG5hbWUSJQoLZGVzY3JpcHRpb24Y
+AiABKAlCA+BBAVILZGVzY3JpcHRpb24SUAoLd2lkZ2V0X3R5cGUYAyABKA4yKi5nb29nbGUu
+Y2xvdWQuY2VzLnYxLldpZGdldFRvb2wuV2lkZ2V0VHlwZUID4EEBUgp3aWRnZXRUeXBlEjkK
+CXVpX2NvbmZpZxgFIAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3RCA+BBAVIIdWlDb25m
+aWcSUwoMZGF0YV9tYXBwaW5nGAYgASgLMisuZ29vZ2xlLmNsb3VkLmNlcy52MS5XaWRnZXRU
+b29sLkRhdGFNYXBwaW5nQgPgQQFSC2RhdGFNYXBwaW5nEmkKFHRleHRfcmVzcG9uc2VfY29u
+ZmlnGAcgASgLMjIuZ29vZ2xlLmNsb3VkLmNlcy52MS5XaWRnZXRUb29sLlRleHRSZXNwb25z
+ZUNvbmZpZ0ID4EEBUhJ0ZXh0UmVzcG9uc2VDb25maWcalAIKElRleHRSZXNwb25zZUNvbmZp
+ZxJQCgR0eXBlGAEgASgOMjcuZ29vZ2xlLmNsb3VkLmNlcy52MS5XaWRnZXRUb29sLlRleHRS
+ZXNwb25zZUNvbmZpZy5UeXBlQgPgQQFSBHR5cGUSJAoLc3RhdGljX3RleHQYAiABKAlCA+BB
+AVIKc3RhdGljVGV4dBI/Chl0ZXh0X3Jlc3BvbnNlX2luc3RydWN0aW9uGAMgASgJQgPgQQFS
+F3RleHRSZXNwb25zZUluc3RydWN0aW9uIkUKBFR5cGUSFAoQVFlQRV9VTlNQRUNJRklFRBAA
+EggKBE5PTkUQARIRCg1MTE1fR0VORVJBVEVEEAISCgoGU1RBVElDEAMa9QMKC0RhdGFNYXBw
+aW5nEi0KEHNvdXJjZV90b29sX25hbWUYASABKAlCA+BBAVIOc291cmNlVG9vbE5hbWUSagoO
+ZmllbGRfbWFwcGluZ3MYAiADKAsyPi5nb29nbGUuY2xvdWQuY2VzLnYxLldpZGdldFRvb2wu
+RGF0YU1hcHBpbmcuRmllbGRNYXBwaW5nc0VudHJ5QgPgQQFSDWZpZWxkTWFwcGluZ3MSUQoP
+cHl0aG9uX2Z1bmN0aW9uGAUgASgLMiMuZ29vZ2xlLmNsb3VkLmNlcy52MS5QeXRob25GdW5j
+dGlvbkID4EEBUg5weXRob25GdW5jdGlvbhJJCgRtb2RlGAQgASgOMjAuZ29vZ2xlLmNsb3Vk
+LmNlcy52MS5XaWRnZXRUb29sLkRhdGFNYXBwaW5nLk1vZGVCA+BBAVIEbW9kZRInCg1weXRo
+b25fc2NyaXB0GAMgASgJQgIYAVIMcHl0aG9uU2NyaXB0GkAKEkZpZWxkTWFwcGluZ3NFbnRy
+eRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoCVIFdmFsdWU6AjgBIkIKBE1vZGUS
+FAoQTU9ERV9VTlNQRUNJRklFRBAAEhEKDUZJRUxEX01BUFBJTkcQARIRCg1QWVRIT05fU0NS
+SVBUEAIirAIKCldpZGdldFR5cGUSGwoXV0lER0VUX1RZUEVfVU5TUEVDSUZJRUQQABIKCgZD
+VVNUT00QARIUChBQUk9EVUNUX0NBUk9VU0VMEAISEwoPUFJPRFVDVF9ERVRBSUxTEAMSEQoN
+UVVJQ0tfQUNUSU9OUxAEEhYKElBST0RVQ1RfQ09NUEFSSVNPThAFEhwKGEFEVkFOQ0VEX1BS
+T0RVQ1RfREVUQUlMUxAGEg4KClNIT1JUX0ZPUk0QBxIYChRPVkVSQUxMX1NBVElTRkFDVElP
+ThAIEhEKDU9SREVSX1NVTU1BUlkQCRIXChNBUFBPSU5UTUVOVF9ERVRBSUxTEAoSGQoVQVBQ
+T0lOVE1FTlRfU0NIRURVTEVSEAsSEAoMQ09OVEFDVF9GT1JNEAxCBwoFaW5wdXRCVwoXY29t
+Lmdvb2dsZS5jbG91ZC5jZXMudjFCD1dpZGdldFRvb2xQcm90b1ABWiljbG91ZC5nb29nbGUu
+Y29tL2dvL2Nlcy9hcGl2MS9jZXNwYjtjZXNwYkqyLwoHEgUOAKkBAQq8BAoBDBIDDgASMrEE
+IENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hl
+IExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVz
+ZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlv
+dSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3
+LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkg
+YXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0
+cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMi
+IEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQs
+IGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBz
+cGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9u
+cyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAHAoJCgIDABIDEgApCgkKAgMBEgMTADMK
+CQoCAwISAxQAKgoJCgIDAxIDFQAmCggKAQgSAxcAQAoJCgIICxIDFwBACggKAQgSAxgAIgoJ
+CgIIChIDGAAiCggKAQgSAxkAMAoJCgIICBIDGQAwCggKAQgSAxoAMAoJCgIIARIDGgAwCpsC
+CgIEABIFIACpAQEajQIgUmVwcmVzZW50cyBhIHdpZGdldCB0b29sIHRoYXQgdGhlIGFnZW50
+IGNhbiBpbnZva2UuIFdoZW4gdGhlIHRvb2wgaXMgY2hvc2VuCiBieSB0aGUgYWdlbnQsIGFn
+ZW50IHdpbGwgcmV0dXJuIHRoZSB3aWRnZXQgdG8gdGhlIGNsaWVudC4gVGhlIGNsaWVudCBp
+cwogcmVzcG9uc2libGUgZm9yIHByb2Nlc3NpbmcgdGhlIHdpZGdldCBhbmQgZ2VuZXJhdGlu
+ZyB0aGUgbmV4dCB1c2VyIHF1ZXJ5IHRvCiBjb250aW51ZSB0aGUgaW50ZXJhY3Rpb24gd2l0
+aCB0aGUgYWdlbnQuCgoKCgMEAAESAyAIEgpNCgQEAAMAEgQiAj4DGj8gQ29uZmlndXJhdGlv
+biBmb3IgdGhlIHRleHQgcmVzcG9uc2UgcmV0dXJuZWQgd2l0aCB0aGUgd2lkZ2V0LgoKDAoF
+BAADAAESAyIKHAo8CgYEAAMABAASBCQEMQUaLCBEZWZpbmVzIGhvdyB0aGUgdGV4dCByZXNw
+b25zZSBpcyBwcm9kdWNlZC4KCg4KBwQAAwAEAAESAyQJDQokCggEAAMABAACABIDJgYbGhMg
+VW5zcGVjaWZpZWQgdHlwZS4KChAKCQQAAwAEAAIAARIDJgYWChAKCQQAAwAEAAIAAhIDJhka
+CosBCggEAAMABAACARIDKgYPGnogVGhlIExMTSBkeW5hbWljYWxseSBkZWNpZGVzIHdoZXRo
+ZXIgdG8gZ2VuZXJhdGUgYSB0ZXh0IHJlc3BvbnNlCiBhbG9uZ3NpZGUgdGhlIHdpZGdldCBi
+YXNlZCBvbiB0aGUgY29udmVyc2F0aW9uIGNvbnRleHQuCgoQCgkEAAMABAACAQESAyoGCgoQ
+CgkEAAMABAACAQISAyoNDgpOCggEAAMABAACAhIDLQYYGj0gVGhlIExMTSBpcyBleHBsaWNp
+dGx5IHJlcXVpcmVkIHRvIGdlbmVyYXRlIGEgdGV4dCByZXNwb25zZS4KChAKCQQAAwAEAAIC
+ARIDLQYTChAKCQQAAwAEAAICAhIDLRYXCkUKCAQAAwAEAAIDEgMwBhEaNCBBIHByZS1kZWZp
+bmVkIHN0YXRpYyB0ZXh0IHJlc3BvbnNlIGlzIGFsd2F5cyB1c2VkLgoKEAoJBAADAAQAAgMB
+EgMwBgwKEAoJBAADAAQAAgMCEgMwDxAKSAoGBAADAAIAEgM0BDsaOSBPcHRpb25hbC4gVGhl
+IHN0cmF0ZWd5IGZvciBwcm92aWRpbmcgdGhlIHRleHQgcmVzcG9uc2UuCgoOCgcEAAMAAgAG
+EgM0BAgKDgoHBAADAAIAARIDNAkNCg4KBwQAAwACAAMSAzQQEQoOCgcEAAMAAgAIEgM0EjoK
+EQoKBAADAAIACJwIABIDNBM5ClIKBgQAAwACARIDNwREGkMgT3B0aW9uYWwuIFRoZSBzdGF0
+aWMgdGV4dCByZXNwb25zZSB0byByZXR1cm4gd2hlbiB0eXBlIGlzIFNUQVRJQy4KCg4KBwQA
+AwACAQUSAzcECgoOCgcEAAMAAgEBEgM3CxYKDgoHBAADAAIBAxIDNxkaCg4KBwQAAwACAQgS
+AzcbQwoRCgoEAAMAAgEInAgAEgM3HEIKrgEKBgQAAwACAhIEPAQ9MRqdASBPcHRpb25hbC4g
+SW5zdHJ1Y3Rpb24gZm9yIHRoZSBMTE0gb24gaG93IHRvIGdlbmVyYXRlIHRoZSB0ZXh0IHJl
+c3BvbnNlLgogVXNlZCBhcyB0aGUgZGVzY3JpcHRpb24gZm9yIHRoZSB0ZXh0IHJlc3BvbnNl
+IHBhcmFtZXRlciBpZiB0eXBlIGlzCiBMTE1fR0VORVJBVEVELgoKDgoHBAADAAICBRIDPAQK
+Cg4KBwQAAwACAgESAzwLJAoOCgcEAAMAAgIDEgM8JygKDgoHBAADAAICCBIDPQgwChEKCgQA
+AwACAgicCAASAz0JLwpkCgQEAAMBEgRCAmIDGlYgQ29uZmlndXJhdGlvbiBmb3IgbWFwcGlu
+ZyBkYXRhIGZyb20gYSBzb3VyY2UgdG9vbCB0byB0aGUgd2lkZ2V0J3MgaW5wdXQKIHBhcmFt
+ZXRlcnMuCgoMCgUEAAMBARIDQgoVClMKBgQAAwEEABIERARNBRpDIFRoZSBzdHJhdGVneSB1
+c2VkIHRvIG1hcCBkYXRhIGZyb20gdGhlIHNvdXJjZSB0b29sIHRvIHRoZSB3aWRnZXQuCgoO
+CgcEAAMBBAABEgNECQ0KJAoIBAADAQQAAgASA0YGGxoTIFVuc3BlY2lmaWVkIG1vZGUuCgoQ
+CgkEAAMBBAACAAESA0YGFgoQCgkEAAMBBAACAAISA0YZGgpICggEAAMBBAACARIDSQYYGjcg
+VXNlIHRoZSBgZmllbGRfbWFwcGluZ3NgIG1hcCBmb3IgZGF0YSB0cmFuc2Zvcm1hdGlvbi4K
+ChAKCQQAAwEEAAIBARIDSQYTChAKCQQAAwEEAAIBAhIDSRYXCkMKCAQAAwEEAAICEgNMBhga
+MiBVc2UgdGhlIGBweXRob25fc2NyaXB0YCBmb3IgZGF0YSB0cmFuc2Zvcm1hdGlvbi4KChAK
+CQQAAwEEAAICARIDTAYTChAKCQQAAwEEAAICAhIDTBYXCtsBCgYEAAMBAgASA1IESRrLASBP
+cHRpb25hbC4gVGhlIHJlc291cmNlIG5hbWUgb2YgdGhlIHRvb2wgdGhhdCBwcm92aWRlcyB0
+aGUgZGF0YSBmb3IgdGhlCiB3aWRnZXQgKGUuZy4sIGEgc2VhcmNoIHRvb2wgb3IgYSBjdXN0
+b20gZnVuY3Rpb24pLiBGb3JtYXQ6CiBgcHJvamVjdHMve3Byb2plY3R9L2xvY2F0aW9ucy97
+bG9jYXRpb259L2FnZW50cy97YWdlbnR9L3Rvb2xzL3t0b29sfWAKCg4KBwQAAwECAAUSA1IE
+CgoOCgcEAAMBAgABEgNSCxsKDgoHBAADAQIAAxIDUh4fCg4KBwQAAwECAAgSA1IgSAoRCgoE
+AAMBAgAInAgAEgNSIUcKegoGBAADAQIBEgRWBFcxGmogT3B0aW9uYWwuIEEgbWFwIG9mIHdp
+ZGdldCBpbnB1dCBwYXJhbWV0ZXIgZmllbGRzIHRvIHRoZSBjb3JyZXNwb25kaW5nCiBvdXRw
+dXQgZmllbGRzIG9mIHRoZSBzb3VyY2UgdG9vbC4KCg4KBwQAAwECAQYSA1YEFwoOCgcEAAMB
+AgEBEgNWGCYKDgoHBAADAQIBAxIDVikqCg4KBwQAAwECAQgSA1cIMAoRCgoEAAMBAgEInAgA
+EgNXCS8KigEKBgQAAwECAhIDWwRQGnsgT3B0aW9uYWwuIENvbmZpZ3VyYXRpb24gZm9yIGEg
+UHl0aG9uIGZ1bmN0aW9uIHVzZWQgdG8gdHJhbnNmb3JtIHRoZQogc291cmNlIHRvb2wncyBv
+dXRwdXQgaW50byB0aGUgd2lkZ2V0J3MgaW5wdXQgZm9ybWF0LgoKDgoHBAADAQICBhIDWwQS
+Cg4KBwQAAwECAgESA1sTIgoOCgcEAAMBAgIDEgNbJSYKDgoHBAADAQICCBIDWydPChEKCgQA
+AwECAgicCAASA1soTgo4CgYEAAMBAgMSA14EOxopIE9wdGlvbmFsLiBUaGUgbW9kZSBvZiB0
+aGUgZGF0YSBtYXBwaW5nLgoKDgoHBAADAQIDBhIDXgQICg4KBwQAAwECAwESA14JDQoOCgcE
+AAMBAgMDEgNeEBEKDgoHBAADAQIDCBIDXhI6ChEKCgQAAwECAwicCAASA14TOQo7CgYEAAMB
+AgQSA2EEMRosIERlcHJlY2F0ZWQ6IFVzZSBgcHl0aG9uX2Z1bmN0aW9uYCBpbnN0ZWFkLgoK
+DgoHBAADAQIEBRIDYQQKCg4KBwQAAwECBAESA2ELGAoOCgcEAAMBAgQDEgNhGxwKDgoHBAAD
+AQIECBIDYR0wCg8KCAQAAwECBAgDEgNhHi8KYQoEBAAEABIFZgKNAQMaUiBBbGwgYXZhaWxh
+YmxlIHdpZGdldCB0eXBlcy4KIE5ldyB2YWx1ZXMgbWF5IGJlIGFkZGVkIHRvIHRoaXMgZW51
+bSBpbiB0aGUgZnV0dXJlLgoKDAoFBAAEAAESA2YHEQopCgYEAAQAAgASA2gEIBoaIFVuc3Bl
+Y2lmaWVkIHdpZGdldCB0eXBlLgoKDgoHBAAEAAIAARIDaAQbCg4KBwQABAACAAISA2geHwok
+CgYEAAQAAgESA2sEDxoVIEN1c3RvbSB3aWRnZXQgdHlwZS4KCg4KBwQABAACAQESA2sECgoO
+CgcEAAQAAgECEgNrDQ4KKQoGBAAEAAICEgNuBBkaGiBQcm9kdWN0IGNhcm91c2VsIHdpZGdl
+dC4KCg4KBwQABAACAgESA24EFAoOCgcEAAQAAgICEgNuFxgKKAoGBAAEAAIDEgNxBBgaGSBQ
+cm9kdWN0IGRldGFpbHMgd2lkZ2V0LgoKDgoHBAAEAAIDARIDcQQTCg4KBwQABAACAwISA3EW
+FwomCgYEAAQAAgQSA3QEFhoXIFF1aWNrIGFjdGlvbnMgd2lkZ2V0LgoKDgoHBAAEAAIEARID
+dAQRCg4KBwQABAACBAISA3QUFQorCgYEAAQAAgUSA3cEGxocIFByb2R1Y3QgY29tcGFyaXNv
+biB3aWRnZXQuCgoOCgcEAAQAAgUBEgN3BBYKDgoHBAAEAAIFAhIDdxkaCjEKBgQABAACBhID
+egQhGiIgQWR2YW5jZWQgcHJvZHVjdCBkZXRhaWxzIHdpZGdldC4KCg4KBwQABAACBgESA3oE
+HAoOCgcEAAQAAgYCEgN6HyAKIwoGBAAEAAIHEgN9BBMaFCBTaG9ydCBmb3JtIHdpZGdldC4K
+Cg4KBwQABAACBwESA30EDgoOCgcEAAQAAgcCEgN9ERIKLgoGBAAEAAIIEgSAAQQdGh4gT3Zl
+cmFsbCBzYXRpc2ZhY3Rpb24gd2lkZ2V0LgoKDwoHBAAEAAIIARIEgAEEGAoPCgcEAAQAAggC
+EgSAARscCicKBgQABAACCRIEgwEEFhoXIE9yZGVyIHN1bW1hcnkgd2lkZ2V0LgoKDwoHBAAE
+AAIJARIEgwEEEQoPCgcEAAQAAgkCEgSDARQVCi0KBgQABAACChIEhgEEHRodIEFwcG9pbnRt
+ZW50IGRldGFpbHMgd2lkZ2V0LgoKDwoHBAAEAAIKARIEhgEEFwoPCgcEAAQAAgoCEgSGARoc
+Ci8KBgQABAACCxIEiQEEHxofIEFwcG9pbnRtZW50IHNjaGVkdWxlciB3aWRnZXQuCgoPCgcE
+AAQAAgsBEgSJAQQZCg8KBwQABAACCwISBIkBHB4KJgoGBAAEAAIMEgSMAQQWGhYgQ29udGFj
+dCBmb3JtIHdpZGdldC4KCg8KBwQABAACDAESBIwBBBAKDwoHBAAEAAIMAhIEjAETFQovCgQE
+AAgAEgaQAQKTAQMaHyBUaGUgaW5wdXQgb2YgdGhlIHdpZGdldCB0b29sLgoKDQoFBAAIAAES
+BJABCA0KQgoEBAACABIEkgEEQxo0IE9wdGlvbmFsLiBUaGUgaW5wdXQgcGFyYW1ldGVycyBv
+ZiB0aGUgd2lkZ2V0IHRvb2wuCgoNCgUEAAIABhIEkgEECgoNCgUEAAIAARIEkgELFQoNCgUE
+AAIAAxIEkgEYGQoNCgUEAAIACBIEkgEaQgoQCggEAAIACJwIABIEkgEbQQo+CgQEAAIBEgSW
+AQI7GjAgUmVxdWlyZWQuIFRoZSBkaXNwbGF5IG5hbWUgb2YgdGhlIHdpZGdldCB0b29sLgoK
+DQoFBAACAQUSBJYBAggKDQoFBAACAQESBJYBCQ0KDQoFBAACAQMSBJYBEBEKDQoFBAACAQgS
+BJYBEjoKEAoIBAACAQicCAASBJYBEzkKPQoEBAACAhIEmQECQhovIE9wdGlvbmFsLiBUaGUg
+ZGVzY3JpcHRpb24gb2YgdGhlIHdpZGdldCB0b29sLgoKDQoFBAACAgUSBJkBAggKDQoFBAAC
+AgESBJkBCRQKDQoFBAACAgMSBJkBFxgKDQoFBAACAggSBJkBGUEKEAoIBAACAgicCAASBJkB
+GkAKbgoEBAACAxIEnQECRhpgIE9wdGlvbmFsLiBUaGUgdHlwZSBvZiB0aGUgd2lkZ2V0IHRv
+b2wuIElmIG5vdCBzcGVjaWZpZWQsIHRoZSBkZWZhdWx0IHR5cGUKIHdpbGwgYmUgQ1VTVE9N
+SVpFRC4KCg0KBQQAAgMGEgSdAQIMCg0KBQQAAgMBEgSdAQ0YCg0KBQQAAgMDEgSdARscCg0K
+BQQAAgMIEgSdAR1FChAKCAQAAgMInAgAEgSdAR5ECkEKBAQAAgQSBKABAlAaMyBPcHRpb25h
+bC4gQ29uZmlndXJhdGlvbiBmb3IgcmVuZGVyaW5nIHRoZSB3aWRnZXQuCgoNCgUEAAIEBhIE
+oAECGAoNCgUEAAIEARIEoAEZIgoNCgUEAAIEAxIEoAElJgoNCgUEAAIECBIEoAEnTwoQCggE
+AAIECJwIABIEoAEoTgp7CgQEAAIFEgSkAQJIGm0gT3B0aW9uYWwuIFRoZSBtYXBwaW5nIHRo
+YXQgZGVmaW5lcyBob3cgZGF0YSBmcm9tIGEgc291cmNlIHRvb2wgaXMgbWFwcGVkIHRvCiB0
+aGUgd2lkZ2V0J3MgaW5wdXQgcGFyYW1ldGVycy4KCg0KBQQAAgUGEgSkAQINCg0KBQQAAgUB
+EgSkAQ4aCg0KBQQAAgUDEgSkAR0eCg0KBQQAAgUIEgSkAR9HChAKCAQAAgUInAgAEgSkASBG
+Ck0KBAQAAgYSBqcBAqgBLxo9IE9wdGlvbmFsLiBDb25maWd1cmF0aW9uIGZvciBhbHdheXMt
+aW5jbHVkZWQgdGV4dCByZXNwb25zZXMuCgoNCgUEAAIGBhIEpwECFAoNCgUEAAIGARIEpwEV
+KQoNCgUEAAIGAxIEpwEsLQoNCgUEAAIGCBIEqAEGLgoQCggEAAIGCJwIABIEqAEHLWIGcHJv
+dG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Ces::V1::WidgetTool::WidgetTool ===
+    # Fields for WidgetTool
+    # Field: parameters Type: 11 (.google.cloud.ces.v1.Schema)
+    # Field: name Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: widget_type Type: 14 (.google.cloud.ces.v1.WidgetTool.WidgetType)
+    # Field: ui_config Type: 11 (.google.protobuf.Struct)
+    # Field: data_mapping Type: 11 (.google.cloud.ces.v1.WidgetTool.DataMapping)
+    # Field: text_response_config Type: 11 (.google.cloud.ces.v1.WidgetTool.TextResponseConfig)
+
+# Enum: WidgetTool::WidgetType
+our $WidgetTool_WIDGET_TYPE_UNSPECIFIED = 0;
+our $WidgetTool_CUSTOM = 1;
+our $WidgetTool_PRODUCT_CAROUSEL = 2;
+our $WidgetTool_PRODUCT_DETAILS = 3;
+our $WidgetTool_QUICK_ACTIONS = 4;
+our $WidgetTool_PRODUCT_COMPARISON = 5;
+our $WidgetTool_ADVANCED_PRODUCT_DETAILS = 6;
+our $WidgetTool_SHORT_FORM = 7;
+our $WidgetTool_OVERALL_SATISFACTION = 8;
+our $WidgetTool_ORDER_SUMMARY = 9;
+our $WidgetTool_APPOINTMENT_DETAILS = 10;
+our $WidgetTool_APPOINTMENT_SCHEDULER = 11;
+our $WidgetTool_CONTACT_FORM = 12;
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Ces::V1::WidgetTool - Compiled Protocol Buffers messages for google/cloud/ces/v1/widget_tool.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Ces::V1::WidgetTool;
+
+    my $msg = Google::Cloud::Ces::V1::WidgetTool::WidgetTool->new({
+        parameters => $parameters,
+        name => $name,
+        description => $description,
+        widget_type => $widget_type,
+    });
+
+    # Read or update a field
+    my $val = $msg->parameters();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Ces::V1::WidgetTool::WidgetTool->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/ces/v1/widget_tool.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Ces::V1::WidgetTool::WidgetTool
+
+Represents a widget tool that the agent can invoke. When the tool is chosen
+by the agent, agent will return the widget to the client. The client is
+responsible for processing the widget and generating the next user query to
+continue the interaction with the agent.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Ces::V1::Schema::Schema>)
+
+Optional. The input parameters of the widget tool.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The display name of the widget tool.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. The description of the widget tool.
+
+=item * C<< $msg->widget_type() >> / C<< $msg->widget_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Ces::V1::WidgetTool::WidgetType>)
+
+Optional. The type of the widget tool. If not specified, the default type
+will be CUSTOMIZED.
+
+=item * C<< $msg->ui_config() >> / C<< $msg->ui_config($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Optional. Configuration for rendering the widget.
+
+=item * C<< $msg->data_mapping() >> / C<< $msg->data_mapping($value) >>
+
+Type: C<Message> (L<Google::Cloud::Ces::V1::WidgetTool::WidgetTool::DataMapping>)
+
+Optional. The mapping that defines how data from a source tool is mapped to
+the widget's input parameters.
+
+=item * C<< $msg->text_response_config() >> / C<< $msg->text_response_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Ces::V1::WidgetTool::WidgetTool::TextResponseConfig>)
+
+Optional. Configuration for always-included text responses.
+
+=back
+
+=head3 Enum: WidgetTool::WidgetType
+
+=over 4
+
+=item * C<WIDGET_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<CUSTOM> => C<1>
+
+=item * C<PRODUCT_CAROUSEL> => C<2>
+
+=item * C<PRODUCT_DETAILS> => C<3>
+
+=item * C<QUICK_ACTIONS> => C<4>
+
+=item * C<PRODUCT_COMPARISON> => C<5>
+
+=item * C<ADVANCED_PRODUCT_DETAILS> => C<6>
+
+=item * C<SHORT_FORM> => C<7>
+
+=item * C<OVERALL_SATISFACTION> => C<8>
+
+=item * C<ORDER_SUMMARY> => C<9>
+
+=item * C<APPOINTMENT_DETAILS> => C<10>
+
+=item * C<APPOINTMENT_SCHEDULER> => C<11>
+
+=item * C<CONTACT_FORM> => C<12>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Ces::V1::WidgetTool::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

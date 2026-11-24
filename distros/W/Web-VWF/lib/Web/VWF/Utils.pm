@@ -16,11 +16,11 @@ Provides cross-driver cache initialization and Haversine formula implementation.
 
 =head1 VERSION
 
-Version 0.003.1
+Version 0.004.1
 
 =cut
 
-use version; our $VERSION = version->declare('0.003.1');
+use version; our $VERSION = version->declare('0.004.1');
 
 use v5.20;
 use strict;

@@ -10,8 +10,10 @@ use File::Copy ();
 use File::Path qw(make_path);
 use File::ShareDir qw(dist_dir);
 use File::Spec;
+use ExtUtils::Installed;
+use Module::Metadata;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 ########################################################################
 sub new {
@@ -19,8 +21,19 @@ sub new {
   my ( $class, %args ) = @_;
 
   my $distribution = $args{distribution};
+  my $module       = $args{module};
 
-  die "ERROR: distribution is required\n"
+  die "ERROR: specify either distribution or module, not both\n"
+    if defined $distribution && defined $module;
+
+  if ( defined $module ) {
+    die "ERROR: module is required\n"
+      if !length $module;
+
+    $distribution = _distribution_for_module($module);
+  }
+
+  die "ERROR: distribution or module is required\n"
     if !defined $distribution || !length $distribution;
 
   my $root = abs_path( dist_dir($distribution) );
@@ -32,6 +45,59 @@ sub new {
     distribution => $distribution,
     dir          => $root,
   }, $class;
+}
+
+########################################################################
+sub _distribution_for_module {
+########################################################################
+  my ($module) = @_;
+
+  die sprintf "ERROR: invalid module name: %s\n", $module
+    if $module !~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
+
+  # Most packages share their name with the distribution that contains them.
+  # Try that cheap lookup before inspecting installed .packlist files.
+  my $candidate = $module;
+  $candidate =~ s/::/-/g;
+
+  my $share_dir = eval { dist_dir($candidate) };
+  return $candidate
+    if defined $share_dir && -d $share_dir;
+
+  my $metadata = Module::Metadata->new_from_module($module);
+  die sprintf "ERROR: module not installed: %s\n", $module
+    if !$metadata;
+
+  my $filename = abs_path( $metadata->filename );
+  die sprintf "ERROR: cannot locate installed module file: %s\n", $module
+    if !defined $filename;
+
+  my $installed = ExtUtils::Installed->new();
+  my @owners;
+
+  foreach my $owner ( $installed->modules ) {
+    my $packlist = $installed->packlist($owner);
+    next if !$packlist;
+
+    foreach my $file ( keys %{$packlist} ) {
+      my $installed_file = abs_path($file);
+      next if !defined $installed_file || $installed_file ne $filename;
+
+      push @owners, $owner;
+      last;
+    }
+  }
+
+  die sprintf "ERROR: cannot determine installed distribution for module %s; use distribution => NAME\n", $module
+    if !@owners;
+
+  die sprintf "ERROR: ambiguous distribution ownership for module %s: %s\n", $module, join( ', ', sort @owners )
+    if @owners > 1;
+
+  my $distribution = $owners[0];
+  $distribution =~ s/::/-/g;
+
+  return $distribution;
 }
 
 ########################################################################
@@ -131,6 +197,35 @@ sub list {
   _collect_entries( $self->dir, q{}, \@files );
 
   return @files;
+}
+
+########################################################################
+sub find {
+########################################################################
+  my ( $self, $pattern ) = @_;
+
+  die "ERROR: find requires a filename pattern\n"
+    if !defined $pattern || !length $pattern;
+
+  # A pattern containing a slash matches a path relative to the share
+  # directory; otherwise it matches the basename at any depth.
+  my $expression = quotemeta($pattern);
+  $expression =~ s/\\\*/.*/g;
+  $expression =~ s/\\\?/./g;
+  my $regex      = qr/\A$expression\z/;
+  my $match_path = index( $pattern, q{/} ) >= 0;
+
+  my @matches;
+  foreach my $relative ( $self->list ) {
+    my $full = File::Spec->catfile( $self->dir, $relative );
+    next if !-f $full || -l $full;
+
+    my $target = $match_path ? $relative : basename($relative);
+    push @matches, $relative
+      if $target =~ $regex;
+  }
+
+  return @matches;
 }
 
 ########################################################################
@@ -241,6 +336,7 @@ File::DistDir - locate and copy installed Perl distribution resources
   use File::DistDir;
 
   my $dist = File::DistDir->new( distribution => 'Bedrock' );
+  my $from_module = File::DistDir->new( module => 'BLM::Startup::RedisSession' );
 
   my $root = $dist->dir;
   my $file = $dist->path('config/tagx.xml');
@@ -250,6 +346,7 @@ File::DistDir - locate and copy installed Perl distribution resources
   $dist->copy('.', '.', recursive => 1);
 
   my @resources = $dist->list;
+  my @xml_files = $dist->find('*.xml');
 
 =head1 DESCRIPTION
 
@@ -260,11 +357,15 @@ L<File::DistDir::CLI> in the same distribution.
 
 =head1 METHODS
 
-=head2 new(distribution => NAME)
+=head2 new(distribution => NAME) or new(module => PACKAGE)
 
 Create an accessor for an installed distribution. C<NAME> is the
 CPAN distribution name, not a Perl package name. A missing distribution
-or share directory causes an exception.
+or share directory causes an exception. Alternatively, C<module> resolves
+the owning distribution from installed module metadata and packlists.
+Provide exactly one of C<distribution> and C<module>. Module resolution
+requires an installed module with a usable packlist; use C<distribution>
+when package ownership cannot be determined.
 
 =head2 dir
 
@@ -300,6 +401,13 @@ Returns a true value on success; failures throw exceptions.
 Return a sorted list of paths relative to the share root, including
 directory entries. Symlinked directories are listed but not traversed.
 Paths are returned as data and are not printed.
+
+=head2 find(PATTERN)
+
+Return sorted, relative paths of regular files whose basenames match a
+simple glob (C<*> and C<?>). Search is recursive. A pattern containing a
+slash instead matches the entire relative path. Symlinks and directories
+are excluded. No matching files returns an empty list.
 
 =head1 SEE ALSO
 

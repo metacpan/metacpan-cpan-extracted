@@ -1,0 +1,1097 @@
+package Google::Cloud::Maintenance::Api::V1::MaintenanceService;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::FieldInfo };
+    eval { require Google::Api::Resource };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+Cjlnb29nbGUvY2xvdWQvbWFpbnRlbmFuY2UvYXBpL3YxL21haW50ZW5hbmNlX3NlcnZpY2Uu
+cHJvdG8SH2dvb2dsZS5jbG91ZC5tYWludGVuYW5jZS5hcGkudjEaHGdvb2dsZS9hcGkvYW5u
+b3RhdGlvbnMucHJvdG8aF2dvb2dsZS9hcGkvY2xpZW50LnByb3RvGh9nb29nbGUvYXBpL2Zp
+ZWxkX2JlaGF2aW9yLnByb3RvGhtnb29nbGUvYXBpL2ZpZWxkX2luZm8ucHJvdG8aGWdvb2ds
+ZS9hcGkvcmVzb3VyY2UucHJvdG8aH2dvb2dsZS9wcm90b2J1Zi90aW1lc3RhbXAucHJvdG8i
+4gEKHFN1bW1hcml6ZU1haW50ZW5hbmNlc1JlcXVlc3QSTwoGcGFyZW50GJZOIAEoCUI24EEC
++kEwEi5tYWludGVuYW5jZS5nb29nbGVhcGlzLmNvbS9SZXNvdXJjZU1haW50ZW5hbmNlUgZw
+YXJlbnQSHAoJcGFnZV9zaXplGIlSIAEoBVIIcGFnZVNpemUSHgoKcGFnZV90b2tlbhiKUiAB
+KAlSCXBhZ2VUb2tlbhIXCgZmaWx0ZXIYi1IgASgJUgZmaWx0ZXISGgoIb3JkZXJfYnkYjFIg
+ASgJUgdvcmRlckJ5IsoBCh1TdW1tYXJpemVNYWludGVuYW5jZXNSZXNwb25zZRJYCgxtYWlu
+dGVuYW5jZXMYjVIgAygLMjMuZ29vZ2xlLmNsb3VkLm1haW50ZW5hbmNlLmFwaS52MS5NYWlu
+dGVuYW5jZVN1bW1hcnlSDG1haW50ZW5hbmNlcxInCg9uZXh0X3BhZ2VfdG9rZW4YjlIgASgJ
+Ug1uZXh0UGFnZVRva2VuEiYKC3VucmVhY2hhYmxlGI9SIAMoCUID4EEGUgt1bnJlYWNoYWJs
+ZSLyBwoSTWFpbnRlbmFuY2VTdW1tYXJ5Ei4KEG1haW50ZW5hbmNlX25hbWUYASABKAlCA+BB
+A1IPbWFpbnRlbmFuY2VOYW1lEhkKBXRpdGxlGAIgASgJQgPgQQNSBXRpdGxlEiUKC2Rlc2Ny
+aXB0aW9uGAMgASgJQgPgQQNSC2Rlc2NyaXB0aW9uElUKCGNhdGVnb3J5GA0gASgOMjQuZ29v
+Z2xlLmNsb3VkLm1haW50ZW5hbmNlLmFwaS52MS5NYWludGVuYW5jZUNhdGVnb3J5QgPgQQNS
+CGNhdGVnb3J5EmgKIG1haW50ZW5hbmNlX3NjaGVkdWxlZF9zdGFydF90aW1lGAYgASgLMhou
+Z29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEID4EEDUh1tYWludGVuYW5jZVNjaGVkdWxlZFN0
+YXJ0VGltZRJkCh5tYWludGVuYW5jZV9zY2hlZHVsZWRfZW5kX3RpbWUYByABKAsyGi5nb29n
+bGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNSG21haW50ZW5hbmNlU2NoZWR1bGVkRW5kVGlt
+ZRJVChZtYWludGVuYW5jZV9zdGFydF90aW1lGAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRp
+bWVzdGFtcEID4EEDUhRtYWludGVuYW5jZVN0YXJ0VGltZRJRChRtYWludGVuYW5jZV9lbmRf
+dGltZRgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCA+BBA1ISbWFpbnRlbmFu
+Y2VFbmRUaW1lEjAKEXVzZXJfY29udHJvbGxhYmxlGAogASgIQgPgQQNSEHVzZXJDb250cm9s
+bGFibGUSVAoIY29udHJvbHMYDiADKAsyMy5nb29nbGUuY2xvdWQubWFpbnRlbmFuY2UuYXBp
+LnYxLk1haW50ZW5hbmNlQ29udHJvbEID4EEDUghjb250cm9scxJUCgVzdGF0cxgMIAMoCzI5
+Lmdvb2dsZS5jbG91ZC5tYWludGVuYW5jZS5hcGkudjEuTWFpbnRlbmFuY2VTdW1tYXJ5LlN0
+YXRzQgPgQQNSBXN0YXRzGoEBCgVTdGF0cxIZCghncm91cF9ieRgBIAEoCVIHZ3JvdXBCeRJd
+CgphZ2dyZWdhdGVzGAIgAygLMj0uZ29vZ2xlLmNsb3VkLm1haW50ZW5hbmNlLmFwaS52MS5N
+YWludGVuYW5jZVN1bW1hcnkuQWdncmVnYXRlUgphZ2dyZWdhdGVzGjcKCUFnZ3JlZ2F0ZRIU
+CgVncm91cBgBIAEoCVIFZ3JvdXASFAoFY291bnQYAiABKANSBWNvdW50IoYQChNSZXNvdXJj
+ZU1haW50ZW5hbmNlEhcKBG5hbWUYASABKAlCA+BBCFIEbmFtZRJeCghyZXNvdXJjZRgCIAEo
+CzI9Lmdvb2dsZS5jbG91ZC5tYWludGVuYW5jZS5hcGkudjEuUmVzb3VyY2VNYWludGVuYW5j
+ZS5SZXNvdXJjZUID4EEDUghyZXNvdXJjZRJnCgttYWludGVuYW5jZRgDIAEoCzJALmdvb2ds
+ZS5jbG91ZC5tYWludGVuYW5jZS5hcGkudjEuUmVzb3VyY2VNYWludGVuYW5jZS5NYWludGVu
+YW5jZUID4EEDUgttYWludGVuYW5jZRJVCgVzdGF0ZRgEIAEoDjI6Lmdvb2dsZS5jbG91ZC5t
+YWludGVuYW5jZS5hcGkudjEuUmVzb3VyY2VNYWludGVuYW5jZS5TdGF0ZUID4EEDUgVzdGF0
+ZRJACgtjcmVhdGVfdGltZRgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCA+BB
+A1IKY3JlYXRlVGltZRJACgt1cGRhdGVfdGltZRgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5U
+aW1lc3RhbXBCA+BBA1IKdXBkYXRlVGltZRJVChZtYWludGVuYW5jZV9zdGFydF90aW1lGAcg
+ASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEID4EEDUhRtYWludGVuYW5jZVN0YXJ0
+VGltZRJRChRtYWludGVuYW5jZV9lbmRfdGltZRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5U
+aW1lc3RhbXBCA+BBA1ISbWFpbnRlbmFuY2VFbmRUaW1lElcKF21haW50ZW5hbmNlX2NhbmNl
+bF90aW1lGAkgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEID4EEDUhVtYWludGVu
+YW5jZUNhbmNlbFRpbWUSaAogbWFpbnRlbmFuY2Vfc2NoZWR1bGVkX3N0YXJ0X3RpbWUYCiAB
+KAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNSHW1haW50ZW5hbmNlU2NoZWR1
+bGVkU3RhcnRUaW1lEmQKHm1haW50ZW5hbmNlX3NjaGVkdWxlZF9lbmRfdGltZRgLIAEoCzIa
+Lmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCA+BBA1IbbWFpbnRlbmFuY2VTY2hlZHVsZWRF
+bmRUaW1lEjAKEXVzZXJfY29udHJvbGxhYmxlGAwgASgIQgPgQQNSEHVzZXJDb250cm9sbGFi
+bGUSVAoIY29udHJvbHMYDSADKAsyMy5nb29nbGUuY2xvdWQubWFpbnRlbmFuY2UuYXBpLnYx
+Lk1haW50ZW5hbmNlQ29udHJvbEID4EEDUghjb250cm9scxJeCgZsYWJlbHMYoVEgAygLMkAu
+Z29vZ2xlLmNsb3VkLm1haW50ZW5hbmNlLmFwaS52MS5SZXNvdXJjZU1haW50ZW5hbmNlLkxh
+YmVsc0VudHJ5QgPgQQFSBmxhYmVscxJtCgthbm5vdGF0aW9ucxiiUSADKAsyRS5nb29nbGUu
+Y2xvdWQubWFpbnRlbmFuY2UuYXBpLnYxLlJlc291cmNlTWFpbnRlbmFuY2UuQW5ub3RhdGlv
+bnNFbnRyeUID4EEBUgthbm5vdGF0aW9ucxIeCgN1aWQY2U8gASgJQgvijM/XCAIIAeBBA1ID
+dWlkEhgKBGV0YWcY2k8gASgJQgPgQQNSBGV0YWcabgoIUmVzb3VyY2USKAoNcmVzb3VyY2Vf
+bmFtZRgBIAEoCUID4EEDUgxyZXNvdXJjZU5hbWUSHwoIbG9jYXRpb24YAiABKAlCA+BBA1II
+bG9jYXRpb24SFwoEdHlwZRgDIAEoCUID4EEDUgR0eXBlGtEBCgtNYWludGVuYW5jZRIpChBt
+YWludGVuYW5jZV9uYW1lGAEgASgJUg9tYWludGVuYW5jZU5hbWUSGQoFdGl0bGUYAiABKAlC
+A+BBA1IFdGl0bGUSJQoLZGVzY3JpcHRpb24YAyABKAlCA+BBA1ILZGVzY3JpcHRpb24SVQoI
+Y2F0ZWdvcnkYBCABKA4yNC5nb29nbGUuY2xvdWQubWFpbnRlbmFuY2UuYXBpLnYxLk1haW50
+ZW5hbmNlQ2F0ZWdvcnlCA+BBA1IIY2F0ZWdvcnkaOQoLTGFiZWxzRW50cnkSEAoDa2V5GAEg
+ASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4ARo+ChBBbm5vdGF0aW9uc0VudHJ5
+EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAEiWAoFU3RhdGUS
+FQoRU1RBVEVfVU5TUEVDSUZJRUQQABINCglTQ0hFRFVMRUQQARILCgdSVU5OSU5HEAISDQoJ
+Q0FOQ0VMTEVEEAMSDQoJU1VDQ0VFREVEEAQ6tAHqQbABCi5tYWludGVuYW5jZS5nb29nbGVh
+cGlzLmNvbS9SZXNvdXJjZU1haW50ZW5hbmNlElNwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRp
+b25zL3tsb2NhdGlvbn0vcmVzb3VyY2VNYWludGVuYW5jZXMve3Jlc291cmNlX21haW50ZW5h
+bmNlfSoUcmVzb3VyY2VNYWludGVuYW5jZXMyE3Jlc291cmNlTWFpbnRlbmFuY2UigAIKEk1h
+aW50ZW5hbmNlQ29udHJvbBJVCgdjb250cm9sGAEgASgOMjsuZ29vZ2xlLmNsb3VkLm1haW50
+ZW5hbmNlLmFwaS52MS5NYWludGVuYW5jZUNvbnRyb2wuQ29udHJvbFIHY29udHJvbBIbCglp
+c19jdXN0b20YAiABKAhSCGlzQ3VzdG9tEiQKDWRvY3VtZW50YXRpb24YAyABKAlSDWRvY3Vt
+ZW50YXRpb24iUAoHQ29udHJvbBIXChNDT05UUk9MX1VOU1BFQ0lGSUVEEAASCQoFQVBQTFkQ
+ARIRCg1NQU5BR0VfUE9MSUNZEAISDgoKUkVTQ0hFRFVMRRADIuUBCh9MaXN0UmVzb3VyY2VN
+YWludGVuYW5jZXNSZXF1ZXN0Ek8KBnBhcmVudBiWTiABKAlCNuBBAvpBMBIubWFpbnRlbmFu
+Y2UuZ29vZ2xlYXBpcy5jb20vUmVzb3VyY2VNYWludGVuYW5jZVIGcGFyZW50EhwKCXBhZ2Vf
+c2l6ZRiJUiABKAVSCHBhZ2VTaXplEh4KCnBhZ2VfdG9rZW4YilIgASgJUglwYWdlVG9rZW4S
+FwoGZmlsdGVyGItSIAEoCVIGZmlsdGVyEhoKCG9yZGVyX2J5GIxSIAEoCVIHb3JkZXJCeSLa
+AQogTGlzdFJlc291cmNlTWFpbnRlbmFuY2VzUmVzcG9uc2USagoVcmVzb3VyY2VfbWFpbnRl
+bmFuY2VzGI1SIAMoCzI0Lmdvb2dsZS5jbG91ZC5tYWludGVuYW5jZS5hcGkudjEuUmVzb3Vy
+Y2VNYWludGVuYW5jZVIUcmVzb3VyY2VNYWludGVuYW5jZXMSJwoPbmV4dF9wYWdlX3Rva2Vu
+GI5SIAEoCVINbmV4dFBhZ2VUb2tlbhIhCgt1bnJlYWNoYWJsZRiPUiADKAlSC3VucmVhY2hh
+YmxlImwKHUdldFJlc291cmNlTWFpbnRlbmFuY2VSZXF1ZXN0EksKBG5hbWUYkU4gASgJQjbg
+QQL6QTAKLm1haW50ZW5hbmNlLmdvb2dsZWFwaXMuY29tL1Jlc291cmNlTWFpbnRlbmFuY2VS
+BG5hbWUqYwoTTWFpbnRlbmFuY2VDYXRlZ29yeRIkCiBNQUlOVEVOQU5DRV9DQVRFR09SWV9V
+TlNQRUNJRklFRBAAEhIKDklORlJBU1RSVUNUVVJFEAESEgoOU0VSVklDRV9VUERBVEUQAzKS
+BgoLTWFpbnRlbmFuY2US6wEKFVN1bW1hcml6ZU1haW50ZW5hbmNlcxI9Lmdvb2dsZS5jbG91
+ZC5tYWludGVuYW5jZS5hcGkudjEuU3VtbWFyaXplTWFpbnRlbmFuY2VzUmVxdWVzdBo+Lmdv
+b2dsZS5jbG91ZC5tYWludGVuYW5jZS5hcGkudjEuU3VtbWFyaXplTWFpbnRlbmFuY2VzUmVz
+cG9uc2UiU4LT5JMCRBJCL3YxL3twYXJlbnQ9cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vcmVz
+b3VyY2VNYWludGVuYW5jZXM6c3VtbWFyaXpl2kEGcGFyZW50EuoBChhMaXN0UmVzb3VyY2VN
+YWludGVuYW5jZXMSQC5nb29nbGUuY2xvdWQubWFpbnRlbmFuY2UuYXBpLnYxLkxpc3RSZXNv
+dXJjZU1haW50ZW5hbmNlc1JlcXVlc3QaQS5nb29nbGUuY2xvdWQubWFpbnRlbmFuY2UuYXBp
+LnYxLkxpc3RSZXNvdXJjZU1haW50ZW5hbmNlc1Jlc3BvbnNlIkmC0+STAjoSOC92MS97cGFy
+ZW50PXByb2plY3RzLyovbG9jYXRpb25zLyp9L3Jlc291cmNlTWFpbnRlbmFuY2Vz2kEGcGFy
+ZW50EtcBChZHZXRSZXNvdXJjZU1haW50ZW5hbmNlEj4uZ29vZ2xlLmNsb3VkLm1haW50ZW5h
+bmNlLmFwaS52MS5HZXRSZXNvdXJjZU1haW50ZW5hbmNlUmVxdWVzdBo0Lmdvb2dsZS5jbG91
+ZC5tYWludGVuYW5jZS5hcGkudjEuUmVzb3VyY2VNYWludGVuYW5jZSJHgtPkkwI6EjgvdjEv
+e25hbWU9cHJvamVjdHMvKi9sb2NhdGlvbnMvKi9yZXNvdXJjZU1haW50ZW5hbmNlcy8qfdpB
+BG5hbWUaTspBGm1haW50ZW5hbmNlLmdvb2dsZWFwaXMuY29t0kEuaHR0cHM6Ly93d3cuZ29v
+Z2xlYXBpcy5jb20vYXV0aC9jbG91ZC1wbGF0Zm9ybUJvCiNjb20uZ29vZ2xlLmNsb3VkLm1h
+aW50ZW5hbmNlLmFwaS52MUIPVU1NU2VydmljZVByb3RvUAFaNWNsb3VkLmdvb2dsZS5jb20v
+Z28vbWFpbnRlbmFuY2UvYXBpL2FwaXYxL2FwaXBiO2FwaXBiStF8CgcSBQ4AsAMBCrwECgEM
+EgMOABIysQQgQ29weXJpZ2h0IDIwMjUgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRo
+ZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1h
+eSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNl
+bnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0
+dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1
+aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdh
+cmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFu
+ICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBB
+TlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBm
+b3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxp
+bWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAoCgkKAgMAEgMSACYKCQoC
+AwESAxMAIQoJCgIDAhIDFAApCgkKAgMDEgMVACUKCQoCAwQSAxYAIwoJCgIDBRIDFwApCggK
+AQgSAxkATAoJCgIICxIDGQBMCggKAQgSAxoAIgoJCgIIChIDGgAiCggKAQgSAxsAMAoJCgII
+CBIDGwAwCggKAQgSAxwAPAoJCgIIARIDHAA8CikKAgYAEgQfAD4BGh0gVW5pZmllZCBNYWlu
+dGVuYW5jZSBzZXJ2aWNlCgoKCgMGAAESAx8IEwoKCgMGAAMSAyACQgoMCgUGAAOZCBIDIAJC
+CgsKAwYAAxIEIQIiNwoNCgUGAAOaCBIEIQIiNwpDCgQGAAIAEgQlAisDGjUgUmV0cmlldmVz
+IHRoZSBzdGF0aXN0aWNzIG9mIGEgc3BlY2lmaWMgbWFpbnRlbmFuY2UuCgoMCgUGAAIAARID
+JQYbCgwKBQYAAgACEgMlHDgKDAoFBgACAAMSAyYPLAoNCgUGAAIABBIEJwQpBgoRCgkGAAIA
+BLDKvCISBCcEKQYKDAoFBgACAAQSAyoENAoPCggGAAIABJsIABIDKgQ0Cj8KBAYAAgESBC4C
+NAMaMSBSZXRyaWV2ZSBhIGNvbGxlY3Rpb24gb2YgcmVzb3VyY2UgbWFpbnRlbmFuY2VzLgoK
+DAoFBgACAQESAy4GHgoMCgUGAAIBAhIDLh8+CgwKBQYAAgEDEgMvDy8KDQoFBgACAQQSBDAE
+MgYKEQoJBgACAQSwyrwiEgQwBDIGCgwKBQYAAgEEEgMzBDQKDwoIBgACAQSbCAASAzMENAo3
+CgQGAAICEgQ3Aj0DGikgUmV0cmlldmUgYSBzaW5nbGUgcmVzb3VyY2UgbWFpbnRlbmFuY2Uu
+CgoMCgUGAAICARIDNwYcCgwKBQYAAgICEgM3HToKDAoFBgACAgMSAzgPIgoNCgUGAAICBBIE
+OQQ7BgoRCgkGAAICBLDKvCISBDkEOwYKDAoFBgACAgQSAzwEMgoPCggGAAICBJsIABIDPAQy
+Ci4KAgUAEgRBAFMBGiIgVGhlIENhdGVnb3J5IG9mIHRoZSBtYWludGVuYW5jZS4KCgoKAwUA
+ARIDQQUYCiQKBAUAAgASA0MCJxoXIFVuc3BlY2lmaWVkIGNhdGVnb3J5LgoKDAoFBQACAAES
+A0MCIgoMCgUFAAIAAhIDQyUmCs8DCgQFAAIBEgNMAhUawQMgSW5mcmFzdHJ1Y3R1cmUgbWFp
+bnRlbmFuY2UgZXZlbnRzIGFyZSB0aW1lcyB0aGF0IEdvb2dsZSBDbG91ZCBwZXJmb3Jtcwog
+cmVndWxhciBtYWludGVuYW5jZSBvbiBuZXR3b3JrIGVxdWlwbWVudCBlLmcuIEdvb2dsZSBD
+bG91ZCBJbnRlcmNvbm5lY3QKIFRoZXNlIGV2ZW50cyBhcmUgdXN1YWxseSBzY2hlZHVsZWQg
+aW4gYWR2YW5jZSBhbmQgd2UgcHJvdmlkZQogbm90aWZpY2F0aW9uLCB3aGVuIHBvc3NpYmxl
+LCBzbyB0aGF0IHVzZXJzIGNhbiBwbGFuIGZvciB0aGUKIGluZnJhc3RydWN0dXJlIG1haW50
+ZW5hbmNlIGV2ZW50IGFuZCBwcmV2ZW50IGRvd250aW1lLiBJbmZyYXN0cnVjdHVyZQogbWFp
+bnRlbmFuY2UgZXZlbnRzIGRvbid0IGhhdmUgYSBzZXQgaW50ZXJ2YWwgYmV0d2VlbiBvY2N1
+cnJlbmNlcywgYnV0CiBnZW5lcmFsbHkgb2NjdXIgc2V2ZXJhbCB0aW1lcyBhIHllYXIuCgoM
+CgUFAAIBARIDTAIQCgwKBQUAAgECEgNMExQKnwIKBAUAAgISA1ICFRqRAiBVcGRhdGVzIHRo
+YXQgY2FuIGluY2x1ZGUgYnVnIGZpeGVzLCBjaGFuZ2VzLCBvciBuZXcgZmVhdHVyZXMgdGhh
+dCBhcmUKIGJhY2t3YXJkIGNvbXBhdGlibGUgd2l0aCBleGlzdGluZyB2ZXJzaW9ucyAoaW5j
+bHVkaW5nIHBhdGNoZXMpLgogU29tZSBTUHMgYWxsb3cgdXNlcnMgdG8gY29udHJvbCB0aGUg
+c2NoZWR1bGluZyBvZiB0aGVzZSBtYWludGVuYW5jZQogZXZlbnRzIHVzaW5nIG1haW50ZW5h
+bmNlIHdpbmRvd3MgYW5kL29yIGRlbnkgbWFpbnRlbmFuY2UgZmVhdHVyZXMuCgoMCgUFAAIC
+ARIDUgIQCgwKBQUAAgICEgNSExQKRgoCBAASBFYAcQEaOiBSZXF1ZXN0IG1lc3NhZ2UgZm9y
+IFN1bW1hcml6ZU1haW50ZW5hbmNlcyBjdXN0b20gbWV0aG9kLgoKCgoDBAABEgNWCCQKYQoE
+BAACABIEWQJeBBpTIFJlcXVpcmVkLiBUaGUgcGFyZW50IG9mIHRoZSByZXNvdXJjZSBtYWlu
+dGVuYW5jZS4KIGVnLiBgcHJvamVjdHMvMTIzL2xvY2F0aW9ucy8qYAoKDAoFBAACAAUSA1kC
+CAoMCgUEAAIAARIDWQkPCgwKBQQAAgADEgNZEhcKDQoFBAACAAgSBFkYXgMKDwoIBAACAAic
+CAASA1oEKgoPCgcEAAIACJ8IEgRbBF0FCoIBCgQEAAIBEgNiAhoadSBUaGUgbWF4aW11bSBu
+dW1iZXIgb2YgcmVzb3VyY2UgbWFpbnRlbmFuY2VzIHRvIHNlbmQgcGVyIHBhZ2UuIFRoZSBk
+ZWZhdWx0CiBwYWdlIHNpemUgaXMgMjAgYW5kIHRoZSBtYXhpbXVtIGlzIDEwMDAuCgoMCgUE
+AAIBBRIDYgIHCgwKBQQAAgEBEgNiCBEKDAoFBAACAQMSA2IUGQqIAQoEBAACAhIDZgIcGnsg
+VGhlIHBhZ2UgdG9rZW46IElmIHRoZSBuZXh0X3BhZ2VfdG9rZW4gZnJvbSBhIHByZXZpb3Vz
+IHJlc3BvbnNlCiBpcyBwcm92aWRlZCwgdGhpcyByZXF1ZXN0IHdpbGwgc2VuZCB0aGUgc3Vi
+c2VxdWVudCBwYWdlLgoKDAoFBAACAgUSA2YCCAoMCgUEAAICARIDZgkTCgwKBQQAAgIDEgNm
+FhsK2gEKBAQAAgMSA20CGBrMASBGaWx0ZXIgdGhlIGxpc3QgYXMgc3BlY2lmaWVkIGluIGh0
+dHBzOi8vZ29vZ2xlLmFpcC5kZXYvMTYwLgogU3VwcG9ydGVkIGZpZWxkcyBpbmNsdWRlOgog
+LSBgbWFpbnRlbmFuY2UubWFpbnRlbmFuY2VOYW1lYAogRXhhbXBsZXM6CiAtIGBtYWludGVu
+YW5jZS5tYWludGVuYW5jZU5hbWU9ImViM2I3MDljLTljYTEtNTQ3Mi05ZmI2LTgwMGEzODQ5
+ZWRhMSJgCgoMCgUEAAIDBRIDbQIICgwKBQQAAgMBEgNtCQ8KDAoFBAACAwMSA20SFwpICgQE
+AAIEEgNwAhoaOyBPcmRlciByZXN1bHRzIGFzIHNwZWNpZmllZCBpbiBodHRwczovL2dvb2ds
+ZS5haXAuZGV2LzEzMi4KCgwKBQQAAgQFEgNwAggKDAoFBAACBAESA3AJEQoMCgUEAAIEAxID
+cBQZCkcKAgQBEgV0AIABARo6IFJlcXVlc3QgbWVzc2FnZSBmb3IgU3VtbWFyaXplTWFpbnRl
+bmFuY2VzIGN1c3RvbSBtZXRob2QuCgoKCgMEAQESA3QIJQonCgQEAQIAEgN2AjMaGiBUaGUg
+cmVzdWx0aW5nIHN1bW1hcmllcy4KCgwKBQQBAgAEEgN2AgoKDAoFBAECAAYSA3YLHQoMCgUE
+AQIAARIDdh4qCgwKBQQBAgADEgN2LTIKpgEKBAQBAgESA3sCIRqYASBJZiBwcmVzZW50LCB0
+aGUgbmV4dCBwYWdlIHRva2VuIGNhbiBiZSBwcm92aWRlZCB0byBhIHN1YnNlcXVlbnQKIFN1
+bW1hcml6ZU1haW50ZW5hbmNlcyBjYWxsIHRvIGxpc3QgdGhlIG5leHQgcGFnZS4KIElmIGVt
+cHR5LCB0aGVyZSBhcmUgbm8gbW9yZSBwYWdlcy4KCgwKBQQBAgEFEgN7AggKDAoFBAECAQES
+A3sJGAoMCgUEAQIBAxIDexsgCkQKBAQBAgISBH4CfzUaNiBVbm9yZGVyZWQgbGlzdC4gTG9j
+YXRpb25zIHRoYXQgY291bGQgbm90IGJlIHJlYWNoZWQuCgoMCgUEAQICBBIDfgIKCgwKBQQB
+AgIFEgN+CxEKDAoFBAECAgESA34SHQoMCgUEAQICAxIDfiAlCgwKBQQBAgIIEgN/BjQKDwoI
+BAECAgicCAASA38HMwqVAQoCBAISBoQBAMsBARqGASBNYWludGVuYW5jZVN1bW1hcnkgY29u
+dGFpbnMgbWFpbnRlbmFuY2Ugc3RhdGlzdGljcyBjYWxjdWxhdGVkIGJhc2VkIG9uCiBSZXNv
+dXJjZU1haW50ZW5hbmNlcyB3aXRoaW4gdGhlIHNjb3BlOiBwcm9qZWN0IGFuZCBsb2NhdGlv
+bi4KCgsKAwQCARIEhAEIGgpZCgQEAgMAEgaGAQKPAQMaSSBTdGF0cyBpbmRpY2F0ZXMgdGhl
+IHR5cGUgb2YgYWdncmVnYXRlIGFuZCB0aGUgY29ycmVzcG9uZGluZyBhZ2dyZWdhdGVzLgoK
+DQoFBAIDAAESBIYBCg8KZQoGBAIDAAIAEgSJAQQYGlUgZ3JvdXBCeSBzcGVjaWZpZXMgdGhl
+IHR5cGUgb2YgYWdncmVnYXRlLgogRm9yIGV4YW1wbGUgYSBncm91cF9ieSBtaWdodCBiZSBg
+InN0YXRlImAKCg8KBwQCAwACAAUSBIkBBAoKDwoHBAIDAAIAARIEiQELEwoPCgcEAgMAAgAD
+EgSJARYXCq4BCgYEAgMAAgESBI4BBCYanQEgQWdncmVnYXRlcyBpcyBhIGxpc3QgPGdyb3Vw
+LCBjb3VudD4gcGFpcnMuIEZvciBleGFtcGxlLCBpZiB0aGUKIGdyb3VwX2J5IGlzIGAic3Rh
+dGUiYCBhIHBvc3NpYmxlIHR1cGxlIGluIHRoZSBhZ2dyZWdhdGVzIGxpc3QgY291bGQgYmUK
+ICJTQ0hFRFVMRUQiIDogYDExYCwKCg8KBwQCAwACAQQSBI4BBAwKDwoHBAIDAAIBBhIEjgEN
+FgoPCgcEAgMAAgEBEgSOARchCg8KBwQCAwACAQMSBI4BJCUKNQoEBAIDARIGkgECmgEDGiUg
+QWdncmVnYXRlIGlzIGEgPGdyb3VwLCBjb3VudD4gcGFpci4KCg0KBQQCAwEBEgSSAQoTCq0B
+CgYEAgMBAgASBJYBBBUanAEgU3BlY2lmaWVzIHdoYXQgc3BlY2lmaWMgdmFsdWUgb2YgdGhl
+IGdyb3VwX2J5IHRoZSBjb3VudCByZXByZXNlbnRzLiBGb3IKIGV4YW1wbGUgaWYgZ3JvdXBf
+YnkgaXMgYCJzdGF0ZSJgIGl0cyBjb3JyZXNwb25kaW5nIGdyb3VwIGNvdWxkIGJlCiBgIlND
+SEVEVUxFRCJgLgoKDwoHBAIDAQIABRIElgEECgoPCgcEAgMBAgABEgSWAQsQCg8KBwQCAwEC
+AAMSBJYBExQKKQoGBAIDAQIBEgSZAQQUGhkgVGhlIGNvdW50IG9mIHRoZSBncm91cC4KCg8K
+BwQCAwECAQUSBJkBBAkKDwoHBAIDAQIBARIEmQEKDwoPCgcEAgMBAgEDEgSZARITCjkKBAQC
+AgASBJ0BAkoaKyBPdXRwdXQgb25seS4gVGhlIG5hbWUgb2YgdGhlIG1haW50ZW5hbmNlLgoK
+DQoFBAICAAUSBJ0BAggKDQoFBAICAAESBJ0BCRkKDQoFBAICAAMSBJ0BHB0KDQoFBAICAAgS
+BJ0BHkkKEAoIBAICAAicCAASBJ0BH0gKOgoEBAICARIEoAECPxosIE91dHB1dCBvbmx5LiBU
+aGUgdGl0bGUgb2YgdGhlIG1haW50ZW5hbmNlLgoKDQoFBAICAQUSBKABAggKDQoFBAICAQES
+BKABCQ4KDQoFBAICAQMSBKABERIKDQoFBAICAQgSBKABEz4KEAoIBAICAQicCAASBKABFD0K
+QAoEBAICAhIEowECRRoyIE91dHB1dCBvbmx5LiBUaGUgZGVzY3JpcHRpb24gb2YgdGhlIG1h
+aW50ZW5hbmNlLgoKDQoFBAICAgUSBKMBAggKDQoFBAICAgESBKMBCRQKDQoFBAICAgMSBKMB
+FxgKDQoFBAICAggSBKMBGUQKEAoIBAICAgicCAASBKMBGkMKQwoEBAICAxIEpgECUBo1IE91
+dHB1dCBvbmx5LiBUaGUgY2F0ZWdvcnkgb2YgdGhlIG1haW50ZW5hbmNlIGV2ZW50LgoKDQoF
+BAICAwYSBKYBAhUKDQoFBAICAwESBKYBFh4KDQoFBAICAwMSBKYBISMKDQoFBAICAwgSBKYB
+JE8KEAoIBAICAwicCAASBKYBJU4K0wEKBAQCAgQSBqsBAqwBMhrCASBPdXRwdXQgb25seS4g
+U2NoZWR1bGVkIHN0YXJ0IHRpbWUgb2YgdGhlIG1haW50ZW5hbmNlLiBUaGUgbWFpbnRlbmFu
+Y2Ugd2lsbAogc3RhcnQgYXQgYG1haW50ZW5hbmNlU2NoZWR1bGVkU3RhcnRUaW1lYCBvciBs
+YXRlciwgd2l0aCBiZXN0IGVmZm9ydCB0bwogZmluaXNoIGJlZm9yZSBgbWFpbnRlbmFuY2VT
+Y2hlZHVsZWRFbmRUaW1lYC4KCg0KBQQCAgQGEgSrAQIbCg0KBQQCAgQBEgSrARw8Cg0KBQQC
+AgQDEgSrAT9ACg0KBQQCAgQIEgSsAQYxChAKCAQCAgQInAgAEgSsAQcwCnEKBAQCAgUSBrAB
+ArEBMhphIE91dHB1dCBvbmx5LiBBbiBlc3RpbWF0ZWQgKGJlc3QgZWZmb3J0LCBub3QgZ3Vh
+cmFudGVlZCkgZW5kIHRpbWUgb2YgdGhlCiBzY2hlZHVsZWQgbWFpbnRlbmFuY2UuCgoNCgUE
+AgIFBhIEsAECGwoNCgUEAgIFARIEsAEcOgoNCgUEAgIFAxIEsAE9PgoNCgUEAgIFCBIEsQEG
+MQoQCggEAgIFCJwIABIEsQEHMAqCAQoEBAICBhIGtQECtgEyGnIgT3V0cHV0IG9ubHkuIEFj
+dHVhbCBkYXRlIHdoZW4gdGhlIG1haW50ZW5hbmNlIHN0YXJ0ZWQuIEZpZWxkIHByZXNlbnQg
+b25seQogYWZ0ZXIgdGhlIHN0YXRlIGNoYW5nZWQgdG8gYFJVTk5JTkdgLgoKDQoFBAICBgYS
+BLUBAhsKDQoFBAICBgESBLUBHDIKDQoFBAICBgMSBLUBNTYKDQoFBAICBggSBLYBBjEKEAoI
+BAICBgicCAASBLYBBzAKlAEKBAQCAgcSBroBArsBMhqDASBPdXRwdXQgb25seS4gQWN0dWFs
+IGRhdGUgd2hlbiB0aGUgbWFpbnRlbmFuY2Ugc3VjY2Vzc2Z1bGx5IGNvbXBsZXRlZC4gRmll
+bGQKIHByZXNlbnQgb25seSBhZnRlciB0aGUgc3RhdGUgY2hhbmdlZCB0byBgU1VDQ0VFREVE
+YC4KCg0KBQQCAgcGEgS6AQIbCg0KBQQCAgcBEgS6ARwwCg0KBQQCAgcDEgS6ATM0Cg0KBQQC
+AgcIEgS7AQYxChAKCAQCAgcInAgAEgS7AQcwCvYBCgQEAgIIEgTBAQJKGucBIE91dHB1dCBv
+bmx5LiBJbmRpY2F0ZXMgd2hldGhlciB0aGUgdXNlciBoYXMgc29tZSBjb250cm9sIG92ZXIg
+dGhhdAogbWFpbnRlbmFuY2UsIGVpdGhlciBwcm9hY3RpdmVseSBiZWZvcmUgbWFpbnRlbmFu
+Y2Ugd2FzIHNjaGVkdWxlZCB3aXRoCiBtYWludGVuYW5jZSBwb2xpY3kgb3Igd2l0aCByZWFj
+dGl2ZSBjb250cm9scyBhZnRlciBpdCB3YXMgc2NoZWR1bGVkIChzZWUKIGNvbnRyb2xzIGZp
+ZWxkKS4KCg0KBQQCAggFEgTBAQIGCg0KBQQCAggBEgTBAQcYCg0KBQQCAggDEgTBARsdCg0K
+BQQCAggIEgTBAR5JChAKCAQCAggInAgAEgTBAR9ICpMBCgQEAgIJEgbFAQLGATIaggEgT3V0
+cHV0IG9ubHkuIENvbnRyb2wgYXZhaWxhYmxlIGZvciB0aGF0IE1haW50ZW5hbmNlIChtaWdo
+dCBub3QgYmUgYXZhaWxhYmxlCiBmb3IgZXZlcnkgcmVzb3VyY2UgdGhhdCBtYWludGVuYW5j
+ZSBpcyBhcHBsaWVkIHRvKS4KCg0KBQQCAgkEEgTFAQIKCg0KBQQCAgkGEgTFAQsdCg0KBQQC
+AgkBEgTFAR4mCg0KBQQCAgkDEgTFASkrCg0KBQQCAgkIEgTGAQYxChAKCAQCAgkInAgAEgTG
+AQcwCmIKBAQCAgoSBMoBAkgaVCBPdXRwdXQgb25seS4gU3RhdHMgaXMgYSBmaWVsZCBvZiBS
+ZXNvdXJjZU1haW50ZW5hbmNlIHVzZWQgdG8gYWdncmVnYXRlIHRoZQogc3RhdHMuCgoNCgUE
+AgIKBBIEygECCgoNCgUEAgIKBhIEygELEAoNCgUEAgIKARIEygERFgoNCgUEAgIKAxIEygEZ
+GwoNCgUEAgIKCBIEygEcRwoQCggEAgIKCJwIABIEygEdRgppCgIEAxIGzwEA4gIBGlsgUmVz
+b3VyY2VNYWludGVuYW5jZSBpcyBhIHJlc291cmNlIHRoYXQgcmVwcmVzZW50cyBhIG1haW50
+ZW5hbmNlIG9wZXJhdGlvbgogb24gYSByZXNvdXJjZS4KCgsKAwQDARIEzwEIGwoNCgMEAwcS
+BtABAtUBBAoPCgUEAwedCBIG0AEC1QEEClsKBAQDAwASBtgBAukBAxpLIFJlc291cmNlIGNv
+bnRhaW5zIGluZm9ybWF0aW9uIGFib3V0IHRoZSByZXNvdXJjZSBhZmZlY3RlZCBieSBtYWlu
+dGVuYW5jZS4KCg0KBQQDAwABEgTYAQoSCssBCgYEAwMAAgASBNwBBEkaugEgT3V0cHV0IG9u
+bHkuIE5hbWUgaXMgdGhlIHJlZmVyZW5jZSB0byB0aGUgY29uc3VtZXIgcmVzb3VyY2UgYWZm
+ZWN0ZWQgYnkKIHRoZSBtYWludGVuYW5jZS4gQXZhaWxhYmxlIHZhbHVlcyBjYW4gYmUgZm91
+bmQgaGVyZToKIGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9hc3NldC1pbnZlbnRvcnkvZG9j
+cy9hc3NldC1uYW1lcwoKDwoHBAMDAAIABRIE3AEECgoPCgcEAwMAAgABEgTcAQsYCg8KBwQD
+AwACAAMSBNwBGxwKDwoHBAMDAAIACBIE3AEdSAoSCgoEAwMAAgAInAgAEgTcAR5HClQKBgQD
+AwACARIE4QEERBpEIE91dHB1dCBvbmx5LiBUaGUgbG9jYXRpb24gb2YgdGhlIHJlc291cmNl
+LgogRm9ybWF0OgogYHVzLWNlbnRyYWwxYAoKDwoHBAMDAAIBBRIE4QEECgoPCgcEAwMAAgEB
+EgThAQsTCg8KBwQDAwACAQMSBOEBFhcKDwoHBAMDAAIBCBIE4QEYQwoSCgoEAwMAAgEInAgA
+EgThARlCCocCCgYEAwMAAgISBOgBBEAa9gEgT3V0cHV0IG9ubHkuIFRoZSB0eXBlIG9mIHRo
+ZSByZXNvdXJjZS4KIEF2YWlsYWJsZSB2YWx1ZXMgY2FuIGJlIGZvdW5kIGhlcmU6CiBodHRw
+czovL2Nsb3VkLmdvb2dsZS5jb20vYXNzZXQtaW52ZW50b3J5L2RvY3MvYXNzZXQtdHlwZXMj
+c3VwcG9ydGVkX3Jlc291cmNlX3R5cGVzCiBQbGVhc2Ugbm90ZSB0aGF0IG5vdCBhbGwgdGhl
+IHJlc291cmNlIHR5cGVzIHdpbGwgaGF2ZSB0aGVpciBtYWludGVuYW5jZXMKIHJlcG9ydGVk
+LgoKDwoHBAMDAAICBRIE6AEECgoPCgcEAwMAAgIBEgToAQsPCg8KBwQDAwACAgMSBOgBEhMK
+DwoHBAMDAAICCBIE6AEUPwoSCgoEAwMAAgIInAgAEgToARU+ClUKBAQDAwESBuwBAvoBAxpF
+IE1haW50ZW5hbmNlIGlzIHRoZSBtYWludGVuYW5jZSBkZXRhaWxzIG9mIGEgcmVzb3VyY2Un
+cyBtYWludGVuYW5jZS4KCg0KBQQDAwEBEgTsAQoVCo8BCgYEAwMBAgASBO8BBCAafyBNYWlu
+dGVuYW5jZSBpcyB0aGUgbmFtZSBvZiB0aGUgY29ycmVzcG9uZGluZyBtYWludGVuYW5jZSBy
+ZXNvdXJjZQogZm9sbG93aW5nIHRoZSBzdGFuZGFyZCBuYW1pbmcgc2NoZW1lOiBgInttYWlu
+dGVuYW5jZS1pZH0iYAoKDwoHBAMDAQIABRIE7wEECgoPCgcEAwMBAgABEgTvAQsbCg8KBwQD
+AwECAAMSBO8BHh8KPAoGBAMDAQIBEgTyAQRBGiwgT3V0cHV0IG9ubHkuIFRoZSB0aXRsZSBv
+ZiB0aGUgbWFpbnRlbmFuY2UuCgoPCgcEAwMBAgEFEgTyAQQKCg8KBwQDAwECAQESBPIBCxAK
+DwoHBAMDAQIBAxIE8gETFAoPCgcEAwMBAgEIEgTyARVAChIKCgQDAwECAQicCAASBPIBFj8K
+QgoGBAMDAQICEgT1AQRHGjIgT3V0cHV0IG9ubHkuIFRoZSBkZXNjcmlwdGlvbiBvZiB0aGUg
+bWFpbnRlbmFuY2UuCgoPCgcEAwMBAgIFEgT1AQQKCg8KBwQDAwECAgESBPUBCxYKDwoHBAMD
+AQICAxIE9QEZGgoPCgcEAwMBAgIIEgT1ARtGChIKCgQDAwECAgicCAASBPUBHEUKQQoGBAMD
+AQIDEgb4AQT5ATQaLyBPdXRwdXQgb25seS4gVGhlIGNhdGVnb3J5IG9mIHRoZSBtYWludGVu
+YW5jZS4KCg8KBwQDAwECAwYSBPgBBBcKDwoHBAMDAQIDARIE+AEYIAoPCgcEAwMBAgMDEgT4
+ASMkCg8KBwQDAwECAwgSBPkBCDMKEgoKBAMDAQIDCJwIABIE+QEJMgo/CgQEAwQAEgb9AQKP
+AgMaLyBTdGF0ZSBpcyB0aGUgc3RhdGUgb2YgYSByZXNvdXJjZSBtYWludGVuYW5jZS4KCg0K
+BQQDBAABEgT9AQcMCiQKBgQDBAACABIE/wEEGhoUIFVuc3BlY2lmaWVkIHN0YXRlLgoKDwoH
+BAMEAAIAARIE/wEEFQoPCgcEAwQAAgACEgT/ARgZCrgBCgYEAwQAAgESBIQCBBIapwEgU2No
+ZWR1bGVkIGZvciBhIHBhcnRpY3VsYXIgd2luZG93LiBGb3IgZGlzcnVwdGl2ZSBtYWludGVu
+YW5jZSBpdCBzaG91bGQKIHJlc3BlY3QgbWFpbnRlbmFuY2UgcG9saWN5LCBpLmUuIGl0cyBh
+dmFpbGFibGUgd2luZG93cywgZXhjbHVzaW9ucyBhbmQKIG5vdGlmaWNhdGlvbiBwZXJpb2Qu
+CgoPCgcEAwQAAgEBEgSEAgQNCg8KBwQDBAACAQISBIQCEBEKKQoGBAMEAAICEgSHAgQQGhkg
+TWFpbnRlbmFuY2UgaXMgb25nb2luZy4KCg8KBwQDBAACAgESBIcCBAsKDwoHBAMEAAICAhIE
+hwIODwqeAQoGBAMEAAIDEgSLAgQSGo0BIE5vIGxvbmdlciBwbGFubmVkLCB0eXBpY2FsbHkg
+d2hlbiBvdGhlciBtYWludGVuYW5jZSAoZS5nLiB1cGdyYWRlIHRvCiBuZXdlciB2ZXJzaW9u
+KSBhbHJlYWR5IGhhcHBlbmVkLCBvciB0aGUgdXNlciBza2lwcGVkIHRoZSBtYWludGVuYW5j
+ZS4KCg8KBwQDBAACAwESBIsCBA0KDwoHBAMEAAIDAhIEiwIQEQopCgYEAwQAAgQSBI4CBBIa
+GSBTdWNjZXNzZnVsbHkgY29tcGxldGVkLgoKDwoHBAMEAAIEARIEjgIEDQoPCgcEAwQAAgQC
+EgSOAhARCq8BCgQEAwIAEgSUAgI9GqABIElkZW50aWZpZXIuIFRoZSBuYW1lIG9mIHRoZSBy
+ZXNvdXJjZV9tYWludGVuYW5jZSByZXNvdXJjZS4KIEZvcm1hdDoKIGAicHJvamVjdHMve3By
+b2plY3R9L2xvY2F0aW9ucy97bG9jYXRpb259L3Jlc291cmNlTWFpbnRlbmFuY2Uve3Jlc291
+cmNlLW1haW50ZW5hbmNlLWlkfSJgCgoNCgUEAwIABRIElAICCAoNCgUEAwIAARIElAIJDQoN
+CgUEAwIAAxIElAIQEQoNCgUEAwIACBIElAISPAoQCggEAwIACJwIABIElAITOwpLCgQEAwIB
+EgSXAgJEGj0gT3V0cHV0IG9ubHkuIFRoZSByZXNvdXJjZSBzcGVjIG9mIHRoZSByZXNvdXJj
+ZSBtYWludGVuYW5jZS4KCg0KBQQDAgEGEgSXAgIKCg0KBQQDAgEBEgSXAgsTCg0KBQQDAgED
+EgSXAhYXCg0KBQQDAgEIEgSXAhhDChAKCAQDAgEInAgAEgSXAhlCCjwKBAQDAgISBJoCAkoa
+LiBPdXRwdXQgb25seS4gVGhlIGRldGFpbHMgb2YgdGhlIG1haW50ZW5hbmNlLgoKDQoFBAMC
+AgYSBJoCAg0KDQoFBAMCAgESBJoCDhkKDQoFBAMCAgMSBJoCHB0KDQoFBAMCAggSBJoCHkkK
+EAoIBAMCAgicCAASBJoCH0gKQwoEBAMCAxIEnQICPho1IE91dHB1dCBvbmx5LiBUaGUgc3Rh
+dGUgb2YgdGhlIHJlc291cmNlIG1haW50ZW5hbmNlLgoKDQoFBAMCAwYSBJ0CAgcKDQoFBAMC
+AwESBJ0CCA0KDQoFBAMCAwMSBJ0CEBEKDQoFBAMCAwgSBJ0CEj0KEAoIBAMCAwicCAASBJ0C
+EzwKSwoEBAMCBBIGoAICoQIyGjsgT3V0cHV0IG9ubHkuIFRoZSBjcmVhdGUgdGltZSBvZiB0
+aGUgcmVzb3VyY2UgbWFpbnRlbmFuY2UuCgoNCgUEAwIEBhIEoAICGwoNCgUEAwIEARIEoAIc
+JwoNCgUEAwIEAxIEoAIqKwoNCgUEAwIECBIEoQIGMQoQCggEAwIECJwIABIEoQIHMApLCgQE
+AwIFEgakAgKlAjIaOyBPdXRwdXQgb25seS4gVGhlIHVwZGF0ZSB0aW1lIG9mIHRoZSByZXNv
+dXJjZSBtYWludGVuYW5jZS4KCg0KBQQDAgUGEgSkAgIbCg0KBQQDAgUBEgSkAhwnCg0KBQQD
+AgUDEgSkAiorCg0KBQQDAgUIEgSlAgYxChAKCAQDAgUInAgAEgSlAgcwClIKBAQDAgYSBqgC
+AqkCMhpCIE91dHB1dCBvbmx5LiBUaGUgdGltZSB3aGVuIHRoZSByZXNvdXJjZSBtYWludGVu
+YW5jZSBoYXMgc3RhcnRlZC4KCg0KBQQDAgYGEgSoAgIbCg0KBQQDAgYBEgSoAhwyCg0KBQQD
+AgYDEgSoAjU2Cg0KBQQDAgYIEgSpAgYxChAKCAQDAgYInAgAEgSpAgcwClQKBAQDAgcSBqwC
+Aq0CMhpEIE91dHB1dCBvbmx5LiBUaGUgdGltZSB3aGVuIHRoZSByZXNvdXJjZSBtYWludGVu
+YW5jZSBoYXMgY29tcGxldGVkLgoKDQoFBAMCBwYSBKwCAhsKDQoFBAMCBwESBKwCHDAKDQoF
+BAMCBwMSBKwCMzQKDQoFBAMCBwgSBK0CBjEKEAoIBAMCBwicCAASBK0CBzAKVAoEBAMCCBIG
+sAICsQIyGkQgT3V0cHV0IG9ubHkuIFRoZSB0aW1lIHdoZW4gdGhlIHJlc291cmNlIG1haW50
+ZW5hbmNlIHdhcyBjYW5jZWxsZWQuCgoNCgUEAwIIBhIEsAICGwoNCgUEAwIIARIEsAIcMwoN
+CgUEAwIIAxIEsAI2NwoNCgUEAwIICBIEsQIGMQoQCggEAwIICJwIABIEsQIHMAplCgQEAwIJ
+Ega1AgK2AjIaVSBPdXRwdXQgb25seS4gVGhlIHRpbWUgd2hlbiB0aGUgbWFpbnRlbmFuY2Ug
+b24gdGhlIHJlc291cmNlIHdhcyBzY2hlZHVsZWQgdG8KIHN0YXJ0LgoKDQoFBAMCCQYSBLUC
+AhsKDQoFBAMCCQESBLUCHDwKDQoFBAMCCQMSBLUCP0EKDQoFBAMCCQgSBLYCBjEKEAoIBAMC
+CQicCAASBLYCBzAKYwoEBAMCChIGugICuwIyGlMgT3V0cHV0IG9ubHkuIFRoZSB0aW1lIHdo
+ZW4gdGhlIG1haW50ZW5hbmNlIG9uIHRoZSByZXNvdXJjZSB3YXMgc2NoZWR1bGVkIHRvCiBl
+bmQuCgoNCgUEAwIKBhIEugICGwoNCgUEAwIKARIEugIcOgoNCgUEAwIKAxIEugI9PwoNCgUE
+AwIKCBIEuwIGMQoQCggEAwIKCJwIABIEuwIHMAr1AQoEBAMCCxIEwQICShrmASBPdXRwdXQg
+b25seS4gSW5kaWNhdGVzIHdoZXRoZXIgdGhlIHVzZXIgaGFzIHNvbWUgY29udHJvbCBvdmVy
+IHRoYXQKIG1haW50ZW5hbmNlLCBlaXRoZXIgcHJvYWN0aXZlbHkgYmVmb3JlIG1haW50ZW5h
+bmNlIHdhcyBzY2hlZHVsZWQgd2l0aAogbWFpbnRlbmFuY2UgcG9saWN5IG9yIHdpdGggcmVh
+Y3RpdmUgY29udHJvbHMgYWZ0ZXIgaXQgd2FzIHNjaGVkdWxlZCAoc2VlCiBjb250cm9scyBm
+aWVsZCkKCg0KBQQDAgsFEgTBAgIGCg0KBQQDAgsBEgTBAgcYCg0KBQQDAgsDEgTBAhsdCg0K
+BQQDAgsIEgTBAh5JChAKCAQDAgsInAgAEgTBAh9ICj8KBAQDAgwSBsQCAsUCMhovIE91dHB1
+dCBvbmx5LiBUaGUgY29udHJvbHMgb2YgdGhlIG1haW50ZW5hbmNlLgoKDQoFBAMCDAQSBMQC
+AgoKDQoFBAMCDAYSBMQCCx0KDQoFBAMCDAESBMQCHiYKDQoFBAMCDAMSBMQCKSsKDQoFBAMC
+DAgSBMUCBjEKEAoIBAMCDAicCAASBMUCBzAKgwEKBAQDAg0SBMkCAk4adSBPcHRpb25hbC4g
+VGhlIGxhYmVscyBvbiB0aGUgcmVzb3VyY2UsIHdoaWNoIGNhbiBiZSB1c2VkIGZvciBjYXRl
+Z29yaXphdGlvbi4KIHNpbWlsYXIgdG8gS3ViZXJuZXRlcyByZXNvdXJjZSBsYWJlbHMuCgoN
+CgUEAwINBhIEyQICFQoNCgUEAwINARIEyQIWHAoNCgUEAwINAxIEyQIfJAoNCgUEAwINCBIE
+yQIlTQoQCggEAwINCJwIABIEyQImTAq1AgoEBAMCDhIG0QIC0gIvGqQCIE9wdGlvbmFsLiBB
+bm5vdGF0aW9ucyBpcyBhbiB1bnN0cnVjdHVyZWQga2V5LXZhbHVlIG1hcCBzdG9yZWQgd2l0
+aCBhCiByZXNvdXJjZSB0aGF0IG1heSBiZSBzZXQgYnkgZXh0ZXJuYWwgdG9vbHMgdG8gc3Rv
+cmUgYW5kIHJldHJpZXZlIGFyYml0cmFyeQogbWV0YWRhdGEuIFRoZXkgYXJlIG5vdCBxdWVy
+eWFibGUgYW5kIHNob3VsZCBiZSBwcmVzZXJ2ZWQgd2hlbiBtb2RpZnlpbmcKIG9iamVjdHMu
+CgogTW9yZSBpbmZvOiBodHRwczovL2t1YmVybmV0ZXMuaW8vZG9jcy91c2VyLWd1aWRlL2Fu
+bm90YXRpb25zCgoNCgUEAwIOBhIE0QICFQoNCgUEAwIOARIE0QIWIQoNCgUEAwIOAxIE0QIk
+KQoNCgUEAwIOCBIE0gIGLgoQCggEAwIOCJwIABIE0gIHLQrlAgoEBAMCDxIG2QIC3AIEGtQC
+IE91dHB1dCBvbmx5LiBUaGUgdW5pcXVlIGlkZW50aWZpZXIgb2YgdGhlIHJlc291cmNlLiBV
+SUQgaXMgdW5pcXVlIGluIHRoZQogdGltZSBhbmQgc3BhY2UgZm9yIHRoaXMgcmVzb3VyY2Ug
+d2l0aGluIHRoZSBzY29wZSBvZiB0aGUgc2VydmljZS4gSXQgaXMKIHR5cGljYWxseSBnZW5l
+cmF0ZWQgYnkgdGhlIHNlcnZlciBvbiBzdWNjZXNzZnVsIGNyZWF0aW9uIG9mIGEgcmVzb3Vy
+Y2UKIGFuZCBtdXN0IG5vdCBiZSBjaGFuZ2VkLiBVSUQgaXMgdXNlZCB0byB1bmlxdWVseSBp
+ZGVudGlmeSByZXNvdXJjZXMKIHdpdGggcmVzb3VyY2UgbmFtZSByZXVzZXMuIFRoaXMgc2hv
+dWxkIGJlIGEgVVVJRDQuCgoNCgUEAwIPBRIE2QICCAoNCgUEAwIPARIE2QIJDAoNCgUEAwIP
+AxIE2QIPFAoPCgUEAwIPCBIG2QIV3AIDChMKCwQDAg8IzPH5igEBEgTaAgQqChAKCAQDAg8I
+nAgAEgTbAgQtCtcBCgQEAwIQEgThAgJCGsgBIE91dHB1dCBvbmx5LiBBbiBvcGFxdWUgdmFs
+dWUgdGhhdCB1bmlxdWVseSBpZGVudGlmaWVzIGEgdmVyc2lvbiBvcgogZ2VuZXJhdGlvbiBv
+ZiBhIHJlc291cmNlLiBJdCBjYW4gYmUgdXNlZCB0byBjb25maXJtIHRoYXQgdGhlIGNsaWVu
+dAogYW5kIHNlcnZlciBhZ3JlZSBvbiB0aGUgb3JkZXJpbmcgb2YgYSByZXNvdXJjZSBiZWlu
+ZyB3cml0dGVuLgoKDQoFBAMCEAUSBOECAggKDQoFBAMCEAESBOECCQ0KDQoFBAMCEAMSBOEC
+EBUKDQoFBAMCEAgSBOECFkEKEAoIBAMCEAicCAASBOECF0AKLwoCBAQSBuUCAP8CARohIFRo
+ZSBjb250cm9sIG9mIHRoZSBtYWludGVuYW5jZS4KCgsKAwQEARIE5QIIGgpLCgQEBAQAEgbn
+AgLzAgMaOyBTZXRzIHRoZSB0eXBlIG9mIGNvbnRyb2wgc3VwcG9ydGVkLiBjb21tZW50IChh
+cyBpbiBsb2dzKS4KCg0KBQQEBAABEgTnAgcOCiYKBgQEBAACABIE6QIEHBoWIFVuc3BlY2lm
+aWVkIGNvbnRyb2wuCgoPCgcEBAQAAgABEgTpAgQXCg8KBwQEBAACAAISBOkCGhsKIAoGBAQE
+AAIBEgTsAgQOGhAgQXBwbHkgY29udHJvbC4KCg8KBwQEBAACAQESBOwCBAkKDwoHBAQEAAIB
+AhIE7AIMDQooCgYEBAQAAgISBO8CBBYaGCBNYW5hZ2UgcG9saWN5IGNvbnRyb2wuCgoPCgcE
+BAQAAgIBEgTvAgQRCg8KBwQEBAACAgISBO8CFBUKJQoGBAQEAAIDEgTyAgQTGhUgUmVzY2hl
+ZHVsZSBjb250cm9sLgoKDwoHBAQEAAIDARIE8gIEDgoPCgcEBAQAAgMCEgTyAhESCjgKBAQE
+AgASBPYCAhYaKiBUaGUgY29udHJvbCBvZiB0aGUgcmVzb3VyY2UgbWFpbnRlbmFuY2UuCgoN
+CgUEBAIABhIE9gICCQoNCgUEBAIAARIE9gIKEQoNCgUEBAIAAxIE9gIUFQp7CgQEBAIBEgT6
+AgIVGm0gSW5kaWNhdGVzIHdoZXRoZXIgdGhlIGNvbnRyb2wgaXMgYXZhaWxhYmxlIG9ubHkg
+aW4gU2VydmljZSBQcm9kdWNlciBBUEkKIChub3QgdGhyb3VnaCBVbmlmaWVkIE1haW50ZW5h
+bmNlKS4KCg0KBQQEAgEFEgT6AgIGCg0KBQQEAgEBEgT6AgcQCg0KBQQEAgEDEgT6AhMUCnsK
+BAQEAgISBP4CAhsabSBMaW5rIHRvIFNlcnZpY2UgUHJvZHVjZXIgZG9jdW1lbnRhdGlvbiBh
+Ym91dCBtYWludGVuYW5jZSBjb250cm9sLiBQcm92aWRlZAogb25seSB3aGVuIGBpc0N1c3Rv
+bWAgaXMgYHRydWVgLgoKDQoFBAQCAgUSBP4CAggKDQoFBAQCAgESBP4CCRYKDQoFBAQCAgMS
+BP4CGRoKTgoCBAUSBoIDAJcDARpAIFRoZSByZXF1ZXN0IHN0cnVjdHVyZSBmb3IgdGhlIExp
+c3RSZXNvdXJjZU1haW50ZW5hbmNlcyBtZXRob2QuCgoLCgMEBQESBIIDCCcKQwoEBAUCABIG
+hAMCiQMEGjMgUmVxdWlyZWQuIFRoZSBwYXJlbnQgb2YgdGhlIHJlc291cmNlIG1haW50ZW5h
+bmNlLgoKDQoFBAUCAAUSBIQDAggKDQoFBAUCAAESBIQDCQ8KDQoFBAUCAAMSBIQDEhcKDwoF
+BAUCAAgSBoQDGIkDAwoQCggEBQIACJwIABIEhQMEKgoRCgcEBQIACJ8IEgaGAwSIAwUKTQoE
+BAUCARIEjAMCGho/IFRoZSBtYXhpbXVtIG51bWJlciBvZiByZXNvdXJjZSBtYWludGVuYW5j
+ZXMgdG8gc2VuZCBwZXIgcGFnZS4KCg0KBQQFAgEFEgSMAwIHCg0KBQQFAgEBEgSMAwgRCg0K
+BQQFAgEDEgSMAxQZCokBCgQEBQICEgSQAwIcGnsgVGhlIHBhZ2UgdG9rZW46IElmIHRoZSBu
+ZXh0X3BhZ2VfdG9rZW4gZnJvbSBhIHByZXZpb3VzIHJlc3BvbnNlCiBpcyBwcm92aWRlZCwg
+dGhpcyByZXF1ZXN0IHdpbGwgc2VuZCB0aGUgc3Vic2VxdWVudCBwYWdlLgoKDQoFBAUCAgUS
+BJADAggKDQoFBAUCAgESBJADCRMKDQoFBAUCAgMSBJADFhsKSwoEBAUCAxIEkwMCGBo9IEZp
+bHRlciB0aGUgbGlzdCBhcyBzcGVjaWZpZWQgaW4gaHR0cHM6Ly9nb29nbGUuYWlwLmRldi8x
+NjAuCgoNCgUEBQIDBRIEkwMCCAoNCgUEBQIDARIEkwMJDwoNCgUEBQIDAxIEkwMSFwpJCgQE
+BQIEEgSWAwIaGjsgT3JkZXIgcmVzdWx0cyBhcyBzcGVjaWZpZWQgaW4gaHR0cHM6Ly9nb29n
+bGUuYWlwLmRldi8xMzIuCgoNCgUEBQIEBRIElgMCCAoNCgUEBQIEARIElgMJEQoNCgUEBQIE
+AxIElgMUGQpPCgIEBhIGmgMApQMBGkEgVGhlIHJlc3BvbnNlIHN0cnVjdHVyZSBmb3IgdGhl
+IExpc3RSZXNvdXJjZU1haW50ZW5hbmNlcyBtZXRob2QuCgoLCgMEBgESBJoDCCgKNAoEBAYC
+ABIEnAMCPRomIFRoZSByZXN1bHRpbmcgcmVzb3VyY2UgbWFpbnRlbmFuY2VzLgoKDQoFBAYC
+AAQSBJwDAgoKDQoFBAYCAAYSBJwDCx4KDQoFBAYCAAESBJwDHzQKDQoFBAYCAAMSBJwDNzwK
+qgEKBAQGAgESBKEDAiEamwEgSWYgcHJlc2VudCwgdGhlIG5leHQgcGFnZSB0b2tlbiBjYW4g
+YmUgcHJvdmlkZWQgdG8gYSBzdWJzZXF1ZW50CiBMaXN0UmVzb3VyY2VNYWludGVuYW5jZXMg
+Y2FsbCB0byBsaXN0IHRoZSBuZXh0IHBhZ2UuCiBJZiBlbXB0eSwgdGhlcmUgYXJlIG5vIG1v
+cmUgcGFnZXMuCgoNCgUEBgIBBRIEoQMCCAoNCgUEBgIBARIEoQMJGAoNCgUEBgIBAxIEoQMb
+IAo0CgQEBgICEgSkAwImGiYgTG9jYXRpb25zIHRoYXQgY291bGQgbm90IGJlIHJlYWNoZWQu
+CgoNCgUEBgICBBIEpAMCCgoNCgUEBgICBRIEpAMLEQoNCgUEBgICARIEpAMSHQoNCgUEBgIC
+AxIEpAMgJQpMCgIEBxIGqAMAsAMBGj4gVGhlIHJlcXVlc3Qgc3RydWN0dXJlIGZvciB0aGUg
+R2V0UmVzb3VyY2VNYWludGVuYW5jZSBtZXRob2QuCgoLCgMEBwESBKgDCCUKTwoEBAcCABIG
+qgMCrwMEGj8gUmVxdWlyZWQuIFRoZSByZXNvdXJjZSBuYW1lIG9mIHRoZSByZXNvdXJjZSB3
+aXRoaW4gYSBzZXJ2aWNlLgoKDQoFBAcCAAUSBKoDAggKDQoFBAcCAAESBKoDCQ0KDQoFBAcC
+AAMSBKoDEBUKDwoFBAcCAAgSBqoDFq8DAwoQCggEBwIACJwIABIEqwMEKgoRCgcEBwIACJ8I
+EgasAwSuAwViBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Maintenance::Api::V1::MaintenanceService::SummarizeMaintenancesRequest ===
+    # Fields for SummarizeMaintenancesRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: order_by Type: 9 ()
+
+# === Message: Google::Cloud::Maintenance::Api::V1::MaintenanceService::SummarizeMaintenancesResponse ===
+    # Fields for SummarizeMaintenancesResponse
+    # Field: maintenances Type: 11 (.google.cloud.maintenance.api.v1.MaintenanceSummary)
+    # Field: next_page_token Type: 9 ()
+    # Field: unreachable Type: 9 ()
+
+# === Message: Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceSummary ===
+    # Fields for MaintenanceSummary
+    # Field: maintenance_name Type: 9 ()
+    # Field: title Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: category Type: 14 (.google.cloud.maintenance.api.v1.MaintenanceCategory)
+    # Field: maintenance_scheduled_start_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: maintenance_scheduled_end_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: maintenance_start_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: maintenance_end_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: user_controllable Type: 8 ()
+    # Field: controls Type: 11 (.google.cloud.maintenance.api.v1.MaintenanceControl)
+    # Field: stats Type: 11 (.google.cloud.maintenance.api.v1.MaintenanceSummary.Stats)
+
+# === Message: Google::Cloud::Maintenance::Api::V1::MaintenanceService::ResourceMaintenance ===
+    # Fields for ResourceMaintenance
+    # Field: name Type: 9 ()
+    # Field: resource Type: 11 (.google.cloud.maintenance.api.v1.ResourceMaintenance.Resource)
+    # Field: maintenance Type: 11 (.google.cloud.maintenance.api.v1.ResourceMaintenance.Maintenance)
+    # Field: state Type: 14 (.google.cloud.maintenance.api.v1.ResourceMaintenance.State)
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: maintenance_start_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: maintenance_end_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: maintenance_cancel_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: maintenance_scheduled_start_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: maintenance_scheduled_end_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: user_controllable Type: 8 ()
+    # Field: controls Type: 11 (.google.cloud.maintenance.api.v1.MaintenanceControl)
+    # Field: labels Type: 11 (.google.cloud.maintenance.api.v1.ResourceMaintenance.LabelsEntry)
+    # Field: annotations Type: 11 (.google.cloud.maintenance.api.v1.ResourceMaintenance.AnnotationsEntry)
+    # Field: uid Type: 9 ()
+    # Field: etag Type: 9 ()
+
+# Enum: ResourceMaintenance::State
+our $ResourceMaintenance_STATE_UNSPECIFIED = 0;
+our $ResourceMaintenance_SCHEDULED = 1;
+our $ResourceMaintenance_RUNNING = 2;
+our $ResourceMaintenance_CANCELLED = 3;
+our $ResourceMaintenance_SUCCEEDED = 4;
+
+# === Message: Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceControl ===
+    # Fields for MaintenanceControl
+    # Field: control Type: 14 (.google.cloud.maintenance.api.v1.MaintenanceControl.Control)
+    # Field: is_custom Type: 8 ()
+    # Field: documentation Type: 9 ()
+
+# Enum: MaintenanceControl::Control
+our $MaintenanceControl_CONTROL_UNSPECIFIED = 0;
+our $MaintenanceControl_APPLY = 1;
+our $MaintenanceControl_MANAGE_POLICY = 2;
+our $MaintenanceControl_RESCHEDULE = 3;
+
+# === Message: Google::Cloud::Maintenance::Api::V1::MaintenanceService::ListResourceMaintenancesRequest ===
+    # Fields for ListResourceMaintenancesRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: order_by Type: 9 ()
+
+# === Message: Google::Cloud::Maintenance::Api::V1::MaintenanceService::ListResourceMaintenancesResponse ===
+    # Fields for ListResourceMaintenancesResponse
+    # Field: resource_maintenances Type: 11 (.google.cloud.maintenance.api.v1.ResourceMaintenance)
+    # Field: next_page_token Type: 9 ()
+    # Field: unreachable Type: 9 ()
+
+# === Message: Google::Cloud::Maintenance::Api::V1::MaintenanceService::GetResourceMaintenanceRequest ===
+    # Fields for GetResourceMaintenanceRequest
+    # Field: name Type: 9 ()
+
+# === Service Client: Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceClient ===
+package Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceClient
+
+Client stub representing the remote C<Maintenance> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<maintenance.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'maintenance.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub summarize_maintenances {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Maintenance::Api::V1::MaintenanceService::SummarizeMaintenancesRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.maintenance.api.v1.Maintenance',
+        method         => 'SummarizeMaintenances',
+        request        => $req,
+        response_class => 'Google::Cloud::Maintenance::Api::V1::MaintenanceService::SummarizeMaintenancesResponse',
+    });
+}
+
+sub list_resource_maintenances {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Maintenance::Api::V1::MaintenanceService::ListResourceMaintenancesRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.maintenance.api.v1.Maintenance',
+        method         => 'ListResourceMaintenances',
+        request        => $req,
+        response_class => 'Google::Cloud::Maintenance::Api::V1::MaintenanceService::ListResourceMaintenancesResponse',
+    });
+}
+
+sub get_resource_maintenance {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Maintenance::Api::V1::MaintenanceService::GetResourceMaintenanceRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.maintenance.api.v1.Maintenance',
+        method         => 'GetResourceMaintenance',
+        request        => $req,
+        response_class => 'Google::Cloud::Maintenance::Api::V1::MaintenanceService::ResourceMaintenance',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Maintenance::Api::V1::MaintenanceService - Compiled Protocol Buffers messages for google/cloud/maintenance/api/v1/maintenance_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Maintenance::Api::V1::MaintenanceService;
+
+    my $msg = Google::Cloud::Maintenance::Api::V1::MaintenanceService::SummarizeMaintenancesRequest->new({
+        parent => $parent,
+        page_size => $page_size,
+        page_token => $page_token,
+        filter => $filter,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Maintenance::Api::V1::MaintenanceService::SummarizeMaintenancesRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/maintenance/api/v1/maintenance_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Maintenance::Api::V1::MaintenanceService::SummarizeMaintenancesRequest
+
+Request message for SummarizeMaintenances custom method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent of the resource maintenance.
+eg. `projects/123/locations/*`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of resource maintenances to send per page. The default
+page size is 20 and the maximum is 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The page token: If the next_page_token from a previous response
+is provided, this request will send the subsequent page.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Filter the list as specified in https://google.aip.dev/160.
+Supported fields include:
+- `maintenance.maintenanceName`
+Examples:
+- `maintenance.maintenanceName="eb3b709c-9ca1-5472-9fb6-800a3849eda1"`
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Order results as specified in https://google.aip.dev/132.
+
+=back
+
+=head2 Google::Cloud::Maintenance::Api::V1::MaintenanceService::SummarizeMaintenancesResponse
+
+Request message for SummarizeMaintenances custom method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->maintenances() >> / C<< $msg->maintenances($value) >>
+
+Type: C<Message> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceSummary>)
+
+The resulting summaries.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If present, the next page token can be provided to a subsequent
+SummarizeMaintenances call to list the next page.
+If empty, there are no more pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unordered list. Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceSummary
+
+MaintenanceSummary contains maintenance statistics calculated based on
+ResourceMaintenances within the scope: project and location.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->maintenance_name() >> / C<< $msg->maintenance_name($value) >>
+
+Type: C<String>
+
+Output only. The name of the maintenance.
+
+=item * C<< $msg->title() >> / C<< $msg->title($value) >>
+
+Type: C<String>
+
+Output only. The title of the maintenance.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Output only. The description of the maintenance.
+
+=item * C<< $msg->category() >> / C<< $msg->category($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceCategory>)
+
+Output only. The category of the maintenance event.
+
+=item * C<< $msg->maintenance_scheduled_start_time() >> / C<< $msg->maintenance_scheduled_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Scheduled start time of the maintenance. The maintenance will
+start at `maintenanceScheduledStartTime` or later, with best effort to
+finish before `maintenanceScheduledEndTime`.
+
+=item * C<< $msg->maintenance_scheduled_end_time() >> / C<< $msg->maintenance_scheduled_end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. An estimated (best effort, not guaranteed) end time of the
+scheduled maintenance.
+
+=item * C<< $msg->maintenance_start_time() >> / C<< $msg->maintenance_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Actual date when the maintenance started. Field present only
+after the state changed to `RUNNING`.
+
+=item * C<< $msg->maintenance_end_time() >> / C<< $msg->maintenance_end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Actual date when the maintenance successfully completed. Field
+present only after the state changed to `SUCCEEDED`.
+
+=item * C<< $msg->user_controllable() >> / C<< $msg->user_controllable($value) >>
+
+Type: C<Bool>
+
+Output only. Indicates whether the user has some control over that
+maintenance, either proactively before maintenance was scheduled with
+maintenance policy or with reactive controls after it was scheduled (see
+controls field).
+
+=item * C<< $msg->controls() >> / C<< $msg->controls($value) >>
+
+Type: C<Message> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceControl>)
+
+Output only. Control available for that Maintenance (might not be available
+for every resource that maintenance is applied to).
+
+=item * C<< $msg->stats() >> / C<< $msg->stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceSummary::Stats>)
+
+Output only. Stats is a field of ResourceMaintenance used to aggregate the
+stats.
+
+=back
+
+=head2 Google::Cloud::Maintenance::Api::V1::MaintenanceService::ResourceMaintenance
+
+ResourceMaintenance is a resource that represents a maintenance operation
+on a resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The name of the resource_maintenance resource.
+Format:
+`"projects/{project}/locations/{location}/resourceMaintenance/{resource-maintenance-id}"`
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<Message> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::ResourceMaintenance::Resource>)
+
+Output only. The resource spec of the resource maintenance.
+
+=item * C<< $msg->maintenance() >> / C<< $msg->maintenance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::ResourceMaintenance::Maintenance>)
+
+Output only. The details of the maintenance.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Maintenance::Api::V1::ResourceMaintenance::State>)
+
+Output only. The state of the resource maintenance.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The create time of the resource maintenance.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The update time of the resource maintenance.
+
+=item * C<< $msg->maintenance_start_time() >> / C<< $msg->maintenance_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the resource maintenance has started.
+
+=item * C<< $msg->maintenance_end_time() >> / C<< $msg->maintenance_end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the resource maintenance has completed.
+
+=item * C<< $msg->maintenance_cancel_time() >> / C<< $msg->maintenance_cancel_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the resource maintenance was cancelled.
+
+=item * C<< $msg->maintenance_scheduled_start_time() >> / C<< $msg->maintenance_scheduled_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the maintenance on the resource was scheduled to
+start.
+
+=item * C<< $msg->maintenance_scheduled_end_time() >> / C<< $msg->maintenance_scheduled_end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the maintenance on the resource was scheduled to
+end.
+
+=item * C<< $msg->user_controllable() >> / C<< $msg->user_controllable($value) >>
+
+Type: C<Bool>
+
+Output only. Indicates whether the user has some control over that
+maintenance, either proactively before maintenance was scheduled with
+maintenance policy or with reactive controls after it was scheduled (see
+controls field)
+
+=item * C<< $msg->controls() >> / C<< $msg->controls($value) >>
+
+Type: C<Message> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceControl>)
+
+Output only. The controls of the maintenance.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::ResourceMaintenance::LabelsEntry>)
+
+Optional. The labels on the resource, which can be used for categorization.
+similar to Kubernetes resource labels.
+
+=item * C<< $msg->annotations() >> / C<< $msg->annotations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::ResourceMaintenance::AnnotationsEntry>)
+
+Optional. Annotations is an unstructured key-value map stored with a
+resource that may be set by external tools to store and retrieve arbitrary
+metadata. They are not queryable and should be preserved when modifying
+objects.
+
+More info: https://kubernetes.io/docs/user-guide/annotations
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. The unique identifier of the resource. UID is unique in the
+time and space for this resource within the scope of the service. It is
+typically generated by the server on successful creation of a resource
+and must not be changed. UID is used to uniquely identify resources
+with resource name reuses. This should be a UUID4.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. An opaque value that uniquely identifies a version or
+generation of a resource. It can be used to confirm that the client
+and server agree on the ordering of a resource being written.
+
+=back
+
+=head3 Enum: ResourceMaintenance::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<SCHEDULED> => C<1>
+
+=item * C<RUNNING> => C<2>
+
+=item * C<CANCELLED> => C<3>
+
+=item * C<SUCCEEDED> => C<4>
+
+=back
+
+=head2 Google::Cloud::Maintenance::Api::V1::MaintenanceService::MaintenanceControl
+
+The control of the maintenance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->control() >> / C<< $msg->control($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceControl::Control>)
+
+The control of the resource maintenance.
+
+=item * C<< $msg->is_custom() >> / C<< $msg->is_custom($value) >>
+
+Type: C<Bool>
+
+Indicates whether the control is available only in Service Producer API
+(not through Unified Maintenance).
+
+=item * C<< $msg->documentation() >> / C<< $msg->documentation($value) >>
+
+Type: C<String>
+
+Link to Service Producer documentation about maintenance control. Provided
+only when `isCustom` is `true`.
+
+=back
+
+=head3 Enum: MaintenanceControl::Control
+
+=over 4
+
+=item * C<CONTROL_UNSPECIFIED> => C<0>
+
+=item * C<APPLY> => C<1>
+
+=item * C<MANAGE_POLICY> => C<2>
+
+=item * C<RESCHEDULE> => C<3>
+
+=back
+
+=head2 Google::Cloud::Maintenance::Api::V1::MaintenanceService::ListResourceMaintenancesRequest
+
+The request structure for the ListResourceMaintenances method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent of the resource maintenance.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of resource maintenances to send per page.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The page token: If the next_page_token from a previous response
+is provided, this request will send the subsequent page.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Filter the list as specified in https://google.aip.dev/160.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Order results as specified in https://google.aip.dev/132.
+
+=back
+
+=head2 Google::Cloud::Maintenance::Api::V1::MaintenanceService::ListResourceMaintenancesResponse
+
+The response structure for the ListResourceMaintenances method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->resource_maintenances() >> / C<< $msg->resource_maintenances($value) >>
+
+Type: C<Message> (L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::ResourceMaintenance>)
+
+The resulting resource maintenances.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If present, the next page token can be provided to a subsequent
+ListResourceMaintenances call to list the next page.
+If empty, there are no more pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Maintenance::Api::V1::MaintenanceService::GetResourceMaintenanceRequest
+
+The request structure for the GetResourceMaintenance method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the resource within a service.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Maintenance::Api::V1::MaintenanceService::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

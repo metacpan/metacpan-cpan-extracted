@@ -22,7 +22,7 @@ ok($sig->signer_cert);
 
 # Test signing with a DSA key
 SKIP: {
-    skip "Crypt::OpenSSL::DSA >= 0.20 is not installed", 1 if (!test_dsa_ok());
+    skip "Crypt::OpenSSL::DSA >= 0.20 is not installed", 8 if (!test_dsa_ok());
 foreach my $key ('t/dsa.private-2048.key', 't/dsa.private-3072.key', 't/dsa.private.key') {
 
     my $dsasig = XML::Sig->new({ key => $key });

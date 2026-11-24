@@ -1,0 +1,46 @@
+Changes
+lib/Google/Cloud/Datacatalog/V1beta1.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Common.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Common/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Datacatalog.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Datacatalog/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/DataCatalogClient.pm
+lib/Google/Cloud/Datacatalog/V1beta1/GcsFilesetSpec.pm
+lib/Google/Cloud/Datacatalog/V1beta1/GcsFilesetSpec/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Policytagmanager.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Policytagmanager/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/PolicyTagManagerClient.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Policytagmanagerserialization.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Policytagmanagerserialization/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/PolicyTagManagerSerializationClient.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Schema.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Schema/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Search.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Search/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/TableSpec.pm
+lib/Google/Cloud/Datacatalog/V1beta1/TableSpec/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Tags.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Tags/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Timestamps.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Timestamps/Types.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Usage.pm
+lib/Google/Cloud/Datacatalog/V1beta1/Usage/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-DataCatalog.t
+t/01-service-Default.t
+t/01-service-PolicyTagManager.t
+t/01-service-PolicyTagManagerSerialization.t
+t/02-rest-transport-DataCatalog.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-PolicyTagManager.t
+t/02-rest-transport-PolicyTagManagerSerialization.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

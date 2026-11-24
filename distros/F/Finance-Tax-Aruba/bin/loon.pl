@@ -144,6 +144,7 @@ my @order = qw(
     fixed_tax
     var_tax
     total_tax
+    reparatietoeslag
     -
     free
     netto
@@ -159,6 +160,7 @@ my @order = qw(
     -
     azv_total
     aov_total
+    total_tax
     gov_costs
     -
     pensioen
@@ -185,6 +187,7 @@ my %year = (
     fixed_tax      => $calc->tax_fixed,
     var_tax        => $calc->tax_variable,
     total_tax      => $calc->income_tax,
+    reparatietoeslag => $calc->reparatietoeslag,
     rate           => $calc->tax_rate,
     azv_employer   => $calc->azv_employer,
     aov_employer   => $calc->aov_employer,
@@ -221,6 +224,7 @@ my %mapping = (
     fixed_tax      => 'Vaste belasting',
     var_tax        => 'Variable belasting',
     total_tax      => 'Totale belastingen',
+    reparatietoeslag => 'Reparatietoeslag',
     rate           => 'Belastingtarief',
     effective_rate => 'Effectief belastingtarief',
     $opts{rate} ? (conv_rate => "$opts{rate}awg/1eur") : (),
@@ -301,7 +305,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSIS
 

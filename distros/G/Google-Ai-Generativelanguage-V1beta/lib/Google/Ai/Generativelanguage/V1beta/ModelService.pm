@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::ModelService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -242,131 +242,19 @@ EOF
     # Fields for GetModelRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::GetModelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::GetModelRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsRequest ===
     # Fields for ListModelsRequest
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsRequest->new(
-        page_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsResponse ===
     # Fields for ListModelsResponse
     # Field: models Type: 11 (.google.ai.generativelanguage.v1beta.Model)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsResponse->new(
-        models => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<models>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Model)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::ModelService::GetTunedModelRequest ===
     # Fields for GetTunedModelRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::GetTunedModelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::GetTunedModelRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsRequest ===
     # Fields for ListTunedModelsRequest
@@ -374,109 +262,15 @@ Type: String
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsRequest->new(
-        page_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsResponse ===
     # Fields for ListTunedModelsResponse
     # Field: tuned_models Type: 11 (.google.ai.generativelanguage.v1beta.TunedModel)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsResponse->new(
-        tuned_models => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tuned_models>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TunedModel)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelRequest ===
     # Fields for CreateTunedModelRequest
     # Field: tuned_model_id Type: 9 ()
     # Field: tuned_model Type: 11 (.google.ai.generativelanguage.v1beta.TunedModel)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelRequest->new(
-        tuned_model_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tuned_model_id>
-
-Type: String
-
-=item * B<tuned_model>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TunedModel)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelMetadata ===
     # Fields for CreateTunedModelMetadata
@@ -486,135 +280,29 @@ Type: Message (.google.ai.generativelanguage.v1beta.TunedModel)
     # Field: completed_percent Type: 2 ()
     # Field: snapshots Type: 11 (.google.ai.generativelanguage.v1beta.TuningSnapshot)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelMetadata->new(
-        tuned_model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tuned_model>
-
-Type: String
-
-=item * B<total_steps>
-
-Type: Int32
-
-=item * B<completed_steps>
-
-Type: Int32
-
-=item * B<completed_percent>
-
-Type: Float
-
-=item * B<snapshots>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TuningSnapshot)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::ModelService::UpdateTunedModelRequest ===
     # Fields for UpdateTunedModelRequest
     # Field: tuned_model Type: 11 (.google.ai.generativelanguage.v1beta.TunedModel)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::UpdateTunedModelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::UpdateTunedModelRequest->new(
-        tuned_model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tuned_model>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TunedModel)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::ModelService::DeleteTunedModelRequest ===
     # Fields for DeleteTunedModelRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::ModelService::DeleteTunedModelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::DeleteTunedModelRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Ai::Generativelanguage::V1beta::ModelService::ModelServiceClient ===
 package Google::Ai::Generativelanguage::V1beta::ModelService::ModelServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Ai::Generativelanguage::V1beta::ModelService::ModelServiceClient
 
-Google::Ai::Generativelanguage::V1beta::ModelService::ModelServiceClient - Client stub representing the remote ModelService service
+Client stub representing the remote C<ModelService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<ai.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -734,13 +422,336 @@ sub delete_tuned_model {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::ModelService - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::ModelService - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/model_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::ModelService;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::ModelService::GetModelRequest->new({
+        name => $name,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::ModelService::GetModelRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/model_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::GetModelRequest
+
+Request for getting information about a specific Model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the model.
+
+This name should match a model name returned by the `ListModels` method.
+
+Format: `models/{model}`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsRequest
+
+Request for listing all Models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of `Models` to return (per page).
+
+If unspecified, 50 models will be returned per page.
+This method returns at most 1000 models per page, even if you pass a larger
+page_size.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A page token, received from a previous `ListModels` call.
+
+Provide the `page_token` returned by one request as an argument to the next
+request to retrieve the next page.
+
+When paginating, all other parameters provided to `ListModels` must match
+the call that provided the page token.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsResponse
+
+Response from `ListModel` containing a paginated list of Models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->models() >> / C<< $msg->models($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Model::Model>)
+
+The returned Models.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+
+If this field is omitted, there are no more pages.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::GetTunedModelRequest
+
+Request for getting information about a specific Model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the model.
+
+Format: `tunedModels/my-model-id`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsRequest
+
+Request for listing TunedModels.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of `TunedModels` to return (per page).
+The service may return fewer tuned models.
+
+If unspecified, at most 10 tuned models will be returned.
+This method returns at most 1000 models per page, even if you pass a larger
+page_size.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListTunedModels` call.
+
+Provide the `page_token` returned by one request as an argument to the next
+request to retrieve the next page.
+
+When paginating, all other parameters provided to `ListTunedModels`
+must match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter is a full text search over the tuned model's description
+and display name. By default, results will not include tuned models shared
+with everyone.
+
+Additional operators:
+  - owner:me
+  - writers:me
+  - readers:me
+  - readers:everyone
+
+Examples:
+  "owner:me" returns all tuned models to which caller has owner role
+  "readers:me" returns all tuned models to which caller has reader role
+  "readers:everyone" returns all tuned models that are shared with everyone
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsResponse
+
+Response from `ListTunedModels` containing a paginated list of Models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tuned_models() >> / C<< $msg->tuned_models($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>)
+
+The returned Models.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+
+If this field is omitted, there are no more pages.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelRequest
+
+Request to create a TunedModel.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tuned_model_id() >> / C<< $msg->tuned_model_id($value) >>
+
+Type: C<String>
+
+Optional. The unique id for the tuned model if specified.
+This value should be up to 40 characters, the first character must be a
+letter, the last could be a letter or a number. The id must match the
+regular expression: `[a-z]([a-z0-9-]{0,38}[a-z0-9])?`.
+
+=item * C<< $msg->tuned_model() >> / C<< $msg->tuned_model($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>)
+
+Required. The tuned model to create.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelMetadata
+
+Metadata about the state and progress of creating a tuned model returned from
+the long-running operation
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tuned_model() >> / C<< $msg->tuned_model($value) >>
+
+Type: C<String>
+
+Name of the tuned model associated with the tuning operation.
+
+=item * C<< $msg->total_steps() >> / C<< $msg->total_steps($value) >>
+
+Type: C<Int32>
+
+The total number of tuning steps.
+
+=item * C<< $msg->completed_steps() >> / C<< $msg->completed_steps($value) >>
+
+Type: C<Int32>
+
+The number of steps completed.
+
+=item * C<< $msg->completed_percent() >> / C<< $msg->completed_percent($value) >>
+
+Type: C<Float>
+
+The completed percentage for the tuning operation.
+
+=item * C<< $msg->snapshots() >> / C<< $msg->snapshots($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::TuningSnapshot>)
+
+Metrics collected during tuning.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::UpdateTunedModelRequest
+
+Request to update a TunedModel.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tuned_model() >> / C<< $msg->tuned_model($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>)
+
+Required. The tuned model to update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::ModelService::DeleteTunedModelRequest
+
+Request to delete a TunedModel.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the model.
+Format: `tunedModels/my-model-id`
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::ModelService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

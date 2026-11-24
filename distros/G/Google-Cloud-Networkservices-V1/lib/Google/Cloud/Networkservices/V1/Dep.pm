@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::Dep;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1386,40 +1386,6 @@ EOF
     # Field: match_condition Type: 11 (.google.cloud.networkservices.v1.ExtensionChain.MatchCondition)
     # Field: extensions Type: 11 (.google.cloud.networkservices.v1.ExtensionChain.Extension)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::ExtensionChain - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::ExtensionChain->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<match_condition>
-
-Type: Message (.google.cloud.networkservices.v1.ExtensionChain.MatchCondition)
-
-=item * B<extensions>
-
-Type: Message (.google.cloud.networkservices.v1.ExtensionChain.Extension)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::LbTrafficExtension ===
     # Fields for LbTrafficExtension
     # Field: name Type: 9 ()
@@ -1432,64 +1398,6 @@ Type: Message (.google.cloud.networkservices.v1.ExtensionChain.Extension)
     # Field: load_balancing_scheme Type: 14 (.google.cloud.networkservices.v1.LoadBalancingScheme)
     # Field: metadata Type: 11 (.google.protobuf.Struct)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::LbTrafficExtension - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::LbTrafficExtension->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.LbTrafficExtension.LabelsEntry)
-
-=item * B<forwarding_rules>
-
-Type: String
-
-=item * B<extension_chains>
-
-Type: Message (.google.cloud.networkservices.v1.ExtensionChain)
-
-=item * B<load_balancing_scheme>
-
-Type: Enum (.google.cloud.networkservices.v1.LoadBalancingScheme)
-
-=item * B<metadata>
-
-Type: Message (.google.protobuf.Struct)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsRequest ===
     # Fields for ListLbTrafficExtensionsRequest
     # Field: parent Type: 9 ()
@@ -1498,117 +1406,15 @@ Type: Message (.google.protobuf.Struct)
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsResponse ===
     # Fields for ListLbTrafficExtensionsResponse
     # Field: lb_traffic_extensions Type: 11 (.google.cloud.networkservices.v1.LbTrafficExtension)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsResponse->new(
-        lb_traffic_extensions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<lb_traffic_extensions>
-
-Type: Message (.google.cloud.networkservices.v1.LbTrafficExtension)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::GetLbTrafficExtensionRequest ===
     # Fields for GetLbTrafficExtensionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::GetLbTrafficExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::GetLbTrafficExtensionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Dep::CreateLbTrafficExtensionRequest ===
     # Fields for CreateLbTrafficExtensionRequest
@@ -1617,118 +1423,16 @@ Type: String
     # Field: lb_traffic_extension Type: 11 (.google.cloud.networkservices.v1.LbTrafficExtension)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::CreateLbTrafficExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::CreateLbTrafficExtensionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<lb_traffic_extension_id>
-
-Type: String
-
-=item * B<lb_traffic_extension>
-
-Type: Message (.google.cloud.networkservices.v1.LbTrafficExtension)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::UpdateLbTrafficExtensionRequest ===
     # Fields for UpdateLbTrafficExtensionRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: lb_traffic_extension Type: 11 (.google.cloud.networkservices.v1.LbTrafficExtension)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::UpdateLbTrafficExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::UpdateLbTrafficExtensionRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<lb_traffic_extension>
-
-Type: Message (.google.cloud.networkservices.v1.LbTrafficExtension)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::DeleteLbTrafficExtensionRequest ===
     # Fields for DeleteLbTrafficExtensionRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::DeleteLbTrafficExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::DeleteLbTrafficExtensionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Dep::LbRouteExtension ===
     # Fields for LbRouteExtension
@@ -1742,64 +1446,6 @@ Type: String
     # Field: load_balancing_scheme Type: 14 (.google.cloud.networkservices.v1.LoadBalancingScheme)
     # Field: metadata Type: 11 (.google.protobuf.Struct)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::LbRouteExtension - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::LbRouteExtension->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.LbRouteExtension.LabelsEntry)
-
-=item * B<forwarding_rules>
-
-Type: String
-
-=item * B<extension_chains>
-
-Type: Message (.google.cloud.networkservices.v1.ExtensionChain)
-
-=item * B<load_balancing_scheme>
-
-Type: Enum (.google.cloud.networkservices.v1.LoadBalancingScheme)
-
-=item * B<metadata>
-
-Type: Message (.google.protobuf.Struct)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::ListLbRouteExtensionsRequest ===
     # Fields for ListLbRouteExtensionsRequest
     # Field: parent Type: 9 ()
@@ -1808,117 +1454,15 @@ Type: Message (.google.protobuf.Struct)
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::ListLbRouteExtensionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::ListLbRouteExtensionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::ListLbRouteExtensionsResponse ===
     # Fields for ListLbRouteExtensionsResponse
     # Field: lb_route_extensions Type: 11 (.google.cloud.networkservices.v1.LbRouteExtension)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::ListLbRouteExtensionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::ListLbRouteExtensionsResponse->new(
-        lb_route_extensions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<lb_route_extensions>
-
-Type: Message (.google.cloud.networkservices.v1.LbRouteExtension)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::GetLbRouteExtensionRequest ===
     # Fields for GetLbRouteExtensionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::GetLbRouteExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::GetLbRouteExtensionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Dep::CreateLbRouteExtensionRequest ===
     # Fields for CreateLbRouteExtensionRequest
@@ -1927,118 +1471,16 @@ Type: String
     # Field: lb_route_extension Type: 11 (.google.cloud.networkservices.v1.LbRouteExtension)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::CreateLbRouteExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::CreateLbRouteExtensionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<lb_route_extension_id>
-
-Type: String
-
-=item * B<lb_route_extension>
-
-Type: Message (.google.cloud.networkservices.v1.LbRouteExtension)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::UpdateLbRouteExtensionRequest ===
     # Fields for UpdateLbRouteExtensionRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: lb_route_extension Type: 11 (.google.cloud.networkservices.v1.LbRouteExtension)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::UpdateLbRouteExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::UpdateLbRouteExtensionRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<lb_route_extension>
-
-Type: Message (.google.cloud.networkservices.v1.LbRouteExtension)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::DeleteLbRouteExtensionRequest ===
     # Fields for DeleteLbRouteExtensionRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::DeleteLbRouteExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::DeleteLbRouteExtensionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Dep::LbEdgeExtension ===
     # Fields for LbEdgeExtension
@@ -2051,60 +1493,6 @@ Type: String
     # Field: extension_chains Type: 11 (.google.cloud.networkservices.v1.ExtensionChain)
     # Field: load_balancing_scheme Type: 14 (.google.cloud.networkservices.v1.LoadBalancingScheme)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::LbEdgeExtension - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::LbEdgeExtension->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.LbEdgeExtension.LabelsEntry)
-
-=item * B<forwarding_rules>
-
-Type: String
-
-=item * B<extension_chains>
-
-Type: Message (.google.cloud.networkservices.v1.ExtensionChain)
-
-=item * B<load_balancing_scheme>
-
-Type: Enum (.google.cloud.networkservices.v1.LoadBalancingScheme)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::ListLbEdgeExtensionsRequest ===
     # Fields for ListLbEdgeExtensionsRequest
     # Field: parent Type: 9 ()
@@ -2113,117 +1501,15 @@ Type: Enum (.google.cloud.networkservices.v1.LoadBalancingScheme)
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::ListLbEdgeExtensionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::ListLbEdgeExtensionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::ListLbEdgeExtensionsResponse ===
     # Fields for ListLbEdgeExtensionsResponse
     # Field: lb_edge_extensions Type: 11 (.google.cloud.networkservices.v1.LbEdgeExtension)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::ListLbEdgeExtensionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::ListLbEdgeExtensionsResponse->new(
-        lb_edge_extensions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<lb_edge_extensions>
-
-Type: Message (.google.cloud.networkservices.v1.LbEdgeExtension)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::GetLbEdgeExtensionRequest ===
     # Fields for GetLbEdgeExtensionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::GetLbEdgeExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::GetLbEdgeExtensionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Dep::CreateLbEdgeExtensionRequest ===
     # Fields for CreateLbEdgeExtensionRequest
@@ -2232,118 +1518,16 @@ Type: String
     # Field: lb_edge_extension Type: 11 (.google.cloud.networkservices.v1.LbEdgeExtension)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::CreateLbEdgeExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::CreateLbEdgeExtensionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<lb_edge_extension_id>
-
-Type: String
-
-=item * B<lb_edge_extension>
-
-Type: Message (.google.cloud.networkservices.v1.LbEdgeExtension)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::UpdateLbEdgeExtensionRequest ===
     # Fields for UpdateLbEdgeExtensionRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: lb_edge_extension Type: 11 (.google.cloud.networkservices.v1.LbEdgeExtension)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::UpdateLbEdgeExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::UpdateLbEdgeExtensionRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<lb_edge_extension>
-
-Type: Message (.google.cloud.networkservices.v1.LbEdgeExtension)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::DeleteLbEdgeExtensionRequest ===
     # Fields for DeleteLbEdgeExtensionRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::DeleteLbEdgeExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::DeleteLbEdgeExtensionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Dep::AuthzExtension ===
     # Fields for AuthzExtension
@@ -2362,84 +1546,6 @@ Type: String
     # Field: forward_attributes Type: 9 ()
     # Field: wire_format Type: 14 (.google.cloud.networkservices.v1.WireFormat)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::AuthzExtension - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::AuthzExtension->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.AuthzExtension.LabelsEntry)
-
-=item * B<load_balancing_scheme>
-
-Type: Enum (.google.cloud.networkservices.v1.LoadBalancingScheme)
-
-=item * B<authority>
-
-Type: String
-
-=item * B<service>
-
-Type: String
-
-=item * B<timeout>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<fail_open>
-
-Type: Bool
-
-=item * B<metadata>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<forward_headers>
-
-Type: String
-
-=item * B<forward_attributes>
-
-Type: String
-
-=item * B<wire_format>
-
-Type: Enum (.google.cloud.networkservices.v1.WireFormat)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::ListAuthzExtensionsRequest ===
     # Fields for ListAuthzExtensionsRequest
     # Field: parent Type: 9 ()
@@ -2448,117 +1554,15 @@ Type: Enum (.google.cloud.networkservices.v1.WireFormat)
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::ListAuthzExtensionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::ListAuthzExtensionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::ListAuthzExtensionsResponse ===
     # Fields for ListAuthzExtensionsResponse
     # Field: authz_extensions Type: 11 (.google.cloud.networkservices.v1.AuthzExtension)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::ListAuthzExtensionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::ListAuthzExtensionsResponse->new(
-        authz_extensions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<authz_extensions>
-
-Type: Message (.google.cloud.networkservices.v1.AuthzExtension)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::GetAuthzExtensionRequest ===
     # Fields for GetAuthzExtensionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::GetAuthzExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::GetAuthzExtensionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Dep::CreateAuthzExtensionRequest ===
     # Fields for CreateAuthzExtensionRequest
@@ -2567,141 +1571,31 @@ Type: String
     # Field: authz_extension Type: 11 (.google.cloud.networkservices.v1.AuthzExtension)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::CreateAuthzExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::CreateAuthzExtensionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<authz_extension_id>
-
-Type: String
-
-=item * B<authz_extension>
-
-Type: Message (.google.cloud.networkservices.v1.AuthzExtension)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::UpdateAuthzExtensionRequest ===
     # Fields for UpdateAuthzExtensionRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: authz_extension Type: 11 (.google.cloud.networkservices.v1.AuthzExtension)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::UpdateAuthzExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::UpdateAuthzExtensionRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<authz_extension>
-
-Type: Message (.google.cloud.networkservices.v1.AuthzExtension)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Dep::DeleteAuthzExtensionRequest ===
     # Fields for DeleteAuthzExtensionRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Dep::DeleteAuthzExtensionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Dep;
-
-    my $msg = Google::Cloud::Networkservices::V1::Dep::DeleteAuthzExtensionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Networkservices::V1::Dep::DepServiceClient ===
 package Google::Cloud::Networkservices::V1::Dep::DepServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networkservices::V1::Dep::DepServiceClient
 
-Google::Cloud::Networkservices::V1::Dep::DepServiceClient - Client stub representing the remote DepService service
+Client stub representing the remote C<DepService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networkservices.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2990,13 +1884,1432 @@ sub delete_authz_extension {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::Dep - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::Dep - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/dep.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networkservices::V1::Dep;
+
+    my $msg = Google::Cloud::Networkservices::V1::Dep::ExtensionChain->new({
+        name => $name,
+        match_condition => $match_condition,
+        extensions => $extensions,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::Dep::ExtensionChain->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/dep.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::Dep::ExtensionChain
+
+A single extension chain wrapper that contains the match conditions and
+extensions to execute.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name for this extension chain.
+The name is logged as part of the HTTP request logs.
+The name must conform with RFC-1034, is restricted to lower-cased letters,
+numbers and hyphens, and can have a maximum length of 63 characters.
+Additionally, the first character must be a letter and the last a letter or
+a number.
+
+=item * C<< $msg->match_condition() >> / C<< $msg->match_condition($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::ExtensionChain::MatchCondition>)
+
+Required. Conditions under which this chain is invoked for a request.
+
+=item * C<< $msg->extensions() >> / C<< $msg->extensions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::ExtensionChain::Extension>)
+
+Required. A set of extensions to execute for the matching request.
+At least one extension is required.
+Up to 3 extensions can be defined for each extension chain
+for `LbTrafficExtension` resource.
+`LbRouteExtension` and `LbEdgeExtension` chains are limited to 1 extension
+per extension chain.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::LbTrafficExtension
+
+`LbTrafficExtension` is a resource that lets the extension service modify the
+headers and payloads of both requests and responses without impacting the
+choice of backend services or any other security policies associated with the
+backend service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Identifier. Name of the `LbTrafficExtension` resource in the
+following format:
+`projects/{project}/locations/{location}/lbTrafficExtensions/{lb_traffic_extension}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A human-readable description of the resource.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbTrafficExtension::LabelsEntry>)
+
+Optional. Set of labels associated with the `LbTrafficExtension` resource.
+
+The format must comply with [the requirements for
+labels](https://cloud.google.com/compute/docs/labeling-resources#requirements)
+for Google Cloud resources.
+
+=item * C<< $msg->forwarding_rules() >> / C<< $msg->forwarding_rules($value) >>
+
+Type: C<String>
+
+Optional. A list of references to the forwarding rules to which this
+service extension is attached. At least one forwarding rule is required.
+Only one `LbTrafficExtension` resource can be associated with a forwarding
+rule.
+
+=item * C<< $msg->extension_chains() >> / C<< $msg->extension_chains($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::ExtensionChain>)
+
+Required. A set of ordered extension chains that contain the match
+conditions and extensions to execute. Match conditions for each extension
+chain are evaluated in sequence for a given request. The first extension
+chain that has a condition that matches the request is executed.
+Any subsequent extension chains do not execute.
+Limited to 5 extension chains per resource.
+
+=item * C<< $msg->load_balancing_scheme() >> / C<< $msg->load_balancing_scheme($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::LoadBalancingScheme>)
+
+Required. All backend services and forwarding rules referenced by this
+extension must share the same load balancing scheme. Supported values:
+`INTERNAL_MANAGED` and `EXTERNAL_MANAGED`. For more information, refer to
+[Backend services
+overview](https://cloud.google.com/load-balancing/docs/backend-service).
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Optional. The metadata provided here is included as part of the
+`metadata_context` (of type `google.protobuf.Struct`) in the
+`ProcessingRequest` message sent to the extension server.
+
+The metadata applies to all extensions in all extensions chains in this
+resource.
+
+The metadata is available under the key
+`com.google.lb_traffic_extension.<resource_name>`.
+
+The following variables are supported in the metadata:
+
+`{forwarding_rule_id}` - substituted with the forwarding rule's fully
+  qualified resource name.
+
+This field must not be set if at least one of the extension chains
+contains plugin extensions. Setting it results in a validation error.
+
+You can set metadata at either the resource level or the extension level.
+The extension level metadata is recommended because you can pass a
+different set of metadata through each extension to the backend.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsRequest
+
+Message for requesting list of `LbTrafficExtension` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the `LbTrafficExtension`
+resources are listed. These values are specified in the following format:
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. The server might return fewer items than
+requested. If unspecified, the server picks an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results that the server returns.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filtering results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Hint about how to order the results.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsResponse
+
+Message for response to listing `LbTrafficExtension` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->lb_traffic_extensions() >> / C<< $msg->lb_traffic_extensions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbTrafficExtension>)
+
+The list of `LbTrafficExtension` resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results that the server returns.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::GetLbTrafficExtensionRequest
+
+Message for getting a `LbTrafficExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the `LbTrafficExtension` resource to get. Must be in
+the format
+`projects/{project}/locations/{location}/lbTrafficExtensions/{lb_traffic_extension}`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::CreateLbTrafficExtensionRequest
+
+Message for creating a `LbTrafficExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the `LbTrafficExtension` resource. Must be
+in the format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->lb_traffic_extension_id() >> / C<< $msg->lb_traffic_extension_id($value) >>
+
+Type: C<String>
+
+Required. User-provided ID of the `LbTrafficExtension` resource to be
+created.
+
+=item * C<< $msg->lb_traffic_extension() >> / C<< $msg->lb_traffic_extension($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbTrafficExtension>)
+
+Required. `LbTrafficExtension` resource to be created.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::UpdateLbTrafficExtensionRequest
+
+Message for updating a `LbTrafficExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Used to specify the fields to be overwritten in the
+`LbTrafficExtension` resource by the update.
+The fields specified in the `update_mask` are relative to the resource, not
+the full request. A field is overwritten if it is in the mask. If the
+user does not specify a mask, then all fields are overwritten.
+
+=item * C<< $msg->lb_traffic_extension() >> / C<< $msg->lb_traffic_extension($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbTrafficExtension>)
+
+Required. `LbTrafficExtension` resource being updated.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::DeleteLbTrafficExtensionRequest
+
+Message for deleting a `LbTrafficExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `LbTrafficExtension` resource to delete. Must be
+in the format
+`projects/{project}/locations/{location}/lbTrafficExtensions/{lb_traffic_extension}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes after the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::LbRouteExtension
+
+`LbRouteExtension` is a resource that lets you control where traffic is
+routed to for a given request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Identifier. Name of the `LbRouteExtension` resource in the
+following format:
+`projects/{project}/locations/{location}/lbRouteExtensions/{lb_route_extension}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A human-readable description of the resource.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbRouteExtension::LabelsEntry>)
+
+Optional. Set of labels associated with the `LbRouteExtension` resource.
+
+The format must comply with [the requirements for
+labels](https://cloud.google.com/compute/docs/labeling-resources#requirements)
+for Google Cloud resources.
+
+=item * C<< $msg->forwarding_rules() >> / C<< $msg->forwarding_rules($value) >>
+
+Type: C<String>
+
+Required. A list of references to the forwarding rules to which this
+service extension is attached. At least one forwarding rule is required.
+Only one `LbRouteExtension` resource can be associated with a forwarding
+rule.
+
+=item * C<< $msg->extension_chains() >> / C<< $msg->extension_chains($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::ExtensionChain>)
+
+Required. A set of ordered extension chains that contain the match
+conditions and extensions to execute. Match conditions for each extension
+chain are evaluated in sequence for a given request. The first extension
+chain that has a condition that matches the request is executed.
+Any subsequent extension chains do not execute.
+Limited to 5 extension chains per resource.
+
+=item * C<< $msg->load_balancing_scheme() >> / C<< $msg->load_balancing_scheme($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::LoadBalancingScheme>)
+
+Required. All backend services and forwarding rules referenced by this
+extension must share the same load balancing scheme. Supported values:
+`INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. For more information, refer to
+[Backend services
+overview](https://cloud.google.com/load-balancing/docs/backend-service).
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Optional. The metadata provided here is included as part of the
+`metadata_context` (of type `google.protobuf.Struct`) in the
+`ProcessingRequest` message sent to the extension server.
+
+The metadata applies to all extensions in all extensions chains in this
+resource.
+
+The metadata is available under the key
+`com.google.lb_route_extension.<resource_name>`.
+
+The following variables are supported in the metadata:
+
+`{forwarding_rule_id}` - substituted with the forwarding rule's fully
+  qualified resource name.
+
+This field must not be set if at least one of the extension chains
+contains plugin extensions. Setting it results in a validation error.
+
+You can set metadata at either the resource level or the extension level.
+The extension level metadata is recommended because you can pass a
+different set of metadata through each extension to the backend.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::ListLbRouteExtensionsRequest
+
+Message for requesting list of `LbRouteExtension` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the `LbRouteExtension`
+resources are listed. These values are specified in the following format:
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. The server might return fewer items than
+requested. If unspecified, the server picks an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results that the server returns.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filtering results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Hint about how to order the results.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::ListLbRouteExtensionsResponse
+
+Message for response to listing `LbRouteExtension` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->lb_route_extensions() >> / C<< $msg->lb_route_extensions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbRouteExtension>)
+
+The list of `LbRouteExtension` resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results that the server returns.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::GetLbRouteExtensionRequest
+
+Message for getting a `LbRouteExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the `LbRouteExtension` resource to get. Must be in the
+format
+`projects/{project}/locations/{location}/lbRouteExtensions/{lb_route_extension}`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::CreateLbRouteExtensionRequest
+
+Message for creating a `LbRouteExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the `LbRouteExtension` resource. Must be
+in the format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->lb_route_extension_id() >> / C<< $msg->lb_route_extension_id($value) >>
+
+Type: C<String>
+
+Required. User-provided ID of the `LbRouteExtension` resource to be
+created.
+
+=item * C<< $msg->lb_route_extension() >> / C<< $msg->lb_route_extension($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbRouteExtension>)
+
+Required. `LbRouteExtension` resource to be created.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::UpdateLbRouteExtensionRequest
+
+Message for updating a `LbRouteExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Used to specify the fields to be overwritten in the
+`LbRouteExtension` resource by the update.
+The fields specified in the `update_mask` are relative to the resource, not
+the full request. A field is overwritten if it is in the mask. If the
+user does not specify a mask, then all fields are overwritten.
+
+=item * C<< $msg->lb_route_extension() >> / C<< $msg->lb_route_extension($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbRouteExtension>)
+
+Required. `LbRouteExtension` resource being updated.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::DeleteLbRouteExtensionRequest
+
+Message for deleting a `LbRouteExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `LbRouteExtension` resource to delete. Must be in
+the format
+`projects/{project}/locations/{location}/lbRouteExtensions/{lb_route_extension}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes after the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::LbEdgeExtension
+
+`LbEdgeExtension` is a resource that lets the extension service influence
+the selection of backend services and Cloud CDN cache keys by modifying
+request headers.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Identifier. Name of the `LbEdgeExtension` resource in the
+following format:
+`projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A human-readable description of the resource.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbEdgeExtension::LabelsEntry>)
+
+Optional. Set of labels associated with the `LbEdgeExtension` resource.
+
+The format must comply with [the requirements for
+labels](https://cloud.google.com/compute/docs/labeling-resources#requirements)
+for Google Cloud resources.
+
+=item * C<< $msg->forwarding_rules() >> / C<< $msg->forwarding_rules($value) >>
+
+Type: C<String>
+
+Required. A list of references to the forwarding rules to which this
+service extension is attached. At least one forwarding rule is required.
+Only one `LbEdgeExtension` resource can be associated with a forwarding
+rule.
+
+=item * C<< $msg->extension_chains() >> / C<< $msg->extension_chains($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::ExtensionChain>)
+
+Required. A set of ordered extension chains that contain the match
+conditions and extensions to execute. Match conditions for each extension
+chain are evaluated in sequence for a given request. The first extension
+chain that has a condition that matches the request is executed.
+Any subsequent extension chains do not execute.
+Limited to 5 extension chains per resource.
+
+=item * C<< $msg->load_balancing_scheme() >> / C<< $msg->load_balancing_scheme($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::LoadBalancingScheme>)
+
+Required. All forwarding rules referenced by this extension must
+share the same load balancing scheme.
+Supported values: `EXTERNAL_MANAGED`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::ListLbEdgeExtensionsRequest
+
+Message for requesting list of `LbEdgeExtension` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the `LbEdgeExtension`
+resources are listed. These values are specified in the following format:
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. The server might return fewer items than
+requested. If unspecified, the server picks an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results that the server returns.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filtering results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Hint about how to order the results.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::ListLbEdgeExtensionsResponse
+
+Message for response to listing `LbEdgeExtension` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->lb_edge_extensions() >> / C<< $msg->lb_edge_extensions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbEdgeExtension>)
+
+The list of `LbEdgeExtension` resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results that the server returns.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::GetLbEdgeExtensionRequest
+
+Message for getting a `LbEdgeExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the `LbEdgeExtension` resource to get. Must be in the
+format
+`projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::CreateLbEdgeExtensionRequest
+
+Message for creating a `LbEdgeExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the `LbEdgeExtension` resource. Must be in
+the format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->lb_edge_extension_id() >> / C<< $msg->lb_edge_extension_id($value) >>
+
+Type: C<String>
+
+Required. User-provided ID of the `LbEdgeExtension` resource to be created.
+
+=item * C<< $msg->lb_edge_extension() >> / C<< $msg->lb_edge_extension($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbEdgeExtension>)
+
+Required. `LbEdgeExtension` resource to be created.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::UpdateLbEdgeExtensionRequest
+
+Message for updating a `LbEdgeExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Used to specify the fields to be overwritten in the
+`LbEdgeExtension` resource by the update.
+The fields specified in the `update_mask` are relative to the resource, not
+the full request. A field is overwritten if it is in the mask. If the
+user does not specify a mask, then all fields are overwritten.
+
+=item * C<< $msg->lb_edge_extension() >> / C<< $msg->lb_edge_extension($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::LbEdgeExtension>)
+
+Required. `LbEdgeExtension` resource being updated.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::DeleteLbEdgeExtensionRequest
+
+Message for deleting a `LbEdgeExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `LbEdgeExtension` resource to delete. Must be in
+the format
+`projects/{project}/locations/{location}/lbEdgeExtensions/{lb_edge_extension}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes after the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::AuthzExtension
+
+`AuthzExtension` is a resource that allows traffic forwarding
+to a callout backend service to make an authorization decision.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Identifier. Name of the `AuthzExtension` resource in the
+following format:
+`projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A human-readable description of the resource.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::AuthzExtension::LabelsEntry>)
+
+Optional. Set of labels associated with the `AuthzExtension`
+resource.
+
+The format must comply with [the requirements for
+labels](/compute/docs/labeling-resources#requirements) for Google Cloud
+resources.
+
+=item * C<< $msg->load_balancing_scheme() >> / C<< $msg->load_balancing_scheme($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::LoadBalancingScheme>)
+
+Optional. All backend services and forwarding rules referenced by this
+extension must share the same load balancing scheme. Supported values:
+`INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. Can be omitted for AuthzExtensions
+that do not reference a backend service. For more information, refer to
+[Backend services
+overview](https://cloud.google.com/load-balancing/docs/backend-service).
+
+=item * C<< $msg->authority() >> / C<< $msg->authority($value) >>
+
+Type: C<String>
+
+Optional. The `:authority` header in the gRPC request sent from Envoy to
+the extension service. It is required when the `service` field points to a
+backend service or a wasm plugin.
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<String>
+
+Required. The reference to the service that runs the extension.
+
+To configure a callout extension, `service` must be a fully-qualified
+reference
+to a [backend
+service](https://cloud.google.com/compute/docs/reference/rest/v1/backendServices)
+in the format:
+`https://www.googleapis.com/compute/v1/projects/{project}/regions/{region}/backendServices/{backendService}`
+or
+`https://www.googleapis.com/compute/v1/projects/{project}/global/backendServices/{backendService}`.
+
+=item * C<< $msg->timeout() >> / C<< $msg->timeout($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Required. Specifies the timeout for each individual message on the stream.
+The timeout must be between 10-10000 milliseconds.
+
+=item * C<< $msg->fail_open() >> / C<< $msg->fail_open($value) >>
+
+Type: C<Bool>
+
+Optional. Determines how the proxy behaves if the call to the extension
+fails or times out.
+
+When set to `TRUE`, request or response processing continues without
+error. Any subsequent extensions in the extension chain are also
+executed. When set to `FALSE` or the default setting of `FALSE` is used,
+one of the following happens:
+
+* If response headers have not been delivered to the downstream client,
+a generic 500 error is returned to the client. The error response can be
+tailored by configuring a custom error response in the load balancer.
+
+* If response headers have been delivered, then the HTTP stream to the
+downstream client is reset.
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Optional. The metadata provided here is included as part of the
+`metadata_context` (of type `google.protobuf.Struct`) in the
+`ProcessingRequest` message sent to the extension
+server. The metadata is available under the namespace
+`com.google.authz_extension.<resource_name>`.
+The following variables are supported in the metadata Struct:
+
+`{forwarding_rule_id}` - substituted with the forwarding rule's fully
+  qualified resource name.
+
+=item * C<< $msg->forward_headers() >> / C<< $msg->forward_headers($value) >>
+
+Type: C<String>
+
+Optional. List of the HTTP headers to forward to the extension
+(from the client). If omitted, all headers are sent.
+Each element is a string indicating the header name.
+
+=item * C<< $msg->forward_attributes() >> / C<< $msg->forward_attributes($value) >>
+
+Type: C<String>
+
+Optional. List of the Envoy attributes to forward to the extension server.
+The attributes provided here are included as part of the
+`ProcessingRequest.attributes` field (of type
+`map<string, google.protobuf.Struct>`), where the keys are the attribute
+names. Refer to the
+[documentation](https://cloud.google.com/service-extensions/docs/cel-matcher-language-reference#attributes)
+for the names of attributes that can be forwarded. If omitted, no
+attributes are sent. Each element is a string indicating the
+attribute name.
+
+=item * C<< $msg->wire_format() >> / C<< $msg->wire_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::WireFormat>)
+
+Optional. The format of communication supported by the callout extension.
+This field is supported only for regional `AuthzExtension` resources. If
+not specified, the default value `EXT_PROC_GRPC` is used. Global
+`AuthzExtension` resources use the `EXT_PROC_GRPC` wire format.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::ListAuthzExtensionsRequest
+
+Message for requesting list of `AuthzExtension` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the `AuthzExtension`
+resources are listed. These values are specified in the following format:
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. The server might return fewer items than
+requested. If unspecified, the server picks an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results that the server returns.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filtering results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Hint about how to order the results.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::ListAuthzExtensionsResponse
+
+Message for response to listing `AuthzExtension` resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->authz_extensions() >> / C<< $msg->authz_extensions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::AuthzExtension>)
+
+The list of `AuthzExtension` resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results that the server returns.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::GetAuthzExtensionRequest
+
+Message for getting a `AuthzExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the `AuthzExtension` resource to get. Must be in
+the format
+`projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::CreateAuthzExtensionRequest
+
+Message for creating a `AuthzExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the `AuthzExtension` resource. Must
+be in the format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->authz_extension_id() >> / C<< $msg->authz_extension_id($value) >>
+
+Type: C<String>
+
+Required. User-provided ID of the `AuthzExtension` resource to be
+created.
+
+=item * C<< $msg->authz_extension() >> / C<< $msg->authz_extension($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::AuthzExtension>)
+
+Required. `AuthzExtension` resource to be created.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::UpdateAuthzExtensionRequest
+
+Message for updating a `AuthzExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Used to specify the fields to be overwritten in the
+`AuthzExtension` resource by the update.
+The fields specified in the `update_mask` are relative to the resource, not
+the full request. A field is overwritten if it is in the mask. If the
+user does not specify a mask, then all fields are overwritten.
+
+=item * C<< $msg->authz_extension() >> / C<< $msg->authz_extension($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Dep::AuthzExtension>)
+
+Required. `AuthzExtension` resource being updated.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Dep::DeleteAuthzExtensionRequest
+
+Message for deleting a `AuthzExtension` resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `AuthzExtension` resource to delete. Must
+be in the format
+`projects/{project}/locations/{location}/authzExtensions/{authz_extension}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server can ignore
+the request if it has already been completed. The server guarantees
+that for 60 minutes after the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server ignores the second request This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::Dep::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

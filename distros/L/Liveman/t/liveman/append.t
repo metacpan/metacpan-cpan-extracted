@@ -81,7 +81,7 @@ local ($::_g0 = do {$liveman_append->{added}}, $::_e0 = do {0}); ::ok defined($:
 
 # 
 # File lib/Alt/The/Plan.md is:
-{ my $s = 'lib/Alt/The/Plan.md'; open my $__f__, '<:utf8', $s or die "Read $s: $!"; my $got = join '', <$__f__>; close $__f__; my $expected = '# NAME
+{ my $s = 'lib/Alt/The/Plan.md'; open my $__f__, '<:encoding(UTF-8)', $s or die "Read $s: $!"; my $got = join '', <$__f__>; close $__f__; my $expected = '# NAME
 
 Alt::The::Plan - 
 
@@ -115,14 +115,6 @@ This is first!
 ```perl
 my $plan = Alt::The::Plan->new;
 $plan->miting($meet, $man, $woman)  # -> .3
-```
-
-# INSTALL
-
-For install this module in your system run next [command](https://metacpan.org/pod/App::cpm):
-
-```sh
-sudo cpm install -gvv Alt::The::Plan
 ```
 
 # AUTHOR

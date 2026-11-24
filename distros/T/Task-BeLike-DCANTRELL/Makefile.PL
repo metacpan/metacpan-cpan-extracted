@@ -19,7 +19,6 @@ META_MERGE => {
 
 __DATA__
 Color::ANSI::Util
-String::Tagged::Terminal
 CPAN::DistnameInfo
 Data::Dumper::Concise
 Date::Roman
@@ -32,6 +31,7 @@ HTTP::Date
 HTTP::Tiny
 JSON
 JSON::Parse
+JSON::PP
 LWP::Protocol::https
 LWP::UserAgent
 MIME::Lite
@@ -40,8 +40,12 @@ Net::DNS
 Parse::CPAN::Packages::Fast
 Path::Tiny
 Sort::Naturally
+String::Tagged::Terminal
 Template
+Test2::V0
+URI
 WWW::Mechanize
+XML::LibXML
 YAML::XS
 Algorithm::Diff::JSON
 App::ptimeout

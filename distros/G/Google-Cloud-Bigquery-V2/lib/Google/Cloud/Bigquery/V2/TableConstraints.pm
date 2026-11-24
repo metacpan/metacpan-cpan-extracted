@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::TableConstraints;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -85,66 +85,10 @@ EOF
     # Fields for PrimaryKey
     # Field: columns Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TableConstraints::PrimaryKey - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::TableConstraints;
-
-    my $msg = Google::Cloud::Bigquery::V2::TableConstraints::PrimaryKey->new(
-        columns => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<columns>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::TableConstraints::ColumnReference ===
     # Fields for ColumnReference
     # Field: referencing_column Type: 9 ()
     # Field: referenced_column Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TableConstraints::ColumnReference - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::TableConstraints;
-
-    my $msg = Google::Cloud::Bigquery::V2::TableConstraints::ColumnReference->new(
-        referencing_column => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<referencing_column>
-
-Type: String
-
-=item * B<referenced_column>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::TableConstraints::ForeignKey ===
     # Fields for ForeignKey
@@ -152,86 +96,151 @@ Type: String
     # Field: referenced_table Type: 11 (.google.cloud.bigquery.v2.TableReference)
     # Field: column_references Type: 11 (.google.cloud.bigquery.v2.ColumnReference)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TableConstraints::ForeignKey - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::TableConstraints;
-
-    my $msg = Google::Cloud::Bigquery::V2::TableConstraints::ForeignKey->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<referenced_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<column_references>
-
-Type: Message (.google.cloud.bigquery.v2.ColumnReference)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::TableConstraints::TableConstraints ===
     # Fields for TableConstraints
     # Field: primary_key Type: 11 (.google.cloud.bigquery.v2.PrimaryKey)
     # Field: foreign_keys Type: 11 (.google.cloud.bigquery.v2.ForeignKey)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::TableConstraints::TableConstraints - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::TableConstraints - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/table_constraints.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::TableConstraints;
 
-    my $msg = Google::Cloud::Bigquery::V2::TableConstraints::TableConstraints->new(
-        primary_key => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::TableConstraints::PrimaryKey->new({
+        columns => $columns,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->columns();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::TableConstraints::PrimaryKey->parse($bytes);
 
-=item * B<primary_key>
-
-Type: Message (.google.cloud.bigquery.v2.PrimaryKey)
-
-=item * B<foreign_keys>
-
-Type: Message (.google.cloud.bigquery.v2.ForeignKey)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TableConstraints - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/table_constraints.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::TableConstraints::PrimaryKey
+
+Represents the primary key constraint on a table's columns.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->columns() >> / C<< $msg->columns($value) >>
+
+Type: C<String>
+
+Required. The columns that are composed of the primary key constraint.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::TableConstraints::ColumnReference
+
+The pair of the foreign key column and primary key column.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->referencing_column() >> / C<< $msg->referencing_column($value) >>
+
+Type: C<String>
+
+Required. The column that composes the foreign key.
+
+=item * C<< $msg->referenced_column() >> / C<< $msg->referenced_column($value) >>
+
+Type: C<String>
+
+Required. The column in the primary key that are referenced by the
+referencing_column.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::TableConstraints::ForeignKey
+
+Represents a foreign key constraint on a table's columns.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. Set only if the foreign key constraint is named.
+
+=item * C<< $msg->referenced_table() >> / C<< $msg->referenced_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Required. The table that holds the primary key and is referenced by this
+foreign key.
+
+=item * C<< $msg->column_references() >> / C<< $msg->column_references($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableConstraints::ColumnReference>)
+
+Required. The columns that compose the foreign key.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::TableConstraints::TableConstraints
+
+The TableConstraints defines the primary key and foreign key.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->primary_key() >> / C<< $msg->primary_key($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableConstraints::PrimaryKey>)
+
+Optional. Represents a primary key constraint on a table's columns.
+Present only if the table has a primary key.
+The primary key is not enforced.
+
+=item * C<< $msg->foreign_keys() >> / C<< $msg->foreign_keys($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableConstraints::ForeignKey>)
+
+Optional. Present only if the table has a foreign key.
+The foreign key is not enforced.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::TableConstraints::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

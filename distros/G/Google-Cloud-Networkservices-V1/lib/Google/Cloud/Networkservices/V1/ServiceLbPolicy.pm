@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::ServiceLbPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -273,64 +273,6 @@ EOF
     # Field: failover_config Type: 11 (.google.cloud.networkservices.v1.ServiceLbPolicy.FailoverConfig)
     # Field: isolation_config Type: 11 (.google.cloud.networkservices.v1.ServiceLbPolicy.IsolationConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceLbPolicy.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<load_balancing_algorithm>
-
-Type: Enum (.google.cloud.networkservices.v1.ServiceLbPolicy.LoadBalancingAlgorithm)
-
-=item * B<auto_capacity_drain>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceLbPolicy.AutoCapacityDrain)
-
-=item * B<failover_config>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceLbPolicy.FailoverConfig)
-
-=item * B<isolation_config>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceLbPolicy.IsolationConfig)
-
-=back
-
-=cut
-
 # Enum: ServiceLbPolicy::LoadBalancingAlgorithm
 our $ServiceLbPolicy_LOAD_BALANCING_ALGORITHM_UNSPECIFIED = 0;
 our $ServiceLbPolicy_SPRAY_TO_WORLD = 3;
@@ -338,70 +280,14 @@ our $ServiceLbPolicy_SPRAY_TO_REGION = 4;
 our $ServiceLbPolicy_WATERFALL_BY_REGION = 5;
 our $ServiceLbPolicy_WATERFALL_BY_ZONE = 6;
 
-=pod
-
-=head2 Enum: ServiceLbPolicy::LoadBalancingAlgorithm
-
-Values:
-
-=over 4
-
-=item * C<LOAD_BALANCING_ALGORITHM_UNSPECIFIED> => 0
-
-=item * C<SPRAY_TO_WORLD> => 3
-
-=item * C<SPRAY_TO_REGION> => 4
-
-=item * C<WATERFALL_BY_REGION> => 5
-
-=item * C<WATERFALL_BY_ZONE> => 6
-
-=back
-
-=cut
-
 # Enum: ServiceLbPolicy::IsolationGranularity
 our $ServiceLbPolicy_ISOLATION_GRANULARITY_UNSPECIFIED = 0;
 our $ServiceLbPolicy_REGION = 1;
-
-=pod
-
-=head2 Enum: ServiceLbPolicy::IsolationGranularity
-
-Values:
-
-=over 4
-
-=item * C<ISOLATION_GRANULARITY_UNSPECIFIED> => 0
-
-=item * C<REGION> => 1
-
-=back
-
-=cut
 
 # Enum: ServiceLbPolicy::IsolationMode
 our $ServiceLbPolicy_ISOLATION_MODE_UNSPECIFIED = 0;
 our $ServiceLbPolicy_NEAREST = 1;
 our $ServiceLbPolicy_STRICT = 2;
-
-=pod
-
-=head2 Enum: ServiceLbPolicy::IsolationMode
-
-Values:
-
-=over 4
-
-=item * C<ISOLATION_MODE_UNSPECIFIED> => 0
-
-=item * C<NEAREST> => 1
-
-=item * C<STRICT> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::ServiceLbPolicy::ListServiceLbPoliciesRequest ===
     # Fields for ListServiceLbPoliciesRequest
@@ -409,109 +295,15 @@ Values:
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceLbPolicy::ListServiceLbPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceLbPolicy::ListServiceLbPoliciesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::ServiceLbPolicy::ListServiceLbPoliciesResponse ===
     # Fields for ListServiceLbPoliciesResponse
     # Field: service_lb_policies Type: 11 (.google.cloud.networkservices.v1.ServiceLbPolicy)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceLbPolicy::ListServiceLbPoliciesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceLbPolicy::ListServiceLbPoliciesResponse->new(
-        service_lb_policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<service_lb_policies>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceLbPolicy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::ServiceLbPolicy::GetServiceLbPolicyRequest ===
     # Fields for GetServiceLbPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceLbPolicy::GetServiceLbPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceLbPolicy::GetServiceLbPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::ServiceLbPolicy::CreateServiceLbPolicyRequest ===
     # Fields for CreateServiceLbPolicyRequest
@@ -519,116 +311,335 @@ Type: String
     # Field: service_lb_policy_id Type: 9 ()
     # Field: service_lb_policy Type: 11 (.google.cloud.networkservices.v1.ServiceLbPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceLbPolicy::CreateServiceLbPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceLbPolicy::CreateServiceLbPolicyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<service_lb_policy_id>
-
-Type: String
-
-=item * B<service_lb_policy>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceLbPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::ServiceLbPolicy::UpdateServiceLbPolicyRequest ===
     # Fields for UpdateServiceLbPolicyRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: service_lb_policy Type: 11 (.google.cloud.networkservices.v1.ServiceLbPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceLbPolicy::UpdateServiceLbPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceLbPolicy::UpdateServiceLbPolicyRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<service_lb_policy>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceLbPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::ServiceLbPolicy::DeleteServiceLbPolicyRequest ===
     # Fields for DeleteServiceLbPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceLbPolicy::DeleteServiceLbPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceLbPolicy::DeleteServiceLbPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::ServiceLbPolicy - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::ServiceLbPolicy - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/service_lb_policy.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
+
+    my $msg = Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        labels => $labels,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/service_lb_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy
+
+ServiceLbPolicy holds global load balancing and traffic distribution
+configuration that can be applied to a BackendService.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the ServiceLbPolicy resource. It matches pattern
+`projects/{project}/locations/{location}/serviceLbPolicies/{service_lb_policy_name}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when this resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when this resource was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy::LabelsEntry>)
+
+Optional. Set of label tags associated with the ServiceLbPolicy resource.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A free-text description of the resource. Max length 1024
+characters.
+
+=item * C<< $msg->load_balancing_algorithm() >> / C<< $msg->load_balancing_algorithm($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::ServiceLbPolicy::LoadBalancingAlgorithm>)
+
+Optional. The type of load balancing algorithm to be used. The default
+behavior is WATERFALL_BY_REGION.
+
+=item * C<< $msg->auto_capacity_drain() >> / C<< $msg->auto_capacity_drain($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy::AutoCapacityDrain>)
+
+Optional. Configuration to automatically move traffic away for unhealthy
+IG/NEG for the associated Backend Service.
+
+=item * C<< $msg->failover_config() >> / C<< $msg->failover_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy::FailoverConfig>)
+
+Optional. Configuration related to health based failover.
+
+=item * C<< $msg->isolation_config() >> / C<< $msg->isolation_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy::IsolationConfig>)
+
+Optional. Configuration to provide isolation support for the associated
+Backend Service.
+
+=back
+
+=head3 Enum: ServiceLbPolicy::LoadBalancingAlgorithm
+
+=over 4
+
+=item * C<LOAD_BALANCING_ALGORITHM_UNSPECIFIED> => C<0>
+
+=item * C<SPRAY_TO_WORLD> => C<3>
+
+=item * C<SPRAY_TO_REGION> => C<4>
+
+=item * C<WATERFALL_BY_REGION> => C<5>
+
+=item * C<WATERFALL_BY_ZONE> => C<6>
+
+=back
+
+=head3 Enum: ServiceLbPolicy::IsolationGranularity
+
+=over 4
+
+=item * C<ISOLATION_GRANULARITY_UNSPECIFIED> => C<0>
+
+=item * C<REGION> => C<1>
+
+=back
+
+=head3 Enum: ServiceLbPolicy::IsolationMode
+
+=over 4
+
+=item * C<ISOLATION_MODE_UNSPECIFIED> => C<0>
+
+=item * C<NEAREST> => C<1>
+
+=item * C<STRICT> => C<2>
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceLbPolicy::ListServiceLbPoliciesRequest
+
+Request used with the ListServiceLbPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the ServiceLbPolicies should
+be listed, specified in the format
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of ServiceLbPolicies to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListServiceLbPoliciesResponse`
+Indicates that this is a continuation of a prior `ListRouters` call,
+and that the system should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceLbPolicy::ListServiceLbPoliciesResponse
+
+Response returned by the ListServiceLbPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->service_lb_policies() >> / C<< $msg->service_lb_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy>)
+
+List of ServiceLbPolicy resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request attempts to list all
+resources across all supported locations, while some locations are
+temporarily unavailable.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceLbPolicy::GetServiceLbPolicyRequest
+
+Request used by the GetServiceLbPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the ServiceLbPolicy to get. Must be in the format
+`projects/{project}/locations/{location}/serviceLbPolicies/*`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceLbPolicy::CreateServiceLbPolicyRequest
+
+Request used by the ServiceLbPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the ServiceLbPolicy. Must be in the
+format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->service_lb_policy_id() >> / C<< $msg->service_lb_policy_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the ServiceLbPolicy resource to be created.
+E.g. for resource name
+`projects/{project}/locations/{location}/serviceLbPolicies/{service_lb_policy_name}`.
+the id is value of {service_lb_policy_name}
+
+=item * C<< $msg->service_lb_policy() >> / C<< $msg->service_lb_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy>)
+
+Required. ServiceLbPolicy resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceLbPolicy::UpdateServiceLbPolicyRequest
+
+Request used by the UpdateServiceLbPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+ServiceLbPolicy resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->service_lb_policy() >> / C<< $msg->service_lb_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceLbPolicy::ServiceLbPolicy>)
+
+Required. Updated ServiceLbPolicy resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceLbPolicy::DeleteServiceLbPolicyRequest
+
+Request used by the DeleteServiceLbPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the ServiceLbPolicy to delete. Must be in the format
+`projects/{project}/locations/{location}/serviceLbPolicies/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::ServiceLbPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

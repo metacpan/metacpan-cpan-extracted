@@ -1,0 +1,42 @@
+Changes
+lib/Google/Cloud/Eventarc/V1.pm
+lib/Google/Cloud/Eventarc/V1/Channel.pm
+lib/Google/Cloud/Eventarc/V1/Channel/Types.pm
+lib/Google/Cloud/Eventarc/V1/ChannelConnection.pm
+lib/Google/Cloud/Eventarc/V1/ChannelConnection/Types.pm
+lib/Google/Cloud/Eventarc/V1/Discovery.pm
+lib/Google/Cloud/Eventarc/V1/Discovery/Types.pm
+lib/Google/Cloud/Eventarc/V1/Enrollment.pm
+lib/Google/Cloud/Eventarc/V1/Enrollment/Types.pm
+lib/Google/Cloud/Eventarc/V1/Eventarc.pm
+lib/Google/Cloud/Eventarc/V1/Eventarc/Types.pm
+lib/Google/Cloud/Eventarc/V1/EventarcClient.pm
+lib/Google/Cloud/Eventarc/V1/GoogleApiSource.pm
+lib/Google/Cloud/Eventarc/V1/GoogleApiSource/Types.pm
+lib/Google/Cloud/Eventarc/V1/GoogleChannelConfig.pm
+lib/Google/Cloud/Eventarc/V1/GoogleChannelConfig/Types.pm
+lib/Google/Cloud/Eventarc/V1/LoggingConfig.pm
+lib/Google/Cloud/Eventarc/V1/LoggingConfig/Types.pm
+lib/Google/Cloud/Eventarc/V1/MessageBus.pm
+lib/Google/Cloud/Eventarc/V1/MessageBus/Types.pm
+lib/Google/Cloud/Eventarc/V1/NetworkConfig.pm
+lib/Google/Cloud/Eventarc/V1/NetworkConfig/Types.pm
+lib/Google/Cloud/Eventarc/V1/Pipeline.pm
+lib/Google/Cloud/Eventarc/V1/Pipeline/Types.pm
+lib/Google/Cloud/Eventarc/V1/Trigger.pm
+lib/Google/Cloud/Eventarc/V1/Trigger/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-Eventarc.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-Eventarc.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

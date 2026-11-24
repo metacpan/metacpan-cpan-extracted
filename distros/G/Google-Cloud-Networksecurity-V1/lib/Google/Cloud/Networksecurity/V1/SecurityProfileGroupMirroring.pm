@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -59,43 +59,66 @@ EOF
     # Fields for CustomMirroringProfile
     # Field: mirroring_endpoint_group Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring::CustomMirroringProfile - Compiled Protocol Buffers message class
+Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/security_profile_group_mirroring.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring;
 
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring::CustomMirroringProfile->new(
-        mirroring_endpoint_group => $value,
-    );
+    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring::CustomMirroringProfile->new({
+        mirroring_endpoint_group => $mirroring_endpoint_group,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->mirroring_endpoint_group();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring::CustomMirroringProfile->parse($bytes);
 
-=item * B<mirroring_endpoint_group>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/security_profile_group_mirroring.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring::CustomMirroringProfile
+
+CustomMirroringProfile defines out-of-band integration behavior (mirroring).
+It is used by mirroring rules with a MIRROR action.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mirroring_endpoint_group() >> / C<< $msg->mirroring_endpoint_group($value) >>
+
+Type: C<String>
+
+Required. Immutable. The target MirroringEndpointGroup.
+When a mirroring rule with this security profile attached matches a packet,
+a replica will be mirrored to the location-local target in this group.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Security;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -74,81 +74,110 @@ EOF
     # Field: writers Type: 9 ()
     # Field: owners Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Security::ResourceAccessSpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Security;
-
-    my $msg = Google::Cloud::Dataplex::V1::Security::ResourceAccessSpec->new(
-        readers => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<readers>
-
-Type: String
-
-=item * B<writers>
-
-Type: String
-
-=item * B<owners>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Security::DataAccessSpec ===
     # Fields for DataAccessSpec
     # Field: readers Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Security::DataAccessSpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Security;
-
-    my $msg = Google::Cloud::Dataplex::V1::Security::DataAccessSpec->new(
-        readers => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<readers>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Security - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::Security - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/security.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Security;
+
+    my $msg = Google::Cloud::Dataplex::V1::Security::ResourceAccessSpec->new({
+        readers => $readers,
+        writers => $writers,
+        owners => $owners,
+    });
+
+    # Read or update a field
+    my $val = $msg->readers();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Security::ResourceAccessSpec->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/security.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Security::ResourceAccessSpec
+
+ResourceAccessSpec holds the access control configuration to be enforced
+on the resources, for example, Cloud Storage bucket, BigQuery dataset,
+BigQuery table.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->readers() >> / C<< $msg->readers($value) >>
+
+Type: C<String>
+
+Optional. The format of strings follows the pattern followed by IAM in the
+bindings. user:{email}, serviceAccount:{email} group:{email}.
+The set of principals to be granted reader role on the resource.
+
+=item * C<< $msg->writers() >> / C<< $msg->writers($value) >>
+
+Type: C<String>
+
+Optional. The set of principals to be granted writer role on the resource.
+
+=item * C<< $msg->owners() >> / C<< $msg->owners($value) >>
+
+Type: C<String>
+
+Optional. The set of principals to be granted owner role on the resource.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Security::DataAccessSpec
+
+DataAccessSpec holds the access control configuration to be enforced on data
+stored within resources (eg: rows, columns in BigQuery Tables). When
+associated with data, the data is only accessible to
+principals explicitly granted access through the DataAccessSpec. Principals
+with access to the containing resource are not implicitly granted access.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->readers() >> / C<< $msg->readers($value) >>
+
+Type: C<String>
+
+Optional. The format of strings follows the pattern followed by IAM in the
+bindings. user:{email}, serviceAccount:{email} group:{email}.
+The set of principals to be granted reader role on data
+stored within resources.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Security::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

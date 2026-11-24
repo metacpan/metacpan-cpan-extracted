@@ -13,9 +13,10 @@ use Google::Api::Common;
 use Google::Iam::V1::Options;
 use Google::Iam::V1::Policy;
 use Google::Iam::V1::ResourcePolicyMember;
+use Google::Iam::V1::Logging::AuditData;
 use Google::Iam::V1::IamPolicy;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -31,7 +32,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'iam.googleapis.com:443';
+    my $target = 'iam-meta-api.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -196,6 +197,8 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/iam/v1/iam_policy.proto>
 
+=item * C<googleapis/google/iam/v1/logging/audit_data.proto>
+
 =item * C<googleapis/google/iam/v1/options.proto>
 
 =item * C<googleapis/google/iam/v1/policy.proto>
@@ -235,15 +238,75 @@ The following RPC methods are available in this client:
 
 =item * B<set_iam_policy>
 
-Calls the RPC method C<SetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_iam_policy(
+        resource                 => $resource,
+        policy                   => $policy,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<SetIamPolicy> on C<google.iam.v1.IAMPolicy>.
+
+Request: L<Google::Iam::V1::IamPolicy::SetIamPolicyRequest>
+
+Returns: L<Google::Iam::V1::Policy::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<resource> - C<string>
+
+=item * C<policy> - L<Google::Iam::V1::Policy::Policy>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<get_iam_policy>
 
-Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_iam_policy(
+        resource                 => $resource,
+        options                  => $options,
+    );
+
+Calls the RPC method C<GetIamPolicy> on C<google.iam.v1.IAMPolicy>.
+
+Request: L<Google::Iam::V1::IamPolicy::GetIamPolicyRequest>
+
+Returns: L<Google::Iam::V1::Policy::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<resource> - C<string>
+
+=item * C<options> - L<Google::Iam::V1::Options::GetPolicyOptions>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        resource                 => $resource,
+        permissions              => [ ... ],
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.iam.v1.IAMPolicy>.
+
+Request: L<Google::Iam::V1::IamPolicy::TestIamPermissionsRequest>
+
+Returns: L<Google::Iam::V1::IamPolicy::TestIamPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<resource> - C<string>
+
+=item * C<permissions> - ArrayRef of C<string>
+
+=back
 
 =back
 

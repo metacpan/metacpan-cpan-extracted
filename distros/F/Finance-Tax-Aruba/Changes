@@ -6,9 +6,20 @@ TODO:
     * Support dual household income tax calculations
     * Convert to Object::Pad / Corina
     * Add SVB fees
-    * Add BBO
     * Add Profit tax
     * Add tourist levy
+
+0.015     2026-11-24 04:36:34Z
+
+    * Add BBO (turnover tax) calculations and bbo.pl for 2020 and later
+    * BBO is BBO plus BAZV: 3% + 3% up to 2023, 4% + 3% from 2024
+    * BBO paid at the border can be offset from 2024, only when the
+      customs invoice is held by the importer
+
+0.014     2026-11-24 04:16:43Z
+
+    * Add reparatietoeslag (2025, 2026)
+    * Split 2026 from 2025
 
 0.013     2026-04-15 14:45:15Z
 

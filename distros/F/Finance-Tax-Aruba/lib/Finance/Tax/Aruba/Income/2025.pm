@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Income::2025;
-our $VERSION = '0.013';
+our $VERSION = '0.015';
 use Moose;
 use namespace::autoclean;
 
@@ -11,6 +11,19 @@ with qw(
 
 has '+taxfree_max' => (
     default  => 30_000,
+);
+
+has '+reparatietoeslag_table' => (
+    default => sub {
+        [
+            { min => 1986.20, max => 2050.00, amount => 125 },
+            { min => 2050.00, max => 2150.00, amount => 120 },
+            { min => 2150.00, max => 2250.00, amount => 115 },
+            { min => 2250.00, max => 2350.00, amount => 110 },
+            { min => 2350.00, max => 2450.00, amount => 105 },
+            { min => 2450.00, max => 2500.01, amount => 100 },
+        ];
+    },
 );
 
 sub _build_tax_bracket {
@@ -41,7 +54,6 @@ sub is_year {
     my $self = shift;
     my $year = shift;
     return 1 if $year == 2025;
-    return 1 if $year == 2026;
     return 0;
 }
 
@@ -60,7 +72,7 @@ Finance::Tax::Aruba::Income::2025 - Income tax calculator for the year 2025
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSIS
 

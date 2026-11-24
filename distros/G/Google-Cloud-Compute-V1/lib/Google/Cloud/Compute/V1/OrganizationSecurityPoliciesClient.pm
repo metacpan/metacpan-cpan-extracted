@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -668,67 +668,416 @@ The following RPC methods are available in this client:
 
 =item * B<add_association>
 
-Calls the RPC method C<AddAssociation> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_association(
+        replace_existing_association => $replace_existing_association,
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+        security_policy_association_resource => $security_policy_association_resource,
+    );
+
+Calls the RPC method C<AddAssociation> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddAssociationOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<replace_existing_association> - C<bool>
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=item * C<security_policy_association_resource> - L<Google::Cloud::Compute::V1::Compute::SecurityPolicyAssociation>
+
+=back
 
 =item * B<add_rule>
 
-Calls the RPC method C<AddRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_rule(
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+        security_policy_rule_resource => $security_policy_rule_resource,
+    );
+
+Calls the RPC method C<AddRule> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddRuleOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=item * C<security_policy_rule_resource> - L<Google::Cloud::Compute::V1::Compute::SecurityPolicyRule>
+
+=back
 
 =item * B<copy_rules>
 
-Calls the RPC method C<CopyRules> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->copy_rules(
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+        source_security_policy   => $source_security_policy,
+    );
+
+Calls the RPC method C<CopyRules> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CopyRulesOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=item * C<source_security_policy> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SecurityPolicy>
+
+Parameters:
+
+=over 4
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<get_association>
 
-Calls the RPC method C<GetAssociation> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_association(
+        name                     => $name,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<GetAssociation> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetAssociationOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SecurityPolicyAssociation>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<get_rule>
 
-Calls the RPC method C<GetRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_rule(
+        priority                 => $priority,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<GetRule> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRuleOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SecurityPolicyRule>
+
+Parameters:
+
+=over 4
+
+=item * C<priority> - C<int32>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        parent_id                => $parent_id,
+        request_id               => $request_id,
+        security_policy_resource => $security_policy_resource,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent_id> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy_resource> - L<Google::Cloud::Compute::V1::Compute::SecurityPolicy>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        parent_id                => $parent_id,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListOrganizationSecurityPoliciesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SecurityPolicyList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<parent_id> - C<string>
+
+=back
 
 =item * B<list_associations>
 
-Calls the RPC method C<ListAssociations> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_associations(
+        target_resource          => $target_resource,
+    );
+
+Calls the RPC method C<ListAssociations> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListAssociationsOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::OrganizationSecurityPoliciesListAssociationsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<target_resource> - C<string>
+
+=back
 
 =item * B<list_preconfigured_expression_sets>
 
-Calls the RPC method C<ListPreconfiguredExpressionSets> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_preconfigured_expression_sets(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        parent_id                => $parent_id,
+    );
+
+Calls the RPC method C<ListPreconfiguredExpressionSets> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListPreconfiguredExpressionSetsOrganizationSecurityPoliciesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SecurityPoliciesListPreconfiguredExpressionSetsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<parent_id> - C<string>
+
+=back
 
 =item * B<move>
 
-Calls the RPC method C<Move> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->move(
+        parent_id                => $parent_id,
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<Move> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::MoveOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent_id> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+        security_policy_resource => $security_policy_resource,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=item * C<security_policy_resource> - L<Google::Cloud::Compute::V1::Compute::SecurityPolicy>
+
+=back
 
 =item * B<patch_rule>
 
-Calls the RPC method C<PatchRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_rule(
+        priority                 => $priority,
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+        security_policy_rule_resource => $security_policy_rule_resource,
+    );
+
+Calls the RPC method C<PatchRule> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchRuleOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<priority> - C<int32>
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=item * C<security_policy_rule_resource> - L<Google::Cloud::Compute::V1::Compute::SecurityPolicyRule>
+
+=back
 
 =item * B<remove_association>
 
-Calls the RPC method C<RemoveAssociation> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->remove_association(
+        name                     => $name,
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<RemoveAssociation> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RemoveAssociationOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<remove_rule>
 
-Calls the RPC method C<RemoveRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->remove_rule(
+        priority                 => $priority,
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<RemoveRule> on C<google.cloud.compute.v1.OrganizationSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RemoveRuleOrganizationSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<priority> - C<int32>
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =back
 

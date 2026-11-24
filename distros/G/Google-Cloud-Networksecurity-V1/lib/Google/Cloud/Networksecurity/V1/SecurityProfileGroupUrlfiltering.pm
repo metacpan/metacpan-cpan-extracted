@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -78,106 +78,120 @@ EOF
     # Fields for UrlFilteringProfile
     # Field: url_filters Type: 11 (.google.cloud.networksecurity.v1.UrlFilter)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilteringProfile - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilteringProfile->new(
-        url_filters => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<url_filters>
-
-Type: Message (.google.cloud.networksecurity.v1.UrlFilter)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilter ===
     # Fields for UrlFilter
     # Field: filtering_action Type: 14 (.google.cloud.networksecurity.v1.UrlFilter.UrlFilteringAction)
     # Field: urls Type: 9 ()
     # Field: priority Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilter - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilter->new(
-        filtering_action => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<filtering_action>
-
-Type: Enum (.google.cloud.networksecurity.v1.UrlFilter.UrlFilteringAction)
-
-=item * B<urls>
-
-Type: String
-
-=item * B<priority>
-
-Type: Int32
-
-=back
-
-=cut
-
 # Enum: UrlFilter::UrlFilteringAction
 our $UrlFilter_URL_FILTERING_ACTION_UNSPECIFIED = 0;
 our $UrlFilter_ALLOW = 1;
 our $UrlFilter_DENY = 2;
 
-=pod
-
-=head2 Enum: UrlFilter::UrlFilteringAction
-
-Values:
-
-=over 4
-
-=item * C<URL_FILTERING_ACTION_UNSPECIFIED> => 0
-
-=item * C<ALLOW> => 1
-
-=item * C<DENY> => 2
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/security_profile_group_urlfiltering.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
+
+    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilteringProfile->new({
+        url_filters => $url_filters,
+    });
+
+    # Read or update a field
+    my $val = $msg->url_filters();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilteringProfile->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/security_profile_group_urlfiltering.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilteringProfile
+
+UrlFilteringProfile defines filters based on URL.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->url_filters() >> / C<< $msg->url_filters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilter>)
+
+Optional. The list of filtering configs in which each config defines an
+action to take for some URL match.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilter
+
+A URL filter defines an action to take for some URL match.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->filtering_action() >> / C<< $msg->filtering_action($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::UrlFilter::UrlFilteringAction>)
+
+Required. The action taken when this filter is applied.
+
+=item * C<< $msg->urls() >> / C<< $msg->urls($value) >>
+
+Type: C<String>
+
+Required. The list of strings that a URL must match with for this filter to
+be applied.
+
+=item * C<< $msg->priority() >> / C<< $msg->priority($value) >>
+
+Type: C<Int32>
+
+Required. The priority of this filter within the URL Filtering Profile.
+Lower integers indicate higher priorities. The priority of a filter must be
+unique within a URL Filtering Profile.
+
+=back
+
+=head3 Enum: UrlFilter::UrlFilteringAction
+
+=over 4
+
+=item * C<URL_FILTERING_ACTION_UNSPECIFIED> => C<0>
+
+=item * C<ALLOW> => C<1>
+
+=item * C<DENY> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

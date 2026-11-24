@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::RowAccessPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -304,82 +304,10 @@ EOF
     # Field: page_token Type: 9 ()
     # Field: page_size Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::RowAccessPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesResponse ===
     # Fields for ListRowAccessPoliciesResponse
     # Field: row_access_policies Type: 11 (.google.cloud.bigquery.v2.RowAccessPolicy)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::RowAccessPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesResponse->new(
-        row_access_policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<row_access_policies>
-
-Type: Message (.google.cloud.bigquery.v2.RowAccessPolicy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::RowAccessPolicy::GetRowAccessPolicyRequest ===
     # Fields for GetRowAccessPolicyRequest
@@ -388,88 +316,12 @@ Type: String
     # Field: table_id Type: 9 ()
     # Field: policy_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RowAccessPolicy::GetRowAccessPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::RowAccessPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicy::GetRowAccessPolicyRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=item * B<policy_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::RowAccessPolicy::CreateRowAccessPolicyRequest ===
     # Fields for CreateRowAccessPolicyRequest
     # Field: project_id Type: 9 ()
     # Field: dataset_id Type: 9 ()
     # Field: table_id Type: 9 ()
     # Field: row_access_policy Type: 11 (.google.cloud.bigquery.v2.RowAccessPolicy)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RowAccessPolicy::CreateRowAccessPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::RowAccessPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicy::CreateRowAccessPolicyRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=item * B<row_access_policy>
-
-Type: Message (.google.cloud.bigquery.v2.RowAccessPolicy)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::RowAccessPolicy::UpdateRowAccessPolicyRequest ===
     # Fields for UpdateRowAccessPolicyRequest
@@ -479,48 +331,6 @@ Type: Message (.google.cloud.bigquery.v2.RowAccessPolicy)
     # Field: policy_id Type: 9 ()
     # Field: row_access_policy Type: 11 (.google.cloud.bigquery.v2.RowAccessPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RowAccessPolicy::UpdateRowAccessPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::RowAccessPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicy::UpdateRowAccessPolicyRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=item * B<policy_id>
-
-Type: String
-
-=item * B<row_access_policy>
-
-Type: Message (.google.cloud.bigquery.v2.RowAccessPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::RowAccessPolicy::DeleteRowAccessPolicyRequest ===
     # Fields for DeleteRowAccessPolicyRequest
     # Field: project_id Type: 9 ()
@@ -529,48 +339,6 @@ Type: Message (.google.cloud.bigquery.v2.RowAccessPolicy)
     # Field: policy_id Type: 9 ()
     # Field: force Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RowAccessPolicy::DeleteRowAccessPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::RowAccessPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicy::DeleteRowAccessPolicyRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=item * B<policy_id>
-
-Type: String
-
-=item * B<force>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::RowAccessPolicy::BatchDeleteRowAccessPoliciesRequest ===
     # Fields for BatchDeleteRowAccessPoliciesRequest
     # Field: project_id Type: 9 ()
@@ -578,48 +346,6 @@ Type: Bool
     # Field: table_id Type: 9 ()
     # Field: policy_ids Type: 9 ()
     # Field: force Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RowAccessPolicy::BatchDeleteRowAccessPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::RowAccessPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicy::BatchDeleteRowAccessPoliciesRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=item * B<policy_ids>
-
-Type: String
-
-=item * B<force>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy ===
     # Fields for RowAccessPolicy
@@ -630,74 +356,20 @@ Type: Bool
     # Field: last_modified_time Type: 11 (.google.protobuf.Timestamp)
     # Field: grantees Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::RowAccessPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy->new(
-        etag => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<etag>
-
-Type: String
-
-=item * B<row_access_policy_reference>
-
-Type: Message (.google.cloud.bigquery.v2.RowAccessPolicyReference)
-
-=item * B<filter_predicate>
-
-Type: String
-
-=item * B<creation_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<last_modified_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<grantees>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicyServiceClient ===
 package Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicyServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicyServiceClient
 
-Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicyServiceClient - Client stub representing the remote RowAccessPolicyService service
+Client stub representing the remote C<RowAccessPolicyService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -804,13 +476,398 @@ sub batch_delete_row_access_policies {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::RowAccessPolicy - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::RowAccessPolicy - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/row_access_policy.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::RowAccessPolicy;
+
+    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesRequest->new({
+        project_id => $project_id,
+        dataset_id => $dataset_id,
+        table_id => $table_id,
+        page_token => $page_token,
+    });
+
+    # Read or update a field
+    my $val = $msg->project_id();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/row_access_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesRequest
+
+Request message for the ListRowAccessPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the row access policies to list.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of row access policies to list.
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. Table ID of the table to list row access policies.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Page token, returned by a previous call, to request the next page of
+results.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of results to return in a single response page. Leverage
+the page tokens to iterate through the entire collection.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesResponse
+
+Response message for the ListRowAccessPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->row_access_policies() >> / C<< $msg->row_access_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy>)
+
+Row access policies on the requested table.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to request the next page of results.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::RowAccessPolicy::GetRowAccessPolicyRequest
+
+Request message for the GetRowAccessPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the table to get the row access policy.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the table to get the row access policy.
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. Table ID of the table to get the row access policy.
+
+=item * C<< $msg->policy_id() >> / C<< $msg->policy_id($value) >>
+
+Type: C<String>
+
+Required. Policy ID of the row access policy.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::RowAccessPolicy::CreateRowAccessPolicyRequest
+
+Request message for the CreateRowAccessPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the table to get the row access policy.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the table to get the row access policy.
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. Table ID of the table to get the row access policy.
+
+=item * C<< $msg->row_access_policy() >> / C<< $msg->row_access_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy>)
+
+Required. The row access policy to create.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::RowAccessPolicy::UpdateRowAccessPolicyRequest
+
+Request message for the UpdateRowAccessPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the table to get the row access policy.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the table to get the row access policy.
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. Table ID of the table to get the row access policy.
+
+=item * C<< $msg->policy_id() >> / C<< $msg->policy_id($value) >>
+
+Type: C<String>
+
+Required. Policy ID of the row access policy.
+
+=item * C<< $msg->row_access_policy() >> / C<< $msg->row_access_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy>)
+
+Required. The row access policy to update.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::RowAccessPolicy::DeleteRowAccessPolicyRequest
+
+Request message for the DeleteRowAccessPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the table to delete the row access policy.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the table to delete the row access policy.
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. Table ID of the table to delete the row access policy.
+
+=item * C<< $msg->policy_id() >> / C<< $msg->policy_id($value) >>
+
+Type: C<String>
+
+Required. Policy ID of the row access policy.
+
+=item * C<< $msg->force() >> / C<< $msg->force($value) >>
+
+Type: C<Bool>
+
+If set to true, it deletes the row access policy even if it's the last row
+access policy on the table and the deletion will widen the access rather
+narrowing it.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::RowAccessPolicy::BatchDeleteRowAccessPoliciesRequest
+
+Request message for the BatchDeleteRowAccessPoliciesRequest method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the table to delete the row access policies.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the table to delete the row access policies.
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. Table ID of the table to delete the row access policies.
+
+=item * C<< $msg->policy_ids() >> / C<< $msg->policy_ids($value) >>
+
+Type: C<String>
+
+Required. Policy IDs of the row access policies.
+
+=item * C<< $msg->force() >> / C<< $msg->force($value) >>
+
+Type: C<Bool>
+
+If set to true, it deletes the row access policy even if it's the last row
+access policy on the table and the deletion will widen the access rather
+narrowing it.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy
+
+Represents access on a subset of rows on the specified table, defined by its
+filter predicate. Access to the subset of rows is controlled by its IAM
+policy.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. A hash of this resource.
+
+=item * C<< $msg->row_access_policy_reference() >> / C<< $msg->row_access_policy_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RowAccessPolicyReference::RowAccessPolicyReference>)
+
+Required. Reference describing the ID of this row access policy.
+
+=item * C<< $msg->filter_predicate() >> / C<< $msg->filter_predicate($value) >>
+
+Type: C<String>
+
+Required. A SQL boolean expression that represents the rows defined by this
+row access policy, similar to the boolean expression in a WHERE clause of a
+SELECT query on a table.
+References to other tables, routines, and temporary functions are not
+supported.
+
+Examples: region="EU"
+          date_field = CAST('2019-9-27' as DATE)
+          nullable_field is not NULL
+          numeric_field BETWEEN 1.0 AND 5.0
+
+=item * C<< $msg->creation_time() >> / C<< $msg->creation_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when this row access policy was created, in
+milliseconds since the epoch.
+
+=item * C<< $msg->last_modified_time() >> / C<< $msg->last_modified_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when this row access policy was last modified, in
+milliseconds since the epoch.
+
+=item * C<< $msg->grantees() >> / C<< $msg->grantees($value) >>
+
+Type: C<String>
+
+Optional. Input only. The optional list of iam_member users or groups that
+specifies the initial members that the row-level access policy should be
+created with.
+
+grantees types:
+
+- "user:alice@example.com": An email address that represents a specific
+Google account.
+- "serviceAccount:my-other-app@appspot.gserviceaccount.com": An email
+address that represents a service account.
+- "group:admins@example.com": An email address that represents a Google
+group.
+- "domain:example.com":The Google Workspace domain (primary) that
+represents all the users of that domain.
+- "allAuthenticatedUsers": A special identifier that represents all service
+accounts and all users on the internet who have authenticated with a Google
+Account. This identifier includes accounts that aren't connected to a
+Google Workspace or Cloud Identity domain, such as personal Gmail accounts.
+Users who aren't authenticated, such as anonymous visitors, aren't
+included.
+- "allUsers":A special identifier that represents anyone who is on
+the internet, including authenticated and unauthenticated users. Because
+BigQuery requires authentication before a user can access the service,
+allUsers includes only authenticated users.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::RowAccessPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

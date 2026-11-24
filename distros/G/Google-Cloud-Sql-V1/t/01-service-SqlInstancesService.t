@@ -237,7 +237,7 @@ subtest 'get method' => sub {
     done_testing();
 };
 
-subtest 'import method' => sub {
+subtest 'import_rpc method' => sub {
     $client->transport->{mock_call} = sub {
         my ($args) = @_;
         is($args->{service}, 'google.cloud.sql.v1.SqlInstancesService', 'Correct service path');
@@ -248,7 +248,7 @@ subtest 'import method' => sub {
         return $response;
     };
     
-    my $res = $client->import();
+    my $res = $client->import_rpc();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Sql::V1::CloudSqlResources::Operation', 'Response object class');
     done_testing();

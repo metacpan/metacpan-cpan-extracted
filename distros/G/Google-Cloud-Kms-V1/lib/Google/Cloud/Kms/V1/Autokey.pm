@@ -3,7 +3,7 @@ package Google::Cloud::Kms::V1::Autokey;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -210,69 +210,9 @@ EOF
     # Field: key_handle_id Type: 9 ()
     # Field: key_handle Type: 11 (.google.cloud.kms.v1.KeyHandle)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Autokey;
-
-    my $msg = Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<key_handle_id>
-
-Type: String
-
-=item * B<key_handle>
-
-Type: Message (.google.cloud.kms.v1.KeyHandle)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Autokey::GetKeyHandleRequest ===
     # Fields for GetKeyHandleRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Autokey::GetKeyHandleRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Autokey;
-
-    my $msg = Google::Cloud::Kms::V1::Autokey::GetKeyHandleRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Autokey::KeyHandle ===
     # Fields for KeyHandle
@@ -280,63 +220,8 @@ Type: String
     # Field: kms_key Type: 9 ()
     # Field: resource_type_selector Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Autokey::KeyHandle - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Autokey;
-
-    my $msg = Google::Cloud::Kms::V1::Autokey::KeyHandle->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<kms_key>
-
-Type: String
-
-=item * B<resource_type_selector>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Autokey::CreateKeyHandleMetadata ===
     # Fields for CreateKeyHandleMetadata
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Autokey::CreateKeyHandleMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Autokey;
-
-    my $msg = Google::Cloud::Kms::V1::Autokey::CreateKeyHandleMetadata->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Autokey::ListKeyHandlesRequest ===
     # Fields for ListKeyHandlesRequest
@@ -345,101 +230,25 @@ Google::Cloud::Kms::V1::Autokey::CreateKeyHandleMetadata - Compiled Protocol Buf
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Autokey::ListKeyHandlesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Autokey;
-
-    my $msg = Google::Cloud::Kms::V1::Autokey::ListKeyHandlesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Autokey::ListKeyHandlesResponse ===
     # Fields for ListKeyHandlesResponse
     # Field: key_handles Type: 11 (.google.cloud.kms.v1.KeyHandle)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Autokey::ListKeyHandlesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Autokey;
-
-    my $msg = Google::Cloud::Kms::V1::Autokey::ListKeyHandlesResponse->new(
-        key_handles => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<key_handles>
-
-Type: Message (.google.cloud.kms.v1.KeyHandle)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Kms::V1::Autokey::AutokeyClient ===
 package Google::Cloud::Kms::V1::Autokey::AutokeyClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Kms::V1::Autokey::AutokeyClient
 
-Google::Cloud::Kms::V1::Autokey::AutokeyClient - Client stub representing the remote Autokey service
+Client stub representing the remote C<Autokey> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<kms.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -507,13 +316,228 @@ sub list_key_handles {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Kms::V1::Autokey - Protocol Buffers schema definition
+Google::Cloud::Kms::V1::Autokey - Compiled Protocol Buffers messages for google/cloud/kms/v1/autokey.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::Autokey;
+
+    my $msg = Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest->new({
+        parent => $parent,
+        key_handle_id => $key_handle_id,
+        key_handle => $key_handle,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/kms/v1/autokey.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest
+
+Request message for
+[Autokey.CreateKeyHandle][google.cloud.kms.v1.Autokey.CreateKeyHandle].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Name of the resource project and location to create the
+[KeyHandle][google.cloud.kms.v1.KeyHandle] in, e.g.
+`projects/{PROJECT_ID}/locations/{LOCATION}`.
+
+=item * C<< $msg->key_handle_id() >> / C<< $msg->key_handle_id($value) >>
+
+Type: C<String>
+
+Optional. Id of the [KeyHandle][google.cloud.kms.v1.KeyHandle]. Must be
+unique to the resource project and location. If not provided by the caller,
+a new UUID is used.
+
+=item * C<< $msg->key_handle() >> / C<< $msg->key_handle($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Autokey::KeyHandle>)
+
+Required. [KeyHandle][google.cloud.kms.v1.KeyHandle] to create.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Autokey::GetKeyHandleRequest
+
+Request message for [GetKeyHandle][google.cloud.kms.v1.Autokey.GetKeyHandle].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the [KeyHandle][google.cloud.kms.v1.KeyHandle] resource,
+e.g.
+`projects/{PROJECT_ID}/locations/{LOCATION}/keyHandles/{KEY_HANDLE_ID}`.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Autokey::KeyHandle
+
+Resource-oriented representation of a request to Cloud KMS Autokey and the
+resulting provisioning of a [CryptoKey][google.cloud.kms.v1.CryptoKey].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the [KeyHandle][google.cloud.kms.v1.KeyHandle]
+resource, e.g.
+`projects/{PROJECT_ID}/locations/{LOCATION}/keyHandles/{KEY_HANDLE_ID}`.
+
+=item * C<< $msg->kms_key() >> / C<< $msg->kms_key($value) >>
+
+Type: C<String>
+
+Output only. Name of a [CryptoKey][google.cloud.kms.v1.CryptoKey] that has
+been provisioned for Customer Managed Encryption Key (CMEK) use in the
+[KeyHandle][google.cloud.kms.v1.KeyHandle] project and location for the
+requested resource type. The [CryptoKey][google.cloud.kms.v1.CryptoKey]
+project will reflect the value configured in the
+[AutokeyConfig][google.cloud.kms.v1.AutokeyConfig] on the resource
+project's ancestor folder at the time of the
+[KeyHandle][google.cloud.kms.v1.KeyHandle] creation. If more than one
+ancestor folder has a configured
+[AutokeyConfig][google.cloud.kms.v1.AutokeyConfig], the nearest of these
+configurations is used.
+
+=item * C<< $msg->resource_type_selector() >> / C<< $msg->resource_type_selector($value) >>
+
+Type: C<String>
+
+Required. Indicates the resource type that the resulting
+[CryptoKey][google.cloud.kms.v1.CryptoKey] is meant to protect, e.g.
+`{SERVICE}.googleapis.com/{TYPE}`. See documentation for supported resource
+types.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Autokey::CreateKeyHandleMetadata
+
+Metadata message for
+[CreateKeyHandle][google.cloud.kms.v1.Autokey.CreateKeyHandle] long-running
+operation response.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Kms::V1::Autokey::ListKeyHandlesRequest
+
+Request message for
+[Autokey.ListKeyHandles][google.cloud.kms.v1.Autokey.ListKeyHandles].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Name of the resource project and location from which to list
+[KeyHandles][google.cloud.kms.v1.KeyHandle], e.g.
+`projects/{PROJECT_ID}/locations/{LOCATION}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Optional limit on the number of
+[KeyHandles][google.cloud.kms.v1.KeyHandle] to include in the response. The
+service may return fewer than this value. Further
+[KeyHandles][google.cloud.kms.v1.KeyHandle] can subsequently be obtained by
+including the
+[ListKeyHandlesResponse.next_page_token][google.cloud.kms.v1.ListKeyHandlesResponse.next_page_token]
+in a subsequent request.  If unspecified, at most 100
+[KeyHandles][google.cloud.kms.v1.KeyHandle] will be returned.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Optional pagination token, returned earlier via
+[ListKeyHandlesResponse.next_page_token][google.cloud.kms.v1.ListKeyHandlesResponse.next_page_token].
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter to apply when listing
+[KeyHandles][google.cloud.kms.v1.KeyHandle], e.g.
+`resource_type_selector="{SERVICE}.googleapis.com/{TYPE}"`.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Autokey::ListKeyHandlesResponse
+
+Response message for
+[Autokey.ListKeyHandles][google.cloud.kms.v1.Autokey.ListKeyHandles].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->key_handles() >> / C<< $msg->key_handles($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Autokey::KeyHandle>)
+
+Resulting [KeyHandles][google.cloud.kms.v1.KeyHandle].
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve next page of results. Pass this value in
+[ListKeyHandlesRequest.page_token][google.cloud.kms.v1.ListKeyHandlesRequest.page_token]
+to retrieve the next page of results.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Kms::V1::Autokey::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

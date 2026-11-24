@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::Jobs;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1050,32 +1050,6 @@ EOF
     # Fields for LoggingConfig
     # Field: driver_log_levels Type: 11 (.google.cloud.dataproc.v1.LoggingConfig.DriverLogLevelsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::LoggingConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::LoggingConfig->new(
-        driver_log_levels => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<driver_log_levels>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig.DriverLogLevelsEntry)
-
-=back
-
-=cut
-
 # Enum: LoggingConfig::Level
 our $LoggingConfig_LEVEL_UNSPECIFIED = 0;
 our $LoggingConfig_ALL = 1;
@@ -1086,36 +1060,6 @@ our $LoggingConfig_WARN = 5;
 our $LoggingConfig_ERROR = 6;
 our $LoggingConfig_FATAL = 7;
 our $LoggingConfig_OFF = 8;
-
-=pod
-
-=head2 Enum: LoggingConfig::Level
-
-Values:
-
-=over 4
-
-=item * C<LEVEL_UNSPECIFIED> => 0
-
-=item * C<ALL> => 1
-
-=item * C<TRACE> => 2
-
-=item * C<DEBUG> => 3
-
-=item * C<INFO> => 4
-
-=item * C<WARN> => 5
-
-=item * C<ERROR> => 6
-
-=item * C<FATAL> => 7
-
-=item * C<OFF> => 8
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::HadoopJob ===
     # Fields for HadoopJob
@@ -1128,60 +1072,6 @@ Values:
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.HadoopJob.PropertiesEntry)
     # Field: logging_config Type: 11 (.google.cloud.dataproc.v1.LoggingConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::HadoopJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::HadoopJob->new(
-        main_jar_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<main_jar_file_uri>
-
-Type: String
-
-=item * B<main_class>
-
-Type: String
-
-=item * B<args>
-
-Type: String
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=item * B<file_uris>
-
-Type: String
-
-=item * B<archive_uris>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.HadoopJob.PropertiesEntry)
-
-=item * B<logging_config>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::SparkJob ===
     # Fields for SparkJob
     # Field: main_jar_file_uri Type: 9 ()
@@ -1192,60 +1082,6 @@ Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
     # Field: archive_uris Type: 9 ()
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.SparkJob.PropertiesEntry)
     # Field: logging_config Type: 11 (.google.cloud.dataproc.v1.LoggingConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::SparkJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::SparkJob->new(
-        main_jar_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<main_jar_file_uri>
-
-Type: String
-
-=item * B<main_class>
-
-Type: String
-
-=item * B<args>
-
-Type: String
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=item * B<file_uris>
-
-Type: String
-
-=item * B<archive_uris>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.SparkJob.PropertiesEntry)
-
-=item * B<logging_config>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::PySparkJob ===
     # Fields for PySparkJob
@@ -1258,89 +1094,9 @@ Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.PySparkJob.PropertiesEntry)
     # Field: logging_config Type: 11 (.google.cloud.dataproc.v1.LoggingConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::PySparkJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::PySparkJob->new(
-        main_python_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<main_python_file_uri>
-
-Type: String
-
-=item * B<args>
-
-Type: String
-
-=item * B<python_file_uris>
-
-Type: String
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=item * B<file_uris>
-
-Type: String
-
-=item * B<archive_uris>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.PySparkJob.PropertiesEntry)
-
-=item * B<logging_config>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::QueryList ===
     # Fields for QueryList
     # Field: queries Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::QueryList - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::QueryList->new(
-        queries => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<queries>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::HiveJob ===
     # Fields for HiveJob
@@ -1351,52 +1107,6 @@ Type: String
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.HiveJob.PropertiesEntry)
     # Field: jar_file_uris Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::HiveJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::HiveJob->new(
-        query_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query_file_uri>
-
-Type: String
-
-=item * B<query_list>
-
-Type: Message (.google.cloud.dataproc.v1.QueryList)
-
-=item * B<continue_on_failure>
-
-Type: Bool
-
-=item * B<script_variables>
-
-Type: Message (.google.cloud.dataproc.v1.HiveJob.ScriptVariablesEntry)
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.HiveJob.PropertiesEntry)
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::SparkSqlJob ===
     # Fields for SparkSqlJob
     # Field: query_file_uri Type: 9 ()
@@ -1405,52 +1115,6 @@ Type: String
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.SparkSqlJob.PropertiesEntry)
     # Field: jar_file_uris Type: 9 ()
     # Field: logging_config Type: 11 (.google.cloud.dataproc.v1.LoggingConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::SparkSqlJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::SparkSqlJob->new(
-        query_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query_file_uri>
-
-Type: String
-
-=item * B<query_list>
-
-Type: Message (.google.cloud.dataproc.v1.QueryList)
-
-=item * B<script_variables>
-
-Type: Message (.google.cloud.dataproc.v1.SparkSqlJob.ScriptVariablesEntry)
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.SparkSqlJob.PropertiesEntry)
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=item * B<logging_config>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::PigJob ===
     # Fields for PigJob
@@ -1462,56 +1126,6 @@ Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
     # Field: jar_file_uris Type: 9 ()
     # Field: logging_config Type: 11 (.google.cloud.dataproc.v1.LoggingConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::PigJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::PigJob->new(
-        query_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query_file_uri>
-
-Type: String
-
-=item * B<query_list>
-
-Type: Message (.google.cloud.dataproc.v1.QueryList)
-
-=item * B<continue_on_failure>
-
-Type: Bool
-
-=item * B<script_variables>
-
-Type: Message (.google.cloud.dataproc.v1.PigJob.ScriptVariablesEntry)
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.PigJob.PropertiesEntry)
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=item * B<logging_config>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::SparkRJob ===
     # Fields for SparkRJob
     # Field: main_r_file_uri Type: 9 ()
@@ -1520,52 +1134,6 @@ Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
     # Field: archive_uris Type: 9 ()
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.SparkRJob.PropertiesEntry)
     # Field: logging_config Type: 11 (.google.cloud.dataproc.v1.LoggingConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::SparkRJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::SparkRJob->new(
-        main_r_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<main_r_file_uri>
-
-Type: String
-
-=item * B<args>
-
-Type: String
-
-=item * B<file_uris>
-
-Type: String
-
-=item * B<archive_uris>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.SparkRJob.PropertiesEntry)
-
-=item * B<logging_config>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::PrestoJob ===
     # Fields for PrestoJob
@@ -1577,56 +1145,6 @@ Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.PrestoJob.PropertiesEntry)
     # Field: logging_config Type: 11 (.google.cloud.dataproc.v1.LoggingConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::PrestoJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::PrestoJob->new(
-        query_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query_file_uri>
-
-Type: String
-
-=item * B<query_list>
-
-Type: Message (.google.cloud.dataproc.v1.QueryList)
-
-=item * B<continue_on_failure>
-
-Type: Bool
-
-=item * B<output_format>
-
-Type: String
-
-=item * B<client_tags>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.PrestoJob.PropertiesEntry)
-
-=item * B<logging_config>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::TrinoJob ===
     # Fields for TrinoJob
     # Field: query_file_uri Type: 9 ()
@@ -1636,56 +1154,6 @@ Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
     # Field: client_tags Type: 9 ()
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.TrinoJob.PropertiesEntry)
     # Field: logging_config Type: 11 (.google.cloud.dataproc.v1.LoggingConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::TrinoJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::TrinoJob->new(
-        query_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query_file_uri>
-
-Type: String
-
-=item * B<query_list>
-
-Type: Message (.google.cloud.dataproc.v1.QueryList)
-
-=item * B<continue_on_failure>
-
-Type: Bool
-
-=item * B<output_format>
-
-Type: String
-
-=item * B<client_tags>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.TrinoJob.PropertiesEntry)
-
-=item * B<logging_config>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::FlinkJob ===
     # Fields for FlinkJob
@@ -1697,95 +1165,11 @@ Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.FlinkJob.PropertiesEntry)
     # Field: logging_config Type: 11 (.google.cloud.dataproc.v1.LoggingConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::FlinkJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::FlinkJob->new(
-        main_jar_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<main_jar_file_uri>
-
-Type: String
-
-=item * B<main_class>
-
-Type: String
-
-=item * B<args>
-
-Type: String
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=item * B<savepoint_uri>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.FlinkJob.PropertiesEntry)
-
-=item * B<logging_config>
-
-Type: Message (.google.cloud.dataproc.v1.LoggingConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::JobPlacement ===
     # Fields for JobPlacement
     # Field: cluster_name Type: 9 ()
     # Field: cluster_uuid Type: 9 ()
     # Field: cluster_labels Type: 11 (.google.cloud.dataproc.v1.JobPlacement.ClusterLabelsEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::JobPlacement - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::JobPlacement->new(
-        cluster_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<cluster_uuid>
-
-Type: String
-
-=item * B<cluster_labels>
-
-Type: Message (.google.cloud.dataproc.v1.JobPlacement.ClusterLabelsEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::JobStatus ===
     # Fields for JobStatus
@@ -1793,44 +1177,6 @@ Type: Message (.google.cloud.dataproc.v1.JobPlacement.ClusterLabelsEntry)
     # Field: details Type: 9 ()
     # Field: state_start_time Type: 11 (.google.protobuf.Timestamp)
     # Field: substate Type: 14 (.google.cloud.dataproc.v1.JobStatus.Substate)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::JobStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::JobStatus->new(
-        state => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataproc.v1.JobStatus.State)
-
-=item * B<details>
-
-Type: String
-
-=item * B<state_start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<substate>
-
-Type: Enum (.google.cloud.dataproc.v1.JobStatus.Substate)
-
-=back
-
-=cut
 
 # Enum: JobStatus::State
 our $JobStatus_STATE_UNSPECIFIED = 0;
@@ -1844,98 +1190,16 @@ our $JobStatus_DONE = 5;
 our $JobStatus_ERROR = 6;
 our $JobStatus_ATTEMPT_FAILURE = 9;
 
-=pod
-
-=head2 Enum: JobStatus::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<PENDING> => 1
-
-=item * C<SETUP_DONE> => 8
-
-=item * C<RUNNING> => 2
-
-=item * C<CANCEL_PENDING> => 3
-
-=item * C<CANCEL_STARTED> => 7
-
-=item * C<CANCELLED> => 4
-
-=item * C<DONE> => 5
-
-=item * C<ERROR> => 6
-
-=item * C<ATTEMPT_FAILURE> => 9
-
-=back
-
-=cut
-
 # Enum: JobStatus::Substate
 our $JobStatus_UNSPECIFIED = 0;
 our $JobStatus_SUBMITTED = 1;
 our $JobStatus_QUEUED = 2;
 our $JobStatus_STALE_STATUS = 3;
 
-=pod
-
-=head2 Enum: JobStatus::Substate
-
-Values:
-
-=over 4
-
-=item * C<UNSPECIFIED> => 0
-
-=item * C<SUBMITTED> => 1
-
-=item * C<QUEUED> => 2
-
-=item * C<STALE_STATUS> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::JobReference ===
     # Fields for JobReference
     # Field: project_id Type: 9 ()
     # Field: job_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::JobReference - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::JobReference->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::YarnApplication ===
     # Fields for YarnApplication
@@ -1945,52 +1209,6 @@ Type: String
     # Field: tracking_url Type: 9 ()
     # Field: vcore_seconds Type: 3 ()
     # Field: memory_mb_seconds Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::YarnApplication - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::YarnApplication->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataproc.v1.YarnApplication.State)
-
-=item * B<progress>
-
-Type: Float
-
-=item * B<tracking_url>
-
-Type: String
-
-=item * B<vcore_seconds>
-
-Type: Int64
-
-=item * B<memory_mb_seconds>
-
-Type: Int64
-
-=back
-
-=cut
 
 # Enum: YarnApplication::State
 our $YarnApplication_STATE_UNSPECIFIED = 0;
@@ -2002,36 +1220,6 @@ our $YarnApplication_RUNNING = 5;
 our $YarnApplication_FINISHED = 6;
 our $YarnApplication_FAILED = 7;
 our $YarnApplication_KILLED = 8;
-
-=pod
-
-=head2 Enum: YarnApplication::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<NEW> => 1
-
-=item * C<NEW_SAVING> => 2
-
-=item * C<SUBMITTED> => 3
-
-=item * C<ACCEPTED> => 4
-
-=item * C<RUNNING> => 5
-
-=item * C<FINISHED> => 6
-
-=item * C<FAILED> => 7
-
-=item * C<KILLED> => 8
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::Job ===
     # Fields for Job
@@ -2058,185 +1246,15 @@ Values:
     # Field: done Type: 8 ()
     # Field: driver_scheduling_config Type: 11 (.google.cloud.dataproc.v1.DriverSchedulingConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::Job - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::Job->new(
-        reference => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<reference>
-
-Type: Message (.google.cloud.dataproc.v1.JobReference)
-
-=item * B<placement>
-
-Type: Message (.google.cloud.dataproc.v1.JobPlacement)
-
-=item * B<hadoop_job>
-
-Type: Message (.google.cloud.dataproc.v1.HadoopJob)
-
-=item * B<spark_job>
-
-Type: Message (.google.cloud.dataproc.v1.SparkJob)
-
-=item * B<pyspark_job>
-
-Type: Message (.google.cloud.dataproc.v1.PySparkJob)
-
-=item * B<hive_job>
-
-Type: Message (.google.cloud.dataproc.v1.HiveJob)
-
-=item * B<pig_job>
-
-Type: Message (.google.cloud.dataproc.v1.PigJob)
-
-=item * B<spark_r_job>
-
-Type: Message (.google.cloud.dataproc.v1.SparkRJob)
-
-=item * B<spark_sql_job>
-
-Type: Message (.google.cloud.dataproc.v1.SparkSqlJob)
-
-=item * B<presto_job>
-
-Type: Message (.google.cloud.dataproc.v1.PrestoJob)
-
-=item * B<trino_job>
-
-Type: Message (.google.cloud.dataproc.v1.TrinoJob)
-
-=item * B<flink_job>
-
-Type: Message (.google.cloud.dataproc.v1.FlinkJob)
-
-=item * B<status>
-
-Type: Message (.google.cloud.dataproc.v1.JobStatus)
-
-=item * B<status_history>
-
-Type: Message (.google.cloud.dataproc.v1.JobStatus)
-
-=item * B<yarn_applications>
-
-Type: Message (.google.cloud.dataproc.v1.YarnApplication)
-
-=item * B<driver_output_resource_uri>
-
-Type: String
-
-=item * B<driver_control_files_uri>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.Job.LabelsEntry)
-
-=item * B<scheduling>
-
-Type: Message (.google.cloud.dataproc.v1.JobScheduling)
-
-=item * B<job_uuid>
-
-Type: String
-
-=item * B<done>
-
-Type: Bool
-
-=item * B<driver_scheduling_config>
-
-Type: Message (.google.cloud.dataproc.v1.DriverSchedulingConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::DriverSchedulingConfig ===
     # Fields for DriverSchedulingConfig
     # Field: memory_mb Type: 5 ()
     # Field: vcores Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::DriverSchedulingConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::DriverSchedulingConfig->new(
-        memory_mb => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<memory_mb>
-
-Type: Int32
-
-=item * B<vcores>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::JobScheduling ===
     # Fields for JobScheduling
     # Field: max_failures_per_hour Type: 5 ()
     # Field: max_failures_total Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::JobScheduling - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::JobScheduling->new(
-        max_failures_per_hour => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<max_failures_per_hour>
-
-Type: Int32
-
-=item * B<max_failures_total>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::SubmitJobRequest ===
     # Fields for SubmitJobRequest
@@ -2245,44 +1263,6 @@ Type: Int32
     # Field: job Type: 11 (.google.cloud.dataproc.v1.Job)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::SubmitJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::SubmitJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<job>
-
-Type: Message (.google.cloud.dataproc.v1.Job)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::JobMetadata ===
     # Fields for JobMetadata
     # Field: job_id Type: 9 ()
@@ -2290,83 +1270,11 @@ Type: String
     # Field: operation_type Type: 9 ()
     # Field: start_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::JobMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::JobMetadata->new(
-        job_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<status>
-
-Type: Message (.google.cloud.dataproc.v1.JobStatus)
-
-=item * B<operation_type>
-
-Type: String
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::GetJobRequest ===
     # Fields for GetJobRequest
     # Field: project_id Type: 9 ()
     # Field: region Type: 9 ()
     # Field: job_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::GetJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::GetJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::ListJobsRequest ===
     # Fields for ListJobsRequest
@@ -2378,78 +1286,10 @@ Type: String
     # Field: job_state_matcher Type: 14 (.google.cloud.dataproc.v1.ListJobsRequest.JobStateMatcher)
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::ListJobsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::ListJobsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<job_state_matcher>
-
-Type: Enum (.google.cloud.dataproc.v1.ListJobsRequest.JobStateMatcher)
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: ListJobsRequest::JobStateMatcher
 our $ListJobsRequest_ALL = 0;
 our $ListJobsRequest_ACTIVE = 1;
 our $ListJobsRequest_NON_ACTIVE = 2;
-
-=pod
-
-=head2 Enum: ListJobsRequest::JobStateMatcher
-
-Values:
-
-=over 4
-
-=item * C<ALL> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<NON_ACTIVE> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::UpdateJobRequest ===
     # Fields for UpdateJobRequest
@@ -2459,87 +1299,11 @@ Values:
     # Field: job Type: 11 (.google.cloud.dataproc.v1.Job)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::UpdateJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::UpdateJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<job>
-
-Type: Message (.google.cloud.dataproc.v1.Job)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::ListJobsResponse ===
     # Fields for ListJobsResponse
     # Field: jobs Type: 11 (.google.cloud.dataproc.v1.Job)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::ListJobsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::ListJobsResponse->new(
-        jobs => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<jobs>
-
-Type: Message (.google.cloud.dataproc.v1.Job)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Jobs::CancelJobRequest ===
     # Fields for CancelJobRequest
@@ -2547,102 +1311,26 @@ Type: String
     # Field: region Type: 9 ()
     # Field: job_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::CancelJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::CancelJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Jobs::DeleteJobRequest ===
     # Fields for DeleteJobRequest
     # Field: project_id Type: 9 ()
     # Field: region Type: 9 ()
     # Field: job_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Jobs::DeleteJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Jobs;
-
-    my $msg = Google::Cloud::Dataproc::V1::Jobs::DeleteJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Dataproc::V1::Jobs::JobControllerClient ===
 package Google::Cloud::Dataproc::V1::Jobs::JobControllerClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataproc::V1::Jobs::JobControllerClient
 
-Google::Cloud::Dataproc::V1::Jobs::JobControllerClient - Client stub representing the remote JobController service
+Client stub representing the remote C<JobController> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataproc.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2762,13 +1450,1568 @@ sub delete_job {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::Jobs - Protocol Buffers schema definition
+Google::Cloud::Dataproc::V1::Jobs - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/jobs.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataproc::V1::Jobs;
+
+    my $msg = Google::Cloud::Dataproc::V1::Jobs::LoggingConfig->new({
+        driver_log_levels => $driver_log_levels,
+    });
+
+    # Read or update a field
+    my $val = $msg->driver_log_levels();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::Jobs::LoggingConfig->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/jobs.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::LoggingConfig
+
+The runtime logging config of the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->driver_log_levels() >> / C<< $msg->driver_log_levels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig::DriverLogLevelsEntry>)
+
+The per-package log levels for the driver. This can include
+"root" package name to configure rootLogger.
+Examples:
+- 'com.google = FATAL'
+- 'root = INFO'
+- 'org.apache = DEBUG'
+
+=back
+
+=head3 Enum: LoggingConfig::Level
+
+=over 4
+
+=item * C<LEVEL_UNSPECIFIED> => C<0>
+
+=item * C<ALL> => C<1>
+
+=item * C<TRACE> => C<2>
+
+=item * C<DEBUG> => C<3>
+
+=item * C<INFO> => C<4>
+
+=item * C<WARN> => C<5>
+
+=item * C<ERROR> => C<6>
+
+=item * C<FATAL> => C<7>
+
+=item * C<OFF> => C<8>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::HadoopJob
+
+A Dataproc job for running
+[Apache Hadoop
+MapReduce](https://hadoop.apache.org/docs/current/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html)
+jobs on [Apache Hadoop
+YARN](https://hadoop.apache.org/docs/r2.7.1/hadoop-yarn/hadoop-yarn-site/YARN.html).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->main_jar_file_uri() >> / C<< $msg->main_jar_file_uri($value) >>
+
+Type: C<String>
+
+The HCFS URI of the jar file containing the main class.
+Examples:
+    'gs://foo-bucket/analytics-binaries/extract-useful-metrics-mr.jar'
+    'hdfs:/tmp/test-samples/custom-wordcount.jar'
+    'file:///home/usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar'
+
+=item * C<< $msg->main_class() >> / C<< $msg->main_class($value) >>
+
+Type: C<String>
+
+The name of the driver's main class. The jar file containing the class
+must be in the default CLASSPATH or specified in `jar_file_uris`.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<String>
+
+Optional. The arguments to pass to the driver. Do not
+include arguments, such as `-libjars` or `-Dfoo=bar`, that can be set as
+job properties, since a collision might occur that causes an incorrect job
+submission.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. Jar file URIs to add to the CLASSPATHs of the
+Hadoop driver and tasks.
+
+=item * C<< $msg->file_uris() >> / C<< $msg->file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS (Hadoop Compatible Filesystem) URIs of files to be copied
+to the working directory of Hadoop drivers and distributed tasks. Useful
+for naively parallel tasks.
+
+=item * C<< $msg->archive_uris() >> / C<< $msg->archive_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of archives to be extracted in the working directory of
+Hadoop drivers and tasks. Supported file types:
+.jar, .tar, .tar.gz, .tgz, or .zip.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::HadoopJob::PropertiesEntry>)
+
+Optional. A mapping of property names to values, used to configure Hadoop.
+Properties that conflict with values set by the Dataproc API might be
+overwritten. Can include properties set in `/etc/hadoop/conf/*-site` and
+classes in user code.
+
+=item * C<< $msg->logging_config() >> / C<< $msg->logging_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig>)
+
+Optional. The runtime log config for job execution.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::SparkJob
+
+A Dataproc job for running [Apache Spark](https://spark.apache.org/)
+applications on YARN.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->main_jar_file_uri() >> / C<< $msg->main_jar_file_uri($value) >>
+
+Type: C<String>
+
+The HCFS URI of the jar file that contains the main class.
+
+=item * C<< $msg->main_class() >> / C<< $msg->main_class($value) >>
+
+Type: C<String>
+
+The name of the driver's main class. The jar file that contains the class
+must be in the default CLASSPATH or specified in
+SparkJob.jar_file_uris.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<String>
+
+Optional. The arguments to pass to the driver. Do not include arguments,
+such as `--conf`, that can be set as job properties, since a collision may
+occur that causes an incorrect job submission.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to add to the CLASSPATHs of the
+Spark driver and tasks.
+
+=item * C<< $msg->file_uris() >> / C<< $msg->file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of files to be placed in the working directory of
+each executor. Useful for naively parallel tasks.
+
+=item * C<< $msg->archive_uris() >> / C<< $msg->archive_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of archives to be extracted into the working directory
+of each executor. Supported file types:
+.jar, .tar, .tar.gz, .tgz, and .zip.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkJob::PropertiesEntry>)
+
+Optional. A mapping of property names to values, used to configure Spark.
+Properties that conflict with values set by the Dataproc API might be
+overwritten. Can include properties set in
+/etc/spark/conf/spark-defaults.conf and classes in user code.
+
+=item * C<< $msg->logging_config() >> / C<< $msg->logging_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig>)
+
+Optional. The runtime log config for job execution.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::PySparkJob
+
+A Dataproc job for running
+[Apache
+PySpark](https://spark.apache.org/docs/0.9.0/python-programming-guide.html)
+applications on YARN.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->main_python_file_uri() >> / C<< $msg->main_python_file_uri($value) >>
+
+Type: C<String>
+
+Required. The HCFS URI of the main Python file to use as the driver. Must
+be a .py file.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<String>
+
+Optional. The arguments to pass to the driver.  Do not include arguments,
+such as `--conf`, that can be set as job properties, since a collision may
+occur that causes an incorrect job submission.
+
+=item * C<< $msg->python_file_uris() >> / C<< $msg->python_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS file URIs of Python files to pass to the PySpark
+framework. Supported file types: .py, .egg, and .zip.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to add to the CLASSPATHs of the
+Python driver and tasks.
+
+=item * C<< $msg->file_uris() >> / C<< $msg->file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of files to be placed in the working directory of
+each executor. Useful for naively parallel tasks.
+
+=item * C<< $msg->archive_uris() >> / C<< $msg->archive_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of archives to be extracted into the working directory
+of each executor. Supported file types:
+.jar, .tar, .tar.gz, .tgz, and .zip.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PySparkJob::PropertiesEntry>)
+
+Optional. A mapping of property names to values, used to configure PySpark.
+Properties that conflict with values set by the Dataproc API might be
+overwritten. Can include properties set in
+/etc/spark/conf/spark-defaults.conf and classes in user code.
+
+=item * C<< $msg->logging_config() >> / C<< $msg->logging_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig>)
+
+Optional. The runtime log config for job execution.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::QueryList
+
+A list of queries to run on a cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->queries() >> / C<< $msg->queries($value) >>
+
+Type: C<String>
+
+Required. The queries to execute. You do not need to end a query expression
+with a semicolon. Multiple queries can be specified in one
+string by separating each with a semicolon. Here is an example of a
+Dataproc API snippet that uses a QueryList to specify a HiveJob:
+
+    "hiveJob": {
+      "queryList": {
+        "queries": [
+          "query1",
+          "query2",
+          "query3;query4",
+        ]
+      }
+    }
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::HiveJob
+
+A Dataproc job for running [Apache Hive](https://hive.apache.org/)
+queries on YARN.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query_file_uri() >> / C<< $msg->query_file_uri($value) >>
+
+Type: C<String>
+
+The HCFS URI of the script that contains Hive queries.
+
+=item * C<< $msg->query_list() >> / C<< $msg->query_list($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::QueryList>)
+
+A list of queries.
+
+=item * C<< $msg->continue_on_failure() >> / C<< $msg->continue_on_failure($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to continue executing queries if a query fails.
+The default value is `false`. Setting to `true` can be useful when
+executing independent parallel queries.
+
+=item * C<< $msg->script_variables() >> / C<< $msg->script_variables($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::HiveJob::ScriptVariablesEntry>)
+
+Optional. Mapping of query variable names to values (equivalent to the
+Hive command: `SET name="value";`).
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::HiveJob::PropertiesEntry>)
+
+Optional. A mapping of property names and values, used to configure Hive.
+Properties that conflict with values set by the Dataproc API might be
+overwritten. Can include properties set in `/etc/hadoop/conf/*-site.xml`,
+/etc/hive/conf/hive-site.xml, and classes in user code.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to add to the CLASSPATH of the
+Hive server and Hadoop MapReduce (MR) tasks. Can contain Hive SerDes
+and UDFs.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::SparkSqlJob
+
+A Dataproc job for running [Apache Spark
+SQL](https://spark.apache.org/sql/) queries.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query_file_uri() >> / C<< $msg->query_file_uri($value) >>
+
+Type: C<String>
+
+The HCFS URI of the script that contains SQL queries.
+
+=item * C<< $msg->query_list() >> / C<< $msg->query_list($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::QueryList>)
+
+A list of queries.
+
+=item * C<< $msg->script_variables() >> / C<< $msg->script_variables($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkSqlJob::ScriptVariablesEntry>)
+
+Optional. Mapping of query variable names to values (equivalent to the
+Spark SQL command: SET `name="value";`).
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkSqlJob::PropertiesEntry>)
+
+Optional. A mapping of property names to values, used to configure
+Spark SQL's SparkConf. Properties that conflict with values set by the
+Dataproc API might be overwritten.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to be added to the Spark CLASSPATH.
+
+=item * C<< $msg->logging_config() >> / C<< $msg->logging_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig>)
+
+Optional. The runtime log config for job execution.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::PigJob
+
+A Dataproc job for running [Apache Pig](https://pig.apache.org/)
+queries on YARN.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query_file_uri() >> / C<< $msg->query_file_uri($value) >>
+
+Type: C<String>
+
+The HCFS URI of the script that contains the Pig queries.
+
+=item * C<< $msg->query_list() >> / C<< $msg->query_list($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::QueryList>)
+
+A list of queries.
+
+=item * C<< $msg->continue_on_failure() >> / C<< $msg->continue_on_failure($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to continue executing queries if a query fails.
+The default value is `false`. Setting to `true` can be useful when
+executing independent parallel queries.
+
+=item * C<< $msg->script_variables() >> / C<< $msg->script_variables($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PigJob::ScriptVariablesEntry>)
+
+Optional. Mapping of query variable names to values (equivalent to the Pig
+command: `name=[value]`).
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PigJob::PropertiesEntry>)
+
+Optional. A mapping of property names to values, used to configure Pig.
+Properties that conflict with values set by the Dataproc API might be
+overwritten. Can include properties set in `/etc/hadoop/conf/*-site.xml`,
+/etc/pig/conf/pig.properties, and classes in user code.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to add to the CLASSPATH of
+the Pig Client and Hadoop MapReduce (MR) tasks. Can contain Pig UDFs.
+
+=item * C<< $msg->logging_config() >> / C<< $msg->logging_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig>)
+
+Optional. The runtime log config for job execution.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::SparkRJob
+
+A Dataproc job for running
+[Apache SparkR](https://spark.apache.org/docs/latest/sparkr.html)
+applications on YARN.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->main_r_file_uri() >> / C<< $msg->main_r_file_uri($value) >>
+
+Type: C<String>
+
+Required. The HCFS URI of the main R file to use as the driver.
+Must be a .R file.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<String>
+
+Optional. The arguments to pass to the driver.  Do not include arguments,
+such as `--conf`, that can be set as job properties, since a collision may
+occur that causes an incorrect job submission.
+
+=item * C<< $msg->file_uris() >> / C<< $msg->file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of files to be placed in the working directory of
+each executor. Useful for naively parallel tasks.
+
+=item * C<< $msg->archive_uris() >> / C<< $msg->archive_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of archives to be extracted into the working directory
+of each executor. Supported file types:
+.jar, .tar, .tar.gz, .tgz, and .zip.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkRJob::PropertiesEntry>)
+
+Optional. A mapping of property names to values, used to configure SparkR.
+Properties that conflict with values set by the Dataproc API might be
+overwritten. Can include properties set in
+/etc/spark/conf/spark-defaults.conf and classes in user code.
+
+=item * C<< $msg->logging_config() >> / C<< $msg->logging_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig>)
+
+Optional. The runtime log config for job execution.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::PrestoJob
+
+A Dataproc job for running [Presto](https://prestosql.io/) queries.
+B<IMPORTANT>: The [Dataproc Presto Optional
+Component](https://cloud.google.com/dataproc/docs/concepts/components/presto)
+must be enabled when the cluster is created to submit a Presto job to the
+cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query_file_uri() >> / C<< $msg->query_file_uri($value) >>
+
+Type: C<String>
+
+The HCFS URI of the script that contains SQL queries.
+
+=item * C<< $msg->query_list() >> / C<< $msg->query_list($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::QueryList>)
+
+A list of queries.
+
+=item * C<< $msg->continue_on_failure() >> / C<< $msg->continue_on_failure($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to continue executing queries if a query fails.
+The default value is `false`. Setting to `true` can be useful when
+executing independent parallel queries.
+
+=item * C<< $msg->output_format() >> / C<< $msg->output_format($value) >>
+
+Type: C<String>
+
+Optional. The format in which query output will be displayed. See the
+Presto documentation for supported output formats
+
+=item * C<< $msg->client_tags() >> / C<< $msg->client_tags($value) >>
+
+Type: C<String>
+
+Optional. Presto client tags to attach to this query
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PrestoJob::PropertiesEntry>)
+
+Optional. A mapping of property names to values. Used to set Presto
+[session properties](https://prestodb.io/docs/current/sql/set-session.html)
+Equivalent to using the --session flag in the Presto CLI
+
+=item * C<< $msg->logging_config() >> / C<< $msg->logging_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig>)
+
+Optional. The runtime log config for job execution.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::TrinoJob
+
+A Dataproc job for running [Trino](https://trino.io/) queries.
+B<IMPORTANT>: The [Dataproc Trino Optional
+Component](https://cloud.google.com/dataproc/docs/concepts/components/trino)
+must be enabled when the cluster is created to submit a Trino job to the
+cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query_file_uri() >> / C<< $msg->query_file_uri($value) >>
+
+Type: C<String>
+
+The HCFS URI of the script that contains SQL queries.
+
+=item * C<< $msg->query_list() >> / C<< $msg->query_list($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::QueryList>)
+
+A list of queries.
+
+=item * C<< $msg->continue_on_failure() >> / C<< $msg->continue_on_failure($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to continue executing queries if a query fails.
+The default value is `false`. Setting to `true` can be useful when
+executing independent parallel queries.
+
+=item * C<< $msg->output_format() >> / C<< $msg->output_format($value) >>
+
+Type: C<String>
+
+Optional. The format in which query output will be displayed. See the
+Trino documentation for supported output formats
+
+=item * C<< $msg->client_tags() >> / C<< $msg->client_tags($value) >>
+
+Type: C<String>
+
+Optional. Trino client tags to attach to this query
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::TrinoJob::PropertiesEntry>)
+
+Optional. A mapping of property names to values. Used to set Trino
+[session properties](https://trino.io/docs/current/sql/set-session.html)
+Equivalent to using the --session flag in the Trino CLI
+
+=item * C<< $msg->logging_config() >> / C<< $msg->logging_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig>)
+
+Optional. The runtime log config for job execution.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::FlinkJob
+
+A Dataproc job for running Apache Flink applications on YARN.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->main_jar_file_uri() >> / C<< $msg->main_jar_file_uri($value) >>
+
+Type: C<String>
+
+The HCFS URI of the jar file that contains the main class.
+
+=item * C<< $msg->main_class() >> / C<< $msg->main_class($value) >>
+
+Type: C<String>
+
+The name of the driver's main class. The jar file that contains the class
+must be in the default CLASSPATH or specified in
+[jarFileUris][google.cloud.dataproc.v1.FlinkJob.jar_file_uris].
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<String>
+
+Optional. The arguments to pass to the driver. Do not include arguments,
+such as `--conf`, that can be set as job properties, since a collision
+might occur that causes an incorrect job submission.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to add to the CLASSPATHs of the
+Flink driver and tasks.
+
+=item * C<< $msg->savepoint_uri() >> / C<< $msg->savepoint_uri($value) >>
+
+Type: C<String>
+
+Optional. HCFS URI of the savepoint, which contains the last saved progress
+for starting the current job.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::FlinkJob::PropertiesEntry>)
+
+Optional. A mapping of property names to values, used to configure Flink.
+Properties that conflict with values set by the Dataproc API might be
+overwritten. Can include properties set in
+`/etc/flink/conf/flink-defaults.conf` and classes in user code.
+
+=item * C<< $msg->logging_config() >> / C<< $msg->logging_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::LoggingConfig>)
+
+Optional. The runtime log config for job execution.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::JobPlacement
+
+Dataproc job config.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Required. The name of the cluster where the job will be submitted.
+
+=item * C<< $msg->cluster_uuid() >> / C<< $msg->cluster_uuid($value) >>
+
+Type: C<String>
+
+Output only. A cluster UUID generated by the Dataproc service when
+the job is submitted.
+
+=item * C<< $msg->cluster_labels() >> / C<< $msg->cluster_labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::JobPlacement::ClusterLabelsEntry>)
+
+Optional. Cluster labels to identify a cluster where the job will be
+submitted.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::JobStatus
+
+Dataproc job status.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::JobStatus::State>)
+
+Output only. A state message specifying the overall job state.
+
+=item * C<< $msg->details() >> / C<< $msg->details($value) >>
+
+Type: C<String>
+
+Optional. Output only. Job state details, such as an error
+description if the state is `ERROR`.
+
+=item * C<< $msg->state_start_time() >> / C<< $msg->state_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when this state was entered.
+
+=item * C<< $msg->substate() >> / C<< $msg->substate($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::JobStatus::Substate>)
+
+Output only. Additional state information, which includes
+status reported by the agent.
+
+=back
+
+=head3 Enum: JobStatus::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<PENDING> => C<1>
+
+=item * C<SETUP_DONE> => C<8>
+
+=item * C<RUNNING> => C<2>
+
+=item * C<CANCEL_PENDING> => C<3>
+
+=item * C<CANCEL_STARTED> => C<7>
+
+=item * C<CANCELLED> => C<4>
+
+=item * C<DONE> => C<5>
+
+=item * C<ERROR> => C<6>
+
+=item * C<ATTEMPT_FAILURE> => C<9>
+
+=back
+
+=head3 Enum: JobStatus::Substate
+
+=over 4
+
+=item * C<UNSPECIFIED> => C<0>
+
+=item * C<SUBMITTED> => C<1>
+
+=item * C<QUEUED> => C<2>
+
+=item * C<STALE_STATUS> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::JobReference
+
+Encapsulates the full scoping used to reference a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the Google Cloud Platform project that the job belongs
+to. If specified, must match the request project ID.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Optional. The job ID, which must be unique within the project.
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), or hyphens (-). The maximum length is 100 characters.
+
+If not specified by the caller, the job ID will be provided by the server.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::YarnApplication
+
+A YARN application created by a job. Application information is a subset of
+<code>org.apache.hadoop.yarn.proto.YarnProtos.ApplicationReportProto</code>.
+
+B<Beta Feature>: This report is available for testing purposes only. It may
+be changed before final release.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The application name.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::YarnApplication::State>)
+
+Required. The application state.
+
+=item * C<< $msg->progress() >> / C<< $msg->progress($value) >>
+
+Type: C<Float>
+
+Required. The numerical progress of the application, from 1 to 100.
+
+=item * C<< $msg->tracking_url() >> / C<< $msg->tracking_url($value) >>
+
+Type: C<String>
+
+Optional. The HTTP URL of the ApplicationMaster, HistoryServer, or
+TimelineServer that provides application-specific information. The URL uses
+the internal hostname, and requires a proxy server for resolution and,
+possibly, access.
+
+=item * C<< $msg->vcore_seconds() >> / C<< $msg->vcore_seconds($value) >>
+
+Type: C<Int64>
+
+Optional. The cumulative CPU time consumed by the application for a job,
+measured in vcore-seconds.
+
+=item * C<< $msg->memory_mb_seconds() >> / C<< $msg->memory_mb_seconds($value) >>
+
+Type: C<Int64>
+
+Optional. The cumulative memory usage of the application for a job,
+measured in mb-seconds.
+
+=back
+
+=head3 Enum: YarnApplication::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<NEW> => C<1>
+
+=item * C<NEW_SAVING> => C<2>
+
+=item * C<SUBMITTED> => C<3>
+
+=item * C<ACCEPTED> => C<4>
+
+=item * C<RUNNING> => C<5>
+
+=item * C<FINISHED> => C<6>
+
+=item * C<FAILED> => C<7>
+
+=item * C<KILLED> => C<8>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::Job
+
+A Dataproc job resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->reference() >> / C<< $msg->reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::JobReference>)
+
+Optional. The fully qualified reference to the job, which can be used to
+obtain the equivalent REST path of the job resource. If this property
+is not specified when a job is created, the server generates a
+<code>job_id</code>.
+
+=item * C<< $msg->placement() >> / C<< $msg->placement($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::JobPlacement>)
+
+Required. Job information, including how, when, and where to
+run the job.
+
+=item * C<< $msg->hadoop_job() >> / C<< $msg->hadoop_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::HadoopJob>)
+
+Optional. Job is a Hadoop job.
+
+=item * C<< $msg->spark_job() >> / C<< $msg->spark_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkJob>)
+
+Optional. Job is a Spark job.
+
+=item * C<< $msg->pyspark_job() >> / C<< $msg->pyspark_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PySparkJob>)
+
+Optional. Job is a PySpark job.
+
+=item * C<< $msg->hive_job() >> / C<< $msg->hive_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::HiveJob>)
+
+Optional. Job is a Hive job.
+
+=item * C<< $msg->pig_job() >> / C<< $msg->pig_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PigJob>)
+
+Optional. Job is a Pig job.
+
+=item * C<< $msg->spark_r_job() >> / C<< $msg->spark_r_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkRJob>)
+
+Optional. Job is a SparkR job.
+
+=item * C<< $msg->spark_sql_job() >> / C<< $msg->spark_sql_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::SparkSqlJob>)
+
+Optional. Job is a SparkSql job.
+
+=item * C<< $msg->presto_job() >> / C<< $msg->presto_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::PrestoJob>)
+
+Optional. Job is a Presto job.
+
+=item * C<< $msg->trino_job() >> / C<< $msg->trino_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::TrinoJob>)
+
+Optional. Job is a Trino job.
+
+=item * C<< $msg->flink_job() >> / C<< $msg->flink_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::FlinkJob>)
+
+Optional. Job is a Flink job.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::JobStatus>)
+
+Output only. The job status. Additional application-specific
+status information might be contained in the <code>type_job</code>
+and <code>yarn_applications</code> fields.
+
+=item * C<< $msg->status_history() >> / C<< $msg->status_history($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::JobStatus>)
+
+Output only. The previous job status.
+
+=item * C<< $msg->yarn_applications() >> / C<< $msg->yarn_applications($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::YarnApplication>)
+
+Output only. The collection of YARN applications spun up by this job.
+
+B<Beta> Feature: This report is available for testing purposes only. It
+might be changed before final release.
+
+=item * C<< $msg->driver_output_resource_uri() >> / C<< $msg->driver_output_resource_uri($value) >>
+
+Type: C<String>
+
+Output only. A URI pointing to the location of the stdout of the job's
+driver program.
+
+=item * C<< $msg->driver_control_files_uri() >> / C<< $msg->driver_control_files_uri($value) >>
+
+Type: C<String>
+
+Output only. If present, the location of miscellaneous control files
+which can be used as part of job setup and handling. If not present,
+control files might be placed in the same location as `driver_output_uri`.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::Job::LabelsEntry>)
+
+Optional. The labels to associate with this job.
+Label B<keys> must contain 1 to 63 characters, and must conform to
+[RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).
+Label B<values> can be empty, but, if present, must contain 1 to 63
+characters, and must conform to [RFC
+1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be
+associated with a job.
+
+=item * C<< $msg->scheduling() >> / C<< $msg->scheduling($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::JobScheduling>)
+
+Optional. Job scheduling configuration.
+
+=item * C<< $msg->job_uuid() >> / C<< $msg->job_uuid($value) >>
+
+Type: C<String>
+
+Output only. A UUID that uniquely identifies a job within the project
+over time. This is in contrast to a user-settable reference.job_id that
+might be reused over time.
+
+=item * C<< $msg->done() >> / C<< $msg->done($value) >>
+
+Type: C<Bool>
+
+Output only. Indicates whether the job is completed. If the value is
+`false`, the job is still in progress. If `true`, the job is completed, and
+`status.state` field will indicate if it was successful, failed,
+or cancelled.
+
+=item * C<< $msg->driver_scheduling_config() >> / C<< $msg->driver_scheduling_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::DriverSchedulingConfig>)
+
+Optional. Driver scheduling configuration.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::DriverSchedulingConfig
+
+Driver scheduling configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->memory_mb() >> / C<< $msg->memory_mb($value) >>
+
+Type: C<Int32>
+
+Required. The amount of memory in MB the driver is requesting.
+
+=item * C<< $msg->vcores() >> / C<< $msg->vcores($value) >>
+
+Type: C<Int32>
+
+Required. The number of vCPUs the driver is requesting.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::JobScheduling
+
+Job scheduling options.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->max_failures_per_hour() >> / C<< $msg->max_failures_per_hour($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of times per hour a driver can be restarted as
+a result of driver exiting with non-zero code before job is
+reported failed.
+
+A job might be reported as thrashing if the driver exits with a non-zero
+code four times within a 10-minute window.
+
+Maximum value is 10.
+
+B<Note:> This restartable job option is not supported in Dataproc
+[workflow templates]
+(https://cloud.google.com/dataproc/docs/concepts/workflows/using-workflows#adding_jobs_to_a_template).
+
+=item * C<< $msg->max_failures_total() >> / C<< $msg->max_failures_total($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum total number of times a driver can be restarted as a
+result of the driver exiting with a non-zero code. After the maximum number
+is reached, the job will be reported as failed.
+
+Maximum value is 240.
+
+B<Note:> Currently, this restartable job option is
+not supported in Dataproc
+[workflow
+templates](https://cloud.google.com/dataproc/docs/concepts/workflows/using-workflows#adding_jobs_to_a_template).
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::SubmitJobRequest
+
+A request to submit a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the job
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::Job>)
+
+Required. The job resource.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique id used to identify the request. If the server
+receives two
+[SubmitJobRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.SubmitJobRequest)s
+with the same id, then the second request will be ignored and the
+first [Job][google.cloud.dataproc.v1.Job] created and stored in the backend
+is returned.
+
+It is recommended to always set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The id must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::JobMetadata
+
+Job Operation metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Output only. The job id.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::JobStatus>)
+
+Output only. Most recent job status.
+
+=item * C<< $msg->operation_type() >> / C<< $msg->operation_type($value) >>
+
+Type: C<String>
+
+Output only. Operation type.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Job submission time.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::GetJobRequest
+
+A request to get the resource representation for a job in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the job
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Required. The job ID.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::ListJobsRequest
+
+A request to list jobs in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the job
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The number of results to return in each response.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The page token, returned by a previous call, to request the
+next page of results.
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Optional. If set, the returned jobs list includes only jobs that were
+submitted to the named cluster.
+
+=item * C<< $msg->job_state_matcher() >> / C<< $msg->job_state_matcher($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::ListJobsRequest::JobStateMatcher>)
+
+Optional. Specifies enumerated categories of jobs to list.
+(default = match ALL jobs).
+
+If `filter` is provided, `jobStateMatcher` will be ignored.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter constraining the jobs to list. Filters are
+case-sensitive and have the following syntax:
+
+[field = value] AND [field [= value]] ...
+
+where B<field> is `status.state` or `insertTime`, or `labels.[KEY]`, and
+`[KEY]` is a label key. B<value> can be `*` to match all values.
+`status.state` can be either `ACTIVE` or `NON_ACTIVE`.
+Allows `insertTime` to be a timestamp in RFC 3339 format in double quotes,
+such as `2025-01-01T00:00:00Z`. Only the logical `AND` operator is
+supported; space-separated items are treated as having an implicit `AND`
+operator.
+
+Example filter:
+
+status.state = ACTIVE AND labels.env = staging AND labels.starred = * AND
+insertTime <= "2025-01-01T00:00:00Z"
+
+=back
+
+=head3 Enum: ListJobsRequest::JobStateMatcher
+
+=over 4
+
+=item * C<ALL> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<NON_ACTIVE> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::UpdateJobRequest
+
+A request to update a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the job
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Required. The job ID.
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::Job>)
+
+Required. The changes to the job.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Specifies the path, relative to <code>Job</code>, of
+the field to update. For example, to update the labels of a Job the
+<code>update_mask</code> parameter would be specified as
+<code>labels</code>, and the `PATCH` request body would specify the new
+value. <strong>Note:</strong> Currently, <code>labels</code> is the only
+field that can be updated.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::ListJobsResponse
+
+A list of jobs in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->jobs() >> / C<< $msg->jobs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Jobs::Job>)
+
+Output only. Jobs list.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Optional. This token is included in the response if there are more results
+to fetch. To fetch additional results, provide this value as the
+`page_token` in a subsequent <code>ListJobsRequest</code>.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Output only. List of jobs with
+[kms_key][google.cloud.dataproc.v1.EncryptionConfig.kms_key]-encrypted
+parameters that could not be decrypted. A response to a `jobs.get` request
+may indicate the reason for the decryption failure for a specific job.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::CancelJobRequest
+
+A request to cancel a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the job
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Required. The job ID.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Jobs::DeleteJobRequest
+
+A request to delete a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Google Cloud Platform project that the job
+belongs to.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Required. The Dataproc region in which to handle the request.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Required. The job ID.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::Jobs::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,59 @@
+{
+   "abstract" : "ONNX Runtime C API bindings for PDL",
+   "author" : [
+      "C.J. Collier <cjac@google.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDL-ONNX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "PDL" : "2.080"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "2.080",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/GoogleCloudPlatform/google-auth-library-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/GoogleCloudPlatform/google-auth-library-perl.git",
+         "web" : "https://github.com/GoogleCloudPlatform/google-auth-library-perl"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

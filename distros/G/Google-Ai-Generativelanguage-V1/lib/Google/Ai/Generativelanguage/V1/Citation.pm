@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1::Citation;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -68,32 +68,6 @@ EOF
     # Fields for CitationMetadata
     # Field: citation_sources Type: 11 (.google.ai.generativelanguage.v1.CitationSource)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Citation::CitationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::Citation;
-
-    my $msg = Google::Ai::Generativelanguage::V1::Citation::CitationMetadata->new(
-        citation_sources => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<citation_sources>
-
-Type: Message (.google.ai.generativelanguage.v1.CitationSource)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1::Citation::CitationSource ===
     # Fields for CitationSource
     # Field: start_index Type: 5 ()
@@ -101,55 +75,105 @@ Type: Message (.google.ai.generativelanguage.v1.CitationSource)
     # Field: uri Type: 9 ()
     # Field: license Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1::Citation::CitationSource - Compiled Protocol Buffers message class
+Google::Ai::Generativelanguage::V1::Citation - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1/citation.proto
 
 =head1 SYNOPSIS
 
     use Google::Ai::Generativelanguage::V1::Citation;
 
-    my $msg = Google::Ai::Generativelanguage::V1::Citation::CitationSource->new(
-        start_index => $value,
-    );
+    my $msg = Google::Ai::Generativelanguage::V1::Citation::CitationMetadata->new({
+        citation_sources => $citation_sources,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->citation_sources();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1::Citation::CitationMetadata->parse($bytes);
 
-=item * B<start_index>
-
-Type: Int32
-
-=item * B<end_index>
-
-Type: Int32
-
-=item * B<uri>
-
-Type: String
-
-=item * B<license>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Citation - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1/citation.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1::Citation::CitationMetadata
+
+A collection of source attributions for a piece of content.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->citation_sources() >> / C<< $msg->citation_sources($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1::Citation::CitationSource>)
+
+Citations to sources for a specific response.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1::Citation::CitationSource
+
+A citation to a source for a portion of a specific response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_index() >> / C<< $msg->start_index($value) >>
+
+Type: C<Int32>
+
+Optional. Start of segment of the response that is attributed to this
+source.
+
+Index indicates the start of the segment, measured in bytes.
+
+=item * C<< $msg->end_index() >> / C<< $msg->end_index($value) >>
+
+Type: C<Int32>
+
+Optional. End of the attributed segment, exclusive.
+
+=item * C<< $msg->uri() >> / C<< $msg->uri($value) >>
+
+Type: C<String>
+
+Optional. URI that is attributed as a source for a portion of the text.
+
+=item * C<< $msg->license() >> / C<< $msg->license($value) >>
+
+Type: C<String>
+
+Optional. License for the GitHub project that is attributed as a source for
+segment.
+
+License info is required for code citations.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1::Citation::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -129,3 +129,18 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Fixed old tests.
 	- Increased diversity of code test coverage (89.9 %).
 	- The manual has been corrected and expanded.
+
+0.815 Tue Nov 24 12:24:24 2026
+	- Added a new subroutine multicell().
+	- A new option 'documentclass' has been added to the subroutine onecell().
+	- Improved handling of hyphens in the subroutine onecell().
+	- The range of supported font sizes has been significantly expanded.
+	- Masking of active symbols and commands in tex_escape() has been improved.
+	- The hash of the glyphs embedded in AGLkit() has been significantly enriched.
+	- Optimized algorithms.
+	- Optimized and fixed tests: redundant auxiliary files have been removed (PTC55F_hex.dump, PTC55F_symbol.dump).
+	- Added new tests.
+	- Fixed old tests.
+	- Increased diversity of code test coverage (~92 %).
+	- The manual has been corrected and expanded.
+

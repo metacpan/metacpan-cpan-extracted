@@ -5,27 +5,27 @@ use warnings;
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Sql::V1::CloudSqlTiers;
 use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
-use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
-use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
+use Google::Cloud::Sql::V1::CloudSqlTiers;
 use Google::Cloud::Sql::V1::CloudSqlResources;
-use Google::Cloud::Sql::V1::CloudSqlEvents;
+use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
 use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
+use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
 use Google::Cloud::Sql::V1::CloudSqlRegions;
-use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+use Google::Cloud::Sql::V1::CloudSqlEvents;
 use Google::Cloud::Sql::V1::CloudSqlUsers;
 use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-use Google::Cloud::Sql::V1::CloudSqlFlags;
-use Google::Cloud::Sql::V1::CloudSqlInstances;
-use Google::Cloud::Sql::V1::CloudSqlDatabases;
-use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
 use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
 use Google::Cloud::Sql::V1::CloudSqlOperations;
+use Google::Cloud::Sql::V1::CloudSqlFlags;
+use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
+use Google::Cloud::Sql::V1::CloudSqlInstances;
 use Google::Cloud::Sql::V1::CloudSqlConnect;
+use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+use Google::Cloud::Sql::V1::CloudSqlDatabases;
 use Google::Cloud::Sql::V1::CloudSqlBackups;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 1; # End of Google::Cloud::Sql::V1::SqlIamPoliciesServiceClient
 
 __END__

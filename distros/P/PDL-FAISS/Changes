@@ -1,0 +1,4 @@
+Revision history for PDL-FAISS
+
+0.01    2026-11-24
+    - Initial release: FAISS IndexFlatL2 and IndexFlatIP bindings for PDL.

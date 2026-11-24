@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -784,113 +784,15 @@ EOF
     # Field: lake Type: 11 (.google.cloud.dataplex.v1.Lake)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::CreateLakeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::CreateLakeRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<lake_id>
-
-Type: String
-
-=item * B<lake>
-
-Type: Message (.google.cloud.dataplex.v1.Lake)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::UpdateLakeRequest ===
     # Fields for UpdateLakeRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: lake Type: 11 (.google.cloud.dataplex.v1.Lake)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::UpdateLakeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::UpdateLakeRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<lake>
-
-Type: Message (.google.cloud.dataplex.v1.Lake)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::DeleteLakeRequest ===
     # Fields for DeleteLakeRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::DeleteLakeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::DeleteLakeRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::ListLakesRequest ===
     # Fields for ListLakesRequest
@@ -900,87 +802,11 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListLakesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListLakesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::ListLakesResponse ===
     # Fields for ListLakesResponse
     # Field: lakes Type: 11 (.google.cloud.dataplex.v1.Lake)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListLakesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListLakesResponse->new(
-        lakes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<lakes>
-
-Type: Message (.google.cloud.dataplex.v1.Lake)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::ListLakeActionsRequest ===
     # Fields for ListLakeActionsRequest
@@ -988,104 +814,14 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListLakeActionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListLakeActionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::ListActionsResponse ===
     # Fields for ListActionsResponse
     # Field: actions Type: 11 (.google.cloud.dataplex.v1.Action)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListActionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListActionsResponse->new(
-        actions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<actions>
-
-Type: Message (.google.cloud.dataplex.v1.Action)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::GetLakeRequest ===
     # Fields for GetLakeRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::GetLakeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::GetLakeRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::CreateZoneRequest ===
     # Fields for CreateZoneRequest
@@ -1094,113 +830,15 @@ Type: String
     # Field: zone Type: 11 (.google.cloud.dataplex.v1.Zone)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::CreateZoneRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::CreateZoneRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<zone_id>
-
-Type: String
-
-=item * B<zone>
-
-Type: Message (.google.cloud.dataplex.v1.Zone)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::UpdateZoneRequest ===
     # Fields for UpdateZoneRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: zone Type: 11 (.google.cloud.dataplex.v1.Zone)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::UpdateZoneRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::UpdateZoneRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<zone>
-
-Type: Message (.google.cloud.dataplex.v1.Zone)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::DeleteZoneRequest ===
     # Fields for DeleteZoneRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::DeleteZoneRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::DeleteZoneRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::ListZonesRequest ===
     # Fields for ListZonesRequest
@@ -1210,82 +848,10 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListZonesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListZonesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::ListZonesResponse ===
     # Fields for ListZonesResponse
     # Field: zones Type: 11 (.google.cloud.dataplex.v1.Zone)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListZonesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListZonesResponse->new(
-        zones => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<zones>
-
-Type: Message (.google.cloud.dataplex.v1.Zone)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::ListZoneActionsRequest ===
     # Fields for ListZoneActionsRequest
@@ -1293,69 +859,9 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListZoneActionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListZoneActionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::GetZoneRequest ===
     # Fields for GetZoneRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::GetZoneRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::GetZoneRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::CreateAssetRequest ===
     # Fields for CreateAssetRequest
@@ -1364,113 +870,15 @@ Type: String
     # Field: asset Type: 11 (.google.cloud.dataplex.v1.Asset)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::CreateAssetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::CreateAssetRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<asset_id>
-
-Type: String
-
-=item * B<asset>
-
-Type: Message (.google.cloud.dataplex.v1.Asset)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::UpdateAssetRequest ===
     # Fields for UpdateAssetRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: asset Type: 11 (.google.cloud.dataplex.v1.Asset)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::UpdateAssetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::UpdateAssetRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<asset>
-
-Type: Message (.google.cloud.dataplex.v1.Asset)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::DeleteAssetRequest ===
     # Fields for DeleteAssetRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::DeleteAssetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::DeleteAssetRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::ListAssetsRequest ===
     # Fields for ListAssetsRequest
@@ -1480,82 +888,10 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListAssetsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListAssetsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::ListAssetsResponse ===
     # Fields for ListAssetsResponse
     # Field: assets Type: 11 (.google.cloud.dataplex.v1.Asset)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListAssetsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListAssetsResponse->new(
-        assets => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<assets>
-
-Type: Message (.google.cloud.dataplex.v1.Asset)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::ListAssetActionsRequest ===
     # Fields for ListAssetActionsRequest
@@ -1563,69 +899,9 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListAssetActionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListAssetActionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::GetAssetRequest ===
     # Fields for GetAssetRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::GetAssetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::GetAssetRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::OperationMetadata ===
     # Fields for OperationMetadata
@@ -1637,56 +913,6 @@ Type: String
     # Field: requested_cancellation Type: 8 ()
     # Field: api_version Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::OperationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::OperationMetadata->new(
-        create_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<target>
-
-Type: String
-
-=item * B<verb>
-
-Type: String
-
-=item * B<status_message>
-
-Type: String
-
-=item * B<requested_cancellation>
-
-Type: Bool
-
-=item * B<api_version>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::CreateTaskRequest ===
     # Fields for CreateTaskRequest
     # Field: parent Type: 9 ()
@@ -1694,113 +920,15 @@ Type: String
     # Field: task Type: 11 (.google.cloud.dataplex.v1.Task)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::CreateTaskRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::CreateTaskRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<task_id>
-
-Type: String
-
-=item * B<task>
-
-Type: Message (.google.cloud.dataplex.v1.Task)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::UpdateTaskRequest ===
     # Fields for UpdateTaskRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: task Type: 11 (.google.cloud.dataplex.v1.Task)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::UpdateTaskRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::UpdateTaskRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<task>
-
-Type: Message (.google.cloud.dataplex.v1.Task)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::DeleteTaskRequest ===
     # Fields for DeleteTaskRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::DeleteTaskRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::DeleteTaskRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::ListTasksRequest ===
     # Fields for ListTasksRequest
@@ -1810,147 +938,19 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListTasksRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListTasksRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::ListTasksResponse ===
     # Fields for ListTasksResponse
     # Field: tasks Type: 11 (.google.cloud.dataplex.v1.Task)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListTasksResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListTasksResponse->new(
-        tasks => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tasks>
-
-Type: Message (.google.cloud.dataplex.v1.Task)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::GetTaskRequest ===
     # Fields for GetTaskRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::GetTaskRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::GetTaskRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::GetJobRequest ===
     # Fields for GetJobRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::GetJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::GetJobRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::RunTaskRequest ===
     # Fields for RunTaskRequest
@@ -1958,69 +958,9 @@ Type: String
     # Field: labels Type: 11 (.google.cloud.dataplex.v1.RunTaskRequest.LabelsEntry)
     # Field: args Type: 11 (.google.cloud.dataplex.v1.RunTaskRequest.ArgsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::RunTaskRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::RunTaskRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.RunTaskRequest.LabelsEntry)
-
-=item * B<args>
-
-Type: Message (.google.cloud.dataplex.v1.RunTaskRequest.ArgsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::RunTaskResponse ===
     # Fields for RunTaskResponse
     # Field: job Type: 11 (.google.cloud.dataplex.v1.Job)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::RunTaskResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::RunTaskResponse->new(
-        job => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<job>
-
-Type: Message (.google.cloud.dataplex.v1.Job)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Service::ListJobsRequest ===
     # Fields for ListJobsRequest
@@ -2028,127 +968,29 @@ Type: Message (.google.cloud.dataplex.v1.Job)
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListJobsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListJobsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::ListJobsResponse ===
     # Fields for ListJobsResponse
     # Field: jobs Type: 11 (.google.cloud.dataplex.v1.Job)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::ListJobsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::ListJobsResponse->new(
-        jobs => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<jobs>
-
-Type: Message (.google.cloud.dataplex.v1.Job)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Service::CancelJobRequest ===
     # Fields for CancelJobRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Service::CancelJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Service;
-
-    my $msg = Google::Cloud::Dataplex::V1::Service::CancelJobRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Dataplex::V1::Service::DataplexServiceClient ===
 package Google::Cloud::Dataplex::V1::Service::DataplexServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataplex::V1::Service::DataplexServiceClient
 
-Google::Cloud::Dataplex::V1::Service::DataplexServiceClient - Client stub representing the remote DataplexService service
+Client stub representing the remote C<DataplexService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataplex.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2528,13 +1370,1148 @@ sub cancel_job {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Service - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::Service - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Service;
+
+    my $msg = Google::Cloud::Dataplex::V1::Service::CreateLakeRequest->new({
+        parent => $parent,
+        lake_id => $lake_id,
+        lake => $lake,
+        validate_only => $validate_only,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Service::CreateLakeRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Service::CreateLakeRequest
+
+Create lake request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the lake location, of the form:
+projects/{project_number}/locations/{location_id}
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->lake_id() >> / C<< $msg->lake_id($value) >>
+
+Type: C<String>
+
+Required. Lake identifier.
+This ID will be used to generate names such as database and dataset names
+when publishing metadata to Hive Metastore and BigQuery.
+* Must contain only lowercase letters, numbers and hyphens.
+* Must start with a letter.
+* Must end with a number or a letter.
+* Must be between 1-63 characters.
+* Must be unique within the customer project / location.
+
+=item * C<< $msg->lake() >> / C<< $msg->lake($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Lake>)
+
+Required. Lake resource
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::UpdateLakeRequest
+
+Update lake request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->lake() >> / C<< $msg->lake($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Lake>)
+
+Required. Update description.
+Only fields specified in `update_mask` are updated.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::DeleteLakeRequest
+
+Delete lake request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the lake:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListLakesRequest
+
+List lakes request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the lake location, of the form:
+`projects/{project_number}/locations/{location_id}`
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of Lakes to return. The service may return fewer
+than this value. If unspecified, at most 10 lakes will be returned. The
+maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListLakes` call. Provide
+this to retrieve the subsequent page. When paginating, all other parameters
+provided to `ListLakes` must match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields for the result.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListLakesResponse
+
+List lakes response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->lakes() >> / C<< $msg->lakes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Lake>)
+
+Lakes under the given parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListLakeActionsRequest
+
+List lake actions request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent lake:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of actions to return. The service may return fewer
+than this value. If unspecified, at most 10 actions will be returned. The
+maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListLakeActions` call.
+Provide this to retrieve the subsequent page. When paginating, all other
+parameters provided to `ListLakeActions` must match the call that provided
+the page token.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListActionsResponse
+
+List actions response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->actions() >> / C<< $msg->actions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Action>)
+
+Actions under the given parent lake/zone/asset.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::GetLakeRequest
+
+Get lake request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the lake:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::CreateZoneRequest
+
+Create zone request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent lake:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}`.
+
+=item * C<< $msg->zone_id() >> / C<< $msg->zone_id($value) >>
+
+Type: C<String>
+
+Required. Zone identifier.
+This ID will be used to generate names such as database and dataset names
+when publishing metadata to Hive Metastore and BigQuery.
+* Must contain only lowercase letters, numbers and hyphens.
+* Must start with a letter.
+* Must end with a number or a letter.
+* Must be between 1-63 characters.
+* Must be unique across all lakes from all locations in a project.
+* Must not be one of the reserved IDs (i.e. "default", "global-temp")
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Zone>)
+
+Required. Zone resource.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::UpdateZoneRequest
+
+Update zone request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Zone>)
+
+Required. Update description.
+Only fields specified in `update_mask` are updated.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::DeleteZoneRequest
+
+Delete zone request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the zone:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListZonesRequest
+
+List zones request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent lake:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of zones to return. The service may return fewer
+than this value. If unspecified, at most 10 zones will be returned. The
+maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListZones` call. Provide
+this to retrieve the subsequent page. When paginating, all other parameters
+provided to `ListZones` must match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields for the result.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListZonesResponse
+
+List zones response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->zones() >> / C<< $msg->zones($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Zone>)
+
+Zones under the given parent lake.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListZoneActionsRequest
+
+List zone actions request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent zone:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of actions to return. The service may return fewer
+than this value. If unspecified, at most 10 actions will be returned. The
+maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListZoneActions` call.
+Provide this to retrieve the subsequent page. When paginating, all other
+parameters provided to `ListZoneActions` must match the call that provided
+the page token.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::GetZoneRequest
+
+Get zone request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the zone:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::CreateAssetRequest
+
+Create asset request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent zone:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}`.
+
+=item * C<< $msg->asset_id() >> / C<< $msg->asset_id($value) >>
+
+Type: C<String>
+
+Required. Asset identifier.
+This ID will be used to generate names such as table names when publishing
+metadata to Hive Metastore and BigQuery.
+* Must contain only lowercase letters, numbers and hyphens.
+* Must start with a letter.
+* Must end with a number or a letter.
+* Must be between 1-63 characters.
+* Must be unique within the zone.
+
+=item * C<< $msg->asset() >> / C<< $msg->asset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Asset>)
+
+Required. Asset resource.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::UpdateAssetRequest
+
+Update asset request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->asset() >> / C<< $msg->asset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Asset>)
+
+Required. Update description.
+Only fields specified in `update_mask` are updated.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::DeleteAssetRequest
+
+Delete asset request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the asset:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}/assets/{asset_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListAssetsRequest
+
+List assets request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent zone:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of asset to return. The service may return fewer
+than this value. If unspecified, at most 10 assets will be returned. The
+maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListAssets` call. Provide
+this to retrieve the subsequent page. When paginating, all other parameters
+provided to `ListAssets` must match the call that provided the page
+token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields for the result.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListAssetsResponse
+
+List assets response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->assets() >> / C<< $msg->assets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Resources::Asset>)
+
+Asset under the given parent zone.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListAssetActionsRequest
+
+List asset actions request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent asset:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}/assets/{asset_id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of actions to return. The service may return fewer
+than this value. If unspecified, at most 10 actions will be returned. The
+maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListAssetActions` call.
+Provide this to retrieve the subsequent page. When paginating, all other
+parameters provided to `ListAssetActions` must match the call that provided
+the page token.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::GetAssetRequest
+
+Get asset request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the asset:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}/assets/{asset_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::OperationMetadata
+
+Represents the metadata of a long-running operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the operation was created.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the operation finished running.
+
+=item * C<< $msg->target() >> / C<< $msg->target($value) >>
+
+Type: C<String>
+
+Output only. Server-defined resource path for the target of the operation.
+
+=item * C<< $msg->verb() >> / C<< $msg->verb($value) >>
+
+Type: C<String>
+
+Output only. Name of the verb executed by the operation.
+
+=item * C<< $msg->status_message() >> / C<< $msg->status_message($value) >>
+
+Type: C<String>
+
+Output only. Human-readable status of the operation, if any.
+
+=item * C<< $msg->requested_cancellation() >> / C<< $msg->requested_cancellation($value) >>
+
+Type: C<Bool>
+
+Output only. Identifies whether the user has requested cancellation
+of the operation. Operations that have successfully been cancelled
+have [Operation.error][] value with a
+[google.rpc.Status.code][google.rpc.Status.code] of 1, corresponding to
+`Code.CANCELLED`.
+
+=item * C<< $msg->api_version() >> / C<< $msg->api_version($value) >>
+
+Type: C<String>
+
+Output only. API version used to start the operation.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::CreateTaskRequest
+
+Create task request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent lake:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}`.
+
+=item * C<< $msg->task_id() >> / C<< $msg->task_id($value) >>
+
+Type: C<String>
+
+Required. Task identifier.
+
+=item * C<< $msg->task() >> / C<< $msg->task($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task>)
+
+Required. Task resource.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::UpdateTaskRequest
+
+Update task request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->task() >> / C<< $msg->task($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task>)
+
+Required. Update description.
+Only fields specified in `update_mask` are updated.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::DeleteTaskRequest
+
+Delete task request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the task:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/task/{task_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListTasksRequest
+
+List tasks request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent lake:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of tasks to return. The service may return fewer
+than this value. If unspecified, at most 10 tasks will be returned. The
+maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListZones` call. Provide
+this to retrieve the subsequent page. When paginating, all other parameters
+provided to `ListZones` must match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields for the result.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListTasksResponse
+
+List tasks response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tasks() >> / C<< $msg->tasks($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Task>)
+
+Tasks under the given parent lake.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::GetTaskRequest
+
+Get task request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the task:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/tasks/{tasks_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::GetJobRequest
+
+Get job request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the job:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/tasks/{task_id}/jobs/{job_id}`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::RunTaskRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the task:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/tasks/{task_id}`.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Service::RunTaskRequest::LabelsEntry>)
+
+Optional. User-defined labels for the task. If the map is left empty, the
+task will run with existing labels from task definition. If the map
+contains an entry with a new key, the same will be added to existing set of
+labels. If the map contains an entry with an existing label key in task
+definition, the task will run with new label value for that entry. Clearing
+an existing label will require label value to be explicitly set to a hyphen
+"-". The label value cannot be empty.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Service::RunTaskRequest::ArgsEntry>)
+
+Optional. Execution spec arguments. If the map is left empty, the task will
+run with existing execution spec args from task definition. If the map
+contains an entry with a new key, the same will be added to existing set of
+args. If the map contains an entry with an existing arg key in task
+definition, the task will run with new arg value for that entry. Clearing
+an existing arg will require arg value to be explicitly set to a hyphen
+"-". The arg value cannot be empty.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::RunTaskResponse
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Job>)
+
+Jobs created by RunTask API.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListJobsRequest
+
+List jobs request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent environment:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/tasks/{task_id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of jobs to return. The service may return fewer
+than this value. If unspecified, at most 10 jobs will be returned. The
+maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListJobs` call. Provide this
+to retrieve the subsequent page. When paginating, all other parameters
+provided to `ListJobs` must match the call that provided the page
+token.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::ListJobsResponse
+
+List jobs response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->jobs() >> / C<< $msg->jobs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Tasks::Job>)
+
+Jobs under a given task.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Service::CancelJobRequest
+
+Cancel task jobs.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the job:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/task/{task_id}/job/{job_id}`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Service::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

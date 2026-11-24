@@ -1,0 +1,32 @@
+Changes
+lib/Google/Cloud/Universalledger/V1.pm
+lib/Google/Cloud/Universalledger/V1/Accounts.pm
+lib/Google/Cloud/Universalledger/V1/Accounts/Types.pm
+lib/Google/Cloud/Universalledger/V1/Common.pm
+lib/Google/Cloud/Universalledger/V1/Common/Types.pm
+lib/Google/Cloud/Universalledger/V1/Query.pm
+lib/Google/Cloud/Universalledger/V1/Query/Types.pm
+lib/Google/Cloud/Universalledger/V1/StatusEvent.pm
+lib/Google/Cloud/Universalledger/V1/StatusEvent/Types.pm
+lib/Google/Cloud/Universalledger/V1/Transactions.pm
+lib/Google/Cloud/Universalledger/V1/Transactions/Types.pm
+lib/Google/Cloud/Universalledger/V1/Types.pm
+lib/Google/Cloud/Universalledger/V1/Types/Types.pm
+lib/Google/Cloud/Universalledger/V1/Universalledger.pm
+lib/Google/Cloud/Universalledger/V1/Universalledger/Types.pm
+lib/Google/Cloud/Universalledger/V1/UniversalLedgerClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-UniversalLedger.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-UniversalLedger.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

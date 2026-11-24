@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::HivePartitioning;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -98,55 +98,130 @@ EOF
     # Field: require_partition_filter Type: 11 (.google.protobuf.BoolValue)
     # Field: fields Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::HivePartitioning::HivePartitioningOptions - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::HivePartitioning - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/hive_partitioning.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::HivePartitioning;
 
-    my $msg = Google::Cloud::Bigquery::V2::HivePartitioning::HivePartitioningOptions->new(
-        mode => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::HivePartitioning::HivePartitioningOptions->new({
+        mode => $mode,
+        source_uri_prefix => $source_uri_prefix,
+        require_partition_filter => $require_partition_filter,
+        fields => $fields,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->mode();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::HivePartitioning::HivePartitioningOptions->parse($bytes);
 
-=item * B<mode>
-
-Type: String
-
-=item * B<source_uri_prefix>
-
-Type: String
-
-=item * B<require_partition_filter>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<fields>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::HivePartitioning - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/hive_partitioning.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::HivePartitioning::HivePartitioningOptions
+
+Options for configuring hive partitioning detect.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mode() >> / C<< $msg->mode($value) >>
+
+Type: C<String>
+
+Optional. When set, what mode of hive partitioning to use when reading
+data.  The following modes are supported:
+
+* AUTO: automatically infer partition key name(s) and type(s).
+
+* STRINGS: automatically infer partition key name(s).  All types are
+strings.
+
+* CUSTOM: partition key schema is encoded in the source URI prefix.
+
+Not all storage formats support hive partitioning. Requesting hive
+partitioning on an unsupported format will lead to an error.
+Currently supported formats are: JSON, CSV, ORC, Avro and Parquet.
+
+=item * C<< $msg->source_uri_prefix() >> / C<< $msg->source_uri_prefix($value) >>
+
+Type: C<String>
+
+Optional. When hive partition detection is requested, a common prefix for
+all source uris must be required.  The prefix must end immediately before
+the partition key encoding begins. For example, consider files following
+this data layout:
+
+gs://bucket/path_to_table/dt=2019-06-01/country=USA/id=7/file.avro
+
+gs://bucket/path_to_table/dt=2019-05-31/country=CA/id=3/file.avro
+
+When hive partitioning is requested with either AUTO or STRINGS detection,
+the common prefix can be either of gs://bucket/path_to_table or
+gs://bucket/path_to_table/.
+
+CUSTOM detection requires encoding the partitioning schema immediately
+after the common prefix.  For CUSTOM, any of
+
+* gs://bucket/path_to_table/{dt:DATE}/{country:STRING}/{id:INTEGER}
+
+* gs://bucket/path_to_table/{dt:STRING}/{country:STRING}/{id:INTEGER}
+
+* gs://bucket/path_to_table/{dt:DATE}/{country:STRING}/{id:STRING}
+
+would all be valid source URI prefixes.
+
+=item * C<< $msg->require_partition_filter() >> / C<< $msg->require_partition_filter($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If set to true, queries over this table require a partition
+filter that can be used for partition elimination to be specified.
+
+Note that this field should only be true when creating a permanent
+external table or querying a temporary external table.
+
+Hive-partitioned loads with require_partition_filter explicitly set to
+true will fail.
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<String>
+
+Output only. For permanent external tables, this field is populated with
+the hive partition keys in the order they were inferred. The types of the
+partition keys can be deduced by checking the table schema (which will
+include the partition keys). Not every API will populate this field in the
+output. For example, Tables.Get will populate it, but Tables.List will not
+contain this field.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::HivePartitioning::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

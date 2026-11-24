@@ -1,0 +1,85 @@
+package Google::Cloud::Baremetalsolution::V2::Common;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Ci5nb29nbGUvY2xvdWQvYmFyZW1ldGFsc29sdXRpb24vdjIvY29tbW9uLnByb3RvEiFnb29n
+bGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIqqgEKFVZvbHVtZVBlcmZvcm1hbmNlVGll
+chInCiNWT0xVTUVfUEVSRk9STUFOQ0VfVElFUl9VTlNQRUNJRklFRBAAEiIKHlZPTFVNRV9Q
+RVJGT1JNQU5DRV9USUVSX1NIQVJFRBABEiQKIFZPTFVNRV9QRVJGT1JNQU5DRV9USUVSX0FT
+U0lHTkVEEAISHgoaVk9MVU1FX1BFUkZPUk1BTkNFX1RJRVJfSFQQAypsCg9Xb3JrbG9hZFBy
+b2ZpbGUSIAocV09SS0xPQURfUFJPRklMRV9VTlNQRUNJRklFRBAAEhwKGFdPUktMT0FEX1BS
+T0ZJTEVfR0VORVJJQxABEhkKFVdPUktMT0FEX1BST0ZJTEVfSEFOQRACQvoBCiVjb20uZ29v
+Z2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyQgtDb21tb25Qcm90b1ABWlNjbG91ZC5n
+b29nbGUuY29tL2dvL2JhcmVtZXRhbHNvbHV0aW9uL2FwaXYyL2JhcmVtZXRhbHNvbHV0aW9u
+cGI7YmFyZW1ldGFsc29sdXRpb25wYqoCIUdvb2dsZS5DbG91ZC5CYXJlTWV0YWxTb2x1dGlv
+bi5WMsoCIUdvb2dsZVxDbG91ZFxCYXJlTWV0YWxTb2x1dGlvblxWMuoCJEdvb2dsZTo6Q2xv
+dWQ6OkJhcmVNZXRhbFNvbHV0aW9uOjpWMkrzCgoGEgQOADMBCrwECgEMEgMOABIysQQgQ29w
+eXJpZ2h0IDIwMjUgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGlj
+ZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRo
+aXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1h
+eSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBh
+Y2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBs
+aWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1
+dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFT
+SVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0
+aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNp
+ZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVu
+ZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAqCggKAQgSAxIAPgoJCgIIJRIDEgA+CggKAQgS
+AxMAagoJCgIICxIDEwBqCggKAQgSAxQAIgoJCgIIChIDFAAiCggKAQgSAxUALAoJCgIICBID
+FQAsCggKAQgSAxYAPgoJCgIIARIDFgA+CggKAQgSAxcAPgoJCgIIKRIDFwA+CggKAQgSAxgA
+PQoJCgIILRIDGAA9Ci0KAgUAEgQbACcBGiEgUGVyZm9ybWFuY2UgdGllciBvZiB0aGUgVm9s
+dW1lLgoKCgoDBQABEgMbBRoKJgoEBQACABIDHQIqGhkgVmFsdWUgaXMgbm90IHNwZWNpZmll
+ZC4KCgwKBQUAAgABEgMdAiUKDAoFBQACAAISAx0oKQoyCgQFAAIBEgMgAiUaJSBSZWd1bGFy
+IHZvbHVtZXMsIHNoYXJlZCBhZ2dyZWdhdGVzLgoKDAoFBQACAQESAyACIAoMCgUFAAIBAhID
+ICMkCiMKBAUAAgISAyMCJxoWIEFzc2lnbmVkIGFnZ3JlZ2F0ZXMuCgoMCgUFAAICARIDIwIi
+CgwKBQUAAgICEgMjJSYKKgoEBQACAxIDJgIhGh0gSGlnaCB0aHJvdWdocHV0IGFnZ3JlZ2F0
+ZXMuCgoMCgUFAAIDARIDJgIcCgwKBQUAAgMCEgMmHyAKOQoCBQESBCoAMwEaLSBUaGUgcG9z
+c2libGUgdmFsdWVzIGZvciBhIHdvcmtsb2FkIHByb2ZpbGUuCgoKCgMFAQESAyoFFAo7CgQF
+AQIAEgMsAiMaLiBUaGUgd29ya2xvYWQgcHJvZmlsZSBpcyBpbiBhbiB1bmtub3duIHN0YXRl
+LgoKDAoFBQECAAESAywCHgoMCgUFAQIAAhIDLCEiCi8KBAUBAgESAy8CHxoiIFRoZSB3b3Jr
+bG9hZCBwcm9maWxlIGlzIGdlbmVyaWMuCgoMCgUFAQIBARIDLwIaCgwKBQUBAgECEgMvHR4K
+LAoEBQECAhIDMgIcGh8gVGhlIHdvcmtsb2FkIHByb2ZpbGUgaXMgaGFuYS4KCgwKBQUBAgIB
+EgMyAhcKDAoFBQECAgISAzIaG2IGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Baremetalsolution::V2::Common - Compiled Protocol Buffers messages for google/cloud/baremetalsolution/v2/common.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/baremetalsolution/v2/common.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Baremetalsolution::V2::Common::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -1,0 +1,40 @@
+Changes
+lib/Google/Cloud/Websecurityscanner/V1.pm
+lib/Google/Cloud/Websecurityscanner/V1/CrawledUrl.pm
+lib/Google/Cloud/Websecurityscanner/V1/CrawledUrl/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/Finding.pm
+lib/Google/Cloud/Websecurityscanner/V1/Finding/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/FindingAddon.pm
+lib/Google/Cloud/Websecurityscanner/V1/FindingAddon/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/FindingTypeStats.pm
+lib/Google/Cloud/Websecurityscanner/V1/FindingTypeStats/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanConfig.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanConfig/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanConfigError.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanConfigError/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanRun.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanRun/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanRunErrorTrace.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanRunErrorTrace/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanRunLog.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanRunLog/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanRunWarningTrace.pm
+lib/Google/Cloud/Websecurityscanner/V1/ScanRunWarningTrace/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/WebSecurityScanner.pm
+lib/Google/Cloud/Websecurityscanner/V1/WebSecurityScanner/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1/WebSecurityScannerClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-WebSecurityScanner.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-WebSecurityScanner.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

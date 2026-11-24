@@ -1,0 +1,104 @@
+use strict;
+use warnings;
+use Test::More;
+use File::Spec;
+
+# A. Mock Google::Auth
+package Google::Auth;
+BEGIN { $INC{'Google/Auth.pm'} = 1; }
+sub default {
+    my ($class, %args) = @_;
+    return bless \%args, 'Google::Auth::MockCredentials';
+}
+package Google::Auth::MockCredentials;
+sub get_token {
+    return 'mock-token';
+}
+
+# B. Mock Google::gRPC::Client
+package Google::gRPC::Client;
+BEGIN { $INC{'Google/gRPC/Client.pm'} = 1; }
+sub new {
+    my $class = shift;
+    my $args = ( @_ == 1 && ref($_[0]) eq 'HASH' ) ? $_[0] : { @_ };
+    return bless $args, $class;
+}
+sub call {
+    my ($self, $args) = @_;
+    if ($self->{mock_call}) {
+        return $self->{mock_call}->($args);
+    }
+    die 'No mock_call handler configured in transport!';
+}
+
+# C. Fallback Mocks for External Response Classes
+BEGIN {
+    for my $pkg (qw( Google::Cloud::Texttospeech::V1::CloudTts::ListVoicesResponse Google::Cloud::Texttospeech::V1::CloudTts::StreamingSynthesizeResponse Google::Cloud::Texttospeech::V1::CloudTts::SynthesizeSpeechResponse )) {
+        unless ($pkg->can('new')) {
+            no strict 'refs';
+            *{"${pkg}::new"} = sub { bless {}, $_[0] };
+            $INC{join('/', split('::', $pkg)) . '.pm'} = 1;
+        }
+    }
+}
+
+# D. Main test execution
+package main;
+use Google::Cloud::Texttospeech::V1::TextToSpeechClient;
+
+my $client = Google::Cloud::Texttospeech::V1::TextToSpeechClient->new();
+ok($client, 'Instantiated generated client');
+isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
+
+subtest 'list_voices method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.texttospeech.v1.TextToSpeech', 'Correct service path');
+        is($args->{method}, 'ListVoices', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Texttospeech::V1::CloudTts::ListVoicesRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Texttospeech::V1::CloudTts::ListVoicesResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->list_voices();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Texttospeech::V1::CloudTts::ListVoicesResponse', 'Response object class');
+    done_testing();
+};
+
+subtest 'synthesize_speech method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.texttospeech.v1.TextToSpeech', 'Correct service path');
+        is($args->{method}, 'SynthesizeSpeech', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Texttospeech::V1::CloudTts::SynthesizeSpeechRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Texttospeech::V1::CloudTts::SynthesizeSpeechResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->synthesize_speech();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Texttospeech::V1::CloudTts::SynthesizeSpeechResponse', 'Response object class');
+    done_testing();
+};
+
+subtest 'streaming_synthesize method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.texttospeech.v1.TextToSpeech', 'Correct service path');
+        is($args->{method}, 'StreamingSynthesize', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Texttospeech::V1::CloudTts::StreamingSynthesizeRequest', 'Request object');
+        
+        my $response = 'Google::Cloud::Texttospeech::V1::CloudTts::StreamingSynthesizeResponse'->new();
+        return $response;
+    };
+    
+    my $res = $client->streaming_synthesize();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Cloud::Texttospeech::V1::CloudTts::StreamingSynthesizeResponse', 'Response object class');
+    done_testing();
+};
+
+done_testing();

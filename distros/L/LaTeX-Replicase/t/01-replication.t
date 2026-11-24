@@ -12,7 +12,7 @@ use warnings;
 use utf8;
 
 # use Test::More 'no_plan';
-use Test::More tests => 93;
+use Test::More tests => 98;
 use Test::More::UTF8;
 # use Test::NoWarnings;
 use Test::Exception;
@@ -429,10 +429,24 @@ my $msg_ref9 = [
 is_deeply( $msg, $msg_ref9, "Test #9: INFILE == OUTFILE");
 
 
-###Test 10
+###Test 10.1
 $msg = replication( $file, {}, ofile => $newfile, silent =>1, debug => 0 ) // [];
 
-is( $msg->[0], "!!! ERROR#2: EMPTY or WRONG data!", "Test #10: EMPTY or WRONG data");
+is( $msg->[0], "!!! ERROR#2: EMPTY or WRONG data!", "Test #10.1: EMPTY or WRONG data HASH");
+
+unlink $newfile;
+
+###Test 10.2
+$msg = replication( $file, [], ofile => $newfile, silent =>1, debug => 0 ) // [];
+
+is( $msg->[0], "!!! ERROR#2: EMPTY or WRONG data!", "Test #10.2: EMPTY or WRONG data ARRAY");
+
+unlink $newfile;
+
+###Test 10.3
+$msg = replication( $file, 1234567890, ofile => $newfile, silent =>1, debug => 0 ) // [];
+
+is( $msg->[0], "!!! ERROR#2: EMPTY or WRONG data!", "Test #10.3: EMPTY or WRONG data SCALAR");
 
 unlink $newfile;
 
@@ -808,7 +822,7 @@ lives_ok { $msg = read_file( $ofile_s ) } "Test #18.1: $ofile_s read";
 $msg_ref_s = [
 '',
 '\begin{tabbing}',
-'{\\hskip0pt plus .02em}\\~\\/{\\hskip0pt plus .02em}1 \=',
+'\\hskip0pt plus.02em\\/\\~\\/\\hskip0pt plus.02em\\/1 \=',
 ' \=',
 '3 \=',
 '4 \=',
@@ -821,7 +835,7 @@ $msg_ref_s = [
 ' &',
 ' \multicolumn{1}{l}{3}',
 ' &',
-' \multicolumn{1}{l}{{\\hskip0pt plus .02em}\\~\\/{\\hskip0pt plus .02em}1}',
+' \multicolumn{1}{l}{\\hskip0pt plus.02em\\/\\~\\/\\hskip0pt plus.02em\\/1}',
 ' &',
 ' \multicolumn{1}{l}{4}',
 ' \\\\ \hline',
@@ -1158,19 +1172,19 @@ $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0, e
 
 lives_ok { $msg = read_file( $ofile_s ) } "Test #24.7: $ofile_s read";
 
-$msg_ref_s->[1] = '{\\hskip0pt plus .02em}~107{\\hskip0pt plus .02em}7{\\hskip0pt plus .02em}7genius\\$'; # '~10777genius\$';
-$msg_ref_s->[3] = '{\\hskip0pt plus .02em}\\$11{\hskip0pt plus .02em}7{\\hskip0pt plus .02em}7{\\hskip0pt plus .02em}7{\\hskip0pt plus .02em}genius'; # '\\$11777genius';
-$msg_ref_s->[8] = '{\\hskip0pt plus .02em}777{\\hskip0pt plus .02em}7{\\hskip0pt plus .02em}genius'; # '7777genius';
+$msg_ref_s->[1] = '\\hskip0pt plus.02em\\/~107\\hskip0pt plus.02em\\/7\\hskip0pt plus.02em\\/7genius\\$'; # '~10777genius\$';
+$msg_ref_s->[3] = '\\hskip0pt plus.02em\\/\\$11\\hskip0pt plus.02em\\/7\\hskip0pt plus.02em\\/7\\hskip0pt plus.02em\\/7\\hskip0pt plus.02em\\/genius'; # '\\$11777genius';
+$msg_ref_s->[8] = '\\hskip0pt plus.02em\\/777\\hskip0pt plus.02em\\/7\\hskip0pt plus.02em\\/genius'; # '7777genius';
 
 is_deeply( $msg, $msg_ref_s, "Test #24.8: check _ACTIONS_ => ['tex_escape', 'REase', 'add_genius']");
 unlink $ofile_s;
 
 
 ###NEXT SUB-TESTS 24.9-24.10
-$actions = [ # phantoms
+$actions = [
 		'REase',
-		'Blah!',
-		[1..9],
+		'Blah!', # phantom
+		[1..9], # phantom
 	];
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0, esc => 'tex_escape, REase',
@@ -1193,6 +1207,16 @@ $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0, e
 lives_ok { $msg = read_file( $ofile_s ) } "Test #24.11: $ofile_s read";
 
 is_deeply( $msg, $msg_ref_s, "Test #24.12: check _ACTIONS_ = []");
+unlink $ofile_s;
+
+
+###NEXT SUB-TESTS 24.13-24.14
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0, esc => 'Blah-Blah',
+	_ACTIONS_ => $actions ) // [];
+
+lives_ok { $msg = read_file( $ofile_s ) } "Test #24.13: $ofile_s read";
+
+is_deeply( $msg, $msg_ref_s, "Test #24.14: check _ACTIONS_ with 'esc => Blah-Blah' option");
 unlink $ofile_s;
 
 
@@ -1384,20 +1408,20 @@ $msg_ref_s = [
  '~~> l.119 Option =debug= set to 1',
           '--> l.121 Found %%%VAR:myTable_hash',
           '--> Table row = 0',
-          '--> l.130>121 Insert %%%V[AR]:A= 00',
-          '-->	l.130>121 Insert head:  \\=',
-          '--> l.130>122 Insert %%%V[AR]:B= 01',
-          '-->	l.130>122 Insert head:  \\=',
-          '--> l.130>123 Insert %%%V[AR]:C= 02',
+          '--> l.130>89 Insert %%%V[AR]:A= 00',
+          '-->	l.130>89 Insert head:  \\=',
+          '--> l.130>89 Insert %%%V[AR]:B= 01',
+          '-->	l.130>89 Insert head:  \\=',
+          '--> l.130>89 Insert %%%V[AR]:C= 02',
           '~~> l.130 NOT defined %%%V:D',
           '--> Table row = 1',
-          '-->	l.130>124 Insert head: \\\\
+          '-->	l.130>90 Insert head: \\\\
 ',
-          '--> l.130>125 Insert %%%V[AR]:A= 10',
-          '-->	l.130>125 Insert head:  \\=',
-          '--> l.130>126 Insert %%%V[AR]:B= 11',
-          '-->	l.130>126 Insert head:  \\=',
-          '--> l.130>127 Insert %%%V[AR]:C= 12',
+          '--> l.130>91 Insert %%%V[AR]:A= 10',
+          '-->	l.130>91 Insert head:  \\=',
+          '--> l.130>91 Insert %%%V[AR]:B= 11',
+          '-->	l.130>91 Insert head:  \\=',
+          '--> l.130>91 Insert %%%V[AR]:C= 12',
           '~~> l.130 NOT defined %%%V:D'
         ];
 
@@ -1517,20 +1541,20 @@ my $msg_warns = [
   '~~> l.130 Option =debug= set to 1',
           '--> l.130 Found %%%VAR:myTable_hash',
           '--> Table row = 0',
-          '--> l.130>121 Insert %%%V[AR]:A= 00',
-          '-->	l.130>121 Insert head:  \\=',
-          '--> l.130>122 Insert %%%V[AR]:B= 01',
-          '-->	l.130>122 Insert head:  \\=',
-          '--> l.130>123 Insert %%%V[AR]:C= 02',
+          '--> l.130>89 Insert %%%V[AR]:A= 00',
+          '-->	l.130>89 Insert head:  \\=',
+          '--> l.130>89 Insert %%%V[AR]:B= 01',
+          '-->	l.130>89 Insert head:  \\=',
+          '--> l.130>89 Insert %%%V[AR]:C= 02',
           '~~> l.130 NOT defined %%%V:D',
           '--> Table row = 1',
-          '-->	l.130>124 Insert head: \\\\
+          '-->	l.130>90 Insert head: \\\\
 ',
-          '--> l.130>125 Insert %%%V[AR]:A= 10',
-          '-->	l.130>125 Insert head:  \\=',
-          '--> l.130>126 Insert %%%V[AR]:B= 11',
-          '-->	l.130>126 Insert head:  \\=',
-          '--> l.130>127 Insert %%%V[AR]:C= 12',
+          '--> l.130>91 Insert %%%V[AR]:A= 10',
+          '-->	l.130>91 Insert head:  \\=',
+          '--> l.130>91 Insert %%%V[AR]:B= 11',
+          '-->	l.130>91 Insert head:  \\=',
+          '--> l.130>91 Insert %%%V[AR]:C= 12',
           '~~> l.130 NOT defined %%%V:D',
         ];
 
@@ -1660,7 +1684,7 @@ is_deeply( $msg, $msg_ref_s, "Test #30.7: main example filling ARRAY of USAGE");
 unlink $ofile_s;
 
 
-###Test #31
+###Test #31.1
 
 $tex = q|
 ~0~
@@ -1689,6 +1713,8 @@ END DOCUMENT
 lives_ok { &save_file( $file_s, \$tex ) } "Test #31.1: input template $file_s save";
 
 $info = { array=>[0,1,2,3], hash =>{ X=>'', Y=>"\x{003}", Z=>"\x{001}", }, };
+
+###Test #31.2-31.3
 
 $LaTeX::Replicase::DEBUG = 1;
 $msg = replication( $file_s, $info, ofile => $ofile_s, def =>1 ) // []; # , debug => 0, silent =>1
@@ -1737,6 +1763,16 @@ $msg_ref_s = [
 is_deeply( $msg, $msg_ref_s, 'Test #31.4: \x{003} --> exists \endinput');
 
 unlink $ofile_s;
+
+
+###Test #31.5
+$LaTeX::Replicase::DEBUG = 0;
+$msg = replication( $file_s, $info, ofile => $ofile_s, def =>1 ) // []; # , debug => 0, silent =>1
+
+is_deeply( $msg, [], 'Test #31.5: check errors for \x{003} --- NO errors with LaTeX::Replicase::DEBUG = 0');
+
+unlink $ofile_s;
+
 
 $info->{array}[2] = "\x{004}";
 
@@ -1886,6 +1922,12 @@ $tex = q|
    SPECIFY VALUE 'B'! %%%V: B%
 %%%END:
 \end{tabbing}
+%%%VAR: ArEmpty/999
+%%%V: 333
+%%%VAR: myHash/0
+%%%V: 000
+%%%VAR: /ArArHs/-1/-1
+YES %%%V: *AAh
 %%%VAR: ArArArEND
 %%%V: -1
 %%%ENDT:
@@ -1902,12 +1944,13 @@ $info = {
 		ArArHs => [ [ { AAh=>777 } ] ],
 		ArArArMx => [ [ [9999, { AAAh=>7777 }] ] ],
 		ArArArEND => [ [0, undef,undef,undef, "\x{04}"] ],
+		ArEmpty => [],
 	};
 
 $msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 2 ) // [];
 
 is_deeply( $msg, [
-          '--> Checking source data: \'t/tmp/template_simple.tex\'',
+          '--> Checking source data: \'t/tmp/template_simple.tex\'', # 0
           '--> Using \'t/tmp/ready_simple.tex\' file as output',
           '--> Open \'t/tmp/template_simple.tex\'',
           '--> Open \'t/tmp/ready_simple.tex\'',
@@ -1917,7 +1960,7 @@ is_deeply( $msg, [
           '--> l.4>4 Insert %%%V[AR]:keyB= 2',
           '--> l.5 Found %%%VAR:/HH//subH',
           '-->	l.8>5 Insert head: ~',
-          '--> l.8>6 Insert %%%V[AR]:sA= 33',
+          '--> l.8>5 Insert %%%V[AR]:sA= 33', # 10
           '--> l.8 Found %%%VAR:ArArHs',
           '--> Table row = 0',
           '~~> l.10 WARNING#10: ...ARRAY.ARRAY[0] is NOT a SCALAR in %%%V:0 ...skipped',
@@ -1927,17 +1970,24 @@ is_deeply( $msg, [
           '~~> l.12 NOT defined %%%V[AR]:',
           '--> l.12 Found %%%VAR:ArArArMx',
           '--> Table row = 0',
-          '--> l.15>7 Insert %%%V[AR]:0= 9999',
+          '--> l.15>6 Insert %%%V[AR]:0= 9999', # 20
           '~~> l.15 NOT defined %%%V:1',
           '~~> l.17 WARNING#5: (ARRAY|HASH) w/o \'/\' is wrong type of \'myHash\' in %%%V:myHash',
-          '--> l.18>9 Insert %%%V[AR]:keyA= 1',
+          '--> l.18>8 Insert %%%V[AR]:keyA= 1',
           '--> l.20 Found %%%VAR://myHash//',
-          '--> l.24>11 Insert %%%V[AR]:A= 11',
-          '-->	l.24>11 Insert head:  \\=
+          '--> l.24>10 Insert %%%V[AR]:A= 11',
+          '-->	l.24>10 Insert head:  \\=
 ',
-          '--> l.24>12 Insert %%%V[AR]:B= 12',
-          '--> l.26 Found %%%VAR:ArArArEND',
-          '--> Table row = 0',
+          '--> l.24>11 Insert %%%V[AR]:B= 12', # 27
+          '~~> l.26 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key \'999\' in %%%VAR:ArEmpty/999', # 28
+          '~~> l.27 WARNING#3: unknown sub-key \'333\' in %%%V:333', # 29
+          '--> l.28 Found %%%VAR:myHash/0', # 30
+          '~~> l.28 NOT defined key in %%%VAR:myHash/0', # 31
+          '~~> l.30 NOT defined %%%V:myHash', # 32
+          '--> l.30 Found %%%VAR:/ArArHs/-1/-1',
+          '--> l.32>14 Insert by eXistence condition (*) of %%%V[AR]:AAh= YES',
+          '--> l.32 Found %%%VAR:ArArArEND', #
+          '--> Table row = 0', #
 ],
 "Test #34.2: '$file_s'");
 
@@ -1955,6 +2005,9 @@ $msg_ref_s = [
           '\\begin{tabbing}',
           '11 \\=',
           '12\\end{tabbing}',
+          '%%%VAR: ArEmpty/999',
+          '%%%V: 333',
+          'YES',
           '\\end{document}'
 ];
 

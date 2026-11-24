@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -430,39 +430,282 @@ The following RPC methods are available in this client:
 
 =item * B<aggregated_list>
 
-Calls the RPC method C<AggregatedList> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list(
+        filter                   => $filter,
+        include_all_scopes       => $include_all_scopes,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        service_project_number   => $service_project_number,
+    );
+
+Calls the RPC method C<AggregatedList> on C<google.cloud.compute.v1.ResourcePolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AggregatedListResourcePoliciesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ResourcePolicyAggregatedList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<include_all_scopes> - C<bool>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<service_project_number> - C<int64>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        resource_policy          => $resource_policy,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.ResourcePolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteResourcePolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<resource_policy> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        region                   => $region,
+        resource_policy          => $resource_policy,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.ResourcePolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetResourcePolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ResourcePolicy>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<resource_policy> - C<string>
+
+=back
 
 =item * B<get_iam_policy>
 
-Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_iam_policy(
+        options_requested_policy_version => $options_requested_policy_version,
+        project                  => $project,
+        region                   => $region,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<GetIamPolicy> on C<google.cloud.compute.v1.ResourcePolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetIamPolicyResourcePolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<options_requested_policy_version> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        resource_policy_resource => $resource_policy_resource,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.ResourcePolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertResourcePolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<resource_policy_resource> - L<Google::Cloud::Compute::V1::Compute::ResourcePolicy>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.ResourcePolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListResourcePoliciesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ResourcePolicyList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        resource_policy          => $resource_policy,
+        resource_policy_resource => $resource_policy_resource,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.ResourcePolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchResourcePolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<resource_policy> - C<string>
+
+=item * C<resource_policy_resource> - L<Google::Cloud::Compute::V1::Compute::ResourcePolicy>
+
+=item * C<update_mask> - C<string>
+
+=back
 
 =item * B<set_iam_policy>
 
-Calls the RPC method C<SetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_iam_policy(
+        project                  => $project,
+        region                   => $region,
+        region_set_policy_request_resource => $region_set_policy_request_resource,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<SetIamPolicy> on C<google.cloud.compute.v1.ResourcePolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetIamPolicyResourcePolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_set_policy_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionSetPolicyRequest>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        region                   => $region,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.ResourcePolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsResourcePolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=back
 
 =back
 

@@ -1,5 +1,28 @@
 Revision history for Perl extension CGI::PSGI
 
+0.16  2026-11-23 23:22:20 JST
+        - Fix the env wrappers: referer (was misspelled referrer) and
+          env_query_string now read the PSGI env, and methods the installed
+          CGI.pm lacks are skipped
+        - Never read the process's @ARGV as request parameters
+          (CVE-2026-120637 on CGI.pm < 5.02, and envs with no REQUEST_METHOD)
+        - Mark read_from_stdin as deprecated
+        - Port the CGI.pm 5.02 header()/redirect() security fixes to
+          psgi_header and psgi_redirect:
+          - header and redirect values are no longer HTML unescaped, which
+            allowed header injection via &#13;&#10; (CVE-2026-120639) and
+            open redirects via e.g. /&#47evil.example/ (CVE-2026-120638)
+          - quotes and backslashes in the -attachment filename are escaped
+            (CVE-2026-120647)
+          - an empty extra header value no longer comes out as a lone "
+        - Catch up with CGI.pm 4.x header() changes: each cookie and P3P
+          value in an array reference, and header names, are checked for
+          newlines, and -set-cookie is accepted as a cookie alias
+        - Document CGI.pm 5.02's request limits and other changes as they
+          apply to PSGI apps
+        - Require CGI 4.04
+        - Convert the distribution to Dist::Milla
+
 0.15  Tue May 17 13:58:50 PDT 2011
         - Updated the list of overriding methods per CGI.pm update
         - Added a note that you can't use CGI::Pretty (reported by Maestro)

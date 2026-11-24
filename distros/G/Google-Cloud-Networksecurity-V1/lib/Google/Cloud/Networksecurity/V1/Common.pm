@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::Common;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -83,67 +83,106 @@ EOF
     # Field: requested_cancellation Type: 8 ()
     # Field: api_version Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::Common::OperationMetadata - Compiled Protocol Buffers message class
+Google::Cloud::Networksecurity::V1::Common - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/common.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networksecurity::V1::Common;
 
-    my $msg = Google::Cloud::Networksecurity::V1::Common::OperationMetadata->new(
-        create_time => $value,
-    );
+    my $msg = Google::Cloud::Networksecurity::V1::Common::OperationMetadata->new({
+        create_time => $create_time,
+        end_time => $end_time,
+        target => $target,
+        verb => $verb,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->create_time();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::Common::OperationMetadata->parse($bytes);
 
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<target>
-
-Type: String
-
-=item * B<verb>
-
-Type: String
-
-=item * B<status_message>
-
-Type: String
-
-=item * B<requested_cancellation>
-
-Type: Bool
-
-=item * B<api_version>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Common - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/common.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::Common::OperationMetadata
+
+Represents the metadata of the long-running operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the operation was created.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the operation finished running.
+
+=item * C<< $msg->target() >> / C<< $msg->target($value) >>
+
+Type: C<String>
+
+Output only. Server-defined resource path for the target of the operation.
+
+=item * C<< $msg->verb() >> / C<< $msg->verb($value) >>
+
+Type: C<String>
+
+Output only. Name of the verb executed by the operation.
+
+=item * C<< $msg->status_message() >> / C<< $msg->status_message($value) >>
+
+Type: C<String>
+
+Output only. Human-readable status of the operation, if any.
+
+=item * C<< $msg->requested_cancellation() >> / C<< $msg->requested_cancellation($value) >>
+
+Type: C<Bool>
+
+Output only. Identifies whether the user has requested cancellation
+of the operation. Operations that have successfully been cancelled
+have [Operation.error][] value with a
+[google.rpc.Status.code][google.rpc.Status.code] of 1, corresponding to
+`Code.CANCELLED`.
+
+=item * C<< $msg->api_version() >> / C<< $msg->api_version($value) >>
+
+Type: C<String>
+
+Output only. API version used to start the operation.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::Common::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

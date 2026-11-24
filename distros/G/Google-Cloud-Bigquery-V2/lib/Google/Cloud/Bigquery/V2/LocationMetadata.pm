@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::LocationMetadata;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -47,43 +47,66 @@ EOF
     # Fields for LocationMetadata
     # Field: legacy_location_id Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::LocationMetadata::LocationMetadata - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::LocationMetadata - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/location_metadata.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::LocationMetadata;
 
-    my $msg = Google::Cloud::Bigquery::V2::LocationMetadata::LocationMetadata->new(
-        legacy_location_id => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::LocationMetadata::LocationMetadata->new({
+        legacy_location_id => $legacy_location_id,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->legacy_location_id();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::LocationMetadata::LocationMetadata->parse($bytes);
 
-=item * B<legacy_location_id>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::LocationMetadata - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/location_metadata.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::LocationMetadata::LocationMetadata
+
+BigQuery-specific metadata about a location. This will be set on
+google.cloud.location.Location.metadata in Cloud Location API
+responses.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->legacy_location_id() >> / C<< $msg->legacy_location_id($value) >>
+
+Type: C<String>
+
+The legacy BigQuery location ID, e.g. “EU” for the “europe” location.
+This is for any API consumers that need the legacy “US” and “EU” locations.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::LocationMetadata::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

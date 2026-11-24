@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::Extensibility;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -538,64 +538,6 @@ EOF
     # Field: versions Type: 11 (.google.cloud.networkservices.v1.WasmPlugin.VersionsEntry)
     # Field: used_by Type: 11 (.google.cloud.networkservices.v1.WasmPlugin.UsedBy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPlugin.LabelsEntry)
-
-=item * B<main_version_id>
-
-Type: String
-
-=item * B<log_config>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPlugin.LogConfig)
-
-=item * B<versions>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPlugin.VersionsEntry)
-
-=item * B<used_by>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPlugin.UsedBy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::WasmPluginVersion ===
     # Fields for WasmPluginVersion
     # Field: plugin_config_data Type: 12 ()
@@ -609,107 +551,11 @@ Type: Message (.google.cloud.networkservices.v1.WasmPlugin.UsedBy)
     # Field: image_digest Type: 9 ()
     # Field: plugin_config_digest Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::WasmPluginVersion - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::WasmPluginVersion->new(
-        plugin_config_data => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<plugin_config_data>
-
-Type: Bytes
-
-=item * B<plugin_config_uri>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPluginVersion.LabelsEntry)
-
-=item * B<image_uri>
-
-Type: String
-
-=item * B<image_digest>
-
-Type: String
-
-=item * B<plugin_config_digest>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginsRequest ===
     # Fields for ListWasmPluginsRequest
     # Field: parent Type: 9 ()
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginsResponse ===
     # Fields for ListWasmPluginsResponse
@@ -717,74 +563,10 @@ Type: String
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginsResponse->new(
-        wasm_plugins => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<wasm_plugins>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPlugin)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::GetWasmPluginRequest ===
     # Fields for GetWasmPluginRequest
     # Field: name Type: 9 ()
     # Field: view Type: 14 (.google.cloud.networkservices.v1.WasmPluginView)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::GetWasmPluginRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::GetWasmPluginRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.cloud.networkservices.v1.WasmPluginView)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::CreateWasmPluginRequest ===
     # Fields for CreateWasmPluginRequest
@@ -792,104 +574,14 @@ Type: Enum (.google.cloud.networkservices.v1.WasmPluginView)
     # Field: wasm_plugin_id Type: 9 ()
     # Field: wasm_plugin Type: 11 (.google.cloud.networkservices.v1.WasmPlugin)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::CreateWasmPluginRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::CreateWasmPluginRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<wasm_plugin_id>
-
-Type: String
-
-=item * B<wasm_plugin>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPlugin)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::UpdateWasmPluginRequest ===
     # Fields for UpdateWasmPluginRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: wasm_plugin Type: 11 (.google.cloud.networkservices.v1.WasmPlugin)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::UpdateWasmPluginRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::UpdateWasmPluginRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<wasm_plugin>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPlugin)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::DeleteWasmPluginRequest ===
     # Fields for DeleteWasmPluginRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::DeleteWasmPluginRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::DeleteWasmPluginRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginVersionsRequest ===
     # Fields for ListWasmPluginVersionsRequest
@@ -897,109 +589,15 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginVersionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginVersionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginVersionsResponse ===
     # Fields for ListWasmPluginVersionsResponse
     # Field: wasm_plugin_versions Type: 11 (.google.cloud.networkservices.v1.WasmPluginVersion)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginVersionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginVersionsResponse->new(
-        wasm_plugin_versions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<wasm_plugin_versions>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPluginVersion)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::GetWasmPluginVersionRequest ===
     # Fields for GetWasmPluginVersionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::GetWasmPluginVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::GetWasmPluginVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::CreateWasmPluginVersionRequest ===
     # Fields for CreateWasmPluginVersionRequest
@@ -1007,81 +605,598 @@ Type: String
     # Field: wasm_plugin_version_id Type: 9 ()
     # Field: wasm_plugin_version Type: 11 (.google.cloud.networkservices.v1.WasmPluginVersion)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::CreateWasmPluginVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::CreateWasmPluginVersionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<wasm_plugin_version_id>
-
-Type: String
-
-=item * B<wasm_plugin_version>
-
-Type: Message (.google.cloud.networkservices.v1.WasmPluginVersion)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Extensibility::DeleteWasmPluginVersionRequest ===
     # Fields for DeleteWasmPluginVersionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Extensibility::DeleteWasmPluginVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Extensibility;
-
-    my $msg = Google::Cloud::Networkservices::V1::Extensibility::DeleteWasmPluginVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::Extensibility - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::Extensibility - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/extensibility.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networkservices::V1::Extensibility;
+
+    my $msg = Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        description => $description,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/extensibility.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin
+
+`WasmPlugin` is a resource representing a service executing
+a customer-provided Wasm module.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the `WasmPlugin` resource in the following format:
+`projects/{project}/locations/{location}/wasmPlugins/{wasm_plugin}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A human-readable description of the resource.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin::LabelsEntry>)
+
+Optional. Set of labels associated with the `WasmPlugin` resource.
+
+The format must comply with [the following
+requirements](/compute/docs/labeling-resources#requirements).
+
+=item * C<< $msg->main_version_id() >> / C<< $msg->main_version_id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the `WasmPluginVersion` resource that is the
+currently serving one. The version referred to must be a child of this
+`WasmPlugin` resource.
+
+=item * C<< $msg->log_config() >> / C<< $msg->log_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin::LogConfig>)
+
+Optional. Specifies the logging options for the activity performed by this
+plugin. If logging is enabled, plugin logs are exported to
+Cloud Logging.
+Note that the settings relate to the logs generated by using
+logging statements in your Wasm code.
+
+=item * C<< $msg->versions() >> / C<< $msg->versions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin::VersionsEntry>)
+
+Optional. All versions of this `WasmPlugin` resource in the key-value
+format. The key is the resource ID, and the value is the `VersionDetails`
+object.
+
+Lets you create or update a `WasmPlugin` resource and its versions in a
+single request. When the `main_version_id` field is not empty, it must
+point to one of the `VersionDetails` objects in the map.
+
+If provided in a `PATCH` request, the new versions replace the
+previous set. Any version omitted from the `versions` field is removed.
+Because the `WasmPluginVersion` resource is immutable, if a
+`WasmPluginVersion` resource with the same name already exists and differs,
+the request fails.
+
+Note: In a `GET` request, this field is populated only if the field
+`GetWasmPluginRequest.view` is set to `WASM_PLUGIN_VIEW_FULL`.
+
+=item * C<< $msg->used_by() >> / C<< $msg->used_by($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin::UsedBy>)
+
+Output only. List of all
+[extensions](https://cloud.google.com/service-extensions/docs/overview)
+that use this `WasmPlugin` resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::WasmPluginVersion
+
+A single immutable version of a `WasmPlugin` resource.
+Defines the Wasm module used and optionally its runtime config.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->plugin_config_data() >> / C<< $msg->plugin_config_data($value) >>
+
+Type: C<Bytes>
+
+Configuration for the plugin.
+The configuration is provided to the plugin at runtime through
+the `ON_CONFIGURE` callback. When a new
+`WasmPluginVersion` resource is created, the digest of the
+contents is saved in the `plugin_config_digest` field.
+
+=item * C<< $msg->plugin_config_uri() >> / C<< $msg->plugin_config_uri($value) >>
+
+Type: C<String>
+
+URI of the plugin configuration stored in the Artifact Registry.
+The configuration is provided to the plugin at runtime through
+the `ON_CONFIGURE` callback.
+
+The URI can refer to one of the following repository formats:
+
+* Container images: the `plugin_config_uri` must point to a container
+that contains a single file with the name `plugin.config`.
+When a new `WasmPluginVersion` resource is created, the digest of the
+image is saved in the `plugin_config_digest` field.
+When pulling a container image from Artifact Registry, the digest
+value is used instead of an image tag.
+
+* Generic artifacts: the `plugin_config_uri` must be in this format:
+`projects/{project}/locations/{location}/repositories/{repository}/
+genericArtifacts/{package}:{version}`.
+The specified package and version must contain a file with the name
+`plugin.config`. When a new `WasmPluginVersion` resource is
+created, the checksum of the contents of the file is saved in the
+`plugin_config_digest` field.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the `WasmPluginVersion` resource in the following
+format: `projects/{project}/locations/{location}/wasmPlugins/{wasm_plugin}/
+versions/{wasm_plugin_version}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A human-readable description of the resource.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPluginVersion::LabelsEntry>)
+
+Optional. Set of labels associated with the `WasmPluginVersion`
+resource.
+
+=item * C<< $msg->image_uri() >> / C<< $msg->image_uri($value) >>
+
+Type: C<String>
+
+Optional. URI of the image containing the Wasm module, stored in
+Artifact Registry.
+
+The URI can refer to one of the following repository formats:
+
+* Container images: the `image_uri` must point to a container that
+contains a single file with the name `plugin.wasm`.
+When a new `WasmPluginVersion` resource is created, the digest of the
+image is saved in the `image_digest` field.
+When pulling a container image from Artifact Registry, the digest value
+is used instead of an image tag.
+
+* Generic artifacts: the `image_uri` must be in this format:
+`projects/{project}/locations/{location}/repositories/{repository}/
+genericArtifacts/{package}:{version}`.
+The specified package and version must contain a file with the name
+`plugin.wasm`. When a new `WasmPluginVersion` resource is created, the
+checksum of the contents of the file is saved in the `image_digest`
+field.
+
+=item * C<< $msg->image_digest() >> / C<< $msg->image_digest($value) >>
+
+Type: C<String>
+
+Output only. This field holds the digest (usually checksum) value for the
+plugin image. The value is calculated based on the `image_uri` field. If
+the `image_uri` field refers to a container image, the digest value is
+obtained from the container image. If the `image_uri` field refers to
+a generic artifact, the digest value is calculated based on the
+contents of the file.
+
+=item * C<< $msg->plugin_config_digest() >> / C<< $msg->plugin_config_digest($value) >>
+
+Type: C<String>
+
+Output only. This field holds the digest (usually checksum) value for the
+plugin configuration. The value is calculated based on the contents of
+`plugin_config_data` field or the image defined by the
+`plugin_config_uri` field.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginsRequest
+
+Request used with the `ListWasmPlugins` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the `WasmPlugin` resources
+are listed, specified in the following format:
+`projects/{project}/locations/global`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of `WasmPlugin` resources to return per call.
+If not specified, at most 50 `WasmPlugin` resources are returned.
+The maximum value is 1000; values above 1000 are coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListWasmPluginsResponse` call.
+Indicates that this is a continuation of a prior
+`ListWasmPlugins` call, and that the
+next page of data is to be returned.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginsResponse
+
+Response returned by the `ListWasmPlugins` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->wasm_plugins() >> / C<< $msg->wasm_plugins($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin>)
+
+List of `WasmPlugin` resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results,
+call this method again using the value of `next_page_token` as
+`page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request attempts to list all
+resources across all supported locations, while some locations are
+temporarily unavailable.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::GetWasmPluginRequest
+
+Request used by the `GetWasmPlugin` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the `WasmPlugin` resource to get. Must be in the
+format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::WasmPluginView>)
+
+Determines how much data must be returned in the response. See
+[AIP-157](https://google.aip.dev/157).
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::CreateWasmPluginRequest
+
+Request used by the `CreateWasmPlugin` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the `WasmPlugin` resource. Must be in the
+format `projects/{project}/locations/global`.
+
+=item * C<< $msg->wasm_plugin_id() >> / C<< $msg->wasm_plugin_id($value) >>
+
+Type: C<String>
+
+Required. User-provided ID of the `WasmPlugin` resource to be created.
+
+=item * C<< $msg->wasm_plugin() >> / C<< $msg->wasm_plugin($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin>)
+
+Required. `WasmPlugin` resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::UpdateWasmPluginRequest
+
+Request used by the `UpdateWasmPlugin` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Used to specify the fields to be overwritten in the
+`WasmPlugin` resource by the update.
+The fields specified in the `update_mask` field are relative to the
+resource, not the full request.
+An omitted `update_mask` field is treated as an implied `update_mask`
+field equivalent to all fields that are populated (that have a non-empty
+value).
+The `update_mask` field supports a special value `*`, which means that
+each field in the given `WasmPlugin` resource (including the empty ones)
+replaces the current value.
+
+=item * C<< $msg->wasm_plugin() >> / C<< $msg->wasm_plugin($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPlugin>)
+
+Required. Updated `WasmPlugin` resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::DeleteWasmPluginRequest
+
+Request used by the `DeleteWasmPlugin` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the `WasmPlugin` resource to delete. Must be in the
+format `projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginVersionsRequest
+
+Request used with the `ListWasmPluginVersions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The `WasmPlugin` resource whose `WasmPluginVersion`s
+are listed, specified in the following format:
+`projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of `WasmPluginVersion` resources to return per
+call. If not specified, at most 50 `WasmPluginVersion` resources are
+returned. The maximum value is 1000; values above 1000 are coerced to
+1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListWasmPluginVersionsResponse` call.
+Indicates that this is a continuation of a prior
+`ListWasmPluginVersions` call, and that the
+next page of data is to be returned.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::ListWasmPluginVersionsResponse
+
+Response returned by the `ListWasmPluginVersions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->wasm_plugin_versions() >> / C<< $msg->wasm_plugin_versions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPluginVersion>)
+
+List of `WasmPluginVersion` resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results,
+call this method again using the value of `next_page_token` as
+`page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request attempts to list all
+resources across all supported locations, while some locations are
+temporarily unavailable.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::GetWasmPluginVersionRequest
+
+Request used by the `GetWasmPluginVersion` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the `WasmPluginVersion` resource to get. Must be in
+the format
+`projects/{project}/locations/global/wasmPlugins/{wasm_plugin}/versions/{wasm_plugin_version}`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::CreateWasmPluginVersionRequest
+
+Request used by the `CreateWasmPluginVersion` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the `WasmPluginVersion` resource. Must be
+in the format
+`projects/{project}/locations/global/wasmPlugins/{wasm_plugin}`.
+
+=item * C<< $msg->wasm_plugin_version_id() >> / C<< $msg->wasm_plugin_version_id($value) >>
+
+Type: C<String>
+
+Required. User-provided ID of the `WasmPluginVersion` resource to be
+created.
+
+=item * C<< $msg->wasm_plugin_version() >> / C<< $msg->wasm_plugin_version($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Extensibility::WasmPluginVersion>)
+
+Required. `WasmPluginVersion` resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Extensibility::DeleteWasmPluginVersionRequest
+
+Request used by the `DeleteWasmPluginVersion` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the `WasmPluginVersion` resource to delete. Must be in
+the format
+`projects/{project}/locations/global/wasmPlugins/{wasm_plugin}/versions/{wasm_plugin_version}`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::Extensibility::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

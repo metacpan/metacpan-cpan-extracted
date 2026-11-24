@@ -10,18 +10,18 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
+use Google::Cloud::Dataproc::V1::Shared;
+use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
 use Google::Cloud::Dataproc::V1::Jobs;
 use Google::Cloud::Dataproc::V1::Operations;
-use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-use Google::Cloud::Dataproc::V1::Shared;
+use Google::Cloud::Dataproc::V1::Sessions;
 use Google::Cloud::Dataproc::V1::Batches;
 use Google::Cloud::Dataproc::V1::Clusters;
-use Google::Cloud::Dataproc::V1::Sessions;
+use Google::Cloud::Dataproc::V1::SessionTemplates;
 use Google::Cloud::Dataproc::V1::WorkflowTemplates;
 use Google::Cloud::Dataproc::V1::NodeGroups;
-use Google::Cloud::Dataproc::V1::SessionTemplates;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -144,9 +144,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/dataproc/v1/operations.proto>
 
-=item * C<googleapis/google/cloud/dataproc/v1/sessions.proto>
-
 =item * C<googleapis/google/cloud/dataproc/v1/session_templates.proto>
+
+=item * C<googleapis/google/cloud/dataproc/v1/sessions.proto>
 
 =item * C<googleapis/google/cloud/dataproc/v1/shared.proto>
 
@@ -185,7 +185,26 @@ The following RPC methods are available in this client:
 
 =item * B<create_autoscaling_policy>
 
-Calls the RPC method C<CreateAutoscalingPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_autoscaling_policy(
+        parent                   => $parent,
+        policy                   => $policy,
+    );
+
+Calls the RPC method C<CreateAutoscalingPolicy> on C<google.cloud.dataproc.v1.AutoscalingPolicyService>.
+
+Request: L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::CreateAutoscalingPolicyRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<policy> - L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy>
+
+=back
 
 =back
 

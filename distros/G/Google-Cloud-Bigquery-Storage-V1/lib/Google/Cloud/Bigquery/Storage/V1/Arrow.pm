@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::Storage::V1::Arrow;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -98,124 +98,20 @@ EOF
     # Fields for ArrowSchema
     # Field: serialized_schema Type: 12 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSchema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Arrow;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSchema->new(
-        serialized_schema => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<serialized_schema>
-
-Type: Bytes
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowRecordBatch ===
     # Fields for ArrowRecordBatch
     # Field: serialized_record_batch Type: 12 ()
     # Field: row_count Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowRecordBatch - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Arrow;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowRecordBatch->new(
-        serialized_record_batch => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<serialized_record_batch>
-
-Type: Bytes
-
-=item * B<row_count>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSerializationOptions ===
     # Fields for ArrowSerializationOptions
     # Field: buffer_compression Type: 14 (.google.cloud.bigquery.storage.v1.ArrowSerializationOptions.CompressionCodec)
     # Field: picos_timestamp_precision Type: 14 (.google.cloud.bigquery.storage.v1.ArrowSerializationOptions.PicosTimestampPrecision)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSerializationOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Arrow;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSerializationOptions->new(
-        buffer_compression => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<buffer_compression>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.ArrowSerializationOptions.CompressionCodec)
-
-=item * B<picos_timestamp_precision>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.ArrowSerializationOptions.PicosTimestampPrecision)
-
-=back
-
-=cut
-
 # Enum: ArrowSerializationOptions::CompressionCodec
 our $ArrowSerializationOptions_COMPRESSION_UNSPECIFIED = 0;
 our $ArrowSerializationOptions_LZ4_FRAME = 1;
 our $ArrowSerializationOptions_ZSTD = 2;
-
-=pod
-
-=head2 Enum: ArrowSerializationOptions::CompressionCodec
-
-Values:
-
-=over 4
-
-=item * C<COMPRESSION_UNSPECIFIED> => 0
-
-=item * C<LZ4_FRAME> => 1
-
-=item * C<ZSTD> => 2
-
-=back
-
-=cut
 
 # Enum: ArrowSerializationOptions::PicosTimestampPrecision
 our $ArrowSerializationOptions_PICOS_TIMESTAMP_PRECISION_UNSPECIFIED = 0;
@@ -223,37 +119,145 @@ our $ArrowSerializationOptions_TIMESTAMP_PRECISION_MICROS = 1;
 our $ArrowSerializationOptions_TIMESTAMP_PRECISION_NANOS = 2;
 our $ArrowSerializationOptions_TIMESTAMP_PRECISION_PICOS = 3;
 
-=pod
-
-=head2 Enum: ArrowSerializationOptions::PicosTimestampPrecision
-
-Values:
-
-=over 4
-
-=item * C<PICOS_TIMESTAMP_PRECISION_UNSPECIFIED> => 0
-
-=item * C<TIMESTAMP_PRECISION_MICROS> => 1
-
-=item * C<TIMESTAMP_PRECISION_NANOS> => 2
-
-=item * C<TIMESTAMP_PRECISION_PICOS> => 3
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::Storage::V1::Arrow - Protocol Buffers schema definition
+Google::Cloud::Bigquery::Storage::V1::Arrow - Compiled Protocol Buffers messages for google/cloud/bigquery/storage/v1/arrow.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::Storage::V1::Arrow;
+
+    my $msg = Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSchema->new({
+        serialized_schema => $serialized_schema,
+    });
+
+    # Read or update a field
+    my $val = $msg->serialized_schema();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSchema->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/storage/v1/arrow.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSchema
+
+Arrow schema as specified in
+https://arrow.apache.org/docs/python/api/datatypes.html
+and serialized to bytes using IPC:
+https://arrow.apache.org/docs/format/Columnar.html#serialization-and-interprocess-communication-ipc
+
+See code samples on how this message can be deserialized.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->serialized_schema() >> / C<< $msg->serialized_schema($value) >>
+
+Type: C<Bytes>
+
+IPC serialized Arrow schema.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowRecordBatch
+
+Arrow RecordBatch.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->serialized_record_batch() >> / C<< $msg->serialized_record_batch($value) >>
+
+Type: C<Bytes>
+
+IPC-serialized Arrow RecordBatch.
+
+=item * C<< $msg->row_count() >> / C<< $msg->row_count($value) >>
+
+Type: C<Int64>
+
+[Deprecated] The count of rows in `serialized_record_batch`.
+Please use the format-independent ReadRowsResponse.row_count instead.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSerializationOptions
+
+Contains options specific to Arrow Serialization.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->buffer_compression() >> / C<< $msg->buffer_compression($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::ArrowSerializationOptions::CompressionCodec>)
+
+The compression codec to use for Arrow buffers in serialized record
+batches.
+
+=item * C<< $msg->picos_timestamp_precision() >> / C<< $msg->picos_timestamp_precision($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::ArrowSerializationOptions::PicosTimestampPrecision>)
+
+Optional. Set timestamp precision option. If not set, the default precision
+is microseconds.
+
+=back
+
+=head3 Enum: ArrowSerializationOptions::CompressionCodec
+
+=over 4
+
+=item * C<COMPRESSION_UNSPECIFIED> => C<0>
+
+=item * C<LZ4_FRAME> => C<1>
+
+=item * C<ZSTD> => C<2>
+
+=back
+
+=head3 Enum: ArrowSerializationOptions::PicosTimestampPrecision
+
+=over 4
+
+=item * C<PICOS_TIMESTAMP_PRECISION_UNSPECIFIED> => C<0>
+
+=item * C<TIMESTAMP_PRECISION_MICROS> => C<1>
+
+=item * C<TIMESTAMP_PRECISION_NANOS> => C<2>
+
+=item * C<TIMESTAMP_PRECISION_PICOS> => C<3>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::Storage::V1::Arrow::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

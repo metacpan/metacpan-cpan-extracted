@@ -32,7 +32,7 @@ print $result->asn->{name};          # who runs the announcing network
 
 ### With an API key
 
-Every paid plan answers every field: `is_hosting`, `is_cdn` and the four proxy flags as well, the carrier and satellite flags, the five service flags (SSH, SMTP, web, DNS resolver and BitTorrent), the `bot` detail (whose bot uses the address, the agents it serves, what they do and whether its operator vouches for it), city-level `location`, the `company` and the `abuse` contact, and the provider (its ID and its name), confidence and last-seen detail behind each flag. The plans differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.vpndetection.io), then pass it in:
+Every paid plan answers every field: `is_hosting`, `is_cdn` and the four proxy flags as well, the carrier and satellite flags, the five service flags (SSH, SMTP, web, DNS resolver and BitTorrent), the `bot` detail (whose bot uses the address, the agents it serves, what they do and whether its operator vouches for it), city-level `location`, the `company` and the `abuse` contact, the provider (its ID and its name), confidence and last-seen detail behind each flag, and `user_agent`, the verdict on a user agent you send with a lookup. The plans differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.vpndetection.io), then pass it in:
 
 ```perl
 my $client = VPNDetection->new(api_key => $ENV{VPNDETECTION_API_KEY});
@@ -42,6 +42,20 @@ print $result->is_vpn;               # 1
 print $result->is_hosting;           # 1, on a paid plan
 print $result->vpn->{provider};      # nordvpn, on a paid plan
 ```
+
+### Is that crawler who it says it is?
+
+Pass the `User-Agent` of the request you are deciding on, and with every field (a paid plan, or a free account's trial) the answer says whose agent it names and whether this address bears that out:
+
+```perl
+my $result = $client->lookup('66.249.66.1', user_agent => $request_user_agent);
+print $result->user_agent->{verdict};   # verified
+print $result->user_agent->{agent};     # Googlebot
+
+my $answers = $client->lookup_batch(\@ips, user_agents => { '66.249.66.1' => $request_user_agent });
+```
+
+`user_agent` is a hashref of `agent`, `kind` and `verdict`. `verdict` is `verified` where the agent's operator vouches for the address, `spoofed` where it does not, `unverifiable` for a bot nothing published can confirm, and `not_bot` for a browser, an app or a script. `my_ip` takes `user_agent` too. A batch's `user_agents` is keyed by each address as you list it, and an address with no agent, or an empty one, is looked up plainly. An answer with an agent is cached apart from the address's plain answer and from another agent's. Unlimited's answers, a private address's and a lookup that sent none carry no `user_agent` (`undef`, and `has('user_agent')` is 0).
 
 ### Your own address
 

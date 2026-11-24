@@ -95,7 +95,8 @@ plan tests => scalar(@sources) * 3 + 3 + scalar(keys %unchanged) + 2
 sub make_regexp {
     my ($source, $mod) = @_;
     local $SIG{__WARN__} = sub { };
-    return $mod ? eval 'qr/$source/' . $mod : qr/$source/;
+    # Some regex patterns are invalid depending on the perl version.
+    return $mod ? eval 'qr/$source/' . $mod : eval { qr/$source/ };
 }
 
 sub eval_dump {
@@ -108,29 +109,41 @@ sub eval_dump {
 
 for my $source (@sources) {
     my $regexp = make_regexp($source);
-    local $RAN = 0;
 
-    my $dump = dump($regexp);
-    my $restored = eval_dump($dump);
-    my $got = defined $restored ? "$restored" : '<undef>';
+    SKIP: {
+        skip "regex [$source] cannot be built on perl $]", 3
+            unless defined $regexp;
 
-    is($@, '', "eval works for regex [$source]");
-    is($RAN, 0, "no code interpolation for regex [$source]");
-    is($got, "$regexp", "regex [$source] round-trips");
+        local $RAN = 0;
+
+        my $dump = dump($regexp);
+        my $restored = eval_dump($dump);
+        my $got = defined $restored ? "$restored" : '<undef>';
+
+        is($@, '', "eval works for regex [$source]");
+        is($RAN, 0, "no code interpolation for regex [$source]");
+        is($got, "$regexp", "regex [$source] round-trips");
+    }
 }
 
 {
     my $regexp = make_regexp('@{[ $main::RAN++ ]}');
-    local $RAN = 0;
 
-    my $dump = dump({ re => $regexp });
-    my $restored = eval_dump($dump);
-    my $got = defined $restored && ref $restored->{re}
-        ? "$restored->{re}" : '<undef>';
+    SKIP: {
+        skip "nested regex cannot be built on perl $]", 3
+            unless defined $regexp;
 
-    is($@, '', 'eval works for nested regex');
-    is($RAN, 0, 'no code interpolation for nested regex');
-    is($got, "$regexp", 'nested regex round-trips');
+        local $RAN = 0;
+
+        my $dump = dump({ re => $regexp });
+        my $restored = eval_dump($dump);
+        my $got = defined $restored && ref $restored->{re}
+            ? "$restored->{re}" : '<undef>';
+
+        is($@, '', 'eval works for nested regex');
+        is($RAN, 0, 'no code interpolation for nested regex');
+        is($got, "$regexp", 'nested regex round-trips');
+    }
 }
 
 for my $mod (@mods) {
@@ -143,14 +156,20 @@ for my $mod (@mods) {
     is($got, "$regexp", "regex with /$mod round-trips");
 
     my $payload = make_regexp('@{[ $main::RAN++ ]}', $mod);
-    local $RAN = 0;
-    my $payload_dump = dump($payload);
-    my $payload_restored = eval_dump($payload_dump);
-    my $payload_got = defined $payload_restored ? "$payload_restored" : '<undef>';
 
-    is($@, '', "eval works for payload with /$mod");
-    is($RAN, 0, "no interpolation with /$mod");
-    is($payload_got, "$payload", "payload with /$mod round-trips");
+    SKIP: {
+        skip "payload with /$mod cannot be built on perl $]", 3
+            unless defined $payload;
+
+        local $RAN = 0;
+        my $payload_dump = dump($payload);
+        my $payload_restored = eval_dump($payload_dump);
+        my $payload_got = defined $payload_restored ? "$payload_restored" : '<undef>';
+
+        is($@, '', "eval works for payload with /$mod");
+        is($RAN, 0, "no interpolation with /$mod");
+        is($payload_got, "$payload", "payload with /$mod round-trips");
+    }
 }
 
 {

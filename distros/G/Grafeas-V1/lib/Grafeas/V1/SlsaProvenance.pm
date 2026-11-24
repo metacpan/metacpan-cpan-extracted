@@ -1,0 +1,238 @@
+package Grafeas::V1::SlsaProvenance;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Protobuf::Any };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+CiBncmFmZWFzL3YxL3Nsc2FfcHJvdmVuYW5jZS5wcm90bxIKZ3JhZmVhcy52MRoZZ29vZ2xl
+L3Byb3RvYnVmL2FueS5wcm90bxofZ29vZ2xlL3Byb3RvYnVmL3RpbWVzdGFtcC5wcm90byLx
+CAoOU2xzYVByb3ZlbmFuY2USQAoHYnVpbGRlchgBIAEoCzImLmdyYWZlYXMudjEuU2xzYVBy
+b3ZlbmFuY2UuU2xzYUJ1aWxkZXJSB2J1aWxkZXISPQoGcmVjaXBlGAIgASgLMiUuZ3JhZmVh
+cy52MS5TbHNhUHJvdmVuYW5jZS5TbHNhUmVjaXBlUgZyZWNpcGUSQwoIbWV0YWRhdGEYAyAB
+KAsyJy5ncmFmZWFzLnYxLlNsc2FQcm92ZW5hbmNlLlNsc2FNZXRhZGF0YVIIbWV0YWRhdGES
+QQoJbWF0ZXJpYWxzGAQgAygLMiMuZ3JhZmVhcy52MS5TbHNhUHJvdmVuYW5jZS5NYXRlcmlh
+bFIJbWF0ZXJpYWxzGt0BCgpTbHNhUmVjaXBlEhIKBHR5cGUYASABKAlSBHR5cGUSLgoTZGVm
+aW5lZF9pbl9tYXRlcmlhbBgCIAEoA1IRZGVmaW5lZEluTWF0ZXJpYWwSHwoLZW50cnlfcG9p
+bnQYAyABKAlSCmVudHJ5UG9pbnQSMgoJYXJndW1lbnRzGAQgASgLMhQuZ29vZ2xlLnByb3Rv
+YnVmLkFueVIJYXJndW1lbnRzEjYKC2Vudmlyb25tZW50GAUgASgLMhQuZ29vZ2xlLnByb3Rv
+YnVmLkFueVILZW52aXJvbm1lbnQacAoQU2xzYUNvbXBsZXRlbmVzcxIcCglhcmd1bWVudHMY
+ASABKAhSCWFyZ3VtZW50cxIgCgtlbnZpcm9ubWVudBgCIAEoCFILZW52aXJvbm1lbnQSHAoJ
+bWF0ZXJpYWxzGAMgASgIUgltYXRlcmlhbHMawQIKDFNsc2FNZXRhZGF0YRIuChNidWlsZF9p
+bnZvY2F0aW9uX2lkGAEgASgJUhFidWlsZEludm9jYXRpb25JZBJEChBidWlsZF9zdGFydGVk
+X29uGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFIOYnVpbGRTdGFydGVkT24S
+RgoRYnVpbGRfZmluaXNoZWRfb24YAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1w
+Ug9idWlsZEZpbmlzaGVkT24STwoMY29tcGxldGVuZXNzGAQgASgLMisuZ3JhZmVhcy52MS5T
+bHNhUHJvdmVuYW5jZS5TbHNhQ29tcGxldGVuZXNzUgxjb21wbGV0ZW5lc3MSIgoMcmVwcm9k
+dWNpYmxlGAUgASgIUgxyZXByb2R1Y2libGUaHQoLU2xzYUJ1aWxkZXISDgoCaWQYASABKAlS
+AmlkGqABCghNYXRlcmlhbBIQCgN1cmkYASABKAlSA3VyaRJHCgZkaWdlc3QYAiADKAsyLy5n
+cmFmZWFzLnYxLlNsc2FQcm92ZW5hbmNlLk1hdGVyaWFsLkRpZ2VzdEVudHJ5UgZkaWdlc3Qa
+OQoLRGlnZXN0RW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVl
+OgI4AUJmCg1pby5ncmFmZWFzLnYxQhNTbHNhUHJvdmVuYW5jZVByb3RvUAFaOGdvb2dsZS5n
+b2xhbmcub3JnL2dlbnByb3RvL2dvb2dsZWFwaXMvZ3JhZmVhcy92MTtncmFmZWFzogIDR1JB
+SpkoCgYSBA4AcgEK2gQKAQwSAw4AEjLPBCBDb3B5cmlnaHQgMjAyMSBUaGUgR3JhZmVhcyBB
+dXRob3JzLiBBbGwgcmlnaHRzIHJlc2VydmVkLgoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFj
+aGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3Qg
+dXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgog
+WW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgaHR0cDovL3d3
+dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5
+IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlz
+dHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElT
+IiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5E
+LCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUg
+c3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlv
+bnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQABMKCQoCAwASAxIAIwoJCgIDARIDEwAp
+CggKAQgSAxUATwoJCgIICxIDFQBPCggKAQgSAxYAIgoJCgIIChIDFgAiCggKAQgSAxcAJgoJ
+CgIIARIDFwAmCggKAQgSAxgAIQoJCgIIJBIDGAAhCggKAQgSAxkANAoJCgIICBIDGQA0CgoK
+AgQAEgQbAHIBCgoKAwQAARIDGwgWCoMBCgQEAAMAEgQfAjsDGnUgU3RlcHMgdGFrZW4gdG8g
+YnVpbGQgdGhlIGFydGlmYWN0LgogRm9yIGEgVGFza1J1biwgdHlwaWNhbGx5IGVhY2ggY29u
+dGFpbmVyIGNvcnJlc3BvbmRzIHRvIG9uZSBzdGVwIGluIHRoZQogcmVjaXBlLgoKDAoFBAAD
+AAESAx8KFAqqAQoGBAADAAIAEgMjBBQamgEgVVJJIGluZGljYXRpbmcgd2hhdCB0eXBlIG9m
+IHJlY2lwZSB3YXMgcGVyZm9ybWVkLiBJdCBkZXRlcm1pbmVzIHRoZQogbWVhbmluZyBvZiBy
+ZWNpcGUuZW50cnlQb2ludCwgcmVjaXBlLmFyZ3VtZW50cywgcmVjaXBlLmVudmlyb25tZW50
+LCBhbmQKIG1hdGVyaWFscy4KCg4KBwQAAwACAAUSAyMECgoOCgcEAAMAAgABEgMjCw8KDgoH
+BAADAAIAAxIDIxITCtACCgYEAAMAAgESAykEIhrAAiBJbmRleCBpbiBtYXRlcmlhbHMgY29u
+dGFpbmluZyB0aGUgcmVjaXBlIHN0ZXBzIHRoYXQgYXJlIG5vdCBpbXBsaWVkIGJ5CiByZWNp
+cGUudHlwZS4gRm9yIGV4YW1wbGUsIGlmIHRoZSByZWNpcGUgdHlwZSB3ZXJlICJtYWtlIiwg
+dGhlbiB0aGlzIHdvdWxkCiBwb2ludCB0byB0aGUgc291cmNlIGNvbnRhaW5pbmcgdGhlIE1h
+a2VmaWxlLCBub3QgdGhlIG1ha2UgcHJvZ3JhbSBpdHNlbGYuCiBTZXQgdG8gLTEgaWYgdGhl
+IHJlY2lwZSBkb2Vzbid0IGNvbWUgZnJvbSBhIG1hdGVyaWFsLCBhcyB6ZXJvIGlzIGRlZmF1
+bHQKIHVuc2V0IHZhbHVlIGZvciBpbnQ2NC4KCg4KBwQAAwACAQUSAykECQoOCgcEAAMAAgEB
+EgMpCh0KDgoHBAADAAIBAxIDKSAhCtoCCgYEAAMAAgISAy8EGxrKAiBTdHJpbmcgaWRlbnRp
+ZnlpbmcgdGhlIGVudHJ5IHBvaW50IGludG8gdGhlIGJ1aWxkLgogVGhpcyBpcyBvZnRlbiBh
+IHBhdGggdG8gYSBjb25maWd1cmF0aW9uIGZpbGUgYW5kL29yIGEgdGFyZ2V0IGxhYmVsIHdp
+dGhpbgogdGhhdCBmaWxlLiBUaGUgc3ludGF4IGFuZCBtZWFuaW5nIGFyZSBkZWZpbmVkIGJ5
+IHJlY2lwZS50eXBlLiBGb3IKIGV4YW1wbGUsIGlmIHRoZSByZWNpcGUgdHlwZSB3ZXJlICJt
+YWtlIiwgdGhlbiB0aGlzIHdvdWxkIHJlZmVyZW5jZSB0aGUKIGRpcmVjdG9yeSBpbiB3aGlj
+aCB0byBydW4gbWFrZSBhcyB3ZWxsIGFzIHdoaWNoIHRhcmdldCB0byB1c2UuCgoOCgcEAAMA
+AgIFEgMvBAoKDgoHBAADAAICARIDLwsWCg4KBwQAAwACAgMSAy8ZGgrhAgoGBAADAAIDEgM1
+BCYa0QIgQ29sbGVjdGlvbiBvZiBhbGwgZXh0ZXJuYWwgaW5wdXRzIHRoYXQgaW5mbHVlbmNl
+ZCB0aGUgYnVpbGQgb24gdG9wIG9mCiByZWNpcGUuZGVmaW5lZEluTWF0ZXJpYWwgYW5kIHJl
+Y2lwZS5lbnRyeVBvaW50LiBGb3IgZXhhbXBsZSwgaWYgdGhlCiByZWNpcGUgdHlwZSB3ZXJl
+ICJtYWtlIiwgdGhlbiB0aGlzIG1pZ2h0IGJlIHRoZSBmbGFncyBwYXNzZWQgdG8gbWFrZQog
+YXNpZGUgZnJvbSB0aGUgdGFyZ2V0LCB3aGljaCBpcyBjYXB0dXJlZCBpbiByZWNpcGUuZW50
+cnlQb2ludC4gRGVwZW5kaW5nCiBvbiB0aGUgcmVjaXBlIFR5cGUsIHRoZSBzdHJ1Y3R1cmUg
+bWF5IGJlIGRpZmZlcmVudC4KCg4KBwQAAwACAwYSAzUEFwoOCgcEAAMAAgMBEgM1GCEKDgoH
+BAADAAIDAxIDNSQlCvgBCgYEAAMAAgQSAzoEKBroASBBbnkgb3RoZXIgYnVpbGRlci1jb250
+cm9sbGVkIGlucHV0cyBuZWNlc3NhcnkgZm9yIGNvcnJlY3RseSBldmFsdWF0aW5nCiB0aGUg
+cmVjaXBlLiBVc3VhbGx5IG9ubHkgbmVlZGVkIGZvciByZXByb2R1Y2luZyB0aGUgYnVpbGQg
+YnV0IG5vdAogZXZhbHVhdGVkIGFzIHBhcnQgb2YgcG9saWN5LiBEZXBlbmRpbmcgb24gdGhl
+IHJlY2lwZSBUeXBlLCB0aGUgc3RydWN0dXJlCiBtYXkgYmUgZGlmZmVyZW50LgoKDgoHBAAD
+AAIEBhIDOgQXCg4KBwQAAwACBAESAzoYIwoOCgcEAAMAAgQDEgM6JicKYQoEBAADARIEPwJJ
+AxpTIEluZGljYXRlcyB0aGF0IHRoZSBidWlsZGVyIGNsYWltcyBjZXJ0YWluIGZpZWxkcyBp
+biB0aGlzIG1lc3NhZ2UgdG8gYmUKIGNvbXBsZXRlLgoKDAoFBAADAQESAz8KGgqXAQoGBAAD
+AQIAEgNCBBcahwEgSWYgdHJ1ZSwgdGhlIGJ1aWxkZXIgY2xhaW1zIHRoYXQgcmVjaXBlLmFy
+Z3VtZW50cyBpcyBjb21wbGV0ZSwgbWVhbmluZwogdGhhdCBhbGwgZXh0ZXJuYWwgaW5wdXRz
+IGFyZSBwcm9wZXJseSBjYXB0dXJlZCBpbiB0aGUgcmVjaXBlLgoKDgoHBAADAQIABRIDQgQI
+Cg4KBwQAAwECAAESA0IJEgoOCgcEAAMBAgADEgNCFRYKYAoGBAADAQIBEgNFBBkaUSBJZiB0
+cnVlLCB0aGUgYnVpbGRlciBjbGFpbXMgdGhhdCByZWNpcGUuZW52aXJvbm1lbnQgaXMgY2xh
+aW1lZCB0byBiZQogY29tcGxldGUuCgoOCgcEAAMBAgEFEgNFBAgKDgoHBAADAQIBARIDRQkU
+Cg4KBwQAAwECAQMSA0UXGAqhAQoGBAADAQICEgNIBBcakQEgSWYgdHJ1ZSwgdGhlIGJ1aWxk
+ZXIgY2xhaW1zIHRoYXQgbWF0ZXJpYWxzIGFyZSBjb21wbGV0ZSwgdXN1YWxseSB0aHJvdWdo
+CiBzb21lIGNvbnRyb2xzIHRvIHByZXZlbnQgbmV0d29yayBhY2Nlc3MuIFNvbWV0aW1lcyBj
+YWxsZWQgImhlcm1ldGljIi4KCg4KBwQAAwECAgUSA0gECAoOCgcEAAMBAgIBEgNICRIKDgoH
+BAADAQICAxIDSBUWCi4KBAQAAwISBEwCWwMaICBPdGhlciBwcm9wZXJ0aWVzIG9mIHRoZSBi
+dWlsZC4KCgwKBQQAAwIBEgNMChYKywEKBgQAAwICABIDUAQjGrsBIElkZW50aWZpZXMgdGhl
+IHBhcnRpY3VsYXIgYnVpbGQgaW52b2NhdGlvbiwgd2hpY2ggY2FuIGJlIHVzZWZ1bCBmb3IK
+IGZpbmRpbmcgYXNzb2NpYXRlZCBsb2dzIG9yIG90aGVyIGFkLWhvYyBhbmFseXNpcy4gVGhl
+IHZhbHVlIFNIT1VMRCBiZQogZ2xvYmFsbHkgdW5pcXVlLCBwZXIgaW4tdG90byBQcm92ZW5h
+bmNlIHNwZWMuCgoOCgcEAAMCAgAFEgNQBAoKDgoHBAADAgIAARIDUAseCg4KBwQAAwICAAMS
+A1AhIgo5CgYEAAMCAgESA1IEMxoqIFRoZSB0aW1lc3RhbXAgb2Ygd2hlbiB0aGUgYnVpbGQg
+c3RhcnRlZC4KCg4KBwQAAwICAQYSA1IEHQoOCgcEAAMCAgEBEgNSHi4KDgoHBAADAgIBAxID
+UjEyCjsKBgQAAwICAhIDVAQ0GiwgVGhlIHRpbWVzdGFtcCBvZiB3aGVuIHRoZSBidWlsZCBj
+b21wbGV0ZWQuCgoOCgcEAAMCAgIGEgNUBB0KDgoHBAADAgICARIDVB4vCg4KBwQAAwICAgMS
+A1QyMwpiCgYEAAMCAgMSA1cEJhpTIEluZGljYXRlcyB0aGF0IHRoZSBidWlsZGVyIGNsYWlt
+cyBjZXJ0YWluIGZpZWxkcyBpbiB0aGlzIG1lc3NhZ2UgdG8gYmUKIGNvbXBsZXRlLgoKDgoH
+BAADAgIDBhIDVwQUCg4KBwQAAwICAwESA1cVIQoOCgcEAAMCAgMDEgNXJCUKfQoGBAADAgIE
+EgNaBBoabiBJZiB0cnVlLCB0aGUgYnVpbGRlciBjbGFpbXMgdGhhdCBydW5uaW5nIHRoZSBy
+ZWNpcGUgb24gbWF0ZXJpYWxzIHdpbGwKIHByb2R1Y2UgYml0LWZvci1iaXQgaWRlbnRpY2Fs
+IG91dHB1dC4KCg4KBwQAAwICBAUSA1oECAoOCgcEAAMCAgQBEgNaCRUKDgoHBAADAgIEAxID
+WhgZCgwKBAQAAwMSBF0CXwMKDAoFBAADAwESA10KFQoNCgYEAAMDAgASA14EEgoOCgcEAAMD
+AgAFEgNeBAoKDgoHBAADAwIAARIDXgsNCg4KBwQAAwMCAAMSA14QEQoMCgQEAAMEEgRhAmQD
+CgwKBQQAAwQBEgNhChIKDQoGBAADBAIAEgNiBBMKDgoHBAADBAIABRIDYgQKCg4KBwQAAwQC
+AAESA2ILDgoOCgcEAAMEAgADEgNiERIKDQoGBAADBAIBEgNjBCMKDgoHBAADBAIBBhIDYwQX
+Cg4KBwQAAwQCAQESA2MYHgoOCgcEAAMEAgEDEgNjISIKFwoEBAACABIDZgIaIgogcmVxdWly
+ZWQKCgwKBQQAAgAGEgNmAg0KDAoFBAACAAESA2YOFQoMCgUEAAIAAxIDZhgZCvwBCgQEAAIB
+EgNrAhga4gEgSWRlbnRpZmllcyB0aGUgY29uZmlndXJhdGlvbiB1c2VkIGZvciB0aGUgYnVp
+bGQuCiBXaGVuIGNvbWJpbmVkIHdpdGggbWF0ZXJpYWxzLCB0aGlzIFNIT1VMRCBmdWxseSBk
+ZXNjcmliZSB0aGUgYnVpbGQsCiBzdWNoIHRoYXQgcmUtcnVubmluZyB0aGlzIHJlY2lwZSBy
+ZXN1bHRzIGluIGJpdC1mb3ItYml0IGlkZW50aWNhbCBvdXRwdXQKIChpZiB0aGUgYnVpbGQg
+aXMgcmVwcm9kdWNpYmxlKS4KIgogcmVxdWlyZWQKCgwKBQQAAgEGEgNrAgwKDAoFBAACAQES
+A2sNEwoMCgUEAAIBAxIDaxYXCgsKBAQAAgISA2wCHAoMCgUEAAICBhIDbAIOCgwKBQQAAgIB
+EgNsDxcKDAoFBAACAgMSA2waGwqIAgoEBAACAxIDcQIiGvoBIFRoZSBjb2xsZWN0aW9uIG9m
+IGFydGlmYWN0cyB0aGF0IGluZmx1ZW5jZWQgdGhlIGJ1aWxkIGluY2x1ZGluZyBzb3VyY2Vz
+LAogZGVwZW5kZW5jaWVzLCBidWlsZCB0b29scywgYmFzZSBpbWFnZXMsIGFuZCBzbyBvbi4g
+VGhpcyBpcyBjb25zaWRlcmVkIHRvIGJlCiBpbmNvbXBsZXRlIHVubGVzcyBtZXRhZGF0YS5j
+b21wbGV0ZW5lc3MubWF0ZXJpYWxzIGlzIHRydWUuIFVuc2V0IG9yIG51bGwgaXMKIGVxdWl2
+YWxlbnQgdG8gZW1wdHkuCgoMCgUEAAIDBBIDcQIKCgwKBQQAAgMGEgNxCxMKDAoFBAACAwES
+A3EUHQoMCgUEAAIDAxIDcSAhYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Grafeas::V1::SlsaProvenance::SlsaProvenance ===
+    # Fields for SlsaProvenance
+    # Field: builder Type: 11 (.grafeas.v1.SlsaProvenance.SlsaBuilder)
+    # Field: recipe Type: 11 (.grafeas.v1.SlsaProvenance.SlsaRecipe)
+    # Field: metadata Type: 11 (.grafeas.v1.SlsaProvenance.SlsaMetadata)
+    # Field: materials Type: 11 (.grafeas.v1.SlsaProvenance.Material)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Grafeas::V1::SlsaProvenance - Compiled Protocol Buffers messages for grafeas/v1/slsa_provenance.proto
+
+=head1 SYNOPSIS
+
+    use Grafeas::V1::SlsaProvenance;
+
+    my $msg = Grafeas::V1::SlsaProvenance::SlsaProvenance->new({
+        builder => $builder,
+        recipe => $recipe,
+        metadata => $metadata,
+        materials => $materials,
+    });
+
+    # Read or update a field
+    my $val = $msg->builder();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Grafeas::V1::SlsaProvenance::SlsaProvenance->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<grafeas/v1/slsa_provenance.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Grafeas::V1::SlsaProvenance::SlsaProvenance
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->builder() >> / C<< $msg->builder($value) >>
+
+Type: C<Message> (L<Grafeas::V1::SlsaProvenance::SlsaProvenance::SlsaBuilder>)
+
+required
+
+=item * C<< $msg->recipe() >> / C<< $msg->recipe($value) >>
+
+Type: C<Message> (L<Grafeas::V1::SlsaProvenance::SlsaProvenance::SlsaRecipe>)
+
+Identifies the configuration used for the build.
+When combined with materials, this SHOULD fully describe the build,
+such that re-running this recipe results in bit-for-bit identical output
+(if the build is reproducible).
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Grafeas::V1::SlsaProvenance::SlsaProvenance::SlsaMetadata>)
+
+=item * C<< $msg->materials() >> / C<< $msg->materials($value) >>
+
+Type: C<Message> (L<Grafeas::V1::SlsaProvenance::SlsaProvenance::Material>)
+
+The collection of artifacts that influenced the build including sources,
+dependencies, build tools, base images, and so on. This is considered to be
+incomplete unless metadata.completeness.materials is true. Unset or null is
+equivalent to empty.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Grafeas::V1::SlsaProvenance::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

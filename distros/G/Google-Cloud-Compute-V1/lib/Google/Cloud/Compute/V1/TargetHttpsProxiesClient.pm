@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -498,47 +498,322 @@ The following RPC methods are available in this client:
 
 =item * B<aggregated_list>
 
-Calls the RPC method C<AggregatedList> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list(
+        filter                   => $filter,
+        include_all_scopes       => $include_all_scopes,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        service_project_number   => $service_project_number,
+    );
+
+Calls the RPC method C<AggregatedList> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AggregatedListTargetHttpsProxiesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TargetHttpsProxyAggregatedList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<include_all_scopes> - C<bool>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<service_project_number> - C<int64>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        project                  => $project,
+        request_id               => $request_id,
+        target_https_proxy       => $target_https_proxy,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteTargetHttpsProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_https_proxy> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        target_https_proxy       => $target_https_proxy,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetTargetHttpsProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TargetHttpsProxy>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<target_https_proxy> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        project                  => $project,
+        request_id               => $request_id,
+        target_https_proxy_resource => $target_https_proxy_resource,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertTargetHttpsProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_https_proxy_resource> - L<Google::Cloud::Compute::V1::Compute::TargetHttpsProxy>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListTargetHttpsProxiesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TargetHttpsProxyList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        project                  => $project,
+        request_id               => $request_id,
+        target_https_proxy       => $target_https_proxy,
+        target_https_proxy_resource => $target_https_proxy_resource,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchTargetHttpsProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_https_proxy> - C<string>
+
+=item * C<target_https_proxy_resource> - L<Google::Cloud::Compute::V1::Compute::TargetHttpsProxy>
+
+=back
 
 =item * B<set_certificate_map>
 
-Calls the RPC method C<SetCertificateMap> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_certificate_map(
+        project                  => $project,
+        request_id               => $request_id,
+        target_https_proxies_set_certificate_map_request_resource => $target_https_proxies_set_certificate_map_request_resource,
+        target_https_proxy       => $target_https_proxy,
+    );
+
+Calls the RPC method C<SetCertificateMap> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetCertificateMapTargetHttpsProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_https_proxies_set_certificate_map_request_resource> - L<Google::Cloud::Compute::V1::Compute::TargetHttpsProxiesSetCertificateMapRequest>
+
+=item * C<target_https_proxy> - C<string>
+
+=back
 
 =item * B<set_quic_override>
 
-Calls the RPC method C<SetQuicOverride> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_quic_override(
+        project                  => $project,
+        request_id               => $request_id,
+        target_https_proxies_set_quic_override_request_resource => $target_https_proxies_set_quic_override_request_resource,
+        target_https_proxy       => $target_https_proxy,
+    );
+
+Calls the RPC method C<SetQuicOverride> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetQuicOverrideTargetHttpsProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_https_proxies_set_quic_override_request_resource> - L<Google::Cloud::Compute::V1::Compute::TargetHttpsProxiesSetQuicOverrideRequest>
+
+=item * C<target_https_proxy> - C<string>
+
+=back
 
 =item * B<set_ssl_certificates>
 
-Calls the RPC method C<SetSslCertificates> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_ssl_certificates(
+        project                  => $project,
+        request_id               => $request_id,
+        target_https_proxies_set_ssl_certificates_request_resource => $target_https_proxies_set_ssl_certificates_request_resource,
+        target_https_proxy       => $target_https_proxy,
+    );
+
+Calls the RPC method C<SetSslCertificates> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetSslCertificatesTargetHttpsProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_https_proxies_set_ssl_certificates_request_resource> - L<Google::Cloud::Compute::V1::Compute::TargetHttpsProxiesSetSslCertificatesRequest>
+
+=item * C<target_https_proxy> - C<string>
+
+=back
 
 =item * B<set_ssl_policy>
 
-Calls the RPC method C<SetSslPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_ssl_policy(
+        project                  => $project,
+        request_id               => $request_id,
+        ssl_policy_reference_resource => $ssl_policy_reference_resource,
+        target_https_proxy       => $target_https_proxy,
+    );
+
+Calls the RPC method C<SetSslPolicy> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetSslPolicyTargetHttpsProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<ssl_policy_reference_resource> - L<Google::Cloud::Compute::V1::Compute::SslPolicyReference>
+
+=item * C<target_https_proxy> - C<string>
+
+=back
 
 =item * B<set_url_map>
 
-Calls the RPC method C<SetUrlMap> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_url_map(
+        project                  => $project,
+        request_id               => $request_id,
+        target_https_proxy       => $target_https_proxy,
+        url_map_reference_resource => $url_map_reference_resource,
+    );
+
+Calls the RPC method C<SetUrlMap> on C<google.cloud.compute.v1.TargetHttpsProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetUrlMapTargetHttpsProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_https_proxy> - C<string>
+
+=item * C<url_map_reference_resource> - L<Google::Cloud::Compute::V1::Compute::UrlMapReference>
+
+=back
 
 =back
 

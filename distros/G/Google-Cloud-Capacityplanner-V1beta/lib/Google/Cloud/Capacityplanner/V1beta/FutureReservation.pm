@@ -1,0 +1,358 @@
+package Google::Cloud::Capacityplanner::V1beta::FutureReservation;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Cloud::Capacityplanner::V1beta::Allocation };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+Cjxnb29nbGUvY2xvdWQvY2FwYWNpdHlwbGFubmVyL3YxYmV0YS9mdXR1cmVfcmVzZXJ2YXRp
+b24ucHJvdG8SI2dvb2dsZS5jbG91ZC5jYXBhY2l0eXBsYW5uZXIudjFiZXRhGjRnb29nbGUv
+Y2xvdWQvY2FwYWNpdHlwbGFubmVyL3YxYmV0YS9hbGxvY2F0aW9uLnByb3RvGh9nb29nbGUv
+cHJvdG9idWYvdGltZXN0YW1wLnByb3RvIo8OChFGdXR1cmVSZXNlcnZhdGlvbhKGAQoXc3Bl
+Y2lmaWNfc2t1X3Byb3BlcnRpZXMYCCABKAsyTC5nb29nbGUuY2xvdWQuY2FwYWNpdHlwbGFu
+bmVyLnYxYmV0YS5GdXR1cmVSZXNlcnZhdGlvbi5TcGVjaWZpY1NLVVByb3BlcnRpZXNIAFIV
+c3BlY2lmaWNTa3VQcm9wZXJ0aWVzEg4KAmlkGAEgASgDUgJpZBI7CgtjcmVhdGVfdGltZRgC
+IAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCmNyZWF0ZVRpbWUSEgoEem9uZRgF
+IAEoCVIEem9uZRIgCgtkZXNjcmlwdGlvbhgGIAEoCVILZGVzY3JpcHRpb24SLQoSZnV0dXJl
+X3Jlc2VydmF0aW9uGAcgASgJUhFmdXR1cmVSZXNlcnZhdGlvbhIoChBvd25lcl9wcm9qZWN0
+X2lkGA8gASgJUg5vd25lclByb2plY3RJZBJiCgt0aW1lX3dpbmRvdxgJIAEoCzJBLmdvb2ds
+ZS5jbG91ZC5jYXBhY2l0eXBsYW5uZXIudjFiZXRhLkZ1dHVyZVJlc2VydmF0aW9uLlRpbWVX
+aW5kb3dSCnRpbWVXaW5kb3cSZAoOc2hhcmVfc2V0dGluZ3MYCiABKAsyPS5nb29nbGUuY2xv
+dWQuY2FwYWNpdHlwbGFubmVyLnYxYmV0YS5BbGxvY2F0aW9uLlNoYXJlU2V0dGluZ3NSDXNo
+YXJlU2V0dGluZ3MSHwoLbmFtZV9wcmVmaXgYCyABKAlSCm5hbWVQcmVmaXgSVQoGc3RhdHVz
+GAwgASgLMj0uZ29vZ2xlLmNsb3VkLmNhcGFjaXR5cGxhbm5lci52MWJldGEuRnV0dXJlUmVz
+ZXJ2YXRpb24uU3RhdHVzUgZzdGF0dXMSbAolYXV0b19jcmVhdGVkX3Jlc2VydmF0aW9uc19k
+ZWxldGVfdGltZRgNIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSIWF1dG9DcmVh
+dGVkUmVzZXJ2YXRpb25zRGVsZXRlVGltZRJQCiVhdXRvX2RlbGV0ZV9hdXRvX2NyZWF0ZWRf
+cmVzZXJ2YXRpb25zGA4gASgIUiFhdXRvRGVsZXRlQXV0b0NyZWF0ZWRSZXNlcnZhdGlvbnMa
+zQEKFVNwZWNpZmljU0tVUHJvcGVydGllcxKSAQoTaW5zdGFuY2VfcHJvcGVydGllcxgBIAEo
+CzJhLmdvb2dsZS5jbG91ZC5jYXBhY2l0eXBsYW5uZXIudjFiZXRhLkFsbG9jYXRpb24uU3Bl
+Y2lmaWNTS1VBbGxvY2F0aW9uLkFsbG9jYXRlZEluc3RhbmNlUHJvcGVydGllc1ISaW5zdGFu
+Y2VQcm9wZXJ0aWVzEh8KC3RvdGFsX2NvdW50GAIgASgDUgp0b3RhbENvdW50Gn4KClRpbWVX
+aW5kb3cSOQoKc3RhcnRfdGltZRgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBS
+CXN0YXJ0VGltZRI1CghlbmRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3Rh
+bXBSB2VuZFRpbWUaugQKBlN0YXR1cxJ+ChJwcm9jdXJlbWVudF9zdGF0dXMYASABKA4yTy5n
+b29nbGUuY2xvdWQuY2FwYWNpdHlwbGFubmVyLnYxYmV0YS5GdXR1cmVSZXNlcnZhdGlvbi5T
+dGF0dXMuUHJvY3VyZW1lbnRTdGF0dXNSEXByb2N1cmVtZW50U3RhdHVzEjcKCWxvY2tfdGlt
+ZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCGxvY2tUaW1lEjoKGWF1dG9f
+Y3JlYXRlZF9yZXNlcnZhdGlvbnMYAyADKAlSF2F1dG9DcmVhdGVkUmVzZXJ2YXRpb25zEicK
+D2Z1bGZpbGxlZF9jb3VudBgEIAEoA1IOZnVsZmlsbGVkQ291bnQikQIKEVByb2N1cmVtZW50
+U3RhdHVzEiIKHlBST0NVUkVNRU5UX1NUQVRVU19VTlNQRUNJRklFRBAAEhQKEFBFTkRJTkdf
+QVBQUk9WQUwQARIMCghBUFBST1ZFRBACEg0KCUNPTU1JVFRFRBADEgwKCERFQ0xJTkVEEAQS
+DQoJQ0FOQ0VMTEVEEAUSDQoJUFJPQ1VSSU5HEAYSEAoMUFJPVklTSU9OSU5HEAcSDQoJRlVM
+RklMTEVEEAgSCgoGRkFJTEVEEAkSHgoaRkFJTEVEX1BBUlRJQUxMWV9GVUxGSUxMRUQQChIM
+CghEUkFGVElORxALEh4KGlBFTkRJTkdfQU1FTkRNRU5UX0FQUFJPVkFMEAxCBgoEdHlwZUKL
+AgonY29tLmdvb2dsZS5jbG91ZC5jYXBhY2l0eXBsYW5uZXIudjFiZXRhQhZGdXR1cmVSZXNl
+cnZhdGlvblByb3RvUAFaUWNsb3VkLmdvb2dsZS5jb20vZ28vY2FwYWNpdHlwbGFubmVyL2Fw
+aXYxYmV0YS9jYXBhY2l0eXBsYW5uZXJwYjtjYXBhY2l0eXBsYW5uZXJwYqoCI0dvb2dsZS5D
+bG91ZC5DYXBhY2l0eVBsYW5uZXIuVjFCZXRhygIjR29vZ2xlXENsb3VkXENhcGFjaXR5UGxh
+bm5lclxWMWJldGHqAiZHb29nbGU6OkNsb3VkOjpDYXBhY2l0eVBsYW5uZXI6OlYxYmV0YUr+
+NAoHEgUOALMBAQq8BAoBDBIDDgASMrEEIENvcHlyaWdodCAyMDI1IEdvb2dsZSBMTEMKCiBM
+aWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxp
+Y2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFu
+Y2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGlj
+ZW5zZSBhdAoKICAgICBodHRwOi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0y
+LjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGlu
+IHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBk
+aXN0cmlidXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9S
+IENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBT
+ZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVy
+bWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAA
+LAoJCgIDABIDEgA+CgkKAgMBEgMTACkKCAoBCBIDFQBACgkKAgglEgMVAEAKCAoBCBIDFgBo
+CgkKAggLEgMWAGgKCAoBCBIDFwAiCgkKAggKEgMXACIKCAoBCBIDGAA3CgkKAggIEgMYADcK
+CAoBCBIDGQBACgkKAggBEgMZAEAKCAoBCBIDGgBACgkKAggpEgMaAEAKCAoBCBIDGwA/CgkK
+AggtEgMbAD8KgwEKAgQAEgUfALMBARp2IFJlcGVzZW50cyBGdXR1cmUgUmVzZXJ2YXRpb24g
+cmVxdWVzdCB3aGljaCBpcyBwYXJ0IG9mIGFnZ3JlZ2F0ZWQKIHJlc2VydmF0aW9ucyBkYXRh
+IHJlc3BvbnNlIG9mICJRdWVyeVJlc2VydmF0aW9ucyIuCgoKCgMEAAESAx8IGQpOCgQEAAMA
+EgQhAikDGkAgUmVwcmVzZW50cyBzcGVjaWZpYyBTS1UgcHJvcGVydGllcyBmb3IgdGhlIEZ1
+dHVyZSBSZXNlcnZhdGlvbi4KCgwKBQQAAwABEgMhCh8KQQoGBAADAAIAEgQjBCQgGjEgUHJv
+cGVydGllcyBvZiB0aGUgU0tVIGluc3RhbmNlcyBiZWluZyByZXNlcnZlZC4KCg4KBwQAAwAC
+AAYSAyMEQAoOCgcEAAMAAgABEgMkCBsKDgoHBAADAAIAAxIDJB4fCm4KBgQAAwACARIDKAQa
+Gl8gVG90YWwgbnVtYmVyIG9mIGluc3RhbmNlcyBmb3Igd2hpY2ggY2FwYWNpdHkgYXNzdXJh
+bmNlIGlzIHJlcXVlc3RlZCBhdCBhCiBmdXR1cmUgdGltZSBwZXJpb2QuCgoOCgcEAAMAAgEF
+EgMoBAkKDgoHBAADAAIBARIDKAoVCg4KBwQAAwACAQMSAygYGQpCCgQEAAMBEgQsAjIDGjQg
+UmVwcmVzZW50cyB0aW1lIHdpbmRvdyBmb3IgdGhlIEZ1dHVyZSBSZXNlcnZhdGlvbi4KCgwK
+BQQAAwEBEgMsChQKNgoGBAADAQIAEgMuBC0aJyBTdGFydCB0aW1lIG9mIHRoZSBGdXR1cmUg
+UmVzZXJ2YXRpb24uCgoOCgcEAAMBAgAGEgMuBB0KDgoHBAADAQIAARIDLh4oCg4KBwQAAwEC
+AAMSAy4rLAo0CgYEAAMBAgESAzEEKxolIEVuZCB0aW1lIG9mIHRoZSBGdXR1cmUgUmVzZXJ2
+YXRpb24uCgoOCgcEAAMBAgEGEgMxBB0KDgoHBAADAQIBARIDMR4mCg4KBwQAAwECAQMSAzEp
+KgpECgQEAAMCEgQ1AnsDGjYgUmVwcmVzZW50cyBzdGF0dXMgcmVsYXRlZCB0byB0aGUgZnV0
+dXJlIHJlc2VydmF0aW9uLgoKDAoFBAADAgESAzUKEApKCgYEAAMCBAASBDcEZwUaOiBSZXBy
+ZXNlbnRzIHByb2N1cmVtZW50IHN0YXR1cyBvZiB0aGUgRnV0dXJlIFJlc2VydmF0aW9uLgoK
+DgoHBAADAgQAARIDNwkaCi8KCAQAAwIEAAIAEgM5BikaHiBUaGlzIGlzIHVudXNlZCBzdGF0
+dXMgdmFsdWUuCgoQCgkEAAMCBAACAAESAzkGJAoQCgkEAAMCBAACAAISAzknKApTCggEAAMC
+BAACARIDPAYbGkIgRnV0dXJlIHJlc2VydmF0aW9uIGlzIHBlbmRpbmcgYXBwcm92YWwgYnkg
+R29vZ2xlIENsb3VkIFBsYXRmb3JtLgoKEAoJBAADAgQAAgEBEgM8BhYKEAoJBAADAgQAAgEC
+EgM8GRoKSwoIBAADAgQAAgISAz8GExo6IEZ1dHVyZSByZXNlcnZhdGlvbiBpcyBhcHByb3Zl
+ZCBieSBHb29nbGUgQ2xvdWQgUGxhdGZvcm0uCgoQCgkEAAMCBAACAgESAz8GDgoQCgkEAAMC
+BAACAgISAz8REgpDCggEAAMCBAACAxIDQgYUGjIgRnV0dXJlIHJlc2VydmF0aW9uIGlzIGNv
+bW1pdHRlZCBieSB0aGUgY3VzdG9tZXIuCgoQCgkEAAMCBAACAwESA0IGDwoQCgkEAAMCBAAC
+AwISA0ISEwpLCggEAAMCBAACBBIDRQYTGjogRnV0dXJlIHJlc2VydmF0aW9uIGlzIHJlamVj
+dGVkIGJ5IEdvb2dsZSBDbG91ZCBQbGF0Zm9ybS4KChAKCQQAAwIEAAIEARIDRQYOChAKCQQA
+AwIEAAIEAhIDRRESCkMKCAQAAwIEAAIFEgNIBhQaMiBGdXR1cmUgcmVzZXJ2YXRpb24gaXMg
+Y2FuY2VsbGVkIGJ5IHRoZSBjdXN0b21lci4KChAKCQQAAwIEAAIFARIDSAYPChAKCQQAAwIE
+AAIFAhIDSBITCq4BCggEAAMCBAACBhIDTQYUGpwBIEZ1dHVyZSByZXNlcnZhdGlvbiBpcyBi
+ZWluZyBwcm9jdXJlZCBieSBHb29nbGUgQ2xvdWQgUGxhdGZvcm0uIEJleW9uZAogdGhpcyBw
+b2ludCwgRnV0dXJlIHJlc2VydmF0aW9uIGlzIGxvY2tlZCBhbmQgbm8gZnVydGhlciBtb2Rp
+ZmljYXRpb25zCiBhcmUgYWxsb3dlZC4KChAKCQQAAwIEAAIGARIDTQYPChAKCQQAAwIEAAIG
+AhIDTRITCv0BCggEAAMCBAACBxIDUwYXGusBIEZ1dHVyZSByZXNlcnZhdGlvbiBjYXBhY2l0
+eSBpcyBiZWluZyBwcm92aXNpb25lZC4gVGhpcyBzdGF0ZSB3aWxsIGJlCiBlbnRlcmVkIGFm
+dGVyIHN0YXJ0X3RpbWUsIHdoaWxlIHJlc2VydmF0aW9ucyBhcmUgYmVpbmcgY3JlYXRlZCB0
+bwogcHJvdmlkZSB0b3RhbF9jb3VudCByZXNlcnZlZCBpbnN0YW5jZSBzbG90cy4gVGhpcyBz
+dGF0ZSB3aWxsIG5vdAogcGVyc2lzdCBwYXN0IHN0YXJ0X3RpbWUgKyAyNGguCgoQCgkEAAMC
+BAACBwESA1MGEgoQCgkEAAMCBAACBwISA1MVFgo+CggEAAMCBAACCBIDVgYUGi0gRnV0dXJl
+IHJlc2VydmF0aW9uIGlzIGZ1bGZpbGxlZCBjb21wbGV0ZWx5LgoKEAoJBAADAgQAAggBEgNW
+Bg8KEAoJBAADAgQAAggCEgNWEhMKVwoIBAADAgQAAgkSA1kGERpGIEZ1dHVyZSByZXNlcnZh
+dGlvbiBmYWlsZWQuIE5vIGFkZGl0aW9uYWwgcmVzZXJ2YXRpb25zIHdlcmUgcHJvdmlkZWQu
+CgoQCgkEAAMCBAACCQESA1kGDAoQCgkEAAMCBAACCQISA1kPEAqcAQoIBAADAgQAAgoSA10G
+JhqKASBGdXR1cmUgcmVzZXJ2YXRpb24gaXMgcGFydGlhbGx5IGZ1bGZpbGxlZC4gQWRkaXRp
+b25hbCByZXNlcnZhdGlvbnMgd2VyZQogcHJvdmlkZWQgYnV0IGRpZCBub3QgcmVhY2ggdG90
+YWxfY291bnQgcmVzZXJ2ZWQgaW5zdGFuY2Ugc2xvdHMuCgoQCgkEAAMCBAACCgESA10GIAoQ
+CgkEAAMCBAACCgISA10jJQp1CggEAAMCBAACCxIDYQYUGmQgUmVsYXRlZCBzdGF0dXMgZm9y
+IFBsYW5uaW5nU3RhdHVzLkRyYWZ0LiBUcmFuc2l0aW9ucyB0bwogUEVORElOR19BUFBST1ZB
+TCB1cG9uIHVzZXIgc3VibWl0dGluZyBGUi4KChAKCQQAAwIEAAILARIDYQYOChAKCQQAAwIE
+AAILAhIDYRETCrQBCggEAAMCBAACDBIDZgYmGqIBIEFuIEFtZW5kbWVudCB0byB0aGUgRnV0
+dXJlIFJlc2VydmF0aW9uIGhhcyBiZWVuIHJlcXVlc3RlZC4gSWYgdGhlCiBBbWVuZG1lbnQg
+aXMgZGVjbGluZWQsIHRoZSBGdXR1cmUgUmVzZXJ2YXRpb24gd2lsbCBiZSByZXN0b3JlZCB0
+byB0aGUKIGxhc3Qga25vd24gZ29vZCBzdGF0ZS4KChAKCQQAAwIEAAIMARIDZgYgChAKCQQA
+AwIEAAIMAhIDZiMlCjkKBgQAAwICABIDagQtGiogQ3VycmVudCBzdGF0ZSBvZiB0aGlzIEZ1
+dHVyZSBSZXNlcnZhdGlvbgoKDgoHBAADAgIABhIDagQVCg4KBwQAAwICAAESA2oWKAoOCgcE
+AAMCAgADEgNqKywKvgIKBgQAAwICARIDcQQsGq4CIFRpbWUgd2hlbiBGdXR1cmUgUmVzZXJ2
+YXRpb24gd291bGQgYmVjb21lIExPQ0tFRCwgYWZ0ZXIgd2hpY2ggbm8KIG1vZGlmaWNhdGlv
+bnMgdG8gRnV0dXJlIFJlc2VydmF0aW9uIHdpbGwgYmUgYWxsb3dlZC4gQXBwbGljYWJsZSBv
+bmx5CiBhZnRlciB0aGUgRnV0dXJlIFJlc2VydmF0aW9uIGlzIGluIHRoZSBBUFBST1ZFRCBz
+dGF0ZS4gVGhlIGxvY2tfdGltZSBpcwogYW4gUkZDMzMzOSBzdHJpbmcuIFRoZSBwcm9jdXJl
+bWVudF9zdGF0dXMgd2lsbCB0cmFuc2l0aW9uIHRvIFBST0NVUklORwogc3RhdGUgYXQgdGhp
+cyB0aW1lLgoKDgoHBAADAgIBBhIDcQQdCg4KBwQAAwICAQESA3EeJwoOCgcEAAMCAgEDEgNx
+KisKXwoGBAADAgICEgN1BDIaUCBGdWxseSBxdWFsaWZpZWQgdXJscyBvZiB0aGUgYXV0b21h
+dGljYWxseSBjcmVhdGVkIHJlc2VydmF0aW9ucyBhdAogc3RhcnRfdGltZS4KCg4KBwQAAwIC
+AgQSA3UEDAoOCgcEAAMCAgIFEgN1DRMKDgoHBAADAgICARIDdRQtCg4KBwQAAwICAgMSA3Uw
+MQrHAQoGBAADAgIDEgN6BB4atwEgVGhpcyBjb3VudCBpbmRpY2F0ZXMgdGhlIGZ1bGZpbGxl
+ZCBjYXBhY2l0eSBzbyBmYXIuIFRoaXMgaXMgc2V0IGR1cmluZwogIlBST1ZJU0lPTklORyIg
+c3RhdGUuIFRoaXMgY291bnQgYWxzbyBpbmNsdWRlcyBjYXBhY2l0eSBkZWxpdmVyZWQgYXMg
+cGFydAogb2YgZXhpc3RpbmcgbWF0Y2hpbmcgcmVzZXJ2YXRpb25zLgoKDgoHBAADAgIDBRID
+egQJCg4KBwQAAwICAwESA3oKGQoOCgcEAAMCAgMDEgN6HB0KYgoEBAAIABIFfwKDAQMaUyBU
+aGUgdHlwZSBvZiB0aGUgZnV0dXJlIHJlc2VydmF0aW9uIHdoaWNoIGNhbiBvbmx5IGJlIGZv
+ciBhIHNwZWNpZmljIFNLVSBmb3IKIG5vdy4KCgwKBQQACAABEgN/CAwKYgoEBAACABIEggEE
+NhpUIEZ1dHVyZSBSZXNlcnZhdGlvbiBjb25maWd1cmF0aW9uIHRvIGluZGljYXRlIGluc3Rh
+bmNlIHByb3BlcnRpZXMgYW5kCiB0b3RhbCBjb3VudC4KCg0KBQQAAgAGEgSCAQQZCg0KBQQA
+AgABEgSCARoxCg0KBQQAAgADEgSCATQ1CmUKBAQAAgESBIcBAg8aVyBBIHVuaXF1ZSBpZGVu
+dGlmaWVyIGZvciB0aGlzIGZ1dHVyZSByZXNlcnZhdGlvbi4gVGhlIHNlcnZlcgogZGVmaW5l
+cyB0aGlzIGlkZW50aWZpZXIuCgoNCgUEAAIBBRIEhwECBwoNCgUEAAIBARIEhwEICgoNCgUE
+AAIBAxIEhwENDgpDCgQEAAICEgSKAQIsGjUgVGhlIGNyZWF0aW9uIHRpbWVzdGFtcCBmb3Ig
+dGhpcyBmdXR1cmUgcmVzZXJ2YXRpb24uCgoNCgUEAAICBhIEigECGwoNCgUEAAICARIEigEc
+JwoNCgUEAAICAxIEigEqKwpGCgQEAAIDEgSNAQISGjggVVJMIG9mIHRoZSBab25lIHdoZXJl
+IHRoaXMgZnV0dXJlIHJlc2VydmF0aW9uIHJlc2lkZXMuCgoNCgUEAAIDBRIEjQECCAoNCgUE
+AAIDARIEjQEJDQoNCgUEAAIDAxIEjQEQEQpHCgQEAAIEEgSQAQIZGjkgRGVzY3JpcHRpb24g
+b2YgdGhlIGZ1dHVyZSByZXNlcnZhdGlvbiBwcm92aWRlZCBieSB1c2VyLgoKDQoFBAACBAUS
+BJABAggKDQoFBAACBAESBJABCRQKDQoFBAACBAMSBJABFxgKNQoEBAACBRIEkwECIBonIFRo
+ZSBmdXR1cmUgcmVzZXJ2YXRpb24gcmVzb3VyY2UgbmFtZS4KCg0KBQQAAgUFEgSTAQIICg0K
+BQQAAgUBEgSTAQkbCg0KBQQAAgUDEgSTAR4fCgwKBAQAAgYSBJUBAh8KDQoFBAACBgUSBJUB
+AggKDQoFBAACBgESBJUBCRkKDQoFBAACBgMSBJUBHB4KOAoEBAACBxIEmAECHRoqIFRpbWUg
+d2luZG93IGZvciB0aGlzIEZ1dHVyZSBSZXNlcnZhdGlvbi4KCg0KBQQAAgcGEgSYAQIMCg0K
+BQQAAgcBEgSYAQ0YCg0KBQQAAgcDEgSYARscCjcKBAQAAggSBJsBAi8aKSBMaXN0IG9mIFBy
+b2plY3RzL0ZvbGRlcnMgdG8gc2hhcmUgd2l0aC4KCg0KBQQAAggGEgSbAQIaCg0KBQQAAggB
+EgSbARspCg0KBQQAAggDEgSbASwuCoMCCgQEAAIJEgShAQIaGvQBIE5hbWUgcHJlZml4IGZv
+ciB0aGUgcmVzZXJ2YXRpb25zIHRvIGJlIGNyZWF0ZWQgYXQgdGhlIHRpbWUgb2YKIGRlbGl2
+ZXJ5LiBUaGUgbmFtZSBwcmVmaXggbXVzdCBjb21wbHkgd2l0aCBSRkMxMDM1LgogTWF4aW11
+bSBhbGxvd2VkIGxlbmd0aCBmb3IgbmFtZSBwcmVmaXggaXMgMjAuIEF1dG9tYXRpY2FsbHkg
+Y3JlYXRlZAogcmVzZXJ2YXRpb25zIG5hbWUgZm9ybWF0IHdpbGwgYmUgPG5hbWUtcHJlZml4
+Pi1kYXRlLSMjIyMuCgoNCgUEAAIJBRIEoQECCAoNCgUEAAIJARIEoQEJFAoNCgUEAAIJAxIE
+oQEXGQowCgQEAAIKEgSkAQIVGiIgU3RhdHVzIG9mIHRoZSBGdXR1cmUgUmVzZXJ2YXRpb24K
+Cg0KBQQAAgoGEgSkAQIICg0KBQQAAgoBEgSkAQkPCg0KBQQAAgoDEgSkARIUCp8BCgQEAAIL
+EgSoAQJHGpABIEZ1dHVyZSB0aW1lc3RhbXAgd2hlbiB0aGUgRlIgYXV0by1jcmVhdGVkIHJl
+c2VydmF0aW9ucyB3aWxsIGJlIGRlbGV0ZWQgYnkKIENvbXB1dGUgRW5naW5lLiBGb3JtYXQg
+b2YgdGhpcyBmaWVsZCBtdXN0IGJlIGEgdmFsaWQgUkZDMzMzOSB2YWx1ZS4KCg0KBQQAAgsG
+EgSoAQIbCg0KBQQAAgsBEgSoARxBCg0KBQQAAgsDEgSoAURGCrMDCgQEAAIMEgSyAQIyGqQD
+IFNldHRpbmcgZm9yIGVuYWJsaW5nIG9yIGRpc2FibGluZyBhdXRvbWF0aWMgZGVsZXRpb24g
+Zm9yIGF1dG8tY3JlYXRlZAogcmVzZXJ2YXRpb24uIElmIHNldCB0byB0cnVlLCBhdXRvLWNy
+ZWF0ZWQgcmVzZXJ2YXRpb25zIHdpbGwgYmUKIGRlbGV0ZWQgYXQgRnV0dXJlIFJlc2VydmF0
+aW9uJ3MgZW5kIHRpbWUgKGRlZmF1bHQpIG9yIGF0IHVzZXIncyBkZWZpbmVkCiB0aW1lc3Rh
+bXAgaWYgYW55IG9mIHRoZQogW2F1dG9fY3JlYXRlZF9yZXNlcnZhdGlvbnNfZGVsZXRlX3Rp
+bWUsIGF1dG9fY3JlYXRlZF9yZXNlcnZhdGlvbnNfZHVyYXRpb25dCiB2YWx1ZXMgaXMgc3Bl
+Y2lmaWVkLgogRm9yIGtlZXBpbmcgYXV0by1jcmVhdGVkIHJlc2VydmF0aW9uIGluZGVmaW5p
+dGVseSwgdGhpcyB2YWx1ZSBzaG91bGQgYmUgc2V0CiB0byBmYWxzZS4KCg0KBQQAAgwFEgSy
+AQIGCg0KBQQAAgwBEgSyAQcsCg0KBQQAAgwDEgSyAS8xYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Capacityplanner::V1beta::FutureReservation::FutureReservation ===
+    # Fields for FutureReservation
+    # Field: specific_sku_properties Type: 11 (.google.cloud.capacityplanner.v1beta.FutureReservation.SpecificSKUProperties)
+    # Field: id Type: 3 ()
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: zone Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: future_reservation Type: 9 ()
+    # Field: owner_project_id Type: 9 ()
+    # Field: time_window Type: 11 (.google.cloud.capacityplanner.v1beta.FutureReservation.TimeWindow)
+    # Field: share_settings Type: 11 (.google.cloud.capacityplanner.v1beta.Allocation.ShareSettings)
+    # Field: name_prefix Type: 9 ()
+    # Field: status Type: 11 (.google.cloud.capacityplanner.v1beta.FutureReservation.Status)
+    # Field: auto_created_reservations_delete_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: auto_delete_auto_created_reservations Type: 8 ()
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Capacityplanner::V1beta::FutureReservation - Compiled Protocol Buffers messages for google/cloud/capacityplanner/v1beta/future_reservation.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Capacityplanner::V1beta::FutureReservation;
+
+    my $msg = Google::Cloud::Capacityplanner::V1beta::FutureReservation::FutureReservation->new({
+        specific_sku_properties => $specific_sku_properties,
+        id => $id,
+        create_time => $create_time,
+        zone => $zone,
+    });
+
+    # Read or update a field
+    my $val = $msg->specific_sku_properties();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Capacityplanner::V1beta::FutureReservation::FutureReservation->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/capacityplanner/v1beta/future_reservation.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Capacityplanner::V1beta::FutureReservation::FutureReservation
+
+Repesents Future Reservation request which is part of aggregated
+reservations data response of "QueryReservations".
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->specific_sku_properties() >> / C<< $msg->specific_sku_properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Capacityplanner::V1beta::FutureReservation::FutureReservation::SpecificSKUProperties>)
+
+Future Reservation configuration to indicate instance properties and
+total count.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<Int64>
+
+A unique identifier for this future reservation. The server
+defines this identifier.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The creation timestamp for this future reservation.
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<String>
+
+URL of the Zone where this future reservation resides.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Description of the future reservation provided by user.
+
+=item * C<< $msg->future_reservation() >> / C<< $msg->future_reservation($value) >>
+
+Type: C<String>
+
+The future reservation resource name.
+
+=item * C<< $msg->owner_project_id() >> / C<< $msg->owner_project_id($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->time_window() >> / C<< $msg->time_window($value) >>
+
+Type: C<Message> (L<Google::Cloud::Capacityplanner::V1beta::FutureReservation::FutureReservation::TimeWindow>)
+
+Time window for this Future Reservation.
+
+=item * C<< $msg->share_settings() >> / C<< $msg->share_settings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Capacityplanner::V1beta::Allocation::Allocation::ShareSettings>)
+
+List of Projects/Folders to share with.
+
+=item * C<< $msg->name_prefix() >> / C<< $msg->name_prefix($value) >>
+
+Type: C<String>
+
+Name prefix for the reservations to be created at the time of
+delivery. The name prefix must comply with RFC1035.
+Maximum allowed length for name prefix is 20. Automatically created
+reservations name format will be <name-prefix>-date-####.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Capacityplanner::V1beta::FutureReservation::FutureReservation::Status>)
+
+Status of the Future Reservation
+
+=item * C<< $msg->auto_created_reservations_delete_time() >> / C<< $msg->auto_created_reservations_delete_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Future timestamp when the FR auto-created reservations will be deleted by
+Compute Engine. Format of this field must be a valid RFC3339 value.
+
+=item * C<< $msg->auto_delete_auto_created_reservations() >> / C<< $msg->auto_delete_auto_created_reservations($value) >>
+
+Type: C<Bool>
+
+Setting for enabling or disabling automatic deletion for auto-created
+reservation. If set to true, auto-created reservations will be
+deleted at Future Reservation's end time (default) or at user's defined
+timestamp if any of the
+[auto_created_reservations_delete_time, auto_created_reservations_duration]
+values is specified.
+For keeping auto-created reservation indefinitely, this value should be set
+to false.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Capacityplanner::V1beta::FutureReservation::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

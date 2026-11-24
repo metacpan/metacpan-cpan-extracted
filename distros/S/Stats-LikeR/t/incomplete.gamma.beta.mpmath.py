@@ -33,12 +33,22 @@ wherever those converge. Expected values are printed at 40 digits.
 tail is 1 minus the one summed, which is exact at 110 digits for any tail
 above 1e-60; the log of a tail within 1e-30 of 1 is its Taylor series, not a
 log() of a number that has lost its digits.
+
+Past a gamma shape of 1e10 and a larger beta shape of 1e7 the series and
+fractions need tens of sqrt(shape) terms, too many at 110 digits, and the
+reference is instead the defining integral, by mpmath's tanh-sinh quad() at the
+same precision (gam_ref_quad(), beta_ref_quad()): the integrand about its
+mean, scaled by the standard deviation, over 60 pieces out to where it has
+fallen by e^-300, the smaller tail integrated and the other 1 minus it.
+sanity() checks the integrals against the series and fractions at shapes both
+reach (1e6 to 1e10 gamma, 1e4 to 1e7 beta); they agreed to 1e-101. These cases
+take about two of the generator's minutes.
 """
 import math
 import sys
 from fractions import Fraction
 
-from mpmath import mp, mpf, log, exp, loggamma, nstr, zeta, bernoulli, sqrt, pi, euler, gammainc, betainc, inf
+from mpmath import mp, mpf, log, log1p, exp, loggamma, nstr, zeta, bernoulli, sqrt, pi, euler, gammainc, betainc, inf, quad
 
 mp.dps = 110
 
@@ -127,6 +137,83 @@ def beta_ref(a, b, x, y):
     return 1 - J, J
 
 
+def tail_integral(lf, lo, hi, peak, scale):
+    """The integral of exp(lf(u)) over [lo, hi] (hi may be inf), for an lf that is
+    unimodal with its maximum at peak (clipped into [lo, hi]) and falls by about 1
+    over `scale` near it. The range is cut where lf has fallen 300 below its
+    maximum (e^-300 = 1e-130, past the 110 digits), and the rest is split into
+    60 pieces for mpmath's tanh-sinh quadrature."""
+    m = min(max(peak, lo), hi)
+    top = lf(m)
+
+    def edge(direction, bound):
+        step, u = scale, m
+        while True:
+            v = u + direction * step
+            if (direction > 0 and v >= bound) or (direction < 0 and v <= bound):
+                return bound
+            if lf(v) < top - 300:
+                return v
+            u, step = v, step * 2
+
+    left = edge(-1, lo) if m > lo else lo
+    right = edge(+1, hi) if m < hi else hi
+    pts = sorted(set([left + (right - left) * k / 60 for k in range(61)] + [m]))
+    return quad(lambda u: exp(lf(u) - top), pts) * exp(top)
+
+
+def gam_ref_quad(a, x):
+    """(P, Q) for a shape the series cannot reach in reasonable time (past 1e10 it needs
+    tens of sqrt(a) terms), as the integral of t^(a-1) e^-t / Gamma(a) with
+    t = a + sqrt(a) u, the smaller tail integrated and the other 1 minus it."""
+    s = sqrt(a)
+    c = (a - 1) * log(a) - a - loggamma(a) + log(s)
+
+    def lf(u):
+        r = u / s
+        return c + (a - 1) * log1p(r) - a * r
+    ux = (x - a) / s
+    if x < a - 1:
+        P = tail_integral(lf, -s, ux, -1 / s, 1 / max(1, abs(ux)))
+        return P, 1 - P
+    Q = tail_integral(lf, ux, inf, -1 / s, 1 / max(1, abs(ux)))
+    return 1 - Q, Q
+
+
+def beta_ref_quad(a, b, x, y):
+    """(I_x(a, b), 1 - I_x(a, b)) past the shapes the fraction reaches in reasonable
+    time, as the integral of t^(a-1) (1-t)^(b-1) / B(a, b) with t = mean + sd u."""
+    n = a + b
+    mu = a / n
+    sd = sqrt(a * b / (n * n * (n + 1)))
+    c = -(loggamma(a) + loggamma(b) - loggamma(n)) + log(sd)
+
+    def lf(u):
+        t = mu + sd * u
+        return c + (a - 1) * log(t) + (b - 1) * log1p(-t)
+    ux = (x - mu) / sd
+    lo, hi = -mu / sd, (1 - mu) / sd
+    mode_t = (a - 1) / (n - 2) if a > 1 and b > 1 else (mpf(0) if a < 1 else mpf(1))
+    mode = (mode_t - mu) / sd
+    if x < mode_t:
+        I = tail_integral(lf, lo, ux, mode, 1 / max(1, abs(ux)))
+        return I, 1 - I
+    J = tail_integral(lf, ux, hi, mode, 1 / max(1, abs(ux)))
+    return 1 - J, J
+
+
+QUAD_GAMMA = 10 ** 10   # gamma shapes above this take gam_ref_quad()
+QUAD_BETA = 10 ** 7     # beta pairs whose larger shape is above this take beta_ref_quad()
+
+
+def gam_ref_any(a, x):
+    return gam_ref_quad(a, x) if a > QUAD_GAMMA else gam_ref(a, x)
+
+
+def beta_ref_any(a, b, x, y):
+    return beta_ref_quad(a, b, x, y) if max(a, b) > QUAD_BETA else beta_ref(a, b, x, y)
+
+
 def lg(v, other):
     """log(v) where other = 1 - v"""
     if other < mpf(10) ** -30:
@@ -143,6 +230,16 @@ def sanity():
     for a, b, x in [(mpf(2), mpf(3), mpf('0.4')), (mpf('0.5'), mpf('0.7'), mpf('0.9')), (mpf(100), mpf(200), mpf('0.3'))]:
         I, _ = beta_ref(a, b, x, 1 - x)
         assert abs(I / betainc(a, b, 0, x, regularized=True) - 1) < mpf(10) ** -90
+    # the quadrature against the series and fraction where both reach (they agreed to 1e-101 when this was written)
+    for a, x in [(10 ** 6, 10 ** 6 - 3000), (10 ** 8, 10 ** 8 + 30000), (10 ** 8, 10 ** 8 - 600000), (10 ** 10, 10 ** 10 + 300000)]:
+        P1, Q1 = gam_ref(mpf(a), mpf(x))
+        P2, Q2 = gam_ref_quad(mpf(a), mpf(x))
+        assert abs(P2 / P1 - 1) < mpf(10) ** -90 and abs(Q2 / Q1 - 1) < mpf(10) ** -90
+    for a, b, x in [(10 ** 7, 10 ** 7, mpf('0.5003')), (mpf('1.5'), 10 ** 4, mpf('0.0002')), (10 ** 4, mpf('1.5'), mpf('0.9997')),
+                    (mpf('0.5'), 10 ** 6, mpf('1e-6')), (3 * 10 ** 5, 10 ** 6, mpf('0.2306'))]:
+        I1, J1 = beta_ref(mpf(a), mpf(b), x, 1 - x)
+        I2, J2 = beta_ref_quad(mpf(a), mpf(b), x, 1 - x)
+        assert abs(I2 / I1 - 1) < mpf(10) ** -90 and abs(J2 / J1 - 1) < mpf(10) ** -90
 
 
 # --------------------------------------------------------------------- cases
@@ -183,6 +280,16 @@ def gamma_cases():
                 xs.add(Fraction(x))
         for x in sorted(xs):
             out.append((me(a), me(x)))
+    # a < 1 with x from 1 to 3, where the continued fraction runs longest (300 to 400 terms)
+    for a in (Fraction(1, 1024), Fraction(1, 8), Fraction(1, 2), Fraction(15, 16)):
+        for x in (Fraction(21, 20), Fraction(3, 2), 2, Fraction(5, 2), 3):
+            if (me(a), me(Fraction(x))) not in out:
+                out.append((me(a), me(Fraction(x))))
+    # past the series' reach, through Temme's expansion: gam_ref_quad(); x to 40 bits, as 24 cannot resolve sqrt(a)
+    for a in (10 ** 11, 10 ** 12, 10 ** 13, 10 ** 14, 10 ** 15, 2 ** 50 + 2 ** 20):
+        a = Fraction(a)
+        for z in (-1000, -100, -30, -3, 0, 3, 30, 100, 1000):
+            out.append((me(a, 53), me(a + z * Fraction(math.isqrt(int(a))), 40)))
     return out
 
 
@@ -214,13 +321,52 @@ def beta_cases():
             xv = Fraction(mx[0]) * Fraction(2) ** mx[1]
             y = 1 - xv
             if y.denominator > 2 ** 52 or not (0 < xv < 1): continue
-            out.append((me(a), me(b), mx, me(y, 53)))
+            out.append(('', me(a), me(b), mx, me(y, 53)))
     # tiny shapes: a shape of 1/1024 is where the Numerical Recipes fraction and bpser's complement are worst
     for a, b in [(Fraction(1, 1024), 5), (Fraction(1, 1024), 500), (Fraction(1, 1024), Fraction(1, 2))]:
         for x in (Fraction(1, 10), Fraction(1, 2), Fraction(9, 10)):
             mx = me(x, 24); xv = Fraction(mx[0]) * Fraction(2) ** mx[1]
             out.append(('tiny', me(a), me(Fraction(b)), mx, me(1 - xv, 53)))
             out.append(('tiny', me(Fraction(b)), me(a), mx, me(1 - xv, 53)))
+
+    def both_ways(tag, a0, b0, x0):
+        """I_x0(a0, b0) and the same probability turned round, I_(1-x0)(b0, a0)"""
+        mx = me(Fraction(x0), 24); xv = Fraction(mx[0]) * Fraction(2) ** mx[1]
+        my = me(1 - xv, 53)
+        out.append((tag, me(Fraction(a0)), me(Fraction(b0)), mx, my))
+        out.append((tag, me(Fraction(b0)), me(Fraction(a0)), my, mx))
+    # "bup": TOMS 708's bup() + bgrat(), which R's bratio() takes for a smaller shape a0 <= 1 against a larger
+    # b0 <= 15 with x0 in [0.1, 0.29) and (x0 b0)^a0 > 0.7, and for both shapes <= 1 with a0 < 0.2, x0^a0 > 0.9
+    # and x0 < 0.3. Up to 0.3428 both went to the Numerical Recipes fraction.
+    for a0 in (Fraction(1, 1024), Fraction(1, 2), 1):
+        for b0 in (Fraction(15, 2), 15):
+            for x0 in (Fraction(1, 10), Fraction(1, 5), Fraction(7, 25)):
+                both_ways('bup', a0, b0, x0)
+    for a0 in (Fraction(1, 1024), Fraction(1, 64)):
+        for b0 in (Fraction(1, 4), 1):
+            for x0 in (Fraction(1, 100), Fraction(1, 10), Fraction(1, 5)):
+                both_ways('bup', a0, b0, x0)
+    # "eps": a shape below NV_EPSILON (TOMS 708's apser() and fpser(), and the b/(a + b) of two shapes below
+    # NV_EPSILON/1000). 2^-70 is below a long double's epsilon and above a __float128's; 2^-130 is below both.
+    for t in (Fraction(1, 2 ** 70), Fraction(1, 2 ** 130)):
+        for b0 in (Fraction(1, 2), 3, 1000):
+            for x0 in (Fraction(1, 100), Fraction(1, 4), Fraction(1, 2)):
+                both_ways('eps', t, b0, x0)
+    for x0 in (Fraction(1, 4), Fraction(1, 2)):
+        both_ways('eps', Fraction(1, 2 ** 140), Fraction(1, 2 ** 150), x0)
+    # past the fraction's reach (beta_ref_quad()): the diagonal to 1e15 (basym()), unequal huge pairs (basym() with
+    # its r1 != 0), and a small shape against a huge one both ways round (bfrac(), bpser(), bgrat()). x is a
+    # multiple of 2^-53, so that 1 - x is exact however small the mean.
+    for a, b in [(10 ** 8, 10 ** 8), (10 ** 10, 10 ** 10), (10 ** 12, 10 ** 12), (10 ** 15, 10 ** 15), (3 * 10 ** 11, 10 ** 12),
+                 (10 ** 13, 10 ** 9), (Fraction(1, 2), 10 ** 9), (10 ** 12, Fraction(1, 2)), (Fraction(3, 2), 10 ** 10),
+                 (10 ** 10, Fraction(3, 2)), (5, 10 ** 12), (Fraction(1, 1024), 10 ** 9)]:
+        a, b = Fraction(a), Fraction(b)
+        mean = a / (a + b)
+        sd = math.sqrt(float(a * b / ((a + b) ** 2 * (a + b + 1))))
+        for z in (-30, -10, -3, 0, 3, 10, 30):
+            xv = Fraction(round((mean + z * Fraction(sd)) * 2 ** 53), 2 ** 53)
+            if not (0 < xv < 1): continue
+            out.append(('', me(a, 53), me(b, 53), me(xv, 53), me(1 - xv, 53)))
     return out
 
 
@@ -291,17 +437,15 @@ def emit_cases():
     print('# each row: [a, x, P(a,x), Q(a,x), log P, log Q]; a, x as [m, e] = m * 2**e')
     print('my @GAMMA = (')
     for a, x in gamma_cases():
-        P, Q = gam_ref(val(a), val(x))
+        P, Q = gam_ref_any(val(a), val(x))
         print("\t[%s, %s, '%s', '%s', '%s', '%s']," % (pl(a), pl(x), fmt(P), fmt(Q), fmt(lg(P, Q)), fmt(lg(Q, P))))
     print(');')
-    print('# each row: [a, b, x, y = 1 - x, I_x(a,b), 1 - I_x(a,b), log, log of the complement]; "tiny" rows lead with that word')
+    print('# each row: [a, b, x, y = 1 - x, I_x(a,b), 1 - I_x(a,b), log, log of the complement]; "tiny", "bup" and "eps" rows lead with that word')
     print('my @BETA = (')
     for c in beta_cases():
-        tag = ''
-        if c[0] == 'tiny':
-            tag = "'tiny', "; c = c[1:]
-        a, b, x, y = c
-        I, J = beta_ref(val(a), val(b), val(x), val(y))
+        tag = "'%s', " % c[0] if c[0] else ''
+        a, b, x, y = c[1:]
+        I, J = beta_ref_any(val(a), val(b), val(x), val(y))
         print("\t[%s%s, %s, %s, %s, '%s', '%s', '%s', '%s']," % (tag, pl(a), pl(b), pl(x), pl(y), fmt(I), fmt(J), fmt(lg(I, J)), fmt(lg(J, I))))
     print(');')
     print('# each row: [kind, p, df1, df2 or undef, lower_tail, q]')

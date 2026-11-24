@@ -3,7 +3,7 @@ package Google::Spanner::V1::Type;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -205,89 +205,134 @@ EOF
     # Field: type_annotation Type: 14 (.google.spanner.v1.TypeAnnotationCode)
     # Field: proto_type_fqn Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Type::Type - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Type;
-
-    my $msg = Google::Spanner::V1::Type::Type->new(
-        code => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<code>
-
-Type: Enum (.google.spanner.v1.TypeCode)
-
-=item * B<array_element_type>
-
-Type: Message (.google.spanner.v1.Type)
-
-=item * B<struct_type>
-
-Type: Message (.google.spanner.v1.StructType)
-
-=item * B<type_annotation>
-
-Type: Enum (.google.spanner.v1.TypeAnnotationCode)
-
-=item * B<proto_type_fqn>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Type::StructType ===
     # Fields for StructType
     # Field: fields Type: 11 (.google.spanner.v1.StructType.Field)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Type::StructType - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Type;
-
-    my $msg = Google::Spanner::V1::Type::StructType->new(
-        fields => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<fields>
-
-Type: Message (.google.spanner.v1.StructType.Field)
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Spanner::V1::Type - Protocol Buffers schema definition
+Google::Spanner::V1::Type - Compiled Protocol Buffers messages for google/spanner/v1/type.proto
+
+=head1 SYNOPSIS
+
+    use Google::Spanner::V1::Type;
+
+    my $msg = Google::Spanner::V1::Type::Type->new({
+        code => $code,
+        array_element_type => $array_element_type,
+        struct_type => $struct_type,
+        type_annotation => $type_annotation,
+    });
+
+    # Read or update a field
+    my $val = $msg->code();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Spanner::V1::Type::Type->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/spanner/v1/type.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Spanner::V1::Type::Type
+
+`Type` indicates the type of a Cloud Spanner value, as might be stored in a
+table cell or returned from an SQL query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::TypeCode>)
+
+Required. The [TypeCode][google.spanner.v1.TypeCode] for this type.
+
+=item * C<< $msg->array_element_type() >> / C<< $msg->array_element_type($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Type::Type>)
+
+If [code][google.spanner.v1.Type.code] ==
+[ARRAY][google.spanner.v1.TypeCode.ARRAY], then `array_element_type` is the
+type of the array elements.
+
+=item * C<< $msg->struct_type() >> / C<< $msg->struct_type($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Type::StructType>)
+
+If [code][google.spanner.v1.Type.code] ==
+[STRUCT][google.spanner.v1.TypeCode.STRUCT], then `struct_type` provides
+type information for the struct's fields.
+
+=item * C<< $msg->type_annotation() >> / C<< $msg->type_annotation($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::TypeAnnotationCode>)
+
+The [TypeAnnotationCode][google.spanner.v1.TypeAnnotationCode] that
+disambiguates SQL type that Spanner will use to represent values of this
+type during query processing. This is necessary for some type codes because
+a single [TypeCode][google.spanner.v1.TypeCode] can be mapped to different
+SQL types depending on the SQL dialect.
+[type_annotation][google.spanner.v1.Type.type_annotation] typically is not
+needed to process the content of a value (it doesn't affect serialization)
+and clients can ignore it on the read path.
+
+=item * C<< $msg->proto_type_fqn() >> / C<< $msg->proto_type_fqn($value) >>
+
+Type: C<String>
+
+If [code][google.spanner.v1.Type.code] ==
+[PROTO][google.spanner.v1.TypeCode.PROTO] or
+[code][google.spanner.v1.Type.code] ==
+[ENUM][google.spanner.v1.TypeCode.ENUM], then `proto_type_fqn` is the fully
+qualified name of the proto type representing the proto/enum definition.
+
+=back
+
+=head2 Google::Spanner::V1::Type::StructType
+
+`StructType` defines the fields of a
+[STRUCT][google.spanner.v1.TypeCode.STRUCT] type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Type::StructType::Field>)
+
+The list of fields that make up this struct. Order is
+significant, because values of this struct type are represented as
+lists, where the order of field values matches the order of
+fields in the [StructType][google.spanner.v1.StructType]. In turn, the
+order of fields matches the order of columns in a read request, or the
+order of fields in the `SELECT` clause of a query.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Spanner::V1::Type::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

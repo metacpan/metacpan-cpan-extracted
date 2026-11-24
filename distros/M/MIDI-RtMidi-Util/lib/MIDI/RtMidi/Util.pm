@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Handy Utilities for Real-time MIDI
 
-our $VERSION = '0.0601';
+our $VERSION = '0.0602';
 
 use v5.40;
 # use Data::Dumper::Compact qw(ddc);
@@ -79,7 +79,6 @@ sub program_changer ($device, $program=0, $channel=0, $msb_bank=undef, $lsb_bank
         $device->program_change($channel, $program);
     }
     catch ($e) {
-        # BUGFIX: errors usually end in a newline already; avoid a doubled one.
         chomp $e;
         die "ERROR: $e\n";
     }
@@ -99,7 +98,7 @@ MIDI::RtMidi::Util - Handy Utilities for Real-time MIDI
 
 =head1 VERSION
 
-version 0.0601
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -166,10 +165,6 @@ Return an array-reference of open MIDI output port names.
 Send bank select messages (CC#0 MSB and CC#32 LSB when given) followed by a
 C<program_change> message. The C<program> and C<channel> arguments default to
 C<0>. The C<msb_bank> and C<lsb_bank> arguments default to C<undef>.
-
-Note that some devices B<remember> the C<lsb_bank> and so, in order for the
-C<program_change> message to be recognized the C<lsb_bank> must be changed from
-the previous setting.
 
 =head1 SEE ALSO
 

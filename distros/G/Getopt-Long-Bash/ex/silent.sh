@@ -18,7 +18,7 @@ declare -A OPTS=(
     [ message | m % ]=
 )
 getoptlong init OPTS EXIT_ON_ERROR= SILENT=1 DEBUG=${DEBUGME:-}
-getoptlong callback help help_main set-x -
+getoptlong callback help help_main
 getoptlong parse "$@" && eval "$(getoptlong set)"
 
 echo "ARGV=[$@]" >&2

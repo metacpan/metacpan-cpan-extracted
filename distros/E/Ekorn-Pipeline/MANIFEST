@@ -61,6 +61,8 @@ t/28-feed.t
 t/29-tee.t
 xt/howto.t
 xt/manuals.t
+xt/reference-index.t
 xt/scaling.t
+xt/spelling.t
 META.yml
 MANIFEST

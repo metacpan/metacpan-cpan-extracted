@@ -8,7 +8,7 @@ use Discord::Client::Model::Channel ();
 use JSON::PP ();
 use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub new {
     my ( $class, %args ) = @_;

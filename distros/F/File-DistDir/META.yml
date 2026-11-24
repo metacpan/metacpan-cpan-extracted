@@ -22,17 +22,18 @@ no_index:
 provides:
   File::DistDir:
     file: lib/File/DistDir.pm
-    version: 1.0.0
+    version: 1.0.1
   File::DistDir::CLI:
     file: lib/File/DistDir/CLI.pm
-    version: 1.0.0
+    version: 1.0.1
 requires:
   CLI::Simple: v2.4.0
   File::ShareDir: '1.118'
+  Module::Metadata: '1.000038'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/rlauer6/File-DistDir/issues
   homepage: https://github.com/rlauer6/File-DistDir
   repository: https://github.com/rlauer6/File-DistDir
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

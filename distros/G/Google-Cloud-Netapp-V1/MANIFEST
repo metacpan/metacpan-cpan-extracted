@@ -1,0 +1,46 @@
+Changes
+lib/Google/Cloud/Netapp/V1.pm
+lib/Google/Cloud/Netapp/V1/ActiveDirectory.pm
+lib/Google/Cloud/Netapp/V1/ActiveDirectory/Types.pm
+lib/Google/Cloud/Netapp/V1/Backup.pm
+lib/Google/Cloud/Netapp/V1/Backup/Types.pm
+lib/Google/Cloud/Netapp/V1/BackupPolicy.pm
+lib/Google/Cloud/Netapp/V1/BackupPolicy/Types.pm
+lib/Google/Cloud/Netapp/V1/BackupVault.pm
+lib/Google/Cloud/Netapp/V1/BackupVault/Types.pm
+lib/Google/Cloud/Netapp/V1/CloudNetappService.pm
+lib/Google/Cloud/Netapp/V1/CloudNetappService/Types.pm
+lib/Google/Cloud/Netapp/V1/Common.pm
+lib/Google/Cloud/Netapp/V1/Common/Types.pm
+lib/Google/Cloud/Netapp/V1/HostGroup.pm
+lib/Google/Cloud/Netapp/V1/HostGroup/Types.pm
+lib/Google/Cloud/Netapp/V1/Kms.pm
+lib/Google/Cloud/Netapp/V1/Kms/Types.pm
+lib/Google/Cloud/Netapp/V1/NetAppClient.pm
+lib/Google/Cloud/Netapp/V1/Ontap.pm
+lib/Google/Cloud/Netapp/V1/Ontap/Types.pm
+lib/Google/Cloud/Netapp/V1/QuotaRule.pm
+lib/Google/Cloud/Netapp/V1/QuotaRule/Types.pm
+lib/Google/Cloud/Netapp/V1/Replication.pm
+lib/Google/Cloud/Netapp/V1/Replication/Types.pm
+lib/Google/Cloud/Netapp/V1/Snapshot.pm
+lib/Google/Cloud/Netapp/V1/Snapshot/Types.pm
+lib/Google/Cloud/Netapp/V1/StoragePool.pm
+lib/Google/Cloud/Netapp/V1/StoragePool/Types.pm
+lib/Google/Cloud/Netapp/V1/Volume.pm
+lib/Google/Cloud/Netapp/V1/Volume/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-NetApp.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-NetApp.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

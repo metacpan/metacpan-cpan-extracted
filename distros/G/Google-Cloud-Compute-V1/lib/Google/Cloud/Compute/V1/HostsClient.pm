@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -226,15 +226,105 @@ The following RPC methods are available in this client:
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        association              => $association,
+        host                     => $host,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.Hosts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetHostRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Host>
+
+Parameters:
+
+=over 4
+
+=item * C<association> - C<string>
+
+=item * C<host> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get_version>
 
-Calls the RPC method C<GetVersion> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_version(
+        association              => $association,
+        host                     => $host,
+        hosts_get_version_request_resource => $hosts_get_version_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<GetVersion> on C<google.cloud.compute.v1.Hosts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetVersionHostRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<association> - C<string>
+
+=item * C<host> - C<string>
+
+=item * C<hosts_get_version_request_resource> - L<Google::Cloud::Compute::V1::Compute::HostsGetVersionRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        association              => $association,
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.Hosts>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListHostsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::HostsListResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<association> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =back
 

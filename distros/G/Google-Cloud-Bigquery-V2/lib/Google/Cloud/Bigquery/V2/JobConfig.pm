@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::JobConfig;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1011,74 +1011,10 @@ EOF
     # Field: description Type: 11 (.google.protobuf.StringValue)
     # Field: labels Type: 11 (.google.cloud.bigquery.v2.DestinationTableProperties.LabelsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobConfig::DestinationTableProperties - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobConfig::DestinationTableProperties->new(
-        friendly_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<friendly_name>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<description>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.bigquery.v2.DestinationTableProperties.LabelsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobConfig::ConnectionProperty ===
     # Fields for ConnectionProperty
     # Field: key Type: 9 ()
     # Field: value Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobConfig::ConnectionProperty - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobConfig::ConnectionProperty->new(
-        key => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<key>
-
-Type: String
-
-=item * B<value>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationQuery ===
     # Fields for JobConfigurationQuery
@@ -1109,194 +1045,16 @@ Type: String
     # Field: continuous Type: 11 (.google.protobuf.BoolValue)
     # Field: write_incremental_results Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationQuery - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationQuery->new(
-        query => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query>
-
-Type: String
-
-=item * B<destination_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<external_table_definitions>
-
-Type: Message (.google.cloud.bigquery.v2.JobConfigurationQuery.ExternalTableDefinitionsEntry)
-
-=item * B<user_defined_function_resources>
-
-Type: Message (.google.cloud.bigquery.v2.UserDefinedFunctionResource)
-
-=item * B<create_disposition>
-
-Type: String
-
-=item * B<write_disposition>
-
-Type: String
-
-=item * B<default_dataset>
-
-Type: Message (.google.cloud.bigquery.v2.DatasetReference)
-
-=item * B<priority>
-
-Type: String
-
-=item * B<allow_large_results>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<use_query_cache>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<flatten_results>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<maximum_bytes_billed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<use_legacy_sql>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<parameter_mode>
-
-Type: String
-
-=item * B<query_parameters>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameter)
-
-=item * B<system_variables>
-
-Type: Message (.google.cloud.bigquery.v2.SystemVariables)
-
-=item * B<schema_update_options>
-
-Type: String
-
-=item * B<time_partitioning>
-
-Type: Message (.google.cloud.bigquery.v2.TimePartitioning)
-
-=item * B<range_partitioning>
-
-Type: Message (.google.cloud.bigquery.v2.RangePartitioning)
-
-=item * B<clustering>
-
-Type: Message (.google.cloud.bigquery.v2.Clustering)
-
-=item * B<destination_encryption_configuration>
-
-Type: Message (.google.cloud.bigquery.v2.EncryptionConfiguration)
-
-=item * B<script_options>
-
-Type: Message (.google.cloud.bigquery.v2.ScriptOptions)
-
-=item * B<connection_properties>
-
-Type: Message (.google.cloud.bigquery.v2.ConnectionProperty)
-
-=item * B<create_session>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<continuous>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<write_incremental_results>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::JobConfig::ScriptOptions ===
     # Fields for ScriptOptions
     # Field: statement_timeout_ms Type: 11 (.google.protobuf.Int64Value)
     # Field: statement_byte_budget Type: 11 (.google.protobuf.Int64Value)
     # Field: key_result_statement Type: 14 (.google.cloud.bigquery.v2.ScriptOptions.KeyResultStatementKind)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobConfig::ScriptOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobConfig::ScriptOptions->new(
-        statement_timeout_ms => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<statement_timeout_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<statement_byte_budget>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<key_result_statement>
-
-Type: Enum (.google.cloud.bigquery.v2.ScriptOptions.KeyResultStatementKind)
-
-=back
-
-=cut
-
 # Enum: ScriptOptions::KeyResultStatementKind
 our $ScriptOptions_KEY_RESULT_STATEMENT_KIND_UNSPECIFIED = 0;
 our $ScriptOptions_LAST = 1;
 our $ScriptOptions_FIRST_SELECT = 2;
-
-=pod
-
-=head2 Enum: ScriptOptions::KeyResultStatementKind
-
-Values:
-
-=over 4
-
-=item * C<KEY_RESULT_STATEMENT_KIND_UNSPECIFIED> => 0
-
-=item * C<LAST> => 1
-
-=item * C<FIRST_SELECT> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationLoad ===
     # Fields for JobConfigurationLoad
@@ -1344,248 +1102,16 @@ Values:
     # Field: source_column_match Type: 14 (.google.cloud.bigquery.v2.JobConfigurationLoad.SourceColumnMatch)
     # Field: timestamp_target_precision Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationLoad - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationLoad->new(
-        source_uris => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<source_uris>
-
-Type: String
-
-=item * B<file_set_spec_type>
-
-Type: Enum (.google.cloud.bigquery.v2.FileSetSpecType)
-
-=item * B<schema>
-
-Type: Message (.google.cloud.bigquery.v2.TableSchema)
-
-=item * B<destination_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<destination_table_properties>
-
-Type: Message (.google.cloud.bigquery.v2.DestinationTableProperties)
-
-=item * B<create_disposition>
-
-Type: String
-
-=item * B<write_disposition>
-
-Type: String
-
-=item * B<null_marker>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<field_delimiter>
-
-Type: String
-
-=item * B<skip_leading_rows>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<encoding>
-
-Type: String
-
-=item * B<quote>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<max_bad_records>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<allow_quoted_newlines>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<source_format>
-
-Type: String
-
-=item * B<allow_jagged_rows>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<ignore_unknown_values>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<projection_fields>
-
-Type: String
-
-=item * B<autodetect>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<schema_update_options>
-
-Type: String
-
-=item * B<time_partitioning>
-
-Type: Message (.google.cloud.bigquery.v2.TimePartitioning)
-
-=item * B<range_partitioning>
-
-Type: Message (.google.cloud.bigquery.v2.RangePartitioning)
-
-=item * B<clustering>
-
-Type: Message (.google.cloud.bigquery.v2.Clustering)
-
-=item * B<destination_encryption_configuration>
-
-Type: Message (.google.cloud.bigquery.v2.EncryptionConfiguration)
-
-=item * B<use_avro_logical_types>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<reference_file_schema_uri>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<hive_partitioning_options>
-
-Type: Message (.google.cloud.bigquery.v2.HivePartitioningOptions)
-
-=item * B<decimal_target_types>
-
-Type: Enum (.google.cloud.bigquery.v2.DecimalTargetType)
-
-=item * B<json_extension>
-
-Type: Enum (.google.cloud.bigquery.v2.JsonExtension)
-
-=item * B<parquet_options>
-
-Type: Message (.google.cloud.bigquery.v2.ParquetOptions)
-
-=item * B<preserve_ascii_control_characters>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<connection_properties>
-
-Type: Message (.google.cloud.bigquery.v2.ConnectionProperty)
-
-=item * B<create_session>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<column_name_character_map>
-
-Type: Enum (.google.cloud.bigquery.v2.JobConfigurationLoad.ColumnNameCharacterMap)
-
-=item * B<copy_files_only>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<time_zone>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<null_markers>
-
-Type: String
-
-=item * B<date_format>
-
-Type: String
-
-=item * B<datetime_format>
-
-Type: String
-
-=item * B<time_format>
-
-Type: String
-
-=item * B<timestamp_format>
-
-Type: String
-
-=item * B<source_column_match>
-
-Type: Enum (.google.cloud.bigquery.v2.JobConfigurationLoad.SourceColumnMatch)
-
-=item * B<timestamp_target_precision>
-
-Type: Int32
-
-=back
-
-=cut
-
 # Enum: JobConfigurationLoad::ColumnNameCharacterMap
 our $JobConfigurationLoad_COLUMN_NAME_CHARACTER_MAP_UNSPECIFIED = 0;
 our $JobConfigurationLoad_STRICT = 1;
 our $JobConfigurationLoad_V1 = 2;
 our $JobConfigurationLoad_V2 = 3;
 
-=pod
-
-=head2 Enum: JobConfigurationLoad::ColumnNameCharacterMap
-
-Values:
-
-=over 4
-
-=item * C<COLUMN_NAME_CHARACTER_MAP_UNSPECIFIED> => 0
-
-=item * C<STRICT> => 1
-
-=item * C<V1> => 2
-
-=item * C<V2> => 3
-
-=back
-
-=cut
-
 # Enum: JobConfigurationLoad::SourceColumnMatch
 our $JobConfigurationLoad_SOURCE_COLUMN_MATCH_UNSPECIFIED = 0;
 our $JobConfigurationLoad_POSITION = 1;
 our $JobConfigurationLoad_NAME = 2;
-
-=pod
-
-=head2 Enum: JobConfigurationLoad::SourceColumnMatch
-
-Values:
-
-=over 4
-
-=item * C<SOURCE_COLUMN_MATCH_UNSPECIFIED> => 0
-
-=item * C<POSITION> => 1
-
-=item * C<NAME> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationTableCopy ===
     # Fields for JobConfigurationTableCopy
@@ -1598,88 +1124,12 @@ Values:
     # Field: operation_type Type: 14 (.google.cloud.bigquery.v2.JobConfigurationTableCopy.OperationType)
     # Field: destination_expiration_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationTableCopy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationTableCopy->new(
-        source_table => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<source_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<source_tables>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<destination_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<create_disposition>
-
-Type: String
-
-=item * B<write_disposition>
-
-Type: String
-
-=item * B<destination_encryption_configuration>
-
-Type: Message (.google.cloud.bigquery.v2.EncryptionConfiguration)
-
-=item * B<operation_type>
-
-Type: Enum (.google.cloud.bigquery.v2.JobConfigurationTableCopy.OperationType)
-
-=item * B<destination_expiration_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # Enum: JobConfigurationTableCopy::OperationType
 our $JobConfigurationTableCopy_OPERATION_TYPE_UNSPECIFIED = 0;
 our $JobConfigurationTableCopy_COPY = 1;
 our $JobConfigurationTableCopy_SNAPSHOT = 2;
 our $JobConfigurationTableCopy_RESTORE = 3;
 our $JobConfigurationTableCopy_CLONE = 4;
-
-=pod
-
-=head2 Enum: JobConfigurationTableCopy::OperationType
-
-Values:
-
-=over 4
-
-=item * C<OPERATION_TYPE_UNSPECIFIED> => 0
-
-=item * C<COPY> => 1
-
-=item * C<SNAPSHOT> => 2
-
-=item * C<RESTORE> => 3
-
-=item * C<CLONE> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationExtract ===
     # Fields for JobConfigurationExtract
@@ -1692,64 +1142,6 @@ Values:
     # Field: compression Type: 9 ()
     # Field: use_avro_logical_types Type: 11 (.google.protobuf.BoolValue)
     # Field: model_extract_options Type: 11 (.google.cloud.bigquery.v2.JobConfigurationExtract.ModelExtractOptions)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationExtract - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationExtract->new(
-        source_table => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<source_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<source_model>
-
-Type: Message (.google.cloud.bigquery.v2.ModelReference)
-
-=item * B<destination_uris>
-
-Type: String
-
-=item * B<print_header>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<field_delimiter>
-
-Type: String
-
-=item * B<destination_format>
-
-Type: String
-
-=item * B<compression>
-
-Type: String
-
-=item * B<use_avro_logical_types>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<model_extract_options>
-
-Type: Message (.google.cloud.bigquery.v2.JobConfigurationExtract.ModelExtractOptions)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::JobConfig::JobConfiguration ===
     # Fields for JobConfiguration
@@ -1764,79 +1156,1249 @@ Type: Message (.google.cloud.bigquery.v2.JobConfigurationExtract.ModelExtractOpt
     # Field: labels Type: 11 (.google.cloud.bigquery.v2.JobConfiguration.LabelsEntry)
     # Field: reservation Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::JobConfig::JobConfiguration - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::JobConfig - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/job_config.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::JobConfig;
 
-    my $msg = Google::Cloud::Bigquery::V2::JobConfig::JobConfiguration->new(
-        job_type => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::JobConfig::DestinationTableProperties->new({
+        friendly_name => $friendly_name,
+        description => $description,
+        labels => $labels,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->friendly_name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::JobConfig::DestinationTableProperties->parse($bytes);
 
-=item * B<job_type>
-
-Type: String
-
-=item * B<query>
-
-Type: Message (.google.cloud.bigquery.v2.JobConfigurationQuery)
-
-=item * B<load>
-
-Type: Message (.google.cloud.bigquery.v2.JobConfigurationLoad)
-
-=item * B<copy>
-
-Type: Message (.google.cloud.bigquery.v2.JobConfigurationTableCopy)
-
-=item * B<extract>
-
-Type: Message (.google.cloud.bigquery.v2.JobConfigurationExtract)
-
-=item * B<dry_run>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<job_timeout_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<max_slots>
-
-Type: Int32
-
-=item * B<labels>
-
-Type: Message (.google.cloud.bigquery.v2.JobConfiguration.LabelsEntry)
-
-=item * B<reservation>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobConfig - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/job_config.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::JobConfig::DestinationTableProperties
+
+Properties for the destination table.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->friendly_name() >> / C<< $msg->friendly_name($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. Friendly name for the destination table. If the table already
+exists, it should be same as the existing friendly name.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. The description for the destination table.
+This will only be used if the destination table is newly created.
+If the table already exists and a value different than the current
+description is provided, the job will fail.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::DestinationTableProperties::LabelsEntry>)
+
+Optional. The labels associated with this table. You can use these to
+organize and group your tables. This will only be used if the destination
+table is newly created. If the table already exists and labels are
+different than the current labels are provided, the job will fail.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobConfig::ConnectionProperty
+
+A connection-level property to customize query behavior. Under JDBC, these
+correspond directly to connection properties passed to the DriverManager.
+Under ODBC, these correspond to properties in the connection string.
+
+Currently supported connection properties:
+
+* B<dataset_project_id>: represents the default project for datasets that
+are used in the query. Setting the
+system variable `@@dataset_project_id` achieves the same behavior.  For
+more information about system variables, see:
+https://cloud.google.com/bigquery/docs/reference/system-variables
+
+* B<time_zone>: represents the default timezone used to run the query.
+
+* B<session_id>: associates the query with a given session.
+
+* B<query_label>: associates the query with a given job label. If set,
+all subsequent queries in a script or session will have this label. For the
+format in which a you can specify a query label, see labels
+in the JobConfiguration resource type:
+https://cloud.google.com/bigquery/docs/reference/rest/v2/Job#jobconfiguration
+
+* B<service_account>: indicates the service account to use to run a
+continuous query. If set, the query job uses the service account to access
+Google Cloud resources. Service account access is bounded by the IAM
+permissions that you have granted to the service account.
+
+Additional properties are allowed, but ignored. Specifying multiple
+connection properties with the same key returns an error.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->key() >> / C<< $msg->key($value) >>
+
+Type: C<String>
+
+The key of the property to set.
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<String>
+
+The value of the property to set.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationQuery
+
+JobConfigurationQuery configures a BigQuery query job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+[Required] SQL query text to execute. The useLegacySql field can be used
+to indicate whether the query uses legacy SQL or GoogleSQL.
+
+=item * C<< $msg->destination_table() >> / C<< $msg->destination_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Optional. Describes the table where the query results should be stored.
+This property must be set for large results that exceed the maximum
+response size.  For queries that produce anonymous (cached) results, this
+field will be populated by BigQuery.
+
+=item * C<< $msg->external_table_definitions() >> / C<< $msg->external_table_definitions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationQuery::ExternalTableDefinitionsEntry>)
+
+Optional. You can specify external table definitions, which operate as
+ephemeral tables that can be queried.  These definitions are configured
+using a JSON map, where the string key represents the table identifier, and
+the value is the corresponding external data configuration object.
+
+=item * C<< $msg->user_defined_function_resources() >> / C<< $msg->user_defined_function_resources($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::UdfResource::UserDefinedFunctionResource>)
+
+Describes user-defined function resources used in the query.
+
+=item * C<< $msg->create_disposition() >> / C<< $msg->create_disposition($value) >>
+
+Type: C<String>
+
+Optional. Specifies whether the job is allowed to create new tables.
+The following values are supported:
+
+* CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the
+table.
+* CREATE_NEVER: The table must already exist. If it does not,
+a 'notFound' error is returned in the job result.
+
+The default value is CREATE_IF_NEEDED.
+Creation, truncation and append actions occur as one atomic update
+upon job completion.
+
+=item * C<< $msg->write_disposition() >> / C<< $msg->write_disposition($value) >>
+
+Type: C<String>
+
+Optional. Specifies the action that occurs if the destination table
+already exists. The following values are supported:
+
+* WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the
+data, removes the constraints, and uses the schema from the query result.
+* WRITE_TRUNCATE_DATA: If the table already exists, BigQuery overwrites the
+data, but keeps the constraints and schema of the existing table.
+* WRITE_APPEND: If the table already exists, BigQuery appends the data to
+the table.
+* WRITE_EMPTY: If the table already exists and contains data, a 'duplicate'
+error is returned in the job result.
+
+The default value is WRITE_EMPTY. Each action is atomic and only occurs if
+BigQuery is able to complete the job successfully. Creation, truncation and
+append actions occur as one atomic update upon job completion.
+
+=item * C<< $msg->default_dataset() >> / C<< $msg->default_dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference>)
+
+Optional. Specifies the default dataset to use for unqualified
+table names in the query. This setting does not alter behavior of
+unqualified dataset names. Setting the system variable
+`@@dataset_id` achieves the same behavior.  See
+https://cloud.google.com/bigquery/docs/reference/system-variables for more
+information on system variables.
+
+=item * C<< $msg->priority() >> / C<< $msg->priority($value) >>
+
+Type: C<String>
+
+Optional. Specifies a priority for the query. Possible values include
+INTERACTIVE and BATCH. The default value is INTERACTIVE.
+
+=item * C<< $msg->allow_large_results() >> / C<< $msg->allow_large_results($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If true and query uses legacy SQL dialect, allows the query
+to produce arbitrarily large result tables at a slight cost in performance.
+Requires destinationTable to be set.
+For GoogleSQL queries, this flag is ignored and large results are
+always allowed.  However, you must still set destinationTable when result
+size exceeds the allowed maximum response size.
+
+=item * C<< $msg->use_query_cache() >> / C<< $msg->use_query_cache($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Whether to look for the result in the query cache. The query
+cache is a best-effort cache that will be flushed whenever tables in the
+query are modified. Moreover, the query cache is only available when a
+query does not have a destination table specified. The default value is
+true.
+
+=item * C<< $msg->flatten_results() >> / C<< $msg->flatten_results($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If true and query uses legacy SQL dialect, flattens all nested
+and repeated fields in the query results.
+allowLargeResults must be true if this is set to false.
+For GoogleSQL queries, this flag is ignored and results are never
+flattened.
+
+=item * C<< $msg->maximum_bytes_billed() >> / C<< $msg->maximum_bytes_billed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Limits the bytes billed for this job. Queries that will have
+bytes billed beyond this limit will fail (without incurring a charge).
+If unspecified, this will be set to your project default.
+
+=item * C<< $msg->use_legacy_sql() >> / C<< $msg->use_legacy_sql($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Specifies whether to use BigQuery's legacy SQL dialect for this
+query. The default value is true. If set to false, the query uses
+BigQuery's
+[GoogleSQL](https://docs.cloud.google.com/bigquery/docs/introduction-sql).
+
+When useLegacySql is set to false, the value of flattenResults is ignored;
+query will be run as if flattenResults is false.
+
+=item * C<< $msg->parameter_mode() >> / C<< $msg->parameter_mode($value) >>
+
+Type: C<String>
+
+GoogleSQL only. Set to POSITIONAL to use positional (?) query parameters
+or to NAMED to use named (@myparam) query parameters in this query.
+
+=item * C<< $msg->query_parameters() >> / C<< $msg->query_parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter>)
+
+Query parameters for GoogleSQL queries.
+
+=item * C<< $msg->system_variables() >> / C<< $msg->system_variables($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::SystemVariable::SystemVariables>)
+
+Output only. System variables for GoogleSQL queries. A system variable is
+output if the variable is settable and its value differs from the system
+default.
+"@@" prefix is not included in the name of the System variables.
+
+=item * C<< $msg->schema_update_options() >> / C<< $msg->schema_update_options($value) >>
+
+Type: C<String>
+
+Allows the schema of the destination table to be updated as a side effect
+of the query job. Schema update options are supported in three cases:
+when writeDisposition is WRITE_APPEND;
+when writeDisposition is WRITE_TRUNCATE_DATA;
+when writeDisposition is WRITE_TRUNCATE and the destination table is a
+partition of a table, specified by partition decorators. For normal tables,
+WRITE_TRUNCATE will always overwrite the schema.
+One or more of the following values are specified:
+
+* ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema.
+* ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original
+schema to nullable.
+
+=item * C<< $msg->time_partitioning() >> / C<< $msg->time_partitioning($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TimePartitioning::TimePartitioning>)
+
+Time-based partitioning specification for the destination table. Only one
+of timePartitioning and rangePartitioning should be specified.
+
+=item * C<< $msg->range_partitioning() >> / C<< $msg->range_partitioning($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RangePartitioning::RangePartitioning>)
+
+Range partitioning specification for the destination table.
+Only one of timePartitioning and rangePartitioning should be specified.
+
+=item * C<< $msg->clustering() >> / C<< $msg->clustering($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Clustering::Clustering>)
+
+Clustering specification for the destination table.
+
+=item * C<< $msg->destination_encryption_configuration() >> / C<< $msg->destination_encryption_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration>)
+
+Custom encryption configuration (e.g., Cloud KMS keys)
+
+=item * C<< $msg->script_options() >> / C<< $msg->script_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::ScriptOptions>)
+
+Options controlling the execution of scripts.
+
+=item * C<< $msg->connection_properties() >> / C<< $msg->connection_properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::ConnectionProperty>)
+
+Connection properties which can modify the query behavior.
+
+=item * C<< $msg->create_session() >> / C<< $msg->create_session($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+If this property is true, the job creates a new session using a randomly
+generated session_id.  To continue using a created session with
+subsequent queries, pass the existing session identifier as a
+`ConnectionProperty` value.  The session identifier is returned as part of
+the `SessionInfo` message within the query statistics.
+
+The new session's location will be set to `Job.JobReference.location` if it
+is present, otherwise it's set to the default location based on existing
+routing logic.
+
+=item * C<< $msg->continuous() >> / C<< $msg->continuous($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Whether to run the query as continuous or a regular query.
+Continuous query is currently in experimental stage and not ready for
+general usage.
+
+=item * C<< $msg->write_incremental_results() >> / C<< $msg->write_incremental_results($value) >>
+
+Type: C<Bool>
+
+Optional. This is only supported for a SELECT query using a temporary
+table. If set, the query is allowed to write results incrementally to the
+temporary result table. This may incur a performance penalty. This option
+cannot be used with Legacy SQL. This feature is not yet available.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobConfig::ScriptOptions
+
+Options related to script execution.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->statement_timeout_ms() >> / C<< $msg->statement_timeout_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Timeout period for each statement in a script.
+
+=item * C<< $msg->statement_byte_budget() >> / C<< $msg->statement_byte_budget($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Limit on the number of bytes billed per statement. Exceeding this budget
+results in an error.
+
+=item * C<< $msg->key_result_statement() >> / C<< $msg->key_result_statement($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ScriptOptions::KeyResultStatementKind>)
+
+Determines which statement in the script represents the "key result",
+used to populate the schema and query results of the script job.
+Default is LAST.
+
+=back
+
+=head3 Enum: ScriptOptions::KeyResultStatementKind
+
+=over 4
+
+=item * C<KEY_RESULT_STATEMENT_KIND_UNSPECIFIED> => C<0>
+
+=item * C<LAST> => C<1>
+
+=item * C<FIRST_SELECT> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationLoad
+
+JobConfigurationLoad contains the configuration properties for loading data
+into a destination table.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->source_uris() >> / C<< $msg->source_uris($value) >>
+
+Type: C<String>
+
+[Required] The fully-qualified URIs that point to your data in Google
+Cloud.
+For Google Cloud Storage URIs:
+  Each URI can contain one '*' wildcard character and it must come after
+  the 'bucket' name. Size limits related to load jobs apply to external
+  data sources.
+For Google Cloud Bigtable URIs:
+  Exactly one URI can be specified and it has be a fully specified and
+  valid HTTPS URL for a Google Cloud Bigtable table.
+For Google Cloud Datastore backups:
+ Exactly one URI can be specified. Also, the '*' wildcard character is not
+ allowed.
+
+=item * C<< $msg->file_set_spec_type() >> / C<< $msg->file_set_spec_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::FileSetSpecType>)
+
+Optional. Specifies how source URIs are interpreted for constructing the
+file set to load. By default, source URIs are expanded against the
+underlying storage. You can also specify manifest files to control how the
+file set is constructed. This option is only applicable to object storage
+systems.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableSchema>)
+
+Optional. The schema for the destination table. The schema can be
+omitted if the destination table already exists, or if you're loading data
+from Google Cloud Datastore.
+
+=item * C<< $msg->destination_table() >> / C<< $msg->destination_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+[Required] The destination table to load the data into.
+
+=item * C<< $msg->destination_table_properties() >> / C<< $msg->destination_table_properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::DestinationTableProperties>)
+
+Optional. [Experimental] Properties with which to create the destination
+table if it is new.
+
+=item * C<< $msg->create_disposition() >> / C<< $msg->create_disposition($value) >>
+
+Type: C<String>
+
+Optional. Specifies whether the job is allowed to create new tables.
+The following values are supported:
+
+* CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the
+table.
+* CREATE_NEVER: The table must already exist. If it does not,
+a 'notFound' error is returned in the job result.
+The default value is CREATE_IF_NEEDED.
+Creation, truncation and append actions occur as one atomic update
+upon job completion.
+
+=item * C<< $msg->write_disposition() >> / C<< $msg->write_disposition($value) >>
+
+Type: C<String>
+
+Optional. Specifies the action that occurs if the destination table
+already exists. The following values are supported:
+
+* WRITE_TRUNCATE:  If the table already exists, BigQuery overwrites the
+data, removes the constraints and uses the schema from the load job.
+* WRITE_TRUNCATE_DATA: If the table already exists, BigQuery overwrites the
+data, but keeps the constraints and schema of the existing table.
+* WRITE_APPEND: If the table already exists, BigQuery appends the data to
+the table.
+* WRITE_EMPTY: If the table already exists and contains data, a 'duplicate'
+error is returned in the job result.
+
+The default value is WRITE_APPEND.
+Each action is atomic and only occurs if BigQuery is able to complete the
+job successfully.
+Creation, truncation and append actions occur as one atomic update
+upon job completion.
+
+=item * C<< $msg->null_marker() >> / C<< $msg->null_marker($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. Specifies a string that represents a null value in a CSV file.
+For example, if you specify "\N", BigQuery interprets "\N" as a null value
+when loading a CSV file.
+The default value is the empty string. If you set this property to a custom
+value, BigQuery throws an error if an empty string is present for all data
+types except for STRING and BYTE. For STRING and BYTE columns, BigQuery
+interprets the empty string as an empty value.
+
+=item * C<< $msg->field_delimiter() >> / C<< $msg->field_delimiter($value) >>
+
+Type: C<String>
+
+Optional. The separator character for fields in a CSV file. The separator
+is interpreted as a single byte. For files encoded in ISO-8859-1, any
+single character can be used as a separator. For files encoded in UTF-8,
+characters represented in decimal range 1-127 (U+0001-U+007F) can be used
+without any modification. UTF-8 characters encoded with multiple bytes
+(i.e. U+0080 and above) will have only the first byte used for separating
+fields. The remaining bytes will be treated as a part of the field.
+BigQuery also supports the escape sequence "\t" (U+0009) to specify a tab
+separator. The default value is comma (",", U+002C).
+
+=item * C<< $msg->skip_leading_rows() >> / C<< $msg->skip_leading_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Optional. The number of rows at the top of a CSV file that BigQuery will
+skip when loading the data. The default value is 0. This property is useful
+if you have header rows in the file that should be skipped. When autodetect
+is on, the behavior is the following:
+
+* skipLeadingRows unspecified - Autodetect tries to detect headers in the
+  first row. If they are not detected, the row is read as data. Otherwise
+  data is read starting from the second row.
+* skipLeadingRows is 0 - Instructs autodetect that there are no headers and
+  data should be read starting from the first row.
+* skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect
+  headers in row N. If headers are not detected, row N is just skipped.
+  Otherwise row N is used to extract column names for the detected schema.
+
+=item * C<< $msg->encoding() >> / C<< $msg->encoding($value) >>
+
+Type: C<String>
+
+Optional. The character encoding of the data.
+The supported values are UTF-8, ISO-8859-1, UTF-16BE, UTF-16LE, UTF-32BE,
+and UTF-32LE. The default value is UTF-8. BigQuery decodes the data after
+the raw, binary data has been split using the values of the `quote` and
+`fieldDelimiter` properties.
+
+If you don't specify an encoding, or if you specify a UTF-8 encoding when
+the CSV file is not UTF-8 encoded, BigQuery attempts to convert the data to
+UTF-8. Generally, your data loads successfully, but it may not match
+byte-for-byte what you expect. To avoid this, specify the correct encoding
+by using the `--encoding` flag.
+
+If BigQuery can't convert a character other than the ASCII `0` character,
+BigQuery converts the character to the standard Unicode replacement
+character: &#65533;.
+
+=item * C<< $msg->quote() >> / C<< $msg->quote($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. The value that is used to quote data sections in a CSV file.
+BigQuery converts the string to ISO-8859-1 encoding, and then uses the
+first byte of the encoded string to split the data in its raw, binary
+state.
+The default value is a double-quote ('"').
+If your data does not contain quoted sections, set the property value to an
+empty string.
+If your data contains quoted newline characters, you must also set the
+allowQuotedNewlines property to true.
+To include the specific quote character within a quoted value, precede it
+with an additional matching quote character. For example, if you want to
+escape the default character  ' " ', use ' "" '.
+@default "
+
+=item * C<< $msg->max_bad_records() >> / C<< $msg->max_bad_records($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Optional. The maximum number of bad records that BigQuery can ignore when
+running the job. If the number of bad records exceeds this value, an
+invalid error is returned in the job result.
+The default value is 0, which requires that all records are valid.
+This is only supported for CSV and NEWLINE_DELIMITED_JSON file formats.
+
+=item * C<< $msg->allow_quoted_newlines() >> / C<< $msg->allow_quoted_newlines($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Indicates if BigQuery should allow quoted data sections that contain
+newline characters in a CSV file. The default value is false.
+
+=item * C<< $msg->source_format() >> / C<< $msg->source_format($value) >>
+
+Type: C<String>
+
+Optional. The format of the data files.
+For CSV files, specify "CSV". For datastore backups,
+specify "DATASTORE_BACKUP". For newline-delimited JSON,
+specify "NEWLINE_DELIMITED_JSON". For Avro, specify "AVRO".
+For parquet, specify "PARQUET". For orc, specify "ORC".
+The default value is CSV.
+
+=item * C<< $msg->allow_jagged_rows() >> / C<< $msg->allow_jagged_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Accept rows that are missing trailing optional columns.
+The missing values are treated as nulls.
+If false, records with missing trailing columns are treated as bad records,
+and if there are too many bad records, an invalid error is returned in the
+job result.
+The default value is false.
+Only applicable to CSV, ignored for other formats.
+
+=item * C<< $msg->ignore_unknown_values() >> / C<< $msg->ignore_unknown_values($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Indicates if BigQuery should allow extra values that are not
+represented in the table schema.
+If true, the extra values are ignored.
+If false, records with extra columns are treated as bad records, and if
+there are too many bad records, an invalid error is returned in the job
+result. The default value is false.
+The sourceFormat property determines what BigQuery treats as an extra
+value:
+  CSV: Trailing columns
+  JSON: Named values that don't match any column names in the table schema
+  Avro, Parquet, ORC: Fields in the file schema that don't exist in the
+  table schema.
+
+=item * C<< $msg->projection_fields() >> / C<< $msg->projection_fields($value) >>
+
+Type: C<String>
+
+If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity
+properties to load into BigQuery from a Cloud Datastore backup. Property
+names are case sensitive and must be top-level properties. If no properties
+are specified, BigQuery loads all properties. If any named property isn't
+found in the Cloud Datastore backup, an invalid error is returned in the
+job result.
+
+=item * C<< $msg->autodetect() >> / C<< $msg->autodetect($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Indicates if we should automatically infer the options and
+schema for CSV and JSON sources.
+
+=item * C<< $msg->schema_update_options() >> / C<< $msg->schema_update_options($value) >>
+
+Type: C<String>
+
+Allows the schema of the destination table to be updated as a side effect
+of the load job if a schema is autodetected or supplied in the job
+configuration.
+Schema update options are supported in three cases:
+when writeDisposition is WRITE_APPEND;
+when writeDisposition is WRITE_TRUNCATE_DATA;
+when writeDisposition is WRITE_TRUNCATE and the destination table is a
+partition of a table, specified by partition decorators. For normal tables,
+WRITE_TRUNCATE will always overwrite the schema.
+One or more of the following values are specified:
+
+* ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema.
+* ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original
+schema to nullable.
+
+=item * C<< $msg->time_partitioning() >> / C<< $msg->time_partitioning($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TimePartitioning::TimePartitioning>)
+
+Time-based partitioning specification for the destination table. Only one
+of timePartitioning and rangePartitioning should be specified.
+
+=item * C<< $msg->range_partitioning() >> / C<< $msg->range_partitioning($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RangePartitioning::RangePartitioning>)
+
+Range partitioning specification for the destination table.
+Only one of timePartitioning and rangePartitioning should be specified.
+
+=item * C<< $msg->clustering() >> / C<< $msg->clustering($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Clustering::Clustering>)
+
+Clustering specification for the destination table.
+
+=item * C<< $msg->destination_encryption_configuration() >> / C<< $msg->destination_encryption_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration>)
+
+Custom encryption configuration (e.g., Cloud KMS keys)
+
+=item * C<< $msg->use_avro_logical_types() >> / C<< $msg->use_avro_logical_types($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If sourceFormat is set to "AVRO", indicates whether to interpret
+logical types as the corresponding BigQuery data type (for example,
+TIMESTAMP), instead of using the raw type (for example, INTEGER).
+
+=item * C<< $msg->reference_file_schema_uri() >> / C<< $msg->reference_file_schema_uri($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. The user can provide a reference file with the reader schema.
+This file is only loaded if it is part of source URIs, but is not loaded
+otherwise. It is enabled for the following formats: AVRO, PARQUET, ORC.
+
+=item * C<< $msg->hive_partitioning_options() >> / C<< $msg->hive_partitioning_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::HivePartitioning::HivePartitioningOptions>)
+
+Optional. When set, configures hive partitioning support.
+Not all storage formats support hive partitioning -- requesting hive
+partitioning on an unsupported format will lead to an error, as will
+providing an invalid specification.
+
+=item * C<< $msg->decimal_target_types() >> / C<< $msg->decimal_target_types($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::DecimalTargetType>)
+
+Defines the list of possible SQL data types to which the source decimal
+values are converted. This list and the precision and the scale parameters
+of the decimal field determine the target type. In the order of NUMERIC,
+BIGNUMERIC, and STRING, a
+type is picked if it is in the specified list and if it supports the
+precision and the scale. STRING supports all precision and scale values.
+If none of the listed types supports the precision and the scale, the type
+supporting the widest range in the specified list is picked, and if a value
+exceeds the supported range when reading the data, an error will be thrown.
+
+Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"].
+If (precision,scale) is:
+
+* (38,9) -> NUMERIC;
+* (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits);
+* (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits);
+* (76,38) -> BIGNUMERIC;
+* (77,38) -> BIGNUMERIC (error if value exceeds supported range).
+
+This field cannot contain duplicate types. The order of the types in this
+field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as
+["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over
+BIGNUMERIC.
+
+Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other
+file formats.
+
+=item * C<< $msg->json_extension() >> / C<< $msg->json_extension($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::JsonExtension>)
+
+Optional. Load option to be used together with source_format
+newline-delimited JSON to indicate that a variant of JSON is being loaded.
+To load newline-delimited GeoJSON, specify GEOJSON (and source_format must
+be set to NEWLINE_DELIMITED_JSON).
+
+=item * C<< $msg->parquet_options() >> / C<< $msg->parquet_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::ParquetOptions>)
+
+Optional. Additional properties to set if sourceFormat is set to PARQUET.
+
+=item * C<< $msg->preserve_ascii_control_characters() >> / C<< $msg->preserve_ascii_control_characters($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. When sourceFormat is set to "CSV", this indicates whether the
+embedded ASCII control characters (the first 32 characters in the
+ASCII-table, from
+'\x00' to '\x1F') are preserved.
+
+=item * C<< $msg->connection_properties() >> / C<< $msg->connection_properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::ConnectionProperty>)
+
+Optional. Connection properties which can modify the load job behavior.
+Currently, only the 'session_id' connection property is supported, and is
+used to resolve _SESSION appearing as the dataset id.
+
+=item * C<< $msg->create_session() >> / C<< $msg->create_session($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If this property is true, the job creates a new session using a
+randomly generated session_id.  To continue using a created session with
+subsequent queries, pass the existing session identifier as a
+`ConnectionProperty` value.  The session identifier is returned as part of
+the `SessionInfo` message within the query statistics.
+
+The new session's location will be set to `Job.JobReference.location` if it
+is present, otherwise it's set to the default location based on existing
+routing logic.
+
+=item * C<< $msg->column_name_character_map() >> / C<< $msg->column_name_character_map($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::JobConfigurationLoad::ColumnNameCharacterMap>)
+
+Optional. Character map supported for column names in CSV/Parquet loads.
+Defaults to STRICT and can be overridden by Project Config Service. Using
+this option with unsupporting load formats will result in an error.
+
+=item * C<< $msg->copy_files_only() >> / C<< $msg->copy_files_only($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. [Experimental] Configures the load job to copy files directly to
+the destination BigLake managed table, bypassing file content reading and
+rewriting.
+
+Copying files only is supported when all the following are true:
+
+* `source_uris` are located in the same Cloud Storage location as the
+  destination table's `storage_uri` location.
+* `source_format` is `PARQUET`.
+* `destination_table` is an existing BigLake managed table. The table's
+  schema does not have flexible column names. The table's columns do not
+  have type parameters other than precision and scale.
+* No options other than the above are specified.
+
+=item * C<< $msg->time_zone() >> / C<< $msg->time_zone($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. Default time zone that will apply when parsing timestamp values
+that have no specific time zone.
+
+=item * C<< $msg->null_markers() >> / C<< $msg->null_markers($value) >>
+
+Type: C<String>
+
+Optional. A list of strings represented as SQL NULL value in a CSV file.
+
+null_marker and null_markers can't be set at the same time.
+If null_marker is set, null_markers has to be not set.
+If null_markers is set, null_marker has to be not set.
+If both null_marker and null_markers are set at the same time, a user
+error would be thrown.
+Any strings listed in null_markers, including
+empty string would be interpreted as SQL NULL. This applies to all column
+types.
+
+=item * C<< $msg->date_format() >> / C<< $msg->date_format($value) >>
+
+Type: C<String>
+
+Optional. Date format used for parsing DATE values.
+
+=item * C<< $msg->datetime_format() >> / C<< $msg->datetime_format($value) >>
+
+Type: C<String>
+
+Optional. Date format used for parsing DATETIME values.
+
+=item * C<< $msg->time_format() >> / C<< $msg->time_format($value) >>
+
+Type: C<String>
+
+Optional. Date format used for parsing TIME values.
+
+=item * C<< $msg->timestamp_format() >> / C<< $msg->timestamp_format($value) >>
+
+Type: C<String>
+
+Optional. Date format used for parsing TIMESTAMP values.
+
+=item * C<< $msg->source_column_match() >> / C<< $msg->source_column_match($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::JobConfigurationLoad::SourceColumnMatch>)
+
+Optional. Controls the strategy used to match loaded columns to the schema.
+If not set, a sensible default is chosen based on how the schema is
+provided. If autodetect is used, then columns are matched by name.
+Otherwise, columns are matched by position. This is done to keep the
+behavior backward-compatible.
+
+=item * C<< $msg->timestamp_target_precision() >> / C<< $msg->timestamp_target_precision($value) >>
+
+Type: C<Int32>
+
+Precisions (maximum number of total digits in base 10) for seconds
+of TIMESTAMP types that are allowed to the destination table for
+autodetection mode.
+
+Available for the formats: CSV, PARQUET, AVRO, and Iceberg External Table.
+
+Possible values include:
+Not Specified, [], or [6]: timestamp(6) for all auto detected TIMESTAMP
+columns
+[6, 12]: timestamp(6) for all auto detected TIMESTAMP columns that have
+less than 6 digits of subseconds.
+         timestamp(12) for all auto detected TIMESTAMP columns that have
+         more than 6 digits of subseconds.
+[12]: timestamp(12) for all auto detected TIMESTAMP columns.
+
+The order of the elements in this array is ignored.
+Inputs that have higher precision than the highest target precision in this
+array will be truncated.
+
+=back
+
+=head3 Enum: JobConfigurationLoad::ColumnNameCharacterMap
+
+=over 4
+
+=item * C<COLUMN_NAME_CHARACTER_MAP_UNSPECIFIED> => C<0>
+
+=item * C<STRICT> => C<1>
+
+=item * C<V1> => C<2>
+
+=item * C<V2> => C<3>
+
+=back
+
+=head3 Enum: JobConfigurationLoad::SourceColumnMatch
+
+=over 4
+
+=item * C<SOURCE_COLUMN_MATCH_UNSPECIFIED> => C<0>
+
+=item * C<POSITION> => C<1>
+
+=item * C<NAME> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationTableCopy
+
+JobConfigurationTableCopy configures a job that copies data from one table
+to another.
+For more information on copying tables, see [Copy a
+ table](https://cloud.google.com/bigquery/docs/managing-tables#copy-table).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->source_table() >> / C<< $msg->source_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+[Pick one] Source table to copy.
+
+=item * C<< $msg->source_tables() >> / C<< $msg->source_tables($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+[Pick one] Source tables to copy.
+
+=item * C<< $msg->destination_table() >> / C<< $msg->destination_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+[Required] The destination table.
+
+=item * C<< $msg->create_disposition() >> / C<< $msg->create_disposition($value) >>
+
+Type: C<String>
+
+Optional. Specifies whether the job is allowed to create new tables.
+The following values are supported:
+
+* CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the
+table.
+* CREATE_NEVER: The table must already exist. If it does not,
+a 'notFound' error is returned in the job result.
+
+The default value is CREATE_IF_NEEDED.
+Creation, truncation and append actions occur as one atomic update
+upon job completion.
+
+=item * C<< $msg->write_disposition() >> / C<< $msg->write_disposition($value) >>
+
+Type: C<String>
+
+Optional. Specifies the action that occurs if the destination table
+already exists. The following values are supported:
+
+* WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the
+table data and uses the schema and table constraints from the source table.
+* WRITE_APPEND: If the table already exists, BigQuery appends the data to
+the table.
+* WRITE_EMPTY: If the table already exists and contains data, a 'duplicate'
+error is returned in the job result.
+
+The default value is WRITE_EMPTY. Each action is atomic and only occurs if
+BigQuery is able to complete the job successfully. Creation, truncation and
+append actions occur as one atomic update upon job completion.
+
+=item * C<< $msg->destination_encryption_configuration() >> / C<< $msg->destination_encryption_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration>)
+
+Custom encryption configuration (e.g., Cloud KMS keys).
+
+=item * C<< $msg->operation_type() >> / C<< $msg->operation_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::JobConfigurationTableCopy::OperationType>)
+
+Optional. Supported operation types in table copy job.
+
+=item * C<< $msg->destination_expiration_time() >> / C<< $msg->destination_expiration_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. The time when the destination table expires. Expired tables will
+be deleted and their storage reclaimed.
+
+=back
+
+=head3 Enum: JobConfigurationTableCopy::OperationType
+
+=over 4
+
+=item * C<OPERATION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<COPY> => C<1>
+
+=item * C<SNAPSHOT> => C<2>
+
+=item * C<RESTORE> => C<3>
+
+=item * C<CLONE> => C<4>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationExtract
+
+JobConfigurationExtract configures a job that exports data from a BigQuery
+table into Google Cloud Storage.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->source_table() >> / C<< $msg->source_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+A reference to the table being exported.
+
+=item * C<< $msg->source_model() >> / C<< $msg->source_model($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ModelReference::ModelReference>)
+
+A reference to the model being exported.
+
+=item * C<< $msg->destination_uris() >> / C<< $msg->destination_uris($value) >>
+
+Type: C<String>
+
+[Pick one] A list of fully-qualified Google Cloud Storage URIs where the
+extracted table should be written.
+
+=item * C<< $msg->print_header() >> / C<< $msg->print_header($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Whether to print out a header row in the results.
+Default is true. Not applicable when extracting models.
+
+=item * C<< $msg->field_delimiter() >> / C<< $msg->field_delimiter($value) >>
+
+Type: C<String>
+
+Optional. When extracting data in CSV format, this defines the
+delimiter to use between fields in the exported data.
+Default is ','. Not applicable when extracting models.
+
+=item * C<< $msg->destination_format() >> / C<< $msg->destination_format($value) >>
+
+Type: C<String>
+
+Optional. The exported file format. Possible values include CSV,
+NEWLINE_DELIMITED_JSON, PARQUET, or AVRO for tables and ML_TF_SAVED_MODEL
+or ML_XGBOOST_BOOSTER for models. The default value for tables is CSV.
+Tables with nested or repeated fields cannot be exported as CSV. The
+default value for models is ML_TF_SAVED_MODEL.
+
+=item * C<< $msg->compression() >> / C<< $msg->compression($value) >>
+
+Type: C<String>
+
+Optional. The compression type to use for exported files. Possible values
+include DEFLATE, GZIP, NONE, SNAPPY, and ZSTD. The default value is NONE.
+Not all compression formats are support for all file formats. DEFLATE is
+only supported for Avro. ZSTD is only supported for Parquet. Not applicable
+when extracting models.
+
+=item * C<< $msg->use_avro_logical_types() >> / C<< $msg->use_avro_logical_types($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether to use logical types when extracting to AVRO format. Not applicable
+when extracting models.
+
+=item * C<< $msg->model_extract_options() >> / C<< $msg->model_extract_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationExtract::ModelExtractOptions>)
+
+Optional. Model extract options only applicable when extracting models.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::JobConfig::JobConfiguration
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job_type() >> / C<< $msg->job_type($value) >>
+
+Type: C<String>
+
+Output only. The type of the job. Can be QUERY, LOAD, EXTRACT, COPY or
+UNKNOWN.
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationQuery>)
+
+[Pick one] Configures a query job.
+
+=item * C<< $msg->load() >> / C<< $msg->load($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationLoad>)
+
+[Pick one] Configures a load job.
+
+=item * C<< $msg->copy() >> / C<< $msg->copy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationTableCopy>)
+
+[Pick one] Copies a table.
+
+=item * C<< $msg->extract() >> / C<< $msg->extract($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::JobConfigurationExtract>)
+
+[Pick one] Configures an extract job.
+
+=item * C<< $msg->dry_run() >> / C<< $msg->dry_run($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If set, don't actually run this job. A valid query will return
+a mostly empty response with some processing statistics, while an invalid
+query will return the same error it would if it wasn't a dry run. Behavior
+of non-query jobs is undefined.
+
+=item * C<< $msg->job_timeout_ms() >> / C<< $msg->job_timeout_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. Job timeout in milliseconds relative to the job creation time. If
+this time limit is exceeded, BigQuery attempts to stop the job, but might
+not always succeed in canceling it before the job completes. For example, a
+job that takes more than 60 seconds to complete has a better chance of
+being stopped than a job that takes 10 seconds to complete.
+
+=item * C<< $msg->max_slots() >> / C<< $msg->max_slots($value) >>
+
+Type: C<Int32>
+
+Optional. A target limit on the rate of slot consumption by this job. If
+set to a value > 0, BigQuery will attempt to limit the rate of slot
+consumption by this job to keep it below the configured limit, even if the
+job is eligible for more slots based on fair scheduling. The unused slots
+will be available for other jobs and queries to use.
+
+Note: This feature is not yet generally available.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::JobConfiguration::LabelsEntry>)
+
+The labels associated with this job. You can use these to organize and
+group your jobs.
+Label keys and values can be no longer than 63 characters, can only contain
+lowercase letters, numeric characters, underscores and dashes.
+International characters are allowed. Label values are optional.  Label
+keys must start with a letter and each label in the list must have a
+different key.
+
+=item * C<< $msg->reservation() >> / C<< $msg->reservation($value) >>
+
+Type: C<String>
+
+Optional. The reservation that job would use. User can specify a
+reservation to execute the job. If reservation is not set, reservation is
+determined based on the rules defined by the reservation assignments. The
+expected format is
+`projects/{project}/locations/{location}/reservations/{reservation}`.
+Forces the query to use on-demand billing when set to `none`, which
+requires the project or organization to have
+`reservation_override_mode` set to `ALLOW_ANY_OVERRIDE`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::JobConfig::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

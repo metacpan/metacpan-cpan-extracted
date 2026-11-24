@@ -1,0 +1,75 @@
+package Google::Cloud::Financialservices::V1::LineOfBusiness;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Cjhnb29nbGUvY2xvdWQvZmluYW5jaWFsc2VydmljZXMvdjEvbGluZV9vZl9idXNpbmVzcy5w
+cm90bxIhZ29vZ2xlLmNsb3VkLmZpbmFuY2lhbHNlcnZpY2VzLnYxKk4KDkxpbmVPZkJ1c2lu
+ZXNzEiAKHExJTkVfT0ZfQlVTSU5FU1NfVU5TUEVDSUZJRUQQABIOCgpDT01NRVJDSUFMEAES
+CgoGUkVUQUlMEAJCggIKJWNvbS5nb29nbGUuY2xvdWQuZmluYW5jaWFsc2VydmljZXMudjFC
+E0xpbmVPZkJ1c2luZXNzUHJvdG9QAVpTY2xvdWQuZ29vZ2xlLmNvbS9nby9maW5hbmNpYWxz
+ZXJ2aWNlcy9hcGl2MS9maW5hbmNpYWxzZXJ2aWNlc3BiO2ZpbmFuY2lhbHNlcnZpY2VzcGKq
+AiFHb29nbGUuQ2xvdWQuRmluYW5jaWFsU2VydmljZXMuVjHKAiFHb29nbGVcQ2xvdWRcRmlu
+YW5jaWFsU2VydmljZXNcVjHqAiRHb29nbGU6OkNsb3VkOjpGaW5hbmNpYWxTZXJ2aWNlczo6
+VjFKkggKBhIEDgAkAQq8BAoBDBIDDgASMrEEIENvcHlyaWdodCAyMDI1IEdvb2dsZSBMTEMK
+CiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUg
+IkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBs
+aWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUg
+TGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5T
+RS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRv
+IGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBp
+cyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVT
+IE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQu
+CiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcg
+cGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQIS
+AxAAKgoICgEIEgMSAD4KCQoCCCUSAxIAPgoICgEIEgMTAGoKCQoCCAsSAxMAagoICgEIEgMU
+ACIKCQoCCAoSAxQAIgoICgEIEgMVADQKCQoCCAgSAxUANAoICgEIEgMWAD4KCQoCCAESAxYA
+PgoICgEIEgMXAD4KCQoCCCkSAxcAPgoICgEIEgMYAD0KCQoCCC0SAxgAPQo/CgIFABIEGwAk
+ARozIEluZGljYXRlIHdoaWNoIExpbmVPZkJ1c2luZXNzIGEgcGFydHkgYmVsb25ncyB0by4K
+CgoKAwUAARIDGwUTCjkKBAUAAgASAx0CIxosIEFuIHVuc3BlY2lmaWVkIExpbmVPZkJ1c2lu
+ZXNzLiBEbyBub3QgdXNlLgoKDAoFBQACAAESAx0CHgoMCgUFAAIAAhIDHSEiCikKBAUAAgES
+AyACERocIENvbW1lcmNpYWwgTGluZU9mQnVzaW5lc3MuCgoMCgUFAAIBARIDIAIMCgwKBQUA
+AgECEgMgDxAKJQoEBQACAhIDIwINGhggUmV0YWlsIExpbmVPZkJ1c2luZXNzLgoKDAoFBQAC
+AgESAyMCCAoMCgUFAAICAhIDIwsMYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Financialservices::V1::LineOfBusiness - Compiled Protocol Buffers messages for google/cloud/financialservices/v1/line_of_business.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/financialservices/v1/line_of_business.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Financialservices::V1::LineOfBusiness::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

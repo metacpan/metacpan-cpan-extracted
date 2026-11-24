@@ -3,6 +3,8 @@ lib/Google/Cloud/Iam/V1.pm
 lib/Google/Cloud/Iam/V1/IAMPolicyClient.pm
 lib/Google/Iam/V1/IamPolicy.pm
 lib/Google/Iam/V1/IamPolicy/Types.pm
+lib/Google/Iam/V1/Logging/AuditData.pm
+lib/Google/Iam/V1/Logging/AuditData/Types.pm
 lib/Google/Iam/V1/Options.pm
 lib/Google/Iam/V1/Options/Types.pm
 lib/Google/Iam/V1/Policy.pm

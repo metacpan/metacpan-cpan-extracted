@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Datascans;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -686,176 +686,26 @@ EOF
     # Field: data_scan_id Type: 9 ()
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<data_scan>
-
-Type: Message (.google.cloud.dataplex.v1.DataScan)
-
-=item * B<data_scan_id>
-
-Type: String
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::UpdateDataScanRequest ===
     # Fields for UpdateDataScanRequest
     # Field: data_scan Type: 11 (.google.cloud.dataplex.v1.DataScan)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::UpdateDataScanRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::UpdateDataScanRequest->new(
-        data_scan => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_scan>
-
-Type: Message (.google.cloud.dataplex.v1.DataScan)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::DeleteDataScanRequest ===
     # Fields for DeleteDataScanRequest
     # Field: name Type: 9 ()
     # Field: force Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::DeleteDataScanRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::DeleteDataScanRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<force>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Datascans::GetDataScanRequest ===
     # Fields for GetDataScanRequest
     # Field: name Type: 9 ()
     # Field: view Type: 14 (.google.cloud.dataplex.v1.GetDataScanRequest.DataScanView)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::GetDataScanRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::GetDataScanRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.cloud.dataplex.v1.GetDataScanRequest.DataScanView)
-
-=back
-
-=cut
-
 # Enum: GetDataScanRequest::DataScanView
 our $GetDataScanRequest_DATA_SCAN_VIEW_UNSPECIFIED = 0;
 our $GetDataScanRequest_BASIC = 1;
 our $GetDataScanRequest_FULL = 10;
-
-=pod
-
-=head2 Enum: GetDataScanRequest::DataScanView
-
-Values:
-
-=over 4
-
-=item * C<DATA_SCAN_VIEW_UNSPECIFIED> => 0
-
-=item * C<BASIC> => 1
-
-=item * C<FULL> => 10
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Datascans::ListDataScansRequest ===
     # Fields for ListDataScansRequest
@@ -865,205 +715,29 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::ListDataScansRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::ListDataScansRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::ListDataScansResponse ===
     # Fields for ListDataScansResponse
     # Field: data_scans Type: 11 (.google.cloud.dataplex.v1.DataScan)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::ListDataScansResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::ListDataScansResponse->new(
-        data_scans => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_scans>
-
-Type: Message (.google.cloud.dataplex.v1.DataScan)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::RunDataScanRequest ===
     # Fields for RunDataScanRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::RunDataScanRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::RunDataScanRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::RunDataScanResponse ===
     # Fields for RunDataScanResponse
     # Field: job Type: 11 (.google.cloud.dataplex.v1.DataScanJob)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::RunDataScanResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::RunDataScanResponse->new(
-        job => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<job>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanJob)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Datascans::GetDataScanJobRequest ===
     # Fields for GetDataScanJobRequest
     # Field: name Type: 9 ()
     # Field: view Type: 14 (.google.cloud.dataplex.v1.GetDataScanJobRequest.DataScanJobView)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::GetDataScanJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::GetDataScanJobRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.cloud.dataplex.v1.GetDataScanJobRequest.DataScanJobView)
-
-=back
-
-=cut
-
 # Enum: GetDataScanJobRequest::DataScanJobView
 our $GetDataScanJobRequest_DATA_SCAN_JOB_VIEW_UNSPECIFIED = 0;
 our $GetDataScanJobRequest_BASIC = 1;
 our $GetDataScanJobRequest_FULL = 10;
-
-=pod
-
-=head2 Enum: GetDataScanJobRequest::DataScanJobView
-
-Values:
-
-=over 4
-
-=item * C<DATA_SCAN_JOB_VIEW_UNSPECIFIED> => 0
-
-=item * C<BASIC> => 1
-
-=item * C<FULL> => 10
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Datascans::ListDataScanJobsRequest ===
     # Fields for ListDataScanJobsRequest
@@ -1072,192 +746,25 @@ Values:
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::ListDataScanJobsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::ListDataScanJobsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::ListDataScanJobsResponse ===
     # Fields for ListDataScanJobsResponse
     # Field: data_scan_jobs Type: 11 (.google.cloud.dataplex.v1.DataScanJob)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::ListDataScanJobsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::ListDataScanJobsResponse->new(
-        data_scan_jobs => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_scan_jobs>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanJob)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::CancelDataScanJobRequest ===
     # Fields for CancelDataScanJobRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::CancelDataScanJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::CancelDataScanJobRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::CancelDataScanJobResponse ===
     # Fields for CancelDataScanJobResponse
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::CancelDataScanJobResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::CancelDataScanJobResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Datascans::GenerateDataQualityRulesRequest ===
     # Fields for GenerateDataQualityRulesRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::GenerateDataQualityRulesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::GenerateDataQualityRulesRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::GenerateDataQualityRulesResponse ===
     # Fields for GenerateDataQualityRulesResponse
     # Field: rule Type: 11 (.google.cloud.dataplex.v1.DataQualityRule)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::GenerateDataQualityRulesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::GenerateDataQualityRulesResponse->new(
-        rule => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<rule>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRule)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Datascans::DataScan ===
     # Fields for DataScan
@@ -1283,151 +790,11 @@ Type: Message (.google.cloud.dataplex.v1.DataQualityRule)
     # Field: data_documentation_result Type: 11 (.google.cloud.dataplex.v1.DataDocumentationResult)
     # Field: execution_identity Type: 11 (.google.cloud.dataplex.v1.ExecutionIdentity)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::DataScan - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::DataScan->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.DataScan.LabelsEntry)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.State)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<data>
-
-Type: Message (.google.cloud.dataplex.v1.DataSource)
-
-=item * B<execution_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataScan.ExecutionSpec)
-
-=item * B<execution_status>
-
-Type: Message (.google.cloud.dataplex.v1.DataScan.ExecutionStatus)
-
-=item * B<type>
-
-Type: Enum (.google.cloud.dataplex.v1.DataScanType)
-
-=item * B<data_quality_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualitySpec)
-
-=item * B<data_profile_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataProfileSpec)
-
-=item * B<data_discovery_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataDiscoverySpec)
-
-=item * B<data_documentation_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataDocumentationSpec)
-
-=item * B<data_quality_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityResult)
-
-=item * B<data_profile_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataProfileResult)
-
-=item * B<data_discovery_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataDiscoveryResult)
-
-=item * B<data_documentation_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataDocumentationResult)
-
-=item * B<execution_identity>
-
-Type: Message (.google.cloud.dataplex.v1.ExecutionIdentity)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Datascans::ExecutionIdentity ===
     # Fields for ExecutionIdentity
     # Field: dataplex_service_agent Type: 11 (.google.cloud.dataplex.v1.ExecutionIdentity.DataplexServiceAgent)
     # Field: user_credential Type: 11 (.google.cloud.dataplex.v1.ExecutionIdentity.UserCredential)
     # Field: service_account Type: 11 (.google.cloud.dataplex.v1.ExecutionIdentity.ServiceAccount)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::ExecutionIdentity - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::ExecutionIdentity->new(
-        dataplex_service_agent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dataplex_service_agent>
-
-Type: Message (.google.cloud.dataplex.v1.ExecutionIdentity.DataplexServiceAgent)
-
-=item * B<user_credential>
-
-Type: Message (.google.cloud.dataplex.v1.ExecutionIdentity.UserCredential)
-
-=item * B<service_account>
-
-Type: Message (.google.cloud.dataplex.v1.ExecutionIdentity.ServiceAccount)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Datascans::DataScanJob ===
     # Fields for DataScanJob
@@ -1449,96 +816,6 @@ Type: Message (.google.cloud.dataplex.v1.ExecutionIdentity.ServiceAccount)
     # Field: data_discovery_result Type: 11 (.google.cloud.dataplex.v1.DataDiscoveryResult)
     # Field: data_documentation_result Type: 11 (.google.cloud.dataplex.v1.DataDocumentationResult)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Datascans::DataScanJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Datascans;
-
-    my $msg = Google::Cloud::Dataplex::V1::Datascans::DataScanJob->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<partial_failure_message>
-
-Type: String
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.DataScanJob.State)
-
-=item * B<message>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.dataplex.v1.DataScanType)
-
-=item * B<data_quality_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualitySpec)
-
-=item * B<data_profile_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataProfileSpec)
-
-=item * B<data_discovery_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataDiscoverySpec)
-
-=item * B<data_documentation_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataDocumentationSpec)
-
-=item * B<data_quality_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityResult)
-
-=item * B<data_profile_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataProfileResult)
-
-=item * B<data_discovery_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataDiscoveryResult)
-
-=item * B<data_documentation_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataDocumentationResult)
-
-=back
-
-=cut
-
 # Enum: DataScanJob::State
 our $DataScanJob_STATE_UNSPECIFIED = 0;
 our $DataScanJob_RUNNING = 1;
@@ -1549,56 +826,20 @@ our $DataScanJob_FAILED = 5;
 our $DataScanJob_PENDING = 7;
 our $DataScanJob_SUCCEEDED_WITH_ERRORS = 8;
 
-=pod
-
-=head2 Enum: DataScanJob::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<RUNNING> => 1
-
-=item * C<CANCELING> => 2
-
-=item * C<CANCELLED> => 3
-
-=item * C<SUCCEEDED> => 4
-
-=item * C<FAILED> => 5
-
-=item * C<PENDING> => 7
-
-=item * C<SUCCEEDED_WITH_ERRORS> => 8
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Dataplex::V1::Datascans::DataScanServiceClient ===
 package Google::Cloud::Dataplex::V1::Datascans::DataScanServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataplex::V1::Datascans::DataScanServiceClient
 
-Google::Cloud::Dataplex::V1::Datascans::DataScanServiceClient - Client stub representing the remote DataScanService service
+Client stub representing the remote C<DataScanService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataplex.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1757,13 +998,849 @@ sub generate_data_quality_rules {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Datascans - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::Datascans - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/datascans.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Datascans;
+
+    my $msg = Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest->new({
+        parent => $parent,
+        data_scan => $data_scan,
+        data_scan_id => $data_scan_id,
+        validate_only => $validate_only,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/datascans.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest
+
+Create dataScan request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent location:
+`projects/{project}/locations/{location_id}`
+where `project` refers to a *project_id* or *project_number* and
+`location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->data_scan() >> / C<< $msg->data_scan($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::DataScan>)
+
+Required. DataScan resource.
+
+=item * C<< $msg->data_scan_id() >> / C<< $msg->data_scan_id($value) >>
+
+Type: C<String>
+
+Optional. DataScan identifier. If not provided, a unique ID will be
+generated with the prefix "data-scan-".
+
+* Must contain only lowercase letters, numbers and hyphens.
+* Must start with a letter.
+* Must end with a number or a letter.
+* Must be between 1-63 characters.
+* Must be unique within the customer project / location.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is `false`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::UpdateDataScanRequest
+
+Update dataScan request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_scan() >> / C<< $msg->data_scan($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::DataScan>)
+
+Required. DataScan resource to be updated.
+
+Only fields specified in `update_mask` are updated.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Mask of fields to update.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is `false`.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::DeleteDataScanRequest
+
+Delete dataScan request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the dataScan:
+`projects/{project}/locations/{location_id}/dataScans/{data_scan_id}`
+where `project` refers to a *project_id* or *project_number* and
+`location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->force() >> / C<< $msg->force($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, any child resources of this data scan will also
+be deleted. (Otherwise, the request will only work if the data scan has no
+child resources.)
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::GetDataScanRequest
+
+Get dataScan request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the dataScan:
+`projects/{project}/locations/{location_id}/dataScans/{data_scan_id}`
+where `project` refers to a *project_id* or *project_number* and
+`location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::GetDataScanRequest::DataScanView>)
+
+Optional. Select the DataScan view to return. Defaults to `BASIC`.
+
+=back
+
+=head3 Enum: GetDataScanRequest::DataScanView
+
+=over 4
+
+=item * C<DATA_SCAN_VIEW_UNSPECIFIED> => C<0>
+
+=item * C<BASIC> => C<1>
+
+=item * C<FULL> => C<10>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::ListDataScansRequest
+
+List dataScans request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent location:
+`projects/{project}/locations/{location_id}`
+where `project` refers to a *project_id* or *project_number* and
+`location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of dataScans to return. The service may return
+fewer than this value. If unspecified, at most 500 scans will be returned.
+The maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListDataScans` call. Provide
+this to retrieve the subsequent page. When paginating, all other parameters
+provided to `ListDataScans` must match the call that provided the
+page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields (`name` or `create_time`) for the result.
+If not specified, the ordering is undefined.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::ListDataScansResponse
+
+List dataScans response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_scans() >> / C<< $msg->data_scans($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::DataScan>)
+
+DataScans (`BASIC` view only) under the given parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::RunDataScanRequest
+
+Run DataScan Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the DataScan:
+`projects/{project}/locations/{location_id}/dataScans/{data_scan_id}`.
+where `project` refers to a *project_id* or *project_number* and
+`location_id` refers to a Google Cloud region.
+
+Only B<OnDemand> data scans are allowed.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::RunDataScanResponse
+
+Run DataScan Response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::DataScanJob>)
+
+DataScanJob created by RunDataScan request.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::GetDataScanJobRequest
+
+Get DataScanJob request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the DataScanJob:
+`projects/{project}/locations/{location_id}/dataScans/{data_scan_id}/jobs/{data_scan_job_id}`
+where `project` refers to a *project_id* or *project_number* and
+`location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::GetDataScanJobRequest::DataScanJobView>)
+
+Optional. Select the DataScanJob view to return. Defaults to `BASIC`.
+
+=back
+
+=head3 Enum: GetDataScanJobRequest::DataScanJobView
+
+=over 4
+
+=item * C<DATA_SCAN_JOB_VIEW_UNSPECIFIED> => C<0>
+
+=item * C<BASIC> => C<1>
+
+=item * C<FULL> => C<10>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::ListDataScanJobsRequest
+
+List DataScanJobs request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent environment:
+`projects/{project}/locations/{location_id}/dataScans/{data_scan_id}`
+where `project` refers to a *project_id* or *project_number* and
+`location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of DataScanJobs to return. The service may return
+fewer than this value. If unspecified, at most 10 DataScanJobs will be
+returned. The maximum value is 1000; values above 1000 will be coerced to
+1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListDataScanJobs` call.
+Provide this to retrieve the subsequent page. When paginating, all other
+parameters provided to `ListDataScanJobs` must match the call that provided
+the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. An expression for filtering the results of the ListDataScanJobs
+request.
+
+If unspecified, all datascan jobs will be returned. Multiple filters can be
+applied (with `AND`, `OR` logical operators). Filters are case-sensitive.
+
+Allowed fields are:
+
+- `start_time`
+- `end_time`
+
+`start_time` and `end_time` expect RFC-3339 formatted strings (e.g.
+2018-10-08T18:30:00-07:00).
+
+For instance, 'start_time > 2018-10-08T00:00:00.123456789Z AND end_time <
+2018-10-09T00:00:00.123456789Z' limits results to DataScanJobs between
+specified start and end times.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::ListDataScanJobsResponse
+
+List DataScanJobs response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_scan_jobs() >> / C<< $msg->data_scan_jobs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::DataScanJob>)
+
+DataScanJobs (`BASIC` view only) under a given dataScan.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::CancelDataScanJobRequest
+
+Request message for the `CancelDataScanJob` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the DataScanJob:
+`projects/{project_id_or_number}/locations/{location_id}/dataScans/{data_scan_id}/jobs/{data_scan_job_id}`
+where `project_id_or_number` refers to a *project_id* or *project_number*
+and `location_id` refers to a Google Cloud region.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::CancelDataScanJobResponse
+
+Response message for the `CancelDataScanJob` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::GenerateDataQualityRulesRequest
+
+Request details for generating data quality rule recommendations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name must be one of the following:
+
+* The name of a data scan with at least one successful, completed data
+profiling job
+* The name of a successful, completed data profiling job (a data scan job
+where the job type is data profiling)
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::GenerateDataQualityRulesResponse
+
+Response details for data quality rule recommendations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->rule() >> / C<< $msg->rule($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityRule>)
+
+The data quality rules that Dataplex Universal Catalog generates based on
+the results of a data profiling scan.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::DataScan
+
+Represents a user-visible job which provides the insights for the related
+data source.
+
+For example:
+
+* Data quality: generates queries based on the rules and runs against the
+  data to get data quality check results. For more information, see [Auto
+  data quality
+  overview](https://cloud.google.com/dataplex/docs/auto-data-quality-overview).
+* Data profile: analyzes the data in tables and generates insights about
+  the structure, content and relationships (such as null percent,
+  cardinality, min/max/mean, etc). For more information, see [About data
+  profiling](https://cloud.google.com/dataplex/docs/data-profiling-overview).
+* Data discovery: scans data in Cloud Storage buckets to extract and then
+  catalog metadata. For more information, see [Discover and catalog Cloud
+  Storage data](https://cloud.google.com/bigquery/docs/automatic-discovery).
+* Data documentation: analyzes the table or dataset metadata and generates
+  insights. For tables, insights include descriptions and sample SQL
+  queries. For datasets, insights include descriptions, schema relationships
+  and sample SQL queries. For more information, see [Generate data insights
+  in BigQuery](https://cloud.google.com/bigquery/docs/data-insights).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The relative resource name of the scan, of the
+form: `projects/{project}/locations/{location_id}/dataScans/{datascan_id}`,
+where `project` refers to a *project_id* or *project_number* and
+`location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the scan. This ID will
+be different if the scan is deleted and re-created with the same name.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the scan.
+
+* Must be between 1-1024 characters.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+* Must be between 1-256 characters.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::DataScan::LabelsEntry>)
+
+Optional. User-defined labels for the scan.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::State>)
+
+Output only. Current state of the DataScan.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the scan was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the scan was last updated.
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Processing::DataSource>)
+
+Required. The data source for DataScan.
+
+=item * C<< $msg->execution_spec() >> / C<< $msg->execution_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::DataScan::ExecutionSpec>)
+
+Optional. DataScan execution settings.
+
+If not specified, the fields in it will use their default values.
+
+=item * C<< $msg->execution_status() >> / C<< $msg->execution_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::DataScan::ExecutionStatus>)
+
+Output only. Status of the data scan execution.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataScanType>)
+
+Output only. The type of DataScan.
+
+=item * C<< $msg->data_quality_spec() >> / C<< $msg->data_quality_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualitySpec>)
+
+Settings for a data quality scan.
+
+=item * C<< $msg->data_profile_spec() >> / C<< $msg->data_profile_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec>)
+
+Settings for a data profile scan.
+
+=item * C<< $msg->data_discovery_spec() >> / C<< $msg->data_discovery_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoverySpec>)
+
+Settings for a data discovery scan.
+
+=item * C<< $msg->data_documentation_spec() >> / C<< $msg->data_documentation_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationSpec>)
+
+Settings for a data documentation scan.
+
+=item * C<< $msg->data_quality_result() >> / C<< $msg->data_quality_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityResult>)
+
+Output only. The result of a data quality scan.
+
+=item * C<< $msg->data_profile_result() >> / C<< $msg->data_profile_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProfile::DataProfileResult>)
+
+Output only. The result of a data profile scan.
+
+=item * C<< $msg->data_discovery_result() >> / C<< $msg->data_discovery_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoveryResult>)
+
+Output only. The result of a data discovery scan.
+
+=item * C<< $msg->data_documentation_result() >> / C<< $msg->data_documentation_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult>)
+
+Output only. The result of a data documentation scan.
+
+=item * C<< $msg->execution_identity() >> / C<< $msg->execution_identity($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::ExecutionIdentity>)
+
+Optional. Immutable. The identity to run the datascan.
+If not specified, defaults to the Dataplex Service Agent.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::ExecutionIdentity
+
+The identity to run the datascan.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataplex_service_agent() >> / C<< $msg->dataplex_service_agent($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::ExecutionIdentity::DataplexServiceAgent>)
+
+Optional. The Dataplex service agent associated with the user's project.
+
+=item * C<< $msg->user_credential() >> / C<< $msg->user_credential($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::ExecutionIdentity::UserCredential>)
+
+Optional. The credential of the calling user. Supports only ONE_TIME
+trigger type.
+
+=item * C<< $msg->service_account() >> / C<< $msg->service_account($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Datascans::ExecutionIdentity::ServiceAccount>)
+
+Optional. The provided service account.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Datascans::DataScanJob
+
+A DataScanJob represents an instance of DataScan execution.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The relative resource name of the DataScanJob, of
+the form:
+`projects/{project}/locations/{location_id}/dataScans/{datascan_id}/jobs/{job_id}`,
+where `project` refers to a *project_id* or *project_number* and
+`location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the DataScanJob.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the DataScanJob was created.
+
+=item * C<< $msg->partial_failure_message() >> / C<< $msg->partial_failure_message($value) >>
+
+Type: C<String>
+
+Output only. A message indicating partial failure details.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the DataScanJob was started.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the DataScanJob ended.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataScanJob::State>)
+
+Output only. Execution state for the DataScanJob.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+Output only. Additional information about the current state.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataScanType>)
+
+Output only. The type of the parent DataScan.
+
+=item * C<< $msg->data_quality_spec() >> / C<< $msg->data_quality_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualitySpec>)
+
+Output only. Settings for a data quality scan.
+
+=item * C<< $msg->data_profile_spec() >> / C<< $msg->data_profile_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProfile::DataProfileSpec>)
+
+Output only. Settings for a data profile scan.
+
+=item * C<< $msg->data_discovery_spec() >> / C<< $msg->data_discovery_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoverySpec>)
+
+Output only. Settings for a data discovery scan.
+
+=item * C<< $msg->data_documentation_spec() >> / C<< $msg->data_documentation_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationSpec>)
+
+Output only. Settings for a data documentation scan.
+
+=item * C<< $msg->data_quality_result() >> / C<< $msg->data_quality_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQuality::DataQualityResult>)
+
+Output only. The result of a data quality scan.
+
+=item * C<< $msg->data_profile_result() >> / C<< $msg->data_profile_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProfile::DataProfileResult>)
+
+Output only. The result of a data profile scan.
+
+=item * C<< $msg->data_discovery_result() >> / C<< $msg->data_discovery_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoveryResult>)
+
+Output only. The result of a data discovery scan.
+
+=item * C<< $msg->data_documentation_result() >> / C<< $msg->data_documentation_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult>)
+
+Output only. The result of a data documentation scan.
+
+=back
+
+=head3 Enum: DataScanJob::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<RUNNING> => C<1>
+
+=item * C<CANCELING> => C<2>
+
+=item * C<CANCELLED> => C<3>
+
+=item * C<SUCCEEDED> => C<4>
+
+=item * C<FAILED> => C<5>
+
+=item * C<PENDING> => C<7>
+
+=item * C<SUCCEEDED_WITH_ERRORS> => C<8>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Datascans::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

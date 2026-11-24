@@ -134,7 +134,8 @@ those three.*/
 fmal() is in the Makefile.PL link probe with the rest of the `l` set. Where the
 probe failed on a long-double perl there is no nv_fma at all (LIKER_NO_NV_FMA):
 fma() would round its operands to a double, which is worse than the product it
-is meant to improve, so the caller keeps its plain expression.*/
+is meant to improve, so the caller keeps its plain expression. A libm whose fma()
+rounds twice is caught at load time instead; see nv_fma_fused.*/
 #if defined(USE_LONG_DOUBLE) && !defined(USE_QUADMATH) && !defined(LIKER_HAVE_LONG_DOUBLE_MATH)
 #  define LIKER_NO_NV_FMA 1
 #else
@@ -351,6 +352,61 @@ is built with.*/
 PERL_STATIC_INLINE bool nv_isnan(NV x)    { return (bool)(x != x); }
 PERL_STATIC_INLINE bool nv_isinf(NV x)    { return (bool)(x > NV_MAX || x < -NV_MAX); }
 PERL_STATIC_INLINE bool nv_isfinite(NV x) { return (bool)(x >= -NV_MAX && x <= NV_MAX); }
+#ifndef LIKER_NO_NV_FMA
+/*TRUE when nv_fma() rounds once, as C99 says it must; BOOT sets it from
+nv_fma_probe().
+
+newlib's portable fma() is x * y + z with two roundings, and newlib is Cygwin's
+libm. On Cygwin 0.3428's pbinom() at n = 1.8e13 was 2.5e-10 off
+(t/numeric.fixes.t test 38, perl 5.44.0 x86_64-cygwin-threads-multi), which is
+the error ib_lambda()'s fma exists to remove. Where this is FALSE, ib_lambda()
+forms the product exactly with nv_two_prod() instead.
+
+The fma() of Strawberry Perl 5.24's mingw-w64 (gcc 4.9.2) rounds twice in
+another way: its results are those of the product formed in an x87 long
+double, 64 bits where a double's product needs 106, and so it passed 0.3429's
+probe, whose product needed only 55. I_x(1e15, 1e15) near x = 1/2 was then
+3e-11 out in the log (t/incomplete.gamma.beta.mpmath.t 680-682 and 684-686,
+perl 5.24.4 MSWin32-x64-multi-thread); the newer mingw-w64 of Strawberry 5.42
+passed. Defining nv_fma(x,y,z) as ((NV)((long double)(x) * (long double)(y) +
+(long double)(z))) reproduces that report to the last digit on x86-64 Linux.*/
+static bool nv_fma_fused = TRUE;
+
+/*Whether nv_fma() rounds once. With a = 1 + 2^-k and k = NV_MANT_DIG - 1, the
+smallest step above 1, a*a = 1 + 2^(1-k) + 2^-2k needs 2k + 1 = 2 NV_MANT_DIG
+- 1 bits, so a product rounded to any narrower format before the add drops the
+last term, and fma(a, a, -(1 + 2^(1-k))) is then 0 where one rounding gives
+2^-2k exactly: that catches x * y + z rounded at the NV's width (newlib) and
+in an x87 long double (old mingw-w64) alike. 2^-2k is a normal number at every
+width (2^-104, 2^-126, 2^-224). The operands are volatile because gcc evaluates
+a constant fma() itself, correctly, and so would answer for the libm.*/
+static bool nv_fma_probe(void) {
+	const int k = NV_MANT_DIG - 1; //int: the exponent nv_ldexp() takes
+	volatile NV a = 1.0 + nv_ldexp(1.0, -k);
+	volatile NV c = -(1.0 + nv_ldexp(1.0, 1 - k));
+	return (bool)(nv_fma(a, a, c) == nv_ldexp(1.0, -2 * k));
+}
+
+/*x * y as p + *e exactly, p being the rounded product: Dekker's mul12 with
+Veltkamp's split (T. J. Dekker, "A floating-point technique for extending the
+available precision", Numer. Math. 18 (1971) 224-242), for a libm whose fma()
+does not round once. Every step is narrowed, so that x87 excess precision cannot
+keep the bits the split depends on losing. The split multiplies by
+2^ceil(NV_MANT_DIG/2) + 1, so it overflows for an operand that close to NV_MAX;
+*e is then 0 and p is the plain rounded product, as before 0.3428.*/
+static NV nv_two_prod(NV x, NV y, NV *restrict e) {
+	const NV split = nv_ldexp(1.0, (NV_MANT_DIG + 1) / 2) + 1.0;
+	const NV p = nv_narrow(x * y);
+	NV t = nv_narrow(split * x);
+	const NV xh = nv_narrow(t - nv_narrow(t - x)), xl = nv_narrow(x - xh);
+	t = nv_narrow(split * y);
+	const NV yh = nv_narrow(t - nv_narrow(t - y)), yl = nv_narrow(y - yh);
+	const NV err = nv_narrow(nv_narrow(nv_narrow(nv_narrow(xh * yh - p) + nv_narrow(xh * yl))
+		+ nv_narrow(xl * yh)) + xl * yl);
+	*e = nv_isfinite(err) ? err : 0.0;
+	return p;
+}
+#endif
 /*Stack_off_t is the type XSUB.h's dITEMS gives `items`, and so the type every
 argument-stack index here is compared against. It arrived in perl 5.39.2, which
 introduced it precisely so the stack offset could widen to SSize_t on a build
@@ -1820,6 +1876,9 @@ Stopping short of the call gives every build the same answer, which is
 also R's and scipy's.*/
 #define PNORM_LOWER_ZERO (-38.4674) //R's own cutoff, nmath/pnorm.c
 static NV approx_pnorm(NV x); //defined below, after the histogram code
+#ifdef LIKER_WIDE_NV
+static NV qnorm_log_polish(NV z, NV lp); //defined with pg_pnorm(), below
+#endif
 
 /* C helper for the non-central T-distribution CDF: quadrature over the scaled
  chi density up to PNT_NORMAL_DF, an asymptotic form above it. Matches R's
@@ -5754,7 +5813,11 @@ static void cor_extract_cols(pTHX_ AV *const *restrict rows, size_t nrows,
 	}
 }
 
-// Math macros
+/*The Numerical Recipes fraction serves only a build without LIKER_WIDE_NV, and
+there only for two shapes above 1 and below IB_LARGE (since 0.3430; before, for
+any smaller shape); a wide build takes TOMS 708's algorithms for every case
+since 0.3429 (see incbeta_xy_core()).*/
+#ifndef LIKER_WIDE_NV
 #define MAX_ITER 500
 /*3e-15 and 1e-30 are the thresholds Numerical Recipes' betacf() carries, at a
 double's width; LIKER_EPS_SCALE takes them to this build's.  EPS is where the
@@ -5762,17 +5825,7 @@ continued fraction is declared converged, so it is what caps the accuracy of
 every t, F and beta tail in this file; FPMIN is Lentz's guard against dividing
 by a denominator that has underflowed to zero, so it scales with the same
 factor to stay the same distance below EPS.*/
-#ifdef LIKER_WIDE_NV
-/*On a wide build the fraction is stopped at NV_EPSILON/20, not at 13.5
-NV_EPSILON: its steps shrink by a factor per term of 0.9 or more where a shape is
-tiny (b = 1/1024, x near 1), so a step of EPS leaves ten steps behind it -- 3e3
-epsilons of a __float128 for I_y(1/1024, 500). If the steps cannot get that small
-(rounding in c and d keeps del - 1 near NV_EPSILON) the loop runs to its cap and
-returns what it has, which is no worse.*/
-#  define EPS   (NV_EPSILON * 0.05)
-#else
-#  define EPS   (3.0e-15 * LIKER_EPS_SCALE)
-#endif
+#define EPS   (3.0e-15 * LIKER_EPS_SCALE)
 #define FPMIN (1.0e-30 * LIKER_EPS_SCALE)
 
 /*Lentz's continued fraction for the incomplete beta (NR's betacf).
@@ -5825,6 +5878,7 @@ static NV _incbeta_cf(NV a, NV b, NV x) {
 	}
 	return h;
 }
+#endif
 
 #ifndef M_LN_2PI
 #define M_LN_2PI      1.837877066409345483560659472811 //log(2*pi)
@@ -5849,7 +5903,12 @@ lower = FALSE) was 2.4e-14 off on a long double. Here a - T x (T = a + b) is
 one fma, whose single rounding is of lambda itself. T is rounded too, unless
 a and b are integers, so its error t (a + b = T + t exactly, by two-sum) is
 taken out of the result as t x, which is small. Without an fma
-(LIKER_NO_NV_FMA: a long-double libm lacking fmal) the older form stays.*/
+(LIKER_NO_NV_FMA: a long-double libm lacking fmal) the older form stays.
+
+Where the libm's fma() rounds twice (nv_fma_fused FALSE: Cygwin), the product is
+split exactly as p + e by nv_two_prod(). Near the mean p is within a factor of 2
+of a (or of b), so a - p is exact by Sterbenz's lemma, and subtracting e is then
+the one rounding of lambda that fma() would have made.*/
 static NV ib_lambda(NV a, NV b, NV x, NV y) {
 	const NV apb = nv_narrow(a + b); //narrowed: the two-sum below needs the rounded sum
 	if (!nv_isfinite(nv_opaque(apb))) return a * y - b * x; //nv_opaque(): a and b are reused
@@ -5857,8 +5916,17 @@ static NV ib_lambda(NV a, NV b, NV x, NV y) {
 	return (a > b) ? apb * y - b : a - apb * x;
 #else
 	const NV bb = nv_narrow(apb - a), t = (a - nv_narrow(apb - bb)) + (b - bb);
-	if (x <= y) return nv_fma(-apb, x, a) - t * x;
-	return nv_fma(apb, y, -b) + t * y;
+	if (nv_fma_fused) {
+		if (x <= y) return nv_fma(-apb, x, a) - t * x;
+		return nv_fma(apb, y, -b) + t * y;
+	}
+	NV e;
+	if (x <= y) {
+		const NV p = nv_two_prod(apb, x, &e);
+		return (nv_narrow(a - p) - e) - t * x;
+	}
+	const NV p = nv_two_prod(apb, y, &e);
+	return (nv_narrow(p - b) + e) + t * y;
 #endif
 }
 
@@ -5965,7 +6033,10 @@ static NV ib_basym(NV a, NV b, NV lambda, NV eps, bool log_p) {
 		r1 = (b - a) / a;
 		w0 = 1.0 / nv_sqrt(b * (h + 1.0));
 	}
-	a0[0] = r1 * (2.0 / 3.0);
+	/*2/3 at the NV's width: 2.0 / 3.0 is folded as a double, and through 0.3428
+	that left I_x(3e11, 1e12) 1e-23 off on a __float128 (5e10 of its epsilons),
+	where r1 = (b - a)/b is not 0; a double build gets the same constant.*/
+	a0[0] = r1 * ((NV)2 / 3);
 	c[0] = a0[0] * -0.5;
 	d[0] = -c[0];
 	NV j0 = 0.5 / e0 * ib_erfcx(z0), j1 = e1;
@@ -6044,6 +6115,28 @@ static NV ib_bfrac(NV a, NV b, NV x, NV y, NV lambda, NV eps, bool log_p) {
 		anp1 = r;
 		bnp1 = 1.0;
 	} while (n < 1000.0);
+#ifdef LIKER_WIDE_NV
+	/*The forward recurrence above carries one rounding per term into r, and
+	near the mean of a large shape against a small one it runs long: 243 terms
+	at a = 1e4, b = 3/2, which left 25 epsilons of a __float128 in r (simulated
+	at 113 bits in mpmath; 14 at b = 5/2). So on a wide build it only finds the
+	depth, and the fraction r = 1/(c/c1 + alpha_1/(beta_1 + alpha_2/(beta_2 +
+	...))) is then evaluated backward from 10 terms past it, as pg_lower_cf()
+	does, where a rounding made deep in is shrunk by the factors that make the
+	fraction converge on its way up: 4 epsilons at a = 1e4, b = 3/2, under 1
+	elsewhere in the same simulation. The coefficients are formed from n in
+	closed form (p = (n - 1)/a + 1, s = a + 2n - 1) rather than carried.*/
+	NV tb = 0.0;
+	for (NV k = n + 10.0; k >= 1.0; k--) { // NV: k only enters NV arithmetic
+		const NV w = k * x * (b - k), sk = a + (2.0 * k - 1.0), pk = (k - 1.0) / a + 1.0;
+		const NV t = k / a, e = a / sk;
+		const NV alpha = pk * (pk + c0) * e * e * (w * x);
+		const NV e2 = (t + 1.0) / (c1 + t + t);
+		const NV beta = w / sk + k + e2 * (c + k * yp1);
+		tb = alpha / (beta + tb);
+	}
+	r = 1.0 / (c / c1 + tb);
+#endif
 	return log_p ? lbrc + nv_log(r) : nv_exp(lbrc) * r;
 }
 
@@ -6110,8 +6203,8 @@ static NV ib_algdiv(NV b, NV a) {
 /*TOMS 708's bpser(), from R 4.6.1's src/nmath/toms708.c: the power series
 x^a / (a B(a, b)) (1 + a sum_n c_n / (a + n)) for I_x(a, b), c_n =
 prod_k (1 - b/k) x. R's bpser() has a branch for every size of the shapes;
-here it is only reached with one shape at most 1 and the other at least
-IB_LARGE (on a wide build, any size: see incbeta_xy_core()), so the factor is
+here it is only reached with one shape at most 1 and the other of any size
+(see ib_bratio_small()), so the factor is
 x^a/(a B(a, b)) with B through TOMS 708's "a0 < 1 < 8 <= b0" form,
 log Gamma(1 + a0) + algdiv(a0, b0). Returns I_x(a, b) or its log; the series
 is R's, stopped at |w| <= eps/a or 1e7 terms.*/
@@ -6119,9 +6212,9 @@ static NV ib_bpser(NV a, NV b, NV x, bool log_p) {
 	if (x <= 0.0) return log_p ? -NV_INF : 0.0;
 	const NV a0 = (a < b) ? a : b, b0 = (a < b) ? b : a;
 	/*TOMS 708 uses algdiv() only from b0 = 8 up, because its own is an asymptotic
-	series. ib_algdiv() is the exact identity through stirlerr(), so on a wide
-	build (where bpser() is reached with a larger shape from 1 up, for the cases
-	it covers) it serves for any b0, and avoids the difference of two lgamma()s
+	series. ib_algdiv() is the exact identity through stirlerr(), so (bpser()
+	being reached with a larger shape from 1 up, for the cases it covers) it
+	serves for any b0, and avoids the difference of two lgamma()s
 	of a few units each, which for a tiny a0 is a log far below its terms.*/
 	const NV z = a * nv_log(x) - pg_lgamma1p(a0) - ib_algdiv(a0, b0);
 	NV ans = log_p ? z + nv_log(a0 / a) : nv_exp(z) * (a0 / a);
@@ -6138,6 +6231,197 @@ static NV ib_bpser(NV a, NV b, NV x, bool log_p) {
 	return (a * sum > -1.0) ? ans * (a * sum + 1.0) : 0.0;
 }
 
+static NV c_digamma(NV x); //with the count-model helpers below
+
+/*log of x^a y^b / B(a, b) where one shape is at most 1, TOMS 708's brcmp1()
+for that case. The smaller shape a0 is kept out of the exponent, since
+1/B(a0, b0) = a0 Gamma(a0 + b0)/(Gamma(1 + a0) Gamma(b0)): for a tiny a0 the
+log B(a0, b0) of about -log a0 that incbeta_log_front()'s saddle point forms
+would carry an absolute error of |log a0| epsilons into the result, and log a0
+is instead added last, to a log. log Gamma(b0) - log Gamma(a0 + b0) is
+ib_algdiv() from b0 = 1/2 up, where stirlerr() is the NV's; below that both
+shapes are under 1/2 and it is lgamma1p()'s difference plus log1p(a0/b0), all
+of order 1.*/
+static NV ib_lbrcmp_small(NV a, NV b, NV x, NV y) {
+	const NV a0 = (a < b) ? a : b, b0 = (a < b) ? b : a;
+	NV lnx, lny;
+	if (x <= 0.375) {
+		lnx = nv_log(x);
+		lny = nv_log1p(-x);
+	} else if (y <= 0.375) {
+		lnx = nv_log1p(-y);
+		lny = nv_log(y);
+	} else {
+		lnx = nv_log(x);
+		lny = nv_log(y);
+	}
+	const NV g = (b0 >= 0.5) ? ib_algdiv(a0, b0)
+	           : pg_lgamma1p(b0) - pg_lgamma1p(a0 + b0) + nv_log1p(a0 / b0);
+	return a * lnx + b * lny - pg_lgamma1p(a0) - g + nv_log(a0);
+}
+
+/*TOMS 708's bup(), from R 4.6.1's src/nmath/toms708.c: I_x(a, b) - I_x(a + n,
+b) for a whole n, or its log, as x^a y^b/(a B(a, b)) times a sum of n positive
+terms. Here only with min(a, b) <= 1 (see ib_bratio_small()), so the front
+factor is ib_lbrcmp_small(). R scales the front and the first term by
+exp(-+mu) so that neither underflows; the front is a log here, and the
+product is formed as one exp() of the sum of the two logs instead.*/
+static NV ib_bup(NV a, NV b, NV x, NV y, unsigned short n, bool give_log) {
+	const NV apb = a + b, ap1 = a + 1.0;
+	const NV lfront = ib_lbrcmp_small(a, b, x, y) - nv_log(a);
+	if (n == 1 || lfront == -NV_INF) return give_log ? lfront : nv_exp(lfront);
+	const unsigned short nm1 = n - 1;
+	NV d = 1.0, w = 1.0;
+	unsigned short k = 0; // the index of the largest term: the sum is not stopped before it
+	if (b > 1.0) {
+		if (y > 1e-4) {
+			const NV r = (b - 1.0) * x / y - a;
+			if (r >= 1.0) k = (r < (NV)nm1) ? (unsigned short)r : nm1;
+		} else
+			k = nm1;
+		for (unsigned short i = 0; i < k; ++i) {
+			d *= (apb + i) / (ap1 + i) * x;
+			w += d;
+		}
+	}
+	for (unsigned short i = k; i < nm1; ++i) {
+		d *= (apb + i) / (ap1 + i) * x;
+		w += d;
+		if (d <= NV_EPSILON * w) break;
+	}
+	return give_log ? lfront + nv_log(w) : nv_exp(lfront + nv_log(w));
+}
+
+/*TOMS 708's apser(), from R 4.6.1's src/nmath/toms708.c: 1 - I_x(a, b) for
+a <= min(eps, eps b), b x <= 1 and x <= 1/2, the expansion to first order in
+the tiny a. Its neglected terms are O(a) of the result, so it is called only
+where a is below NV_EPSILON (R's eps is 1e-15). R's g is Euler's constant to
+15 digits; here NVK_EULER, and psi() is c_digamma(), which is the NV's.*/
+static NV ib_apser(NV a, NV b, NV x) {
+	const NV bx = b * x;
+	NV t = x - bx;
+	const NV c = (b * NV_EPSILON <= 0.02) ? nv_log(x) + c_digamma(b) + NVK_EULER + t
+	                                      : nv_log(bx) + NVK_EULER + t; // psi(b) = log b to the NV's width
+	const NV tol = NV_EPSILON * 5.0 * nv_fabs(c);
+	NV j = 1.0, s = 0.0, aj;
+	do {
+		j += 1.0;
+		t *= x - bx / j;
+		aj = t / j;
+		s += aj;
+	} while (nv_fabs(aj) > tol);
+	return -a * (c + s);
+}
+
+/*TOMS 708's fpser(), from R 4.6.1's src/nmath/toms708.c: I_x(a, b) for
+b < min(eps, eps a) and x <= 1/2, to first order in the tiny b (1/B(a, b) = b
+there), or its log. As with ib_apser(), eps is NV_EPSILON. R's exparg(1)
+underflow test is the exp() itself here.*/
+static NV ib_fpser(NV a, NV b, NV x, bool log_p) {
+	NV ans;
+	if (log_p) ans = a * nv_log(x) + nv_log(b) - nv_log(a);
+	else {
+		ans = (a > NV_EPSILON * 0.001) ? nv_exp(a * nv_log(x)) : 1.0;
+		if (ans == 0.0) return 0.0;
+		ans *= b / a;
+	}
+	const NV tol = NV_EPSILON / a;
+	NV an = a + 1.0, t = x, s = t / an, c;
+	do {
+		an += 1.0;
+		t *= x;
+		c = t / an;
+		s += c;
+	} while (nv_fabs(c) > tol);
+	return log_p ? ans + nv_log1p(a * s) : ans * (a * s + 1.0);
+}
+
+/*I_y(b, a) for b <= 15 and a <= 1 as R's bratio() forms it there:
+bup(b, a, y, x, 20), the first 20 terms, plus bgrat() at b + 20, which needs a
+shape of 15 or more. Both are positive, so the sum is not a cancellation; in
+logs it is the larger log plus log1p(exp(the difference)).*/
+static NV ib_bup_bgrat(NV b, NV a, NV y, NV x, bool give_log) {
+	const NV u = ib_bup(b, a, y, x, 20, give_log);
+	const NV g = ib_bgrat(b + 20.0, a, y, x, NV_EPSILON, give_log);
+	if (!give_log) return u + g;
+	const NV hi = (u > g) ? u : g, lo = (u > g) ? g : u;
+	if (hi == -NV_INF) return hi;
+	return hi + nv_log1p(nv_exp(lo - hi));
+}
+
+/*R's bratio() for min(a, b) <= 1, every branch of it, on every build; R 4.6.1
+src/nmath/toms708.c. Returns I_x(a, b), or 1 - I_x(a, b) with *flip set TRUE,
+or the log of either.
+
+0.3426 took only the branches of it that bpser() and bgrat() serve. Where R
+uses bup() it took bpser() if x0 b0 <= 3/2 and the Numerical Recipes fraction
+otherwise, and where R uses apser() or fpser() it took bpser(); for both
+shapes at most 1 it took bpser() always. bpser() there sums the larger of the
+two tails, near 1, and the smaller is what is left of 1 - it: 59 epsilons of a
+__float128 at I_0.8(15/2, 1/1024) and 1e31 at I_0.999(1/2, 2^-130).
+
+Up to 0.3429 this served only a wide build. A double build took the
+bpser()/bgrat() subset from a larger shape of IB_LARGE up, and the Numerical
+Recipes fraction below it, which is 1e16 to 1e18 epsilons out at a shape of
+2^-60 (some logs NaN). Where the fraction's I_x is near 1 and the tail wanted
+is its complement, one rounding of lgamma() in the front factor is thousands
+of epsilons of that tail: 1 - I_0.1(1/1024, 15/2) was 1.9e-13 out (870
+epsilons) with glibc 2.39's lgamma() and 5.0e-12 with lgammal() rounded to a
+double, the result 0.3429 gave on the Solaris, Hurd, aarch64 and x86_64 Linux
+smokers of one tester.
+
+R's eps, 1e-15, is NV_EPSILON in the apser() and fpser() tests, as those two
+are first-order expansions in a shape below it; the other thresholds are R's.*/
+static NV ib_bratio_small(NV a, NV b, NV x, NV y, bool give_log, bool *restrict flip) {
+	if (((a > b) ? a : b) < NV_EPSILON * 0.001) {
+		/*R's case for both shapes below eps/1000: I_x(a, b) = b/(a + b) to the
+		NV's precision, whatever x is.*/
+		*flip = FALSE;
+		if (!give_log) return b / (a + b);
+		return (a < b) ? nv_log1p(-a / (a + b)) : nv_log(b / (a + b));
+	}
+	const bool swp = x > 0.5;
+	const NV a0 = swp ? b : a, b0 = swp ? a : b, x0 = swp ? y : x, y0 = swp ? x : y;
+	NV w;
+	bool w_lower; //TRUE when w is I_x0(a0, b0), FALSE when it is the complement
+	if (b0 < NV_EPSILON * ((a0 < 1.0) ? a0 : 1.0)) {
+		w = ib_fpser(a0, b0, x0, give_log); w_lower = TRUE;
+	} else if (a0 < NV_EPSILON * ((b0 < 1.0) ? b0 : 1.0) && b0 * x0 <= 1.0) {
+		w = ib_apser(a0, b0, x0); w_lower = FALSE;
+		if (give_log) w = nv_log(w);
+	} else if (a0 > 1.0 || b0 > 1.0) {
+		if (b0 <= 1.0) {
+			w = ib_bpser(a0, b0, x0, give_log); w_lower = TRUE;
+		} else if (x0 >= 0.29) {
+			w = ib_bpser(b0, a0, y0, give_log); w_lower = FALSE;
+		} else if (x0 < 0.1 && nv_pow(x0 * b0, a0) <= 0.7) {
+			w = ib_bpser(a0, b0, x0, give_log); w_lower = TRUE;
+		} else if (b0 > 15.0) {
+			w = ib_bgrat(b0, a0, y0, x0, NV_EPSILON, give_log); w_lower = FALSE;
+		} else {
+			w = ib_bup_bgrat(b0, a0, y0, x0, give_log); w_lower = FALSE;
+		}
+	} else if (a0 >= ((b0 < 0.2) ? b0 : 0.2) || nv_pow(x0, a0) <= 0.9) {
+		w = ib_bpser(a0, b0, x0, give_log); w_lower = TRUE;
+	} else if (x0 >= 0.3) {
+		w = ib_bpser(b0, a0, y0, give_log); w_lower = FALSE;
+	} else {
+		w = ib_bup_bgrat(b0, a0, y0, x0, give_log); w_lower = FALSE;
+	}
+	*flip = (w_lower == swp); //the caller wants I_x(a, b), which is w for no swap and 1 - w for a swap
+	/*R turns the problem so that x0 <= 1/2 and takes the complement when it
+	must, and that is 1 - w with w near 1 where the caller's tail is the small
+	one: 1/(1 - w) epsilons lost, 1e3 at I_0.9(10.5, 1/1024). The series for
+	I_x(a, b) itself converges as x^n, so where it applies (a shape of at most 1,
+	or x b <= 3/2) and is not long (x <= 0.97: 1100 terms for 1e-34) it is
+	summed directly instead.*/
+	if (*flip && (give_log ? w > -M_LN2 : w > 0.5) && (b <= 1.0 || x * b <= 1.5) && x <= 0.97) {
+		w = ib_bpser(a, b, x, give_log);
+		*flip = FALSE;
+	}
+	return w;
+}
+
 /*Where ib_basym() takes over from the continued fractions: both shapes above
 IB_BASYM_MIN and |lambda| within 3% of the smaller, TOMS 708's own window.
 TOMS 708 opens it at 100. It opens at 1e5 here because below that bfrac()
@@ -6148,9 +6432,9 @@ about 300 smaller than the last, and twenty reach 1e-40.*/
 #define IB_BASYM_MIN 1e5
 
 /*From this size of the larger shape up, incbeta_xy_core() takes TOMS 708's
-algorithms rather than the Numerical Recipes fraction (on a LIKER_WIDE_NV build
-from 15 where the other shape is at most 1, and for any two shapes above 1: see
-the test at the top of incbeta_xy_core()). That fraction re-forms
+algorithms rather than the Numerical Recipes fraction for two shapes above 1
+(on a LIKER_WIDE_NV build for every case, and on every build where one shape
+is at most 1: see the top of incbeta_xy_core()). That fraction re-forms
 1 - x from x inside its coefficients and loses about max(a, b) * eps relative
 to it, measured against mpmath at mp.dps = 40 over x from 0.3 to 30 standard
 deviations below the mean: 2e-13 at a = 1e3, 1e-10 at 1e6, 5e-2 at 1e15 --
@@ -6184,12 +6468,13 @@ positive when x has already rounded to 1.0 is precisely the case this
 function exists to get right.  Only y <= 0 means the upper tail has really
 vanished.
 
-Once either shape reaches IB_LARGE the work goes to TOMS 708's methods, chosen
-as R's bratio() chooses them: with both shapes above 1, the problem is turned
-so that lambda >= 0 and handed to basym() near the mean of two large shapes
-and to bfrac() everywhere else; with the smaller shape at most 1, the choice
-among bpser() and bgrat() is R's (see the branch below). Whichever tail is computed, the requested
-one is it or 1 - it.
+With the smaller shape at most 1, or once either shape reaches IB_LARGE, the
+work goes to TOMS 708's methods, chosen as R's bratio() chooses them: with
+both shapes above 1, the problem is turned so that lambda >= 0 and handed to
+basym() near the mean of two large shapes and to bfrac() everywhere else;
+with the smaller shape at most 1 it is all of R's choice, bup(), apser() and
+fpser() included (ib_bratio_small()). Whichever tail is computed, the
+requested one is it or 1 - it.
 
 The log form takes the log of the front factor rather than of its exp(), so a
 tail far below NV_MIN still has a log: pt(-1e10, 30, log => 1) and the qt()
@@ -6200,24 +6485,18 @@ static NV incbeta_xy_core(NV a, NV b, NV x, NV y, bool give_log) {
 	if (x <= 0.0) return give_log ? -NV_INF : 0.0;
 	if (y <= 0.0) return give_log ? 0.0 : 1.0;
 #ifdef LIKER_WIDE_NV
-	/*Where TOMS 708's algorithms take over (see IB_LARGE): from a shape of 15 up
-	where the other is at most 1 -- bgrat() needs one above 15, which is what
-	the b0 > 15 test in the branch below relies on -- and for any two shapes
-	above 1, where bfrac() has no cancellation to lose near the mean.*/
-	bool toms = (a > 1.0 && b > 1.0) || a > 15.0 || b > 15.0;
-	if (!toms) {
-		// both shapes at most 15, one at most 1: bpser() takes the cases R's bratio() gives it
-		const bool swp = x > 0.5;
-		const NV a0 = swp ? b : a, b0 = swp ? a : b, x0 = swp ? y : x;
-		/*R sends the rest -- b0 up to 15 with x0 between 0.1 and 0.29 -- to bup()
-		and bgrat(), which are not ported. bpser() converges there too, its terms
-		growing by at most e^(x0 b0) before they shrink, which for x0 b0 <= 3/2 costs
-		two bits; the cases past that stay on the Numerical Recipes fraction.*/
-		toms = b0 <= 1.0 || x0 >= 0.29 || (x0 < 0.1 && nv_pow(x0 * b0, a0) <= 0.7) || x0 * b0 <= 1.5;
-	}
-	if (toms) {
+	/*On a wide build every case takes TOMS 708's algorithms (see IB_LARGE):
+	bfrac() and basym() for two shapes above 1, where bfrac() has no
+	cancellation to lose near the mean, and R's whole bratio() dispatch
+	(ib_bratio_small()) where one is at most 1. Up to 0.3428 a larger shape of
+	at most 15 was left on the Numerical Recipes fraction wherever bpser() did
+	not serve, because bup(), apser() and fpser() were not ported.*/
+	{
 #else
-	if (a >= IB_LARGE || b >= IB_LARGE) {
+	/*A double build keeps the Numerical Recipes fraction only for two shapes
+	above 1 and below IB_LARGE; up to 0.3429 it kept it below IB_LARGE whatever
+	the smaller shape (see ib_bratio_small()).*/
+	if (a >= IB_LARGE || b >= IB_LARGE || a <= 1.0 || b <= 1.0) {
 #endif
 		bool flip; //TRUE when w below is 1 - I_x(a, b)
 		NV w; //log when give_log
@@ -6233,47 +6512,17 @@ static NV incbeta_xy_core(NV a, NV b, NV x, NV y, bool give_log) {
 			else
 				w = ib_bfrac(A, B, X, Y, lam, NV_EPSILON, give_log);
 		} else {
-			/*The smaller shape is at most 1. R's bratio() turns the problem so that
-			x0 <= 1/2 and then picks, in this order: bpser() when b0 <= 1, for the
-			complement when x0 >= 0.29, and for the lower tail when x0 < 0.1 and
-			(x0 b0)^a0 <= 0.7; bgrat() for the complement otherwise (b0 > 15 holds
-			here, since b0 is the larger shape once it exceeds 1). Up to 0.3413 this
-			sent every such case that was not on the fraction's own side to bgrat(),
-			whose expansion is poor for a tiny variable: pt(-3000, 5000, log = TRUE)
-			was NaN and pt(-960, 2508.3, log = TRUE) was wrong in the sixth digit.*/
-			const bool swp = x > 0.5;
-			const NV a0 = swp ? b : a, b0 = swp ? a : b, x0 = swp ? y : x, y0 = swp ? x : y;
-			bool w_lower; //TRUE when w is I_x0(a0, b0), FALSE when it is the complement
-			if (b0 <= 1.0) {
-				w = ib_bpser(a0, b0, x0, give_log); w_lower = 1;
-			} else if (x0 >= 0.29) {
-				w = ib_bpser(b0, a0, y0, give_log); w_lower = 0;
-			} else if ((x0 < 0.1 && nv_pow(x0 * b0, a0) <= 0.7)
-#ifdef LIKER_WIDE_NV
-			        || (b0 <= 15.0 && x0 * b0 <= 1.5) // see toms above
-#endif
-			          ) {
-				w = ib_bpser(a0, b0, x0, give_log); w_lower = 1;
-			} else {
-				w = ib_bgrat(b0, a0, y0, x0, NV_EPSILON, give_log); w_lower = 0;
-			}
-			flip = (w_lower == swp); //the caller wants I_x(a, b), which is w for no swap and 1 - w for a swap
-#ifdef LIKER_WIDE_NV
-			/*R turns the problem so that x0 <= 1/2 and takes the complement when it
-			must, and that is 1 - w with w near 1 where the caller's tail is the small
-			one: 1/(1 - w) epsilons lost, 1e3 at I_0.9(10.5, 1/1024). The series for
-			I_x(a, b) itself converges as x^n, so where it applies (a shape of at most 1,
-			or x b <= 3/2) and is not long (x <= 0.97: 1100 terms for 1e-34) it is
-			summed directly instead.*/
-			if (flip && (give_log ? w > -M_LN2 : w > 0.5) && (b <= 1.0 || x * b <= 1.5) && x <= 0.97) {
-				w = ib_bpser(a, b, x, give_log);
-				flip = 0;
-			}
-#endif
+			/*The smaller shape is at most 1: R's bratio() dispatch. Up to 0.3413 a
+			double build sent every such case with a larger shape of IB_LARGE or
+			more that was not on the fraction's own side to bgrat(), whose
+			expansion is poor for a tiny variable: pt(-3000, 5000, log = TRUE) was
+			NaN and pt(-960, 2508.3, log = TRUE) was wrong in the sixth digit.*/
+			w = ib_bratio_small(a, b, x, y, give_log, &flip);
 		}
 		if (!flip) return w;
 		return give_log ? nv_log1mexp(w) : 1.0 - w;
 	}
+#ifndef LIKER_WIDE_NV
 	if (x < (a + 1.0) / (a + b + 2.0)) {
 		if (give_log)
 			return incbeta_log_front(a, b, x, y) + nv_log(_incbeta_cf(a, b, x) / a);
@@ -6281,6 +6530,7 @@ static NV incbeta_xy_core(NV a, NV b, NV x, NV y, bool give_log) {
 	}
 	const NV w = nv_exp(incbeta_log_front(b, a, y, x)) * _incbeta_cf(b, a, y) / b;
 	return give_log ? nv_log1p(-w) : 1.0 - w;
+#endif
 }
 
 static NV incbeta_xy(NV a, NV b, NV x, NV y) {
@@ -7234,9 +7484,21 @@ move z, so a double pays for one pass and only the wider NVs pay for a second.
 Takes p in (0, 1). The domain guards, and the reflection that keeps the result
 accurate above the median, live in std_qnorm() below: call that, not this.
 
-The 1/sqrt(2*pi) literal is only ever a divisor of the correction, so its own
-rounding scales an already-converged step and never limits the answer.*/
+In the tail the 1/sqrt(2*pi) literal is only ever a divisor of the
+correction, so its own rounding scales an already-converged step and never
+limits the answer. Near the median it is not: there the step is sum - y / dens,
+and the constant's rounding is the answer's, which is why it is taken at the
+NV's width on a LIKER_WIDE_NV build (the double literal left qnorm(0.25) 3e17
+epsilons of a __float128 out). On such a build the tail is then polished on
+the log scale by qnorm_log_polish(): the Newton loop below runs against the
+linear CDF and stops after four passes, which from Moro's start is not enough
+for a __float128 below about p = 1e-200.*/
 static NV normal_quantile_hp(NV p) {
+#ifdef LIKER_WIDE_NV
+	const NV inv_sqrt_2pi = NVK_1_SQRT_2PI;
+#else
+	const NV inv_sqrt_2pi = 0.39894228040143267794; // 1/sqrt(2 pi)
+#endif
 	NV z = inverse_normal_cdf(p);
 	const NV y = p - 0.5; // exact for p in [0.25, 0.5] (Sterbenz)
 	if (nv_fabs(y) < 0.3) {
@@ -7260,7 +7522,7 @@ static NV normal_quantile_hp(NV p) {
 				sum += term;
 				if (nv_fabs(term) <= NV_EPSILON * 0.25 * nv_fabs(sum)) break;
 			}
-			NV dens = 0.39894228040143267794 * nv_exp(-0.5 * z2);
+			NV dens = inv_sqrt_2pi * nv_exp(-0.5 * z2);
 			NV step = sum - y / dens;
 			z -= step;
 			if (step * step <= 2.0 * NV_EPSILON * z * z) break;
@@ -7268,7 +7530,7 @@ static NV normal_quantile_hp(NV p) {
 		return z;
 	}
 	for (unsigned short i = 0; i < 4; i++) {
-		NV dens = 0.39894228040143267794 * nv_exp(-0.5 * z * z);
+		NV dens = inv_sqrt_2pi * nv_exp(-0.5 * z * z);
 		NV step;
 		if (!(dens > 0.0)) break;
 		step = (approx_pnorm(z) - p) / dens;
@@ -7279,6 +7541,9 @@ static NV normal_quantile_hp(NV p) {
 		   test costs a multiply rather than an assumption about either. */
 		if (step * step <= 2.0 * NV_EPSILON) break;
 	}
+#ifdef LIKER_WIDE_NV
+	z = qnorm_log_polish(z, nv_log(p));
+#endif
 	return z;
 }
 
@@ -8020,16 +8285,51 @@ static PerlIO *wt_target_open(pTHX_ WtTarget *restrict tg, const char *mode) {
 	return PerlIO_open(tg->file, mode);
 }
 
+/*Copy the finished temporary over the target's contents in place, for a rename
+the system refused; rename_errno is that refusal's errno.
+
+Windows will not rename over a file that any handle holds open without
+FILE_SHARE_DELETE, and the C runtime's open() never asks for it: write_table()
+to the name of a File::Temp object, or of a tempfile() made with UNLINK (whose
+handle File::Temp keeps until END), failed "could not replace ...: Permission
+denied" on every Windows perl in 0.3428 (t/numeric.options.t 108,
+t/write_table.t, t/write_table.tex.rownames.t). Opening such a file to write
+in place is allowed, and is what write_table() did up to 0.3427. A croak here
+can leave the target cut short, as any write in place could then; the unwind
+still removes the temporary.*/
+static void wt_target_copy(pTHX_ WtTarget *restrict tg, int rename_errno) {
+	PerlIO *in = PerlIO_open(tg->tmp, "rb"); // no restrict: PerlIO handles are perl's
+	PerlIO *out = in ? PerlIO_open(tg->file, "wb") : NULL;
+	if (!out) {
+		if (in) PerlIO_close(in);
+		croak("write_table: could not replace '%s': %" SVf "\n",
+			tg->file, SVfARG(wt_errno_text(aTHX_ rename_errno)));
+	}
+	char buf[8192]; // one PerlIO buffer's worth; the copy runs once per table
+	int errnum = 0; // errno at the first failure seen
+	bool failed = FALSE;
+	SSize_t got;
+	while ((got = PerlIO_read(in, buf, sizeof buf)) > 0) {
+		if (PerlIO_write(out, buf, (Size_t)got) != got) { failed = TRUE; errnum = errno; break; }
+	}
+	if (!failed && (got < 0 || PerlIO_error(in))) { failed = TRUE; errnum = errno; }
+	PerlIO_close(in);
+	if (failed) {
+		PerlIO_close(out);
+		wt_write_failed(aTHX_ tg->file, errnum);
+	}
+	wt_close_checked(aTHX_ out, tg->file);
+	(void)PerlLIO_unlink(tg->tmp);
+}
+
 /*The table is complete and its handle closed: put it where the caller named.
 A rename over an existing file replaces it on POSIX and, through perl's own
-rename, on Windows.  A failure croaks, and the unwind removes the temporary.*/
+rename, on Windows. Where the rename is refused, the contents are copied in
+place by wt_target_copy(). A failure croaks, and the unwind removes the
+temporary.*/
 static void wt_target_commit(pTHX_ WtTarget *restrict tg) {
 	if (!tg->tmp[0]) return;
-	if (PerlLIO_rename(tg->tmp, tg->file) != 0) {
-		const int errnum = errno;
-		croak("write_table: could not replace '%s': %" SVf "\n",
-			tg->file, SVfARG(wt_errno_text(aTHX_ errnum)));
-	}
+	if (PerlLIO_rename(tg->tmp, tg->file) != 0) wt_target_copy(aTHX_ tg, errno);
 	tg->done = TRUE;
 }
 
@@ -10595,24 +10895,28 @@ double-limited piece has a wide replacement, each described where it is:
 log1pmx() and lgamma1p() sum more terms (60 coefficients, 42 digits),
 bt_stirlerr() and bt_bd0() are accurate to the NV, pg_pnorm() replaces the two
 pnorm() calls, the series sum with compensation (PG_KADD()), pd_lower_cf() is
-the stable Lentz form of the same fraction, and Temme's expansion is used only
-where its eight terms reach NV_EPSILON (temme_ok in pgamma_raw()).
+the same fraction evaluated backward from a fixed depth, and Temme's expansion
+is used only where its eight terms reach NV_EPSILON (temme_ok in pgamma_raw()).
 
 Measured against mpmath at mp.dps = 110 over 909 (a, x) pairs, a from 2^-20 to
 1e8 and x from 60 standard deviations below the mean to 60 above, in the four
 forms (P, Q, log P, log Q), and with the error counted in epsilons per unit of
 (1 + |log tail|) -- a tail exp(-f) is good to f epsilons by construction -- the
 worst error is 20 on a double (R's own, and unchanged to the last bit), 8 on a
-long double (it was 5e15) and 39 on a __float128 (it was 3e30). What is left on
-a __float128 is the continued fraction for a < 1 with x between 1 and 3, where
-400 terms each round: 25 to 39 epsilons, where the fraction gave 62 in
-R's own recurrence there. t/incomplete.gamma.beta.mpmath.t keeps a sample of
-the grid, with the values frozen.*/
+long double (it was 5e15) and 39 on a __float128 (it was 3e30). That 39 was the
+continued fraction for a < 1 with x between 1 and 3, 400 terms each rounding;
+evaluated backward since 0.3429 (pg_lower_cf()), it measures 1.7 on either
+width over 384 pairs there, and the worst anywhere is 3.3 on a long double and
+4.1 on a __float128, a from 1e11 to 1e15 included (against mpmath's integral
+of the density). t/incomplete.gamma.beta.mpmath.t keeps a sample of the grid,
+with the values frozen.*/
 static NV bt_bd0(NV x, NV np); //defined with the binomial helpers below
 static NV bt_stirlerr(NV n); //likewise
 static NV nv_log1mexp(NV x); //defined with the count-model helpers below
 static NV c_dnorm(NV x, NV mu, NV sigma, bool give_log); //defined with dnorm()
-static double c_pnorm(double x, double mu, double sigma, bool lower_tail, bool log_p);
+#ifndef LIKER_WIDE_NV
+static double c_pnorm(double x, double mu, double sigma, bool lower_tail, bool log_p); //a double build's only
+#endif
 
 #define PG_SCALE 1.157920892373162e77 //2^256, R's scalefactor
 
@@ -10874,21 +11178,33 @@ R's is Abramowitz and Stegun 6.5.31 in a two-term-at-a-time recurrence whose
 coefficients c3 = i (y - i) are negative, so each step subtracts: it loses two or
 three digits to cancellation by the time it has converged (400 steps at x near
 1), which is invisible on a double and 40 to 60 epsilons of a __float128 in
-Q(1/8, 1). On a LIKER_WIDE_NV build the same fraction is evaluated as the
-Numerical Recipes Lentz iteration (gcf()): 1/(d + a_1/(d + 2 + a_2/(d + 4 + ...)))
-with a_i = -i (i - y), times y, which is that function with no subtraction in the
-recurrence (c and d each stay near the fraction's own size). It is stopped when a
-step is below NV_EPSILON/4, which leaves the error ten times that at worst, where
-x is near 1 and the steps shrink slowest, and 200000 terms at most, as R.*/
+Q(1/8, 1). On a LIKER_WIDE_NV build the same fraction,
+y/(d + a_1/(d + 2 + a_2/(d + 4 + ...))) with a_i = -i (i - y), is evaluated
+backward from a fixed depth instead. Forward evaluation of any kind multiplies
+the result by one rounded factor per term: the Numerical Recipes Lentz iteration
+(gcf()), which 0.3426 used, has no subtraction in its recurrence and still left
+25 to 58 epsilons of a __float128 at a < 1 and x between 1 and 3, the 300 to 400
+terms' roundings adding up (simulated at 113 bits in mpmath: 58 at Q(1/2, 1.3)).
+Backward, t_N = 0 and t_(i-1) = a_i/(d + 2i + t_i), an error made at depth i
+reaches the top shrunk by the same factors that make the fraction converge, so
+the roundings do not accumulate: 0.1 to 1.6 epsilons over the same cases.
+
+The depth is found by running Lentz's iteration first, to the step below
+NV_EPSILON/50 (a tenth of an epsilon left: the steps are a tenth of the error
+where x is near 1 and they shrink slowest), and 20 terms are added to it. Its
+own value is discarded. Rounding in its c and d can keep a step from getting
+that small, so past 5000 terms a step of 4 epsilons is taken: nothing in t/ is
+near it, it only bounds the work, as R's 200000 terms do.*/
 static NV pg_lower_cf(NV y, NV d) {
 #ifdef LIKER_WIDE_NV
 	if (y == 0.0) return 0.0;
 	const NV f0 = y / d;
 	if (nv_fabs(y - 1.0) < nv_fabs(d) * NV_EPSILON) return f0; // includes y < d = Inf
 	const NV tiny = NV_MIN / NV_EPSILON; // Lentz's guard against a zero denominator
-	NV b = d, c = 1.0 / tiny, dd = 1.0 / b, h = dd;
-	for (NV i = 1.0; i < 200000.0; i++) { // NV: i only enters NV arithmetic below
-		const NV an = -i * (i - y);
+	NV b = d, c = 1.0 / tiny, dd = 1.0 / b;
+	NV depth = 1.0; // read after the loop: the term the forward pass converged at
+	for (; depth < 200000.0; depth++) { // NV: the depth only enters NV arithmetic
+		const NV an = -depth * (depth - y);
 		b += 2.0;
 		dd = an * dd + b;
 		if (nv_fabs(dd) < tiny) dd = tiny;
@@ -10896,15 +11212,12 @@ static NV pg_lower_cf(NV y, NV d) {
 		if (nv_fabs(c) < tiny) c = tiny;
 		dd = 1.0 / dd;
 		const NV del = dd * c;
-		h *= del;
-		/*A step below NV_EPSILON/50 leaves about a tenth of an epsilon (the steps
-		are a tenth of the error where x is near 1: 400 terms reach 1e-34 and the
-		step there is 1e-35). Rounding in c and d can keep del - 1 from getting
-		that small, so past 5000 terms a step of 4 epsilons is taken: nothing in
-		t/ is near it, it only bounds the work.*/
-		if (nv_fabs(del - 1.0) < NV_EPSILON * 0.02 || (i > 5000.0 && nv_fabs(del - 1.0) < NV_EPSILON * 4.0)) break;
+		if (nv_fabs(del - 1.0) < NV_EPSILON * 0.02 || (depth > 5000.0 && nv_fabs(del - 1.0) < NV_EPSILON * 4.0)) break;
 	}
-	return y * h;
+	NV t = 0.0;
+	for (NV i = depth + 20.0; i >= 1.0; i--) // NV: i only enters NV arithmetic
+		t = -i * (i - y) / (d + 2.0 * i + t);
+	return y / (d + t);
 #else
 	NV f = 0.0, of, f0, i, c2, c3, c4, a1, b1, a2, b2;
 	if (y == 0.0) return 0.0;
@@ -10993,6 +11306,37 @@ static NV pg_pnorm(NV z, bool lower_tail, bool log_p) {
 	if (w > 0.0) return pg_pnorm_upper(w, log_p);
 	if (log_p) return (w == 0.0) ? nv_log((NV)0.5) : nv_log1p(-pg_pnorm_upper(-w, FALSE));
 	return 0.5 * nv_erfc(w * nv_sqrt((NV)0.5));
+}
+
+/*Newton on the defining equation log Phi(z) = lp at the NV's width, from a z
+<= 0 that is already good to a double: the last step of every lower-tail normal
+quantile on a LIKER_WIDE_NV build.
+
+The step is (log Phi(z) - lp) / (phi(z) / Phi(z)), and the Mills ratio
+Phi(z) / phi(z) is taken as sqrt(pi/2) erfcx(|z|/sqrt(2)), never as
+exp(log Phi(z) - log phi(z)): both logs are about -z^2/2, and their difference
+is what R's qnorm() lost past r = sqrt(-lp) = 36000 (its exp() is of the
+difference of two numbers above 6e8), so qnorm_log_lower() stopped polishing
+there. With the ratio formed directly the residual's rounding is about z^2/2
+epsilons of log Phi, which moves z by about z/2 epsilons of itself: the step
+is good to the NV's epsilon at any z whose square is finite. Past that (lp
+below about -NV_MAX/2) the step is not finite and the start is returned.
+
+From a double's 1e-16 one step reaches a long double's epsilon and two a
+__float128's; the loop stops on a step within two epsilons, and the cap of 8 is
+a guard. Not for the median: near z = 0 log Phi is log(1/2) plus a small
+change, so the residual has lost what normal_quantile_hp()'s series keeps.*/
+static NV qnorm_log_polish(NV z, NV lp) {
+	const NV sqrt_half_pi = nv_sqrt(0.5 * NVK_PI);
+	if (!(z < 0.0) || !nv_isfinite(z) || !nv_isfinite(lp)) return z;
+	for (unsigned short i = 0; i < 8; i++) {
+		const NV lc = pg_pnorm(z, TRUE, TRUE);
+		const NV step = (lc - lp) * sqrt_half_pi * ib_erfcx(-z * nv_sqrt((NV)0.5));
+		if (!nv_isfinite(step)) break;
+		z -= step;
+		if (nv_fabs(step) <= 2.0 * NV_EPSILON * nv_fabs(z)) break;
+	}
+	return z;
 }
 #endif
 
@@ -11112,29 +11456,6 @@ static NV pgamma_raw(NV x, NV alph, bool lower_tail, bool log_p) {
 #else
 	const bool temme_ok = 1;
 #endif
-#ifdef LIKER_WIDE_NV
-	/*For 1 <= x < 3/2 the lower series is summed whatever alph is, where R takes
-	it only for x <= alph - 1: the fraction of branch 2 closes in slowest where x
-	is near 1 and, being a recurrence of 400 terms there, carries the rounding of
-	all of them (39 epsilons of a __float128 at x = 1.01), against the series'
-	30 terms. The lower tail is the series; the upper is 1 - P, which costs P/Q
-	epsilons and so is taken only for P <= 0.8, where it is at most 4 -- for a
-	small alph Q is of the order of alph and it is the fraction's 30 epsilons
-	that are the better of the two.*/
-	if (x >= 1.0 && x < 1.5) {
-		const NV sum = pg_upper_series(x, alph, log_p);
-		const NV d = pg_dpois_wrap(alph, x, log_p);
-		const NV p = log_p ? sum + d : sum * d;
-		if (lower_tail) {
-			/*As a log, P near 1 is a difference of two logs of order 1, which
-			is why p <= log(0.8) is needed for that form too.*/
-			if (log_p ? p <= -0.2 : p >= NV_MIN / NV_EPSILON) return p;
-		} else {
-			const NV pl = log_p ? nv_exp(p) : p;
-			if (pl <= 0.8) return log_p ? nv_log1p(-pl) : 1.0 - pl;
-		}
-	}
-#endif
 	if (x < 1.0) {
 		res = pg_smallx(x, alph, lower_tail, log_p);
 	} else if (x <= alph - 1.0 && (x < 0.8 * (alph + 50.0) || !temme_ok)) {
@@ -11212,9 +11533,12 @@ static NV get_p_value(NV stat, int df) {
 /*The coefficients of the asymptotic series of trigamma, B_2, B_4, ..., B_24
 (Abramowitz and Stegun 6.4.12, values from Table 23.2), and of digamma, B_2k/(2k)
 (6.3.18), as constant expressions so that the compiler folds each quotient and
-no division is paid per call.*/
-static const NV cg_tri_c[12] = {1.0 / 6.0, -1.0 / 30.0, 1.0 / 42.0, -1.0 / 30.0, 5.0 / 66.0, -691.0 / 2730.0, 7.0 / 6.0, -3617.0 / 510.0, 43867.0 / 798.0, -174611.0 / 330.0, 854513.0 / 138.0, -236364091.0 / 2730.0};
-static const NV cg_dig_c[12] = {1.0 / 12.0, -1.0 / 120.0, 1.0 / 252.0, -1.0 / 240.0, 1.0 / 132.0, -691.0 / 32760.0, 1.0 / 12.0, -3617.0 / 8160.0, 43867.0 / 14364.0, -174611.0 / 6600.0, 77683.0 / 276.0, -236364091.0 / 65520.0};
+no division is paid per call. The numerators are cast to NV so that the
+quotient is folded at the NV's width: through 0.3428 they were double literals,
+so 1.0/12.0 was rounded to a double, which left digamma() 3e-22 off on a
+__float128 (about 1e12 of its epsilons; under a long double's at x >= 9).*/
+static const NV cg_tri_c[12] = {(NV)1 / 6, (NV)-1 / 30, (NV)1 / 42, (NV)-1 / 30, (NV)5 / 66, (NV)-691 / 2730, (NV)7 / 6, (NV)-3617 / 510, (NV)43867 / 798, (NV)-174611 / 330, (NV)854513 / 138, (NV)-236364091 / 2730};
+static const NV cg_dig_c[12] = {(NV)1 / 12, (NV)-1 / 120, (NV)1 / 252, (NV)-1 / 240, (NV)1 / 132, (NV)-691 / 32760, (NV)1 / 12, (NV)-3617 / 8160, (NV)43867 / 14364, (NV)-174611 / 6600, (NV)77683 / 276, (NV)-236364091 / 65520};
 
 /*Where the recurrence hands over to the asymptotic series, which is cut
 after B_24: its truncation error relative to the value is about
@@ -20129,7 +20453,11 @@ static void zt_tables(pTHX_ const MfPart *restrict mp, size_t k, size_t np, cons
 Satterthwaite degrees of freedom.
 
 The model is y = X beta + Z b + e, b ~ N(0, sigma^2 Lambda Lambda'),
-e ~ N(0, sigma^2 I).  Lambda is block diagonal: one lower-triangular T_k per
+e ~ N(0, sigma^2 W^-1), W the diagonal of prior weights (I without them); an
+offset is subtracted from y before anything here sees it.  Every cross-product
+below (X'X, Z'Z, Z'X, Z'y and the residual sums of squares) is weighted by W,
+which is the same model as the rows scaled by sqrt(w), and the criteria
+subtract log|W| = sum of log w, as lme4's lmerResp::Laplace() does (d_ldW).  Lambda is block diagonal: one lower-triangular T_k per
 random-effects term, repeated for each level of the term's grouping factor
 (diagonal for `||`).  The free parameters are theta, the lower triangles of
 the T_k in column-major order, exactly lme4's theta.
@@ -20178,7 +20506,9 @@ typedef struct {
 	size_t n, p, nterm, nblock, ntheta;
 	LmmTerm  *term;
 	LmmBlock *block;
-	const NV *X, *y;
+	const NV *X, *y; //y is the response less any offset
+	const NV *w; //prior weights, all positive; NULL when every weight is 1
+	NV        ldW; //sum of log w, which lme4's criterion subtracts (its d_ldW)
 	bool      reml;
 	NV *M, *B, *c, *T, *tmp;//scratch, sized for the largest block
 	/*Everything below depends on the data alone, not on theta, so
@@ -20199,17 +20529,26 @@ from the actual residuals e0, so the terms that cancel are of the size of the
 residuals rather than of y.  Xe0 is zero up to rounding, and d is the shift
 the random effects induce in beta, which is small relative to b0 for a mixed
 model.*/
+static void lmm_prep_into(LmmModel *restrict m, NV *restrict pre);
 static NV *lmm_prep(LmmModel *restrict m) {
+	NV *pre;
+	Newx(pre, m->p * m->p + 3 * m->p + 1, NV);
+	lmm_prep_into(m, pre);
+	return pre;
+}
+/*lmm_prep() into a buffer of p^2 + 3p + 1 NVs the caller already holds, which
+glmer()'s PIRLS refills at every step.*/
+static void lmm_prep_into(LmmModel *restrict m, NV *restrict pre) {
 	const size_t p = m->p;
-	NV *pre, *inv;
+	NV *inv;
 	bool *al;
-	Newxz(pre, p * p + 3 * p + 1, NV);
+	Zero(pre, p * p + 3 * p + 1, NV);
 	m->XtX = pre; m->Xty = pre + p * p; m->b0 = m->Xty + p; m->Xe0 = m->b0 + p;
 	for (size_t i = 0; i < m->n; i++) {
-		const NV *x = m->X + i * p;
+		const NV *x = m->X + i * p, wi = m->w ? m->w[i] : 1.0;
 		for (size_t j = 0; j < p; j++) {
-			m->Xty[j] += x[j] * m->y[i];
-			for (size_t l = 0; l < p; l++) m->XtX[j * p + l] += x[j] * x[l];
+			m->Xty[j] += wi * x[j] * m->y[i];
+			for (size_t l = 0; l < p; l++) m->XtX[j * p + l] += wi * x[j] * x[l];
 		}
 	}
 	Newx(inv, p ? p * p : 1, NV); Newx(al, p ? p : 1, bool);
@@ -20222,13 +20561,13 @@ static NV *lmm_prep(LmmModel *restrict m) {
 	}
 	m->ee0 = 0.0;
 	for (size_t i = 0; i < m->n; i++) {
+		const NV wi = m->w ? m->w[i] : 1.0;
 		NV e = m->y[i];
 		for (size_t j = 0; j < p; j++) e -= m->X[i * p + j] * m->b0[j];
-		m->ee0 += e * e;
-		for (size_t j = 0; j < p; j++) m->Xe0[j] += m->X[i * p + j] * e;
+		m->ee0 += wi * e * e;
+		for (size_t j = 0; j < p; j++) m->Xe0[j] += wi * m->X[i * p + j] * e;
 	}
 	Safefree(inv); Safefree(al);
-	return pre;
 }
 
 //T_k from theta, as a q x q lower-triangular row-major matrix.
@@ -20376,7 +20715,7 @@ static bool lmm_eval(LmmModel *restrict m, const NV *restrict theta, NV *restric
 			for (size_t i = 0; i < m->n; i++) {
 				NV e = m->y[i];
 				for (j = 0; j < p; j++) e -= m->X[i * p + j] * beta[j];
-				ee += e * e;
+				ee += (m->w ? m->w[i] : 1.0) * e * e;
 			}
 		} else {
  //criterion evaluations: O(p^2), see lmm_prep()
@@ -20437,10 +20776,10 @@ static NV lmm_crit(LmmModel *restrict m, const NV *restrict theta) {
 			for (size_t a = 0; a < q; a++) for (size_t b = 0; b < q; b++) C[a * q + b] = XtVX[idx[a] * p + idx[b]];
 			if (!lmm_chol(C, q)) ldx = NV_INF;
 			else for (size_t a = 0; a < q; a++) ldx += 2.0 * nv_log(C[a * q + a]);
-			crit = ld + ldx + (nn - (NV)rank) * (1.0 + nv_log(2.0 * NV_PI * r2 / (nn - (NV)rank)));
+			crit = ld + ldx + (nn - (NV)rank) * (1.0 + nv_log(2.0 * NV_PI * r2 / (nn - (NV)rank))) - m->ldW;
 			Safefree(C); Safefree(idx);
 		} else {
-			crit = ld + nn * (1.0 + nv_log(2.0 * NV_PI * r2 / nn));
+			crit = ld + nn * (1.0 + nv_log(2.0 * NV_PI * r2 / nn)) - m->ldW;
 		}
 	}
 	Safefree(XtVX); Safefree(Xa); Safefree(beta); Safefree(al);
@@ -20457,7 +20796,7 @@ static NV lmm_dev_vp(LmmModel *restrict m, const NV *restrict theta, NV sigma) {
 	Newx(beta, p ? p : 1, NV); Newx(al, p ? p : 1, bool);
 	if (!lmm_eval(m, theta, XtVX, Xa, beta, al, &r2, &ld, NULL)) dev = NV_INF;
 	else {
-		dev = ld + r2 / s2 + nn * nv_log(2.0 * NV_PI * s2);
+		dev = ld + r2 / s2 + nn * nv_log(2.0 * NV_PI * s2) - m->ldW;
 		if (m->reml) {
 			NV *C, ldx = 0.0;
 			size_t q = 0, *idx;
@@ -20474,20 +20813,22 @@ static NV lmm_dev_vp(LmmModel *restrict m, const NV *restrict theta, NV sigma) {
 	return dev;
 }
 
-/*Nelder-Mead on lmm_crit() (standard coefficients 1, 2, 0.5, 0.5), from x,
-with an initial step of 0.25 in each coordinate -- lme4's own start has every
-theta entry at 1 or 0, so a quarter of that is a sensible first reach.  Stops
-when the simplex's criterion values span less than 1e-10, or after 20000
-evaluations.*/
-static void lmm_nelder_mead(LmmModel *restrict m, NV *restrict x, size_t d) {
+/*Nelder-Mead on f (standard coefficients 1, 2, 0.5, 0.5), from x, with an
+initial step of step0[j] in coordinate j, or 0.25 in each when step0 is NULL --
+lme4's own start has every theta entry at 1 or 0, so a quarter of that is a
+sensible first reach.  Stops when the simplex's criterion values span less
+than 1e-10, or after 20000 evaluations.  m and ctx go to f, so neither is
+restrict.*/
+typedef NV (*lmm_fn)(LmmModel *, const NV *, void *);
+static void lmm_nm(LmmModel *m, lmm_fn f, void *ctx, NV *restrict x, size_t d, const NV *restrict step0) {
 	size_t i, j, np = d + 1, evals = 0;
 	NV *P, *F, *cen, *xr, *xe, *xc;
 	Newx(P, np * d, NV); Newx(F, np, NV); Newx(cen, d, NV);
 	Newx(xr, d, NV); Newx(xe, d, NV); Newx(xc, d, NV);
 	for (i = 0; i < np; i++) {
 		for (j = 0; j < d; j++) P[i * d + j] = x[j];
-		if (i > 0) P[i * d + (i - 1)] += 0.25;
-		F[i] = lmm_crit(m, P + i * d); evals++;
+		if (i > 0) P[i * d + (i - 1)] += step0 ? step0[i - 1] : 0.25;
+		F[i] = f(m, P + i * d, ctx); evals++;
 	}
 	while (evals < 20000) {
 		size_t hi = 0, lo = 0, nh = 0;
@@ -20502,10 +20843,10 @@ static void lmm_nelder_mead(LmmModel *restrict m, NV *restrict x, size_t d) {
 			cen[j] = s / (NV)d;
 		}
 		for (j = 0; j < d; j++) xr[j] = cen[j] + (cen[j] - P[hi * d + j]);
-		fr = lmm_crit(m, xr); evals++;
+		fr = f(m, xr, ctx); evals++;
 		if (fr < F[lo]) {
 			for (j = 0; j < d; j++) xe[j] = cen[j] + 2.0 * (cen[j] - P[hi * d + j]);
-			fe = lmm_crit(m, xe); evals++;
+			fe = f(m, xe, ctx); evals++;
 			if (fe < fr) { memcpy(P + hi * d, xe, d * sizeof(NV)); F[hi] = fe; }
 			else { memcpy(P + hi * d, xr, d * sizeof(NV)); F[hi] = fr; }
 		} else if (fr < F[nh]) {
@@ -20514,13 +20855,13 @@ static void lmm_nelder_mead(LmmModel *restrict m, NV *restrict x, size_t d) {
 			bool outside = fr < F[hi];
 			for (j = 0; j < d; j++)
 				xc[j] = outside ? cen[j] + 0.5 * (xr[j] - cen[j]) : cen[j] + 0.5 * (P[hi * d + j] - cen[j]);
-			fc = lmm_crit(m, xc); evals++;
+			fc = f(m, xc, ctx); evals++;
 			if (fc < (outside ? fr : F[hi])) { memcpy(P + hi * d, xc, d * sizeof(NV)); F[hi] = fc; }
 			else {
 				for (i = 0; i < np; i++) {
 					if (i == lo) continue;
 					for (j = 0; j < d; j++) P[i * d + j] = P[lo * d + j] + 0.5 * (P[i * d + j] - P[lo * d + j]);
-					F[i] = lmm_crit(m, P + i * d); evals++;
+					F[i] = f(m, P + i * d, ctx); evals++;
 				}
 			}
 		}
@@ -20532,19 +20873,32 @@ static void lmm_nelder_mead(LmmModel *restrict m, NV *restrict x, size_t d) {
 	}
 	Safefree(P); Safefree(F); Safefree(cen); Safefree(xr); Safefree(xe); Safefree(xc);
 }
+static NV lmm_crit_fn(LmmModel *m, const NV *x, void *ctx) { PERL_UNUSED_VAR(ctx); return lmm_crit(m, x); }
+static void lmm_nelder_mead(LmmModel *restrict m, NV *restrict x, size_t d) {
+	lmm_nm(m, lmm_crit_fn, NULL, x, d, NULL);
+}
 
 /*Richardson-extrapolated central differences of a function of d variables:
 the gradient and Hessian from steps h and h/2, (4 D(h/2) - D(h)) / 3, which
 cancels the h^2 error term.  h is 1e-3 times each coordinate's size (or
 1e-3 when it is near 0); on the test corpora the extrapolated Hessian agrees
-with a 1e-4 step's to better than 1e-9.*/
-typedef NV (*lmm_fn)(LmmModel *, const NV *, void *);
+with a 1e-4 step's to better than 1e-9.
+
+With hmin (glmer(); lmer() passes NULL), coordinate a's h is instead the
+larger of 1e-3 |x_a| and hmin[a].  The rule above gives a coordinate just
+past 1e-3 a step of 1e-6: on epil's random-slope Poisson fit a theta entry of
+0.0059 then had a step of 6e-6, where the deviance's rounding, divided by h^2,
+moved the standard errors in their fourth digit.*/
 // m and ctx are handed to the callback, so neither is restrict.
-static void lmm_fd(LmmModel *m, lmm_fn f, void *ctx, const NV *restrict x, size_t d, NV *restrict g, NV *restrict H) {
+static NV lmm_fd_step(const NV *restrict x, const NV *restrict hmin, size_t a) {
+	if (!hmin) return 1e-3 * (nv_fabs(x[a]) > 1e-3 ? nv_fabs(x[a]) : 1.0);
+	return (1e-3 * nv_fabs(x[a]) > hmin[a]) ? 1e-3 * nv_fabs(x[a]) : hmin[a];
+}
+static void lmm_fd_h(LmmModel *m, lmm_fn f, void *ctx, const NV *restrict x, size_t d, NV *restrict g, NV *restrict H, const NV *restrict hmin) {
 	NV *xp, f0 = f(m, x, ctx);
 	Newx(xp, d ? d : 1, NV);
 	for (size_t a = 0; a < d; a++) {
-		NV ha = 1e-3 * (nv_fabs(x[a]) > 1e-3 ? nv_fabs(x[a]) : 1.0);
+		NV ha = lmm_fd_step(x, hmin, a);
 		NV gd[2], hd[2];
 		for (unsigned short r = 0; r < 2; r++) {
 			NV h = r ? ha / 2.0 : ha, fp, fm;
@@ -20558,7 +20912,7 @@ static void lmm_fd(LmmModel *m, lmm_fn f, void *ctx, const NV *restrict x, size_
 		if (H) H[a * d + a] = (4.0 * hd[1] - hd[0]) / 3.0;
 		if (H)
 			for (size_t b = 0; b < a; b++) {
-				NV hb = 1e-3 * (nv_fabs(x[b]) > 1e-3 ? nv_fabs(x[b]) : 1.0);
+				NV hb = lmm_fd_step(x, hmin, b);
 				NV md[2];
 				for (unsigned short r = 0; r < 2; r++) {
 					NV h1 = r ? ha / 2.0 : ha, h2 = r ? hb / 2.0 : hb, fpp, fpm, fmp, fmm;
@@ -20574,22 +20928,24 @@ static void lmm_fd(LmmModel *m, lmm_fn f, void *ctx, const NV *restrict x, size_
 	}
 	Safefree(xp);
 }
-static NV lmm_crit_fn(LmmModel *m, const NV *x, void *ctx) { PERL_UNUSED_VAR(ctx); return lmm_crit(m, x); }
+static void lmm_fd(LmmModel *m, lmm_fn f, void *ctx, const NV *restrict x, size_t d, NV *restrict g, NV *restrict H) {
+	lmm_fd_h(m, f, ctx, x, d, g, H, NULL);
+}
 
-/*Newton-Raphson polish of theta on lmm_crit(), Levenberg-Marquardt damped
+/*Newton-Raphson polish of x on f (lmm_crit() for lmer()), Levenberg-Marquardt damped
 where the finite-difference Hessian is not positive definite, with step
 halving.  Stops once a full undamped step moves no coordinate by more than
 1e-10 of its size (plus 1e-10), within 50 steps; on the test corpora it
 takes 2 to 5 after Nelder-Mead.*/
-static bool lmm_newton(LmmModel *restrict m, NV *restrict x, size_t d) {
-	NV *g, *H, *A, *s, *xt, f0 = lmm_crit(m, x);
+static bool lmm_newton_fn(LmmModel *m, lmm_fn f, void *ctx, NV *restrict x, size_t d, const NV *restrict hmin) {
+	NV *g, *H, *A, *s, *xt, f0 = f(m, x, ctx);
 	bool conv = 0;
 	Newx(g, d, NV); Newx(H, d * d, NV); Newx(A, d * d, NV); Newx(s, d, NV); Newx(xt, d, NV);
 	for (unsigned short it = 0; it < 50; it++) {
 		NV lambda = 0.0, f1 = 0.0, big = 0.0;
 		bool damped = 0;
 		unsigned short half;
-		lmm_fd(m, lmm_crit_fn, NULL, x, d, g, H);
+		lmm_fd_h(m, f, ctx, x, d, g, H, hmin);
 		for (unsigned short tries = 0; tries < 40; tries++) {
 			for (size_t a = 0; a < d * d; a++) A[a] = H[a];
 			for (size_t a = 0; a < d; a++) A[a * d + a] += lambda * (nv_fabs(H[a * d + a]) + 1e-12);
@@ -20601,7 +20957,7 @@ static bool lmm_newton(LmmModel *restrict m, NV *restrict x, size_t d) {
 		lmm_cholsolve(A, d, s, 1);
 		for (half = 0; half < 40; half++) {
 			for (size_t a = 0; a < d; a++) xt[a] = x[a] + s[a];
-			f1 = lmm_crit(m, xt);
+			f1 = f(m, xt, ctx);
 			if (f1 <= f0 + 1e-12 * (nv_fabs(f0) + 1.0)) break;
 			for (size_t a = 0; a < d; a++) s[a] *= 0.5;
 		}
@@ -20620,7 +20976,7 @@ static bool lmm_newton(LmmModel *restrict m, NV *restrict x, size_t d) {
 	level of the criterion's own rounding.*/
 	if (!conv) {
 		NV gmax = 0.0;
-		lmm_fd(m, lmm_crit_fn, NULL, x, d, g, NULL);
+		lmm_fd_h(m, f, ctx, x, d, g, NULL, hmin);
 		for (size_t a = 0; a < d; a++) {
 			NV v = nv_fabs(g[a]) * (1.0 + nv_fabs(x[a]));
 			if (v > gmax) gmax = v;
@@ -20629,6 +20985,9 @@ static bool lmm_newton(LmmModel *restrict m, NV *restrict x, size_t d) {
 	}
 	Safefree(g); Safefree(H); Safefree(A); Safefree(s); Safefree(xt);
 	return conv;
+}
+static bool lmm_newton(LmmModel *restrict m, NV *restrict x, size_t d) {
+	return lmm_newton_fn(m, lmm_crit_fn, NULL, x, d, NULL);
 }
 
 //lmm_dev_vp() over varpar = (theta, sigma), for lmm_fd().
@@ -20652,6 +21011,974 @@ static NV lmm_vcov_fn(LmmModel *m, const NV *vp, void *ctx) {
 	}
 	Safefree(XtVX); Safefree(Xa); Safefree(beta); Safefree(al);
 	return out;
+}
+
+/*The data side of a mixed model, shared by lmer() and glmer(): the formula
+split into its fixed part and its random-effects terms, the rows read, and
+lme4's identifiability checks made.  Every allocation is on the save stack.*/
+#define LMM_MAX_RE 64 //random-effects terms in one formula; the arrays below are sized by it
+#define LMM_SINGULAR_TOL 1e-4 //lme4 2.0-6 getSingTol() (R/utilities.R): a theta below it in size is a "singular fit"
+typedef struct {
+	MfRows   R;
+	MfPart   PF; //the fixed part
+	MfPart   PR[LMM_MAX_RE]; //each random-effects term's columns
+	size_t   nre; //random-effects terms
+	char    *re_expr[LMM_MAX_RE], *re_group[LMM_MAX_RE];
+	bool     re_diag[LMM_MAX_RE]; //`||`: uncorrelated
+	size_t   n, p, nlev_tot; //rows kept, fixed columns, levels over every term
+	NV      *X, *Y; //n x p fixed design; the response, offset not subtracted
+	NV      *OFF; //each row's offset, 0 without one
+	NV      *WT; //prior weights, all positive; NULL without them
+	NV       ldW; //sum of log WT
+	NV     **ZR; //per term: n x PR[k].p random design
+	size_t **LV, *NL; //per term: each row's level 0 .. NL[k] - 1, and the level count
+	char   **names; //each kept row's name
+} LmmFrame;
+
+/*Read formula and data into f.  allow_n is lme4's allow.n, TRUE for a model
+with no scale parameter (glmer's binomial, Poisson and negative binomial):
+then a grouping factor may have a level per row, and a term as many random
+effects as there are rows, as glFormula() allows them.*/
+static void lmm_frame(pTHX_ const char *restrict fname, const char *restrict formula, SV *data_sv,
+                      SV *offset_sv, SV *weights_sv, bool allow_n, LmmFrame *restrict f) {
+	char *fixed_f;
+	size_t nre = 0, n = 0, p, nlev_tot = 0;
+	GlmVarSpec off_spec, w_spec;
+	NV *OFF, *WT = NULL, ldW = 0.0;
+	char *re_expr[LMM_MAX_RE], *re_group[LMM_MAX_RE];
+	bool re_diag[LMM_MAX_RE];
+	MfRows R;
+	MfPart PF, PR[LMM_MAX_RE];
+	NV *X, *Y, **ZR;
+	size_t **LV, *NL;
+	char **names;
+	/*Split the right-hand side into its top-level terms and take out the
+	parenthesised ones with a bar in them.*/
+	{
+		char *f = savepv(formula), *tilde, *rhs, *q, *fixed, *d;
+		size_t cap;
+		SAVEFREEPV(f);
+		{ char *s = f, *t = f; while (*s) { if (!isspace((unsigned char)*s)) *t++ = *s; s++; } *t = '\0'; }
+		tilde = strchr(f, '~');
+		if (!tilde) croak("%s: invalid formula, missing '~'", fname);
+		rhs = tilde + 1;
+		cap = strlen(f) + 8;
+		Newx(fixed, cap, char); SAVEFREEPV(fixed);
+		memcpy(fixed, f, (size_t)(tilde - f) + 1); fixed[tilde - f + 1] = '\0';
+		d = fixed + strlen(fixed);
+		q = rhs;
+		while (*q) {
+			char *start = q, *end;
+			int depth = 0;
+			char sign = '+';
+			if (*q == '+' || *q == '-') { sign = *q; q++; start = q; }
+			for (end = q; *end; end++) {
+				if (*end == '(') depth++;
+				else if (*end == ')') depth--;
+				else if ((*end == '+' || *end == '-') && depth == 0) break;
+			}
+			if (*start == '(' && end > start && end[-1] == ')' && sign == '+') {
+				// is there a bar at depth 1?
+				char *bar = NULL;
+				int dd = 0;
+				for (char *s = start; s < end; s++) {
+					if (*s == '(') dd++;
+					else if (*s == ')') dd--;
+					else if (*s == '|' && dd == 1) { bar = s; break; }
+				}
+				if (bar) {
+					bool dbl = bar[1] == '|';
+					char *ex = savepvn(start + 1, (STRLEN)(bar - start - 1));
+					char *gr = savepvn(bar + (dbl ? 2 : 1), (STRLEN)(end - 1 - (bar + (dbl ? 2 : 1))));
+					char *slash;
+					SAVEFREEPV(ex); SAVEFREEPV(gr);
+					if (!*gr) croak("%s: a random-effects term needs a grouping factor after '|'", fname);
+					slash = strchr(gr, '/');
+					if (slash) {
+						/*(e | a/b/c) is (e | a) + (e | a:b) + (e | a:b:c): one
+						term per cumulative prefix, as lme4 expands it.  The
+						prefix ending before each '/' gets its inner '/'s turned
+						into ':'; the last prefix is the whole of gr.*/
+						char *all = savepv(gr);
+						SAVEFREEPV(all);
+						for (char *s = all; *s; s++) if (*s == '/') *s = ':';
+						while (TRUE) {
+							const size_t len = slash ? (size_t)(slash - gr) : strlen(gr);
+							char *pre = savepvn(all, (STRLEN)len);
+							SAVEFREEPV(pre);
+							if (!*pre || (slash && !slash[1])) croak("%s: empty grouping factor in a nesting '/'", fname);
+							if (nre + 1 > LMM_MAX_RE) croak("%s: at most %u random-effects terms", fname, (unsigned)LMM_MAX_RE);
+							re_expr[nre] = ex; re_group[nre] = pre; re_diag[nre] = dbl; nre++;
+							if (!slash) break;
+							slash = strchr(slash + 1, '/');
+							if (!slash) {  // the final prefix is all of gr
+								if (nre + 1 > LMM_MAX_RE) croak("%s: at most %u random-effects terms", fname, (unsigned)LMM_MAX_RE);
+								re_expr[nre] = ex; re_group[nre] = all; re_diag[nre] = dbl; nre++;
+								break;
+							}
+						}
+					} else {
+						if (nre + 1 > LMM_MAX_RE) croak("%s: at most %u random-effects terms", fname, (unsigned)LMM_MAX_RE);
+						re_expr[nre] = ex; re_group[nre] = gr; re_diag[nre] = dbl; nre++;
+					}
+					q = end;
+					continue;
+				}
+			}
+			// a fixed term: copy it through with its sign
+			if (d > fixed + (tilde - f) + 1 || sign == '-') *d++ = sign;
+			memcpy(d, start, (size_t)(end - start)); d += end - start; *d = '\0';
+			q = end;
+		}
+		if (nre == 0) croak("%s: no random-effects terms in the formula; use %s()", fname, strEQ(fname, "lmer") ? "lm" : "glm");
+		if (d == fixed + (tilde - f) + 1) { *d++ = '1'; *d = '\0'; }
+		fixed_f = fixed;
+	}
+	mf_rows(aTHX_ fname, data_sv, &R);
+	glm_var_spec(aTHX_ fname, "offset",  offset_sv,  R.ordered, R.n, &off_spec);
+	glm_var_spec(aTHX_ fname, "weights", weights_sv, R.ordered, R.n, &w_spec);
+	R.req[R.nreq++] = &off_spec; R.req[R.nreq++] = &w_spec; //see zerotrunc()
+	{
+		HV *xlev = (HV *)sv_2mortal((SV *)newHV());
+		mf_part(aTHX_ fname, fixed_f, &R, FALSE, xlev, &PF);
+		for (size_t k = 0; k < nre; k++) {
+			char *rf;
+			Newx(rf, strlen(PF.lhs) + strlen(re_expr[k]) + 4, char); SAVEFREEPV(rf);
+			sprintf(rf, "%s~%s", PF.lhs, re_expr[k][0] ? re_expr[k] : "1");
+			mf_part(aTHX_ fname, rf, &R, FALSE, xlev, &PR[k]);
+			if (PR[k].p == 0) croak("%s: random-effects term %u has no columns", fname, (unsigned)(k + 1));
+		}
+	}
+	p = PF.p;
+	Newx(X, (R.n ? R.n : 1) * (p ? p : 1), NV); SAVEFREEPV(X);
+	Newx(Y, R.n ? R.n : 1, NV); SAVEFREEPV(Y);
+	Newx(OFF, R.n ? R.n : 1, NV); SAVEFREEPV(OFF);
+	if (w_spec.col || w_spec.av) { Newx(WT, R.n ? R.n : 1, NV); SAVEFREEPV(WT); }
+	Newx(names, R.n ? R.n : 1, char *); SAVEFREEPV(names);
+	Newx(ZR, nre, NV *); SAVEFREEPV(ZR);
+	Newx(LV, nre, size_t *); SAVEFREEPV(LV);
+	Newxz(NL, nre, size_t); SAVEFREEPV(NL);
+	{
+		HV *maps[LMM_MAX_RE];
+		for (size_t k = 0; k < nre; k++) {
+			Newx(ZR[k], (R.n ? R.n : 1) * PR[k].p, NV); SAVEFREEPV(ZR[k]);
+			Newx(LV[k], R.n ? R.n : 1, size_t); SAVEFREEPV(LV[k]);
+			maps[k] = (HV *)sv_2mortal((SV *)newHV());
+		}
+		for (size_t i = 0; i < R.n; i++) {
+			NV y = evaluate_term(aTHX_ R.data_hoa, R.row_hashes, (unsigned)i, PF.lhs), off = 0.0, wt = 1.0;
+			bool ok = !nv_isnan(y);
+			size_t lv[LMM_MAX_RE];
+			if (ok && !mf_row(aTHX_ &PF, &R, i, X + n * p, &off)) ok = FALSE;
+			if (ok && (off_spec.col || off_spec.av)) {
+				const NV o2 = glm_var_num(aTHX_ &off_spec, R.data_hoa, R.row_hashes, i);
+				if (nv_isnan(o2)) ok = FALSE;
+				off += o2;
+			}
+			if (ok && WT) {
+				wt = glm_var_num(aTHX_ &w_spec, R.data_hoa, R.row_hashes, i);
+				if (nv_isnan(wt)) ok = FALSE;
+				else if (wt < 0.0 || !nv_isfinite(wt)) croak("%s: weights must be finite and non-negative", fname);
+				/*A zero weight drops the row, as glm() does: lme4 keeps it,
+				and its criterion subtracts log 0 and is infinite.*/
+				else if (wt == 0.0) ok = FALSE;
+			}
+			for (size_t k = 0; ok && k < nre; k++) {
+				char *g = re_group[k], *part, *e, buf[4096];
+				size_t len = 0;
+				if (!mf_row(aTHX_ &PR[k], &R, i, ZR[k] + n * PR[k].p, NULL)) { ok = FALSE; break; }
+				// the grouping factor's label, a:b joined
+				part = g;
+				while (ok && part) {
+					char *s, save = 0;
+					e = strchr(part, ':');
+					if (e) { save = *e; *e = '\0'; }
+					s = get_data_string_alloc(aTHX_ R.data_hoa, R.row_hashes, i, part);
+					if (e) *e = save;
+					if (!s) { ok = FALSE; break; }
+					if (len + strlen(s) + 2 > sizeof buf) { Safefree(s); croak("%s: grouping label too long", fname); }
+					if (len) buf[len++] = '\x1f';
+					memcpy(buf + len, s, strlen(s)); len += strlen(s);
+					Safefree(s);
+					part = e ? e + 1 : NULL;
+				}
+				if (!ok) break;
+				{
+					SV **hit = hv_fetch(maps[k], buf, (I32)len, 0);
+					if (hit) lv[k] = (size_t)SvUV(*hit);
+					else { lv[k] = NL[k]; hv_store(maps[k], buf, (I32)len, newSVuv((UV)NL[k]), 0); NL[k]++; }
+				}
+			}
+			if (!ok) continue;
+			for (size_t k = 0; k < nre; k++) LV[k][n] = lv[k];
+			Y[n] = y; OFF[n] = off; names[n] = R.row_names[i];
+			if (WT) { WT[n] = wt; ldW += nv_log(wt); }
+			n++;
+		}
+		// dense renumbering: levels of rows that were dropped leave gaps
+		for (size_t k = 0; k < nre; k++) {
+			size_t *scratch;
+			Newx(scratch, NL[k] ? NL[k] : 1, size_t);
+			NL[k] = glm_reindex(LV[k], n, NL[k], scratch);
+			Safefree(scratch);
+			nlev_tot += NL[k];
+		}
+	}
+	if (n <= p) croak("%s: not enough complete observations", fname);
+	/*lme4's checkNlevels() and checkZdims(), at lmerControl()'s defaults
+	(check.nlev.gtr.1, check.nobs.vs.nlev and check.nobs.vs.nRE all "stop"),
+	in its order and with its messages, on the levels the kept rows use.  A
+	factor with one level is confounded with the intercept, and one with a
+	level per row with the residual; either used to be fitted and reported as
+	converged.  An uncorrelated (x || g) term is one term per column in lme4,
+	so its random effects are counted per column.*/
+	for (size_t k = 0; k < nre; k++)
+		if (NL[k] < 2) croak("%s: grouping factors must have > 1 sampled level", fname);
+	{
+		SV *bad = NULL;
+		for (size_t k = 0; k < nre; k++) {
+			bool seen = FALSE;
+			if (NL[k] < n || (allow_n && NL[k] == n)) continue; //lme4's checkNlevels(allow.n)
+			for (size_t k2 = 0; k2 < k; k2++)
+				if (strEQ(re_group[k2], re_group[k])) { seen = TRUE; break; }
+			if (seen) continue;
+			if (!bad) bad = sv_2mortal(newSVpv(re_group[k], 0));
+			else sv_catpvf(bad, ", %s", re_group[k]);
+		}
+		if (bad)
+			croak("%s: number of levels of each grouping factor must be %s number of observations (problems: %s)",
+			      fname, allow_n ? "<=" : "<", SvPV_nolen(bad));
+	}
+	for (size_t k = 0; k < nre; k++) {
+		size_t q = NL[k] * (re_diag[k] ? 1 : PR[k].p);
+		if (allow_n ? n < q : n <= q) //lme4's checkZdims(allow.n), messages and all
+			croak("%s: number of observations (=%" UVuf ") %s number of random effects (=%" UVuf ") for term (%s | %s); "
+			      "the random-effects parameters%s are probably unidentifiable",
+			      fname, (UV)n, allow_n ? "<" : "<=", (UV)q, re_expr[k][0] ? re_expr[k] : "1", re_group[k],
+			      allow_n ? "" : " and the residual variance (or scale parameter)");
+	}
+
+	f->R = R; f->R.nreq = 0; //R.req pointed at this function's own specs, which mf_part() has done with
+	f->PF = PF;
+	for (size_t k = 0; k < nre; k++) {
+		f->PR[k] = PR[k];
+		f->re_expr[k] = re_expr[k]; f->re_group[k] = re_group[k]; f->re_diag[k] = re_diag[k];
+	}
+	f->nre = nre; f->n = n; f->p = p; f->nlev_tot = nlev_tot;
+	f->X = X; f->Y = Y; f->OFF = OFF; f->WT = WT; f->ldW = ldW;
+	f->ZR = ZR; f->LV = LV; f->NL = NL; f->names = names;
+}
+
+/*The block structure of M for a frame: terms in lme4's order, theta's layout,
+and each block's Z'Z, Z'X and Z'y allocated, zero, for lmm_fill(); the scratch
+the evaluations need; *single is TRUE when one grouping factor serves every
+term, so that M is block diagonal by its levels, and toff[k] is term k's first
+random effect in the one dense block otherwise.  max_q caps the random
+effects of that dense block, and timing is the measured time the caller's
+message quotes; each caller states how they were measured.*/
+static void lmm_layout(pTHX_ const char *restrict fname, const LmmFrame *restrict f, LmmModel *restrict mm,
+                       size_t max_q, const char *restrict timing,
+                       size_t **restrict order_out, size_t **restrict toff_out, bool *restrict single_out) {
+	const size_t nre = f->nre, p = f->p, nlev_tot = f->nlev_tot;
+	const size_t *NL = f->NL;
+	const MfPart *PR = f->PR;
+	const bool *re_diag = f->re_diag;
+	char *const *re_group = f->re_group;
+	LmmTerm *terms;
+	size_t *order, *toff, ntheta = 0, maxblock = 0;
+	bool single = TRUE;
+	Newxz(toff, nre, size_t); SAVEFREEPV(toff);
+	/*lme4 orders the terms by decreasing number of levels (stably); theta
+	follows that order*/
+	Newx(order, nre, size_t); SAVEFREEPV(order);
+	for (size_t k = 0; k < nre; k++) order[k] = k;
+	for (size_t a = 1; a < nre; a++)
+		for (size_t b2 = a; b2 > 0 && NL[order[b2]] > NL[order[b2 - 1]]; b2--) {
+			size_t t = order[b2]; order[b2] = order[b2 - 1]; order[b2 - 1] = t;
+		}
+	Newxz(terms, nre, LmmTerm); SAVEFREEPV(terms);
+	for (size_t oi = 0; oi < nre; oi++) {
+		size_t k = order[oi];
+		terms[k].q = PR[k].p;
+		terms[k].diag = re_diag[k];
+		terms[k].off = ntheta;
+		ntheta += re_diag[k] ? PR[k].p : PR[k].p * (PR[k].p + 1) / 2;
+	}
+	mm->term = terms; mm->ntheta = ntheta;
+	/*one grouping factor for every term means the same levels for every
+	term, which makes M block diagonal by level*/
+	for (size_t k = 1; k < nre; k++) if (strNE(re_group[k], re_group[0])) single = FALSE;
+	if (single) {
+		size_t qtot = 0, m = NL[0];
+		for (size_t k = 0; k < nre; k++) qtot += PR[k].p;
+		mm->nblock = m;
+		Newxz(mm->block, m, LmmBlock); SAVEFREEPV(mm->block);
+		for (size_t lv = 0; lv < m; lv++) {
+			LmmBlock *b = &mm->block[lv];
+			size_t off = 0;
+			b->size = qtot; b->nsub = nre;
+			Newx(b->sub_off, nre, size_t); SAVEFREEPV(b->sub_off);
+			Newx(b->sub_term, nre, size_t); SAVEFREEPV(b->sub_term);
+			for (size_t oi = 0; oi < nre; oi++) {
+				size_t k = order[oi];
+				b->sub_off[oi] = off; b->sub_term[oi] = k; off += PR[k].p;
+			}
+			Newxz(b->ZtZ, qtot * qtot, NV); SAVEFREEPV(b->ZtZ);
+			Newxz(b->ZtX, qtot * (p ? p : 1), NV); SAVEFREEPV(b->ZtX);
+			Newxz(b->Zty, qtot, NV); SAVEFREEPV(b->Zty);
+		}
+		maxblock = qtot;
+	} else {
+		/*one dense block over every random effect: term by term, level
+		by level*/
+		size_t Q = 0;
+		LmmBlock *b;
+		for (size_t oi = 0; oi < nre; oi++) { size_t k = order[oi]; toff[k] = Q; Q += NL[k] * PR[k].p; }
+		/*The dense method holds two Q x Q matrices (ZtZ and M) and
+		factors M in O(Q^3) time, once per evaluation in lmer() and at every
+		PIRLS step of every evaluation in glmer(); max_q and timing are the
+		caller's.*/
+		if (Q > max_q)
+			croak("%s: %" UVuf " random effects over more than one grouping factor is more than the dense method "
+			      "takes (at most %" UVuf "; its time grows as the cube of that number, and %s); "
+			      "use a single grouping factor, whose levels are fitted one at a time, or fewer levels",
+			      fname, (UV)Q, (UV)max_q, timing);
+		mm->nblock = 1;
+		Newxz(mm->block, 1, LmmBlock); SAVEFREEPV(mm->block);
+		b = &mm->block[0];
+		b->size = Q; b->nsub = nlev_tot;
+		Newx(b->sub_off, nlev_tot, size_t); SAVEFREEPV(b->sub_off);
+		Newx(b->sub_term, nlev_tot, size_t); SAVEFREEPV(b->sub_term);
+		{
+			size_t sb = 0;
+			for (size_t oi = 0; oi < nre; oi++) {
+				size_t k = order[oi];
+				for (size_t lv = 0; lv < NL[k]; lv++) { b->sub_off[sb] = toff[k] + lv * PR[k].p; b->sub_term[sb] = k; sb++; }
+			}
+		}
+		Newxz(b->ZtZ, Q * Q, NV); SAVEFREEPV(b->ZtZ);
+		Newxz(b->ZtX, Q * (p ? p : 1), NV); SAVEFREEPV(b->ZtX);
+		Newxz(b->Zty, Q, NV); SAVEFREEPV(b->Zty);
+		maxblock = Q;
+	}
+	Newx(mm->M, maxblock * maxblock, NV); SAVEFREEPV(mm->M);
+	Newx(mm->B, maxblock * (p ? p : 1), NV); SAVEFREEPV(mm->B);
+	Newx(mm->c, maxblock, NV); SAVEFREEPV(mm->c);
+	{
+		size_t qmax = 1;
+		for (size_t k = 0; k < nre; k++) if (PR[k].p > qmax) qmax = PR[k].p;
+		Newx(mm->T, qmax * qmax, NV); SAVEFREEPV(mm->T);
+		Newx(mm->tmp, qmax, NV); SAVEFREEPV(mm->tmp);
+	}
+	*order_out = order; *toff_out = toff; *single_out = single;
+}
+
+/*Z'WZ, Z'WX and Z'Wy into every block of mm, for weights w (NULL for all 1)
+and response y: lmer() calls it once, with the prior weights and the response
+less its offset, and glmer() at every PIRLS step, with the working weights and
+response.*/
+static void lmm_fill(const LmmFrame *restrict f, LmmModel *restrict mm, const size_t *restrict order,
+                     const size_t *restrict toff, bool single, const NV *restrict w, const NV *restrict y) {
+	const size_t nre = f->nre, n = f->n, p = f->p;
+	const NV *X = f->X;
+	NV *const *ZR = f->ZR;
+	size_t *const *LV = f->LV;
+	const MfPart *PR = f->PR;
+	for (size_t bi = 0; bi < mm->nblock; bi++) {
+		LmmBlock *b = &mm->block[bi];
+		const size_t s = b->size;
+		Zero(b->ZtZ, s * s, NV); Zero(b->ZtX, s * p, NV); Zero(b->Zty, s, NV);
+	}
+	if (single) {
+		const size_t qtot = mm->block[0].size;
+		NV *z;
+		Newx(z, qtot, NV);
+		for (size_t i = 0; i < n; i++) {
+			LmmBlock *b = &mm->block[LV[0][i]];
+			const NV wi = w ? w[i] : 1.0;
+			for (size_t oi = 0; oi < nre; oi++) {
+				size_t k = order[oi];
+				for (size_t c = 0; c < PR[k].p; c++) z[b->sub_off[oi] + c] = ZR[k][i * PR[k].p + c];
+			}
+			for (size_t a = 0; a < qtot; a++) {
+				const NV wz = wi * z[a];
+				for (size_t c = 0; c < qtot; c++) b->ZtZ[a * qtot + c] += wz * z[c];
+				for (size_t j = 0; j < p; j++) b->ZtX[a * p + j] += wz * X[i * p + j];
+				b->Zty[a] += wz * y[i];
+			}
+		}
+		Safefree(z);
+	} else {
+		LmmBlock *b = &mm->block[0];
+		const size_t Q = b->size;
+		for (size_t i = 0; i < n; i++) {
+			for (size_t k = 0; k < nre; k++) {
+				size_t ok0 = toff[k] + LV[k][i] * PR[k].p;
+				for (size_t c = 0; c < PR[k].p; c++) {
+					NV zc = ZR[k][i * PR[k].p + c] * (w ? w[i] : 1.0); //w z, so the products below are weighted
+					if (zc == 0.0) continue;
+					for (size_t k2 = 0; k2 < nre; k2++) {
+						size_t o2 = toff[k2] + LV[k2][i] * PR[k2].p;
+						for (size_t c2 = 0; c2 < PR[k2].p; c2++)
+							b->ZtZ[(ok0 + c) * Q + o2 + c2] += zc * ZR[k2][i * PR[k2].p + c2];
+					}
+					for (size_t j = 0; j < p; j++) b->ZtX[(ok0 + c) * p + j] += zc * X[i * p + j];
+					b->Zty[ok0 + c] += zc * y[i];
+				}
+			}
+		}
+	}
+}
+
+/*GENERALIZED LINEAR MIXED MODELS -- lme4::glmer() and glmer.nb(): a binomial
+(logit link), Poisson or negative-binomial (log link) response with the random
+effects of lmer() (see the block above LmmModel), fitted by the Laplace
+approximation or, for a single scalar random effect, adaptive Gauss-Hermite
+quadrature.
+
+With b = Lambda u, u ~ N(0, I), and eta = X beta + Z Lambda u + offset, lme4's
+deviance at (theta, beta) is (Bates et al. 2015, J Stat Softw 67(1), sec. 5;
+lme4 2.0-6 src/respModule.cpp glmResp::Laplace(), src/external.cpp):
+
+    D = -2 log f(y | u-hat) + |u-hat|^2 + log|L|^2,   L L' = Lambda'Z'WZ Lambda + I
+
+where u-hat, the conditional mode, minimizes the penalized deviance
+sum(unit deviances) + |u|^2, and W holds the working weights
+w (dmu/deta)^2 / V(mu) there.  -2 log f(y | u) is the family's aic() (glm's
+-2 log-likelihood before its 2p), so D is -2 times the Laplace approximation
+to the log-likelihood, which is what logLik() reports.
+
+u-hat comes from penalized IRLS: from the working response z = eta - offset
++ (y - mu) / (dmu/deta) and weights W at the current mode, the next one solves
+
+    (Lambda'Z'WZ Lambda + I) u = Lambda'Z'W (z - X beta)
+
+which is lmer()'s system for the weighted LMM of z on X and Z; with beta free
+too (lme4's nAGQ = 0 stage) it is that LMM's whole solution, lmm_eval().  The
+blocks' Z'WZ, Z'WX and Z'Wz are therefore rebuilt from the rows at every step
+(lmm_fill()), which costs O(n) per step for one grouping factor, where lmer()
+forms them once.  Step halving guards a step that raises the penalized
+deviance, as lme4's pwrssUpdate() does.
+
+The fit follows glmer()'s two stages: theta alone, with beta inside PIRLS (the
+nAGQ = 0 deviance, lme4's control nAGQ0initStep), then theta and beta
+together.  Each stage is Nelder-Mead followed by Newton on Richardson
+differences, as lmer() does.  Standard errors are lme4's vcov.merMod() with
+use.hessian: twice the inverse of the finite-difference Hessian of D in
+(theta, beta), its beta block.  For glmer.nb the negative-binomial theta is a
+third block of parameters (its log), started from MASS::theta.ml() on a
+Poisson fit's fitted values, as glmer.nb() starts; lme4 then maximizes the
+same likelihood over it with optimize(), which this does jointly.  The
+Hessian for the standard errors holds it fixed, as lme4's refit does.*/
+
+/*Nodes and weights of the n-point Gauss-Hermite rule for the standard normal
+density: sum w_k f(z_k) approximates the integral of f(z) phi(z), as lme4's
+GHrule() gives them (it tabulates fastGHQuad's, rescaled).  Computed here at
+the NV's width by Newton on the orthonormal Hermite recurrence, Numerical
+Recipes' gauher() (Press et al. 2007, sec. 4.6.1) with its starting guesses,
+for the weight exp(-x^2); then z = x sqrt(2) and w over sqrt(pi).  The rule is
+symmetric, and the middle node of an odd rule is set to exactly 0, as lme4's
+symmetrized table has it.  n is 1 to 100, lme4's range.*/
+#define GLMM_MAX_AGQ 100 //lme4's GHrule() limit
+static void glmm_gh_rule(unsigned short n, NV *restrict z, NV *restrict w) {
+	const NV pim4 = nv_pow(NVK_PI, (NV)-0.25);
+	const unsigned short m = (unsigned short)((n + 1) / 2);
+	NV x = 0.0, pp = 0.0;
+	for (unsigned short i = 1; i <= m; i++) {
+		if (i == 1)      x = nv_sqrt((NV)(2 * n + 1)) - 1.85575 * nv_pow((NV)(2 * n + 1), (NV)(-1.0 / 6.0));
+		else if (i == 2) x -= 1.14 * nv_pow((NV)n, (NV)0.426) / x;
+		else if (i == 3) x = 1.86 * x - 0.86 * z[0];
+		else if (i == 4) x = 1.91 * x - 0.91 * z[1];
+		else             x = 2.0 * x - z[i - 3];
+		for (unsigned short it = 0; it < 100; it++) {
+			NV p1 = pim4, p2 = 0.0;
+			for (unsigned short j = 1; j <= n; j++) {
+				const NV p3 = p2;
+				p2 = p1;
+				p1 = x * nv_sqrt(2.0 / (NV)j) * p2 - nv_sqrt((NV)(j - 1) / (NV)j) * p3;
+			}
+			pp = nv_sqrt(2.0 * (NV)n) * p2;
+			const NV dx = p1 / pp;
+			x -= dx;
+			if (nv_fabs(dx) <= 4.0 * NV_EPSILON * (nv_fabs(x) + 1.0)) break;
+		}
+		z[i - 1] = x; //a physicists' node for now
+		w[i - 1] = 2.0 / (pp * pp);
+	}
+	for (unsigned short i = 0; i < m; i++) {
+		const NV zz = (n % 2 == 1 && i == m - 1) ? 0.0 : z[i] * nv_sqrt((NV)2);
+		const NV ww = w[i] / nv_sqrt(NVK_PI);
+		z[i] = zz; w[i] = ww;
+		z[n - 1 - i] = -zz; w[n - 1 - i] = ww;
+	}
+}
+
+typedef struct {
+	LmmModel       *lm; //the weighted LMM a PIRLS step solves: lm->w = W, lm->y = z
+	const LmmFrame *fr;
+	const size_t   *order, *toff;
+	bool            single;
+	short int       fam; //GLM_BINOMIAL, GLM_POISSON or GLM_NEGBIN
+	NV              nbth; //the negative-binomial theta in use
+	size_t          n, p, q; //rows, fixed effects, random effects in all
+	size_t          qr; //random effects one row touches: sum of the terms' columns
+	size_t         *rix; //n x qr: the random effect each of row i's z values multiplies
+	NV             *rz; //n x qr: those z values
+	const NV       *pw; //prior weights, or NULL
+	NV             *eta, *mu, *W, *zw; //per row: linear predictor, mean, working weight and response
+	NV             *u, *b, *beta; //the mode in use; b = Lambda u
+	NV             *u_new, *beta_new, *eta_new, *mu_new; //a PIRLS step's proposal, and AGQ's trial points
+	NV             *u0, *beta0; //where the next PIRLS starts (the last mode found)
+	NV             *XtVX, *Xa; //p x p and p scratch for lmm_eval()
+	bool           *al; //p: aliased fixed effects, from the joint step
+	NV             *pre; //lmm_prep()'s buffer, refilled at every step
+	unsigned short  nagq; //1 = Laplace; 2 .. GLMM_MAX_AGQ = Gauss-Hermite (one scalar term)
+	NV             *ghz, *ghw; //the rule's nodes and weights
+	size_t          npar_beta; //0 in stage 1 (beta inside PIRLS), p in stage 2
+	bool            nb_free; //the negative-binomial theta is the last parameter (its log)
+	bool            ok; //the last evaluation's PIRLS converged
+	bool            from_mustart; //the next PIRLS starts from eta and mu as they stand (the family's mustart)
+	size_t          pirls_fail; //evaluations whose PIRLS did not converge
+} GlmmModel;
+
+/*lme4's link and variance functions (src/glmFamily.cpp, lme4 2.0-6): the
+inverse link and dmu/deta clamped at DBL_EPSILON, and the binomial variance
+too, as its logitinv, logitmueta, boundexp and x1mx clamp them -- with a
+double's epsilon on every NV width, since the aim is lme4's numbers (as
+glm_linkinv() argues for R's).*/
+static NV glmm_linkinv(short int fam, NV eta) {
+	const NV eps = (NV)DBL_EPSILON;
+	if (fam == GLM_BINOMIAL) {
+		const NV e = nv_exp(-nv_fabs(eta));
+		NV mu = (eta >= 0.0) ? 1.0 / (1.0 + e) : e / (1.0 + e);
+		if (mu < eps) mu = eps;
+		if (mu > 1.0 - eps) mu = 1.0 - eps;
+		return mu;
+	}
+	{
+		const NV mu = nv_exp(eta);
+		return (mu > eps) ? mu : eps;
+	}
+}
+static NV glmm_mu_eta(short int fam, NV eta) {
+	const NV eps = (NV)DBL_EPSILON;
+	if (fam == GLM_BINOMIAL) {
+		const NV e = nv_exp(-nv_fabs(eta)), d = e / ((1.0 + e) * (1.0 + e));
+		return (d > eps) ? d : eps;
+	}
+	{
+		const NV d = nv_exp(eta);
+		return (d > eps) ? d : eps;
+	}
+}
+static NV glmm_variance(short int fam, NV mu, NV th) {
+	if (fam == GLM_BINOMIAL) {
+		const NV v = mu * (1.0 - mu);
+		return (v > (NV)DBL_EPSILON) ? v : (NV)DBL_EPSILON;
+	}
+	if (fam == GLM_NEGBIN) return mu + mu * mu / th;
+	return mu;
+}
+
+/*In the glmm_* helpers below g is not restrict: its own buffers (g->eta,
+g->beta, g->u_new and the rest) are passed beside it.*/
+
+//-2 log f(y | mu): the family's aic(), lme4's glmResp::aic(), over every row.
+static NV glmm_aic(const GlmmModel *g, const NV *restrict mu) {
+	const NV *y = g->fr->Y, *pw = g->pw;
+	NV ll = 0.0;
+	if (g->fam == GLM_BINOMIAL) {
+		for (size_t i = 0; i < g->n; i++) {
+			const NV m = pw ? pw[i] : 1.0;
+			ll += glm_ldbinom(nv_rint(m * y[i]), nv_rint(m), mu[i]);
+		}
+	} else if (g->fam == GLM_POISSON) {
+		for (size_t i = 0; i < g->n; i++)
+			ll += (pw ? pw[i] : 1.0) * ((y[i] > 0.0 ? y[i] * nv_log(mu[i]) : 0.0) - mu[i] - nv_lgamma(y[i] + 1.0));
+	} else {
+		ll = nb_loglik(y, mu, pw, g->n, g->nbth);
+	}
+	return -2.0 * ll;
+}
+
+//Sum of the weighted unit deviances, the family's dev.resids() summed.
+static NV glmm_resdev(const GlmmModel *g, const NV *restrict mu) {
+	const NV *y = g->fr->Y, *pw = g->pw;
+	NV d = 0.0;
+	for (size_t i = 0; i < g->n; i++) d += (pw ? pw[i] : 1.0) * glm_unit_dev(g->fam, y[i], mu[i], g->nbth);
+	return d;
+}
+
+//b = Lambda u, sub-block by sub-block.
+static void glmm_b(GlmmModel *g, const NV *restrict theta, const NV *restrict u, NV *restrict b) {
+	LmmModel *m = g->lm;
+	size_t base = 0;
+	for (size_t bi = 0; bi < m->nblock; bi++) {
+		const LmmBlock *bl = &m->block[bi];
+		for (size_t sb = 0; sb < bl->nsub; sb++) {
+			const size_t k = bl->sub_term[sb], q = m->term[k].q, o = base + bl->sub_off[sb];
+			lmm_T(m, k, theta, m->T);
+			for (size_t r = 0; r < q; r++) {
+				NV s = 0.0;
+				for (size_t c = 0; c <= r; c++) s += m->T[r * q + c] * u[o + c];
+				b[o + r] = s;
+			}
+		}
+		base += bl->size;
+	}
+}
+
+//eta = X beta + Z Lambda u + offset, and mu from it.
+static void glmm_eta(GlmmModel *g, const NV *restrict theta, const NV *restrict beta, const NV *restrict u,
+                     NV *restrict eta, NV *restrict mu) {
+	const NV *X = g->fr->X, *off = g->fr->OFF;
+	glmm_b(g, theta, u, g->b);
+	for (size_t i = 0; i < g->n; i++) {
+		NV e = off[i];
+		for (size_t j = 0; j < g->p; j++) e += X[i * g->p + j] * beta[j];
+		for (size_t a = 0; a < g->qr; a++) e += g->rz[i * g->qr + a] * g->b[g->rix[i * g->qr + a]];
+		eta[i] = e;
+		mu[i] = glmm_linkinv(g->fam, e);
+	}
+}
+
+/*The working weights and response at the current eta, and the LMM a PIRLS
+step solves formed from them.*/
+static void glmm_working(GlmmModel *g) {
+	const NV *y = g->fr->Y, *off = g->fr->OFF;
+	for (size_t i = 0; i < g->n; i++) {
+		const NV d = glmm_mu_eta(g->fam, g->eta[i]);
+		g->W[i] = (g->pw ? g->pw[i] : 1.0) * d * d / glmm_variance(g->fam, g->mu[i], g->nbth);
+		g->zw[i] = (g->eta[i] - off[i]) + (y[i] - g->mu[i]) / d;
+	}
+	lmm_fill(g->fr, g->lm, g->order, g->toff, g->single, g->W, g->zw);
+}
+
+/*u = M^-1 Lambda'Z'W(z - X beta) for fixed beta, block by block, from the
+blocks as glmm_working() last filled them, with log|M| = log|L|^2 into *ldL2.
+Each block is factored in the model's scratch M and not kept.  FALSE when a
+factorization fails.*/
+static bool glmm_solve_u(GlmmModel *g, const NV *restrict theta, const NV *restrict beta, NV *restrict u, NV *restrict ldL2) {
+	LmmModel *m = g->lm;
+	const size_t p = m->p;
+	size_t base = 0;
+	*ldL2 = 0.0;
+	for (size_t bi = 0; bi < m->nblock; bi++) {
+		LmmBlock *bl = &m->block[bi];
+		const size_t s = bl->size;
+		NV *M = m->M, *d = m->c;
+		memcpy(M, bl->ZtZ, s * s * sizeof(NV));
+		lmm_lambda_t_left(m, bl, theta, M, s, m->T, m->tmp);
+		lmm_lambda_right(m, bl, theta, M, s, s, m->T, m->tmp);
+		for (size_t j = 0; j < s; j++) M[j * s + j] += 1.0;
+		if (!lmm_chol(M, s)) return FALSE;
+		for (size_t j = 0; j < s; j++) *ldL2 += 2.0 * nv_log(M[j * s + j]);
+		for (size_t j = 0; j < s; j++) {
+			NV v = bl->Zty[j];
+			for (size_t l = 0; l < p; l++) v -= bl->ZtX[j * p + l] * beta[l];
+			d[j] = v;
+		}
+		lmm_lambda_t_left(m, bl, theta, d, 1, m->T, m->tmp);
+		lmm_cholsolve(M, s, d, 1);
+		memcpy(u + base, d, s * sizeof(NV));
+		base += s;
+	}
+	return TRUE;
+}
+
+/*log|L|^2 at the working weights of the current mode, from the blocks as
+glmm_working() last filled them.*/
+static bool glmm_ldL2(GlmmModel *g, const NV *restrict theta, NV *restrict ldL2) {
+	LmmModel *m = g->lm;
+	*ldL2 = 0.0;
+	for (size_t bi = 0; bi < m->nblock; bi++) {
+		LmmBlock *bl = &m->block[bi];
+		const size_t s = bl->size;
+		NV *M = m->M;
+		memcpy(M, bl->ZtZ, s * s * sizeof(NV));
+		lmm_lambda_t_left(m, bl, theta, M, s, m->T, m->tmp);
+		lmm_lambda_right(m, bl, theta, M, s, s, m->T, m->tmp);
+		for (size_t j = 0; j < s; j++) M[j * s + j] += 1.0;
+		if (!lmm_chol(M, s)) return FALSE;
+		for (size_t j = 0; j < s; j++) *ldL2 += 2.0 * nv_log(M[j * s + j]);
+	}
+	return TRUE;
+}
+
+/*PIRLS to the conditional mode at theta: over u alone with beta fixed at
+*beta (u_only), or over u and beta together (lme4's nAGQ = 0 stage), when
+beta is updated in place.  Starts from g->u0 (and g->beta0 for the joint
+form), and leaves the mode in g->u, g->eta, g->mu, the working weights and
+response at it in g->W and g->zw, and the blocks filled from them.
+
+Iterates until a step moves no coordinate of u or beta by more than 1e-10 of
+the largest (plus 1e-10): Newton's convergence is quadratic, so the mode is
+then good to about 1e-20, which the finite differences of the deviance need --
+log|L|^2 moves linearly with an error in the mode, where the penalized
+deviance moves quadratically.  lme4 stops on a relative change of 1e-7 in the
+penalized deviance (glmerControl's tolPwrss), which on cbpp leaves its
+log-likelihood 2.8e-4 short and its standard errors 0.5% out.  At most 100
+steps, each halved up to 30 times while it raises the penalized deviance, as
+pwrssUpdate() does (maxit 100 in lme4's mkdevfun(), 20 halvings) -- except
+the last, a full step already within the stopping rule, which is taken as it
+is: started at the mode, as the warm start of a nearby evaluation is, a step
+can raise the penalized deviance by rounding alone, and halving it then only
+fails.  FALSE when it does not converge or a factorization fails.*/
+#define GLMM_PIRLS_MAXIT 100 //lme4's mkdevfun() maxit for a GLMM
+#define GLMM_PIRLS_HALF 30 //lme4's maxstephalfit is 20; a few more for a tighter stop
+#define GLMM_PIRLS_TOL 1e-10 //largest step, relative to the largest coordinate, that ends the loop
+/*A rise in the penalized deviance this small, relative, is not one: the sum of
+n unit deviances carries about n epsilons of rounding, 2600 x 2.2e-16 = 6e-13 on
+the largest test corpus at the worst, and a step of 1e-7 changes it by 1e-14.*/
+#define GLMM_PIRLS_FLAT 1e-13
+static bool glmm_pirls(GlmmModel *g, const NV *restrict theta, NV *restrict beta, bool u_only) {
+	const size_t q = g->q, p = g->p, n = g->n;
+	NV pdev_old;
+	bool conv = FALSE;
+	memcpy(g->u, g->u0, q * sizeof(NV));
+	if (!u_only) memcpy(beta, g->beta0, p * sizeof(NV));
+	if (g->from_mustart) {
+		/*The first fit: eta and mu are the family's mustart, as lme4's
+		response module starts, and the first step may raise the penalized
+		deviance, which is not that of any mode*/
+		g->from_mustart = FALSE;
+		pdev_old = NV_INF;
+	} else {
+		glmm_eta(g, theta, beta, g->u, g->eta, g->mu);
+		pdev_old = glmm_resdev(g, g->mu);
+		for (size_t a = 0; a < q; a++) pdev_old += g->u[a] * g->u[a];
+		if (!nv_isfinite(pdev_old)) return FALSE;
+	}
+	for (unsigned short it = 0; it < GLMM_PIRLS_MAXIT; it++) {
+		NV pdev = NV_INF, scale = 1.0, big = 0.0, r2, ld;
+		glmm_working(g);
+		if (u_only) {
+			if (!glmm_solve_u(g, theta, beta, g->u_new, &ld)) return FALSE;
+			memcpy(g->beta_new, beta, p * sizeof(NV));
+		} else {
+			lmm_prep_into(g->lm, g->pre);
+			if (!lmm_eval(g->lm, theta, g->XtVX, g->Xa, g->beta_new, g->al, &r2, &ld, g->u_new)) return FALSE;
+		}
+		/*The size of the full step, before any halving: a step this small
+		means the mode is where PIRLS stands, to the stopping rule.*/
+		for (size_t a = 0; a < q; a++) {
+			const NV d = nv_fabs(g->u_new[a] - g->u[a]), s = nv_fabs(g->u_new[a]);
+			if (d > big) big = d;
+			if (s > scale) scale = s;
+		}
+		for (size_t j = 0; j < p; j++) {
+			const NV d = nv_fabs(g->beta_new[j] - beta[j]), s = nv_fabs(g->beta_new[j]);
+			if (d > big) big = d;
+			if (s > scale) scale = s;
+		}
+		/*A full step this small is the last: it is taken whatever it does to
+		the penalized deviance, which from so near the mode it can raise by
+		rounding alone (lme4 too tests for convergence before it halves), and
+		it leaves the mode good to about its square.*/
+		if (big <= GLMM_PIRLS_TOL * scale) {
+			glmm_eta(g, theta, g->beta_new, g->u_new, g->eta, g->mu);
+			memcpy(g->u, g->u_new, q * sizeof(NV));
+			memcpy(beta, g->beta_new, p * sizeof(NV));
+			conv = TRUE;
+			break;
+		}
+		for (unsigned short h = 0; h <= GLMM_PIRLS_HALF; h++) {
+			glmm_eta(g, theta, g->beta_new, g->u_new, g->eta_new, g->mu_new);
+			pdev = glmm_resdev(g, g->mu_new);
+			for (size_t a = 0; a < q; a++) pdev += g->u_new[a] * g->u_new[a];
+			/*a rise within GLMM_PIRLS_FLAT of the penalized deviance is its
+			rounding, not a worse point: near the mode a step changes it by
+			the step's square*/
+			if (nv_isfinite(pdev) && (pdev <= pdev_old + GLMM_PIRLS_FLAT * nv_fabs(pdev_old) || !nv_isfinite(pdev_old))) break;
+			for (size_t a = 0; a < q; a++) g->u_new[a] = 0.5 * (g->u_new[a] + g->u[a]);
+			for (size_t j = 0; j < p; j++) g->beta_new[j] = 0.5 * (g->beta_new[j] + beta[j]);
+			pdev = NV_INF;
+		}
+		if (!nv_isfinite(pdev)) return FALSE;
+		memcpy(g->u, g->u_new, q * sizeof(NV));
+		memcpy(beta, g->beta_new, p * sizeof(NV));
+		memcpy(g->eta, g->eta_new, n * sizeof(NV));
+		memcpy(g->mu, g->mu_new, n * sizeof(NV));
+		pdev_old = pdev;
+	}
+	glmm_working(g); //the weights at the mode, for log|L|^2
+	if (conv) {
+		memcpy(g->u0, g->u, q * sizeof(NV));
+		if (!u_only) memcpy(g->beta0, beta, p * sizeof(NV));
+	}
+	return conv;
+}
+
+/*The deviance at the mode PIRLS left: the Laplace D of the block comment, or
+for nAGQ > 1 lme4's glmerAGQ() -- which, for the one scalar random effect per
+level it allows, integrates each level's factor of the likelihood over its u
+by Gauss-Hermite at the mode, scaled by the curvature there:
+
+    D = sum_j devc0_j + log|L|^2 - 2 sum_j log m_j,
+    devc0_j = u_j^2 + sum of level j's unit deviances,
+    m_j = sum_k w_k exp(-(devc_j(u_j + z_k / L_jj) - devc0_j)/2 + z_k^2/2)
+
+It sums unit deviances, not aic() terms as the Laplace form does, so for a
+Poisson or negative-binomial response the two differ by the saturated model's
+-2 log-likelihood, a constant; lme4's logLik() reports -D/2 either way, and so
+does this.*/
+static NV glmm_dev_at_mode(GlmmModel *g, const NV *restrict theta, const NV *restrict beta) {
+	NV ld, D;
+	if (!glmm_ldL2(g, theta, &ld)) return NV_INF;
+	if (g->nagq <= 1) {
+		D = glmm_aic(g, g->mu) + ld;
+		for (size_t a = 0; a < g->q; a++) D += g->u[a] * g->u[a];
+		return D;
+	}
+	{
+		/*One scalar term on one grouping factor: block j is level j, of size
+		1, and M's factor is the scalar L_jj.*/
+		const size_t q = g->q, n = g->n;
+		const NV *y = g->fr->Y, *pw = g->pw;
+		const size_t *lev = g->fr->LV[0];
+		NV *devc0, *devc, *mult, *ujs;
+		Newxz(devc0, q, NV); Newxz(devc, q, NV); Newxz(mult, q, NV); Newx(ujs, q, NV);
+		for (size_t a = 0; a < q; a++) devc0[a] = g->u[a] * g->u[a];
+		for (size_t i = 0; i < n; i++) devc0[lev[i]] += (pw ? pw[i] : 1.0) * glm_unit_dev(g->fam, y[i], g->mu[i], g->nbth);
+		/*each level's L_jj = sqrt(theta^2 z'Wz + 1), its block of M being 1 x 1*/
+		for (unsigned short k = 0; k < g->nagq; k++) {
+			const NV zk = g->ghz[k];
+			if (zk == 0.0) {
+				for (size_t a = 0; a < q; a++) mult[a] += g->ghw[k];
+				continue;
+			}
+			for (size_t a = 0; a < q; a++) {
+				const LmmBlock *bl = &g->lm->block[a];
+				const NV L = nv_sqrt(theta[0] * theta[0] * bl->ZtZ[0] + 1.0);
+				ujs[a] = g->u[a] + zk / L;
+			}
+			glmm_eta(g, theta, beta, ujs, g->eta_new, g->mu_new);
+			for (size_t a = 0; a < q; a++) devc[a] = ujs[a] * ujs[a];
+			for (size_t i = 0; i < n; i++) devc[lev[i]] += (pw ? pw[i] : 1.0) * glm_unit_dev(g->fam, y[i], g->mu_new[i], g->nbth);
+			for (size_t a = 0; a < q; a++)
+				mult[a] += g->ghw[k] * nv_exp(-0.5 * (devc[a] - devc0[a]) + 0.5 * zk * zk);
+		}
+		D = ld;
+		for (size_t a = 0; a < q; a++) D += devc0[a] - 2.0 * nv_log(mult[a]);
+		Safefree(devc0); Safefree(devc); Safefree(mult); Safefree(ujs);
+		glmm_b(g, theta, g->u, g->b); //b back at the mode
+		return D;
+	}
+}
+
+/*The objective of either stage, for the optimizers: x is theta (stage 1), or
+theta then beta (stage 2), then log(nb theta) when that is free.  m is the
+model's own LMM, unused; ctx is the GlmmModel.*/
+static NV glmm_objective(LmmModel *m, const NV *x, void *ctx) {
+	GlmmModel *g = (GlmmModel *)ctx;
+	const size_t nt = g->lm->ntheta;
+	NV *beta = g->beta;
+	PERL_UNUSED_VAR(m);
+	if (g->nb_free) {
+		const NV lt = x[nt + g->npar_beta];
+		if (!(lt > -30.0 && lt < 30.0)) return NV_INF; //exp() of it is a theta no data identify
+		g->nbth = nv_exp(lt);
+	}
+	if (g->npar_beta) memcpy(beta, x + nt, g->p * sizeof(NV));
+	g->ok = glmm_pirls(g, x, beta, g->npar_beta > 0);
+	if (!g->ok) { g->pirls_fail++; return NV_INF; }
+	return glmm_dev_at_mode(g, x, beta);
+}
+
+/*Fill g's per-row map of random effects: for row i, the qr global indices
+into u (or b) of the random effects its z values multiply, in the terms'
+order, and those values.  One grouping factor: block LV[0][i], whose terms
+sit at sub_off; several: term k's level LV[k][i] at toff[k] in the one block.*/
+static void glmm_rowmap(GlmmModel *g) {
+	const LmmFrame *f = g->fr;
+	const LmmModel *m = g->lm;
+	for (size_t i = 0; i < g->n; i++) {
+		size_t a = 0;
+		for (size_t oi = 0; oi < f->nre; oi++) {
+			const size_t k = g->order[oi], qk = f->PR[k].p;
+			const size_t base = g->single
+				? f->LV[0][i] * m->block[0].size + m->block[0].sub_off[oi]
+				: g->toff[k] + f->LV[k][i] * qk;
+			for (size_t c = 0; c < qk; c++, a++) {
+				g->rix[i * g->qr + a] = base + c;
+				g->rz[i * g->qr + a] = f->ZR[k][i * qk + c];
+			}
+		}
+	}
+}
+
+/*The smallest finite-difference step lmm_fd_h() takes in each of x's
+coordinates: 1e-3 for theta and log(nb theta), whose scale is about 1, and
+2% of a fixed effect's RX standard error (the step0 of glmm_fit(), here se),
+within which the deviance is quadratic to its rounding and over which its
+second difference is many times that rounding.*/
+#define GLMM_FD_THETA 1e-3 //the smallest step in a covariance parameter
+#define GLMM_FD_SE    0.02 //the smallest step in a fixed effect, in its standard errors
+static void glmm_fd_floor(size_t nt, size_t p, bool nb, const NV *restrict se, NV *restrict hmin) {
+	for (size_t a = 0; a < nt; a++) hmin[a] = GLMM_FD_THETA;
+	for (size_t j = 0; j < p; j++) hmin[nt + j] = GLMM_FD_SE * se[j];
+	if (nb) hmin[nt + p] = GLMM_FD_THETA;
+}
+
+/*One stage of the fit: Nelder-Mead and then Newton over x, d entries, from
+step0 (NULL: 0.25 each), with finite-difference steps of at least hmin.
+TRUE when the Newton polish converged and the last evaluation's PIRLS did;
+the state of g is then that at x.*/
+static bool glmm_stage(GlmmModel *g, NV *restrict x, size_t d, const NV *restrict step0, const NV *restrict hmin) {
+	bool conv;
+	lmm_nm(g->lm, glmm_objective, g, x, d, step0);
+	conv = lmm_newton_fn(g->lm, glmm_objective, g, x, d, hmin);
+	(void)glmm_objective(g->lm, x, g); //the mode at x, not at the last point tried
+	return conv && g->ok;
+}
+
+/*Stage 1 (beta inside PIRLS) from theta, then stage 2 over theta and beta
+together, with log(nb theta) as well when est_nb: the whole of glmer()'s fit,
+or glmer.nb()'s after its start.  theta and beta are updated in place, and
+g->nbth when est_nb.  With nagq0, lme4's nAGQ = 0, stage 2 is skipped.  TRUE
+when both stages converged.*/
+static bool glmm_fit(pTHX_ GlmmModel *g, NV *restrict theta, NV *restrict beta, bool nagq0, bool est_nb) {
+	const size_t nt = g->lm->ntheta, p = g->p;
+	const unsigned short nagq = g->nagq;
+	NV *x, *step, *hmin;
+	bool conv;
+	Newx(hmin, nt + p + 1, NV); SAVEFREEPV(hmin);
+	glmm_fd_floor(nt, 0, FALSE, NULL, hmin);
+	g->npar_beta = 0; g->nb_free = FALSE; g->nagq = 1; //stage 1 is the nAGQ = 0 deviance, a Laplace form
+	conv = glmm_stage(g, theta, nt, NULL, hmin);
+	memcpy(beta, g->beta, p * sizeof(NV));
+	g->nagq = nagq;
+	if (nagq0) return conv;
+	Newx(x, nt + p + 1, NV); SAVEFREEPV(x);
+	Newx(step, nt + p + 1, NV); SAVEFREEPV(step);
+	memcpy(x, theta, nt * sizeof(NV));
+	memcpy(x + nt, beta, p * sizeof(NV));
+	for (size_t a = 0; a < nt; a++) step[a] = 0.25;
+	/*beta's first reach: its standard error from stage 1's X'V^-1X (lme4's
+	RX-based one), so that the simplex is scaled to the data; 0.1 where that
+	is not available*/
+	{
+		NV *inv;
+		bool *al;
+		Newx(inv, p ? p * p : 1, NV); Newx(al, p ? p : 1, bool);
+		memcpy(inv, g->XtVX, p * p * sizeof(NV));
+		sweep_matrix_ols(inv, p, al);
+		for (size_t j = 0; j < p; j++) {
+			const NV v = inv[j * p + j];
+			step[nt + j] = (!al[j] && v > 0.0 && nv_isfinite(v)) ? nv_sqrt(v) : 0.1;
+		}
+		Safefree(inv); Safefree(al);
+	}
+	g->npar_beta = p;
+	g->nb_free = est_nb;
+	if (est_nb) { x[nt + p] = nv_log(g->nbth); step[nt + p] = 0.25; }
+	glmm_fd_floor(nt, p, est_nb, step + nt, hmin);
+	conv = glmm_stage(g, x, nt + p + (est_nb ? 1 : 0), step, hmin) && conv;
+	memcpy(theta, x, nt * sizeof(NV));
+	memcpy(beta, x + nt, p * sizeof(NV));
+	if (est_nb) g->nbth = nv_exp(x[nt + p]);
+	g->nb_free = FALSE;
+	return conv;
 }
 
 // perl.h defines it from 5.19.4 on, ppport.h not at all; this is its definition.
@@ -21822,6 +23149,9 @@ only double precision -- so the core runs in `double` regardless of the NV width
 #define pn_swap_tail                                                       \
 	if (x > 0.) { temp = *cum; if (lower) *cum = *ccum; *ccum = temp; }
 
+/*R's Cody pnorm, the double build's: a LIKER_WIDE_NV build computes every
+normal CDF through nv_pnorm() and pg_pnorm(), and compiles neither of these.*/
+#ifndef LIKER_WIDE_NV
 static void c_pnorm_both(double x, double *cum, double *ccum, int i_tail, bool log_p) {
 	static const double a[5] = {
 		2.2352520354606839287, 161.02823106855587881, 1067.6894854603709582,
@@ -21933,6 +23263,32 @@ static double c_pnorm(double x, double mu, double sigma, bool lower_tail, bool l
 #undef PN_D__1
 #undef PN_DT_0
 #undef PN_DT_1
+}
+#endif
+
+/*R's pnorm(x, mu, sigma, lower_tail, log_p) at the NV's width: c_pnorm() on a
+double build, unchanged, and on a LIKER_WIDE_NV build the same edge cases
+followed by pg_pnorm() on (x - mu) / sigma formed in NV. c_pnorm() is Cody's
+double algorithm, with R's double cut-off at z = -38.47, so up to 0.3428
+pnorm() was good to a double's 1e-16 on every perl and 0 below that z, where a
+long double or __float128 holds the tail down to z = -150. pnorm() and qnorm()
+take this; the p-values the module computes from approx_pnorm() keep its
+cut-off on every build, for the reason given at PNORM_LOWER_ZERO.*/
+static NV nv_pnorm(NV x, NV mu, NV sigma, bool lower_tail, bool log_p) {
+#ifdef LIKER_WIDE_NV
+	const NV d0 = log_p ? -NV_INF : 0.0, d1 = log_p ? 0.0 : 1.0;
+	if (nv_isnan(x) || nv_isnan(mu) || nv_isnan(sigma)) return x + mu + sigma;
+	if (!nv_isfinite(x) && mu == x) return NV_NAN; // x - mu = NaN
+	if (sigma <= 0.0) {
+		if (sigma < 0.0) return NV_NAN;
+		return ((x < mu) == lower_tail) ? d0 : d1; // sigma == 0: a step at mu
+	}
+	const NV z = (x - mu) / sigma;
+	if (!nv_isfinite(z)) return ((x < mu) == lower_tail) ? d0 : d1;
+	return pg_pnorm(z, lower_tail, log_p);
+#else
+	return (NV)c_pnorm((double)x, (double)mu, (double)sigma, lower_tail, log_p);
+#endif
 }
 /*anova() : sequential (Type-I) ANOVA table for a linear model, returned in
 the same shape as aov() in this module, OR an F-test comparison of two or more
@@ -26209,8 +27565,9 @@ of the quantile is 36 epsilons on a double, 31 on a long double (it was 1.7e3)
 and 31 on a __float128 (it was 1e18); on a double build these agree with R to
 about 1e-14 relative, and the tolerances in t/distributions.R.scipy.t, which
 are R's, are set from the worst observed disagreement with R rather than from
-the NV width. c_pnorm is a double-precision port on every build: qnorm and
-pnorm are not part of this.*/
+the NV width. qnorm and pnorm are the NV's on such a build since 0.3429 (see
+nv_pnorm() and qnorm_log_polish()); c_pnorm, R's Cody port, is what a double
+build computes them with.*/
 
 #define DIST_MAX_PAR 2
 
@@ -26293,7 +27650,9 @@ do. Newton's step is (log Phi(z) - lp) Phi(z)/phi(z), with the ratio taken as
 exp(log Phi - log phi) so neither underflows; it stops on a step within 2 ulp
 of z. It runs only below R's r = 36000: past it log Phi + z^2/2 is a difference
 of numbers above 6e8 whose rounding swamps the step -- at r = 1e10 it sent z to
-the wrong sign -- and R's xs_1 alone is what R reports there.*/
+the wrong sign -- and R's xs_1 alone is what R reports there. On a
+LIKER_WIDE_NV build the polish is qnorm_log_polish() instead, at the NV's
+width and at every r, since it forms that ratio without the difference.*/
 static NV qnorm_log_lower(NV lp) {
 	const NV r = nv_sqrt(-lp);
 	NV z;
@@ -26319,6 +27678,9 @@ static NV qnorm_log_lower(NV lp) {
 		}
 		z = -nv_sqrt(x2);
 	}
+#ifdef LIKER_WIDE_NV
+	return qnorm_log_polish(z, lp);
+#else
 	for (unsigned short i = 0; r < 36000.0 && i < 4; i++) {
 		const NV lc = (NV)c_pnorm((double)z, 0.0, 1.0, TRUE, TRUE);
 		const NV step = (lc - lp) * nv_exp(lc + M_LN_SQRT_2PI + 0.5 * z * z);
@@ -26327,6 +27689,7 @@ static NV qnorm_log_lower(NV lp) {
 		if (nv_fabs(step) <= 2.0 * NV_EPSILON * nv_fabs(z)) break;
 	}
 	return z;
+#endif
 }
 
 /*The lower-tail standard normal quantile of t's probability, which is at most
@@ -26365,7 +27728,7 @@ static NV d_pt(NV q, const NV *par, bool lower, bool give_log) {
 	if (!(df > 0.0))                 return NV_NAN;
 	if (nv_isinf(q)) return dist_log((q < 0.0) == lower ? 0.0 : 1.0, give_log);
 	if (nv_isinf(df)) //R's pt.c: the t on infinite df is the normal
-		return (NV)c_pnorm((double)q, 0.0, 1.0, lower, give_log);
+		return nv_pnorm(q, 0.0, 1.0, lower, give_log);
 	if (give_log) return pt_upper_log(lower ? -q : q, df);
 	return pt_upper(lower ? -q : q, df);
 }
@@ -31761,6 +33124,9 @@ OUTPUT:
 
 BOOT:
 	newXS("Stats::LikeR::__cs_uninit_catcher", cs_uninit_catcher, __FILE__);
+#ifndef LIKER_NO_NV_FMA
+	nv_fma_fused = nv_fma_probe();
+#endif
 
 void csort(...)
 PREINIT:
@@ -38367,19 +39733,16 @@ SV *lmer(...)
 	a formula (an intercept unless `0 +` or `- 1`) and g a column, or an
 	interaction `a:b`, or a nesting `a/b` (= (expr | a) + (expr | a:b), and so on for a/b/c).  See
 	the block above LmmModel for the method.*/
-	SV *data_sv = NULL;
+	SV *data_sv = NULL, *offset_sv = NULL, *weights_sv = NULL;
 	const char *formula = NULL;
 	NV conf_level = NV_CONF_95;
 	bool reml = 1;
-	char *fixed_f;
-	size_t nre = 0, i, j, n = 0, p, nlev_tot = 0;
-	char *re_expr[64], *re_group[64];
-	bool re_diag[64];
-	MfRows R;
-	MfPart PF, PR[64];
-	NV *X, *Y, **ZR;
+	size_t nre, i, j, n, p;
+	LmmFrame F;
+	MfPart PF, *PR;
+	NV *X, *Y, **ZR, *OFF;
 	size_t **LV, *NL;
-	char **names;
+	char **names, **re_group;
 	HV *res;
 
 	if (items % 2 != 0) usage_croak(aTHX_ "lmer", "arguments must be name => value pairs");
@@ -38389,327 +39752,38 @@ SV *lmer(...)
 		else if (strEQ(k, "data"))    data_sv = v;
 		else if (strEQ(k, "REML") || strEQ(k, "reml")) reml = SvTRUE(v) ? 1 : 0;
 		else if (strEQ(k, "conf_level")) conf_level = sv_num_opt(aTHX_ v, "lmer", "conf_level");
+		else if (strEQ(k, "offset"))  offset_sv = v;
+		else if (strEQ(k, "weights")) weights_sv = v;
 		else usage_croak(aTHX_ "lmer", "unknown argument '%s'", k);
 	}
 	if (!formula) usage_croak(aTHX_ "lmer", "formula is required");
 	if (!(conf_level > 0.0 && conf_level < 1.0)) usage_croak(aTHX_ "lmer", "conf_level must be between 0 and 1");
-
-	/*Split the right-hand side into its top-level terms and take out the
-	parenthesised ones with a bar in them.*/
-	{
-		char *f = savepv(formula), *tilde, *rhs, *q, *fixed, *d;
-		size_t cap;
-		SAVEFREEPV(f);
-		{ char *s = f, *t = f; while (*s) { if (!isspace((unsigned char)*s)) *t++ = *s; s++; } *t = '\0'; }
-		tilde = strchr(f, '~');
-		if (!tilde) croak("lmer: invalid formula, missing '~'");
-		rhs = tilde + 1;
-		cap = strlen(f) + 8;
-		Newx(fixed, cap, char); SAVEFREEPV(fixed);
-		memcpy(fixed, f, (size_t)(tilde - f) + 1); fixed[tilde - f + 1] = '\0';
-		d = fixed + strlen(fixed);
-		q = rhs;
-		while (*q) {
-			char *start = q, *end;
-			int depth = 0;
-			char sign = '+';
-			if (*q == '+' || *q == '-') { sign = *q; q++; start = q; }
-			for (end = q; *end; end++) {
-				if (*end == '(') depth++;
-				else if (*end == ')') depth--;
-				else if ((*end == '+' || *end == '-') && depth == 0) break;
-			}
-			if (*start == '(' && end > start && end[-1] == ')' && sign == '+') {
-				// is there a bar at depth 1?
-				char *bar = NULL;
-				int dd = 0;
-				for (char *s = start; s < end; s++) {
-					if (*s == '(') dd++;
-					else if (*s == ')') dd--;
-					else if (*s == '|' && dd == 1) { bar = s; break; }
-				}
-				if (bar) {
-					bool dbl = bar[1] == '|';
-					char *ex = savepvn(start + 1, (STRLEN)(bar - start - 1));
-					char *gr = savepvn(bar + (dbl ? 2 : 1), (STRLEN)(end - 1 - (bar + (dbl ? 2 : 1))));
-					char *slash;
-					SAVEFREEPV(ex); SAVEFREEPV(gr);
-					if (!*gr) croak("lmer: a random-effects term needs a grouping factor after '|'");
-					slash = strchr(gr, '/');
-					if (slash) {
-						/*(e | a/b/c) is (e | a) + (e | a:b) + (e | a:b:c): one
-						term per cumulative prefix, as lme4 expands it.  The
-						prefix ending before each '/' gets its inner '/'s turned
-						into ':'; the last prefix is the whole of gr.*/
-						char *all = savepv(gr);
-						SAVEFREEPV(all);
-						for (char *s = all; *s; s++) if (*s == '/') *s = ':';
-						while (TRUE) {
-							const size_t len = slash ? (size_t)(slash - gr) : strlen(gr);
-							char *pre = savepvn(all, (STRLEN)len);
-							SAVEFREEPV(pre);
-							if (!*pre || (slash && !slash[1])) croak("lmer: empty grouping factor in a nesting '/'");
-							if (nre + 1 > 64) croak("lmer: at most 64 random-effects terms");
-							re_expr[nre] = ex; re_group[nre] = pre; re_diag[nre] = dbl; nre++;
-							if (!slash) break;
-							slash = strchr(slash + 1, '/');
-							if (!slash) {  // the final prefix is all of gr
-								if (nre + 1 > 64) croak("lmer: at most 64 random-effects terms");
-								re_expr[nre] = ex; re_group[nre] = all; re_diag[nre] = dbl; nre++;
-								break;
-							}
-						}
-					} else {
-						if (nre + 1 > 64) croak("lmer: at most 64 random-effects terms");
-						re_expr[nre] = ex; re_group[nre] = gr; re_diag[nre] = dbl; nre++;
-					}
-					q = end;
-					continue;
-				}
-			}
-			// a fixed term: copy it through with its sign
-			if (d > fixed + (tilde - f) + 1 || sign == '-') *d++ = sign;
-			memcpy(d, start, (size_t)(end - start)); d += end - start; *d = '\0';
-			q = end;
-		}
-		if (nre == 0) croak("lmer: no random-effects terms in the formula; use lm()");
-		if (d == fixed + (tilde - f) + 1) { *d++ = '1'; *d = '\0'; }
-		fixed_f = fixed;
-	}
-	mf_rows(aTHX_ "lmer", data_sv, &R);
-	{
-		HV *xlev = (HV *)sv_2mortal((SV *)newHV());
-		mf_part(aTHX_ "lmer", fixed_f, &R, FALSE, xlev, &PF);
-		if (PF.noff) croak("lmer: offset() is not supported");
-		for (size_t k = 0; k < nre; k++) {
-			char *rf;
-			Newx(rf, strlen(PF.lhs) + strlen(re_expr[k]) + 4, char); SAVEFREEPV(rf);
-			sprintf(rf, "%s~%s", PF.lhs, re_expr[k][0] ? re_expr[k] : "1");
-			mf_part(aTHX_ "lmer", rf, &R, FALSE, xlev, &PR[k]);
-			if (PR[k].p == 0) croak("lmer: random-effects term %u has no columns", (unsigned)(k + 1));
-		}
-	}
-	p = PF.p;
-	Newx(X, (R.n ? R.n : 1) * (p ? p : 1), NV); SAVEFREEPV(X);
-	Newx(Y, R.n ? R.n : 1, NV); SAVEFREEPV(Y);
-	Newx(names, R.n ? R.n : 1, char *); SAVEFREEPV(names);
-	Newx(ZR, nre, NV *); SAVEFREEPV(ZR);
-	Newx(LV, nre, size_t *); SAVEFREEPV(LV);
-	Newxz(NL, nre, size_t); SAVEFREEPV(NL);
-	{
-		HV *maps[64];
-		for (size_t k = 0; k < nre; k++) {
-			Newx(ZR[k], (R.n ? R.n : 1) * PR[k].p, NV); SAVEFREEPV(ZR[k]);
-			Newx(LV[k], R.n ? R.n : 1, size_t); SAVEFREEPV(LV[k]);
-			maps[k] = (HV *)sv_2mortal((SV *)newHV());
-		}
-		for (i = 0; i < R.n; i++) {
-			NV y = evaluate_term(aTHX_ R.data_hoa, R.row_hashes, (unsigned)i, PF.lhs);
-			bool ok = !nv_isnan(y);
-			size_t lv[64];
-			if (ok && !mf_row(aTHX_ &PF, &R, i, X + n * p, NULL)) ok = 0;
-			for (size_t k = 0; ok && k < nre; k++) {
-				char *g = re_group[k], *part, *e, buf[4096];
-				size_t len = 0;
-				if (!mf_row(aTHX_ &PR[k], &R, i, ZR[k] + n * PR[k].p, NULL)) { ok = 0; break; }
-				// the grouping factor's label, a:b joined
-				part = g;
-				while (ok && part) {
-					char *s, save = 0;
-					e = strchr(part, ':');
-					if (e) { save = *e; *e = '\0'; }
-					s = get_data_string_alloc(aTHX_ R.data_hoa, R.row_hashes, i, part);
-					if (e) *e = save;
-					if (!s) { ok = 0; break; }
-					if (len + strlen(s) + 2 > sizeof buf) { Safefree(s); croak("lmer: grouping label too long"); }
-					if (len) buf[len++] = '\x1f';
-					memcpy(buf + len, s, strlen(s)); len += strlen(s);
-					Safefree(s);
-					part = e ? e + 1 : NULL;
-				}
-				if (!ok) break;
-				{
-					SV **hit = hv_fetch(maps[k], buf, (I32)len, 0);
-					if (hit) lv[k] = (size_t)SvUV(*hit);
-					else { lv[k] = NL[k]; hv_store(maps[k], buf, (I32)len, newSVuv((UV)NL[k]), 0); NL[k]++; }
-				}
-			}
-			if (!ok) continue;
-			for (size_t k = 0; k < nre; k++) LV[k][n] = lv[k];
-			Y[n] = y; names[n] = R.row_names[i];
-			n++;
-		}
-		// dense renumbering: levels of rows that were dropped leave gaps
-		for (size_t k = 0; k < nre; k++) {
-			size_t *scratch;
-			Newx(scratch, NL[k] ? NL[k] : 1, size_t);
-			NL[k] = glm_reindex(LV[k], n, NL[k], scratch);
-			Safefree(scratch);
-			nlev_tot += NL[k];
-		}
-	}
-	if (n <= p) croak("lmer: not enough complete observations");
-	/*lme4's checkNlevels() and checkZdims(), at lmerControl()'s defaults
-	(check.nlev.gtr.1, check.nobs.vs.nlev and check.nobs.vs.nRE all "stop"),
-	in its order and with its messages, on the levels the kept rows use.  A
-	factor with one level is confounded with the intercept, and one with a
-	level per row with the residual; either used to be fitted and reported as
-	converged.  An uncorrelated (x || g) term is one term per column in lme4,
-	so its random effects are counted per column.*/
-	for (size_t k = 0; k < nre; k++)
-		if (NL[k] < 2) croak("lmer: grouping factors must have > 1 sampled level");
-	{
-		SV *bad = NULL;
-		for (size_t k = 0; k < nre; k++) {
-			bool seen = 0;
-			if (NL[k] < n) continue;
-			for (size_t k2 = 0; k2 < k; k2++)
-				if (strEQ(re_group[k2], re_group[k])) { seen = 1; break; }
-			if (seen) continue;
-			if (!bad) bad = sv_2mortal(newSVpv(re_group[k], 0));
-			else sv_catpvf(bad, ", %s", re_group[k]);
-		}
-		if (bad)
-			croak("lmer: number of levels of each grouping factor must be < number of observations (problems: %s)",
-			      SvPV_nolen(bad));
-	}
-	for (size_t k = 0; k < nre; k++) {
-		size_t q = NL[k] * (re_diag[k] ? 1 : PR[k].p);
-		if (n <= q)
-			croak("lmer: number of observations (=%" UVuf ") <= number of random effects (=%" UVuf ") for term (%s | %s); "
-			      "the random-effects parameters and the residual variance (or scale parameter) are probably unidentifiable",
-			      (UV)n, (UV)q, re_expr[k][0] ? re_expr[k] : "1", re_group[k]);
-	}
+	lmm_frame(aTHX_ "lmer", formula, data_sv, offset_sv, weights_sv, FALSE, &F);
+	nre = F.nre; n = F.n; p = F.p; PF = F.PF; PR = F.PR; X = F.X; OFF = F.OFF;
+	ZR = F.ZR; LV = F.LV; NL = F.NL; names = F.names; re_group = F.re_group;
+	Newx(Y, n ? n : 1, NV); SAVEFREEPV(Y);
+	for (i = 0; i < n; i++) Y[i] = F.Y[i] - OFF[i]; //the response less its offset, which is all the fit sees
 
 	res = (HV *)sv_2mortal((SV *)newHV());
 	{
 		LmmModel mm;
 		LmmTerm *terms;
-		size_t *order, ntheta = 0, maxblock = 0;
-		bool single = 1;
+		size_t *order, *toff, ntheta;
+		bool single;
 		Zero(&mm, 1, LmmModel);
-		mm.n = n; mm.p = p; mm.X = X; mm.y = Y; mm.reml = reml; mm.nterm = nre;
-		/*lme4 orders the terms by decreasing number of levels (stably); theta
-		follows that order*/
-		Newx(order, nre, size_t); SAVEFREEPV(order);
-		for (size_t k = 0; k < nre; k++) order[k] = k;
-		for (size_t a = 1; a < nre; a++)
-			for (size_t b2 = a; b2 > 0 && NL[order[b2]] > NL[order[b2 - 1]]; b2--) {
-				size_t t = order[b2]; order[b2] = order[b2 - 1]; order[b2 - 1] = t;
-			}
-		Newxz(terms, nre, LmmTerm); SAVEFREEPV(terms);
-		for (size_t oi = 0; oi < nre; oi++) {
-			size_t k = order[oi];
-			terms[k].q = PR[k].p;
-			terms[k].diag = re_diag[k];
-			terms[k].off = ntheta;
-			ntheta += re_diag[k] ? PR[k].p : PR[k].p * (PR[k].p + 1) / 2;
-		}
-		mm.term = terms; mm.ntheta = ntheta;
-		/*one grouping factor for every term means the same levels for every
-		term, which makes M block diagonal by level*/
-		for (size_t k = 1; k < nre; k++) if (strNE(re_group[k], re_group[0])) single = 0;
-		if (single) {
-			size_t qtot = 0, m = NL[0];
-			for (size_t k = 0; k < nre; k++) qtot += PR[k].p;
-			mm.nblock = m;
-			Newxz(mm.block, m, LmmBlock); SAVEFREEPV(mm.block);
-			for (size_t lv = 0; lv < m; lv++) {
-				LmmBlock *b = &mm.block[lv];
-				size_t off = 0;
-				b->size = qtot; b->nsub = nre;
-				Newx(b->sub_off, nre, size_t); SAVEFREEPV(b->sub_off);
-				Newx(b->sub_term, nre, size_t); SAVEFREEPV(b->sub_term);
-				for (size_t oi = 0; oi < nre; oi++) {
-					size_t k = order[oi];
-					b->sub_off[oi] = off; b->sub_term[oi] = k; off += PR[k].p;
-				}
-				Newxz(b->ZtZ, qtot * qtot, NV); SAVEFREEPV(b->ZtZ);
-				Newxz(b->ZtX, qtot * (p ? p : 1), NV); SAVEFREEPV(b->ZtX);
-				Newxz(b->Zty, qtot, NV); SAVEFREEPV(b->Zty);
-			}
-			maxblock = qtot;
-			{
-				NV *z;
-				Newx(z, qtot, NV); SAVEFREEPV(z);
-				for (i = 0; i < n; i++) {
-					LmmBlock *b = &mm.block[LV[0][i]];
-					for (size_t oi = 0; oi < nre; oi++) {
-						size_t k = order[oi];
-						for (size_t c = 0; c < PR[k].p; c++) z[b->sub_off[oi] + c] = ZR[k][i * PR[k].p + c];
-					}
-					for (size_t a = 0; a < qtot; a++) {
-						for (size_t c = 0; c < qtot; c++) b->ZtZ[a * qtot + c] += z[a] * z[c];
-						for (j = 0; j < p; j++) b->ZtX[a * p + j] += z[a] * X[i * p + j];
-						b->Zty[a] += z[a] * Y[i];
-					}
-				}
-			}
-		} else {
-			/*one dense block over every random effect: term by term, level
-			by level*/
-			size_t Q = 0, *toff;
-			LmmBlock *b;
-			Newx(toff, nre, size_t); SAVEFREEPV(toff);
-			for (size_t oi = 0; oi < nre; oi++) { size_t k = order[oi]; toff[k] = Q; Q += NL[k] * PR[k].p; }
-			/*The dense method holds two Q x Q matrices (ZtZ and M) and
-			factors M once per criterion evaluation, so it costs 2 Q^2 NVs and
-			O(Q^3) time an evaluation.  Measured 2026-10-20 (gcc -O2, double
-			NV, y ~ x + (1|a) + (1|b) with a and b crossed, Q/2 levels each,
-			n = 3Q rows, one fresh process per Q): Q = 500 took
-			3.7 s and 17 MB, Q = 1000 32 s and 29 MB, Q = 2000 283 s and 71 MB,
-			and Q = 4000 reached 210 MB in its first minute.  4000 is then
-			about 40 minutes and 256 MB (512 MB at a 16-byte NV); the old
-			bound of 20000 was 6.4 GB (12.8 GB) and, at the measured cubic
-			rate, days.*/
-			if (Q > 4000)
-				croak("lmer: %" UVuf " random effects over more than one grouping factor is more than the dense method "
-				      "takes (at most 4000; its time grows as the cube of that number, and 2000 take about 5 minutes); "
-				      "use a single grouping factor, whose levels are fitted one at a time, or fewer levels", (UV)Q);
-			mm.nblock = 1;
-			Newxz(mm.block, 1, LmmBlock); SAVEFREEPV(mm.block);
-			b = &mm.block[0];
-			b->size = Q; b->nsub = nlev_tot;
-			Newx(b->sub_off, nlev_tot, size_t); SAVEFREEPV(b->sub_off);
-			Newx(b->sub_term, nlev_tot, size_t); SAVEFREEPV(b->sub_term);
-			{
-				size_t sb = 0;
-				for (size_t oi = 0; oi < nre; oi++) {
-					size_t k = order[oi];
-					for (size_t lv = 0; lv < NL[k]; lv++) { b->sub_off[sb] = toff[k] + lv * PR[k].p; b->sub_term[sb] = k; sb++; }
-				}
-			}
-			Newxz(b->ZtZ, Q * Q, NV); SAVEFREEPV(b->ZtZ);
-			Newxz(b->ZtX, Q * (p ? p : 1), NV); SAVEFREEPV(b->ZtX);
-			Newxz(b->Zty, Q, NV); SAVEFREEPV(b->Zty);
-			for (i = 0; i < n; i++) {
-				for (size_t k = 0; k < nre; k++) {
-					size_t ok0 = toff[k] + LV[k][i] * PR[k].p;
-					for (size_t c = 0; c < PR[k].p; c++) {
-						NV zc = ZR[k][i * PR[k].p + c];
-						if (zc == 0.0) continue;
-						for (size_t k2 = 0; k2 < nre; k2++) {
-							size_t o2 = toff[k2] + LV[k2][i] * PR[k2].p;
-							for (size_t c2 = 0; c2 < PR[k2].p; c2++)
-								b->ZtZ[(ok0 + c) * Q + o2 + c2] += zc * ZR[k2][i * PR[k2].p + c2];
-						}
-						for (j = 0; j < p; j++) b->ZtX[(ok0 + c) * p + j] += zc * X[i * p + j];
-						b->Zty[ok0 + c] += zc * Y[i];
-					}
-				}
-			}
-			maxblock = Q;
-		}
-		Newx(mm.M, maxblock * maxblock, NV); SAVEFREEPV(mm.M);
+		mm.n = n; mm.p = p; mm.X = X; mm.y = Y; mm.w = F.WT; mm.ldW = F.ldW; mm.reml = reml; mm.nterm = nre;
+		/*The dense block costs 2 Q^2 NVs and O(Q^3) time an evaluation.
+		Measured 2026-10-20 (gcc -O2, double NV, y ~ x + (1|a) + (1|b) with
+		a and b crossed, Q/2 levels each, n = 3Q rows, one fresh process per
+		Q): Q = 500 took 3.7 s and 17 MB, Q = 1000 32 s and 29 MB, Q = 2000
+		283 s and 71 MB, and Q = 4000 reached 210 MB in its first minute.
+		4000 is then about 40 minutes and 256 MB (512 MB at a 16-byte NV);
+		the old bound of 20000 was 6.4 GB (12.8 GB) and, at the measured cubic
+		rate, days.*/
+		lmm_layout(aTHX_ "lmer", &F, &mm, 4000, "2000 take about 5 minutes", &order, &toff, &single);
+		terms = mm.term; ntheta = mm.ntheta;
+		lmm_fill(&F, &mm, order, toff, single, F.WT, Y);
 		SAVEFREEPV(lmm_prep(&mm));
-		Newx(mm.B, maxblock * (p ? p : 1), NV); SAVEFREEPV(mm.B);
-		Newx(mm.c, maxblock, NV); SAVEFREEPV(mm.c);
-		{
-			size_t qmax = 1;
-			for (size_t k = 0; k < nre; k++) if (PR[k].p > qmax) qmax = PR[k].p;
-			Newx(mm.T, qmax * qmax, NV); SAVEFREEPV(mm.T);
-			Newx(mm.tmp, qmax, NV); SAVEFREEPV(mm.tmp);
-		}
 
 		{
 			NV *theta, *XtVX, *Xa, *beta, *V, r2, ld, crit, sigma, *u;
@@ -38879,7 +39953,7 @@ SV *lmer(...)
 					}
 				}
 				for (i = 0; i < n; i++) {
-					NV f = 0.0;
+					NV f = OFF[i];
 					for (j = 0; j < p; j++) if (!al[j]) f += X[i * p + j] * beta[j];
 					for (size_t k = 0; k < nre; k++) {
 						size_t o;
@@ -38912,17 +39986,406 @@ SV *lmer(...)
 				hv_store(res, "conf_level", 10, newSVnv(conf_level), 0);
 				{
 					// a variance component on its boundary: lme4's "singular fit"
-					bool sing = 0;
+					bool sing = FALSE;
 					for (size_t k = 0; k < nre; k++) {
 						size_t q = terms[k].q, idx = terms[k].off;
 						for (size_t col = 0; col < q; col++) {
-							if (nv_fabs(theta[idx]) < 1e-4) sing = 1;
+							if (nv_fabs(theta[idx]) < LMM_SINGULAR_TOL) sing = TRUE;
 							idx += terms[k].diag ? 1 : q - col;
 						}
 					}
 					hv_store(res, "singular", 8, newSVuv(sing ? 1 : 0), 0);
 				}
 			}
+		}
+	}
+	RETVAL = newRV_inc((SV *)res);
+	}
+	OUTPUT:
+		RETVAL
+
+SV *glmer(...)
+	CODE:
+	{
+	/*lme4::glmer() and glmer.nb(): see the block above GlmmModel for the
+	method, and lmer() for the formula.*/
+	SV *data_sv = NULL, *offset_sv = NULL, *weights_sv = NULL;
+	const char *formula = NULL, *family_str = "binomial";
+	NV conf_level = NV_CONF_95, nb_theta = 0.0;
+	bool theta_given = FALSE;
+	short int fam = GLM_BINOMIAL; //GLM_BINOMIAL, GLM_POISSON or GLM_NEGBIN
+	UV nagq = 1; //0 = lme4's nAGQ = 0, 1 = Laplace, 2 .. GLMM_MAX_AGQ = Gauss-Hermite
+	size_t n, p, pr = 0, nt, *cols;
+	LmmFrame F, Fr;
+	LmmModel mm;
+	GlmmModel g;
+	size_t *order, *toff;
+	bool single, conv, *dropped;
+	NV *theta, *beta, ghz[GLMM_MAX_AGQ], ghw[GLMM_MAX_AGQ];
+	HV *res;
+
+	if (items % 2 != 0) usage_croak(aTHX_ "glmer", "arguments must be name => value pairs");
+	for (Stack_off_t a = 0; a < items; a += 2) {
+		const char *k = SvPV_nolen(ST(a)); SV *v = ST(a + 1);
+		if      (strEQ(k, "formula")) formula = SvPV_nolen(v);
+		else if (strEQ(k, "data"))    data_sv = v;
+		else if (strEQ(k, "family"))  family_str = SvPV_nolen(v);
+		else if (strEQ(k, "conf_level")) conf_level = sv_num_opt(aTHX_ v, "glmer", "conf_level");
+		else if (strEQ(k, "offset"))  offset_sv = v;
+		else if (strEQ(k, "weights")) weights_sv = v;
+		else if (strEQ(k, "theta") || strEQ(k, "nb_theta")) {
+			nb_theta = sv_num_opt(aTHX_ v, "glmer", k);
+			theta_given = TRUE;
+		}
+		else if (strEQ(k, "nAGQ") || strEQ(k, "nagq")) {
+			const NV q = sv_num_opt(aTHX_ v, "glmer", "nAGQ");
+			if (!(q >= 0.0 && q <= (NV)GLMM_MAX_AGQ && q == nv_floor(q)))
+				usage_croak(aTHX_ "glmer", "nAGQ must be a whole number from 0 to %u", (unsigned)GLMM_MAX_AGQ);
+			nagq = (UV)q;
+		}
+		else usage_croak(aTHX_ "glmer", "unknown argument '%s'", k);
+	}
+	if (!formula) usage_croak(aTHX_ "glmer", "formula is required");
+	if (!(conf_level > 0.0 && conf_level < 1.0)) usage_croak(aTHX_ "glmer", "conf_level must be between 0 and 1");
+	if      (strEQ(family_str, "binomial")) fam = GLM_BINOMIAL;
+	else if (strEQ(family_str, "poisson"))  fam = GLM_POISSON;
+	else if (strEQ(family_str, "negbin") || strEQ(family_str, "negative.binomial") || strEQ(family_str, "nb"))
+		fam = GLM_NEGBIN;
+	else usage_croak(aTHX_ "glmer", "unsupported family '%s' (binomial, poisson, negbin)", family_str);
+	if (theta_given && !(nb_theta > 0.0 && nv_isfinite(nb_theta)))
+		usage_croak(aTHX_ "glmer", "theta must be positive and finite");
+	if (theta_given && fam != GLM_NEGBIN) usage_croak(aTHX_ "glmer", "theta is the negbin family's dispersion");
+
+	lmm_frame(aTHX_ "glmer", formula, data_sv, offset_sv, weights_sv, TRUE, &F);
+	n = F.n; p = F.p;
+	/*The response, checked as the family's initialize() checks it (R 4.6.1
+	src/library/stats/R/family.R; MASS 7.3-66 negative.binomial()), and
+	lme4's check.response.not.const.*/
+	{
+		bool constant = TRUE, nonint = FALSE;
+		for (size_t i = 0; i < n; i++) {
+			const NV y = F.Y[i];
+			if (y != F.Y[0]) constant = FALSE;
+			if (fam == GLM_BINOMIAL) {
+				const NV m = F.WT ? F.WT[i] : 1.0;
+				if (y < 0.0 || y > 1.0) croak("glmer: y values must be 0 <= y <= 1");
+				if (nv_fabs(m * y - nv_rint(m * y)) > 1e-3) nonint = TRUE; // R 4.6.1 binomial()'s initialize, abs(m*y - round(m*y)) > 0.001
+			} else if (y < 0.0) {
+				croak(fam == GLM_POISSON ? "glmer: negative values not allowed for the 'Poisson' family"
+				                         : "glmer: negative values not allowed for the negative binomial family");
+			}
+		}
+		if (constant) croak("glmer: response is constant");
+		if (nonint) warn("glmer: non-integer #successes in a binomial glm!");
+	}
+	if (nagq > 1 && (F.nre != 1 || F.PR[0].p != 1))
+		croak("glmer: nAGQ > 1 is only available for models with a single, scalar random-effects term");
+
+	/*Aliased fixed-effect columns are left out of the fit, as lme4's
+	check.rankX = "message+drop.cols" leaves them out, and reported as NaN, as
+	lmer() reports them.  Which they are is decided as lmm_prep() decides it,
+	by sweeping X'X.*/
+	Newxz(dropped, p ? p : 1, bool); SAVEFREEPV(dropped);
+	Newx(cols, p ? p : 1, size_t); SAVEFREEPV(cols);
+	{
+		NV *xtx;
+		Newxz(xtx, p ? p * p : 1, NV);
+		for (size_t i = 0; i < n; i++)
+			for (size_t j = 0; j < p; j++)
+				for (size_t l = 0; l < p; l++) xtx[j * p + l] += F.X[i * p + j] * F.X[i * p + l];
+		sweep_matrix_ols(xtx, p, dropped);
+		Safefree(xtx);
+		for (size_t j = 0; j < p; j++) if (!dropped[j]) cols[pr++] = j;
+	}
+	Fr = F;
+	if (pr < p) {
+		NV *Xr;
+		Newx(Xr, (n ? n : 1) * (pr ? pr : 1), NV); SAVEFREEPV(Xr);
+		for (size_t i = 0; i < n; i++)
+			for (size_t j = 0; j < pr; j++) Xr[i * pr + j] = F.X[i * p + cols[j]];
+		Fr.X = Xr; Fr.p = pr;
+	}
+
+	Zero(&mm, 1, LmmModel);
+	mm.n = n; mm.p = pr; mm.X = Fr.X; mm.reml = 0; mm.nterm = Fr.nre;
+	/*glmer() refactors the dense block at every PIRLS step, so its cap is
+	lower than lmer()'s 4000.  Measured 2026-11-22 (gcc -O2, double NV, one
+	process): grouseticks' TICKS ~ YEAR + cHEIGHT + (1|BROOD) + (1|INDEX) +
+	(1|LOCATION), Q = 584 over three crossed factors, took 781 s; at the
+	cubic rate Q = 1000 is about 65 minutes and 2000 about 9 hours.*/
+	lmm_layout(aTHX_ "glmer", &Fr, &mm, 1000, "584 took about 13 minutes", &order, &toff, &single);
+	nt = mm.ntheta;
+
+	Zero(&g, 1, GlmmModel);
+	g.lm = &mm; g.fr = &Fr; g.order = order; g.toff = toff; g.single = single;
+	g.fam = fam; g.nbth = theta_given ? nb_theta : 1.0;
+	g.n = n; g.p = pr; g.pw = Fr.WT;
+	for (size_t bi = 0; bi < mm.nblock; bi++) g.q += mm.block[bi].size;
+	for (size_t k = 0; k < Fr.nre; k++) g.qr += Fr.PR[k].p;
+	g.nagq = (unsigned short)(nagq == 0 ? 1 : nagq);
+	if (nagq > 1) { glmm_gh_rule((unsigned short)nagq, ghz, ghw); g.ghz = ghz; g.ghw = ghw; }
+	{
+		const size_t nn = n ? n : 1, qq = g.q ? g.q : 1, pp = pr ? pr : 1;
+		Newx(g.rix, nn * g.qr, size_t); SAVEFREEPV(g.rix);
+		Newx(g.rz, nn * g.qr, NV); SAVEFREEPV(g.rz);
+		Newx(g.eta, nn, NV); SAVEFREEPV(g.eta);
+		Newx(g.mu, nn, NV); SAVEFREEPV(g.mu);
+		Newx(g.W, nn, NV); SAVEFREEPV(g.W);
+		Newx(g.zw, nn, NV); SAVEFREEPV(g.zw);
+		Newx(g.eta_new, nn, NV); SAVEFREEPV(g.eta_new);
+		Newx(g.mu_new, nn, NV); SAVEFREEPV(g.mu_new);
+		Newxz(g.u, qq, NV); SAVEFREEPV(g.u);
+		Newxz(g.b, qq, NV); SAVEFREEPV(g.b);
+		Newxz(g.u_new, qq, NV); SAVEFREEPV(g.u_new);
+		Newxz(g.u0, qq, NV); SAVEFREEPV(g.u0);
+		Newxz(g.beta, pp, NV); SAVEFREEPV(g.beta);
+		Newxz(g.beta_new, pp, NV); SAVEFREEPV(g.beta_new);
+		Newxz(g.beta0, pp, NV); SAVEFREEPV(g.beta0);
+		Newxz(g.XtVX, pp * pp, NV); SAVEFREEPV(g.XtVX);
+		Newxz(g.Xa, pp, NV); SAVEFREEPV(g.Xa);
+		Newxz(g.al, pp, bool); SAVEFREEPV(g.al);
+		Newx(g.pre, pr * pr + 3 * pr + 1, NV); SAVEFREEPV(g.pre);
+	}
+	mm.w = g.W; mm.y = g.zw;
+	glmm_rowmap(&g);
+
+	/*The family's mustart (R's binomial()$initialize, poisson()'s, MASS's
+	negative.binomial()'s) and eta from it, where the first PIRLS starts.*/
+	{
+		const short int f0 = (fam == GLM_NEGBIN && !theta_given) ? GLM_POISSON : fam;
+		for (size_t i = 0; i < n; i++) {
+			const NV y = Fr.Y[i], m = Fr.WT ? Fr.WT[i] : 1.0;
+			NV mu = (f0 == GLM_BINOMIAL) ? (m * y + 0.5) / (m + 1.0)
+			      : (f0 == GLM_POISSON)  ? y + 0.1
+			      :                        y + (y == 0.0 ? 1.0 / 6.0 : 0.0);
+			g.mu[i] = mu;
+			g.eta[i] = (f0 == GLM_BINOMIAL) ? nv_log(mu / (1.0 - mu)) : nv_log(mu);
+		}
+		g.fam = f0;
+	}
+	g.from_mustart = TRUE;
+
+	Newx(theta, nt ? nt : 1, NV); SAVEFREEPV(theta);
+	Newxz(beta, pr ? pr : 1, NV); SAVEFREEPV(beta);
+	// lme4's start: every T_k the identity
+	for (size_t k = 0; k < Fr.nre; k++) {
+		size_t idx = mm.term[k].off, q = mm.term[k].q;
+		if (mm.term[k].diag) for (size_t a = 0; a < q; a++) theta[idx++] = 1.0;
+		else for (size_t col = 0; col < q; col++) for (size_t row = col; row < q; row++) theta[idx++] = (row == col) ? 1.0 : 0.0;
+	}
+	if (fam == GLM_NEGBIN && !theta_given) {
+		/*glmer.nb(): a Poisson fit, MASS::theta.ml() on its fitted means
+		(lme4's est_theta(), limit 20), then the negative-binomial fit from
+		there, with theta free*/
+		NV se_th;
+		(void)glmm_fit(aTHX_ &g, theta, beta, FALSE, FALSE);
+		g.nbth = nb_theta_ml(Fr.Y, g.mu, Fr.WT, n, 20, &se_th);
+		if (!(g.nbth > 0.0 && nv_isfinite(g.nbth))) g.nbth = 1.0;
+		g.fam = GLM_NEGBIN;
+		conv = glmm_fit(aTHX_ &g, theta, beta, nagq == 0, nagq != 0);
+	} else {
+		conv = glmm_fit(aTHX_ &g, theta, beta, nagq == 0, FALSE);
+	}
+	// turn each column of every T_k to a non-negative diagonal, as lmer() does
+	for (size_t k = 0; k < Fr.nre; k++) {
+		size_t q = mm.term[k].q, idx = mm.term[k].off;
+		if (mm.term[k].diag) { for (size_t a = 0; a < q; a++) { theta[idx] = nv_fabs(theta[idx]); idx++; } continue; }
+		for (size_t col = 0; col < q; col++) {
+			bool neg = theta[idx] < 0.0;
+			for (size_t row = col; row < q; row++) { if (neg) theta[idx] = -theta[idx]; idx++; }
+		}
+	}
+
+	res = (HV *)sv_2mortal((SV *)newHV());
+	{
+		const size_t d = nt + pr;
+		NV *x, *H, *V, *Vrx, *hmin, *se_rx, crit, zcrit = std_qnorm(1.0 - (1.0 - conf_level) / 2.0);
+		bool use_hess = FALSE;
+		Newx(x, d ? d : 1, NV); SAVEFREEPV(x);
+		Newx(H, d ? d * d : 1, NV); SAVEFREEPV(H);
+		Newx(V, pr ? pr * pr : 1, NV); SAVEFREEPV(V);
+		Newx(Vrx, pr ? pr * pr : 1, NV); SAVEFREEPV(Vrx);
+		Newx(hmin, d ? d : 1, NV); SAVEFREEPV(hmin);
+		Newx(se_rx, pr ? pr : 1, NV); SAVEFREEPV(se_rx);
+		memcpy(x, theta, nt * sizeof(NV));
+		memcpy(x + nt, beta, pr * sizeof(NV));
+		g.npar_beta = pr; g.nb_free = FALSE;
+		/*X'V^-1X at the mode, with W the working weights there: lme4's
+		RX-based vcov, which it uses for nAGQ = 0 and where the Hessian is not
+		positive definite, and whose standard errors scale the steps of the
+		finite differences below*/
+		(void)glmm_objective(&mm, x, &g);
+		{
+			NV r2, ld;
+			bool *al2;
+			Newx(al2, pr ? pr : 1, bool); SAVEFREEPV(al2);
+			lmm_prep_into(&mm, g.pre);
+			if (!lmm_eval(&mm, theta, g.XtVX, g.Xa, g.beta_new, g.al, &r2, &ld, g.u_new))
+				croak("glmer: the model could not be factored at its optimum");
+			memcpy(Vrx, g.XtVX, pr * pr * sizeof(NV));
+			sweep_matrix_ols(Vrx, pr, al2);
+			for (size_t j = 0; j < pr; j++)
+				se_rx[j] = (!al2[j] && Vrx[j * pr + j] > 0.0 && nv_isfinite(Vrx[j * pr + j])) ? nv_sqrt(Vrx[j * pr + j]) : 0.1;
+		}
+		glmm_fd_floor(nt, pr, FALSE, se_rx, hmin);
+		if (nagq != 0) {
+			/*lme4's vcov.merMod(use.hessian = TRUE): 2 H^-1, its beta block,
+			H the Hessian of the deviance in (theta, beta), here by
+			Richardson differences; the negative-binomial theta held fixed,
+			as lme4's refit does*/
+			bool *alh;
+			Newx(alh, d ? d : 1, bool); SAVEFREEPV(alh);
+			lmm_fd_h(&mm, glmm_objective, &g, x, d, NULL, H, hmin);
+			if ((size_t)sweep_matrix_ols(H, d, alh) == d) {
+				for (size_t j = 0; j < pr; j++)
+					for (size_t l = 0; l < pr; l++)
+						V[j * pr + l] = H[(nt + j) * d + nt + l] + H[(nt + l) * d + nt + j];
+				use_hess = TRUE;
+				for (size_t j = 0; j < pr; j++) if (!(V[j * pr + j] > 0.0) || !nv_isfinite(V[j * pr + j])) use_hess = FALSE;
+				if (use_hess) {
+					/*positive definite, as lme4 requires of it (eigen > 0):
+					a Cholesky succeeds.  Like lme4 2.0-6 vcov.merMod() (R/lmer.R,
+					calc.vcov.hess() and bad.V.hess), this tests only the beta block of
+					H^-1, not H itself, so an indefinite H whose beta block is still
+					positive definite is used, as lme4 uses it.*/
+					NV *C;
+					Newx(C, pr ? pr * pr : 1, NV);
+					memcpy(C, V, pr * pr * sizeof(NV));
+					use_hess = lmm_chol(C, pr);
+					Safefree(C);
+				}
+			}
+		}
+		crit = glmm_objective(&mm, x, &g); //the mode at the estimate, after the differences moved it
+		if (!g.ok) conv = FALSE;
+		if (!use_hess) {
+			memcpy(V, Vrx, pr * pr * sizeof(NV));
+			if (nagq != 0)
+				warn("glmer: variance-covariance matrix computed from finite-difference Hessian is\n"
+				     "not positive definite or contains NA values: falling back to var-cov estimated from RX");
+		}
+		{
+			HV *coef = newHV(), *summ = newHV(), *vcov = newHV(), *conf = newHV(), *ex = newHV();
+			AV *terms_av = newAV();
+			size_t jr = 0;
+			for (size_t j = 0; j < p; j++) {
+				const char *nm = mf_colname(&F.PF, j);
+				HV *row = newHV();
+				av_push(terms_av, LM_NSV(F.PF.design, nm));
+				if (dropped[j]) {
+					LM_NSTORE(F.PF.design, coef, nm, newSVnv(NV_NAN));
+					hv_store(row, "Estimate", 8, newSVpv("NaN", 0), 0);
+				} else {
+					const NV est = beta[jr], se = nv_sqrt(V[jr * pr + jr]), z = est / se;
+					HV *vr = newHV(), *er = newHV();
+					AV *ci = newAV();
+					LM_NSTORE(F.PF.design, coef, nm, newSVnv(est));
+					hv_store(row, "Estimate", 8, newSVnv(est), 0);
+					hv_store(row, "Std. Error", 10, newSVnv(se), 0);
+					hv_store(row, "z value", 7, newSVnv(z), 0);
+					hv_store(row, "Pr(>|z|)", 8, newSVnv(2.0 * approx_pnorm(-nv_fabs(z))), 0);
+					hv_store(row, "CI_lower", 8, newSVnv(est - zcrit * se), 0);
+					hv_store(row, "CI_upper", 8, newSVnv(est + zcrit * se), 0);
+					av_push(ci, newSVnv(est - zcrit * se));
+					av_push(ci, newSVnv(est + zcrit * se));
+					LM_NSTORE(F.PF.design, conf, nm, newRV_noinc((SV *)ci));
+					hv_stores(er, "estimate", newSVnv(nv_exp(est)));
+					hv_stores(er, "conf_low", newSVnv(nv_exp(est - zcrit * se)));
+					hv_stores(er, "conf_high", newSVnv(nv_exp(est + zcrit * se)));
+					LM_NSTORE(F.PF.design, ex, nm, newRV_noinc((SV *)er));
+					for (size_t l = 0, lr = 0; l < p; l++) {
+						if (dropped[l]) continue;
+						LM_NSTORE(F.PF.design, vr, mf_colname(&F.PF, l), newSVnv(V[jr * pr + lr]));
+						lr++;
+					}
+					LM_NSTORE(F.PF.design, vcov, nm, newRV_noinc((SV *)vr));
+					jr++;
+				}
+				LM_NSTORE(F.PF.design, summ, nm, newRV_noinc((SV *)row));
+			}
+			hv_store(res, "coefficients", 12, newRV_noinc((SV *)coef), 0);
+			hv_store(res, "summary", 7, newRV_noinc((SV *)summ), 0);
+			hv_store(res, "vcov", 4, newRV_noinc((SV *)vcov), 0);
+			hv_store(res, "conf_int", 8, newRV_noinc((SV *)conf), 0);
+			hv_store(res, "exp", 3, newRV_noinc((SV *)ex), 0);
+			hv_store(res, "terms", 5, newRV_noinc((SV *)terms_av), 0);
+		}
+		// variance components, VarCorr(): T_k T_k', no residual scale
+		{
+			AV *vc = newAV(), *th = newAV();
+			NV *T;
+			for (size_t j = 0; j < nt; j++) av_push(th, newSVnv(theta[j]));
+			hv_store(res, "theta", 5, newRV_noinc((SV *)th), 0);
+			for (size_t k = 0; k < Fr.nre; k++) {
+				const size_t q = mm.term[k].q;
+				HV *e = newHV(), *sd = newHV();
+				AV *nm = newAV(), *cor = newAV();
+				Newx(T, q * q, NV);
+				lmm_T(&mm, k, theta, T);
+				for (size_t a = 0; a < q; a++) {
+					NV v = 0.0;
+					const char *cn = mf_colname(&Fr.PR[k], a);
+					for (size_t c = 0; c < q; c++) v += T[a * q + c] * T[a * q + c];
+					av_push(nm, LM_NSV(Fr.PR[k].design, cn));
+					LM_NSTORE(Fr.PR[k].design, sd, cn, newSVnv(nv_sqrt(v)));
+				}
+				for (size_t a = 0; a < q; a++) {
+					AV *r = newAV();
+					for (size_t b2 = 0; b2 < q; b2++) {
+						NV s = 0.0, va = 0.0, vb = 0.0;
+						for (size_t c = 0; c < q; c++) { s += T[a * q + c] * T[b2 * q + c]; va += T[a * q + c] * T[a * q + c]; vb += T[b2 * q + c] * T[b2 * q + c]; }
+						av_push(r, newSVnv((va > 0.0 && vb > 0.0) ? s / nv_sqrt(va * vb) : NV_NAN));
+					}
+					av_push(cor, newRV_noinc((SV *)r));
+				}
+				Safefree(T);
+				hv_stores(e, "group", newSVpv(Fr.re_group[k], 0));
+				hv_stores(e, "names", newRV_noinc((SV *)nm));
+				hv_stores(e, "sd", newRV_noinc((SV *)sd));
+				hv_stores(e, "corr", newRV_noinc((SV *)cor));
+				hv_stores(e, "levels", newSVuv((UV)Fr.NL[k]));
+				av_push(vc, newRV_noinc((SV *)e));
+			}
+			hv_store(res, "varcor", 6, newRV_noinc((SV *)vc), 0);
+		}
+		{
+			HV *fit = newHV(), *lin = newHV();
+			for (size_t i = 0; i < n; i++) {
+				hv_store(fit, Fr.names[i], ROWNAME_KLEN(Fr.names[i]), newSVnv(g.mu[i]), 0);
+				hv_store(lin, Fr.names[i], ROWNAME_KLEN(Fr.names[i]), newSVnv(g.eta[i]), 0);
+			}
+			hv_store(res, "fitted_values", 13, newRV_noinc((SV *)fit), 0);
+			hv_store(res, "linear_predictors", 17, newRV_noinc((SV *)lin), 0);
+		}
+		{
+			/*lme4's logLik(): -D/2, with df the covariance parameters, the
+			fixed effects and, for the negative binomial, its theta -- which
+			lme4 counts even when it was given, as glmer(family =
+			negative.binomial(2)), where glm() does not count it*/
+			const NV ll = -crit / 2.0;
+			const NV dfm = (NV)(nt + pr) + (fam == GLM_NEGBIN ? 1.0 : 0.0);
+			bool sing = FALSE;
+			hv_store(res, "deviance", 8, newSVnv(crit), 0);
+			hv_store(res, "loglik", 6, newSVnv(ll), 0);
+			hv_store(res, "AIC", 3, newSVnv(-2.0 * ll + 2.0 * dfm), 0);
+			hv_store(res, "BIC", 3, newSVnv(-2.0 * ll + nv_log((NV)n) * dfm), 0);
+			hv_store(res, "df_residual", 11, newSVnv((NV)n - dfm), 0);
+			hv_store(res, "nobs", 4, newSVuv((UV)n), 0);
+			hv_store(res, "converged", 9, newSVuv(conv ? 1 : 0), 0);
+			hv_store(res, "family", 6, newSVpv(fam == GLM_BINOMIAL ? "binomial" : fam == GLM_POISSON ? "poisson" : "negbin", 0), 0);
+			hv_store(res, "nAGQ", 4, newSVuv(nagq), 0);
+			hv_store(res, "conf_level", 10, newSVnv(conf_level), 0);
+			hv_store(res, "vcov_method", 11, newSVpv(use_hess ? "Hessian" : "RX", 0), 0);
+			if (fam == GLM_NEGBIN) hv_store(res, "nb_theta", 8, newSVnv(g.nbth), 0);
+			// a variance component on its boundary: lme4's "singular fit"
+			for (size_t k = 0; k < Fr.nre; k++) {
+				size_t q = mm.term[k].q, idx = mm.term[k].off;
+				for (size_t col = 0; col < q; col++) {
+					if (nv_fabs(theta[idx]) < LMM_SINGULAR_TOL) sing = TRUE;
+					idx += mm.term[k].diag ? 1 : q - col;
+				}
+			}
+			hv_store(res, "singular", 8, newSVuv(sing ? 1 : 0), 0);
 		}
 	}
 	RETVAL = newRV_inc((SV *)res);
@@ -48289,16 +49752,14 @@ CODE:
 			for (SSize_t i = 0; i < n; i++) {
 				SV **elem = av_fetch(x_av, i, 0);
 				const NV x_val = dist_arg_nv(aTHX_ elem ? *elem : NULL, "pnorm");
-				NV res = (NV)c_pnorm((double)x_val, (double)mean, (double)sd,
-				                     lower_tail, give_log);
+				NV res = nv_pnorm(x_val, mean, sd, lower_tail, give_log);
 				av_store(result_av, i, newSVnv(res));
 			}
 		}
 		RETVAL = SvREFCNT_inc_simple_NN(rv);
 	} else {
 		const NV x_val = SvOK(x_sv) ? sv_num_opt(aTHX_ x_sv, "pnorm", "x") : NV_NAN;
-		NV res = (NV)c_pnorm((double)x_val, (double)mean, (double)sd,
-		                     lower_tail, give_log);
+		NV res = nv_pnorm(x_val, mean, sd, lower_tail, give_log);
 		RETVAL = newSVnv(res);
 	}
 }

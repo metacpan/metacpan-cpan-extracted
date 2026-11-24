@@ -1,0 +1,83 @@
+package Google::Cloud::Databasecenter::V1beta::SuspensionReason;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Cjpnb29nbGUvY2xvdWQvZGF0YWJhc2VjZW50ZXIvdjFiZXRhL3N1c3BlbnNpb25fcmVhc29u
+LnByb3RvEiJnb29nbGUuY2xvdWQuZGF0YWJhc2VjZW50ZXIudjFiZXRhKuYBChBTdXNwZW5z
+aW9uUmVhc29uEiEKHVNVU1BFTlNJT05fUkVBU09OX1VOU1BFQ0lGSUVEEAASFgoSV0lQRU9V
+VF9ISURFX0VWRU5UEAESFwoTV0lQRU9VVF9QVVJHRV9FVkVOVBACEhQKEEJJTExJTkdfRElT
+QUJMRUQQAxITCg9BQlVTRVJfREVURUNURUQQBBIfChtFTkNSWVBUSU9OX0tFWV9JTkFDQ0VT
+U0lCTEUQBRIyCi5SRVBMSUNBVEVEX0NMVVNURVJfRU5DUllQVElPTl9LRVlfSU5BQ0NFU1NJ
+QkxFEAZCgwIKJmNvbS5nb29nbGUuY2xvdWQuZGF0YWJhc2VjZW50ZXIudjFiZXRhQhVTdXNw
+ZW5zaW9uUmVhc29uUHJvdG9QAVpOY2xvdWQuZ29vZ2xlLmNvbS9nby9kYXRhYmFzZWNlbnRl
+ci9hcGl2MWJldGEvZGF0YWJhc2VjZW50ZXJwYjtkYXRhYmFzZWNlbnRlcnBiqgIiR29vZ2xl
+LkNsb3VkLkRhdGFiYXNlQ2VudGVyLlYxQmV0YcoCIkdvb2dsZVxDbG91ZFxEYXRhYmFzZUNl
+bnRlclxWMWJldGHqAiVHb29nbGU6OkNsb3VkOjpEYXRhYmFzZUNlbnRlcjo6VjFiZXRhSrgK
+CgYSBA4AMAEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExDCgogTGlj
+ZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNl
+bnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNl
+IHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vu
+c2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4w
+CgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3
+cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlz
+dHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBD
+T05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2Vl
+IHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1p
+c3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQACsK
+CAoBCBIDEgA/CgkKAgglEgMSAD8KCAoBCBIDEwBlCgkKAggLEgMTAGUKCAoBCBIDFAAiCgkK
+AggKEgMUACIKCAoBCBIDFQA2CgkKAggIEgMVADYKCAoBCBIDFgA/CgkKAggBEgMWAD8KCAoB
+CBIDFwA/CgkKAggpEgMXAD8KCAoBCBIDGAA+CgkKAggtEgMYAD4KQQoCBQASBBsAMAEaNSBU
+aGUgcmVhc29uIGZvciBzdXNwZW5zaW9uIG9mIHRoZSBkYXRhYmFzZSByZXNvdXJjZS4KCgoK
+AwUAARIDGwUVCjAKBAUAAgASAx0CJBojIFN1c3BlbnNpb24gcmVhc29uIGlzIHVuc3BlY2lm
+aWVkLgoKDAoFBQACAAESAx0CHwoMCgUFAAIAAhIDHSIjCiIKBAUAAgESAyACGRoVIFdpcGVv
+dXQgaGlkZSBldmVudC4KCgwKBQUAAgEBEgMgAhQKDAoFBQACAQISAyAXGAojCgQFAAICEgMj
+AhoaFiBXaXBlb3V0IHB1cmdlIGV2ZW50LgoKDAoFBQACAgESAyMCFQoMCgUFAAICAhIDIxgZ
+CisKBAUAAgMSAyYCFxoeIEJpbGxpbmcgZGlzYWJsZWQgZm9yIHByb2plY3QKCgwKBQUAAgMB
+EgMmAhIKDAoFBQACAwISAyYVFgoqCgQFAAIEEgMpAhYaHSBBYnVzZSBkZXRlY3RlZCBmb3Ig
+cmVzb3VyY2UKCgwKBQUAAgQBEgMpAhEKDAoFBQACBAISAykUFQorCgQFAAIFEgMsAiIaHiBF
+bmNyeXB0aW9uIGtleSBpbmFjY2Vzc2libGUuCgoMCgUFAAIFARIDLAIdCgwKBQUAAgUCEgMs
+ICEKPgoEBQACBhIDLwI1GjEgUmVwbGljYXRlZCBjbHVzdGVyIGVuY3J5cHRpb24ga2V5IGlu
+YWNjZXNzaWJsZS4KCgwKBQUAAgYBEgMvAjAKDAoFBQACBgISAy8zNGIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Databasecenter::V1beta::SuspensionReason - Compiled Protocol Buffers messages for google/cloud/databasecenter/v1beta/suspension_reason.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/databasecenter/v1beta/suspension_reason.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Databasecenter::V1beta::SuspensionReason::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

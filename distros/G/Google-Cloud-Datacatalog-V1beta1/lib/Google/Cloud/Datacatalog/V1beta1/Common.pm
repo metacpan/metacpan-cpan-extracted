@@ -1,0 +1,81 @@
+package Google::Cloud::Datacatalog::V1beta1::Common;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Ci1nb29nbGUvY2xvdWQvZGF0YWNhdGFsb2cvdjFiZXRhMS9jb21tb24ucHJvdG8SIGdvb2ds
+ZS5jbG91ZC5kYXRhY2F0YWxvZy52MWJldGExKlUKEEludGVncmF0ZWRTeXN0ZW0SIQodSU5U
+RUdSQVRFRF9TWVNURU1fVU5TUEVDSUZJRUQQABIMCghCSUdRVUVSWRABEhAKDENMT1VEX1BV
+QlNVQhACKmoKDk1hbmFnaW5nU3lzdGVtEh8KG01BTkFHSU5HX1NZU1RFTV9VTlNQRUNJRklF
+RBAAEhwKGE1BTkFHSU5HX1NZU1RFTV9EQVRBUExFWBABEhkKFU1BTkFHSU5HX1NZU1RFTV9P
+VEhFUhACQtwBCiRjb20uZ29vZ2xlLmNsb3VkLmRhdGFjYXRhbG9nLnYxYmV0YTFQAVpGY2xv
+dWQuZ29vZ2xlLmNvbS9nby9kYXRhY2F0YWxvZy9hcGl2MWJldGExL2RhdGFjYXRhbG9ncGI7
+ZGF0YWNhdGFsb2dwYqoCIEdvb2dsZS5DbG91ZC5EYXRhQ2F0YWxvZy5WMUJldGExygIgR29v
+Z2xlXENsb3VkXERhdGFDYXRhbG9nXFYxYmV0YTHqAiNHb29nbGU6OkNsb3VkOjpEYXRhQ2F0
+YWxvZzo6VjFiZXRhMUqPCgoGEgQOADEBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjUg
+R29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lv
+biAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNl
+cHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBj
+b3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNl
+bnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBv
+ciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRo
+ZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VU
+IFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mg
+b3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdl
+IGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNl
+bnNlLgoKCAoBAhIDEAApCggKAQgSAxIAPQoJCgIIJRIDEgA9CggKAQgSAxMAXQoJCgIICxID
+EwBdCggKAQgSAxQAIgoJCgIIChIDFAAiCggKAQgSAxUAPQoJCgIIARIDFQA9CggKAQgSAxYA
+PQoJCgIIKRIDFgA9CggKAQgSAxcAPAoJCgIILRIDFwA8Cl4KAgUAEgQbACQBGlIgVGhpcyBl
+bnVtIGRlc2NyaWJlcyBhbGwgdGhlIHBvc3NpYmxlIHN5c3RlbXMgdGhhdCBEYXRhIENhdGFs
+b2cgaW50ZWdyYXRlcwogd2l0aC4KCgoKAwUAARIDGwUVCiYKBAUAAgASAx0CJBoZIERlZmF1
+bHQgdW5rbm93biBzeXN0ZW0uCgoMCgUFAAIAARIDHQIfCgwKBQUAAgACEgMdIiMKGAoEBQAC
+ARIDIAIPGgsgQmlnUXVlcnkuCgoMCgUFAAIBARIDIAIKCgwKBQUAAgECEgMgDQ4KHQoEBQAC
+AhIDIwITGhAgQ2xvdWQgUHViL1N1Yi4KCgwKBQUAAgIBEgMjAg4KDAoFBQACAgISAyMREgpv
+CgIFARIEKAAxARpjIFRoaXMgZW51bSBkZXNjcmliZXMgYWxsIHRoZSBzeXN0ZW1zIHRoYXQg
+bWFuYWdlCiBUYXhvbm9teSBhbmQgUG9saWN5VGFnIHJlc291cmNlcyBpbiBEYXRhQ2F0YWxv
+Zy4KCgoKAwUBARIDKAUTChwKBAUBAgASAyoCIhoPIERlZmF1bHQgdmFsdWUKCgwKBQUBAgAB
+EgMqAh0KDAoFBQECAAISAyogIQoYCgQFAQIBEgMtAh8aCyBEYXRhcGxleC4KCgwKBQUBAgEB
+EgMtAhoKDAoFBQECAQISAy0dHgoUCgQFAQICEgMwAhwaByBPdGhlcgoKDAoFBQECAgESAzAC
+FwoMCgUFAQICAhIDMBobYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Datacatalog::V1beta1::Common - Compiled Protocol Buffers messages for google/cloud/datacatalog/v1beta1/common.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/datacatalog/v1beta1/common.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Datacatalog::V1beta1::Common::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

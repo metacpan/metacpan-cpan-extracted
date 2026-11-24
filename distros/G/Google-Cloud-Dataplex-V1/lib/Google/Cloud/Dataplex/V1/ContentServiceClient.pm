@@ -5,13 +5,13 @@ use warnings;
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Dataplex::V1::Resources;
-use Google::Cloud::Dataplex::V1::Security;
 use Google::Cloud::Dataplex::V1::DataDocumentation;
-use Google::Cloud::Dataplex::V1::Processing;
+use Google::Cloud::Dataplex::V1::Resources;
 use Google::Cloud::Dataplex::V1::DatascansCommon;
-use Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
 use Google::Cloud::Dataplex::V1::DataDiscovery;
+use Google::Cloud::Dataplex::V1::Security;
+use Google::Cloud::Dataplex::V1::Processing;
+use Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
 use Google::Cloud::Dataplex::V1::Content;
 use Google::Cloud::Dataplex::V1::Metadata;
 use Google::Cloud::Dataplex::V1::Analyze;
@@ -20,15 +20,15 @@ use Google::Cloud::Dataplex::V1::Logs;
 use Google::Cloud::Dataplex::V1::DataProfile;
 use Google::Cloud::Dataplex::V1::DataQuality;
 use Google::Cloud::Dataplex::V1::Service;
+use Google::Cloud::Dataplex::V1::Datascans;
+use Google::Cloud::Dataplex::V1::Catalog;
 use Google::Cloud::Dataplex::V1::Cmek;
 use Google::Cloud::Dataplex::V1::BusinessGlossary;
-use Google::Cloud::Dataplex::V1::Datascans;
 use Google::Cloud::Dataplex::V1::DataTaxonomy;
-use Google::Cloud::Dataplex::V1::Catalog;
 use Google::Cloud::Dataplex::V1::ApprovalWorkflow;
 use Google::Cloud::Dataplex::V1::DataProducts;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 1; # End of Google::Cloud::Dataplex::V1::ContentServiceClient
 
 __END__
@@ -107,11 +107,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/dataplex/v1/data_quality_rule_template.proto>
 
-=item * C<googleapis/google/cloud/dataplex/v1/datascans_common.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_taxonomy.proto>
 
 =item * C<googleapis/google/cloud/dataplex/v1/datascans.proto>
 
-=item * C<googleapis/google/cloud/dataplex/v1/data_taxonomy.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/datascans_common.proto>
 
 =item * C<googleapis/google/cloud/dataplex/v1/logs.proto>
 

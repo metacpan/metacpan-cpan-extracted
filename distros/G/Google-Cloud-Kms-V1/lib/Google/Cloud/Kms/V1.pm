@@ -11,13 +11,13 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Kms::V1::Resources;
-use Google::Cloud::Kms::V1::EkmService;
 use Google::Cloud::Kms::V1::AutokeyAdmin;
+use Google::Cloud::Kms::V1::EkmService;
 use Google::Cloud::Kms::V1::Autokey;
 use Google::Cloud::Kms::V1::HsmManagement;
 use Google::Cloud::Kms::V1::Service;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -51,6 +51,40 @@ sub BUILD {
         );
         $self->transport($client);
     }
+}
+
+sub create_key_handle {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.kms.v1.Autokey/CreateKeyHandle',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.kms.v1.Autokey',
+        method         => 'CreateKeyHandle',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
 }
 
 sub update_autokey_config {
@@ -148,40 +182,6 @@ sub show_effective_autokey_config {
     my $response = $self->transport->call({
         service        => 'google.cloud.kms.v1.AutokeyAdmin',
         method         => 'ShowEffectiveAutokeyConfig',
-        request        => $request,
-        response_class => $response_class,
-    });
-
-    return $response;
-}
-
-sub create_key_handle {
-    my ($self, %params) = @_;
-
-    my $request_class = 'Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest';
-    my $request = eval { $request_class->new(\%params) };
-    my $new_err = $@;
-    if (!$request) {
-        $request = eval { $request_class->new(%params) };
-        $new_err ||= $@;
-    }
-    if (!$request) {
-        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
-    }
-
-    my $response_class = 'Google::Longrunning::Operations::Operation';
-    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
-        return $self->transport->call({
-            http_method    => 'POST',
-            path           => '/google.cloud.kms.v1.Autokey/CreateKeyHandle',
-            request        => $request,
-            response_class => $response_class,
-        });
-    }
-
-    my $response = $self->transport->call({
-        service        => 'google.cloud.kms.v1.Autokey',
-        method         => 'CreateKeyHandle',
         request        => $request,
         response_class => $response_class,
     });
@@ -332,9 +332,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/cloud/kms/v1/autokey_admin.proto>
-
 =item * C<googleapis/google/cloud/kms/v1/autokey.proto>
+
+=item * C<googleapis/google/cloud/kms/v1/autokey_admin.proto>
 
 =item * C<googleapis/google/cloud/kms/v1/ekm_service.proto>
 
@@ -375,33 +375,193 @@ The following RPC methods are available in this client:
 
 =over 4
 
+=item * B<create_key_handle>
+
+    my $response = $client->create_key_handle(
+        parent                   => $parent,
+        key_handle_id            => $key_handle_id,
+        key_handle               => $key_handle,
+    );
+
+Calls the RPC method C<CreateKeyHandle> on C<google.cloud.kms.v1.Autokey>.
+
+Request: L<Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<key_handle_id> - C<string>
+
+=item * C<key_handle> - L<Google::Cloud::Kms::V1::Autokey::KeyHandle>
+
+=back
+
 =item * B<update_autokey_config>
 
-Calls the RPC method C<UpdateAutokeyConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_autokey_config(
+        autokey_config           => $autokey_config,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<UpdateAutokeyConfig> on C<google.cloud.kms.v1.AutokeyAdmin>.
+
+Request: L<Google::Cloud::Kms::V1::AutokeyAdmin::UpdateAutokeyConfigRequest>
+
+Returns: L<Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig>
+
+Parameters:
+
+=over 4
+
+=item * C<autokey_config> - L<Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<get_autokey_config>
 
-Calls the RPC method C<GetAutokeyConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_autokey_config(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetAutokeyConfig> on C<google.cloud.kms.v1.AutokeyAdmin>.
+
+Request: L<Google::Cloud::Kms::V1::AutokeyAdmin::GetAutokeyConfigRequest>
+
+Returns: L<Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<show_effective_autokey_config>
 
-Calls the RPC method C<ShowEffectiveAutokeyConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->show_effective_autokey_config(
+        parent                   => $parent,
+    );
 
-=item * B<create_key_handle>
+Calls the RPC method C<ShowEffectiveAutokeyConfig> on C<google.cloud.kms.v1.AutokeyAdmin>.
 
-Calls the RPC method C<CreateKeyHandle> on the service. Takes a hash of parameters representing the request.
+Request: L<Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigRequest>
+
+Returns: L<Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=back
 
 =item * B<list_ekm_connections>
 
-Calls the RPC method C<ListEkmConnections> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_ekm_connections(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListEkmConnections> on C<google.cloud.kms.v1.EkmService>.
+
+Request: L<Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsRequest>
+
+Returns: L<Google::Cloud::Kms::V1::EkmService::ListEkmConnectionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =item * B<list_single_tenant_hsm_instances>
 
-Calls the RPC method C<ListSingleTenantHsmInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_single_tenant_hsm_instances(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+        show_deleted             => $show_deleted,
+    );
+
+Calls the RPC method C<ListSingleTenantHsmInstances> on C<google.cloud.kms.v1.HsmManagement>.
+
+Request: L<Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesRequest>
+
+Returns: L<Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=item * C<show_deleted> - C<bool>
+
+=back
 
 =item * B<list_key_rings>
 
-Calls the RPC method C<ListKeyRings> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_key_rings(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListKeyRings> on C<google.cloud.kms.v1.KeyManagementService>.
+
+Request: L<Google::Cloud::Kms::V1::Service::ListKeyRingsRequest>
+
+Returns: L<Google::Cloud::Kms::V1::Service::ListKeyRingsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =back
 

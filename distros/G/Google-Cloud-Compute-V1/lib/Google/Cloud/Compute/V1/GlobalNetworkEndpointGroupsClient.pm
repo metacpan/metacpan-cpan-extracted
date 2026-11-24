@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -362,31 +362,203 @@ The following RPC methods are available in this client:
 
 =item * B<attach_network_endpoints>
 
-Calls the RPC method C<AttachNetworkEndpoints> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->attach_network_endpoints(
+        global_network_endpoint_groups_attach_endpoints_request_resource => $global_network_endpoint_groups_attach_endpoints_request_resource,
+        network_endpoint_group   => $network_endpoint_group,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<AttachNetworkEndpoints> on C<google.cloud.compute.v1.GlobalNetworkEndpointGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AttachNetworkEndpointsGlobalNetworkEndpointGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<global_network_endpoint_groups_attach_endpoints_request_resource> - L<Google::Cloud::Compute::V1::Compute::GlobalNetworkEndpointGroupsAttachEndpointsRequest>
+
+=item * C<network_endpoint_group> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        network_endpoint_group   => $network_endpoint_group,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.GlobalNetworkEndpointGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteGlobalNetworkEndpointGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network_endpoint_group> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<detach_network_endpoints>
 
-Calls the RPC method C<DetachNetworkEndpoints> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->detach_network_endpoints(
+        global_network_endpoint_groups_detach_endpoints_request_resource => $global_network_endpoint_groups_detach_endpoints_request_resource,
+        network_endpoint_group   => $network_endpoint_group,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<DetachNetworkEndpoints> on C<google.cloud.compute.v1.GlobalNetworkEndpointGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DetachNetworkEndpointsGlobalNetworkEndpointGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<global_network_endpoint_groups_detach_endpoints_request_resource> - L<Google::Cloud::Compute::V1::Compute::GlobalNetworkEndpointGroupsDetachEndpointsRequest>
+
+=item * C<network_endpoint_group> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        network_endpoint_group   => $network_endpoint_group,
+        project                  => $project,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.GlobalNetworkEndpointGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetGlobalNetworkEndpointGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::NetworkEndpointGroup>
+
+Parameters:
+
+=over 4
+
+=item * C<network_endpoint_group> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        network_endpoint_group_resource => $network_endpoint_group_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.GlobalNetworkEndpointGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertGlobalNetworkEndpointGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network_endpoint_group_resource> - L<Google::Cloud::Compute::V1::Compute::NetworkEndpointGroup>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.GlobalNetworkEndpointGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListGlobalNetworkEndpointGroupsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::NetworkEndpointGroupList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<list_network_endpoints>
 
-Calls the RPC method C<ListNetworkEndpoints> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_network_endpoints(
+        filter                   => $filter,
+        max_results              => $max_results,
+        network_endpoint_group   => $network_endpoint_group,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<ListNetworkEndpoints> on C<google.cloud.compute.v1.GlobalNetworkEndpointGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListNetworkEndpointsGlobalNetworkEndpointGroupsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::NetworkEndpointGroupsListNetworkEndpoints>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<network_endpoint_group> - C<string>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =back
 

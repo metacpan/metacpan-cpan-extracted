@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Logs;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -728,76 +728,6 @@ EOF
     # Field: action Type: 11 (.google.cloud.dataplex.v1.DiscoveryEvent.ActionDetails)
     # Field: table Type: 11 (.google.cloud.dataplex.v1.DiscoveryEvent.TableDetails)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Logs;
-
-    my $msg = Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent->new(
-        message => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message>
-
-Type: String
-
-=item * B<lake_id>
-
-Type: String
-
-=item * B<zone_id>
-
-Type: String
-
-=item * B<asset_id>
-
-Type: String
-
-=item * B<data_location>
-
-Type: String
-
-=item * B<datascan_id>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.dataplex.v1.DiscoveryEvent.EventType)
-
-=item * B<config>
-
-Type: Message (.google.cloud.dataplex.v1.DiscoveryEvent.ConfigDetails)
-
-=item * B<entity>
-
-Type: Message (.google.cloud.dataplex.v1.DiscoveryEvent.EntityDetails)
-
-=item * B<partition>
-
-Type: Message (.google.cloud.dataplex.v1.DiscoveryEvent.PartitionDetails)
-
-=item * B<action>
-
-Type: Message (.google.cloud.dataplex.v1.DiscoveryEvent.ActionDetails)
-
-=item * B<table>
-
-Type: Message (.google.cloud.dataplex.v1.DiscoveryEvent.TableDetails)
-
-=back
-
-=cut
-
 # Enum: DiscoveryEvent::EventType
 our $DiscoveryEvent_EVENT_TYPE_UNSPECIFIED = 0;
 our $DiscoveryEvent_CONFIG = 1;
@@ -812,90 +742,16 @@ our $DiscoveryEvent_TABLE_UPDATED = 11;
 our $DiscoveryEvent_TABLE_IGNORED = 12;
 our $DiscoveryEvent_TABLE_DELETED = 13;
 
-=pod
-
-=head2 Enum: DiscoveryEvent::EventType
-
-Values:
-
-=over 4
-
-=item * C<EVENT_TYPE_UNSPECIFIED> => 0
-
-=item * C<CONFIG> => 1
-
-=item * C<ENTITY_CREATED> => 2
-
-=item * C<ENTITY_UPDATED> => 3
-
-=item * C<ENTITY_DELETED> => 4
-
-=item * C<PARTITION_CREATED> => 5
-
-=item * C<PARTITION_UPDATED> => 6
-
-=item * C<PARTITION_DELETED> => 7
-
-=item * C<TABLE_PUBLISHED> => 10
-
-=item * C<TABLE_UPDATED> => 11
-
-=item * C<TABLE_IGNORED> => 12
-
-=item * C<TABLE_DELETED> => 13
-
-=back
-
-=cut
-
 # Enum: DiscoveryEvent::EntityType
 our $DiscoveryEvent_ENTITY_TYPE_UNSPECIFIED = 0;
 our $DiscoveryEvent_TABLE = 1;
 our $DiscoveryEvent_FILESET = 2;
-
-=pod
-
-=head2 Enum: DiscoveryEvent::EntityType
-
-Values:
-
-=over 4
-
-=item * C<ENTITY_TYPE_UNSPECIFIED> => 0
-
-=item * C<TABLE> => 1
-
-=item * C<FILESET> => 2
-
-=back
-
-=cut
 
 # Enum: DiscoveryEvent::TableType
 our $DiscoveryEvent_TABLE_TYPE_UNSPECIFIED = 0;
 our $DiscoveryEvent_EXTERNAL_TABLE = 1;
 our $DiscoveryEvent_BIGLAKE_TABLE = 2;
 our $DiscoveryEvent_OBJECT_TABLE = 3;
-
-=pod
-
-=head2 Enum: DiscoveryEvent::TableType
-
-Values:
-
-=over 4
-
-=item * C<TABLE_TYPE_UNSPECIFIED> => 0
-
-=item * C<EXTERNAL_TABLE> => 1
-
-=item * C<BIGLAKE_TABLE> => 2
-
-=item * C<OBJECT_TABLE> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Logs::JobEvent ===
     # Fields for JobEvent
@@ -910,90 +766,10 @@ Values:
     # Field: service_job Type: 9 ()
     # Field: execution_trigger Type: 14 (.google.cloud.dataplex.v1.JobEvent.ExecutionTrigger)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Logs::JobEvent - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Logs;
-
-    my $msg = Google::Cloud::Dataplex::V1::Logs::JobEvent->new(
-        message => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.JobEvent.State)
-
-=item * B<retries>
-
-Type: Int32
-
-=item * B<type>
-
-Type: Enum (.google.cloud.dataplex.v1.JobEvent.Type)
-
-=item * B<service>
-
-Type: Enum (.google.cloud.dataplex.v1.JobEvent.Service)
-
-=item * B<service_job>
-
-Type: String
-
-=item * B<execution_trigger>
-
-Type: Enum (.google.cloud.dataplex.v1.JobEvent.ExecutionTrigger)
-
-=back
-
-=cut
-
 # Enum: JobEvent::Type
 our $JobEvent_TYPE_UNSPECIFIED = 0;
 our $JobEvent_SPARK = 1;
 our $JobEvent_NOTEBOOK = 2;
-
-=pod
-
-=head2 Enum: JobEvent::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<SPARK> => 1
-
-=item * C<NOTEBOOK> => 2
-
-=back
-
-=cut
 
 # Enum: JobEvent::State
 our $JobEvent_STATE_UNSPECIFIED = 0;
@@ -1002,70 +778,14 @@ our $JobEvent_FAILED = 2;
 our $JobEvent_CANCELLED = 3;
 our $JobEvent_ABORTED = 4;
 
-=pod
-
-=head2 Enum: JobEvent::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<SUCCEEDED> => 1
-
-=item * C<FAILED> => 2
-
-=item * C<CANCELLED> => 3
-
-=item * C<ABORTED> => 4
-
-=back
-
-=cut
-
 # Enum: JobEvent::Service
 our $JobEvent_SERVICE_UNSPECIFIED = 0;
 our $JobEvent_DATAPROC = 1;
-
-=pod
-
-=head2 Enum: JobEvent::Service
-
-Values:
-
-=over 4
-
-=item * C<SERVICE_UNSPECIFIED> => 0
-
-=item * C<DATAPROC> => 1
-
-=back
-
-=cut
 
 # Enum: JobEvent::ExecutionTrigger
 our $JobEvent_EXECUTION_TRIGGER_UNSPECIFIED = 0;
 our $JobEvent_TASK_CONFIG = 1;
 our $JobEvent_RUN_REQUEST = 2;
-
-=pod
-
-=head2 Enum: JobEvent::ExecutionTrigger
-
-Values:
-
-=over 4
-
-=item * C<EXECUTION_TRIGGER_UNSPECIFIED> => 0
-
-=item * C<TASK_CONFIG> => 1
-
-=item * C<RUN_REQUEST> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Logs::SessionEvent ===
     # Fields for SessionEvent
@@ -1078,60 +798,6 @@ Values:
     # Field: fast_startup_enabled Type: 8 ()
     # Field: unassigned_duration Type: 11 (.google.protobuf.Duration)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Logs::SessionEvent - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Logs;
-
-    my $msg = Google::Cloud::Dataplex::V1::Logs::SessionEvent->new(
-        message => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message>
-
-Type: String
-
-=item * B<user_id>
-
-Type: String
-
-=item * B<session_id>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.dataplex.v1.SessionEvent.EventType)
-
-=item * B<query>
-
-Type: Message (.google.cloud.dataplex.v1.SessionEvent.QueryDetail)
-
-=item * B<event_succeeded>
-
-Type: Bool
-
-=item * B<fast_startup_enabled>
-
-Type: Bool
-
-=item * B<unassigned_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
-
 # Enum: SessionEvent::EventType
 our $SessionEvent_EVENT_TYPE_UNSPECIFIED = 0;
 our $SessionEvent_START = 1;
@@ -1139,67 +805,11 @@ our $SessionEvent_STOP = 2;
 our $SessionEvent_QUERY = 3;
 our $SessionEvent_CREATE = 4;
 
-=pod
-
-=head2 Enum: SessionEvent::EventType
-
-Values:
-
-=over 4
-
-=item * C<EVENT_TYPE_UNSPECIFIED> => 0
-
-=item * C<START> => 1
-
-=item * C<STOP> => 2
-
-=item * C<QUERY> => 3
-
-=item * C<CREATE> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Logs::GovernanceEvent ===
     # Fields for GovernanceEvent
     # Field: message Type: 9 ()
     # Field: event_type Type: 14 (.google.cloud.dataplex.v1.GovernanceEvent.EventType)
     # Field: entity Type: 11 (.google.cloud.dataplex.v1.GovernanceEvent.Entity)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Logs::GovernanceEvent - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Logs;
-
-    my $msg = Google::Cloud::Dataplex::V1::Logs::GovernanceEvent->new(
-        message => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message>
-
-Type: String
-
-=item * B<event_type>
-
-Type: Enum (.google.cloud.dataplex.v1.GovernanceEvent.EventType)
-
-=item * B<entity>
-
-Type: Message (.google.cloud.dataplex.v1.GovernanceEvent.Entity)
-
-=back
-
-=cut
 
 # Enum: GovernanceEvent::EventType
 our $GovernanceEvent_EVENT_TYPE_UNSPECIFIED = 0;
@@ -1219,52 +829,6 @@ our $GovernanceEvent_GOVERNANCE_RULE_MATCHED_RESOURCES = 15;
 our $GovernanceEvent_GOVERNANCE_RULE_SEARCH_LIMIT_EXCEEDS = 16;
 our $GovernanceEvent_GOVERNANCE_RULE_ERRORS = 17;
 our $GovernanceEvent_GOVERNANCE_RULE_PROCESSING = 18;
-
-=pod
-
-=head2 Enum: GovernanceEvent::EventType
-
-Values:
-
-=over 4
-
-=item * C<EVENT_TYPE_UNSPECIFIED> => 0
-
-=item * C<RESOURCE_IAM_POLICY_UPDATE> => 1
-
-=item * C<BIGQUERY_TABLE_CREATE> => 2
-
-=item * C<BIGQUERY_TABLE_UPDATE> => 3
-
-=item * C<BIGQUERY_TABLE_DELETE> => 4
-
-=item * C<BIGQUERY_CONNECTION_CREATE> => 5
-
-=item * C<BIGQUERY_CONNECTION_UPDATE> => 6
-
-=item * C<BIGQUERY_CONNECTION_DELETE> => 7
-
-=item * C<BIGQUERY_TAXONOMY_CREATE> => 10
-
-=item * C<BIGQUERY_POLICY_TAG_CREATE> => 11
-
-=item * C<BIGQUERY_POLICY_TAG_DELETE> => 12
-
-=item * C<BIGQUERY_POLICY_TAG_SET_IAM_POLICY> => 13
-
-=item * C<ACCESS_POLICY_UPDATE> => 14
-
-=item * C<GOVERNANCE_RULE_MATCHED_RESOURCES> => 15
-
-=item * C<GOVERNANCE_RULE_SEARCH_LIMIT_EXCEEDS> => 16
-
-=item * C<GOVERNANCE_RULE_ERRORS> => 17
-
-=item * C<GOVERNANCE_RULE_PROCESSING> => 18
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Logs::DataScanEvent ===
     # Fields for DataScanEvent
@@ -1286,121 +850,11 @@ Values:
     # Field: post_scan_actions_result Type: 11 (.google.cloud.dataplex.v1.DataScanEvent.PostScanActionsResult)
     # Field: catalog_publishing_status Type: 11 (.google.cloud.dataplex.v1.DataScanCatalogPublishingStatus)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Logs::DataScanEvent - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Logs;
-
-    my $msg = Google::Cloud::Dataplex::V1::Logs::DataScanEvent->new(
-        data_source => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_source>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<type>
-
-Type: Enum (.google.cloud.dataplex.v1.DataScanEvent.ScanType)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.DataScanEvent.State)
-
-=item * B<message>
-
-Type: String
-
-=item * B<spec_version>
-
-Type: String
-
-=item * B<trigger>
-
-Type: Enum (.google.cloud.dataplex.v1.DataScanEvent.Trigger)
-
-=item * B<scope>
-
-Type: Enum (.google.cloud.dataplex.v1.DataScanEvent.Scope)
-
-=item * B<data_profile>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanEvent.DataProfileResult)
-
-=item * B<data_quality>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanEvent.DataQualityResult)
-
-=item * B<data_profile_configs>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanEvent.DataProfileAppliedConfigs)
-
-=item * B<data_quality_configs>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanEvent.DataQualityAppliedConfigs)
-
-=item * B<post_scan_actions_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanEvent.PostScanActionsResult)
-
-=item * B<catalog_publishing_status>
-
-Type: Message (.google.cloud.dataplex.v1.DataScanCatalogPublishingStatus)
-
-=back
-
-=cut
-
 # Enum: DataScanEvent::ScanType
 our $DataScanEvent_SCAN_TYPE_UNSPECIFIED = 0;
 our $DataScanEvent_DATA_PROFILE = 1;
 our $DataScanEvent_DATA_QUALITY = 2;
 our $DataScanEvent_DATA_DISCOVERY = 4;
-
-=pod
-
-=head2 Enum: DataScanEvent::ScanType
-
-Values:
-
-=over 4
-
-=item * C<SCAN_TYPE_UNSPECIFIED> => 0
-
-=item * C<DATA_PROFILE> => 1
-
-=item * C<DATA_QUALITY> => 2
-
-=item * C<DATA_DISCOVERY> => 4
-
-=back
-
-=cut
 
 # Enum: DataScanEvent::State
 our $DataScanEvent_STATE_UNSPECIFIED = 0;
@@ -1410,78 +864,16 @@ our $DataScanEvent_FAILED = 3;
 our $DataScanEvent_CANCELLED = 4;
 our $DataScanEvent_CREATED = 5;
 
-=pod
-
-=head2 Enum: DataScanEvent::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<STARTED> => 1
-
-=item * C<SUCCEEDED> => 2
-
-=item * C<FAILED> => 3
-
-=item * C<CANCELLED> => 4
-
-=item * C<CREATED> => 5
-
-=back
-
-=cut
-
 # Enum: DataScanEvent::Trigger
 our $DataScanEvent_TRIGGER_UNSPECIFIED = 0;
 our $DataScanEvent_ON_DEMAND = 1;
 our $DataScanEvent_SCHEDULE = 2;
 our $DataScanEvent_ONE_TIME = 3;
 
-=pod
-
-=head2 Enum: DataScanEvent::Trigger
-
-Values:
-
-=over 4
-
-=item * C<TRIGGER_UNSPECIFIED> => 0
-
-=item * C<ON_DEMAND> => 1
-
-=item * C<SCHEDULE> => 2
-
-=item * C<ONE_TIME> => 3
-
-=back
-
-=cut
-
 # Enum: DataScanEvent::Scope
 our $DataScanEvent_SCOPE_UNSPECIFIED = 0;
 our $DataScanEvent_FULL = 1;
 our $DataScanEvent_INCREMENTAL = 2;
-
-=pod
-
-=head2 Enum: DataScanEvent::Scope
-
-Values:
-
-=over 4
-
-=item * C<SCOPE_UNSPECIFIED> => 0
-
-=item * C<FULL> => 1
-
-=item * C<INCREMENTAL> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::Logs::DataQualityScanRuleResult ===
     # Fields for DataQualityScanRuleResult
@@ -1499,80 +891,6 @@ Values:
     # Field: null_row_count Type: 3 ()
     # Field: assertion_row_count Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Logs::DataQualityScanRuleResult - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Logs;
-
-    my $msg = Google::Cloud::Dataplex::V1::Logs::DataQualityScanRuleResult->new(
-        job_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<data_source>
-
-Type: String
-
-=item * B<column>
-
-Type: String
-
-=item * B<rule_name>
-
-Type: String
-
-=item * B<rule_type>
-
-Type: Enum (.google.cloud.dataplex.v1.DataQualityScanRuleResult.RuleType)
-
-=item * B<evalution_type>
-
-Type: Enum (.google.cloud.dataplex.v1.DataQualityScanRuleResult.EvaluationType)
-
-=item * B<rule_dimension>
-
-Type: String
-
-=item * B<threshold_percent>
-
-Type: Double
-
-=item * B<result>
-
-Type: Enum (.google.cloud.dataplex.v1.DataQualityScanRuleResult.Result)
-
-=item * B<evaluated_row_count>
-
-Type: Int64
-
-=item * B<passed_row_count>
-
-Type: Int64
-
-=item * B<null_row_count>
-
-Type: Int64
-
-=item * B<assertion_row_count>
-
-Type: Int64
-
-=back
-
-=cut
-
 # Enum: DataQualityScanRuleResult::RuleType
 our $DataQualityScanRuleResult_RULE_TYPE_UNSPECIFIED = 0;
 our $DataQualityScanRuleResult_NON_NULL_EXPECTATION = 1;
@@ -1586,125 +904,21 @@ our $DataQualityScanRuleResult_UNIQUENESS_EXPECTATION = 8;
 our $DataQualityScanRuleResult_SQL_ASSERTION = 9;
 our $DataQualityScanRuleResult_TEMPLATE_REFERENCE = 10;
 
-=pod
-
-=head2 Enum: DataQualityScanRuleResult::RuleType
-
-Values:
-
-=over 4
-
-=item * C<RULE_TYPE_UNSPECIFIED> => 0
-
-=item * C<NON_NULL_EXPECTATION> => 1
-
-=item * C<RANGE_EXPECTATION> => 2
-
-=item * C<REGEX_EXPECTATION> => 3
-
-=item * C<ROW_CONDITION_EXPECTATION> => 4
-
-=item * C<SET_EXPECTATION> => 5
-
-=item * C<STATISTIC_RANGE_EXPECTATION> => 6
-
-=item * C<TABLE_CONDITION_EXPECTATION> => 7
-
-=item * C<UNIQUENESS_EXPECTATION> => 8
-
-=item * C<SQL_ASSERTION> => 9
-
-=item * C<TEMPLATE_REFERENCE> => 10
-
-=back
-
-=cut
-
 # Enum: DataQualityScanRuleResult::EvaluationType
 our $DataQualityScanRuleResult_EVALUATION_TYPE_UNSPECIFIED = 0;
 our $DataQualityScanRuleResult_PER_ROW = 1;
 our $DataQualityScanRuleResult_AGGREGATE = 2;
-
-=pod
-
-=head2 Enum: DataQualityScanRuleResult::EvaluationType
-
-Values:
-
-=over 4
-
-=item * C<EVALUATION_TYPE_UNSPECIFIED> => 0
-
-=item * C<PER_ROW> => 1
-
-=item * C<AGGREGATE> => 2
-
-=back
-
-=cut
 
 # Enum: DataQualityScanRuleResult::Result
 our $DataQualityScanRuleResult_RESULT_UNSPECIFIED = 0;
 our $DataQualityScanRuleResult_PASSED = 1;
 our $DataQualityScanRuleResult_FAILED = 2;
 
-=pod
-
-=head2 Enum: DataQualityScanRuleResult::Result
-
-Values:
-
-=over 4
-
-=item * C<RESULT_UNSPECIFIED> => 0
-
-=item * C<PASSED> => 1
-
-=item * C<FAILED> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Logs::BusinessGlossaryEvent ===
     # Fields for BusinessGlossaryEvent
     # Field: message Type: 9 ()
     # Field: event_type Type: 14 (.google.cloud.dataplex.v1.BusinessGlossaryEvent.EventType)
     # Field: resource Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Logs::BusinessGlossaryEvent - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Logs;
-
-    my $msg = Google::Cloud::Dataplex::V1::Logs::BusinessGlossaryEvent->new(
-        message => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message>
-
-Type: String
-
-=item * B<event_type>
-
-Type: Enum (.google.cloud.dataplex.v1.BusinessGlossaryEvent.EventType)
-
-=item * B<resource>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: BusinessGlossaryEvent::EventType
 our $BusinessGlossaryEvent_EVENT_TYPE_UNSPECIFIED = 0;
@@ -1718,112 +932,890 @@ our $BusinessGlossaryEvent_GLOSSARY_TERM_CREATE = 7;
 our $BusinessGlossaryEvent_GLOSSARY_TERM_UPDATE = 8;
 our $BusinessGlossaryEvent_GLOSSARY_TERM_DELETE = 9;
 
-=pod
-
-=head2 Enum: BusinessGlossaryEvent::EventType
-
-Values:
-
-=over 4
-
-=item * C<EVENT_TYPE_UNSPECIFIED> => 0
-
-=item * C<GLOSSARY_CREATE> => 1
-
-=item * C<GLOSSARY_UPDATE> => 2
-
-=item * C<GLOSSARY_DELETE> => 3
-
-=item * C<GLOSSARY_CATEGORY_CREATE> => 4
-
-=item * C<GLOSSARY_CATEGORY_UPDATE> => 5
-
-=item * C<GLOSSARY_CATEGORY_DELETE> => 6
-
-=item * C<GLOSSARY_TERM_CREATE> => 7
-
-=item * C<GLOSSARY_TERM_UPDATE> => 8
-
-=item * C<GLOSSARY_TERM_DELETE> => 9
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Logs::EntryLinkEvent ===
     # Fields for EntryLinkEvent
     # Field: message Type: 9 ()
     # Field: event_type Type: 14 (.google.cloud.dataplex.v1.EntryLinkEvent.EventType)
     # Field: resource Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Logs::EntryLinkEvent - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Logs;
-
-    my $msg = Google::Cloud::Dataplex::V1::Logs::EntryLinkEvent->new(
-        message => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message>
-
-Type: String
-
-=item * B<event_type>
-
-Type: Enum (.google.cloud.dataplex.v1.EntryLinkEvent.EventType)
-
-=item * B<resource>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: EntryLinkEvent::EventType
 our $EntryLinkEvent_EVENT_TYPE_UNSPECIFIED = 0;
 our $EntryLinkEvent_ENTRY_LINK_CREATE = 1;
 our $EntryLinkEvent_ENTRY_LINK_DELETE = 2;
 
-=pod
-
-=head2 Enum: EntryLinkEvent::EventType
-
-Values:
-
-=over 4
-
-=item * C<EVENT_TYPE_UNSPECIFIED> => 0
-
-=item * C<ENTRY_LINK_CREATE> => 1
-
-=item * C<ENTRY_LINK_DELETE> => 2
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Logs - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::Logs - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/logs.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Logs;
+
+    my $msg = Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent->new({
+        message => $message,
+        lake_id => $lake_id,
+        zone_id => $zone_id,
+        asset_id => $asset_id,
+    });
+
+    # Read or update a field
+    my $val = $msg->message();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/logs.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent
+
+The payload associated with Discovery data processing.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+The log message.
+
+=item * C<< $msg->lake_id() >> / C<< $msg->lake_id($value) >>
+
+Type: C<String>
+
+The id of the associated lake.
+
+=item * C<< $msg->zone_id() >> / C<< $msg->zone_id($value) >>
+
+Type: C<String>
+
+The id of the associated zone.
+
+=item * C<< $msg->asset_id() >> / C<< $msg->asset_id($value) >>
+
+Type: C<String>
+
+The id of the associated asset.
+
+=item * C<< $msg->data_location() >> / C<< $msg->data_location($value) >>
+
+Type: C<String>
+
+The data location associated with the event.
+
+=item * C<< $msg->datascan_id() >> / C<< $msg->datascan_id($value) >>
+
+Type: C<String>
+
+The id of the associated datascan for standalone discovery.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DiscoveryEvent::EventType>)
+
+The type of the event being logged.
+
+=item * C<< $msg->config() >> / C<< $msg->config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent::ConfigDetails>)
+
+Details about discovery configuration in effect.
+
+=item * C<< $msg->entity() >> / C<< $msg->entity($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent::EntityDetails>)
+
+Details about the entity associated with the event.
+
+=item * C<< $msg->partition() >> / C<< $msg->partition($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent::PartitionDetails>)
+
+Details about the partition associated with the event.
+
+=item * C<< $msg->action() >> / C<< $msg->action($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent::ActionDetails>)
+
+Details about the action associated with the event.
+
+=item * C<< $msg->table() >> / C<< $msg->table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DiscoveryEvent::TableDetails>)
+
+Details about the BigQuery table publishing associated with the event.
+
+=back
+
+=head3 Enum: DiscoveryEvent::EventType
+
+=over 4
+
+=item * C<EVENT_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<CONFIG> => C<1>
+
+=item * C<ENTITY_CREATED> => C<2>
+
+=item * C<ENTITY_UPDATED> => C<3>
+
+=item * C<ENTITY_DELETED> => C<4>
+
+=item * C<PARTITION_CREATED> => C<5>
+
+=item * C<PARTITION_UPDATED> => C<6>
+
+=item * C<PARTITION_DELETED> => C<7>
+
+=item * C<TABLE_PUBLISHED> => C<10>
+
+=item * C<TABLE_UPDATED> => C<11>
+
+=item * C<TABLE_IGNORED> => C<12>
+
+=item * C<TABLE_DELETED> => C<13>
+
+=back
+
+=head3 Enum: DiscoveryEvent::EntityType
+
+=over 4
+
+=item * C<ENTITY_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<TABLE> => C<1>
+
+=item * C<FILESET> => C<2>
+
+=back
+
+=head3 Enum: DiscoveryEvent::TableType
+
+=over 4
+
+=item * C<TABLE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<EXTERNAL_TABLE> => C<1>
+
+=item * C<BIGLAKE_TABLE> => C<2>
+
+=item * C<OBJECT_TABLE> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Logs::JobEvent
+
+The payload associated with Job logs that contains events describing jobs
+that have run within a Lake.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+The log message.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+The unique id identifying the job.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the job started running.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the job ended running.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::JobEvent::State>)
+
+The job state on completion.
+
+=item * C<< $msg->retries() >> / C<< $msg->retries($value) >>
+
+Type: C<Int32>
+
+The number of retries.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::JobEvent::Type>)
+
+The type of the job.
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::JobEvent::Service>)
+
+The service used to execute the job.
+
+=item * C<< $msg->service_job() >> / C<< $msg->service_job($value) >>
+
+Type: C<String>
+
+The reference to the job within the service.
+
+=item * C<< $msg->execution_trigger() >> / C<< $msg->execution_trigger($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::JobEvent::ExecutionTrigger>)
+
+Job execution trigger.
+
+=back
+
+=head3 Enum: JobEvent::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<SPARK> => C<1>
+
+=item * C<NOTEBOOK> => C<2>
+
+=back
+
+=head3 Enum: JobEvent::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<SUCCEEDED> => C<1>
+
+=item * C<FAILED> => C<2>
+
+=item * C<CANCELLED> => C<3>
+
+=item * C<ABORTED> => C<4>
+
+=back
+
+=head3 Enum: JobEvent::Service
+
+=over 4
+
+=item * C<SERVICE_UNSPECIFIED> => C<0>
+
+=item * C<DATAPROC> => C<1>
+
+=back
+
+=head3 Enum: JobEvent::ExecutionTrigger
+
+=over 4
+
+=item * C<EXECUTION_TRIGGER_UNSPECIFIED> => C<0>
+
+=item * C<TASK_CONFIG> => C<1>
+
+=item * C<RUN_REQUEST> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Logs::SessionEvent
+
+These messages contain information about sessions within an environment.
+The monitored resource is 'Environment'.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+The log message.
+
+=item * C<< $msg->user_id() >> / C<< $msg->user_id($value) >>
+
+Type: C<String>
+
+The information about the user that created the session. It will be the
+email address of the user.
+
+=item * C<< $msg->session_id() >> / C<< $msg->session_id($value) >>
+
+Type: C<String>
+
+Unique identifier for the session.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::SessionEvent::EventType>)
+
+The type of the event.
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::SessionEvent::QueryDetail>)
+
+The execution details of the query.
+
+=item * C<< $msg->event_succeeded() >> / C<< $msg->event_succeeded($value) >>
+
+Type: C<Bool>
+
+The status of the event.
+
+=item * C<< $msg->fast_startup_enabled() >> / C<< $msg->fast_startup_enabled($value) >>
+
+Type: C<Bool>
+
+If the session is associated with an environment with fast startup enabled,
+and was created before being assigned to a user.
+
+=item * C<< $msg->unassigned_duration() >> / C<< $msg->unassigned_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+The idle duration of a warm pooled session before it is assigned to user.
+
+=back
+
+=head3 Enum: SessionEvent::EventType
+
+=over 4
+
+=item * C<EVENT_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<START> => C<1>
+
+=item * C<STOP> => C<2>
+
+=item * C<QUERY> => C<3>
+
+=item * C<CREATE> => C<4>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Logs::GovernanceEvent
+
+Payload associated with Governance related log events.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+The log message.
+
+=item * C<< $msg->event_type() >> / C<< $msg->event_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::GovernanceEvent::EventType>)
+
+The type of the event.
+
+=item * C<< $msg->entity() >> / C<< $msg->entity($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::GovernanceEvent::Entity>)
+
+Entity resource information if the log event is associated with a
+specific entity.
+
+=back
+
+=head3 Enum: GovernanceEvent::EventType
+
+=over 4
+
+=item * C<EVENT_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<RESOURCE_IAM_POLICY_UPDATE> => C<1>
+
+=item * C<BIGQUERY_TABLE_CREATE> => C<2>
+
+=item * C<BIGQUERY_TABLE_UPDATE> => C<3>
+
+=item * C<BIGQUERY_TABLE_DELETE> => C<4>
+
+=item * C<BIGQUERY_CONNECTION_CREATE> => C<5>
+
+=item * C<BIGQUERY_CONNECTION_UPDATE> => C<6>
+
+=item * C<BIGQUERY_CONNECTION_DELETE> => C<7>
+
+=item * C<BIGQUERY_TAXONOMY_CREATE> => C<10>
+
+=item * C<BIGQUERY_POLICY_TAG_CREATE> => C<11>
+
+=item * C<BIGQUERY_POLICY_TAG_DELETE> => C<12>
+
+=item * C<BIGQUERY_POLICY_TAG_SET_IAM_POLICY> => C<13>
+
+=item * C<ACCESS_POLICY_UPDATE> => C<14>
+
+=item * C<GOVERNANCE_RULE_MATCHED_RESOURCES> => C<15>
+
+=item * C<GOVERNANCE_RULE_SEARCH_LIMIT_EXCEEDS> => C<16>
+
+=item * C<GOVERNANCE_RULE_ERRORS> => C<17>
+
+=item * C<GOVERNANCE_RULE_PROCESSING> => C<18>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Logs::DataScanEvent
+
+These messages contain information about the execution of a datascan.
+The monitored resource is 'DataScan'
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_source() >> / C<< $msg->data_source($value) >>
+
+Type: C<String>
+
+The data source of the data scan
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+The identifier of the specific data scan job this log entry is for.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the data scan job was created.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the data scan job started to run.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the data scan job finished.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataScanEvent::ScanType>)
+
+The type of the data scan.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataScanEvent::State>)
+
+The status of the data scan job.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+The message describing the data scan job event.
+
+=item * C<< $msg->spec_version() >> / C<< $msg->spec_version($value) >>
+
+Type: C<String>
+
+A version identifier of the spec which was used to execute this job.
+
+=item * C<< $msg->trigger() >> / C<< $msg->trigger($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataScanEvent::Trigger>)
+
+The trigger type of the data scan job.
+
+=item * C<< $msg->scope() >> / C<< $msg->scope($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataScanEvent::Scope>)
+
+The scope of the data scan (e.g. full, incremental).
+
+=item * C<< $msg->data_profile() >> / C<< $msg->data_profile($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DataScanEvent::DataProfileResult>)
+
+Data profile result for data profile type data scan.
+
+=item * C<< $msg->data_quality() >> / C<< $msg->data_quality($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DataScanEvent::DataQualityResult>)
+
+Data quality result for data quality type data scan.
+
+=item * C<< $msg->data_profile_configs() >> / C<< $msg->data_profile_configs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DataScanEvent::DataProfileAppliedConfigs>)
+
+Applied configs for data profile type data scan.
+
+=item * C<< $msg->data_quality_configs() >> / C<< $msg->data_quality_configs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DataScanEvent::DataQualityAppliedConfigs>)
+
+Applied configs for data quality type data scan.
+
+=item * C<< $msg->post_scan_actions_result() >> / C<< $msg->post_scan_actions_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Logs::DataScanEvent::PostScanActionsResult>)
+
+The result of post scan actions.
+
+=item * C<< $msg->catalog_publishing_status() >> / C<< $msg->catalog_publishing_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DatascansCommon::DataScanCatalogPublishingStatus>)
+
+The status of publishing the data scan as Dataplex Universal Catalog
+metadata.
+
+=back
+
+=head3 Enum: DataScanEvent::ScanType
+
+=over 4
+
+=item * C<SCAN_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<DATA_PROFILE> => C<1>
+
+=item * C<DATA_QUALITY> => C<2>
+
+=item * C<DATA_DISCOVERY> => C<4>
+
+=back
+
+=head3 Enum: DataScanEvent::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<STARTED> => C<1>
+
+=item * C<SUCCEEDED> => C<2>
+
+=item * C<FAILED> => C<3>
+
+=item * C<CANCELLED> => C<4>
+
+=item * C<CREATED> => C<5>
+
+=back
+
+=head3 Enum: DataScanEvent::Trigger
+
+=over 4
+
+=item * C<TRIGGER_UNSPECIFIED> => C<0>
+
+=item * C<ON_DEMAND> => C<1>
+
+=item * C<SCHEDULE> => C<2>
+
+=item * C<ONE_TIME> => C<3>
+
+=back
+
+=head3 Enum: DataScanEvent::Scope
+
+=over 4
+
+=item * C<SCOPE_UNSPECIFIED> => C<0>
+
+=item * C<FULL> => C<1>
+
+=item * C<INCREMENTAL> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Logs::DataQualityScanRuleResult
+
+Information about the result of a data quality rule for data quality scan.
+The monitored resource is 'DataScan'.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Identifier of the specific data scan job this log entry is for.
+
+=item * C<< $msg->data_source() >> / C<< $msg->data_source($value) >>
+
+Type: C<String>
+
+The data source of the data scan (e.g. BigQuery table name).
+
+=item * C<< $msg->column() >> / C<< $msg->column($value) >>
+
+Type: C<String>
+
+The column which this rule is evaluated against.
+
+=item * C<< $msg->rule_name() >> / C<< $msg->rule_name($value) >>
+
+Type: C<String>
+
+The name of the data quality rule.
+
+=item * C<< $msg->rule_type() >> / C<< $msg->rule_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataQualityScanRuleResult::RuleType>)
+
+The type of the data quality rule.
+
+=item * C<< $msg->evalution_type() >> / C<< $msg->evalution_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataQualityScanRuleResult::EvaluationType>)
+
+The evaluation type of the data quality rule.
+
+=item * C<< $msg->rule_dimension() >> / C<< $msg->rule_dimension($value) >>
+
+Type: C<String>
+
+The dimension of the data quality rule.
+
+=item * C<< $msg->threshold_percent() >> / C<< $msg->threshold_percent($value) >>
+
+Type: C<Double>
+
+The passing threshold ([0.0, 100.0]) of the data quality rule.
+
+=item * C<< $msg->result() >> / C<< $msg->result($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataQualityScanRuleResult::Result>)
+
+The result of the data quality rule.
+
+=item * C<< $msg->evaluated_row_count() >> / C<< $msg->evaluated_row_count($value) >>
+
+Type: C<Int64>
+
+The number of rows evaluated against the data quality rule.
+This field is only valid for rules of PER_ROW evaluation type.
+
+=item * C<< $msg->passed_row_count() >> / C<< $msg->passed_row_count($value) >>
+
+Type: C<Int64>
+
+The number of rows which passed a rule evaluation.
+This field is only valid for rules of PER_ROW evaluation type.
+
+=item * C<< $msg->null_row_count() >> / C<< $msg->null_row_count($value) >>
+
+Type: C<Int64>
+
+The number of rows with null values in the specified column.
+
+=item * C<< $msg->assertion_row_count() >> / C<< $msg->assertion_row_count($value) >>
+
+Type: C<Int64>
+
+The number of rows returned by the SQL statement in a SQL assertion rule.
+This field is only valid for SQL assertion rules.
+
+=back
+
+=head3 Enum: DataQualityScanRuleResult::RuleType
+
+=over 4
+
+=item * C<RULE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<NON_NULL_EXPECTATION> => C<1>
+
+=item * C<RANGE_EXPECTATION> => C<2>
+
+=item * C<REGEX_EXPECTATION> => C<3>
+
+=item * C<ROW_CONDITION_EXPECTATION> => C<4>
+
+=item * C<SET_EXPECTATION> => C<5>
+
+=item * C<STATISTIC_RANGE_EXPECTATION> => C<6>
+
+=item * C<TABLE_CONDITION_EXPECTATION> => C<7>
+
+=item * C<UNIQUENESS_EXPECTATION> => C<8>
+
+=item * C<SQL_ASSERTION> => C<9>
+
+=item * C<TEMPLATE_REFERENCE> => C<10>
+
+=back
+
+=head3 Enum: DataQualityScanRuleResult::EvaluationType
+
+=over 4
+
+=item * C<EVALUATION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<PER_ROW> => C<1>
+
+=item * C<AGGREGATE> => C<2>
+
+=back
+
+=head3 Enum: DataQualityScanRuleResult::Result
+
+=over 4
+
+=item * C<RESULT_UNSPECIFIED> => C<0>
+
+=item * C<PASSED> => C<1>
+
+=item * C<FAILED> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Logs::BusinessGlossaryEvent
+
+Payload associated with Business Glossary related log events.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+The log message.
+
+=item * C<< $msg->event_type() >> / C<< $msg->event_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::BusinessGlossaryEvent::EventType>)
+
+The type of the event.
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+Name of the resource.
+
+=back
+
+=head3 Enum: BusinessGlossaryEvent::EventType
+
+=over 4
+
+=item * C<EVENT_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<GLOSSARY_CREATE> => C<1>
+
+=item * C<GLOSSARY_UPDATE> => C<2>
+
+=item * C<GLOSSARY_DELETE> => C<3>
+
+=item * C<GLOSSARY_CATEGORY_CREATE> => C<4>
+
+=item * C<GLOSSARY_CATEGORY_UPDATE> => C<5>
+
+=item * C<GLOSSARY_CATEGORY_DELETE> => C<6>
+
+=item * C<GLOSSARY_TERM_CREATE> => C<7>
+
+=item * C<GLOSSARY_TERM_UPDATE> => C<8>
+
+=item * C<GLOSSARY_TERM_DELETE> => C<9>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Logs::EntryLinkEvent
+
+Payload associated with Entry related log events.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+The log message.
+
+=item * C<< $msg->event_type() >> / C<< $msg->event_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::EntryLinkEvent::EventType>)
+
+The type of the event.
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+Name of the resource.
+
+=back
+
+=head3 Enum: EntryLinkEvent::EventType
+
+=over 4
+
+=item * C<EVENT_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<ENTRY_LINK_CREATE> => C<1>
+
+=item * C<ENTRY_LINK_DELETE> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Logs::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

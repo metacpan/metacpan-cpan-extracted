@@ -10,23 +10,23 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
+use Google::Cloud::Networkservices::V1::RouteView;
 use Google::Cloud::Networkservices::V1::Common;
 use Google::Cloud::Networkservices::V1::TlsRoute;
-use Google::Cloud::Networkservices::V1::RouteView;
-use Google::Cloud::Networkservices::V1::AgentGateway;
-use Google::Cloud::Networkservices::V1::TcpRoute;
 use Google::Cloud::Networkservices::V1::GrpcRoute;
+use Google::Cloud::Networkservices::V1::TcpRoute;
+use Google::Cloud::Networkservices::V1::AgentGateway;
 use Google::Cloud::Networkservices::V1::Extensibility;
 use Google::Cloud::Networkservices::V1::ServiceLbPolicy;
 use Google::Cloud::Networkservices::V1::ServiceBinding;
 use Google::Cloud::Networkservices::V1::HttpRoute;
 use Google::Cloud::Networkservices::V1::EndpointPolicy;
-use Google::Cloud::Networkservices::V1::Mesh;
-use Google::Cloud::Networkservices::V1::Dep;
 use Google::Cloud::Networkservices::V1::Gateway;
+use Google::Cloud::Networkservices::V1::Dep;
+use Google::Cloud::Networkservices::V1::Mesh;
 use Google::Cloud::Networkservices::V1::NetworkServices;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -200,7 +200,35 @@ The following RPC methods are available in this client:
 
 =item * B<list_lb_traffic_extensions>
 
-Calls the RPC method C<ListLbTrafficExtensions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_lb_traffic_extensions(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListLbTrafficExtensions> on C<google.cloud.networkservices.v1.DepService>.
+
+Request: L<Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsRequest>
+
+Returns: L<Google::Cloud::Networkservices::V1::Dep::ListLbTrafficExtensionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =back
 

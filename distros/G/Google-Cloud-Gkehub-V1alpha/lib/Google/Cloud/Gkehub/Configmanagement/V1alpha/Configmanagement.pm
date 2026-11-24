@@ -1,0 +1,1457 @@
+package Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+CkNnb29nbGUvY2xvdWQvZ2tlaHViL3YxYWxwaGEvY29uZmlnbWFuYWdlbWVudC9jb25maWdt
+YW5hZ2VtZW50LnByb3RvEixnb29nbGUuY2xvdWQuZ2tlaHViLmNvbmZpZ21hbmFnZW1lbnQu
+djFhbHBoYRofZ29vZ2xlL3Byb3RvYnVmL3RpbWVzdGFtcC5wcm90byLSBQoPTWVtYmVyc2hp
+cFN0YXRlEiEKDGNsdXN0ZXJfbmFtZRgBIAEoCVILY2x1c3Rlck5hbWUSZQoPbWVtYmVyc2hp
+cF9zcGVjGAIgASgLMjwuZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdtYW5hZ2VtZW50LnYx
+YWxwaGEuTWVtYmVyc2hpcFNwZWNSDm1lbWJlcnNoaXBTcGVjEmIKDm9wZXJhdG9yX3N0YXRl
+GAMgASgLMjsuZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdtYW5hZ2VtZW50LnYxYWxwaGEu
+T3BlcmF0b3JTdGF0ZVINb3BlcmF0b3JTdGF0ZRJpChFjb25maWdfc3luY19zdGF0ZRgEIAEo
+CzI9Lmdvb2dsZS5jbG91ZC5na2VodWIuY29uZmlnbWFuYWdlbWVudC52MWFscGhhLkNvbmZp
+Z1N5bmNTdGF0ZVIPY29uZmlnU3luY1N0YXRlEnsKF3BvbGljeV9jb250cm9sbGVyX3N0YXRl
+GAUgASgLMkMuZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdtYW5hZ2VtZW50LnYxYWxwaGEu
+UG9saWN5Q29udHJvbGxlclN0YXRlUhVwb2xpY3lDb250cm9sbGVyU3RhdGUSYgoOYmluYXV0
+aHpfc3RhdGUYBiABKAsyOy5nb29nbGUuY2xvdWQuZ2tlaHViLmNvbmZpZ21hbmFnZW1lbnQu
+djFhbHBoYS5CaW5hdXRoelN0YXRlUg1iaW5hdXRoelN0YXRlEoQBChpoaWVyYXJjaHlfY29u
+dHJvbGxlcl9zdGF0ZRgHIAEoCzJGLmdvb2dsZS5jbG91ZC5na2VodWIuY29uZmlnbWFuYWdl
+bWVudC52MWFscGhhLkhpZXJhcmNoeUNvbnRyb2xsZXJTdGF0ZVIYaGllcmFyY2h5Q29udHJv
+bGxlclN0YXRlIsgDCg5NZW1iZXJzaGlwU3BlYxJZCgtjb25maWdfc3luYxgBIAEoCzI4Lmdv
+b2dsZS5jbG91ZC5na2VodWIuY29uZmlnbWFuYWdlbWVudC52MWFscGhhLkNvbmZpZ1N5bmNS
+CmNvbmZpZ1N5bmMSawoRcG9saWN5X2NvbnRyb2xsZXIYAiABKAsyPi5nb29nbGUuY2xvdWQu
+Z2tlaHViLmNvbmZpZ21hbmFnZW1lbnQudjFhbHBoYS5Qb2xpY3lDb250cm9sbGVyUhBwb2xp
+Y3lDb250cm9sbGVyElgKCGJpbmF1dGh6GAMgASgLMjwuZ29vZ2xlLmNsb3VkLmdrZWh1Yi5j
+b25maWdtYW5hZ2VtZW50LnYxYWxwaGEuQmluYXV0aHpDb25maWdSCGJpbmF1dGh6EnoKFGhp
+ZXJhcmNoeV9jb250cm9sbGVyGAQgASgLMkcuZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdt
+YW5hZ2VtZW50LnYxYWxwaGEuSGllcmFyY2h5Q29udHJvbGxlckNvbmZpZ1ITaGllcmFyY2h5
+Q29udHJvbGxlchIYCgd2ZXJzaW9uGAogASgJUgd2ZXJzaW9uInwKCkNvbmZpZ1N5bmMSSQoD
+Z2l0GAcgASgLMjcuZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdtYW5hZ2VtZW50LnYxYWxw
+aGEuR2l0Q29uZmlnUgNnaXQSIwoNc291cmNlX2Zvcm1hdBgIIAEoCVIMc291cmNlRm9ybWF0
+IqYCCglHaXRDb25maWcSGwoJc3luY19yZXBvGAEgASgJUghzeW5jUmVwbxIfCgtzeW5jX2Jy
+YW5jaBgCIAEoCVIKc3luY0JyYW5jaBIdCgpwb2xpY3lfZGlyGAMgASgJUglwb2xpY3lEaXIS
+JAoOc3luY193YWl0X3NlY3MYBCABKANSDHN5bmNXYWl0U2VjcxIZCghzeW5jX3JldhgFIAEo
+CVIHc3luY1JldhIfCgtzZWNyZXRfdHlwZRgGIAEoCVIKc2VjcmV0VHlwZRIfCgtodHRwc19w
+cm94eRgHIAEoCVIKaHR0cHNQcm94eRI5ChlnY3Bfc2VydmljZV9hY2NvdW50X2VtYWlsGAgg
+ASgJUhZnY3BTZXJ2aWNlQWNjb3VudEVtYWlsIq4DChBQb2xpY3lDb250cm9sbGVyEhgKB2Vu
+YWJsZWQYASABKAhSB2VuYWJsZWQSQQoadGVtcGxhdGVfbGlicmFyeV9pbnN0YWxsZWQYAiAB
+KAhIAFIYdGVtcGxhdGVMaWJyYXJ5SW5zdGFsbGVkiAEBEjkKFmF1ZGl0X2ludGVydmFsX3Nl
+Y29uZHMYAyABKANIAVIUYXVkaXRJbnRlcnZhbFNlY29uZHOIAQESMwoVZXhlbXB0YWJsZV9u
+YW1lc3BhY2VzGAQgAygJUhRleGVtcHRhYmxlTmFtZXNwYWNlcxI6ChlyZWZlcmVudGlhbF9y
+dWxlc19lbmFibGVkGAUgASgIUhdyZWZlcmVudGlhbFJ1bGVzRW5hYmxlZBIsChJsb2dfZGVu
+aWVzX2VuYWJsZWQYBiABKAhSEGxvZ0Rlbmllc0VuYWJsZWQSKQoQbXV0YXRpb25fZW5hYmxl
+ZBgHIAEoCFIPbXV0YXRpb25FbmFibGVkQh0KG190ZW1wbGF0ZV9saWJyYXJ5X2luc3RhbGxl
+ZEIZChdfYXVkaXRfaW50ZXJ2YWxfc2Vjb25kcyIqCg5CaW5hdXRoekNvbmZpZxIYCgdlbmFi
+bGVkGAEgASgIUgdlbmFibGVkIrcBChlIaWVyYXJjaHlDb250cm9sbGVyQ29uZmlnEhgKB2Vu
+YWJsZWQYASABKAhSB2VuYWJsZWQSMwoWZW5hYmxlX3BvZF90cmVlX2xhYmVscxgCIAEoCFIT
+ZW5hYmxlUG9kVHJlZUxhYmVscxJLCiJlbmFibGVfaGllcmFyY2hpY2FsX3Jlc291cmNlX3F1
+b3RhGAMgASgIUh9lbmFibGVIaWVyYXJjaGljYWxSZXNvdXJjZVF1b3RhItIBCiJIaWVyYXJj
+aHlDb250cm9sbGVyRGVwbG95bWVudFN0YXRlEk8KA2huYxgBIAEoDjI9Lmdvb2dsZS5jbG91
+ZC5na2VodWIuY29uZmlnbWFuYWdlbWVudC52MWFscGhhLkRlcGxveW1lbnRTdGF0ZVIDaG5j
+ElsKCWV4dGVuc2lvbhgCIAEoDjI9Lmdvb2dsZS5jbG91ZC5na2VodWIuY29uZmlnbWFuYWdl
+bWVudC52MWFscGhhLkRlcGxveW1lbnRTdGF0ZVIJZXh0ZW5zaW9uIkwKGkhpZXJhcmNoeUNv
+bnRyb2xsZXJWZXJzaW9uEhAKA2huYxgBIAEoCVIDaG5jEhwKCWV4dGVuc2lvbhgCIAEoCVIJ
+ZXh0ZW5zaW9uIuYBChhIaWVyYXJjaHlDb250cm9sbGVyU3RhdGUSYgoHdmVyc2lvbhgBIAEo
+CzJILmdvb2dsZS5jbG91ZC5na2VodWIuY29uZmlnbWFuYWdlbWVudC52MWFscGhhLkhpZXJh
+cmNoeUNvbnRyb2xsZXJWZXJzaW9uUgd2ZXJzaW9uEmYKBXN0YXRlGAIgASgLMlAuZ29vZ2xl
+LmNsb3VkLmdrZWh1Yi5jb25maWdtYW5hZ2VtZW50LnYxYWxwaGEuSGllcmFyY2h5Q29udHJv
+bGxlckRlcGxveW1lbnRTdGF0ZVIFc3RhdGUi5wEKDU9wZXJhdG9yU3RhdGUSGAoHdmVyc2lv
+bhgBIAEoCVIHdmVyc2lvbhJoChBkZXBsb3ltZW50X3N0YXRlGAIgASgOMj0uZ29vZ2xlLmNs
+b3VkLmdrZWh1Yi5jb25maWdtYW5hZ2VtZW50LnYxYWxwaGEuRGVwbG95bWVudFN0YXRlUg9k
+ZXBsb3ltZW50U3RhdGUSUgoGZXJyb3JzGAMgAygLMjouZ29vZ2xlLmNsb3VkLmdrZWh1Yi5j
+b25maWdtYW5hZ2VtZW50LnYxYWxwaGEuSW5zdGFsbEVycm9yUgZlcnJvcnMiMwoMSW5zdGFs
+bEVycm9yEiMKDWVycm9yX21lc3NhZ2UYASABKAlSDGVycm9yTWVzc2FnZSK4AgoPQ29uZmln
+U3luY1N0YXRlElkKB3ZlcnNpb24YASABKAsyPy5nb29nbGUuY2xvdWQuZ2tlaHViLmNvbmZp
+Z21hbmFnZW1lbnQudjFhbHBoYS5Db25maWdTeW5jVmVyc2lvblIHdmVyc2lvbhJyChBkZXBs
+b3ltZW50X3N0YXRlGAIgASgLMkcuZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdtYW5hZ2Vt
+ZW50LnYxYWxwaGEuQ29uZmlnU3luY0RlcGxveW1lbnRTdGF0ZVIPZGVwbG95bWVudFN0YXRl
+ElYKCnN5bmNfc3RhdGUYAyABKAsyNy5nb29nbGUuY2xvdWQuZ2tlaHViLmNvbmZpZ21hbmFn
+ZW1lbnQudjFhbHBoYS5TeW5jU3RhdGVSCXN5bmNTdGF0ZSLUAQoRQ29uZmlnU3luY1ZlcnNp
+b24SGgoIaW1wb3J0ZXIYASABKAlSCGltcG9ydGVyEhYKBnN5bmNlchgCIAEoCVIGc3luY2Vy
+EhkKCGdpdF9zeW5jGAMgASgJUgdnaXRTeW5jEhgKB21vbml0b3IYBCABKAlSB21vbml0b3IS
+LQoScmVjb25jaWxlcl9tYW5hZ2VyGAUgASgJUhFyZWNvbmNpbGVyTWFuYWdlchInCg9yb290
+X3JlY29uY2lsZXIYBiABKAlSDnJvb3RSZWNvbmNpbGVyItYEChlDb25maWdTeW5jRGVwbG95
+bWVudFN0YXRlElkKCGltcG9ydGVyGAEgASgOMj0uZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25m
+aWdtYW5hZ2VtZW50LnYxYWxwaGEuRGVwbG95bWVudFN0YXRlUghpbXBvcnRlchJVCgZzeW5j
+ZXIYAiABKA4yPS5nb29nbGUuY2xvdWQuZ2tlaHViLmNvbmZpZ21hbmFnZW1lbnQudjFhbHBo
+YS5EZXBsb3ltZW50U3RhdGVSBnN5bmNlchJYCghnaXRfc3luYxgDIAEoDjI9Lmdvb2dsZS5j
+bG91ZC5na2VodWIuY29uZmlnbWFuYWdlbWVudC52MWFscGhhLkRlcGxveW1lbnRTdGF0ZVIH
+Z2l0U3luYxJXCgdtb25pdG9yGAQgASgOMj0uZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdt
+YW5hZ2VtZW50LnYxYWxwaGEuRGVwbG95bWVudFN0YXRlUgdtb25pdG9yEmwKEnJlY29uY2ls
+ZXJfbWFuYWdlchgFIAEoDjI9Lmdvb2dsZS5jbG91ZC5na2VodWIuY29uZmlnbWFuYWdlbWVu
+dC52MWFscGhhLkRlcGxveW1lbnRTdGF0ZVIRcmVjb25jaWxlck1hbmFnZXISZgoPcm9vdF9y
+ZWNvbmNpbGVyGAYgASgOMj0uZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdtYW5hZ2VtZW50
+LnYxYWxwaGEuRGVwbG95bWVudFN0YXRlUg5yb290UmVjb25jaWxlciKQBAoJU3luY1N0YXRl
+EiEKDHNvdXJjZV90b2tlbhgBIAEoCVILc291cmNlVG9rZW4SIQoMaW1wb3J0X3Rva2VuGAIg
+ASgJUgtpbXBvcnRUb2tlbhIdCgpzeW5jX3Rva2VuGAMgASgJUglzeW5jVG9rZW4SHwoJbGFz
+dF9zeW5jGAQgASgJQgIYAVIIbGFzdFN5bmMSQAoObGFzdF9zeW5jX3RpbWUYByABKAsyGi5n
+b29nbGUucHJvdG9idWYuVGltZXN0YW1wUgxsYXN0U3luY1RpbWUSVAoEY29kZRgFIAEoDjJA
+Lmdvb2dsZS5jbG91ZC5na2VodWIuY29uZmlnbWFuYWdlbWVudC52MWFscGhhLlN5bmNTdGF0
+ZS5TeW5jQ29kZVIEY29kZRJPCgZlcnJvcnMYBiADKAsyNy5nb29nbGUuY2xvdWQuZ2tlaHVi
+LmNvbmZpZ21hbmFnZW1lbnQudjFhbHBoYS5TeW5jRXJyb3JSBmVycm9ycyKTAQoIU3luY0Nv
+ZGUSGQoVU1lOQ19DT0RFX1VOU1BFQ0lGSUVEEAASCgoGU1lOQ0VEEAESCwoHUEVORElORxAC
+EgkKBUVSUk9SEAMSEgoOTk9UX0NPTkZJR1VSRUQQBBIRCg1OT1RfSU5TVEFMTEVEEAUSEAoM
+VU5BVVRIT1JJWkVEEAYSDwoLVU5SRUFDSEFCTEUQByKqAQoJU3luY0Vycm9yEhIKBGNvZGUY
+ASABKAlSBGNvZGUSIwoNZXJyb3JfbWVzc2FnZRgCIAEoCVIMZXJyb3JNZXNzYWdlEmQKD2Vy
+cm9yX3Jlc291cmNlcxgDIAMoCzI7Lmdvb2dsZS5jbG91ZC5na2VodWIuY29uZmlnbWFuYWdl
+bWVudC52MWFscGhhLkVycm9yUmVzb3VyY2VSDmVycm9yUmVzb3VyY2VzIucBCg1FcnJvclJl
+c291cmNlEh8KC3NvdXJjZV9wYXRoGAEgASgJUgpzb3VyY2VQYXRoEiMKDXJlc291cmNlX25h
+bWUYAiABKAlSDHJlc291cmNlTmFtZRItChJyZXNvdXJjZV9uYW1lc3BhY2UYAyABKAlSEXJl
+c291cmNlTmFtZXNwYWNlEmEKDHJlc291cmNlX2d2axgEIAEoCzI+Lmdvb2dsZS5jbG91ZC5n
+a2VodWIuY29uZmlnbWFuYWdlbWVudC52MWFscGhhLkdyb3VwVmVyc2lvbktpbmRSC3Jlc291
+cmNlR3ZrIlYKEEdyb3VwVmVyc2lvbktpbmQSFAoFZ3JvdXAYASABKAlSBWdyb3VwEhgKB3Zl
+cnNpb24YAiABKAlSB3ZlcnNpb24SEgoEa2luZBgDIAEoCVIEa2luZCLsAQoVUG9saWN5Q29u
+dHJvbGxlclN0YXRlEl8KB3ZlcnNpb24YASABKAsyRS5nb29nbGUuY2xvdWQuZ2tlaHViLmNv
+bmZpZ21hbmFnZW1lbnQudjFhbHBoYS5Qb2xpY3lDb250cm9sbGVyVmVyc2lvblIHdmVyc2lv
+bhJyChBkZXBsb3ltZW50X3N0YXRlGAIgASgLMkcuZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25m
+aWdtYW5hZ2VtZW50LnYxYWxwaGEuR2F0ZWtlZXBlckRlcGxveW1lbnRTdGF0ZVIPZGVwbG95
+bWVudFN0YXRlIjMKF1BvbGljeUNvbnRyb2xsZXJWZXJzaW9uEhgKB3ZlcnNpb24YASABKAlS
+B3ZlcnNpb24iwQEKDUJpbmF1dGh6U3RhdGUSVwoHd2ViaG9vaxgBIAEoDjI9Lmdvb2dsZS5j
+bG91ZC5na2VodWIuY29uZmlnbWFuYWdlbWVudC52MWFscGhhLkRlcGxveW1lbnRTdGF0ZVIH
+d2ViaG9vaxJXCgd2ZXJzaW9uGAIgASgLMj0uZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdt
+YW5hZ2VtZW50LnYxYWxwaGEuQmluYXV0aHpWZXJzaW9uUgd2ZXJzaW9uIjoKD0JpbmF1dGh6
+VmVyc2lvbhInCg93ZWJob29rX3ZlcnNpb24YASABKAlSDndlYmhvb2tWZXJzaW9uIoQDChlH
+YXRla2VlcGVyRGVwbG95bWVudFN0YXRlEowBCiNnYXRla2VlcGVyX2NvbnRyb2xsZXJfbWFu
+YWdlcl9zdGF0ZRgBIAEoDjI9Lmdvb2dsZS5jbG91ZC5na2VodWIuY29uZmlnbWFuYWdlbWVu
+dC52MWFscGhhLkRlcGxveW1lbnRTdGF0ZVIgZ2F0ZWtlZXBlckNvbnRyb2xsZXJNYW5hZ2Vy
+U3RhdGUSaAoQZ2F0ZWtlZXBlcl9hdWRpdBgCIAEoDjI9Lmdvb2dsZS5jbG91ZC5na2VodWIu
+Y29uZmlnbWFuYWdlbWVudC52MWFscGhhLkRlcGxveW1lbnRTdGF0ZVIPZ2F0ZWtlZXBlckF1
+ZGl0Em4KE2dhdGVrZWVwZXJfbXV0YXRpb24YAyABKA4yPS5nb29nbGUuY2xvdWQuZ2tlaHVi
+LmNvbmZpZ21hbmFnZW1lbnQudjFhbHBoYS5EZXBsb3ltZW50U3RhdGVSEmdhdGVrZWVwZXJN
+dXRhdGlvbipgCg9EZXBsb3ltZW50U3RhdGUSIAocREVQTE9ZTUVOVF9TVEFURV9VTlNQRUNJ
+RklFRBAAEhEKDU5PVF9JTlNUQUxMRUQQARINCglJTlNUQUxMRUQQAhIJCgVFUlJPUhADQroC
+CjBjb20uZ29vZ2xlLmNsb3VkLmdrZWh1Yi5jb25maWdtYW5hZ2VtZW50LnYxYWxwaGFCFUNv
+bmZpZ01hbmFnZW1lbnRQcm90b1ABWlxjbG91ZC5nb29nbGUuY29tL2dvL2drZWh1Yi9jb25m
+aWdtYW5hZ2VtZW50L2FwaXYxYWxwaGEvY29uZmlnbWFuYWdlbWVudHBiO2NvbmZpZ21hbmFn
+ZW1lbnRwYqoCLEdvb2dsZS5DbG91ZC5Ha2VIdWIuQ29uZmlnTWFuYWdlbWVudC5WMUFscGhh
+ygIsR29vZ2xlXENsb3VkXEdrZUh1YlxDb25maWdNYW5hZ2VtZW50XFYxYWxwaGHqAjBHb29n
+bGU6OkNsb3VkOjpHa2VIdWI6OkNvbmZpZ01hbmFnZW1lbnQ6OlYxYWxwaGFKsW0KBxIFDgCe
+AwEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNSBHb29nbGUgTExDCgogTGljZW5zZWQg
+dW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7
+CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGgg
+dGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQK
+CiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5s
+ZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5n
+LCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0
+ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJ
+T05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBM
+aWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25z
+IGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQADUKCQoCAwAS
+AxIAKQoICgEIEgMUAEkKCQoCCCUSAxQASQoICgEIEgMVAHMKCQoCCAsSAxUAcwoICgEIEgMW
+ACIKCQoCCAoSAxYAIgoICgEIEgMXADYKCQoCCAgSAxcANgoICgEIEgMYAEkKCQoCCAESAxgA
+SQoICgEIEgMZAEoKCQoCCCkSAxkASgoICgEIEgMaAEkKCQoCCC0SAxoASQpNCgIFABIEHQAp
+ARpBIEVudW0gcmVwcmVzZW50aW5nIHRoZSBzdGF0ZSBvZiBhbiBBQ00ncyBkZXBsb3ltZW50
+IG9uIGEgY2x1c3RlcgoKCgoDBQABEgMdBRQKNgoEBQACABIDHwIjGikgRGVwbG95bWVudCdz
+IHN0YXRlIGNhbm5vdCBiZSBkZXRlcm1pbmVkCgoMCgUFAAIAARIDHwIeCgwKBQUAAgACEgMf
+ISIKKgoEBQACARIDIgIUGh0gRGVwbG95bWVudCBpcyBub3QgaW5zdGFsbGVkCgoMCgUFAAIB
+ARIDIgIPCgwKBQUAAgECEgMiEhMKJgoEBQACAhIDJQIQGhkgRGVwbG95bWVudCBpcyBpbnN0
+YWxsZWQKCgwKBQUAAgIBEgMlAgsKDAoFBQACAgISAyUODwpHCgQFAAIDEgMoAgwaOiBEZXBs
+b3ltZW50IHdhcyBhdHRlbXB0ZWQgdG8gYmUgaW5zdGFsbGVkLCBidXQgaGFzIGVycm9ycwoK
+DAoFBQACAwESAygCBwoMCgUFAAIDAhIDKAoLCkcKAgQAEgQsAEcBGjsgKipBbnRob3MgQ29u
+ZmlnIE1hbmFnZW1lbnQqKjogU3RhdGUgZm9yIGEgc2luZ2xlIGNsdXN0ZXIuCgoKCgMEAAES
+AywIFwqyAgoEBAACABIDMgIaGqQCIFRoZSB1c2VyLWRlZmluZWQgbmFtZSBmb3IgdGhlIGNs
+dXN0ZXIgdXNlZCBieSBDbHVzdGVyU2VsZWN0b3JzIHRvIGdyb3VwCiBjbHVzdGVycyB0b2dl
+dGhlci4gVGhpcyBzaG91bGQgbWF0Y2ggTWVtYmVyc2hpcCdzIG1lbWJlcnNoaXBfbmFtZSwK
+IHVubGVzcyB0aGUgdXNlciBpbnN0YWxsZWQgQUNNIG9uIHRoZSBjbHVzdGVyIG1hbnVhbGx5
+IHByaW9yIHRvIGVuYWJsaW5nCiB0aGUgQUNNIGh1YiBmZWF0dXJlLgogVW5pcXVlIHdpdGhp
+biBhIEFudGhvcyBDb25maWcgTWFuYWdlbWVudCBpbnN0YWxsYXRpb24uCgoMCgUEAAIABRID
+MgIICgwKBQQAAgABEgMyCRUKDAoFBAACAAMSAzIYGQq1AQoEBAACARIDNwIlGqcBIE1lbWJl
+cnNoaXAgY29uZmlndXJhdGlvbiBpbiB0aGUgY2x1c3Rlci4gVGhpcyByZXByZXNlbnRzIHRo
+ZSBhY3R1YWwgc3RhdGUKIGluIHRoZSBjbHVzdGVyLCB3aGlsZSB0aGUgTWVtYmVyc2hpcFNw
+ZWMgaW4gdGhlIEZlYXR1cmVTcGVjIHJlcHJlc2VudHMKIHRoZSBpbnRlbmRlZCBzdGF0ZQoK
+DAoFBAACAQYSAzcCEAoMCgUEAAIBARIDNxEgCgwKBQQAAgEDEgM3IyQKNwoEBAACAhIDOgIj
+GiogQ3VycmVudCBpbnN0YWxsIHN0YXR1cyBvZiBBQ00ncyBPcGVyYXRvcgoKDAoFBAACAgYS
+AzoCDwoMCgUEAAICARIDOhAeCgwKBQQAAgIDEgM6ISIKIgoEBAACAxIDPQIoGhUgQ3VycmVu
+dCBzeW5jIHN0YXR1cwoKDAoFBAACAwYSAz0CEQoMCgUEAAIDARIDPRIjCgwKBQQAAgMDEgM9
+JicKJgoEBAACBBIDQAI0GhkgUG9saWN5Q29udHJvbGxlciBzdGF0dXMKCgwKBQQAAgQGEgNA
+AhcKDAoFBAACBAESA0AYLwoMCgUEAAIEAxIDQDIzCh4KBAQAAgUSA0MCIxoRIEJpbmF1dGh6
+IHN0YXR1cwoKDAoFBAACBQYSA0MCDwoMCgUEAAIFARIDQxAeCgwKBQQAAgUDEgNDISIKKgoE
+BAACBhIDRgI6Gh0gSGllcmFyY2h5IENvbnRyb2xsZXIgc3RhdHVzCgoMCgUEAAIGBhIDRgIa
+CgwKBQQAAgYBEgNGGzUKDAoFBAACBgMSA0Y4OQp+CgIEARIESwBaARpyICoqQW50aG9zIENv
+bmZpZyBNYW5hZ2VtZW50Kio6IENvbmZpZ3VyYXRpb24gZm9yIGEgc2luZ2xlIGNsdXN0ZXIu
+CiBJbnRlbmRlZCB0byBwYXJhbGxlbCB0aGUgQ29uZmlnTWFuYWdlbWVudCBDUi4KCgoKAwQB
+ARIDSwgWCjkKBAQBAgASA00CHRosIENvbmZpZyBTeW5jIGNvbmZpZ3VyYXRpb24gZm9yIHRo
+ZSBjbHVzdGVyLgoKDAoFBAECAAYSA00CDAoMCgUEAQIAARIDTQ0YCgwKBQQBAgADEgNNGxwK
+PwoEBAECARIDUAIpGjIgUG9saWN5IENvbnRyb2xsZXIgY29uZmlndXJhdGlvbiBmb3IgdGhl
+IGNsdXN0ZXIuCgoMCgUEAQIBBhIDUAISCgwKBQQBAgEBEgNQEyQKDAoFBAECAQMSA1AnKAo2
+CgQEAQICEgNTAh4aKSBCaW5hdXRoeiBjb25pZmd1cmF0aW9uIGZvciB0aGUgY2x1c3Rlci4K
+CgwKBQQBAgIGEgNTAhAKDAoFBAECAgESA1MRGQoMCgUEAQICAxIDUxwdCkIKBAQBAgMSA1YC
+NRo1IEhpZXJhcmNoeSBDb250cm9sbGVyIGNvbmZpZ3VyYXRpb24gZm9yIHRoZSBjbHVzdGVy
+LgoKDAoFBAECAwYSA1YCGwoMCgUEAQIDARIDVhwwCgwKBQQBAgMDEgNWMzQKKAoEBAECBBID
+WQIWGhsgVmVyc2lvbiBvZiBBQ00gaW5zdGFsbGVkLgoKDAoFBAECBAUSA1kCCAoMCgUEAQIE
+ARIDWQkQCgwKBQQBAgQDEgNZExUKKwoCBAISBF0AZAEaHyBDb25maWd1cmF0aW9uIGZvciBD
+b25maWcgU3luYwoKCgoDBAIBEgNdCBIKNgoEBAICABIDXwIUGikgR2l0IHJlcG8gY29uZmln
+dXJhdGlvbiBmb3IgdGhlIGNsdXN0ZXIuCgoMCgUEAgIABhIDXwILCgwKBQQCAgABEgNfDA8K
+DAoFBAICAAMSA18SEwprCgQEAgIBEgNjAhsaXiBTcGVjaWZpZXMgd2hldGhlciB0aGUgQ29u
+ZmlnIFN5bmMgUmVwbyBpcwogaW4g4oCcaGllcmFyY2hpY2Fs4oCdIG9yIOKAnHVuc3RydWN0
+dXJlZOKAnSBtb2RlLgoKDAoFBAICAQUSA2MCCAoMCgUEAgIBARIDYwkWCgwKBQQCAgEDEgNj
+GRoKOwoCBAMSBWcAgQEBGi4gR2l0IHJlcG8gY29uZmlndXJhdGlvbiBmb3IgYSBzaW5nbGUg
+Y2x1c3Rlci4KCgoKAwQDARIDZwgRCksKBAQDAgASA2kCFxo+IFRoZSBVUkwgb2YgdGhlIEdp
+dCByZXBvc2l0b3J5IHRvIHVzZSBhcyB0aGUgc291cmNlIG9mIHRydXRoLgoKDAoFBAMCAAUS
+A2kCCAoMCgUEAwIAARIDaQkSCgwKBQQDAgADEgNpFRYKSgoEBAMCARIDbAIZGj0gVGhlIGJy
+YW5jaCBvZiB0aGUgcmVwb3NpdG9yeSB0byBzeW5jIGZyb20uIERlZmF1bHQ6IG1hc3Rlci4K
+CgwKBQQDAgEFEgNsAggKDAoFBAMCAQESA2wJFAoMCgUEAwIBAxIDbBcYCpUBCgQEAwICEgNw
+AhgahwEgVGhlIHBhdGggd2l0aGluIHRoZSBHaXQgcmVwb3NpdG9yeSB0aGF0IHJlcHJlc2Vu
+dHMgdGhlIHRvcCBsZXZlbCBvZiB0aGUKIHJlcG8gdG8gc3luYy4gRGVmYXVsdDogdGhlIHJv
+b3QgZGlyZWN0b3J5IG9mIHRoZSByZXBvc2l0b3J5LgoKDAoFBAMCAgUSA3ACCAoMCgUEAwIC
+ARIDcAkTCgwKBQQDAgIDEgNwFhcKSAoEBAMCAxIDcwIbGjsgUGVyaW9kIGluIHNlY29uZHMg
+YmV0d2VlbiBjb25zZWN1dGl2ZSBzeW5jcy4gRGVmYXVsdDogMTUuCgoMCgUEAwIDBRIDcwIH
+CgwKBQQDAgMBEgNzCBYKDAoFBAMCAwMSA3MZGgpFCgQEAwIEEgN2AhYaOCBHaXQgcmV2aXNp
+b24gKHRhZyBvciBoYXNoKSB0byBjaGVjayBvdXQuIERlZmF1bHQgSEVBRC4KCgwKBQQDAgQF
+EgN2AggKDAoFBAMCBAESA3YJEQoMCgUEAwIEAxIDdhQVCkQKBAQDAgUSA3kCGRo3IFR5cGUg
+b2Ygc2VjcmV0IGNvbmZpZ3VyZWQgZm9yIGFjY2VzcyB0byB0aGUgR2l0IHJlcG8uCgoMCgUE
+AwIFBRIDeQIICgwKBQQDAgUBEgN5CRQKDAoFBAMCBQMSA3kXGApXCgQEAwIGEgN8AhkaSiBV
+UkwgZm9yIHRoZSBIVFRQUyBwcm94eSB0byBiZSB1c2VkIHdoZW4gY29tbXVuaWNhdGluZyB3
+aXRoIHRoZSBHaXQgcmVwby4KCgwKBQQDAgYFEgN8AggKDAoFBAMCBgESA3wJFAoMCgUEAwIG
+AxIDfBcYCmMKBAQDAgcSBIABAicaVSBUaGUgR0NQIFNlcnZpY2UgQWNjb3VudCBFbWFpbCB1
+c2VkIGZvciBhdXRoIHdoZW4gc2VjcmV0X3R5cGUgaXMKIGdjcFNlcnZpY2VBY2NvdW50LgoK
+DQoFBAMCBwUSBIABAggKDQoFBAMCBwESBIABCSIKDQoFBAMCBwMSBIABJSYKMwoCBAQSBoQB
+AJ4BARolIENvbmZpZ3VyYXRpb24gZm9yIFBvbGljeSBDb250cm9sbGVyCgoLCgMEBAESBIQB
+CBgKfgoEBAQCABIEiAECExpwIEVuYWJsZXMgdGhlIGluc3RhbGxhdGlvbiBvZiBQb2xpY3kg
+Q29udHJvbGxlci4KIElmIGZhbHNlLCB0aGUgcmVzdCBvZiBQb2xpY3lDb250cm9sbGVyIGZp
+ZWxkcyB0YWtlIG5vCiBlZmZlY3QuCgoNCgUEBAIABRIEiAECBgoNCgUEBAIAARIEiAEHDgoN
+CgUEBAIAAxIEiAEREgpTCgQEBAIBEgSLAQIvGkUgSW5zdGFsbHMgdGhlIGRlZmF1bHQgdGVt
+cGxhdGUgbGlicmFyeSBhbG9uZyB3aXRoIFBvbGljeSBDb250cm9sbGVyLgoKDQoFBAQCAQQS
+BIsBAgoKDQoFBAQCAQUSBIsBCw8KDQoFBAQCAQESBIsBECoKDQoFBAQCAQMSBIsBLS4KkAEK
+BAQEAgISBI8BAiwagQEgU2V0cyB0aGUgaW50ZXJ2YWwgZm9yIFBvbGljeSBDb250cm9sbGVy
+IEF1ZGl0IFNjYW5zIChpbiBzZWNvbmRzKS4KIFdoZW4gc2V0IHRvIDAsIHRoaXMgZGlzYWJs
+ZXMgYXVkaXQgZnVuY3Rpb25hbGl0eSBhbHRvZ2V0aGVyLgoKDQoFBAQCAgQSBI8BAgoKDQoF
+BAQCAgUSBI8BCxAKDQoFBAQCAgESBI8BEScKDQoFBAQCAgMSBI8BKisKkgEKBAQEAgMSBJMB
+AiwagwEgVGhlIHNldCBvZiBuYW1lc3BhY2VzIHRoYXQgYXJlIGV4Y2x1ZGVkIGZyb20gUG9s
+aWN5IENvbnRyb2xsZXIgY2hlY2tzLgogTmFtZXNwYWNlcyBkbyBub3QgbmVlZCB0byBjdXJy
+ZW50bHkgZXhpc3Qgb24gdGhlIGNsdXN0ZXIuCgoNCgUEBAIDBBIEkwECCgoNCgUEBAIDBRIE
+kwELEQoNCgUEBAIDARIEkwESJwoNCgUEBAIDAxIEkwEqKwqLAQoEBAQCBBIElwECJRp9IEVu
+YWJsZXMgdGhlIGFiaWxpdHkgdG8gdXNlIENvbnN0cmFpbnQgVGVtcGxhdGVzIHRoYXQgcmVm
+ZXJlbmNlIHRvIG9iamVjdHMKIG90aGVyIHRoYW4gdGhlIG9iamVjdCBjdXJyZW50bHkgYmVp
+bmcgZXZhbHVhdGVkLgoKDQoFBAQCBAUSBJcBAgYKDQoFBAQCBAESBJcBByAKDQoFBAQCBAMS
+BJcBIyQKNQoEBAQCBRIEmgECHhonIExvZ3MgYWxsIGRlbmllcyBhbmQgZHJ5IHJ1biBmYWls
+dXJlcy4KCg0KBQQEAgUFEgSaAQIGCg0KBQQEAgUBEgSaAQcZCg0KBQQEAgUDEgSaARwdCkYK
+BAQEAgYSBJ0BAhwaOCBFbmFibGUgdXNlcnMgdG8gdHJ5IG91dCBtdXRhdGlvbiBmb3IgUG9s
+aWN5Q29udHJvbGxlci4KCg0KBQQEAgYFEgSdAQIGCg0KBQQEAgYBEgSdAQcXCg0KBQQEAgYD
+EgSdARobCioKAgQFEgahAQCkAQEaHCBDb25maWd1cmF0aW9uIGZvciBCaW5hdXRoegoKCwoD
+BAUBEgShAQgWCjwKBAQFAgASBKMBAhMaLiBXaGV0aGVyIGJpbmF1dGh6IGlzIGVuYWJsZWQg
+aW4gdGhpcyBjbHVzdGVyLgoKDQoFBAUCAAUSBKMBAgYKDQoFBAUCAAESBKMBBw4KDQoFBAUC
+AAMSBKMBERIKNgoCBAYSBqcBALABARooIENvbmZpZ3VyYXRpb24gZm9yIEhpZXJhcmNoeSBD
+b250cm9sbGVyCgoLCgMEBgESBKcBCCEKSAoEBAYCABIEqQECExo6IFdoZXRoZXIgSGllcmFy
+Y2h5IENvbnRyb2xsZXIgaXMgZW5hYmxlZCBpbiB0aGlzIGNsdXN0ZXIuCgoNCgUEBgIABRIE
+qQECBgoNCgUEBgIAARIEqQEHDgoNCgUEBgIAAxIEqQEREgpECgQEBgIBEgSsAQIiGjYgV2hl
+dGhlciBwb2QgdHJlZSBsYWJlbHMgYXJlIGVuYWJsZWQgaW4gdGhpcyBjbHVzdGVyLgoKDQoF
+BAYCAQUSBKwBAgYKDQoFBAYCAQESBKwBBx0KDQoFBAYCAQMSBKwBICEKTwoEBAYCAhIErwEC
+LhpBIFdoZXRoZXIgaGllcmFyY2hpY2FsIHJlc291cmNlIHF1b3RhIGlzIGVuYWJsZWQgaW4g
+dGhpcyBjbHVzdGVyLgoKDQoFBAYCAgUSBK8BAgYKDQoFBAYCAgESBK8BBykKDQoFBAYCAgMS
+BK8BLC0KOQoCBAcSBrMBALkBARorIERlcGxveW1lbnQgc3RhdGUgZm9yIEhpZXJhcmNoeSBD
+b250cm9sbGVyCgoLCgMEBwESBLMBCCoKSwoEBAcCABIEtQECGho9IFRoZSBkZXBsb3ltZW50
+IHN0YXRlIGZvciBvcGVuIHNvdXJjZSBITkMgKGUuZy4gdjAuNy4wLWhjLjApCgoNCgUEBwIA
+BhIEtQECEQoNCgUEBwIAARIEtQESFQoNCgUEBwIAAxIEtQEYGQpaCgQEBwIBEgS4AQIgGkwg
+VGhlIGRlcGxveW1lbnQgc3RhdGUgZm9yIEhpZXJhcmNoeSBDb250cm9sbGVyIGV4dGVuc2lv
+biAoZS5nLiB2MC43LjAtaGMuMSkKCg0KBQQHAgEGEgS4AQIRCg0KBQQHAgEBEgS4ARIbCg0K
+BQQHAgEDEgS4AR4fCjAKAgQIEga8AQDCAQEaIiBWZXJzaW9uIGZvciBIaWVyYXJjaHkgQ29u
+dHJvbGxlcgoKCwoDBAgBEgS8AQgiCisKBAQIAgASBL4BAhEaHSBWZXJzaW9uIGZvciBvcGVu
+IHNvdXJjZSBITkMKCg0KBQQIAgAFEgS+AQIICg0KBQQIAgABEgS+AQkMCg0KBQQIAgADEgS+
+AQ8QCjoKBAQIAgESBMEBAhcaLCBWZXJzaW9uIGZvciBIaWVyYXJjaHkgQ29udHJvbGxlciBl
+eHRlbnNpb24KCg0KBQQIAgEFEgTBAQIICg0KBQQIAgEBEgTBAQkSCg0KBQQIAgEDEgTBARUW
+Ci4KAgQJEgbFAQDLAQEaICBTdGF0ZSBmb3IgSGllcmFyY2h5IENvbnRyb2xsZXIKCgsKAwQJ
+ARIExQEIIAo0CgQECQIAEgTHAQIpGiYgVGhlIHZlcnNpb24gZm9yIEhpZXJhcmNoeSBDb250
+cm9sbGVyCgoNCgUECQIABhIExwECHAoNCgUECQIAARIExwEdJAoNCgUECQIAAxIExwEnKAo9
+CgQECQIBEgTKAQIvGi8gVGhlIGRlcGxveW1lbnQgc3RhdGUgZm9yIEhpZXJhcmNoeSBDb250
+cm9sbGVyCgoNCgUECQIBBhIEygECJAoNCgUECQIBARIEygElKgoNCgUECQIBAxIEygEtLgo3
+CgIEChIGzgEA1wEBGikgU3RhdGUgaW5mb3JtYXRpb24gZm9yIGFuIEFDTSdzIE9wZXJhdG9y
+CgoLCgMECgESBM4BCBUKPAoEBAoCABIE0AECFRouIFRoZSBzZW1lbmF0aWMgdmVyc2lvbiBu
+dW1iZXIgb2YgdGhlIG9wZXJhdG9yCgoNCgUECgIABRIE0AECCAoNCgUECgIAARIE0AEJEAoN
+CgUECgIAAxIE0AETFAo2CgQECgIBEgTTAQInGiggVGhlIHN0YXRlIG9mIHRoZSBPcGVyYXRv
+cidzIGRlcGxveW1lbnQKCg0KBQQKAgEGEgTTAQIRCg0KBQQKAgEBEgTTARIiCg0KBQQKAgED
+EgTTASUmCh8KBAQKAgISBNYBAiMaESBJbnN0YWxsIGVycm9ycy4KCg0KBQQKAgIEEgTWAQIK
+Cg0KBQQKAgIGEgTWAQsXCg0KBQQKAgIBEgTWARgeCg0KBQQKAgIDEgTWASEiCjwKAgQLEgba
+AQDdAQEaLiBFcnJvcnMgcGVydGFpbmluZyB0byB0aGUgaW5zdGFsbGF0aW9uIG9mIEFDTQoK
+CwoDBAsBEgTaAQgUCkMKBAQLAgASBNwBAhsaNSBBIHN0cmluZyByZXByZXNlbnRpbmcgdGhl
+IHVzZXIgZmFjaW5nIGVycm9yIG1lc3NhZ2UKCg0KBQQLAgAFEgTcAQIICg0KBQQLAgABEgTc
+AQkWCg0KBQQLAgADEgTcARkaCjAKAgQMEgbgAQDqAQEaIiBTdGF0ZSBpbmZvcm1hdGlvbiBm
+b3IgQ29uZmlnU3luYwoKCwoDBAwBEgTgAQgXCjIKBAQMAgASBOIBAiAaJCBUaGUgdmVyc2lv
+biBvZiBDb25maWdTeW5jIGRlcGxveWVkCgoNCgUEDAIABhIE4gECEwoNCgUEDAIAARIE4gEU
+GwoNCgUEDAIAAxIE4gEeHwpzCgQEDAIBEgTmAQIxGmUgSW5mb3JtYXRpb24gYWJvdXQgdGhl
+IGRlcGxveW1lbnQgb2YgQ29uZmlnU3luYywgaW5jbHVkaW5nIHRoZSB2ZXJzaW9uCiBvZiB0
+aGUgdmFyaW91cyBQb2RzIGRlcGxveWVkCgoNCgUEDAIBBhIE5gECGwoNCgUEDAIBARIE5gEc
+LAoNCgUEDAIBAxIE5gEvMApOCgQEDAICEgTpAQIbGkAgVGhlIHN0YXRlIG9mIENvbmZpZ1N5
+bmMncyBwcm9jZXNzIHRvIHN5bmMgY29uZmlncyB0byBhIGNsdXN0ZXIKCg0KBQQMAgIGEgTp
+AQILCg0KBQQMAgIBEgTpAQwWCg0KBQQMAgIDEgTpARkaCk8KAgQNEgbtAQD/AQEaQSBTcGVj
+aWZpYyB2ZXJzaW9uaW5nIGluZm9ybWF0aW9uIHBlcnRhaW5pbmcgdG8gQ29uZmlnU3luYydz
+IFBvZHMKCgsKAwQNARIE7QEIGQo0CgQEDQIAEgTvAQIWGiYgVmVyc2lvbiBvZiB0aGUgZGVw
+bG95ZWQgaW1wb3J0ZXIgcG9kCgoNCgUEDQIABRIE7wECCAoNCgUEDQIAARIE7wEJEQoNCgUE
+DQIAAxIE7wEUFQoyCgQEDQIBEgTyAQIUGiQgVmVyc2lvbiBvZiB0aGUgZGVwbG95ZWQgc3lu
+Y2VyIHBvZAoKDQoFBA0CAQUSBPIBAggKDQoFBA0CAQESBPIBCQ8KDQoFBA0CAQMSBPIBEhMK
+NAoEBA0CAhIE9QECFhomIFZlcnNpb24gb2YgdGhlIGRlcGxveWVkIGdpdC1zeW5jIHBvZAoK
+DQoFBA0CAgUSBPUBAggKDQoFBA0CAgESBPUBCREKDQoFBA0CAgMSBPUBFBUKMwoEBA0CAxIE
++AECFRolIFZlcnNpb24gb2YgdGhlIGRlcGxveWVkIG1vbml0b3IgcG9kCgoNCgUEDQIDBRIE
++AECCAoNCgUEDQIDARIE+AEJEAoNCgUEDQIDAxIE+AETFAo+CgQEDQIEEgT7AQIgGjAgVmVy
+c2lvbiBvZiB0aGUgZGVwbG95ZWQgcmVjb25jaWxlci1tYW5hZ2VyIHBvZAoKDQoFBA0CBAUS
+BPsBAggKDQoFBA0CBAESBPsBCRsKDQoFBA0CBAMSBPsBHh8KUwoEBA0CBRIE/gECHRpFIFZl
+cnNpb24gb2YgdGhlIGRlcGxveWVkIHJlY29uY2lsZXIgY29udGFpbmVyIGluIHJvb3QtcmVj
+b25jaWxlciBwb2QKCg0KBQQNAgUFEgT+AQIICg0KBQQNAgUBEgT+AQkYCg0KBQQNAgUDEgT+
+ARscCkEKAgQOEgaCAgCUAgEaMyBUaGUgc3RhdGUgb2YgQ29uZmlnU3luYydzIGRlcGxveW1l
+bnQgb24gYSBjbHVzdGVyCgoLCgMEDgESBIICCCEKNAoEBA4CABIEhAICHxomIERlcGxveW1l
+bnQgc3RhdGUgb2YgdGhlIGltcG9ydGVyIHBvZAoKDQoFBA4CAAYSBIQCAhEKDQoFBA4CAAES
+BIQCEhoKDQoFBA4CAAMSBIQCHR4KMgoEBA4CARIEhwICHRokIERlcGxveW1lbnQgc3RhdGUg
+b2YgdGhlIHN5bmNlciBwb2QKCg0KBQQOAgEGEgSHAgIRCg0KBQQOAgEBEgSHAhIYCg0KBQQO
+AgEDEgSHAhscCjQKBAQOAgISBIoCAh8aJiBEZXBsb3ltZW50IHN0YXRlIG9mIHRoZSBnaXQt
+c3luYyBwb2QKCg0KBQQOAgIGEgSKAgIRCg0KBQQOAgIBEgSKAhIaCg0KBQQOAgIDEgSKAh0e
+CjMKBAQOAgMSBI0CAh4aJSBEZXBsb3ltZW50IHN0YXRlIG9mIHRoZSBtb25pdG9yIHBvZAoK
+DQoFBA4CAwYSBI0CAhEKDQoFBA4CAwESBI0CEhkKDQoFBA4CAwMSBI0CHB0KOgoEBA4CBBIE
+kAICKRosIERlcGxveW1lbnQgc3RhdGUgb2YgcmVjb25jaWxlci1tYW5hZ2VyIHBvZAoKDQoF
+BA4CBAYSBJACAhEKDQoFBA4CBAESBJACEiQKDQoFBA4CBAMSBJACJygKMwoEBA4CBRIEkwIC
+JholIERlcGxveW1lbnQgc3RhdGUgb2Ygcm9vdC1yZWNvbmNpbGVyCgoNCgUEDgIFBhIEkwIC
+EQoNCgUEDgIFARIEkwISIQoNCgUEDgIFAxIEkwIkJQpWCgIEDxIGlwIAzAIBGkggU3RhdGUg
+aW5kaWNhdGluZyBhbiBBQ00ncyBwcm9ncmVzcyBzeW5jaW5nIGNvbmZpZ3VyYXRpb25zIHRv
+IGEgY2x1c3RlcgoKCwoDBA8BEgSXAggRClMKBAQPBAASBpkCArICAxpDIEFuIGVudW0gcmVw
+cmVzZW50aW5nIGFuIEFDTSdzIHN0YXR1cyBzeW5jaW5nIGNvbmZpZ3MgdG8gYSBjbHVzdGVy
+CgoNCgUEDwQAARIEmQIHDwoyCgYEDwQAAgASBJsCBB4aIiBBQ00gY2Fubm90IGRldGVybWlu
+ZSBhIHN5bmMgY29kZQoKDwoHBA8EAAIAARIEmwIEGQoPCgcEDwQAAgACEgSbAhwdCkcKBgQP
+BAACARIEngIEDxo3IEFDTSBzdWNjZXNzZnVsbHkgc3luY2VkIHRoZSBnaXQgUmVwbyB3aXRo
+IHRoZSBjbHVzdGVyCgoPCgcEDwQAAgEBEgSeAgQKCg8KBwQPBAACAQISBJ4CDQ4KQAoGBA8E
+AAICEgShAgQQGjAgQUNNIGlzIGluIHRoZSBwcm9ncmVzcyBvZiBzeW5jaW5nIGEgbmV3IGNo
+YW5nZQoKDwoHBA8EAAICARIEoQIECwoPCgcEDwQAAgICEgShAg4PClEKBgQPBAACAxIEpAIE
+DhpBIEluZGljYXRlcyBhbiBlcnJvciBjb25maWd1cmluZyBBQ00sIGFuZCB1c2VyIGFjdGlv
+biBpcyByZXF1aXJlZAoKDwoHBA8EAAIDARIEpAIECQoPCgcEDwQAAgMCEgSkAgwNClsKBgQP
+BAACBBIEqAIEFxpLIEFDTSBoYXMgYmVlbiBpbnN0YWxsZWQgKG9wZXJhdG9yIG1hbmlmZXN0
+IGRlcGxveWVkKSwKIGJ1dCBub3QgY29uZmlndXJlZC4KCg8KBwQPBAACBAESBKgCBBIKDwoH
+BA8EAAIEAhIEqAIVFgpECgYEDwQAAgUSBKsCBBYaNCBBQ00gaGFzIG5vdCBiZWVuIGluc3Rh
+bGxlZCAobm8gb3BlcmF0b3IgcG9kIGZvdW5kKQoKDwoHBA8EAAIFARIEqwIEEQoPCgcEDwQA
+AgUCEgSrAhQVCjQKBgQPBAACBhIErgIEFRokIEVycm9yIGF1dGhvcml6aW5nIHdpdGggdGhl
+IGNsdXN0ZXIKCg8KBwQPBAACBgESBK4CBBAKDwoHBA8EAAIGAhIErgITFAouCgYEDwQAAgcS
+BLECBBQaHiBDbHVzdGVyIGNvdWxkIG5vdCBiZSByZWFjaGVkCgoPCgcEDwQAAgcBEgSxAgQP
+Cg8KBwQPBAACBwISBLECEhMKNwoEBA8CABIEtQICGhopIFRva2VuIGluZGljYXRpbmcgdGhl
+IHN0YXRlIG9mIHRoZSByZXBvLgoKDQoFBA8CAAUSBLUCAggKDQoFBA8CAAESBLUCCRUKDQoF
+BA8CAAMSBLUCGBkKOwoEBA8CARIEuAICGhotIFRva2VuIGluZGljYXRpbmcgdGhlIHN0YXRl
+IG9mIHRoZSBpbXBvcnRlci4KCg0KBQQPAgEFEgS4AgIICg0KBQQPAgEBEgS4AgkVCg0KBQQP
+AgEDEgS4AhgZCjkKBAQPAgISBLsCAhgaKyBUb2tlbiBpbmRpY2F0aW5nIHRoZSBzdGF0ZSBv
+ZiB0aGUgc3luY2VyLgoKDQoFBA8CAgUSBLsCAggKDQoFBA8CAgESBLsCCRMKDQoFBA8CAgMS
+BLsCFhcKuwEKBAQPAgMSBMACAisarAEgRGVwcmVjYXRlZDogdXNlIGxhc3Rfc3luY190aW1l
+IGluc3RlYWQuCiBUaW1lc3RhbXAgb2Ygd2hlbiBBQ00gbGFzdCBzdWNjZXNzZnVsbHkgc3lu
+Y2VkIHRoZSByZXBvCiBUaGUgdGltZSBmb3JtYXQgaXMgc3BlY2lmaWVkIGluIGh0dHBzOi8v
+Z29sYW5nLm9yZy9wa2cvdGltZS8jVGltZS5TdHJpbmcKCg0KBQQPAgMFEgTAAgIICg0KBQQP
+AgMBEgTAAgkSCg0KBQQPAgMDEgTAAhUWCg0KBQQPAgMIEgTAAhcqCg4KBgQPAgMIAxIEwAIY
+KQpMCgQEDwIEEgTDAgIvGj4gVGltZXN0YW1wIHR5cGUgb2Ygd2hlbiBBQ00gbGFzdCBzdWNj
+ZXNzZnVsbHkgc3luY2VkIHRoZSByZXBvCgoNCgUEDwIEBhIEwwICGwoNCgUEDwIEARIEwwIc
+KgoNCgUEDwIEAxIEwwItLgogCgQEDwIFEgTGAgIUGhIgU3luYyBzdGF0dXMgY29kZQoKDQoF
+BA8CBQYSBMYCAgoKDQoFBA8CBQESBMYCCw8KDQoFBA8CBQMSBMYCEhMKuwEKBAQPAgYSBMsC
+AiAarAEgQSBsaXN0IG9mIGVycm9ycyByZXN1bHRpbmcgZnJvbSBwcm9ibGVtYXRpYyBjb25m
+aWdzLgogVGhpcyBsaXN0IHdpbGwgYmUgdHJ1bmNhdGVkIGFmdGVyIDEwMCBlcnJvcnMsIGFs
+dGhvdWdoIGl0IGlzCiB1bmxpa2VseSBmb3IgdGhhdCBtYW55IGVycm9ycyB0byBzaW11bHRh
+bmVvdXNseSBleGlzdC4KCg0KBQQPAgYEEgTLAgIKCg0KBQQPAgYGEgTLAgsUCg0KBQQPAgYB
+EgTLAhUbCg0KBQQPAgYDEgTLAh4fClIKAgQQEgbPAgDYAgEaRCBBbiBBQ00gY3JlYXRlZCBl
+cnJvciByZXByZXNlbnRpbmcgYSBwcm9ibGVtIHN5bmNpbmcgY29uZmlndXJhdGlvbnMKCgsK
+AwQQARIEzwIIEQopCgQEEAIAEgTRAgISGhsgQW4gQUNNIGRlZmluZWQgZXJyb3IgY29kZQoK
+DQoFBBACAAUSBNECAggKDQoFBBACAAESBNECCQ0KDQoFBBACAAMSBNECEBEKKgoEBBACARIE
+1AICGxocIEEgZGVzY3JpcHRpb24gb2YgdGhlIGVycm9yCgoNCgUEEAIBBRIE1AICCAoNCgUE
+EAIBARIE1AIJFgoNCgUEEAIBAxIE1AIZGgpFCgQEEAICEgTXAgItGjcgQSBsaXN0IG9mIGNv
+bmZpZyhzKSBhc3NvY2lhdGVkIHdpdGggdGhlIGVycm9yLCBpZiBhbnkKCg0KBQQQAgIEEgTX
+AgIKCg0KBQQQAgIGEgTXAgsYCg0KBQQQAgIBEgTXAhkoCg0KBQQQAgIDEgTXAissClUKAgQR
+EgbbAgDnAgEaRyBNb2RlbCBmb3IgYSBjb25maWcgZmlsZSBpbiB0aGUgZ2l0IHJlcG8gd2l0
+aCBhbiBhc3NvY2lhdGVkIFN5bmMgZXJyb3IKCgsKAwQRARIE2wIIFQo8CgQEEQIAEgTdAgIZ
+Gi4gUGF0aCBpbiB0aGUgZ2l0IHJlcG8gb2YgdGhlIGVycm9uZW91cyBjb25maWcKCg0KBQQR
+AgAFEgTdAgIICg0KBQQRAgABEgTdAgkUCg0KBQQRAgADEgTdAhcYCkYKBAQRAgESBOACAhsa
+OCBNZXRhZGF0YSBuYW1lIG9mIHRoZSByZXNvdXJjZSB0aGF0IGlzIGNhdXNpbmcgYW4gZXJy
+b3IKCg0KBQQRAgEFEgTgAgIICg0KBQQRAgEBEgTgAgkWCg0KBQQRAgEDEgTgAhkaCkIKBAQR
+AgISBOMCAiAaNCBOYW1lc3BhY2Ugb2YgdGhlIHJlc291cmNlIHRoYXQgaXMgY2F1c2luZyBh
+biBlcnJvcgoKDQoFBBECAgUSBOMCAggKDQoFBBECAgESBOMCCRsKDQoFBBECAgMSBOMCHh8K
+SwoEBBECAxIE5gICJBo9IEdyb3VwL3ZlcnNpb24va2luZCBvZiB0aGUgcmVzb3VyY2UgdGhh
+dCBpcyBjYXVzaW5nIGFuIGVycm9yCgoNCgUEEQIDBhIE5gICEgoNCgUEEQIDARIE5gITHwoN
+CgUEEQIDAxIE5gIiIwopCgIEEhIG6gIA8wIBGhsgQSBLdWJlcm5ldGVzIG9iamVjdCdzIEdW
+SwoKCwoDBBIBEgTqAggYCiAKBAQSAgASBOwCAhMaEiBLdWJlcm5ldGVzIEdyb3VwCgoNCgUE
+EgIABRIE7AICCAoNCgUEEgIAARIE7AIJDgoNCgUEEgIAAxIE7AIREgoiCgQEEgIBEgTvAgIV
+GhQgS3ViZXJuZXRlcyBWZXJzaW9uCgoNCgUEEgIBBRIE7wICCAoNCgUEEgIBARIE7wIJEAoN
+CgUEEgIBAxIE7wITFAofCgQEEgICEgTyAgISGhEgS3ViZXJuZXRlcyBLaW5kCgoNCgUEEgIC
+BRIE8gICCAoNCgUEEgICARIE8gIJDQoNCgUEEgICAxIE8gIQEQowCgIEExIG9gIA/AIBGiIg
+U3RhdGUgZm9yIFBvbGljeUNvbnRyb2xsZXJTdGF0ZS4KCgsKAwQTARIE9gIIHQpFCgQEEwIA
+EgT4AgImGjcgVGhlIHZlcnNpb24gb2YgR2F0ZWtlZXBlciBQb2xpY3kgQ29udHJvbGxlciBk
+ZXBsb3llZC4KCg0KBQQTAgAGEgT4AgIZCg0KBQQTAgABEgT4AhohCg0KBQQTAgADEgT4AiQl
+CkMKBAQTAgESBPsCAjEaNSBUaGUgc3RhdGUgYWJvdXQgdGhlIHBvbGljeSBjb250cm9sbGVy
+IGluc3RhbGxhdGlvbi4KCg0KBQQTAgEGEgT7AgIbCg0KBQQTAgEBEgT7AhwsCg0KBQQTAgED
+EgT7Ai8wCksKAgQUEgb/AgCDAwEaPSBUaGUgYnVpbGQgdmVyc2lvbiBvZiBHYXRla2VlcGVy
+IFBvbGljeSBDb250cm9sbGVyIGlzIHVzaW5nLgoKCwoDBBQBEgT/AggfCmEKBAQUAgASBIID
+AhUaUyBUaGUgZ2F0ZWtlZXBlciBpbWFnZSB0YWcgdGhhdCBpcyBjb21wb3NlZCBvZiBBQ00g
+dmVyc2lvbiwgZ2l0IHRhZywgYnVpbGQKIG51bWJlci4KCg0KBQQUAgAFEgSCAwIICg0KBQQU
+AgABEgSCAwkQCg0KBQQUAgADEgSCAxMUCiIKAgQVEgaGAwCMAwEaFCBTdGF0ZSBmb3IgQmlu
+YXV0aHoKCgsKAwQVARIEhgMIFQoyCgQEFQIAEgSIAwIeGiQgVGhlIHN0YXRlIG9mIHRoZSBi
+aW5hdXRoeiB3ZWJob29rLgoKDQoFBBUCAAYSBIgDAhEKDQoFBBUCAAESBIgDEhkKDQoFBBUC
+AAMSBIgDHB0KOgoEBBUCARIEiwMCHhosIFRoZSB2ZXJzaW9uIG9mIGJpbmF1dGh6IHRoYXQg
+aXMgaW5zdGFsbGVkLgoKDQoFBBUCAQYSBIsDAhEKDQoFBBUCAQESBIsDEhkKDQoFBBUCAQMS
+BIsDHB0KKAoCBBYSBo8DAJIDARoaIFRoZSB2ZXJzaW9uIG9mIGJpbmF1dGh6LgoKCwoDBBYB
+EgSPAwgXCjQKBAQWAgASBJEDAh0aJiBUaGUgdmVyc2lvbiBvZiB0aGUgYmluYXV0aHogd2Vi
+aG9vay4KCg0KBQQWAgAFEgSRAwIICg0KBQQWAgABEgSRAwkYCg0KBQQWAgADEgSRAxscCjgK
+AgQXEgaVAwCeAwEaKiBTdGF0ZSBvZiBQb2xpY3kgQ29udHJvbGxlciBpbnN0YWxsYXRpb24u
+CgoLCgMEFwESBJUDCCEKPAoEBBcCABIElwMCOhouIFN0YXR1cyBvZiBnYXRla2VlcGVyLWNv
+bnRyb2xsZXItbWFuYWdlciBwb2QuCgoNCgUEFwIABhIElwMCEQoNCgUEFwIAARIElwMSNQoN
+CgUEFwIAAxIElwM4OQo2CgQEFwIBEgSaAwInGiggU3RhdHVzIG9mIGdhdGVrZWVwZXItYXVk
+aXQgZGVwbG95bWVudC4KCg0KBQQXAgEGEgSaAwIRCg0KBQQXAgEBEgSaAxIiCg0KBQQXAgED
+EgSaAyUmCj8KBAQXAgISBJ0DAioaMSBTdGF0dXMgb2YgdGhlIHBvZCBzZXJ2aW5nIHRoZSBt
+dXRhdGlvbiB3ZWJob29rLgoKDQoFBBcCAgYSBJ0DAhEKDQoFBBcCAgESBJ0DEiUKDQoFBBcC
+AgMSBJ0DKCliBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::MembershipState ===
+    # Fields for MembershipState
+    # Field: cluster_name Type: 9 ()
+    # Field: membership_spec Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.MembershipSpec)
+    # Field: operator_state Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.OperatorState)
+    # Field: config_sync_state Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.ConfigSyncState)
+    # Field: policy_controller_state Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.PolicyControllerState)
+    # Field: binauthz_state Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.BinauthzState)
+    # Field: hierarchy_controller_state Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.HierarchyControllerState)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::MembershipSpec ===
+    # Fields for MembershipSpec
+    # Field: config_sync Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.ConfigSync)
+    # Field: policy_controller Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.PolicyController)
+    # Field: binauthz Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.BinauthzConfig)
+    # Field: hierarchy_controller Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.HierarchyControllerConfig)
+    # Field: version Type: 9 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSync ===
+    # Fields for ConfigSync
+    # Field: git Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.GitConfig)
+    # Field: source_format Type: 9 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::GitConfig ===
+    # Fields for GitConfig
+    # Field: sync_repo Type: 9 ()
+    # Field: sync_branch Type: 9 ()
+    # Field: policy_dir Type: 9 ()
+    # Field: sync_wait_secs Type: 3 ()
+    # Field: sync_rev Type: 9 ()
+    # Field: secret_type Type: 9 ()
+    # Field: https_proxy Type: 9 ()
+    # Field: gcp_service_account_email Type: 9 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::PolicyController ===
+    # Fields for PolicyController
+    # Field: enabled Type: 8 ()
+    # Field: template_library_installed Type: 8 ()
+    # Field: audit_interval_seconds Type: 3 ()
+    # Field: exemptable_namespaces Type: 9 ()
+    # Field: referential_rules_enabled Type: 8 ()
+    # Field: log_denies_enabled Type: 8 ()
+    # Field: mutation_enabled Type: 8 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::BinauthzConfig ===
+    # Fields for BinauthzConfig
+    # Field: enabled Type: 8 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerConfig ===
+    # Fields for HierarchyControllerConfig
+    # Field: enabled Type: 8 ()
+    # Field: enable_pod_tree_labels Type: 8 ()
+    # Field: enable_hierarchical_resource_quota Type: 8 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerDeploymentState ===
+    # Fields for HierarchyControllerDeploymentState
+    # Field: hnc Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: extension Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerVersion ===
+    # Fields for HierarchyControllerVersion
+    # Field: hnc Type: 9 ()
+    # Field: extension Type: 9 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerState ===
+    # Fields for HierarchyControllerState
+    # Field: version Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.HierarchyControllerVersion)
+    # Field: state Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.HierarchyControllerDeploymentState)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::OperatorState ===
+    # Fields for OperatorState
+    # Field: version Type: 9 ()
+    # Field: deployment_state Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: errors Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.InstallError)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::InstallError ===
+    # Fields for InstallError
+    # Field: error_message Type: 9 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSyncState ===
+    # Fields for ConfigSyncState
+    # Field: version Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.ConfigSyncVersion)
+    # Field: deployment_state Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.ConfigSyncDeploymentState)
+    # Field: sync_state Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.SyncState)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSyncVersion ===
+    # Fields for ConfigSyncVersion
+    # Field: importer Type: 9 ()
+    # Field: syncer Type: 9 ()
+    # Field: git_sync Type: 9 ()
+    # Field: monitor Type: 9 ()
+    # Field: reconciler_manager Type: 9 ()
+    # Field: root_reconciler Type: 9 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSyncDeploymentState ===
+    # Fields for ConfigSyncDeploymentState
+    # Field: importer Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: syncer Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: git_sync Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: monitor Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: reconciler_manager Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: root_reconciler Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::SyncState ===
+    # Fields for SyncState
+    # Field: source_token Type: 9 ()
+    # Field: import_token Type: 9 ()
+    # Field: sync_token Type: 9 ()
+    # Field: last_sync Type: 9 ()
+    # Field: last_sync_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: code Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.SyncState.SyncCode)
+    # Field: errors Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.SyncError)
+
+# Enum: SyncState::SyncCode
+our $SyncState_SYNC_CODE_UNSPECIFIED = 0;
+our $SyncState_SYNCED = 1;
+our $SyncState_PENDING = 2;
+our $SyncState_ERROR = 3;
+our $SyncState_NOT_CONFIGURED = 4;
+our $SyncState_NOT_INSTALLED = 5;
+our $SyncState_UNAUTHORIZED = 6;
+our $SyncState_UNREACHABLE = 7;
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::SyncError ===
+    # Fields for SyncError
+    # Field: code Type: 9 ()
+    # Field: error_message Type: 9 ()
+    # Field: error_resources Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.ErrorResource)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ErrorResource ===
+    # Fields for ErrorResource
+    # Field: source_path Type: 9 ()
+    # Field: resource_name Type: 9 ()
+    # Field: resource_namespace Type: 9 ()
+    # Field: resource_gvk Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.GroupVersionKind)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::GroupVersionKind ===
+    # Fields for GroupVersionKind
+    # Field: group Type: 9 ()
+    # Field: version Type: 9 ()
+    # Field: kind Type: 9 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::PolicyControllerState ===
+    # Fields for PolicyControllerState
+    # Field: version Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.PolicyControllerVersion)
+    # Field: deployment_state Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.GatekeeperDeploymentState)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::PolicyControllerVersion ===
+    # Fields for PolicyControllerVersion
+    # Field: version Type: 9 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::BinauthzState ===
+    # Fields for BinauthzState
+    # Field: webhook Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: version Type: 11 (.google.cloud.gkehub.configmanagement.v1alpha.BinauthzVersion)
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::BinauthzVersion ===
+    # Fields for BinauthzVersion
+    # Field: webhook_version Type: 9 ()
+
+# === Message: Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::GatekeeperDeploymentState ===
+    # Fields for GatekeeperDeploymentState
+    # Field: gatekeeper_controller_manager_state Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: gatekeeper_audit Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+    # Field: gatekeeper_mutation Type: 14 (.google.cloud.gkehub.configmanagement.v1alpha.DeploymentState)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement - Compiled Protocol Buffers messages for google/cloud/gkehub/v1alpha/configmanagement/configmanagement.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement;
+
+    my $msg = Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::MembershipState->new({
+        cluster_name => $cluster_name,
+        membership_spec => $membership_spec,
+        operator_state => $operator_state,
+        config_sync_state => $config_sync_state,
+    });
+
+    # Read or update a field
+    my $val = $msg->cluster_name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::MembershipState->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/gkehub/v1alpha/configmanagement/configmanagement.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::MembershipState
+
+B<Anthos Config Management>: State for a single cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+The user-defined name for the cluster used by ClusterSelectors to group
+clusters together. This should match Membership's membership_name,
+unless the user installed ACM on the cluster manually prior to enabling
+the ACM hub feature.
+Unique within a Anthos Config Management installation.
+
+=item * C<< $msg->membership_spec() >> / C<< $msg->membership_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::MembershipSpec>)
+
+Membership configuration in the cluster. This represents the actual state
+in the cluster, while the MembershipSpec in the FeatureSpec represents
+the intended state
+
+=item * C<< $msg->operator_state() >> / C<< $msg->operator_state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::OperatorState>)
+
+Current install status of ACM's Operator
+
+=item * C<< $msg->config_sync_state() >> / C<< $msg->config_sync_state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSyncState>)
+
+Current sync status
+
+=item * C<< $msg->policy_controller_state() >> / C<< $msg->policy_controller_state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::PolicyControllerState>)
+
+PolicyController status
+
+=item * C<< $msg->binauthz_state() >> / C<< $msg->binauthz_state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::BinauthzState>)
+
+Binauthz status
+
+=item * C<< $msg->hierarchy_controller_state() >> / C<< $msg->hierarchy_controller_state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerState>)
+
+Hierarchy Controller status
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::MembershipSpec
+
+B<Anthos Config Management>: Configuration for a single cluster.
+Intended to parallel the ConfigManagement CR.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->config_sync() >> / C<< $msg->config_sync($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSync>)
+
+Config Sync configuration for the cluster.
+
+=item * C<< $msg->policy_controller() >> / C<< $msg->policy_controller($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::PolicyController>)
+
+Policy Controller configuration for the cluster.
+
+=item * C<< $msg->binauthz() >> / C<< $msg->binauthz($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::BinauthzConfig>)
+
+Binauthz conifguration for the cluster.
+
+=item * C<< $msg->hierarchy_controller() >> / C<< $msg->hierarchy_controller($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerConfig>)
+
+Hierarchy Controller configuration for the cluster.
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Version of ACM installed.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSync
+
+Configuration for Config Sync
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->git() >> / C<< $msg->git($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::GitConfig>)
+
+Git repo configuration for the cluster.
+
+=item * C<< $msg->source_format() >> / C<< $msg->source_format($value) >>
+
+Type: C<String>
+
+Specifies whether the Config Sync Repo is
+in “hierarchical” or “unstructured” mode.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::GitConfig
+
+Git repo configuration for a single cluster.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->sync_repo() >> / C<< $msg->sync_repo($value) >>
+
+Type: C<String>
+
+The URL of the Git repository to use as the source of truth.
+
+=item * C<< $msg->sync_branch() >> / C<< $msg->sync_branch($value) >>
+
+Type: C<String>
+
+The branch of the repository to sync from. Default: master.
+
+=item * C<< $msg->policy_dir() >> / C<< $msg->policy_dir($value) >>
+
+Type: C<String>
+
+The path within the Git repository that represents the top level of the
+repo to sync. Default: the root directory of the repository.
+
+=item * C<< $msg->sync_wait_secs() >> / C<< $msg->sync_wait_secs($value) >>
+
+Type: C<Int64>
+
+Period in seconds between consecutive syncs. Default: 15.
+
+=item * C<< $msg->sync_rev() >> / C<< $msg->sync_rev($value) >>
+
+Type: C<String>
+
+Git revision (tag or hash) to check out. Default HEAD.
+
+=item * C<< $msg->secret_type() >> / C<< $msg->secret_type($value) >>
+
+Type: C<String>
+
+Type of secret configured for access to the Git repo.
+
+=item * C<< $msg->https_proxy() >> / C<< $msg->https_proxy($value) >>
+
+Type: C<String>
+
+URL for the HTTPS proxy to be used when communicating with the Git repo.
+
+=item * C<< $msg->gcp_service_account_email() >> / C<< $msg->gcp_service_account_email($value) >>
+
+Type: C<String>
+
+The GCP Service Account Email used for auth when secret_type is
+gcpServiceAccount.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::PolicyController
+
+Configuration for Policy Controller
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enabled() >> / C<< $msg->enabled($value) >>
+
+Type: C<Bool>
+
+Enables the installation of Policy Controller.
+If false, the rest of PolicyController fields take no
+effect.
+
+=item * C<< $msg->template_library_installed() >> / C<< $msg->template_library_installed($value) >>
+
+Type: C<Bool>
+
+Installs the default template library along with Policy Controller.
+
+=item * C<< $msg->audit_interval_seconds() >> / C<< $msg->audit_interval_seconds($value) >>
+
+Type: C<Int64>
+
+Sets the interval for Policy Controller Audit Scans (in seconds).
+When set to 0, this disables audit functionality altogether.
+
+=item * C<< $msg->exemptable_namespaces() >> / C<< $msg->exemptable_namespaces($value) >>
+
+Type: C<String>
+
+The set of namespaces that are excluded from Policy Controller checks.
+Namespaces do not need to currently exist on the cluster.
+
+=item * C<< $msg->referential_rules_enabled() >> / C<< $msg->referential_rules_enabled($value) >>
+
+Type: C<Bool>
+
+Enables the ability to use Constraint Templates that reference to objects
+other than the object currently being evaluated.
+
+=item * C<< $msg->log_denies_enabled() >> / C<< $msg->log_denies_enabled($value) >>
+
+Type: C<Bool>
+
+Logs all denies and dry run failures.
+
+=item * C<< $msg->mutation_enabled() >> / C<< $msg->mutation_enabled($value) >>
+
+Type: C<Bool>
+
+Enable users to try out mutation for PolicyController.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::BinauthzConfig
+
+Configuration for Binauthz
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enabled() >> / C<< $msg->enabled($value) >>
+
+Type: C<Bool>
+
+Whether binauthz is enabled in this cluster.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerConfig
+
+Configuration for Hierarchy Controller
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enabled() >> / C<< $msg->enabled($value) >>
+
+Type: C<Bool>
+
+Whether Hierarchy Controller is enabled in this cluster.
+
+=item * C<< $msg->enable_pod_tree_labels() >> / C<< $msg->enable_pod_tree_labels($value) >>
+
+Type: C<Bool>
+
+Whether pod tree labels are enabled in this cluster.
+
+=item * C<< $msg->enable_hierarchical_resource_quota() >> / C<< $msg->enable_hierarchical_resource_quota($value) >>
+
+Type: C<Bool>
+
+Whether hierarchical resource quota is enabled in this cluster.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerDeploymentState
+
+Deployment state for Hierarchy Controller
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->hnc() >> / C<< $msg->hnc($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+The deployment state for open source HNC (e.g. v0.7.0-hc.0)
+
+=item * C<< $msg->extension() >> / C<< $msg->extension($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+The deployment state for Hierarchy Controller extension (e.g. v0.7.0-hc.1)
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerVersion
+
+Version for Hierarchy Controller
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->hnc() >> / C<< $msg->hnc($value) >>
+
+Type: C<String>
+
+Version for open source HNC
+
+=item * C<< $msg->extension() >> / C<< $msg->extension($value) >>
+
+Type: C<String>
+
+Version for Hierarchy Controller extension
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerState
+
+State for Hierarchy Controller
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerVersion>)
+
+The version for Hierarchy Controller
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::HierarchyControllerDeploymentState>)
+
+The deployment state for Hierarchy Controller
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::OperatorState
+
+State information for an ACM's Operator
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+The semenatic version number of the operator
+
+=item * C<< $msg->deployment_state() >> / C<< $msg->deployment_state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+The state of the Operator's deployment
+
+=item * C<< $msg->errors() >> / C<< $msg->errors($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::InstallError>)
+
+Install errors.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::InstallError
+
+Errors pertaining to the installation of ACM
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->error_message() >> / C<< $msg->error_message($value) >>
+
+Type: C<String>
+
+A string representing the user facing error message
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSyncState
+
+State information for ConfigSync
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSyncVersion>)
+
+The version of ConfigSync deployed
+
+=item * C<< $msg->deployment_state() >> / C<< $msg->deployment_state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSyncDeploymentState>)
+
+Information about the deployment of ConfigSync, including the version
+of the various Pods deployed
+
+=item * C<< $msg->sync_state() >> / C<< $msg->sync_state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::SyncState>)
+
+The state of ConfigSync's process to sync configs to a cluster
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSyncVersion
+
+Specific versioning information pertaining to ConfigSync's Pods
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->importer() >> / C<< $msg->importer($value) >>
+
+Type: C<String>
+
+Version of the deployed importer pod
+
+=item * C<< $msg->syncer() >> / C<< $msg->syncer($value) >>
+
+Type: C<String>
+
+Version of the deployed syncer pod
+
+=item * C<< $msg->git_sync() >> / C<< $msg->git_sync($value) >>
+
+Type: C<String>
+
+Version of the deployed git-sync pod
+
+=item * C<< $msg->monitor() >> / C<< $msg->monitor($value) >>
+
+Type: C<String>
+
+Version of the deployed monitor pod
+
+=item * C<< $msg->reconciler_manager() >> / C<< $msg->reconciler_manager($value) >>
+
+Type: C<String>
+
+Version of the deployed reconciler-manager pod
+
+=item * C<< $msg->root_reconciler() >> / C<< $msg->root_reconciler($value) >>
+
+Type: C<String>
+
+Version of the deployed reconciler container in root-reconciler pod
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ConfigSyncDeploymentState
+
+The state of ConfigSync's deployment on a cluster
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->importer() >> / C<< $msg->importer($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+Deployment state of the importer pod
+
+=item * C<< $msg->syncer() >> / C<< $msg->syncer($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+Deployment state of the syncer pod
+
+=item * C<< $msg->git_sync() >> / C<< $msg->git_sync($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+Deployment state of the git-sync pod
+
+=item * C<< $msg->monitor() >> / C<< $msg->monitor($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+Deployment state of the monitor pod
+
+=item * C<< $msg->reconciler_manager() >> / C<< $msg->reconciler_manager($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+Deployment state of reconciler-manager pod
+
+=item * C<< $msg->root_reconciler() >> / C<< $msg->root_reconciler($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+Deployment state of root-reconciler
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::SyncState
+
+State indicating an ACM's progress syncing configurations to a cluster
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->source_token() >> / C<< $msg->source_token($value) >>
+
+Type: C<String>
+
+Token indicating the state of the repo.
+
+=item * C<< $msg->import_token() >> / C<< $msg->import_token($value) >>
+
+Type: C<String>
+
+Token indicating the state of the importer.
+
+=item * C<< $msg->sync_token() >> / C<< $msg->sync_token($value) >>
+
+Type: C<String>
+
+Token indicating the state of the syncer.
+
+=item * C<< $msg->last_sync() >> / C<< $msg->last_sync($value) >>
+
+Type: C<String>
+
+Deprecated: use last_sync_time instead.
+Timestamp of when ACM last successfully synced the repo
+The time format is specified in https://golang.org/pkg/time/#Time.String
+
+=item * C<< $msg->last_sync_time() >> / C<< $msg->last_sync_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Timestamp type of when ACM last successfully synced the repo
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::SyncState::SyncCode>)
+
+Sync status code
+
+=item * C<< $msg->errors() >> / C<< $msg->errors($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::SyncError>)
+
+A list of errors resulting from problematic configs.
+This list will be truncated after 100 errors, although it is
+unlikely for that many errors to simultaneously exist.
+
+=back
+
+=head3 Enum: SyncState::SyncCode
+
+=over 4
+
+=item * C<SYNC_CODE_UNSPECIFIED> => C<0>
+
+=item * C<SYNCED> => C<1>
+
+=item * C<PENDING> => C<2>
+
+=item * C<ERROR> => C<3>
+
+=item * C<NOT_CONFIGURED> => C<4>
+
+=item * C<NOT_INSTALLED> => C<5>
+
+=item * C<UNAUTHORIZED> => C<6>
+
+=item * C<UNREACHABLE> => C<7>
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::SyncError
+
+An ACM created error representing a problem syncing configurations
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<String>
+
+An ACM defined error code
+
+=item * C<< $msg->error_message() >> / C<< $msg->error_message($value) >>
+
+Type: C<String>
+
+A description of the error
+
+=item * C<< $msg->error_resources() >> / C<< $msg->error_resources($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ErrorResource>)
+
+A list of config(s) associated with the error, if any
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::ErrorResource
+
+Model for a config file in the git repo with an associated Sync error
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->source_path() >> / C<< $msg->source_path($value) >>
+
+Type: C<String>
+
+Path in the git repo of the erroneous config
+
+=item * C<< $msg->resource_name() >> / C<< $msg->resource_name($value) >>
+
+Type: C<String>
+
+Metadata name of the resource that is causing an error
+
+=item * C<< $msg->resource_namespace() >> / C<< $msg->resource_namespace($value) >>
+
+Type: C<String>
+
+Namespace of the resource that is causing an error
+
+=item * C<< $msg->resource_gvk() >> / C<< $msg->resource_gvk($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::GroupVersionKind>)
+
+Group/version/kind of the resource that is causing an error
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::GroupVersionKind
+
+A Kubernetes object's GVK
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->group() >> / C<< $msg->group($value) >>
+
+Type: C<String>
+
+Kubernetes Group
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Kubernetes Version
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+Kubernetes Kind
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::PolicyControllerState
+
+State for PolicyControllerState.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::PolicyControllerVersion>)
+
+The version of Gatekeeper Policy Controller deployed.
+
+=item * C<< $msg->deployment_state() >> / C<< $msg->deployment_state($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::GatekeeperDeploymentState>)
+
+The state about the policy controller installation.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::PolicyControllerVersion
+
+The build version of Gatekeeper Policy Controller is using.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+The gatekeeper image tag that is composed of ACM version, git tag, build
+number.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::BinauthzState
+
+State for Binauthz
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->webhook() >> / C<< $msg->webhook($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+The state of the binauthz webhook.
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Message> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::BinauthzVersion>)
+
+The version of binauthz that is installed.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::BinauthzVersion
+
+The version of binauthz.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->webhook_version() >> / C<< $msg->webhook_version($value) >>
+
+Type: C<String>
+
+The version of the binauthz webhook.
+
+=back
+
+=head2 Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::GatekeeperDeploymentState
+
+State of Policy Controller installation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->gatekeeper_controller_manager_state() >> / C<< $msg->gatekeeper_controller_manager_state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+Status of gatekeeper-controller-manager pod.
+
+=item * C<< $msg->gatekeeper_audit() >> / C<< $msg->gatekeeper_audit($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+Status of gatekeeper-audit deployment.
+
+=item * C<< $msg->gatekeeper_mutation() >> / C<< $msg->gatekeeper_mutation($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Gkehub::Configmanagement::V1alpha::DeploymentState>)
+
+Status of the pod serving the mutation webhook.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Gkehub::Configmanagement::V1alpha::Configmanagement::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

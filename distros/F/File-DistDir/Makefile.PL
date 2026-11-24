@@ -27,7 +27,8 @@ WriteMakefile(
 ,
   PREREQ_PM        => {
       'CLI::Simple' => '2.4.0',
-      'File::ShareDir' => '1.118'
+      'File::ShareDir' => '1.118',
+      'Module::Metadata' => '1.000038'
     },
   BUILD_REQUIRES   => {
       'ExtUtils::MakeMaker' => '6.64',
@@ -45,11 +46,11 @@ WriteMakefile(
       'provides'=>{
                       'File::DistDir'=>{
                                            'file'=>'lib/File/DistDir.pm',
-                                           'version'=>'1.0.0'
+                                           'version'=>'1.0.1'
                                          },
                       'File::DistDir::CLI'=>{
                                                 'file'=>'lib/File/DistDir/CLI.pm',
-                                                'version'=>'1.0.0'
+                                                'version'=>'1.0.1'
                                               }
                     },
       'resources'=>{

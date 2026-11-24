@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -277,96 +277,12 @@ EOF
     # Field: tls_feature_profile Type: 14 (.google.cloud.networksecurity.v1.TlsInspectionPolicy.Profile)
     # Field: custom_tls_features Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::TlsInspectionPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::TlsInspectionPolicy->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<ca_pool>
-
-Type: String
-
-=item * B<trust_config>
-
-Type: String
-
-=item * B<exclude_public_ca_set>
-
-Type: Bool
-
-=item * B<min_tls_version>
-
-Type: Enum (.google.cloud.networksecurity.v1.TlsInspectionPolicy.TlsVersion)
-
-=item * B<tls_feature_profile>
-
-Type: Enum (.google.cloud.networksecurity.v1.TlsInspectionPolicy.Profile)
-
-=item * B<custom_tls_features>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: TlsInspectionPolicy::TlsVersion
 our $TlsInspectionPolicy_TLS_VERSION_UNSPECIFIED = 0;
 our $TlsInspectionPolicy_TLS_1_0 = 1;
 our $TlsInspectionPolicy_TLS_1_1 = 2;
 our $TlsInspectionPolicy_TLS_1_2 = 3;
 our $TlsInspectionPolicy_TLS_1_3 = 4;
-
-=pod
-
-=head2 Enum: TlsInspectionPolicy::TlsVersion
-
-Values:
-
-=over 4
-
-=item * C<TLS_VERSION_UNSPECIFIED> => 0
-
-=item * C<TLS_1_0> => 1
-
-=item * C<TLS_1_1> => 2
-
-=item * C<TLS_1_2> => 3
-
-=item * C<TLS_1_3> => 4
-
-=back
-
-=cut
 
 # Enum: TlsInspectionPolicy::Profile
 our $TlsInspectionPolicy_PROFILE_UNSPECIFIED = 0;
@@ -375,67 +291,11 @@ our $TlsInspectionPolicy_PROFILE_MODERN = 2;
 our $TlsInspectionPolicy_PROFILE_RESTRICTED = 3;
 our $TlsInspectionPolicy_PROFILE_CUSTOM = 4;
 
-=pod
-
-=head2 Enum: TlsInspectionPolicy::Profile
-
-Values:
-
-=over 4
-
-=item * C<PROFILE_UNSPECIFIED> => 0
-
-=item * C<PROFILE_COMPATIBLE> => 1
-
-=item * C<PROFILE_MODERN> => 2
-
-=item * C<PROFILE_RESTRICTED> => 3
-
-=item * C<PROFILE_CUSTOM> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::CreateTlsInspectionPolicyRequest ===
     # Fields for CreateTlsInspectionPolicyRequest
     # Field: parent Type: 9 ()
     # Field: tls_inspection_policy_id Type: 9 ()
     # Field: tls_inspection_policy Type: 11 (.google.cloud.networksecurity.v1.TlsInspectionPolicy)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::CreateTlsInspectionPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::CreateTlsInspectionPolicyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<tls_inspection_policy_id>
-
-Type: String
-
-=item * B<tls_inspection_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.TlsInspectionPolicy)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::ListTlsInspectionPoliciesRequest ===
     # Fields for ListTlsInspectionPoliciesRequest
@@ -443,191 +303,382 @@ Type: Message (.google.cloud.networksecurity.v1.TlsInspectionPolicy)
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::ListTlsInspectionPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::ListTlsInspectionPoliciesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::ListTlsInspectionPoliciesResponse ===
     # Fields for ListTlsInspectionPoliciesResponse
     # Field: tls_inspection_policies Type: 11 (.google.cloud.networksecurity.v1.TlsInspectionPolicy)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::ListTlsInspectionPoliciesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::ListTlsInspectionPoliciesResponse->new(
-        tls_inspection_policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tls_inspection_policies>
-
-Type: Message (.google.cloud.networksecurity.v1.TlsInspectionPolicy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::GetTlsInspectionPolicyRequest ===
     # Fields for GetTlsInspectionPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::GetTlsInspectionPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::GetTlsInspectionPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::DeleteTlsInspectionPolicyRequest ===
     # Fields for DeleteTlsInspectionPolicyRequest
     # Field: name Type: 9 ()
     # Field: force Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::DeleteTlsInspectionPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::DeleteTlsInspectionPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<force>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::UpdateTlsInspectionPolicyRequest ===
     # Fields for UpdateTlsInspectionPolicyRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: tls_inspection_policy Type: 11 (.google.cloud.networksecurity.v1.TlsInspectionPolicy)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::UpdateTlsInspectionPolicyRequest - Compiled Protocol Buffers message class
+Google::Cloud::Networksecurity::V1::TlsInspectionPolicy - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/tls_inspection_policy.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
 
-    my $msg = Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::UpdateTlsInspectionPolicyRequest->new(
-        update_mask => $value,
-    );
+    my $msg = Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::TlsInspectionPolicy->new({
+        name => $name,
+        description => $description,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::TlsInspectionPolicy->parse($bytes);
 
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<tls_inspection_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.TlsInspectionPolicy)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::TlsInspectionPolicy - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/tls_inspection_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::TlsInspectionPolicy
+
+The TlsInspectionPolicy resource contains references to CA pools in
+Certificate Authority Service and associated metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource. Name is of the form
+projects/{project}/locations/{location}/tlsInspectionPolicies/{tls_inspection_policy}
+tls_inspection_policy should match the
+pattern:(^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$).
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Free-text description of the resource.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->ca_pool() >> / C<< $msg->ca_pool($value) >>
+
+Type: C<String>
+
+Required. A CA pool resource used to issue interception certificates.
+The CA pool string has a relative resource path following the form
+"projects/{project}/locations/{location}/caPools/{ca_pool}".
+
+=item * C<< $msg->trust_config() >> / C<< $msg->trust_config($value) >>
+
+Type: C<String>
+
+Optional. A TrustConfig resource used when making a connection to the TLS
+server. This is a relative resource path following the form
+"projects/{project}/locations/{location}/trustConfigs/{trust_config}". This
+is necessary to intercept TLS connections to servers with certificates
+signed by a private CA or self-signed certificates.
+Note that Secure Web Proxy does not yet honor this field.
+
+=item * C<< $msg->exclude_public_ca_set() >> / C<< $msg->exclude_public_ca_set($value) >>
+
+Type: C<Bool>
+
+Optional. If  FALSE (the default), use our default set of public CAs in
+addition to any CAs specified in trust_config. These public CAs are
+currently based on the Mozilla Root Program and are subject to change over
+time. If TRUE, do not accept our default set of public CAs. Only CAs
+specified in trust_config will be accepted. This defaults to FALSE (use
+public CAs in addition to trust_config) for backwards compatibility, but
+trusting public root CAs is *not recommended* unless the traffic in
+question is outbound to public web servers. When possible, prefer setting
+this to "false" and explicitly specifying trusted CAs and certificates in a
+TrustConfig. Note that Secure Web Proxy does not yet honor this field.
+
+=item * C<< $msg->min_tls_version() >> / C<< $msg->min_tls_version($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::TlsVersion>)
+
+Optional. Minimum TLS version that the firewall should use when negotiating
+connections with both clients and servers. If this is not set, then the
+default value is to allow the broadest set of clients and servers (TLS 1.0
+or higher). Setting this to more restrictive values may improve security,
+but may also prevent the firewall from connecting to some clients or
+servers.
+Note that Secure Web Proxy does not yet honor this field.
+
+=item * C<< $msg->tls_feature_profile() >> / C<< $msg->tls_feature_profile($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::Profile>)
+
+Optional. The selected Profile. If this is not set, then the default value
+is to allow the broadest set of clients and servers ("PROFILE_COMPATIBLE").
+Setting this to more restrictive values may improve security, but may also
+prevent the TLS inspection proxy from connecting to some clients or
+servers. Note that Secure Web Proxy does not yet honor this field.
+
+=item * C<< $msg->custom_tls_features() >> / C<< $msg->custom_tls_features($value) >>
+
+Type: C<String>
+
+Optional. List of custom TLS cipher suites selected.
+This field is valid only if the selected tls_feature_profile is CUSTOM.
+The [compute.SslPoliciesService.ListAvailableFeatures][] method returns the
+set of features that can be specified in this list.
+Note that Secure Web Proxy does not yet honor this field.
+
+=back
+
+=head3 Enum: TlsInspectionPolicy::TlsVersion
+
+=over 4
+
+=item * C<TLS_VERSION_UNSPECIFIED> => C<0>
+
+=item * C<TLS_1_0> => C<1>
+
+=item * C<TLS_1_1> => C<2>
+
+=item * C<TLS_1_2> => C<3>
+
+=item * C<TLS_1_3> => C<4>
+
+=back
+
+=head3 Enum: TlsInspectionPolicy::Profile
+
+=over 4
+
+=item * C<PROFILE_UNSPECIFIED> => C<0>
+
+=item * C<PROFILE_COMPATIBLE> => C<1>
+
+=item * C<PROFILE_MODERN> => C<2>
+
+=item * C<PROFILE_RESTRICTED> => C<3>
+
+=item * C<PROFILE_CUSTOM> => C<4>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::CreateTlsInspectionPolicyRequest
+
+Request used by the CreateTlsInspectionPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the TlsInspectionPolicy. Must be in the
+format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->tls_inspection_policy_id() >> / C<< $msg->tls_inspection_policy_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the TlsInspectionPolicy resource to be created.
+This value should be 1-63 characters long, containing only
+letters, numbers, hyphens, and underscores, and should not start
+with a number. E.g. "tls_inspection_policy1".
+
+=item * C<< $msg->tls_inspection_policy() >> / C<< $msg->tls_inspection_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::TlsInspectionPolicy>)
+
+Required. TlsInspectionPolicy resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::ListTlsInspectionPoliciesRequest
+
+Request used with the ListTlsInspectionPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the TlsInspectionPolicies
+should be listed, specified in the format
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of TlsInspectionPolicies to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last
+'ListTlsInspectionPoliciesResponse' Indicates that this is a
+continuation of a prior 'ListTlsInspectionPolicies' call, and
+that the system should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::ListTlsInspectionPoliciesResponse
+
+Response returned by the ListTlsInspectionPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tls_inspection_policies() >> / C<< $msg->tls_inspection_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::TlsInspectionPolicy>)
+
+List of TlsInspectionPolicies resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+'next_page_token' is included. To get the next set of results, call this
+method again using the value of 'next_page_token' as 'page_token'.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::GetTlsInspectionPolicyRequest
+
+Request used by the GetTlsInspectionPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the TlsInspectionPolicy to get. Must be in the format
+`projects/{project}/locations/{location}/tlsInspectionPolicies/{tls_inspection_policy}`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::DeleteTlsInspectionPolicyRequest
+
+Request used by the DeleteTlsInspectionPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the TlsInspectionPolicy to delete. Must be in the
+format
+`projects/{project}/locations/{location}/tlsInspectionPolicies/{tls_inspection_policy}`.
+
+=item * C<< $msg->force() >> / C<< $msg->force($value) >>
+
+Type: C<Bool>
+
+If set to true, any rules for this TlsInspectionPolicy will also be
+deleted. (Otherwise, the request will only work if the TlsInspectionPolicy
+has no rules.)
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::UpdateTlsInspectionPolicyRequest
+
+Request used by the UpdateTlsInspectionPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+TlsInspectionPolicy resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->tls_inspection_policy() >> / C<< $msg->tls_inspection_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::TlsInspectionPolicy>)
+
+Required. Updated TlsInspectionPolicy resource.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::TlsInspectionPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

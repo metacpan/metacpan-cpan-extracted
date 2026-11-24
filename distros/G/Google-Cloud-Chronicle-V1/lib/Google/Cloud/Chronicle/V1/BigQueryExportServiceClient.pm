@@ -1,0 +1,294 @@
+package Google::Cloud::Chronicle::V1::BigQueryExportServiceClient;
+
+use strict;
+use warnings;
+use Moo;
+use Google::gRPC::Client;
+use Google::Cloud::REST::Client;
+use Google::Auth;
+use Carp qw(croak);
+
+use Protobuf;
+use Google::Api::Common;
+use Google::Cloud::Chronicle::V1::SimulatedData;
+use Google::Cloud::Chronicle::V1::Event;
+use Google::Cloud::Chronicle::V1::Instance;
+use Google::Cloud::Chronicle::V1::Entity;
+use Google::Cloud::Chronicle::V1::DataAccessControl;
+use Google::Cloud::Chronicle::V1::FeaturedContentMetadata;
+use Google::Cloud::Chronicle::V1::BigQueryExport;
+use Google::Cloud::Chronicle::V1::Rule;
+use Google::Cloud::Chronicle::V1::DashboardQuery;
+use Google::Cloud::Chronicle::V1::FindingsRefinement;
+use Google::Cloud::Chronicle::V1::RuleExecutionError;
+use Google::Cloud::Chronicle::V1::Feed;
+use Google::Cloud::Chronicle::V1::ReferenceList;
+use Google::Cloud::Chronicle::V1::DataTable;
+use Google::Cloud::Chronicle::V1::Search;
+use Google::Cloud::Chronicle::V1::DashboardChart;
+use Google::Cloud::Chronicle::V1::NativeDashboard;
+use Google::Cloud::Chronicle::V1::FeaturedContentNativeDashboard;
+
+our $VERSION = '0.06';
+
+has credentials => ( is => 'ro', required => 0 );
+has transport   => ( is => 'rw' );
+
+sub BUILD {
+    my ($self) = @_;
+
+    my $auth = $self->credentials;
+    if (!defined $auth) {
+        $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
+    }
+    my $token = $auth->get_token();
+
+    my $target = 'chronicle.googleapis.com:443';
+    my $t = $self->transport || 'grpc';
+
+    if (ref($t) && eval { $t->can('call') }) {
+        # Already a transport object
+    } elsif (lc($t) eq 'rest') {
+        my $client = Google::Cloud::REST::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    } else {
+        my $client = Google::gRPC::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    }
+}
+
+sub get_big_query_export {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Chronicle::V1::BigQueryExport::GetBigQueryExportRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Chronicle::V1::BigQueryExport::BigQueryExport';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.chronicle.v1.BigQueryExportService/GetBigQueryExport',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.chronicle.v1.BigQueryExportService',
+        method         => 'GetBigQueryExport',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub provision_big_query_export {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Chronicle::V1::BigQueryExport::ProvisionBigQueryExportRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Chronicle::V1::BigQueryExport::BigQueryExport';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.chronicle.v1.BigQueryExportService/ProvisionBigQueryExport',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.chronicle.v1.BigQueryExportService',
+        method         => 'ProvisionBigQueryExport',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+1; # End of Google::Cloud::Chronicle::V1::BigQueryExportServiceClient
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Chronicle::V1::BigQueryExportServiceClient - Client library for Google Cloud Services
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Chronicle::V1::BigQueryExportServiceClient;
+    use Google::Auth;
+
+    my $auth = Google::Auth->default();
+
+    # 1. High-performance gRPC Transport (Default)
+    my $grpc_client = Google::Cloud::Chronicle::V1::BigQueryExportServiceClient->new(
+        credentials => $auth,
+        transport   => 'grpc', # Optional: 'grpc' is default
+    );
+
+    # 2. HTTP/REST Transport
+    my $rest_client = Google::Cloud::Chronicle::V1::BigQueryExportServiceClient->new(
+        credentials => $auth,
+        transport   => 'rest',
+    );
+
+    # Execute service methods
+    my $res = $grpc_client->some_method( %params );
+
+=head1 DESCRIPTION
+
+C<Google::Cloud::Chronicle::V1::BigQueryExportServiceClient> is an auto-generated client library for Google Cloud Services.
+
+It provides a unified client interface supporting both high-performance HTTP/2 gRPC and HTTP/REST transports, with automatic Google Cloud Application Default Credentials (ADC) resolution and typed Protocol Buffers message handling.
+
+=head1 SOURCE
+
+Generated from the following Protocol Buffers schemas:
+
+=over 4
+
+=item * C<googleapis/google/cloud/chronicle/v1/big_query_export.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/dashboard_chart.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/dashboard_query.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/data_access_control.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/data_table.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/entity.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/event.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/featured_content_metadata.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/featured_content_native_dashboard.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/feed.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/findings_refinement.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/instance.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/native_dashboard.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/reference_list.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/rule.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/rule_execution_error.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/search.proto>
+
+=item * C<googleapis/google/cloud/chronicle/v1/simulated_data.proto>
+
+
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $client = Google::Cloud::Chronicle::V1::BigQueryExportServiceClient->new(
+        credentials => $auth,   # Optional: Google::Auth object (defaults to ADC)
+        transport   => 'grpc', # Optional: 'grpc' (default) or 'rest'
+    );
+
+=head1 ATTRIBUTES
+
+=head2 credentials
+
+Returns or accepts the L<Google::Auth> credentials object.
+
+=head2 transport
+
+Returns or accepts the active transport object (L<Google::gRPC::Client> or L<Google::Cloud::REST::Client>).
+
+=head1 METHODS
+
+=head2 METHODS
+
+The following RPC methods are available in this client:
+
+=over 4
+
+=item * B<get_big_query_export>
+
+    my $response = $client->get_big_query_export(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetBigQueryExport> on C<google.cloud.chronicle.v1.BigQueryExportService>.
+
+Request: L<Google::Cloud::Chronicle::V1::BigQueryExport::GetBigQueryExportRequest>
+
+Returns: L<Google::Cloud::Chronicle::V1::BigQueryExport::BigQueryExport>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
+
+=item * B<provision_big_query_export>
+
+    my $response = $client->provision_big_query_export(
+        parent                   => $parent,
+    );
+
+Calls the RPC method C<ProvisionBigQueryExport> on C<google.cloud.chronicle.v1.BigQueryExportService>.
+
+Request: L<Google::Cloud::Chronicle::V1::BigQueryExport::ProvisionBigQueryExportRequest>
+
+Returns: L<Google::Cloud::Chronicle::V1::BigQueryExport::BigQueryExport>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=back
+
+=back
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

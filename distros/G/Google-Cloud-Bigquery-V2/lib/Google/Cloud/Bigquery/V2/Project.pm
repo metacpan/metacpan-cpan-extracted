@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::Project;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -71,89 +71,25 @@ EOF
     # Fields for GetServiceAccountRequest
     # Field: project_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Project::GetServiceAccountRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Project;
-
-    my $msg = Google::Cloud::Bigquery::V2::Project::GetServiceAccountRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Project::GetServiceAccountResponse ===
     # Fields for GetServiceAccountResponse
     # Field: kind Type: 9 ()
     # Field: email Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Project::GetServiceAccountResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Project;
-
-    my $msg = Google::Cloud::Bigquery::V2::Project::GetServiceAccountResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<email>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Bigquery::V2::Project::ProjectServiceClient ===
 package Google::Cloud::Bigquery::V2::Project::ProjectServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Bigquery::V2::Project::ProjectServiceClient
 
-Google::Cloud::Bigquery::V2::Project::ProjectServiceClient - Client stub representing the remote ProjectService service
+Client stub representing the remote C<ProjectService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -195,13 +131,83 @@ sub get_service_account {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::Project - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::Project - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/project.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::Project;
+
+    my $msg = Google::Cloud::Bigquery::V2::Project::GetServiceAccountRequest->new({
+        project_id => $project_id,
+    });
+
+    # Read or update a field
+    my $val = $msg->project_id();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::Project::GetServiceAccountRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/project.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::Project::GetServiceAccountRequest
+
+Request object of GetServiceAccount
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. ID of the project.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Project::GetServiceAccountResponse
+
+Response object of GetServiceAccount
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The resource type of the response.
+
+=item * C<< $msg->email() >> / C<< $msg->email($value) >>
+
+Type: C<String>
+
+The service account email address.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::Project::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlConnect;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -243,74 +243,10 @@ EOF
     # Field: project Type: 9 ()
     # Field: read_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlConnect::GetConnectSettingsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlConnect;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlConnect::GetConnectSettingsRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<read_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlConnect::ResolveConnectSettingsRequest ===
     # Fields for ResolveConnectSettingsRequest
     # Field: dns_name Type: 9 ()
     # Field: location Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlConnect::ResolveConnectSettingsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlConnect;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlConnect::ResolveConnectSettingsRequest->new(
-        dns_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dns_name>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlConnect::ConnectSettings ===
     # Fields for ConnectSettings
@@ -330,133 +266,15 @@ Type: String
     # Field: mdx_protocol_support Type: 14 (.google.cloud.sql.v1.ConnectSettings.MdxProtocolSupport)
     # Field: connection_name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlConnect::ConnectSettings - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlConnect;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlConnect::ConnectSettings->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<server_ca_cert>
-
-Type: Message (.google.cloud.sql.v1.SslCert)
-
-=item * B<ip_addresses>
-
-Type: Message (.google.cloud.sql.v1.IpMapping)
-
-=item * B<region>
-
-Type: String
-
-=item * B<database_version>
-
-Type: Enum (.google.cloud.sql.v1.SqlDatabaseVersion)
-
-=item * B<backend_type>
-
-Type: Enum (.google.cloud.sql.v1.SqlBackendType)
-
-=item * B<psc_enabled>
-
-Type: Bool
-
-=item * B<dns_name>
-
-Type: String
-
-=item * B<server_ca_mode>
-
-Type: Enum (.google.cloud.sql.v1.ConnectSettings.CaMode)
-
-=item * B<custom_subject_alternative_names>
-
-Type: String
-
-=item * B<dns_names>
-
-Type: Message (.google.cloud.sql.v1.DnsNameMapping)
-
-=item * B<node_count>
-
-Type: Int32
-
-=item * B<nodes>
-
-Type: Message (.google.cloud.sql.v1.ConnectSettings.ConnectPoolNodeConfig)
-
-=item * B<mdx_protocol_support>
-
-Type: Enum (.google.cloud.sql.v1.ConnectSettings.MdxProtocolSupport)
-
-=item * B<connection_name>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: ConnectSettings::CaMode
 our $ConnectSettings_CA_MODE_UNSPECIFIED = 0;
 our $ConnectSettings_GOOGLE_MANAGED_INTERNAL_CA = 1;
 our $ConnectSettings_GOOGLE_MANAGED_CAS_CA = 2;
 our $ConnectSettings_CUSTOMER_MANAGED_CAS_CA = 3;
 
-=pod
-
-=head2 Enum: ConnectSettings::CaMode
-
-Values:
-
-=over 4
-
-=item * C<CA_MODE_UNSPECIFIED> => 0
-
-=item * C<GOOGLE_MANAGED_INTERNAL_CA> => 1
-
-=item * C<GOOGLE_MANAGED_CAS_CA> => 2
-
-=item * C<CUSTOMER_MANAGED_CAS_CA> => 3
-
-=back
-
-=cut
-
 # Enum: ConnectSettings::MdxProtocolSupport
 our $ConnectSettings_MDX_PROTOCOL_SUPPORT_UNSPECIFIED = 0;
 our $ConnectSettings_CLIENT_PROTOCOL_TYPE = 1;
-
-=pod
-
-=head2 Enum: ConnectSettings::MdxProtocolSupport
-
-Values:
-
-=over 4
-
-=item * C<MDX_PROTOCOL_SUPPORT_UNSPECIFIED> => 0
-
-=item * C<CLIENT_PROTOCOL_TYPE> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertRequest ===
     # Fields for GenerateEphemeralCertRequest
@@ -467,104 +285,24 @@ Values:
     # Field: read_time Type: 11 (.google.protobuf.Timestamp)
     # Field: valid_duration Type: 11 (.google.protobuf.Duration)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlConnect;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<public_key>
-
-Type: String
-
-=item * B<access_token>
-
-Type: String
-
-=item * B<read_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<valid_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertResponse ===
     # Fields for GenerateEphemeralCertResponse
     # Field: ephemeral_cert Type: 11 (.google.cloud.sql.v1.SslCert)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlConnect;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertResponse->new(
-        ephemeral_cert => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<ephemeral_cert>
-
-Type: Message (.google.cloud.sql.v1.SslCert)
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlConnect::SqlConnectServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlConnect::SqlConnectServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlConnect::SqlConnectServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlConnect::SqlConnectServiceClient - Client stub representing the remote SqlConnectService service
+Client stub representing the remote C<SqlConnectService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -632,13 +370,311 @@ sub generate_ephemeral_cert {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlConnect - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlConnect - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_connect.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlConnect;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlConnect::GetConnectSettingsRequest->new({
+        instance => $instance,
+        project => $project,
+        read_time => $read_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->instance();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlConnect::GetConnectSettingsRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_connect.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlConnect::GetConnectSettingsRequest
+
+Connect settings retrieval request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->read_time() >> / C<< $msg->read_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. Optional snapshot read timestamp to trade freshness for
+performance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlConnect::ResolveConnectSettingsRequest
+
+Connect settings retrieval request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dns_name() >> / C<< $msg->dns_name($value) >>
+
+Type: C<String>
+
+Required. Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Required. The region of the instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlConnect::ConnectSettings
+
+Connect settings retrieval response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#connectSettings`.
+
+=item * C<< $msg->server_ca_cert() >> / C<< $msg->server_ca_cert($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SslCert>)
+
+SSL configuration.
+
+=item * C<< $msg->ip_addresses() >> / C<< $msg->ip_addresses($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::IpMapping>)
+
+The assigned IP addresses for the instance.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+The cloud region for the instance. For example, `us-central1`,
+`europe-west1`. The region cannot be changed after instance creation.
+
+=item * C<< $msg->database_version() >> / C<< $msg->database_version($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlDatabaseVersion>)
+
+The database engine type and version. The `databaseVersion`
+field cannot be changed after instance creation.
+  MySQL instances: `MYSQL_8_0`, `MYSQL_5_7` (default),
+or `MYSQL_5_6`.
+  PostgreSQL instances: `POSTGRES_9_6`, `POSTGRES_10`,
+`POSTGRES_11`, `POSTGRES_12` (default), `POSTGRES_13`, or `POSTGRES_14`.
+  SQL Server instances: `SQLSERVER_2017_STANDARD` (default),
+`SQLSERVER_2017_ENTERPRISE`, `SQLSERVER_2017_EXPRESS`,
+`SQLSERVER_2017_WEB`, `SQLSERVER_2019_STANDARD`,
+`SQLSERVER_2019_ENTERPRISE`, `SQLSERVER_2019_EXPRESS`, or
+`SQLSERVER_2019_WEB`.
+
+=item * C<< $msg->backend_type() >> / C<< $msg->backend_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlBackendType>)
+
+`SECOND_GEN`: Cloud SQL database instance.
+`EXTERNAL`: A database server that is not managed by Google.
+This property is read-only; use the `tier` property in the `settings`
+object to determine the database type.
+
+=item * C<< $msg->psc_enabled() >> / C<< $msg->psc_enabled($value) >>
+
+Type: C<Bool>
+
+Whether PSC connectivity is enabled for this instance.
+
+=item * C<< $msg->dns_name() >> / C<< $msg->dns_name($value) >>
+
+Type: C<String>
+
+The dns name of the instance.
+
+=item * C<< $msg->server_ca_mode() >> / C<< $msg->server_ca_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::ConnectSettings::CaMode>)
+
+Specify what type of CA is used for the server certificate.
+
+=item * C<< $msg->custom_subject_alternative_names() >> / C<< $msg->custom_subject_alternative_names($value) >>
+
+Type: C<String>
+
+Custom subject alternative names for the server certificate.
+
+=item * C<< $msg->dns_names() >> / C<< $msg->dns_names($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::DnsNameMapping>)
+
+Output only. The list of DNS names used by this instance.
+
+=item * C<< $msg->node_count() >> / C<< $msg->node_count($value) >>
+
+Type: C<Int32>
+
+The number of read pool nodes in a read pool.
+
+=item * C<< $msg->nodes() >> / C<< $msg->nodes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlConnect::ConnectSettings::ConnectPoolNodeConfig>)
+
+Output only. Entries containing information about each read pool node of
+the read pool.
+
+=item * C<< $msg->mdx_protocol_support() >> / C<< $msg->mdx_protocol_support($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::ConnectSettings::MdxProtocolSupport>)
+
+Optional. Output only. mdx_protocol_support controls how the client uses
+metadata exchange when connecting to the instance. The values in the list
+representing parts of the MDX protocol that are supported by this instance.
+When the list is empty, the instance does not support MDX, so the client
+must not send an MDX request. The default is empty.
+
+=item * C<< $msg->connection_name() >> / C<< $msg->connection_name($value) >>
+
+Type: C<String>
+
+Optional. Output only. Connection name of the Cloud SQL instance used in
+connection strings, in the format project:region:instance.
+
+=back
+
+=head3 Enum: ConnectSettings::CaMode
+
+=over 4
+
+=item * C<CA_MODE_UNSPECIFIED> => C<0>
+
+=item * C<GOOGLE_MANAGED_INTERNAL_CA> => C<1>
+
+=item * C<GOOGLE_MANAGED_CAS_CA> => C<2>
+
+=item * C<CUSTOMER_MANAGED_CAS_CA> => C<3>
+
+=back
+
+=head3 Enum: ConnectSettings::MdxProtocolSupport
+
+=over 4
+
+=item * C<MDX_PROTOCOL_SUPPORT_UNSPECIFIED> => C<0>
+
+=item * C<CLIENT_PROTOCOL_TYPE> => C<1>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertRequest
+
+Ephemeral certificate creation request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->public_key() >> / C<< $msg->public_key($value) >>
+
+Type: C<String>
+
+PEM encoded public key to include in the signed certificate.
+
+=item * C<< $msg->access_token() >> / C<< $msg->access_token($value) >>
+
+Type: C<String>
+
+Optional. Access token to include in the signed certificate.
+
+=item * C<< $msg->read_time() >> / C<< $msg->read_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. Optional snapshot read timestamp to trade freshness for
+performance.
+
+=item * C<< $msg->valid_duration() >> / C<< $msg->valid_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. If set, it will contain the cert valid duration.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlConnect::GenerateEphemeralCertResponse
+
+Ephemeral certificate creation request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->ephemeral_cert() >> / C<< $msg->ephemeral_cert($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SslCert>)
+
+Generated cert
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlConnect::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

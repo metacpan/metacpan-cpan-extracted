@@ -1,0 +1,4 @@
+Revision history for PDL-IO-Protobuf
+
+0.01    2026-11-23
+    - Initial release: rprotobuf, wprotobuf, from_protobuf, to_protobuf, and pdl_type_for_proto_type.

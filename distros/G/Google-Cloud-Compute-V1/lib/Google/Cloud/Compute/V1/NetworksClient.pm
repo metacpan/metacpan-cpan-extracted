@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -566,55 +566,377 @@ The following RPC methods are available in this client:
 
 =item * B<add_peering>
 
-Calls the RPC method C<AddPeering> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_peering(
+        network                  => $network,
+        networks_add_peering_request_resource => $networks_add_peering_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<AddPeering> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddPeeringNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<networks_add_peering_request_resource> - L<Google::Cloud::Compute::V1::Compute::NetworksAddPeeringRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<cancel_request_remove_peering>
 
-Calls the RPC method C<CancelRequestRemovePeering> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->cancel_request_remove_peering(
+        network                  => $network,
+        networks_cancel_request_remove_peering_request_resource => $networks_cancel_request_remove_peering_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<CancelRequestRemovePeering> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CancelRequestRemovePeeringNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<networks_cancel_request_remove_peering_request_resource> - L<Google::Cloud::Compute::V1::Compute::NetworksCancelRequestRemovePeeringRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        network                  => $network,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        network                  => $network,
+        project                  => $project,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Network>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<get_effective_firewalls>
 
-Calls the RPC method C<GetEffectiveFirewalls> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_effective_firewalls(
+        network                  => $network,
+        project                  => $project,
+    );
+
+Calls the RPC method C<GetEffectiveFirewalls> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetEffectiveFirewallsNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::NetworksGetEffectiveFirewallsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        network_resource         => $network_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network_resource> - L<Google::Cloud::Compute::V1::Compute::Network>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListNetworksRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::NetworkList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<list_peering_routes>
 
-Calls the RPC method C<ListPeeringRoutes> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_peering_routes(
+        direction                => $direction,
+        filter                   => $filter,
+        max_results              => $max_results,
+        network                  => $network,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        peering_name             => $peering_name,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<ListPeeringRoutes> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListPeeringRoutesNetworksRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ExchangedPeeringRoutesList>
+
+Parameters:
+
+=over 4
+
+=item * C<direction> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<network> - C<string>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<peering_name> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        network                  => $network,
+        network_resource         => $network_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<network_resource> - L<Google::Cloud::Compute::V1::Compute::Network>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<remove_peering>
 
-Calls the RPC method C<RemovePeering> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->remove_peering(
+        network                  => $network,
+        networks_remove_peering_request_resource => $networks_remove_peering_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<RemovePeering> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RemovePeeringNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<networks_remove_peering_request_resource> - L<Google::Cloud::Compute::V1::Compute::NetworksRemovePeeringRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<request_remove_peering>
 
-Calls the RPC method C<RequestRemovePeering> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->request_remove_peering(
+        network                  => $network,
+        networks_request_remove_peering_request_resource => $networks_request_remove_peering_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<RequestRemovePeering> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RequestRemovePeeringNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<networks_request_remove_peering_request_resource> - L<Google::Cloud::Compute::V1::Compute::NetworksRequestRemovePeeringRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<switch_to_custom_mode>
 
-Calls the RPC method C<SwitchToCustomMode> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->switch_to_custom_mode(
+        network                  => $network,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SwitchToCustomMode> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SwitchToCustomModeNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<update_peering>
 
-Calls the RPC method C<UpdatePeering> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_peering(
+        network                  => $network,
+        networks_update_peering_request_resource => $networks_update_peering_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<UpdatePeering> on C<google.cloud.compute.v1.Networks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdatePeeringNetworkRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<network> - C<string>
+
+=item * C<networks_update_peering_request_resource> - L<Google::Cloud::Compute::V1::Compute::NetworksUpdatePeeringRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =back
 

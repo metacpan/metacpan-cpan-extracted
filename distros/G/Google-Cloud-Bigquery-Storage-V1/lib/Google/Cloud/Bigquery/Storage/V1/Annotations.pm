@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::Storage::V1::Annotations;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -44,13 +44,21 @@ EOF
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::Storage::V1::Annotations - Protocol Buffers schema definition
+Google::Cloud::Bigquery::Storage::V1::Annotations - Compiled Protocol Buffers messages for google/cloud/bigquery/storage/v1/annotations.proto
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/storage/v1/annotations.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::Storage::V1::Annotations::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -52,6 +52,7 @@ requires:
   HTTP::Date: '0'
   HTTP::Tiny: '0'
   JSON: '0'
+  JSON::PP: '0'
   JSON::Parse: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
@@ -75,16 +76,19 @@ requires:
   Sub::Attribute: '0'
   Sub::WrapPackages: '0'
   Template: '0'
+  Test2::V0: '0'
   Test::Differences: '0'
   Test::Mojo::Role::HTTPstatus: '0'
   Test::Most: '0'
   Tie::Hash::Vivify: '0'
   Tie::STDOUT: '0'
+  URI: '0'
   WWW::Mechanize: '0'
   XML::DoubleEncodedEntities: '0'
+  XML::LibXML: '0'
   YAML::XS: '0'
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-Task-BeLike-DCANTRELL/issues
   repository: https://github.com/DrHyde/perl-modules-Task-BeLike-DCANTRELL
-version: '2'
+version: '3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

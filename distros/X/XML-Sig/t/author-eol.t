@@ -46,6 +46,8 @@ my @files = (
     't/030-reject-duplicate-id.t',
     't/031_verify_must_verify_something.t',
     't/032_verified_ids.t',
+    't/033_algorithm_allow_list.t',
+    't/034_unavailable_hash.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

@@ -1,0 +1,27 @@
+Changes
+lib/Google/Cloud/Speech/V1.pm
+lib/Google/Cloud/Speech/V1/AdaptationClient.pm
+lib/Google/Cloud/Speech/V1/CloudSpeech.pm
+lib/Google/Cloud/Speech/V1/CloudSpeech/Types.pm
+lib/Google/Cloud/Speech/V1/CloudSpeechAdaptation.pm
+lib/Google/Cloud/Speech/V1/CloudSpeechAdaptation/Types.pm
+lib/Google/Cloud/Speech/V1/Resource.pm
+lib/Google/Cloud/Speech/V1/Resource/Types.pm
+lib/Google/Cloud/Speech/V1/SpeechClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Adaptation.t
+t/01-service-Default.t
+t/01-service-Speech.t
+t/02-rest-transport-Adaptation.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-Speech.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

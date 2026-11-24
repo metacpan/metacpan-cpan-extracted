@@ -1,0 +1,27 @@
+Changes
+lib/Google/Cloud/Policysimulator/V1.pm
+lib/Google/Cloud/Policysimulator/V1/Explanations.pm
+lib/Google/Cloud/Policysimulator/V1/Explanations/Types.pm
+lib/Google/Cloud/Policysimulator/V1/Orgpolicy.pm
+lib/Google/Cloud/Policysimulator/V1/Orgpolicy/Types.pm
+lib/Google/Cloud/Policysimulator/V1/OrgPolicyViolationsPreviewServiceClient.pm
+lib/Google/Cloud/Policysimulator/V1/Simulator.pm
+lib/Google/Cloud/Policysimulator/V1/Simulator/Types.pm
+lib/Google/Cloud/Policysimulator/V1/SimulatorClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-OrgPolicyViolationsPreviewService.t
+t/01-service-Simulator.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-OrgPolicyViolationsPreviewService.t
+t/02-rest-transport-Simulator.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

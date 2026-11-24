@@ -3,7 +3,7 @@ package Google::Spanner::V1::QueryPlan;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -177,155 +177,192 @@ EOF
     # Field: metadata Type: 11 (.google.protobuf.Struct)
     # Field: execution_stats Type: 11 (.google.protobuf.Struct)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::QueryPlan::PlanNode - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::QueryPlan;
-
-    my $msg = Google::Spanner::V1::QueryPlan::PlanNode->new(
-        index => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<index>
-
-Type: Int32
-
-=item * B<kind>
-
-Type: Enum (.google.spanner.v1.PlanNode.Kind)
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<child_links>
-
-Type: Message (.google.spanner.v1.PlanNode.ChildLink)
-
-=item * B<short_representation>
-
-Type: Message (.google.spanner.v1.PlanNode.ShortRepresentation)
-
-=item * B<metadata>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<execution_stats>
-
-Type: Message (.google.protobuf.Struct)
-
-=back
-
-=cut
-
 # Enum: PlanNode::Kind
 our $PlanNode_KIND_UNSPECIFIED = 0;
 our $PlanNode_RELATIONAL = 1;
 our $PlanNode_SCALAR = 2;
 
-=pod
-
-=head2 Enum: PlanNode::Kind
-
-Values:
-
-=over 4
-
-=item * C<KIND_UNSPECIFIED> => 0
-
-=item * C<RELATIONAL> => 1
-
-=item * C<SCALAR> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::QueryPlan::QueryAdvisorResult ===
     # Fields for QueryAdvisorResult
     # Field: index_advice Type: 11 (.google.spanner.v1.QueryAdvisorResult.IndexAdvice)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::QueryPlan::QueryAdvisorResult - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::QueryPlan;
-
-    my $msg = Google::Spanner::V1::QueryPlan::QueryAdvisorResult->new(
-        index_advice => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<index_advice>
-
-Type: Message (.google.spanner.v1.QueryAdvisorResult.IndexAdvice)
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::QueryPlan::QueryPlan ===
     # Fields for QueryPlan
     # Field: plan_nodes Type: 11 (.google.spanner.v1.PlanNode)
     # Field: query_advice Type: 11 (.google.spanner.v1.QueryAdvisorResult)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Spanner::V1::QueryPlan::QueryPlan - Compiled Protocol Buffers message class
+Google::Spanner::V1::QueryPlan - Compiled Protocol Buffers messages for google/spanner/v1/query_plan.proto
 
 =head1 SYNOPSIS
 
     use Google::Spanner::V1::QueryPlan;
 
-    my $msg = Google::Spanner::V1::QueryPlan::QueryPlan->new(
-        plan_nodes => $value,
-    );
+    my $msg = Google::Spanner::V1::QueryPlan::PlanNode->new({
+        index => $index,
+        kind => $kind,
+        display_name => $display_name,
+        child_links => $child_links,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->index();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Spanner::V1::QueryPlan::PlanNode->parse($bytes);
 
-=item * B<plan_nodes>
-
-Type: Message (.google.spanner.v1.PlanNode)
-
-=item * B<query_advice>
-
-Type: Message (.google.spanner.v1.QueryAdvisorResult)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Spanner::V1::QueryPlan - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/spanner/v1/query_plan.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Spanner::V1::QueryPlan::PlanNode
+
+Node information for nodes appearing in a
+[QueryPlan.plan_nodes][google.spanner.v1.QueryPlan.plan_nodes].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->index() >> / C<< $msg->index($value) >>
+
+Type: C<Int32>
+
+The `PlanNode`'s index in [node
+list][google.spanner.v1.QueryPlan.plan_nodes].
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::PlanNode::Kind>)
+
+Used to determine the type of node. May be needed for visualizing
+different kinds of nodes differently. For example, If the node is a
+[SCALAR][google.spanner.v1.PlanNode.Kind.SCALAR] node, it will have a
+condensed representation which can be used to directly embed a description
+of the node in its parent.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+The display name for the node.
+
+=item * C<< $msg->child_links() >> / C<< $msg->child_links($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::QueryPlan::PlanNode::ChildLink>)
+
+List of child node `index`es and their relationship to this parent.
+
+=item * C<< $msg->short_representation() >> / C<< $msg->short_representation($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::QueryPlan::PlanNode::ShortRepresentation>)
+
+Condensed representation for
+[SCALAR][google.spanner.v1.PlanNode.Kind.SCALAR] nodes.
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Attributes relevant to the node contained in a group of key-value pairs.
+For example, a Parameter Reference node could have the following
+information in its metadata:
+
+    {
+      "parameter_reference": "param1",
+      "parameter_type": "array"
+    }
+
+=item * C<< $msg->execution_stats() >> / C<< $msg->execution_stats($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+The execution statistics associated with the node, contained in a group of
+key-value pairs. Only present if the plan was returned as a result of a
+profile query. For example, number of executions, number of rows/time per
+execution etc.
+
+=back
+
+=head3 Enum: PlanNode::Kind
+
+=over 4
+
+=item * C<KIND_UNSPECIFIED> => C<0>
+
+=item * C<RELATIONAL> => C<1>
+
+=item * C<SCALAR> => C<2>
+
+=back
+
+=head2 Google::Spanner::V1::QueryPlan::QueryAdvisorResult
+
+Output of query advisor analysis.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->index_advice() >> / C<< $msg->index_advice($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::QueryPlan::QueryAdvisorResult::IndexAdvice>)
+
+Optional. Index Recommendation for a query. This is an optional field and
+the recommendation will only be available when the recommendation
+guarantees significant improvement in query performance.
+
+=back
+
+=head2 Google::Spanner::V1::QueryPlan::QueryPlan
+
+Contains an ordered list of nodes appearing in the query plan.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->plan_nodes() >> / C<< $msg->plan_nodes($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::QueryPlan::PlanNode>)
+
+The nodes in the query plan. Plan nodes are returned in pre-order starting
+with the plan root. Each [PlanNode][google.spanner.v1.PlanNode]'s `id`
+corresponds to its index in `plan_nodes`.
+
+=item * C<< $msg->query_advice() >> / C<< $msg->query_advice($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::QueryPlan::QueryAdvisorResult>)
+
+Optional. The advise/recommendations for a query. Currently this field will
+be serving index recommendations for a query.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Spanner::V1::QueryPlan::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,87 @@
+package Google::Cloud::Dialogflow::Cx::V3beta1::ImportStrategy;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Cjhnb29nbGUvY2xvdWQvZGlhbG9nZmxvdy9jeC92M2JldGExL2ltcG9ydF9zdHJhdGVneS5w
+cm90bxIiZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zsb3cuY3gudjNiZXRhMSrEAQoOSW1wb3J0U3Ry
+YXRlZ3kSHwobSU1QT1JUX1NUUkFURUdZX1VOU1BFQ0lGSUVEEAASHgoaSU1QT1JUX1NUUkFU
+RUdZX0NSRUFURV9ORVcQARIbChdJTVBPUlRfU1RSQVRFR1lfUkVQTEFDRRACEhgKFElNUE9S
+VF9TVFJBVEVHWV9LRUVQEAMSGQoVSU1QT1JUX1NUUkFURUdZX01FUkdFEAQSHwobSU1QT1JU
+X1NUUkFURUdZX1RIUk9XX0VSUk9SEAVCygEKJmNvbS5nb29nbGUuY2xvdWQuZGlhbG9nZmxv
+dy5jeC52M2JldGExQhNJbXBvcnRTdHJhdGVneVByb3RvUAFaNmNsb3VkLmdvb2dsZS5jb20v
+Z28vZGlhbG9nZmxvdy9jeC9hcGl2M2JldGExL2N4cGI7Y3hwYqICAkRGqgIiR29vZ2xlLkNs
+b3VkLkRpYWxvZ2Zsb3cuQ3guVjNCZXRhMeoCJkdvb2dsZTo6Q2xvdWQ6OkRpYWxvZ2Zsb3c6
+OkNYOjpWM2JldGExSsEMCgYSBA4AMgEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBH
+b29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9u
+IDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2Vw
+dCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNv
+cHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vu
+c2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9y
+IGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhl
+IExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQg
+V0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBv
+ciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2Ug
+Z292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vu
+c2UuCgoICgECEgMQACsKCAoBCBIDEgA/CgkKAgglEgMSAD8KCAoBCBIDEwBNCgkKAggLEgMT
+AE0KCAoBCBIDFAAiCgkKAggKEgMUACIKCAoBCBIDFQA0CgkKAggIEgMVADQKCAoBCBIDFgA/
+CgkKAggBEgMWAD8KCAoBCBIDFwAgCgkKAggkEgMXACAKCAoBCBIDGAA/CgkKAggtEgMYAD8K
+qQEKAgUAEgQdADIBGpwBIEltcG9ydCBzdHJhdGVnaWVzIGZvciB0aGUgY29uZmxpY3QgcmVz
+b2x1dGlvbiBvZiByZXNvdXJjZXMgKGkuZS4gaW50ZW50cywKIGVudGl0aWVzLCBhbmQgd2Vi
+aG9va3MpIHdpdGggaWRlbnRpY2FsIGRpc3BsYXkgbmFtZXMgZHVyaW5nIGltcG9ydAogb3Bl
+cmF0aW9ucy4KCgoKAwUAARIDHQUTCjQKBAUAAgASAx8CIhonIFVuc3BlY2lmaWVkLiBUcmVh
+dGVkIGFzICdDUkVBVEVfTkVXJy4KCgwKBQUAAgABEgMfAh0KDAoFBQACAAISAx8gIQptCgQF
+AAIBEgMjAiEaYCBDcmVhdGUgYSBuZXcgcmVzb3VyY2Ugd2l0aCBhIG51bWVyaWMgc3VmZml4
+IGFwcGVuZGVkIHRvIHRoZSBlbmQgb2YgdGhlCiBleGlzdGluZyBkaXNwbGF5IG5hbWUuCgoM
+CgUFAAIBARIDIwIcCgwKBQUAAgECEgMjHyAKXwoEBQACAhIDJwIeGlIgUmVwbGFjZSBleGlz
+dGluZyByZXNvdXJjZSB3aXRoIGluY29taW5nIHJlc291cmNlIGluIHRoZSBjb250ZW50IHRv
+IGJlCiBpbXBvcnRlZC4KCgwKBQUAAgIBEgMnAhkKDAoFBQACAgISAyccHQpjCgQFAAIDEgMr
+AhsaViBLZWVwIGV4aXN0aW5nIHJlc291cmNlIGFuZCBkaXNjYXJkIGluY29taW5nIHJlc291
+cmNlIGluIHRoZSBjb250ZW50IHRvIGJlCiBpbXBvcnRlZC4KCgwKBQUAAgMBEgMrAhYKDAoF
+BQACAwISAysZGgpWCgQFAAIEEgMuAhwaSSBDb21iaW5lIGV4aXN0aW5nIGFuZCBpbmNvbWlu
+ZyByZXNvdXJjZXMgd2hlbiBhIGNvbmZsaWN0IGlzIGVuY291bnRlcmVkLgoKDAoFBQACBAES
+Ay4CFwoMCgUFAAIEAhIDLhobCjgKBAUAAgUSAzECIhorIFRocm93IGVycm9yIGlmIGEgY29u
+ZmxpY3QgaXMgZW5jb3VudGVyZWQuCgoMCgUFAAIFARIDMQIdCgwKBQUAAgUCEgMxICFiBnBy
+b3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Dialogflow::Cx::V3beta1::ImportStrategy - Compiled Protocol Buffers messages for google/cloud/dialogflow/cx/v3beta1/import_strategy.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dialogflow/cx/v3beta1/import_strategy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dialogflow::Cx::V3beta1::ImportStrategy::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

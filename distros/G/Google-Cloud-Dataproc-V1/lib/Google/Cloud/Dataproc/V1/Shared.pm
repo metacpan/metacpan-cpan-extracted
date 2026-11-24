@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::Shared;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -641,86 +641,10 @@ EOF
     # Field: autotuning_config Type: 11 (.google.cloud.dataproc.v1.AutotuningConfig)
     # Field: cohort Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::RuntimeConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::RuntimeConfig->new(
-        version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<version>
-
-Type: String
-
-=item * B<container_image>
-
-Type: String
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.RuntimeConfig.PropertiesEntry)
-
-=item * B<repository_config>
-
-Type: Message (.google.cloud.dataproc.v1.RepositoryConfig)
-
-=item * B<autotuning_config>
-
-Type: Message (.google.cloud.dataproc.v1.AutotuningConfig)
-
-=item * B<cohort>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Shared::EnvironmentConfig ===
     # Fields for EnvironmentConfig
     # Field: execution_config Type: 11 (.google.cloud.dataproc.v1.ExecutionConfig)
     # Field: peripherals_config Type: 11 (.google.cloud.dataproc.v1.PeripheralsConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::EnvironmentConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::EnvironmentConfig->new(
-        execution_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<execution_config>
-
-Type: Message (.google.cloud.dataproc.v1.ExecutionConfig)
-
-=item * B<peripherals_config>
-
-Type: Message (.google.cloud.dataproc.v1.PeripheralsConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Shared::ExecutionConfig ===
     # Fields for ExecutionConfig
@@ -735,132 +659,14 @@ Type: Message (.google.cloud.dataproc.v1.PeripheralsConfig)
     # Field: authentication_config Type: 11 (.google.cloud.dataproc.v1.AuthenticationConfig)
     # Field: resource_manager_tags Type: 11 (.google.cloud.dataproc.v1.ExecutionConfig.ResourceManagerTagsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::ExecutionConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::ExecutionConfig->new(
-        service_account => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<service_account>
-
-Type: String
-
-=item * B<network_uri>
-
-Type: String
-
-=item * B<subnetwork_uri>
-
-Type: String
-
-=item * B<network_tags>
-
-Type: String
-
-=item * B<kms_key>
-
-Type: String
-
-=item * B<idle_ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<staging_bucket>
-
-Type: String
-
-=item * B<authentication_config>
-
-Type: Message (.google.cloud.dataproc.v1.AuthenticationConfig)
-
-=item * B<resource_manager_tags>
-
-Type: Message (.google.cloud.dataproc.v1.ExecutionConfig.ResourceManagerTagsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Shared::SparkHistoryServerConfig ===
     # Fields for SparkHistoryServerConfig
     # Field: dataproc_cluster Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::SparkHistoryServerConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::SparkHistoryServerConfig->new(
-        dataproc_cluster => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dataproc_cluster>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Shared::PeripheralsConfig ===
     # Fields for PeripheralsConfig
     # Field: metastore_service Type: 9 ()
     # Field: spark_history_server_config Type: 11 (.google.cloud.dataproc.v1.SparkHistoryServerConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::PeripheralsConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::PeripheralsConfig->new(
-        metastore_service => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<metastore_service>
-
-Type: String
-
-=item * B<spark_history_server_config>
-
-Type: Message (.google.cloud.dataproc.v1.SparkHistoryServerConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Shared::RuntimeInfo ===
     # Fields for RuntimeInfo
@@ -870,48 +676,6 @@ Type: Message (.google.cloud.dataproc.v1.SparkHistoryServerConfig)
     # Field: approximate_usage Type: 11 (.google.cloud.dataproc.v1.UsageMetrics)
     # Field: current_usage Type: 11 (.google.cloud.dataproc.v1.UsageSnapshot)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::RuntimeInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::RuntimeInfo->new(
-        endpoints => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<endpoints>
-
-Type: Message (.google.cloud.dataproc.v1.RuntimeInfo.EndpointsEntry)
-
-=item * B<output_uri>
-
-Type: String
-
-=item * B<diagnostic_output_uri>
-
-Type: String
-
-=item * B<approximate_usage>
-
-Type: Message (.google.cloud.dataproc.v1.UsageMetrics)
-
-=item * B<current_usage>
-
-Type: Message (.google.cloud.dataproc.v1.UsageSnapshot)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Shared::UsageMetrics ===
     # Fields for UsageMetrics
     # Field: milli_dcu_seconds Type: 3 ()
@@ -919,48 +683,6 @@ Type: Message (.google.cloud.dataproc.v1.UsageSnapshot)
     # Field: milli_accelerator_seconds Type: 3 ()
     # Field: accelerator_type Type: 9 ()
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::UsageMetrics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::UsageMetrics->new(
-        milli_dcu_seconds => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<milli_dcu_seconds>
-
-Type: Int64
-
-=item * B<shuffle_storage_gb_seconds>
-
-Type: Int64
-
-=item * B<milli_accelerator_seconds>
-
-Type: Int64
-
-=item * B<accelerator_type>
-
-Type: String
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Shared::UsageSnapshot ===
     # Fields for UsageSnapshot
@@ -972,90 +694,10 @@ Type: Message (.google.protobuf.Timestamp)
     # Field: accelerator_type Type: 9 ()
     # Field: snapshot_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::UsageSnapshot - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::UsageSnapshot->new(
-        milli_dcu => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<milli_dcu>
-
-Type: Int64
-
-=item * B<shuffle_storage_gb>
-
-Type: Int64
-
-=item * B<milli_dcu_premium>
-
-Type: Int64
-
-=item * B<shuffle_storage_gb_premium>
-
-Type: Int64
-
-=item * B<milli_accelerator>
-
-Type: Int64
-
-=item * B<accelerator_type>
-
-Type: String
-
-=item * B<snapshot_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Shared::GkeClusterConfig ===
     # Fields for GkeClusterConfig
     # Field: gke_cluster_target Type: 9 ()
     # Field: node_pool_target Type: 11 (.google.cloud.dataproc.v1.GkeNodePoolTarget)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::GkeClusterConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::GkeClusterConfig->new(
-        gke_cluster_target => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<gke_cluster_target>
-
-Type: String
-
-=item * B<node_pool_target>
-
-Type: Message (.google.cloud.dataproc.v1.GkeNodePoolTarget)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Shared::KubernetesClusterConfig ===
     # Fields for KubernetesClusterConfig
@@ -1063,114 +705,16 @@ Type: Message (.google.cloud.dataproc.v1.GkeNodePoolTarget)
     # Field: gke_cluster_config Type: 11 (.google.cloud.dataproc.v1.GkeClusterConfig)
     # Field: kubernetes_software_config Type: 11 (.google.cloud.dataproc.v1.KubernetesSoftwareConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::KubernetesClusterConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::KubernetesClusterConfig->new(
-        kubernetes_namespace => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kubernetes_namespace>
-
-Type: String
-
-=item * B<gke_cluster_config>
-
-Type: Message (.google.cloud.dataproc.v1.GkeClusterConfig)
-
-=item * B<kubernetes_software_config>
-
-Type: Message (.google.cloud.dataproc.v1.KubernetesSoftwareConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Shared::KubernetesSoftwareConfig ===
     # Fields for KubernetesSoftwareConfig
     # Field: component_version Type: 11 (.google.cloud.dataproc.v1.KubernetesSoftwareConfig.ComponentVersionEntry)
     # Field: properties Type: 11 (.google.cloud.dataproc.v1.KubernetesSoftwareConfig.PropertiesEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::KubernetesSoftwareConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::KubernetesSoftwareConfig->new(
-        component_version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<component_version>
-
-Type: Message (.google.cloud.dataproc.v1.KubernetesSoftwareConfig.ComponentVersionEntry)
-
-=item * B<properties>
-
-Type: Message (.google.cloud.dataproc.v1.KubernetesSoftwareConfig.PropertiesEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Shared::GkeNodePoolTarget ===
     # Fields for GkeNodePoolTarget
     # Field: node_pool Type: 9 ()
     # Field: roles Type: 14 (.google.cloud.dataproc.v1.GkeNodePoolTarget.Role)
     # Field: node_pool_config Type: 11 (.google.cloud.dataproc.v1.GkeNodePoolConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::GkeNodePoolTarget - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::GkeNodePoolTarget->new(
-        node_pool => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<node_pool>
-
-Type: String
-
-=item * B<roles>
-
-Type: Enum (.google.cloud.dataproc.v1.GkeNodePoolTarget.Role)
-
-=item * B<node_pool_config>
-
-Type: Message (.google.cloud.dataproc.v1.GkeNodePoolConfig)
-
-=back
-
-=cut
 
 # Enum: GkeNodePoolTarget::Role
 our $GkeNodePoolTarget_ROLE_UNSPECIFIED = 0;
@@ -1179,150 +723,24 @@ our $GkeNodePoolTarget_CONTROLLER = 2;
 our $GkeNodePoolTarget_SPARK_DRIVER = 3;
 our $GkeNodePoolTarget_SPARK_EXECUTOR = 4;
 
-=pod
-
-=head2 Enum: GkeNodePoolTarget::Role
-
-Values:
-
-=over 4
-
-=item * C<ROLE_UNSPECIFIED> => 0
-
-=item * C<DEFAULT> => 1
-
-=item * C<CONTROLLER> => 2
-
-=item * C<SPARK_DRIVER> => 3
-
-=item * C<SPARK_EXECUTOR> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Shared::GkeNodePoolConfig ===
     # Fields for GkeNodePoolConfig
     # Field: config Type: 11 (.google.cloud.dataproc.v1.GkeNodePoolConfig.GkeNodeConfig)
     # Field: locations Type: 9 ()
     # Field: autoscaling Type: 11 (.google.cloud.dataproc.v1.GkeNodePoolConfig.GkeNodePoolAutoscalingConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::GkeNodePoolConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::GkeNodePoolConfig->new(
-        config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<config>
-
-Type: Message (.google.cloud.dataproc.v1.GkeNodePoolConfig.GkeNodeConfig)
-
-=item * B<locations>
-
-Type: String
-
-=item * B<autoscaling>
-
-Type: Message (.google.cloud.dataproc.v1.GkeNodePoolConfig.GkeNodePoolAutoscalingConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Shared::AuthenticationConfig ===
     # Fields for AuthenticationConfig
     # Field: user_workload_authentication_type Type: 14 (.google.cloud.dataproc.v1.AuthenticationConfig.AuthenticationType)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::AuthenticationConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::AuthenticationConfig->new(
-        user_workload_authentication_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<user_workload_authentication_type>
-
-Type: Enum (.google.cloud.dataproc.v1.AuthenticationConfig.AuthenticationType)
-
-=back
-
-=cut
 
 # Enum: AuthenticationConfig::AuthenticationType
 our $AuthenticationConfig_AUTHENTICATION_TYPE_UNSPECIFIED = 0;
 our $AuthenticationConfig_SERVICE_ACCOUNT = 1;
 our $AuthenticationConfig_END_USER_CREDENTIALS = 2;
 
-=pod
-
-=head2 Enum: AuthenticationConfig::AuthenticationType
-
-Values:
-
-=over 4
-
-=item * C<AUTHENTICATION_TYPE_UNSPECIFIED> => 0
-
-=item * C<SERVICE_ACCOUNT> => 1
-
-=item * C<END_USER_CREDENTIALS> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Shared::AutotuningConfig ===
     # Fields for AutotuningConfig
     # Field: scenarios Type: 14 (.google.cloud.dataproc.v1.AutotuningConfig.Scenario)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::AutotuningConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::AutotuningConfig->new(
-        scenarios => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<scenarios>
-
-Type: Enum (.google.cloud.dataproc.v1.AutotuningConfig.Scenario)
-
-=back
-
-=cut
 
 # Enum: AutotuningConfig::Scenario
 our $AutotuningConfig_SCENARIO_UNSPECIFIED = 0;
@@ -1332,101 +750,765 @@ our $AutotuningConfig_MEMORY = 4;
 our $AutotuningConfig_NONE = 5;
 our $AutotuningConfig_AUTO = 6;
 
-=pod
-
-=head2 Enum: AutotuningConfig::Scenario
-
-Values:
-
-=over 4
-
-=item * C<SCENARIO_UNSPECIFIED> => 0
-
-=item * C<SCALING> => 2
-
-=item * C<BROADCAST_HASH_JOIN> => 3
-
-=item * C<MEMORY> => 4
-
-=item * C<NONE> => 5
-
-=item * C<AUTO> => 6
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Shared::RepositoryConfig ===
     # Fields for RepositoryConfig
     # Field: pypi_repository_config Type: 11 (.google.cloud.dataproc.v1.PyPiRepositoryConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared::RepositoryConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Shared;
-
-    my $msg = Google::Cloud::Dataproc::V1::Shared::RepositoryConfig->new(
-        pypi_repository_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<pypi_repository_config>
-
-Type: Message (.google.cloud.dataproc.v1.PyPiRepositoryConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Shared::PyPiRepositoryConfig ===
     # Fields for PyPiRepositoryConfig
     # Field: pypi_repository Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::Shared::PyPiRepositoryConfig - Compiled Protocol Buffers message class
+Google::Cloud::Dataproc::V1::Shared - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/shared.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Dataproc::V1::Shared;
 
-    my $msg = Google::Cloud::Dataproc::V1::Shared::PyPiRepositoryConfig->new(
-        pypi_repository => $value,
-    );
+    my $msg = Google::Cloud::Dataproc::V1::Shared::RuntimeConfig->new({
+        version => $version,
+        container_image => $container_image,
+        properties => $properties,
+        repository_config => $repository_config,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->version();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::Shared::RuntimeConfig->parse($bytes);
 
-=item * B<pypi_repository>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Shared - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/shared.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::Shared::RuntimeConfig
+
+Runtime configuration for a workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Optional. Version of the batch runtime.
+
+=item * C<< $msg->container_image() >> / C<< $msg->container_image($value) >>
+
+Type: C<String>
+
+Optional. Optional custom container image for the job runtime environment.
+If not specified, a default container image will be used.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::RuntimeConfig::PropertiesEntry>)
+
+Optional. A mapping of property names to values, which are used to
+configure workload execution.
+
+=item * C<< $msg->repository_config() >> / C<< $msg->repository_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::RepositoryConfig>)
+
+Optional. Dependency repository configuration.
+
+=item * C<< $msg->autotuning_config() >> / C<< $msg->autotuning_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::AutotuningConfig>)
+
+Optional. Autotuning configuration of the workload.
+
+=item * C<< $msg->cohort() >> / C<< $msg->cohort($value) >>
+
+Type: C<String>
+
+Optional. Cohort identifier. Identifies families of the workloads that have
+the same shape, for example, daily ETL jobs.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::EnvironmentConfig
+
+Environment configuration for a workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->execution_config() >> / C<< $msg->execution_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::ExecutionConfig>)
+
+Optional. Execution configuration for a workload.
+
+=item * C<< $msg->peripherals_config() >> / C<< $msg->peripherals_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::PeripheralsConfig>)
+
+Optional. Peripherals configuration that workload has access to.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::ExecutionConfig
+
+Execution configuration for a workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->service_account() >> / C<< $msg->service_account($value) >>
+
+Type: C<String>
+
+Optional. Service account that used to execute workload.
+
+=item * C<< $msg->network_uri() >> / C<< $msg->network_uri($value) >>
+
+Type: C<String>
+
+Optional. Network URI to connect workload to.
+
+=item * C<< $msg->subnetwork_uri() >> / C<< $msg->subnetwork_uri($value) >>
+
+Type: C<String>
+
+Optional. Subnetwork URI to connect workload to.
+
+=item * C<< $msg->network_tags() >> / C<< $msg->network_tags($value) >>
+
+Type: C<String>
+
+Optional. Tags used for network traffic control.
+
+=item * C<< $msg->kms_key() >> / C<< $msg->kms_key($value) >>
+
+Type: C<String>
+
+Optional. The Cloud KMS key to use for encryption.
+
+=item * C<< $msg->idle_ttl() >> / C<< $msg->idle_ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Applies to sessions only. The duration to keep the session alive
+while it's idling. Exceeding this threshold causes the session to
+terminate. This field cannot be set on a batch workload. Minimum value is
+10 minutes; maximum value is 14 days (see JSON representation of
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+Defaults to 1 hour if not set.
+If both `ttl` and `idle_ttl` are specified for an interactive session,
+the conditions are treated as `OR` conditions: the workload will be
+terminated when it has been idle for `idle_ttl` or when `ttl` has been
+exceeded, whichever occurs first.
+
+=item * C<< $msg->ttl() >> / C<< $msg->ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The duration after which the workload will be terminated,
+specified as the JSON representation for
+[Duration](https://protobuf.dev/programming-guides/proto3/#json).
+When the workload exceeds this duration, it will be unconditionally
+terminated without waiting for ongoing work to finish. If `ttl` is not
+specified for a batch workload, the workload will be allowed to run until
+it exits naturally (or run forever without exiting). If `ttl` is not
+specified for an interactive session, it defaults to 24 hours. If `ttl` is
+not specified for a batch that uses 2.1+ runtime version, it defaults to 4
+hours. Minimum value is 10 minutes; maximum value is 14 days. If both `ttl`
+and `idle_ttl` are specified (for an interactive session), the conditions
+are treated as `OR` conditions: the workload will be terminated when it has
+been idle for `idle_ttl` or when `ttl` has been exceeded, whichever occurs
+first.
+
+=item * C<< $msg->staging_bucket() >> / C<< $msg->staging_bucket($value) >>
+
+Type: C<String>
+
+Optional. A Cloud Storage bucket used to stage workload dependencies,
+config files, and store workload output and other ephemeral data, such as
+Spark history files. If you do not specify a staging bucket, Cloud Dataproc
+will determine a Cloud Storage location according to the region where your
+workload is running, and then create and manage project-level, per-location
+staging and temporary buckets.
+**This field requires a Cloud Storage bucket name, not a `gs://...` URI to
+a Cloud Storage bucket.**
+
+=item * C<< $msg->authentication_config() >> / C<< $msg->authentication_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::AuthenticationConfig>)
+
+Optional. Authentication configuration used to set the default identity for
+the workload execution. The config specifies the type of identity
+(service account or user) that will be used by workloads to access
+resources on the project(s).
+
+=item * C<< $msg->resource_manager_tags() >> / C<< $msg->resource_manager_tags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::ExecutionConfig::ResourceManagerTagsEntry>)
+
+Optional. Associates Resource Manager tags with the workload nodes.
+There is a max limit of 30 tags.
+Keys and values can be either in numeric format, such as
+`tagKeys/{tag_key_id}` and `tagValues/{tag_value_id}`, or in namespaced
+format, such as `{org_id|project_id}/{tag_key_short_name}` and
+`{tag_value_short_name}`.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::SparkHistoryServerConfig
+
+Spark History Server configuration for the workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataproc_cluster() >> / C<< $msg->dataproc_cluster($value) >>
+
+Type: C<String>
+
+Optional. Resource name of an existing Dataproc Cluster to act as a Spark
+History Server for the workload.
+
+Example:
+
+* `projects/[project_id]/regions/[region]/clusters/[cluster_name]`
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::PeripheralsConfig
+
+Auxiliary services configuration for a workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->metastore_service() >> / C<< $msg->metastore_service($value) >>
+
+Type: C<String>
+
+Optional. Resource name of an existing Dataproc Metastore service.
+
+Example:
+
+* `projects/[project_id]/locations/[region]/services/[service_id]`
+
+=item * C<< $msg->spark_history_server_config() >> / C<< $msg->spark_history_server_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::SparkHistoryServerConfig>)
+
+Optional. The Spark History Server configuration for the workload.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::RuntimeInfo
+
+Runtime information about workload execution.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->endpoints() >> / C<< $msg->endpoints($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::RuntimeInfo::EndpointsEntry>)
+
+Output only. Map of remote access endpoints (such as web interfaces and
+APIs) to their URIs.
+
+=item * C<< $msg->output_uri() >> / C<< $msg->output_uri($value) >>
+
+Type: C<String>
+
+Output only. A URI pointing to the location of the stdout and stderr of the
+workload.
+
+=item * C<< $msg->diagnostic_output_uri() >> / C<< $msg->diagnostic_output_uri($value) >>
+
+Type: C<String>
+
+Output only. A URI pointing to the location of the diagnostics tarball.
+
+=item * C<< $msg->approximate_usage() >> / C<< $msg->approximate_usage($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::UsageMetrics>)
+
+Output only. Approximate workload resource usage, calculated when
+the workload completes (see [Dataproc Serverless pricing]
+(https://cloud.google.com/dataproc-serverless/pricing)).
+
+B<Note:> This metric calculation may change in the future, for
+example, to capture cumulative workload resource
+consumption during workload execution (see the
+[Dataproc Serverless release notes]
+(https://cloud.google.com/dataproc-serverless/docs/release-notes)
+for announcements, changes, fixes
+and other Dataproc developments).
+
+=item * C<< $msg->current_usage() >> / C<< $msg->current_usage($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::UsageSnapshot>)
+
+Output only. Snapshot of current workload resource usage.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::UsageMetrics
+
+Usage metrics represent approximate total resources consumed by a workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->milli_dcu_seconds() >> / C<< $msg->milli_dcu_seconds($value) >>
+
+Type: C<Int64>
+
+Optional. DCU (Dataproc Compute Units) usage in (`milliDCU` x `seconds`)
+(see [Dataproc Serverless pricing]
+(https://cloud.google.com/dataproc-serverless/pricing)).
+
+=item * C<< $msg->shuffle_storage_gb_seconds() >> / C<< $msg->shuffle_storage_gb_seconds($value) >>
+
+Type: C<Int64>
+
+Optional. Shuffle storage usage in (`GB` x `seconds`) (see
+[Dataproc Serverless pricing]
+(https://cloud.google.com/dataproc-serverless/pricing)).
+
+=item * C<< $msg->milli_accelerator_seconds() >> / C<< $msg->milli_accelerator_seconds($value) >>
+
+Type: C<Int64>
+
+Optional. [DEPRECATED] Accelerator usage in (`milliAccelerator` x
+`seconds`) (see [Dataproc Serverless pricing]
+(https://cloud.google.com/dataproc-serverless/pricing)).
+
+=item * C<< $msg->accelerator_type() >> / C<< $msg->accelerator_type($value) >>
+
+Type: C<String>
+
+Optional. [DEPRECATED] Accelerator type being used, if any
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. The timestamp of the usage metrics.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::UsageSnapshot
+
+The usage snapshot represents the resources consumed by a workload at a
+specified time.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->milli_dcu() >> / C<< $msg->milli_dcu($value) >>
+
+Type: C<Int64>
+
+Optional. Milli (one-thousandth) Dataproc Compute Units (DCUs) (see
+[Dataproc Serverless pricing]
+(https://cloud.google.com/dataproc-serverless/pricing)).
+
+=item * C<< $msg->shuffle_storage_gb() >> / C<< $msg->shuffle_storage_gb($value) >>
+
+Type: C<Int64>
+
+Optional. Shuffle Storage in gigabytes (GB). (see [Dataproc Serverless
+pricing] (https://cloud.google.com/dataproc-serverless/pricing))
+
+=item * C<< $msg->milli_dcu_premium() >> / C<< $msg->milli_dcu_premium($value) >>
+
+Type: C<Int64>
+
+Optional. Milli (one-thousandth) Dataproc Compute Units (DCUs) charged at
+premium tier (see [Dataproc Serverless pricing]
+(https://cloud.google.com/dataproc-serverless/pricing)).
+
+=item * C<< $msg->shuffle_storage_gb_premium() >> / C<< $msg->shuffle_storage_gb_premium($value) >>
+
+Type: C<Int64>
+
+Optional. Shuffle Storage in gigabytes (GB) charged at premium tier. (see
+[Dataproc Serverless pricing]
+(https://cloud.google.com/dataproc-serverless/pricing))
+
+=item * C<< $msg->milli_accelerator() >> / C<< $msg->milli_accelerator($value) >>
+
+Type: C<Int64>
+
+Optional. Milli (one-thousandth) accelerator. (see [Dataproc
+Serverless pricing] (https://cloud.google.com/dataproc-serverless/pricing))
+
+=item * C<< $msg->accelerator_type() >> / C<< $msg->accelerator_type($value) >>
+
+Type: C<String>
+
+Optional. Accelerator type being used, if any
+
+=item * C<< $msg->snapshot_time() >> / C<< $msg->snapshot_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. The timestamp of the usage snapshot.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::GkeClusterConfig
+
+The cluster's GKE config.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->gke_cluster_target() >> / C<< $msg->gke_cluster_target($value) >>
+
+Type: C<String>
+
+Optional. A target GKE cluster to deploy to. It must be in the same project
+and region as the Dataproc cluster (the GKE cluster can be zonal or
+regional). Format:
+'projects/{project}/locations/{location}/clusters/{cluster_id}'
+
+=item * C<< $msg->node_pool_target() >> / C<< $msg->node_pool_target($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::GkeNodePoolTarget>)
+
+Optional. GKE node pools where workloads will be scheduled. At least one
+node pool must be assigned the `DEFAULT`
+[GkeNodePoolTarget.Role][google.cloud.dataproc.v1.GkeNodePoolTarget.Role].
+If a `GkeNodePoolTarget` is not specified, Dataproc constructs a `DEFAULT`
+`GkeNodePoolTarget`. Each role can be given to only one
+`GkeNodePoolTarget`. All node pools must have the same location settings.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::KubernetesClusterConfig
+
+The configuration for running the Dataproc cluster on Kubernetes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kubernetes_namespace() >> / C<< $msg->kubernetes_namespace($value) >>
+
+Type: C<String>
+
+Optional. A namespace within the Kubernetes cluster to deploy into. If this
+namespace does not exist, it is created. If it exists, Dataproc verifies
+that another Dataproc VirtualCluster is not installed into it. If not
+specified, the name of the Dataproc Cluster is used.
+
+=item * C<< $msg->gke_cluster_config() >> / C<< $msg->gke_cluster_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::GkeClusterConfig>)
+
+Required. The configuration for running the Dataproc cluster on GKE.
+
+=item * C<< $msg->kubernetes_software_config() >> / C<< $msg->kubernetes_software_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::KubernetesSoftwareConfig>)
+
+Optional. The software configuration for this Dataproc cluster running on
+Kubernetes.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::KubernetesSoftwareConfig
+
+The software configuration for this Dataproc cluster running on Kubernetes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->component_version() >> / C<< $msg->component_version($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::KubernetesSoftwareConfig::ComponentVersionEntry>)
+
+The components that should be installed in this Dataproc cluster. The key
+must be a string from the KubernetesComponent enumeration. The value is
+the version of the software to be installed.
+At least one entry must be specified.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::KubernetesSoftwareConfig::PropertiesEntry>)
+
+The properties to set on daemon config files.
+
+Property keys are specified in `prefix:property` format, for example
+`spark:spark.kubernetes.container.image`. The following are supported
+prefixes and their mappings:
+
+* spark:  `spark-defaults.conf`
+
+For more information, see [Cluster
+properties](https://cloud.google.com/dataproc/docs/concepts/cluster-properties).
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::GkeNodePoolTarget
+
+GKE node pools that Dataproc workloads run on.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->node_pool() >> / C<< $msg->node_pool($value) >>
+
+Type: C<String>
+
+Required. The target GKE node pool.
+Format:
+'projects/{project}/locations/{location}/clusters/{cluster}/nodePools/{node_pool}'
+
+=item * C<< $msg->roles() >> / C<< $msg->roles($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::GkeNodePoolTarget::Role>)
+
+Required. The roles associated with the GKE node pool.
+
+=item * C<< $msg->node_pool_config() >> / C<< $msg->node_pool_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::GkeNodePoolConfig>)
+
+Input only. The configuration for the GKE node pool.
+
+If specified, Dataproc attempts to create a node pool with the
+specified shape. If one with the same name already exists, it is
+verified against all specified fields. If a field differs, the
+virtual cluster creation will fail.
+
+If omitted, any node pool with the specified name is used. If a
+node pool with the specified name does not exist, Dataproc create a
+node pool with default values.
+
+This is an input only field. It will not be returned by the API.
+
+=back
+
+=head3 Enum: GkeNodePoolTarget::Role
+
+=over 4
+
+=item * C<ROLE_UNSPECIFIED> => C<0>
+
+=item * C<DEFAULT> => C<1>
+
+=item * C<CONTROLLER> => C<2>
+
+=item * C<SPARK_DRIVER> => C<3>
+
+=item * C<SPARK_EXECUTOR> => C<4>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::GkeNodePoolConfig
+
+The configuration of a GKE node pool used by a [Dataproc-on-GKE
+cluster](https://cloud.google.com/dataproc/docs/concepts/jobs/dataproc-gke#create-a-dataproc-on-gke-cluster).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->config() >> / C<< $msg->config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::GkeNodePoolConfig::GkeNodeConfig>)
+
+Optional. The node pool configuration.
+
+=item * C<< $msg->locations() >> / C<< $msg->locations($value) >>
+
+Type: C<String>
+
+Optional. The list of Compute Engine
+[zones](https://cloud.google.com/compute/docs/zones#available) where
+node pool nodes associated with a Dataproc on GKE virtual cluster
+will be located.
+
+B<Note:> All node pools associated with a virtual cluster
+must be located in the same region as the virtual cluster, and they must
+be located in the same zone within that region.
+
+If a location is not specified during node pool creation, Dataproc on GKE
+will choose the zone.
+
+=item * C<< $msg->autoscaling() >> / C<< $msg->autoscaling($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::GkeNodePoolConfig::GkeNodePoolAutoscalingConfig>)
+
+Optional. The autoscaler configuration for this node pool. The autoscaler
+is enabled only when a valid configuration is present.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::AuthenticationConfig
+
+Authentication configuration for a workload is used to set the default
+identity for the workload execution.
+The config specifies the type of identity (service account or user) that
+will be used by workloads to access resources on the project(s).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->user_workload_authentication_type() >> / C<< $msg->user_workload_authentication_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::AuthenticationConfig::AuthenticationType>)
+
+Optional. Authentication type for the user workload running in containers.
+
+=back
+
+=head3 Enum: AuthenticationConfig::AuthenticationType
+
+=over 4
+
+=item * C<AUTHENTICATION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<SERVICE_ACCOUNT> => C<1>
+
+=item * C<END_USER_CREDENTIALS> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::AutotuningConfig
+
+Autotuning configuration of the workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->scenarios() >> / C<< $msg->scenarios($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::AutotuningConfig::Scenario>)
+
+Optional. Scenarios for which tunings are applied.
+
+=back
+
+=head3 Enum: AutotuningConfig::Scenario
+
+=over 4
+
+=item * C<SCENARIO_UNSPECIFIED> => C<0>
+
+=item * C<SCALING> => C<2>
+
+=item * C<BROADCAST_HASH_JOIN> => C<3>
+
+=item * C<MEMORY> => C<4>
+
+=item * C<NONE> => C<5>
+
+=item * C<AUTO> => C<6>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::RepositoryConfig
+
+Configuration for dependency repositories
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->pypi_repository_config() >> / C<< $msg->pypi_repository_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::PyPiRepositoryConfig>)
+
+Optional. Configuration for PyPi repository.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Shared::PyPiRepositoryConfig
+
+Configuration for PyPi repository
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->pypi_repository() >> / C<< $msg->pypi_repository($value) >>
+
+Type: C<String>
+
+Optional. The PyPi repository address. **Note: This field is not available
+for batch workloads.**
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::Shared::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

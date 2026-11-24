@@ -1,0 +1,4 @@
+Revision history for PDL-IO-GGUF
+
+0.01    2026-11-24
+        - Initial release: pure-Perl GGUF v3 reader and writer for PDL ndarrays.

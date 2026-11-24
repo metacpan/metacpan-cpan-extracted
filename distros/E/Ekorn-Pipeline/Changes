@@ -2,6 +2,42 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.3.9 2026-11-23
+
+    v0.3.8's documentation, on CPAN, as v0.3.8 never reached it: it was
+    tagged, but a word in the reference failed Minilla's POD spelling
+    test as its tarball was built, so it wasn't uploaded. What v0.3.8's
+    entry in Changes says is new is new to CPAN here.
+
+    It ships no roadmap item, and changes only the documentation: the
+    code is v0.3.7's.
+
+    - Ekorn::Pipeline::Manual::Reference lists "setlist", a word its
+      examples use, among its stopwords.
+
+v0.3.8 2026-11-23
+
+    The reference's index is for looking a name up, and the text before
+    it for seeing it used. Each entry in the index has a synopsis of
+    all the name's forms, what it does, whether it's exported by
+    default or upon request, and a link to the section that shows it
+    in use; those sections show it, with examples on one catalogue of
+    tracks, rather than define it again.
+
+    It ships no roadmap item, and changes only the documentation: the
+    code is v0.3.7's.
+
+    - Ekorn::Pipeline::Manual::Reference, and docs/REFERENCE.md: each
+      index entry has a synopsis, and a link to the name in use. Names
+      used together are shown together: Flow's stages in "Taking and
+      dropping", Batch's in "Batching and collecting", peek and
+      count_into in "Taps", Stop and throw in "What a stop does", pipe
+      and tap in one section. The tables that only defined names, and
+      the Exports and The modules sections, are gone, as the index
+      holds what they did. The manuals have index entries.
+    - The README shows Ekorn-Pipeline's logo, on GitHub; POD readers
+      no longer show its badges' links as text.
+
 v0.3.7 2026-11-18
 
     The reference ends in an index: each module, A to Z, with its

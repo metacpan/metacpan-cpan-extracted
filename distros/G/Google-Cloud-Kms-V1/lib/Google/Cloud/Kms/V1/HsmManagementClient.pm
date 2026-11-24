@@ -11,13 +11,13 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Kms::V1::EkmService;
-use Google::Cloud::Kms::V1::Resources;
-use Google::Cloud::Kms::V1::AutokeyAdmin;
 use Google::Cloud::Kms::V1::Autokey;
 use Google::Cloud::Kms::V1::HsmManagement;
+use Google::Cloud::Kms::V1::Resources;
+use Google::Cloud::Kms::V1::AutokeyAdmin;
 use Google::Cloud::Kms::V1::Service;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -128,9 +128,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/cloud/kms/v1/autokey_admin.proto>
-
 =item * C<googleapis/google/cloud/kms/v1/autokey.proto>
+
+=item * C<googleapis/google/cloud/kms/v1/autokey_admin.proto>
 
 =item * C<googleapis/google/cloud/kms/v1/ekm_service.proto>
 
@@ -173,7 +173,38 @@ The following RPC methods are available in this client:
 
 =item * B<list_single_tenant_hsm_instances>
 
-Calls the RPC method C<ListSingleTenantHsmInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_single_tenant_hsm_instances(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+        show_deleted             => $show_deleted,
+    );
+
+Calls the RPC method C<ListSingleTenantHsmInstances> on C<google.cloud.kms.v1.HsmManagement>.
+
+Request: L<Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesRequest>
+
+Returns: L<Google::Cloud::Kms::V1::HsmManagement::ListSingleTenantHsmInstancesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=item * C<show_deleted> - C<bool>
+
+=back
 
 =back
 

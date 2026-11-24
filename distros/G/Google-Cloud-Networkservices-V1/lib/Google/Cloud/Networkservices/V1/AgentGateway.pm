@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::AgentGateway;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -323,95 +323,9 @@ EOF
     # Field: network_config Type: 11 (.google.cloud.networkservices.v1.AgentGateway.NetworkConfig)
     # Field: agent_gateway_card Type: 11 (.google.cloud.networkservices.v1.AgentGateway.AgentGatewayOutputCard)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::AgentGateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway->new(
-        google_managed => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<google_managed>
-
-Type: Message (.google.cloud.networkservices.v1.AgentGateway.GoogleManaged)
-
-=item * B<self_managed>
-
-Type: Message (.google.cloud.networkservices.v1.AgentGateway.SelfManaged)
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.AgentGateway.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<protocols>
-
-Type: Enum (.google.cloud.networkservices.v1.AgentGateway.Protocol)
-
-=item * B<registries>
-
-Type: String
-
-=item * B<network_config>
-
-Type: Message (.google.cloud.networkservices.v1.AgentGateway.NetworkConfig)
-
-=item * B<agent_gateway_card>
-
-Type: Message (.google.cloud.networkservices.v1.AgentGateway.AgentGatewayOutputCard)
-
-=back
-
-=cut
-
 # Enum: AgentGateway::Protocol
 our $AgentGateway_PROTOCOL_UNSPECIFIED = 0;
 our $AgentGateway_MCP = 1;
-
-=pod
-
-=head2 Enum: AgentGateway::Protocol
-
-Values:
-
-=over 4
-
-=item * C<PROTOCOL_UNSPECIFIED> => 0
-
-=item * C<MCP> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::AgentGateway::ListAgentGatewaysRequest ===
     # Fields for ListAgentGatewaysRequest
@@ -420,113 +334,15 @@ Values:
     # Field: page_token Type: 9 ()
     # Field: return_partial_success Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::AgentGateway::ListAgentGatewaysRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::AgentGateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::AgentGateway::ListAgentGatewaysRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<return_partial_success>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::AgentGateway::ListAgentGatewaysResponse ===
     # Fields for ListAgentGatewaysResponse
     # Field: agent_gateways Type: 11 (.google.cloud.networkservices.v1.AgentGateway)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::AgentGateway::ListAgentGatewaysResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::AgentGateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::AgentGateway::ListAgentGatewaysResponse->new(
-        agent_gateways => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<agent_gateways>
-
-Type: Message (.google.cloud.networkservices.v1.AgentGateway)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::AgentGateway::GetAgentGatewayRequest ===
     # Fields for GetAgentGatewayRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::AgentGateway::GetAgentGatewayRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::AgentGateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::AgentGateway::GetAgentGatewayRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::AgentGateway::CreateAgentGatewayRequest ===
     # Fields for CreateAgentGatewayRequest
@@ -534,121 +350,340 @@ Type: String
     # Field: agent_gateway_id Type: 9 ()
     # Field: agent_gateway Type: 11 (.google.cloud.networkservices.v1.AgentGateway)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::AgentGateway::CreateAgentGatewayRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::AgentGateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::AgentGateway::CreateAgentGatewayRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<agent_gateway_id>
-
-Type: String
-
-=item * B<agent_gateway>
-
-Type: Message (.google.cloud.networkservices.v1.AgentGateway)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::AgentGateway::UpdateAgentGatewayRequest ===
     # Fields for UpdateAgentGatewayRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: agent_gateway Type: 11 (.google.cloud.networkservices.v1.AgentGateway)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::AgentGateway::UpdateAgentGatewayRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::AgentGateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::AgentGateway::UpdateAgentGatewayRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<agent_gateway>
-
-Type: Message (.google.cloud.networkservices.v1.AgentGateway)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::AgentGateway::DeleteAgentGatewayRequest ===
     # Fields for DeleteAgentGatewayRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::AgentGateway::DeleteAgentGatewayRequest - Compiled Protocol Buffers message class
+Google::Cloud::Networkservices::V1::AgentGateway - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/agent_gateway.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networkservices::V1::AgentGateway;
 
-    my $msg = Google::Cloud::Networkservices::V1::AgentGateway::DeleteAgentGatewayRequest->new(
-        name => $value,
-    );
+    my $msg = Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway->new({
+        google_managed => $google_managed,
+        self_managed => $self_managed,
+        name => $name,
+        create_time => $create_time,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->google_managed();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::AgentGateway - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/agent_gateway.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway
+
+AgentGateway represents the agent gateway resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->google_managed() >> / C<< $msg->google_managed($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway::GoogleManaged>)
+
+Optional. Proxy is orchestrated and managed by GoogleCloud in a tenant
+project.
+
+=item * C<< $msg->self_managed() >> / C<< $msg->self_managed($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway::SelfManaged>)
+
+Optional. Attach to existing Application Load Balancers or Secure Web
+Proxies.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the AgentGateway resource. It matches pattern
+`projects/*/locations/*/agentGateways/<agent_gateway>`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway::LabelsEntry>)
+
+Optional. Set of label tags associated with the AgentGateway resource.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A free-text description of the resource. Max length 1024
+characters.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag of the resource.
+If this is provided, it must match the server's etag. If the provided etag
+does not match the server's etag, the request will fail with a 409 ABORTED
+error.
+
+=item * C<< $msg->protocols() >> / C<< $msg->protocols($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::AgentGateway::Protocol>)
+
+Optional. Deprecated.
+
+=item * C<< $msg->registries() >> / C<< $msg->registries($value) >>
+
+Type: C<String>
+
+Optional. A list of Agent registries containing the agents, MCP servers and
+tools governed by the Agent Gateway. Note: Currently limited to
+project-scoped registries Must be of format
+`//agentregistry.googleapis.com/projects/{project}/locations/{location}/`
+
+=item * C<< $msg->network_config() >> / C<< $msg->network_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway::NetworkConfig>)
+
+Optional. Network configuration for the AgentGateway.
+
+=item * C<< $msg->agent_gateway_card() >> / C<< $msg->agent_gateway_card($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway::AgentGatewayOutputCard>)
+
+Output only. Field for populated AgentGateway card.
+
+=back
+
+=head3 Enum: AgentGateway::Protocol
+
+=over 4
+
+=item * C<PROTOCOL_UNSPECIFIED> => C<0>
+
+=item * C<MCP> => C<1>
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::AgentGateway::ListAgentGatewaysRequest
+
+Request used with the ListAgentGateways method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the AgentGateways should be
+listed, specified in the format `projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of AgentGateways to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The value returned by the last `ListAgentGatewaysResponse`
+Indicates that this is a continuation of a prior `ListAgentGateways`
+call, and that the system should return the next page of data.
+
+=item * C<< $msg->return_partial_success() >> / C<< $msg->return_partial_success($value) >>
+
+Type: C<Bool>
+
+Optional. If true, allow partial responses for multi-regional Aggregated
+List requests. Otherwise if one of the locations is down or unreachable,
+the Aggregated List request will fail.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::AgentGateway::ListAgentGatewaysResponse
+
+Response returned by the ListAgentGateways method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->agent_gateways() >> / C<< $msg->agent_gateways($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway>)
+
+List of AgentGateway resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request attempts to list all
+resources across all supported locations, while some locations are
+temporarily unavailable.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::AgentGateway::GetAgentGatewayRequest
+
+Request used by the GetAgentGateway method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the AgentGateway to get. Must be in the format
+`projects/*/locations/*/agentGateways/*`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::AgentGateway::CreateAgentGatewayRequest
+
+Request used by the CreateAgentGateway method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the AgentGateway. Must be in the
+format `projects/*/locations/*`.
+
+=item * C<< $msg->agent_gateway_id() >> / C<< $msg->agent_gateway_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the AgentGateway resource to be created.
+
+=item * C<< $msg->agent_gateway() >> / C<< $msg->agent_gateway($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway>)
+
+Required. AgentGateway resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::AgentGateway::UpdateAgentGatewayRequest
+
+Request used by the UpdateAgentGateway method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+AgentGateway resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->agent_gateway() >> / C<< $msg->agent_gateway($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::AgentGateway::AgentGateway>)
+
+Required. Updated AgentGateway resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::AgentGateway::DeleteAgentGatewayRequest
+
+Request used by the DeleteAgentGateway method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the AgentGateway to delete. Must be in the format
+`projects/*/locations/*/agentGateways/*`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. The etag of the AgentGateway to delete.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::AgentGateway::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

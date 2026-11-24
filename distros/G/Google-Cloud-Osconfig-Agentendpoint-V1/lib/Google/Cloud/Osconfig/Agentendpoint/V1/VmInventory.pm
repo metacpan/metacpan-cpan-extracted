@@ -1,0 +1,202 @@
+package Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Protobuf::Struct };
+    my $descriptor_b64 = <<'EOF';
+Cjlnb29nbGUvY2xvdWQvb3Njb25maWcvYWdlbnRlbmRwb2ludC92MS92bV9pbnZlbnRvcnku
+cHJvdG8SJmdvb2dsZS5jbG91ZC5vc2NvbmZpZy5hZ2VudGVuZHBvaW50LnYxGh9nb29nbGUv
+YXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvGhxnb29nbGUvcHJvdG9idWYvc3RydWN0LnByb3Rv
+IvoGCgtWbUludmVudG9yeRJYCgdvc19pbmZvGAEgASgLMjouZ29vZ2xlLmNsb3VkLm9zY29u
+ZmlnLmFnZW50ZW5kcG9pbnQudjEuVm1JbnZlbnRvcnkuT3NJbmZvQgPgQQJSBm9zSW5mbxJ1
+ChJpbnN0YWxsZWRfcGFja2FnZXMYAiADKAsyQS5nb29nbGUuY2xvdWQub3Njb25maWcuYWdl
+bnRlbmRwb2ludC52MS5WbUludmVudG9yeS5JbnZlbnRvcnlJdGVtQgPgQQJSEWluc3RhbGxl
+ZFBhY2thZ2VzEnUKEmF2YWlsYWJsZV9wYWNrYWdlcxgDIAMoCzJBLmdvb2dsZS5jbG91ZC5v
+c2NvbmZpZy5hZ2VudGVuZHBvaW50LnYxLlZtSW52ZW50b3J5LkludmVudG9yeUl0ZW1CA+BB
+AlIRYXZhaWxhYmxlUGFja2FnZXMaywIKBk9zSW5mbxIgCglob3N0X25hbWUYASABKAlCA+BB
+AlIIaG9zdE5hbWUSIAoJbG9uZ19uYW1lGAIgASgJQgPgQQFSCGxvbmdOYW1lEiIKCnNob3J0
+X25hbWUYAyABKAlCA+BBAlIJc2hvcnROYW1lEh0KB3ZlcnNpb24YBCABKAlCA+BBAVIHdmVy
+c2lvbhInCgxhcmNoaXRlY3R1cmUYBSABKAlCA+BBAlIMYXJjaGl0ZWN0dXJlEioKDmtlcm5l
+bF92ZXJzaW9uGAYgASgJQgPgQQFSDWtlcm5lbFZlcnNpb24SKgoOa2VybmVsX3JlbGVhc2UY
+ByABKAlCA+BBAVINa2VybmVsUmVsZWFzZRI5ChZvc2NvbmZpZ19hZ2VudF92ZXJzaW9uGAgg
+ASgJQgPgQQJSFG9zY29uZmlnQWdlbnRWZXJzaW9uGtQBCg1JbnZlbnRvcnlJdGVtEhcKBG5h
+bWUYASABKAlCA+BBAlIEbmFtZRIXCgR0eXBlGAIgASgJQgPgQQJSBHR5cGUSHQoHdmVyc2lv
+bhgDIAEoCUID4EECUgd2ZXJzaW9uEhcKBHB1cmwYBCABKAlCA+BBAlIEcHVybBIfCghsb2Nh
+dGlvbhgFIAMoCUID4EECUghsb2NhdGlvbhI4CghtZXRhZGF0YRgGIAEoCzIXLmdvb2dsZS5w
+cm90b2J1Zi5TdHJ1Y3RCA+BBAVIIbWV0YWRhdGFCkgEKKmNvbS5nb29nbGUuY2xvdWQub3Nj
+b25maWcuYWdlbnRlbmRwb2ludC52MUIQVm1JbnZlbnRvcnlQcm90b1ABWlBjbG91ZC5nb29n
+bGUuY29tL2dvL29zY29uZmlnL2FnZW50ZW5kcG9pbnQvYXBpdjEvYWdlbnRlbmRwb2ludHBi
+O2FnZW50ZW5kcG9pbnRwYkrgHQoGEgQOAF4BCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIw
+MjYgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVy
+c2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBl
+eGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4g
+YSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9s
+aWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxh
+dyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVy
+IHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRI
+T1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJl
+c3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1
+YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBM
+aWNlbnNlLgoKCAoBAhIDEAAvCgkKAgMAEgMSACkKCQoCAwESAxMAJgoICgEIEgMVAGcKCQoC
+CAsSAxUAZwoICgEIEgMWACIKCQoCCAoSAxYAIgoICgEIEgMXADEKCQoCCAgSAxcAMQoICgEI
+EgMYAEMKCQoCCAESAxgAQwqrAQoCBAASBB4AXgEaICBUaGUgaW52ZW50b3J5IGRldGFpbHMg
+b2YgYSBWTS4KMn0gT1MgQ29uZmlnIFZNIEludmVudG9yeSBpcyBhIHNlcnZpY2UgZm9yIGNv
+bGxlY3RpbmcgYW5kIHJlcG9ydGluZyBvcGVyYXRpbmcKIHN5c3RlbSBhbmQgcGFja2FnZSBp
+bmZvcm1hdGlvbiBvbiBWTSBpbnN0YW5jZXMuCgoKCgMEAAESAx4IEwo4CgQEAAMAEgQgAjsD
+GiogT3BlcmF0aW5nIHN5c3RlbSBpbmZvcm1hdGlvbiBmb3IgdGhlIFZNLgoKDAoFBAADAAES
+AyAKEAorCgYEAAMAAgASAyIEQhocIFJlcXVpcmVkLiBUaGUgVk0gaG9zdG5hbWUuCgoOCgcE
+AAMAAgAFEgMiBAoKDgoHBAADAAIAARIDIgsUCg4KBwQAAwACAAMSAyIXGAoOCgcEAAMAAgAI
+EgMiGUEKEQoKBAADAAIACJwIABIDIhpACosBCgYEAAMAAgESAycEQhp8IE9wdGlvbmFsLiBU
+aGUgb3BlcmF0aW5nIHN5c3RlbSBsb25nIG5hbWUuCiBGb3IgZXhhbXBsZSAnRGViaWFuIEdO
+VS9MaW51eCA5JyBvciAnTWljcm9zb2Z0IFdpbmRvdyBTZXJ2ZXIgMjAxOQogRGF0YWNlbnRl
+cicuCgoOCgcEAAMAAgEFEgMnBAoKDgoHBAADAAIBARIDJwsUCg4KBwQAAwACAQMSAycXGAoO
+CgcEAAMAAgEIEgMnGUEKEQoKBAADAAIBCJwIABIDJxpACmAKBgQAAwACAhIDKwRDGlEgUmVx
+dWlyZWQuIFRoZSBvcGVyYXRpbmcgc3lzdGVtIHNob3J0IG5hbWUuCiBGb3IgZXhhbXBsZSwg
+J3dpbmRvd3MnIG9yICdkZWJpYW4nLgoKDgoHBAADAAICBRIDKwQKCg4KBwQAAwACAgESAysL
+FQoOCgcEAAMAAgIDEgMrGBkKDgoHBAADAAICCBIDKxpCChEKCgQAAwACAgicCAASAysbQQo/
+CgYEAAMAAgMSAy4EQBowIE9wdGlvbmFsLiBUaGUgdmVyc2lvbiBvZiB0aGUgb3BlcmF0aW5n
+IHN5c3RlbS4KCg4KBwQAAwACAwUSAy4ECgoOCgcEAAMAAgMBEgMuCxIKDgoHBAADAAIDAxID
+LhUWCg4KBwQAAwACAwgSAy4XPwoRCgoEAAMAAgMInAgAEgMuGD4KSwoGBAADAAIEEgMxBEUa
+PCBSZXF1aXJlZC4gVGhlIHN5c3RlbSBhcmNoaXRlY3R1cmUgb2YgdGhlIG9wZXJhdGluZyBz
+eXN0ZW0uCgoOCgcEAAMAAgQFEgMxBAoKDgoHBAADAAIEARIDMQsXCg4KBwQAAwACBAMSAzEa
+GwoOCgcEAAMAAgQIEgMxHEQKEQoKBAADAAIECJwIABIDMR1DCkYKBgQAAwACBRIDNARHGjcg
+T3B0aW9uYWwuIFRoZSBrZXJuZWwgdmVyc2lvbiBvZiB0aGUgb3BlcmF0aW5nIHN5c3RlbS4K
+Cg4KBwQAAwACBQUSAzQECgoOCgcEAAMAAgUBEgM0CxkKDgoHBAADAAIFAxIDNBwdCg4KBwQA
+AwACBQgSAzQeRgoRCgoEAAMAAgUInAgAEgM0H0UKRgoGBAADAAIGEgM3BEcaNyBPcHRpb25h
+bC4gVGhlIGtlcm5lbCByZWxlYXNlIG9mIHRoZSBvcGVyYXRpbmcgc3lzdGVtLgoKDgoHBAAD
+AAIGBRIDNwQKCg4KBwQAAwACBgESAzcLGQoOCgcEAAMAAgYDEgM3HB0KDgoHBAADAAIGCBID
+Nx5GChEKCgQAAwACBgicCAASAzcfRQpYCgYEAAMAAgcSAzoETxpJIFJlcXVpcmVkLiBUaGUg
+Y3VycmVudCB2ZXJzaW9uIG9mIHRoZSBPUyBDb25maWcgYWdlbnQgcnVubmluZyBvbiB0aGUg
+Vk0uCgoOCgcEAAMAAgcFEgM6BAoKDgoHBAADAAIHARIDOgshCg4KBwQAAwACBwMSAzokJQoO
+CgcEAAMAAgcIEgM6Jk4KEQoKBAADAAIHCJwIABIDOidNCiwKBAQAAwESBD4CUQMaHiBBIFZN
+IHBhY2thZ2UgcmVwcmVzZW50YXRpb24uCgoMCgUEAAMBARIDPgoXClQKBgQAAwECABIDQAQ9
+GkUgUmVxdWlyZWQuIEh1bWFuLXJlYWRhYmxlIG5hbWUgb2YgdGhlIHNvZnR3YXJlLCB0byBz
+aG93IHRvIHRoZSB1c2VyLgoKDgoHBAADAQIABRIDQAQKCg4KBwQAAwECAAESA0ALDwoOCgcE
+AAMBAgADEgNAEhMKDgoHBAADAQIACBIDQBQ8ChEKCgQAAwECAAicCAASA0AVOwpXCgYEAAMB
+AgESA0MEPRpIIFJlcXVpcmVkLiBQYWNrYWdlIHR5cGUsIGUuZy4gImphdmEvbWF2ZW4iLCAi
+amF2YXNjcmlwdC9ucG0iLCAib3MvZHBrZyIKCg4KBwQAAwECAQUSA0MECgoOCgcEAAMBAgEB
+EgNDCw8KDgoHBAADAQIBAxIDQxITCg4KBwQAAwECAQgSA0MUPAoRCgoEAAMBAgEInAgAEgND
+FTsKMgoGBAADAQICEgNGBEAaIyBSZXF1aXJlZC4gVmVyc2lvbiBvZiB0aGUgcGFja2FnZS4K
+Cg4KBwQAAwECAgUSA0YECgoOCgcEAAMBAgIBEgNGCxIKDgoHBAADAQICAxIDRhUWCg4KBwQA
+AwECAggSA0YXPwoRCgoEAAMBAgIInAgAEgNGGD4KOAoGBAADAQIDEgNJBD0aKSBSZXF1aXJl
+ZC4gUHVybCBpcyBhIHBhY2thZ2UgaWRlbnRpZmllci4KCg4KBwQAAwECAwUSA0kECgoOCgcE
+AAMBAgMBEgNJCw8KDgoHBAADAQIDAxIDSRITCg4KBwQAAwECAwgSA0kUPAoRCgoEAAMBAgMI
+nAgAEgNJFTsKSgoGBAADAQIEEgNMBEoaOyBSZXF1aXJlZC4gUGF0aCBvciBzb3VyY2Ugb2Yg
+ZmlsZXMgcmVsYXRlZCB0byB0aGUgcGFja2FnZS4KCg4KBwQAAwECBAQSA0wEDAoOCgcEAAMB
+AgQFEgNMDRMKDgoHBAADAQIEARIDTBQcCg4KBwQAAwECBAMSA0wfIAoOCgcEAAMBAgQIEgNM
+IUkKEQoKBAADAQIECJwIABIDTCJICksKBgQAAwECBRIETwRQMRo7IE9wdGlvbmFsLiBNZXRh
+ZGF0YSBvZiB0aGUgcGFja2FnZSBleHRyYWN0ZWQgYnkgZXh0cmFjdG9yLgoKDgoHBAADAQIF
+BhIDTwQaCg4KBwQAAwECBQESA08bIwoOCgcEAAMBAgUDEgNPJicKDgoHBAADAQIFCBIDUAgw
+ChEKCgQAAwECBQicCAASA1AJLwpMCgQEAAIAEgNUAj4aPyBSZXF1aXJlZC4gQmFzZSBsZXZl
+bCBvcGVyYXRpbmcgc3lzdGVtIGluZm9ybWF0aW9uIGZvciB0aGUgVk0uCgoMCgUEAAIABhID
+VAIICgwKBQQAAgABEgNUCRAKDAoFBAACAAMSA1QTFAoMCgUEAAIACBIDVBU9Cg8KCAQAAgAI
+nAgAEgNUFjwKSwoEBAACARIEVwJYLxo9IFJlcXVpcmVkLiBBIGxpc3Qgb2YgaW5zdGFsbGVk
+IHBhY2thZ2VzIGN1cnJlbnRseSBvbiB0aGUgVk0uCgoMCgUEAAIBBBIDVwIKCgwKBQQAAgEG
+EgNXCxgKDAoFBAACAQESA1cZKwoMCgUEAAIBAxIDVy4vCgwKBQQAAgEIEgNYBi4KDwoIBAAC
+AQicCAASA1gHLQpuCgQEAAICEgRcAl0vGmAgUmVxdWlyZWQuIEEgbGlzdCBvZiBzb2Z0d2Fy
+ZSB1cGRhdGVzIGF2YWlsYWJsZSBmb3IgdGhlIFZNIGFzIHJlcG9ydGVkIGJ5CiB0aGUgdXBk
+YXRlIG1hbmFnZXJzLgoKDAoFBAACAgQSA1wCCgoMCgUEAAICBhIDXAsYCgwKBQQAAgIBEgNc
+GSsKDAoFBAACAgMSA1wuLwoMCgUEAAICCBIDXQYuCg8KCAQAAgIInAgAEgNdBy1iBnByb3Rv
+Mw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory::VmInventory ===
+    # Fields for VmInventory
+    # Field: os_info Type: 11 (.google.cloud.osconfig.agentendpoint.v1.VmInventory.OsInfo)
+    # Field: installed_packages Type: 11 (.google.cloud.osconfig.agentendpoint.v1.VmInventory.InventoryItem)
+    # Field: available_packages Type: 11 (.google.cloud.osconfig.agentendpoint.v1.VmInventory.InventoryItem)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory - Compiled Protocol Buffers messages for google/cloud/osconfig/agentendpoint/v1/vm_inventory.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory;
+
+    my $msg = Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory::VmInventory->new({
+        os_info => $os_info,
+        installed_packages => $installed_packages,
+        available_packages => $available_packages,
+    });
+
+    # Read or update a field
+    my $val = $msg->os_info();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory::VmInventory->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/osconfig/agentendpoint/v1/vm_inventory.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory::VmInventory
+
+The inventory details of a VM.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->os_info() >> / C<< $msg->os_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory::VmInventory::OsInfo>)
+
+Required. Base level operating system information for the VM.
+
+=item * C<< $msg->installed_packages() >> / C<< $msg->installed_packages($value) >>
+
+Type: C<Message> (L<Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory::VmInventory::InventoryItem>)
+
+Required. A list of installed packages currently on the VM.
+
+=item * C<< $msg->available_packages() >> / C<< $msg->available_packages($value) >>
+
+Type: C<Message> (L<Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory::VmInventory::InventoryItem>)
+
+Required. A list of software updates available for the VM as reported by
+the update managers.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Osconfig::Agentendpoint::V1::VmInventory::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

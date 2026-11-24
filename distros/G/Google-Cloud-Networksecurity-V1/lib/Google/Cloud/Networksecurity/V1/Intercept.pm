@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::Intercept;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1202,68 +1202,6 @@ EOF
     # Field: associations Type: 11 (.google.cloud.networksecurity.v1.InterceptEndpointGroup.AssociationDetails)
     # Field: description Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroup.LabelsEntry)
-
-=item * B<intercept_deployment_group>
-
-Type: String
-
-=item * B<connected_deployment_group>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroup.ConnectedDeploymentGroup)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.InterceptEndpointGroup.State)
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<associations>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroup.AssociationDetails)
-
-=item * B<description>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: InterceptEndpointGroup::State
 our $InterceptEndpointGroup_STATE_UNSPECIFIED = 0;
 our $InterceptEndpointGroup_ACTIVE = 1;
@@ -1273,32 +1211,6 @@ our $InterceptEndpointGroup_DELETING = 4;
 our $InterceptEndpointGroup_OUT_OF_SYNC = 5;
 our $InterceptEndpointGroup_DELETE_FAILED = 6;
 
-=pod
-
-=head2 Enum: InterceptEndpointGroup::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<CLOSED> => 2
-
-=item * C<CREATING> => 3
-
-=item * C<DELETING> => 4
-
-=item * C<OUT_OF_SYNC> => 5
-
-=item * C<DELETE_FAILED> => 6
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsRequest ===
     # Fields for ListInterceptEndpointGroupsRequest
     # Field: parent Type: 9 ()
@@ -1307,112 +1219,14 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsResponse ===
     # Fields for ListInterceptEndpointGroupsResponse
     # Field: intercept_endpoint_groups Type: 11 (.google.cloud.networksecurity.v1.InterceptEndpointGroup)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsResponse->new(
-        intercept_endpoint_groups => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<intercept_endpoint_groups>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroup)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::GetInterceptEndpointGroupRequest ===
     # Fields for GetInterceptEndpointGroupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::GetInterceptEndpointGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::GetInterceptEndpointGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptEndpointGroupRequest ===
     # Fields for CreateInterceptEndpointGroupRequest
@@ -1421,118 +1235,16 @@ Type: String
     # Field: intercept_endpoint_group Type: 11 (.google.cloud.networksecurity.v1.InterceptEndpointGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptEndpointGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptEndpointGroupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<intercept_endpoint_group_id>
-
-Type: String
-
-=item * B<intercept_endpoint_group>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptEndpointGroupRequest ===
     # Fields for UpdateInterceptEndpointGroupRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: intercept_endpoint_group Type: 11 (.google.cloud.networksecurity.v1.InterceptEndpointGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptEndpointGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptEndpointGroupRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<intercept_endpoint_group>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptEndpointGroupRequest ===
     # Fields for DeleteInterceptEndpointGroupRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptEndpointGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptEndpointGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroupAssociation ===
     # Fields for InterceptEndpointGroupAssociation
@@ -1548,72 +1260,6 @@ Type: String
     # Field: locations Type: 11 (.google.cloud.networksecurity.v1.InterceptLocation)
     # Field: network_cookie Type: 13 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroupAssociation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroupAssociation->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroupAssociation.LabelsEntry)
-
-=item * B<intercept_endpoint_group>
-
-Type: String
-
-=item * B<network>
-
-Type: String
-
-=item * B<locations_details>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroupAssociation.LocationDetails)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.InterceptEndpointGroupAssociation.State)
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<locations>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptLocation)
-
-=item * B<network_cookie>
-
-Type: UInt32
-
-=back
-
-=cut
-
 # Enum: InterceptEndpointGroupAssociation::State
 our $InterceptEndpointGroupAssociation_STATE_UNSPECIFIED = 0;
 our $InterceptEndpointGroupAssociation_ACTIVE = 1;
@@ -1623,32 +1269,6 @@ our $InterceptEndpointGroupAssociation_CLOSED = 4;
 our $InterceptEndpointGroupAssociation_OUT_OF_SYNC = 5;
 our $InterceptEndpointGroupAssociation_DELETE_FAILED = 6;
 
-=pod
-
-=head2 Enum: InterceptEndpointGroupAssociation::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<CREATING> => 2
-
-=item * C<DELETING> => 3
-
-=item * C<CLOSED> => 4
-
-=item * C<OUT_OF_SYNC> => 5
-
-=item * C<DELETE_FAILED> => 6
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupAssociationsRequest ===
     # Fields for ListInterceptEndpointGroupAssociationsRequest
     # Field: parent Type: 9 ()
@@ -1657,112 +1277,14 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupAssociationsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupAssociationsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupAssociationsResponse ===
     # Fields for ListInterceptEndpointGroupAssociationsResponse
     # Field: intercept_endpoint_group_associations Type: 11 (.google.cloud.networksecurity.v1.InterceptEndpointGroupAssociation)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupAssociationsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupAssociationsResponse->new(
-        intercept_endpoint_group_associations => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<intercept_endpoint_group_associations>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroupAssociation)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::GetInterceptEndpointGroupAssociationRequest ===
     # Fields for GetInterceptEndpointGroupAssociationRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::GetInterceptEndpointGroupAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::GetInterceptEndpointGroupAssociationRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptEndpointGroupAssociationRequest ===
     # Fields for CreateInterceptEndpointGroupAssociationRequest
@@ -1771,118 +1293,16 @@ Type: String
     # Field: intercept_endpoint_group_association Type: 11 (.google.cloud.networksecurity.v1.InterceptEndpointGroupAssociation)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptEndpointGroupAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptEndpointGroupAssociationRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<intercept_endpoint_group_association_id>
-
-Type: String
-
-=item * B<intercept_endpoint_group_association>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroupAssociation)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptEndpointGroupAssociationRequest ===
     # Fields for UpdateInterceptEndpointGroupAssociationRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: intercept_endpoint_group_association Type: 11 (.google.cloud.networksecurity.v1.InterceptEndpointGroupAssociation)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptEndpointGroupAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptEndpointGroupAssociationRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<intercept_endpoint_group_association>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptEndpointGroupAssociation)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptEndpointGroupAssociationRequest ===
     # Fields for DeleteInterceptEndpointGroupAssociationRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptEndpointGroupAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptEndpointGroupAssociationRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup ===
     # Fields for InterceptDeploymentGroup
@@ -1898,97 +1318,11 @@ Type: String
     # Field: description Type: 9 ()
     # Field: locations Type: 11 (.google.cloud.networksecurity.v1.InterceptLocation)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeploymentGroup.LabelsEntry)
-
-=item * B<network>
-
-Type: String
-
-=item * B<connected_endpoint_groups>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeploymentGroup.ConnectedEndpointGroup)
-
-=item * B<nested_deployments>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeploymentGroup.Deployment)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.InterceptDeploymentGroup.State)
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<description>
-
-Type: String
-
-=item * B<locations>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptLocation)
-
-=back
-
-=cut
-
 # Enum: InterceptDeploymentGroup::State
 our $InterceptDeploymentGroup_STATE_UNSPECIFIED = 0;
 our $InterceptDeploymentGroup_ACTIVE = 1;
 our $InterceptDeploymentGroup_CREATING = 2;
 our $InterceptDeploymentGroup_DELETING = 3;
-
-=pod
-
-=head2 Enum: InterceptDeploymentGroup::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<CREATING> => 2
-
-=item * C<DELETING> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentGroupsRequest ===
     # Fields for ListInterceptDeploymentGroupsRequest
@@ -1998,112 +1332,14 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentGroupsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentGroupsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentGroupsResponse ===
     # Fields for ListInterceptDeploymentGroupsResponse
     # Field: intercept_deployment_groups Type: 11 (.google.cloud.networksecurity.v1.InterceptDeploymentGroup)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentGroupsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentGroupsResponse->new(
-        intercept_deployment_groups => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<intercept_deployment_groups>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeploymentGroup)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::GetInterceptDeploymentGroupRequest ===
     # Fields for GetInterceptDeploymentGroupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::GetInterceptDeploymentGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::GetInterceptDeploymentGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptDeploymentGroupRequest ===
     # Fields for CreateInterceptDeploymentGroupRequest
@@ -2112,118 +1348,16 @@ Type: String
     # Field: intercept_deployment_group Type: 11 (.google.cloud.networksecurity.v1.InterceptDeploymentGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptDeploymentGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptDeploymentGroupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<intercept_deployment_group_id>
-
-Type: String
-
-=item * B<intercept_deployment_group>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeploymentGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptDeploymentGroupRequest ===
     # Fields for UpdateInterceptDeploymentGroupRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: intercept_deployment_group Type: 11 (.google.cloud.networksecurity.v1.InterceptDeploymentGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptDeploymentGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptDeploymentGroupRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<intercept_deployment_group>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeploymentGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptDeploymentGroupRequest ===
     # Fields for DeleteInterceptDeploymentGroupRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptDeploymentGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptDeploymentGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::InterceptDeployment ===
     # Fields for InterceptDeployment
@@ -2237,64 +1371,6 @@ Type: String
     # Field: reconciling Type: 8 ()
     # Field: description Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::InterceptDeployment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::InterceptDeployment->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeployment.LabelsEntry)
-
-=item * B<forwarding_rule>
-
-Type: String
-
-=item * B<intercept_deployment_group>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.InterceptDeployment.State)
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<description>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: InterceptDeployment::State
 our $InterceptDeployment_STATE_UNSPECIFIED = 0;
 our $InterceptDeployment_ACTIVE = 1;
@@ -2302,30 +1378,6 @@ our $InterceptDeployment_CREATING = 2;
 our $InterceptDeployment_DELETING = 3;
 our $InterceptDeployment_OUT_OF_SYNC = 4;
 our $InterceptDeployment_DELETE_FAILED = 5;
-
-=pod
-
-=head2 Enum: InterceptDeployment::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<CREATING> => 2
-
-=item * C<DELETING> => 3
-
-=item * C<OUT_OF_SYNC> => 4
-
-=item * C<DELETE_FAILED> => 5
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentsRequest ===
     # Fields for ListInterceptDeploymentsRequest
@@ -2335,117 +1387,15 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentsResponse ===
     # Fields for ListInterceptDeploymentsResponse
     # Field: intercept_deployments Type: 11 (.google.cloud.networksecurity.v1.InterceptDeployment)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentsResponse->new(
-        intercept_deployments => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<intercept_deployments>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeployment)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::GetInterceptDeploymentRequest ===
     # Fields for GetInterceptDeploymentRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::GetInterceptDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::GetInterceptDeploymentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptDeploymentRequest ===
     # Fields for CreateInterceptDeploymentRequest
@@ -2454,199 +1404,41 @@ Type: String
     # Field: intercept_deployment Type: 11 (.google.cloud.networksecurity.v1.InterceptDeployment)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptDeploymentRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<intercept_deployment_id>
-
-Type: String
-
-=item * B<intercept_deployment>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeployment)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptDeploymentRequest ===
     # Fields for UpdateInterceptDeploymentRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: intercept_deployment Type: 11 (.google.cloud.networksecurity.v1.InterceptDeployment)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptDeploymentRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<intercept_deployment>
-
-Type: Message (.google.cloud.networksecurity.v1.InterceptDeployment)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptDeploymentRequest ===
     # Fields for DeleteInterceptDeploymentRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptDeploymentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptDeploymentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::Intercept::InterceptLocation ===
     # Fields for InterceptLocation
     # Field: location Type: 9 ()
     # Field: state Type: 14 (.google.cloud.networksecurity.v1.InterceptLocation.State)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::Intercept::InterceptLocation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::Intercept;
-
-    my $msg = Google::Cloud::Networksecurity::V1::Intercept::InterceptLocation->new(
-        location => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<location>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.InterceptLocation.State)
-
-=back
-
-=cut
-
 # Enum: InterceptLocation::State
 our $InterceptLocation_STATE_UNSPECIFIED = 0;
 our $InterceptLocation_ACTIVE = 1;
 our $InterceptLocation_OUT_OF_SYNC = 2;
-
-=pod
-
-=head2 Enum: InterceptLocation::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<OUT_OF_SYNC> => 2
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Networksecurity::V1::Intercept::InterceptClient ===
 package Google::Cloud::Networksecurity::V1::Intercept::InterceptClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networksecurity::V1::Intercept::InterceptClient
 
-Google::Cloud::Networksecurity::V1::Intercept::InterceptClient - Client stub representing the remote Intercept service
+Client stub representing the remote C<Intercept> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networksecurity.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2935,13 +1727,1331 @@ sub delete_intercept_deployment {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::Intercept - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::Intercept - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/intercept.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::Intercept;
+
+    my $msg = Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        labels => $labels,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/intercept.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup
+
+An endpoint group is a consumer frontend for a deployment group (backend).
+In order to configure intercept for a network, consumers must create:
+- An association between their network and the endpoint group.
+- A security profile that points to the endpoint group.
+- A firewall rule that references the security profile (group).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The resource name of this endpoint group, for
+example:
+`projects/123456789/locations/global/interceptEndpointGroups/my-eg`.
+See https://google.aip.dev/122 for more details.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was most recently updated.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup::LabelsEntry>)
+
+Optional. Labels are key/value pairs that help to organize and filter
+resources.
+
+=item * C<< $msg->intercept_deployment_group() >> / C<< $msg->intercept_deployment_group($value) >>
+
+Type: C<String>
+
+Required. Immutable. The deployment group that this endpoint group is
+connected to, for example:
+`projects/123456789/locations/global/interceptDeploymentGroups/my-dg`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->connected_deployment_group() >> / C<< $msg->connected_deployment_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup::ConnectedDeploymentGroup>)
+
+Output only. Details about the connected deployment group to this endpoint
+group.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::InterceptEndpointGroup::State>)
+
+Output only. The current state of the endpoint group.
+See https://google.aip.dev/216.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. The current state of the resource does not match the user's
+intended state, and the system is working to reconcile them. This is part
+of the normal operation (e.g. adding a new association to the group). See
+https://google.aip.dev/128.
+
+=item * C<< $msg->associations() >> / C<< $msg->associations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup::AssociationDetails>)
+
+Output only. List of associations to this endpoint group.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. User-provided description of the endpoint group.
+Used as additional context for the endpoint group.
+
+=back
+
+=head3 Enum: InterceptEndpointGroup::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<CLOSED> => C<2>
+
+=item * C<CREATING> => C<3>
+
+=item * C<DELETING> => C<4>
+
+=item * C<OUT_OF_SYNC> => C<5>
+
+=item * C<DELETE_FAILED> => C<6>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsRequest
+
+Request message for ListInterceptEndpointGroups.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of endpoint groups.
+Example: `projects/123456789/locations/global`.
+See https://google.aip.dev/132 for more details.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default. See
+https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous
+`ListInterceptEndpointGroups` call. Provide this to retrieve the subsequent
+page. When paginating, all other parameters provided to
+`ListInterceptEndpointGroups` must match the call that provided the page
+token.
+See https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression.
+See https://google.aip.dev/160#filtering for more details.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort expression.
+See https://google.aip.dev/132#ordering for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupsResponse
+
+Response message for ListInterceptEndpointGroups.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->intercept_endpoint_groups() >> / C<< $msg->intercept_endpoint_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup>)
+
+The endpoint groups from the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+See https://google.aip.dev/158 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::GetInterceptEndpointGroupRequest
+
+Request message for GetInterceptEndpointGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the endpoint group to retrieve.
+Format:
+projects/{project}/locations/{location}/interceptEndpointGroups/{intercept_endpoint_group}
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptEndpointGroupRequest
+
+Request message for CreateInterceptEndpointGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this endpoint group will be created.
+Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->intercept_endpoint_group_id() >> / C<< $msg->intercept_endpoint_group_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for the endpoint group, which will become the final
+component of the endpoint group's resource name.
+
+=item * C<< $msg->intercept_endpoint_group() >> / C<< $msg->intercept_endpoint_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup>)
+
+Required. The endpoint group to create.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptEndpointGroupRequest
+
+Request message for UpdateInterceptEndpointGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+Fields are specified relative to the endpoint group
+(e.g. `description`; *not* `intercept_endpoint_group.description`).
+See https://google.aip.dev/161 for more details.
+
+=item * C<< $msg->intercept_endpoint_group() >> / C<< $msg->intercept_endpoint_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroup>)
+
+Required. The endpoint group to update.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptEndpointGroupRequest
+
+Request message for DeleteInterceptEndpointGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The endpoint group to delete.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroupAssociation
+
+An endpoint group association represents a link between a network and an
+endpoint group in the organization.
+
+Creating an association creates the networking infrastructure linking the
+network to the endpoint group, but does not enable intercept by itself.
+To enable intercept, the user must also create a network firewall policy
+containing intercept rules and associate it with the network.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The resource name of this endpoint group
+association, for example:
+`projects/123456789/locations/global/interceptEndpointGroupAssociations/my-eg-association`.
+See https://google.aip.dev/122 for more details.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was most recently updated.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroupAssociation::LabelsEntry>)
+
+Optional. Labels are key/value pairs that help to organize and filter
+resources.
+
+=item * C<< $msg->intercept_endpoint_group() >> / C<< $msg->intercept_endpoint_group($value) >>
+
+Type: C<String>
+
+Required. Immutable. The endpoint group that this association is connected
+to, for example:
+`projects/123456789/locations/global/interceptEndpointGroups/my-eg`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Required. Immutable. The VPC network that is associated. for example:
+`projects/123456789/global/networks/my-network`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->locations_details() >> / C<< $msg->locations_details($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroupAssociation::LocationDetails>)
+
+Output only. The list of locations where the association is present. This
+information is retrieved from the linked endpoint group, and not configured
+as part of the association itself.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::InterceptEndpointGroupAssociation::State>)
+
+Output only. Current state of the endpoint group association.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. The current state of the resource does not match the user's
+intended state, and the system is working to reconcile them. This part of
+the normal operation (e.g. adding a new location to the target deployment
+group). See https://google.aip.dev/128.
+
+=item * C<< $msg->locations() >> / C<< $msg->locations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptLocation>)
+
+Output only. The list of locations where the association is configured.
+This information is retrieved from the linked endpoint group.
+
+=item * C<< $msg->network_cookie() >> / C<< $msg->network_cookie($value) >>
+
+Type: C<UInt32>
+
+Output only. Identifier used by the data-path.
+See the NSI GENEVE format for more details:
+https://docs.cloud.google.com/network-security-integration/docs/understand-geneve#network_id
+
+=back
+
+=head3 Enum: InterceptEndpointGroupAssociation::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<CREATING> => C<2>
+
+=item * C<DELETING> => C<3>
+
+=item * C<CLOSED> => C<4>
+
+=item * C<OUT_OF_SYNC> => C<5>
+
+=item * C<DELETE_FAILED> => C<6>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupAssociationsRequest
+
+Request message for ListInterceptEndpointGroupAssociations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of associations.
+Example: `projects/123456789/locations/global`.
+See https://google.aip.dev/132 for more details.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default. See
+https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous
+`ListInterceptEndpointGroups` call. Provide this to retrieve the subsequent
+page. When paginating, all other parameters provided to
+`ListInterceptEndpointGroups` must match the call that provided the page
+token. See https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression.
+See https://google.aip.dev/160#filtering for more details.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort expression.
+See https://google.aip.dev/132#ordering for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::ListInterceptEndpointGroupAssociationsResponse
+
+Response message for ListInterceptEndpointGroupAssociations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->intercept_endpoint_group_associations() >> / C<< $msg->intercept_endpoint_group_associations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroupAssociation>)
+
+The associations from the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+See https://google.aip.dev/158 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::GetInterceptEndpointGroupAssociationRequest
+
+Request message for GetInterceptEndpointGroupAssociation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the association to retrieve.
+Format:
+projects/{project}/locations/{location}/interceptEndpointGroupAssociations/{intercept_endpoint_group_association}
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptEndpointGroupAssociationRequest
+
+Request message for CreateInterceptEndpointGroupAssociation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this association will be created.
+Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->intercept_endpoint_group_association_id() >> / C<< $msg->intercept_endpoint_group_association_id($value) >>
+
+Type: C<String>
+
+Optional. The ID to use for the new association, which will become the
+final component of the endpoint group's resource name. If not provided, the
+server will generate a unique ID.
+
+=item * C<< $msg->intercept_endpoint_group_association() >> / C<< $msg->intercept_endpoint_group_association($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroupAssociation>)
+
+Required. The association to create.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptEndpointGroupAssociationRequest
+
+Request message for UpdateInterceptEndpointGroupAssociation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+Fields are specified relative to the association
+(e.g. `description`; *not*
+`intercept_endpoint_group_association.description`). See
+https://google.aip.dev/161 for more details.
+
+=item * C<< $msg->intercept_endpoint_group_association() >> / C<< $msg->intercept_endpoint_group_association($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptEndpointGroupAssociation>)
+
+Required. The association to update.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptEndpointGroupAssociationRequest
+
+Request message for DeleteInterceptEndpointGroupAssociation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The association to delete.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup
+
+A deployment group aggregates many zonal intercept backends (deployments)
+into a single global intercept service. Consumers can connect this service
+using an endpoint group.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The resource name of this deployment group, for
+example:
+`projects/123456789/locations/global/interceptDeploymentGroups/my-dg`.
+See https://google.aip.dev/122 for more details.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was most recently updated.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup::LabelsEntry>)
+
+Optional. Labels are key/value pairs that help to organize and filter
+resources.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Required. Immutable. The network that will be used for all child
+deployments, for example: `projects/{project}/global/networks/{network}`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->connected_endpoint_groups() >> / C<< $msg->connected_endpoint_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup::ConnectedEndpointGroup>)
+
+Output only. The list of endpoint groups that are connected to this
+resource.
+
+=item * C<< $msg->nested_deployments() >> / C<< $msg->nested_deployments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup::Deployment>)
+
+Output only. The list of Intercept Deployments that belong to this group.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::InterceptDeploymentGroup::State>)
+
+Output only. The current state of the deployment group.
+See https://google.aip.dev/216.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. The current state of the resource does not match the user's
+intended state, and the system is working to reconcile them. This is part
+of the normal operation (e.g. adding a new deployment to the group) See
+https://google.aip.dev/128.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. User-provided description of the deployment group.
+Used as additional context for the deployment group.
+
+=item * C<< $msg->locations() >> / C<< $msg->locations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptLocation>)
+
+Output only. The list of locations where the deployment group is present.
+
+=back
+
+=head3 Enum: InterceptDeploymentGroup::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<CREATING> => C<2>
+
+=item * C<DELETING> => C<3>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentGroupsRequest
+
+Request message for ListInterceptDeploymentGroups.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of deployment groups.
+Example: `projects/123456789/locations/global`.
+See https://google.aip.dev/132 for more details.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default. See
+https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous
+`ListInterceptDeploymentGroups` call. Provide this to retrieve the
+subsequent page. When paginating, all other parameters provided to
+`ListInterceptDeploymentGroups` must match the call that provided the page
+token. See https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression.
+See https://google.aip.dev/160#filtering for more details.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort expression.
+See https://google.aip.dev/132#ordering for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentGroupsResponse
+
+Response message for ListInterceptDeploymentGroups.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->intercept_deployment_groups() >> / C<< $msg->intercept_deployment_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup>)
+
+The deployment groups from the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+See https://google.aip.dev/158 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::GetInterceptDeploymentGroupRequest
+
+Request message for GetInterceptDeploymentGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the deployment group to retrieve.
+Format:
+projects/{project}/locations/{location}/interceptDeploymentGroups/{intercept_deployment_group}
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptDeploymentGroupRequest
+
+Request message for CreateInterceptDeploymentGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this deployment group will be created.
+Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->intercept_deployment_group_id() >> / C<< $msg->intercept_deployment_group_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for the new deployment group, which will become the
+final component of the deployment group's resource name.
+
+=item * C<< $msg->intercept_deployment_group() >> / C<< $msg->intercept_deployment_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup>)
+
+Required. The deployment group to create.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptDeploymentGroupRequest
+
+Request message for UpdateInterceptDeploymentGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+Fields are specified relative to the deployment group
+(e.g. `description`; *not*
+`intercept_deployment_group.description`). See
+https://google.aip.dev/161 for more details.
+
+=item * C<< $msg->intercept_deployment_group() >> / C<< $msg->intercept_deployment_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeploymentGroup>)
+
+Required. The deployment group to update.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptDeploymentGroupRequest
+
+Request message for DeleteInterceptDeploymentGroup.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The deployment group to delete.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::InterceptDeployment
+
+A deployment represents a zonal intercept backend ready to accept
+GENEVE-encapsulated traffic, e.g. a zonal instance group fronted by an
+internal passthrough load balancer. Deployments are always part of a
+global deployment group which represents a global intercept service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The resource name of this deployment, for example:
+`projects/123456789/locations/us-central1-a/interceptDeployments/my-dep`.
+See https://google.aip.dev/122 for more details.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was most recently updated.
+See https://google.aip.dev/148#timestamps.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeployment::LabelsEntry>)
+
+Optional. Labels are key/value pairs that help to organize and filter
+resources.
+
+=item * C<< $msg->forwarding_rule() >> / C<< $msg->forwarding_rule($value) >>
+
+Type: C<String>
+
+Required. Immutable. The regional forwarding rule that fronts the
+interceptors, for example:
+`projects/123456789/regions/us-central1/forwardingRules/my-rule`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->intercept_deployment_group() >> / C<< $msg->intercept_deployment_group($value) >>
+
+Type: C<String>
+
+Required. Immutable. The deployment group that this deployment is a part
+of, for example:
+`projects/123456789/locations/global/interceptDeploymentGroups/my-dg`.
+See https://google.aip.dev/124.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::InterceptDeployment::State>)
+
+Output only. The current state of the deployment.
+See https://google.aip.dev/216.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. The current state of the resource does not match the user's
+intended state, and the system is working to reconcile them. This part of
+the normal operation (e.g. linking a new association to the parent group).
+See https://google.aip.dev/128.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. User-provided description of the deployment.
+Used as additional context for the deployment.
+
+=back
+
+=head3 Enum: InterceptDeployment::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<CREATING> => C<2>
+
+=item * C<DELETING> => C<3>
+
+=item * C<OUT_OF_SYNC> => C<4>
+
+=item * C<DELETE_FAILED> => C<5>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentsRequest
+
+Request message for ListInterceptDeployments.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of deployments.
+Example: `projects/123456789/locations/us-central1-a`.
+See https://google.aip.dev/132 for more details.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default. See
+https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListInterceptDeployments`
+call. Provide this to retrieve the subsequent page. When paginating, all
+other parameters provided to `ListInterceptDeployments` must match the call
+that provided the page token. See https://google.aip.dev/158 for more
+details.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression.
+See https://google.aip.dev/160#filtering for more details.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort expression.
+See https://google.aip.dev/132#ordering for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::ListInterceptDeploymentsResponse
+
+Response message for ListInterceptDeployments.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->intercept_deployments() >> / C<< $msg->intercept_deployments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeployment>)
+
+The deployments from the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+See https://google.aip.dev/158 for more details.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::GetInterceptDeploymentRequest
+
+Request message for GetInterceptDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the deployment to retrieve.
+Format:
+projects/{project}/locations/{location}/interceptDeployments/{intercept_deployment}
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::CreateInterceptDeploymentRequest
+
+Request message for CreateInterceptDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this deployment will be created.
+Format: projects/{project}/locations/{location}
+
+=item * C<< $msg->intercept_deployment_id() >> / C<< $msg->intercept_deployment_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for the new deployment, which will become the final
+component of the deployment's resource name.
+
+=item * C<< $msg->intercept_deployment() >> / C<< $msg->intercept_deployment($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeployment>)
+
+Required. The deployment to create.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::UpdateInterceptDeploymentRequest
+
+Request message for UpdateInterceptDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+Fields are specified relative to the deployment
+(e.g. `description`; *not* `intercept_deployment.description`).
+See https://google.aip.dev/161 for more details.
+
+=item * C<< $msg->intercept_deployment() >> / C<< $msg->intercept_deployment($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Intercept::InterceptDeployment>)
+
+Required. The deployment to update.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::DeleteInterceptDeploymentRequest
+
+Request message for DeleteInterceptDeployment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier for this request. Must be a UUID4.
+This request is only idempotent if a `request_id` is provided.
+See https://google.aip.dev/155 for more details.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::Intercept::InterceptLocation
+
+Details about intercept in a specific cloud location.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Output only. The cloud location, e.g. "us-central1-a" or "asia-south1".
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::InterceptLocation::State>)
+
+Output only. The current state of the association in this location.
+
+=back
+
+=head3 Enum: InterceptLocation::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<OUT_OF_SYNC> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::Intercept::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

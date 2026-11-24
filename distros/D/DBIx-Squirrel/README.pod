@@ -1,6 +1,11 @@
 =encoding utf8
 
-=for markdown [![CPAN](https://img.shields.io/cpan/v/DBIx-Squirrel)](https://metacpan.org/release/DBIx-Squirrel) [![Kwalitee](https://cpants.cpanauthors.org/dist/DBIx-Squirrel.svg)](https://cpants.cpanauthors.org/dist/DBIx-Squirrel)
+=begin markdown
+
+[![CPAN](https://img.shields.io/cpan/v/DBIx-Squirrel)](https://metacpan.org/release/DBIx-Squirrel) [![Kwalitee](https://cpants.cpanauthors.org/dist/DBIx-Squirrel.svg)](https://cpants.cpanauthors.org/dist/DBIx-Squirrel)
+<img align="right" src="logo/dbix-squirrel-128.png" alt="DBIx::Squirrel logo" width="128">
+
+=end markdown
 
 =head1 DBIx-Squirrel
 

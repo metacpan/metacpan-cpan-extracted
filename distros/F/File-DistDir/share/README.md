@@ -4,11 +4,12 @@
 * [SYNOPSIS](#synopsis)
 * [DESCRIPTION](#description)
 * [METHODS](#methods)
-  * [new(distribution => NAME)](#newdistribution-=>-name)
+  * [new(distribution => NAME) or new(module => PACKAGE)](#newdistribution-=>-name-or-newmodule-=>-package)
   * [dir](#dir)
   * [path(RELATIVE)](#pathrelative)
   * [copy(SOURCE, DESTINATION, recursive => 1)](#copysource-destination-recursive-=>-1)
   * [list](#list)
+  * [find(PATTERN)](#findpattern)
 * [SEE ALSO](#see-also)
 * [LICENSE](#license)
 * [AUTHOR](#author)
@@ -21,6 +22,7 @@ File::DistDir - locate and copy installed Perl distribution resources
     use File::DistDir;
 
     my $dist = File::DistDir->new( distribution => 'Bedrock' );
+    my $from_module = File::DistDir->new( module => 'BLM::Startup::RedisSession' );
 
     my $root = $dist->dir;
     my $file = $dist->path('config/tagx.xml');
@@ -30,6 +32,7 @@ File::DistDir - locate and copy installed Perl distribution resources
     $dist->copy('.', '.', recursive => 1);
 
     my @resources = $dist->list;
+    my @xml_files = $dist->find('*.xml');
 
 # DESCRIPTION
 
@@ -40,11 +43,15 @@ installed in a distribution's share directory. Resource discovery uses
 
 # METHODS
 
-## new(distribution => NAME)
+## new(distribution => NAME) or new(module => PACKAGE)
 
 Create an accessor for an installed distribution. `NAME` is the
 CPAN distribution name, not a Perl package name. A missing distribution
-or share directory causes an exception.
+or share directory causes an exception. Alternatively, `module` resolves
+the owning distribution from installed module metadata and packlists.
+Provide exactly one of `distribution` and `module`. Module resolution
+requires an installed module with a usable packlist; use `distribution`
+when package ownership cannot be determined.
 
 ## dir
 
@@ -80,6 +87,13 @@ Returns a true value on success; failures throw exceptions.
 Return a sorted list of paths relative to the share root, including
 directory entries. Symlinked directories are listed but not traversed.
 Paths are returned as data and are not printed.
+
+## find(PATTERN)
+
+Return sorted, relative paths of regular files whose basenames match a
+simple glob (`*` and `?`). Search is recursive. A pattern containing a
+slash instead matches the entire relative path. Symlinks and directories
+are excluded. No matching files returns an empty list.
 
 # SEE ALSO
 

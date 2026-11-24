@@ -1,0 +1,1376 @@
+package Google::Cloud::Designcenter::V1::CatalogManagementMessages;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Designcenter::V1::BestPractices };
+    eval { require Google::Cloud::Designcenter::V1::CatalogManagement };
+    eval { require Google::Cloud::Designcenter::V1::Iac };
+    eval { require Google::Protobuf::FieldMask };
+    my $descriptor_b64 = <<'EOF';
+Cj5nb29nbGUvY2xvdWQvZGVzaWduY2VudGVyL3YxL2NhdGFsb2dfbWFuYWdlbWVudF9tZXNz
+YWdlcy5wcm90bxIcZ29vZ2xlLmNsb3VkLmRlc2lnbmNlbnRlci52MRofZ29vZ2xlL2FwaS9m
+aWVsZF9iZWhhdmlvci5wcm90bxoZZ29vZ2xlL2FwaS9yZXNvdXJjZS5wcm90bxoxZ29vZ2xl
+L2Nsb3VkL2Rlc2lnbmNlbnRlci92MS9iZXN0X3ByYWN0aWNlcy5wcm90bxo1Z29vZ2xlL2Ns
+b3VkL2Rlc2lnbmNlbnRlci92MS9jYXRhbG9nX21hbmFnZW1lbnQucHJvdG8aJmdvb2dsZS9j
+bG91ZC9kZXNpZ25jZW50ZXIvdjEvaWFjLnByb3RvGiBnb29nbGUvcHJvdG9idWYvZmllbGRf
+bWFzay5wcm90byLZAQoRTGlzdFNwYWNlc1JlcXVlc3QSQQoGcGFyZW50GAEgASgJQingQQL6
+QSMSIWRlc2lnbmNlbnRlci5nb29nbGVhcGlzLmNvbS9TcGFjZVIGcGFyZW50EiAKCXBhZ2Vf
+c2l6ZRgCIAEoBUID4EEBUghwYWdlU2l6ZRIiCgpwYWdlX3Rva2VuGAMgASgJQgPgQQFSCXBh
+Z2VUb2tlbhIbCgZmaWx0ZXIYBCABKAlCA+BBAVIGZmlsdGVyEh4KCG9yZGVyX2J5GAUgASgJ
+QgPgQQFSB29yZGVyQnkioAEKEkxpc3RTcGFjZXNSZXNwb25zZRI7CgZzcGFjZXMYASADKAsy
+Iy5nb29nbGUuY2xvdWQuZGVzaWduY2VudGVyLnYxLlNwYWNlUgZzcGFjZXMSJgoPbmV4dF9w
+YWdlX3Rva2VuGAIgASgJUg1uZXh0UGFnZVRva2VuEiUKC3VucmVhY2hhYmxlGAMgAygJQgPg
+QQZSC3VucmVhY2hhYmxlIlAKD0dldFNwYWNlUmVxdWVzdBI9CgRuYW1lGAEgASgJQingQQL6
+QSMKIWRlc2lnbmNlbnRlci5nb29nbGVhcGlzLmNvbS9TcGFjZVIEbmFtZSK3AQoSQ3JlYXRl
+U3BhY2VSZXF1ZXN0EkEKBnBhcmVudBgBIAEoCUIp4EEC+kEjEiFkZXNpZ25jZW50ZXIuZ29v
+Z2xlYXBpcy5jb20vU3BhY2VSBnBhcmVudBIeCghzcGFjZV9pZBgCIAEoCUID4EECUgdzcGFj
+ZUlkEj4KBXNwYWNlGAMgASgLMiMuZ29vZ2xlLmNsb3VkLmRlc2lnbmNlbnRlci52MS5TcGFj
+ZUID4EECUgVzcGFjZSKWAQoSVXBkYXRlU3BhY2VSZXF1ZXN0EkAKC3VwZGF0ZV9tYXNrGAEg
+ASgLMhouZ29vZ2xlLnByb3RvYnVmLkZpZWxkTWFza0ID4EEBUgp1cGRhdGVNYXNrEj4KBXNw
+YWNlGAIgASgLMiMuZ29vZ2xlLmNsb3VkLmRlc2lnbmNlbnRlci52MS5TcGFjZUID4EECUgVz
+cGFjZSJuChJEZWxldGVTcGFjZVJlcXVlc3QSPQoEbmFtZRgBIAEoCUIp4EEC+kEjCiFkZXNp
+Z25jZW50ZXIuZ29vZ2xlYXBpcy5jb20vU3BhY2VSBG5hbWUSGQoFZm9yY2UYAiABKAhCA+BB
+AVIFZm9yY2UiVAoRR2V0Q2F0YWxvZ1JlcXVlc3QSPwoEbmFtZRgBIAEoCUIr4EEC+kElCiNk
+ZXNpZ25jZW50ZXIuZ29vZ2xlYXBpcy5jb20vQ2F0YWxvZ1IEbmFtZSLdAQoTTGlzdENhdGFs
+b2dzUmVxdWVzdBJDCgZwYXJlbnQYASABKAlCK+BBAvpBJRIjZGVzaWduY2VudGVyLmdvb2ds
+ZWFwaXMuY29tL0NhdGFsb2dSBnBhcmVudBIgCglwYWdlX3NpemUYAiABKAVCA+BBAVIIcGFn
+ZVNpemUSIgoKcGFnZV90b2tlbhgDIAEoCUID4EEBUglwYWdlVG9rZW4SGwoGZmlsdGVyGAQg
+ASgJQgPgQQFSBmZpbHRlchIeCghvcmRlcl9ieRgFIAEoCUID4EEBUgdvcmRlckJ5IoEBChRM
+aXN0Q2F0YWxvZ3NSZXNwb25zZRJBCghjYXRhbG9ncxgBIAMoCzIlLmdvb2dsZS5jbG91ZC5k
+ZXNpZ25jZW50ZXIudjEuQ2F0YWxvZ1IIY2F0YWxvZ3MSJgoPbmV4dF9wYWdlX3Rva2VuGAIg
+ASgJUg1uZXh0UGFnZVRva2VuIsUBChRDcmVhdGVDYXRhbG9nUmVxdWVzdBJDCgZwYXJlbnQY
+ASABKAlCK+BBAvpBJRIjZGVzaWduY2VudGVyLmdvb2dsZWFwaXMuY29tL0NhdGFsb2dSBnBh
+cmVudBIiCgpjYXRhbG9nX2lkGAIgASgJQgPgQQJSCWNhdGFsb2dJZBJECgdjYXRhbG9nGAMg
+ASgLMiUuZ29vZ2xlLmNsb3VkLmRlc2lnbmNlbnRlci52MS5DYXRhbG9nQgPgQQJSB2NhdGFs
+b2cingEKFFVwZGF0ZUNhdGFsb2dSZXF1ZXN0EkAKC3VwZGF0ZV9tYXNrGAEgASgLMhouZ29v
+Z2xlLnByb3RvYnVmLkZpZWxkTWFza0ID4EEBUgp1cGRhdGVNYXNrEkQKB2NhdGFsb2cYAiAB
+KAsyJS5nb29nbGUuY2xvdWQuZGVzaWduY2VudGVyLnYxLkNhdGFsb2dCA+BBAlIHY2F0YWxv
+ZyJyChREZWxldGVDYXRhbG9nUmVxdWVzdBI/CgRuYW1lGAEgASgJQivgQQL6QSUKI2Rlc2ln
+bmNlbnRlci5nb29nbGVhcGlzLmNvbS9DYXRhbG9nUgRuYW1lEhkKBWZvcmNlGAIgASgIQgPg
+QQFSBWZvcmNlIv8BChxDcmVhdGVDYXRhbG9nVGVtcGxhdGVSZXF1ZXN0EksKBnBhcmVudBgB
+IAEoCUIz4EEC+kEtEitkZXNpZ25jZW50ZXIuZ29vZ2xlYXBpcy5jb20vQ2F0YWxvZ1RlbXBs
+YXRlUgZwYXJlbnQSMwoTY2F0YWxvZ190ZW1wbGF0ZV9pZBgCIAEoCUID4EECUhFjYXRhbG9n
+VGVtcGxhdGVJZBJdChBjYXRhbG9nX3RlbXBsYXRlGAMgASgLMi0uZ29vZ2xlLmNsb3VkLmRl
+c2lnbmNlbnRlci52MS5DYXRhbG9nVGVtcGxhdGVCA+BBAlIPY2F0YWxvZ1RlbXBsYXRlImQK
+GUdldENhdGFsb2dUZW1wbGF0ZVJlcXVlc3QSRwoEbmFtZRgBIAEoCUIz4EEC+kEtCitkZXNp
+Z25jZW50ZXIuZ29vZ2xlYXBpcy5jb20vQ2F0YWxvZ1RlbXBsYXRlUgRuYW1lIu0BChtMaXN0
+Q2F0YWxvZ1RlbXBsYXRlc1JlcXVlc3QSSwoGcGFyZW50GAEgASgJQjPgQQL6QS0SK2Rlc2ln
+bmNlbnRlci5nb29nbGVhcGlzLmNvbS9DYXRhbG9nVGVtcGxhdGVSBnBhcmVudBIgCglwYWdl
+X3NpemUYAiABKAVCA+BBAVIIcGFnZVNpemUSIgoKcGFnZV90b2tlbhgDIAEoCUID4EEBUglw
+YWdlVG9rZW4SGwoGZmlsdGVyGAQgASgJQgPgQQFSBmZpbHRlchIeCghvcmRlcl9ieRgFIAEo
+CUID4EEBUgdvcmRlckJ5IqIBChxMaXN0Q2F0YWxvZ1RlbXBsYXRlc1Jlc3BvbnNlEloKEWNh
+dGFsb2dfdGVtcGxhdGVzGAEgAygLMi0uZ29vZ2xlLmNsb3VkLmRlc2lnbmNlbnRlci52MS5D
+YXRhbG9nVGVtcGxhdGVSEGNhdGFsb2dUZW1wbGF0ZXMSJgoPbmV4dF9wYWdlX3Rva2VuGAIg
+ASgJUg1uZXh0UGFnZVRva2VuIr8BChxVcGRhdGVDYXRhbG9nVGVtcGxhdGVSZXF1ZXN0El0K
+EGNhdGFsb2dfdGVtcGxhdGUYAiABKAsyLS5nb29nbGUuY2xvdWQuZGVzaWduY2VudGVyLnYx
+LkNhdGFsb2dUZW1wbGF0ZUID4EECUg9jYXRhbG9nVGVtcGxhdGUSQAoLdXBkYXRlX21hc2sY
+ASABKAsyGi5nb29nbGUucHJvdG9idWYuRmllbGRNYXNrQgPgQQFSCnVwZGF0ZU1hc2siggEK
+HERlbGV0ZUNhdGFsb2dUZW1wbGF0ZVJlcXVlc3QSRwoEbmFtZRgBIAEoCUIz4EEC+kEtCitk
+ZXNpZ25jZW50ZXIuZ29vZ2xlYXBpcy5jb20vQ2F0YWxvZ1RlbXBsYXRlUgRuYW1lEhkKBWZv
+cmNlGAIgASgIQgPgQQFSBWZvcmNlIrkCCiRDcmVhdGVDYXRhbG9nVGVtcGxhdGVSZXZpc2lv
+blJlcXVlc3QSUwoGcGFyZW50GAEgASgJQjvgQQL6QTUSM2Rlc2lnbmNlbnRlci5nb29nbGVh
+cGlzLmNvbS9DYXRhbG9nVGVtcGxhdGVSZXZpc2lvblIGcGFyZW50EkQKHGNhdGFsb2dfdGVt
+cGxhdGVfcmV2aXNpb25faWQYAiABKAlCA+BBAlIZY2F0YWxvZ1RlbXBsYXRlUmV2aXNpb25J
+ZBJ2ChljYXRhbG9nX3RlbXBsYXRlX3JldmlzaW9uGAMgASgLMjUuZ29vZ2xlLmNsb3VkLmRl
+c2lnbmNlbnRlci52MS5DYXRhbG9nVGVtcGxhdGVSZXZpc2lvbkID4EECUhdjYXRhbG9nVGVt
+cGxhdGVSZXZpc2lvbiJ0CiFHZXRDYXRhbG9nVGVtcGxhdGVSZXZpc2lvblJlcXVlc3QSTwoE
+bmFtZRgBIAEoCUI74EEC+kE1CjNkZXNpZ25jZW50ZXIuZ29vZ2xlYXBpcy5jb20vQ2F0YWxv
+Z1RlbXBsYXRlUmV2aXNpb25SBG5hbWUi/QEKI0xpc3RDYXRhbG9nVGVtcGxhdGVSZXZpc2lv
+bnNSZXF1ZXN0ElMKBnBhcmVudBgBIAEoCUI74EEC+kE1EjNkZXNpZ25jZW50ZXIuZ29vZ2xl
+YXBpcy5jb20vQ2F0YWxvZ1RlbXBsYXRlUmV2aXNpb25SBnBhcmVudBIgCglwYWdlX3NpemUY
+AiABKAVCA+BBAVIIcGFnZVNpemUSIgoKcGFnZV90b2tlbhgDIAEoCUID4EEBUglwYWdlVG9r
+ZW4SGwoGZmlsdGVyGAQgASgJQgPgQQFSBmZpbHRlchIeCghvcmRlcl9ieRgFIAEoCUID4EEB
+UgdvcmRlckJ5IuUBCiRMaXN0Q2F0YWxvZ1RlbXBsYXRlUmV2aXNpb25zUmVzcG9uc2UScwoa
+Y2F0YWxvZ190ZW1wbGF0ZV9yZXZpc2lvbnMYASADKAsyNS5nb29nbGUuY2xvdWQuZGVzaWdu
+Y2VudGVyLnYxLkNhdGFsb2dUZW1wbGF0ZVJldmlzaW9uUhhjYXRhbG9nVGVtcGxhdGVSZXZp
+c2lvbnMSJgoPbmV4dF9wYWdlX3Rva2VuGAIgASgJUg1uZXh0UGFnZVRva2VuEiAKC3VucmVh
+Y2hhYmxlGAMgAygJUgt1bnJlYWNoYWJsZSJ3CiREZWxldGVDYXRhbG9nVGVtcGxhdGVSZXZp
+c2lvblJlcXVlc3QSTwoEbmFtZRgBIAEoCUI74EEC+kE1CjNkZXNpZ25jZW50ZXIuZ29vZ2xl
+YXBpcy5jb20vQ2F0YWxvZ1RlbXBsYXRlUmV2aXNpb25SBG5hbWUifgorRmV0Y2hDYXRhbG9n
+VGVtcGxhdGVSZXZpc2lvblRGU291cmNlUmVxdWVzdBJPCgRuYW1lGAEgASgJQjvgQQL6QTUK
+M2Rlc2lnbmNlbnRlci5nb29nbGVhcGlzLmNvbS9DYXRhbG9nVGVtcGxhdGVSZXZpc2lvblIE
+bmFtZSLHAQosRmV0Y2hDYXRhbG9nVGVtcGxhdGVSZXZpc2lvblRGU291cmNlUmVzcG9uc2US
+TgoLcm9vdF9tb2R1bGUYASABKAsyLS5nb29nbGUuY2xvdWQuZGVzaWduY2VudGVyLnYxLlRl
+cnJhZm9ybU1vZHVsZVIKcm9vdE1vZHVsZRJHCgdtb2R1bGVzGAIgAygLMi0uZ29vZ2xlLmNs
+b3VkLmRlc2lnbmNlbnRlci52MS5UZXJyYWZvcm1Nb2R1bGVSB21vZHVsZXMihgEKM0ZldGNo
+Q2F0YWxvZ1RlbXBsYXRlUmV2aXNpb25Bc3Nlc3NtZW50UmVwb3J0UmVxdWVzdBJPCgRuYW1l
+GAEgASgJQjvgQQL6QTUKM2Rlc2lnbmNlbnRlci5nb29nbGVhcGlzLmNvbS9DYXRhbG9nVGVt
+cGxhdGVSZXZpc2lvblIEbmFtZSKTAQo0RmV0Y2hDYXRhbG9nVGVtcGxhdGVSZXZpc2lvbkFz
+c2Vzc21lbnRSZXBvcnRSZXNwb25zZRJbChFhc3Nlc3NtZW50X3JlcG9ydBgBIAEoCzIuLmdv
+b2dsZS5jbG91ZC5kZXNpZ25jZW50ZXIudjEuQXNzZXNzbWVudFJlcG9ydFIQYXNzZXNzbWVu
+dFJlcG9ydELtAQogY29tLmdvb2dsZS5jbG91ZC5kZXNpZ25jZW50ZXIudjFCIUNhdGFsb2dN
+YW5hZ2VtZW50UnBjTWVzc2FnZXNQcm90b1ABWkRjbG91ZC5nb29nbGUuY29tL2dvL2Rlc2ln
+bmNlbnRlci9hcGl2MS9kZXNpZ25jZW50ZXJwYjtkZXNpZ25jZW50ZXJwYqoCHEdvb2dsZS5D
+bG91ZC5EZXNpZ25DZW50ZXIuVjHKAhxHb29nbGVcQ2xvdWRcRGVzaWduQ2VudGVyXFYx6gIf
+R29vZ2xlOjpDbG91ZDo6RGVzaWduQ2VudGVyOjpWMUrIewoHEgUOAMoDAQq8BAoBDBIDDgAS
+MrEEIENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBh
+Y2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90
+IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4K
+IFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8v
+d3d3LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQg
+YnkgYXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBk
+aXN0cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMg
+SVMiIEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJ
+TkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRo
+ZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0
+aW9ucyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAJQoJCgIDABIDEgApCgkKAgMBEgMT
+ACMKCQoCAwISAxQAOwoJCgIDAxIDFQA/CgkKAgMEEgMWADAKCQoCAwUSAxcAKgoICgEIEgMZ
+ADkKCQoCCCUSAxkAOQoICgEIEgMaAFsKCQoCCAsSAxoAWwoICgEIEgMbACIKCQoCCAoSAxsA
+IgoICgEIEgMcAEIKCQoCCAgSAxwAQgoICgEIEgMdADkKCQoCCAESAx0AOQoICgEIEgMeADkK
+CQoCCCkSAx4AOQoICgEIEgMfADgKCQoCCC0SAx8AOAo2CgIEABIEIgA7ARoqIE1lc3NhZ2Ug
+Zm9yIHJlcXVlc3RpbmcgYSBsaXN0IG9mIHNwYWNlcy4KCgoKAwQAARIDIggZClcKBAQAAgAS
+BCQCKQQaSSBSZXF1aXJlZC4gVGhlIG5hbWUgb2YgdGhlIHBhcmVudCByZXNvdXJjZSwgZm9y
+IHdoaWNoIHNwYWNlcyBhcmUgbGlzdGVkLgoKDAoFBAACAAUSAyQCCAoMCgUEAAIAARIDJAkP
+CgwKBQQAAgADEgMkEhMKDQoFBAACAAgSBCQUKQMKDwoIBAACAAicCAASAyUEKgoPCgcEAAIA
+CJ8IEgQmBCgFCqUBCgQEAAIBEgMuAj8alwEgT3B0aW9uYWwuIFRoZSBtYXhpbXVtIG51bWJl
+ciBvZiBwYWdlcyB0byByZXR1cm4gZnJvbSB0aGlzIHJlcXVlc3QuCiBJZiB1bnNwZWNpZmll
+ZCwgdGhlIHZhbHVlIGF1dG9tYXRpY2FsbHkgcmVmbGVjdHMgdGhlIG51bWJlciBvZiByZXN1
+bHRzCiByZXR1cm5lZC4KCgwKBQQAAgEFEgMuAgcKDAoFBAACAQESAy4IEQoMCgUEAAIBAxID
+LhQVCgwKBQQAAgEIEgMuFj4KDwoIBAACAQicCAASAy4XPQqVAgoEBAACAhIDNAJBGocCIE9w
+dGlvbmFsLiBJZiBwcmVzZW50LCByZXRyaWV2ZSB0aGUgbmV4dCBiYXRjaCBvZiByZXN1bHRz
+IGZyb20gdGhlIHByZWNlZGluZwogY2FsbCB0byB0aGlzIG1ldGhvZC4gcGFnZVRva2VuIG11
+c3QgYmUgdGhlIHZhbHVlIG9mIG5leHRQYWdlVG9rZW4gZnJvbSB0aGUKIHByZXZpb3VzIHJl
+c3BvbnNlLiBUaGUgdmFsdWVzIG9mIG90aGVyIG1ldGhvZCBwYXJhbWV0ZXJzIHNob3VsZCBi
+ZQogaWRlbnRpY2FsIHRvIHRob3NlIGluIHRoZSBwcmV2aW91cyBjYWxsLgoKDAoFBAACAgUS
+AzQCCAoMCgUEAAICARIDNAkTCgwKBQQAAgIDEgM0FhcKDAoFBAACAggSAzQYQAoPCggEAAIC
+CJwIABIDNBk/CkYKBAQAAgMSAzcCPRo5IE9wdGlvbmFsLiBBIGZpbHRlciB0aGF0IGNob29z
+ZXMgd2hpY2ggc3BhY2VzIHRvIHJldHVybi4KCgwKBQQAAgMFEgM3AggKDAoFBAACAwESAzcJ
+DwoMCgUEAAIDAxIDNxITCgwKBQQAAgMIEgM3FDwKDwoIBAACAwicCAASAzcVOwo0CgQEAAIE
+EgM6Aj8aJyBPcHRpb25hbC4gSG93IHRoZSByZXN1bHRzIGFyZSBzb3J0ZWQuCgoMCgUEAAIE
+BRIDOgIICgwKBQQAAgQBEgM6CREKDAoFBAACBAMSAzoUFQoMCgUEAAIECBIDOhY+Cg8KCAQA
+AgQInAgAEgM6Fz0KQwoCBAESBD4ASgEaNyBSZXN1bHRzIHJldHVybmVkIGZyb20gcHJvamVj
+dHMubG9jYXRpb25zLnNwYWNlcy5saXN0LgoKCgoDBAEBEgM+CBoKIAoEBAECABIDQAIcGhMg
+QSBsaXN0IG9mIHNwYWNlcy4KCgwKBQQBAgAEEgNAAgoKDAoFBAECAAYSA0ALEAoMCgUEAQIA
+ARIDQBEXCgwKBQQBAgADEgNAGhsK2AEKBAQBAgESA0UCHRrKASBJZiB0aGVyZSBtaWdodCBi
+ZSBtb3JlIHJlc3VsdHMgdGhhbiB0aG9zZSBhcHBlYXJpbmcgaW4gdGhpcyByZXNwb25zZSwK
+IG5leHRQYWdlVG9rZW4gaXMgaW5jbHVkZWQuIFRvIGdldCB0aGUgbmV4dCBzZXQgb2YgcmVz
+dWx0cywgY2FsbCB0aGlzIG1ldGhvZAogYWdhaW4gdXNpbmcgdGhlIHZhbHVlIG9mIG5leHRQ
+YWdlVG9rZW4gYXMgcGFnZVRva2VuLgoKDAoFBAECAQUSA0UCCAoMCgUEAQIBARIDRQkYCgwK
+BQQBAgEDEgNFGxwKRAoEBAECAhIESAJJNRo2IFVub3JkZXJlZCBsaXN0LiBMb2NhdGlvbnMg
+dGhhdCBjb3VsZCBub3QgYmUgcmVhY2hlZC4KCgwKBQQBAgIEEgNIAgoKDAoFBAECAgUSA0gL
+EQoMCgUEAQICARIDSBIdCgwKBQQBAgIDEgNIICEKDAoFBAECAggSA0kGNAoPCggEAQICCJwI
+ABIDSQczCkIKAgQCEgRNAFUBGjYgUmVzdWx0cyByZXR1cm5lZCBmcm9tIHByb2plY3RzLmxv
+Y2F0aW9ucy5zcGFjZXMuZ2V0LgoKCgoDBAIBEgNNCBcKKQoEBAICABIETwJUBBobIFJlcXVp
+cmVkLiBUaGUgc3BhY2UgbmFtZS4KCgwKBQQCAgAFEgNPAggKDAoFBAICAAESA08JDQoMCgUE
+AgIAAxIDTxARCg0KBQQCAgAIEgRPElQDCg8KCAQCAgAInAgAEgNQBCoKDwoHBAICAAifCBIE
+UQRTBQorCgIEAxIEWABmARofIE1lc3NhZ2UgZm9yIGNyZWF0aW5nIGEgc3BhY2UuCgoKCgME
+AwESA1gIGgpACgQEAwIAEgRaAl8EGjIgUmVxdWlyZWQuIFRoZSBwYXJlbnQgaW4gd2hpY2gg
+dG8gY3JlYXRlIGEgc3BhY2UuCgoMCgUEAwIABRIDWgIICgwKBQQDAgABEgNaCQ8KDAoFBAMC
+AAMSA1oSEwoNCgUEAwIACBIEWhRfAwoPCggEAwIACJwIABIDWwQqCg8KBwQDAgAInwgSBFwE
+XgUKNwoEBAMCARIDYgI/GiogUmVxdWlyZWQuIFRoZSBJRCBvZiB0aGUgc3BhY2UgdG8gY3Jl
+YXRlLgoKDAoFBAMCAQUSA2ICCAoMCgUEAwIBARIDYgkRCgwKBQQDAgEDEgNiFBUKDAoFBAMC
+AQgSA2IWPgoPCggEAwIBCJwIABIDYhc9Ci0KBAQDAgISA2UCOxogIFJlcXVpcmVkLiBUaGUg
+c3BhY2UgdG8gY3JlYXRlLgoKDAoFBAMCAgYSA2UCBwoMCgUEAwICARIDZQgNCgwKBQQDAgID
+EgNlEBEKDAoFBAMCAggSA2USOgoPCggEAwICCJwIABIDZRM5CisKAgQEEgRpAHEBGh8gTWVz
+c2FnZSBmb3IgdXBkYXRpbmcgYSBzcGFjZS4KCgoKAwQEARIDaQgaCoABCgQEBAIAEgRsAm0v
+GnIgT3B0aW9uYWwuIFRoZSBmaWVsZHMgdG8gb3ZlcndyaXRlIGluIHRoZSBzcGFjZSB1cGRh
+dGUuIElmIHlvdSBkb24ndCBwcm92aWRlCiBhIG1hc2ssIGFsbCBmaWVsZHMgYXJlIG92ZXJ3
+cml0dGVuLgoKDAoFBAQCAAYSA2wCGwoMCgUEBAIAARIDbBwnCgwKBQQEAgADEgNsKisKDAoF
+BAQCAAgSA20GLgoPCggEBAIACJwIABIDbQctCi0KBAQEAgESA3ACOxogIFJlcXVpcmVkLiBU
+aGUgc3BhY2UgdG8gdXBkYXRlLgoKDAoFBAQCAQYSA3ACBwoMCgUEBAIBARIDcAgNCgwKBQQE
+AgEDEgNwEBEKDAoFBAQCAQgSA3ASOgoPCggEBAIBCJwIABIDcBM5CiwKAgQFEgV0AIABARof
+IE1lc3NhZ2UgZm9yIGRlbGV0aW5nIGEgc3BhY2UuCgoKCgMEBQESA3QIGgopCgQEBQIAEgR2
+AnsEGhsgUmVxdWlyZWQuIFRoZSBzcGFjZSBuYW1lLgoKDAoFBAUCAAUSA3YCCAoMCgUEBQIA
+ARIDdgkNCgwKBQQFAgADEgN2EBEKDQoFBAUCAAgSBHYSewMKDwoIBAUCAAicCAASA3cEKgoP
+CgcEBQIACJ8IEgR4BHoFCosBCgQEBQIBEgN/AjoafiBPcHRpb25hbC4gSWYgc2V0IHRvIHRy
+dWUsIHRoZSBzcGFjZSdzIGNoaWxkcmVuIGFyZSBhbHNvIGRlbGV0ZWQuIElmIGZhbHNlLAog
+dGhlIHNwYWNlIGlzIG9ubHkgZGVsZXRlZCBpZiBpdCBoYXMgbm8gY2hpbGRyZW4uCgoMCgUE
+BQIBBRIDfwIGCgwKBQQFAgEBEgN/BwwKDAoFBAUCAQMSA38PEAoMCgUEBQIBCBIDfxE5Cg8K
+CAQFAgEInAgAEgN/EjgKLgoCBAYSBoMBAIwBARogIE1lc3NhZ2UgZm9yIGdldHRpbmcgYSBj
+YXRhbG9nLgoKCwoDBAYBEgSDAQgZCo4BCgQEBgIAEgaGAQKLAQQafiBSZXF1aXJlZC4gVGhl
+IGNhdGFsb2cgbmFtZSBpbiB0aGUgZm9sbG93aW5nIGZvcm1hdDoKIGBwcm9qZWN0cy8kcHJv
+amVjdC9sb2NhdGlvbnMvJGxvY2F0aW9uL3NwYWNlcy8kc3BhY2UvY2F0YWxvZ3MvJGNhdGFs
+b2dgCgoNCgUEBgIABRIEhgECCAoNCgUEBgIAARIEhgEJDQoNCgUEBgIAAxIEhgEQEQoPCgUE
+BgIACBIGhgESiwEDChAKCAQGAgAInAgAEgSHAQQqChEKBwQGAgAInwgSBogBBIoBBQo6CgIE
+BxIGjwEAqQEBGiwgTWVzc2FnZSBmb3IgcmVxdWVzdGluZyBhIGxpc3Qgb2YgY2F0YWxvZ3Mu
+CgoLCgMEBwESBI8BCBsKiwEKBAQHAgASBpIBApcBBBp7IFJlcXVpcmVkLiBUaGUgcGFyZW50
+IHNwYWNlIGZyb20gd2hpY2ggY2F0YWxvZ3MgYXJlIGxpc3RlZC4KIEZvcm1hdDogYHByb2pl
+Y3RzLyRwcm9qZWN0L2xvY2F0aW9ucy8kbG9jYXRpb24vc3BhY2VzLyRzcGFjZWAKCg0KBQQH
+AgAFEgSSAQIICg0KBQQHAgABEgSSAQkPCg0KBQQHAgADEgSSARITCg8KBQQHAgAIEgaSARSX
+AQMKEAoIBAcCAAicCAASBJMBBCoKEQoHBAcCAAifCBIGlAEElgEFCtYBCgQEBwIBEgScAQI/
+GscBIE9wdGlvbmFsLiBUaGUgbWF4aW11bSBudW1iZXIgb2YgcmVzdWx0cyB0byByZXR1cm4g
+ZnJvbSB0aGlzIHJlcXVlc3QuCiBOb24tcG9zaXRpdmUgdmFsdWVzIGFyZSBpZ25vcmVkLiBU
+aGUgcHJlc2VuY2Ugb2YgbmV4dFBhZ2VUb2tlbiBpbiB0aGUKIHJlc3BvbnNlIGluZGljYXRl
+cyB0aGF0IG1vcmUgcmVzdWx0cyBtaWdodCBiZSBhdmFpbGFibGUuCgoNCgUEBwIBBRIEnAEC
+BwoNCgUEBwIBARIEnAEIEQoNCgUEBwIBAxIEnAEUFQoNCgUEBwIBCBIEnAEWPgoQCggEBwIB
+CJwIABIEnAEXPQqWAgoEBAcCAhIEogECQRqHAiBPcHRpb25hbC4gSWYgcHJlc2VudCwgcmV0
+cmlldmUgdGhlIG5leHQgYmF0Y2ggb2YgcmVzdWx0cyBmcm9tIHRoZSBwcmVjZWRpbmcKIGNh
+bGwgdG8gdGhpcyBtZXRob2QuIHBhZ2VUb2tlbiBtdXN0IGJlIHRoZSB2YWx1ZSBvZiBuZXh0
+UGFnZVRva2VuIGZyb20gdGhlCiBwcmV2aW91cyByZXNwb25zZS4gVGhlIHZhbHVlcyBvZiBv
+dGhlciBtZXRob2QgcGFyYW1ldGVycyBzaG91bGQgYmUKIGlkZW50aWNhbCB0byB0aG9zZSBp
+biB0aGUgcHJldmlvdXMgY2FsbC4KCg0KBQQHAgIFEgSiAQIICg0KBQQHAgIBEgSiAQkTCg0K
+BQQHAgIDEgSiARYXCg0KBQQHAgIIEgSiARhAChAKCAQHAgIInAgAEgSiARk/CkkKBAQHAgMS
+BKUBAj0aOyBPcHRpb25hbC4gQSBmaWx0ZXIgdGhhdCBjaG9vc2VzIHdoaWNoIGNhdGFsb2dz
+IHRvIHJldHVybi4KCg0KBQQHAgMFEgSlAQIICg0KBQQHAgMBEgSlAQkPCg0KBQQHAgMDEgSl
+ARITCg0KBQQHAgMIEgSlARQ8ChAKCAQHAgMInAgAEgSlARU7CjsKBAQHAgQSBKgBAj8aLSBP
+cHRpb25hbC4gSG93IHRoZSByZXN1bHRzIHNob3VsZCBiZSBzb3J0ZWQuCgoNCgUEBwIEBRIE
+qAECCAoNCgUEBwIEARIEqAEJEQoNCgUEBwIEAxIEqAEUFQoNCgUEBwIECBIEqAEWPgoQCggE
+BwIECJwIABIEqAEXPQo0CgIECBIGrAEAtAEBGiYgUmVzdWx0cyByZXR1cm5lZCBmcm9tIGNh
+dGFsb2dzLmxpc3QuCgoLCgMECAESBKwBCBwKIgoEBAgCABIErgECIBoUIEEgbGlzdCBvZiBj
+YXRhbG9ncwoKDQoFBAgCAAQSBK4BAgoKDQoFBAgCAAYSBK4BCxIKDQoFBAgCAAESBK4BExsK
+DQoFBAgCAAMSBK4BHh8K2QEKBAQIAgESBLMBAh0aygEgSWYgdGhlcmUgbWlnaHQgYmUgbW9y
+ZSByZXN1bHRzIHRoYW4gdGhvc2UgYXBwZWFyaW5nIGluIHRoaXMgcmVzcG9uc2UsCiBuZXh0
+UGFnZVRva2VuIGlzIGluY2x1ZGVkLiBUbyBnZXQgdGhlIG5leHQgc2V0IG9mIHJlc3VsdHMs
+IGNhbGwgdGhpcyBtZXRob2QKIGFnYWluIHVzaW5nIHRoZSB2YWx1ZSBvZiBuZXh0UGFnZVRv
+a2VuIGFzIHBhZ2VUb2tlbi4KCg0KBQQIAgEFEgSzAQIICg0KBQQIAgEBEgSzAQkYCg0KBQQI
+AgEDEgSzARscCi8KAgQJEga3AQDGAQEaISBNZXNzYWdlIGZvciBjcmVhdGluZyBhIGNhdGFs
+b2cuCgoLCgMECQESBLcBCBwKmwEKBAQJAgASBroBAr8BBBqKASBSZXF1aXJlZC4gVGhlIHBh
+cmVudCBzcGFjZSBpbiB3aGljaCBhIGNhdGFsb2cgaXMgY3JlYXRlZCBpbiB0aGUgZm9sbG93
+aW5nCiBmb3JtYXQ6IGBwcm9qZWN0cy8kcHJvamVjdC9sb2NhdGlvbnMvJGxvY2F0aW9uL3Nw
+YWNlcy8kc3BhY2VgCgoNCgUECQIABRIEugECCAoNCgUECQIAARIEugEJDwoNCgUECQIAAxIE
+ugESEwoPCgUECQIACBIGugEUvwEDChAKCAQJAgAInAgAEgS7AQQqChEKBwQJAgAInwgSBrwB
+BL4BBQo6CgQECQIBEgTCAQJBGiwgUmVxdWlyZWQuIFRoZSBJRCBvZiB0aGUgY2F0YWxvZyB0
+byBjcmVhdGUuCgoNCgUECQIBBRIEwgECCAoNCgUECQIBARIEwgEJEwoNCgUECQIBAxIEwgEW
+FwoNCgUECQIBCBIEwgEYQAoQCggECQIBCJwIABIEwgEZPwowCgQECQICEgTFAQI/GiIgUmVx
+dWlyZWQuIFRoZSBjYXRhbG9nIHRvIGNyZWF0ZS4KCg0KBQQJAgIGEgTFAQIJCg0KBQQJAgIB
+EgTFAQoRCg0KBQQJAgIDEgTFARQVCg0KBQQJAgIIEgTFARY+ChAKCAQJAgIInAgAEgTFARc9
+Ci8KAgQKEgbJAQDRAQEaISBNZXNzYWdlIGZvciB1cGRhdGluZyBhIGNhdGFsb2cuCgoLCgME
+CgESBMkBCBwKhAEKBAQKAgASBswBAs0BLxp0IE9wdGlvbmFsLiBUaGUgZmllbGRzIHRvIG92
+ZXJ3cml0ZSBpbiB0aGUgY2F0YWxvZyB1cGRhdGUuIElmIHlvdSBkb24ndAogcHJvdmlkZSBh
+IG1hc2ssIGFsbCBmaWVsZHMgYXJlIG92ZXJ3cml0dGVuLgoKDQoFBAoCAAYSBMwBAhsKDQoF
+BAoCAAESBMwBHCcKDQoFBAoCAAMSBMwBKisKDQoFBAoCAAgSBM0BBi4KEAoIBAoCAAicCAAS
+BM0BBy0KMAoEBAoCARIE0AECPxoiIFJlcXVpcmVkLiBUaGUgY2F0YWxvZyB0byB1cGRhdGUu
+CgoNCgUECgIBBhIE0AECCQoNCgUECgIBARIE0AEKEQoNCgUECgIBAxIE0AEUFQoNCgUECgIB
+CBIE0AEWPgoQCggECgIBCJwIABIE0AEXPQovCgIECxIG1AEA4QEBGiEgTWVzc2FnZSBmb3Ig
+ZGVsZXRpbmcgYSBjYXRhbG9nLgoKCwoDBAsBEgTUAQgcCo4BCgQECwIAEgbXAQLcAQQafiBS
+ZXF1aXJlZC4gVGhlIGNhdGFsb2cgbmFtZSBpbiB0aGUgZm9sbG93aW5nIGZvcm1hdDoKIGBw
+cm9qZWN0cy8kcHJvamVjdC9sb2NhdGlvbnMvJGxvY2F0aW9uL3NwYWNlcy8kc3BhY2UvY2F0
+YWxvZ3MvJGNhdGFsb2dgCgoNCgUECwIABRIE1wECCAoNCgUECwIAARIE1wEJDQoNCgUECwIA
+AxIE1wEQEQoPCgUECwIACBIG1wES3AEDChAKCAQLAgAInAgAEgTYAQQqChEKBwQLAgAInwgS
+BtkBBNsBBQqRAQoEBAsCARIE4AECOhqCASBPcHRpb25hbC4gSWYgc2V0IHRvIHRydWUsIHRo
+ZSBjYXRhbG9nJ3MgY2hpbGRyZW4gYXJlIGFsc28gZGVsZXRlZC4gSWYKIGZhbHNlLCB0aGUg
+Y2F0YWxvZyBpcyBvbmx5IGRlbGV0ZWQgaWYgaXQgaGFzIG5vIGNoaWxkcmVuLgoKDQoFBAsC
+AQUSBOABAgYKDQoFBAsCAQESBOABBwwKDQoFBAsCAQMSBOABDxAKDQoFBAsCAQgSBOABETkK
+EAoIBAsCAQicCAASBOABEjgKOAoCBAwSBuQBAPMBARoqIE1lc3NhZ2UgZm9yIGNyZWF0aW5n
+IGEgY2F0YWxvZyB0ZW1wbGF0ZS4KCgsKAwQMARIE5AEIJApZCgQEDAIAEgbmAQLrAQQaSSBS
+ZXF1aXJlZC4gVGhlIHBhcmVudCByZXNvdXJjZSBpbiB3aGljaCB0aGUgY2F0YWxvZyB0ZW1w
+bGF0ZSBpcyBjcmVhdGVkLgoKDQoFBAwCAAUSBOYBAggKDQoFBAwCAAESBOYBCQ8KDQoFBAwC
+AAMSBOYBEhMKDwoFBAwCAAgSBuYBFOsBAwoQCggEDAIACJwIABIE5wEEKgoRCgcEDAIACJ8I
+EgboAQTqAQUKdwoEBAwCARIE7wECShppIFJlcXVpcmVkLiBUaGUgSUQgb2YgdGhlIGNhdGFs
+b2cgdGVtcGxhdGUgdG8gY3JlYXRlLiBUaGUgSUQgaXMgYXBwZW5kZWQgdG8KIHRoZSBjYXRh
+bG9nIHRlbXBsYXRlJ3MgbmFtZS4KCg0KBQQMAgEFEgTvAQIICg0KBQQMAgEBEgTvAQkcCg0K
+BQQMAgEDEgTvAR8gCg0KBQQMAgEIEgTvASFJChAKCAQMAgEInAgAEgTvASJICjkKBAQMAgIS
+BPIBAlAaKyBSZXF1aXJlZC4gVGhlIGNhdGFsb2cgdGVtcGxhdGUgdG8gY3JlYXRlLgoKDQoF
+BAwCAgYSBPIBAhEKDQoFBAwCAgESBPIBEiIKDQoFBAwCAgMSBPIBJSYKDQoFBAwCAggSBPIB
+J08KEAoIBAwCAgicCAASBPIBKE4KQAoCBA0SBvYBAP8BARoyIE1lc3NhZ2UgZm9yIGdldHRp
+bmcgYSBjYXRhbG9nIHRlbXBsYXRlIHJlc291cmNlLgoKCwoDBA0BEgT2AQghCqwBCgQEDQIA
+Egb5AQL+AQQamwEgUmVxdWlyZWQuIFRoZSBjYXRhbG9nIHRlbXBsYXRlIG5hbWUgaW4gdGhl
+IGZvbGxvd2luZyBmb3JtYXQ6CiBgcHJvamVjdHMvJHByb2plY3QvbG9jYXRpb25zLyRsb2Nh
+dGlvbi9zcGFjZXMvJHNwYWNlL2NhdGFsb2dzLyRjYXRhbG9nL3RlbXBsYXRlcy8kdGVtcGxh
+dGVgCgoNCgUEDQIABRIE+QECCAoNCgUEDQIAARIE+QEJDQoNCgUEDQIAAxIE+QEQEQoPCgUE
+DQIACBIG+QES/gEDChAKCAQNAgAInAgAEgT6AQQqChEKBwQNAgAInwgSBvsBBP0BBQpDCgIE
+DhIGggIAngIBGjUgTWVzc2FnZSBmb3IgcmVxdWVzdGluZyBhIGxpc3Qgb2YgY2F0YWxvZyB0
+ZW1wbGF0ZXMuCgoLCgMEDgESBIICCCMKtgEKBAQOAgASBoYCAosCBBqlASBSZXF1aXJlZC4g
+VGhlIHBhcmVudCBmcm9tIHdoaWNoIHRoZSBjYXRhbG9nIHRlbXBsYXRlcyBhcmUgbGlzdGVk
+IGluIHRoZQogZm9sbG93aW5nIGZvcm1hdDoKIGBwcm9qZWN0cy8kcHJvamVjdC9sb2NhdGlv
+bnMvJGxvY2F0aW9uL3NwYWNlcy8kc3BhY2UvY2F0YWxvZ3MvJGNhdGFsb2dgCgoNCgUEDgIA
+BRIEhgICCAoNCgUEDgIAARIEhgIJDwoNCgUEDgIAAxIEhgISEwoPCgUEDgIACBIGhgIUiwID
+ChAKCAQOAgAInAgAEgSHAgQqChEKBwQOAgAInwgSBogCBIoCBQrZAQoEBA4CARIEkQICPxrK
+ASBPcHRpb25hbC4gVGhlIG1heGltdW0gbnVtYmVyIG9mIHJlc3VsdHMgdG8gcmV0dXJuIGZy
+b20gdGhpcyByZXF1ZXN0LgogTm9uLXBvc2l0aXZlCiAgdmFsdWVzIGFyZSBpZ25vcmVkLiBU
+aGUgcHJlc2VuY2Ugb2YgbmV4dFBhZ2VUb2tlbiBpbiB0aGUgcmVzcG9uc2UKICBpbmRpY2F0
+ZXMgdGhhdCBtb3JlIHJlc3VsdHMgbWlnaHQgYmUgYXZhaWxhYmxlLgoKDQoFBA4CAQUSBJEC
+AgcKDQoFBA4CAQESBJECCBEKDQoFBA4CAQMSBJECFBUKDQoFBA4CAQgSBJECFj4KEAoIBA4C
+AQicCAASBJECFz0KmwIKBAQOAgISBJcCAkEajAIgT3B0aW9uYWwuIElmIHByZXNlbnQsIHRo
+ZW4gcmV0cmlldmUgdGhlIG5leHQgYmF0Y2ggb2YgcmVzdWx0cyBmcm9tIHRoZQogcHJlY2Vk
+aW5nIGNhbGwgdG8gdGhpcyBtZXRob2QuIHBhZ2VUb2tlbiBtdXN0IGJlIHRoZSB2YWx1ZSBv
+ZiBuZXh0UGFnZVRva2VuCiBmcm9tIHRoZSBwcmV2aW91cyByZXNwb25zZS4gVGhlIHZhbHVl
+cyBvZiBvdGhlciBtZXRob2QgcGFyYW1ldGVycyBzaG91bGQgYmUKIGlkZW50aWNhbCB0byB0
+aG9zZSBpbiB0aGUgcHJldmlvdXMgY2FsbC4KCg0KBQQOAgIFEgSXAgIICg0KBQQOAgIBEgSX
+AgkTCg0KBQQOAgIDEgSXAhYXCg0KBQQOAgIIEgSXAhhAChAKCAQOAgIInAgAEgSXAhk/ClAK
+BAQOAgMSBJoCAj0aQiBPcHRpb25hbC4gQSBmaWx0ZXIgdGhhdCBjaG9vc2VzIHRoZSBjYXRh
+bG9nIHRlbXBsYXRlcyB0byByZXR1cm4uCgoNCgUEDgIDBRIEmgICCAoNCgUEDgIDARIEmgIJ
+DwoNCgUEDgIDAxIEmgISEwoNCgUEDgIDCBIEmgIUPAoQCggEDgIDCJwIABIEmgIVOwo7CgQE
+DgIEEgSdAgI/Gi0gT3B0aW9uYWwuIEhvdyB0aGUgcmVzdWx0cyBzaG91bGQgYmUgc29ydGVk
+LgoKDQoFBA4CBAUSBJ0CAggKDQoFBA4CBAESBJ0CCREKDQoFBA4CBAMSBJ0CFBUKDQoFBA4C
+BAgSBJ0CFj4KEAoIBA4CBAicCAASBJ0CFz0KQgoCBA8SBqECAKkCARo0IE1lc3NhZ2UgZm9y
+IHJlc3BvbnNlIHRvIGxpc3RpbmcgY2F0YWxvZyB0ZW1wbGF0ZXMuCgoLCgMEDwESBKECCCQK
+LgoEBA8CABIEowICMRogIFRoZSBsaXN0IG9mIGNhdGFsb2cgdGVtcGxhdGVzLgoKDQoFBA8C
+AAQSBKMCAgoKDQoFBA8CAAYSBKMCCxoKDQoFBA8CAAESBKMCGywKDQoFBA8CAAMSBKMCLzAK
+3gEKBAQPAgESBKgCAh0azwEgSWYgdGhlcmUgbWlnaHQgYmUgbW9yZSByZXN1bHRzIHRoYW4g
+dGhvc2UgYXBwZWFyaW5nIGluIHRoaXMgcmVzcG9uc2UsIHRoZW4KIG5leHRQYWdlVG9rZW4g
+aXMgaW5jbHVkZWQuIFRvIGdldCB0aGUgbmV4dCBzZXQgb2YgcmVzdWx0cywgY2FsbCB0aGlz
+IG1ldGhvZAogYWdhaW4gdXNpbmcgdGhlIHZhbHVlIG9mIG5leHRQYWdlVG9rZW4gYXMgcGFn
+ZVRva2VuLgoKDQoFBA8CAQUSBKgCAggKDQoFBA8CAQESBKgCCRgKDQoFBA8CAQMSBKgCGxwK
+OAoCBBASBqwCALgCARoqIE1lc3NhZ2UgZm9yIHVwZGF0aW5nIGEgY2F0YWxvZyB0ZW1wbGF0
+ZS4KCgsKAwQQARIErAIIJAqgAQoEBBACABIEsAICUBqRASBSZXF1aXJlZC4gVGhlIGNhdGFs
+b2cgdGVtcGxhdGUgdG8gdXBkYXRlLgogRm9ybWF0OgogYHByb2plY3RzLyRwcm9qZWN0L2xv
+Y2F0aW9ucy8kbG9jYXRpb24vc3BhY2VzLyRzcGFjZS9jYXRhbG9ncy8kY2F0YWxvZy90ZW1w
+bGF0ZXMvJHRlbXBsYXRlYAoKDQoFBBACAAYSBLACAhEKDQoFBBACAAESBLACEiIKDQoFBBAC
+AAMSBLACJSYKDQoFBBACAAgSBLACJ08KEAoIBBACAAicCAASBLACKE4KngIKBAQQAgESBrYC
+ArcCLxqNAiBPcHRpb25hbC4gVGhlIGZpZWxkcyB0byBvdmVyd3JpdGUgaW4gdGhlIGNhdGFs
+b2cgdGVtcGxhdGUgdXBkYXRlLiBUaGUKIGZpZWxkcyBzcGVjaWZpZWQgaW4gdGhlIHVwZGF0
+ZV9tYXNrIGFyZSByZWxhdGl2ZSB0byB0aGUgcmVzb3VyY2UsIG5vdCB0aGUKIGZ1bGwgcmVx
+dWVzdC4gQSBmaWVsZCB3aWxsIGJlIG92ZXJ3cml0dGVuIGlmIGl0IGlzIGluIHRoZSBtYXNr
+LiBJZiB5b3UKIGRvbid0IHByb3ZpZGUgYSBtYXNrLCBhbGwgZmllbGRzIGFyZSBvdmVyd3Jp
+dHRlbi4KCg0KBQQQAgEGEgS2AgIbCg0KBQQQAgEBEgS2AhwnCg0KBQQQAgEDEgS2AiorCg0K
+BQQQAgEIEgS3AgYuChAKCAQQAgEInAgAEgS3AgctCjgKAgQREga7AgDJAgEaKiBNZXNzYWdl
+IGZvciBkZWxldGluZyBhIGNhdGFsb2cgdGVtcGxhdGUuCgoLCgMEEQESBLsCCCQKnQEKBAQR
+AgASBr8CAsQCBBqMASBSZXF1aXJlZC4gVGhlIGNhdGFsb2cgdGVtcGxhdGUgbmFtZS4KIEZv
+cm1hdDoKIGBwcm9qZWN0cy8kcHJvamVjdC9sb2NhdGlvbnMvJGxvY2F0aW9uL3NwYWNlcy8k
+c3BhY2UvY2F0YWxvZ3MvJGNhdGFsb2cvdGVtcGxhdGVzLyR0ZW1wbGF0ZWAKCg0KBQQRAgAF
+EgS/AgIICg0KBQQRAgABEgS/AgkNCg0KBQQRAgADEgS/AhARCg8KBQQRAgAIEga/AhLEAgMK
+EAoIBBECAAicCAASBMACBCoKEQoHBBECAAifCBIGwQIEwwIFCqMBCgQEEQIBEgTIAgI6GpQB
+IE9wdGlvbmFsLiBJZiBzZXQgdG8gdHJ1ZSwgdGhlIGNhdGFsb2cgdGVtcGxhdGUncyBjaGls
+ZHJlbiBhcmUgYWxzbyBkZWxldGVkLgogSWYgZmFsc2UsIHRoZSBjYXRhbG9nIHRlbXBsYXRl
+IGlzIG9ubHkgZGVsZXRlZCBpZiBpdCBoYXMgbm8gY2hpbGRyZW4uCgoNCgUEEQIBBRIEyAIC
+BgoNCgUEEQIBARIEyAIHDAoNCgUEEQIBAxIEyAIPEAoNCgUEEQIBCBIEyAIROQoQCggEEQIB
+CJwIABIEyAISOApCCgIEEhIGzAIA3gIBGjQgTWVzc2FnZSBmb3IgY3JlYXRpbmcgYSB0ZW1w
+bGF0ZSByZXZpc2lvbnMgcmVxdWVzdC4KCgsKAwQSARIEzAIILArDAQoEBBICABIG0AIC1QIE
+GrIBIFJlcXVpcmVkLiBUaGUgcGFyZW50IGluIHdoaWNoIHRoZSBjYXRhbG9nIHRlbXBsYXRl
+IHJldmlzaW9ucyByZXF1ZXN0IGlzCiBjcmVhdGVkIGluIGZvbGxvd2luZyBmb3JtYXQ6CiBg
+cHJvamVjdHMvJHByb2plY3QvbG9jYXRpb25zLyRsb2NhdGlvbi9zcGFjZXMvJHNwYWNlL3Rl
+bXBsYXRlcy8kdGVtcGxhdGVgCgoNCgUEEgIABRIE0AICCAoNCgUEEgIAARIE0AIJDwoNCgUE
+EgIAAxIE0AISEwoPCgUEEgIACBIG0AIU1QIDChAKCAQSAgAInAgAEgTRAgQqChEKBwQSAgAI
+nwgSBtICBNQCBQpGCgQEEgIBEgbYAgLZAi8aNiBSZXF1aXJlZC4gVGhlIElEIG9mIHRoZSB0
+ZW1wbGF0ZSByZXZpc2lvbiB0byBjcmVhdGUuCgoNCgUEEgIBBRIE2AICCAoNCgUEEgIBARIE
+2AIJJQoNCgUEEgIBAxIE2AIoKQoNCgUEEgIBCBIE2QIGLgoQCggEEgIBCJwIABIE2QIHLQo8
+CgQEEgICEgbcAgLdAi8aLCBSZXF1aXJlZC4gVGhlIHRlbXBsYXRlIHJldmlzaW9uIHRvIGNy
+ZWF0ZS4KCg0KBQQSAgIGEgTcAgIZCg0KBQQSAgIBEgTcAhozCg0KBQQSAgIDEgTcAjY3Cg0K
+BQQSAgIIEgTdAgYuChAKCAQSAgIInAgAEgTdAgctCjcKAgQTEgbhAgDpAgEaKSBNZXNzYWdl
+IGZvciBHZXRUZW1wbGF0ZVJldmlzaW9uIFJlcXVlc3QKCgsKAwQTARIE4QIIKQpACgQEEwIA
+EgbjAgLoAgQaMCBSZXF1aXJlZC4gVGhlIGNhdGFsb2cgdGVtcGxhdGUgcmV2aXNpb25zIG5h
+bWUuCgoNCgUEEwIABRIE4wICCAoNCgUEEwIAARIE4wIJDQoNCgUEEwIAAxIE4wIQEQoPCgUE
+EwIACBIG4wIS6AIDChAKCAQTAgAInAgAEgTkAgQqChEKBwQTAgAInwgSBuUCBOcCBQpCCgIE
+FBIG7AIAhwMBGjQgTWVzc2FnZSBmb3IgcmVxdWVzdGluZyBsaXN0IG9mIHRlbXBsYXRlIHJl
+dmlzaW9ucy4KCgsKAwQUARIE7AIIKwpuCgQEFAIAEgbvAgL0AgQaXiBSZXF1aXJlZC4gVGhl
+IHBhcmVudCByZXNvdXJjZSBmcm9tIHdoaWNoIGEgbGlzdCBvZiBjYXRhbG9nIHRlbXBsYXRl
+CiByZXZpc2lvbnMgaXMgcmVxdWVzdGVkLgoKDQoFBBQCAAUSBO8CAggKDQoFBBQCAAESBO8C
+CQ8KDQoFBBQCAAMSBO8CEhMKDwoFBBQCAAgSBu8CFPQCAwoQCggEFAIACJwIABIE8AIEKgoR
+CgcEFAIACJ8IEgbxAgTzAgUK2QEKBAQUAgESBPoCAj8aygEgT3B0aW9uYWwuIFRoZSBtYXhp
+bXVtIG51bWJlciBvZiByZXN1bHRzIHRvIHJldHVybiBmcm9tIHRoaXMgcmVxdWVzdC4KIE5v
+bi1wb3NpdGl2ZQogIHZhbHVlcyBhcmUgaWdub3JlZC4gVGhlIHByZXNlbmNlIG9mIG5leHRQ
+YWdlVG9rZW4gaW4gdGhlIHJlc3BvbnNlCiAgaW5kaWNhdGVzIHRoYXQgbW9yZSByZXN1bHRz
+IG1pZ2h0IGJlIGF2YWlsYWJsZS4KCg0KBQQUAgEFEgT6AgIHCg0KBQQUAgEBEgT6AggRCg0K
+BQQUAgEDEgT6AhQVCg0KBQQUAgEIEgT6AhY+ChAKCAQUAgEInAgAEgT6Ahc9CpsCCgQEFAIC
+EgSAAwJBGowCIE9wdGlvbmFsLiBJZiBwcmVzZW50LCB0aGVuIHJldHJpZXZlIHRoZSBuZXh0
+IGJhdGNoIG9mIHJlc3VsdHMgZnJvbSB0aGUKIHByZWNlZGluZyBjYWxsIHRvIHRoaXMgbWV0
+aG9kLiBwYWdlVG9rZW4gbXVzdCBiZSB0aGUgdmFsdWUgb2YgbmV4dFBhZ2VUb2tlbgogZnJv
+bSB0aGUgcHJldmlvdXMgcmVzcG9uc2UuIFRoZSB2YWx1ZXMgb2Ygb3RoZXIgbWV0aG9kIHBh
+cmFtZXRlcnMgc2hvdWxkIGJlCiBpZGVudGljYWwgdG8gdGhvc2UgaW4gdGhlIHByZXZpb3Vz
+IGNhbGwuCgoNCgUEFAICBRIEgAMCCAoNCgUEFAICARIEgAMJEwoNCgUEFAICAxIEgAMWFwoN
+CgUEFAICCBIEgAMYQAoQCggEFAICCJwIABIEgAMZPwpbCgQEFAIDEgSDAwI9Gk0gT3B0aW9u
+YWwuIEEgZmlsdGVyIHRoYXQgY2hvb3NlcyB3aGljaCBjYXRhbG9nIHRlbXBsYXRlIHJldmlz
+aW9ucyB0byByZXR1cm4uCgoNCgUEFAIDBRIEgwMCCAoNCgUEFAIDARIEgwMJDwoNCgUEFAID
+AxIEgwMSEwoNCgUEFAIDCBIEgwMUPAoQCggEFAIDCJwIABIEgwMVOwo7CgQEFAIEEgSGAwI/
+Gi0gT3B0aW9uYWwuIEhvdyB0aGUgcmVzdWx0cyBzaG91bGQgYmUgc29ydGVkLgoKDQoFBBQC
+BAUSBIYDAggKDQoFBBQCBAESBIYDCREKDQoFBBQCBAMSBIYDFBUKDQoFBBQCBAgSBIYDFj4K
+EAoIBBQCBAicCAASBIYDFz0KQwoCBBUSBooDAJUDARo1IE1lc3NhZ2UgZm9yIHJlc3BvbnNl
+IHRvIGxpc3RpbmcgdGVtcGxhdGUgcmV2aXNpb25zLgoKCwoDBBUBEgSKAwgsCi8KBAQVAgAS
+BIwDAkIaISBUaGUgbGlzdCBvZiB0ZW1wbGF0ZSByZXZpc2lvbnMuCgoNCgUEFQIABBIEjAMC
+CgoNCgUEFQIABhIEjAMLIgoNCgUEFQIAARIEjAMjPQoNCgUEFQIAAxIEjANAQQreAQoEBBUC
+ARIEkQMCHRrPASBJZiB0aGVyZSBtaWdodCBiZSBtb3JlIHJlc3VsdHMgdGhhbiB0aG9zZSBh
+cHBlYXJpbmcgaW4gdGhpcyByZXNwb25zZSwgdGhlbgogbmV4dFBhZ2VUb2tlbiBpcyBpbmNs
+dWRlZC4gVG8gZ2V0IHRoZSBuZXh0IHNldCBvZiByZXN1bHRzLCBjYWxsIHRoaXMgbWV0aG9k
+CiBhZ2FpbiB1c2luZyB0aGUgdmFsdWUgb2YgbmV4dFBhZ2VUb2tlbiBhcyBwYWdlVG9rZW4u
+CgoNCgUEFQIBBRIEkQMCCAoNCgUEFQIBARIEkQMJGAoNCgUEFQIBAxIEkQMbHAo0CgQEFQIC
+EgSUAwIiGiYgTG9jYXRpb25zIHRoYXQgY291bGQgbm90IGJlIHJlYWNoZWQuCgoNCgUEFQIC
+BBIElAMCCgoNCgUEFQICBRIElAMLEQoNCgUEFQICARIElAMSHQoNCgUEFQICAxIElAMgIQo5
+CgIEFhIGmAMAoAMBGisgTWVzc2FnZSBmb3IgZGVsZXRpbmcgYSB0ZW1wbGF0ZSByZXZpc2lv
+bi4KCgsKAwQWARIEmAMILAo3CgQEFgIAEgaaAwKfAwQaJyBSZXF1aXJlZC4gVGhlIHRlbXBs
+YXRlIHJldmlzaW9uIG5hbWUuCgoNCgUEFgIABRIEmgMCCAoNCgUEFgIAARIEmgMJDQoNCgUE
+FgIAAxIEmgMQEQoPCgUEFgIACBIGmgMSnwMDChAKCAQWAgAInAgAEgSbAwQqChEKBwQWAgAI
+nwgSBpwDBJ4DBQpiCgIEFxIGpAMArgMBGlQgUmVxdWVzdCBtZXNzYWdlIGZvciBmZXRjaGlu
+ZyB0aGUgVGVycmFmb3JtIHNvdXJjZSBvZiBhIGNhdGFsb2cgdGVtcGxhdGUKIHJldmlzaW9u
+LgoKCwoDBBcBEgSkAwgzCqcBCgQEFwIAEgaoAwKtAwQalgEgUmVxdWlyZWQuIE5hbWUgb2Yg
+dGhlIHJlc291cmNlCiBFZzoKIGBwcm9qZWN0cy8kcHJvamVjdC9sb2NhdGlvbnMvJGxvY2F0
+aW9uL3NwYWNlcy8kc3BhY2UvY2F0YWxvZ3MvJGNhdGFsb2cvdGVtcGxhdGVzLyR0ZW1wbGF0
+ZS9yZXZpc2lvbnMvJHJldmlzaW9uYAoKDQoFBBcCAAUSBKgDAggKDQoFBBcCAAESBKgDCQ0K
+DQoFBBcCAAMSBKgDEBEKDwoFBBcCAAgSBqgDEq0DAwoQCggEFwIACJwIABIEqQMEKgoRCgcE
+FwIACJ8IEgaqAwSsAwUKYgoCBBgSBrIDALgDARpUIFJlc3BvbnNlIG1lc3NhZ2UgZm9yIGdl
+dHRpbmcgdGhlIFRlcnJhZm9ybSBzb3VyY2Ugb2YgYSBjYXRhbG9nIHRlbXBsYXRlCiByZXZp
+c2lvbi4KCgsKAwQYARIEsgMINApLCgQEGAIAEgS0AwIiGj0gVGhlIHJvb3QgVGVycmFmb3Jt
+IG1vZHVsZSBvZiB0aGUgY2F0YWxvZyB0ZW1wbGF0ZSByZXZpc2lvbi4KCg0KBQQYAgAGEgS0
+AwIRCg0KBQQYAgABEgS0AxIdCg0KBQQYAgADEgS0AyAhCkgKBAQYAgESBLcDAicaOiBUaGUg
+ZGVwZW5kZW50IFRlcnJhZm9ybSBtb2R1bGVzIHVzZWQgYnkgdGhlIHJvb3QgbW9kdWxlLgoK
+DQoFBBgCAQQSBLcDAgoKDQoFBBgCAQYSBLcDCxoKDQoFBBgCAQESBLcDGyIKDQoFBBgCAQMS
+BLcDJSYKUQoCBBkSBrsDAMQDARpDIFJlcXVlc3QgbWVzc2FnZSBmb3IgRmV0Y2hDYXRhbG9n
+VGVtcGxhdGVSZXZpc2lvbkFzc2Vzc21lbnRSZXBvcnQuCgoLCgMEGQESBLsDCDsKzwEKBAQZ
+AgASBr4DAsMDBBq+ASBSZXF1aXJlZC4gVGhlIGNhdGFsb2cgdGVtcGxhdGUgcmV2aXNpb24g
+bmFtZSBpbiB0aGUgZm9sbG93aW5nIGZvcm1hdDoKIGBwcm9qZWN0cy97cHJvamVjdH0vbG9j
+YXRpb25zL3tsb2NhdGlvbn0vc3BhY2VzL3tzcGFjZX0vY2F0YWxvZ3Mve2NhdGFsb2d9L3Rl
+bXBsYXRlcy97dGVtcGxhdGV9L3JldmlzaW9ucy97cmV2aXNpb259YAoKDQoFBBkCAAUSBL4D
+AggKDQoFBBkCAAESBL4DCQ0KDQoFBBkCAAMSBL4DEBEKDwoFBBkCAAgSBr4DEsMDAwoQCggE
+GQIACJwIABIEvwMEKgoRCgcEGQIACJ8IEgbAAwTCAwUKUgoCBBoSBscDAMoDARpEIFJlc3Bv
+bnNlIG1lc3NhZ2UgZm9yIEZldGNoQ2F0YWxvZ1RlbXBsYXRlUmV2aXNpb25Bc3Nlc3NtZW50
+UmVwb3J0LgoKCwoDBBoBEgTHAwg8CkQKBAQaAgASBMkDAikaNiBBc3Nlc3NtZW50IHJlcG9y
+dCBmb3IgdGhlIGNhdGFsb2cgdGVtcGxhdGUgcmV2aXNpb24uCgoNCgUEGgIABhIEyQMCEgoN
+CgUEGgIAARIEyQMTJAoNCgUEGgIAAxIEyQMnKGIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListSpacesRequest ===
+    # Fields for ListSpacesRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: order_by Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListSpacesResponse ===
+    # Fields for ListSpacesResponse
+    # Field: spaces Type: 11 (.google.cloud.designcenter.v1.Space)
+    # Field: next_page_token Type: 9 ()
+    # Field: unreachable Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::GetSpaceRequest ===
+    # Fields for GetSpaceRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::CreateSpaceRequest ===
+    # Fields for CreateSpaceRequest
+    # Field: parent Type: 9 ()
+    # Field: space_id Type: 9 ()
+    # Field: space Type: 11 (.google.cloud.designcenter.v1.Space)
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::UpdateSpaceRequest ===
+    # Fields for UpdateSpaceRequest
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+    # Field: space Type: 11 (.google.cloud.designcenter.v1.Space)
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::DeleteSpaceRequest ===
+    # Fields for DeleteSpaceRequest
+    # Field: name Type: 9 ()
+    # Field: force Type: 8 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::GetCatalogRequest ===
+    # Fields for GetCatalogRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogsRequest ===
+    # Fields for ListCatalogsRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: order_by Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogsResponse ===
+    # Fields for ListCatalogsResponse
+    # Field: catalogs Type: 11 (.google.cloud.designcenter.v1.Catalog)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::CreateCatalogRequest ===
+    # Fields for CreateCatalogRequest
+    # Field: parent Type: 9 ()
+    # Field: catalog_id Type: 9 ()
+    # Field: catalog Type: 11 (.google.cloud.designcenter.v1.Catalog)
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::UpdateCatalogRequest ===
+    # Fields for UpdateCatalogRequest
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+    # Field: catalog Type: 11 (.google.cloud.designcenter.v1.Catalog)
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::DeleteCatalogRequest ===
+    # Fields for DeleteCatalogRequest
+    # Field: name Type: 9 ()
+    # Field: force Type: 8 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::CreateCatalogTemplateRequest ===
+    # Fields for CreateCatalogTemplateRequest
+    # Field: parent Type: 9 ()
+    # Field: catalog_template_id Type: 9 ()
+    # Field: catalog_template Type: 11 (.google.cloud.designcenter.v1.CatalogTemplate)
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::GetCatalogTemplateRequest ===
+    # Fields for GetCatalogTemplateRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogTemplatesRequest ===
+    # Fields for ListCatalogTemplatesRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: order_by Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogTemplatesResponse ===
+    # Fields for ListCatalogTemplatesResponse
+    # Field: catalog_templates Type: 11 (.google.cloud.designcenter.v1.CatalogTemplate)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::UpdateCatalogTemplateRequest ===
+    # Fields for UpdateCatalogTemplateRequest
+    # Field: catalog_template Type: 11 (.google.cloud.designcenter.v1.CatalogTemplate)
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::DeleteCatalogTemplateRequest ===
+    # Fields for DeleteCatalogTemplateRequest
+    # Field: name Type: 9 ()
+    # Field: force Type: 8 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::CreateCatalogTemplateRevisionRequest ===
+    # Fields for CreateCatalogTemplateRevisionRequest
+    # Field: parent Type: 9 ()
+    # Field: catalog_template_revision_id Type: 9 ()
+    # Field: catalog_template_revision Type: 11 (.google.cloud.designcenter.v1.CatalogTemplateRevision)
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::GetCatalogTemplateRevisionRequest ===
+    # Fields for GetCatalogTemplateRevisionRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogTemplateRevisionsRequest ===
+    # Fields for ListCatalogTemplateRevisionsRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: order_by Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogTemplateRevisionsResponse ===
+    # Fields for ListCatalogTemplateRevisionsResponse
+    # Field: catalog_template_revisions Type: 11 (.google.cloud.designcenter.v1.CatalogTemplateRevision)
+    # Field: next_page_token Type: 9 ()
+    # Field: unreachable Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::DeleteCatalogTemplateRevisionRequest ===
+    # Fields for DeleteCatalogTemplateRevisionRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::FetchCatalogTemplateRevisionTFSourceRequest ===
+    # Fields for FetchCatalogTemplateRevisionTFSourceRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::FetchCatalogTemplateRevisionTFSourceResponse ===
+    # Fields for FetchCatalogTemplateRevisionTFSourceResponse
+    # Field: root_module Type: 11 (.google.cloud.designcenter.v1.TerraformModule)
+    # Field: modules Type: 11 (.google.cloud.designcenter.v1.TerraformModule)
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::FetchCatalogTemplateRevisionAssessmentReportRequest ===
+    # Fields for FetchCatalogTemplateRevisionAssessmentReportRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Designcenter::V1::CatalogManagementMessages::FetchCatalogTemplateRevisionAssessmentReportResponse ===
+    # Fields for FetchCatalogTemplateRevisionAssessmentReportResponse
+    # Field: assessment_report Type: 11 (.google.cloud.designcenter.v1.AssessmentReport)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Designcenter::V1::CatalogManagementMessages - Compiled Protocol Buffers messages for google/cloud/designcenter/v1/catalog_management_messages.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Designcenter::V1::CatalogManagementMessages;
+
+    my $msg = Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListSpacesRequest->new({
+        parent => $parent,
+        page_size => $page_size,
+        page_token => $page_token,
+        filter => $filter,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListSpacesRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/designcenter/v1/catalog_management_messages.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListSpacesRequest
+
+Message for requesting a list of spaces.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The name of the parent resource, for which spaces are listed.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of pages to return from this request.
+If unspecified, the value automatically reflects the number of results
+returned.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. If present, retrieve the next batch of results from the preceding
+call to this method. pageToken must be the value of nextPageToken from the
+previous response. The values of other method parameters should be
+identical to those in the previous call.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter that chooses which spaces to return.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. How the results are sorted.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListSpacesResponse
+
+Results returned from projects.locations.spaces.list.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->spaces() >> / C<< $msg->spaces($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::Space>)
+
+A list of spaces.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response,
+nextPageToken is included. To get the next set of results, call this method
+again using the value of nextPageToken as pageToken.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unordered list. Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::GetSpaceRequest
+
+Results returned from projects.locations.spaces.get.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The space name.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::CreateSpaceRequest
+
+Message for creating a space.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent in which to create a space.
+
+=item * C<< $msg->space_id() >> / C<< $msg->space_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the space to create.
+
+=item * C<< $msg->space() >> / C<< $msg->space($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::Space>)
+
+Required. The space to create.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::UpdateSpaceRequest
+
+Message for updating a space.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The fields to overwrite in the space update. If you don't provide
+a mask, all fields are overwritten.
+
+=item * C<< $msg->space() >> / C<< $msg->space($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::Space>)
+
+Required. The space to update.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::DeleteSpaceRequest
+
+Message for deleting a space.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The space name.
+
+=item * C<< $msg->force() >> / C<< $msg->force($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, the space's children are also deleted. If false,
+the space is only deleted if it has no children.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::GetCatalogRequest
+
+Message for getting a catalog.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The catalog name in the following format:
+`projects/$project/locations/$location/spaces/$space/catalogs/$catalog`
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogsRequest
+
+Message for requesting a list of catalogs.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent space from which catalogs are listed.
+Format: `projects/$project/locations/$location/spaces/$space`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of results to return from this request.
+Non-positive values are ignored. The presence of nextPageToken in the
+response indicates that more results might be available.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. If present, retrieve the next batch of results from the preceding
+call to this method. pageToken must be the value of nextPageToken from the
+previous response. The values of other method parameters should be
+identical to those in the previous call.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter that chooses which catalogs to return.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. How the results should be sorted.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogsResponse
+
+Results returned from catalogs.list.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->catalogs() >> / C<< $msg->catalogs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::Catalog>)
+
+A list of catalogs
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response,
+nextPageToken is included. To get the next set of results, call this method
+again using the value of nextPageToken as pageToken.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::CreateCatalogRequest
+
+Message for creating a catalog.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent space in which a catalog is created in the following
+format: `projects/$project/locations/$location/spaces/$space`
+
+=item * C<< $msg->catalog_id() >> / C<< $msg->catalog_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the catalog to create.
+
+=item * C<< $msg->catalog() >> / C<< $msg->catalog($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::Catalog>)
+
+Required. The catalog to create.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::UpdateCatalogRequest
+
+Message for updating a catalog.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The fields to overwrite in the catalog update. If you don't
+provide a mask, all fields are overwritten.
+
+=item * C<< $msg->catalog() >> / C<< $msg->catalog($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::Catalog>)
+
+Required. The catalog to update.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::DeleteCatalogRequest
+
+Message for deleting a catalog.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The catalog name in the following format:
+`projects/$project/locations/$location/spaces/$space/catalogs/$catalog`
+
+=item * C<< $msg->force() >> / C<< $msg->force($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, the catalog's children are also deleted. If
+false, the catalog is only deleted if it has no children.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::CreateCatalogTemplateRequest
+
+Message for creating a catalog template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource in which the catalog template is created.
+
+=item * C<< $msg->catalog_template_id() >> / C<< $msg->catalog_template_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the catalog template to create. The ID is appended to
+the catalog template's name.
+
+=item * C<< $msg->catalog_template() >> / C<< $msg->catalog_template($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::CatalogTemplate>)
+
+Required. The catalog template to create.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::GetCatalogTemplateRequest
+
+Message for getting a catalog template resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The catalog template name in the following format:
+`projects/$project/locations/$location/spaces/$space/catalogs/$catalog/templates/$template`
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogTemplatesRequest
+
+Message for requesting a list of catalog templates.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent from which the catalog templates are listed in the
+following format:
+`projects/$project/locations/$location/spaces/$space/catalogs/$catalog`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of results to return from this request.
+Non-positive
+ values are ignored. The presence of nextPageToken in the response
+ indicates that more results might be available.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. If present, then retrieve the next batch of results from the
+preceding call to this method. pageToken must be the value of nextPageToken
+from the previous response. The values of other method parameters should be
+identical to those in the previous call.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter that chooses the catalog templates to return.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. How the results should be sorted.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogTemplatesResponse
+
+Message for response to listing catalog templates.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->catalog_templates() >> / C<< $msg->catalog_templates($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::CatalogTemplate>)
+
+The list of catalog templates.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+nextPageToken is included. To get the next set of results, call this method
+again using the value of nextPageToken as pageToken.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::UpdateCatalogTemplateRequest
+
+Message for updating a catalog template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->catalog_template() >> / C<< $msg->catalog_template($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::CatalogTemplate>)
+
+Required. The catalog template to update.
+Format:
+`projects/$project/locations/$location/spaces/$space/catalogs/$catalog/templates/$template`
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The fields to overwrite in the catalog template update. The
+fields specified in the update_mask are relative to the resource, not the
+full request. A field will be overwritten if it is in the mask. If you
+don't provide a mask, all fields are overwritten.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::DeleteCatalogTemplateRequest
+
+Message for deleting a catalog template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The catalog template name.
+Format:
+`projects/$project/locations/$location/spaces/$space/catalogs/$catalog/templates/$template`
+
+=item * C<< $msg->force() >> / C<< $msg->force($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, the catalog template's children are also deleted.
+If false, the catalog template is only deleted if it has no children.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::CreateCatalogTemplateRevisionRequest
+
+Message for creating a template revisions request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent in which the catalog template revisions request is
+created in following format:
+`projects/$project/locations/$location/spaces/$space/templates/$template`
+
+=item * C<< $msg->catalog_template_revision_id() >> / C<< $msg->catalog_template_revision_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the template revision to create.
+
+=item * C<< $msg->catalog_template_revision() >> / C<< $msg->catalog_template_revision($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::CatalogTemplateRevision>)
+
+Required. The template revision to create.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::GetCatalogTemplateRevisionRequest
+
+Message for GetTemplateRevision Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The catalog template revisions name.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogTemplateRevisionsRequest
+
+Message for requesting list of template revisions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource from which a list of catalog template
+revisions is requested.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of results to return from this request.
+Non-positive
+ values are ignored. The presence of nextPageToken in the response
+ indicates that more results might be available.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. If present, then retrieve the next batch of results from the
+preceding call to this method. pageToken must be the value of nextPageToken
+from the previous response. The values of other method parameters should be
+identical to those in the previous call.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter that chooses which catalog template revisions to return.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. How the results should be sorted.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::ListCatalogTemplateRevisionsResponse
+
+Message for response to listing template revisions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->catalog_template_revisions() >> / C<< $msg->catalog_template_revisions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::CatalogManagement::CatalogTemplateRevision>)
+
+The list of template revisions.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+nextPageToken is included. To get the next set of results, call this method
+again using the value of nextPageToken as pageToken.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::DeleteCatalogTemplateRevisionRequest
+
+Message for deleting a template revision.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The template revision name.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::FetchCatalogTemplateRevisionTFSourceRequest
+
+Request message for fetching the Terraform source of a catalog template
+revision.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource
+Eg:
+`projects/$project/locations/$location/spaces/$space/catalogs/$catalog/templates/$template/revisions/$revision`
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::FetchCatalogTemplateRevisionTFSourceResponse
+
+Response message for getting the Terraform source of a catalog template
+revision.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->root_module() >> / C<< $msg->root_module($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::Iac::TerraformModule>)
+
+The root Terraform module of the catalog template revision.
+
+=item * C<< $msg->modules() >> / C<< $msg->modules($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::Iac::TerraformModule>)
+
+The dependent Terraform modules used by the root module.
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::FetchCatalogTemplateRevisionAssessmentReportRequest
+
+Request message for FetchCatalogTemplateRevisionAssessmentReport.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The catalog template revision name in the following format:
+`projects/{project}/locations/{location}/spaces/{space}/catalogs/{catalog}/templates/{template}/revisions/{revision}`
+
+=back
+
+=head2 Google::Cloud::Designcenter::V1::CatalogManagementMessages::FetchCatalogTemplateRevisionAssessmentReportResponse
+
+Response message for FetchCatalogTemplateRevisionAssessmentReport.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->assessment_report() >> / C<< $msg->assessment_report($value) >>
+
+Type: C<Message> (L<Google::Cloud::Designcenter::V1::BestPractices::AssessmentReport>)
+
+Assessment report for the catalog template revision.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Designcenter::V1::CatalogManagementMessages::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

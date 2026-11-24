@@ -3,7 +3,7 @@ package Google::Cloud::Metastore::V1::MetastoreFederation;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -358,68 +358,6 @@ EOF
     # Field: state_message Type: 9 ()
     # Field: uid Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::MetastoreFederation::Federation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::MetastoreFederation;
-
-    my $msg = Google::Cloud::Metastore::V1::MetastoreFederation::Federation->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.metastore.v1.Federation.LabelsEntry)
-
-=item * B<version>
-
-Type: String
-
-=item * B<backend_metastores>
-
-Type: Message (.google.cloud.metastore.v1.Federation.BackendMetastoresEntry)
-
-=item * B<endpoint_uri>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.metastore.v1.Federation.State)
-
-=item * B<state_message>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: Federation::State
 our $Federation_STATE_UNSPECIFIED = 0;
 our $Federation_CREATING = 1;
@@ -428,87 +366,15 @@ our $Federation_UPDATING = 3;
 our $Federation_DELETING = 4;
 our $Federation_ERROR = 5;
 
-=pod
-
-=head2 Enum: Federation::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<UPDATING> => 3
-
-=item * C<DELETING> => 4
-
-=item * C<ERROR> => 5
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::MetastoreFederation::BackendMetastore ===
     # Fields for BackendMetastore
     # Field: name Type: 9 ()
     # Field: metastore_type Type: 14 (.google.cloud.metastore.v1.BackendMetastore.MetastoreType)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::MetastoreFederation::BackendMetastore - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::MetastoreFederation;
-
-    my $msg = Google::Cloud::Metastore::V1::MetastoreFederation::BackendMetastore->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<metastore_type>
-
-Type: Enum (.google.cloud.metastore.v1.BackendMetastore.MetastoreType)
-
-=back
-
-=cut
-
 # Enum: BackendMetastore::MetastoreType
 our $BackendMetastore_METASTORE_TYPE_UNSPECIFIED = 0;
 our $BackendMetastore_BIGQUERY = 2;
 our $BackendMetastore_DATAPROC_METASTORE = 3;
-
-=pod
-
-=head2 Enum: BackendMetastore::MetastoreType
-
-Values:
-
-=over 4
-
-=item * C<METASTORE_TYPE_UNSPECIFIED> => 0
-
-=item * C<BIGQUERY> => 2
-
-=item * C<DATAPROC_METASTORE> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsRequest ===
     # Fields for ListFederationsRequest
@@ -518,117 +384,15 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::MetastoreFederation;
-
-    my $msg = Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse ===
     # Fields for ListFederationsResponse
     # Field: federations Type: 11 (.google.cloud.metastore.v1.Federation)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::MetastoreFederation;
-
-    my $msg = Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse->new(
-        federations => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<federations>
-
-Type: Message (.google.cloud.metastore.v1.Federation)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::MetastoreFederation::GetFederationRequest ===
     # Fields for GetFederationRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::MetastoreFederation::GetFederationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::MetastoreFederation;
-
-    my $msg = Google::Cloud::Metastore::V1::MetastoreFederation::GetFederationRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Metastore::V1::MetastoreFederation::CreateFederationRequest ===
     # Fields for CreateFederationRequest
@@ -637,141 +401,31 @@ Type: String
     # Field: federation Type: 11 (.google.cloud.metastore.v1.Federation)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::MetastoreFederation::CreateFederationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::MetastoreFederation;
-
-    my $msg = Google::Cloud::Metastore::V1::MetastoreFederation::CreateFederationRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<federation_id>
-
-Type: String
-
-=item * B<federation>
-
-Type: Message (.google.cloud.metastore.v1.Federation)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::MetastoreFederation::UpdateFederationRequest ===
     # Fields for UpdateFederationRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: federation Type: 11 (.google.cloud.metastore.v1.Federation)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::MetastoreFederation::UpdateFederationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::MetastoreFederation;
-
-    my $msg = Google::Cloud::Metastore::V1::MetastoreFederation::UpdateFederationRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<federation>
-
-Type: Message (.google.cloud.metastore.v1.Federation)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Metastore::V1::MetastoreFederation::DeleteFederationRequest ===
     # Fields for DeleteFederationRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Metastore::V1::MetastoreFederation::DeleteFederationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Metastore::V1::MetastoreFederation;
-
-    my $msg = Google::Cloud::Metastore::V1::MetastoreFederation::DeleteFederationRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Metastore::V1::MetastoreFederation::DataprocMetastoreFederationClient ===
 package Google::Cloud::Metastore::V1::MetastoreFederation::DataprocMetastoreFederationClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Metastore::V1::MetastoreFederation::DataprocMetastoreFederationClient
 
-Google::Cloud::Metastore::V1::MetastoreFederation::DataprocMetastoreFederationClient - Client stub representing the remote DataprocMetastoreFederation service
+Client stub representing the remote C<DataprocMetastoreFederation> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<metastore.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -865,13 +519,438 @@ sub delete_federation {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Metastore::V1::MetastoreFederation - Protocol Buffers schema definition
+Google::Cloud::Metastore::V1::MetastoreFederation - Compiled Protocol Buffers messages for google/cloud/metastore/v1/metastore_federation.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Metastore::V1::MetastoreFederation;
+
+    my $msg = Google::Cloud::Metastore::V1::MetastoreFederation::Federation->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        labels => $labels,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Metastore::V1::MetastoreFederation::Federation->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/metastore/v1/metastore_federation.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Metastore::V1::MetastoreFederation::Federation
+
+Represents a federation of multiple backend metastores.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. The relative resource name of the federation, of the
+form:
+projects/{project_number}/locations/{location_id}/federations/{federation_id}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the metastore federation was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the metastore federation was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::MetastoreFederation::Federation::LabelsEntry>)
+
+User-defined labels for the metastore federation.
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Immutable. The Apache Hive metastore version of the federation. All backend
+metastore versions must be compatible with the federation version.
+
+=item * C<< $msg->backend_metastores() >> / C<< $msg->backend_metastores($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::MetastoreFederation::Federation::BackendMetastoresEntry>)
+
+A map from `BackendMetastore` rank to `BackendMetastore`s from which the
+federation service serves metadata at query time. The map key represents
+the order in which `BackendMetastore`s should be evaluated to resolve
+database names at query time and should be greater than or equal to zero. A
+`BackendMetastore` with a lower number will be evaluated before a
+`BackendMetastore` with a higher number.
+
+=item * C<< $msg->endpoint_uri() >> / C<< $msg->endpoint_uri($value) >>
+
+Type: C<String>
+
+Output only. The federation endpoint.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::Federation::State>)
+
+Output only. The current state of the federation.
+
+=item * C<< $msg->state_message() >> / C<< $msg->state_message($value) >>
+
+Type: C<String>
+
+Output only. Additional information about the current state of the
+metastore federation, if available.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. The globally unique resource identifier of the metastore
+federation.
+
+=back
+
+=head3 Enum: Federation::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<UPDATING> => C<3>
+
+=item * C<DELETING> => C<4>
+
+=item * C<ERROR> => C<5>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::MetastoreFederation::BackendMetastore
+
+Represents a backend metastore for the federation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The relative resource name of the metastore that is being federated.
+The formats of the relative resource names for the currently supported
+metastores are listed below:
+
+* BigQuery
+    * `projects/{project_id}`
+* Dataproc Metastore
+    * `projects/{project_id}/locations/{location}/services/{service_id}`
+
+=item * C<< $msg->metastore_type() >> / C<< $msg->metastore_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Metastore::V1::BackendMetastore::MetastoreType>)
+
+The type of the backend metastore.
+
+=back
+
+=head3 Enum: BackendMetastore::MetastoreType
+
+=over 4
+
+=item * C<METASTORE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<BIGQUERY> => C<2>
+
+=item * C<DATAPROC_METASTORE> => C<3>
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsRequest
+
+Request message for ListFederations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the location of metastore
+federations to list, in the following form:
+`projects/{project_number}/locations/{location_id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of federations to return. The response may
+contain less than the maximum number. If unspecified, no more than 500
+services are returned. The maximum value is 1000; values above 1000 are
+changed to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous ListFederationServices
+call. Provide this token to retrieve the subsequent page.
+
+To retrieve the first page, supply an empty page token.
+
+When paginating, other parameters provided to
+ListFederationServices must match the call that provided the
+page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. The filter to apply to list results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify the ordering of results as described in [Sorting
+Order](https://cloud.google.com/apis/design/design_patterns#sorting_order).
+If not specified, the results will be sorted in the default order.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse
+
+Response message for ListFederations
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->federations() >> / C<< $msg->federations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::MetastoreFederation::Federation>)
+
+The services in the specified location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page. If this
+field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::MetastoreFederation::GetFederationRequest
+
+Request message for GetFederation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore federation to
+retrieve, in the following form:
+
+`projects/{project_number}/locations/{location_id}/federations/{federation_id}`.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::MetastoreFederation::CreateFederationRequest
+
+Request message for CreateFederation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the location in which to create a
+federation service, in the following form:
+
+`projects/{project_number}/locations/{location_id}`.
+
+=item * C<< $msg->federation_id() >> / C<< $msg->federation_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the metastore federation, which is used as the final
+component of the metastore federation's name.
+
+This value must be between 2 and 63 characters long inclusive, begin with a
+letter, end with a letter or number, and consist of alpha-numeric
+ASCII characters or hyphens.
+
+=item * C<< $msg->federation() >> / C<< $msg->federation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::MetastoreFederation::Federation>)
+
+Required. The Metastore Federation to create. The `name` field is
+ignored. The ID of the created metastore federation must be
+provided in the request's `federation_id` field.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::MetastoreFederation::UpdateFederationRequest
+
+Request message for UpdateFederation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. A field mask used to specify the fields to be overwritten in the
+metastore federation resource by the update.
+Fields specified in the `update_mask` are relative to the resource (not
+to the full request). A field is overwritten if it is in the mask.
+
+=item * C<< $msg->federation() >> / C<< $msg->federation($value) >>
+
+Type: C<Message> (L<Google::Cloud::Metastore::V1::MetastoreFederation::Federation>)
+
+Required. The metastore federation to update. The server only merges fields
+in the service if they are specified in `update_mask`.
+
+The metastore federation's `name` field is used to identify the
+metastore service to be updated.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head2 Google::Cloud::Metastore::V1::MetastoreFederation::DeleteFederationRequest
+
+Request message for DeleteFederation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The relative resource name of the metastore federation to delete,
+in the following form:
+
+`projects/{project_number}/locations/{location_id}/federations/{federation_id}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A request ID. Specify a unique request ID to allow the server to
+ignore the request if it has completed. The server will ignore subsequent
+requests that provide a duplicate request ID for at least 60 minutes after
+the first request.
+
+For example, if an initial request times out, followed by another request
+with the same request ID, the server ignores the second request to prevent
+the creation of duplicate commitments.
+
+The request ID must be a valid
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier#Format)
+A zero UUID (00000000-0000-0000-0000-000000000000) is not supported.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Metastore::V1::MetastoreFederation::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

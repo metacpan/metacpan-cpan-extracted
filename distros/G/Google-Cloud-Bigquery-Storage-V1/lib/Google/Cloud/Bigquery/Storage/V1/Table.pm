@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::Storage::V1::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -174,32 +174,6 @@ EOF
     # Fields for TableSchema
     # Field: fields Type: 11 (.google.cloud.bigquery.storage.v1.TableFieldSchema)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Table::TableSchema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Table;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Table::TableSchema->new(
-        fields => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<fields>
-
-Type: Message (.google.cloud.bigquery.storage.v1.TableFieldSchema)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Table::TableFieldSchema ===
     # Fields for TableFieldSchema
     # Field: name Type: 9 ()
@@ -213,72 +187,6 @@ Type: Message (.google.cloud.bigquery.storage.v1.TableFieldSchema)
     # Field: default_value_expression Type: 9 ()
     # Field: timestamp_precision Type: 11 (.google.protobuf.Int64Value)
     # Field: range_element_type Type: 11 (.google.cloud.bigquery.storage.v1.TableFieldSchema.FieldElementType)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Table::TableFieldSchema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Table;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Table::TableFieldSchema->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.TableFieldSchema.Type)
-
-=item * B<mode>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.TableFieldSchema.Mode)
-
-=item * B<fields>
-
-Type: Message (.google.cloud.bigquery.storage.v1.TableFieldSchema)
-
-=item * B<description>
-
-Type: String
-
-=item * B<max_length>
-
-Type: Int64
-
-=item * B<precision>
-
-Type: Int64
-
-=item * B<scale>
-
-Type: Int64
-
-=item * B<default_value_expression>
-
-Type: String
-
-=item * B<timestamp_precision>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<range_element_type>
-
-Type: Message (.google.cloud.bigquery.storage.v1.TableFieldSchema.FieldElementType)
-
-=back
-
-=cut
 
 # Enum: TableFieldSchema::Type
 our $TableFieldSchema_TYPE_UNSPECIFIED = 0;
@@ -299,89 +207,260 @@ our $TableFieldSchema_INTERVAL = 14;
 our $TableFieldSchema_JSON = 15;
 our $TableFieldSchema_RANGE = 16;
 
-=pod
-
-=head2 Enum: TableFieldSchema::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<STRING> => 1
-
-=item * C<INT64> => 2
-
-=item * C<DOUBLE> => 3
-
-=item * C<STRUCT> => 4
-
-=item * C<BYTES> => 5
-
-=item * C<BOOL> => 6
-
-=item * C<TIMESTAMP> => 7
-
-=item * C<DATE> => 8
-
-=item * C<TIME> => 9
-
-=item * C<DATETIME> => 10
-
-=item * C<GEOGRAPHY> => 11
-
-=item * C<NUMERIC> => 12
-
-=item * C<BIGNUMERIC> => 13
-
-=item * C<INTERVAL> => 14
-
-=item * C<JSON> => 15
-
-=item * C<RANGE> => 16
-
-=back
-
-=cut
-
 # Enum: TableFieldSchema::Mode
 our $TableFieldSchema_MODE_UNSPECIFIED = 0;
 our $TableFieldSchema_NULLABLE = 1;
 our $TableFieldSchema_REQUIRED = 2;
 our $TableFieldSchema_REPEATED = 3;
 
-=pod
-
-=head2 Enum: TableFieldSchema::Mode
-
-Values:
-
-=over 4
-
-=item * C<MODE_UNSPECIFIED> => 0
-
-=item * C<NULLABLE> => 1
-
-=item * C<REQUIRED> => 2
-
-=item * C<REPEATED> => 3
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::Storage::V1::Table - Protocol Buffers schema definition
+Google::Cloud::Bigquery::Storage::V1::Table - Compiled Protocol Buffers messages for google/cloud/bigquery/storage/v1/table.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::Storage::V1::Table;
+
+    my $msg = Google::Cloud::Bigquery::Storage::V1::Table::TableSchema->new({
+        fields => $fields,
+    });
+
+    # Read or update a field
+    my $val = $msg->fields();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::Storage::V1::Table::TableSchema->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/storage/v1/table.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Table::TableSchema
+
+Schema of a table. This schema is a subset of
+google.cloud.bigquery.v2.TableSchema containing information necessary to
+generate valid message to write to BigQuery.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Table::TableFieldSchema>)
+
+Describes the fields in a table.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Table::TableFieldSchema
+
+TableFieldSchema defines a single field/column within a table schema.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The field name. The name must contain only letters (a-z, A-Z),
+numbers (0-9), or underscores (_), and must start with a letter or
+underscore. The maximum length is 128 characters.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::TableFieldSchema::Type>)
+
+Required. The field data type.
+
+=item * C<< $msg->mode() >> / C<< $msg->mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::TableFieldSchema::Mode>)
+
+Optional. The field mode. The default value is NULLABLE.
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Table::TableFieldSchema>)
+
+Optional. Describes the nested schema fields if the type property is set to
+STRUCT.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. The field description. The maximum length is 1,024 characters.
+
+=item * C<< $msg->max_length() >> / C<< $msg->max_length($value) >>
+
+Type: C<Int64>
+
+Optional. Maximum length of values of this field for STRINGS or BYTES.
+
+If max_length is not specified, no maximum length constraint is imposed
+on this field.
+
+If type = "STRING", then max_length represents the maximum UTF-8
+length of strings in this field.
+
+If type = "BYTES", then max_length represents the maximum number of
+bytes in this field.
+
+It is invalid to set this field if type is not "STRING" or "BYTES".
+
+=item * C<< $msg->precision() >> / C<< $msg->precision($value) >>
+
+Type: C<Int64>
+
+Optional. Precision (maximum number of total digits in base 10) and scale
+(maximum number of digits in the fractional part in base 10) constraints
+for values of this field for NUMERIC or BIGNUMERIC.
+
+It is invalid to set precision or scale if type is not "NUMERIC" or
+"BIGNUMERIC".
+
+If precision and scale are not specified, no value range constraint is
+imposed on this field insofar as values are permitted by the type.
+
+Values of this NUMERIC or BIGNUMERIC field must be in this range when:
+
+* Precision (P) and scale (S) are specified:
+  [-10^(P-S) + 10^(-S), 10^(P-S) - 10^(-S)]
+* Precision (P) is specified but not scale (and thus scale is
+  interpreted to be equal to zero):
+  [-10^P + 1, 10^P - 1].
+
+Acceptable values for precision and scale if both are specified:
+
+* If type = "NUMERIC":
+  1 <= precision - scale <= 29 and 0 <= scale <= 9.
+* If type = "BIGNUMERIC":
+  1 <= precision - scale <= 38 and 0 <= scale <= 38.
+
+Acceptable values for precision if only precision is specified but not
+scale (and thus scale is interpreted to be equal to zero):
+
+* If type = "NUMERIC": 1 <= precision <= 29.
+* If type = "BIGNUMERIC": 1 <= precision <= 38.
+
+If scale is specified but not precision, then it is invalid.
+
+=item * C<< $msg->scale() >> / C<< $msg->scale($value) >>
+
+Type: C<Int64>
+
+Optional. See documentation for precision.
+
+=item * C<< $msg->default_value_expression() >> / C<< $msg->default_value_expression($value) >>
+
+Type: C<String>
+
+Optional. A SQL expression to specify the [default value]
+(https://cloud.google.com/bigquery/docs/default-values) for this field.
+
+=item * C<< $msg->timestamp_precision() >> / C<< $msg->timestamp_precision($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. Precision (maximum number of total digits in base 10) for seconds
+of TIMESTAMP type.
+
+Possible values include:
+
+* 6 (Default, for TIMESTAMP type with microsecond precision)
+* 12 (For TIMESTAMP type with picosecond precision)
+
+=item * C<< $msg->range_element_type() >> / C<< $msg->range_element_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Table::TableFieldSchema::FieldElementType>)
+
+Optional. The subtype of the RANGE, if the type of this field is RANGE. If
+the type is RANGE, this field is required. Possible values for the field
+element type of a RANGE include:
+* DATE
+* DATETIME
+* TIMESTAMP
+
+=back
+
+=head3 Enum: TableFieldSchema::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<STRING> => C<1>
+
+=item * C<INT64> => C<2>
+
+=item * C<DOUBLE> => C<3>
+
+=item * C<STRUCT> => C<4>
+
+=item * C<BYTES> => C<5>
+
+=item * C<BOOL> => C<6>
+
+=item * C<TIMESTAMP> => C<7>
+
+=item * C<DATE> => C<8>
+
+=item * C<TIME> => C<9>
+
+=item * C<DATETIME> => C<10>
+
+=item * C<GEOGRAPHY> => C<11>
+
+=item * C<NUMERIC> => C<12>
+
+=item * C<BIGNUMERIC> => C<13>
+
+=item * C<INTERVAL> => C<14>
+
+=item * C<JSON> => C<15>
+
+=item * C<RANGE> => C<16>
+
+=back
+
+=head3 Enum: TableFieldSchema::Mode
+
+=over 4
+
+=item * C<MODE_UNSPECIFIED> => C<0>
+
+=item * C<NULLABLE> => C<1>
+
+=item * C<REQUIRED> => C<2>
+
+=item * C<REPEATED> => C<3>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::Storage::V1::Table::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

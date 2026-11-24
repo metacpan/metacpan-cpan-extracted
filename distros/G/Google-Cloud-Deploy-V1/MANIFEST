@@ -1,0 +1,46 @@
+Changes
+lib/Google/Cloud/Deploy/V1.pm
+lib/Google/Cloud/Deploy/V1/AutomationPayload.pm
+lib/Google/Cloud/Deploy/V1/AutomationPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/AutomationrunPayload.pm
+lib/Google/Cloud/Deploy/V1/AutomationrunPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/CloudDeploy.pm
+lib/Google/Cloud/Deploy/V1/CloudDeploy/Types.pm
+lib/Google/Cloud/Deploy/V1/CloudDeployClient.pm
+lib/Google/Cloud/Deploy/V1/CustomtargettypeNotificationPayload.pm
+lib/Google/Cloud/Deploy/V1/CustomtargettypeNotificationPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/DeliverypipelineNotificationPayload.pm
+lib/Google/Cloud/Deploy/V1/DeliverypipelineNotificationPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/DeploypolicyEvaluationPayload.pm
+lib/Google/Cloud/Deploy/V1/DeploypolicyEvaluationPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/DeploypolicyNotificationPayload.pm
+lib/Google/Cloud/Deploy/V1/DeploypolicyNotificationPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/JobrunNotificationPayload.pm
+lib/Google/Cloud/Deploy/V1/JobrunNotificationPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/LogEnums.pm
+lib/Google/Cloud/Deploy/V1/LogEnums/Types.pm
+lib/Google/Cloud/Deploy/V1/ReleaseNotificationPayload.pm
+lib/Google/Cloud/Deploy/V1/ReleaseNotificationPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/ReleaseRenderPayload.pm
+lib/Google/Cloud/Deploy/V1/ReleaseRenderPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/RolloutNotificationPayload.pm
+lib/Google/Cloud/Deploy/V1/RolloutNotificationPayload/Types.pm
+lib/Google/Cloud/Deploy/V1/RolloutUpdatePayload.pm
+lib/Google/Cloud/Deploy/V1/RolloutUpdatePayload/Types.pm
+lib/Google/Cloud/Deploy/V1/TargetNotificationPayload.pm
+lib/Google/Cloud/Deploy/V1/TargetNotificationPayload/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-CloudDeploy.t
+t/01-service-Default.t
+t/02-rest-transport-CloudDeploy.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

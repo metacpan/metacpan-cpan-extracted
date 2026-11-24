@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::Storage::V1::Avro;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -92,101 +92,15 @@ EOF
     # Fields for AvroSchema
     # Field: schema Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Avro::AvroSchema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Avro;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Avro::AvroSchema->new(
-        schema => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<schema>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Avro::AvroRows ===
     # Fields for AvroRows
     # Field: serialized_binary_rows Type: 12 ()
     # Field: row_count Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Avro::AvroRows - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Avro;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Avro::AvroRows->new(
-        serialized_binary_rows => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<serialized_binary_rows>
-
-Type: Bytes
-
-=item * B<row_count>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Avro::AvroSerializationOptions ===
     # Fields for AvroSerializationOptions
     # Field: enable_display_name_attribute Type: 8 ()
     # Field: picos_timestamp_precision Type: 14 (.google.cloud.bigquery.storage.v1.AvroSerializationOptions.PicosTimestampPrecision)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Avro::AvroSerializationOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Avro;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Avro::AvroSerializationOptions->new(
-        enable_display_name_attribute => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enable_display_name_attribute>
-
-Type: Bool
-
-=item * B<picos_timestamp_precision>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.AvroSerializationOptions.PicosTimestampPrecision)
-
-=back
-
-=cut
 
 # Enum: AvroSerializationOptions::PicosTimestampPrecision
 our $AvroSerializationOptions_PICOS_TIMESTAMP_PRECISION_UNSPECIFIED = 0;
@@ -194,37 +108,137 @@ our $AvroSerializationOptions_TIMESTAMP_PRECISION_MICROS = 1;
 our $AvroSerializationOptions_TIMESTAMP_PRECISION_NANOS = 2;
 our $AvroSerializationOptions_TIMESTAMP_PRECISION_PICOS = 3;
 
-=pod
-
-=head2 Enum: AvroSerializationOptions::PicosTimestampPrecision
-
-Values:
-
-=over 4
-
-=item * C<PICOS_TIMESTAMP_PRECISION_UNSPECIFIED> => 0
-
-=item * C<TIMESTAMP_PRECISION_MICROS> => 1
-
-=item * C<TIMESTAMP_PRECISION_NANOS> => 2
-
-=item * C<TIMESTAMP_PRECISION_PICOS> => 3
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::Storage::V1::Avro - Protocol Buffers schema definition
+Google::Cloud::Bigquery::Storage::V1::Avro - Compiled Protocol Buffers messages for google/cloud/bigquery/storage/v1/avro.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::Storage::V1::Avro;
+
+    my $msg = Google::Cloud::Bigquery::Storage::V1::Avro::AvroSchema->new({
+        schema => $schema,
+    });
+
+    # Read or update a field
+    my $val = $msg->schema();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::Storage::V1::Avro::AvroSchema->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/storage/v1/avro.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Avro::AvroSchema
+
+Avro schema.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<String>
+
+Json serialized schema, as described at
+https://avro.apache.org/docs/1.8.1/spec.html.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Avro::AvroRows
+
+Avro rows.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->serialized_binary_rows() >> / C<< $msg->serialized_binary_rows($value) >>
+
+Type: C<Bytes>
+
+Binary serialized rows in a block.
+
+=item * C<< $msg->row_count() >> / C<< $msg->row_count($value) >>
+
+Type: C<Int64>
+
+[Deprecated] The count of rows in the returning block.
+Please use the format-independent ReadRowsResponse.row_count instead.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Avro::AvroSerializationOptions
+
+Contains options specific to Avro Serialization.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enable_display_name_attribute() >> / C<< $msg->enable_display_name_attribute($value) >>
+
+Type: C<Bool>
+
+Enable displayName attribute in Avro schema.
+
+The Avro specification requires field names to be alphanumeric.  By
+default, in cases when column names do not conform to these requirements
+(e.g. non-ascii unicode codepoints) and Avro is requested as an output
+format, the CreateReadSession call will fail.
+
+Setting this field to true, populates avro field names with a placeholder
+value and populates a "displayName" attribute for every avro field with the
+original column name.
+
+=item * C<< $msg->picos_timestamp_precision() >> / C<< $msg->picos_timestamp_precision($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::AvroSerializationOptions::PicosTimestampPrecision>)
+
+Optional. Set timestamp precision option. If not set, the default precision
+is microseconds.
+
+=back
+
+=head3 Enum: AvroSerializationOptions::PicosTimestampPrecision
+
+=over 4
+
+=item * C<PICOS_TIMESTAMP_PRECISION_UNSPECIFIED> => C<0>
+
+=item * C<TIMESTAMP_PRECISION_MICROS> => C<1>
+
+=item * C<TIMESTAMP_PRECISION_NANOS> => C<2>
+
+=item * C<TIMESTAMP_PRECISION_PICOS> => C<3>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::Storage::V1::Avro::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

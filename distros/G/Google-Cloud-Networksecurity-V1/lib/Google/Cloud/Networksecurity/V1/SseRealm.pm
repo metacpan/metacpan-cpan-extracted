@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::SseRealm;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -460,75 +460,9 @@ EOF
     # Field: pairing_key Type: 11 (.google.cloud.networksecurity.v1.SACRealm.PairingKey)
     # Field: state Type: 14 (.google.cloud.networksecurity.v1.SACRealm.State)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::SACRealm - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::SACRealm->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.SACRealm.LabelsEntry)
-
-=item * B<security_service>
-
-Type: Enum (.google.cloud.networksecurity.v1.SACRealm.SecurityService)
-
-=item * B<pairing_key>
-
-Type: Message (.google.cloud.networksecurity.v1.SACRealm.PairingKey)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.SACRealm.State)
-
-=back
-
-=cut
-
 # Enum: SACRealm::SecurityService
 our $SACRealm_SECURITY_SERVICE_UNSPECIFIED = 0;
 our $SACRealm_PALO_ALTO_PRISMA_ACCESS = 1;
-
-=pod
-
-=head2 Enum: SACRealm::SecurityService
-
-Values:
-
-=over 4
-
-=item * C<SECURITY_SERVICE_UNSPECIFIED> => 0
-
-=item * C<PALO_ALTO_PRISMA_ACCESS> => 1
-
-=back
-
-=cut
 
 # Enum: SACRealm::State
 our $SACRealm_STATE_UNSPECIFIED = 0;
@@ -536,28 +470,6 @@ our $SACRealm_PENDING_PARTNER_ATTACHMENT = 7;
 our $SACRealm_PARTNER_ATTACHED = 1;
 our $SACRealm_PARTNER_DETACHED = 2;
 our $SACRealm_KEY_EXPIRED = 3;
-
-=pod
-
-=head2 Enum: SACRealm::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<PENDING_PARTNER_ATTACHMENT> => 7
-
-=item * C<PARTNER_ATTACHED> => 1
-
-=item * C<PARTNER_DETACHED> => 2
-
-=item * C<KEY_EXPIRED> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsRequest ===
     # Fields for ListSACRealmsRequest
@@ -567,117 +479,15 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsResponse ===
     # Fields for ListSACRealmsResponse
     # Field: sac_realms Type: 11 (.google.cloud.networksecurity.v1.SACRealm)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsResponse->new(
-        sac_realms => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<sac_realms>
-
-Type: Message (.google.cloud.networksecurity.v1.SACRealm)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::GetSACRealmRequest ===
     # Fields for GetSACRealmRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::GetSACRealmRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::GetSACRealmRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::CreateSACRealmRequest ===
     # Fields for CreateSACRealmRequest
@@ -686,78 +496,10 @@ Type: String
     # Field: sac_realm Type: 11 (.google.cloud.networksecurity.v1.SACRealm)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::CreateSACRealmRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::CreateSACRealmRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<sac_realm_id>
-
-Type: String
-
-=item * B<sac_realm>
-
-Type: Message (.google.cloud.networksecurity.v1.SACRealm)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::DeleteSACRealmRequest ===
     # Fields for DeleteSACRealmRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::DeleteSACRealmRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::DeleteSACRealmRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::SACAttachment ===
     # Fields for SACAttachment
@@ -769,81 +511,11 @@ Type: String
     # Field: ncc_gateway Type: 9 ()
     # Field: state Type: 14 (.google.cloud.networksecurity.v1.SACAttachment.State)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::SACAttachment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::SACAttachment->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.SACAttachment.LabelsEntry)
-
-=item * B<sac_realm>
-
-Type: String
-
-=item * B<ncc_gateway>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.SACAttachment.State)
-
-=back
-
-=cut
-
 # Enum: SACAttachment::State
 our $SACAttachment_STATE_UNSPECIFIED = 0;
 our $SACAttachment_PENDING_PARTNER_ATTACHMENT = 1;
 our $SACAttachment_PARTNER_ATTACHED = 2;
 our $SACAttachment_PARTNER_DETACHED = 3;
-
-=pod
-
-=head2 Enum: SACAttachment::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<PENDING_PARTNER_ATTACHMENT> => 1
-
-=item * C<PARTNER_ATTACHED> => 2
-
-=item * C<PARTNER_DETACHED> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::ListSACAttachmentsRequest ===
     # Fields for ListSACAttachmentsRequest
@@ -853,117 +525,15 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::ListSACAttachmentsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::ListSACAttachmentsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::ListSACAttachmentsResponse ===
     # Fields for ListSACAttachmentsResponse
     # Field: sac_attachments Type: 11 (.google.cloud.networksecurity.v1.SACAttachment)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::ListSACAttachmentsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::ListSACAttachmentsResponse->new(
-        sac_attachments => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<sac_attachments>
-
-Type: Message (.google.cloud.networksecurity.v1.SACAttachment)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::GetSACAttachmentRequest ===
     # Fields for GetSACAttachmentRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::GetSACAttachmentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::GetSACAttachmentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::CreateSACAttachmentRequest ===
     # Fields for CreateSACAttachmentRequest
@@ -972,101 +542,25 @@ Type: String
     # Field: sac_attachment Type: 11 (.google.cloud.networksecurity.v1.SACAttachment)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::CreateSACAttachmentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::CreateSACAttachmentRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<sac_attachment_id>
-
-Type: String
-
-=item * B<sac_attachment>
-
-Type: Message (.google.cloud.networksecurity.v1.SACAttachment)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SseRealm::DeleteSACAttachmentRequest ===
     # Fields for DeleteSACAttachmentRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SseRealm::DeleteSACAttachmentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SseRealm;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::DeleteSACAttachmentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Networksecurity::V1::SseRealm::SSERealmServiceClient ===
 package Google::Cloud::Networksecurity::V1::SseRealm::SSERealmServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networksecurity::V1::SseRealm::SSERealmServiceClient
 
-Google::Cloud::Networksecurity::V1::SseRealm::SSERealmServiceClient - Client stub representing the remote SSERealmService service
+Client stub representing the remote C<SSERealmService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networksecurity.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1199,13 +693,574 @@ sub delete_s_a_c_attachment {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::SseRealm - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::SseRealm - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/sse_realm.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::SseRealm;
+
+    my $msg = Google::Cloud::Networksecurity::V1::SseRealm::SACRealm->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        labels => $labels,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::SseRealm::SACRealm->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/sse_realm.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::SACRealm
+
+Represents a Secure Access Connect (SAC) realm resource.
+
+A Secure Access Connect realm establishes a connection between your Google
+Cloud project and an SSE service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Resource name, in the form
+`projects/{project}/locations/global/sacRealms/{sacRealm}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when the realm was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when the realm was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SseRealm::SACRealm::LabelsEntry>)
+
+Optional. Optional list of labels applied to the resource.
+
+=item * C<< $msg->security_service() >> / C<< $msg->security_service($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::SACRealm::SecurityService>)
+
+Immutable. SSE service provider associated with the realm.
+
+=item * C<< $msg->pairing_key() >> / C<< $msg->pairing_key($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SseRealm::SACRealm::PairingKey>)
+
+Output only. Key to be shared with SSE service provider during pairing.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::SACRealm::State>)
+
+Output only. State of the realm.
+
+=back
+
+=head3 Enum: SACRealm::SecurityService
+
+=over 4
+
+=item * C<SECURITY_SERVICE_UNSPECIFIED> => C<0>
+
+=item * C<PALO_ALTO_PRISMA_ACCESS> => C<1>
+
+=back
+
+=head3 Enum: SACRealm::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<PENDING_PARTNER_ATTACHMENT> => C<7>
+
+=item * C<PARTNER_ATTACHED> => C<1>
+
+=item * C<PARTNER_DETACHED> => C<2>
+
+=item * C<KEY_EXPIRED> => C<3>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsRequest
+
+Request for `ListSACRealms` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, in the form `projects/{project}/locations/global`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results the server should return.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. An expression that filters the list of results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort the results by a certain order.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::ListSACRealmsResponse
+
+Response for `ListSACRealms` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->sac_realms() >> / C<< $msg->sac_realms($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SseRealm::SACRealm>)
+
+The list of SACRealms.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results the server should return.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::GetSACRealmRequest
+
+Request for `GetSACRealm` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource, in the form
+`projects/{project}/locations/global/sacRealms/{sacRealm}`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::CreateSACRealmRequest
+
+Request for `CreateSACRealm` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, in the form `projects/{project}/locations/global`.
+
+=item * C<< $msg->sac_realm_id() >> / C<< $msg->sac_realm_id($value) >>
+
+Type: C<String>
+
+Required. ID of the created realm.
+The ID must be 1-63 characters long, and comply with
+<a href="https://www.ietf.org/rfc/rfc1035.txt" target="_blank">RFC1035</a>.
+Specifically, it must be 1-63 characters long and match the regular
+expression `[a-z]([-a-z0-9]*[a-z0-9])?`
+which means the first character must be a lowercase letter, and all
+following characters must be a dash, lowercase letter, or digit, except
+the last character, which cannot be a dash.
+
+=item * C<< $msg->sac_realm() >> / C<< $msg->sac_realm($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SseRealm::SACRealm>)
+
+Required. The resource being created.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::DeleteSACRealmRequest
+
+Request for `DeleteSACRealm` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource, in the form
+`projects/{project}/locations/global/sacRealms/{sacRealm}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes after the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::SACAttachment
+
+Represents a Secure Access Connect (SAC) attachment resource.
+
+A Secure Access Connect attachment enables NCC Gateway to process traffic
+with an SSE product.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Resource name, in the form
+`projects/{project}/locations/{location}/sacAttachments/{sac_attachment}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when the attachment was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when the attachment was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SseRealm::SACAttachment::LabelsEntry>)
+
+Optional. Optional list of labels applied to the resource.
+
+=item * C<< $msg->sac_realm() >> / C<< $msg->sac_realm($value) >>
+
+Type: C<String>
+
+Required. SAC Realm which owns the attachment. This can be input as an ID
+or a full resource name. The output always has the form
+`projects/{project_number}/locations/{location}/sacRealms/{sac_realm}`.
+
+=item * C<< $msg->ncc_gateway() >> / C<< $msg->ncc_gateway($value) >>
+
+Type: C<String>
+
+Required. NCC Gateway associated with the attachment. This can be input as
+an ID or a full resource name. The output always has the form
+`projects/{project_number}/locations/{location}/spokes/{ncc_gateway}`.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::SACAttachment::State>)
+
+Output only. State of the attachment.
+
+=back
+
+=head3 Enum: SACAttachment::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<PENDING_PARTNER_ATTACHMENT> => C<1>
+
+=item * C<PARTNER_ATTACHED> => C<2>
+
+=item * C<PARTNER_DETACHED> => C<3>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::ListSACAttachmentsRequest
+
+Request for `ListSACAttachments` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, in the form
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results the server should return.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. An expression that filters the list of results.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Sort the results by a certain order.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::ListSACAttachmentsResponse
+
+Response for `ListSACAttachments` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->sac_attachments() >> / C<< $msg->sac_attachments($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SseRealm::SACAttachment>)
+
+The list of SACAttachments.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results the server should return.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::GetSACAttachmentRequest
+
+Request for `GetSACAttachment` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource, in the form
+`projects/{project}/locations/{location}/sacAttachments/{sac_attachment}`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::CreateSACAttachmentRequest
+
+Request for `CreateSACAttachment` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, in the form
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->sac_attachment_id() >> / C<< $msg->sac_attachment_id($value) >>
+
+Type: C<String>
+
+Required. ID of the created attachment.
+The ID must be 1-63 characters long, and comply with
+<a href="https://www.ietf.org/rfc/rfc1035.txt" target="_blank">RFC1035</a>.
+Specifically, it must be 1-63 characters long and match the regular
+expression `[a-z]([-a-z0-9]*[a-z0-9])?`
+which means the first character must be a lowercase letter, and all
+following characters must be a dash, lowercase letter, or digit, except
+the last character, which cannot be a dash.
+
+=item * C<< $msg->sac_attachment() >> / C<< $msg->sac_attachment($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SseRealm::SACAttachment>)
+
+Required. The resource being created.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SseRealm::DeleteSACAttachmentRequest
+
+Request for `DeleteSACAttachment` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource, in the form
+`projects/{project}/locations/{location}/sacAttachments/{sac_attachment}`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes after the first request.
+
+For example, consider a situation where you make an initial request and the
+request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::SseRealm::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

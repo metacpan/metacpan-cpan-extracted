@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::JobReference;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -61,51 +61,82 @@ EOF
     # Field: job_id Type: 9 ()
     # Field: location Type: 11 (.google.protobuf.StringValue)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::JobReference::JobReference - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::JobReference - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/job_reference.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::JobReference;
 
-    my $msg = Google::Cloud::Bigquery::V2::JobReference::JobReference->new(
-        project_id => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::JobReference::JobReference->new({
+        project_id => $project_id,
+        job_id => $job_id,
+        location => $location,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->project_id();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::JobReference::JobReference->parse($bytes);
 
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<location>
-
-Type: Message (.google.protobuf.StringValue)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobReference - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/job_reference.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::JobReference::JobReference
+
+A job reference is a fully qualified identifier for referring to a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the project containing this job.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the job. The ID must contain only letters (a-z, A-Z),
+numbers (0-9), underscores (_), or dashes (-). The maximum length is 1,024
+characters.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. The geographic location of the job. The default value is US.
+
+For more information about BigQuery locations, see:
+https://cloud.google.com/bigquery/docs/locations
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::JobReference::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

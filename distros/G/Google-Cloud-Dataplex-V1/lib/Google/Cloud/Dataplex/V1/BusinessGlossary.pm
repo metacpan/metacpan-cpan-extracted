@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::BusinessGlossary;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -645,68 +645,6 @@ EOF
     # Field: category_count Type: 5 ()
     # Field: etag Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.Glossary.LabelsEntry)
-
-=item * B<term_count>
-
-Type: Int32
-
-=item * B<category_count>
-
-Type: Int32
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryCategory ===
     # Fields for GlossaryCategory
     # Field: name Type: 9 ()
@@ -717,60 +655,6 @@ Type: String
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
     # Field: labels Type: 11 (.google.cloud.dataplex.v1.GlossaryCategory.LabelsEntry)
     # Field: parent Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryCategory - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryCategory->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.GlossaryCategory.LabelsEntry)
-
-=item * B<parent>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryTerm ===
     # Fields for GlossaryTerm
@@ -783,60 +667,6 @@ Type: String
     # Field: labels Type: 11 (.google.cloud.dataplex.v1.GlossaryTerm.LabelsEntry)
     # Field: parent Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryTerm - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryTerm->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.GlossaryTerm.LabelsEntry)
-
-=item * B<parent>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryRequest ===
     # Fields for CreateGlossaryRequest
     # Field: parent Type: 9 ()
@@ -844,148 +674,20 @@ Type: String
     # Field: glossary Type: 11 (.google.cloud.dataplex.v1.Glossary)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<glossary_id>
-
-Type: String
-
-=item * B<glossary>
-
-Type: Message (.google.cloud.dataplex.v1.Glossary)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryRequest ===
     # Fields for UpdateGlossaryRequest
     # Field: glossary Type: 11 (.google.cloud.dataplex.v1.Glossary)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryRequest->new(
-        glossary => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<glossary>
-
-Type: Message (.google.cloud.dataplex.v1.Glossary)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryRequest ===
     # Fields for DeleteGlossaryRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryRequest ===
     # Fields for GetGlossaryRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossariesRequest ===
     # Fields for ListGlossariesRequest
@@ -995,87 +697,11 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossariesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossariesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossariesResponse ===
     # Fields for ListGlossariesResponse
     # Field: glossaries Type: 11 (.google.cloud.dataplex.v1.Glossary)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossariesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossariesResponse->new(
-        glossaries => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<glossaries>
-
-Type: Message (.google.cloud.dataplex.v1.Glossary)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryCategoryRequest ===
     # Fields for CreateGlossaryCategoryRequest
@@ -1083,134 +709,18 @@ Type: String
     # Field: category_id Type: 9 ()
     # Field: category Type: 11 (.google.cloud.dataplex.v1.GlossaryCategory)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryCategoryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryCategoryRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<category_id>
-
-Type: String
-
-=item * B<category>
-
-Type: Message (.google.cloud.dataplex.v1.GlossaryCategory)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryCategoryRequest ===
     # Fields for UpdateGlossaryCategoryRequest
     # Field: category Type: 11 (.google.cloud.dataplex.v1.GlossaryCategory)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryCategoryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryCategoryRequest->new(
-        category => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<category>
-
-Type: Message (.google.cloud.dataplex.v1.GlossaryCategory)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryCategoryRequest ===
     # Fields for DeleteGlossaryCategoryRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryCategoryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryCategoryRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryCategoryRequest ===
     # Fields for GetGlossaryCategoryRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryCategoryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryCategoryRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryCategoriesRequest ===
     # Fields for ListGlossaryCategoriesRequest
@@ -1220,87 +730,11 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryCategoriesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryCategoriesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryCategoriesResponse ===
     # Fields for ListGlossaryCategoriesResponse
     # Field: categories Type: 11 (.google.cloud.dataplex.v1.GlossaryCategory)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryCategoriesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryCategoriesResponse->new(
-        categories => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<categories>
-
-Type: Message (.google.cloud.dataplex.v1.GlossaryCategory)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryTermRequest ===
     # Fields for CreateGlossaryTermRequest
@@ -1308,134 +742,18 @@ Type: String
     # Field: term_id Type: 9 ()
     # Field: term Type: 11 (.google.cloud.dataplex.v1.GlossaryTerm)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryTermRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryTermRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<term_id>
-
-Type: String
-
-=item * B<term>
-
-Type: Message (.google.cloud.dataplex.v1.GlossaryTerm)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryTermRequest ===
     # Fields for UpdateGlossaryTermRequest
     # Field: term Type: 11 (.google.cloud.dataplex.v1.GlossaryTerm)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryTermRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryTermRequest->new(
-        term => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<term>
-
-Type: Message (.google.cloud.dataplex.v1.GlossaryTerm)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryTermRequest ===
     # Fields for DeleteGlossaryTermRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryTermRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryTermRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryTermRequest ===
     # Fields for GetGlossaryTermRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryTermRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryTermRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryTermsRequest ===
     # Fields for ListGlossaryTermsRequest
@@ -1445,110 +763,26 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryTermsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryTermsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryTermsResponse ===
     # Fields for ListGlossaryTermsResponse
     # Field: terms Type: 11 (.google.cloud.dataplex.v1.GlossaryTerm)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryTermsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::BusinessGlossary;
-
-    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryTermsResponse->new(
-        terms => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<terms>
-
-Type: Message (.google.cloud.dataplex.v1.GlossaryTerm)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Dataplex::V1::BusinessGlossary::BusinessGlossaryServiceClient ===
 package Google::Cloud::Dataplex::V1::BusinessGlossary::BusinessGlossaryServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataplex::V1::BusinessGlossary::BusinessGlossaryServiceClient
 
-Google::Cloud::Dataplex::V1::BusinessGlossary::BusinessGlossaryServiceClient - Client stub representing the remote BusinessGlossaryService service
+Client stub representing the remote C<BusinessGlossaryService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataplex.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1772,13 +1006,870 @@ sub list_glossary_terms {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::BusinessGlossary - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::BusinessGlossary - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/business_glossary.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::BusinessGlossary;
+
+    my $msg = Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary->new({
+        name => $name,
+        uid => $uid,
+        display_name => $display_name,
+        description => $description,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/business_glossary.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary
+
+A Glossary represents a collection of GlossaryCategories and GlossaryTerms
+defined by the user. Glossary is a top level resource and is the Google Cloud
+parent resource of all the GlossaryCategories and GlossaryTerms within it.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The resource name of the Glossary.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated unique id for the Glossary. This ID will be
+different if the Glossary is deleted and re-created with the
+same name.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name of the Glossary. This is user-mutable.
+This will be same as the GlossaryId, if not specified.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. The user-mutable description of the Glossary.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the Glossary was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the Glossary was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary::LabelsEntry>)
+
+Optional. User-defined labels for the Glossary.
+
+=item * C<< $msg->term_count() >> / C<< $msg->term_count($value) >>
+
+Type: C<Int32>
+
+Output only. The number of GlossaryTerms in the Glossary.
+
+=item * C<< $msg->category_count() >> / C<< $msg->category_count($value) >>
+
+Type: C<Int32>
+
+Output only. The number of GlossaryCategories in the Glossary.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Needed for resource freshness validation.
+This checksum is computed by the server based on the value of other
+fields, and may be sent on update and delete requests to ensure the
+client has an up-to-date value before proceeding.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryCategory
+
+A GlossaryCategory represents a collection of GlossaryCategories and
+GlossaryTerms within a Glossary that are related to each other.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The resource name of the GlossaryCategory.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/categories/{category_id}
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated unique id for the GlossaryCategory. This ID
+will be different if the GlossaryCategory is deleted and re-created with
+the same name.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name of the GlossaryCategory. This is
+user-mutable. This will be same as the GlossaryCategoryId, if not
+specified.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. The user-mutable description of the GlossaryCategory.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the GlossaryCategory was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the GlossaryCategory was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryCategory::LabelsEntry>)
+
+Optional. User-defined labels for the GlossaryCategory.
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The immediate parent of the GlossaryCategory in the
+resource-hierarchy. It can either be a Glossary or a GlossaryCategory.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+OR
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/categories/{category_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryTerm
+
+GlossaryTerms are the core of Glossary.
+A GlossaryTerm holds a rich text description that can be attached to Entries
+or specific columns to enrich them.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. The resource name of the GlossaryTerm.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/terms/{term_id}
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated unique id for the GlossaryTerm. This ID will
+be different if the GlossaryTerm is deleted and re-created with the same
+name.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name of the GlossaryTerm. This is
+user-mutable. This will be same as the GlossaryTermId, if not specified.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. The user-mutable description of the GlossaryTerm.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the GlossaryTerm was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the GlossaryTerm was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryTerm::LabelsEntry>)
+
+Optional. User-defined labels for the GlossaryTerm.
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The immediate parent of the GlossaryTerm in the
+resource-hierarchy. It can either be a Glossary or a GlossaryCategory.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+OR
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/categories/{category_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryRequest
+
+Create Glossary Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this Glossary will be created.
+Format: projects/{project_id_or_number}/locations/{location_id}
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->glossary_id() >> / C<< $msg->glossary_id($value) >>
+
+Type: C<String>
+
+Required. Glossary ID: Glossary identifier.
+
+=item * C<< $msg->glossary() >> / C<< $msg->glossary($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary>)
+
+Required. The Glossary to create.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Validates the request without actually creating the Glossary.
+Default: false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryRequest
+
+Update Glossary Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->glossary() >> / C<< $msg->glossary($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary>)
+
+Required. The Glossary to update.
+The Glossary's `name` field is used to identify the Glossary to update.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. The list of fields to update.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Validates the request without actually updating the Glossary.
+Default: false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryRequest
+
+Delete Glossary Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the Glossary to delete.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. The etag of the Glossary.
+If this is provided, it must match the server's etag.
+If the etag is provided and does not match the server-computed etag,
+the request must fail with a ABORTED error code.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryRequest
+
+Get Glossary Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the Glossary to retrieve.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossariesRequest
+
+List Glossaries Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which has this collection of Glossaries.
+Format: projects/{project_id_or_number}/locations/{location_id}
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of Glossaries to return. The service may
+return fewer than this value. If unspecified, at most 50 Glossaries will be
+returned. The maximum value is 1000; values above 1000 will be coerced to
+1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListGlossaries` call.
+Provide this to retrieve the subsequent page.
+When paginating, all other parameters provided to `ListGlossaries` must
+match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression that filters Glossaries listed in the response.
+Filters on proto fields of Glossary are supported.
+Examples of using a filter are:
+  - `display_name="my-glossary"`
+  - `categoryCount=1`
+  - `termCount=0`
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by expression that orders Glossaries listed in the
+response. Order by fields are: `name` or `create_time` for the result. If
+not specified, the ordering is undefined.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossariesResponse
+
+List Glossaries Response
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->glossaries() >> / C<< $msg->glossaries($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::Glossary>)
+
+Lists the Glossaries in the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that the service couldn't reach.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryCategoryRequest
+
+Creates a new GlossaryCategory under the specified Glossary.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this GlossaryCategory will be created.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+where `locationId` refers to a Google Cloud region.
+
+=item * C<< $msg->category_id() >> / C<< $msg->category_id($value) >>
+
+Type: C<String>
+
+Required. GlossaryCategory identifier.
+
+=item * C<< $msg->category() >> / C<< $msg->category($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryCategory>)
+
+Required. The GlossaryCategory to create.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryCategoryRequest
+
+Update GlossaryCategory Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->category() >> / C<< $msg->category($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryCategory>)
+
+Required. The GlossaryCategory to update.
+The GlossaryCategory's `name` field is used to identify the
+GlossaryCategory to update. Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/categories/{category_id}
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. The list of fields to update.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryCategoryRequest
+
+Delete GlossaryCategory Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the GlossaryCategory to delete.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/categories/{category_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryCategoryRequest
+
+Get GlossaryCategory Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the GlossaryCategory to retrieve.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/categories/{category_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryCategoriesRequest
+
+List GlossaryCategories Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which has this collection of GlossaryCategories.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+Location is the Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of GlossaryCategories to return. The service
+may return fewer than this value. If unspecified, at most 50
+GlossaryCategories will be returned. The maximum value is 1000; values
+above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListGlossaryCategories`
+call. Provide this to retrieve the subsequent page. When paginating, all
+other parameters provided to `ListGlossaryCategories` must match the call
+that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression that filters GlossaryCategories listed in the
+response. Filters are supported on the following fields:
+  - immediate_parent
+
+Examples of using a filter are:
+  -
+  `immediate_parent="projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}"`
+  -
+  `immediate_parent="projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/categories/{category_id}"`
+
+This will only return the GlossaryCategories that are directly nested
+under the specified parent.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by expression that orders GlossaryCategories listed in the
+response. Order by fields are: `name` or `create_time` for the result. If
+not specified, the ordering is undefined.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryCategoriesResponse
+
+List GlossaryCategories Response
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->categories() >> / C<< $msg->categories($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryCategory>)
+
+Lists the GlossaryCategories in the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that the service couldn't reach.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryTermRequest
+
+Creates a new GlossaryTerm under the specified Glossary.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where the GlossaryTerm will be created.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->term_id() >> / C<< $msg->term_id($value) >>
+
+Type: C<String>
+
+Required. GlossaryTerm identifier.
+
+=item * C<< $msg->term() >> / C<< $msg->term($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryTerm>)
+
+Required. The GlossaryTerm to create.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryTermRequest
+
+Update GlossaryTerm Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->term() >> / C<< $msg->term($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryTerm>)
+
+Required. The GlossaryTerm to update.
+The GlossaryTerm's `name` field is used to identify the GlossaryTerm to
+update. Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/terms/{term_id}
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. The list of fields to update.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryTermRequest
+
+Delete GlossaryTerm Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the GlossaryTerm to delete.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/terms/{term_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::GetGlossaryTermRequest
+
+Get GlossaryTerm Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the GlossaryTerm to retrieve.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/terms/{term_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryTermsRequest
+
+List GlossaryTerms Request
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which has this collection of GlossaryTerms.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of GlossaryTerms to return. The service may
+return fewer than this value. If unspecified, at most 50 GlossaryTerms will
+be returned. The maximum value is 1000; values above 1000 will be coerced
+to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListGlossaryTerms` call.
+Provide this to retrieve the subsequent page.
+When paginating, all other parameters provided to `ListGlossaryTerms` must
+match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression that filters GlossaryTerms listed in the
+response. Filters are supported on the following fields:
+  - immediate_parent
+
+Examples of using a filter are:
+  -
+  `immediate_parent="projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}"`
+  -
+  `immediate_parent="projects/{project_id_or_number}/locations/{location_id}/glossaries/{glossary_id}/categories/{category_id}"`
+
+This will only return the GlossaryTerms that are directly nested under the
+specified parent.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by expression that orders GlossaryTerms listed in the
+response. Order by fields are: `name` or `create_time` for the result. If
+not specified, the ordering is undefined.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::BusinessGlossary::ListGlossaryTermsResponse
+
+List GlossaryTerms Response
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->terms() >> / C<< $msg->terms($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::GlossaryTerm>)
+
+Lists the GlossaryTerms in the specified parent.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that the service couldn't reach.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::BusinessGlossary::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,702 @@
+package Google::Cloud::Discoveryengine::V1beta::ServingConfig;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Discoveryengine::V1beta::Common };
+    eval { require Google::Cloud::Discoveryengine::V1beta::SearchService };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+Cjhnb29nbGUvY2xvdWQvZGlzY292ZXJ5ZW5naW5lL3YxYmV0YS9zZXJ2aW5nX2NvbmZpZy5w
+cm90bxIjZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEaH2dvb2dsZS9hcGkv
+ZmllbGRfYmVoYXZpb3IucHJvdG8aGWdvb2dsZS9hcGkvcmVzb3VyY2UucHJvdG8aMGdvb2ds
+ZS9jbG91ZC9kaXNjb3ZlcnllbmdpbmUvdjFiZXRhL2NvbW1vbi5wcm90bxo4Z29vZ2xlL2Ns
+b3VkL2Rpc2NvdmVyeWVuZ2luZS92MWJldGEvc2VhcmNoX3NlcnZpY2UucHJvdG8aH2dvb2ds
+ZS9wcm90b2J1Zi90aW1lc3RhbXAucHJvdG8iuhIKDVNlcnZpbmdDb25maWcSYwoMbWVkaWFf
+Y29uZmlnGAcgASgLMj4uZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEuU2Vy
+dmluZ0NvbmZpZy5NZWRpYUNvbmZpZ0gAUgttZWRpYUNvbmZpZxJpCg5nZW5lcmljX2NvbmZp
+ZxgKIAEoCzJALmdvb2dsZS5jbG91ZC5kaXNjb3ZlcnllbmdpbmUudjFiZXRhLlNlcnZpbmdD
+b25maWcuR2VuZXJpY0NvbmZpZ0gAUg1nZW5lcmljQ29uZmlnEhcKBG5hbWUYASABKAlCA+BB
+BVIEbmFtZRImCgxkaXNwbGF5X25hbWUYAiABKAlCA+BBAlILZGlzcGxheU5hbWUSXgoNc29s
+dXRpb25fdHlwZRgDIAEoDjIxLmdvb2dsZS5jbG91ZC5kaXNjb3ZlcnllbmdpbmUudjFiZXRh
+LlNvbHV0aW9uVHlwZUIG4EEC4EEFUgxzb2x1dGlvblR5cGUSGQoIbW9kZWxfaWQYBCABKAlS
+B21vZGVsSWQSJwoPZGl2ZXJzaXR5X2xldmVsGAUgASgJUg5kaXZlcnNpdHlMZXZlbBJfChBl
+bWJlZGRpbmdfY29uZmlnGBQgASgLMjQuZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52
+MWJldGEuRW1iZWRkaW5nQ29uZmlnUg9lbWJlZGRpbmdDb25maWcSLQoScmFua2luZ19leHBy
+ZXNzaW9uGBUgASgJUhFyYW5raW5nRXhwcmVzc2lvbhJACgtjcmVhdGVfdGltZRgIIAEoCzIa
+Lmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCA+BBA1IKY3JlYXRlVGltZRJACgt1cGRhdGVf
+dGltZRgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCA+BBA1IKdXBkYXRlVGlt
+ZRIsChJmaWx0ZXJfY29udHJvbF9pZHMYCyADKAlSEGZpbHRlckNvbnRyb2xJZHMSKgoRYm9v
+c3RfY29udHJvbF9pZHMYDCADKAlSD2Jvb3N0Q29udHJvbElkcxIwChRyZWRpcmVjdF9jb250
+cm9sX2lkcxgOIAMoCVIScmVkaXJlY3RDb250cm9sSWRzEjAKFHN5bm9ueW1zX2NvbnRyb2xf
+aWRzGA8gAygJUhJzeW5vbnltc0NvbnRyb2xJZHMSPQobb25ld2F5X3N5bm9ueW1zX2NvbnRy
+b2xfaWRzGBAgAygJUhhvbmV3YXlTeW5vbnltc0NvbnRyb2xJZHMSNAoWZGlzc29jaWF0ZV9j
+b250cm9sX2lkcxgRIAMoCVIUZGlzc29jaWF0ZUNvbnRyb2xJZHMSNgoXcmVwbGFjZW1lbnRf
+Y29udHJvbF9pZHMYEiADKAlSFXJlcGxhY2VtZW50Q29udHJvbElkcxIsChJpZ25vcmVfY29u
+dHJvbF9pZHMYEyADKAlSEGlnbm9yZUNvbnRyb2xJZHMSLgoTcHJvbW90ZV9jb250cm9sX2lk
+cxgaIAMoCVIRcHJvbW90ZUNvbnRyb2xJZHMSeQoUcGVyc29uYWxpemF0aW9uX3NwZWMYGSAB
+KAsyRi5nb29nbGUuY2xvdWQuZGlzY292ZXJ5ZW5naW5lLnYxYmV0YS5TZWFyY2hSZXF1ZXN0
+LlBlcnNvbmFsaXphdGlvblNwZWNSE3BlcnNvbmFsaXphdGlvblNwZWMSdAoWYW5zd2VyX2dl
+bmVyYXRpb25fc3BlYxgbIAEoCzI5Lmdvb2dsZS5jbG91ZC5kaXNjb3ZlcnllbmdpbmUudjFi
+ZXRhLkFuc3dlckdlbmVyYXRpb25TcGVjQgPgQQFSFGFuc3dlckdlbmVyYXRpb25TcGVjGocD
+CgtNZWRpYUNvbmZpZxJRCiRjb250ZW50X3dhdGNoZWRfcGVyY2VudGFnZV90aHJlc2hvbGQY
+AiABKAJIAFIhY29udGVudFdhdGNoZWRQZXJjZW50YWdlVGhyZXNob2xkEksKIWNvbnRlbnRf
+d2F0Y2hlZF9zZWNvbmRzX3RocmVzaG9sZBgFIAEoAkgAUh5jb250ZW50V2F0Y2hlZFNlY29u
+ZHNUaHJlc2hvbGQSLgoTZGVtb3Rpb25fZXZlbnRfdHlwZRgBIAEoCVIRZGVtb3Rpb25FdmVu
+dFR5cGUSSwogZGVtb3RlX2NvbnRlbnRfd2F0Y2hlZF9wYXN0X2RheXMYJSABKAVCA+BBAVIc
+ZGVtb3RlQ29udGVudFdhdGNoZWRQYXN0RGF5cxJBCh1jb250ZW50X2ZyZXNobmVzc19jdXRv
+ZmZfZGF5cxgEIAEoBVIaY29udGVudEZyZXNobmVzc0N1dG9mZkRheXNCGAoWZGVtb3RlX2Nv
+bnRlbnRfd2F0Y2hlZBqFAQoNR2VuZXJpY0NvbmZpZxJ0ChNjb250ZW50X3NlYXJjaF9zcGVj
+GAEgASgLMkQuZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEuU2VhcmNoUmVx
+dWVzdC5Db250ZW50U2VhcmNoU3BlY1IRY29udGVudFNlYXJjaFNwZWM6gAPqQfwCCixkaXNj
+b3ZlcnllbmdpbmUuZ29vZ2xlYXBpcy5jb20vU2VydmluZ0NvbmZpZxJfcHJvamVjdHMve3By
+b2plY3R9L2xvY2F0aW9ucy97bG9jYXRpb259L2RhdGFTdG9yZXMve2RhdGFfc3RvcmV9L3Nl
+cnZpbmdDb25maWdzL3tzZXJ2aW5nX2NvbmZpZ30SeHByb2plY3RzL3twcm9qZWN0fS9sb2Nh
+dGlvbnMve2xvY2F0aW9ufS9jb2xsZWN0aW9ucy97Y29sbGVjdGlvbn0vZGF0YVN0b3Jlcy97
+ZGF0YV9zdG9yZX0vc2VydmluZ0NvbmZpZ3Mve3NlcnZpbmdfY29uZmlnfRJxcHJvamVjdHMv
+e3Byb2plY3R9L2xvY2F0aW9ucy97bG9jYXRpb259L2NvbGxlY3Rpb25zL3tjb2xsZWN0aW9u
+fS9lbmdpbmVzL3tlbmdpbmV9L3NlcnZpbmdDb25maWdzL3tzZXJ2aW5nX2NvbmZpZ31CEQoP
+dmVydGljYWxfY29uZmlnIvUDChRBbnN3ZXJHZW5lcmF0aW9uU3BlYxKZAQocdXNlcl9kZWZp
+bmVkX2NsYXNzaWZpZXJfc3BlYxgBIAEoCzJTLmdvb2dsZS5jbG91ZC5kaXNjb3Zlcnllbmdp
+bmUudjFiZXRhLkFuc3dlckdlbmVyYXRpb25TcGVjLlVzZXJEZWZpbmVkQ2xhc3NpZmllclNw
+ZWNCA+BBAVIZdXNlckRlZmluZWRDbGFzc2lmaWVyU3BlYxrAAgoZVXNlckRlZmluZWRDbGFz
+c2lmaWVyU3BlYxJICh5lbmFibGVfdXNlcl9kZWZpbmVkX2NsYXNzaWZpZXIYASABKAhCA+BB
+AVIbZW5hYmxlVXNlckRlZmluZWRDbGFzc2lmaWVyEh8KCHByZWFtYmxlGAIgASgJQgPgQQFS
+CHByZWFtYmxlEh4KCG1vZGVsX2lkGAMgASgJQgPgQQFSB21vZGVsSWQSJAoLdGFza19tYXJr
+ZXIYBCABKAlCA+BBAVIKdGFza01hcmtlchIYCgV0b3BfcBgFIAEoAUID4EEBUgR0b3BQEhgK
+BXRvcF9rGAYgASgDQgPgQQFSBHRvcEsSJQoLdGVtcGVyYXR1cmUYByABKAFCA+BBAVILdGVt
+cGVyYXR1cmUSFwoEc2VlZBgIIAEoBUID4EEBUgRzZWVkQpkCCidjb20uZ29vZ2xlLmNsb3Vk
+LmRpc2NvdmVyeWVuZ2luZS52MWJldGFCElNlcnZpbmdDb25maWdQcm90b1ABWlFjbG91ZC5n
+b29nbGUuY29tL2dvL2Rpc2NvdmVyeWVuZ2luZS9hcGl2MWJldGEvZGlzY292ZXJ5ZW5naW5l
+cGI7ZGlzY292ZXJ5ZW5naW5lcGKiAg9ESVNDT1ZFUllFTkdJTkWqAiNHb29nbGUuQ2xvdWQu
+RGlzY292ZXJ5RW5naW5lLlYxQmV0YcoCI0dvb2dsZVxDbG91ZFxEaXNjb3ZlcnlFbmdpbmVc
+VjFiZXRh6gImR29vZ2xlOjpDbG91ZDo6RGlzY292ZXJ5RW5naW5lOjpWMWJldGFKhmsKBxIF
+DgDLAgEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29nbGUgTExDCgogTGljZW5z
+ZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNl
+Iik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdp
+dGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2Ug
+YXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgog
+VW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0
+aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJp
+YnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05E
+SVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRo
+ZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Np
+b25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQACwKCQoC
+AwASAxIAKQoJCgIDARIDEwAjCgkKAgMCEgMUADoKCQoCAwMSAxUAQgoJCgIDBBIDFgApCggK
+AQgSAxgAQAoJCgIIJRIDGABACggKAQgSAxkAaAoJCgIICxIDGQBoCggKAQgSAxoAIgoJCgII
+ChIDGgAiCggKAQgSAxsAMwoJCgIICBIDGwAzCggKAQgSAxwAQAoJCgIIARIDHABACggKAQgS
+Ax0ALQoJCgIIJBIDHQAtCggKAQgSAx4AQAoJCgIIKRIDHgBACggKAQgSAx8APwoJCgIILRID
+HwA/Ct4BCgIEABIFJQCnAgEa0AEgQ29uZmlndXJlcyBtZXRhZGF0YSB0aGF0IGlzIHVzZWQg
+dG8gZ2VuZXJhdGUgc2VydmluZyB0aW1lIHJlc3VsdHMgKGUuZy4KIHNlYXJjaCByZXN1bHRz
+IG9yIHJlY29tbWVuZGF0aW9uIHByZWRpY3Rpb25zKS4KIFRoZSBTZXJ2aW5nQ29uZmlnIGlz
+IHBhc3NlZCBpbiB0aGUgc2VhcmNoIGFuZCBwcmVkaWN0IHJlcXVlc3QgYW5kIGdlbmVyYXRl
+cwogcmVzdWx0cy4KCgoKAwQAARIDJQgVCgsKAwQABxIEJgIrBAoNCgUEAAedCBIEJgIrBArr
+BgoEBAADABIEPAJeAxrcBiBTcGVjaWZpZXMgdGhlIGNvbmZpZ3VyYXRpb25zIG5lZWRlZCBm
+b3IgTWVkaWEgRGlzY292ZXJ5LiBDdXJyZW50bHkgd2UKIHN1cHBvcnQ6CgogKiBgZGVtb3Rl
+X2NvbnRlbnRfd2F0Y2hlZGA6IFRocmVzaG9sZCBmb3Igd2F0Y2hlZCBjb250ZW50IGRlbW90
+aW9uLgogQ3VzdG9tZXJzIGNhbiBzcGVjaWZ5IGlmIHVzaW5nIHdhdGNoZWQgY29udGVudCBk
+ZW1vdGlvbiBvciB1c2Ugdmlld2VkCiBkZXRhaWwgcGFnZS4gVXNpbmcgdGhlIGNvbnRlbnQg
+d2F0Y2hlZCBkZW1vdGlvbiwgY3VzdG9tZXJzIG5lZWQgdG8gc3BlY2lmeQogdGhlIHdhdGNo
+ZWQgbWludXRlcyBvciBwZXJjZW50YWdlIGV4Y2VlZHMgdGhlIHRocmVzaG9sZCwgdGhlIGNv
+bnRlbnQgd2lsbAogYmUgZGVtb3RlZCBpbiB0aGUgcmVjb21tZW5kYXRpb24gcmVzdWx0Lgog
+KiBgcHJvbW90ZV9mcmVzaF9jb250ZW50YDogY3V0b2ZmIGRheXMgZm9yIGZyZXNoIGNvbnRl
+bnQgcHJvbW90aW9uLgogQ3VzdG9tZXJzIGNhbiBzcGVjaWZ5IGlmIHVzaW5nIGNvbnRlbnQg
+ZnJlc2huZXNzIHByb21vdGlvbi4gSWYgdGhlIGNvbnRlbnQKIHdhcyBwdWJsaXNoZWQgd2l0
+aGluIHRoZSBjdXRvZmYgZGF5cywgdGhlIGNvbnRlbnQgd2lsbCBiZSBwcm9tb3RlZCBpbiB0
+aGUKIHJlY29tbWVuZGF0aW9uIHJlc3VsdC4KIENhbiBvbmx5IGJlIHNldCBpZgogW1NvbHV0
+aW9uVHlwZV1bZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEuU29sdXRpb25U
+eXBlXSBpcwogW1NPTFVUSU9OX1RZUEVfUkVDT01NRU5EQVRJT05dW2dvb2dsZS5jbG91ZC5k
+aXNjb3ZlcnllbmdpbmUudjFiZXRhLlNvbHV0aW9uVHlwZS5TT0xVVElPTl9UWVBFX1JFQ09N
+TUVOREFUSU9OXS4KCgwKBQQAAwABEgM8ChUKswEKBgQAAwAIABIEQARHBRqiASBTcGVjaWZ5
+IHRoZSB0aHJlc2hvbGQgZm9yIGRlbW90aW5nIHdhdGNoZWQgY29udGVudCwgdGhlIHRocmVz
+aG9sZCBjYW4gYmUKIGVpdGhlciBwZXJjZW50YWdlIG9yIG1pbnV0ZXMgdmFsdWUuCiBUaGlz
+IG11c3QgYmUgc2V0IGZvciBgbWVkaWEtY29tcGxldGVgIGV2ZW50IHR5cGUuCgoOCgcEAAMA
+CAABEgNACiAKhgEKBgQAAwACABIDQwY1GncgU3BlY2lmaWVzIHRoZSBjb250ZW50IHdhdGNo
+ZWQgcGVyY2VudGFnZSB0aHJlc2hvbGQgZm9yIGRlbW90aW9uLgogVGhyZXNob2xkIHZhbHVl
+IG11c3QgYmUgYmV0d2VlbiBbMCwgMS4wXSBpbmNsdXNpdmUuCgoOCgcEAAMAAgAFEgNDBgsK
+DgoHBAADAAIAARIDQwwwCg4KBwQAAwACAAMSA0MzNApOCgYEAAMAAgESA0YGMho/IFNwZWNp
+ZmllcyB0aGUgY29udGVudCB3YXRjaGVkIG1pbnV0ZXMgdGhyZXNob2xkIGZvciBkZW1vdGlv
+bi4KCg4KBwQAAwACAQUSA0YGCwoOCgcEAAMAAgEBEgNGDC0KDgoHBAADAAIBAxIDRjAxCosD
+CgYEAAMAAgISA1MEIxr7AiBTcGVjaWZpZXMgdGhlIGV2ZW50IHR5cGUgdXNlZCBmb3IgZGVt
+b3RpbmcgcmVjb21tZW5kYXRpb24gcmVzdWx0LgogQ3VycmVudGx5IHN1cHBvcnRlZCB2YWx1
+ZXM6CgogKiBgdmlldy1pdGVtYDogSXRlbSB2aWV3ZWQuCiAqIGBtZWRpYS1wbGF5YDogU3Rh
+cnQvcmVzdW1lIHdhdGNoaW5nIGEgdmlkZW8sIHBsYXlpbmcgYSBzb25nLCBldGMuCiAqIGBt
+ZWRpYS1jb21wbGV0ZWA6IEZpbmlzaGVkIG9yIHN0b3BwZWQgbWlkd2F5IHRocm91Z2ggYSB2
+aWRlbywgc29uZywKIGV0Yy4KCiBJZiB1bnNldCwgd2F0Y2ggaGlzdG9yeSBkZW1vdGlvbiB3
+aWxsIG5vdCBiZSBhcHBsaWVkLiBDb250ZW50IGZyZXNobmVzcwogZGVtb3Rpb24gd2lsbCBz
+dGlsbCBiZSBhcHBsaWVkLgoKDgoHBAADAAICBRIDUwQKCg4KBwQAAwACAgESA1MLHgoOCgcE
+AAMAAgIDEgNTISIKowEKBgQAAwACAxIEVwRYMRqSASBPcHRpb25hbC4gU3BlY2lmaWVzIHRo
+ZSBudW1iZXIgb2YgZGF5cyB0byBsb29rIGJhY2sgZm9yIGRlbW90aW5nIHdhdGNoZWQKIGNv
+bnRlbnQuIElmIHNldCB0byB6ZXJvIG9yIHVuc2V0LCBkZWZhdWx0cyB0byB0aGUgbWF4aW11
+bSBvZiAzNjUgZGF5cy4KCg4KBwQAAwACAwUSA1cECQoOCgcEAAMAAgMBEgNXCioKDgoHBAAD
+AAIDAxIDVy0vCg4KBwQAAwACAwgSA1gIMAoRCgoEAAMAAgMInAgAEgNYCS8KtAEKBgQAAwAC
+BBIDXQQsGqQBIFNwZWNpZmllcyB0aGUgY29udGVudCBmcmVzaG5lc3MgdXNlZCBmb3IgcmVj
+b21tZW5kYXRpb24gcmVzdWx0LgogQ29udGVudHMgd2lsbCBiZSBkZW1vdGVkIGlmIGNvbnRl
+bnRzIHdlcmUgcHVibGlzaGVkIGZvciBtb3JlIHRoYW4gY29udGVudAogZnJlc2huZXNzIGN1
+dG9mZiBkYXlzLgoKDgoHBAADAAIEBRIDXQQJCg4KBwQAAwACBAESA10KJwoOCgcEAAMAAgQD
+EgNdKisKpgEKBAQAAwESBGQCaAMalwEgU3BlY2lmaWVzIHRoZSBjb25maWd1cmF0aW9ucyBu
+ZWVkZWQgZm9yIEdlbmVyaWMgRGlzY292ZXJ5LkN1cnJlbnRseSB3ZQogc3VwcG9ydDoKCiAq
+IGBjb250ZW50X3NlYXJjaF9zcGVjYDogY29uZmlndXJhdGlvbiBmb3IgZ2VuZXJpYyBjb250
+ZW50IHNlYXJjaC4KCgwKBQQAAwEBEgNkChcKdgoGBAADAQIAEgNnBDwaZyBTcGVjaWZpZXMg
+dGhlIGV4cGVjdGVkIGJlaGF2aW9yIG9mIGNvbnRlbnQgc2VhcmNoLgogT25seSB2YWxpZCBm
+b3IgY29udGVudC1zZWFyY2ggZW5hYmxlZCBkYXRhIHN0b3JlLgoKDgoHBAADAQIABhIDZwQj
+Cg4KBwQAAwECAAESA2ckNwoOCgcEAAMBAgADEgNnOjsKMgoEBAAIABIEawJxAxokIEluZHVz
+dHJ5IHZlcnRpY2FsIHNwZWNpZmljIGNvbmZpZy4KCgwKBQQACAABEgNrCBcKPAoEBAACABID
+bQQhGi8gVGhlIE1lZGlhQ29uZmlnIG9mIHRoZSBzZXJ2aW5nIGNvbmZpZ3VyYXRpb24uCgoM
+CgUEAAIABhIDbQQPCgwKBQQAAgABEgNtEBwKDAoFBAACAAMSA20fIAo+CgQEAAIBEgNwBCYa
+MSBUaGUgR2VuZXJpY0NvbmZpZyBvZiB0aGUgc2VydmluZyBjb25maWd1cmF0aW9uLgoKDAoF
+BAACAQYSA3AEEQoMCgUEAAIBARIDcBIgCgwKBQQAAgEDEgNwIyUKrQEKBAQAAgISA3UCPBqf
+ASBJbW11dGFibGUuIEZ1bGx5IHF1YWxpZmllZCBuYW1lCiBgcHJvamVjdHMve3Byb2plY3R9
+L2xvY2F0aW9ucy97bG9jYXRpb259L2NvbGxlY3Rpb25zL3tjb2xsZWN0aW9uX2lkfS9lbmdp
+bmVzL3tlbmdpbmVfaWR9L3NlcnZpbmdDb25maWdzL3tzZXJ2aW5nX2NvbmZpZ19pZH1gCgoM
+CgUEAAICBRIDdQIICgwKBQQAAgIBEgN1CQ0KDAoFBAACAgMSA3UQEQoMCgUEAAICCBIDdRI7
+Cg8KCAQAAgIInAgAEgN1EzoK5gEKBAQAAgMSA3wCQxrYASBSZXF1aXJlZC4gVGhlIGh1bWFu
+IHJlYWRhYmxlIHNlcnZpbmcgY29uZmlnIGRpc3BsYXkgbmFtZS4gVXNlZCBpbiBEaXNjb3Zl
+cnkKIFVJLgoKIFRoaXMgZmllbGQgbXVzdCBiZSBhIFVURi04IGVuY29kZWQgc3RyaW5nIHdp
+dGggYSBsZW5ndGggbGltaXQgb2YgMTI4CiBjaGFyYWN0ZXJzLiBPdGhlcndpc2UsIGFuIElO
+VkFMSURfQVJHVU1FTlQgZXJyb3IgaXMgcmV0dXJuZWQuCgoMCgUEAAIDBRIDfAIICgwKBQQA
+AgMBEgN8CRUKDAoFBAACAwMSA3wYGQoMCgUEAAIDCBIDfBpCCg8KCAQAAgMInAgAEgN8G0EK
+cQoEBAACBBIGgAECgwEEGmEgUmVxdWlyZWQuIEltbXV0YWJsZS4gU3BlY2lmaWVzIHRoZSBz
+b2x1dGlvbiB0eXBlIHRoYXQgYSBzZXJ2aW5nIGNvbmZpZyBjYW4KIGJlIGFzc29jaWF0ZWQg
+d2l0aC4KCg0KBQQAAgQGEgSAAQIOCg0KBQQAAgQBEgSAAQ8cCg0KBQQAAgQDEgSAAR8gCg8K
+BQQAAgQIEgaAASGDAQMKEAoIBAACBAicCAASBIEBBCoKEAoIBAACBAicCAESBIIBBCsKoAMK
+BAQAAgUSBI0BAhYakQMgVGhlIGlkIG9mIHRoZSBtb2RlbCB0byB1c2UgYXQgc2VydmluZyB0
+aW1lLgogQ3VycmVudGx5IG9ubHkgUmVjb21tZW5kYXRpb25Nb2RlbHMgYXJlIHN1cHBvcnRl
+ZC4KIENhbiBiZSBjaGFuZ2VkIGJ1dCBvbmx5IHRvIGEgY29tcGF0aWJsZSBtb2RlbCAoZS5n
+Lgogb3RoZXJzLXlvdS1tYXktbGlrZSBDVFIgdG8gb3RoZXJzLXlvdS1tYXktbGlrZSBDVlIp
+LgoKIFJlcXVpcmVkIHdoZW4KIFtTb2x1dGlvblR5cGVdW2dvb2dsZS5jbG91ZC5kaXNjb3Zl
+cnllbmdpbmUudjFiZXRhLlNvbHV0aW9uVHlwZV0gaXMKIFtTT0xVVElPTl9UWVBFX1JFQ09N
+TUVOREFUSU9OXVtnb29nbGUuY2xvdWQuZGlzY292ZXJ5ZW5naW5lLnYxYmV0YS5Tb2x1dGlv
+blR5cGUuU09MVVRJT05fVFlQRV9SRUNPTU1FTkRBVElPTl0uCgoNCgUEAAIFBRIEjQECCAoN
+CgUEAAIFARIEjQEJEQoNCgUEAAIFAxIEjQEUFQqsBAoEBAACBhIEngECHRqdBCBIb3cgbXVj
+aCBkaXZlcnNpdHkgdG8gdXNlIGluIHJlY29tbWVuZGF0aW9uIG1vZGVsIHJlc3VsdHMgZS5n
+LgogYG1lZGl1bS1kaXZlcnNpdHlgIG9yIGBoaWdoLWRpdmVyc2l0eWAuIEN1cnJlbnRseSBz
+dXBwb3J0ZWQgdmFsdWVzOgoKICogYG5vLWRpdmVyc2l0eWAKICogYGxvdy1kaXZlcnNpdHlg
+CiAqIGBtZWRpdW0tZGl2ZXJzaXR5YAogKiBgaGlnaC1kaXZlcnNpdHlgCiAqIGBhdXRvLWRp
+dmVyc2l0eWAKCiBJZiBub3Qgc3BlY2lmaWVkLCB3ZSBjaG9vc2UgZGVmYXVsdCBiYXNlZCBv
+biByZWNvbW1lbmRhdGlvbiBtb2RlbAogdHlwZS4gRGVmYXVsdCB2YWx1ZTogYG5vLWRpdmVy
+c2l0eWAuCgogQ2FuIG9ubHkgYmUgc2V0IGlmCiBbU29sdXRpb25UeXBlXVtnb29nbGUuY2xv
+dWQuZGlzY292ZXJ5ZW5naW5lLnYxYmV0YS5Tb2x1dGlvblR5cGVdIGlzCiBbU09MVVRJT05f
+VFlQRV9SRUNPTU1FTkRBVElPTl1bZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJl
+dGEuU29sdXRpb25UeXBlLlNPTFVUSU9OX1RZUEVfUkVDT01NRU5EQVRJT05dLgoKDQoFBAAC
+BgUSBJ4BAggKDQoFBAACBgESBJ4BCRgKDQoFBAACBgMSBJ4BGxwK/wQKBAQAAgcSBKcBAiga
+8AQgQnJpbmcgeW91ciBvd24gZW1iZWRkaW5nIGNvbmZpZy4gVGhlIGNvbmZpZyBpcyB1c2Vk
+IGZvciBzZWFyY2ggc2VtYW50aWMKIHJldHJpZXZhbC4gVGhlIHJldHJpZXZhbCBpcyBiYXNl
+ZCBvbiB0aGUgZG90IHByb2R1Y3Qgb2YKIFtTZWFyY2hSZXF1ZXN0LkVtYmVkZGluZ1NwZWMu
+RW1iZWRkaW5nVmVjdG9yLnZlY3Rvcl1bZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52
+MWJldGEuU2VhcmNoUmVxdWVzdC5FbWJlZGRpbmdTcGVjLkVtYmVkZGluZ1ZlY3Rvci52ZWN0
+b3JdCiBhbmQgdGhlIGRvY3VtZW50IGVtYmVkZGluZ3MgdGhhdCBhcmUgcHJvdmlkZWQgYnkg
+dGhpcyBFbWJlZGRpbmdDb25maWcuIElmCiBbU2VhcmNoUmVxdWVzdC5FbWJlZGRpbmdTcGVj
+LkVtYmVkZGluZ1ZlY3Rvci52ZWN0b3JdW2dvb2dsZS5jbG91ZC5kaXNjb3ZlcnllbmdpbmUu
+djFiZXRhLlNlYXJjaFJlcXVlc3QuRW1iZWRkaW5nU3BlYy5FbWJlZGRpbmdWZWN0b3IudmVj
+dG9yXQogaXMgcHJvdmlkZWQsIGl0IG92ZXJyaWRlcyB0aGlzCiBbU2VydmluZ0NvbmZpZy5l
+bWJlZGRpbmdfY29uZmlnXVtnb29nbGUuY2xvdWQuZGlzY292ZXJ5ZW5naW5lLnYxYmV0YS5T
+ZXJ2aW5nQ29uZmlnLmVtYmVkZGluZ19jb25maWddLgoKDQoFBAACBwYSBKcBAhEKDQoFBAAC
+BwESBKcBEiIKDQoFBAACBwMSBKcBJScK4wgKBAQAAggSBMYBAiEa1AggVGhlIHJhbmtpbmcg
+ZXhwcmVzc2lvbiBjb250cm9scyB0aGUgY3VzdG9taXplZCByYW5raW5nIG9uIHJldHJpZXZh
+bAogZG9jdW1lbnRzLiBUbyBsZXZlcmFnZSB0aGlzLCBkb2N1bWVudCBlbWJlZGRpbmcgaXMg
+cmVxdWlyZWQuIFRoZSByYW5raW5nCiBleHByZXNzaW9uIHNldHRpbmcgaW4gU2VydmluZ0Nv
+bmZpZyBhcHBsaWVzIHRvIGFsbCBzZWFyY2ggcmVxdWVzdHMgc2VydmVkCiBieSB0aGUgc2Vy
+dmluZyBjb25maWcuIEhvd2V2ZXIsIGlmIGBTZWFyY2hSZXF1ZXN0LnJhbmtpbmdfZXhwcmVz
+c2lvbmAgaXMKIHNwZWNpZmllZCwgaXQgb3ZlcnJpZGVzIHRoZSBTZXJ2aW5nQ29uZmlnIHJh
+bmtpbmcgZXhwcmVzc2lvbi4KCiBUaGUgcmFua2luZyBleHByZXNzaW9uIGlzIGEgc2luZ2xl
+IGZ1bmN0aW9uIG9yIG11bHRpcGxlIGZ1bmN0aW9ucyB0aGF0IGFyZQogam9pbmVkIGJ5ICIr
+Ii4KCiAgICogcmFua2luZ19leHByZXNzaW9uID0gZnVuY3Rpb24sIHsgIiArICIsIGZ1bmN0
+aW9uIH07CgogU3VwcG9ydGVkIGZ1bmN0aW9uczoKCiAgICogZG91YmxlICogcmVsZXZhbmNl
+X3Njb3JlCiAgICogZG91YmxlICogZG90UHJvZHVjdChlbWJlZGRpbmdfZmllbGRfcGF0aCkK
+CiBGdW5jdGlvbiB2YXJpYWJsZXM6CgogICAqIGByZWxldmFuY2Vfc2NvcmVgOiBwcmUtZGVm
+aW5lZCBrZXl3b3JkcywgdXNlZCBmb3IgbWVhc3VyZSByZWxldmFuY2UKICAgYmV0d2VlbiBx
+dWVyeSBhbmQgZG9jdW1lbnQuCiAgICogYGVtYmVkZGluZ19maWVsZF9wYXRoYDogdGhlIGRv
+Y3VtZW50IGVtYmVkZGluZyBmaWVsZAogICB1c2VkIHdpdGggcXVlcnkgZW1iZWRkaW5nIHZl
+Y3Rvci4KICAgKiBgZG90UHJvZHVjdGA6IGVtYmVkZGluZyBmdW5jdGlvbiBiZXR3ZWVuIGVt
+YmVkZGluZ19maWVsZF9wYXRoIGFuZCBxdWVyeQogICBlbWJlZGRpbmcgdmVjdG9yLgoKICBF
+eGFtcGxlIHJhbmtpbmcgZXhwcmVzc2lvbjoKCiAgICBJZiBkb2N1bWVudCBoYXMgYW4gZW1i
+ZWRkaW5nIGZpZWxkIGRvY19lbWJlZGRpbmcsIHRoZSByYW5raW5nIGV4cHJlc3Npb24KICAg
+IGNvdWxkIGJlIGAwLjUgKiByZWxldmFuY2Vfc2NvcmUgKyAwLjMgKiBkb3RQcm9kdWN0KGRv
+Y19lbWJlZGRpbmcpYC4KCg0KBQQAAggFEgTGAQIICg0KBQQAAggBEgTGAQkbCg0KBQQAAggD
+EgTGAR4gCj8KBAQAAgkSBskBAsoBMhovIE91dHB1dCBvbmx5LiBTZXJ2aW5nQ29uZmlnIGNy
+ZWF0ZWQgdGltZXN0YW1wLgoKDQoFBAACCQYSBMkBAhsKDQoFBAACCQESBMkBHCcKDQoFBAAC
+CQMSBMkBKisKDQoFBAACCQgSBMoBBjEKEAoIBAACCQicCAASBMoBBzAKPwoEBAACChIGzQEC
+zgEyGi8gT3V0cHV0IG9ubHkuIFNlcnZpbmdDb25maWcgdXBkYXRlZCB0aW1lc3RhbXAuCgoN
+CgUEAAIKBhIEzQECGwoNCgUEAAIKARIEzQEcJwoNCgUEAAIKAxIEzQEqKwoNCgUEAAIKCBIE
+zgEGMQoQCggEAAIKCJwIABIEzgEHMArPAQoEBAACCxIE1AECKhrAASBGaWx0ZXIgY29udHJv
+bHMgdG8gdXNlIGluIHNlcnZpbmcgcGF0aC4KIEFsbCB0cmlnZ2VyZWQgZmlsdGVyIGNvbnRy
+b2xzIHdpbGwgYmUgYXBwbGllZC4KIEZpbHRlciBjb250cm9scyBtdXN0IGJlIGluIHRoZSBz
+YW1lIGRhdGEgc3RvcmUgYXMgdGhlIHNlcnZpbmcgY29uZmlnLgogTWF4aW11bSBvZiAyMCBm
+aWx0ZXIgY29udHJvbHMuCgoNCgUEAAILBBIE1AECCgoNCgUEAAILBRIE1AELEQoNCgUEAAIL
+ARIE1AESJAoNCgUEAAILAxIE1AEnKQrLAQoEBAACDBIE2gECKRq8ASBCb29zdCBjb250cm9s
+cyB0byB1c2UgaW4gc2VydmluZyBwYXRoLgogQWxsIHRyaWdnZXJlZCBib29zdCBjb250cm9s
+cyB3aWxsIGJlIGFwcGxpZWQuCiBCb29zdCBjb250cm9scyBtdXN0IGJlIGluIHRoZSBzYW1l
+IGRhdGEgc3RvcmUgYXMgdGhlIHNlcnZpbmcgY29uZmlnLgogTWF4aW11bSBvZiAyMCBib29z
+dCBjb250cm9scy4KCg0KBQQAAgwEEgTaAQIKCg0KBQQAAgwFEgTaAQsRCg0KBQQAAgwBEgTa
+ARIjCg0KBQQAAgwDEgTaASYoCuACCgQEAAINEgTjAQIsGtECIElEcyBvZiB0aGUgcmVkaXJl
+Y3QgY29udHJvbHMuIE9ubHkgdGhlIGZpcnN0IHRyaWdnZXJlZCByZWRpcmVjdAogYWN0aW9u
+IGlzIGFwcGxpZWQsIGV2ZW4gaWYgbXVsdGlwbGUgYXBwbHkuIE1heGltdW0gbnVtYmVyIG9m
+CiBzcGVjaWZpY2F0aW9ucyBpcyAxMDAuCgogQ2FuIG9ubHkgYmUgc2V0IGlmCiBbU29sdXRp
+b25UeXBlXVtnb29nbGUuY2xvdWQuZGlzY292ZXJ5ZW5naW5lLnYxYmV0YS5Tb2x1dGlvblR5
+cGVdIGlzCiBbU09MVVRJT05fVFlQRV9TRUFSQ0hdW2dvb2dsZS5jbG91ZC5kaXNjb3Zlcnll
+bmdpbmUudjFiZXRhLlNvbHV0aW9uVHlwZS5TT0xVVElPTl9UWVBFX1NFQVJDSF0uCgoNCgUE
+AAINBBIE4wECCgoNCgUEAAINBRIE4wELEQoNCgUEAAINARIE4wESJgoNCgUEAAINAxIE4wEp
+Kwr4AgoEBAACDhIE7AECLBrpAiBDb25kaXRpb24gc3lub255bXMgc3BlY2lmaWNhdGlvbnMu
+IElmIG11bHRpcGxlIHN5bm9ueW1zIGNvbmRpdGlvbnMKIG1hdGNoLCBhbGwgbWF0Y2hpbmcg
+c3lub255bXMgY29udHJvbHMgaW4gdGhlIGxpc3Qgd2lsbCBleGVjdXRlLgogTWF4aW11bSBu
+dW1iZXIgb2Ygc3BlY2lmaWNhdGlvbnMgaXMgMTAwLgoKIENhbiBvbmx5IGJlIHNldCBpZgog
+W1NvbHV0aW9uVHlwZV1bZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEuU29s
+dXRpb25UeXBlXSBpcwogW1NPTFVUSU9OX1RZUEVfU0VBUkNIXVtnb29nbGUuY2xvdWQuZGlz
+Y292ZXJ5ZW5naW5lLnYxYmV0YS5Tb2x1dGlvblR5cGUuU09MVVRJT05fVFlQRV9TRUFSQ0hd
+LgoKDQoFBAACDgQSBOwBAgoKDQoFBAACDgUSBOwBCxEKDQoFBAACDgESBOwBEiYKDQoFBAAC
+DgMSBOwBKSsKjQMKBAQAAg8SBPUBAjMa/gIgQ29uZGl0aW9uIG9uZXdheSBzeW5vbnltcyBz
+cGVjaWZpY2F0aW9ucy4gSWYgbXVsdGlwbGUgb25ld2F5IHN5bm9ueW1zCiBjb25kaXRpb25z
+IG1hdGNoLCBhbGwgbWF0Y2hpbmcgb25ld2F5IHN5bm9ueW1zIGNvbnRyb2xzIGluIHRoZSBs
+aXN0CiB3aWxsIGV4ZWN1dGUuIE1heGltdW0gbnVtYmVyIG9mIHNwZWNpZmljYXRpb25zIGlz
+IDEwMC4KCiBDYW4gb25seSBiZSBzZXQgaWYKIFtTb2x1dGlvblR5cGVdW2dvb2dsZS5jbG91
+ZC5kaXNjb3ZlcnllbmdpbmUudjFiZXRhLlNvbHV0aW9uVHlwZV0gaXMKIFtTT0xVVElPTl9U
+WVBFX1NFQVJDSF1bZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEuU29sdXRp
+b25UeXBlLlNPTFVUSU9OX1RZUEVfU0VBUkNIXS4KCg0KBQQAAg8EEgT1AQIKCg0KBQQAAg8F
+EgT1AQsRCg0KBQQAAg8BEgT1ARItCg0KBQQAAg8DEgT1ATAyCqkDCgQEAAIQEgSAAgIuGpoD
+IENvbmRpdGlvbiBkbyBub3QgYXNzb2NpYXRlIHNwZWNpZmljYXRpb25zLiBJZiBtdWx0aXBs
+ZSBkbyBub3QKIGFzc29jaWF0ZSBjb25kaXRpb25zIG1hdGNoLCBhbGwgbWF0Y2hpbmcgZG8g
+bm90IGFzc29jaWF0ZSBjb250cm9scyBpbgogdGhlIGxpc3Qgd2lsbCBleGVjdXRlLgogT3Jk
+ZXIgZG9lcyBub3QgbWF0dGVyLgogTWF4aW11bSBudW1iZXIgb2Ygc3BlY2lmaWNhdGlvbnMg
+aXMgMTAwLgoKIENhbiBvbmx5IGJlIHNldCBpZgogW1NvbHV0aW9uVHlwZV1bZ29vZ2xlLmNs
+b3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEuU29sdXRpb25UeXBlXSBpcwogW1NPTFVUSU9O
+X1RZUEVfU0VBUkNIXVtnb29nbGUuY2xvdWQuZGlzY292ZXJ5ZW5naW5lLnYxYmV0YS5Tb2x1
+dGlvblR5cGUuU09MVVRJT05fVFlQRV9TRUFSQ0hdLgoKDQoFBAACEAQSBIACAgoKDQoFBAAC
+EAUSBIACCxEKDQoFBAACEAESBIACEigKDQoFBAACEAMSBIACKy0K+wIKBAQAAhESBIoCAi8a
+7AIgQ29uZGl0aW9uIHJlcGxhY2VtZW50IHNwZWNpZmljYXRpb25zLgogQXBwbGllZCBhY2Nv
+cmRpbmcgdG8gdGhlIG9yZGVyIGluIHRoZSBsaXN0LgogQSBwcmV2aW91c2x5IHJlcGxhY2Vk
+IHRlcm0gY2FuIG5vdCBiZSByZS1yZXBsYWNlZC4KIE1heGltdW0gbnVtYmVyIG9mIHNwZWNp
+ZmljYXRpb25zIGlzIDEwMC4KCiBDYW4gb25seSBiZSBzZXQgaWYKIFtTb2x1dGlvblR5cGVd
+W2dvb2dsZS5jbG91ZC5kaXNjb3ZlcnllbmdpbmUudjFiZXRhLlNvbHV0aW9uVHlwZV0gaXMK
+IFtTT0xVVElPTl9UWVBFX1NFQVJDSF1bZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52
+MWJldGEuU29sdXRpb25UeXBlLlNPTFVUSU9OX1RZUEVfU0VBUkNIXS4KCg0KBQQAAhEEEgSK
+AgIKCg0KBQQAAhEFEgSKAgsRCg0KBQQAAhEBEgSKAhIpCg0KBQQAAhEDEgSKAiwuCtEBCgQE
+AAISEgSRAgIqGsIBIENvbmRpdGlvbiBpZ25vcmUgc3BlY2lmaWNhdGlvbnMuIElmIG11bHRp
+cGxlIGlnbm9yZQogY29uZGl0aW9ucyBtYXRjaCwgYWxsIG1hdGNoaW5nIGlnbm9yZSBjb250
+cm9scyBpbiB0aGUgbGlzdCB3aWxsCiBleGVjdXRlLgogT3JkZXIgZG9lcyBub3QgbWF0dGVy
+LgogTWF4aW11bSBudW1iZXIgb2Ygc3BlY2lmaWNhdGlvbnMgaXMgMTAwLgoKDQoFBAACEgQS
+BJECAgoKDQoFBAACEgUSBJECCxEKDQoFBAACEgESBJECEiQKDQoFBAACEgMSBJECJykKXAoE
+BAACExIElgICKxpOIENvbmRpdGlvbiBwcm9tb3RlIHNwZWNpZmljYXRpb25zLgoKIE1heGlt
+dW0gbnVtYmVyIG9mIHNwZWNpZmljYXRpb25zIGlzIDEwMC4KCg0KBQQAAhMEEgSWAgIKCg0K
+BQQAAhMFEgSWAgsRCg0KBQQAAhMBEgSWAhIlCg0KBQQAAhMDEgSWAigqCqUECgQEAAIUEgSi
+AgI+GpYEIFRoZSBzcGVjaWZpY2F0aW9uIGZvciBwZXJzb25hbGl6YXRpb24gc3BlYy4KCiBO
+b3RpY2UgdGhhdCBpZiBib3RoCiBbU2VydmluZ0NvbmZpZy5wZXJzb25hbGl6YXRpb25fc3Bl
+Y11bZ29vZ2xlLmNsb3VkLmRpc2NvdmVyeWVuZ2luZS52MWJldGEuU2VydmluZ0NvbmZpZy5w
+ZXJzb25hbGl6YXRpb25fc3BlY10KIGFuZAogW1NlYXJjaFJlcXVlc3QucGVyc29uYWxpemF0
+aW9uX3NwZWNdW2dvb2dsZS5jbG91ZC5kaXNjb3ZlcnllbmdpbmUudjFiZXRhLlNlYXJjaFJl
+cXVlc3QucGVyc29uYWxpemF0aW9uX3NwZWNdCiBhcmUgc2V0LAogW1NlYXJjaFJlcXVlc3Qu
+cGVyc29uYWxpemF0aW9uX3NwZWNdW2dvb2dsZS5jbG91ZC5kaXNjb3ZlcnllbmdpbmUudjFi
+ZXRhLlNlYXJjaFJlcXVlc3QucGVyc29uYWxpemF0aW9uX3NwZWNdCiBvdmVycmlkZXMKIFtT
+ZXJ2aW5nQ29uZmlnLnBlcnNvbmFsaXphdGlvbl9zcGVjXVtnb29nbGUuY2xvdWQuZGlzY292
+ZXJ5ZW5naW5lLnYxYmV0YS5TZXJ2aW5nQ29uZmlnLnBlcnNvbmFsaXphdGlvbl9zcGVjXS4K
+Cg0KBQQAAhQGEgSiAgIjCg0KBQQAAhQBEgSiAiQ4Cg0KBQQAAhQDEgSiAjs9CkQKBAQAAhUS
+BqUCAqYCLxo0IE9wdGlvbmFsLiBUaGUgc3BlY2lmaWNhdGlvbiBmb3IgYW5zd2VyIGdlbmVy
+YXRpb24uCgoNCgUEAAIVBhIEpQICFgoNCgUEAAIVARIEpQIXLQoNCgUEAAIVAxIEpQIwMgoN
+CgUEAAIVCBIEpgIGLgoQCggEAAIVCJwIABIEpgIHLQo4CgIEARIGqgIAywIBGiogVGhlIHNw
+ZWNpZmljYXRpb24gZm9yIGFuc3dlciBnZW5lcmF0aW9uLgoKCwoDBAEBEgSqAggcCkAKBAQB
+AwASBqwCAsYCAxowIFRoZSBzcGVjaWZpY2F0aW9uIGZvciB1c2VyIGRlZmluZWQgY2xhc3Np
+Zmllci4KCg0KBQQBAwABEgSsAgojClsKBgQBAwACABIGrgIErwIxGkkgT3B0aW9uYWwuIFdo
+ZXRoZXIgb3Igbm90IHRvIGVuYWJsZSBhbmQgaW5jbHVkZSB1c2VyIGRlZmluZWQgY2xhc3Np
+Zmllci4KCg8KBwQBAwACAAUSBK4CBAgKDwoHBAEDAAIAARIErgIJJwoPCgcEAQMAAgADEgSu
+AiorCg8KBwQBAwACAAgSBK8CCDAKEgoKBAEDAAIACJwIABIErwIJLwpUCgYEAQMAAgESBLIC
+BEEaRCBPcHRpb25hbC4gVGhlIHByZWFtYmxlIHRvIGJlIHVzZWQgZm9yIHRoZSB1c2VyIGRl
+ZmluZWQgY2xhc3NpZmllci4KCg8KBwQBAwACAQUSBLICBAoKDwoHBAEDAAIBARIEsgILEwoP
+CgcEAQMAAgEDEgSyAhYXCg8KBwQBAwACAQgSBLICGEAKEgoKBAEDAAIBCJwIABIEsgIZPwpU
+CgYEAQMAAgISBLUCBEEaRCBPcHRpb25hbC4gVGhlIG1vZGVsIGlkIHRvIGJlIHVzZWQgZm9y
+IHRoZSB1c2VyIGRlZmluZWQgY2xhc3NpZmllci4KCg8KBwQBAwACAgUSBLUCBAoKDwoHBAED
+AAICARIEtQILEwoPCgcEAQMAAgIDEgS1AhYXCg8KBwQBAwACAggSBLUCGEAKEgoKBAEDAAIC
+CJwIABIEtQIZPwpXCgYEAQMAAgMSBLgCBEQaRyBPcHRpb25hbC4gVGhlIHRhc2sgbWFya2Vy
+IHRvIGJlIHVzZWQgZm9yIHRoZSB1c2VyIGRlZmluZWQgY2xhc3NpZmllci4KCg8KBwQBAwAC
+AwUSBLgCBAoKDwoHBAEDAAIDARIEuAILFgoPCgcEAQMAAgMDEgS4AhkaCg8KBwQBAwACAwgS
+BLgCG0MKEgoKBAEDAAIDCJwIABIEuAIcQgpXCgYEAQMAAgQSBLsCBD4aRyBPcHRpb25hbC4g
+VGhlIHRvcC1wIHZhbHVlIHRvIGJlIHVzZWQgZm9yIHRoZSB1c2VyIGRlZmluZWQgY2xhc3Np
+Zmllci4KCg8KBwQBAwACBAUSBLsCBAoKDwoHBAEDAAIEARIEuwILEAoPCgcEAQMAAgQDEgS7
+AhMUCg8KBwQBAwACBAgSBLsCFT0KEgoKBAEDAAIECJwIABIEuwIWPApXCgYEAQMAAgUSBL4C
+BD0aRyBPcHRpb25hbC4gVGhlIHRvcC1rIHZhbHVlIHRvIGJlIHVzZWQgZm9yIHRoZSB1c2Vy
+IGRlZmluZWQgY2xhc3NpZmllci4KCg8KBwQBAwACBQUSBL4CBAkKDwoHBAEDAAIFARIEvgIK
+DwoPCgcEAQMAAgUDEgS+AhITCg8KBwQBAwACBQgSBL4CFDwKEgoKBAEDAAIFCJwIABIEvgIV
+OwpeCgYEAQMAAgYSBMICBEQaTiBPcHRpb25hbC4gVGhlIHRlbXBlcmF0dXJlIHZhbHVlIHRv
+IGJlIHVzZWQgZm9yIHRoZSB1c2VyIGRlZmluZWQKIGNsYXNzaWZpZXIuCgoPCgcEAQMAAgYF
+EgTCAgQKCg8KBwQBAwACBgESBMICCxYKDwoHBAEDAAIGAxIEwgIZGgoPCgcEAQMAAgYIEgTC
+AhtDChIKCgQBAwACBgicCAASBMICHEIKVgoGBAEDAAIHEgTFAgQ8GkYgT3B0aW9uYWwuIFRo
+ZSBzZWVkIHZhbHVlIHRvIGJlIHVzZWQgZm9yIHRoZSB1c2VyIGRlZmluZWQgY2xhc3NpZmll
+ci4KCg8KBwQBAwACBwUSBMUCBAkKDwoHBAEDAAIHARIExQIKDgoPCgcEAQMAAgcDEgTFAhES
+Cg8KBwQBAwACBwgSBMUCEzsKEgoKBAEDAAIHCJwIABIExQIUOgpRCgQEAQIAEgbJAgLKAi8a
+QSBPcHRpb25hbC4gVGhlIHNwZWNpZmljYXRpb24gZm9yIHVzZXIgc3BlY2lmaWVkIGNsYXNz
+aWZpZXIgc3BlYy4KCg0KBQQBAgAGEgTJAgIbCg0KBQQBAgABEgTJAhw4Cg0KBQQBAgADEgTJ
+Ajs8Cg0KBQQBAgAIEgTKAgYuChAKCAQBAgAInAgAEgTKAgctYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Discoveryengine::V1beta::ServingConfig::ServingConfig ===
+    # Fields for ServingConfig
+    # Field: media_config Type: 11 (.google.cloud.discoveryengine.v1beta.ServingConfig.MediaConfig)
+    # Field: generic_config Type: 11 (.google.cloud.discoveryengine.v1beta.ServingConfig.GenericConfig)
+    # Field: name Type: 9 ()
+    # Field: display_name Type: 9 ()
+    # Field: solution_type Type: 14 (.google.cloud.discoveryengine.v1beta.SolutionType)
+    # Field: model_id Type: 9 ()
+    # Field: diversity_level Type: 9 ()
+    # Field: embedding_config Type: 11 (.google.cloud.discoveryengine.v1beta.EmbeddingConfig)
+    # Field: ranking_expression Type: 9 ()
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: filter_control_ids Type: 9 ()
+    # Field: boost_control_ids Type: 9 ()
+    # Field: redirect_control_ids Type: 9 ()
+    # Field: synonyms_control_ids Type: 9 ()
+    # Field: oneway_synonyms_control_ids Type: 9 ()
+    # Field: dissociate_control_ids Type: 9 ()
+    # Field: replacement_control_ids Type: 9 ()
+    # Field: ignore_control_ids Type: 9 ()
+    # Field: promote_control_ids Type: 9 ()
+    # Field: personalization_spec Type: 11 (.google.cloud.discoveryengine.v1beta.SearchRequest.PersonalizationSpec)
+    # Field: answer_generation_spec Type: 11 (.google.cloud.discoveryengine.v1beta.AnswerGenerationSpec)
+
+# === Message: Google::Cloud::Discoveryengine::V1beta::ServingConfig::AnswerGenerationSpec ===
+    # Fields for AnswerGenerationSpec
+    # Field: user_defined_classifier_spec Type: 11 (.google.cloud.discoveryengine.v1beta.AnswerGenerationSpec.UserDefinedClassifierSpec)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Discoveryengine::V1beta::ServingConfig - Compiled Protocol Buffers messages for google/cloud/discoveryengine/v1beta/serving_config.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Discoveryengine::V1beta::ServingConfig;
+
+    my $msg = Google::Cloud::Discoveryengine::V1beta::ServingConfig::ServingConfig->new({
+        media_config => $media_config,
+        generic_config => $generic_config,
+        name => $name,
+        display_name => $display_name,
+    });
+
+    # Read or update a field
+    my $val = $msg->media_config();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Discoveryengine::V1beta::ServingConfig::ServingConfig->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/discoveryengine/v1beta/serving_config.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Discoveryengine::V1beta::ServingConfig::ServingConfig
+
+Configures metadata that is used to generate serving time results (e.g.
+search results or recommendation predictions).
+The ServingConfig is passed in the search and predict request and generates
+results.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->media_config() >> / C<< $msg->media_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Discoveryengine::V1beta::ServingConfig::ServingConfig::MediaConfig>)
+
+The MediaConfig of the serving configuration.
+
+=item * C<< $msg->generic_config() >> / C<< $msg->generic_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Discoveryengine::V1beta::ServingConfig::ServingConfig::GenericConfig>)
+
+The GenericConfig of the serving configuration.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Fully qualified name
+`projects/{project}/locations/{location}/collections/{collection_id}/engines/{engine_id}/servingConfigs/{serving_config_id}`
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Required. The human readable serving config display name. Used in Discovery
+UI.
+
+This field must be a UTF-8 encoded string with a length limit of 128
+characters. Otherwise, an INVALID_ARGUMENT error is returned.
+
+=item * C<< $msg->solution_type() >> / C<< $msg->solution_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Discoveryengine::V1beta::SolutionType>)
+
+Required. Immutable. Specifies the solution type that a serving config can
+be associated with.
+
+=item * C<< $msg->model_id() >> / C<< $msg->model_id($value) >>
+
+Type: C<String>
+
+The id of the model to use at serving time.
+Currently only RecommendationModels are supported.
+Can be changed but only to a compatible model (e.g.
+others-you-may-like CTR to others-you-may-like CVR).
+
+Required when
+[SolutionType][google.cloud.discoveryengine.v1beta.SolutionType] is
+[SOLUTION_TYPE_RECOMMENDATION][google.cloud.discoveryengine.v1beta.SolutionType.SOLUTION_TYPE_RECOMMENDATION].
+
+=item * C<< $msg->diversity_level() >> / C<< $msg->diversity_level($value) >>
+
+Type: C<String>
+
+How much diversity to use in recommendation model results e.g.
+`medium-diversity` or `high-diversity`. Currently supported values:
+
+* `no-diversity`
+* `low-diversity`
+* `medium-diversity`
+* `high-diversity`
+* `auto-diversity`
+
+If not specified, we choose default based on recommendation model
+type. Default value: `no-diversity`.
+
+Can only be set if
+[SolutionType][google.cloud.discoveryengine.v1beta.SolutionType] is
+[SOLUTION_TYPE_RECOMMENDATION][google.cloud.discoveryengine.v1beta.SolutionType.SOLUTION_TYPE_RECOMMENDATION].
+
+=item * C<< $msg->embedding_config() >> / C<< $msg->embedding_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Discoveryengine::V1beta::Common::EmbeddingConfig>)
+
+Bring your own embedding config. The config is used for search semantic
+retrieval. The retrieval is based on the dot product of
+[SearchRequest.EmbeddingSpec.EmbeddingVector.vector][google.cloud.discoveryengine.v1beta.SearchRequest.EmbeddingSpec.EmbeddingVector.vector]
+and the document embeddings that are provided by this EmbeddingConfig. If
+[SearchRequest.EmbeddingSpec.EmbeddingVector.vector][google.cloud.discoveryengine.v1beta.SearchRequest.EmbeddingSpec.EmbeddingVector.vector]
+is provided, it overrides this
+[ServingConfig.embedding_config][google.cloud.discoveryengine.v1beta.ServingConfig.embedding_config].
+
+=item * C<< $msg->ranking_expression() >> / C<< $msg->ranking_expression($value) >>
+
+Type: C<String>
+
+The ranking expression controls the customized ranking on retrieval
+documents. To leverage this, document embedding is required. The ranking
+expression setting in ServingConfig applies to all search requests served
+by the serving config. However, if `SearchRequest.ranking_expression` is
+specified, it overrides the ServingConfig ranking expression.
+
+The ranking expression is a single function or multiple functions that are
+joined by "+".
+
+  * ranking_expression = function, { " + ", function };
+
+Supported functions:
+
+  * double * relevance_score
+  * double * dotProduct(embedding_field_path)
+
+Function variables:
+
+  * `relevance_score`: pre-defined keywords, used for measure relevance
+  between query and document.
+  * `embedding_field_path`: the document embedding field
+  used with query embedding vector.
+  * `dotProduct`: embedding function between embedding_field_path and query
+  embedding vector.
+
+ Example ranking expression:
+
+   If document has an embedding field doc_embedding, the ranking expression
+   could be `0.5 * relevance_score + 0.3 * dotProduct(doc_embedding)`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. ServingConfig created timestamp.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. ServingConfig updated timestamp.
+
+=item * C<< $msg->filter_control_ids() >> / C<< $msg->filter_control_ids($value) >>
+
+Type: C<String>
+
+Filter controls to use in serving path.
+All triggered filter controls will be applied.
+Filter controls must be in the same data store as the serving config.
+Maximum of 20 filter controls.
+
+=item * C<< $msg->boost_control_ids() >> / C<< $msg->boost_control_ids($value) >>
+
+Type: C<String>
+
+Boost controls to use in serving path.
+All triggered boost controls will be applied.
+Boost controls must be in the same data store as the serving config.
+Maximum of 20 boost controls.
+
+=item * C<< $msg->redirect_control_ids() >> / C<< $msg->redirect_control_ids($value) >>
+
+Type: C<String>
+
+IDs of the redirect controls. Only the first triggered redirect
+action is applied, even if multiple apply. Maximum number of
+specifications is 100.
+
+Can only be set if
+[SolutionType][google.cloud.discoveryengine.v1beta.SolutionType] is
+[SOLUTION_TYPE_SEARCH][google.cloud.discoveryengine.v1beta.SolutionType.SOLUTION_TYPE_SEARCH].
+
+=item * C<< $msg->synonyms_control_ids() >> / C<< $msg->synonyms_control_ids($value) >>
+
+Type: C<String>
+
+Condition synonyms specifications. If multiple synonyms conditions
+match, all matching synonyms controls in the list will execute.
+Maximum number of specifications is 100.
+
+Can only be set if
+[SolutionType][google.cloud.discoveryengine.v1beta.SolutionType] is
+[SOLUTION_TYPE_SEARCH][google.cloud.discoveryengine.v1beta.SolutionType.SOLUTION_TYPE_SEARCH].
+
+=item * C<< $msg->oneway_synonyms_control_ids() >> / C<< $msg->oneway_synonyms_control_ids($value) >>
+
+Type: C<String>
+
+Condition oneway synonyms specifications. If multiple oneway synonyms
+conditions match, all matching oneway synonyms controls in the list
+will execute. Maximum number of specifications is 100.
+
+Can only be set if
+[SolutionType][google.cloud.discoveryengine.v1beta.SolutionType] is
+[SOLUTION_TYPE_SEARCH][google.cloud.discoveryengine.v1beta.SolutionType.SOLUTION_TYPE_SEARCH].
+
+=item * C<< $msg->dissociate_control_ids() >> / C<< $msg->dissociate_control_ids($value) >>
+
+Type: C<String>
+
+Condition do not associate specifications. If multiple do not
+associate conditions match, all matching do not associate controls in
+the list will execute.
+Order does not matter.
+Maximum number of specifications is 100.
+
+Can only be set if
+[SolutionType][google.cloud.discoveryengine.v1beta.SolutionType] is
+[SOLUTION_TYPE_SEARCH][google.cloud.discoveryengine.v1beta.SolutionType.SOLUTION_TYPE_SEARCH].
+
+=item * C<< $msg->replacement_control_ids() >> / C<< $msg->replacement_control_ids($value) >>
+
+Type: C<String>
+
+Condition replacement specifications.
+Applied according to the order in the list.
+A previously replaced term can not be re-replaced.
+Maximum number of specifications is 100.
+
+Can only be set if
+[SolutionType][google.cloud.discoveryengine.v1beta.SolutionType] is
+[SOLUTION_TYPE_SEARCH][google.cloud.discoveryengine.v1beta.SolutionType.SOLUTION_TYPE_SEARCH].
+
+=item * C<< $msg->ignore_control_ids() >> / C<< $msg->ignore_control_ids($value) >>
+
+Type: C<String>
+
+Condition ignore specifications. If multiple ignore
+conditions match, all matching ignore controls in the list will
+execute.
+Order does not matter.
+Maximum number of specifications is 100.
+
+=item * C<< $msg->promote_control_ids() >> / C<< $msg->promote_control_ids($value) >>
+
+Type: C<String>
+
+Condition promote specifications.
+
+Maximum number of specifications is 100.
+
+=item * C<< $msg->personalization_spec() >> / C<< $msg->personalization_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Discoveryengine::V1beta::SearchService::SearchRequest::PersonalizationSpec>)
+
+The specification for personalization spec.
+
+Notice that if both
+[ServingConfig.personalization_spec][google.cloud.discoveryengine.v1beta.ServingConfig.personalization_spec]
+and
+[SearchRequest.personalization_spec][google.cloud.discoveryengine.v1beta.SearchRequest.personalization_spec]
+are set,
+[SearchRequest.personalization_spec][google.cloud.discoveryengine.v1beta.SearchRequest.personalization_spec]
+overrides
+[ServingConfig.personalization_spec][google.cloud.discoveryengine.v1beta.ServingConfig.personalization_spec].
+
+=item * C<< $msg->answer_generation_spec() >> / C<< $msg->answer_generation_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Discoveryengine::V1beta::ServingConfig::AnswerGenerationSpec>)
+
+Optional. The specification for answer generation.
+
+=back
+
+=head2 Google::Cloud::Discoveryengine::V1beta::ServingConfig::AnswerGenerationSpec
+
+The specification for answer generation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->user_defined_classifier_spec() >> / C<< $msg->user_defined_classifier_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Discoveryengine::V1beta::ServingConfig::AnswerGenerationSpec::UserDefinedClassifierSpec>)
+
+Optional. The specification for user specified classifier spec.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Discoveryengine::V1beta::ServingConfig::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

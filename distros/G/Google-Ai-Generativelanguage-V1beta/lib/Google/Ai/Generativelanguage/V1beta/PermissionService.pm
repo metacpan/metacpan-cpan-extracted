@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::PermissionService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -189,65 +189,9 @@ EOF
     # Field: parent Type: 9 ()
     # Field: permission Type: 11 (.google.ai.generativelanguage.v1beta.Permission)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PermissionService::CreatePermissionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PermissionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PermissionService::CreatePermissionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<permission>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Permission)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::PermissionService::GetPermissionRequest ===
     # Fields for GetPermissionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PermissionService::GetPermissionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PermissionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PermissionService::GetPermissionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::PermissionService::ListPermissionsRequest ===
     # Fields for ListPermissionsRequest
@@ -255,221 +199,42 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PermissionService::ListPermissionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PermissionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PermissionService::ListPermissionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::PermissionService::ListPermissionsResponse ===
     # Fields for ListPermissionsResponse
     # Field: permissions Type: 11 (.google.ai.generativelanguage.v1beta.Permission)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PermissionService::ListPermissionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PermissionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PermissionService::ListPermissionsResponse->new(
-        permissions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<permissions>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Permission)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::PermissionService::UpdatePermissionRequest ===
     # Fields for UpdatePermissionRequest
     # Field: permission Type: 11 (.google.ai.generativelanguage.v1beta.Permission)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PermissionService::UpdatePermissionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PermissionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PermissionService::UpdatePermissionRequest->new(
-        permission => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<permission>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Permission)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::PermissionService::DeletePermissionRequest ===
     # Fields for DeletePermissionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PermissionService::DeletePermissionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PermissionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PermissionService::DeletePermissionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipRequest ===
     # Fields for TransferOwnershipRequest
     # Field: name Type: 9 ()
     # Field: email_address Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PermissionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<email_address>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipResponse ===
     # Fields for TransferOwnershipResponse
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PermissionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Service Client: Google::Ai::Generativelanguage::V1beta::PermissionService::PermissionServiceClient ===
 package Google::Ai::Generativelanguage::V1beta::PermissionService::PermissionServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Ai::Generativelanguage::V1beta::PermissionService::PermissionServiceClient
 
-Google::Ai::Generativelanguage::V1beta::PermissionService::PermissionServiceClient - Client stub representing the remote PermissionService service
+Client stub representing the remote C<PermissionService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<ai.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -576,13 +341,243 @@ sub transfer_ownership {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::PermissionService - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::PermissionService - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/permission_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::PermissionService;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::PermissionService::CreatePermissionRequest->new({
+        parent => $parent,
+        permission => $permission,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::PermissionService::CreatePermissionRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/permission_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::PermissionService::CreatePermissionRequest
+
+Request to create a `Permission`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the `Permission`.
+Formats:
+   `tunedModels/{tuned_model}`
+   `corpora/{corpus}`
+
+=item * C<< $msg->permission() >> / C<< $msg->permission($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Permission::Permission>)
+
+Required. The permission to create.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PermissionService::GetPermissionRequest
+
+Request for getting information about a specific `Permission`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the permission.
+
+Formats:
+   `tunedModels/{tuned_model}/permissions/{permission}`
+   `corpora/{corpus}/permissions/{permission}`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PermissionService::ListPermissionsRequest
+
+Request for listing permissions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the permissions.
+Formats:
+   `tunedModels/{tuned_model}`
+   `corpora/{corpus}`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of `Permission`s to return (per page).
+The service may return fewer permissions.
+
+If unspecified, at most 10 permissions will be returned.
+This method returns at most 1000 permissions per page, even if you pass
+larger page_size.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListPermissions` call.
+
+Provide the `page_token` returned by one request as an argument to the
+next request to retrieve the next page.
+
+When paginating, all other parameters provided to `ListPermissions`
+must match the call that provided the page token.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PermissionService::ListPermissionsResponse
+
+Response from `ListPermissions` containing a paginated list of
+permissions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->permissions() >> / C<< $msg->permissions($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Permission::Permission>)
+
+Returned permissions.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+
+If this field is omitted, there are no more pages.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PermissionService::UpdatePermissionRequest
+
+Request to update the `Permission`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->permission() >> / C<< $msg->permission($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Permission::Permission>)
+
+Required. The permission to update.
+
+The permission's `name` field is used to identify the permission to update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. The list of fields to update. Accepted ones:
+ - role (`Permission.role` field)
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PermissionService::DeletePermissionRequest
+
+Request to delete the `Permission`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the permission.
+Formats:
+   `tunedModels/{tuned_model}/permissions/{permission}`
+   `corpora/{corpus}/permissions/{permission}`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipRequest
+
+Request to transfer the ownership of the tuned model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the tuned model to transfer ownership.
+
+Format: `tunedModels/my-model-id`
+
+=item * C<< $msg->email_address() >> / C<< $msg->email_address($value) >>
+
+Type: C<String>
+
+Required. The email address of the user to whom the tuned model is being
+transferred to.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipResponse
+
+Response from `TransferOwnership`.
+
+Inherits from L<Protobuf::Message>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::PermissionService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

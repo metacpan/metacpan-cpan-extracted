@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::Sessions;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -345,73 +345,9 @@ EOF
     # Field: session_id Type: 9 ()
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Sessions;
-
-    my $msg = Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<session>
-
-Type: Message (.google.cloud.dataproc.v1.Session)
-
-=item * B<session_id>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Sessions::GetSessionRequest ===
     # Fields for GetSessionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Sessions::GetSessionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Sessions;
-
-    my $msg = Google::Cloud::Dataproc::V1::Sessions::GetSessionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Sessions::ListSessionsRequest ===
     # Fields for ListSessionsRequest
@@ -420,148 +356,20 @@ Type: String
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Sessions::ListSessionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Sessions;
-
-    my $msg = Google::Cloud::Dataproc::V1::Sessions::ListSessionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Sessions::ListSessionsResponse ===
     # Fields for ListSessionsResponse
     # Field: sessions Type: 11 (.google.cloud.dataproc.v1.Session)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Sessions::ListSessionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Sessions;
-
-    my $msg = Google::Cloud::Dataproc::V1::Sessions::ListSessionsResponse->new(
-        sessions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<sessions>
-
-Type: Message (.google.cloud.dataproc.v1.Session)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Sessions::TerminateSessionRequest ===
     # Fields for TerminateSessionRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Sessions::TerminateSessionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Sessions;
-
-    my $msg = Google::Cloud::Dataproc::V1::Sessions::TerminateSessionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Sessions::DeleteSessionRequest ===
     # Fields for DeleteSessionRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Sessions::DeleteSessionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Sessions;
-
-    my $msg = Google::Cloud::Dataproc::V1::Sessions::DeleteSessionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Sessions::Session ===
     # Fields for Session
@@ -582,92 +390,6 @@ Type: String
     # Field: state_history Type: 11 (.google.cloud.dataproc.v1.Session.SessionStateHistory)
     # Field: session_template Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Sessions::Session - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Sessions;
-
-    my $msg = Google::Cloud::Dataproc::V1::Sessions::Session->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uuid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<jupyter_session>
-
-Type: Message (.google.cloud.dataproc.v1.JupyterConfig)
-
-=item * B<spark_connect_session>
-
-Type: Message (.google.cloud.dataproc.v1.SparkConnectConfig)
-
-=item * B<runtime_info>
-
-Type: Message (.google.cloud.dataproc.v1.RuntimeInfo)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataproc.v1.Session.State)
-
-=item * B<state_message>
-
-Type: String
-
-=item * B<state_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<creator>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.Session.LabelsEntry)
-
-=item * B<runtime_config>
-
-Type: Message (.google.cloud.dataproc.v1.RuntimeConfig)
-
-=item * B<environment_config>
-
-Type: Message (.google.cloud.dataproc.v1.EnvironmentConfig)
-
-=item * B<user>
-
-Type: String
-
-=item * B<state_history>
-
-Type: Message (.google.cloud.dataproc.v1.Session.SessionStateHistory)
-
-=item * B<session_template>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: Session::State
 our $Session_STATE_UNSPECIFIED = 0;
 our $Session_CREATING = 1;
@@ -676,134 +398,33 @@ our $Session_TERMINATING = 3;
 our $Session_TERMINATED = 4;
 our $Session_FAILED = 5;
 
-=pod
-
-=head2 Enum: Session::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<TERMINATING> => 3
-
-=item * C<TERMINATED> => 4
-
-=item * C<FAILED> => 5
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Sessions::JupyterConfig ===
     # Fields for JupyterConfig
     # Field: kernel Type: 14 (.google.cloud.dataproc.v1.JupyterConfig.Kernel)
     # Field: display_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Sessions::JupyterConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Sessions;
-
-    my $msg = Google::Cloud::Dataproc::V1::Sessions::JupyterConfig->new(
-        kernel => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kernel>
-
-Type: Enum (.google.cloud.dataproc.v1.JupyterConfig.Kernel)
-
-=item * B<display_name>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: JupyterConfig::Kernel
 our $JupyterConfig_KERNEL_UNSPECIFIED = 0;
 our $JupyterConfig_PYTHON = 1;
 our $JupyterConfig_SCALA = 2;
 
-=pod
-
-=head2 Enum: JupyterConfig::Kernel
-
-Values:
-
-=over 4
-
-=item * C<KERNEL_UNSPECIFIED> => 0
-
-=item * C<PYTHON> => 1
-
-=item * C<SCALA> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Sessions::SparkConnectConfig ===
     # Fields for SparkConnectConfig
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Sessions::SparkConnectConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Sessions;
-
-    my $msg = Google::Cloud::Dataproc::V1::Sessions::SparkConnectConfig->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Dataproc::V1::Sessions::SessionControllerClient ===
 package Google::Cloud::Dataproc::V1::Sessions::SessionControllerClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataproc::V1::Sessions::SessionControllerClient
 
-Google::Cloud::Dataproc::V1::Sessions::SessionControllerClient - Client stub representing the remote SessionController service
+Client stub representing the remote C<SessionController> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataproc.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -897,13 +518,441 @@ sub delete_session {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::Sessions - Protocol Buffers schema definition
+Google::Cloud::Dataproc::V1::Sessions - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/sessions.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataproc::V1::Sessions;
+
+    my $msg = Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest->new({
+        parent => $parent,
+        session => $session,
+        session_id => $session_id,
+        request_id => $request_id,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/sessions.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest
+
+A request to create a session.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this session will be created.
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Sessions::Session>)
+
+Required. The interactive session to create.
+
+=item * C<< $msg->session_id() >> / C<< $msg->session_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for the session, which becomes the final component
+of the session's resource name.
+
+This value must be 4-63 characters. Valid characters
+are /[a-z][0-9]-/.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the service
+receives two
+[CreateSessionRequests](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.CreateSessionRequest)s
+with the same ID, the second request is ignored, and the
+first [Session][google.cloud.dataproc.v1.Session] is created and stored in
+the backend.
+
+Recommendation: Set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The value must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Sessions::GetSessionRequest
+
+A request to get the resource representation for a session.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the session to retrieve.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Sessions::ListSessionsRequest
+
+A request to list sessions in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of sessions.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of sessions to return in each response.
+The service may return fewer than this value.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token received from a previous `ListSessions` call.
+Provide this token to retrieve the subsequent page.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter for the sessions to return in the response.
+
+A filter is a logical expression constraining the values of various fields
+in each session resource. Filters are case sensitive, and may contain
+multiple clauses combined with logical operators (AND, OR).
+Supported fields are `session_id`, `session_uuid`, `state`, `create_time`,
+and `labels`.
+
+Example: `state = ACTIVE and create_time < "2023-01-01T00:00:00Z"`
+is a filter for sessions in an ACTIVE state that were created before
+2023-01-01. `state = ACTIVE and labels.environment=production` is a filter
+for sessions in an ACTIVE state that have a production environment label.
+
+See https://google.aip.dev/assets/misc/ebnf-filtering.txt for a detailed
+description of the filter syntax and a list of supported comparators.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Sessions::ListSessionsResponse
+
+A list of interactive sessions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->sessions() >> / C<< $msg->sessions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Sessions::Session>)
+
+Output only. The sessions from the specified collection.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token`, to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Sessions::TerminateSessionRequest
+
+A request to terminate an interactive session.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the session resource to terminate.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the service
+receives two
+[TerminateSessionRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.TerminateSessionRequest)s
+with the same ID, the second request is ignored.
+
+Recommendation: Set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The value must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Sessions::DeleteSessionRequest
+
+A request to delete a session.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the session resource to delete.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the service
+receives two
+[DeleteSessionRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.DeleteSessionRequest)s
+with the same ID, the second request is ignored.
+
+Recommendation: Set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The value must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Sessions::Session
+
+A representation of a session.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The resource name of the session.
+
+=item * C<< $msg->uuid() >> / C<< $msg->uuid($value) >>
+
+Type: C<String>
+
+Output only. A session UUID (Unique Universal Identifier). The service
+generates this value when it creates the session.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the session was created.
+
+=item * C<< $msg->jupyter_session() >> / C<< $msg->jupyter_session($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Sessions::JupyterConfig>)
+
+Optional. Jupyter session config.
+
+=item * C<< $msg->spark_connect_session() >> / C<< $msg->spark_connect_session($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Sessions::SparkConnectConfig>)
+
+Optional. Spark connect session config.
+
+=item * C<< $msg->runtime_info() >> / C<< $msg->runtime_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::RuntimeInfo>)
+
+Output only. Runtime information about session execution.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::Session::State>)
+
+Output only. A state of the session.
+
+=item * C<< $msg->state_message() >> / C<< $msg->state_message($value) >>
+
+Type: C<String>
+
+Output only. Session state details, such as the failure
+description if the state is `FAILED`.
+
+=item * C<< $msg->state_time() >> / C<< $msg->state_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the session entered the current state.
+
+=item * C<< $msg->creator() >> / C<< $msg->creator($value) >>
+
+Type: C<String>
+
+Output only. The email address of the user who created the session.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Sessions::Session::LabelsEntry>)
+
+Optional. The labels to associate with the session.
+Label B<keys> must contain 1 to 63 characters, and must conform to
+[RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).
+Label B<values> may be empty, but, if present, must contain 1 to 63
+characters, and must conform to [RFC
+1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be
+associated with a session.
+
+=item * C<< $msg->runtime_config() >> / C<< $msg->runtime_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::RuntimeConfig>)
+
+Optional. Runtime configuration for the session execution.
+
+=item * C<< $msg->environment_config() >> / C<< $msg->environment_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::EnvironmentConfig>)
+
+Optional. Environment configuration for the session execution.
+
+=item * C<< $msg->user() >> / C<< $msg->user($value) >>
+
+Type: C<String>
+
+Optional. The email address of the user who owns the session.
+
+=item * C<< $msg->state_history() >> / C<< $msg->state_history($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Sessions::Session::SessionStateHistory>)
+
+Output only. Historical state information for the session.
+
+=item * C<< $msg->session_template() >> / C<< $msg->session_template($value) >>
+
+Type: C<String>
+
+Optional. The session template used by the session.
+
+Only resource names, including project ID and location, are valid.
+
+Example:
+* `https://www.googleapis.com/compute/v1/projects/[project_id]/locations/[dataproc_region]/sessionTemplates/[template_id]`
+* `projects/[project_id]/locations/[dataproc_region]/sessionTemplates/[template_id]`
+
+The template must be in the same project and Dataproc region as the
+session.
+
+=back
+
+=head3 Enum: Session::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<TERMINATING> => C<3>
+
+=item * C<TERMINATED> => C<4>
+
+=item * C<FAILED> => C<5>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Sessions::JupyterConfig
+
+Jupyter configuration for an interactive session.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kernel() >> / C<< $msg->kernel($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::JupyterConfig::Kernel>)
+
+Optional. Kernel
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. Display name, shown in the Jupyter kernelspec card.
+
+=back
+
+=head3 Enum: JupyterConfig::Kernel
+
+=over 4
+
+=item * C<KERNEL_UNSPECIFIED> => C<0>
+
+=item * C<PYTHON> => C<1>
+
+=item * C<SCALA> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Sessions::SparkConnectConfig
+
+Spark connect configuration for an interactive session.
+
+Inherits from L<Protobuf::Message>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::Sessions::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

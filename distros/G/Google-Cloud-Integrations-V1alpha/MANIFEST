@@ -1,0 +1,31 @@
+Changes
+lib/Google/Cloud/Integrations/V1alpha.pm
+lib/Google/Cloud/Integrations/V1alpha/CloudLoggingDetails.pm
+lib/Google/Cloud/Integrations/V1alpha/CloudLoggingDetails/Types.pm
+lib/Google/Cloud/Integrations/V1alpha/Coordinate.pm
+lib/Google/Cloud/Integrations/V1alpha/Coordinate/Types.pm
+lib/Google/Cloud/Integrations/V1alpha/EventParameter.pm
+lib/Google/Cloud/Integrations/V1alpha/EventParameter/Types.pm
+lib/Google/Cloud/Integrations/V1alpha/IntegrationState.pm
+lib/Google/Cloud/Integrations/V1alpha/IntegrationState/Types.pm
+lib/Google/Cloud/Integrations/V1alpha/JsonValidation.pm
+lib/Google/Cloud/Integrations/V1alpha/JsonValidation/Types.pm
+lib/Google/Cloud/Integrations/V1alpha/LogEntries.pm
+lib/Google/Cloud/Integrations/V1alpha/LogEntries/Types.pm
+lib/Google/Cloud/Integrations/V1alpha/Product.pm
+lib/Google/Cloud/Integrations/V1alpha/Product/Types.pm
+lib/Google/Cloud/Integrations/V1alpha/TaskConfig.pm
+lib/Google/Cloud/Integrations/V1alpha/TaskConfig/Types.pm
+lib/Google/Cloud/Integrations/V1alpha/ValueType.pm
+lib/Google/Cloud/Integrations/V1alpha/ValueType/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

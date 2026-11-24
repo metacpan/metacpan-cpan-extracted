@@ -3018,17 +3018,36 @@ are a double's, as R's are, so these agree with R to about `1e-14` relative.
 On a long-double or `__float128` perl they are the NV's from 0.3426 on: the
 incomplete gamma and beta (and so `pchisq`, `pt`, `pf`, `pbinom` and the
 `qchisq`, `qt`, `qf` that invert them, `log => 1` included) are accurate to a
-few tens of the NV's epsilon rather than to `1e-14`. Against mpmath at 110
-digits the worst relative error over a grid of 900 chi-square and 4500 beta
-tails, 60 standard deviations either side of the mean and shapes from 1/1024
-to 1e7 (counting the exponent's own rounding: a tail `exp(-f)` is good to `f`
-epsilons) is 8 epsilons of a long double and 39 of a `__float128` for the gamma
-(it was 5e15 and 3e30) and 64 and 86 for the beta (it was 1e5 and 7e19); the
-quantiles, 31 and 31 (they were 1.7e3 and 1e18). A double perl is not changed
-by a single bit. `t/incomplete.gamma.beta.mpmath.t` holds the expected
+few of the NV's epsilon rather than to `1e-14`. Against mpmath at 110 digits
+the worst relative error over a grid of 900 chi-square and 4500 beta tails, 60
+standard deviations either side of the mean and shapes from 1/1024 to 1e7
+(counting the exponent's own rounding: a tail `exp(-f)` is good to `f`
+epsilons) was, in 0.3426, 8 epsilons of a long double and 39 of a `__float128`
+for the gamma (it had been 5e15 and 3e30) and 64 and 86 for the beta (1e5 and
+7e19); the quantiles, 31 and 31 (1.7e3 and 1e18). Since 0.3429 the worst over
+the test's 861 cases and 2200 others, which add shapes from 2^-130 to 1e15, is
+3 and 4 epsilons for the gamma and 11 and 10 for the beta. 0.3429 left a double
+perl unchanged to the last bit. Since 0.3430 a double perl also takes R's own
+algorithms wherever one shape of the incomplete beta is at most 1 (`pt` below
+2000 degrees of freedom, `pf` with either df at most 2), where it had used a
+continued fraction that was up to `5e-12` out and whose last digits depended on
+the C library's `lgamma`. `t/incomplete.gamma.beta.mpmath.t` holds the expected
 values, frozen, with the script that made them. A long-double perl whose C
 library lacks the long-double math functions, or whose long double is the
 double-double of ppc64, keeps the double's constants and its `1e-14`.
+
+`pnorm` and `qnorm` follow the same rule from 0.3429 on. On a double perl
+`pnorm` is R's port of Cody's algorithm, which is 0 below `z = -38.47`, as R's
+is. On a long-double or `__float128` perl it computes from that NV's `erfc`,
+with the far tail taken from `erfcx` so that it reaches `z = -150`
+(`pnorm(-40)` is `3.655893540915e-350` there, not `0`); `qnorm` is refined on
+the log scale at the same width, down to `qnorm(-1e100, log => 1)`. Against
+mpmath at 110 digits, over 85 `z` from 0 to `1e150` (both tails and their logs)
+and 100 quantiles, the worst error is 1.3 epsilons of a long double and 1.1 of
+a `__float128` for `pnorm` (in the units above), and 2 epsilons for `qnorm`
+on both; it was `1e16` and `7e30` for `pnorm`, `2e4` and `1e19` for `qnorm`.
+`t/pnorm.qnorm.mpmath.t` holds those cases. The p-values the tests in this
+module report keep R's cut-off at `z = -38.47` on every build.
 
 `log => 1` is carried through in both directions, as in R:
 
@@ -3874,6 +3893,101 @@ errors are right as they stand.
 | `offset_terms` | `ArrayRef` | With an offset: the expressions it is made of, which [`predict`](#predict) re-evaluates on new data. | `['log(persontime)']` |
 | `twologlik` | `Double` | `negbin` only: twice the log-likelihood, as `MASS::glm.nb`. | `-240.6` |
 | `SE_theta` | `Double` | `negbin` with `theta` estimated: its standard error. | `0.41` |
+
+## glmer
+
+Generalized linear mixed models, `lme4::glmer()` and `lme4::glmer.nb()`: a
+binomial (logit link), Poisson or negative-binomial (log link) response with
+the random effects of [`lmer`](#lmer), for counts and binary outcomes measured
+repeatedly on the same units. Where a fixed-effects [`glm`](#glm) with a dummy
+per unit drops every unit with no events, a random intercept keeps them.
+
+    use Stats::LikeR 'glmer';
+
+    # events per child-month, a random intercept per child, rate ratios
+    my $m = glmer(formula => 'events ~ age + treat + (1 | child)',
+                  offset  => 'log(months)', data => \%d, family => 'negbin');
+    printf "treat: RR %.2f (%.2f-%.2f)\n", @{ $m->{exp}{treat} }{qw(estimate conf_low conf_high)};
+    printf "between-child sd %.2f, NB theta %.2f\n", $m->{varcor}[0]{sd}{Intercept}, $m->{nb_theta};
+
+    # a proportion with its number of trials as the weights, as in lme4
+    my $b = glmer(formula => 'incidence ~ period + (1 | herd)', weights => 'size',
+                  data => \%cbpp, family => 'binomial');
+
+The formula is [`lmer`](#lmer)'s: `(1 | g)`, `(x | g)`, `(x || g)`, nesting
+`(1 | a/b)`, several grouping factors, and `offset()` terms. A binomial
+response is 0/1 or a proportion, with the number of trials as `weights` (R's
+`cbind(successes, failures)` is the proportion of `successes + failures` with
+those as weights). The fit is `lme4`'s: the Laplace approximation to the
+likelihood, the conditional modes of the random effects by penalized IRLS,
+and two stages, the covariance parameters first with the fixed effects inside
+the IRLS (`lme4`'s `nAGQ = 0` fit) and then all of them together. With
+`nAGQ` from 2 to 100 a model with a single scalar random effect (`(1 | g)` or
+`(0 + x | g)`) is fitted by adaptive Gauss-Hermite quadrature instead, as in
+`lme4`; `nAGQ => 0` stops after the first stage. As in `lme4`, the
+quadrature's `deviance` and `loglik` sum the deviance residuals rather than the
+full log-likelihood, so they differ from the Laplace fit's by the saturated
+model's log-likelihood, which is 0 only for a 0/1 response: `cbpp`'s
+`loglik` is -92.03 by Laplace and -50.01 with `nAGQ => 9`.
+
+`family => 'negbin'` is `glmer.nb()`: the negative-binomial `theta` is started
+from `MASS::theta.ml()` on a Poisson fit's fitted values, as `glmer.nb()`
+starts it, and then estimated by maximum likelihood together with the rest;
+`theta => 1.7` holds it fixed instead (`glmer(family =
+negative.binomial(1.7))`).
+
+Standard errors are `lme4`'s: from the Hessian of the deviance in the
+covariance parameters and the fixed effects, by finite differences, inverted
+and doubled (`vcov.merMod(use.hessian = TRUE)`), with the negative-binomial
+`theta` held fixed. Where that Hessian is not positive definite, and for
+`nAGQ => 0`, they come from the fixed-effects block of the penalized IRLS
+system instead, with a warning in the first case, as `lme4` does;
+`vcov_method` says which. The Wald `z`, p-value and interval follow.
+
+The estimates are those of a tightly converged `lme4` fit. `lme4`'s defaults
+stop its penalized IRLS at a relative change of `1e-7` in the penalized
+deviance (`tolPwrss`), which is not tight enough for the finite differences
+it takes the Hessian from: on `cbpp` its log-likelihood is `2.8e-4` short of
+the optimum and its standard errors are `0.5%` out, and
+`glmerControl(tolPwrss = 1e-12)` moves them onto these.
+
+A random-effects structure is fitted as [`lmer`](#lmer) fits it, one level at
+a time when every term shares one grouping factor, so any number of levels is
+practical. With several grouping factors the random effects are one dense
+matrix, factored at every IRLS step: 71 random effects (`cbpp` with an
+observation-level term) take a fraction of a second, but 584 (`grouseticks`'
+three crossed factors) took 13 minutes on a desktop, where `lme4`'s sparse
+Cholesky takes about a second, and more than 1000 croaks (`lmer` takes 4000). A
+grouping factor may have a level per row (an observation-level random effect
+for overdispersion), which `lme4` allows for a model with no scale parameter. Fixed-effect columns that are linear combinations of others
+are left out of the fit and reported as `NaN`, as `lme4` drops them.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `formula` | *(required)* | As [`lmer`](#lmer)'s. |
+| `data` | *(required)* | HoA, AoH or HoH. |
+| `family` | `'binomial'` | `'binomial'` (logit), `'poisson'` (log) or `'negbin'` (negative binomial, log; also `'nb'`, `'negative.binomial'`). |
+| `theta` | *estimated* | `negbin` only: a fixed negative-binomial `theta`. Also `nb_theta`. |
+| `nAGQ` | `1` | `1` for the Laplace approximation; `2` to `100` Gauss-Hermite points for a single scalar random effect; `0` for `lme4`'s faster first-stage fit. |
+| `offset` | *none* | As in [`glm`](#glm): a column, an expression such as `'log(t)'`, or one value per row. |
+| `weights` | *none* | Prior weights: the number of trials for a binomial proportion. A row with weight 0 is left out. |
+| `conf_level` | `0.95` | Level of the Wald intervals. |
+
+The result holds `coefficients`, `summary` (per term `Estimate`,
+`Std. Error`, `z value`, `Pr(>|z|)`, `CI_lower`, `CI_upper`), `vcov`,
+`conf_int`, `exp` (odds or rate ratios with their intervals, as [`glm`](#glm)
+gives them), `terms`, `theta` (`lme4`'s relative covariance factor),
+`varcor` (as [`lmer`](#lmer)'s; here the standard deviations are on the
+link scale, with no residual), `nb_theta` (`negbin`), `fitted_values` (the
+fitted means, with the predicted random effects) and `linear_predictors`,
+`deviance` (`-2 loglik`, the summary's "deviance" in `lme4`), `loglik`, `AIC`,
+`BIC` (the negative-binomial `theta` counted as a parameter, as `lme4` counts
+it, even when `theta` holds it fixed), `df_residual`, `nobs`, `family`, `nAGQ`, `conf_level`, `vcov_method`,
+`converged` and `singular`.
+
+Validated against `lme4` 2.0-6's own examples and tests (`cbpp`,
+`grouseticks`, its simulated Bernoulli, binomial and Poisson data, its offset
+test, `glmer.nb`'s examples, and `MASS`'s epilepsy data with a random slope).
 
 ## group_by
 
@@ -5075,10 +5189,21 @@ that.
 
 | Option | Default | Description |
 | --- | --- | --- |
-| `formula` | *(required)* | Fixed effects plus one or more `( terms \| group )` random-effects terms. |
+| `formula` | *(required)* | Fixed effects plus one or more `( terms \| group )` random-effects terms, and any `offset()` terms. |
 | `data` | *(required)* | HoA, AoH or HoH. |
 | `REML` | `1` | `0` for a maximum-likelihood fit (needed to compare fixed effects by likelihood ratio). |
 | `conf_level` | `0.95` | Level of `conf_int`, from the Satterthwaite t. |
+| `offset` | *none* | A column, an expression such as `'log(t)'` or `'I(0.5*Days)'`, or one value per row, with coefficient 1; adds to any `offset()` terms. |
+| `weights` | *none* | Prior weights, `lmer(weights = )`: a column or one value per row. A row's residual variance is `sigma^2 / w`. |
+
+An **offset** is subtracted from the response before the fit and added back
+into `fitted_values`, as in `lme4`. **Prior weights** make the residual
+variance of a row `sigma^2 / w` and enter the criterion as `lme4`'s does,
+which subtracts the sum of `log(w)`; so multiplying every weight by 10 leaves
+the deviance, the fixed effects and the random-effect standard deviations
+alone, and makes `sigma` `sqrt(10)` times larger. A row whose weight is 0 is
+left out of the fit and of `nobs`, as in [`glm`](#glm); `lme4` keeps it, and
+its criterion is then infinite. A negative weight croaks.
 
 The result holds `coefficients`, `summary` (per term `Estimate`,
 `Std. Error`, `df`, `t value`, `Pr(>|t|)`), `vcov`, `conf_int`, `terms`,

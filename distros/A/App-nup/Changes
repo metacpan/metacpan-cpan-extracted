@@ -1,5 +1,13 @@
 Revision history for Perl extension App-nup
 
+1.24 2026-11-24T07:00:14Z
+
+    - Require Getopt::Long::Bash 2.0.0, which has the fix of the
+      command injection through the regex validation
+      (GHSA-wjqv-m6g4-g5fr).  An older getoptlong.sh in PATH stops
+      the script
+    - Require App::ansicolumn 1.70 and App::optex 1.07
+
 1.23 2026-11-22T16:17:21Z
 
     - -L: f moves to the right by the panes on the screen, as space

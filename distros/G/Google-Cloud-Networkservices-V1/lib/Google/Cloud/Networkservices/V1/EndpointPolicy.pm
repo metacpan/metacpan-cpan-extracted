@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::EndpointPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -249,94 +249,10 @@ EOF
     # Field: server_tls_policy Type: 9 ()
     # Field: client_tls_policy Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::EndpointPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicy->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.EndpointPolicy.LabelsEntry)
-
-=item * B<type>
-
-Type: Enum (.google.cloud.networkservices.v1.EndpointPolicy.EndpointPolicyType)
-
-=item * B<authorization_policy>
-
-Type: String
-
-=item * B<endpoint_matcher>
-
-Type: Message (.google.cloud.networkservices.v1.EndpointMatcher)
-
-=item * B<traffic_port_selector>
-
-Type: Message (.google.cloud.networkservices.v1.TrafficPortSelector)
-
-=item * B<description>
-
-Type: String
-
-=item * B<server_tls_policy>
-
-Type: String
-
-=item * B<client_tls_policy>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: EndpointPolicy::EndpointPolicyType
 our $EndpointPolicy_ENDPOINT_POLICY_TYPE_UNSPECIFIED = 0;
 our $EndpointPolicy_SIDECAR_PROXY = 1;
 our $EndpointPolicy_GRPC_SERVER = 2;
-
-=pod
-
-=head2 Enum: EndpointPolicy::EndpointPolicyType
-
-Values:
-
-=over 4
-
-=item * C<ENDPOINT_POLICY_TYPE_UNSPECIFIED> => 0
-
-=item * C<SIDECAR_PROXY> => 1
-
-=item * C<GRPC_SERVER> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesRequest ===
     # Fields for ListEndpointPoliciesRequest
@@ -345,113 +261,15 @@ Values:
     # Field: page_token Type: 9 ()
     # Field: return_partial_success Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::EndpointPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<return_partial_success>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesResponse ===
     # Fields for ListEndpointPoliciesResponse
     # Field: endpoint_policies Type: 11 (.google.cloud.networkservices.v1.EndpointPolicy)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::EndpointPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesResponse->new(
-        endpoint_policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<endpoint_policies>
-
-Type: Message (.google.cloud.networkservices.v1.EndpointPolicy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::EndpointPolicy::GetEndpointPolicyRequest ===
     # Fields for GetEndpointPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::EndpointPolicy::GetEndpointPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::EndpointPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::EndpointPolicy::GetEndpointPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::EndpointPolicy::CreateEndpointPolicyRequest ===
     # Fields for CreateEndpointPolicyRequest
@@ -459,116 +277,345 @@ Type: String
     # Field: endpoint_policy_id Type: 9 ()
     # Field: endpoint_policy Type: 11 (.google.cloud.networkservices.v1.EndpointPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::EndpointPolicy::CreateEndpointPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::EndpointPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::EndpointPolicy::CreateEndpointPolicyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<endpoint_policy_id>
-
-Type: String
-
-=item * B<endpoint_policy>
-
-Type: Message (.google.cloud.networkservices.v1.EndpointPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::EndpointPolicy::UpdateEndpointPolicyRequest ===
     # Fields for UpdateEndpointPolicyRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: endpoint_policy Type: 11 (.google.cloud.networkservices.v1.EndpointPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::EndpointPolicy::UpdateEndpointPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::EndpointPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::EndpointPolicy::UpdateEndpointPolicyRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<endpoint_policy>
-
-Type: Message (.google.cloud.networkservices.v1.EndpointPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::EndpointPolicy::DeleteEndpointPolicyRequest ===
     # Fields for DeleteEndpointPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::EndpointPolicy::DeleteEndpointPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::EndpointPolicy;
-
-    my $msg = Google::Cloud::Networkservices::V1::EndpointPolicy::DeleteEndpointPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::EndpointPolicy - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::EndpointPolicy - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/endpoint_policy.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networkservices::V1::EndpointPolicy;
+
+    my $msg = Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicy->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        labels => $labels,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicy->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/endpoint_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicy
+
+EndpointPolicy is a resource that helps apply desired configuration
+on the endpoints that match specific criteria.
+For example, this resource can be used to apply "authentication config"
+an all endpoints that serve on port 8080.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the EndpointPolicy resource. It matches pattern
+`projects/{project}/locations/*/endpointPolicies/{endpoint_policy}`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicy::LabelsEntry>)
+
+Optional. Set of label tags associated with the EndpointPolicy resource.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicyType>)
+
+Required. The type of endpoint policy. This is primarily used to validate
+the configuration.
+
+=item * C<< $msg->authorization_policy() >> / C<< $msg->authorization_policy($value) >>
+
+Type: C<String>
+
+Optional. This field specifies the URL of AuthorizationPolicy resource that
+applies authorization policies to the inbound traffic at the
+matched endpoints. Refer to Authorization. If this field is not
+specified, authorization is disabled(no authz checks) for this
+endpoint.
+
+=item * C<< $msg->endpoint_matcher() >> / C<< $msg->endpoint_matcher($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Common::EndpointMatcher>)
+
+Required. A matcher that selects endpoints to which the policies should be
+applied.
+
+=item * C<< $msg->traffic_port_selector() >> / C<< $msg->traffic_port_selector($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Common::TrafficPortSelector>)
+
+Optional. Port selector for the (matched) endpoints. If no port selector is
+provided, the matched config is applied to all ports.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A free-text description of the resource. Max length 1024
+characters.
+
+=item * C<< $msg->server_tls_policy() >> / C<< $msg->server_tls_policy($value) >>
+
+Type: C<String>
+
+Optional. A URL referring to ServerTlsPolicy resource. ServerTlsPolicy is
+used to determine the authentication policy to be applied to terminate the
+inbound traffic at the identified backends. If this field is not set,
+authentication is disabled(open) for this endpoint.
+
+=item * C<< $msg->client_tls_policy() >> / C<< $msg->client_tls_policy($value) >>
+
+Type: C<String>
+
+Optional. Deprecated: This field is not used and is a no-op.
+A URL referring to a ClientTlsPolicy resource. ClientTlsPolicy can be set
+to specify the authentication for traffic from the proxy to the actual
+endpoints. More specifically, it is applied to the outgoing traffic from
+the proxy to the endpoint. This is typically used for sidecar model where
+the proxy identifies itself as endpoint to the control plane, with the
+connection between sidecar and endpoint requiring authentication. If this
+field is not set, authentication is disabled(open). Applicable only when
+EndpointPolicyType is SIDECAR_PROXY.
+
+=back
+
+=head3 Enum: EndpointPolicy::EndpointPolicyType
+
+=over 4
+
+=item * C<ENDPOINT_POLICY_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<SIDECAR_PROXY> => C<1>
+
+=item * C<GRPC_SERVER> => C<2>
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesRequest
+
+Request used with the ListEndpointPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the EndpointPolicies should
+be listed, specified in the format `projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of EndpointPolicies to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListEndpointPoliciesResponse`
+Indicates that this is a continuation of a prior
+`ListEndpointPolicies` call, and that the system should return the
+next page of data.
+
+=item * C<< $msg->return_partial_success() >> / C<< $msg->return_partial_success($value) >>
+
+Type: C<Bool>
+
+Optional. If true, allow partial responses for multi-regional Aggregated
+List requests. Otherwise if one of the locations is down or unreachable,
+the Aggregated List request will fail.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::EndpointPolicy::ListEndpointPoliciesResponse
+
+Response returned by the ListEndpointPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->endpoint_policies() >> / C<< $msg->endpoint_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicy>)
+
+List of EndpointPolicy resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request opts into
+[return_partial_success][google.cloud.networkservices.v1.ListEndpointPoliciesRequest.return_partial_success]
+and reading across collections e.g. when
+attempting to list all resources across all supported locations.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::EndpointPolicy::GetEndpointPolicyRequest
+
+Request used with the GetEndpointPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the EndpointPolicy to get. Must be in the format
+`projects/*/locations/*/endpointPolicies/*`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::EndpointPolicy::CreateEndpointPolicyRequest
+
+Request used with the CreateEndpointPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the EndpointPolicy. Must be in the
+format `projects/*/locations/*`.
+
+=item * C<< $msg->endpoint_policy_id() >> / C<< $msg->endpoint_policy_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the EndpointPolicy resource to be created.
+E.g. "CustomECS".
+
+=item * C<< $msg->endpoint_policy() >> / C<< $msg->endpoint_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicy>)
+
+Required. EndpointPolicy resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::EndpointPolicy::UpdateEndpointPolicyRequest
+
+Request used with the UpdateEndpointPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+EndpointPolicy resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->endpoint_policy() >> / C<< $msg->endpoint_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::EndpointPolicy::EndpointPolicy>)
+
+Required. Updated EndpointPolicy resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::EndpointPolicy::DeleteEndpointPolicyRequest
+
+Request used with the DeleteEndpointPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the EndpointPolicy to delete. Must be in the format
+`projects/*/locations/*/endpointPolicies/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::EndpointPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

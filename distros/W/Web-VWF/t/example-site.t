@@ -45,7 +45,10 @@ sub render
 }
 
 like(render('page=index'), qr/^Status: 200 OK/m, 'page=index is 200');
-like(render('page=meta_data'), qr/^Status: 200 OK/m, 'page=meta_data is 200');
+my $meta_data = render('page=meta_data');
+like($meta_data, qr/^Status: 200 OK/m, 'page=meta_data is 200');
+# The access log is read through a handle that must not take <data> for its rows
+unlike($meta_data, qr/Where did the data come from/, 'page=meta_data reads the access log');
 like(render('page=states'), qr/^Status: 200 OK/m, 'page=states is 200');
 like(render('page=states'), qr{<td>NY</td><td>N\.Y\.</td><td>New York</td>}, 'page=states lists New York');
 is(scalar(() = render('page=states') =~ /<tr><td>/g), 50, 'page=states lists all 50 states');
@@ -76,8 +79,8 @@ like(render('page=nosuch'), qr/^Status: 404 Not Found/m, 'an unknown page is 404
 	like(render('page=states'), qr/^Status: 200 OK/m, 'a page with its own <directory> loads from there');
 }
 
-# The same for a data module: move Web::VWF::Data::states out of example/lib and
-# name where it went in its <database>.  A fresh copy of the site, as the one
+# The same for a data module: move Web::VWF::Data::states out of example/data and
+# name where it went in its <driver>.  A fresh copy of the site, as the one
 # above has had its states page moved already.
 {
 	my $site2 = File::Spec->catdir(tempdir(CLEANUP => 1), 'example');
@@ -85,7 +88,7 @@ like(render('page=nosuch'), qr/^Status: 404 Not Found/m, 'an unknown page is 404
 	$site = $site2;
 
 	my $moved = File::Spec->catdir(tempdir(CLEANUP => 1), 'data-modules');
-	my $from = File::Spec->catfile($site, 'lib', 'Web', 'VWF', 'Data', 'states.pm');
+	my $from = File::Spec->catfile($site, 'data', 'states.pm');
 	File::Path::make_path($moved);
 	File::Copy::move($from, File::Spec->catfile($moved, 'states.pm')) or die "Cannot move $from: $!";
 
@@ -95,12 +98,34 @@ like(render('page=nosuch'), qr/^Status: 404 Not Found/m, 'an unknown page is 404
 	open(my $in, '<', $conf) or die "$conf: $!";
 	my $xml = do { local $/; <$in> };
 	close($in);
-	$xml =~ s{(<name>states</name>)(\s*<description>List)}{$1<directory>$moved</directory>$2} or die 'no states database in the configuration';
+	$xml =~ s{(<name>states</name>)(\s*<description>List)}{$1<directory>$moved</directory>$2} or die 'no states driver in the configuration';
 	open(my $out, '>', $conf) or die "$conf: $!";
 	print $out $xml;
 	close($out);
 
-	like(render('page=states'), qr{<td>NY</td><td>N\.Y\.</td><td>New York</td>}, 'a database with its own <directory> loads from there');
+	like(render('page=states'), qr{<td>NY</td><td>N\.Y\.</td><td>New York</td>}, 'a driver with its own <directory> loads from there');
+}
+
+# The 0.003 way of declaring a driver, <databases><database>, is not read any
+# more: say so, and keep serving.  A fresh copy of the site again.
+{
+	my $site3 = File::Spec->catdir(tempdir(CLEANUP => 1), 'example');
+	File::Copy::Recursive::dircopy(File::Spec->catdir($root, 'example'), $site3) or die "Cannot copy the example: $!";
+	$site = $site3;
+
+	my $conf = File::Spec->catfile($site, 'conf', 'default');
+	open(my $in, '<', $conf) or die "$conf: $!";
+	my $xml = do { local $/; <$in> };
+	close($in);
+	$xml =~ s{(</databases>)}{<database><name>states</name></database>$1} or die 'no <databases> in the configuration';
+	open(my $out, '>', $conf) or die "$conf: $!";
+	print $out $xml;
+	close($out);
+
+	my $output = render('page=index');
+	like($output, qr/^Status: 200 OK/m, 'the old <databases><database> does not stop the site');
+	like($output, qr/<databases><database> is no longer read: declare each driver as <data><driver>/, 'but it is reported');
+	like(render('page=states'), qr/<td>NY<\/td>/, 'the drivers <data> declares are still loaded');
 }
 
 done_testing();

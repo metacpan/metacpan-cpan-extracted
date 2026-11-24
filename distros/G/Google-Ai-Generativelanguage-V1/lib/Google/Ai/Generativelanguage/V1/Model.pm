@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1::Model;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -122,91 +122,178 @@ EOF
     # Field: top_k Type: 5 ()
     # Field: thinking Type: 8 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1::Model::Model - Compiled Protocol Buffers message class
+Google::Ai::Generativelanguage::V1::Model - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1/model.proto
 
 =head1 SYNOPSIS
 
     use Google::Ai::Generativelanguage::V1::Model;
 
-    my $msg = Google::Ai::Generativelanguage::V1::Model::Model->new(
-        name => $value,
-    );
+    my $msg = Google::Ai::Generativelanguage::V1::Model::Model->new({
+        name => $name,
+        base_model_id => $base_model_id,
+        version => $version,
+        display_name => $display_name,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1::Model::Model->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<base_model_id>
-
-Type: String
-
-=item * B<version>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<input_token_limit>
-
-Type: Int32
-
-=item * B<output_token_limit>
-
-Type: Int32
-
-=item * B<supported_generation_methods>
-
-Type: String
-
-=item * B<temperature>
-
-Type: Float
-
-=item * B<max_temperature>
-
-Type: Float
-
-=item * B<top_p>
-
-Type: Float
-
-=item * B<top_k>
-
-Type: Int32
-
-=item * B<thinking>
-
-Type: Bool
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Model - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1/model.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1::Model::Model
+
+Information about a Generative Language Model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the `Model`. Refer to [Model
+variants](https://ai.google.dev/gemini-api/docs/models/gemini#model-variations)
+for all allowed values.
+
+Format: `models/{model}` with a `{model}` naming convention of:
+
+* "{base_model_id}-{version}"
+
+Examples:
+
+* `models/gemini-1.5-flash-001`
+
+=item * C<< $msg->base_model_id() >> / C<< $msg->base_model_id($value) >>
+
+Type: C<String>
+
+Required. The name of the base model, pass this to the generation request.
+
+Examples:
+
+* `gemini-1.5-flash`
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Required. The version number of the model.
+
+This represents the major version (`1.0` or `1.5`)
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+The human-readable name of the model. E.g. "Gemini 1.5 Flash".
+
+The name can be up to 128 characters long and can consist of any UTF-8
+characters.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+A short description of the model.
+
+=item * C<< $msg->input_token_limit() >> / C<< $msg->input_token_limit($value) >>
+
+Type: C<Int32>
+
+Maximum number of input tokens allowed for this model.
+
+=item * C<< $msg->output_token_limit() >> / C<< $msg->output_token_limit($value) >>
+
+Type: C<Int32>
+
+Maximum number of output tokens available for this model.
+
+=item * C<< $msg->supported_generation_methods() >> / C<< $msg->supported_generation_methods($value) >>
+
+Type: C<String>
+
+The model's supported generation methods.
+
+The corresponding API method names are defined as Pascal case
+strings, such as `generateMessage` and `generateContent`.
+
+=item * C<< $msg->temperature() >> / C<< $msg->temperature($value) >>
+
+Type: C<Float>
+
+Controls the randomness of the output.
+
+Values can range over `[0.0,max_temperature]`, inclusive. A higher value
+will produce responses that are more varied, while a value closer to `0.0`
+will typically result in less surprising responses from the model.
+This value specifies default to be used by the backend while making the
+call to the model.
+
+=item * C<< $msg->max_temperature() >> / C<< $msg->max_temperature($value) >>
+
+Type: C<Float>
+
+The maximum temperature this model can use.
+
+=item * C<< $msg->top_p() >> / C<< $msg->top_p($value) >>
+
+Type: C<Float>
+
+For [Nucleus
+sampling](https://ai.google.dev/gemini-api/docs/prompting-strategies#top-p).
+
+Nucleus sampling considers the smallest set of tokens whose probability
+sum is at least `top_p`.
+This value specifies default to be used by the backend while making the
+call to the model.
+
+=item * C<< $msg->top_k() >> / C<< $msg->top_k($value) >>
+
+Type: C<Int32>
+
+For Top-k sampling.
+
+Top-k sampling considers the set of `top_k` most probable tokens.
+This value specifies default to be used by the backend while making the
+call to the model.
+If empty, indicates the model doesn't use top-k sampling, and `top_k` isn't
+allowed as a generation parameter.
+
+=item * C<< $msg->thinking() >> / C<< $msg->thinking($value) >>
+
+Type: C<Bool>
+
+Whether the model supports thinking.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1::Model::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

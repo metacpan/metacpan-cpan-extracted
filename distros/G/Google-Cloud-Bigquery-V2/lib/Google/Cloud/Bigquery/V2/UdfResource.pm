@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::UdfResource;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -59,47 +59,80 @@ EOF
     # Field: resource_uri Type: 11 (.google.protobuf.StringValue)
     # Field: inline_code Type: 11 (.google.protobuf.StringValue)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::UdfResource::UserDefinedFunctionResource - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::UdfResource - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/udf_resource.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::UdfResource;
 
-    my $msg = Google::Cloud::Bigquery::V2::UdfResource::UserDefinedFunctionResource->new(
-        resource_uri => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::UdfResource::UserDefinedFunctionResource->new({
+        resource_uri => $resource_uri,
+        inline_code => $inline_code,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->resource_uri();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::UdfResource::UserDefinedFunctionResource->parse($bytes);
 
-=item * B<resource_uri>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<inline_code>
-
-Type: Message (.google.protobuf.StringValue)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::UdfResource - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/udf_resource.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::UdfResource::UserDefinedFunctionResource
+
+
+This is used for defining User Defined Function (UDF) resources only when
+using legacy SQL.  Users of GoogleSQL should leverage either DDL (e.g.
+CREATE [TEMPORARY] FUNCTION ... ) or the Routines API to define UDF
+resources.
+
+For additional information on migrating, see:
+https://cloud.google.com/bigquery/docs/reference/standard-sql/migrating-from-legacy-sql#differences_in_user-defined_javascript_functions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->resource_uri() >> / C<< $msg->resource_uri($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+[Pick one] A code resource to load from a Google Cloud Storage URI
+(gs://bucket/path).
+
+=item * C<< $msg->inline_code() >> / C<< $msg->inline_code($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+[Pick one] An inline resource that contains code for a user-defined
+function (UDF). Providing a inline code resource is equivalent to providing
+a URI for a file containing the same code.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::UdfResource::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

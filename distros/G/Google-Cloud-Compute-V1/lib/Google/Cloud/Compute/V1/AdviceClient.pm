@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -226,15 +226,81 @@ The following RPC methods are available in this client:
 
 =item * B<calendar_mode>
 
-Calls the RPC method C<CalendarMode> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->calendar_mode(
+        calendar_mode_advice_request_resource => $calendar_mode_advice_request_resource,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<CalendarMode> on C<google.cloud.compute.v1.Advice>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CalendarModeAdviceRpcRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::CalendarModeAdviceResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<calendar_mode_advice_request_resource> - L<Google::Cloud::Compute::V1::Compute::CalendarModeAdviceRequest>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<capacity>
 
-Calls the RPC method C<Capacity> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->capacity(
+        capacity_advice_request_resource => $capacity_advice_request_resource,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<Capacity> on C<google.cloud.compute.v1.Advice>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CapacityAdviceRpcRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::CapacityAdviceResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<capacity_advice_request_resource> - L<Google::Cloud::Compute::V1::Compute::CapacityAdviceRequest>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<capacity_history>
 
-Calls the RPC method C<CapacityHistory> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->capacity_history(
+        capacity_history_request_resource => $capacity_history_request_resource,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<CapacityHistory> on C<google.cloud.compute.v1.Advice>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CapacityHistoryAdviceRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::CapacityHistoryResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<capacity_history_request_resource> - L<Google::Cloud::Compute::V1::Compute::CapacityHistoryRequest>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =back
 

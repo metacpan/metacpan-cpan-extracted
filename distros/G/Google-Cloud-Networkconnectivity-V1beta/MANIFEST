@@ -1,0 +1,37 @@
+Changes
+lib/Google/Cloud/Networkconnectivity/V1beta.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/Common.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/Common/Types.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/DataTransfer.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/DataTransfer/Types.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/DataTransferServiceClient.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/Hub.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/Hub/Types.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/HubServiceClient.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/PolicyBasedRouting.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/PolicyBasedRouting/Types.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/PolicyBasedRoutingServiceClient.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/TransportManager.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/TransportManager/Types.pm
+lib/Google/Cloud/Networkconnectivity/V1beta/TransportManagerClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-DataTransferService.t
+t/01-service-Default.t
+t/01-service-HubService.t
+t/01-service-PolicyBasedRoutingService.t
+t/01-service-TransportManager.t
+t/02-rest-transport-DataTransferService.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-HubService.t
+t/02-rest-transport-PolicyBasedRoutingService.t
+t/02-rest-transport-TransportManager.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

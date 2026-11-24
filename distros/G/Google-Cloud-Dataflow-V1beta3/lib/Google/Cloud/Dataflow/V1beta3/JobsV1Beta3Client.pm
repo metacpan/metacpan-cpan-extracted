@@ -11,14 +11,14 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Dataflow::V1beta3::Streaming;
-use Google::Dataflow::V1beta3::Messages;
-use Google::Dataflow::V1beta3::Snapshots;
 use Google::Dataflow::V1beta3::Environment;
 use Google::Dataflow::V1beta3::Metrics;
+use Google::Dataflow::V1beta3::Snapshots;
+use Google::Dataflow::V1beta3::Messages;
 use Google::Dataflow::V1beta3::Jobs;
 use Google::Dataflow::V1beta3::Templates;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -380,31 +380,227 @@ The following RPC methods are available in this client:
 
 =item * B<create_job>
 
-Calls the RPC method C<CreateJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_job(
+        project_id               => $project_id,
+        job                      => $job,
+        view                     => $view,
+        replace_job_id           => $replace_job_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<CreateJob> on C<google.dataflow.v1beta3.JobsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Jobs::CreateJobRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job> - L<Google::Dataflow::V1beta3::Jobs::Job>
+
+=item * C<view> - L<Google::Dataflow::V1beta3::Jobs::JobView>
+
+=item * C<replace_job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<get_job>
 
-Calls the RPC method C<GetJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_job(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        view                     => $view,
+        location                 => $location,
+    );
+
+Calls the RPC method C<GetJob> on C<google.dataflow.v1beta3.JobsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Jobs::GetJobRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<view> - L<Google::Dataflow::V1beta3::Jobs::JobView>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<update_job>
 
-Calls the RPC method C<UpdateJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_job(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        job                      => $job,
+        location                 => $location,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<UpdateJob> on C<google.dataflow.v1beta3.JobsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Jobs::UpdateJobRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<job> - L<Google::Dataflow::V1beta3::Jobs::Job>
+
+=item * C<location> - C<string>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<list_jobs>
 
-Calls the RPC method C<ListJobs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_jobs(
+        filter                   => $filter,
+        project_id               => $project_id,
+        view                     => $view,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        location                 => $location,
+        name                     => $name,
+    );
+
+Calls the RPC method C<ListJobs> on C<google.dataflow.v1beta3.JobsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Jobs::ListJobsRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Jobs::ListJobsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - L<Google::Dataflow::V1beta3::Jobs::Filter>
+
+=item * C<project_id> - C<string>
+
+=item * C<view> - L<Google::Dataflow::V1beta3::Jobs::JobView>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<location> - C<string>
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<aggregated_list_jobs>
 
-Calls the RPC method C<AggregatedListJobs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list_jobs(
+        filter                   => $filter,
+        project_id               => $project_id,
+        view                     => $view,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        location                 => $location,
+        name                     => $name,
+    );
+
+Calls the RPC method C<AggregatedListJobs> on C<google.dataflow.v1beta3.JobsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Jobs::ListJobsRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Jobs::ListJobsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - L<Google::Dataflow::V1beta3::Jobs::Filter>
+
+=item * C<project_id> - C<string>
+
+=item * C<view> - L<Google::Dataflow::V1beta3::Jobs::JobView>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<location> - C<string>
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<check_active_jobs>
 
-Calls the RPC method C<CheckActiveJobs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->check_active_jobs(
+        project_id               => $project_id,
+    );
+
+Calls the RPC method C<CheckActiveJobs> on C<google.dataflow.v1beta3.JobsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Jobs::CheckActiveJobsRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Jobs::CheckActiveJobsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=back
 
 =item * B<snapshot_job>
 
-Calls the RPC method C<SnapshotJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->snapshot_job(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        ttl                      => $ttl,
+        location                 => $location,
+        snapshot_sources         => $snapshot_sources,
+        description              => $description,
+    );
+
+Calls the RPC method C<SnapshotJob> on C<google.dataflow.v1beta3.JobsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Jobs::SnapshotJobRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Snapshots::Snapshot>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<ttl> - L<Google::Protobuf::Duration::Duration>
+
+=item * C<location> - C<string>
+
+=item * C<snapshot_sources> - C<bool>
+
+=item * C<description> - C<string>
+
+=back
 
 =back
 

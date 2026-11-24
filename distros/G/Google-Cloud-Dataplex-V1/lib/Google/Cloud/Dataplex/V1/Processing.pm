@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Processing;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -132,116 +132,143 @@ EOF
     # Field: schedule Type: 11 (.google.cloud.dataplex.v1.Trigger.Schedule)
     # Field: one_time Type: 11 (.google.cloud.dataplex.v1.Trigger.OneTime)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Processing::Trigger - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Processing;
-
-    my $msg = Google::Cloud::Dataplex::V1::Processing::Trigger->new(
-        on_demand => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<on_demand>
-
-Type: Message (.google.cloud.dataplex.v1.Trigger.OnDemand)
-
-=item * B<schedule>
-
-Type: Message (.google.cloud.dataplex.v1.Trigger.Schedule)
-
-=item * B<one_time>
-
-Type: Message (.google.cloud.dataplex.v1.Trigger.OneTime)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Processing::DataSource ===
     # Fields for DataSource
     # Field: entity Type: 9 ()
     # Field: resource Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Processing::DataSource - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Processing;
-
-    my $msg = Google::Cloud::Dataplex::V1::Processing::DataSource->new(
-        entity => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entity>
-
-Type: String
-
-=item * B<resource>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Processing::ScannedData ===
     # Fields for ScannedData
     # Field: incremental_field Type: 11 (.google.cloud.dataplex.v1.ScannedData.IncrementalField)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Processing::ScannedData - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Processing;
-
-    my $msg = Google::Cloud::Dataplex::V1::Processing::ScannedData->new(
-        incremental_field => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<incremental_field>
-
-Type: Message (.google.cloud.dataplex.v1.ScannedData.IncrementalField)
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Processing - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::Processing - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/processing.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::Processing;
+
+    my $msg = Google::Cloud::Dataplex::V1::Processing::Trigger->new({
+        on_demand => $on_demand,
+        schedule => $schedule,
+        one_time => $one_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->on_demand();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Processing::Trigger->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/processing.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Processing::Trigger
+
+DataScan scheduling and trigger settings.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->on_demand() >> / C<< $msg->on_demand($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Processing::Trigger::OnDemand>)
+
+The scan runs once via `RunDataScan` API.
+
+=item * C<< $msg->schedule() >> / C<< $msg->schedule($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Processing::Trigger::Schedule>)
+
+The scan is scheduled to run periodically.
+
+=item * C<< $msg->one_time() >> / C<< $msg->one_time($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Processing::Trigger::OneTime>)
+
+The scan runs once, and does not create an associated ScanJob child
+resource.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Processing::DataSource
+
+The data source for DataScan.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entity() >> / C<< $msg->entity($value) >>
+
+Type: C<String>
+
+Immutable. The Dataplex Universal Catalog entity that represents the data
+source (e.g. BigQuery table) for DataScan, of the form:
+`projects/{project_number}/locations/{location_id}/lakes/{lake_id}/zones/{zone_id}/entities/{entity_id}`.
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+Immutable. The service-qualified full resource name of the cloud resource
+for a DataScan job to scan against. The field could either be: Cloud
+Storage bucket for DataDiscoveryScan Format:
+//storage.googleapis.com/projects/PROJECT_ID/buckets/BUCKET_ID
+or
+BigQuery table of type "TABLE" for
+DataProfileScan/DataQualityScan/DataDocumentationScan
+Format:
+//bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID/tables/TABLE_ID
+or
+BigQuery dataset for DataDocumentationScan only
+Format:
+//bigquery.googleapis.com/projects/PROJECT_ID/datasets/DATASET_ID
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Processing::ScannedData
+
+The data scanned during processing (e.g. in incremental DataScan)
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->incremental_field() >> / C<< $msg->incremental_field($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Processing::ScannedData::IncrementalField>)
+
+The range denoted by values of an incremental field
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Processing::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

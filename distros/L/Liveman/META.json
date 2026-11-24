@@ -4,7 +4,7 @@
       "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.28",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "gpl_3"
    ],
@@ -74,7 +74,6 @@
             "Text::Trim" : "0",
             "UUID" : "0.37",
             "common::sense" : "3.75",
-            "open" : "0",
             "parent" : "0",
             "perl" : "v5.22.0"
          }
@@ -100,7 +99,7 @@
    "provides" : {
       "Liveman" : {
          "file" : "lib/Liveman.pm",
-         "version" : "4.1"
+         "version" : "4.2"
       },
       "Liveman::App::liveman" : {
          "file" : "lib/Liveman/App/liveman.pm"
@@ -133,7 +132,7 @@
          "web" : "https://github.com/darviarush/perl-liveman"
       }
    },
-   "version" : "4.1",
+   "version" : "4.2",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",

@@ -5,7 +5,7 @@ Liveman - компиллятор из markdown в тесты и документ
 
 # VERSION
 
-4.1
+4.2
 
 # SYNOPSIS
 

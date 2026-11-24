@@ -1,0 +1,45 @@
+Changes
+lib/Google/Ai/Generativelanguage/V1beta3.pm
+lib/Google/Ai/Generativelanguage/V1beta3/Citation.pm
+lib/Google/Ai/Generativelanguage/V1beta3/Citation/Types.pm
+lib/Google/Ai/Generativelanguage/V1beta3/DiscussService.pm
+lib/Google/Ai/Generativelanguage/V1beta3/DiscussService/Types.pm
+lib/Google/Ai/Generativelanguage/V1beta3/DiscussServiceClient.pm
+lib/Google/Ai/Generativelanguage/V1beta3/Model.pm
+lib/Google/Ai/Generativelanguage/V1beta3/Model/Types.pm
+lib/Google/Ai/Generativelanguage/V1beta3/ModelService.pm
+lib/Google/Ai/Generativelanguage/V1beta3/ModelService/Types.pm
+lib/Google/Ai/Generativelanguage/V1beta3/ModelServiceClient.pm
+lib/Google/Ai/Generativelanguage/V1beta3/Permission.pm
+lib/Google/Ai/Generativelanguage/V1beta3/Permission/Types.pm
+lib/Google/Ai/Generativelanguage/V1beta3/PermissionService.pm
+lib/Google/Ai/Generativelanguage/V1beta3/PermissionService/Types.pm
+lib/Google/Ai/Generativelanguage/V1beta3/PermissionServiceClient.pm
+lib/Google/Ai/Generativelanguage/V1beta3/Safety.pm
+lib/Google/Ai/Generativelanguage/V1beta3/Safety/Types.pm
+lib/Google/Ai/Generativelanguage/V1beta3/TextService.pm
+lib/Google/Ai/Generativelanguage/V1beta3/TextService/Types.pm
+lib/Google/Ai/Generativelanguage/V1beta3/TextServiceClient.pm
+lib/Google/Ai/Generativelanguage/V1beta3/TunedModel.pm
+lib/Google/Ai/Generativelanguage/V1beta3/TunedModel/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-DiscussService.t
+t/01-service-ModelService.t
+t/01-service-PermissionService.t
+t/01-service-TextService.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-DiscussService.t
+t/02-rest-transport-ModelService.t
+t/02-rest-transport-PermissionService.t
+t/02-rest-transport-TextService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

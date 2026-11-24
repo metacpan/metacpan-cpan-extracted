@@ -15,13 +15,13 @@ use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
 use Google::Cloud::Dataproc::V1::Shared;
 use Google::Cloud::Dataproc::V1::Jobs;
 use Google::Cloud::Dataproc::V1::Sessions;
-use Google::Cloud::Dataproc::V1::Batches;
 use Google::Cloud::Dataproc::V1::Clusters;
+use Google::Cloud::Dataproc::V1::Batches;
 use Google::Cloud::Dataproc::V1::SessionTemplates;
 use Google::Cloud::Dataproc::V1::NodeGroups;
 use Google::Cloud::Dataproc::V1::WorkflowTemplates;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -144,9 +144,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/dataproc/v1/operations.proto>
 
-=item * C<googleapis/google/cloud/dataproc/v1/sessions.proto>
-
 =item * C<googleapis/google/cloud/dataproc/v1/session_templates.proto>
+
+=item * C<googleapis/google/cloud/dataproc/v1/sessions.proto>
 
 =item * C<googleapis/google/cloud/dataproc/v1/shared.proto>
 
@@ -185,7 +185,32 @@ The following RPC methods are available in this client:
 
 =item * B<create_session>
 
-Calls the RPC method C<CreateSession> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_session(
+        parent                   => $parent,
+        session                  => $session,
+        session_id               => $session_id,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<CreateSession> on C<google.cloud.dataproc.v1.SessionController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<session> - L<Google::Cloud::Dataproc::V1::Sessions::Session>
+
+=item * C<session_id> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =back
 

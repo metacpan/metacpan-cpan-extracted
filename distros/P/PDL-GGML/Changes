@@ -1,0 +1,4 @@
+Revision history for PDL-GGML
+
+0.01    2026-11-24
+    - Initial release: GGML tensor computation graph bindings for PDL.

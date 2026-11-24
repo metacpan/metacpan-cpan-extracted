@@ -1,0 +1,395 @@
+package Google::Cloud::Documentai::V1beta3::Evaluation;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+CjBnb29nbGUvY2xvdWQvZG9jdW1lbnRhaS92MWJldGEzL2V2YWx1YXRpb24ucHJvdG8SH2dv
+b2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMaH2dvb2dsZS9hcGkvZmllbGRfYmVoYXZp
+b3IucHJvdG8aGWdvb2dsZS9hcGkvcmVzb3VyY2UucHJvdG8aH2dvb2dsZS9wcm90b2J1Zi90
+aW1lc3RhbXAucHJvdG8izQIKE0V2YWx1YXRpb25SZWZlcmVuY2USHAoJb3BlcmF0aW9uGAEg
+ASgJUglvcGVyYXRpb24SSQoKZXZhbHVhdGlvbhgCIAEoCUIp+kEmCiRkb2N1bWVudGFpLmdv
+b2dsZWFwaXMuY29tL0V2YWx1YXRpb25SCmV2YWx1YXRpb24SYAoRYWdncmVnYXRlX21ldHJp
+Y3MYBCABKAsyMy5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkV2YWx1YXRpb24u
+TWV0cmljc1IQYWdncmVnYXRlTWV0cmljcxJrChdhZ2dyZWdhdGVfbWV0cmljc19leGFjdBgF
+IAEoCzIzLmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuRXZhbHVhdGlvbi5NZXRy
+aWNzUhVhZ2dyZWdhdGVNZXRyaWNzRXhhY3Qi5BcKCkV2YWx1YXRpb24SEgoEbmFtZRgBIAEo
+CVIEbmFtZRI7CgtjcmVhdGVfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3Rh
+bXBSCmNyZWF0ZVRpbWUSYQoRZG9jdW1lbnRfY291bnRlcnMYBSABKAsyNC5nb29nbGUuY2xv
+dWQuZG9jdW1lbnRhaS52MWJldGEzLkV2YWx1YXRpb24uQ291bnRlcnNSEGRvY3VtZW50Q291
+bnRlcnMSdAoUYWxsX2VudGl0aWVzX21ldHJpY3MYAyABKAsyQi5nb29nbGUuY2xvdWQuZG9j
+dW1lbnRhaS52MWJldGEzLkV2YWx1YXRpb24uTXVsdGlDb25maWRlbmNlTWV0cmljc1ISYWxs
+RW50aXRpZXNNZXRyaWNzEmUKDmVudGl0eV9tZXRyaWNzGAQgAygLMj4uZ29vZ2xlLmNsb3Vk
+LmRvY3VtZW50YWkudjFiZXRhMy5FdmFsdWF0aW9uLkVudGl0eU1ldHJpY3NFbnRyeVINZW50
+aXR5TWV0cmljcxIgCgxrbXNfa2V5X25hbWUYBiABKAlSCmttc0tleU5hbWUSLwoUa21zX2tl
+eV92ZXJzaW9uX25hbWUYByABKAlSEWttc0tleVZlcnNpb25OYW1lElwKCXJldmlzaW9ucxgJ
+IAMoCzI+Lmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuRXZhbHVhdGlvbi5FdmFs
+dWF0aW9uUmV2aXNpb25SCXJldmlzaW9ucxroAQoIQ291bnRlcnMSMgoVaW5wdXRfZG9jdW1l
+bnRzX2NvdW50GAEgASgFUhNpbnB1dERvY3VtZW50c0NvdW50EjYKF2ludmFsaWRfZG9jdW1l
+bnRzX2NvdW50GAIgASgFUhVpbnZhbGlkRG9jdW1lbnRzQ291bnQSNAoWZmFpbGVkX2RvY3Vt
+ZW50c19jb3VudBgDIAEoBVIUZmFpbGVkRG9jdW1lbnRzQ291bnQSOgoZZXZhbHVhdGVkX2Rv
+Y3VtZW50c19jb3VudBgEIAEoBVIXZXZhbHVhdGVkRG9jdW1lbnRzQ291bnQapgQKB01ldHJp
+Y3MSHAoJcHJlY2lzaW9uGAEgASgCUglwcmVjaXNpb24SFgoGcmVjYWxsGAIgASgCUgZyZWNh
+bGwSGQoIZjFfc2NvcmUYAyABKAJSB2YxU2NvcmUSPgobcHJlZGljdGVkX29jY3VycmVuY2Vz
+X2NvdW50GAQgASgFUhlwcmVkaWN0ZWRPY2N1cnJlbmNlc0NvdW50EkMKHmdyb3VuZF90cnV0
+aF9vY2N1cnJlbmNlc19jb3VudBgFIAEoBVIbZ3JvdW5kVHJ1dGhPY2N1cnJlbmNlc0NvdW50
+EjgKGHByZWRpY3RlZF9kb2N1bWVudF9jb3VudBgKIAEoBVIWcHJlZGljdGVkRG9jdW1lbnRD
+b3VudBI9Chtncm91bmRfdHJ1dGhfZG9jdW1lbnRfY291bnQYCyABKAVSGGdyb3VuZFRydXRo
+RG9jdW1lbnRDb3VudBIwChR0cnVlX3Bvc2l0aXZlc19jb3VudBgGIAEoBVISdHJ1ZVBvc2l0
+aXZlc0NvdW50EjIKFWZhbHNlX3Bvc2l0aXZlc19jb3VudBgHIAEoBVITZmFsc2VQb3NpdGl2
+ZXNDb3VudBIyChVmYWxzZV9uZWdhdGl2ZXNfY291bnQYCCABKAVSE2ZhbHNlTmVnYXRpdmVz
+Q291bnQSMgoVdG90YWxfZG9jdW1lbnRzX2NvdW50GAkgASgFUhN0b3RhbERvY3VtZW50c0Nv
+dW50GpIBChZDb25maWRlbmNlTGV2ZWxNZXRyaWNzEikKEGNvbmZpZGVuY2VfbGV2ZWwYASAB
+KAJSD2NvbmZpZGVuY2VMZXZlbBJNCgdtZXRyaWNzGAIgASgLMjMuZ29vZ2xlLmNsb3VkLmRv
+Y3VtZW50YWkudjFiZXRhMy5FdmFsdWF0aW9uLk1ldHJpY3NSB21ldHJpY3MakQUKFk11bHRp
+Q29uZmlkZW5jZU1ldHJpY3MSfAoYY29uZmlkZW5jZV9sZXZlbF9tZXRyaWNzGAEgAygLMkIu
+Z29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5FdmFsdWF0aW9uLkNvbmZpZGVuY2VM
+ZXZlbE1ldHJpY3NSFmNvbmZpZGVuY2VMZXZlbE1ldHJpY3MShwEKHmNvbmZpZGVuY2VfbGV2
+ZWxfbWV0cmljc19leGFjdBgEIAMoCzJCLmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0
+YTMuRXZhbHVhdGlvbi5Db25maWRlbmNlTGV2ZWxNZXRyaWNzUhtjb25maWRlbmNlTGV2ZWxN
+ZXRyaWNzRXhhY3QSFAoFYXVwcmMYAiABKAJSBWF1cHJjEj4KG2VzdGltYXRlZF9jYWxpYnJh
+dGlvbl9lcnJvchgDIAEoAlIZZXN0aW1hdGVkQ2FsaWJyYXRpb25FcnJvchIfCgthdXByY19l
+eGFjdBgFIAEoAlIKYXVwcmNFeGFjdBJJCiFlc3RpbWF0ZWRfY2FsaWJyYXRpb25fZXJyb3Jf
+ZXhhY3QYBiABKAJSHmVzdGltYXRlZENhbGlicmF0aW9uRXJyb3JFeGFjdBJxCgxtZXRyaWNz
+X3R5cGUYByABKA4yTi5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkV2YWx1YXRp
+b24uTXVsdGlDb25maWRlbmNlTWV0cmljcy5NZXRyaWNzVHlwZVILbWV0cmljc1R5cGUiOgoL
+TWV0cmljc1R5cGUSHAoYTUVUUklDU19UWVBFX1VOU1BFQ0lGSUVEEAASDQoJQUdHUkVHQVRF
+EAEaowQKEkV2YWx1YXRpb25SZXZpc2lvbhIkCgtyZXZpc2lvbl9pZBgBIAEoCUID4EEDUgpy
+ZXZpc2lvbklkEmYKEWRvY3VtZW50X2NvdW50ZXJzGAIgASgLMjQuZ29vZ2xlLmNsb3VkLmRv
+Y3VtZW50YWkudjFiZXRhMy5FdmFsdWF0aW9uLkNvdW50ZXJzQgPgQQNSEGRvY3VtZW50Q291
+bnRlcnMSeQoUYWxsX2VudGl0aWVzX21ldHJpY3MYAyABKAsyQi5nb29nbGUuY2xvdWQuZG9j
+dW1lbnRhaS52MWJldGEzLkV2YWx1YXRpb24uTXVsdGlDb25maWRlbmNlTWV0cmljc0ID4EED
+UhJhbGxFbnRpdGllc01ldHJpY3MSfQoOZW50aXR5X21ldHJpY3MYBCADKAsyUS5nb29nbGUu
+Y2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkV2YWx1YXRpb24uRXZhbHVhdGlvblJldmlzaW9u
+LkVudGl0eU1ldHJpY3NFbnRyeUID4EEDUg1lbnRpdHlNZXRyaWNzGoQBChJFbnRpdHlNZXRy
+aWNzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSWAoFdmFsdWUYAiABKAsyQi5nb29nbGUuY2xv
+dWQuZG9jdW1lbnRhaS52MWJldGEzLkV2YWx1YXRpb24uTXVsdGlDb25maWRlbmNlTWV0cmlj
+c1IFdmFsdWU6AjgBGoQBChJFbnRpdHlNZXRyaWNzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkS
+WAoFdmFsdWUYAiABKAsyQi5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkV2YWx1
+YXRpb24uTXVsdGlDb25maWRlbmNlTWV0cmljc1IFdmFsdWU6AjgBOqkB6kGlAQokZG9jdW1l
+bnRhaS5nb29nbGVhcGlzLmNvbS9FdmFsdWF0aW9uEn1wcm9qZWN0cy97cHJvamVjdH0vbG9j
+YXRpb25zL3tsb2NhdGlvbn0vcHJvY2Vzc29ycy97cHJvY2Vzc29yfS9wcm9jZXNzb3JWZXJz
+aW9ucy97cHJvY2Vzc29yX3ZlcnNpb259L2V2YWx1YXRpb25zL3tldmFsdWF0aW9ufULrAQoj
+Y29tLmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTNCFERvY3VtZW50QWlFdmFsdWF0
+aW9uUAFaQ2Nsb3VkLmdvb2dsZS5jb20vZ28vZG9jdW1lbnRhaS9hcGl2MWJldGEzL2RvY3Vt
+ZW50YWlwYjtkb2N1bWVudGFpcGKqAh9Hb29nbGUuQ2xvdWQuRG9jdW1lbnRBSS5WMUJldGEz
+ygIfR29vZ2xlXENsb3VkXERvY3VtZW50QUlcVjFiZXRhM+oCIkdvb2dsZTo6Q2xvdWQ6OkRv
+Y3VtZW50QUk6OlYxYmV0YTNK+zgKBxIFDgDJAQEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQg
+MjAyNiBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBW
+ZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxl
+IGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFp
+biBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3Jn
+L2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUg
+bGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5k
+ZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJ
+VEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhw
+cmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFu
+Z3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhl
+IExpY2Vuc2UuCgoICgECEgMQACgKCQoCAwASAxIAKQoJCgIDARIDEwAjCgkKAgMCEgMUACkK
+CAoBCBIDFgA8CgkKAgglEgMWADwKCAoBCBIDFwBaCgkKAggLEgMXAFoKCAoBCBIDGAAiCgkK
+AggKEgMYACIKCAoBCBIDGQA1CgkKAggIEgMZADUKCAoBCBIDGgA8CgkKAggBEgMaADwKCAoB
+CBIDGwA8CgkKAggpEgMbADwKCAoBCBIDHAA7CgkKAggtEgMcADsKWQoCBAASBB8ALQEaTSBH
+aXZlcyBhIHNob3J0IHN1bW1hcnkgb2YgYW4gZXZhbHVhdGlvbiwgYW5kIGxpbmtzIHRvIHRo
+ZSBldmFsdWF0aW9uIGl0c2VsZi4KCgoKAwQAARIDHwgbClIKBAQAAgASAyECFxpFIFRoZSBy
+ZXNvdXJjZSBuYW1lIG9mIHRoZSBMb25nIFJ1bm5pbmcgT3BlcmF0aW9uIGZvciB0aGUgZXZh
+bHVhdGlvbi4KCgwKBQQAAgAFEgMhAggKDAoFBAACAAESAyEJEgoMCgUEAAIAAxIDIRUWCjQK
+BAQAAgESBCQCJgUaJiBUaGUgcmVzb3VyY2UgbmFtZSBvZiB0aGUgZXZhbHVhdGlvbi4KCgwK
+BQQAAgEFEgMkAggKDAoFBAACAQESAyQJEwoMCgUEAAIBAxIDJBYXCg0KBQQAAgEIEgQkGCYE
+Cg8KBwQAAgEInwgSBCQZJgMKWAoEBAACAhIDKQIrGksgQW4gYWdncmVnYXRlIG9mIHRoZSBz
+dGF0aXN0aWNzIGZvciB0aGUgZXZhbHVhdGlvbiB3aXRoIGZ1enp5IG1hdGNoaW5nIG9uLgoK
+DAoFBAACAgYSAykCFAoMCgUEAAICARIDKRUmCgwKBQQAAgIDEgMpKSoKWQoEBAACAxIDLAIx
+GkwgQW4gYWdncmVnYXRlIG9mIHRoZSBzdGF0aXN0aWNzIGZvciB0aGUgZXZhbHVhdGlvbiB3
+aXRoIGZ1enp5IG1hdGNoaW5nIG9mZi4KCgwKBQQAAgMGEgMsAhQKDAoFBAACAwESAywVLAoM
+CgUEAAIDAxIDLC8wCkEKAgQBEgUwAMkBARo0IEFuIGV2YWx1YXRpb24gb2YgYSBQcm9jZXNz
+b3JWZXJzaW9uJ3MgcGVyZm9ybWFuY2UuCgoKCgMEAQESAzAIEgoLCgMEAQcSBDECNAQKDQoF
+BAEHnQgSBDECNAQKRQoEBAEDABIENwJFAxo3IEV2YWx1YXRpb24gY291bnRlcnMgZm9yIHRo
+ZSBkb2N1bWVudHMgdGhhdCB3ZXJlIHVzZWQuCgoMCgUEAQMAARIDNwoSCj0KBgQBAwACABID
+OQQkGi4gSG93IG1hbnkgZG9jdW1lbnRzIHdlcmUgc2VudCBmb3IgZXZhbHVhdGlvbi4KCg4K
+BwQBAwACAAUSAzkECQoOCgcEAQMAAgABEgM5Ch8KDgoHBAEDAAIAAxIDOSIjCmgKBgQBAwAC
+ARIDPQQmGlkgSG93IG1hbnkgZG9jdW1lbnRzIHdlcmUgbm90IGluY2x1ZGVkIGluIHRoZSBl
+dmFsdWF0aW9uIGFzIHRoZXkgZGlkbid0CiBwYXNzIHZhbGlkYXRpb24uCgoOCgcEAQMAAgEF
+EgM9BAkKDgoHBAEDAAIBARIDPQohCg4KBwQBAwACAQMSAz0kJQpvCgYEAQMAAgISA0EEJRpg
+IEhvdyBtYW55IGRvY3VtZW50cyB3ZXJlIG5vdCBpbmNsdWRlZCBpbiB0aGUgZXZhbHVhdGlv
+biBhcyBEb2N1bWVudCBBSQogZmFpbGVkIHRvIHByb2Nlc3MgdGhlbS4KCg4KBwQBAwACAgUS
+A0EECQoOCgcEAQMAAgIBEgNBCiAKDgoHBAEDAAICAxIDQSMkCkAKBgQBAwACAxIDRAQoGjEg
+SG93IG1hbnkgZG9jdW1lbnRzIHdlcmUgdXNlZCBpbiB0aGUgZXZhbHVhdGlvbi4KCg4KBwQB
+AwACAwUSA0QECQoOCgcEAQMAAgMBEgNECiMKDgoHBAEDAAIDAxIDRCYnClMKBAQBAwESBEgC
+aQMaRSBFdmFsdWF0aW9uIG1ldHJpY3MsIGVpdGhlciBpbiBhZ2dyZWdhdGUgb3IgYWJvdXQg
+YSBzcGVjaWZpYyBlbnRpdHkuCgoMCgUEAQMBARIDSAoRCioKBgQBAwECABIDSgQYGhsgVGhl
+IGNhbGN1bGF0ZWQgcHJlY2lzaW9uLgoKDgoHBAEDAQIABRIDSgQJCg4KBwQBAwECAAESA0oK
+EwoOCgcEAQMBAgADEgNKFhcKJwoGBAEDAQIBEgNNBBUaGCBUaGUgY2FsY3VsYXRlZCByZWNh
+bGwuCgoOCgcEAQMBAgEFEgNNBAkKDgoHBAEDAQIBARIDTQoQCg4KBwQBAwECAQMSA00TFAop
+CgYEAQMBAgISA1AEFxoaIFRoZSBjYWxjdWxhdGVkIEYxIHNjb3JlLgoKDgoHBAEDAQICBRID
+UAQJCg4KBwQBAwECAgESA1AKEgoOCgcEAQMBAgIDEgNQFRYKQgoGBAEDAQIDEgNTBCoaMyBU
+aGUgYW1vdW50IG9mIG9jY3VycmVuY2VzIGluIHByZWRpY3RlZCBkb2N1bWVudHMuCgoOCgcE
+AQMBAgMFEgNTBAkKDgoHBAEDAQIDARIDUwolCg4KBwQBAwECAwMSA1MoKQpFCgYEAQMBAgQS
+A1YELRo2IFRoZSBhbW91bnQgb2Ygb2NjdXJyZW5jZXMgaW4gZ3JvdW5kIHRydXRoIGRvY3Vt
+ZW50cy4KCg4KBwQBAwECBAUSA1YECQoOCgcEAQMBAgQBEgNWCigKDgoHBAEDAQIEAxIDViss
+CkUKBgQBAwECBRIDWQQoGjYgVGhlIGFtb3VudCBvZiBkb2N1bWVudHMgd2l0aCBhIHByZWRp
+Y3RlZCBvY2N1cnJlbmNlLgoKDgoHBAEDAQIFBRIDWQQJCg4KBwQBAwECBQESA1kKIgoOCgcE
+AQMBAgUDEgNZJScKSAoGBAEDAQIGEgNcBCsaOSBUaGUgYW1vdW50IG9mIGRvY3VtZW50cyB3
+aXRoIGEgZ3JvdW5kIHRydXRoIG9jY3VycmVuY2UuCgoOCgcEAQMBAgYFEgNcBAkKDgoHBAED
+AQIGARIDXAolCg4KBwQBAwECBgMSA1woKgouCgYEAQMBAgcSA18EIxofIFRoZSBhbW91bnQg
+b2YgdHJ1ZSBwb3NpdGl2ZXMuCgoOCgcEAQMBAgcFEgNfBAkKDgoHBAEDAQIHARIDXwoeCg4K
+BwQBAwECBwMSA18hIgovCgYEAQMBAggSA2IEJBogIFRoZSBhbW91bnQgb2YgZmFsc2UgcG9z
+aXRpdmVzLgoKDgoHBAEDAQIIBRIDYgQJCg4KBwQBAwECCAESA2IKHwoOCgcEAQMBAggDEgNi
+IiMKLwoGBAEDAQIJEgNlBCQaICBUaGUgYW1vdW50IG9mIGZhbHNlIG5lZ2F0aXZlcy4KCg4K
+BwQBAwECCQUSA2UECQoOCgcEAQMBAgkBEgNlCh8KDgoHBAEDAQIJAxIDZSIjCk4KBgQBAwEC
+ChIDaAQkGj8gVGhlIGFtb3VudCBvZiBkb2N1bWVudHMgdGhhdCBoYWQgYW4gb2NjdXJyZW5j
+ZSBvZiB0aGlzIGxhYmVsLgoKDgoHBAEDAQIKBRIDaAQJCg4KBwQBAwECCgESA2gKHwoOCgcE
+AQMBAgoDEgNoIiMKRAoEBAEDAhIEbAJyAxo2IEV2YWx1YXRpb25zIG1ldHJpY3MsIGF0IGEg
+c3BlY2lmaWMgY29uZmlkZW5jZSBsZXZlbC4KCgwKBQQBAwIBEgNsCiAKJgoGBAEDAgIAEgNu
+BB8aFyBUaGUgY29uZmlkZW5jZSBsZXZlbC4KCg4KBwQBAwICAAUSA24ECQoOCgcEAQMCAgAB
+EgNuChoKDgoHBAEDAgIAAxIDbh0eCj4KBgQBAwICARIDcQQYGi8gVGhlIG1ldHJpY3MgYXQg
+dGhlIHNwZWNpZmljIGNvbmZpZGVuY2UgbGV2ZWwuCgoOCgcEAQMCAgEGEgNxBAsKDgoHBAED
+AgIBARIDcQwTCg4KBwQBAwICAQMSA3EWFwo7CgQEAQMDEgV1Ap0BAxosIE1ldHJpY3MgYWNy
+b3NzIG11bHRpcGxlIGNvbmZpZGVuY2UgbGV2ZWxzLgoKDAoFBAEDAwESA3UKIApMCgYEAQMD
+BAASBXcEgwEFGjsgQSB0eXBlIHRoYXQgZGV0ZXJtaW5lcyBob3cgbWV0cmljcyBzaG91bGQg
+YmUgaW50ZXJwcmV0ZWQuCgoOCgcEAQMDBAABEgN3CRQK8gEKCAQBAwMEAAIAEgN8BiMa4AEg
+VGhlIG1ldHJpY3MgdHlwZSBpcyB1bnNwZWNpZmllZC4gQnkgZGVmYXVsdCwgbWV0cmljcyB3
+aXRob3V0IGEKIHBhcnRpY3VsYXIgc3BlY2lmaWNhdGlvbiBhcmUgZm9yIGxlYWYgZW50aXR5
+IHR5cGVzIChpLmUuLCB0b3AtbGV2ZWwKIGVudGl0eSB0eXBlcyB3aXRob3V0IGNoaWxkIHR5
+cGVzLCBvciBjaGlsZCB0eXBlcyB3aGljaCBhcmUgbm90CiBwYXJlbnQgdHlwZXMgdGhlbXNl
+bHZlcykuCgoQCgkEAQMDBAACAAESA3wGHgoQCgkEAQMDBAACAAISA3whIgqoAgoIBAEDAwQA
+AgESBIIBBhQalQIgSW5kaWNhdGVzIHdoZXRoZXIgbWV0cmljcyBmb3IgdGhpcyBwYXJ0aWN1
+bGFyIGxhYmVsIHR5cGUgcmVwcmVzZW50IGFuCiBhZ2dyZWdhdGUgb2YgbWV0cmljcyBmb3Ig
+b3RoZXIgdHlwZXMgaW5zdGVhZCBvZiBiZWluZyBiYXNlZCBvbiBhY3R1YWwKIFRQL0ZQL0ZO
+IHZhbHVlcyBmb3IgdGhlIGxhYmVsIHR5cGUuIE1ldHJpY3MgZm9yIHBhcmVudCAoaS5lLiwg
+bm9uLWxlYWYpCiBlbnRpdHkgdHlwZXMgYXJlIGFuIGFnZ3JlZ2F0ZSBvZiBtZXRyaWNzIGZv
+ciB0aGVpciBjaGlsZHJlbi4KChEKCQQBAwMEAAIBARIEggEGDwoRCgkEAQMDBAACAQISBIIB
+EhMKTwoGBAEDAwIAEgSGAQRBGj8gTWV0cmljcyBhY3Jvc3MgY29uZmlkZW5jZSBsZXZlbHMg
+d2l0aCBmdXp6eSBtYXRjaGluZyBlbmFibGVkLgoKDwoHBAEDAwIABBIEhgEEDAoPCgcEAQMD
+AgAGEgSGAQ0jCg8KBwQBAwMCAAESBIYBJDwKDwoHBAEDAwIAAxIEhgE/QApMCgYEAQMDAgES
+BIkBBEcaPCBNZXRyaWNzIGFjcm9zcyBjb25maWRlbmNlIGxldmVscyB3aXRoIG9ubHkgZXhh
+Y3QgbWF0Y2hpbmcuCgoPCgcEAQMDAgEEEgSJAQQMCg8KBwQBAwMCAQYSBIkBDSMKDwoHBAED
+AwIBARIEiQEkQgoPCgcEAQMDAgEDEgSJAUVGCogBCgYEAQMDAgISBI0BBBQaeCBUaGUgY2Fs
+Y3VsYXRlZCBhcmVhIHVuZGVyIHRoZSBwcmVjaXNpb24gcmVjYWxsIGN1cnZlIChBVVBSQyks
+IGNvbXB1dGVkIGJ5CiBpbnRlZ3JhdGluZyBvdmVyIGFsbCBjb25maWRlbmNlIHRocmVzaG9s
+ZHMuCgoPCgcEAQMDAgIFEgSNAQQJCg8KBwQBAwMCAgESBI0BCg8KDwoHBAEDAwICAxIEjQES
+EwplCgYEAQMDAgMSBJEBBCoaVSBUaGUgRXN0aW1hdGVkIENhbGlicmF0aW9uIEVycm9yIChF
+Q0UpIG9mIHRoZSBjb25maWRlbmNlIG9mIHRoZSBwcmVkaWN0ZWQKIGVudGl0aWVzLgoKDwoH
+BAEDAwIDBRIEkQEECQoPCgcEAQMDAgMBEgSRAQolCg8KBwQBAwMCAwMSBJEBKCkKYQoGBAED
+AwIEEgSVAQQaGlEgVGhlIEFVUFJDIGZvciBtZXRyaWNzIHdpdGggZnV6enkgbWF0Y2hpbmcg
+ZGlzYWJsZWQsIGkuZS4sIGV4YWN0IG1hdGNoaW5nCiBvbmx5LgoKDwoHBAEDAwIEBRIElQEE
+CQoPCgcEAQMDAgQBEgSVAQoVCg8KBwQBAwMCBAMSBJUBGBkKbgoGBAEDAwIFEgSZAQQwGl4g
+VGhlIEVDRSBmb3IgdGhlIHByZWRpY3RlZCBlbnRpdGllcyB3aXRoIGZ1enp5IG1hdGNoaW5n
+IGRpc2FibGVkLCBpLmUuLAogZXhhY3QgbWF0Y2hpbmcgb25seS4KCg8KBwQBAwMCBQUSBJkB
+BAkKDwoHBAEDAwIFARIEmQEKKwoPCgcEAQMDAgUDEgSZAS4vCjEKBgQBAwMCBhIEnAEEIRoh
+IFRoZSBtZXRyaWNzIHR5cGUgZm9yIHRoZSBsYWJlbC4KCg8KBwQBAwMCBgYSBJwBBA8KDwoH
+BAEDAwIGARIEnAEQHAoPCgcEAQMDAgYDEgScAR8gCi8KBAQBAwQSBqABAq4BAxofIEEgcmV2
+aXNpb24gb2YgdGhlIGV2YWx1YXRpb24uCgoNCgUEAQMEARIEoAEKHApBCgYEAQMEAgASBKIB
+BEcaMSBPdXRwdXQgb25seS4gVGhlIHJldmlzaW9uIElEIG9mIHRoZSBldmFsdWF0aW9uLgoK
+DwoHBAEDBAIABRIEogEECgoPCgcEAQMEAgABEgSiAQsWCg8KBwQBAwQCAAMSBKIBGRoKDwoH
+BAEDBAIACBIEogEbRgoSCgoEAQMEAgAInAgAEgSiARxFClEKBgQBAwQCARIEpQEETxpBIE91
+dHB1dCBvbmx5LiBDb3VudGVycyBmb3IgdGhlIGRvY3VtZW50cyB1c2VkIGluIHRoZSBldmFs
+dWF0aW9uLgoKDwoHBAEDBAIBBhIEpQEEDAoPCgcEAQMEAgEBEgSlAQ0eCg8KBwQBAwQCAQMS
+BKUBISIKDwoHBAEDBAIBCBIEpQEjTgoSCgoEAQMEAgEInAgAEgSlASRNCksKBgQBAwQCAhIG
+qAEEqQE0GjkgT3V0cHV0IG9ubHkuIE1ldHJpY3MgZm9yIGFsbCB0aGUgZW50aXRpZXMgaW4g
+YWdncmVnYXRlLgoKDwoHBAEDBAICBhIEqAEEGgoPCgcEAQMEAgIBEgSoARsvCg8KBwQBAwQC
+AgMSBKgBMjMKDwoHBAEDBAICCBIEqQEIMwoSCgoEAQMEAgIInAgAEgSpAQkyCloKBgQBAwQC
+AxIGrAEErQE0GkggT3V0cHV0IG9ubHkuIE1ldHJpY3MgYWNyb3NzIGNvbmZpZGVuY2UgbGV2
+ZWxzLCBmb3IgZGlmZmVyZW50IGVudGl0aWVzLgoKDwoHBAEDBAIDBhIErAEEJwoPCgcEAQME
+AgMBEgSsASg2Cg8KBwQBAwQCAwMSBKwBOToKDwoHBAEDBAIDCBIErQEIMwoSCgoEAQMEAgMI
+nAgAEgStAQkyCr8BCgQEAQIAEgSzAQISGrABIFRoZSByZXNvdXJjZSBuYW1lIG9mIHRoZSBl
+dmFsdWF0aW9uLgogRm9ybWF0OgogYHByb2plY3RzL3twcm9qZWN0fS9sb2NhdGlvbnMve2xv
+Y2F0aW9ufS9wcm9jZXNzb3JzL3twcm9jZXNzb3J9L3Byb2Nlc3NvclZlcnNpb25zL3twcm9j
+ZXNzb3JfdmVyc2lvbn0vZXZhbHVhdGlvbnMve2V2YWx1YXRpb259YAoKDQoFBAECAAUSBLMB
+AggKDQoFBAECAAESBLMBCQ0KDQoFBAECAAMSBLMBEBEKOQoEBAECARIEtgECLBorIFRoZSB0
+aW1lIHRoYXQgdGhlIGV2YWx1YXRpb24gd2FzIGNyZWF0ZWQuCgoNCgUEAQIBBhIEtgECGwoN
+CgUEAQIBARIEtgEcJwoNCgUEAQIBAxIEtgEqKwpCCgQEAQICEgS5AQIhGjQgQ291bnRlcnMg
+Zm9yIHRoZSBkb2N1bWVudHMgdXNlZCBpbiB0aGUgZXZhbHVhdGlvbi4KCg0KBQQBAgIGEgS5
+AQIKCg0KBQQBAgIBEgS5AQscCg0KBQQBAgIDEgS5AR8gCjoKBAQBAgMSBLwBAjIaLCBNZXRy
+aWNzIGZvciBhbGwgdGhlIGVudGl0aWVzIGluIGFnZ3JlZ2F0ZS4KCg0KBQQBAgMGEgS8AQIY
+Cg0KBQQBAgMBEgS8ARktCg0KBQQBAgMDEgS8ATAxCkkKBAQBAgQSBL8BAjkaOyBNZXRyaWNz
+IGFjcm9zcyBjb25maWRlbmNlIGxldmVscywgZm9yIGRpZmZlcmVudCBlbnRpdGllcy4KCg0K
+BQQBAgQGEgS/AQIlCg0KBQQBAgQBEgS/ASY0Cg0KBQQBAgQDEgS/ATc4CjUKBAQBAgUSBMIB
+AhoaJyBUaGUgS01TIGtleSBuYW1lIHVzZWQgZm9yIGVuY3J5cHRpb24uCgoNCgUEAQIFBRIE
+wgECCAoNCgUEAQIFARIEwgEJFQoNCgUEAQIFAxIEwgEYGQpBCgQEAQIGEgTFAQIiGjMgVGhl
+IEtNUyBrZXkgdmVyc2lvbiB3aXRoIHdoaWNoIGRhdGEgaXMgZW5jcnlwdGVkLgoKDQoFBAEC
+BgUSBMUBAggKDQoFBAECBgESBMUBCR0KDQoFBAECBgMSBMUBICEKUwoEBAECBxIEyAECLBpF
+IENvbnRhaW5zIGFsbCByZXZpc2lvbnMgb2YgdGhlIGV2YWx1YXRpb24sIGV4Y2x1ZGluZyB0
+aGUgbGF0ZXN0IG9uZS4KCg0KBQQBAgcEEgTIAQIKCg0KBQQBAgcGEgTIAQsdCg0KBQQBAgcB
+EgTIAR4nCg0KBQQBAgcDEgTIASorYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Documentai::V1beta3::Evaluation::EvaluationReference ===
+    # Fields for EvaluationReference
+    # Field: operation Type: 9 ()
+    # Field: evaluation Type: 9 ()
+    # Field: aggregate_metrics Type: 11 (.google.cloud.documentai.v1beta3.Evaluation.Metrics)
+    # Field: aggregate_metrics_exact Type: 11 (.google.cloud.documentai.v1beta3.Evaluation.Metrics)
+
+# === Message: Google::Cloud::Documentai::V1beta3::Evaluation::Evaluation ===
+    # Fields for Evaluation
+    # Field: name Type: 9 ()
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: document_counters Type: 11 (.google.cloud.documentai.v1beta3.Evaluation.Counters)
+    # Field: all_entities_metrics Type: 11 (.google.cloud.documentai.v1beta3.Evaluation.MultiConfidenceMetrics)
+    # Field: entity_metrics Type: 11 (.google.cloud.documentai.v1beta3.Evaluation.EntityMetricsEntry)
+    # Field: kms_key_name Type: 9 ()
+    # Field: kms_key_version_name Type: 9 ()
+    # Field: revisions Type: 11 (.google.cloud.documentai.v1beta3.Evaluation.EvaluationRevision)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Documentai::V1beta3::Evaluation - Compiled Protocol Buffers messages for google/cloud/documentai/v1beta3/evaluation.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Documentai::V1beta3::Evaluation;
+
+    my $msg = Google::Cloud::Documentai::V1beta3::Evaluation::EvaluationReference->new({
+        operation => $operation,
+        evaluation => $evaluation,
+        aggregate_metrics => $aggregate_metrics,
+        aggregate_metrics_exact => $aggregate_metrics_exact,
+    });
+
+    # Read or update a field
+    my $val = $msg->operation();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Documentai::V1beta3::Evaluation::EvaluationReference->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/documentai/v1beta3/evaluation.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Documentai::V1beta3::Evaluation::EvaluationReference
+
+Gives a short summary of an evaluation, and links to the evaluation itself.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->operation() >> / C<< $msg->operation($value) >>
+
+Type: C<String>
+
+The resource name of the Long Running Operation for the evaluation.
+
+=item * C<< $msg->evaluation() >> / C<< $msg->evaluation($value) >>
+
+Type: C<String>
+
+The resource name of the evaluation.
+
+=item * C<< $msg->aggregate_metrics() >> / C<< $msg->aggregate_metrics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Evaluation::Evaluation::Metrics>)
+
+An aggregate of the statistics for the evaluation with fuzzy matching on.
+
+=item * C<< $msg->aggregate_metrics_exact() >> / C<< $msg->aggregate_metrics_exact($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Evaluation::Evaluation::Metrics>)
+
+An aggregate of the statistics for the evaluation with fuzzy matching off.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::Evaluation::Evaluation
+
+An evaluation of a ProcessorVersion's performance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The resource name of the evaluation.
+Format:
+`projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processor_version}/evaluations/{evaluation}`
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time that the evaluation was created.
+
+=item * C<< $msg->document_counters() >> / C<< $msg->document_counters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Evaluation::Evaluation::Counters>)
+
+Counters for the documents used in the evaluation.
+
+=item * C<< $msg->all_entities_metrics() >> / C<< $msg->all_entities_metrics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Evaluation::Evaluation::MultiConfidenceMetrics>)
+
+Metrics for all the entities in aggregate.
+
+=item * C<< $msg->entity_metrics() >> / C<< $msg->entity_metrics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Evaluation::Evaluation::EntityMetricsEntry>)
+
+Metrics across confidence levels, for different entities.
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<String>
+
+The KMS key name used for encryption.
+
+=item * C<< $msg->kms_key_version_name() >> / C<< $msg->kms_key_version_name($value) >>
+
+Type: C<String>
+
+The KMS key version with which data is encrypted.
+
+=item * C<< $msg->revisions() >> / C<< $msg->revisions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Evaluation::Evaluation::EvaluationRevision>)
+
+Contains all revisions of the evaluation, excluding the latest one.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Documentai::V1beta3::Evaluation::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

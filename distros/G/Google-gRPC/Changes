@@ -1,5 +1,8 @@
 Revision history for Google::gRPC
 
+0.10    2026-11-24
+    - Added Google::gRPC::Server with HTTP/2 framing, Protobuf request/response dispatch, gRPC status/error handling, and AnyEvent TCP listener support (t/10-server.t).
+
 0.09    2026-11-23
     - Overhauled POD documentation (modeled on grpc.io language docs) across Google::gRPC and all submodules: Client, Channel, ChannelPool, Engine, Engine::NGHTTP2, Engine::PP, Stream, Deadline, Status, and Framing.
     - Added META_MERGE resources in Makefile.PL for CPAN and Debian upstream/metadata compliance.

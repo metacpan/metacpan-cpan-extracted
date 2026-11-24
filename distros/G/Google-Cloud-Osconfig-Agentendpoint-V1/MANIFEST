@@ -1,0 +1,32 @@
+Changes
+lib/Google/Cloud/Osconfig/Agentendpoint/V1.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/Agentendpoint.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/Agentendpoint/Types.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/AgentEndpointServiceClient.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/ConfigCommon.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/ConfigCommon/Types.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/Inventory.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/Inventory/Types.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/OsPolicy.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/OsPolicy/Types.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/PatchJobs.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/PatchJobs/Types.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/Tasks.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/Tasks/Types.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/VmInventory.pm
+lib/Google/Cloud/Osconfig/Agentendpoint/V1/VmInventory/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-AgentEndpointService.t
+t/01-service-Default.t
+t/02-rest-transport-AgentEndpointService.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

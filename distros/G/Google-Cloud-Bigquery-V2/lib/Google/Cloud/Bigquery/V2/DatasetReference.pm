@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::DatasetReference;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -52,47 +52,72 @@ EOF
     # Field: dataset_id Type: 9 ()
     # Field: project_id Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::DatasetReference - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/dataset_reference.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::DatasetReference;
 
-    my $msg = Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference->new(
-        dataset_id => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference->new({
+        dataset_id => $dataset_id,
+        project_id => $project_id,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->dataset_id();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference->parse($bytes);
 
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<project_id>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::DatasetReference - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/dataset_reference.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference
+
+Identifier for a dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. A unique ID for this dataset, without the project name. The ID
+must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_).
+The maximum length is 1,024 characters.
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the project containing this dataset.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::DatasetReference::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

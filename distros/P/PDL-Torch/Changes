@@ -1,0 +1,4 @@
+Revision history for PDL-Torch
+
+0.01    2026-11-24
+    - Initial release: LibTorch (PyTorch C++) XS/C++17 bindings for PDL with CPU/CUDA tensor transfer and overloaded arithmetic/matmul/reduction ops.

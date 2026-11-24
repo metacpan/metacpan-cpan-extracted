@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -498,47 +498,349 @@ The following RPC methods are available in this client:
 
 =item * B<aggregated_list>
 
-Calls the RPC method C<AggregatedList> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->aggregated_list(
+        filter                   => $filter,
+        include_all_scopes       => $include_all_scopes,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        service_project_number   => $service_project_number,
+    );
+
+Calls the RPC method C<AggregatedList> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AggregatedListReservationsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ReservationAggregatedList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<include_all_scopes> - C<bool>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<service_project_number> - C<int64>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        project                  => $project,
+        request_id               => $request_id,
+        reservation              => $reservation,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteReservationRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<reservation> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        reservation              => $reservation,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetReservationRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Reservation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<reservation> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get_iam_policy>
 
-Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_iam_policy(
+        options_requested_policy_version => $options_requested_policy_version,
+        project                  => $project,
+        resource                 => $resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<GetIamPolicy> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetIamPolicyReservationRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<options_requested_policy_version> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        project                  => $project,
+        request_id               => $request_id,
+        reservation_resource     => $reservation_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertReservationRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<reservation_resource> - L<Google::Cloud::Compute::V1::Compute::Reservation>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListReservationsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ReservationList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<perform_maintenance>
 
-Calls the RPC method C<PerformMaintenance> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->perform_maintenance(
+        project                  => $project,
+        request_id               => $request_id,
+        reservation              => $reservation,
+        reservations_perform_maintenance_request_resource => $reservations_perform_maintenance_request_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<PerformMaintenance> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PerformMaintenanceReservationRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<reservation> - C<string>
+
+=item * C<reservations_perform_maintenance_request_resource> - L<Google::Cloud::Compute::V1::Compute::ReservationsPerformMaintenanceRequest>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<resize>
 
-Calls the RPC method C<Resize> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->resize(
+        project                  => $project,
+        request_id               => $request_id,
+        reservation              => $reservation,
+        reservations_resize_request_resource => $reservations_resize_request_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Resize> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ResizeReservationRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<reservation> - C<string>
+
+=item * C<reservations_resize_request_resource> - L<Google::Cloud::Compute::V1::Compute::ReservationsResizeRequest>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_iam_policy>
 
-Calls the RPC method C<SetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_iam_policy(
+        project                  => $project,
+        resource                 => $resource,
+        zone                     => $zone,
+        zone_set_policy_request_resource => $zone_set_policy_request_resource,
+    );
+
+Calls the RPC method C<SetIamPolicy> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetIamPolicyReservationRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<zone> - C<string>
+
+=item * C<zone_set_policy_request_resource> - L<Google::Cloud::Compute::V1::Compute::ZoneSetPolicyRequest>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsReservationRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<update>
 
-Calls the RPC method C<Update> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update(
+        paths                    => $paths,
+        project                  => $project,
+        request_id               => $request_id,
+        reservation              => $reservation,
+        reservation_resource     => $reservation_resource,
+        update_mask              => $update_mask,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Update> on C<google.cloud.compute.v1.Reservations>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateReservationRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<paths> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<reservation> - C<string>
+
+=item * C<reservation_resource> - L<Google::Cloud::Compute::V1::Compute::Reservation>
+
+=item * C<update_mask> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =back
 

@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::EncryptionConfig;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -51,43 +51,65 @@ EOF
     # Fields for EncryptionConfiguration
     # Field: kms_key_name Type: 11 (.google.protobuf.StringValue)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::EncryptionConfig - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/encryption_config.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::EncryptionConfig;
 
-    my $msg = Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration->new(
-        kms_key_name => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration->new({
+        kms_key_name => $kms_key_name,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->kms_key_name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration->parse($bytes);
 
-=item * B<kms_key_name>
-
-Type: Message (.google.protobuf.StringValue)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::EncryptionConfig - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/encryption_config.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration
+
+Configuration for Cloud KMS encryption settings.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. Describes the Cloud KMS encryption key that will be used to
+protect destination BigQuery table. The BigQuery Service Account associated
+with your project requires access to this encryption key.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::EncryptionConfig::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,286 @@
+package Google::Cloud::Netapp::V1::Common;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    my $descriptor_b64 = <<'EOF';
+CiNnb29nbGUvY2xvdWQvbmV0YXBwL3YxL2NvbW1vbi5wcm90bxIWZ29vZ2xlLmNsb3VkLm5l
+dGFwcC52MRofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90byLwAwoQTG9jYXRpb25N
+ZXRhZGF0YRJjChhzdXBwb3J0ZWRfc2VydmljZV9sZXZlbHMYASADKA4yJC5nb29nbGUuY2xv
+dWQubmV0YXBwLnYxLlNlcnZpY2VMZXZlbEID4EEDUhZzdXBwb3J0ZWRTZXJ2aWNlTGV2ZWxz
+EmoKGnN1cHBvcnRlZF9mbGV4X3BlcmZvcm1hbmNlGAIgAygOMicuZ29vZ2xlLmNsb3VkLm5l
+dGFwcC52MS5GbGV4UGVyZm9ybWFuY2VCA+BBA1IYc3VwcG9ydGVkRmxleFBlcmZvcm1hbmNl
+EhwKB2hhc192Y3AYAyABKAhCA+BBA1IGaGFzVmNwEisKD2hhc19vbnRhcF9wcm94eRgEIAEo
+CEID4EEDUg1oYXNPbnRhcFByb3h5EnUKFWZsZXhfcGVyZm9ybWFuY2VfdGllchgFIAEoDjI8
+Lmdvb2dsZS5jbG91ZC5uZXRhcHAudjEuTG9jYXRpb25NZXRhZGF0YS5GbGV4UGVyZm9ybWFu
+Y2VUaWVyQgPgQQNSE2ZsZXhQZXJmb3JtYW5jZVRpZXIiSQoTRmxleFBlcmZvcm1hbmNlVGll
+chIlCiFGTEVYX1BFUkZPUk1BTkNFX1RJRVJfVU5TUEVDSUZJRUQQABILCgdMSU1JVEVEEAEi
+LwoMVXNlckNvbW1hbmRzEh8KCGNvbW1hbmRzGAEgAygJQgPgQQNSCGNvbW1hbmRzKl8KDFNl
+cnZpY2VMZXZlbBIdChlTRVJWSUNFX0xFVkVMX1VOU1BFQ0lGSUVEEAASCwoHUFJFTUlVTRAB
+EgsKB0VYVFJFTUUQAhIMCghTVEFOREFSRBADEggKBEZMRVgQBCpuCg9GbGV4UGVyZm9ybWFu
+Y2USIAocRkxFWF9QRVJGT1JNQU5DRV9VTlNQRUNJRklFRBAAEhwKGEZMRVhfUEVSRk9STUFO
+Q0VfREVGQVVMVBABEhsKF0ZMRVhfUEVSRk9STUFOQ0VfQ1VTVE9NEAIqVQoORW5jcnlwdGlv
+blR5cGUSHwobRU5DUllQVElPTl9UWVBFX1VOU1BFQ0lGSUVEEAASEwoPU0VSVklDRV9NQU5B
+R0VEEAESDQoJQ0xPVURfS01TEAIqVAoURGlyZWN0b3J5U2VydmljZVR5cGUSJgoiRElSRUNU
+T1JZX1NFUlZJQ0VfVFlQRV9VTlNQRUNJRklFRBAAEhQKEEFDVElWRV9ESVJFQ1RPUlkQASpL
+Cg9TdG9yYWdlUG9vbFR5cGUSIQodU1RPUkFHRV9QT09MX1RZUEVfVU5TUEVDSUZJRUQQABII
+CgRGSUxFEAESCwoHVU5JRklFRBACKlgKCVNjYWxlVHlwZRIaChZTQ0FMRV9UWVBFX1VOU1BF
+Q0lGSUVEEAASFgoSU0NBTEVfVFlQRV9ERUZBVUxUEAESFwoTU0NBTEVfVFlQRV9TQ0FMRU9V
+VBACKnUKGUh5YnJpZFJlcGxpY2F0aW9uU2NoZWR1bGUSKwonSFlCUklEX1JFUExJQ0FUSU9O
+X1NDSEVEVUxFX1VOU1BFQ0lGSUVEEAASFAoQRVZFUllfMTBfTUlOVVRFUxABEgoKBkhPVVJM
+WRACEgkKBURBSUxZEAMqOQoHUW9zVHlwZRIYChRRT1NfVFlQRV9VTlNQRUNJRklFRBAAEggK
+BEFVVE8QARIKCgZNQU5VQUwQAipDCgZPc1R5cGUSFwoTT1NfVFlQRV9VTlNQRUNJRklFRBAA
+EgkKBUxJTlVYEAESCwoHV0lORE9XUxACEggKBEVTWEkQA0KtAQoaY29tLmdvb2dsZS5jbG91
+ZC5uZXRhcHAudjFCC0NvbW1vblByb3RvUAFaMmNsb3VkLmdvb2dsZS5jb20vZ28vbmV0YXBw
+L2FwaXYxL25ldGFwcHBiO25ldGFwcHBiqgIWR29vZ2xlLkNsb3VkLk5ldEFwcC5WMcoCFkdv
+b2dsZVxDbG91ZFxOZXRBcHBcVjHqAhlHb29nbGU6OkNsb3VkOjpOZXRBcHA6OlYxSpMpCgcS
+BQ4AuAEBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vu
+c2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5z
+ZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3
+aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNl
+IGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoK
+IFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3Jp
+dGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3Ry
+aWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09O
+RElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0
+aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNz
+aW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAfCgkK
+AgMAEgMSACkKCAoBCBIDFAAzCgkKAgglEgMUADMKCAoBCBIDFQBJCgkKAggLEgMVAEkKCAoB
+CBIDFgAiCgkKAggKEgMWACIKCAoBCBIDFwAsCgkKAggIEgMXACwKCAoBCBIDGAAzCgkKAggB
+EgMYADMKCAoBCBIDGQAzCgkKAggpEgMZADMKCAoBCBIDGgAyCgkKAggtEgMaADIKQgoCBQAS
+BB0ALAEaNiBUaGUgc2VydmljZSBsZXZlbCBvZiBhIHN0b3JhZ2UgcG9vbCBhbmQgaXRzIHZv
+bHVtZXMuCgoKCgMFAAESAx0FEQopCgQFAAIAEgMfAiAaHCBVbnNwZWNpZmllZCBzZXJ2aWNl
+IGxldmVsLgoKDAoFBQACAAESAx8CGwoMCgUFAAIAAhIDHx4fCiUKBAUAAgESAyICDhoYIFBy
+ZW1pdW0gc2VydmljZSBsZXZlbC4KCgwKBQUAAgEBEgMiAgkKDAoFBQACAQISAyIMDQolCgQF
+AAICEgMlAg4aGCBFeHRyZW1lIHNlcnZpY2UgbGV2ZWwuCgoMCgUFAAICARIDJQIJCgwKBQUA
+AgICEgMlDA0KJgoEBQACAxIDKAIPGhkgU3RhbmRhcmQgc2VydmljZSBsZXZlbC4KCgwKBQUA
+AgMBEgMoAgoKDAoFBQACAwISAygNDgoiCgQFAAIEEgMrAgsaFSBGbGV4IHNlcnZpY2UgbGV2
+ZWwuCgoMCgUFAAIEARIDKwIGCgwKBQUAAgQCEgMrCQoKLAoCBQESBC8AOAEaICBGbGV4IFN0
+b3JhZ2UgUG9vbCBwZXJmb3JtYW5jZS4KCgoKAwUBARIDLwUUCiwKBAUBAgASAzECIxofIFVu
+c3BlY2lmaWVkIGZsZXggcGVyZm9ybWFuY2UuCgoMCgUFAQIAARIDMQIeCgwKBQUBAgACEgMx
+ISIKOgoEBQECARIDNAIfGi0gRmxleCBTdG9yYWdlIFBvb2wgd2l0aCBkZWZhdWx0IHBlcmZv
+cm1hbmNlLgoKDAoFBQECAQESAzQCGgoMCgUFAQIBAhIDNB0eCjkKBAUBAgISAzcCHhosIEZs
+ZXggU3RvcmFnZSBQb29sIHdpdGggY3VzdG9tIHBlcmZvcm1hbmNlLgoKDAoFBQECAgESAzcC
+GQoMCgUFAQICAhIDNxwdCi8KAgUCEgQ7AEQBGiMgVGhlIHZvbHVtZSBlbmNyeXB0aW9uIGtl
+eSBzb3VyY2UuCgoKCgMFAgESAzsFEwpBCgQFAgIAEgM9AiIaNCBUaGUgc291cmNlIG9mIHRo
+ZSBlbmNyeXB0aW9uIGtleSBpcyBub3Qgc3BlY2lmaWVkLgoKDAoFBQICAAESAz0CHQoMCgUF
+AgIAAhIDPSAhCi0KBAUCAgESA0ACFhogIEdvb2dsZSBtYW5hZ2VkIGVuY3J5cHRpb24ga2V5
+LgoKDAoFBQICAQESA0ACEQoMCgUFAgIBAhIDQBQVCkcKBAUCAgISA0MCEBo6IEN1c3RvbWVy
+IG1hbmFnZWQgZW5jcnlwdGlvbiBrZXksIHdoaWNoIGlzIHN0b3JlZCBpbiBLTVMuCgoMCgUF
+AgICARIDQwILCgwKBQUCAgICEgNDDg8KJwoCBQMSBEcATQEaGyBUeXBlIG9mIGRpcmVjdG9y
+eSBzZXJ2aWNlCgoKCgMFAwESA0cFGQo3CgQFAwIAEgNJAikaKiBEaXJlY3Rvcnkgc2Vydmlj
+ZSB0eXBlIGlzIG5vdCBzcGVjaWZpZWQuCgoMCgUFAwIAARIDSQIkCgwKBQUDAgACEgNJJygK
+RAoEBQMCARIDTAIXGjcgQWN0aXZlIGRpcmVjdG9yeSBwb2xpY3kgYXR0YWNoZWQgdG8gdGhl
+IHN0b3JhZ2UgcG9vbC4KCgwKBQUDAgEBEgNMAhIKDAoFBQMCAQISA0wVFgoiCgIFBBIEUABZ
+ARoWIFR5cGUgb2Ygc3RvcmFnZSBwb29sCgoKCgMFBAESA1AFFAoyCgQFBAIAEgNSAiQaJSBT
+dG9yYWdlIHBvb2wgdHlwZSBpcyBub3Qgc3BlY2lmaWVkLgoKDAoFBQQCAAESA1ICHwoMCgUF
+BAIAAhIDUiIjCikKBAUEAgESA1UCCxocIFN0b3JhZ2UgcG9vbCB0eXBlIGlzIGZpbGUuCgoM
+CgUFBAIBARIDVQIGCgwKBQUEAgECEgNVCQoKLAoEBQQCAhIDWAIOGh8gU3RvcmFnZSBwb29s
+IHR5cGUgaXMgdW5pZmllZC4KCgwKBQUEAgIBEgNYAgkKDAoFBQQCAgISA1gMDQo/CgIFBRIE
+XABnARozIERlZmluZXMgdGhlIHNjYWxlLXR5cGUgb2YgYSBVTklGSUVEIFN0b3JhZ2UgUG9v
+bC4KCgoKAwUFARIDXAUOCiYKBAUFAgASA14CHRoZIFVuc3BlY2lmaWVkIHNjYWxlIHR5cGUu
+CgoMCgUFBQIAARIDXgIYCgwKBQUFAgACEgNeGxwKcAoEBQUCARIDYgIZGmMgUmVwcmVzZW50
+cyBzdGFuZGFyZCBjYXBhY2l0eSBhbmQgcGVyZm9ybWFuY2Ugc2NhbGUtdHlwZS4KIFN1aXRh
+YmxlIGZvciBnZW5lcmFsIHB1cnBvc2Ugd29ya2xvYWRzLgoKDAoFBQUCAQESA2ICFAoMCgUF
+BQIBAhIDYhcYCm0KBAUFAgISA2YCGhpgIFJlcHJlc2VudHMgaGlnaGVyIGNhcGFjaXR5IGFu
+ZCBwZXJmb3JtYW5jZSBzY2FsZS10eXBlLgogU3VpdGFibGUgZm9yIG1vcmUgZGVtYW5kaW5n
+IHdvcmtsb2Fkcy4KCgwKBQUFAgIBEgNmAhUKDAoFBQUCAgISA2YYGQqGAQoCBQYSBGwAeAEa
+eiBTY2hlZHVsZSBmb3IgSHlicmlkIFJlcGxpY2F0aW9uLgogTmV3IGVudW0gdmFsdWVzIG1h
+eSBiZSBhZGRlZCBpbiBmdXR1cmUgdG8gc3VwcG9ydCBkaWZmZXJlbnQgZnJlcXVlbmN5IG9m
+CiByZXBsaWNhdGlvbi4KCgoKAwUGARIDbAUeCjQKBAUGAgASA24CLhonIFVuc3BlY2lmaWVk
+IEh5YnJpZFJlcGxpY2F0aW9uU2NoZWR1bGUKCgwKBQUGAgABEgNuAikKDAoFBQYCAAISA24s
+LQo5CgQFBgIBEgNxAhcaLCBSZXBsaWNhdGlvbiBoYXBwZW5zIG9uY2UgZXZlcnkgMTAgbWlu
+dXRlcy4KCgwKBQUGAgEBEgNxAhIKDAoFBQYCAQISA3EVFgozCgQFBgICEgN0Ag0aJiBSZXBs
+aWNhdGlvbiBoYXBwZW5zIG9uY2UgZXZlcnkgaG91ci4KCgwKBQUGAgIBEgN0AggKDAoFBQYC
+AgISA3QLDAoyCgQFBgIDEgN3AgwaJSBSZXBsaWNhdGlvbiBoYXBwZW5zIG9uY2UgZXZlcnkg
+ZGF5LgoKDAoFBQYCAwESA3cCBwoMCgUFBgIDAhIDdwoLCkEKAgUHEgV7AIQBARo0IFFvUyAo
+UXVhbGl0eSBvZiBTZXJ2aWNlKSBUeXBlcyBvZiB0aGUgc3RvcmFnZSBwb29sCgoKCgMFBwES
+A3sFDAojCgQFBwIAEgN9AhsaFiBVbnNwZWNpZmllZCBRb1MgVHlwZQoKDAoFBQcCAAESA30C
+FgoMCgUFBwIAAhIDfRkaCiAKBAUHAgESBIABAgsaEiBRb1MgVHlwZSBpcyBBdXRvCgoNCgUF
+BwIBARIEgAECBgoNCgUFBwIBAhIEgAEJCgoiCgQFBwICEgSDAQINGhQgUW9TIFR5cGUgaXMg
+TWFudWFsCgoNCgUFBwICARIEgwECCAoNCgUFBwICAhIEgwELDAorCgIFCBIGhwEAkwEBGh0g
+T1MgdHlwZXMgZm9yIHRoZSBob3N0IGdyb3VwCgoLCgMFCAESBIcBBQsKIwoEBQgCABIEiQEC
+GhoVIFVuc3BlY2lmaWVkIE9TIFR5cGUKCg0KBQUIAgABEgSJAQIVCg0KBQUIAgACEgSJARgZ
+CiAKBAUIAgESBIwBAgwaEiBPUyBUeXBlIGlzIExpbnV4CgoNCgUFCAIBARIEjAECBwoNCgUF
+CAIBAhIEjAEKCwoiCgQFCAICEgSPAQIOGhQgT1MgVHlwZSBpcyBXaW5kb3dzCgoNCgUFCAIC
+ARIEjwECCQoNCgUFCAICAhIEjwEMDQomCgQFCAIDEgSSAQILGhggT1MgVHlwZSBpcyBWTXdh
+cmUgRVNYaQoKDQoFBQgCAwESBJIBAgYKDQoFBQgCAwISBJIBCQoKZwoCBAASBpcBALIBARpZ
+IE1ldGFkYXRhIGZvciBhIGdpdmVuCiBbZ29vZ2xlLmNsb3VkLmxvY2F0aW9uLkxvY2F0aW9u
+XVtnb29nbGUuY2xvdWQubG9jYXRpb24uTG9jYXRpb25dLgoKCwoDBAABEgSXAQgYCj0KBAQA
+BAASBpkBAp8BAxotIFRoZSBmbGV4IHBlcmZvcm1hbmNlIHRpZXIgb2YgdGhpcyBsb2NhdGlv
+bi4KCg0KBQQABAABEgSZAQcaCjQKBgQABAACABIEmwEEKhokIFVuc3BlY2lmaWVkIGZsZXgg
+cGVyZm9ybWFuY2UgdGllci4KCg8KBwQABAACAAESBJsBBCUKDwoHBAAEAAIAAhIEmwEoKQoz
+CgYEAAQAAgESBJ4BBBAaIyBGbGV4IHBlcmZvcm1hbmNlIHRpZXIgaXMgbGltaXRlZC4KCg8K
+BwQABAACAQESBJ4BBAsKDwoHBAAEAAIBAhIEngEODwpGCgQEAAIAEgaiAQKjATIaNiBPdXRw
+dXQgb25seS4gU3VwcG9ydGVkIHNlcnZpY2UgbGV2ZWxzIGluIGEgbG9jYXRpb24uCgoNCgUE
+AAIABBIEogECCgoNCgUEAAIABhIEogELFwoNCgUEAAIAARIEogEYMAoNCgUEAAIAAxIEogEz
+NAoNCgUEAAIACBIEowEGMQoQCggEAAIACJwIABIEowEHMApICgQEAAIBEgamAQKnATIaOCBP
+dXRwdXQgb25seS4gU3VwcG9ydGVkIGZsZXggcGVyZm9ybWFuY2UgaW4gYSBsb2NhdGlvbi4K
+Cg0KBQQAAgEEEgSmAQIKCg0KBQQAAgEGEgSmAQsaCg0KBQQAAgEBEgSmARs1Cg0KBQQAAgED
+EgSmATg5Cg0KBQQAAgEIEgSnAQYxChAKCAQAAgEInAgAEgSnAQcwCkcKBAQAAgISBKoBAj8a
+OSBPdXRwdXQgb25seS4gSW5kaWNhdGVzIGlmIHRoZSBsb2NhdGlvbiBoYXMgVkNQIHN1cHBv
+cnQuCgoNCgUEAAICBRIEqgECBgoNCgUEAAICARIEqgEHDgoNCgUEAAICAxIEqgEREgoNCgUE
+AAICCBIEqgETPgoQCggEAAICCJwIABIEqgEUPQpPCgQEAAIDEgStAQJHGkEgT3V0cHV0IG9u
+bHkuIEluZGljYXRlcyBpZiB0aGUgbG9jYXRpb24gaGFzIE9OVEFQIFByb3h5IHN1cHBvcnQu
+CgoNCgUEAAIDBRIErQECBgoNCgUEAAIDARIErQEHFgoNCgUEAAIDAxIErQEZGgoNCgUEAAID
+CBIErQEbRgoQCggEAAIDCJwIABIErQEcRQpUCgQEAAIEEgawAQKxATIaRCBPdXRwdXQgb25s
+eS4gSW5kaWNhdGVzIHRoZSBmbGV4IHBlcmZvcm1hbmNlIHRpZXIgb2YgdGhpcyBsb2NhdGlv
+bi4KCg0KBQQAAgQGEgSwAQIVCg0KBQQAAgQBEgSwARYrCg0KBQQAAgQDEgSwAS4vCg0KBQQA
+AgQIEgSxAQYxChAKCAQAAgQInAgAEgSxAQcwClIKAgQBEga1AQC4AQEaRCBVc2VyQ29tbWFu
+ZHMgY29udGFpbnMgdGhlIGNvbW1hbmRzIHRvIGJlIGV4ZWN1dGVkIGJ5IHRoZSBjdXN0b21l
+ci4KCgsKAwQBARIEtQEIFApNCgQEAQIAEgS3AQJLGj8gT3V0cHV0IG9ubHkuIExpc3Qgb2Yg
+Y29tbWFuZHMgdG8gYmUgZXhlY3V0ZWQgYnkgdGhlIGN1c3RvbWVyLgoKDQoFBAECAAQSBLcB
+AgoKDQoFBAECAAUSBLcBCxEKDQoFBAECAAESBLcBEhoKDQoFBAECAAMSBLcBHR4KDQoFBAEC
+AAgSBLcBH0oKEAoIBAECAAicCAASBLcBIEliBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Netapp::V1::Common::LocationMetadata ===
+    # Fields for LocationMetadata
+    # Field: supported_service_levels Type: 14 (.google.cloud.netapp.v1.ServiceLevel)
+    # Field: supported_flex_performance Type: 14 (.google.cloud.netapp.v1.FlexPerformance)
+    # Field: has_vcp Type: 8 ()
+    # Field: has_ontap_proxy Type: 8 ()
+    # Field: flex_performance_tier Type: 14 (.google.cloud.netapp.v1.LocationMetadata.FlexPerformanceTier)
+
+# Enum: LocationMetadata::FlexPerformanceTier
+our $LocationMetadata_FLEX_PERFORMANCE_TIER_UNSPECIFIED = 0;
+our $LocationMetadata_LIMITED = 1;
+
+# === Message: Google::Cloud::Netapp::V1::Common::UserCommands ===
+    # Fields for UserCommands
+    # Field: commands Type: 9 ()
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Netapp::V1::Common - Compiled Protocol Buffers messages for google/cloud/netapp/v1/common.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Netapp::V1::Common;
+
+    my $msg = Google::Cloud::Netapp::V1::Common::LocationMetadata->new({
+        supported_service_levels => $supported_service_levels,
+        supported_flex_performance => $supported_flex_performance,
+        has_vcp => $has_vcp,
+        has_ontap_proxy => $has_ontap_proxy,
+    });
+
+    # Read or update a field
+    my $val = $msg->supported_service_levels();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Netapp::V1::Common::LocationMetadata->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/netapp/v1/common.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Netapp::V1::Common::LocationMetadata
+
+Metadata for a given
+[google.cloud.location.Location][google.cloud.location.Location].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->supported_service_levels() >> / C<< $msg->supported_service_levels($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Netapp::V1::ServiceLevel>)
+
+Output only. Supported service levels in a location.
+
+=item * C<< $msg->supported_flex_performance() >> / C<< $msg->supported_flex_performance($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Netapp::V1::FlexPerformance>)
+
+Output only. Supported flex performance in a location.
+
+=item * C<< $msg->has_vcp() >> / C<< $msg->has_vcp($value) >>
+
+Type: C<Bool>
+
+Output only. Indicates if the location has VCP support.
+
+=item * C<< $msg->has_ontap_proxy() >> / C<< $msg->has_ontap_proxy($value) >>
+
+Type: C<Bool>
+
+Output only. Indicates if the location has ONTAP Proxy support.
+
+=item * C<< $msg->flex_performance_tier() >> / C<< $msg->flex_performance_tier($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Netapp::V1::LocationMetadata::FlexPerformanceTier>)
+
+Output only. Indicates the flex performance tier of this location.
+
+=back
+
+=head3 Enum: LocationMetadata::FlexPerformanceTier
+
+=over 4
+
+=item * C<FLEX_PERFORMANCE_TIER_UNSPECIFIED> => C<0>
+
+=item * C<LIMITED> => C<1>
+
+=back
+
+=head2 Google::Cloud::Netapp::V1::Common::UserCommands
+
+UserCommands contains the commands to be executed by the customer.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->commands() >> / C<< $msg->commands($value) >>
+
+Type: C<String>
+
+Output only. List of commands to be executed by the customer.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Netapp::V1::Common::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

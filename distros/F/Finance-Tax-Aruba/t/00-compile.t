@@ -5,19 +5,29 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Finance/Tax/Aruba.pm',
+    'Finance/Tax/Aruba/BBO.pm',
+    'Finance/Tax/Aruba/BBO/2020.pm',
+    'Finance/Tax/Aruba/BBO/2021.pm',
+    'Finance/Tax/Aruba/BBO/2022.pm',
+    'Finance/Tax/Aruba/BBO/2023.pm',
+    'Finance/Tax/Aruba/BBO/2024.pm',
+    'Finance/Tax/Aruba/BBO/2025.pm',
     'Finance/Tax/Aruba/Income.pm',
     'Finance/Tax/Aruba/Income/2020.pm',
     'Finance/Tax/Aruba/Income/2021.pm',
     'Finance/Tax/Aruba/Income/2023.pm',
     'Finance/Tax/Aruba/Income/2025.pm',
+    'Finance/Tax/Aruba/Income/2026.pm',
+    'Finance/Tax/Aruba/Role/BBO/TaxYear.pm',
     'Finance/Tax/Aruba/Role/Income/TaxYear.pm'
 );
 
 my @scripts = (
+    'bin/bbo.pl',
     'bin/loon.pl'
 );
 

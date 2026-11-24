@@ -1,0 +1,539 @@
+package Google::Cloud::Devtools::Testing::V1;
+
+use strict;
+use warnings;
+use Moo;
+use Google::gRPC::Client;
+use Google::Cloud::REST::Client;
+use Google::Auth;
+use Carp qw(croak);
+
+use Protobuf;
+use Google::Api::Common;
+use Google::Devtools::Testing::V1::AdbService;
+use Google::Devtools::Testing::V1::TestEnvironmentDiscovery;
+use Google::Devtools::Testing::V1::TestExecution;
+use Google::Devtools::Testing::V1::ApplicationDetails;
+use Google::Devtools::Testing::V1::DirectAccessService;
+
+our $VERSION = '0.06';
+
+has credentials => ( is => 'ro', required => 0 );
+has transport   => ( is => 'rw' );
+
+sub BUILD {
+    my ($self) = @_;
+
+    my $auth = $self->credentials;
+    if (!defined $auth) {
+        $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
+    }
+    my $token = $auth->get_token();
+
+    my $target = 'testing.googleapis.com:443';
+    my $t = $self->transport || 'grpc';
+
+    if (ref($t) && eval { $t->can('call') }) {
+        # Already a transport object
+    } elsif (lc($t) eq 'rest') {
+        my $client = Google::Cloud::REST::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    } else {
+        my $client = Google::gRPC::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    }
+}
+
+sub get_apk_details {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Testing::V1::ApplicationDetails::GetApkDetailsRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Testing::V1::ApplicationDetails::GetApkDetailsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.testing.v1.ApplicationDetailService/GetApkDetails',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.testing.v1.ApplicationDetailService',
+        method         => 'GetApkDetails',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub create_device_session {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Testing::V1::DirectAccessService::CreateDeviceSessionRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Testing::V1::DirectAccessService::DeviceSession';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.testing.v1.DirectAccessService/CreateDeviceSession',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.testing.v1.DirectAccessService',
+        method         => 'CreateDeviceSession',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub adb_connect {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Testing::V1::AdbService::AdbMessage';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Testing::V1::AdbService::DeviceMessage';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.testing.v1.DirectAccessService/AdbConnect',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.testing.v1.DirectAccessService',
+        method         => 'AdbConnect',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub get_test_environment_catalog {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Testing::V1::TestEnvironmentDiscovery::GetTestEnvironmentCatalogRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Testing::V1::TestEnvironmentDiscovery::TestEnvironmentCatalog';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.testing.v1.TestEnvironmentDiscoveryService/GetTestEnvironmentCatalog',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.testing.v1.TestEnvironmentDiscoveryService',
+        method         => 'GetTestEnvironmentCatalog',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub create_test_matrix {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Testing::V1::TestExecution::CreateTestMatrixRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Testing::V1::TestExecution::TestMatrix';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.testing.v1.TestExecutionService/CreateTestMatrix',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.testing.v1.TestExecutionService',
+        method         => 'CreateTestMatrix',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub get_test_matrix {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Testing::V1::TestExecution::GetTestMatrixRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Testing::V1::TestExecution::TestMatrix';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.testing.v1.TestExecutionService/GetTestMatrix',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.testing.v1.TestExecutionService',
+        method         => 'GetTestMatrix',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub cancel_test_matrix {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Devtools::Testing::V1::TestExecution::CancelTestMatrixRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Devtools::Testing::V1::TestExecution::CancelTestMatrixResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.devtools.testing.v1.TestExecutionService/CancelTestMatrix',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.devtools.testing.v1.TestExecutionService',
+        method         => 'CancelTestMatrix',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+1; # End of Google::Cloud::Devtools::Testing::V1
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Devtools::Testing::V1 - Client library for Google Cloud Services
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Devtools::Testing::V1;
+    use Google::Auth;
+
+    my $auth = Google::Auth->default();
+
+    # 1. High-performance gRPC Transport (Default)
+    my $grpc_client = Google::Cloud::Devtools::Testing::V1->new(
+        credentials => $auth,
+        transport   => 'grpc', # Optional: 'grpc' is default
+    );
+
+    # 2. HTTP/REST Transport
+    my $rest_client = Google::Cloud::Devtools::Testing::V1->new(
+        credentials => $auth,
+        transport   => 'rest',
+    );
+
+    # Execute service methods
+    my $res = $grpc_client->some_method( %params );
+
+=head1 DESCRIPTION
+
+C<Google::Cloud::Devtools::Testing::V1> is an auto-generated client library for Google Cloud Services.
+
+It provides a unified client interface supporting both high-performance HTTP/2 gRPC and HTTP/REST transports, with automatic Google Cloud Application Default Credentials (ADC) resolution and typed Protocol Buffers message handling.
+
+=head1 SOURCE
+
+Generated from the following Protocol Buffers schemas:
+
+=over 4
+
+=item * C<googleapis/google/devtools/testing/v1/adb_service.proto>
+
+=item * C<googleapis/google/devtools/testing/v1/application_details.proto>
+
+=item * C<googleapis/google/devtools/testing/v1/direct_access_service.proto>
+
+=item * C<googleapis/google/devtools/testing/v1/test_environment_discovery.proto>
+
+=item * C<googleapis/google/devtools/testing/v1/test_execution.proto>
+
+
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $client = Google::Cloud::Devtools::Testing::V1->new(
+        credentials => $auth,   # Optional: Google::Auth object (defaults to ADC)
+        transport   => 'grpc', # Optional: 'grpc' (default) or 'rest'
+    );
+
+=head1 ATTRIBUTES
+
+=head2 credentials
+
+Returns or accepts the L<Google::Auth> credentials object.
+
+=head2 transport
+
+Returns or accepts the active transport object (L<Google::gRPC::Client> or L<Google::Cloud::REST::Client>).
+
+=head1 METHODS
+
+=head2 METHODS
+
+The following RPC methods are available in this client:
+
+=over 4
+
+=item * B<get_apk_details>
+
+    my $response = $client->get_apk_details(
+        location                 => $location,
+        bundle_location          => $bundle_location,
+    );
+
+Calls the RPC method C<GetApkDetails> on C<google.devtools.testing.v1.ApplicationDetailService>.
+
+Request: L<Google::Devtools::Testing::V1::ApplicationDetails::GetApkDetailsRequest>
+
+Returns: L<Google::Devtools::Testing::V1::ApplicationDetails::GetApkDetailsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<location> - L<Google::Devtools::Testing::V1::TestExecution::FileReference>
+
+=item * C<bundle_location> - L<Google::Devtools::Testing::V1::TestExecution::FileReference>
+
+=back
+
+=item * B<create_device_session>
+
+    my $response = $client->create_device_session(
+        parent                   => $parent,
+        device_session           => $device_session,
+    );
+
+Calls the RPC method C<CreateDeviceSession> on C<google.devtools.testing.v1.DirectAccessService>.
+
+Request: L<Google::Devtools::Testing::V1::DirectAccessService::CreateDeviceSessionRequest>
+
+Returns: L<Google::Devtools::Testing::V1::DirectAccessService::DeviceSession>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<device_session> - L<Google::Devtools::Testing::V1::DirectAccessService::DeviceSession>
+
+=back
+
+=item * B<adb_connect>
+
+    my $response = $client->adb_connect();
+
+Calls the RPC method C<AdbConnect> on C<google.devtools.testing.v1.DirectAccessService>.
+
+Request: L<Google::Devtools::Testing::V1::AdbService::AdbMessage>
+
+Returns: L<Google::Devtools::Testing::V1::AdbService::DeviceMessage>
+
+=item * B<get_test_environment_catalog>
+
+    my $response = $client->get_test_environment_catalog(
+        environment_type         => $environment_type,
+        project_id               => $project_id,
+        include_viewable_models  => $include_viewable_models,
+    );
+
+Calls the RPC method C<GetTestEnvironmentCatalog> on C<google.devtools.testing.v1.TestEnvironmentDiscoveryService>.
+
+Request: L<Google::Devtools::Testing::V1::TestEnvironmentDiscovery::GetTestEnvironmentCatalogRequest>
+
+Returns: L<Google::Devtools::Testing::V1::TestEnvironmentDiscovery::TestEnvironmentCatalog>
+
+Parameters:
+
+=over 4
+
+=item * C<environment_type> - L<Google::Devtools::Testing::V1::TestEnvironmentDiscovery::EnvironmentType>
+
+=item * C<project_id> - C<string>
+
+=item * C<include_viewable_models> - C<bool>
+
+=back
+
+=item * B<create_test_matrix>
+
+    my $response = $client->create_test_matrix(
+        project_id               => $project_id,
+        test_matrix              => $test_matrix,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<CreateTestMatrix> on C<google.devtools.testing.v1.TestExecutionService>.
+
+Request: L<Google::Devtools::Testing::V1::TestExecution::CreateTestMatrixRequest>
+
+Returns: L<Google::Devtools::Testing::V1::TestExecution::TestMatrix>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<test_matrix> - L<Google::Devtools::Testing::V1::TestExecution::TestMatrix>
+
+=item * C<request_id> - C<string>
+
+=back
+
+=item * B<get_test_matrix>
+
+    my $response = $client->get_test_matrix(
+        project_id               => $project_id,
+        test_matrix_id           => $test_matrix_id,
+    );
+
+Calls the RPC method C<GetTestMatrix> on C<google.devtools.testing.v1.TestExecutionService>.
+
+Request: L<Google::Devtools::Testing::V1::TestExecution::GetTestMatrixRequest>
+
+Returns: L<Google::Devtools::Testing::V1::TestExecution::TestMatrix>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<test_matrix_id> - C<string>
+
+=back
+
+=item * B<cancel_test_matrix>
+
+    my $response = $client->cancel_test_matrix(
+        project_id               => $project_id,
+        test_matrix_id           => $test_matrix_id,
+    );
+
+Calls the RPC method C<CancelTestMatrix> on C<google.devtools.testing.v1.TestExecutionService>.
+
+Request: L<Google::Devtools::Testing::V1::TestExecution::CancelTestMatrixRequest>
+
+Returns: L<Google::Devtools::Testing::V1::TestExecution::CancelTestMatrixResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<test_matrix_id> - C<string>
+
+=back
+
+=back
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

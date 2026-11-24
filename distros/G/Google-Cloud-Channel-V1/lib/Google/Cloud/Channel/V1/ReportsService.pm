@@ -1,0 +1,1260 @@
+package Google::Cloud::Channel::V1::ReportsService;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Channel::V1::Operations };
+    eval { require Google::Longrunning::Operations };
+    eval { require Google::Protobuf::Timestamp };
+    eval { require Google::Type::Date };
+    eval { require Google::Type::Datetime };
+    eval { require Google::Type::Decimal };
+    eval { require Google::Type::Money };
+    my $descriptor_b64 = <<'EOF';
+Ci1nb29nbGUvY2xvdWQvY2hhbm5lbC92MS9yZXBvcnRzX3NlcnZpY2UucHJvdG8SF2dvb2ds
+ZS5jbG91ZC5jaGFubmVsLnYxGhxnb29nbGUvYXBpL2Fubm90YXRpb25zLnByb3RvGhdnb29n
+bGUvYXBpL2NsaWVudC5wcm90bxofZ29vZ2xlL2FwaS9maWVsZF9iZWhhdmlvci5wcm90bxoZ
+Z29vZ2xlL2FwaS9yZXNvdXJjZS5wcm90bxooZ29vZ2xlL2Nsb3VkL2NoYW5uZWwvdjEvb3Bl
+cmF0aW9ucy5wcm90bxojZ29vZ2xlL2xvbmdydW5uaW5nL29wZXJhdGlvbnMucHJvdG8aH2dv
+b2dsZS9wcm90b2J1Zi90aW1lc3RhbXAucHJvdG8aFmdvb2dsZS90eXBlL2RhdGUucHJvdG8a
+Gmdvb2dsZS90eXBlL2RhdGV0aW1lLnByb3RvGhlnb29nbGUvdHlwZS9kZWNpbWFsLnByb3Rv
+Ghdnb29nbGUvdHlwZS9tb25leS5wcm90byLoAQoTUnVuUmVwb3J0Sm9iUmVxdWVzdBI+CgRu
+YW1lGAEgASgJQirgQQL6QSQKImNsb3VkY2hhbm5lbC5nb29nbGVhcGlzLmNvbS9SZXBvcnRS
+BG5hbWUSRgoKZGF0ZV9yYW5nZRgCIAEoCzIiLmdvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkRh
+dGVSYW5nZUID4EEBUglkYXRlUmFuZ2USGwoGZmlsdGVyGAMgASgJQgPgQQFSBmZpbHRlchIo
+Cg1sYW5ndWFnZV9jb2RlGAQgASgJQgPgQQFSDGxhbmd1YWdlQ29kZToCGAEitgEKFFJ1blJl
+cG9ydEpvYlJlc3BvbnNlEkEKCnJlcG9ydF9qb2IYASABKAsyIi5nb29nbGUuY2xvdWQuY2hh
+bm5lbC52MS5SZXBvcnRKb2JSCXJlcG9ydEpvYhJXCg9yZXBvcnRfbWV0YWRhdGEYAiABKAsy
+Li5nb29nbGUuY2xvdWQuY2hhbm5lbC52MS5SZXBvcnRSZXN1bHRzTWV0YWRhdGFSDnJlcG9y
+dE1ldGFkYXRhOgIYASLfAQoZRmV0Y2hSZXBvcnRSZXN1bHRzUmVxdWVzdBJMCgpyZXBvcnRf
+am9iGAEgASgJQi3gQQL6QScKJWNsb3VkY2hhbm5lbC5nb29nbGVhcGlzLmNvbS9SZXBvcnRK
+b2JSCXJlcG9ydEpvYhIgCglwYWdlX3NpemUYAiABKAVCA+BBAVIIcGFnZVNpemUSIgoKcGFn
+ZV90b2tlbhgDIAEoCUID4EEBUglwYWdlVG9rZW4SKgoOcGFydGl0aW9uX2tleXMYBCADKAlC
+A+BBAVINcGFydGl0aW9uS2V5czoCGAEi0wEKGkZldGNoUmVwb3J0UmVzdWx0c1Jlc3BvbnNl
+ElcKD3JlcG9ydF9tZXRhZGF0YRgBIAEoCzIuLmdvb2dsZS5jbG91ZC5jaGFubmVsLnYxLlJl
+cG9ydFJlc3VsdHNNZXRhZGF0YVIOcmVwb3J0TWV0YWRhdGESMAoEcm93cxgCIAMoCzIcLmdv
+b2dsZS5jbG91ZC5jaGFubmVsLnYxLlJvd1IEcm93cxImCg9uZXh0X3BhZ2VfdG9rZW4YAyAB
+KAlSDW5leHRQYWdlVG9rZW46AhgBIqUBChJMaXN0UmVwb3J0c1JlcXVlc3QSGwoGcGFyZW50
+GAEgASgJQgPgQQJSBnBhcmVudBIgCglwYWdlX3NpemUYAiABKAVCA+BBAVIIcGFnZVNpemUS
+IgoKcGFnZV90b2tlbhgDIAEoCUID4EEBUglwYWdlVG9rZW4SKAoNbGFuZ3VhZ2VfY29kZRgE
+IAEoCUID4EEBUgxsYW5ndWFnZUNvZGU6AhgBInwKE0xpc3RSZXBvcnRzUmVzcG9uc2USOQoH
+cmVwb3J0cxgBIAMoCzIfLmdvb2dsZS5jbG91ZC5jaGFubmVsLnYxLlJlcG9ydFIHcmVwb3J0
+cxImCg9uZXh0X3BhZ2VfdG9rZW4YAiABKAlSDW5leHRQYWdlVG9rZW46AhgBIsoBCglSZXBv
+cnRKb2ISFwoEbmFtZRgBIAEoCUID4EECUgRuYW1lEkoKDXJlcG9ydF9zdGF0dXMYAiABKAsy
+JS5nb29nbGUuY2xvdWQuY2hhbm5lbC52MS5SZXBvcnRTdGF0dXNSDHJlcG9ydFN0YXR1czpY
+GAHqQVMKJWNsb3VkY2hhbm5lbC5nb29nbGVhcGlzLmNvbS9SZXBvcnRKb2ISKmFjY291bnRz
+L3thY2NvdW50fS9yZXBvcnRKb2JzL3tyZXBvcnRfam9ifSKKAgoVUmVwb3J0UmVzdWx0c01l
+dGFkYXRhEjcKBnJlcG9ydBgBIAEoCzIfLmdvb2dsZS5jbG91ZC5jaGFubmVsLnYxLlJlcG9y
+dFIGcmVwb3J0EhsKCXJvd19jb3VudBgCIAEoA1IIcm93Q291bnQSQQoKZGF0ZV9yYW5nZRgD
+IAEoCzIiLmdvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkRhdGVSYW5nZVIJZGF0ZVJhbmdlElQK
+FHByZWNlZGluZ19kYXRlX3JhbmdlGAQgASgLMiIuZ29vZ2xlLmNsb3VkLmNoYW5uZWwudjEu
+RGF0ZVJhbmdlUhJwcmVjZWRpbmdEYXRlUmFuZ2U6AhgBIoACCgZDb2x1bW4SGwoJY29sdW1u
+X2lkGAEgASgJUghjb2x1bW5JZBIhCgxkaXNwbGF5X25hbWUYAiABKAlSC2Rpc3BsYXlOYW1l
+EkUKCWRhdGFfdHlwZRgDIAEoDjIoLmdvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkNvbHVtbi5E
+YXRhVHlwZVIIZGF0YVR5cGUiawoIRGF0YVR5cGUSGQoVREFUQV9UWVBFX1VOU1BFQ0lGSUVE
+EAASCgoGU1RSSU5HEAESBwoDSU5UEAISCwoHREVDSU1BTBADEgkKBU1PTkVZEAQSCAoEREFU
+RRAFEg0KCURBVEVfVElNRRAGOgIYASKdAgoJRGF0ZVJhbmdlEkgKFXVzYWdlX3N0YXJ0X2Rh
+dGVfdGltZRgBIAEoCzIVLmdvb2dsZS50eXBlLkRhdGVUaW1lUhJ1c2FnZVN0YXJ0RGF0ZVRp
+bWUSRAoTdXNhZ2VfZW5kX2RhdGVfdGltZRgCIAEoCzIVLmdvb2dsZS50eXBlLkRhdGVUaW1l
+UhB1c2FnZUVuZERhdGVUaW1lEj8KEmludm9pY2Vfc3RhcnRfZGF0ZRgDIAEoCzIRLmdvb2ds
+ZS50eXBlLkRhdGVSEGludm9pY2VTdGFydERhdGUSOwoQaW52b2ljZV9lbmRfZGF0ZRgEIAEo
+CzIRLmdvb2dsZS50eXBlLkRhdGVSDmludm9pY2VFbmREYXRlOgIYASJsCgNSb3cSPAoGdmFs
+dWVzGAEgAygLMiQuZ29vZ2xlLmNsb3VkLmNoYW5uZWwudjEuUmVwb3J0VmFsdWVSBnZhbHVl
+cxIjCg1wYXJ0aXRpb25fa2V5GAIgASgJUgxwYXJ0aXRpb25LZXk6AhgBIscCCgtSZXBvcnRW
+YWx1ZRIjCgxzdHJpbmdfdmFsdWUYASABKAlIAFILc3RyaW5nVmFsdWUSHQoJaW50X3ZhbHVl
+GAIgASgDSABSCGludFZhbHVlEjsKDWRlY2ltYWxfdmFsdWUYAyABKAsyFC5nb29nbGUudHlw
+ZS5EZWNpbWFsSABSDGRlY2ltYWxWYWx1ZRI1Cgttb25leV92YWx1ZRgEIAEoCzISLmdvb2ds
+ZS50eXBlLk1vbmV5SABSCm1vbmV5VmFsdWUSMgoKZGF0ZV92YWx1ZRgFIAEoCzIRLmdvb2ds
+ZS50eXBlLkRhdGVIAFIJZGF0ZVZhbHVlEj8KD2RhdGVfdGltZV92YWx1ZRgGIAEoCzIVLmdv
+b2dsZS50eXBlLkRhdGVUaW1lSABSDWRhdGVUaW1lVmFsdWU6AhgBQgcKBXZhbHVlIpwCCgxS
+ZXBvcnRTdGF0dXMSQQoFc3RhdGUYASABKA4yKy5nb29nbGUuY2xvdWQuY2hhbm5lbC52MS5S
+ZXBvcnRTdGF0dXMuU3RhdGVSBXN0YXRlEjkKCnN0YXJ0X3RpbWUYAiABKAsyGi5nb29nbGUu
+cHJvdG9idWYuVGltZXN0YW1wUglzdGFydFRpbWUSNQoIZW5kX3RpbWUYAyABKAsyGi5nb29n
+bGUucHJvdG9idWYuVGltZXN0YW1wUgdlbmRUaW1lIlMKBVN0YXRlEhUKEVNUQVRFX1VOU1BF
+Q0lGSUVEEAASCwoHU1RBUlRFRBABEgsKB1dSSVRJTkcQAhINCglBVkFJTEFCTEUQAxIKCgZG
+QUlMRUQQBDoCGAEi8QEKBlJlcG9ydBIXCgRuYW1lGAEgASgJQgPgQQJSBG5hbWUSIQoMZGlz
+cGxheV9uYW1lGAIgASgJUgtkaXNwbGF5TmFtZRI5Cgdjb2x1bW5zGAMgAygLMh8uZ29vZ2xl
+LmNsb3VkLmNoYW5uZWwudjEuQ29sdW1uUgdjb2x1bW5zEiAKC2Rlc2NyaXB0aW9uGAQgASgJ
+UgtkZXNjcmlwdGlvbjpOGAHqQUkKImNsb3VkY2hhbm5lbC5nb29nbGVhcGlzLmNvbS9SZXBv
+cnQSI2FjY291bnRzL3thY2NvdW50fS9yZXBvcnRzL3tyZXBvcnR9MrIFChpDbG91ZENoYW5u
+ZWxSZXBvcnRzU2VydmljZRK6AQoMUnVuUmVwb3J0Sm9iEiwuZ29vZ2xlLmNsb3VkLmNoYW5u
+ZWwudjEuUnVuUmVwb3J0Sm9iUmVxdWVzdBodLmdvb2dsZS5sb25ncnVubmluZy5PcGVyYXRp
+b24iXYgCAYLT5JMCKCIjL3YxL3tuYW1lPWFjY291bnRzLyovcmVwb3J0cy8qfTpydW46ASrK
+QSkKFFJ1blJlcG9ydEpvYlJlc3BvbnNlEhFPcGVyYXRpb25NZXRhZGF0YRLVAQoSRmV0Y2hS
+ZXBvcnRSZXN1bHRzEjIuZ29vZ2xlLmNsb3VkLmNoYW5uZWwudjEuRmV0Y2hSZXBvcnRSZXN1
+bHRzUmVxdWVzdBozLmdvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkZldGNoUmVwb3J0UmVzdWx0
+c1Jlc3BvbnNlIlaIAgGC0+STAkAiOy92MS97cmVwb3J0X2pvYj1hY2NvdW50cy8qL3JlcG9y
+dEpvYnMvKn06ZmV0Y2hSZXBvcnRSZXN1bHRzOgEq2kEKcmVwb3J0X2pvYhKdAQoLTGlzdFJl
+cG9ydHMSKy5nb29nbGUuY2xvdWQuY2hhbm5lbC52MS5MaXN0UmVwb3J0c1JlcXVlc3QaLC5n
+b29nbGUuY2xvdWQuY2hhbm5lbC52MS5MaXN0UmVwb3J0c1Jlc3BvbnNlIjOIAgGC0+STAiES
+Hy92MS97cGFyZW50PWFjY291bnRzLyp9L3JlcG9ydHPaQQZwYXJlbnQaX4gCAcpBG2Nsb3Vk
+Y2hhbm5lbC5nb29nbGVhcGlzLmNvbdJBO2h0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL2F1
+dGgvYXBwcy5yZXBvcnRzLnVzYWdlLnJlYWRvbmx5QmsKG2NvbS5nb29nbGUuY2xvdWQuY2hh
+bm5lbC52MUITUmVwb3J0c1NlcnZpY2VQcm90b1ABWjVjbG91ZC5nb29nbGUuY29tL2dvL2No
+YW5uZWwvYXBpdjEvY2hhbm5lbHBiO2NoYW5uZWxwYkq7iQEKBxIFDgDyAwEKvAQKAQwSAw4A
+EjKxBCBDb3B5cmlnaHQgMjAyNSBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFw
+YWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5v
+dCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2Uu
+CiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDov
+L3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVk
+IGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQog
+ZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFT
+IElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBL
+SU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0
+aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRh
+dGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQACAKCQoCAwASAxIAJgoJCgIDARID
+EwAhCgkKAgMCEgMUACkKCQoCAwMSAxUAIwoJCgIDBBIDFgAyCgkKAgMFEgMXAC0KCQoCAwYS
+AxgAKQoJCgIDBxIDGQAgCgkKAgMIEgMaACQKCQoCAwkSAxsAIwoJCgIDChIDHAAhCggKAQgS
+Ax4ATAoJCgIICxIDHgBMCggKAQgSAx8AIgoJCgIIChIDHwAiCggKAQgSAyAANAoJCgIICBID
+IAA0CggKAQgSAyEANAoJCgIIARIDIQA0CpUDCgIGABIEKwB3ARqIAyBDbG91ZENoYW5uZWxS
+ZXBvcnRzU2VydmljZSBsZXRzIEdvb2dsZSBDbG91ZCByZXNlbGxlcnMgYW5kCiBkaXN0cmli
+dXRvcnMgcmV0cmlldmUgYW5kIGNvbWJpbmUgYSB2YXJpZXR5IG9mIGRhdGEgaW4gQ2xvdWQg
+Q2hhbm5lbCBmb3IKIG11bHRpcGxlIHByb2R1Y3RzIChHb29nbGUgQ2xvdWQsIEdvb2dsZSBW
+b2ljZSwgYW5kIEdvb2dsZSBXb3Jrc3BhY2UuKQoKIERlcHJlY2F0ZWQ6IFRoaXMgc2Vydmlj
+ZSBpcyBiZWluZyBkZXByZWNhdGVkLiBQbGVhc2UgdXNlIFtFeHBvcnQgQ2hhbm5lbAogU2Vy
+dmljZXMgZGF0YSB0bwogQmlnUXVlcnldKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9jaGFu
+bmVsL2RvY3MvcmViaWxsaW5nL2V4cG9ydC1kYXRhLXRvLWJpZ3F1ZXJ5KQogaW5zdGVhZC4K
+CgoKAwYAARIDKwgiCgoKAwYAAxIDLAIbCgsKBAYAAyESAywCGwoKCgMGAAMSAy0CQwoMCgUG
+AAOZCBIDLQJDCgsKAwYAAxIELgIvRAoNCgUGAAOaCBIELgIvRArkCQoEBgACABIETgJYAxrV
+CSBCZWdpbnMgZ2VuZXJhdGlvbiBvZiBkYXRhIGZvciBhIGdpdmVuIHJlcG9ydC4gVGhlIHJl
+cG9ydAogaWRlbnRpZmllciBpcyBhIFVJRCAoZm9yIGV4YW1wbGUsIGA2MTNiZjU5cWApLgoK
+IFBvc3NpYmxlIGVycm9yIGNvZGVzOgoKICogUEVSTUlTU0lPTl9ERU5JRUQ6IFRoZSB1c2Vy
+IGRvZXNuJ3QgaGF2ZSBhY2Nlc3MgdG8gdGhpcyByZXBvcnQuCiAqIElOVkFMSURfQVJHVU1F
+TlQ6IFJlcXVpcmVkIHJlcXVlc3QgcGFyYW1ldGVycyBhcmUgbWlzc2luZwogICBvciBpbnZh
+bGlkLgogKiBOT1RfRk9VTkQ6IFRoZSByZXBvcnQgaWRlbnRpZmllciB3YXMgbm90IGZvdW5k
+LgogKiBJTlRFUk5BTDogQW55IG5vbi11c2VyIGVycm9yIHJlbGF0ZWQgdG8gYSB0ZWNobmlj
+YWwgaXNzdWUKICAgaW4gdGhlIGJhY2tlbmQuIENvbnRhY3QgQ2xvdWQgQ2hhbm5lbCBzdXBw
+b3J0LgogKiBVTktOT1dOOiBBbnkgbm9uLXVzZXIgZXJyb3IgcmVsYXRlZCB0byBhIHRlY2hu
+aWNhbCBpc3N1ZQogICBpbiB0aGUgYmFja2VuZC4gQ29udGFjdCBDbG91ZCBDaGFubmVsIHN1
+cHBvcnQuCgogUmV0dXJuIHZhbHVlOgogVGhlIElEIG9mIGEgbG9uZy1ydW5uaW5nIG9wZXJh
+dGlvbi4KCiBUbyBnZXQgdGhlIHJlc3VsdHMgb2YgdGhlIG9wZXJhdGlvbiwgY2FsbCB0aGUg
+R2V0T3BlcmF0aW9uIG1ldGhvZCBvZgogQ2xvdWRDaGFubmVsT3BlcmF0aW9uc1NlcnZpY2Uu
+IFRoZSBPcGVyYXRpb24gbWV0YWRhdGEgY29udGFpbnMgYW4KIGluc3RhbmNlIG9mIFtPcGVy
+YXRpb25NZXRhZGF0YV1bZ29vZ2xlLmNsb3VkLmNoYW5uZWwudjEuT3BlcmF0aW9uTWV0YWRh
+dGFdLgoKIFRvIGdldCB0aGUgcmVzdWx0cyBvZiByZXBvcnQgZ2VuZXJhdGlvbiwgY2FsbAog
+W0Nsb3VkQ2hhbm5lbFJlcG9ydHNTZXJ2aWNlLkZldGNoUmVwb3J0UmVzdWx0c11bZ29vZ2xl
+LmNsb3VkLmNoYW5uZWwudjEuQ2xvdWRDaGFubmVsUmVwb3J0c1NlcnZpY2UuRmV0Y2hSZXBv
+cnRSZXN1bHRzXQogd2l0aCB0aGUKIFtSdW5SZXBvcnRKb2JSZXNwb25zZS5yZXBvcnRfam9i
+XVtnb29nbGUuY2xvdWQuY2hhbm5lbC52MS5SdW5SZXBvcnRKb2JSZXNwb25zZS5yZXBvcnRf
+am9iXS4KCiBEZXByZWNhdGVkOiBQbGVhc2UgdXNlIFtFeHBvcnQgQ2hhbm5lbCBTZXJ2aWNl
+cyBkYXRhIHRvCiBCaWdRdWVyeV0oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2NoYW5uZWwv
+ZG9jcy9yZWJpbGxpbmcvZXhwb3J0LWRhdGEtdG8tYmlncXVlcnkpCiBpbnN0ZWFkLgoKDAoF
+BgACAAESA04GEgoMCgUGAAIAAhIDThMmCgwKBQYAAgADEgNOMU0KDAoFBgACAAQSA08EHQoN
+CgYGAAIABCESA08EHQoNCgUGAAIABBIEUARTBgoRCgkGAAIABLDKvCISBFAEUwYKDQoFBgAC
+AAQSBFQEVwYKDwoHBgACAASZCBIEVARXBgqxAgoEBgACARIEYAJoAxqiAiBSZXRyaWV2ZXMg
+ZGF0YSBnZW5lcmF0ZWQgYnkKIFtDbG91ZENoYW5uZWxSZXBvcnRzU2VydmljZS5SdW5SZXBv
+cnRKb2JdW2dvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkNsb3VkQ2hhbm5lbFJlcG9ydHNTZXJ2
+aWNlLlJ1blJlcG9ydEpvYl0uCgogRGVwcmVjYXRlZDogUGxlYXNlIHVzZSBbRXhwb3J0IENo
+YW5uZWwgU2VydmljZXMgZGF0YSB0bwogQmlnUXVlcnldKGh0dHBzOi8vY2xvdWQuZ29vZ2xl
+LmNvbS9jaGFubmVsL2RvY3MvcmViaWxsaW5nL2V4cG9ydC1kYXRhLXRvLWJpZ3F1ZXJ5KQog
+aW5zdGVhZC4KCgwKBQYAAgEBEgNgBhgKDAoFBgACAQISA2AZMgoMCgUGAAIBAxIDYQ8pCgwK
+BQYAAgEEEgNiBB0KDQoGBgACAQQhEgNiBB0KDQoFBgACAQQSBGMEZgYKEQoJBgACAQSwyrwi
+EgRjBGYGCgwKBQYAAgEEEgNnBDgKDwoIBgACAQSbCAASA2cEOAq2AgoEBgACAhIEcAJ2Axqn
+AiBMaXN0cyB0aGUgcmVwb3J0cyB0aGF0IFJ1blJlcG9ydEpvYiBjYW4gcnVuLiBUaGVzZSBy
+ZXBvcnRzIGluY2x1ZGUgYW4gSUQsCiBhIGRlc2NyaXB0aW9uLCBhbmQgdGhlIGxpc3Qgb2Yg
+Y29sdW1ucyB0aGF0IHdpbGwgYmUgaW4gdGhlIHJlc3VsdC4KCiBEZXByZWNhdGVkOiBQbGVh
+c2UgdXNlIFtFeHBvcnQgQ2hhbm5lbCBTZXJ2aWNlcyBkYXRhIHRvCiBCaWdRdWVyeV0oaHR0
+cHM6Ly9jbG91ZC5nb29nbGUuY29tL2NoYW5uZWwvZG9jcy9yZWJpbGxpbmcvZXhwb3J0LWRh
+dGEtdG8tYmlncXVlcnkpCiBpbnN0ZWFkLgoKDAoFBgACAgESA3AGEQoMCgUGAAICAhIDcBIk
+CgwKBQYAAgIDEgNwL0IKDAoFBgACAgQSA3EEHQoNCgYGAAICBCESA3EEHQoNCgUGAAICBBIE
+cgR0BgoRCgkGAAICBLDKvCISBHIEdAYKDAoFBgACAgQSA3UENAoPCggGAAICBJsIABIDdQQ0
+CpABCgIEABIFewCeAQEaggEgUmVxdWVzdCBtZXNzYWdlIGZvcgogW0Nsb3VkQ2hhbm5lbFJl
+cG9ydHNTZXJ2aWNlLlJ1blJlcG9ydEpvYl1bZ29vZ2xlLmNsb3VkLmNoYW5uZWwudjEuQ2xv
+dWRDaGFubmVsUmVwb3J0c1NlcnZpY2UuUnVuUmVwb3J0Sm9iXS4KCgoKAwQAARIDewgbCgoK
+AwQABxIDfAIbCgsKBAQABwMSA3wCGwr4AQoEBAACABIGgwECiAEEGucBIFJlcXVpcmVkLiBU
+aGUgcmVwb3J0J3MgcmVzb3VyY2UgbmFtZS4gU3BlY2lmaWVzIHRoZSBhY2NvdW50IGFuZCBy
+ZXBvcnQgdXNlZAogdG8gZ2VuZXJhdGUgcmVwb3J0IGRhdGEuIFRoZSByZXBvcnRfaWQgaWRl
+bnRpZmllciBpcyBhIFVJRCAoZm9yIGV4YW1wbGUsCiBgNjEzYmY1OXFgKS4KIE5hbWUgdXNl
+cyB0aGUgZm9ybWF0OgogYWNjb3VudHMve2FjY291bnRfaWR9L3JlcG9ydHMve3JlcG9ydF9p
+ZH0KCg0KBQQAAgAFEgSDAQIICg0KBQQAAgABEgSDAQkNCg0KBQQAAgADEgSDARARCg8KBQQA
+AgAIEgaDARKIAQMKEAoIBAACAAicCAASBIQBBCoKEQoHBAACAAifCBIGhQEEhwEFClcKBAQA
+AgESBIsBAkQaSSBPcHRpb25hbC4gVGhlIHJhbmdlIG9mIHVzYWdlIG9yIGludm9pY2UgZGF0
+ZXMgdG8gaW5jbHVkZSBpbiB0aGUgcmVzdWx0LgoKDQoFBAACAQYSBIsBAgsKDQoFBAACAQES
+BIsBDBYKDQoFBAACAQMSBIsBGRoKDQoFBAACAQgSBIsBG0MKEAoIBAACAQicCAASBIsBHEIK
+lwMKBAQAAgISBJcBAj0aiAMgT3B0aW9uYWwuIEEgc3RydWN0dXJlZCBzdHJpbmcgdGhhdCBk
+ZWZpbmVzIGNvbmRpdGlvbnMgb24gZGltZW5zaW9uIGNvbHVtbnMKIHRvIHJlc3RyaWN0IHRo
+ZSByZXBvcnQgb3V0cHV0LgoKIEZpbHRlcnMgc3VwcG9ydCBsb2dpY2FsIG9wZXJhdG9ycyAo
+QU5ELCBPUiwgTk9UKSBhbmQgY29uZGl0aW9uYWwgb3BlcmF0b3JzCiAoPSwgIT0sIDwsID4s
+IDw9LCBhbmQgPj0pIHVzaW5nIGBjb2x1bW5faWRgIGFzIGtleXMuCgogRm9yIGV4YW1wbGU6
+CiBgKGN1c3RvbWVyOiJhY2NvdW50cy9DMTIzYWJjL2N1c3RvbWVycy9TNDU2ZGVmIiBPUgog
+Y3VzdG9tZXI6ImFjY291bnRzL0MxMjNhYmMvY3VzdG9tZXJzL1M3ODlnaGkiKSBBTkQKIGlu
+dm9pY2Vfc3RhcnRfZGF0ZS55ZWFyID49IDIwMjJgCgoNCgUEAAICBRIElwECCAoNCgUEAAIC
+ARIElwEJDwoNCgUEAAICAxIElwESEwoNCgUEAAICCBIElwEUPAoQCggEAAICCJwIABIElwEV
+OwrRAQoEBAACAxIEnQECRBrCASBPcHRpb25hbC4gVGhlIEJDUC00NyBsYW5ndWFnZSBjb2Rl
+LCBzdWNoIGFzICJlbi1VUyIuICBJZiBzcGVjaWZpZWQsIHRoZQogcmVzcG9uc2UgaXMgbG9j
+YWxpemVkIHRvIHRoZSBjb3JyZXNwb25kaW5nIGxhbmd1YWdlIGNvZGUgaWYgdGhlCiBvcmln
+aW5hbCBkYXRhIHNvdXJjZXMgc3VwcG9ydCBpdC4KIERlZmF1bHQgaXMgImVuLVVTIi4KCg0K
+BQQAAgMFEgSdAQIICg0KBQQAAgMBEgSdAQkWCg0KBQQAAgMDEgSdARkaCg0KBQQAAgMIEgSd
+ARtDChAKCAQAAgMInAgAEgSdARxCCpIBCgIEARIGogEArgEBGoMBIFJlc3BvbnNlIG1lc3Nh
+Z2UgZm9yCiBbQ2xvdWRDaGFubmVsUmVwb3J0c1NlcnZpY2UuUnVuUmVwb3J0Sm9iXVtnb29n
+bGUuY2xvdWQuY2hhbm5lbC52MS5DbG91ZENoYW5uZWxSZXBvcnRzU2VydmljZS5SdW5SZXBv
+cnRKb2JdLgoKCwoDBAEBEgSiAQgcCgsKAwQBBxIEowECGwoMCgQEAQcDEgSjAQIbCrMBCgQE
+AQIAEgSoAQIbGqQBIFBhc3MgYHJlcG9ydF9qb2IubmFtZWAgdG8KIFtGZXRjaFJlcG9ydFJl
+c3VsdHNSZXF1ZXN0LnJlcG9ydF9qb2JdW2dvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkZldGNo
+UmVwb3J0UmVzdWx0c1JlcXVlc3QucmVwb3J0X2pvYl0KIHRvIHJldHJpZXZlIHRoZSByZXBv
+cnQncyByZXN1bHRzLgoKDQoFBAECAAYSBKgBAgsKDQoFBAECAAESBKgBDBYKDQoFBAECAAMS
+BKgBGRoKuQEKBAQBAgESBK0BAiwaqgEgVGhlIG1ldGFkYXRhIGZvciB0aGUgcmVwb3J0J3Mg
+cmVzdWx0cyAoZGlzcGxheSBuYW1lLCBjb2x1bW5zLCByb3cgY291bnQsCiBhbmQgZGF0ZSBy
+YW5nZSkuIElmIHlvdSB2aWV3IHRoaXMgYmVmb3JlIHRoZSBvcGVyYXRpb24gZmluaXNoZXMs
+CiB5b3UgbWF5IHNlZSBpbmNvbXBsZXRlIGRhdGEuCgoNCgUEAQIBBhIErQECFwoNCgUEAQIB
+ARIErQEYJwoNCgUEAQIBAxIErQEqKwqdAQoCBAISBrIBANMBARqOASBSZXF1ZXN0IG1lc3Nh
+Z2UgZm9yCiBbQ2xvdWRDaGFubmVsUmVwb3J0c1NlcnZpY2UuRmV0Y2hSZXBvcnRSZXN1bHRz
+XVtnb29nbGUuY2xvdWQuY2hhbm5lbC52MS5DbG91ZENoYW5uZWxSZXBvcnRzU2VydmljZS5G
+ZXRjaFJlcG9ydFJlc3VsdHNdLgoKCwoDBAIBEgSyAQghCgsKAwQCBxIEswECGwoMCgQEAgcD
+EgSzAQIbCvIBCgQEAgIAEga5AQK+AQQa4QEgUmVxdWlyZWQuIFRoZSByZXBvcnQgam9iIGNy
+ZWF0ZWQgYnkKIFtDbG91ZENoYW5uZWxSZXBvcnRzU2VydmljZS5SdW5SZXBvcnRKb2JdW2dv
+b2dsZS5jbG91ZC5jaGFubmVsLnYxLkNsb3VkQ2hhbm5lbFJlcG9ydHNTZXJ2aWNlLlJ1blJl
+cG9ydEpvYl0uCiBSZXBvcnRfam9iIHVzZXMgdGhlIGZvcm1hdDoKIGFjY291bnRzL3thY2Nv
+dW50X2lkfS9yZXBvcnRKb2JzL3tyZXBvcnRfam9iX2lkfQoKDQoFBAICAAUSBLkBAggKDQoF
+BAICAAESBLkBCRMKDQoFBAICAAMSBLkBFhcKDwoFBAICAAgSBrkBGL4BAwoQCggEAgIACJwI
+ABIEugEEKgoRCgcEAgIACJ8IEga7AQS9AQUKoAIKBAQCAgESBMYBAj8akQIgT3B0aW9uYWwu
+IFJlcXVlc3RlZCBwYWdlIHNpemUgb2YgdGhlIHJlcG9ydC4gVGhlIHNlcnZlciBtYXkgcmV0
+dXJuIGZld2VyCiByZXN1bHRzIHRoYW4gcmVxdWVzdGVkLiBJZiB5b3UgZG9uJ3Qgc3BlY2lm
+eSBhIHBhZ2Ugc2l6ZSwgdGhlIHNlcnZlciB1c2VzIGEKIHNlbnNpYmxlIGRlZmF1bHQgKG1h
+eSBjaGFuZ2Ugb3ZlciB0aW1lKS4KCiBUaGUgbWF4aW11bSB2YWx1ZSBpcyAzMCwwMDA7IHRo
+ZSBzZXJ2ZXIgd2lsbCBjaGFuZ2UgbGFyZ2VyIHZhbHVlcyB0bwogMzAsMDAwLgoKDQoFBAIC
+AQUSBMYBAgcKDQoFBAICAQESBMYBCBEKDQoFBAICAQMSBMYBFBUKDQoFBAICAQgSBMYBFj4K
+EAoIBAICAQicCAASBMYBFz0K7gIKBAQCAgISBM4BAkEa3wIgT3B0aW9uYWwuIEEgdG9rZW4g
+dGhhdCBzcGVjaWZpZXMgYSBwYWdlIG9mIHJlc3VsdHMgYmV5b25kIHRoZSBmaXJzdCBwYWdl
+LgogT2J0YWluZWQgdGhyb3VnaAogW0ZldGNoUmVwb3J0UmVzdWx0c1Jlc3BvbnNlLm5leHRf
+cGFnZV90b2tlbl1bZ29vZ2xlLmNsb3VkLmNoYW5uZWwudjEuRmV0Y2hSZXBvcnRSZXN1bHRz
+UmVzcG9uc2UubmV4dF9wYWdlX3Rva2VuXQogb2YgdGhlIHByZXZpb3VzCiBbQ2xvdWRDaGFu
+bmVsUmVwb3J0c1NlcnZpY2UuRmV0Y2hSZXBvcnRSZXN1bHRzXVtnb29nbGUuY2xvdWQuY2hh
+bm5lbC52MS5DbG91ZENoYW5uZWxSZXBvcnRzU2VydmljZS5GZXRjaFJlcG9ydFJlc3VsdHNd
+CiBjYWxsLgoKDQoFBAICAgUSBM4BAggKDQoFBAICAgESBM4BCRMKDQoFBAICAgMSBM4BFhcK
+DQoFBAICAggSBM4BGEAKEAoIBAICAgicCAASBM4BGT8KdwoEBAICAxIE0gECThppIE9wdGlv
+bmFsLiBMaXN0IG9mIGtleXMgc3BlY2lmeWluZyB3aGljaCByZXBvcnQgcGFydGl0aW9ucyB0
+byByZXR1cm4uCiBJZiBlbXB0eSwgcmV0dXJucyBhbGwgcGFydGl0aW9ucy4KCg0KBQQCAgME
+EgTSAQIKCg0KBQQCAgMFEgTSAQsRCg0KBQQCAgMBEgTSARIgCg0KBQQCAgMDEgTSASMkCg0K
+BQQCAgMIEgTSASVNChAKCAQCAgMInAgAEgTSASZMCtgBCgIEAxIG2AEA5wEBGskBIFJlc3Bv
+bnNlIG1lc3NhZ2UgZm9yCiBbQ2xvdWRDaGFubmVsUmVwb3J0c1NlcnZpY2UuRmV0Y2hSZXBv
+cnRSZXN1bHRzXVtnb29nbGUuY2xvdWQuY2hhbm5lbC52MS5DbG91ZENoYW5uZWxSZXBvcnRz
+U2VydmljZS5GZXRjaFJlcG9ydFJlc3VsdHNdLgogQ29udGFpbnMgYSB0YWJ1bGFyIHJlcHJl
+c2VudGF0aW9uIG9mIHRoZSByZXBvcnQgcmVzdWx0cy4KCgsKAwQDARIE2AEIIgoLCgMEAwcS
+BNkBAhsKDAoEBAMHAxIE2QECGwppCgQEAwIAEgTdAQIsGlsgVGhlIG1ldGFkYXRhIGZvciB0
+aGUgcmVwb3J0IHJlc3VsdHMgKGRpc3BsYXkgbmFtZSwgY29sdW1ucywgcm93IGNvdW50LCBh
+bmQKIGRhdGUgcmFuZ2VzKS4KCg0KBQQDAgAGEgTdAQIXCg0KBQQDAgABEgTdARgnCg0KBQQD
+AgADEgTdASorCoABCgQEAwIBEgThAQIYGnIgVGhlIHJlcG9ydCdzIGxpc3RzIG9mIHZhbHVl
+cy4gRWFjaCByb3cgZm9sbG93cyB0aGUgc2V0dGluZ3MgYW5kIG9yZGVyaW5nCiBvZiB0aGUg
+Y29sdW1ucyBmcm9tIGByZXBvcnRfbWV0YWRhdGFgLgoKDQoFBAMCAQQSBOEBAgoKDQoFBAMC
+AQYSBOEBCw4KDQoFBAMCAQESBOEBDxMKDQoFBAMCAQMSBOEBFhcKsAEKBAQDAgISBOYBAh0a
+oQEgUGFzcyB0aGlzIHRva2VuIHRvCiBbRmV0Y2hSZXBvcnRSZXN1bHRzUmVxdWVzdC5wYWdl
+X3Rva2VuXVtnb29nbGUuY2xvdWQuY2hhbm5lbC52MS5GZXRjaFJlcG9ydFJlc3VsdHNSZXF1
+ZXN0LnBhZ2VfdG9rZW5dCiB0byByZXRyaWV2ZSB0aGUgbmV4dCBwYWdlIG9mIHJlc3VsdHMu
+CgoNCgUEAwICBRIE5gECCAoNCgUEAwICARIE5gEJGAoNCgUEAwICAxIE5gEbHAqPAQoCBAQS
+BusBAIQCARqAASBSZXF1ZXN0IG1lc3NhZ2UgZm9yCiBbQ2xvdWRDaGFubmVsUmVwb3J0c1Nl
+cnZpY2UuTGlzdFJlcG9ydHNdW2dvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkNsb3VkQ2hhbm5l
+bFJlcG9ydHNTZXJ2aWNlLkxpc3RSZXBvcnRzXS4KCgsKAwQEARIE6wEIGgoLCgMEBAcSBOwB
+AhsKDAoEBAQHAxIE7AECGwqRAQoEBAQCABIE8AECPRqCASBSZXF1aXJlZC4gVGhlIHJlc291
+cmNlIG5hbWUgb2YgdGhlIHBhcnRuZXIgYWNjb3VudCB0byBsaXN0IGF2YWlsYWJsZQogcmVw
+b3J0cyBmb3IuIFBhcmVudCB1c2VzIHRoZSBmb3JtYXQ6IGFjY291bnRzL3thY2NvdW50X2lk
+fQoKDQoFBAQCAAUSBPABAggKDQoFBAQCAAESBPABCQ8KDQoFBAQCAAMSBPABEhMKDQoFBAQC
+AAgSBPABFDwKEAoIBAQCAAicCAASBPABFTsKswEKBAQEAgESBPUBAj8apAEgT3B0aW9uYWwu
+IFJlcXVlc3RlZCBwYWdlIHNpemUgb2YgdGhlIHJlcG9ydC4gVGhlIHNlcnZlciBtaWdodCBy
+ZXR1cm4gZmV3ZXIKIHJlc3VsdHMgdGhhbiByZXF1ZXN0ZWQuIElmIHVuc3BlY2lmaWVkLCBy
+ZXR1cm5zIDIwIHJlcG9ydHMuIFRoZSBtYXhpbXVtCiB2YWx1ZSBpcyAxMDAuCgoNCgUEBAIB
+BRIE9QECBwoNCgUEBAIBARIE9QEIEQoNCgUEBAIBAxIE9QEUFQoNCgUEBAIBCBIE9QEWPgoQ
+CggEBAIBCJwIABIE9QEXPQrSAgoEBAQCAhIE/QECQRrDAiBPcHRpb25hbC4gQSB0b2tlbiB0
+aGF0IHNwZWNpZmllcyBhIHBhZ2Ugb2YgcmVzdWx0cyBiZXlvbmQgdGhlIGZpcnN0IHBhZ2Uu
+CiBPYnRhaW5lZCB0aHJvdWdoCiBbTGlzdFJlcG9ydHNSZXNwb25zZS5uZXh0X3BhZ2VfdG9r
+ZW5dW2dvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkxpc3RSZXBvcnRzUmVzcG9uc2UubmV4dF9w
+YWdlX3Rva2VuXQogb2YgdGhlIHByZXZpb3VzCiBbQ2xvdWRDaGFubmVsUmVwb3J0c1NlcnZp
+Y2UuTGlzdFJlcG9ydHNdW2dvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkNsb3VkQ2hhbm5lbFJl
+cG9ydHNTZXJ2aWNlLkxpc3RSZXBvcnRzXQogY2FsbC4KCg0KBQQEAgIFEgT9AQIICg0KBQQE
+AgIBEgT9AQkTCg0KBQQEAgIDEgT9ARYXCg0KBQQEAgIIEgT9ARhAChAKCAQEAgIInAgAEgT9
+ARk/CtEBCgQEBAIDEgSDAgJEGsIBIE9wdGlvbmFsLiBUaGUgQkNQLTQ3IGxhbmd1YWdlIGNv
+ZGUsIHN1Y2ggYXMgImVuLVVTIi4gIElmIHNwZWNpZmllZCwgdGhlCiByZXNwb25zZSBpcyBs
+b2NhbGl6ZWQgdG8gdGhlIGNvcnJlc3BvbmRpbmcgbGFuZ3VhZ2UgY29kZSBpZiB0aGUKIG9y
+aWdpbmFsIGRhdGEgc291cmNlcyBzdXBwb3J0IGl0LgogRGVmYXVsdCBpcyAiZW4tVVMiLgoK
+DQoFBAQCAwUSBIMCAggKDQoFBAQCAwESBIMCCRYKDQoFBAQCAwMSBIMCGRoKDQoFBAQCAwgS
+BIMCG0MKEAoIBAQCAwicCAASBIMCHEIKkAEKAgQFEgaIAgCSAgEagQEgUmVzcG9uc2UgbWVz
+c2FnZSBmb3IKIFtDbG91ZENoYW5uZWxSZXBvcnRzU2VydmljZS5MaXN0UmVwb3J0c11bZ29v
+Z2xlLmNsb3VkLmNoYW5uZWwudjEuQ2xvdWRDaGFubmVsUmVwb3J0c1NlcnZpY2UuTGlzdFJl
+cG9ydHNdLgoKCwoDBAUBEgSIAggbCgsKAwQFBxIEiQICGwoMCgQEBQcDEgSJAgIbCjUKBAQF
+AgASBIwCAh4aJyBUaGUgcmVwb3J0cyBhdmFpbGFibGUgdG8gdGhlIHBhcnRuZXIuCgoNCgUE
+BQIABBIEjAICCgoNCgUEBQIABhIEjAILEQoNCgUEBQIAARIEjAISGQoNCgUEBQIAAxIEjAIc
+HQqwAQoEBAUCARIEkQICHRqhASBQYXNzIHRoaXMgdG9rZW4gdG8KIFtGZXRjaFJlcG9ydFJl
+c3VsdHNSZXF1ZXN0LnBhZ2VfdG9rZW5dW2dvb2dsZS5jbG91ZC5jaGFubmVsLnYxLkZldGNo
+UmVwb3J0UmVzdWx0c1JlcXVlc3QucGFnZV90b2tlbl0KIHRvIHJldHJpZXZlIHRoZSBuZXh0
+IHBhZ2Ugb2YgcmVzdWx0cy4KCg0KBQQFAgEFEgSRAgIICg0KBQQFAgEBEgSRAgkYCg0KBQQF
+AgEDEgSRAhscCuABCgIEBhIGlwIApQIBGtEBIFRoZSByZXN1bHQgb2YgYSBbUnVuUmVwb3J0
+Sm9iXVtdIG9wZXJhdGlvbi4gQ29udGFpbnMgdGhlIG5hbWUgdG8gdXNlIGluCiBbRmV0Y2hS
+ZXBvcnRSZXN1bHRzUmVxdWVzdC5yZXBvcnRfam9iXVtnb29nbGUuY2xvdWQuY2hhbm5lbC52
+MS5GZXRjaFJlcG9ydFJlc3VsdHNSZXF1ZXN0LnJlcG9ydF9qb2JdCiBhbmQgdGhlIHN0YXR1
+cyBvZiB0aGUgb3BlcmF0aW9uLgoKCwoDBAYBEgSXAggRCgsKAwQGBxIEmAICGwoMCgQEBgcD
+EgSYAgIbCg0KAwQGBxIGmQICnAIECg8KBQQGB50IEgaZAgKcAgQKhwEKBAQGAgASBKECAjsa
+eSBSZXF1aXJlZC4gVGhlIHJlc291cmNlIG5hbWUgb2YgYSByZXBvcnQgam9iLgogTmFtZSB1
+c2VzIHRoZSBmb3JtYXQ6CiBgYWNjb3VudHMve2FjY291bnRfaWR9L3JlcG9ydEpvYnMve3Jl
+cG9ydF9qb2JfaWR9YAoKDQoFBAYCAAUSBKECAggKDQoFBAYCAAESBKECCQ0KDQoFBAYCAAMS
+BKECEBEKDQoFBAYCAAgSBKECEjoKEAoIBAYCAAicCAASBKECEzkKOAoEBAYCARIEpAICIRoq
+IFRoZSBjdXJyZW50IHN0YXR1cyBvZiByZXBvcnQgZ2VuZXJhdGlvbi4KCg0KBQQGAgEGEgSk
+AgIOCg0KBQQGAgEBEgSkAg8cCg0KBQQGAgEDEgSkAh8gCqgCCgIEBxIGqwIAvgIBGpkCIFRo
+ZSBmZWF0dXJlcyBkZXNjcmliaW5nIHRoZSBkYXRhLiBSZXR1cm5lZCBieQogW0Nsb3VkQ2hh
+bm5lbFJlcG9ydHNTZXJ2aWNlLlJ1blJlcG9ydEpvYl1bZ29vZ2xlLmNsb3VkLmNoYW5uZWwu
+djEuQ2xvdWRDaGFubmVsUmVwb3J0c1NlcnZpY2UuUnVuUmVwb3J0Sm9iXQogYW5kCiBbQ2xv
+dWRDaGFubmVsUmVwb3J0c1NlcnZpY2UuRmV0Y2hSZXBvcnRSZXN1bHRzXVtnb29nbGUuY2xv
+dWQuY2hhbm5lbC52MS5DbG91ZENoYW5uZWxSZXBvcnRzU2VydmljZS5GZXRjaFJlcG9ydFJl
+c3VsdHNdLgoKCwoDBAcBEgSrAggdCgsKAwQHBxIErAICGwoMCgQEBwcDEgSsAgIbCjAKBAQH
+AgASBK8CAhQaIiBEZXRhaWxzIG9mIHRoZSBjb21wbGV0ZWQgcmVwb3J0LgoKDQoFBAcCAAYS
+BK8CAggKDQoFBAcCAAESBK8CCQ8KDQoFBAcCAAMSBK8CEhMKRQoEBAcCARIEsgICFho3IFRo
+ZSB0b3RhbCBudW1iZXIgb2Ygcm93cyBvZiBkYXRhIGluIHRoZSBmaW5hbCByZXBvcnQuCgoN
+CgUEBwIBBRIEsgICBwoNCgUEBwIBARIEsgIIEQoNCgUEBwIBAxIEsgIUFQoxCgQEBwICEgS1
+AgIbGiMgVGhlIGRhdGUgcmFuZ2Ugb2YgcmVwb3J0ZWQgdXNhZ2UuCgoNCgUEBwICBhIEtQIC
+CwoNCgUEBwICARIEtQIMFgoNCgUEBwICAxIEtQIZGgqbAgoEBAcCAxIEvQICJRqMAiBUaGUg
+dXNhZ2UgZGF0ZXMgaW1tZWRpYXRlbHkgcHJlY2VkaW5nIGBkYXRlX3JhbmdlYCB3aXRoIHRo
+ZSBzYW1lIGR1cmF0aW9uLgogVXNlIHRoaXMgdG8gY2FsY3VsYXRlIHRyZW5kaW5nIHVzYWdl
+IGFuZCBjb3N0cy4gVGhpcyBpcyBvbmx5IHBvcHVsYXRlZCBpZgogeW91IHJlcXVlc3QgdHJl
+bmRpbmcgZGF0YS4KCiBGb3IgZXhhbXBsZSwgaWYgYGRhdGVfcmFuZ2VgIGlzIEp1bHkgMS0x
+NSwgYHByZWNlZGluZ19kYXRlX3JhbmdlYCB3aWxsIGJlCiBKdW5lIDE2LTMwLgoKDQoFBAcC
+AwYSBL0CAgsKDQoFBAcCAwESBL0CDCAKDQoFBAcCAwMSBL0CIyQKgwEKAgQIEgbCAgDqAgEa
+dSBUaGUgZGVmaW5pdGlvbiBvZiBhIHJlcG9ydCBjb2x1bW4uIFNwZWNpZmllcyB0aGUgZGF0
+YSBwcm9wZXJ0aWVzCiBpbiB0aGUgY29ycmVzcG9uZGluZyBwb3NpdGlvbiBvZiB0aGUgcmVw
+b3J0IHJvd3MuCgoLCgMECAESBMICCA4KCwoDBAgHEgTDAgIbCgwKBAQIBwMSBMMCAhsKcAoE
+BAgEABIGxwIC3AIDGmAgQXZhaWxhYmxlIGRhdGEgdHlwZXMgZm9yIGNvbHVtbnMuIENvcnJl
+c3BvbmRzIHRvIHRoZSBmaWVsZHMgaW4gdGhlCiBSZXBvcnRWYWx1ZSBgb25lb2ZgIGZpZWxk
+LgoKDQoFBAgEAAESBMcCBw8KGwoGBAgEAAIAEgTJAgQeGgsgTm90IHVzZWQuCgoPCgcECAQA
+AgABEgTJAgQZCg8KBwQIBAACAAISBMkCHB0KRQoGBAgEAAIBEgTMAgQPGjUgUmVwb3J0VmFs
+dWVzIGZvciB0aGlzIGNvbHVtbiB3aWxsIHVzZSBzdHJpbmdfdmFsdWUuCgoPCgcECAQAAgEB
+EgTMAgQKCg8KBwQIBAACAQISBMwCDQ4KQgoGBAgEAAICEgTPAgQMGjIgUmVwb3J0VmFsdWVz
+IGZvciB0aGlzIGNvbHVtbiB3aWxsIHVzZSBpbnRfdmFsdWUuCgoPCgcECAQAAgIBEgTPAgQH
+Cg8KBwQIBAACAgISBM8CCgsKRgoGBAgEAAIDEgTSAgQQGjYgUmVwb3J0VmFsdWVzIGZvciB0
+aGlzIGNvbHVtbiB3aWxsIHVzZSBkZWNpbWFsX3ZhbHVlLgoKDwoHBAgEAAIDARIE0gIECwoP
+CgcECAQAAgMCEgTSAg4PCkQKBgQIBAACBBIE1QIEDho0IFJlcG9ydFZhbHVlcyBmb3IgdGhp
+cyBjb2x1bW4gd2lsbCB1c2UgbW9uZXlfdmFsdWUuCgoPCgcECAQAAgQBEgTVAgQJCg8KBwQI
+BAACBAISBNUCDA0KQwoGBAgEAAIFEgTYAgQNGjMgUmVwb3J0VmFsdWVzIGZvciB0aGlzIGNv
+bHVtbiB3aWxsIHVzZSBkYXRlX3ZhbHVlLgoKDwoHBAgEAAIFARIE2AIECAoPCgcECAQAAgUC
+EgTYAgsMCkgKBgQIBAACBhIE2wIEEho4IFJlcG9ydFZhbHVlcyBmb3IgdGhpcyBjb2x1bW4g
+d2lsbCB1c2UgZGF0ZV90aW1lX3ZhbHVlLgoKDwoHBAgEAAIGARIE2wIEDQoPCgcECAQAAgYC
+EgTbAhARCvMCCgQECAIAEgTjAgIXGuQCIFRoZSB1bmlxdWUgbmFtZSBvZiB0aGUgY29sdW1u
+IChmb3IgZXhhbXBsZSwgY3VzdG9tZXJfZG9tYWluLAogY2hhbm5lbF9wYXJ0bmVyLCBjdXN0
+b21lcl9jb3N0KS4gWW91IGNhbiB1c2UgY29sdW1uIElEcyBpbgogW1J1blJlcG9ydEpvYlJl
+cXVlc3QuZmlsdGVyXVtnb29nbGUuY2xvdWQuY2hhbm5lbC52MS5SdW5SZXBvcnRKb2JSZXF1
+ZXN0LmZpbHRlcl0uCiBUbyBzZWUgYWxsIHJlcG9ydHMgYW5kIHRoZWlyIGNvbHVtbnMsIGNh
+bGwKIFtDbG91ZENoYW5uZWxSZXBvcnRzU2VydmljZS5MaXN0UmVwb3J0c11bZ29vZ2xlLmNs
+b3VkLmNoYW5uZWwudjEuQ2xvdWRDaGFubmVsUmVwb3J0c1NlcnZpY2UuTGlzdFJlcG9ydHNd
+LgoKDQoFBAgCAAUSBOMCAggKDQoFBAgCAAESBOMCCRIKDQoFBAgCAAMSBOMCFRYKKgoEBAgC
+ARIE5gICGhocIFRoZSBjb2x1bW4ncyBkaXNwbGF5IG5hbWUuCgoNCgUECAIBBRIE5gICCAoN
+CgUECAIBARIE5gIJFQoNCgUECAIBAxIE5gIYGQo3CgQECAICEgTpAgIZGikgVGhlIHR5cGUg
+b2YgdGhlIHZhbHVlcyBmb3IgdGhpcyBjb2x1bW4uCgoNCgUECAICBhIE6QICCgoNCgUECAIC
+ARIE6QILFAoNCgUECAICAxIE6QIXGApBCgIECRIG7QIAiwMBGjMgQSByZXByZXNlbnRhdGlv
+biBvZiB1c2FnZSBvciBpbnZvaWNlIGRhdGUgcmFuZ2VzLgoKCwoDBAkBEgTtAggRCgsKAwQJ
+BxIE7gICGwoMCgQECQcDEgTuAgIbCr8CCgQECQIAEgT2AgIxGrACIFRoZSBlYXJsaWVzdCB1
+c2FnZSBkYXRlIHRpbWUgKGluY2x1c2l2ZSkuCgogSWYgeW91IHVzZSB0aW1lIGdyb3VwaW5n
+cyAoZGFpbHksIHdlZWtseSwgZXRjKSwgZWFjaCBncm91cCB1c2VzCiBtaWRuaWdodCB0byBt
+aWRuaWdodCAoUGFjaWZpYyB0aW1lKS4gVGhlIHVzYWdlIHN0YXJ0IGRhdGUgaXMKIHJvdW5k
+ZWQgZG93biB0byBpbmNsdWRlIGFsbCB1c2FnZSBmcm9tIHRoZSBzcGVjaWZpZWQgZGF0ZS4g
+V2UgcmVjb21tZW5kCiB0aGF0IGNsaWVudHMgcGFzcyBgdXNhZ2Vfc3RhcnRfZGF0ZV90aW1l
+YCBpbiBQYWNpZmljIHRpbWUuCgoNCgUECQIABhIE9gICFgoNCgUECQIAARIE9gIXLAoNCgUE
+CQIAAxIE9gIvMAq7AgoEBAkCARIE/gICLxqsAiBUaGUgbGF0ZXN0IHVzYWdlIGRhdGUgdGlt
+ZSAoZXhjbHVzaXZlKS4KCiBJZiB5b3UgdXNlIHRpbWUgZ3JvdXBpbmdzIChkYWlseSwgd2Vl
+a2x5LCBldGMpLCBlYWNoIGdyb3VwIHVzZXMKIG1pZG5pZ2h0IHRvIG1pZG5pZ2h0IChQYWNp
+ZmljIHRpbWUpLiBUaGUgdXNhZ2UgZW5kIGRhdGUgaXMKIHJvdW5kZWQgZG93biB0byBpbmNs
+dWRlIGFsbCB1c2FnZSBmcm9tIHRoZSBzcGVjaWZpZWQgZGF0ZS4gV2UgcmVjb21tZW5kCiB0
+aGF0IGNsaWVudHMgcGFzcyBgdXNhZ2Vfc3RhcnRfZGF0ZV90aW1lYCBpbiBQYWNpZmljIHRp
+bWUuCgoNCgUECQIBBhIE/gICFgoNCgUECQIBARIE/gIXKgoNCgUECQIBAxIE/gItLgqlAQoE
+BAkCAhIEhAMCKhqWASBUaGUgZWFybGllc3QgaW52b2ljZSBkYXRlIChpbmNsdXNpdmUpLgoK
+IElmIHRoaXMgdmFsdWUgaXMgbm90IHRoZSBmaXJzdCBkYXkgb2YgYSBtb250aCwgdGhpcyB3
+aWxsIG1vdmUgaXQgYmFjayB0bwogdGhlIGZpcnN0IGRheSBvZiB0aGUgZ2l2ZW4gbW9udGgu
+CgoNCgUECQICBhIEhAMCEgoNCgUECQICARIEhAMTJQoNCgUECQICAxIEhAMoKQqkAQoEBAkC
+AxIEigMCKBqVASBUaGUgbGF0ZXN0IGludm9pY2UgZGF0ZSAoaW5jbHVzaXZlKS4KCiBJZiB0
+aGlzIHZhbHVlIGlzIG5vdCB0aGUgbGFzdCBkYXkgb2YgYSBtb250aCwgdGhpcyB3aWxsIG1v
+dmUgaXQgZm9yd2FyZCB0bwogdGhlIGxhc3QgZGF5IG9mIHRoZSBnaXZlbiBtb250aC4KCg0K
+BQQJAgMGEgSKAwISCg0KBQQJAgMBEgSKAxMjCg0KBQQJAgMDEgSKAyYnCicKAgQKEgaOAwCX
+AwEaGSBBIHJvdyBvZiByZXBvcnQgdmFsdWVzLgoKCwoDBAoBEgSOAwgLCgsKAwQKBxIEjwMC
+GwoMCgQECgcDEgSPAwIbCi4KBAQKAgASBJIDAiIaICBUaGUgbGlzdCBvZiB2YWx1ZXMgaW4g
+dGhlIHJvdy4KCg0KBQQKAgAEEgSSAwIKCg0KBQQKAgAGEgSSAwsWCg0KBQQKAgABEgSSAxcd
+Cg0KBQQKAgADEgSSAyAhCnUKBAQKAgESBJYDAhsaZyBUaGUga2V5IGZvciB0aGUgcGFydGl0
+aW9uIHRoaXMgcm93IGJlbG9uZ3MgdG8uIFRoaXMgZmllbGQgaXMgZW1wdHkKIGlmIHRoZSBy
+ZXBvcnQgaXMgbm90IHBhcnRpdGlvbmVkLgoKDQoFBAoCAQUSBJYDAggKDQoFBAoCAQESBJYD
+CRYKDQoFBAoCAQMSBJYDGRoKJgoCBAsSBpoDALQDARoYIEEgc2luZ2xlIHJlcG9ydCB2YWx1
+ZS4KCgsKAwQLARIEmgMIEwoLCgMECwcSBJsDAhsKDAoEBAsHAxIEmwMCGwooCgQECwgAEgae
+AwKzAwMaGCBBIHNpbmdsZSByZXBvcnQgdmFsdWUuCgoNCgUECwgAARIEngMIDQopCgQECwIA
+EgSgAwQcGhsgQSB2YWx1ZSBvZiB0eXBlIGBzdHJpbmdgLgoKDQoFBAsCAAUSBKADBAoKDQoF
+BAsCAAESBKADCxcKDQoFBAsCAAMSBKADGhsKJgoEBAsCARIEowMEGBoYIEEgdmFsdWUgb2Yg
+dHlwZSBgaW50YC4KCg0KBQQLAgEFEgSjAwQJCg0KBQQLAgEBEgSjAwoTCg0KBQQLAgEDEgSj
+AxYXCmAKBAQLAgISBKcDBCoaUiBBIHZhbHVlIG9mIHR5cGUgYGdvb2dsZS50eXBlLkRlY2lt
+YWxgLCByZXByZXNlbnRpbmcgbm9uLWludGVnZXIgbnVtZXJpYwogdmFsdWVzLgoKDQoFBAsC
+AgYSBKcDBBcKDQoFBAsCAgESBKcDGCUKDQoFBAsCAgMSBKcDKCkKYQoEBAsCAxIEqwMEJhpT
+IEEgdmFsdWUgb2YgdHlwZSBgZ29vZ2xlLnR5cGUuTW9uZXlgIChjdXJyZW5jeSBjb2RlLCB3
+aG9sZSB1bml0cywgZGVjaW1hbAogdW5pdHMpLgoKDQoFBAsCAwYSBKsDBBUKDQoFBAsCAwES
+BKsDFiEKDQoFBAsCAwMSBKsDJCUKRgoEBAsCBBIErgMEJBo4IEEgdmFsdWUgb2YgdHlwZSBg
+Z29vZ2xlLnR5cGUuRGF0ZWAgKHllYXIsIG1vbnRoLCBkYXkpLgoKDQoFBAsCBAYSBK4DBBQK
+DQoFBAsCBAESBK4DFR8KDQoFBAsCBAMSBK4DIiMKfQoEBAsCBRIEsgMELRpvIEEgdmFsdWUg
+b2YgdHlwZSBgZ29vZ2xlLnR5cGUuRGF0ZVRpbWVgICh5ZWFyLCBtb250aCwgZGF5LCBob3Vy
+LCBtaW51dGUsCiBzZWNvbmQsIGFuZCBVVEMgb2Zmc2V0IG9yIHRpbWV6b25lLikKCg0KBQQL
+AgUGEgSyAwQYCg0KBQQLAgUBEgSyAxkoCg0KBQQLAgUDEgSyAyssCjYKAgQMEga3AwDUAwEa
+KCBTdGF0dXMgb2YgYSByZXBvcnQgZ2VuZXJhdGlvbiBwcm9jZXNzLgoKCwoDBAwBEgS3AwgU
+CgsKAwQMBxIEuAMCGwoMCgQEDAcDEgS4AwIbCjgKBAQMBAASBrsDAsoDAxooIEF2YWlsYWJs
+ZSBzdGF0ZXMgb2YgcmVwb3J0IGdlbmVyYXRpb24uCgoNCgUEDAQAARIEuwMHDAobCgYEDAQA
+AgASBL0DBBoaCyBOb3QgdXNlZC4KCg8KBwQMBAACAAESBL0DBBUKDwoHBAwEAAIAAhIEvQMY
+GQosCgYEDAQAAgESBMADBBAaHCBSZXBvcnQgcHJvY2Vzc2luZyBzdGFydGVkLgoKDwoHBAwE
+AAIBARIEwAMECwoPCgcEDAQAAgECEgTAAw4PCkEKBgQMBAACAhIEwwMEEBoxIERhdGEgZ2Vu
+ZXJhdGVkIGZyb20gdGhlIHJlcG9ydCBpcyBiZWluZyBzdGFnZWQuCgoPCgcEDAQAAgIBEgTD
+AwQLCg8KBwQMBAACAgISBMMDDg8KNgoGBAwEAAIDEgTGAwQSGiYgUmVwb3J0IGRhdGEgaXMg
+YXZhaWxhYmxlIGZvciBhY2Nlc3MuCgoPCgcEDAQAAgMBEgTGAwQNCg8KBwQMBAACAwISBMYD
+EBEKIAoGBAwEAAIEEgTJAwQPGhAgUmVwb3J0IGZhaWxlZC4KCg8KBwQMBAACBAESBMkDBAoK
+DwoHBAwEAAIEAhIEyQMNDgpDCgQEDAIAEgTNAwISGjUgVGhlIGN1cnJlbnQgc3RhdGUgb2Yg
+dGhlIHJlcG9ydCBnZW5lcmF0aW9uIHByb2Nlc3MuCgoNCgUEDAIABhIEzQMCBwoNCgUEDAIA
+ARIEzQMIDQoNCgUEDAIAAxIEzQMQEQozCgQEDAIBEgTQAwIrGiUgVGhlIHJlcG9ydCBnZW5l
+cmF0aW9uJ3Mgc3RhcnQgdGltZS4KCg0KBQQMAgEGEgTQAwIbCg0KBQQMAgEBEgTQAxwmCg0K
+BQQMAgEDEgTQAykqCjgKBAQMAgISBNMDAikaKiBUaGUgcmVwb3J0IGdlbmVyYXRpb24ncyBj
+b21wbGV0aW9uIHRpbWUuCgoNCgUEDAICBhIE0wMCGwoNCgUEDAICARIE0wMcJAoNCgUEDAIC
+AxIE0wMnKAqvAQoCBA0SBtkDAPIDARqgASBUaGUgSUQgYW5kIGRlc2NyaXB0aW9uIG9mIGEg
+cmVwb3J0IHRoYXQgd2FzIHVzZWQgdG8gZ2VuZXJhdGUgcmVwb3J0IGRhdGEuCiBGb3IgZXhh
+bXBsZSwgIkdvb2dsZSBDbG91ZCBEYWlseSBTcGVuZCIsICJHb29nbGUgV29ya3NwYWNlIExp
+Y2Vuc2UgQWN0aXZpdHkiLAogZXRjLgoKCwoDBA0BEgTZAwgOCgsKAwQNBxIE2gMCGwoMCgQE
+DQcDEgTaAwIbCg0KAwQNBxIG2wMC3gMECg8KBQQNB50IEgbbAwLeAwQK9wEKBAQNAgASBOYD
+Ajsa6AEgUmVxdWlyZWQuIFRoZSByZXBvcnQncyByZXNvdXJjZSBuYW1lLiBTcGVjaWZpZXMg
+dGhlIGFjY291bnQgYW5kIHJlcG9ydCB1c2VkCiB0byBnZW5lcmF0ZSByZXBvcnQgZGF0YS4g
+VGhlIHJlcG9ydF9pZCBpZGVudGlmaWVyIGlzIGEgVUlEIChmb3IgZXhhbXBsZSwKIGA2MTNi
+ZjU5cWApLgoKIE5hbWUgdXNlcyB0aGUgZm9ybWF0OgogYWNjb3VudHMve2FjY291bnRfaWR9
+L3JlcG9ydHMve3JlcG9ydF9pZH0KCg0KBQQNAgAFEgTmAwIICg0KBQQNAgABEgTmAwkNCg0K
+BQQNAgADEgTmAxARCg0KBQQNAgAIEgTmAxI6ChAKCAQNAgAInAgAEgTmAxM5CjYKBAQNAgES
+BOkDAhoaKCBBIGh1bWFuLXJlYWRhYmxlIG5hbWUgZm9yIHRoaXMgcmVwb3J0LgoKDQoFBA0C
+AQUSBOkDAggKDQoFBA0CAQESBOkDCRUKDQoFBA0CAQMSBOkDGBkKawoEBA0CAhIE7QMCHhpd
+IFRoZSBsaXN0IG9mIGNvbHVtbnMgaW5jbHVkZWQgaW4gdGhlIHJlcG9ydC4gVGhpcyBkZWZp
+bmVzIHRoZSBzY2hlbWEgb2YKIHRoZSByZXBvcnQgcmVzdWx0cy4KCg0KBQQNAgIEEgTtAwIK
+Cg0KBQQNAgIGEgTtAwsRCg0KBQQNAgIBEgTtAxIZCg0KBQQNAgIDEgTtAxwdCmAKBAQNAgMS
+BPEDAhkaUiBBIGRlc2NyaXB0aW9uIG9mIG90aGVyIGFzcGVjdHMgb2YgdGhlIHJlcG9ydCwg
+c3VjaCBhcyB0aGUgcHJvZHVjdHMKIGl0IHN1cHBvcnRzLgoKDQoFBA0CAwUSBPEDAggKDQoF
+BA0CAwESBPEDCRQKDQoFBA0CAwMSBPEDFxhiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::RunReportJobRequest ===
+    # Fields for RunReportJobRequest
+    # Field: name Type: 9 ()
+    # Field: date_range Type: 11 (.google.cloud.channel.v1.DateRange)
+    # Field: filter Type: 9 ()
+    # Field: language_code Type: 9 ()
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::RunReportJobResponse ===
+    # Fields for RunReportJobResponse
+    # Field: report_job Type: 11 (.google.cloud.channel.v1.ReportJob)
+    # Field: report_metadata Type: 11 (.google.cloud.channel.v1.ReportResultsMetadata)
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::FetchReportResultsRequest ===
+    # Fields for FetchReportResultsRequest
+    # Field: report_job Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: partition_keys Type: 9 ()
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::FetchReportResultsResponse ===
+    # Fields for FetchReportResultsResponse
+    # Field: report_metadata Type: 11 (.google.cloud.channel.v1.ReportResultsMetadata)
+    # Field: rows Type: 11 (.google.cloud.channel.v1.Row)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::ListReportsRequest ===
+    # Fields for ListReportsRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: language_code Type: 9 ()
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::ListReportsResponse ===
+    # Fields for ListReportsResponse
+    # Field: reports Type: 11 (.google.cloud.channel.v1.Report)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::ReportJob ===
+    # Fields for ReportJob
+    # Field: name Type: 9 ()
+    # Field: report_status Type: 11 (.google.cloud.channel.v1.ReportStatus)
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::ReportResultsMetadata ===
+    # Fields for ReportResultsMetadata
+    # Field: report Type: 11 (.google.cloud.channel.v1.Report)
+    # Field: row_count Type: 3 ()
+    # Field: date_range Type: 11 (.google.cloud.channel.v1.DateRange)
+    # Field: preceding_date_range Type: 11 (.google.cloud.channel.v1.DateRange)
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::Column ===
+    # Fields for Column
+    # Field: column_id Type: 9 ()
+    # Field: display_name Type: 9 ()
+    # Field: data_type Type: 14 (.google.cloud.channel.v1.Column.DataType)
+
+# Enum: Column::DataType
+our $Column_DATA_TYPE_UNSPECIFIED = 0;
+our $Column_STRING = 1;
+our $Column_INT = 2;
+our $Column_DECIMAL = 3;
+our $Column_MONEY = 4;
+our $Column_DATE = 5;
+our $Column_DATE_TIME = 6;
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::DateRange ===
+    # Fields for DateRange
+    # Field: usage_start_date_time Type: 11 (.google.type.DateTime)
+    # Field: usage_end_date_time Type: 11 (.google.type.DateTime)
+    # Field: invoice_start_date Type: 11 (.google.type.Date)
+    # Field: invoice_end_date Type: 11 (.google.type.Date)
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::Row ===
+    # Fields for Row
+    # Field: values Type: 11 (.google.cloud.channel.v1.ReportValue)
+    # Field: partition_key Type: 9 ()
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::ReportValue ===
+    # Fields for ReportValue
+    # Field: string_value Type: 9 ()
+    # Field: int_value Type: 3 ()
+    # Field: decimal_value Type: 11 (.google.type.Decimal)
+    # Field: money_value Type: 11 (.google.type.Money)
+    # Field: date_value Type: 11 (.google.type.Date)
+    # Field: date_time_value Type: 11 (.google.type.DateTime)
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::ReportStatus ===
+    # Fields for ReportStatus
+    # Field: state Type: 14 (.google.cloud.channel.v1.ReportStatus.State)
+    # Field: start_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: end_time Type: 11 (.google.protobuf.Timestamp)
+
+# Enum: ReportStatus::State
+our $ReportStatus_STATE_UNSPECIFIED = 0;
+our $ReportStatus_STARTED = 1;
+our $ReportStatus_WRITING = 2;
+our $ReportStatus_AVAILABLE = 3;
+our $ReportStatus_FAILED = 4;
+
+# === Message: Google::Cloud::Channel::V1::ReportsService::Report ===
+    # Fields for Report
+    # Field: name Type: 9 ()
+    # Field: display_name Type: 9 ()
+    # Field: columns Type: 11 (.google.cloud.channel.v1.Column)
+    # Field: description Type: 9 ()
+
+# === Service Client: Google::Cloud::Channel::V1::ReportsService::CloudChannelReportsServiceClient ===
+package Google::Cloud::Channel::V1::ReportsService::CloudChannelReportsServiceClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Channel::V1::ReportsService::CloudChannelReportsServiceClient
+
+Client stub representing the remote C<CloudChannelReportsService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<channel.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'channel.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub run_report_job {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Channel::V1::ReportsService::RunReportJobRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.channel.v1.CloudChannelReportsService',
+        method         => 'RunReportJob',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub fetch_report_results {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Channel::V1::ReportsService::FetchReportResultsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.channel.v1.CloudChannelReportsService',
+        method         => 'FetchReportResults',
+        request        => $req,
+        response_class => 'Google::Cloud::Channel::V1::ReportsService::FetchReportResultsResponse',
+    });
+}
+
+sub list_reports {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Channel::V1::ReportsService::ListReportsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.channel.v1.CloudChannelReportsService',
+        method         => 'ListReports',
+        request        => $req,
+        response_class => 'Google::Cloud::Channel::V1::ReportsService::ListReportsResponse',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Channel::V1::ReportsService - Compiled Protocol Buffers messages for google/cloud/channel/v1/reports_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Channel::V1::ReportsService;
+
+    my $msg = Google::Cloud::Channel::V1::ReportsService::RunReportJobRequest->new({
+        name => $name,
+        date_range => $date_range,
+        filter => $filter,
+        language_code => $language_code,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Channel::V1::ReportsService::RunReportJobRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/channel/v1/reports_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Channel::V1::ReportsService::RunReportJobRequest
+
+Request message for
+[CloudChannelReportsService.RunReportJob][google.cloud.channel.v1.CloudChannelReportsService.RunReportJob].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The report's resource name. Specifies the account and report used
+to generate report data. The report_id identifier is a UID (for example,
+`613bf59q`).
+Name uses the format:
+accounts/{account_id}/reports/{report_id}
+
+=item * C<< $msg->date_range() >> / C<< $msg->date_range($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::DateRange>)
+
+Optional. The range of usage or invoice dates to include in the result.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A structured string that defines conditions on dimension columns
+to restrict the report output.
+
+Filters support logical operators (AND, OR, NOT) and conditional operators
+(=, !=, <, >, <=, and >=) using `column_id` as keys.
+
+For example:
+`(customer:"accounts/C123abc/customers/S456def" OR
+customer:"accounts/C123abc/customers/S789ghi") AND
+invoice_start_date.year >= 2022`
+
+=item * C<< $msg->language_code() >> / C<< $msg->language_code($value) >>
+
+Type: C<String>
+
+Optional. The BCP-47 language code, such as "en-US".  If specified, the
+response is localized to the corresponding language code if the
+original data sources support it.
+Default is "en-US".
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::RunReportJobResponse
+
+Response message for
+[CloudChannelReportsService.RunReportJob][google.cloud.channel.v1.CloudChannelReportsService.RunReportJob].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->report_job() >> / C<< $msg->report_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::ReportJob>)
+
+Pass `report_job.name` to
+[FetchReportResultsRequest.report_job][google.cloud.channel.v1.FetchReportResultsRequest.report_job]
+to retrieve the report's results.
+
+=item * C<< $msg->report_metadata() >> / C<< $msg->report_metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::ReportResultsMetadata>)
+
+The metadata for the report's results (display name, columns, row count,
+and date range). If you view this before the operation finishes,
+you may see incomplete data.
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::FetchReportResultsRequest
+
+Request message for
+[CloudChannelReportsService.FetchReportResults][google.cloud.channel.v1.CloudChannelReportsService.FetchReportResults].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->report_job() >> / C<< $msg->report_job($value) >>
+
+Type: C<String>
+
+Required. The report job created by
+[CloudChannelReportsService.RunReportJob][google.cloud.channel.v1.CloudChannelReportsService.RunReportJob].
+Report_job uses the format:
+accounts/{account_id}/reportJobs/{report_job_id}
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size of the report. The server may return fewer
+results than requested. If you don't specify a page size, the server uses a
+sensible default (may change over time).
+
+The maximum value is 30,000; the server will change larger values to
+30,000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token that specifies a page of results beyond the first page.
+Obtained through
+[FetchReportResultsResponse.next_page_token][google.cloud.channel.v1.FetchReportResultsResponse.next_page_token]
+of the previous
+[CloudChannelReportsService.FetchReportResults][google.cloud.channel.v1.CloudChannelReportsService.FetchReportResults]
+call.
+
+=item * C<< $msg->partition_keys() >> / C<< $msg->partition_keys($value) >>
+
+Type: C<String>
+
+Optional. List of keys specifying which report partitions to return.
+If empty, returns all partitions.
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::FetchReportResultsResponse
+
+Response message for
+[CloudChannelReportsService.FetchReportResults][google.cloud.channel.v1.CloudChannelReportsService.FetchReportResults].
+Contains a tabular representation of the report results.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->report_metadata() >> / C<< $msg->report_metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::ReportResultsMetadata>)
+
+The metadata for the report results (display name, columns, row count, and
+date ranges).
+
+=item * C<< $msg->rows() >> / C<< $msg->rows($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::Row>)
+
+The report's lists of values. Each row follows the settings and ordering
+of the columns from `report_metadata`.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Pass this token to
+[FetchReportResultsRequest.page_token][google.cloud.channel.v1.FetchReportResultsRequest.page_token]
+to retrieve the next page of results.
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::ListReportsRequest
+
+Request message for
+[CloudChannelReportsService.ListReports][google.cloud.channel.v1.CloudChannelReportsService.ListReports].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the partner account to list available
+reports for. Parent uses the format: accounts/{account_id}
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size of the report. The server might return fewer
+results than requested. If unspecified, returns 20 reports. The maximum
+value is 100.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token that specifies a page of results beyond the first page.
+Obtained through
+[ListReportsResponse.next_page_token][google.cloud.channel.v1.ListReportsResponse.next_page_token]
+of the previous
+[CloudChannelReportsService.ListReports][google.cloud.channel.v1.CloudChannelReportsService.ListReports]
+call.
+
+=item * C<< $msg->language_code() >> / C<< $msg->language_code($value) >>
+
+Type: C<String>
+
+Optional. The BCP-47 language code, such as "en-US".  If specified, the
+response is localized to the corresponding language code if the
+original data sources support it.
+Default is "en-US".
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::ListReportsResponse
+
+Response message for
+[CloudChannelReportsService.ListReports][google.cloud.channel.v1.CloudChannelReportsService.ListReports].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->reports() >> / C<< $msg->reports($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::Report>)
+
+The reports available to the partner.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Pass this token to
+[FetchReportResultsRequest.page_token][google.cloud.channel.v1.FetchReportResultsRequest.page_token]
+to retrieve the next page of results.
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::ReportJob
+
+The result of a [RunReportJob][] operation. Contains the name to use in
+[FetchReportResultsRequest.report_job][google.cloud.channel.v1.FetchReportResultsRequest.report_job]
+and the status of the operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of a report job.
+Name uses the format:
+`accounts/{account_id}/reportJobs/{report_job_id}`
+
+=item * C<< $msg->report_status() >> / C<< $msg->report_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::ReportStatus>)
+
+The current status of report generation.
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::ReportResultsMetadata
+
+The features describing the data. Returned by
+[CloudChannelReportsService.RunReportJob][google.cloud.channel.v1.CloudChannelReportsService.RunReportJob]
+and
+[CloudChannelReportsService.FetchReportResults][google.cloud.channel.v1.CloudChannelReportsService.FetchReportResults].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->report() >> / C<< $msg->report($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::Report>)
+
+Details of the completed report.
+
+=item * C<< $msg->row_count() >> / C<< $msg->row_count($value) >>
+
+Type: C<Int64>
+
+The total number of rows of data in the final report.
+
+=item * C<< $msg->date_range() >> / C<< $msg->date_range($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::DateRange>)
+
+The date range of reported usage.
+
+=item * C<< $msg->preceding_date_range() >> / C<< $msg->preceding_date_range($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::DateRange>)
+
+The usage dates immediately preceding `date_range` with the same duration.
+Use this to calculate trending usage and costs. This is only populated if
+you request trending data.
+
+For example, if `date_range` is July 1-15, `preceding_date_range` will be
+June 16-30.
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::Column
+
+The definition of a report column. Specifies the data properties
+in the corresponding position of the report rows.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->column_id() >> / C<< $msg->column_id($value) >>
+
+Type: C<String>
+
+The unique name of the column (for example, customer_domain,
+channel_partner, customer_cost). You can use column IDs in
+[RunReportJobRequest.filter][google.cloud.channel.v1.RunReportJobRequest.filter].
+To see all reports and their columns, call
+[CloudChannelReportsService.ListReports][google.cloud.channel.v1.CloudChannelReportsService.ListReports].
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+The column's display name.
+
+=item * C<< $msg->data_type() >> / C<< $msg->data_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Channel::V1::Column::DataType>)
+
+The type of the values for this column.
+
+=back
+
+=head3 Enum: Column::DataType
+
+=over 4
+
+=item * C<DATA_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<STRING> => C<1>
+
+=item * C<INT> => C<2>
+
+=item * C<DECIMAL> => C<3>
+
+=item * C<MONEY> => C<4>
+
+=item * C<DATE> => C<5>
+
+=item * C<DATE_TIME> => C<6>
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::DateRange
+
+A representation of usage or invoice date ranges.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->usage_start_date_time() >> / C<< $msg->usage_start_date_time($value) >>
+
+Type: C<Message> (L<Google::Type::Datetime::DateTime>)
+
+The earliest usage date time (inclusive).
+
+If you use time groupings (daily, weekly, etc), each group uses
+midnight to midnight (Pacific time). The usage start date is
+rounded down to include all usage from the specified date. We recommend
+that clients pass `usage_start_date_time` in Pacific time.
+
+=item * C<< $msg->usage_end_date_time() >> / C<< $msg->usage_end_date_time($value) >>
+
+Type: C<Message> (L<Google::Type::Datetime::DateTime>)
+
+The latest usage date time (exclusive).
+
+If you use time groupings (daily, weekly, etc), each group uses
+midnight to midnight (Pacific time). The usage end date is
+rounded down to include all usage from the specified date. We recommend
+that clients pass `usage_start_date_time` in Pacific time.
+
+=item * C<< $msg->invoice_start_date() >> / C<< $msg->invoice_start_date($value) >>
+
+Type: C<Message> (L<Google::Type::Date::Date>)
+
+The earliest invoice date (inclusive).
+
+If this value is not the first day of a month, this will move it back to
+the first day of the given month.
+
+=item * C<< $msg->invoice_end_date() >> / C<< $msg->invoice_end_date($value) >>
+
+Type: C<Message> (L<Google::Type::Date::Date>)
+
+The latest invoice date (inclusive).
+
+If this value is not the last day of a month, this will move it forward to
+the last day of the given month.
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::Row
+
+A row of report values.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->values() >> / C<< $msg->values($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::ReportValue>)
+
+The list of values in the row.
+
+=item * C<< $msg->partition_key() >> / C<< $msg->partition_key($value) >>
+
+Type: C<String>
+
+The key for the partition this row belongs to. This field is empty
+if the report is not partitioned.
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::ReportValue
+
+A single report value.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->string_value() >> / C<< $msg->string_value($value) >>
+
+Type: C<String>
+
+A value of type `string`.
+
+=item * C<< $msg->int_value() >> / C<< $msg->int_value($value) >>
+
+Type: C<Int64>
+
+A value of type `int`.
+
+=item * C<< $msg->decimal_value() >> / C<< $msg->decimal_value($value) >>
+
+Type: C<Message> (L<Google::Type::Decimal::Decimal>)
+
+A value of type `google.type.Decimal`, representing non-integer numeric
+values.
+
+=item * C<< $msg->money_value() >> / C<< $msg->money_value($value) >>
+
+Type: C<Message> (L<Google::Type::Money::Money>)
+
+A value of type `google.type.Money` (currency code, whole units, decimal
+units).
+
+=item * C<< $msg->date_value() >> / C<< $msg->date_value($value) >>
+
+Type: C<Message> (L<Google::Type::Date::Date>)
+
+A value of type `google.type.Date` (year, month, day).
+
+=item * C<< $msg->date_time_value() >> / C<< $msg->date_time_value($value) >>
+
+Type: C<Message> (L<Google::Type::Datetime::DateTime>)
+
+A value of type `google.type.DateTime` (year, month, day, hour, minute,
+second, and UTC offset or timezone.)
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::ReportStatus
+
+Status of a report generation process.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Channel::V1::ReportStatus::State>)
+
+The current state of the report generation process.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The report generation's start time.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The report generation's completion time.
+
+=back
+
+=head3 Enum: ReportStatus::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<STARTED> => C<1>
+
+=item * C<WRITING> => C<2>
+
+=item * C<AVAILABLE> => C<3>
+
+=item * C<FAILED> => C<4>
+
+=back
+
+=head2 Google::Cloud::Channel::V1::ReportsService::Report
+
+The ID and description of a report that was used to generate report data.
+For example, "Google Cloud Daily Spend", "Google Workspace License Activity",
+etc.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The report's resource name. Specifies the account and report used
+to generate report data. The report_id identifier is a UID (for example,
+`613bf59q`).
+
+Name uses the format:
+accounts/{account_id}/reports/{report_id}
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+A human-readable name for this report.
+
+=item * C<< $msg->columns() >> / C<< $msg->columns($value) >>
+
+Type: C<Message> (L<Google::Cloud::Channel::V1::ReportsService::Column>)
+
+The list of columns included in the report. This defines the schema of
+the report results.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+A description of other aspects of the report, such as the products
+it supports.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Channel::V1::ReportsService::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

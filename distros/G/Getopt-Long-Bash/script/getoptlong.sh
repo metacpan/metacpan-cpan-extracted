@@ -2,9 +2,9 @@
 # vim: filetype=bash :  -*- mode: sh; sh-shell: bash; -*-
 ###############################################################################
 # GetOptLong: Getopt Library for Bash Script
-# Copyright 2025-2026 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong>
+# Copyright 2025-2026 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong-bash>
 # MIT License: See <https://opensource.org/licenses/MIT>
-: ${GOL_VERSION:=1.5.0}
+: ${GOL_VERSION:=2.0.0}
 ###############################################################################
 # Check bash version (4.4+ for nameref and ${parameter@Q})
 ((BASH_VERSINFO[0] > 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4))) ||
@@ -29,8 +29,8 @@ _gol_dest()  {
     [[ $1 =~ ^[[:alpha:]] ]] || _gol_die "$1: variable name must start with alphabet"
     _gol_opts "$_MK_DEST"  "$@"
 }
-_gol_type()  { [[ ${_opts["$1"]} =~ ^([^[:alnum:]]+) ]] && echo "${_MATCH[1]}" || _gol_die "$1: unexpected" ; }
-_gol_debug() { [[ ${_opts["&DEBUG"]:-} ]] && _gol_warn DEBUG: "${@}" || : ; }
+_gol_type()  { [[ ${_opts[$1]} =~ ^([^[:alnum:]]+) ]] && echo "${_MATCH[1]}" || _gol_die "$1: unexpected" ; }
+_gol_debug() { [[ ${_opts[&DEBUG]:-} ]] && _gol_warn DEBUG: "${@}" || : ; }
 _gol_plusone() { [[ $1 =~ ^[0-9]+$ ]] && echo $(( $1 + 1 )) || echo 1 ; }
 _gol_vstr() { printf "%03d." ${1//./ } ; }
 # Main redirection function - sets up environment and delegates to implementation
@@ -152,7 +152,7 @@ gol_getopts () { _gol_redirect "$@" ; }
 gol_getopts_() { local _non= _optname _val _vtype _vname _name _callback _trigger _pass ;
     local _opt="$1"; shift;
     case $_opt in
-	[:?]) _callback=$(_gol_hook "$_opt") && [[ $_callback ]] && $_callback "$OPTARG"
+	[:?]) _callback=$(_gol_hook "$_opt") && [[ $_callback ]] && _gol_call_hook "$_callback" "$OPTARG"
 	      [[ $_EXIT_ON_ERROR ]] && exit 1 || return 1 ;;
 	-) _gol_getopts_long "$@" || return $? ;;
 	*) _gol_getopts_short || return $? ;;
@@ -169,7 +169,7 @@ _gol_call_hook() {
     declare -F "${_call[0]}" > /dev/null \
 	|| _gol_die "callback function ${_call[0]}() is not defined"
     # the callback handles its own errors: the return value is ignored
-    "${_call[0]}" "$2" "${_call[@]:1}" "${@:3}" || :
+    "${_call[@]}" "${@:2}" || :
 }
 _gol_getopts_long() { local _param ;
     [[ $OPTARG =~ ^(no-)?([-_[:alnum:]]+)(=(.*))? ]] || _gol_die "$OPTARG: unrecognized option"
@@ -248,25 +248,27 @@ _gol_add_array() { declare -n __target__="$1" ; __target__+=("${@:2}") ; }
 _gol_set_hash()  { declare -n __target__="$1" ; __target__["$2"]="$3" ; }
 _gol_validate() {
     case $1 in
-	i)   [[ "$2" =~ ^[-+]?[0-9]+$ ]]            || _gol_die "$2: not an integer" ;;
-	f)   [[ "$2" =~ ^[-+]?[0-9]*(\.[0-9]+)?$ ]] || _gol_die "$2: not a number" ;;
-	\(*) local _regex="$1" error=([1]="$2: invalid argument" [2]="$1: something wrong")
-	     [[ $2 =~ $_regex ]] || _gol_die "${error[$?]}" ;;
+	i)   [[ $2 =~ ^[-+]?[0-9]+$ ]]            || _gol_die "$2: not an integer" ;;
+	f)   [[ $2 =~ ^[-+]?[0-9]*(\.[0-9]+)?$ ]] || _gol_die "$2: not a number" ;;
+	\(*) declare -a error=([1]="$2: invalid argument" [2]="$1: something wrong")
+	     [[ $2 =~ $1 ]] || _gol_die "${error[$?]}" ;;
 	*)   _gol_die "$1: unknown validation pattern" ;;
     esac
 }
 gol_callback () { _gol_redirect "$@" ; }
-gol_callback_() {
-    local _setter=_gol_hook
+gol_callback_() { local _setter=_gol_hook _name _func _arg ;
     case ${1-} in -b|--before) _setter=_gol_trig ; shift ;; esac
-    while (($# > 0)) ; do
-	local _name=$1 _callback=${2:-$1}
-	[[ $_callback =~ ^[_[:alnum:]] ]] || _callback=$_name
-	local args ; read -ra args <<< "$_callback"
-	$_setter "$_name" "${args[0]//-/_} ${args[*]:1}"
-	shift $(( $# >= 2 ? 2 : 1 ))
+    (($# > 0)) || _gol_die "callback: option name is required"
+    _name=$(_gol_alias "$1") || _name=$1
+    [[ $_name == [:?] ]] || _gol_opts "$_MK_DEST" "$_name" > /dev/null \
+	|| _gol_die "$1: no such option"
+    _func=${2:-$_name}
+    [[ $_func =~ ^[_[:alnum:]] ]] || _func=$_name
+    [[ $_func =~ [[:space:]] ]] && _gol_die "$_func: invalid function name"
+    for _arg in "${@:3}" ; do
+	[[ $_arg =~ ^[^[:space:]]+$ ]] || _gol_die "${_arg@Q}: invalid callback argument"
     done
-    return 0
+    $_setter "$_name" "${_func//-/_} ${*:3}"
 }
 gol_help () { _gol_redirect "$@" ; }
 gol_help_() {
@@ -281,7 +283,7 @@ _gol_show_help() { local _key _aliases _init= _default= _column _flag _msg ;
 	_msg="$(_gol_help $_key)" || {
 	    _init="$(_gol_ival $_key)" && _default="${_init:+ (default:$_init)}"
 	    [[ $_init =~ ^[0-9]+$ ]] && _flag=bump || _flag=enable
-	    [[ "${_opts[$_key]}" =~ ([^[:alnum:]]+)(.*) ]] || _gol_die "${_opts[$_key]}: invalid entry"
+	    [[ ${_opts[$_key]} =~ ([^[:alnum:]]+)(.*) ]] || _gol_die "${_opts[$_key]}: invalid entry"
 	    case "${_MATCH[1]}" in
 		*[$_IS_PASS]) _msg="passthrough to ${_MATCH[2]^^}" ;;
 		*[$_IS_FLAG]) _msg="$_flag ${_key^^}$_default" ;;

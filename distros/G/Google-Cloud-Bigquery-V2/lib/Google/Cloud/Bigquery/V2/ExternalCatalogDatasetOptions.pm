@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -60,47 +60,75 @@ EOF
     # Field: parameters Type: 11 (.google.cloud.bigquery.v2.ExternalCatalogDatasetOptions.ParametersEntry)
     # Field: default_storage_location_uri Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions::ExternalCatalogDatasetOptions - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/external_catalog_dataset_options.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
 
-    my $msg = Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions::ExternalCatalogDatasetOptions->new(
-        parameters => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions::ExternalCatalogDatasetOptions->new({
+        parameters => $parameters,
+        default_storage_location_uri => $default_storage_location_uri,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->parameters();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions::ExternalCatalogDatasetOptions->parse($bytes);
 
-=item * B<parameters>
-
-Type: Message (.google.cloud.bigquery.v2.ExternalCatalogDatasetOptions.ParametersEntry)
-
-=item * B<default_storage_location_uri>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/external_catalog_dataset_options.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions::ExternalCatalogDatasetOptions
+
+Options defining open source compatible datasets living in the BigQuery
+catalog. Contains metadata of open source database, schema,
+or namespace represented by the current dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions::ExternalCatalogDatasetOptions::ParametersEntry>)
+
+Optional. A map of key value pairs defining the parameters and properties
+of the open source schema. Maximum size of 2MiB.
+
+=item * C<< $msg->default_storage_location_uri() >> / C<< $msg->default_storage_location_uri($value) >>
+
+Type: C<String>
+
+Optional. The storage location URI for all tables in the dataset.
+Equivalent to hive metastore's database locationUri. Maximum length of 1024
+characters.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

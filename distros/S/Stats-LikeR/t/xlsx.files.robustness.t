@@ -242,6 +242,27 @@ SKIP: {
 	is( sprintf('%04o', (stat $f)[2] & 07777), '0640', 'and keeps its permissions' );
 }
 
+# a target that a handle still holds open is replaced too.  Windows refuses to
+# rename over such a file, so there the table is copied into it in place
+# (wt_target_copy()); 0.3428 croaked "could not replace ...: Permission denied"
+# instead, and failed t/numeric.options.t, t/write_table.t and
+# t/write_table.tex.rownames.t on every Windows perl, which name a File::Temp
+# file they still hold.  On POSIX the rename succeeds and only the outcome is
+# checked here; to run the copy on Linux, LD_PRELOAD a rename() that fails with
+# EACCES while the process has the target open, as Windows does.
+for my $ext (qw(xlsx csv tex)) {
+	my $fresh = path($ext);
+	write_table([ { a => 1, b => 'x' } ], $fresh, quiet => 1);
+	my $held = path($ext);
+	spew($held, 'z' x 100_000);	# longer than any of the tables: the copy must truncate it
+	open my $h, '<:raw', $held or die "cannot read $held: $!";
+	ok( eval { write_table([ { a => 1, b => 'x' } ], $held, quiet => 1); 1 },
+		"$ext: a target held open is written" ) or diag $@;
+	close $h;
+	ok( slurp($held) eq slurp($fresh), "$ext: with the bytes a fresh file gets" );
+	is( tmp_left(), 0, "$ext: and no temporary file is left" );
+}
+
 # targets that are not regular files are written in place
 SKIP: {
 	skip 'no /dev/null here', 2 unless -c '/dev/null';

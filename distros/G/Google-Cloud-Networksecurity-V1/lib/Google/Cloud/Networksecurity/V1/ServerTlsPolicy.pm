@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -268,60 +268,6 @@ EOF
     # Field: server_certificate Type: 11 (.google.cloud.networksecurity.v1.CertificateProvider)
     # Field: mtls_policy Type: 11 (.google.cloud.networksecurity.v1.ServerTlsPolicy.MTLSPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.ServerTlsPolicy.LabelsEntry)
-
-=item * B<allow_open>
-
-Type: Bool
-
-=item * B<server_certificate>
-
-Type: Message (.google.cloud.networksecurity.v1.CertificateProvider)
-
-=item * B<mtls_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.ServerTlsPolicy.MTLSPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ListServerTlsPoliciesRequest ===
     # Fields for ListServerTlsPoliciesRequest
     # Field: parent Type: 9 ()
@@ -329,113 +275,15 @@ Type: Message (.google.cloud.networksecurity.v1.ServerTlsPolicy.MTLSPolicy)
     # Field: page_token Type: 9 ()
     # Field: return_partial_success Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ListServerTlsPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ListServerTlsPoliciesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<return_partial_success>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ListServerTlsPoliciesResponse ===
     # Fields for ListServerTlsPoliciesResponse
     # Field: server_tls_policies Type: 11 (.google.cloud.networksecurity.v1.ServerTlsPolicy)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ListServerTlsPoliciesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ListServerTlsPoliciesResponse->new(
-        server_tls_policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<server_tls_policies>
-
-Type: Message (.google.cloud.networksecurity.v1.ServerTlsPolicy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::ServerTlsPolicy::GetServerTlsPolicyRequest ===
     # Fields for GetServerTlsPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::ServerTlsPolicy::GetServerTlsPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::ServerTlsPolicy::GetServerTlsPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::ServerTlsPolicy::CreateServerTlsPolicyRequest ===
     # Fields for CreateServerTlsPolicyRequest
@@ -443,116 +291,328 @@ Type: String
     # Field: server_tls_policy_id Type: 9 ()
     # Field: server_tls_policy Type: 11 (.google.cloud.networksecurity.v1.ServerTlsPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::ServerTlsPolicy::CreateServerTlsPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::ServerTlsPolicy::CreateServerTlsPolicyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<server_tls_policy_id>
-
-Type: String
-
-=item * B<server_tls_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.ServerTlsPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::ServerTlsPolicy::UpdateServerTlsPolicyRequest ===
     # Fields for UpdateServerTlsPolicyRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: server_tls_policy Type: 11 (.google.cloud.networksecurity.v1.ServerTlsPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::ServerTlsPolicy::UpdateServerTlsPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::ServerTlsPolicy::UpdateServerTlsPolicyRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<server_tls_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.ServerTlsPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::ServerTlsPolicy::DeleteServerTlsPolicyRequest ===
     # Fields for DeleteServerTlsPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::ServerTlsPolicy::DeleteServerTlsPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::ServerTlsPolicy::DeleteServerTlsPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::ServerTlsPolicy - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::ServerTlsPolicy - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/server_tls_policy.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
+
+    my $msg = Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy->new({
+        name => $name,
+        description => $description,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/server_tls_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy
+
+ServerTlsPolicy is a resource that specifies how a server should authenticate
+incoming requests. This resource itself does not affect configuration unless
+it is attached to a target HTTPS proxy or endpoint config selector resource.
+
+ServerTlsPolicy in the form accepted by Application Load Balancers can
+be attached only to TargetHttpsProxy with an `EXTERNAL`, `EXTERNAL_MANAGED`
+or `INTERNAL_MANAGED` load balancing scheme. Traffic Director compatible
+ServerTlsPolicies can be attached to EndpointPolicy and TargetHttpsProxy with
+Traffic Director `INTERNAL_SELF_MANAGED` load balancing scheme.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the ServerTlsPolicy resource. It matches the pattern
+`projects/*/locations/{location}/serverTlsPolicies/{server_tls_policy}`
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Free-text description of the resource.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy::LabelsEntry>)
+
+Set of label tags associated with the resource.
+
+=item * C<< $msg->allow_open() >> / C<< $msg->allow_open($value) >>
+
+Type: C<Bool>
+
+This field applies only for Traffic Director policies. It is must be set to
+false for Application Load Balancer policies.
+
+Determines if server allows plaintext connections. If set to true, server
+allows plain text connections. By default, it is set to false. This setting
+is not exclusive of other encryption modes. For example, if `allow_open`
+and `mtls_policy` are set, server allows both plain text and mTLS
+connections. See documentation of other encryption modes to confirm
+compatibility.
+
+Consider using it if you wish to upgrade in place your deployment to TLS
+while having mixed TLS and non-TLS traffic reaching port :80.
+
+=item * C<< $msg->server_certificate() >> / C<< $msg->server_certificate($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::Tls::CertificateProvider>)
+
+Optional if policy is to be used with Traffic Director. For Application
+Load Balancers must be empty.
+
+Defines a mechanism to provision server identity (public and private keys).
+Cannot be combined with `allow_open` as a permissive mode that allows both
+plain text and TLS is not supported.
+
+=item * C<< $msg->mtls_policy() >> / C<< $msg->mtls_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy::MTLSPolicy>)
+
+This field is required if the policy is used with Application Load
+Balancers. This field can be empty for Traffic Director.
+
+Defines a mechanism to provision peer validation certificates for peer to
+peer authentication (Mutual TLS - mTLS). If not specified, client
+certificate will not be requested. The connection is treated as TLS and not
+mTLS. If `allow_open` and `mtls_policy` are set, server allows both plain
+text and mTLS connections.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ListServerTlsPoliciesRequest
+
+Request used by the ListServerTlsPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the ServerTlsPolicies should
+be listed, specified in the format `projects/*/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of ServerTlsPolicies to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListServerTlsPoliciesResponse`
+Indicates that this is a continuation of a prior
+`ListServerTlsPolicies` call, and that the system
+should return the next page of data.
+
+=item * C<< $msg->return_partial_success() >> / C<< $msg->return_partial_success($value) >>
+
+Type: C<Bool>
+
+Optional. Setting this field to `true` will opt the request into returning
+the resources that are reachable, and into including the names of those
+that were unreachable in the [ListServerTlsPoliciesResponse.unreachable]
+field. This can only be `true` when reading across collections e.g. when
+`parent` is set to `"projects/example/locations/-"`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ListServerTlsPoliciesResponse
+
+Response returned by the ListServerTlsPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->server_tls_policies() >> / C<< $msg->server_tls_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy>)
+
+List of ServerTlsPolicy resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request opts into
+`return_partial_success` and reading across collections e.g. when
+attempting to list all resources across all supported locations.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::ServerTlsPolicy::GetServerTlsPolicyRequest
+
+Request used by the GetServerTlsPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the ServerTlsPolicy to get. Must be in the format
+`projects/*/locations/{location}/serverTlsPolicies/*`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::ServerTlsPolicy::CreateServerTlsPolicyRequest
+
+Request used by the CreateServerTlsPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the ServerTlsPolicy. Must be in
+the format `projects/*/locations/{location}`.
+
+=item * C<< $msg->server_tls_policy_id() >> / C<< $msg->server_tls_policy_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the ServerTlsPolicy resource to be created. This
+value should be 1-63 characters long, containing only letters, numbers,
+hyphens, and underscores, and should not start with a number. E.g.
+"server_mtls_policy".
+
+=item * C<< $msg->server_tls_policy() >> / C<< $msg->server_tls_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy>)
+
+Required. ServerTlsPolicy resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::ServerTlsPolicy::UpdateServerTlsPolicyRequest
+
+Request used by UpdateServerTlsPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+ServerTlsPolicy resource by the update.  The fields
+specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the
+mask. If the user does not provide a mask then all fields will be
+overwritten.
+
+=item * C<< $msg->server_tls_policy() >> / C<< $msg->server_tls_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::ServerTlsPolicy::ServerTlsPolicy>)
+
+Required. Updated ServerTlsPolicy resource.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::ServerTlsPolicy::DeleteServerTlsPolicyRequest
+
+Request used by the DeleteServerTlsPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the ServerTlsPolicy to delete. Must be in
+the format `projects/*/locations/{location}/serverTlsPolicies/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::ServerTlsPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Pubsub::V1::Pubsub;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -2715,80 +2715,12 @@ EOF
     # Field: allowed_persistence_regions Type: 9 ()
     # Field: enforce_in_transit Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::MessageStoragePolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::MessageStoragePolicy->new(
-        allowed_persistence_regions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<allowed_persistence_regions>
-
-Type: String
-
-=item * B<enforce_in_transit>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::SchemaSettings ===
     # Fields for SchemaSettings
     # Field: schema Type: 9 ()
     # Field: encoding Type: 14 (.google.pubsub.v1.Encoding)
     # Field: first_revision_id Type: 9 ()
     # Field: last_revision_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::SchemaSettings - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::SchemaSettings->new(
-        schema => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<schema>
-
-Type: String
-
-=item * B<encoding>
-
-Type: Enum (.google.pubsub.v1.Encoding)
-
-=item * B<first_revision_id>
-
-Type: String
-
-=item * B<last_revision_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings ===
     # Fields for IngestionDataSourceSettings
@@ -2799,81 +2731,9 @@ Type: String
     # Field: confluent_cloud Type: 11 (.google.pubsub.v1.IngestionDataSourceSettings.ConfluentCloud)
     # Field: platform_logs_settings Type: 11 (.google.pubsub.v1.PlatformLogsSettings)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings->new(
-        aws_kinesis => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<aws_kinesis>
-
-Type: Message (.google.pubsub.v1.IngestionDataSourceSettings.AwsKinesis)
-
-=item * B<cloud_storage>
-
-Type: Message (.google.pubsub.v1.IngestionDataSourceSettings.CloudStorage)
-
-=item * B<azure_event_hubs>
-
-Type: Message (.google.pubsub.v1.IngestionDataSourceSettings.AzureEventHubs)
-
-=item * B<aws_msk>
-
-Type: Message (.google.pubsub.v1.IngestionDataSourceSettings.AwsMsk)
-
-=item * B<confluent_cloud>
-
-Type: Message (.google.pubsub.v1.IngestionDataSourceSettings.ConfluentCloud)
-
-=item * B<platform_logs_settings>
-
-Type: Message (.google.pubsub.v1.PlatformLogsSettings)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::PlatformLogsSettings ===
     # Fields for PlatformLogsSettings
     # Field: severity Type: 14 (.google.pubsub.v1.PlatformLogsSettings.Severity)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::PlatformLogsSettings - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::PlatformLogsSettings->new(
-        severity => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<severity>
-
-Type: Enum (.google.pubsub.v1.PlatformLogsSettings.Severity)
-
-=back
-
-=cut
 
 # Enum: PlatformLogsSettings::Severity
 our $PlatformLogsSettings_SEVERITY_UNSPECIFIED = 0;
@@ -2882,30 +2742,6 @@ our $PlatformLogsSettings_DEBUG = 2;
 our $PlatformLogsSettings_INFO = 3;
 our $PlatformLogsSettings_WARNING = 4;
 our $PlatformLogsSettings_ERROR = 5;
-
-=pod
-
-=head2 Enum: PlatformLogsSettings::Severity
-
-Values:
-
-=over 4
-
-=item * C<SEVERITY_UNSPECIFIED> => 0
-
-=item * C<DISABLED> => 1
-
-=item * C<DEBUG> => 2
-
-=item * C<INFO> => 3
-
-=item * C<WARNING> => 4
-
-=item * C<ERROR> => 5
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::IngestionFailureEvent ===
     # Fields for IngestionFailureEvent
@@ -2917,211 +2753,31 @@ Values:
     # Field: confluent_cloud_failure Type: 11 (.google.pubsub.v1.IngestionFailureEvent.ConfluentCloudFailureReason)
     # Field: aws_kinesis_failure Type: 11 (.google.pubsub.v1.IngestionFailureEvent.AwsKinesisFailureReason)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::IngestionFailureEvent - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::IngestionFailureEvent->new(
-        topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic>
-
-Type: String
-
-=item * B<error_message>
-
-Type: String
-
-=item * B<cloud_storage_failure>
-
-Type: Message (.google.pubsub.v1.IngestionFailureEvent.CloudStorageFailure)
-
-=item * B<aws_msk_failure>
-
-Type: Message (.google.pubsub.v1.IngestionFailureEvent.AwsMskFailureReason)
-
-=item * B<azure_event_hubs_failure>
-
-Type: Message (.google.pubsub.v1.IngestionFailureEvent.AzureEventHubsFailureReason)
-
-=item * B<confluent_cloud_failure>
-
-Type: Message (.google.pubsub.v1.IngestionFailureEvent.ConfluentCloudFailureReason)
-
-=item * B<aws_kinesis_failure>
-
-Type: Message (.google.pubsub.v1.IngestionFailureEvent.AwsKinesisFailureReason)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::JavaScriptUDF ===
     # Fields for JavaScriptUDF
     # Field: function_name Type: 9 ()
     # Field: code Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::JavaScriptUDF - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::JavaScriptUDF->new(
-        function_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<function_name>
-
-Type: String
-
-=item * B<code>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::Compression ===
     # Fields for Compression
     # Field: compression_algorithm Type: 14 (.google.pubsub.v1.Compression.CompressionAlgorithm)
     # Field: compression_mode Type: 14 (.google.pubsub.v1.Compression.CompressionMode)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::Compression - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::Compression->new(
-        compression_algorithm => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<compression_algorithm>
-
-Type: Enum (.google.pubsub.v1.Compression.CompressionAlgorithm)
-
-=item * B<compression_mode>
-
-Type: Enum (.google.pubsub.v1.Compression.CompressionMode)
-
-=back
-
-=cut
-
 # Enum: Compression::CompressionAlgorithm
 our $Compression_COMPRESSION_ALGORITHM_UNSPECIFIED = 0;
 our $Compression_ZLIB = 1;
 our $Compression_ZSTD = 3;
-
-=pod
-
-=head2 Enum: Compression::CompressionAlgorithm
-
-Values:
-
-=over 4
-
-=item * C<COMPRESSION_ALGORITHM_UNSPECIFIED> => 0
-
-=item * C<ZLIB> => 1
-
-=item * C<ZSTD> => 3
-
-=back
-
-=cut
 
 # Enum: Compression::CompressionMode
 our $Compression_COMPRESSION_MODE_UNSPECIFIED = 0;
 our $Compression_COMPRESS = 1;
 our $Compression_DECOMPRESS = 2;
 
-=pod
-
-=head2 Enum: Compression::CompressionMode
-
-Values:
-
-=over 4
-
-=item * C<COMPRESSION_MODE_UNSPECIFIED> => 0
-
-=item * C<COMPRESS> => 1
-
-=item * C<DECOMPRESS> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::AIInference ===
     # Fields for AIInference
     # Field: endpoint Type: 9 ()
     # Field: unstructured_inference Type: 11 (.google.pubsub.v1.AIInference.UnstructuredInference)
     # Field: service_account_email Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::AIInference - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::AIInference->new(
-        endpoint => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<endpoint>
-
-Type: String
-
-=item * B<unstructured_inference>
-
-Type: Message (.google.pubsub.v1.AIInference.UnstructuredInference)
-
-=item * B<service_account_email>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::MessageTransform ===
     # Fields for MessageTransform
@@ -3130,48 +2786,6 @@ Type: String
     # Field: ai_inference Type: 11 (.google.pubsub.v1.AIInference)
     # Field: enabled Type: 8 ()
     # Field: disabled Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::MessageTransform - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::MessageTransform->new(
-        javascript_udf => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<javascript_udf>
-
-Type: Message (.google.pubsub.v1.JavaScriptUDF)
-
-=item * B<compression>
-
-Type: Message (.google.pubsub.v1.Compression)
-
-=item * B<ai_inference>
-
-Type: Message (.google.pubsub.v1.AIInference)
-
-=item * B<enabled>
-
-Type: Bool
-
-=item * B<disabled>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::Topic ===
     # Fields for Topic
@@ -3187,94 +2801,10 @@ Type: Bool
     # Field: message_transforms Type: 11 (.google.pubsub.v1.MessageTransform)
     # Field: tags Type: 11 (.google.pubsub.v1.Topic.TagsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::Topic - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::Topic->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.pubsub.v1.Topic.LabelsEntry)
-
-=item * B<message_storage_policy>
-
-Type: Message (.google.pubsub.v1.MessageStoragePolicy)
-
-=item * B<kms_key_name>
-
-Type: String
-
-=item * B<schema_settings>
-
-Type: Message (.google.pubsub.v1.SchemaSettings)
-
-=item * B<satisfies_pzs>
-
-Type: Bool
-
-=item * B<message_retention_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<state>
-
-Type: Enum (.google.pubsub.v1.Topic.State)
-
-=item * B<ingestion_data_source_settings>
-
-Type: Message (.google.pubsub.v1.IngestionDataSourceSettings)
-
-=item * B<message_transforms>
-
-Type: Message (.google.pubsub.v1.MessageTransform)
-
-=item * B<tags>
-
-Type: Message (.google.pubsub.v1.Topic.TagsEntry)
-
-=back
-
-=cut
-
 # Enum: Topic::State
 our $Topic_STATE_UNSPECIFIED = 0;
 our $Topic_ACTIVE = 1;
 our $Topic_INGESTION_RESOURCE_ERROR = 2;
-
-=pod
-
-=head2 Enum: Topic::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<INGESTION_RESOURCE_ERROR> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::PubsubMessage ===
     # Fields for PubsubMessage
@@ -3284,177 +2814,23 @@ Values:
     # Field: publish_time Type: 11 (.google.protobuf.Timestamp)
     # Field: ordering_key Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::PubsubMessage - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::PubsubMessage->new(
-        data => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data>
-
-Type: Bytes
-
-=item * B<attributes>
-
-Type: Message (.google.pubsub.v1.PubsubMessage.AttributesEntry)
-
-=item * B<message_id>
-
-Type: String
-
-=item * B<publish_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<ordering_key>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::GetTopicRequest ===
     # Fields for GetTopicRequest
     # Field: topic Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::GetTopicRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::GetTopicRequest->new(
-        topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::UpdateTopicRequest ===
     # Fields for UpdateTopicRequest
     # Field: topic Type: 11 (.google.pubsub.v1.Topic)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::UpdateTopicRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::UpdateTopicRequest->new(
-        topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic>
-
-Type: Message (.google.pubsub.v1.Topic)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::PublishRequest ===
     # Fields for PublishRequest
     # Field: topic Type: 9 ()
     # Field: messages Type: 11 (.google.pubsub.v1.PubsubMessage)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::PublishRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::PublishRequest->new(
-        topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic>
-
-Type: String
-
-=item * B<messages>
-
-Type: Message (.google.pubsub.v1.PubsubMessage)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::PublishResponse ===
     # Fields for PublishResponse
     # Field: message_ids Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::PublishResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::PublishResponse->new(
-        message_ids => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message_ids>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::ListTopicsRequest ===
     # Fields for ListTopicsRequest
@@ -3462,74 +2838,10 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListTopicsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListTopicsRequest->new(
-        project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::ListTopicsResponse ===
     # Fields for ListTopicsResponse
     # Field: topics Type: 11 (.google.pubsub.v1.Topic)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListTopicsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListTopicsResponse->new(
-        topics => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topics>
-
-Type: Message (.google.pubsub.v1.Topic)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::ListTopicSubscriptionsRequest ===
     # Fields for ListTopicSubscriptionsRequest
@@ -3537,74 +2849,10 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListTopicSubscriptionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListTopicSubscriptionsRequest->new(
-        topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::ListTopicSubscriptionsResponse ===
     # Fields for ListTopicSubscriptionsResponse
     # Field: subscriptions Type: 9 ()
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListTopicSubscriptionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListTopicSubscriptionsResponse->new(
-        subscriptions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscriptions>
-
-Type: String
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::ListTopicSnapshotsRequest ===
     # Fields for ListTopicSnapshotsRequest
@@ -3612,158 +2860,21 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListTopicSnapshotsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListTopicSnapshotsRequest->new(
-        topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::ListTopicSnapshotsResponse ===
     # Fields for ListTopicSnapshotsResponse
     # Field: snapshots Type: 9 ()
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListTopicSnapshotsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListTopicSnapshotsResponse->new(
-        snapshots => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<snapshots>
-
-Type: String
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::DeleteTopicRequest ===
     # Fields for DeleteTopicRequest
     # Field: topic Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::DeleteTopicRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::DeleteTopicRequest->new(
-        topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::DetachSubscriptionRequest ===
     # Fields for DetachSubscriptionRequest
     # Field: subscription Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::DetachSubscriptionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::DetachSubscriptionRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::DetachSubscriptionResponse ===
     # Fields for DetachSubscriptionResponse
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::DetachSubscriptionResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::DetachSubscriptionResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::Subscription ===
     # Fields for Subscription
@@ -3790,238 +2901,24 @@ Google::Pubsub::V1::Pubsub::DetachSubscriptionResponse - Compiled Protocol Buffe
     # Field: message_transforms Type: 11 (.google.pubsub.v1.MessageTransform)
     # Field: tags Type: 11 (.google.pubsub.v1.Subscription.TagsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::Subscription - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::Subscription->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<topic>
-
-Type: String
-
-=item * B<push_config>
-
-Type: Message (.google.pubsub.v1.PushConfig)
-
-=item * B<bigquery_config>
-
-Type: Message (.google.pubsub.v1.BigQueryConfig)
-
-=item * B<cloud_storage_config>
-
-Type: Message (.google.pubsub.v1.CloudStorageConfig)
-
-=item * B<bigtable_config>
-
-Type: Message (.google.pubsub.v1.BigtableConfig)
-
-=item * B<ack_deadline_seconds>
-
-Type: Int32
-
-=item * B<retain_acked_messages>
-
-Type: Bool
-
-=item * B<message_retention_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<labels>
-
-Type: Message (.google.pubsub.v1.Subscription.LabelsEntry)
-
-=item * B<enable_message_ordering>
-
-Type: Bool
-
-=item * B<expiration_policy>
-
-Type: Message (.google.pubsub.v1.ExpirationPolicy)
-
-=item * B<filter>
-
-Type: String
-
-=item * B<dead_letter_policy>
-
-Type: Message (.google.pubsub.v1.DeadLetterPolicy)
-
-=item * B<retry_policy>
-
-Type: Message (.google.pubsub.v1.RetryPolicy)
-
-=item * B<detached>
-
-Type: Bool
-
-=item * B<enable_exactly_once_delivery>
-
-Type: Bool
-
-=item * B<topic_message_retention_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<state>
-
-Type: Enum (.google.pubsub.v1.Subscription.State)
-
-=item * B<analytics_hub_subscription_info>
-
-Type: Message (.google.pubsub.v1.Subscription.AnalyticsHubSubscriptionInfo)
-
-=item * B<message_transforms>
-
-Type: Message (.google.pubsub.v1.MessageTransform)
-
-=item * B<tags>
-
-Type: Message (.google.pubsub.v1.Subscription.TagsEntry)
-
-=back
-
-=cut
-
 # Enum: Subscription::State
 our $Subscription_STATE_UNSPECIFIED = 0;
 our $Subscription_ACTIVE = 1;
 our $Subscription_RESOURCE_ERROR = 2;
-
-=pod
-
-=head2 Enum: Subscription::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<RESOURCE_ERROR> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::RetryPolicy ===
     # Fields for RetryPolicy
     # Field: minimum_backoff Type: 11 (.google.protobuf.Duration)
     # Field: maximum_backoff Type: 11 (.google.protobuf.Duration)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::RetryPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::RetryPolicy->new(
-        minimum_backoff => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<minimum_backoff>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<maximum_backoff>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::DeadLetterPolicy ===
     # Fields for DeadLetterPolicy
     # Field: dead_letter_topic Type: 9 ()
     # Field: max_delivery_attempts Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::DeadLetterPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::DeadLetterPolicy->new(
-        dead_letter_topic => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dead_letter_topic>
-
-Type: String
-
-=item * B<max_delivery_attempts>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::ExpirationPolicy ===
     # Fields for ExpirationPolicy
     # Field: ttl Type: 11 (.google.protobuf.Duration)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ExpirationPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ExpirationPolicy->new(
-        ttl => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::PushConfig ===
     # Fields for PushConfig
@@ -4030,48 +2927,6 @@ Type: Message (.google.protobuf.Duration)
     # Field: oidc_token Type: 11 (.google.pubsub.v1.PushConfig.OidcToken)
     # Field: pubsub_wrapper Type: 11 (.google.pubsub.v1.PushConfig.PubsubWrapper)
     # Field: no_wrapper Type: 11 (.google.pubsub.v1.PushConfig.NoWrapper)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::PushConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::PushConfig->new(
-        push_endpoint => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<push_endpoint>
-
-Type: String
-
-=item * B<attributes>
-
-Type: Message (.google.pubsub.v1.PushConfig.AttributesEntry)
-
-=item * B<oidc_token>
-
-Type: Message (.google.pubsub.v1.PushConfig.OidcToken)
-
-=item * B<pubsub_wrapper>
-
-Type: Message (.google.pubsub.v1.PushConfig.PubsubWrapper)
-
-=item * B<no_wrapper>
-
-Type: Message (.google.pubsub.v1.PushConfig.NoWrapper)
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::BigQueryConfig ===
     # Fields for BigQueryConfig
@@ -4083,56 +2938,6 @@ Type: Message (.google.pubsub.v1.PushConfig.NoWrapper)
     # Field: use_table_schema Type: 8 ()
     # Field: service_account_email Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::BigQueryConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::BigQueryConfig->new(
-        table => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<table>
-
-Type: String
-
-=item * B<use_topic_schema>
-
-Type: Bool
-
-=item * B<write_metadata>
-
-Type: Bool
-
-=item * B<drop_unknown_fields>
-
-Type: Bool
-
-=item * B<state>
-
-Type: Enum (.google.pubsub.v1.BigQueryConfig.State)
-
-=item * B<use_table_schema>
-
-Type: Bool
-
-=item * B<service_account_email>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: BigQueryConfig::State
 our $BigQueryConfig_STATE_UNSPECIFIED = 0;
 our $BigQueryConfig_ACTIVE = 1;
@@ -4141,32 +2946,6 @@ our $BigQueryConfig_NOT_FOUND = 3;
 our $BigQueryConfig_SCHEMA_MISMATCH = 4;
 our $BigQueryConfig_IN_TRANSIT_LOCATION_RESTRICTION = 5;
 our $BigQueryConfig_VERTEX_AI_LOCATION_RESTRICTION = 6;
-
-=pod
-
-=head2 Enum: BigQueryConfig::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<PERMISSION_DENIED> => 2
-
-=item * C<NOT_FOUND> => 3
-
-=item * C<SCHEMA_MISMATCH> => 4
-
-=item * C<IN_TRANSIT_LOCATION_RESTRICTION> => 5
-
-=item * C<VERTEX_AI_LOCATION_RESTRICTION> => 6
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::BigtableConfig ===
     # Fields for BigtableConfig
@@ -4177,52 +2956,6 @@ Values:
     # Field: column_family_mapping Type: 11 (.google.pubsub.v1.BigtableConfig.ColumnFamilyMapping)
     # Field: state Type: 14 (.google.pubsub.v1.BigtableConfig.State)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::BigtableConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::BigtableConfig->new(
-        table => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<table>
-
-Type: String
-
-=item * B<app_profile_id>
-
-Type: String
-
-=item * B<service_account_email>
-
-Type: String
-
-=item * B<write_metadata>
-
-Type: Bool
-
-=item * B<column_family_mapping>
-
-Type: Message (.google.pubsub.v1.BigtableConfig.ColumnFamilyMapping)
-
-=item * B<state>
-
-Type: Enum (.google.pubsub.v1.BigtableConfig.State)
-
-=back
-
-=cut
-
 # Enum: BigtableConfig::State
 our $BigtableConfig_STATE_UNSPECIFIED = 0;
 our $BigtableConfig_ACTIVE = 1;
@@ -4232,34 +2965,6 @@ our $BigtableConfig_PERMISSION_DENIED = 4;
 our $BigtableConfig_SCHEMA_MISMATCH = 5;
 our $BigtableConfig_IN_TRANSIT_LOCATION_RESTRICTION = 6;
 our $BigtableConfig_VERTEX_AI_LOCATION_RESTRICTION = 7;
-
-=pod
-
-=head2 Enum: BigtableConfig::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<NOT_FOUND> => 2
-
-=item * C<APP_PROFILE_MISCONFIGURED> => 3
-
-=item * C<PERMISSION_DENIED> => 4
-
-=item * C<SCHEMA_MISMATCH> => 5
-
-=item * C<IN_TRANSIT_LOCATION_RESTRICTION> => 6
-
-=item * C<VERTEX_AI_LOCATION_RESTRICTION> => 7
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::CloudStorageConfig ===
     # Fields for CloudStorageConfig
@@ -4275,72 +2980,6 @@ Values:
     # Field: state Type: 14 (.google.pubsub.v1.CloudStorageConfig.State)
     # Field: service_account_email Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::CloudStorageConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::CloudStorageConfig->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<filename_prefix>
-
-Type: String
-
-=item * B<filename_suffix>
-
-Type: String
-
-=item * B<filename_datetime_format>
-
-Type: String
-
-=item * B<text_config>
-
-Type: Message (.google.pubsub.v1.CloudStorageConfig.TextConfig)
-
-=item * B<avro_config>
-
-Type: Message (.google.pubsub.v1.CloudStorageConfig.AvroConfig)
-
-=item * B<max_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<max_bytes>
-
-Type: Int64
-
-=item * B<max_messages>
-
-Type: Int64
-
-=item * B<state>
-
-Type: Enum (.google.pubsub.v1.CloudStorageConfig.State)
-
-=item * B<service_account_email>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: CloudStorageConfig::State
 our $CloudStorageConfig_STATE_UNSPECIFIED = 0;
 our $CloudStorageConfig_ACTIVE = 1;
@@ -4350,136 +2989,20 @@ our $CloudStorageConfig_IN_TRANSIT_LOCATION_RESTRICTION = 4;
 our $CloudStorageConfig_SCHEMA_MISMATCH = 5;
 our $CloudStorageConfig_VERTEX_AI_LOCATION_RESTRICTION = 6;
 
-=pod
-
-=head2 Enum: CloudStorageConfig::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<PERMISSION_DENIED> => 2
-
-=item * C<NOT_FOUND> => 3
-
-=item * C<IN_TRANSIT_LOCATION_RESTRICTION> => 4
-
-=item * C<SCHEMA_MISMATCH> => 5
-
-=item * C<VERTEX_AI_LOCATION_RESTRICTION> => 6
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::ReceivedMessage ===
     # Fields for ReceivedMessage
     # Field: ack_id Type: 9 ()
     # Field: message Type: 11 (.google.pubsub.v1.PubsubMessage)
     # Field: delivery_attempt Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ReceivedMessage - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ReceivedMessage->new(
-        ack_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<ack_id>
-
-Type: String
-
-=item * B<message>
-
-Type: Message (.google.pubsub.v1.PubsubMessage)
-
-=item * B<delivery_attempt>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::GetSubscriptionRequest ===
     # Fields for GetSubscriptionRequest
     # Field: subscription Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::GetSubscriptionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::GetSubscriptionRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::UpdateSubscriptionRequest ===
     # Fields for UpdateSubscriptionRequest
     # Field: subscription Type: 11 (.google.pubsub.v1.Subscription)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::UpdateSubscriptionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::UpdateSubscriptionRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: Message (.google.pubsub.v1.Subscription)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::ListSubscriptionsRequest ===
     # Fields for ListSubscriptionsRequest
@@ -4487,139 +3010,19 @@ Type: Message (.google.protobuf.FieldMask)
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListSubscriptionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListSubscriptionsRequest->new(
-        project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::ListSubscriptionsResponse ===
     # Fields for ListSubscriptionsResponse
     # Field: subscriptions Type: 11 (.google.pubsub.v1.Subscription)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListSubscriptionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListSubscriptionsResponse->new(
-        subscriptions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscriptions>
-
-Type: Message (.google.pubsub.v1.Subscription)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::DeleteSubscriptionRequest ===
     # Fields for DeleteSubscriptionRequest
     # Field: subscription Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::DeleteSubscriptionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::DeleteSubscriptionRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::ModifyPushConfigRequest ===
     # Fields for ModifyPushConfigRequest
     # Field: subscription Type: 9 ()
     # Field: push_config Type: 11 (.google.pubsub.v1.PushConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ModifyPushConfigRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ModifyPushConfigRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: String
-
-=item * B<push_config>
-
-Type: Message (.google.pubsub.v1.PushConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::PullRequest ===
     # Fields for PullRequest
@@ -4627,69 +3030,9 @@ Type: Message (.google.pubsub.v1.PushConfig)
     # Field: return_immediately Type: 8 ()
     # Field: max_messages Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::PullRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::PullRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: String
-
-=item * B<return_immediately>
-
-Type: Bool
-
-=item * B<max_messages>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::PullResponse ===
     # Fields for PullResponse
     # Field: received_messages Type: 11 (.google.pubsub.v1.ReceivedMessage)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::PullResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::PullResponse->new(
-        received_messages => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<received_messages>
-
-Type: Message (.google.pubsub.v1.ReceivedMessage)
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::ModifyAckDeadlineRequest ===
     # Fields for ModifyAckDeadlineRequest
@@ -4697,74 +3040,10 @@ Type: Message (.google.pubsub.v1.ReceivedMessage)
     # Field: ack_ids Type: 9 ()
     # Field: ack_deadline_seconds Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ModifyAckDeadlineRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ModifyAckDeadlineRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: String
-
-=item * B<ack_ids>
-
-Type: String
-
-=item * B<ack_deadline_seconds>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::AcknowledgeRequest ===
     # Fields for AcknowledgeRequest
     # Field: subscription Type: 9 ()
     # Field: ack_ids Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::AcknowledgeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::AcknowledgeRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: String
-
-=item * B<ack_ids>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::StreamingPullRequest ===
     # Fields for StreamingPullRequest
@@ -4778,108 +3057,12 @@ Type: String
     # Field: max_outstanding_bytes Type: 3 ()
     # Field: protocol_version Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::StreamingPullRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::StreamingPullRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: String
-
-=item * B<ack_ids>
-
-Type: String
-
-=item * B<modify_deadline_seconds>
-
-Type: Int32
-
-=item * B<modify_deadline_ack_ids>
-
-Type: String
-
-=item * B<stream_ack_deadline_seconds>
-
-Type: Int32
-
-=item * B<client_id>
-
-Type: String
-
-=item * B<max_outstanding_messages>
-
-Type: Int64
-
-=item * B<max_outstanding_bytes>
-
-Type: Int64
-
-=item * B<protocol_version>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::StreamingPullResponse ===
     # Fields for StreamingPullResponse
     # Field: received_messages Type: 11 (.google.pubsub.v1.ReceivedMessage)
     # Field: acknowledge_confirmation Type: 11 (.google.pubsub.v1.StreamingPullResponse.AcknowledgeConfirmation)
     # Field: modify_ack_deadline_confirmation Type: 11 (.google.pubsub.v1.StreamingPullResponse.ModifyAckDeadlineConfirmation)
     # Field: subscription_properties Type: 11 (.google.pubsub.v1.StreamingPullResponse.SubscriptionProperties)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::StreamingPullResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::StreamingPullResponse->new(
-        received_messages => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<received_messages>
-
-Type: Message (.google.pubsub.v1.ReceivedMessage)
-
-=item * B<acknowledge_confirmation>
-
-Type: Message (.google.pubsub.v1.StreamingPullResponse.AcknowledgeConfirmation)
-
-=item * B<modify_ack_deadline_confirmation>
-
-Type: Message (.google.pubsub.v1.StreamingPullResponse.ModifyAckDeadlineConfirmation)
-
-=item * B<subscription_properties>
-
-Type: Message (.google.pubsub.v1.StreamingPullResponse.SubscriptionProperties)
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::CreateSnapshotRequest ===
     # Fields for CreateSnapshotRequest
@@ -4888,78 +3071,10 @@ Type: Message (.google.pubsub.v1.StreamingPullResponse.SubscriptionProperties)
     # Field: labels Type: 11 (.google.pubsub.v1.CreateSnapshotRequest.LabelsEntry)
     # Field: tags Type: 11 (.google.pubsub.v1.CreateSnapshotRequest.TagsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::CreateSnapshotRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::CreateSnapshotRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<subscription>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.pubsub.v1.CreateSnapshotRequest.LabelsEntry)
-
-=item * B<tags>
-
-Type: Message (.google.pubsub.v1.CreateSnapshotRequest.TagsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::UpdateSnapshotRequest ===
     # Fields for UpdateSnapshotRequest
     # Field: snapshot Type: 11 (.google.pubsub.v1.Snapshot)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::UpdateSnapshotRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::UpdateSnapshotRequest->new(
-        snapshot => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<snapshot>
-
-Type: Message (.google.pubsub.v1.Snapshot)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::Snapshot ===
     # Fields for Snapshot
@@ -4968,73 +3083,9 @@ Type: Message (.google.protobuf.FieldMask)
     # Field: expire_time Type: 11 (.google.protobuf.Timestamp)
     # Field: labels Type: 11 (.google.pubsub.v1.Snapshot.LabelsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::Snapshot - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::Snapshot->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<topic>
-
-Type: String
-
-=item * B<expire_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.pubsub.v1.Snapshot.LabelsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::GetSnapshotRequest ===
     # Fields for GetSnapshotRequest
     # Field: snapshot Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::GetSnapshotRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::GetSnapshotRequest->new(
-        snapshot => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<snapshot>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::ListSnapshotsRequest ===
     # Fields for ListSnapshotsRequest
@@ -5042,104 +3093,14 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListSnapshotsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListSnapshotsRequest->new(
-        project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::ListSnapshotsResponse ===
     # Fields for ListSnapshotsResponse
     # Field: snapshots Type: 11 (.google.pubsub.v1.Snapshot)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::ListSnapshotsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::ListSnapshotsResponse->new(
-        snapshots => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<snapshots>
-
-Type: Message (.google.pubsub.v1.Snapshot)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::DeleteSnapshotRequest ===
     # Fields for DeleteSnapshotRequest
     # Field: snapshot Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::DeleteSnapshotRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::DeleteSnapshotRequest->new(
-        snapshot => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<snapshot>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::SeekRequest ===
     # Fields for SeekRequest
@@ -5147,116 +3108,27 @@ Type: String
     # Field: time Type: 11 (.google.protobuf.Timestamp)
     # Field: snapshot Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::SeekRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::SeekRequest->new(
-        subscription => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<subscription>
-
-Type: String
-
-=item * B<time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<snapshot>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Pubsub::SeekResponse ===
     # Fields for SeekResponse
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::SeekResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::SeekResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Pubsub::PubsubClientTelemetry ===
     # Fields for PubsubClientTelemetry
     # Field: publish_operation Type: 11 (.google.pubsub.v1.PubsubClientTelemetry.PublishOperation)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Pubsub::PubsubClientTelemetry - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Pubsub;
-
-    my $msg = Google::Pubsub::V1::Pubsub::PubsubClientTelemetry->new(
-        publish_operation => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<publish_operation>
-
-Type: Message (.google.pubsub.v1.PubsubClientTelemetry.PublishOperation)
-
-=back
-
-=cut
 
 # === Service Client: Google::Pubsub::V1::Pubsub::PublisherClient ===
 package Google::Pubsub::V1::Pubsub::PublisherClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Pubsub::V1::Pubsub::PublisherClient
 
-Google::Pubsub::V1::Pubsub::PublisherClient - Client stub representing the remote Publisher service
+Client stub representing the remote C<Publisher> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<pubsub.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -5403,23 +3275,15 @@ package Google::Pubsub::V1::Pubsub::SubscriberClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Pubsub::V1::Pubsub::SubscriberClient
 
-Google::Pubsub::V1::Pubsub::SubscriberClient - Client stub representing the remote Subscriber service
+Client stub representing the remote C<Subscriber> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<pubsub.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -5656,13 +3520,2452 @@ sub seek {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Pubsub::V1::Pubsub - Protocol Buffers schema definition
+Google::Pubsub::V1::Pubsub - Compiled Protocol Buffers messages for google/pubsub/v1/pubsub.proto
+
+=head1 SYNOPSIS
+
+    use Google::Pubsub::V1::Pubsub;
+
+    my $msg = Google::Pubsub::V1::Pubsub::MessageStoragePolicy->new({
+        allowed_persistence_regions => $allowed_persistence_regions,
+        enforce_in_transit => $enforce_in_transit,
+    });
+
+    # Read or update a field
+    my $val = $msg->allowed_persistence_regions();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Pubsub::V1::Pubsub::MessageStoragePolicy->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/pubsub/v1/pubsub.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Pubsub::V1::Pubsub::MessageStoragePolicy
+
+A policy constraining the storage of messages published to the topic.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->allowed_persistence_regions() >> / C<< $msg->allowed_persistence_regions($value) >>
+
+Type: C<String>
+
+Optional. A list of IDs of Google Cloud regions where messages that are
+published to the topic may be persisted in storage. Messages published by
+publishers running in non-allowed Google Cloud regions (or running outside
+of Google Cloud altogether) are routed for storage in one of the allowed
+regions. An empty list means that no regions are allowed, and is not a
+valid configuration.
+
+=item * C<< $msg->enforce_in_transit() >> / C<< $msg->enforce_in_transit($value) >>
+
+Type: C<Bool>
+
+Optional. If true, `allowed_persistence_regions` is also used to enforce
+in-transit guarantees for messages. That is, Pub/Sub will fail
+Publish operations on this topic and subscribe operations
+on any subscription attached to this topic in any region that is
+not in `allowed_persistence_regions`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::SchemaSettings
+
+Settings for validating messages published against a schema.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<String>
+
+Required. The name of the schema that messages published should be
+validated against. Format is `projects/{project}/schemas/{schema}`. The
+value of this field will be `_deleted-schema_` if the schema has been
+deleted.
+
+=item * C<< $msg->encoding() >> / C<< $msg->encoding($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::Encoding>)
+
+Optional. The encoding of messages validated against `schema`.
+
+=item * C<< $msg->first_revision_id() >> / C<< $msg->first_revision_id($value) >>
+
+Type: C<String>
+
+Optional. The minimum (inclusive) revision allowed for validating messages.
+If empty or not present, allow any revision to be validated against
+last_revision or any revision created before.
+
+=item * C<< $msg->last_revision_id() >> / C<< $msg->last_revision_id($value) >>
+
+Type: C<String>
+
+Optional. The maximum (inclusive) revision allowed for validating messages.
+If empty or not present, allow any revision to be validated against
+first_revision or any revision created after.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings
+
+Settings for an ingestion data source on a topic.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->aws_kinesis() >> / C<< $msg->aws_kinesis($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings::AwsKinesis>)
+
+Optional. Amazon Kinesis Data Streams.
+
+=item * C<< $msg->cloud_storage() >> / C<< $msg->cloud_storage($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings::CloudStorage>)
+
+Optional. Cloud Storage.
+
+=item * C<< $msg->azure_event_hubs() >> / C<< $msg->azure_event_hubs($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings::AzureEventHubs>)
+
+Optional. Azure Event Hubs.
+
+=item * C<< $msg->aws_msk() >> / C<< $msg->aws_msk($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings::AwsMsk>)
+
+Optional. Amazon MSK.
+
+=item * C<< $msg->confluent_cloud() >> / C<< $msg->confluent_cloud($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings::ConfluentCloud>)
+
+Optional. Confluent Cloud.
+
+=item * C<< $msg->platform_logs_settings() >> / C<< $msg->platform_logs_settings($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PlatformLogsSettings>)
+
+Optional. Platform Logs settings. If unset, no Platform Logs will be
+generated.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::PlatformLogsSettings
+
+Settings for Platform Logs produced by Pub/Sub.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->severity() >> / C<< $msg->severity($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::PlatformLogsSettings::Severity>)
+
+Optional. The minimum severity level of Platform Logs that will be written.
+
+=back
+
+=head3 Enum: PlatformLogsSettings::Severity
+
+=over 4
+
+=item * C<SEVERITY_UNSPECIFIED> => C<0>
+
+=item * C<DISABLED> => C<1>
+
+=item * C<DEBUG> => C<2>
+
+=item * C<INFO> => C<3>
+
+=item * C<WARNING> => C<4>
+
+=item * C<ERROR> => C<5>
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::IngestionFailureEvent
+
+Payload of the Platform Log entry sent when a failure is encountered while
+ingesting.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+Required. Name of the import topic. Format is:
+projects/{project_name}/topics/{topic_name}.
+
+=item * C<< $msg->error_message() >> / C<< $msg->error_message($value) >>
+
+Type: C<String>
+
+Required. Error details explaining why ingestion to Pub/Sub has failed.
+
+=item * C<< $msg->cloud_storage_failure() >> / C<< $msg->cloud_storage_failure($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionFailureEvent::CloudStorageFailure>)
+
+Optional. Failure when ingesting from Cloud Storage.
+
+=item * C<< $msg->aws_msk_failure() >> / C<< $msg->aws_msk_failure($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionFailureEvent::AwsMskFailureReason>)
+
+Optional. Failure when ingesting from Amazon MSK.
+
+=item * C<< $msg->azure_event_hubs_failure() >> / C<< $msg->azure_event_hubs_failure($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionFailureEvent::AzureEventHubsFailureReason>)
+
+Optional. Failure when ingesting from Azure Event Hubs.
+
+=item * C<< $msg->confluent_cloud_failure() >> / C<< $msg->confluent_cloud_failure($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionFailureEvent::ConfluentCloudFailureReason>)
+
+Optional. Failure when ingesting from Confluent Cloud.
+
+=item * C<< $msg->aws_kinesis_failure() >> / C<< $msg->aws_kinesis_failure($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionFailureEvent::AwsKinesisFailureReason>)
+
+Optional. Failure when ingesting from AWS Kinesis.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::JavaScriptUDF
+
+User-defined JavaScript function that can transform or filter a Pub/Sub
+message.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->function_name() >> / C<< $msg->function_name($value) >>
+
+Type: C<String>
+
+Required. Name of the JavasScript function that should applied to Pub/Sub
+messages.
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<String>
+
+Required. JavaScript code that contains a function `function_name` with the
+below signature:
+
+```
+  /**
+  * Transforms a Pub/Sub message.
+
+  * @return {(Object<string, (string | Object<string, string>)>|null)} - To
+  * filter a message, return `null`. To transform a message return a map
+  * with the following keys:
+  *   - (required) 'data' : {string}
+  *   - (optional) 'attributes' : {Object<string, string>}
+  * Returning empty `attributes` will remove all attributes from the
+  * message.
+  *
+  * @param  {(Object<string, (string | Object<string, string>)>} Pub/Sub
+  * message. Keys:
+  *   - (required) 'data' : {string}
+  *   - (required) 'attributes' : {Object<string, string>}
+  *
+  * @param  {Object<string, any>} metadata - Pub/Sub message metadata.
+  * Keys:
+  *   - (optional) 'message_id'  : {string}
+  *   - (optional) 'publish_time': {string} YYYY-MM-DDTHH:MM:SSZ format
+  *   - (optional) 'ordering_key': {string}
+  */
+
+  function <function_name>(message, metadata) {
+  }
+```
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::Compression
+
+Configuration for compressing/decompressing message data using a
+user-specified compression algorithm.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->compression_algorithm() >> / C<< $msg->compression_algorithm($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::Compression::CompressionAlgorithm>)
+
+Required. Specifies the compression algorithm to use.
+
+=item * C<< $msg->compression_mode() >> / C<< $msg->compression_mode($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::Compression::CompressionMode>)
+
+Required. Specifies whether to compress or decompress the message.
+
+=back
+
+=head3 Enum: Compression::CompressionAlgorithm
+
+=over 4
+
+=item * C<COMPRESSION_ALGORITHM_UNSPECIFIED> => C<0>
+
+=item * C<ZLIB> => C<1>
+
+=item * C<ZSTD> => C<3>
+
+=back
+
+=head3 Enum: Compression::CompressionMode
+
+=over 4
+
+=item * C<COMPRESSION_MODE_UNSPECIFIED> => C<0>
+
+=item * C<COMPRESS> => C<1>
+
+=item * C<DECOMPRESS> => C<2>
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::AIInference
+
+Configuration for making inference requests against Vertex AI models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->endpoint() >> / C<< $msg->endpoint($value) >>
+
+Type: C<String>
+
+Required. An endpoint to a Vertex AI model of the form
+`projects/{project}/locations/{location}/endpoints/{endpoint}` or
+`projects/{project}/locations/{location}/publishers/{publisher}/models/{model}`.
+Vertex AI API requests will be sent to this endpoint.
+
+=item * C<< $msg->unstructured_inference() >> / C<< $msg->unstructured_inference($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::AIInference::UnstructuredInference>)
+
+Optional. Requests and responses can be any arbitrary JSON object.
+
+=item * C<< $msg->service_account_email() >> / C<< $msg->service_account_email($value) >>
+
+Type: C<String>
+
+Optional. The service account to use to make prediction requests against
+endpoints. The resource creator or updater that specifies this field must
+have `iam.serviceAccounts.actAs` permission on the service account. If not
+specified, the Pub/Sub [service
+agent](https://cloud.google.com/iam/docs/service-agents),
+service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::MessageTransform
+
+All supported message transforms types.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->javascript_udf() >> / C<< $msg->javascript_udf($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::JavaScriptUDF>)
+
+Optional. JavaScript User Defined Function. If multiple JavaScriptUDF's
+are specified on a resource, each must have a unique `function_name`.
+
+=item * C<< $msg->compression() >> / C<< $msg->compression($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Compression>)
+
+Optional. Compression/Decompression.
+
+=item * C<< $msg->ai_inference() >> / C<< $msg->ai_inference($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::AIInference>)
+
+Optional. AI Inference. Specifies the Vertex AI endpoint that inference
+requests built from the Pub/Sub message data and provided parameters will
+be sent to.
+
+=item * C<< $msg->enabled() >> / C<< $msg->enabled($value) >>
+
+Type: C<Bool>
+
+Optional. This field is deprecated, use the `disabled` field to disable
+transforms.
+
+=item * C<< $msg->disabled() >> / C<< $msg->disabled($value) >>
+
+Type: C<Bool>
+
+Optional. If true, the transform is disabled and will not be applied to
+messages. Defaults to `false`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::Topic
+
+A topic resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Identifier. The name of the topic. It must have the format
+`"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
+and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
+underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
+signs (`%`). It must be between 3 and 255 characters in length, and it
+must not start with `"goog"`.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Topic::LabelsEntry>)
+
+Optional. See [Creating and managing labels]
+(https://cloud.google.com/pubsub/docs/labels).
+
+=item * C<< $msg->message_storage_policy() >> / C<< $msg->message_storage_policy($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::MessageStoragePolicy>)
+
+Optional. Policy constraining the set of Google Cloud Platform regions
+where messages published to the topic may be stored. If not present, then
+no constraints are in effect.
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<String>
+
+Optional. The resource name of the Cloud KMS CryptoKey to be used to
+protect access to messages published on this topic.
+
+The expected format is `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
+
+=item * C<< $msg->schema_settings() >> / C<< $msg->schema_settings($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::SchemaSettings>)
+
+Optional. Settings for validating messages published against a schema.
+
+=item * C<< $msg->satisfies_pzs() >> / C<< $msg->satisfies_pzs($value) >>
+
+Type: C<Bool>
+
+Optional. Reserved for future use. This field is set only in responses from
+the server; it is ignored if it is set in any requests.
+
+=item * C<< $msg->message_retention_duration() >> / C<< $msg->message_retention_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Indicates the minimum duration to retain a message after it is
+published to the topic. If this field is set, messages published to the
+topic in the last `message_retention_duration` are always available to
+subscribers. For instance, it allows any attached subscription to [seek to
+a
+timestamp](https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time)
+that is up to `message_retention_duration` in the past. If this field is
+not set, message retention is controlled by settings on individual
+subscriptions. Cannot be more than 31 days or less than 10 minutes.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::Topic::State>)
+
+Output only. An output-only field indicating the state of the topic.
+
+=item * C<< $msg->ingestion_data_source_settings() >> / C<< $msg->ingestion_data_source_settings($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::IngestionDataSourceSettings>)
+
+Optional. Settings for ingestion from a data source into this topic.
+
+=item * C<< $msg->message_transforms() >> / C<< $msg->message_transforms($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::MessageTransform>)
+
+Optional. Transforms to be applied to messages published to the topic.
+Transforms are applied in the order specified.
+
+=item * C<< $msg->tags() >> / C<< $msg->tags($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Topic::TagsEntry>)
+
+Optional. Input only. Immutable. Tag keys/values directly bound to this
+resource. For example:
+  "123/environment": "production",
+  "123/costCenter": "marketing"
+See
+https://{$universe.dns_names.final_documentation_domain}/pubsub/docs/tags
+for more information on using tags with Pub/Sub resources.
+
+=back
+
+=head3 Enum: Topic::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<INGESTION_RESOURCE_ERROR> => C<2>
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::PubsubMessage
+
+A message that is published by publishers and consumed by subscribers. The
+message must contain either a non-empty data field or at least one attribute.
+Note that client libraries represent this object differently
+depending on the language. See the corresponding [client library
+documentation](https://cloud.google.com/pubsub/docs/reference/libraries) for
+more information. See [quotas and limits]
+(https://cloud.google.com/pubsub/quotas) for more information about message
+limits.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+Optional. The message data field. If this field is empty, the message must
+contain at least one attribute.
+
+=item * C<< $msg->attributes() >> / C<< $msg->attributes($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PubsubMessage::AttributesEntry>)
+
+Optional. Attributes for this message. If this field is empty, the message
+must contain non-empty data. This can be used to filter messages on the
+subscription.
+
+=item * C<< $msg->message_id() >> / C<< $msg->message_id($value) >>
+
+Type: C<String>
+
+ID of this message, assigned by the server when the message is published.
+Guaranteed to be unique within the topic. This value may be read by a
+subscriber that receives a `PubsubMessage` via a `Pull` call or a push
+delivery. It must not be populated by the publisher in a `Publish` call.
+
+=item * C<< $msg->publish_time() >> / C<< $msg->publish_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time at which the message was published, populated by the server when
+it receives the `Publish` call. It must not be populated by the
+publisher in a `Publish` call.
+
+=item * C<< $msg->ordering_key() >> / C<< $msg->ordering_key($value) >>
+
+Type: C<String>
+
+Optional. If non-empty, identifies related messages for which publish order
+should be respected. If a `Subscription` has `enable_message_ordering` set
+to `true`, messages published with the same non-empty `ordering_key` value
+will be delivered to subscribers in the order in which they are received by
+the Pub/Sub system. All `PubsubMessage`s published in a given
+`PublishRequest` must specify the same `ordering_key` value. For more
+information, see [ordering
+messages](https://cloud.google.com/pubsub/docs/ordering).
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::GetTopicRequest
+
+Request for the GetTopic method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+Required. The name of the topic to get.
+Format is `projects/{project}/topics/{topic}`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::UpdateTopicRequest
+
+Request for the UpdateTopic method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Topic>)
+
+Required. The updated topic object.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Indicates which fields in the provided topic to update. Must be
+specified and non-empty. Note that if `update_mask` contains
+"message_storage_policy" but the `message_storage_policy` is not set in
+the `topic` provided above, then the updated value is determined by the
+policy configured at the project or organization level.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::PublishRequest
+
+Request for the Publish method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+Required. The messages in the request will be published on this topic.
+Format is `projects/{project}/topics/{topic}`.
+
+=item * C<< $msg->messages() >> / C<< $msg->messages($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PubsubMessage>)
+
+Required. The messages to publish.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::PublishResponse
+
+Response for the `Publish` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message_ids() >> / C<< $msg->message_ids($value) >>
+
+Type: C<String>
+
+Optional. The server-assigned ID of each published message, in the same
+order as the messages in the request. IDs are guaranteed to be unique
+within the topic.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListTopicsRequest
+
+Request for the `ListTopics` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. The name of the project in which to list topics.
+Format is `projects/{project-id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of topics to return.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The value returned by the last `ListTopicsResponse`; indicates
+that this is a continuation of a prior `ListTopics` call, and that the
+system should return the next page of data.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListTopicsResponse
+
+Response for the `ListTopics` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topics() >> / C<< $msg->topics($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Topic>)
+
+Optional. The resulting topics.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Optional. If not empty, indicates that there may be more topics that match
+the request; this value should be passed in a new `ListTopicsRequest`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListTopicSubscriptionsRequest
+
+Request for the `ListTopicSubscriptions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+Required. The name of the topic that subscriptions are attached to.
+Format is `projects/{project}/topics/{topic}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of subscription names to return.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The value returned by the last `ListTopicSubscriptionsResponse`;
+indicates that this is a continuation of a prior `ListTopicSubscriptions`
+call, and that the system should return the next page of data.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListTopicSubscriptionsResponse
+
+Response for the `ListTopicSubscriptions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscriptions() >> / C<< $msg->subscriptions($value) >>
+
+Type: C<String>
+
+Optional. The names of subscriptions attached to the topic specified in the
+request.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Optional. If not empty, indicates that there may be more subscriptions that
+match the request; this value should be passed in a new
+`ListTopicSubscriptionsRequest` to get more subscriptions.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListTopicSnapshotsRequest
+
+Request for the `ListTopicSnapshots` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+Required. The name of the topic that snapshots are attached to.
+Format is `projects/{project}/topics/{topic}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of snapshot names to return.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The value returned by the last `ListTopicSnapshotsResponse`;
+indicates that this is a continuation of a prior `ListTopicSnapshots` call,
+and that the system should return the next page of data.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListTopicSnapshotsResponse
+
+Response for the `ListTopicSnapshots` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->snapshots() >> / C<< $msg->snapshots($value) >>
+
+Type: C<String>
+
+Optional. The names of the snapshots that match the request.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Optional. If not empty, indicates that there may be more snapshots that
+match the request; this value should be passed in a new
+`ListTopicSnapshotsRequest` to get more snapshots.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::DeleteTopicRequest
+
+Request for the `DeleteTopic` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+Required. Name of the topic to delete.
+Format is `projects/{project}/topics/{topic}`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::DetachSubscriptionRequest
+
+Request for the DetachSubscription method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The subscription to detach.
+Format is `projects/{project}/subscriptions/{subscription}`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::DetachSubscriptionResponse
+
+Response for the DetachSubscription method.
+Reserved for future use.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Pubsub::V1::Pubsub::Subscription
+
+A subscription resource. If none of `push_config`, `bigquery_config`,
+`cloud_storage_config`, or `bigtable_config` is set, then the subscriber will
+pull and ack messages using API methods. At most one of these fields may be
+set.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Identifier. The name of the subscription. It must have the format
+`"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+start with a letter, and contain only letters (`[A-Za-z]`), numbers
+(`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+in length, and it must not start with `"goog"`.
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+Required. The name of the topic from which this subscription is receiving
+messages. Format is `projects/{project}/topics/{topic}`. The value of this
+field will be `_deleted-topic_` if the topic has been deleted.
+
+=item * C<< $msg->push_config() >> / C<< $msg->push_config($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PushConfig>)
+
+Optional. If push delivery is used with this subscription, this field is
+used to configure it.
+
+=item * C<< $msg->bigquery_config() >> / C<< $msg->bigquery_config($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::BigQueryConfig>)
+
+Optional. If delivery to BigQuery is used with this subscription, this
+field is used to configure it.
+
+=item * C<< $msg->cloud_storage_config() >> / C<< $msg->cloud_storage_config($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::CloudStorageConfig>)
+
+Optional. If delivery to Google Cloud Storage is used with this
+subscription, this field is used to configure it.
+
+=item * C<< $msg->bigtable_config() >> / C<< $msg->bigtable_config($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::BigtableConfig>)
+
+Optional. If delivery to Bigtable is used with this subscription, this
+field is used to configure it.
+
+=item * C<< $msg->ack_deadline_seconds() >> / C<< $msg->ack_deadline_seconds($value) >>
+
+Type: C<Int32>
+
+Optional. The approximate amount of time (on a best-effort basis) Pub/Sub
+waits for the subscriber to acknowledge receipt before resending the
+message. In the interval after the message is delivered and before it is
+acknowledged, it is considered to be _outstanding_. During that time
+period, the message will not be redelivered (on a best-effort basis).
+
+For pull subscriptions, this value is used as the initial value for the ack
+deadline. To override this value for a given message, call
+`ModifyAckDeadline` with the corresponding `ack_id` if using
+non-streaming pull or send the `ack_id` in a
+`StreamingModifyAckDeadlineRequest` if using streaming pull.
+The minimum custom deadline you can specify is 10 seconds.
+The maximum custom deadline you can specify is 600 seconds (10 minutes).
+If this parameter is 0, a default value of 10 seconds is used.
+
+For push delivery, this value is also used to set the request timeout for
+the call to the push endpoint.
+
+If the subscriber never acknowledges the message, the Pub/Sub
+system will eventually redeliver the message.
+
+=item * C<< $msg->retain_acked_messages() >> / C<< $msg->retain_acked_messages($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates whether to retain acknowledged messages. If true, then
+messages are not expunged from the subscription's backlog, even if they are
+acknowledged, until they fall out of the `message_retention_duration`
+window. This must be true if you would like to [`Seek` to a timestamp]
+(https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time) in
+the past to replay previously-acknowledged messages.
+
+=item * C<< $msg->message_retention_duration() >> / C<< $msg->message_retention_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. How long to retain unacknowledged messages in the subscription's
+backlog, from the moment a message is published. If `retain_acked_messages`
+is true, then this also configures the retention of acknowledged messages,
+and thus configures how far back in time a `Seek` can be done. Defaults to
+7 days. Cannot be more than 31 days or less than 10 minutes.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Subscription::LabelsEntry>)
+
+Optional. See [Creating and managing
+labels](https://cloud.google.com/pubsub/docs/labels).
+
+=item * C<< $msg->enable_message_ordering() >> / C<< $msg->enable_message_ordering($value) >>
+
+Type: C<Bool>
+
+Optional. If true, messages published with the same `ordering_key` in
+`PubsubMessage` will be delivered to the subscribers in the order in which
+they are received by the Pub/Sub system. Otherwise, they may be delivered
+in any order.
+
+=item * C<< $msg->expiration_policy() >> / C<< $msg->expiration_policy($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::ExpirationPolicy>)
+
+Optional. A policy that specifies the conditions for this subscription's
+expiration. A subscription is considered active as long as any connected
+subscriber is successfully consuming messages from the subscription or is
+issuing operations on the subscription. If `expiration_policy` is not set,
+a *default policy* with `ttl` of 31 days will be used. The minimum allowed
+value for `expiration_policy.ttl` is 1 day. If `expiration_policy` is set,
+but `expiration_policy.ttl` is not set, the subscription never expires.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. An expression written in the Pub/Sub [filter
+language](https://cloud.google.com/pubsub/docs/filtering). If non-empty,
+then only `PubsubMessage`s whose `attributes` field matches the filter are
+delivered on this subscription. If empty, then no messages are filtered
+out.
+
+=item * C<< $msg->dead_letter_policy() >> / C<< $msg->dead_letter_policy($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::DeadLetterPolicy>)
+
+Optional. A policy that specifies the conditions for dead lettering
+messages in this subscription. If dead_letter_policy is not set, dead
+lettering is disabled.
+
+The Pub/Sub service account associated with this subscriptions's
+parent project (i.e.,
+service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have
+permission to Acknowledge() messages on this subscription.
+
+=item * C<< $msg->retry_policy() >> / C<< $msg->retry_policy($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::RetryPolicy>)
+
+Optional. A policy that specifies how Pub/Sub retries message delivery for
+this subscription.
+
+If not set, the default retry policy is applied. This generally implies
+that messages will be retried as soon as possible for healthy subscribers.
+RetryPolicy will be triggered on NACKs or acknowledgment deadline exceeded
+events for a given message.
+
+=item * C<< $msg->detached() >> / C<< $msg->detached($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates whether the subscription is detached from its topic.
+Detached subscriptions don't receive messages from their topic and don't
+retain any backlog. `Pull` and `StreamingPull` requests will return
+FAILED_PRECONDITION. If the subscription is a push subscription, pushes to
+the endpoint will not be made.
+
+=item * C<< $msg->enable_exactly_once_delivery() >> / C<< $msg->enable_exactly_once_delivery($value) >>
+
+Type: C<Bool>
+
+Optional. If true, Pub/Sub provides the following guarantees for the
+delivery of a message with a given value of `message_id` on this
+subscription:
+
+* The message sent to a subscriber is guaranteed not to be resent
+before the message's acknowledgment deadline expires.
+* An acknowledged message will not be resent to a subscriber.
+
+Note that subscribers may still receive multiple copies of a message
+when `enable_exactly_once_delivery` is true if the message was published
+multiple times by a publisher client. These copies are  considered distinct
+by Pub/Sub and have distinct `message_id` values.
+
+=item * C<< $msg->topic_message_retention_duration() >> / C<< $msg->topic_message_retention_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Output only. Indicates the minimum duration for which a message is retained
+after it is published to the subscription's topic. If this field is set,
+messages published to the subscription's topic in the last
+`topic_message_retention_duration` are always available to subscribers. See
+the `message_retention_duration` field in `Topic`. This field is set only
+in responses from the server; it is ignored if it is set in any requests.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::Subscription::State>)
+
+Output only. An output-only field indicating whether or not the
+subscription can receive messages.
+
+=item * C<< $msg->analytics_hub_subscription_info() >> / C<< $msg->analytics_hub_subscription_info($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Subscription::AnalyticsHubSubscriptionInfo>)
+
+Output only. Information about the associated Analytics Hub subscription.
+Only set if the subscription is created by Analytics Hub.
+
+=item * C<< $msg->message_transforms() >> / C<< $msg->message_transforms($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::MessageTransform>)
+
+Optional. Transforms to be applied to messages before they are delivered to
+subscribers. Transforms are applied in the order specified.
+
+=item * C<< $msg->tags() >> / C<< $msg->tags($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Subscription::TagsEntry>)
+
+Optional. Input only. Immutable. Tag keys/values directly bound to this
+resource. For example:
+  "123/environment": "production",
+  "123/costCenter": "marketing"
+See
+https://{$universe.dns_names.final_documentation_domain}/pubsub/docs/tags
+for more information on using tags with Pub/Sub resources.
+
+=back
+
+=head3 Enum: Subscription::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<RESOURCE_ERROR> => C<2>
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::RetryPolicy
+
+A policy that specifies how Pub/Sub retries message delivery.
+
+Retry delay will be exponential based on provided minimum and maximum
+backoffs. https://en.wikipedia.org/wiki/Exponential_backoff.
+
+RetryPolicy will be triggered on NACKs or acknowledgment deadline exceeded
+events for a given message.
+
+Retry Policy is implemented on a best effort basis. At times, the delay
+between consecutive deliveries may not match the configuration. That is,
+delay can be more or less than configured backoff.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->minimum_backoff() >> / C<< $msg->minimum_backoff($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The minimum delay between consecutive deliveries of a given
+message. Value should be between 0 and 600 seconds. Defaults to 10 seconds.
+
+=item * C<< $msg->maximum_backoff() >> / C<< $msg->maximum_backoff($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The maximum delay between consecutive deliveries of a given
+message. Value should be between 0 and 600 seconds. Defaults to 600
+seconds.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::DeadLetterPolicy
+
+Dead lettering is done on a best effort basis. The same message might be
+dead lettered multiple times.
+
+If validation on any of the fields fails at subscription creation/updation,
+the create/update subscription request will fail.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dead_letter_topic() >> / C<< $msg->dead_letter_topic($value) >>
+
+Type: C<String>
+
+Optional. The name of the topic to which dead letter messages should be
+published. Format is `projects/{project}/topics/{topic}`.The Pub/Sub
+service account associated with the enclosing subscription's parent project
+(i.e., service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must
+have permission to Publish() to this topic.
+
+The operation will fail if the topic does not exist.
+Users should ensure that there is a subscription attached to this topic
+since messages published to a topic with no subscriptions are lost.
+
+=item * C<< $msg->max_delivery_attempts() >> / C<< $msg->max_delivery_attempts($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of delivery attempts for any message. The
+value must be between 5 and 100.
+
+The number of delivery attempts is defined as 1 + (the sum of number of
+NACKs and number of times the acknowledgment deadline has been exceeded
+for the message).
+
+A NACK is any call to ModifyAckDeadline with a 0 deadline. Note that
+client libraries may automatically extend ack_deadlines.
+
+This field will be honored on a best effort basis.
+
+If this parameter is 0, a default value of 5 is used.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ExpirationPolicy
+
+A policy that specifies the conditions for resource expiration (i.e.,
+automatic resource deletion).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->ttl() >> / C<< $msg->ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Specifies the "time-to-live" duration for an associated resource.
+The resource expires if it is not active for a period of `ttl`. The
+definition of "activity" depends on the type of the associated resource.
+The minimum and maximum allowed values for `ttl` depend on the type of the
+associated resource, as well. If `ttl` is not set, the associated resource
+never expires.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::PushConfig
+
+Configuration for a push delivery endpoint.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->push_endpoint() >> / C<< $msg->push_endpoint($value) >>
+
+Type: C<String>
+
+Optional. A URL locating the endpoint to which messages should be pushed.
+For example, a Webhook endpoint might use `https://example.com/push`.
+
+=item * C<< $msg->attributes() >> / C<< $msg->attributes($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PushConfig::AttributesEntry>)
+
+Optional. Endpoint configuration attributes that can be used to control
+different aspects of the message delivery.
+
+The only currently supported attribute is `x-goog-version`, which you can
+use to change the format of the pushed message. This attribute
+indicates the version of the data expected by the endpoint. This
+controls the shape of the pushed message (i.e., its fields and metadata).
+
+If not present during the `CreateSubscription` call, it will default to
+the version of the Pub/Sub API used to make such call. If not present in a
+`ModifyPushConfig` call, its value will not be changed. `GetSubscription`
+calls will always return a valid version, even if the subscription was
+created without this attribute.
+
+The only supported values for the `x-goog-version` attribute are:
+
+* `v1beta1`: uses the push format defined in the v1beta1 Pub/Sub API.
+* `v1` or `v1beta2`: uses the push format defined in the v1 Pub/Sub API.
+
+For example:
+`attributes { "x-goog-version": "v1" }`
+
+=item * C<< $msg->oidc_token() >> / C<< $msg->oidc_token($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PushConfig::OidcToken>)
+
+Optional. If specified, Pub/Sub will generate and attach an OIDC JWT
+token as an `Authorization` header in the HTTP request for every pushed
+message.
+
+=item * C<< $msg->pubsub_wrapper() >> / C<< $msg->pubsub_wrapper($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PushConfig::PubsubWrapper>)
+
+Optional. When set, the payload to the push endpoint is in the form of
+the JSON representation of a PubsubMessage
+(https://cloud.google.com/pubsub/docs/reference/rpc/google.pubsub.v1#pubsubmessage).
+
+=item * C<< $msg->no_wrapper() >> / C<< $msg->no_wrapper($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PushConfig::NoWrapper>)
+
+Optional. When set, the payload to the push endpoint is not wrapped.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::BigQueryConfig
+
+Configuration for a BigQuery subscription.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->table() >> / C<< $msg->table($value) >>
+
+Type: C<String>
+
+Optional. The name of the table to which to write data, of the form
+{projectId}.{datasetId}.{tableId}
+
+=item * C<< $msg->use_topic_schema() >> / C<< $msg->use_topic_schema($value) >>
+
+Type: C<Bool>
+
+Optional. When true, use the topic's schema as the columns to write to in
+BigQuery, if it exists. `use_topic_schema` and `use_table_schema` cannot be
+enabled at the same time.
+
+=item * C<< $msg->write_metadata() >> / C<< $msg->write_metadata($value) >>
+
+Type: C<Bool>
+
+Optional. When true, write the subscription name, message_id, publish_time,
+attributes, and ordering_key to additional columns in the table. The
+subscription name, message_id, and publish_time fields are put in their own
+columns while all other message properties (other than data) are written to
+a JSON object in the attributes column.
+
+=item * C<< $msg->drop_unknown_fields() >> / C<< $msg->drop_unknown_fields($value) >>
+
+Type: C<Bool>
+
+Optional. If true and `use_topic_schema` is true, drops any fields that are
+part of the topic schema that are not part of the BigQuery table schema
+when writing to BigQuery. Otherwise, the schemas must be kept in sync and
+any messages with extra fields are not written and remain in the
+subscription's backlog. If true and `use_table_schema` is true, drops any
+fields in the message that are not part of the BigQuery table schema when
+writing to BigQuery. Otherwise, the write to BigQuery will fail.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::BigQueryConfig::State>)
+
+Output only. An output-only field that indicates whether or not the
+subscription can receive messages.
+
+=item * C<< $msg->use_table_schema() >> / C<< $msg->use_table_schema($value) >>
+
+Type: C<Bool>
+
+Optional. When true, use the BigQuery table's schema as the columns to
+write to in BigQuery. `use_table_schema` and `use_topic_schema` cannot be
+enabled at the same time.
+
+=item * C<< $msg->service_account_email() >> / C<< $msg->service_account_email($value) >>
+
+Type: C<String>
+
+Optional. The service account to use to write to BigQuery. The subscription
+creator or updater that specifies this field must have
+`iam.serviceAccounts.actAs` permission on the service account. If not
+specified, the Pub/Sub [service
+agent](https://cloud.google.com/iam/docs/service-agents),
+service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used.
+
+=back
+
+=head3 Enum: BigQueryConfig::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<PERMISSION_DENIED> => C<2>
+
+=item * C<NOT_FOUND> => C<3>
+
+=item * C<SCHEMA_MISMATCH> => C<4>
+
+=item * C<IN_TRANSIT_LOCATION_RESTRICTION> => C<5>
+
+=item * C<VERTEX_AI_LOCATION_RESTRICTION> => C<6>
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::BigtableConfig
+
+Configuration for a Bigtable subscription, which will write a Pub/Sub message
+to a Bigtable row. See the ColumnFamilyMapping documentation below for
+details on how the row keys and columns will be written.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->table() >> / C<< $msg->table($value) >>
+
+Type: C<String>
+
+Optional. The unique name of the table to write messages to.
+
+Values are of the form
+`projects/<project>/instances/<instance>/tables/<table>`.
+
+=item * C<< $msg->app_profile_id() >> / C<< $msg->app_profile_id($value) >>
+
+Type: C<String>
+
+Optional. The app profile to use for the Bigtable writes. If not specified,
+the "default" application profile will be used. The app profile must use
+single-cluster routing.
+
+=item * C<< $msg->service_account_email() >> / C<< $msg->service_account_email($value) >>
+
+Type: C<String>
+
+Optional. The service account to use to write to Bigtable. The subscription
+creator or updater that specifies this field must have
+`iam.serviceAccounts.actAs` permission on the service account. If not
+specified, the Pub/Sub [service
+agent](https://cloud.google.com/iam/docs/service-agents),
+service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used.
+
+=item * C<< $msg->write_metadata() >> / C<< $msg->write_metadata($value) >>
+
+Type: C<Bool>
+
+Optional. When true, write the subscription name, message_id, publish_time,
+attributes, and ordering_key to additional columns in the table under the
+pubsub_metadata column family. The subscription name, message_id, and
+publish_time fields are put in their own columns while all other message
+properties (other than data) are written to a JSON object in the attributes
+column.
+
+=item * C<< $msg->column_family_mapping() >> / C<< $msg->column_family_mapping($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::BigtableConfig::ColumnFamilyMapping>)
+
+Optional. Configuration that allows writing row keys and/or columns based
+on fields in the input message. The input message format must be JSON if
+this field is set.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::BigtableConfig::State>)
+
+Output only. An output-only field that indicates whether or not the
+subscription can receive messages.
+
+=back
+
+=head3 Enum: BigtableConfig::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<NOT_FOUND> => C<2>
+
+=item * C<APP_PROFILE_MISCONFIGURED> => C<3>
+
+=item * C<PERMISSION_DENIED> => C<4>
+
+=item * C<SCHEMA_MISMATCH> => C<5>
+
+=item * C<IN_TRANSIT_LOCATION_RESTRICTION> => C<6>
+
+=item * C<VERTEX_AI_LOCATION_RESTRICTION> => C<7>
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::CloudStorageConfig
+
+Configuration for a Cloud Storage subscription.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Required. User-provided name for the Cloud Storage bucket.
+The bucket must be created by the user. The bucket name must be without
+any prefix like "gs://". See the [bucket naming
+requirements] (https://cloud.google.com/storage/docs/buckets#naming).
+
+=item * C<< $msg->filename_prefix() >> / C<< $msg->filename_prefix($value) >>
+
+Type: C<String>
+
+Optional. User-provided prefix for Cloud Storage filename. See the [object
+naming requirements](https://cloud.google.com/storage/docs/objects#naming).
+
+=item * C<< $msg->filename_suffix() >> / C<< $msg->filename_suffix($value) >>
+
+Type: C<String>
+
+Optional. User-provided suffix for Cloud Storage filename. See the [object
+naming requirements](https://cloud.google.com/storage/docs/objects#naming).
+Must not end in "/".
+
+=item * C<< $msg->filename_datetime_format() >> / C<< $msg->filename_datetime_format($value) >>
+
+Type: C<String>
+
+Optional. User-provided format string specifying how to represent datetimes
+in Cloud Storage filenames. See the [datetime format
+guidance](https://cloud.google.com/pubsub/docs/create-cloudstorage-subscription#file_names).
+
+=item * C<< $msg->text_config() >> / C<< $msg->text_config($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::CloudStorageConfig::TextConfig>)
+
+Optional. If set, message data will be written to Cloud Storage in text
+format.
+
+=item * C<< $msg->avro_config() >> / C<< $msg->avro_config($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::CloudStorageConfig::AvroConfig>)
+
+Optional. If set, message data will be written to Cloud Storage in Avro
+format.
+
+=item * C<< $msg->max_duration() >> / C<< $msg->max_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The maximum duration that can elapse before a new Cloud Storage
+file is created. Min 1 minute, max 10 minutes, default 5 minutes. May not
+exceed the subscription's acknowledgment deadline.
+
+=item * C<< $msg->max_bytes() >> / C<< $msg->max_bytes($value) >>
+
+Type: C<Int64>
+
+Optional. The maximum bytes that can be written to a Cloud Storage file
+before a new file is created. Min 1 KB, max 10 GiB. The max_bytes limit may
+be exceeded in cases where messages are larger than the limit.
+
+=item * C<< $msg->max_messages() >> / C<< $msg->max_messages($value) >>
+
+Type: C<Int64>
+
+Optional. The maximum number of messages that can be written to a Cloud
+Storage file before a new file is created. Min 1000 messages.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::CloudStorageConfig::State>)
+
+Output only. An output-only field that indicates whether or not the
+subscription can receive messages.
+
+=item * C<< $msg->service_account_email() >> / C<< $msg->service_account_email($value) >>
+
+Type: C<String>
+
+Optional. The service account to use to write to Cloud Storage. The
+subscription creator or updater that specifies this field must have
+`iam.serviceAccounts.actAs` permission on the service account. If not
+specified, the Pub/Sub
+[service agent](https://cloud.google.com/iam/docs/service-agents),
+service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used.
+
+=back
+
+=head3 Enum: CloudStorageConfig::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<PERMISSION_DENIED> => C<2>
+
+=item * C<NOT_FOUND> => C<3>
+
+=item * C<IN_TRANSIT_LOCATION_RESTRICTION> => C<4>
+
+=item * C<SCHEMA_MISMATCH> => C<5>
+
+=item * C<VERTEX_AI_LOCATION_RESTRICTION> => C<6>
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ReceivedMessage
+
+A message and its corresponding acknowledgment ID.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->ack_id() >> / C<< $msg->ack_id($value) >>
+
+Type: C<String>
+
+Optional. This ID can be used to acknowledge the received message.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PubsubMessage>)
+
+Optional. The message.
+
+=item * C<< $msg->delivery_attempt() >> / C<< $msg->delivery_attempt($value) >>
+
+Type: C<Int32>
+
+Optional. The approximate number of times that Pub/Sub has attempted to
+deliver the associated message to a subscriber.
+
+More precisely, this is 1 + (number of NACKs) +
+(number of ack_deadline exceeds) for this message.
+
+A NACK is any call to ModifyAckDeadline with a 0 deadline. An ack_deadline
+exceeds event is whenever a message is not acknowledged within
+ack_deadline. Note that ack_deadline is initially
+Subscription.ackDeadlineSeconds, but may get extended automatically by
+the client library.
+
+Upon the first delivery of a given message, `delivery_attempt` will have a
+value of 1. The value is calculated at best effort and is approximate.
+
+If a DeadLetterPolicy is not set on the subscription, this will be 0.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::GetSubscriptionRequest
+
+Request for the GetSubscription method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The name of the subscription to get.
+Format is `projects/{project}/subscriptions/{sub}`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::UpdateSubscriptionRequest
+
+Request for the UpdateSubscription method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Subscription>)
+
+Required. The updated subscription object.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Indicates which fields in the provided subscription to update.
+Must be specified and non-empty.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListSubscriptionsRequest
+
+Request for the `ListSubscriptions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. The name of the project in which to list subscriptions.
+Format is `projects/{project-id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of subscriptions to return.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The value returned by the last `ListSubscriptionsResponse`;
+indicates that this is a continuation of a prior `ListSubscriptions` call,
+and that the system should return the next page of data.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListSubscriptionsResponse
+
+Response for the `ListSubscriptions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscriptions() >> / C<< $msg->subscriptions($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Subscription>)
+
+Optional. The subscriptions that match the request.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Optional. If not empty, indicates that there may be more subscriptions that
+match the request; this value should be passed in a new
+`ListSubscriptionsRequest` to get more subscriptions.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::DeleteSubscriptionRequest
+
+Request for the DeleteSubscription method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The subscription to delete.
+Format is `projects/{project}/subscriptions/{sub}`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ModifyPushConfigRequest
+
+Request for the ModifyPushConfig method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The name of the subscription.
+Format is `projects/{project}/subscriptions/{sub}`.
+
+=item * C<< $msg->push_config() >> / C<< $msg->push_config($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PushConfig>)
+
+Required. The push configuration for future deliveries.
+
+An empty `pushConfig` indicates that the Pub/Sub system should
+stop pushing messages from the given subscription and allow
+messages to be pulled and acknowledged - effectively pausing
+the subscription if `Pull` or `StreamingPull` is not called.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::PullRequest
+
+Request for the `Pull` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The subscription from which messages should be pulled.
+Format is `projects/{project}/subscriptions/{sub}`.
+
+=item * C<< $msg->return_immediately() >> / C<< $msg->return_immediately($value) >>
+
+Type: C<Bool>
+
+Optional. If this field set to true, the system will respond immediately
+even if it there are no messages available to return in the `Pull`
+response. Otherwise, the system may wait (for a bounded amount of time)
+until at least one message is available, rather than returning no messages.
+Warning: setting this field to `true` is discouraged because it adversely
+impacts the performance of `Pull` operations. We recommend that users do
+not set this field.
+
+=item * C<< $msg->max_messages() >> / C<< $msg->max_messages($value) >>
+
+Type: C<Int32>
+
+Required. The maximum number of messages to return for this request. Must
+be a positive integer. The Pub/Sub system may return fewer than the number
+specified.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::PullResponse
+
+Response for the `Pull` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->received_messages() >> / C<< $msg->received_messages($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::ReceivedMessage>)
+
+Optional. Received Pub/Sub messages. The list will be empty if there are no
+more messages available in the backlog, or if no messages could be returned
+before the request timeout. For JSON, the response can be entirely
+empty. The Pub/Sub system may return fewer than the `maxMessages` requested
+even if there are more messages available in the backlog.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ModifyAckDeadlineRequest
+
+Request for the ModifyAckDeadline method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The name of the subscription.
+Format is `projects/{project}/subscriptions/{sub}`.
+
+=item * C<< $msg->ack_ids() >> / C<< $msg->ack_ids($value) >>
+
+Type: C<String>
+
+Required. List of acknowledgment IDs.
+
+=item * C<< $msg->ack_deadline_seconds() >> / C<< $msg->ack_deadline_seconds($value) >>
+
+Type: C<Int32>
+
+Required. The new ack deadline with respect to the time this request was
+sent to the Pub/Sub system. For example, if the value is 10, the new ack
+deadline will expire 10 seconds after the `ModifyAckDeadline` call was
+made. Specifying zero might immediately make the message available for
+delivery to another subscriber client. This typically results in an
+increase in the rate of message redeliveries (that is, duplicates).
+The minimum deadline you can specify is 0 seconds.
+The maximum deadline you can specify in a single request is 600 seconds
+(10 minutes).
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::AcknowledgeRequest
+
+Request for the Acknowledge method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The subscription whose message is being acknowledged.
+Format is `projects/{project}/subscriptions/{sub}`.
+
+=item * C<< $msg->ack_ids() >> / C<< $msg->ack_ids($value) >>
+
+Type: C<String>
+
+Required. The acknowledgment ID for the messages being acknowledged that
+was returned by the Pub/Sub system in the `Pull` response. Must not be
+empty.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::StreamingPullRequest
+
+Request for the `StreamingPull` streaming RPC method. This request is used to
+establish the initial stream as well as to stream acknowledgments and ack
+deadline modifications from the client to the server.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The subscription for which to initialize the new stream. This
+must be provided in the first request on the stream, and must not be set in
+subsequent requests from client to server.
+Format is `projects/{project}/subscriptions/{sub}`.
+
+=item * C<< $msg->ack_ids() >> / C<< $msg->ack_ids($value) >>
+
+Type: C<String>
+
+Optional. List of acknowledgment IDs for acknowledging previously received
+messages (received on this stream or a different stream). If an ack ID has
+expired, the corresponding message may be redelivered later. Acknowledging
+a message more than once will not result in an error. If the acknowledgment
+ID is malformed, the stream will be aborted with status `INVALID_ARGUMENT`.
+
+=item * C<< $msg->modify_deadline_seconds() >> / C<< $msg->modify_deadline_seconds($value) >>
+
+Type: C<Int32>
+
+Optional. The list of new ack deadlines for the IDs listed in
+`modify_deadline_ack_ids`. The size of this list must be the same as the
+size of `modify_deadline_ack_ids`. If it differs the stream will be aborted
+with `INVALID_ARGUMENT`. Each element in this list is applied to the
+element in the same position in `modify_deadline_ack_ids`. The new ack
+deadline is with respect to the time this request was sent to the Pub/Sub
+system. Must be >= 0. For example, if the value is 10, the new ack deadline
+will expire 10 seconds after this request is received. If the value is 0,
+the message is immediately made available for another streaming or
+non-streaming pull request. If the value is < 0 (an error), the stream will
+be aborted with status `INVALID_ARGUMENT`.
+
+=item * C<< $msg->modify_deadline_ack_ids() >> / C<< $msg->modify_deadline_ack_ids($value) >>
+
+Type: C<String>
+
+Optional. List of acknowledgment IDs whose deadline will be modified based
+on the corresponding element in `modify_deadline_seconds`. This field can
+be used to indicate that more time is needed to process a message by the
+subscriber, or to make the message available for redelivery if the
+processing was interrupted.
+
+=item * C<< $msg->stream_ack_deadline_seconds() >> / C<< $msg->stream_ack_deadline_seconds($value) >>
+
+Type: C<Int32>
+
+Required. The ack deadline to use for the stream. This must be provided in
+the first request on the stream, but it can also be updated on subsequent
+requests from client to server. The minimum deadline you can specify is 10
+seconds. The maximum deadline you can specify is 600 seconds (10 minutes).
+
+=item * C<< $msg->client_id() >> / C<< $msg->client_id($value) >>
+
+Type: C<String>
+
+Optional. A unique identifier that is used to distinguish client instances
+from each other. Only needs to be provided on the initial request. When a
+stream disconnects and reconnects for the same stream, the client_id should
+be set to the same value so that state associated with the old stream can
+be transferred to the new stream. The same client_id should not be used for
+different client instances.
+
+=item * C<< $msg->max_outstanding_messages() >> / C<< $msg->max_outstanding_messages($value) >>
+
+Type: C<Int64>
+
+Optional. Flow control settings for the maximum number of outstanding
+messages. When there are `max_outstanding_messages` currently sent to the
+streaming pull client that have not yet been acked or nacked, the server
+stops sending more messages. The sending of messages resumes once the
+number of outstanding messages is less than this value. If the value is
+<= 0, there is no limit to the number of outstanding messages. This
+property can only be set on the initial StreamingPullRequest. If it is set
+on a subsequent request, the stream will be aborted with status
+`INVALID_ARGUMENT`.
+
+=item * C<< $msg->max_outstanding_bytes() >> / C<< $msg->max_outstanding_bytes($value) >>
+
+Type: C<Int64>
+
+Optional. Flow control settings for the maximum number of outstanding
+bytes. When there are `max_outstanding_bytes` or more worth of messages
+currently sent to the streaming pull client that have not yet been acked or
+nacked, the server will stop sending more messages. The sending of messages
+resumes once the number of outstanding bytes is less than this value. If
+the value is <= 0, there is no limit to the number of outstanding bytes.
+This property can only be set on the initial StreamingPullRequest. If it is
+set on a subsequent request, the stream will be aborted with status
+`INVALID_ARGUMENT`.
+
+=item * C<< $msg->protocol_version() >> / C<< $msg->protocol_version($value) >>
+
+Type: C<Int64>
+
+Optional. The protocol version used by the client. This property can only
+be set on the initial StreamingPullRequest. If it is set on a subsequent
+request, the stream will be aborted with status `INVALID_ARGUMENT`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::StreamingPullResponse
+
+Response for the `StreamingPull` method. This response is used to stream
+messages from the server to the client.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->received_messages() >> / C<< $msg->received_messages($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::ReceivedMessage>)
+
+Optional. Received Pub/Sub messages.
+
+=item * C<< $msg->acknowledge_confirmation() >> / C<< $msg->acknowledge_confirmation($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::StreamingPullResponse::AcknowledgeConfirmation>)
+
+Optional. This field will only be set if `enable_exactly_once_delivery` is
+set to `true` and is not guaranteed to be populated.
+
+=item * C<< $msg->modify_ack_deadline_confirmation() >> / C<< $msg->modify_ack_deadline_confirmation($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::StreamingPullResponse::ModifyAckDeadlineConfirmation>)
+
+Optional. This field will only be set if `enable_exactly_once_delivery` is
+set to `true` and is not guaranteed to be populated.
+
+=item * C<< $msg->subscription_properties() >> / C<< $msg->subscription_properties($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::StreamingPullResponse::SubscriptionProperties>)
+
+Optional. Properties associated with this subscription.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::CreateSnapshotRequest
+
+Request for the `CreateSnapshot` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. User-provided name for this snapshot. If the name is not provided
+in the request, the server will assign a random name for this snapshot on
+the same project as the subscription. Note that for REST API requests, you
+must specify a name.  See the [resource name
+rules](https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names).
+Format is `projects/{project}/snapshots/{snap}`.
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The subscription whose backlog the snapshot retains.
+Specifically, the created snapshot is guaranteed to retain:
+ (a) The existing backlog on the subscription. More precisely, this is
+     defined as the messages in the subscription's backlog that are
+     unacknowledged upon the successful completion of the
+     `CreateSnapshot` request; as well as:
+ (b) Any messages published to the subscription's topic following the
+     successful completion of the CreateSnapshot request.
+Format is `projects/{project}/subscriptions/{sub}`.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::CreateSnapshotRequest::LabelsEntry>)
+
+Optional. See [Creating and managing
+labels](https://cloud.google.com/pubsub/docs/labels).
+
+=item * C<< $msg->tags() >> / C<< $msg->tags($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::CreateSnapshotRequest::TagsEntry>)
+
+Optional. Input only. Immutable. Tag keys/values directly bound to this
+resource. For example:
+  "123/environment": "production",
+  "123/costCenter": "marketing"
+See
+https://{$universe.dns_names.final_documentation_domain}/pubsub/docs/tags
+for more information on using tags with Pub/Sub resources.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::UpdateSnapshotRequest
+
+Request for the UpdateSnapshot method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->snapshot() >> / C<< $msg->snapshot($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Snapshot>)
+
+Required. The updated snapshot object.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Indicates which fields in the provided snapshot to update.
+Must be specified and non-empty.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::Snapshot
+
+A snapshot resource. Snapshots are used in
+[Seek](https://cloud.google.com/pubsub/docs/replay-overview)
+operations, which allow you to manage message acknowledgments in bulk. That
+is, you can set the acknowledgment state of messages in an existing
+subscription to the state captured by a snapshot.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. The name of the snapshot.
+
+=item * C<< $msg->topic() >> / C<< $msg->topic($value) >>
+
+Type: C<String>
+
+Optional. The name of the topic from which this snapshot is retaining
+messages.
+
+=item * C<< $msg->expire_time() >> / C<< $msg->expire_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. The snapshot is guaranteed to exist up until this time.
+A newly-created snapshot expires no later than 7 days from the time of its
+creation. Its exact lifetime is determined at creation by the existing
+backlog in the source subscription. Specifically, the lifetime of the
+snapshot is `7 days - (age of oldest unacked message in the subscription)`.
+For example, consider a subscription whose oldest unacked message is 3 days
+old. If a snapshot is created from this subscription, the snapshot -- which
+will always capture this 3-day-old backlog as long as the snapshot
+exists -- will expire in 4 days. The service will refuse to create a
+snapshot that would expire in less than 1 hour after creation.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Snapshot::LabelsEntry>)
+
+Optional. See [Creating and managing labels]
+(https://cloud.google.com/pubsub/docs/labels).
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::GetSnapshotRequest
+
+Request for the GetSnapshot method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->snapshot() >> / C<< $msg->snapshot($value) >>
+
+Type: C<String>
+
+Required. The name of the snapshot to get.
+Format is `projects/{project}/snapshots/{snap}`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListSnapshotsRequest
+
+Request for the `ListSnapshots` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. The name of the project in which to list snapshots.
+Format is `projects/{project-id}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of snapshots to return.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The value returned by the last `ListSnapshotsResponse`; indicates
+that this is a continuation of a prior `ListSnapshots` call, and that the
+system should return the next page of data.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::ListSnapshotsResponse
+
+Response for the `ListSnapshots` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->snapshots() >> / C<< $msg->snapshots($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::Snapshot>)
+
+Optional. The resulting snapshots.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Optional. If not empty, indicates that there may be more snapshot that
+match the request; this value should be passed in a new
+`ListSnapshotsRequest`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::DeleteSnapshotRequest
+
+Request for the `DeleteSnapshot` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->snapshot() >> / C<< $msg->snapshot($value) >>
+
+Type: C<String>
+
+Required. The name of the snapshot to delete.
+Format is `projects/{project}/snapshots/{snap}`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::SeekRequest
+
+Request for the `Seek` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->subscription() >> / C<< $msg->subscription($value) >>
+
+Type: C<String>
+
+Required. The subscription to affect.
+
+=item * C<< $msg->time() >> / C<< $msg->time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. The time to seek to.
+Messages retained in the subscription that were published before this
+time are marked as acknowledged, and messages retained in the
+subscription that were published after this time are marked as
+unacknowledged. Note that this operation affects only those messages
+retained in the subscription (configured by the combination of
+`message_retention_duration` and `retain_acked_messages`). For example,
+if `time` corresponds to a point before the message retention
+window (or to a point before the system's notion of the subscription
+creation time), only retained messages will be marked as unacknowledged,
+and already-expunged messages will not be restored.
+
+=item * C<< $msg->snapshot() >> / C<< $msg->snapshot($value) >>
+
+Type: C<String>
+
+Optional. The snapshot to seek to. The snapshot's topic must be the same
+as that of the provided subscription. Format is
+`projects/{project}/snapshots/{snap}`.
+
+=back
+
+=head2 Google::Pubsub::V1::Pubsub::SeekResponse
+
+Response for the `Seek` method (this response is empty).
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Pubsub::V1::Pubsub::PubsubClientTelemetry
+
+Client-side telemetry about Pub/Sub requests, useful for debugging purposes.
+If the client opts to provide this information, it will be passed as a
+serialized proto in the `x-goog-pubsub-client-telemetry` header.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->publish_operation() >> / C<< $msg->publish_operation($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Pubsub::PubsubClientTelemetry::PublishOperation>)
+
+Optional. Telemetry about a `Publish` operation.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Pubsub::V1::Pubsub::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

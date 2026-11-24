@@ -1,0 +1,479 @@
+package Google::Cloud::Documentai::V1beta3::DocumentSchema;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    my $descriptor_b64 = <<'EOF';
+CjVnb29nbGUvY2xvdWQvZG9jdW1lbnRhaS92MWJldGEzL2RvY3VtZW50X3NjaGVtYS5wcm90
+bxIfZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMxofZ29vZ2xlL2FwaS9maWVsZF9i
+ZWhhdmlvci5wcm90byK8AgoOU3VtbWFyeU9wdGlvbnMSTgoGbGVuZ3RoGAEgASgOMjYuZ29v
+Z2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5TdW1tYXJ5T3B0aW9ucy5MZW5ndGhSBmxl
+bmd0aBJOCgZmb3JtYXQYAiABKA4yNi5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEz
+LlN1bW1hcnlPcHRpb25zLkZvcm1hdFIGZm9ybWF0IkwKBkxlbmd0aBIWChJMRU5HVEhfVU5T
+UEVDSUZJRUQQABIJCgVCUklFRhABEgwKCE1PREVSQVRFEAISEQoNQ09NUFJFSEVOU0lWRRAD
+IjwKBkZvcm1hdBIWChJGT1JNQVRfVU5TUEVDSUZJRUQQABINCglQQVJBR1JBUEgQARILCgdC
+VUxMRVRTEAIicwoXRmllbGRFeHRyYWN0aW9uTWV0YWRhdGESWAoPc3VtbWFyeV9vcHRpb25z
+GAIgASgLMi8uZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5TdW1tYXJ5T3B0aW9u
+c1IOc3VtbWFyeU9wdGlvbnMipAEKEFByb3BlcnR5TWV0YWRhdGESGgoIaW5hY3RpdmUYAyAB
+KAhSCGluYWN0aXZlEnQKGWZpZWxkX2V4dHJhY3Rpb25fbWV0YWRhdGEYCSABKAsyOC5nb29n
+bGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkZpZWxkRXh0cmFjdGlvbk1ldGFkYXRhUhdm
+aWVsZEV4dHJhY3Rpb25NZXRhZGF0YSIwChJFbnRpdHlUeXBlTWV0YWRhdGESGgoIaW5hY3Rp
+dmUYBSABKAhSCGluYWN0aXZlIqwNCg5Eb2N1bWVudFNjaGVtYRIhCgxkaXNwbGF5X25hbWUY
+ASABKAlSC2Rpc3BsYXlOYW1lEiAKC2Rlc2NyaXB0aW9uGAIgASgJUgtkZXNjcmlwdGlvbhJd
+CgxlbnRpdHlfdHlwZXMYAyADKAsyOi5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEz
+LkRvY3VtZW50U2NoZW1hLkVudGl0eVR5cGVSC2VudGl0eVR5cGVzElQKCG1ldGFkYXRhGAQg
+ASgLMjguZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5Eb2N1bWVudFNjaGVtYS5N
+ZXRhZGF0YVIIbWV0YWRhdGESLAoPZG9jdW1lbnRfcHJvbXB0GAUgASgJQgPgQQFSDmRvY3Vt
+ZW50UHJvbXB0GvkICgpFbnRpdHlUeXBlEmgKC2VudW1fdmFsdWVzGA4gASgLMkUuZ29vZ2xl
+LmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5Eb2N1bWVudFNjaGVtYS5FbnRpdHlUeXBlLkVu
+dW1WYWx1ZXNIAFIKZW51bVZhbHVlcxIhCgxkaXNwbGF5X25hbWUYDSABKAlSC2Rpc3BsYXlO
+YW1lEhIKBG5hbWUYASABKAlSBG5hbWUSIAoLZGVzY3JpcHRpb24YDyABKAlSC2Rlc2NyaXB0
+aW9uEh0KCmJhc2VfdHlwZXMYAiADKAlSCWJhc2VUeXBlcxJjCgpwcm9wZXJ0aWVzGAYgAygL
+MkMuZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5Eb2N1bWVudFNjaGVtYS5FbnRp
+dHlUeXBlLlByb3BlcnR5Ugpwcm9wZXJ0aWVzEmUKFGVudGl0eV90eXBlX21ldGFkYXRhGAsg
+ASgLMjMuZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5FbnRpdHlUeXBlTWV0YWRh
+dGFSEmVudGl0eVR5cGVNZXRhZGF0YRokCgpFbnVtVmFsdWVzEhYKBnZhbHVlcxgBIAMoCVIG
+dmFsdWVzGoYFCghQcm9wZXJ0eRISCgRuYW1lGAEgASgJUgRuYW1lEiAKC2Rlc2NyaXB0aW9u
+GAcgASgJUgtkZXNjcmlwdGlvbhIhCgxkaXNwbGF5X25hbWUYBiABKAlSC2Rpc3BsYXlOYW1l
+Eh0KCnZhbHVlX3R5cGUYAiABKAlSCXZhbHVlVHlwZRJ7Cg9vY2N1cnJlbmNlX3R5cGUYAyAB
+KA4yUi5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkRvY3VtZW50U2NoZW1hLkVu
+dGl0eVR5cGUuUHJvcGVydHkuT2NjdXJyZW5jZVR5cGVSDm9jY3VycmVuY2VUeXBlEmIKBm1l
+dGhvZBgIIAEoDjJKLmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuRG9jdW1lbnRT
+Y2hlbWEuRW50aXR5VHlwZS5Qcm9wZXJ0eS5NZXRob2RSBm1ldGhvZBJeChFwcm9wZXJ0eV9t
+ZXRhZGF0YRgFIAEoCzIxLmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuUHJvcGVy
+dHlNZXRhZGF0YVIQcHJvcGVydHlNZXRhZGF0YSKFAQoOT2NjdXJyZW5jZVR5cGUSHwobT0ND
+VVJSRU5DRV9UWVBFX1VOU1BFQ0lGSUVEEAASEQoNT1BUSU9OQUxfT05DRRABEhUKEU9QVElP
+TkFMX01VTFRJUExFEAISEQoNUkVRVUlSRURfT05DRRADEhUKEVJFUVVJUkVEX01VTFRJUExF
+EAQiOQoGTWV0aG9kEhYKEk1FVEhPRF9VTlNQRUNJRklFRBAAEgsKB0VYVFJBQ1QQARIKCgZE
+RVJJVkUQAkIOCgx2YWx1ZV9zb3VyY2Ua9QEKCE1ldGFkYXRhEisKEWRvY3VtZW50X3NwbGl0
+dGVyGAEgASgIUhBkb2N1bWVudFNwbGl0dGVyEkMKHmRvY3VtZW50X2FsbG93X211bHRpcGxl
+X2xhYmVscxgCIAEoCFIbZG9jdW1lbnRBbGxvd011bHRpcGxlTGFiZWxzEkEKHXByZWZpeGVk
+X25hbWluZ19vbl9wcm9wZXJ0aWVzGAYgASgIUhpwcmVmaXhlZE5hbWluZ09uUHJvcGVydGll
+cxI0ChZza2lwX25hbWluZ192YWxpZGF0aW9uGAcgASgIUhRza2lwTmFtaW5nVmFsaWRhdGlv
+bkLvAQojY29tLmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTNCGERvY3VtZW50QWlE
+b2N1bWVudFNjaGVtYVABWkNjbG91ZC5nb29nbGUuY29tL2dvL2RvY3VtZW50YWkvYXBpdjFi
+ZXRhMy9kb2N1bWVudGFpcGI7ZG9jdW1lbnRhaXBiqgIfR29vZ2xlLkNsb3VkLkRvY3VtZW50
+QUkuVjFCZXRhM8oCH0dvb2dsZVxDbG91ZFxEb2N1bWVudEFJXFYxYmV0YTPqAiJHb29nbGU6
+OkNsb3VkOjpEb2N1bWVudEFJOjpWMWJldGEzSstGCgcSBQ4A9QEBCrwECgEMEgMOABIysQQg
+Q29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUg
+TGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNl
+IHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91
+IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cu
+YXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBh
+cHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3Ry
+aWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIg
+QkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwg
+ZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNw
+ZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25z
+IHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAoCgkKAgMAEgMSACkKCAoBCBIDFAA8CgkK
+AgglEgMUADwKCAoBCBIDFQBaCgkKAggLEgMVAFoKCAoBCBIDFgAiCgkKAggKEgMWACIKCAoB
+CBIDFwA5CgkKAggIEgMXADkKCAoBCBIDGAA8CgkKAggBEgMYADwKCAoBCBIDGQA8CgkKAggp
+EgMZADwKCAoBCBIDGgA7CgkKAggtEgMaADsKMgoCBAASBB0APgEaJiBNZXRhZGF0YSBmb3Ig
+ZG9jdW1lbnQgc3VtbWFyaXphdGlvbi4KCgoKAwQAARIDHQgWCiAKBAQABAASBB8CKwMaEiBU
+aGUgTGVuZ3RoIGVudW0uCgoMCgUEAAQAARIDHwcNChkKBgQABAACABIDIQQbGgogRGVmYXVs
+dC4KCg4KBwQABAACAAESAyEEFgoOCgcEAAQAAgACEgMhGRoKOQoGBAAEAAIBEgMkBA4aKiBB
+IGJyaWVmIHN1bW1hcnkgb2Ygb25lIG9yIHR3byBzZW50ZW5jZXMuCgoOCgcEAAQAAgEBEgMk
+BAkKDgoHBAAEAAIBAhIDJAwNCiwKBgQABAACAhIDJwQRGh0gQSBwYXJhZ3JhcGgtbGVuZ3Ro
+IHN1bW1hcnkuCgoOCgcEAAQAAgIBEgMnBAwKDgoHBAAEAAICAhIDJw8QCi4KBgQABAACAxID
+KgQWGh8gVGhlIGxvbmdlc3Qgb3B0aW9uIGF2YWlsYWJsZS4KCg4KBwQABAACAwESAyoEEQoO
+CgcEAAQAAgMCEgMqFBUKIAoEBAAEARIELgI3AxoSIFRoZSBGb3JtYXQgZW51bS4KCgwKBQQA
+BAEBEgMuBw0KGQoGBAAEAQIAEgMwBBsaCiBEZWZhdWx0LgoKDgoHBAAEAQIAARIDMAQWCg4K
+BwQABAECAAISAzAZGgoxCgYEAAQBAgESAzMEEhoiIEZvcm1hdCB0aGUgb3V0cHV0IGluIHBh
+cmFncmFwaHMuCgoOCgcEAAQBAgEBEgMzBA0KDgoHBAAEAQIBAhIDMxARCi4KBgQABAECAhID
+NgQQGh8gRm9ybWF0IHRoZSBvdXRwdXQgaW4gYnVsbGV0cy4KCg4KBwQABAECAgESAzYECwoO
+CgcEAAQBAgICEgM2Dg8KLgoEBAACABIDOgIUGiEgSG93IGxvbmcgdGhlIHN1bW1hcnkgc2hv
+dWxkIGJlLgoKDAoFBAACAAYSAzoCCAoMCgUEAAIAARIDOgkPCgwKBQQAAgADEgM6EhMKMwoE
+BAACARIDPQIUGiYgVGhlIGZvcm1hdCB0aGUgc3VtbWFyeSBzaG91bGQgYmUgaW4uCgoMCgUE
+AAIBBhIDPQIICgwKBQQAAgEBEgM9CQ8KDAoFBAACAQMSAz0SEwo9CgIEARIEQQBEARoxIE1l
+dGFkYXRhIGZvciBob3cgdGhpcyBmaWVsZCB2YWx1ZSBpcyBleHRyYWN0ZWQuCgoKCgMEAQES
+A0EIHwomCgQEAQIAEgNDAiUaGSBTdW1tYXJ5IG9wdGlvbnMgY29uZmlnLgoKDAoFBAECAAYS
+A0MCEAoMCgUEAQIAARIDQxEgCgwKBQQBAgADEgNDIyQKKAoCBAISBEcATQEaHCBNZXRhZGF0
+YSBhYm91dCBhIHByb3BlcnR5LgoKCgoDBAIBEgNHCBgKRwoEBAICABIDSQIUGjogV2hldGhl
+ciB0aGUgcHJvcGVydHkgc2hvdWxkIGJlIGNvbnNpZGVyZWQgYXMgImluYWN0aXZlIi4KCgwK
+BQQCAgAFEgNJAgYKDAoFBAICAAESA0kHDwoMCgUEAgIAAxIDSRITCjkKBAQCAgESA0wCOBos
+IEZpZWxkIGV4dHJhY3Rpb24gbWV0YWRhdGEgb24gdGhlIHByb3BlcnR5LgoKDAoFBAICAQYS
+A0wCGQoMCgUEAgIBARIDTBozCgwKBQQCAgEDEgNMNjcKLAoCBAMSBFAAUwEaICBNZXRhZGF0
+YSBhYm91dCBhbiBlbnRpdHkgdHlwZS4KCgoKAwQDARIDUAgaCkUKBAQDAgASA1ICFBo4IFdo
+ZXRoZXIgdGhlIGVudGl0eSB0eXBlIHNob3VsZCBiZSBjb25zaWRlcmVkIGluYWN0aXZlLgoK
+DAoFBAMCAAUSA1ICBgoMCgUEAwIAARIDUgcPCgwKBQQDAgADEgNSEhMKVgoCBAQSBVYA9QEB
+GkkgVGhlIHNjaGVtYSBkZWZpbmVzIHRoZSBvdXRwdXQgb2YgdGhlIHByb2Nlc3NlZCBkb2N1
+bWVudCBieSBhIHByb2Nlc3Nvci4KCgoKAwQEARIDVggWCuYBCgQEBAMAEgVaAs8BAxrWASBF
+bnRpdHlUeXBlIGlzIHRoZSB3cmFwcGVyIG9mIGEgbGFiZWwgb2YgdGhlIGNvcnJlc3BvbmRp
+bmcgbW9kZWwgd2l0aAogZGV0YWlsZWQgYXR0cmlidXRlcyBhbmQgbGltaXRhdGlvbnMgZm9y
+IGVudGl0eS1iYXNlZCBwcm9jZXNzb3JzLiBNdWx0aXBsZQogdHlwZXMgY2FuIGFsc28gY29t
+cG9zZSBhIGRlcGVuZGVuY3kgdHJlZSB0byByZXByZXNlbnQgbmVzdGVkIHR5cGVzLgoKDAoF
+BAQDAAESA1oKFAo0CgYEBAMAAwASBFwEXwUaJCBEZWZpbmVzIHRoZSBhIGxpc3Qgb2YgZW51
+bSB2YWx1ZXMuCgoOCgcEBAMAAwABEgNcDBYKUAoIBAQDAAMAAgASA14GIRo/IFRoZSBpbmRp
+dmlkdWFsIHZhbHVlcyB0aGF0IHRoaXMgZW51bSB2YWx1ZXMgdHlwZSBjYW4gaW5jbHVkZS4K
+ChAKCQQEAwADAAIABBIDXgYOChAKCQQEAwADAAIABRIDXg8VChAKCQQEAwADAAIAARIDXhYc
+ChAKCQQEAwADAAIAAxIDXh8gCkoKBgQEAwADARIFYgSlAQUaOSBEZWZpbmVzIHByb3BlcnRp
+ZXMgdGhhdCBjYW4gYmUgcGFydCBvZiB0aGUgZW50aXR5IHR5cGUuCgoOCgcEBAMAAwEBEgNi
+DBQKsAQKCAQEAwADAQQAEgRsBn0HGp0EIFR5cGVzIG9mIG9jY3VycmVuY2VzIG9mIHRoZSBl
+bnRpdHkgdHlwZSBpbiB0aGUgZG9jdW1lbnQuICBUaGlzCiByZXByZXNlbnRzIHRoZSBudW1i
+ZXIgb2YgaW5zdGFuY2VzLCBub3QgbWVudGlvbnMsIG9mIGFuIGVudGl0eS4KIEZvciBleGFt
+cGxlLCBhIGJhbmsgc3RhdGVtZW50IG1pZ2h0IG9ubHkgaGF2ZSBvbmUKIGBhY2NvdW50X251
+bWJlcmAsIGJ1dCB0aGlzIGFjY291bnQgbnVtYmVyIGNhbiBiZSBtZW50aW9uZWQgaW4gc2V2
+ZXJhbAogcGxhY2VzIG9uIHRoZSBkb2N1bWVudC4gIEluIHRoaXMgY2FzZSwgdGhlIGBhY2Nv
+dW50X251bWJlcmAgaXMKIGNvbnNpZGVyZWQgYSBgUkVRVUlSRURfT05DRWAgZW50aXR5IHR5
+cGUuIElmLCBvbiB0aGUgb3RoZXIgaGFuZCwgaXQncwogZXhwZWN0ZWQgdGhhdCBhIGJhbmsg
+c3RhdGVtZW50IGNvbnRhaW5zIHRoZSBzdGF0dXMgb2YgbXVsdGlwbGUKIGRpZmZlcmVudCBh
+Y2NvdW50cyBmb3IgdGhlIGN1c3RvbWVycywgdGhlIG9jY3VycmVuY2UgdHlwZSBpcyBzZXQg
+dG8KIGBSRVFVSVJFRF9NVUxUSVBMRWAuCgoQCgkEBAMAAwEEAAESA2wLGQoxCgoEBAMAAwEE
+AAIAEgNuCCgaHiBVbnNwZWNpZmllZCBvY2N1cnJlbmNlIHR5cGUuCgoSCgsEBAMAAwEEAAIA
+ARIDbggjChIKCwQEAwADAQQAAgACEgNuJicKiAEKCgQEAwADAQQAAgESA3IIGhp1IFRoZXJl
+IHdpbGwgYmUgemVybyBvciBvbmUgaW5zdGFuY2Ugb2YgdGhpcyBlbnRpdHkgdHlwZS4gIFRo
+ZSBzYW1lCiBlbnRpdHkgaW5zdGFuY2UgbWF5IGJlIG1lbnRpb25lZCBtdWx0aXBsZSB0aW1l
+cy4KChIKCwQEAwADAQQAAgEBEgNyCBUKEgoLBAQDAAMBBAACAQISA3IYGQpICgoEBAMAAwEE
+AAICEgN1CB4aNSBUaGUgZW50aXR5IHR5cGUgd2lsbCBhcHBlYXIgemVybyBvciBtdWx0aXBs
+ZSB0aW1lcy4KChIKCwQEAwADAQQAAgIBEgN1CBkKEgoLBAQDAAMBBAACAgISA3UcHQp/CgoE
+BAMAAwEEAAIDEgN5CBoabCBUaGUgZW50aXR5IHR5cGUgd2lsbCBvbmx5IGFwcGVhciBleGFj
+dGx5IG9uY2UuICBUaGUgc2FtZQogZW50aXR5IGluc3RhbmNlIG1heSBiZSBtZW50aW9uZWQg
+bXVsdGlwbGUgdGltZXMuCgoSCgsEBAMAAwEEAAIDARIDeQgVChIKCwQEAwADAQQAAgMCEgN5
+GBkKRAoKBAQDAAMBBAACBBIDfAgeGjEgVGhlIGVudGl0eSB0eXBlIHdpbGwgYXBwZWFyIG9u
+Y2Ugb3IgbW9yZSB0aW1lcy4KChIKCwQEAwADAQQAAgQBEgN8CBkKEgoLBAQDAAMBBAACBAIS
+A3wcHQpVCggEBAMAAwEEARIGgAEGiwEHGkEgU3BlY2lmaWVzIGhvdyB0aGUgZW50aXR5J3Mg
+dmFsdWUgaXMgb2J0YWluZWQgZnJvbSB0aGUgZG9jdW1lbnQuCgoRCgkEBAMAAwEEAQESBIAB
+CxEKQwoKBAQDAAMBBAECABIEggEIHxovIFVuc3BlY2lmaWVkIG1ldGhvZC4gSXQgZGVmYXVs
+dHMgdG8gYEVYVFJBQ1RgLgoKEwoLBAQDAAMBBAECAAESBIIBCBoKEwoLBAQDAAMBBAECAAIS
+BIIBHR4KXQoKBAQDAAMBBAECARIEhgEIFBpJIFRoZSBlbnRpdHkncyB2YWx1ZSBpcyBkaXJl
+Y3RseSBleHRyYWN0ZWQgYXMtaXMgZnJvbSB0aGUgZG9jdW1lbnQKIHRleHQuCgoTCgsEBAMA
+AwEEAQIBARIEhgEIDwoTCgsEBAMAAwEEAQIBAhIEhgESEwqJAQoKBAQDAAMBBAECAhIEigEI
+Exp1IFRoZSBlbnRpdHkncyB2YWx1ZSBpcyBkZXJpdmVkIHRocm91Z2ggaW5mZXJlbmNlIGFu
+ZCBpcyBub3QKIG5lY2Vzc2FyaWx5IGFuIGV4YWN0IHRleHQgZXh0cmFjdGlvbiBmcm9tIHRo
+ZSBkb2N1bWVudC4KChMKCwQEAwADAQQBAgIBEgSKAQgOChMKCwQEAwADAQQBAgICEgSKARES
+CmMKCAQEAwADAQIAEgSPAQYWGlEgVGhlIG5hbWUgb2YgdGhlIHByb3BlcnR5LiAgRm9sbG93
+cyB0aGUgc2FtZSBndWlkZWxpbmVzIGFzIHRoZQogRW50aXR5VHlwZSBuYW1lLgoKEQoJBAQD
+AAMBAgAFEgSPAQYMChEKCQQEAwADAQIAARIEjwENEQoRCgkEBAMAAwECAAMSBI8BFBUKgwEK
+CAQEAwADAQIBEgSTAQYdGnEgVGhlIGRlc2NyaXB0aW9uIG9mIHRoZSBwcm9wZXJ0eS4gQ291
+bGQgYmUgdXNlZCB0byBwcm92aWRlIG1vcmUKIGluZm9ybWF0aW9uIGFib3V0IHRoZSBwcm9w
+ZXJ0eSBmb3IgbW9kZWwgY2FsbHMuCgoRCgkEBAMAAwECAQUSBJMBBgwKEQoJBAQDAAMBAgEB
+EgSTAQ0YChEKCQQEAwADAQIBAxIEkwEbHAo3CggEBAMAAwECAhIElgEGHholIFVzZXIgZGVm
+aW5lZCBuYW1lIGZvciB0aGUgcHJvcGVydHkuCgoRCgkEBAMAAwECAgUSBJYBBgwKEQoJBAQD
+AAMBAgIBEgSWAQ0ZChEKCQQEAwADAQICAxIElgEcHQqUAQoIBAQDAAMBAgMSBJoBBhwagQEg
+QSByZWZlcmVuY2UgdG8gdGhlIHZhbHVlIHR5cGUgb2YgdGhlIHByb3BlcnR5LiAgVGhpcyB0
+eXBlIGlzIHN1YmplY3QKIHRvIHRoZSBzYW1lIGNvbnZlbnRpb25zIGFzIHRoZSBgRW50aXR5
+LmJhc2VfdHlwZXNgIGZpZWxkLgoKEQoJBAQDAAMBAgMFEgSaAQYMChEKCQQEAwADAQIDARIE
+mgENFwoRCgkEBAMAAwECAwMSBJoBGhsKawoIBAQDAAMBAgQSBJ4BBikaWSBPY2N1cnJlbmNl
+IHR5cGUgbGltaXRzIHRoZSBudW1iZXIgb2YgaW5zdGFuY2VzIGFuIGVudGl0eSB0eXBlIGFw
+cGVhcnMKIGluIHRoZSBkb2N1bWVudC4KChEKCQQEAwADAQIEBhIEngEGFAoRCgkEBAMAAwEC
+BAESBJ4BFSQKEQoJBAQDAAMBAgQDEgSeAScoCkEKCAQEAwADAQIFEgShAQYYGi8gU3BlY2lm
+aWVzIGhvdyB0aGUgZW50aXR5J3MgdmFsdWUgaXMgb2J0YWluZWQuCgoRCgkEBAMAAwECBQYS
+BKEBBgwKEQoJBAQDAAMBAgUBEgShAQ0TChEKCQQEAwADAQIFAxIEoQEWFwpRCggEBAMAAwEC
+BhIEpAEGLRo/IEFueSBhZGRpdGlvbmFsIG1ldGFkYXRhIGFib3V0IHRoZSBwcm9wZXJ0eSBj
+YW4gYmUgYWRkZWQgaGVyZS4KChEKCQQEAwADAQIGBhIEpAEGFgoRCgkEBAMAAwECBgESBKQB
+FygKEQoJBAQDAAMBAgYDEgSkASssChAKBgQEAwAIABIGpwEErgEFCg8KBwQEAwAIAAESBKcB
+ChYKsAIKBgQEAwACABIErQEGIhqfAiBJZiBzcGVjaWZpZWQsIGxpc3RzIGFsbCB0aGUgcG9z
+c2libGUgdmFsdWVzIGZvciB0aGlzIGVudGl0eS4gIFRoaXMKIHNob3VsZCBub3QgYmUgbW9y
+ZSB0aGFuIGEgaGFuZGZ1bCBvZiB2YWx1ZXMuICBJZiB0aGUgbnVtYmVyIG9mIHZhbHVlcwog
+aXMgPjEwIG9yIGNvdWxkIGNoYW5nZSBmcmVxdWVudGx5LCB1c2UgdGhlIGBFbnRpdHlUeXBl
+LnZhbHVlX29udG9sb2d5YAogZmllbGQgYW5kIHNwZWNpZnkgYSBsaXN0IG9mIGFsbCBwb3Nz
+aWJsZSB2YWx1ZXMgaW4gYSB2YWx1ZSBvbnRvbG9neQogZmlsZS4KCg8KBwQEAwACAAYSBK0B
+BhAKDwoHBAQDAAIAARIErQERHAoPCgcEBAMAAgADEgStAR8hCjEKBgQEAwACARIEsQEEHRoh
+IFVzZXIgZGVmaW5lZCBuYW1lIGZvciB0aGUgdHlwZS4KCg8KBwQEAwACAQUSBLEBBAoKDwoH
+BAQDAAIBARIEsQELFwoPCgcEBAMAAgEDEgSxARocCuIECgYEBAMAAgISBMABBBQa0QQgTmFt
+ZSBvZiB0aGUgdHlwZS4gSXQgbXVzdCBiZSB1bmlxdWUgd2l0aGluIHRoZSBzY2hlbWEgZmls
+ZSBhbmQKIGNhbm5vdCBiZSBhICJDb21tb24gVHlwZSIuICBUaGUgZm9sbG93aW5nIG5hbWlu
+ZyBjb252ZW50aW9ucyBhcmUgdXNlZDoKCiAtIFVzZSBgc25ha2VfY2FzaW5nYC4KIC0gTmFt
+ZSBtYXRjaGluZyBpcyBjYXNlLXNlbnNpdGl2ZS4KIC0gTWF4aW11bSA2NCBjaGFyYWN0ZXJz
+LgogLSBNdXN0IHN0YXJ0IHdpdGggYSBsZXR0ZXIuCiAtIEFsbG93ZWQgY2hhcmFjdGVyczog
+QVNDSUkgbGV0dGVycyBgW2EtejAtOV8tXWAuICAoRm9yIGJhY2t3YXJkCiAgIGNvbXBhdGli
+aWxpdHksIGludGVybmFsIGluZnJhc3RydWN0dXJlIGFuZCB0b29saW5nIGNhbiBoYW5kbGUg
+YW55IEFTQ0lJCiAgIGNoYXJhY3Rlci4pCiAtIFRoZSBgL2AgaXMgc29tZXRpbWVzIHVzZWQg
+dG8gZGVub3RlIGEgcHJvcGVydHkgb2YgYSB0eXBlLiAgRm9yIGV4YW1wbGUKICAgYGxpbmVf
+aXRlbS9hbW91bnRgLiAgVGhpcyBjb252ZW50aW9uIGlzIGRlcHJlY2F0ZWQsIGJ1dCB3aWxs
+IHN0aWxsIGJlCiAgIGhvbm9yZWQgZm9yIGJhY2t3YXJkIGNvbXBhdGliaWxpdHkuCgoPCgcE
+BAMAAgIFEgTAAQQKCg8KBwQEAwACAgESBMABCw8KDwoHBAQDAAICAxIEwAESEwqHAQoGBAQD
+AAIDEgTEAQQcGncgVGhlIGRlc2NyaXB0aW9uIG9mIHRoZSBlbnRpdHkgdHlwZS4gQ291bGQg
+YmUgdXNlZCB0byBwcm92aWRlIG1vcmUKIGluZm9ybWF0aW9uIGFib3V0IHRoZSBlbnRpdHkg
+dHlwZSBmb3IgbW9kZWwgY2FsbHMuCgoPCgcEBAMAAgMFEgTEAQQKCg8KBwQEAwACAwESBMQB
+CxYKDwoHBAQDAAIDAxIExAEZGwpsCgYEBAMAAgQSBMgBBCMaXCBUaGUgZW50aXR5IHR5cGUg
+dGhhdCB0aGlzIHR5cGUgaXMgZGVyaXZlZCBmcm9tLiAgRm9yIG5vdywgb25lIGFuZCBvbmx5
+CiBvbmUgc2hvdWxkIGJlIHNldC4KCg8KBwQEAwACBAQSBMgBBAwKDwoHBAQDAAIEBRIEyAEN
+EwoPCgcEBAMAAgQBEgTIARQeCg8KBwQEAwACBAMSBMgBISIKUAoGBAQDAAIFEgTLAQQlGkAg
+RGVzY3JpcHRpb24gdGhlIG5lc3RlZCBzdHJ1Y3R1cmUsIG9yIGNvbXBvc2l0aW9uIG9mIGFu
+IGVudGl0eS4KCg8KBwQEAwACBQQSBMsBBAwKDwoHBAQDAAIFBhIEywENFQoPCgcEBAMAAgUB
+EgTLARYgCg8KBwQEAwACBQMSBMsBIyQKLwoGBAQDAAIGEgTOAQQxGh8gTWV0YWRhdGEgZm9y
+IHRoZSBlbnRpdHkgdHlwZS4KCg8KBwQEAwACBgYSBM4BBBYKDwoHBAQDAAIGARIEzgEXKwoP
+CgcEBAMAAgYDEgTOAS4wCjYKBAQEAwESBtIBAuMBAxomIE1ldGFkYXRhIGZvciBnbG9iYWwg
+c2NoZW1hIGJlaGF2aW9yLgoKDQoFBAQDAQESBNIBChIKrAEKBgQEAwECABIE1gEEHxqbASBJ
+ZiB0cnVlLCBhIGBkb2N1bWVudGAgZW50aXR5IHR5cGUgY2FuIGJlIGFwcGxpZWQgdG8gc3Vi
+ZG9jdW1lbnQKIChzcGxpdHRpbmcpLiBPdGhlcndpc2UsIGl0IGNhbiBvbmx5IGJlIGFwcGxp
+ZWQgdG8gdGhlIGVudGlyZSBkb2N1bWVudAogKGNsYXNzaWZpY2F0aW9uKS4KCg8KBwQEAwEC
+AAUSBNYBBAgKDwoHBAQDAQIAARIE1gEJGgoPCgcEBAMBAgADEgTWAR0eCmYKBgQEAwECARIE
+2gEELBpWIElmIHRydWUsIG9uIGEgZ2l2ZW4gcGFnZSwgdGhlcmUgY2FuIGJlIG11bHRpcGxl
+IGBkb2N1bWVudGAgYW5ub3RhdGlvbnMKIGNvdmVyaW5nIGl0LgoKDwoHBAQDAQIBBRIE2gEE
+CAoPCgcEBAMBAgEBEgTaAQknCg8KBwQEAwECAQMSBNoBKisKVAoGBAQDAQICEgTdAQQrGkQg
+SWYgc2V0LCBhbGwgdGhlIG5lc3RlZCBlbnRpdGllcyBtdXN0IGJlIHByZWZpeGVkIHdpdGgg
+dGhlIHBhcmVudHMuCgoPCgcEBAMBAgIFEgTdAQQICg8KBwQEAwECAgESBN0BCSYKDwoHBAQD
+AQICAxIE3QEpKgrTAQoGBAQDAQIDEgTiAQQkGsIBIElmIHNldCwgdGhpcyB3aWxsIHNraXAg
+dGhlIG5hbWluZyBmb3JtYXQgdmFsaWRhdGlvbiBpbiB0aGUgc2NoZW1hLiBTbyB0aGUKIHN0
+cmluZyB2YWx1ZXMgaW4gYERvY3VtZW50U2NoZW1hLkVudGl0eVR5cGUubmFtZWAgYW5kCiBg
+RG9jdW1lbnRTY2hlbWEuRW50aXR5VHlwZS5Qcm9wZXJ0eS5uYW1lYCB3aWxsIG5vdCBiZSBj
+aGVja2VkLgoKDwoHBAQDAQIDBRIE4gEECAoPCgcEBAMBAgMBEgTiAQkfCg8KBwQEAwECAwMS
+BOIBIiMKKwoEBAQCABIE5gECGhodIERpc3BsYXkgbmFtZSB0byBzaG93IHVzZXJzLgoKDQoF
+BAQCAAUSBOYBAggKDQoFBAQCAAESBOYBCRUKDQoFBAQCAAMSBOYBGBkKKgoEBAQCARIE6QEC
+GRocIERlc2NyaXB0aW9uIG9mIHRoZSBzY2hlbWEuCgoNCgUEBAIBBRIE6QECCAoNCgUEBAIB
+ARIE6QEJFAoNCgUEBAIBAxIE6QEXGAorCgQEBAICEgTsAQInGh0gRW50aXR5IHR5cGVzIG9m
+IHRoZSBzY2hlbWEuCgoNCgUEBAICBBIE7AECCgoNCgUEBAICBhIE7AELFQoNCgUEBAICARIE
+7AEWIgoNCgUEBAICAxIE7AElJgonCgQEBAIDEgTvAQIYGhkgTWV0YWRhdGEgb2YgdGhlIHNj
+aGVtYS4KCg0KBQQEAgMGEgTvAQIKCg0KBQQEAgMBEgTvAQsTCg0KBQQEAgMDEgTvARYXCrkB
+CgQEBAIEEgT0AQJGGqoBIE9wdGlvbmFsLiBEb2N1bWVudCBsZXZlbCBwcm9tcHQgcHJvdmlk
+ZWQgYnkgdGhlIHVzZXIuIFRoaXMgY3VzdG9tIHRleHQgaXMKIGluamVjdGVkIGludG8gdGhl
+IEFJIG1vZGVsJ3MgcHJvbXB0IHRvIHByb3ZpZGUgZXh0cmEsIGRvY3VtZW50LXdpZGUKIGd1
+aWRhbmNlIGZvciBwcm9jZXNzaW5nLgoKDQoFBAQCBAUSBPQBAggKDQoFBAQCBAESBPQBCRgK
+DQoFBAQCBAMSBPQBGxwKDQoFBAQCBAgSBPQBHUUKEAoIBAQCBAicCAASBPQBHkRiBnByb3Rv
+Mw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentSchema::SummaryOptions ===
+    # Fields for SummaryOptions
+    # Field: length Type: 14 (.google.cloud.documentai.v1beta3.SummaryOptions.Length)
+    # Field: format Type: 14 (.google.cloud.documentai.v1beta3.SummaryOptions.Format)
+
+# Enum: SummaryOptions::Length
+our $SummaryOptions_LENGTH_UNSPECIFIED = 0;
+our $SummaryOptions_BRIEF = 1;
+our $SummaryOptions_MODERATE = 2;
+our $SummaryOptions_COMPREHENSIVE = 3;
+
+# Enum: SummaryOptions::Format
+our $SummaryOptions_FORMAT_UNSPECIFIED = 0;
+our $SummaryOptions_PARAGRAPH = 1;
+our $SummaryOptions_BULLETS = 2;
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentSchema::FieldExtractionMetadata ===
+    # Fields for FieldExtractionMetadata
+    # Field: summary_options Type: 11 (.google.cloud.documentai.v1beta3.SummaryOptions)
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentSchema::PropertyMetadata ===
+    # Fields for PropertyMetadata
+    # Field: inactive Type: 8 ()
+    # Field: field_extraction_metadata Type: 11 (.google.cloud.documentai.v1beta3.FieldExtractionMetadata)
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentSchema::EntityTypeMetadata ===
+    # Fields for EntityTypeMetadata
+    # Field: inactive Type: 8 ()
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentSchema::DocumentSchema ===
+    # Fields for DocumentSchema
+    # Field: display_name Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: entity_types Type: 11 (.google.cloud.documentai.v1beta3.DocumentSchema.EntityType)
+    # Field: metadata Type: 11 (.google.cloud.documentai.v1beta3.DocumentSchema.Metadata)
+    # Field: document_prompt Type: 9 ()
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Documentai::V1beta3::DocumentSchema - Compiled Protocol Buffers messages for google/cloud/documentai/v1beta3/document_schema.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Documentai::V1beta3::DocumentSchema;
+
+    my $msg = Google::Cloud::Documentai::V1beta3::DocumentSchema::SummaryOptions->new({
+        length => $length,
+        format => $format,
+    });
+
+    # Read or update a field
+    my $val = $msg->length();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Documentai::V1beta3::DocumentSchema::SummaryOptions->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/documentai/v1beta3/document_schema.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentSchema::SummaryOptions
+
+Metadata for document summarization.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->length() >> / C<< $msg->length($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Documentai::V1beta3::SummaryOptions::Length>)
+
+How long the summary should be.
+
+=item * C<< $msg->format() >> / C<< $msg->format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Documentai::V1beta3::SummaryOptions::Format>)
+
+The format the summary should be in.
+
+=back
+
+=head3 Enum: SummaryOptions::Length
+
+=over 4
+
+=item * C<LENGTH_UNSPECIFIED> => C<0>
+
+=item * C<BRIEF> => C<1>
+
+=item * C<MODERATE> => C<2>
+
+=item * C<COMPREHENSIVE> => C<3>
+
+=back
+
+=head3 Enum: SummaryOptions::Format
+
+=over 4
+
+=item * C<FORMAT_UNSPECIFIED> => C<0>
+
+=item * C<PARAGRAPH> => C<1>
+
+=item * C<BULLETS> => C<2>
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentSchema::FieldExtractionMetadata
+
+Metadata for how this field value is extracted.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->summary_options() >> / C<< $msg->summary_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentSchema::SummaryOptions>)
+
+Summary options config.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentSchema::PropertyMetadata
+
+Metadata about a property.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->inactive() >> / C<< $msg->inactive($value) >>
+
+Type: C<Bool>
+
+Whether the property should be considered as "inactive".
+
+=item * C<< $msg->field_extraction_metadata() >> / C<< $msg->field_extraction_metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentSchema::FieldExtractionMetadata>)
+
+Field extraction metadata on the property.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentSchema::EntityTypeMetadata
+
+Metadata about an entity type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->inactive() >> / C<< $msg->inactive($value) >>
+
+Type: C<Bool>
+
+Whether the entity type should be considered inactive.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentSchema::DocumentSchema
+
+The schema defines the output of the processed document by a processor.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Display name to show users.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Description of the schema.
+
+=item * C<< $msg->entity_types() >> / C<< $msg->entity_types($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentSchema::DocumentSchema::EntityType>)
+
+Entity types of the schema.
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentSchema::DocumentSchema::Metadata>)
+
+Metadata of the schema.
+
+=item * C<< $msg->document_prompt() >> / C<< $msg->document_prompt($value) >>
+
+Type: C<String>
+
+Optional. Document level prompt provided by the user. This custom text is
+injected into the AI model's prompt to provide extra, document-wide
+guidance for processing.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Documentai::V1beta3::DocumentSchema::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

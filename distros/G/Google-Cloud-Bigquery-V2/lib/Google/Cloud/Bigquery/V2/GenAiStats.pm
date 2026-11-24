@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::GenAiStats;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -106,100 +106,14 @@ EOF
     # Field: errors Type: 9 ()
     # Field: num_failed_rows Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionErrorStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::GenAiStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionErrorStats->new(
-        errors => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<errors>
-
-Type: String
-
-=item * B<num_failed_rows>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCostOptimizationStats ===
     # Fields for GenAiFunctionCostOptimizationStats
     # Field: num_cost_optimized_rows Type: 3 ()
     # Field: message Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCostOptimizationStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::GenAiStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCostOptimizationStats->new(
-        num_cost_optimized_rows => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<num_cost_optimized_rows>
-
-Type: Int64
-
-=item * B<message>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCacheStats ===
     # Fields for GenAiFunctionCacheStats
     # Field: num_cache_hit_rows Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCacheStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::GenAiStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCacheStats->new(
-        num_cache_hit_rows => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<num_cache_hit_rows>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionStats ===
     # Fields for GenAiFunctionStats
@@ -210,128 +124,215 @@ Type: Int64
     # Field: cost_optimization_stats Type: 11 (.google.cloud.bigquery.v2.GenAiFunctionCostOptimizationStats)
     # Field: cache_stats Type: 11 (.google.cloud.bigquery.v2.GenAiFunctionCacheStats)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::GenAiStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionStats->new(
-        function_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<function_name>
-
-Type: String
-
-=item * B<prompt>
-
-Type: String
-
-=item * B<num_processed_rows>
-
-Type: Int64
-
-=item * B<error_stats>
-
-Type: Message (.google.cloud.bigquery.v2.GenAiFunctionErrorStats)
-
-=item * B<cost_optimization_stats>
-
-Type: Message (.google.cloud.bigquery.v2.GenAiFunctionCostOptimizationStats)
-
-=item * B<cache_stats>
-
-Type: Message (.google.cloud.bigquery.v2.GenAiFunctionCacheStats)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::GenAiStats::GenAiErrorStats ===
     # Fields for GenAiErrorStats
     # Field: errors Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::GenAiStats::GenAiErrorStats - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::GenAiStats;
-
-    my $msg = Google::Cloud::Bigquery::V2::GenAiStats::GenAiErrorStats->new(
-        errors => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<errors>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::GenAiStats::GenAiStats ===
     # Fields for GenAiStats
     # Field: error_stats Type: 11 (.google.cloud.bigquery.v2.GenAiErrorStats)
     # Field: function_stats Type: 11 (.google.cloud.bigquery.v2.GenAiFunctionStats)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::GenAiStats::GenAiStats - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::GenAiStats - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/gen_ai_stats.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::GenAiStats;
 
-    my $msg = Google::Cloud::Bigquery::V2::GenAiStats::GenAiStats->new(
-        error_stats => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionErrorStats->new({
+        errors => $errors,
+        num_failed_rows => $num_failed_rows,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->errors();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionErrorStats->parse($bytes);
 
-=item * B<error_stats>
-
-Type: Message (.google.cloud.bigquery.v2.GenAiErrorStats)
-
-=item * B<function_stats>
-
-Type: Message (.google.cloud.bigquery.v2.GenAiFunctionStats)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::GenAiStats - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/gen_ai_stats.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionErrorStats
+
+Provides error statistics for a GenAi function call.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->errors() >> / C<< $msg->errors($value) >>
+
+Type: C<String>
+
+A list of unique errors at function level (up to 5, truncated to 100
+chars).
+
+=item * C<< $msg->num_failed_rows() >> / C<< $msg->num_failed_rows($value) >>
+
+Type: C<Int64>
+
+Number of failed rows processed by the function
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCostOptimizationStats
+
+Provides cost optimization statistics for a GenAi function call.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->num_cost_optimized_rows() >> / C<< $msg->num_cost_optimized_rows($value) >>
+
+Type: C<Int64>
+
+Number of rows inferred via cost optimized workflow.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+System generated message to provide insights into cost optimization state.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCacheStats
+
+Provides cache statistics for a GenAi function call.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->num_cache_hit_rows() >> / C<< $msg->num_cache_hit_rows($value) >>
+
+Type: C<Int64>
+
+Number of rows served from cache.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionStats
+
+Provides statistics for each Ai function call within a query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->function_name() >> / C<< $msg->function_name($value) >>
+
+Type: C<String>
+
+Name of the function.
+
+=item * C<< $msg->prompt() >> / C<< $msg->prompt($value) >>
+
+Type: C<String>
+
+User input prompt of the function (truncated to 20 chars).
+
+=item * C<< $msg->num_processed_rows() >> / C<< $msg->num_processed_rows($value) >>
+
+Type: C<Int64>
+
+Number of rows processed by this GenAi function.
+This includes all cost_optimized, llm_inferred and failed_rows.
+
+=item * C<< $msg->error_stats() >> / C<< $msg->error_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionErrorStats>)
+
+Error stats for the function.
+
+=item * C<< $msg->cost_optimization_stats() >> / C<< $msg->cost_optimization_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCostOptimizationStats>)
+
+Cost optimization stats if applied on the rows processed by the function.
+
+=item * C<< $msg->cache_stats() >> / C<< $msg->cache_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionCacheStats>)
+
+Cache stats for the function.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::GenAiStats::GenAiErrorStats
+
+Provides error statistics for the query job across all AI function calls.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->errors() >> / C<< $msg->errors($value) >>
+
+Type: C<String>
+
+A list of unique errors at query level (up to 5, truncated to 100 chars)
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::GenAiStats::GenAiStats
+
+GenAi stats for the query job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->error_stats() >> / C<< $msg->error_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::GenAiStats::GenAiErrorStats>)
+
+Job level error stats across all GenAi functions
+
+=item * C<< $msg->function_stats() >> / C<< $msg->function_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::GenAiStats::GenAiFunctionStats>)
+
+Function level stats for GenAI Functions. For more information, see
+[Generative AI
+overview](https://docs.cloud.google.com/bigquery/docs/generative-ai-overview).
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::GenAiStats::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

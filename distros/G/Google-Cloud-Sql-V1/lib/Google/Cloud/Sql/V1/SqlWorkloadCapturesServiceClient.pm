@@ -12,25 +12,25 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Sql::V1::CloudSqlResources;
 use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
-use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
-use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
-use Google::Cloud::Sql::V1::CloudSqlRegions;
-use Google::Cloud::Sql::V1::CloudSqlEvents;
-use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
 use Google::Cloud::Sql::V1::CloudSqlTiers;
-use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-use Google::Cloud::Sql::V1::CloudSqlOperations;
-use Google::Cloud::Sql::V1::CloudSqlConnect;
-use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
+use Google::Cloud::Sql::V1::CloudSqlEvents;
+use Google::Cloud::Sql::V1::CloudSqlRegions;
+use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
+use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
 use Google::Cloud::Sql::V1::CloudSqlSslCerts;
+use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
 use Google::Cloud::Sql::V1::CloudSqlUsers;
 use Google::Cloud::Sql::V1::CloudSqlFlags;
-use Google::Cloud::Sql::V1::CloudSqlDatabases;
+use Google::Cloud::Sql::V1::CloudSqlOperations;
 use Google::Cloud::Sql::V1::CloudSqlInstances;
+use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
+use Google::Cloud::Sql::V1::CloudSqlDatabases;
+use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+use Google::Cloud::Sql::V1::CloudSqlConnect;
 use Google::Cloud::Sql::V1::CloudSqlBackups;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -348,23 +348,133 @@ The following RPC methods are available in this client:
 
 =item * B<start>
 
-Calls the RPC method C<Start> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start(
+        project                  => $project,
+        instance                 => $instance,
+        start_workload_capture_context => $start_workload_capture_context,
+    );
+
+Calls the RPC method C<Start> on C<google.cloud.sql.v1.SqlWorkloadCapturesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<start_workload_capture_context> - L<Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext>
+
+=back
 
 =item * B<stop>
 
-Calls the RPC method C<Stop> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stop(
+        project                  => $project,
+        instance                 => $instance,
+        stop_workload_capture_context => $stop_workload_capture_context,
+    );
+
+Calls the RPC method C<Stop> on C<google.cloud.sql.v1.SqlWorkloadCapturesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<stop_workload_capture_context> - L<Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext>
+
+=back
 
 =item * B<start_replay>
 
-Calls the RPC method C<StartReplay> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start_replay(
+        project                  => $project,
+        instance                 => $instance,
+        start_workload_replay_context => $start_workload_replay_context,
+        workload_id              => $workload_id,
+    );
+
+Calls the RPC method C<StartReplay> on C<google.cloud.sql.v1.SqlWorkloadCapturesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStartReplayRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<start_workload_replay_context> - L<Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext>
+
+=item * C<workload_id> - C<string>
+
+=back
 
 =item * B<stop_replay>
 
-Calls the RPC method C<StopReplay> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stop_replay(
+        project                  => $project,
+        instance                 => $instance,
+        stop_workload_replay_context => $stop_workload_replay_context,
+    );
+
+Calls the RPC method C<StopReplay> on C<google.cloud.sql.v1.SqlWorkloadCapturesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesStopReplayRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<stop_workload_replay_context> - L<Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        project                  => $project,
+        instance                 => $instance,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.sql.v1.SqlWorkloadCapturesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::SqlWorkloadCapturesListRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures::WorkloadCapturesListResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<instance> - C<string>
+
+=back
 
 =back
 

@@ -1,5 +1,6 @@
 [![Actions Status](https://github.com/nukopian/Ekorn-Pipeline/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/nukopian/Ekorn-Pipeline/actions?workflow=test)
 [![CPAN](https://img.shields.io/cpan/v/Ekorn-Pipeline)](https://metacpan.org/release/Ekorn-Pipeline) [![Kwalitee](https://cpants.cpanauthors.org/dist/Ekorn-Pipeline.svg)](https://cpants.cpanauthors.org/dist/Ekorn-Pipeline)
+<img align="right" src="logo/ekorn-pipeline-128.png" alt="Ekorn::Pipeline logo" width="128">
 
 # Ekorn-Pipeline
 

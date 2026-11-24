@@ -1,0 +1,1238 @@
+package Google::Ai::Generativelanguage::V1alpha::Content;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Protobuf::Struct };
+    my $descriptor_b64 = <<'EOF';
+CjJnb29nbGUvYWkvZ2VuZXJhdGl2ZWxhbmd1YWdlL3YxYWxwaGEvY29udGVudC5wcm90bxIk
+Z29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFnZS52MWFscGhhGh9nb29nbGUvYXBpL2ZpZWxk
+X2JlaGF2aW9yLnByb3RvGhxnb29nbGUvcHJvdG9idWYvc3RydWN0LnByb3RvImQKB0NvbnRl
+bnQSQAoFcGFydHMYASADKAsyKi5nb29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxYWxw
+aGEuUGFydFIFcGFydHMSFwoEcm9sZRgCIAEoCUID4EEBUgRyb2xlItYECgRQYXJ0EhQKBHRl
+eHQYAiABKAlIAFIEdGV4dBJNCgtpbmxpbmVfZGF0YRgDIAEoCzIqLmdvb2dsZS5haS5nZW5l
+cmF0aXZlbGFuZ3VhZ2UudjFhbHBoYS5CbG9iSABSCmlubGluZURhdGESWQoNZnVuY3Rpb25f
+Y2FsbBgEIAEoCzIyLmdvb2dsZS5haS5nZW5lcmF0aXZlbGFuZ3VhZ2UudjFhbHBoYS5GdW5j
+dGlvbkNhbGxIAFIMZnVuY3Rpb25DYWxsEmUKEWZ1bmN0aW9uX3Jlc3BvbnNlGAUgASgLMjYu
+Z29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFnZS52MWFscGhhLkZ1bmN0aW9uUmVzcG9uc2VI
+AFIQZnVuY3Rpb25SZXNwb25zZRJNCglmaWxlX2RhdGEYBiABKAsyLi5nb29nbGUuYWkuZ2Vu
+ZXJhdGl2ZWxhbmd1YWdlLnYxYWxwaGEuRmlsZURhdGFIAFIIZmlsZURhdGESXwoPZXhlY3V0
+YWJsZV9jb2RlGAkgASgLMjQuZ29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFnZS52MWFscGhh
+LkV4ZWN1dGFibGVDb2RlSABSDmV4ZWN1dGFibGVDb2RlEm8KFWNvZGVfZXhlY3V0aW9uX3Jl
+c3VsdBgKIAEoCzI5Lmdvb2dsZS5haS5nZW5lcmF0aXZlbGFuZ3VhZ2UudjFhbHBoYS5Db2Rl
+RXhlY3V0aW9uUmVzdWx0SABSE2NvZGVFeGVjdXRpb25SZXN1bHRCBgoEZGF0YSI3CgRCbG9i
+EhsKCW1pbWVfdHlwZRgBIAEoCVIIbWltZVR5cGUSEgoEZGF0YRgCIAEoDFIEZGF0YSJMCghG
+aWxlRGF0YRIgCgltaW1lX3R5cGUYASABKAlCA+BBAVIIbWltZVR5cGUSHgoIZmlsZV91cmkY
+AiABKAlCA+BBAlIHZmlsZVVyaSK7AQoORXhlY3V0YWJsZUNvZGUSXgoIbGFuZ3VhZ2UYASAB
+KA4yPS5nb29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxYWxwaGEuRXhlY3V0YWJsZUNv
+ZGUuTGFuZ3VhZ2VCA+BBAlIIbGFuZ3VhZ2USFwoEY29kZRgCIAEoCUID4EECUgRjb2RlIjAK
+CExhbmd1YWdlEhgKFExBTkdVQUdFX1VOU1BFQ0lGSUVEEAASCgoGUFlUSE9OEAEi+wEKE0Nv
+ZGVFeGVjdXRpb25SZXN1bHQSYAoHb3V0Y29tZRgBIAEoDjJBLmdvb2dsZS5haS5nZW5lcmF0
+aXZlbGFuZ3VhZ2UudjFhbHBoYS5Db2RlRXhlY3V0aW9uUmVzdWx0Lk91dGNvbWVCA+BBAlIH
+b3V0Y29tZRIbCgZvdXRwdXQYAiABKAlCA+BBAVIGb3V0cHV0ImUKB091dGNvbWUSFwoTT1VU
+Q09NRV9VTlNQRUNJRklFRBAAEg4KCk9VVENPTUVfT0sQARISCg5PVVRDT01FX0ZBSUxFRBAC
+Eh0KGU9VVENPTUVfREVBRExJTkVfRVhDRUVERUQQAyLJAwoEVG9vbBJzChVmdW5jdGlvbl9k
+ZWNsYXJhdGlvbnMYASADKAsyOS5nb29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxYWxw
+aGEuRnVuY3Rpb25EZWNsYXJhdGlvbkID4EEBUhRmdW5jdGlvbkRlY2xhcmF0aW9ucxJ4Chdn
+b29nbGVfc2VhcmNoX3JldHJpZXZhbBgCIAEoCzI7Lmdvb2dsZS5haS5nZW5lcmF0aXZlbGFu
+Z3VhZ2UudjFhbHBoYS5Hb29nbGVTZWFyY2hSZXRyaWV2YWxCA+BBAVIVZ29vZ2xlU2VhcmNo
+UmV0cmlldmFsEl8KDmNvZGVfZXhlY3V0aW9uGAMgASgLMjMuZ29vZ2xlLmFpLmdlbmVyYXRp
+dmVsYW5ndWFnZS52MWFscGhhLkNvZGVFeGVjdXRpb25CA+BBAVINY29kZUV4ZWN1dGlvbhJh
+Cg1nb29nbGVfc2VhcmNoGAQgASgLMjcuZ29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFnZS52
+MWFscGhhLlRvb2wuR29vZ2xlU2VhcmNoQgPgQQFSDGdvb2dsZVNlYXJjaBoOCgxHb29nbGVT
+ZWFyY2gijwEKFUdvb2dsZVNlYXJjaFJldHJpZXZhbBJ2ChhkeW5hbWljX3JldHJpZXZhbF9j
+b25maWcYASABKAsyPC5nb29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxYWxwaGEuRHlu
+YW1pY1JldHJpZXZhbENvbmZpZ1IWZHluYW1pY1JldHJpZXZhbENvbmZpZyLnAQoWRHluYW1p
+Y1JldHJpZXZhbENvbmZpZxJVCgRtb2RlGAEgASgOMkEuZ29vZ2xlLmFpLmdlbmVyYXRpdmVs
+YW5ndWFnZS52MWFscGhhLkR5bmFtaWNSZXRyaWV2YWxDb25maWcuTW9kZVIEbW9kZRIwChFk
+eW5hbWljX3RocmVzaG9sZBgCIAEoAkgAUhBkeW5hbWljVGhyZXNob2xkiAEBIi4KBE1vZGUS
+FAoQTU9ERV9VTlNQRUNJRklFRBAAEhAKDE1PREVfRFlOQU1JQxABQhQKEl9keW5hbWljX3Ro
+cmVzaG9sZCIPCg1Db2RlRXhlY3V0aW9uIoYBCgpUb29sQ29uZmlnEngKF2Z1bmN0aW9uX2Nh
+bGxpbmdfY29uZmlnGAEgASgLMjsuZ29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFnZS52MWFs
+cGhhLkZ1bmN0aW9uQ2FsbGluZ0NvbmZpZ0ID4EEBUhVmdW5jdGlvbkNhbGxpbmdDb25maWci
+6AEKFUZ1bmN0aW9uQ2FsbGluZ0NvbmZpZxJZCgRtb2RlGAEgASgOMkAuZ29vZ2xlLmFpLmdl
+bmVyYXRpdmVsYW5ndWFnZS52MWFscGhhLkZ1bmN0aW9uQ2FsbGluZ0NvbmZpZy5Nb2RlQgPg
+QQFSBG1vZGUSOQoWYWxsb3dlZF9mdW5jdGlvbl9uYW1lcxgCIAMoCUID4EEBUhRhbGxvd2Vk
+RnVuY3Rpb25OYW1lcyI5CgRNb2RlEhQKEE1PREVfVU5TUEVDSUZJRUQQABIICgRBVVRPEAES
+BwoDQU5ZEAISCAoETk9ORRADIp0CChNGdW5jdGlvbkRlY2xhcmF0aW9uEhcKBG5hbWUYASAB
+KAlCA+BBAlIEbmFtZRIlCgtkZXNjcmlwdGlvbhgCIAEoCUID4EECUgtkZXNjcmlwdGlvbhJW
+CgpwYXJhbWV0ZXJzGAMgASgLMiwuZ29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFnZS52MWFs
+cGhhLlNjaGVtYUID4EEBSABSCnBhcmFtZXRlcnOIAQESUgoIcmVzcG9uc2UYBCABKAsyLC5n
+b29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxYWxwaGEuU2NoZW1hQgPgQQFIAVIIcmVz
+cG9uc2WIAQFCDQoLX3BhcmFtZXRlcnNCCwoJX3Jlc3BvbnNlInwKDEZ1bmN0aW9uQ2FsbBIT
+CgJpZBgDIAEoCUID4EEBUgJpZBIXCgRuYW1lGAEgASgJQgPgQQJSBG5hbWUSNQoEYXJncxgC
+IAEoCzIXLmdvb2dsZS5wcm90b2J1Zi5TdHJ1Y3RCA+BBAUgAUgRhcmdziAEBQgcKBV9hcmdz
+InoKEEZ1bmN0aW9uUmVzcG9uc2USEwoCaWQYAyABKAlCA+BBAVICaWQSFwoEbmFtZRgBIAEo
+CUID4EECUgRuYW1lEjgKCHJlc3BvbnNlGAIgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVj
+dEID4EECUghyZXNwb25zZSLYBAoGU2NoZW1hEkMKBHR5cGUYASABKA4yKi5nb29nbGUuYWku
+Z2VuZXJhdGl2ZWxhbmd1YWdlLnYxYWxwaGEuVHlwZUID4EECUgR0eXBlEhsKBmZvcm1hdBgC
+IAEoCUID4EEBUgZmb3JtYXQSJQoLZGVzY3JpcHRpb24YAyABKAlCA+BBAVILZGVzY3JpcHRp
+b24SHwoIbnVsbGFibGUYBCABKAhCA+BBAVIIbnVsbGFibGUSFwoEZW51bRgFIAMoCUID4EEB
+UgRlbnVtEkwKBWl0ZW1zGAYgASgLMiwuZ29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFnZS52
+MWFscGhhLlNjaGVtYUID4EEBSABSBWl0ZW1ziAEBEiAKCW1heF9pdGVtcxgVIAEoA0ID4EEB
+UghtYXhJdGVtcxIgCgltaW5faXRlbXMYFiABKANCA+BBAVIIbWluSXRlbXMSYQoKcHJvcGVy
+dGllcxgHIAMoCzI8Lmdvb2dsZS5haS5nZW5lcmF0aXZlbGFuZ3VhZ2UudjFhbHBoYS5TY2hl
+bWEuUHJvcGVydGllc0VudHJ5QgPgQQFSCnByb3BlcnRpZXMSHwoIcmVxdWlyZWQYCCADKAlC
+A+BBAVIIcmVxdWlyZWQaawoPUHJvcGVydGllc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5EkIK
+BXZhbHVlGAIgASgLMiwuZ29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFnZS52MWFscGhhLlNj
+aGVtYVIFdmFsdWU6AjgBQggKBl9pdGVtcyJrChBHcm91bmRpbmdQYXNzYWdlEg4KAmlkGAEg
+ASgJUgJpZBJHCgdjb250ZW50GAIgASgLMi0uZ29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFn
+ZS52MWFscGhhLkNvbnRlbnRSB2NvbnRlbnQiZwoRR3JvdW5kaW5nUGFzc2FnZXMSUgoIcGFz
+c2FnZXMYASADKAsyNi5nb29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxYWxwaGEuR3Jv
+dW5kaW5nUGFzc2FnZVIIcGFzc2FnZXMqZQoEVHlwZRIUChBUWVBFX1VOU1BFQ0lGSUVEEAAS
+CgoGU1RSSU5HEAESCgoGTlVNQkVSEAISCwoHSU5URUdFUhADEgsKB0JPT0xFQU4QBBIJCgVB
+UlJBWRAFEgoKBk9CSkVDVBAGQpoBCihjb20uZ29vZ2xlLmFpLmdlbmVyYXRpdmVsYW5ndWFn
+ZS52MWFscGhhQgxDb250ZW50UHJvdG9QAVpeY2xvdWQuZ29vZ2xlLmNvbS9nby9haS9nZW5l
+cmF0aXZlbGFuZ3VhZ2UvYXBpdjFhbHBoYS9nZW5lcmF0aXZlbGFuZ3VhZ2VwYjtnZW5lcmF0
+aXZlbGFuZ3VhZ2VwYkrVgQEKBxIFDgCjAwEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAy
+NSBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJz
+aW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4
+Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBh
+IGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xp
+Y2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3
+IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIg
+dGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhP
+VVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVz
+cyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3Vh
+Z2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExp
+Y2Vuc2UuCgoICgECEgMQAC0KCQoCAwASAxIAKQoJCgIDARIDEwAmCggKAQgSAxUAdQoJCgII
+CxIDFQB1CggKAQgSAxYAIgoJCgIIChIDFgAiCggKAQgSAxcALQoJCgIICBIDFwAtCggKAQgS
+AxgAQQoJCgIIARIDGABBCnkKAgUAEgQcADEBGm0gVHlwZSBjb250YWlucyB0aGUgbGlzdCBv
+ZiBPcGVuQVBJIGRhdGEgdHlwZXMgYXMgZGVmaW5lZCBieQogaHR0cHM6Ly9zcGVjLm9wZW5h
+cGlzLm9yZy9vYXMvdjMuMC4zI2RhdGEtdHlwZXMKCgoKAwUAARIDHAUJCjEKBAUAAgASAx4C
+FxokIE5vdCBzcGVjaWZpZWQsIHNob3VsZCBub3QgYmUgdXNlZC4KCgwKBQUAAgABEgMeAhIK
+DAoFBQACAAISAx4VFgobCgQFAAIBEgMhAg0aDiBTdHJpbmcgdHlwZS4KCgwKBQUAAgEBEgMh
+AggKDAoFBQACAQISAyELDAobCgQFAAICEgMkAg0aDiBOdW1iZXIgdHlwZS4KCgwKBQUAAgIB
+EgMkAggKDAoFBQACAgISAyQLDAocCgQFAAIDEgMnAg4aDyBJbnRlZ2VyIHR5cGUuCgoMCgUF
+AAIDARIDJwIJCgwKBQUAAgMCEgMnDA0KHAoEBQACBBIDKgIOGg8gQm9vbGVhbiB0eXBlLgoK
+DAoFBQACBAESAyoCCQoMCgUFAAIEAhIDKgwNChoKBAUAAgUSAy0CDBoNIEFycmF5IHR5cGUu
+CgoMCgUFAAIFARIDLQIHCgwKBQUAAgUCEgMtCgsKGwoEBQACBhIDMAINGg4gT2JqZWN0IHR5
+cGUuCgoMCgUFAAIGARIDMAIICgwKBQUAAgYCEgMwCwwKhwIKAgQAEgQ4AEIBGvoBIFRoZSBi
+YXNlIHN0cnVjdHVyZWQgZGF0YXR5cGUgY29udGFpbmluZyBtdWx0aS1wYXJ0IGNvbnRlbnQg
+b2YgYSBtZXNzYWdlLgoKIEEgYENvbnRlbnRgIGluY2x1ZGVzIGEgYHJvbGVgIGZpZWxkIGRl
+c2lnbmF0aW5nIHRoZSBwcm9kdWNlciBvZiB0aGUgYENvbnRlbnRgCiBhbmQgYSBgcGFydHNg
+IGZpZWxkIGNvbnRhaW5pbmcgbXVsdGktcGFydCBkYXRhIHRoYXQgY29udGFpbnMgdGhlIGNv
+bnRlbnQgb2YKIHRoZSBtZXNzYWdlIHR1cm4uCgoKCgMEAAESAzgIDwpmCgQEAAIAEgM7Ahoa
+WSBPcmRlcmVkIGBQYXJ0c2AgdGhhdCBjb25zdGl0dXRlIGEgc2luZ2xlIG1lc3NhZ2UuIFBh
+cnRzIG1heSBoYXZlIGRpZmZlcmVudAogTUlNRSB0eXBlcy4KCgwKBQQAAgAEEgM7AgoKDAoF
+BAACAAYSAzsLDwoMCgUEAAIAARIDOxAVCgwKBQQAAgADEgM7GBkKrQEKBAQAAgESA0ECOxqf
+ASBPcHRpb25hbC4gVGhlIHByb2R1Y2VyIG9mIHRoZSBjb250ZW50LiBNdXN0IGJlIGVpdGhl
+ciAndXNlcicgb3IgJ21vZGVsJy4KCiBVc2VmdWwgdG8gc2V0IGZvciBtdWx0aS10dXJuIGNv
+bnZlcnNhdGlvbnMsIG90aGVyd2lzZSBjYW4gYmUgbGVmdCBibGFuawogb3IgdW5zZXQuCgoM
+CgUEAAIBBRIDQQIICgwKBQQAAgEBEgNBCQ0KDAoFBAACAQMSA0EQEQoMCgUEAAIBCBIDQRI6
+Cg8KCAQAAgEInAgAEgNBEzkK7QIKAgQBEgRLAGcBGuACIEEgZGF0YXR5cGUgY29udGFpbmlu
+ZyBtZWRpYSB0aGF0IGlzIHBhcnQgb2YgYSBtdWx0aS1wYXJ0IGBDb250ZW50YCBtZXNzYWdl
+LgoKIEEgYFBhcnRgIGNvbnNpc3RzIG9mIGRhdGEgd2hpY2ggaGFzIGFuIGFzc29jaWF0ZWQg
+ZGF0YXR5cGUuIEEgYFBhcnRgIGNhbiBvbmx5CiBjb250YWluIG9uZSBvZiB0aGUgYWNjZXB0
+ZWQgdHlwZXMgaW4gYFBhcnQuZGF0YWAuCgogQSBgUGFydGAgbXVzdCBoYXZlIGEgZml4ZWQg
+SUFOQSBNSU1FIHR5cGUgaWRlbnRpZnlpbmcgdGhlIHR5cGUgYW5kIHN1YnR5cGUKIG9mIHRo
+ZSBtZWRpYSBpZiB0aGUgYGlubGluZV9kYXRhYCBmaWVsZCBpcyBmaWxsZWQgd2l0aCByYXcg
+Ynl0ZXMuCgoKCgMEAQESA0sIDAoMCgQEAQgAEgRMAmYDCgwKBQQBCAABEgNMCAwKGwoEBAEC
+ABIDTgQUGg4gSW5saW5lIHRleHQuCgoMCgUEAQIABRIDTgQKCgwKBQQBAgABEgNOCw8KDAoF
+BAECAAMSA04SEwoiCgQEAQIBEgNRBBkaFSBJbmxpbmUgbWVkaWEgYnl0ZXMuCgoMCgUEAQIB
+BhIDUQQICgwKBQQBAgEBEgNRCRQKDAoFBAECAQMSA1EXGAqsAQoEBAECAhIDVgQjGp4BIEEg
+cHJlZGljdGVkIGBGdW5jdGlvbkNhbGxgIHJldHVybmVkIGZyb20gdGhlIG1vZGVsIHRoYXQg
+Y29udGFpbnMKIGEgc3RyaW5nIHJlcHJlc2VudGluZyB0aGUgYEZ1bmN0aW9uRGVjbGFyYXRp
+b24ubmFtZWAgd2l0aCB0aGUKIGFyZ3VtZW50cyBhbmQgdGhlaXIgdmFsdWVzLgoKDAoFBAEC
+AgYSA1YEEAoMCgUEAQICARIDVhEeCgwKBQQBAgIDEgNWISIK4QEKBAQBAgMSA1wEKxrTASBU
+aGUgcmVzdWx0IG91dHB1dCBvZiBhIGBGdW5jdGlvbkNhbGxgIHRoYXQgY29udGFpbnMgYSBz
+dHJpbmcKIHJlcHJlc2VudGluZyB0aGUgYEZ1bmN0aW9uRGVjbGFyYXRpb24ubmFtZWAgYW5k
+IGEgc3RydWN0dXJlZCBKU09OCiBvYmplY3QgY29udGFpbmluZyBhbnkgb3V0cHV0IGZyb20g
+dGhlIGZ1bmN0aW9uIGlzIHVzZWQgYXMgY29udGV4dCB0bwogdGhlIG1vZGVsLgoKDAoFBAEC
+AwYSA1wEFAoMCgUEAQIDARIDXBUmCgwKBQQBAgMDEgNcKSoKHgoEBAECBBIDXwQbGhEgVVJJ
+IGJhc2VkIGRhdGEuCgoMCgUEAQIEBhIDXwQMCgwKBQQBAgQBEgNfDRYKDAoFBAECBAMSA18Z
+GgpICgQEAQIFEgNiBCcaOyBDb2RlIGdlbmVyYXRlZCBieSB0aGUgbW9kZWwgdGhhdCBpcyBt
+ZWFudCB0byBiZSBleGVjdXRlZC4KCgwKBQQBAgUGEgNiBBIKDAoFBAECBQESA2ITIgoMCgUE
+AQIFAxIDYiUmCjgKBAQBAgYSA2UEMxorIFJlc3VsdCBvZiBleGVjdXRpbmcgdGhlIGBFeGVj
+dXRhYmxlQ29kZWAuCgoMCgUEAQIGBhIDZQQXCgwKBQQBAgYBEgNlGC0KDAoFBAECBgMSA2Uw
+MgpcCgIEAhIEbAB4ARpQIFJhdyBtZWRpYSBieXRlcy4KCiBUZXh0IHNob3VsZCBub3QgYmUg
+c2VudCBhcyByYXcgYnl0ZXMsIHVzZSB0aGUgJ3RleHQnIGZpZWxkLgoKCgoDBAIBEgNsCAwK
+yQIKBAQCAgASA3QCFxq7AiBUaGUgSUFOQSBzdGFuZGFyZCBNSU1FIHR5cGUgb2YgdGhlIHNv
+dXJjZSBkYXRhLgogRXhhbXBsZXM6CiAgIC0gaW1hZ2UvcG5nCiAgIC0gaW1hZ2UvanBlZwog
+SWYgYW4gdW5zdXBwb3J0ZWQgTUlNRSB0eXBlIGlzIHByb3ZpZGVkLCBhbiBlcnJvciB3aWxs
+IGJlIHJldHVybmVkLiBGb3IgYQogY29tcGxldGUgbGlzdCBvZiBzdXBwb3J0ZWQgdHlwZXMs
+IHNlZSBbU3VwcG9ydGVkIGZpbGUKIGZvcm1hdHNdKGh0dHBzOi8vYWkuZ29vZ2xlLmRldi9n
+ZW1pbmktYXBpL2RvY3MvcHJvbXB0aW5nX3dpdGhfbWVkaWEjc3VwcG9ydGVkX2ZpbGVfZm9y
+bWF0cykuCgoMCgUEAgIABRIDdAIICgwKBQQCAgABEgN0CRIKDAoFBAICAAMSA3QVFgorCgQE
+AgIBEgN3AhEaHiBSYXcgYnl0ZXMgZm9yIG1lZGlhIGZvcm1hdHMuCgoMCgUEAgIBBRIDdwIH
+CgwKBQQCAgEBEgN3CAwKDAoFBAICAQMSA3cPEAoeCgIEAxIFewCBAQEaESBVUkkgYmFzZWQg
+ZGF0YS4KCgoKAwQDARIDewgQCkgKBAQDAgASA30CQBo7IE9wdGlvbmFsLiBUaGUgSUFOQSBz
+dGFuZGFyZCBNSU1FIHR5cGUgb2YgdGhlIHNvdXJjZSBkYXRhLgoKDAoFBAMCAAUSA30CCAoM
+CgUEAwIAARIDfQkSCgwKBQQDAgADEgN9FRYKDAoFBAMCAAgSA30XPwoPCggEAwIACJwIABID
+fRg+Ch4KBAQDAgESBIABAj8aECBSZXF1aXJlZC4gVVJJLgoKDQoFBAMCAQUSBIABAggKDQoF
+BAMCAQESBIABCREKDQoFBAMCAQMSBIABFBUKDQoFBAMCAQgSBIABFj4KEAoIBAMCAQicCAAS
+BIABFz0KnQIKAgQEEgaJAQCYAQEajgIgQ29kZSBnZW5lcmF0ZWQgYnkgdGhlIG1vZGVsIHRo
+YXQgaXMgbWVhbnQgdG8gYmUgZXhlY3V0ZWQsIGFuZCB0aGUgcmVzdWx0CiByZXR1cm5lZCB0
+byB0aGUgbW9kZWwuCgogT25seSBnZW5lcmF0ZWQgd2hlbiB1c2luZyB0aGUgYENvZGVFeGVj
+dXRpb25gIHRvb2wsIGluIHdoaWNoIHRoZSBjb2RlIHdpbGwKIGJlIGF1dG9tYXRpY2FsbHkg
+ZXhlY3V0ZWQsIGFuZCBhIGNvcnJlc3BvbmRpbmcgYENvZGVFeGVjdXRpb25SZXN1bHRgIHdp
+bGwKIGFsc28gYmUgZ2VuZXJhdGVkLgoKCwoDBAQBEgSJAQgWCkkKBAQEBAASBosBApEBAxo5
+IFN1cHBvcnRlZCBwcm9ncmFtbWluZyBsYW5ndWFnZXMgZm9yIHRoZSBnZW5lcmF0ZWQgY29k
+ZS4KCg0KBQQEBAABEgSLAQcPCkYKBgQEBAACABIEjQEEHRo2IFVuc3BlY2lmaWVkIGxhbmd1
+YWdlLiBUaGlzIHZhbHVlIHNob3VsZCBub3QgYmUgdXNlZC4KCg8KBwQEBAACAAESBI0BBBgK
+DwoHBAQEAAIAAhIEjQEbHApBCgYEBAQAAgESBJABBA8aMSBQeXRob24gPj0gMy4xMCwgd2l0
+aCBudW1weSBhbmQgc2ltcHkgYXZhaWxhYmxlLgoKDwoHBAQEAAIBARIEkAEECgoPCgcEBAQA
+AgECEgSQAQ0OCj0KBAQEAgASBJQBAkEaLyBSZXF1aXJlZC4gUHJvZ3JhbW1pbmcgbGFuZ3Vh
+Z2Ugb2YgdGhlIGBjb2RlYC4KCg0KBQQEAgAGEgSUAQIKCg0KBQQEAgABEgSUAQsTCg0KBQQE
+AgADEgSUARYXCg0KBQQEAgAIEgSUARhAChAKCAQEAgAInAgAEgSUARk/CjIKBAQEAgESBJcB
+AjsaJCBSZXF1aXJlZC4gVGhlIGNvZGUgdG8gYmUgZXhlY3V0ZWQuCgoNCgUEBAIBBRIElwEC
+CAoNCgUEBAIBARIElwEJDQoNCgUEBAIBAxIElwEQEQoNCgUEBAIBCBIElwESOgoQCggEBAIB
+CJwIABIElwETOQqpAQoCBAUSBp4BALYBARqaASBSZXN1bHQgb2YgZXhlY3V0aW5nIHRoZSBg
+RXhlY3V0YWJsZUNvZGVgLgoKIE9ubHkgZ2VuZXJhdGVkIHdoZW4gdXNpbmcgdGhlIGBDb2Rl
+RXhlY3V0aW9uYCwgYW5kIGFsd2F5cyBmb2xsb3dzIGEgYHBhcnRgCiBjb250YWluaW5nIHRo
+ZSBgRXhlY3V0YWJsZUNvZGVgLgoKCwoDBAUBEgSeAQgbCkkKBAQFBAASBqABAq4BAxo5IEVu
+dW1lcmF0aW9uIG9mIHBvc3NpYmxlIG91dGNvbWVzIG9mIHRoZSBjb2RlIGV4ZWN1dGlvbi4K
+Cg0KBQQFBAABEgSgAQcOCkQKBgQFBAACABIEogEEHBo0IFVuc3BlY2lmaWVkIHN0YXR1cy4g
+VGhpcyB2YWx1ZSBzaG91bGQgbm90IGJlIHVzZWQuCgoPCgcEBQQAAgABEgSiAQQXCg8KBwQF
+BAACAAISBKIBGhsKOAoGBAUEAAIBEgSlAQQTGiggQ29kZSBleGVjdXRpb24gY29tcGxldGVk
+IHN1Y2Nlc3NmdWxseS4KCg8KBwQFBAACAQESBKUBBA4KDwoHBAUEAAIBAhIEpQEREgpiCgYE
+BQQAAgISBKkBBBcaUiBDb2RlIGV4ZWN1dGlvbiBmaW5pc2hlZCBidXQgd2l0aCBhIGZhaWx1
+cmUuIGBzdGRlcnJgIHNob3VsZCBjb250YWluIHRoZQogcmVhc29uLgoKDwoHBAUEAAICARIE
+qQEEEgoPCgcEBQQAAgICEgSpARUWCngKBgQFBAACAxIErQEEIhpoIENvZGUgZXhlY3V0aW9u
+IHJhbiBmb3IgdG9vIGxvbmcsIGFuZCB3YXMgY2FuY2VsbGVkLiBUaGVyZSBtYXkgb3IgbWF5
+IG5vdAogYmUgYSBwYXJ0aWFsIG91dHB1dCBwcmVzZW50LgoKDwoHBAUEAAIDARIErQEEHQoP
+CgcEBQQAAgMCEgStASAhCjgKBAQFAgASBLEBAj8aKiBSZXF1aXJlZC4gT3V0Y29tZSBvZiB0
+aGUgY29kZSBleGVjdXRpb24uCgoNCgUEBQIABhIEsQECCQoNCgUEBQIAARIEsQEKEQoNCgUE
+BQIAAxIEsQEUFQoNCgUEBQIACBIEsQEWPgoQCggEBQIACJwIABIEsQEXPQp0CgQEBQIBEgS1
+AQI9GmYgT3B0aW9uYWwuIENvbnRhaW5zIHN0ZG91dCB3aGVuIGNvZGUgZXhlY3V0aW9uIGlz
+IHN1Y2Nlc3NmdWwsIHN0ZGVyciBvcgogb3RoZXIgZGVzY3JpcHRpb24gb3RoZXJ3aXNlLgoK
+DQoFBAUCAQUSBLUBAggKDQoFBAUCAQESBLUBCQ8KDQoFBAUCAQMSBLUBEhMKDQoFBAUCAQgS
+BLUBFDwKEAoIBAUCAQicCAASBLUBFTsK+gEKAgQGEga9AQDcAQEa6wEgVG9vbCBkZXRhaWxz
+IHRoYXQgdGhlIG1vZGVsIG1heSB1c2UgdG8gZ2VuZXJhdGUgcmVzcG9uc2UuCgogQSBgVG9v
+bGAgaXMgYSBwaWVjZSBvZiBjb2RlIHRoYXQgZW5hYmxlcyB0aGUgc3lzdGVtIHRvIGludGVy
+YWN0IHdpdGgKIGV4dGVybmFsIHN5c3RlbXMgdG8gcGVyZm9ybSBhbiBhY3Rpb24sIG9yIHNl
+dCBvZiBhY3Rpb25zLCBvdXRzaWRlIG9mCiBrbm93bGVkZ2UgYW5kIHNjb3BlIG9mIHRoZSBt
+b2RlbC4KCgsKAwQGARIEvQEIDApjCgQEBgMAEgTAAQIZGlUgR29vZ2xlU2VhcmNoIHRvb2wg
+dHlwZS4KIFRvb2wgdG8gc3VwcG9ydCBHb29nbGUgU2VhcmNoIGluIE1vZGVsLiBQb3dlcmVk
+IGJ5IEdvb2dsZS4KCg0KBQQGAwABEgTAAQoWCoAGCgQEBgIAEgbPAQLQAS8a7wUgT3B0aW9u
+YWwuIEEgbGlzdCBvZiBgRnVuY3Rpb25EZWNsYXJhdGlvbnNgIGF2YWlsYWJsZSB0byB0aGUg
+bW9kZWwgdGhhdCBjYW4KIGJlIHVzZWQgZm9yIGZ1bmN0aW9uIGNhbGxpbmcuCgogVGhlIG1v
+ZGVsIG9yIHN5c3RlbSBkb2VzIG5vdCBleGVjdXRlIHRoZSBmdW5jdGlvbi4gSW5zdGVhZCB0
+aGUgZGVmaW5lZAogZnVuY3Rpb24gbWF5IGJlIHJldHVybmVkIGFzIGEKIFtGdW5jdGlvbkNh
+bGxdW2dvb2dsZS5haS5nZW5lcmF0aXZlbGFuZ3VhZ2UudjFhbHBoYS5QYXJ0LmZ1bmN0aW9u
+X2NhbGxdCiB3aXRoIGFyZ3VtZW50cyB0byB0aGUgY2xpZW50IHNpZGUgZm9yIGV4ZWN1dGlv
+bi4gVGhlIG1vZGVsIG1heSBkZWNpZGUgdG8KIGNhbGwgYSBzdWJzZXQgb2YgdGhlc2UgZnVu
+Y3Rpb25zIGJ5IHBvcHVsYXRpbmcKIFtGdW5jdGlvbkNhbGxdW2dvb2dsZS5haS5nZW5lcmF0
+aXZlbGFuZ3VhZ2UudjFhbHBoYS5QYXJ0LmZ1bmN0aW9uX2NhbGxdIGluCiB0aGUgcmVzcG9u
+c2UuIFRoZSBuZXh0IGNvbnZlcnNhdGlvbiB0dXJuIG1heSBjb250YWluIGEKIFtGdW5jdGlv
+blJlc3BvbnNlXVtnb29nbGUuYWkuZ2VuZXJhdGl2ZWxhbmd1YWdlLnYxYWxwaGEuUGFydC5m
+dW5jdGlvbl9yZXNwb25zZV0KIHdpdGggdGhlIFtDb250ZW50LnJvbGVdW2dvb2dsZS5haS5n
+ZW5lcmF0aXZlbGFuZ3VhZ2UudjFhbHBoYS5Db250ZW50LnJvbGVdCiAiZnVuY3Rpb24iIGdl
+bmVyYXRpb24gY29udGV4dCBmb3IgdGhlIG5leHQgbW9kZWwgdHVybi4KCg0KBQQGAgAEEgTP
+AQIKCg0KBQQGAgAGEgTPAQseCg0KBQQGAgABEgTPAR80Cg0KBQQGAgADEgTPATc4Cg0KBQQG
+AgAIEgTQAQYuChAKCAQGAgAInAgAEgTQAQctCkwKBAQGAgESBtMBAtQBLxo8IE9wdGlvbmFs
+LiBSZXRyaWV2YWwgdG9vbCB0aGF0IGlzIHBvd2VyZWQgYnkgR29vZ2xlIHNlYXJjaC4KCg0K
+BQQGAgEGEgTTAQIXCg0KBQQGAgEBEgTTARgvCg0KBQQGAgEDEgTTATIzCg0KBQQGAgEIEgTU
+AQYuChAKCAQGAgEInAgAEgTUAQctClIKBAQGAgISBNcBAkwaRCBPcHRpb25hbC4gRW5hYmxl
+cyB0aGUgbW9kZWwgdG8gZXhlY3V0ZSBjb2RlIGFzIHBhcnQgb2YgZ2VuZXJhdGlvbi4KCg0K
+BQQGAgIGEgTXAQIPCg0KBQQGAgIBEgTXARAeCg0KBQQGAgIDEgTXASEiCg0KBQQGAgIIEgTX
+ASNLChAKCAQGAgIInAgAEgTXASRKCm0KBAQGAgMSBNsBAkoaXyBPcHRpb25hbC4gR29vZ2xl
+U2VhcmNoIHRvb2wgdHlwZS4KIFRvb2wgdG8gc3VwcG9ydCBHb29nbGUgU2VhcmNoIGluIE1v
+ZGVsLiBQb3dlcmVkIGJ5IEdvb2dsZS4KCg0KBQQGAgMGEgTbAQIOCg0KBQQGAgMBEgTbAQ8c
+Cg0KBQQGAgMDEgTbAR8gCg0KBQQGAgMIEgTbASFJChAKCAQGAgMInAgAEgTbASJIClIKAgQH
+EgbfAQDiAQEaRCBUb29sIHRvIHJldHJpZXZlIHB1YmxpYyB3ZWIgZGF0YSBmb3IgZ3JvdW5k
+aW5nLCBwb3dlcmVkIGJ5IEdvb2dsZS4KCgsKAwQHARIE3wEIHQpTCgQEBwIAEgThAQI2GkUg
+U3BlY2lmaWVzIHRoZSBkeW5hbWljIHJldHJpZXZhbCBjb25maWd1cmF0aW9uIGZvciB0aGUg
+Z2l2ZW4gc291cmNlLgoKDQoFBAcCAAYSBOEBAhgKDQoFBAcCAAESBOEBGTEKDQoFBAcCAAMS
+BOEBNDUKRQoCBAgSBuUBAPUBARo3IERlc2NyaWJlcyB0aGUgb3B0aW9ucyB0byBjdXN0b21p
+emUgZHluYW1pYyByZXRyaWV2YWwuCgoLCgMECAESBOUBCB4KTAoEBAgEABIG5wEC7QEDGjwg
+VGhlIG1vZGUgb2YgdGhlIHByZWRpY3RvciB0byBiZSB1c2VkIGluIGR5bmFtaWMgcmV0cmll
+dmFsLgoKDQoFBAgEAAESBOcBBwsKKwoGBAgEAAIAEgTpAQQZGhsgQWx3YXlzIHRyaWdnZXIg
+cmV0cmlldmFsLgoKDwoHBAgEAAIAARIE6QEEFAoPCgcECAQAAgACEgTpARcYCkkKBgQIBAAC
+ARIE7AEEFRo5IFJ1biByZXRyaWV2YWwgb25seSB3aGVuIHN5c3RlbSBkZWNpZGVzIGl0IGlz
+IG5lY2Vzc2FyeS4KCg8KBwQIBAACAQESBOwBBBAKDwoHBAgEAAIBAhIE7AETFApKCgQECAIA
+EgTwAQIQGjwgVGhlIG1vZGUgb2YgdGhlIHByZWRpY3RvciB0byBiZSB1c2VkIGluIGR5bmFt
+aWMgcmV0cmlldmFsLgoKDQoFBAgCAAYSBPABAgYKDQoFBAgCAAESBPABBwsKDQoFBAgCAAMS
+BPABDg8KawoEBAgCARIE9AECJxpdIFRoZSB0aHJlc2hvbGQgdG8gYmUgdXNlZCBpbiBkeW5h
+bWljIHJldHJpZXZhbC4KIElmIG5vdCBzZXQsIGEgc3lzdGVtIGRlZmF1bHQgdmFsdWUgaXMg
+dXNlZC4KCg0KBQQIAgEEEgT0AQIKCg0KBQQIAgEFEgT0AQsQCg0KBQQIAgEBEgT0AREiCg0K
+BQQIAgEDEgT0ASUmCtgBCgIECRIE/AEAGBrLASBUb29sIHRoYXQgZXhlY3V0ZXMgY29kZSBn
+ZW5lcmF0ZWQgYnkgdGhlIG1vZGVsLCBhbmQgYXV0b21hdGljYWxseSByZXR1cm5zCiB0aGUg
+cmVzdWx0IHRvIHRoZSBtb2RlbC4KCiBTZWUgYWxzbyBgRXhlY3V0YWJsZUNvZGVgIGFuZCBg
+Q29kZUV4ZWN1dGlvblJlc3VsdGAgd2hpY2ggYXJlIG9ubHkgZ2VuZXJhdGVkCiB3aGVuIHVz
+aW5nIHRoaXMgdG9vbC4KCgsKAwQJARIE/AEIFQpnCgIEChIGgAIAhAIBGlkgVGhlIFRvb2wg
+Y29uZmlndXJhdGlvbiBjb250YWluaW5nIHBhcmFtZXRlcnMgZm9yIHNwZWNpZnlpbmcgYFRv
+b2xgIHVzZQogaW4gdGhlIHJlcXVlc3QuCgoLCgMECgESBIACCBIKNAoEBAoCABIGggICgwIv
+GiQgT3B0aW9uYWwuIEZ1bmN0aW9uIGNhbGxpbmcgY29uZmlnLgoKDQoFBAoCAAYSBIICAhcK
+DQoFBAoCAAESBIICGC8KDQoFBAoCAAMSBIICMjMKDQoFBAoCAAgSBIMCBi4KEAoIBAoCAAic
+CAASBIMCBy0KRwoCBAsSBocCAKkCARo5IENvbmZpZ3VyYXRpb24gZm9yIHNwZWNpZnlpbmcg
+ZnVuY3Rpb24gY2FsbGluZyBiZWhhdmlvci4KCgsKAwQLARIEhwIIHQpmCgQECwQAEgaKAgKb
+AgMaViBEZWZpbmVzIHRoZSBleGVjdXRpb24gYmVoYXZpb3IgZm9yIGZ1bmN0aW9uIGNhbGxp
+bmcgYnkgZGVmaW5pbmcgdGhlCiBleGVjdXRpb24gbW9kZS4KCg0KBQQLBAABEgSKAgcLClMK
+BgQLBAACABIEjAIEGRpDIFVuc3BlY2lmaWVkIGZ1bmN0aW9uIGNhbGxpbmcgbW9kZS4gVGhp
+cyB2YWx1ZSBzaG91bGQgbm90IGJlIHVzZWQuCgoPCgcECwQAAgABEgSMAgQUCg8KBwQLBAAC
+AAISBIwCFxgKegoGBAsEAAIBEgSQAgQNGmogRGVmYXVsdCBtb2RlbCBiZWhhdmlvciwgbW9k
+ZWwgZGVjaWRlcyB0byBwcmVkaWN0IGVpdGhlciBhIGZ1bmN0aW9uIGNhbGwKIG9yIGEgbmF0
+dXJhbCBsYW5ndWFnZSByZXNwb25zZS4KCg8KBwQLBAACAQESBJACBAgKDwoHBAsEAAIBAhIE
+kAILDAqoAgoGBAsEAAICEgSWAgQMGpcCIE1vZGVsIGlzIGNvbnN0cmFpbmVkIHRvIGFsd2F5
+cyBwcmVkaWN0aW5nIGEgZnVuY3Rpb24gY2FsbCBvbmx5LgogSWYgImFsbG93ZWRfZnVuY3Rp
+b25fbmFtZXMiIGFyZSBzZXQsIHRoZSBwcmVkaWN0ZWQgZnVuY3Rpb24gY2FsbCB3aWxsIGJl
+CiBsaW1pdGVkIHRvIGFueSBvbmUgb2YgImFsbG93ZWRfZnVuY3Rpb25fbmFtZXMiLCBlbHNl
+IHRoZSBwcmVkaWN0ZWQKIGZ1bmN0aW9uIGNhbGwgd2lsbCBiZSBhbnkgb25lIG9mIHRoZSBw
+cm92aWRlZCAiZnVuY3Rpb25fZGVjbGFyYXRpb25zIi4KCg8KBwQLBAACAgESBJYCBAcKDwoH
+BAsEAAICAhIElgIKCwqCAQoGBAsEAAIDEgSaAgQNGnIgTW9kZWwgd2lsbCBub3QgcHJlZGlj
+dCBhbnkgZnVuY3Rpb24gY2FsbC4gTW9kZWwgYmVoYXZpb3IgaXMgc2FtZSBhcyB3aGVuCiBu
+b3QgcGFzc2luZyBhbnkgZnVuY3Rpb24gZGVjbGFyYXRpb25zLgoKDwoHBAsEAAIDARIEmgIE
+CAoPCgcECwQAAgMCEgSaAgsMCo8BCgQECwIAEgSfAgI5GoABIE9wdGlvbmFsLiBTcGVjaWZp
+ZXMgdGhlIG1vZGUgaW4gd2hpY2ggZnVuY3Rpb24gY2FsbGluZyBzaG91bGQgZXhlY3V0ZS4g
+SWYKIHVuc3BlY2lmaWVkLCB0aGUgZGVmYXVsdCB2YWx1ZSB3aWxsIGJlIHNldCB0byBBVVRP
+LgoKDQoFBAsCAAYSBJ8CAgYKDQoFBAsCAAESBJ8CBwsKDQoFBAsCAAMSBJ8CDg8KDQoFBAsC
+AAgSBJ8CEDgKEAoIBAsCAAicCAASBJ8CETcKwAIKBAQLAgESBqcCAqgCLxqvAiBPcHRpb25h
+bC4gQSBzZXQgb2YgZnVuY3Rpb24gbmFtZXMgdGhhdCwgd2hlbiBwcm92aWRlZCwgbGltaXRz
+IHRoZSBmdW5jdGlvbnMKIHRoZSBtb2RlbCB3aWxsIGNhbGwuCgogVGhpcyBzaG91bGQgb25s
+eSBiZSBzZXQgd2hlbiB0aGUgTW9kZSBpcyBBTlkuIEZ1bmN0aW9uIG5hbWVzCiBzaG91bGQg
+bWF0Y2ggW0Z1bmN0aW9uRGVjbGFyYXRpb24ubmFtZV0uIFdpdGggbW9kZSBzZXQgdG8gQU5Z
+LCBtb2RlbCB3aWxsCiBwcmVkaWN0IGEgZnVuY3Rpb24gY2FsbCBmcm9tIHRoZSBzZXQgb2Yg
+ZnVuY3Rpb24gbmFtZXMgcHJvdmlkZWQuCgoNCgUECwIBBBIEpwICCgoNCgUECwIBBRIEpwIL
+EQoNCgUECwIBARIEpwISKAoNCgUECwIBAxIEpwIrLAoNCgUECwIBCBIEqAIGLgoQCggECwIB
+CJwIABIEqAIHLQrnAgoCBAwSBrACAMMCARrYAiBTdHJ1Y3R1cmVkIHJlcHJlc2VudGF0aW9u
+IG9mIGEgZnVuY3Rpb24gZGVjbGFyYXRpb24gYXMgZGVmaW5lZCBieSB0aGUKIFtPcGVuQVBJ
+IDMuMDMgc3BlY2lmaWNhdGlvbl0oaHR0cHM6Ly9zcGVjLm9wZW5hcGlzLm9yZy9vYXMvdjMu
+MC4zKS4gSW5jbHVkZWQKIGluIHRoaXMgZGVjbGFyYXRpb24gYXJlIHRoZSBmdW5jdGlvbiBu
+YW1lIGFuZCBwYXJhbWV0ZXJzLiBUaGlzCiBGdW5jdGlvbkRlY2xhcmF0aW9uIGlzIGEgcmVw
+cmVzZW50YXRpb24gb2YgYSBibG9jayBvZiBjb2RlIHRoYXQgY2FuIGJlIHVzZWQKIGFzIGEg
+YFRvb2xgIGJ5IHRoZSBtb2RlbCBhbmQgZXhlY3V0ZWQgYnkgdGhlIGNsaWVudC4KCgsKAwQM
+ARIEsAIIGwqMAQoEBAwCABIEtAICOxp+IFJlcXVpcmVkLiBUaGUgbmFtZSBvZiB0aGUgZnVu
+Y3Rpb24uCiBNdXN0IGJlIGEteiwgQS1aLCAwLTksIG9yIGNvbnRhaW4gdW5kZXJzY29yZXMg
+YW5kIGRhc2hlcywgd2l0aCBhIG1heGltdW0KIGxlbmd0aCBvZiA2My4KCg0KBQQMAgAFEgS0
+AgIICg0KBQQMAgABEgS0AgkNCg0KBQQMAgADEgS0AhARCg0KBQQMAgAIEgS0AhI6ChAKCAQM
+AgAInAgAEgS0AhM5Cj4KBAQMAgESBLcCAkIaMCBSZXF1aXJlZC4gQSBicmllZiBkZXNjcmlw
+dGlvbiBvZiB0aGUgZnVuY3Rpb24uCgoNCgUEDAIBBRIEtwICCAoNCgUEDAIBARIEtwIJFAoN
+CgUEDAIBAxIEtwIXGAoNCgUEDAIBCBIEtwIZQQoQCggEDAIBCJwIABIEtwIaQAqCAgoEBAwC
+AhIEvQICShrzASBPcHRpb25hbC4gRGVzY3JpYmVzIHRoZSBwYXJhbWV0ZXJzIHRvIHRoaXMg
+ZnVuY3Rpb24uIFJlZmxlY3RzIHRoZSBPcGVuCiBBUEkgMy4wMyBQYXJhbWV0ZXIgT2JqZWN0
+IHN0cmluZyBLZXk6IHRoZSBuYW1lIG9mIHRoZSBwYXJhbWV0ZXIuIFBhcmFtZXRlcgogbmFt
+ZXMgYXJlIGNhc2Ugc2Vuc2l0aXZlLiBTY2hlbWEgVmFsdWU6IHRoZSBTY2hlbWEgZGVmaW5p
+bmcgdGhlIHR5cGUgdXNlZAogZm9yIHRoZSBwYXJhbWV0ZXIuCgoNCgUEDAICBBIEvQICCgoN
+CgUEDAICBhIEvQILEQoNCgUEDAICARIEvQISHAoNCgUEDAICAxIEvQIfIAoNCgUEDAICCBIE
+vQIhSQoQCggEDAICCJwIABIEvQIiSArQAQoEBAwCAxIEwgICSBrBASBPcHRpb25hbC4gRGVz
+Y3JpYmVzIHRoZSBvdXRwdXQgZnJvbSB0aGlzIGZ1bmN0aW9uIGluIEpTT04gU2NoZW1hIGZv
+cm1hdC4KIFJlZmxlY3RzIHRoZSBPcGVuIEFQSSAzLjAzIFJlc3BvbnNlIE9iamVjdC4gVGhl
+IFNjaGVtYSBkZWZpbmVzIHRoZSB0eXBlCiB1c2VkIGZvciB0aGUgcmVzcG9uc2UgdmFsdWUg
+b2YgdGhlIGZ1bmN0aW9uLgoKDQoFBAwCAwQSBMICAgoKDQoFBAwCAwYSBMICCxEKDQoFBAwC
+AwESBMICEhoKDQoFBAwCAwMSBMICHR4KDQoFBAwCAwgSBMICH0cKEAoIBAwCAwicCAASBMIC
+IEYKrQEKAgQNEgbIAgDVAgEangEgQSBwcmVkaWN0ZWQgYEZ1bmN0aW9uQ2FsbGAgcmV0dXJu
+ZWQgZnJvbSB0aGUgbW9kZWwgdGhhdCBjb250YWlucwogYSBzdHJpbmcgcmVwcmVzZW50aW5n
+IHRoZSBgRnVuY3Rpb25EZWNsYXJhdGlvbi5uYW1lYCB3aXRoIHRoZQogYXJndW1lbnRzIGFu
+ZCB0aGVpciB2YWx1ZXMuCgoLCgMEDQESBMgCCBQKpwEKBAQNAgASBMsCAjkamAEgT3B0aW9u
+YWwuIFRoZSB1bmlxdWUgaWQgb2YgdGhlIGZ1bmN0aW9uIGNhbGwuIElmIHBvcHVsYXRlZCwg
+dGhlIGNsaWVudCB0bwogZXhlY3V0ZSB0aGUgYGZ1bmN0aW9uX2NhbGxgIGFuZCByZXR1cm4g
+dGhlIHJlc3BvbnNlIHdpdGggdGhlIG1hdGNoaW5nIGBpZGAuCgoNCgUEDQIABRIEywICCAoN
+CgUEDQIAARIEywIJCwoNCgUEDQIAAxIEywIODwoNCgUEDQIACBIEywIQOAoQCggEDQIACJwI
+ABIEywIRNwqVAQoEBA0CARIE0AICOxqGASBSZXF1aXJlZC4gVGhlIG5hbWUgb2YgdGhlIGZ1
+bmN0aW9uIHRvIGNhbGwuCiBNdXN0IGJlIGEteiwgQS1aLCAwLTksIG9yIGNvbnRhaW4gdW5k
+ZXJzY29yZXMgYW5kIGRhc2hlcywgd2l0aCBhIG1heGltdW0KIGxlbmd0aCBvZiA2My4KCg0K
+BQQNAgEFEgTQAgIICg0KBQQNAgEBEgTQAgkNCg0KBQQNAgEDEgTQAhARCg0KBQQNAgEIEgTQ
+AhI6ChAKCAQNAgEInAgAEgTQAhM5ClUKBAQNAgISBtMCAtQCLxpFIE9wdGlvbmFsLiBUaGUg
+ZnVuY3Rpb24gcGFyYW1ldGVycyBhbmQgdmFsdWVzIGluIEpTT04gb2JqZWN0IGZvcm1hdC4K
+Cg0KBQQNAgIEEgTTAgIKCg0KBQQNAgIGEgTTAgshCg0KBQQNAgIBEgTTAiImCg0KBQQNAgID
+EgTTAikqCg0KBQQNAgIIEgTUAgYuChAKCAQNAgIInAgAEgTUAgctCrcCCgIEDhIG3AIA6AIB
+GqgCIFRoZSByZXN1bHQgb3V0cHV0IGZyb20gYSBgRnVuY3Rpb25DYWxsYCB0aGF0IGNvbnRh
+aW5zIGEgc3RyaW5nCiByZXByZXNlbnRpbmcgdGhlIGBGdW5jdGlvbkRlY2xhcmF0aW9uLm5h
+bWVgIGFuZCBhIHN0cnVjdHVyZWQgSlNPTgogb2JqZWN0IGNvbnRhaW5pbmcgYW55IG91dHB1
+dCBmcm9tIHRoZSBmdW5jdGlvbiBpcyB1c2VkIGFzIGNvbnRleHQgdG8KIHRoZSBtb2RlbC4g
+VGhpcyBzaG91bGQgY29udGFpbiB0aGUgcmVzdWx0IG9mIGFgRnVuY3Rpb25DYWxsYCBtYWRl
+CiBiYXNlZCBvbiBtb2RlbCBwcmVkaWN0aW9uLgoKCwoDBA4BEgTcAggYCpQBCgQEDgIAEgTf
+AgI5GoUBIE9wdGlvbmFsLiBUaGUgaWQgb2YgdGhlIGZ1bmN0aW9uIGNhbGwgdGhpcyByZXNw
+b25zZSBpcyBmb3IuIFBvcHVsYXRlZCBieQogdGhlIGNsaWVudCB0byBtYXRjaCB0aGUgY29y
+cmVzcG9uZGluZyBmdW5jdGlvbiBjYWxsIGBpZGAuCgoNCgUEDgIABRIE3wICCAoNCgUEDgIA
+ARIE3wIJCwoNCgUEDgIAAxIE3wIODwoNCgUEDgIACBIE3wIQOAoQCggEDgIACJwIABIE3wIR
+NwqVAQoEBA4CARIE5AICOxqGASBSZXF1aXJlZC4gVGhlIG5hbWUgb2YgdGhlIGZ1bmN0aW9u
+IHRvIGNhbGwuCiBNdXN0IGJlIGEteiwgQS1aLCAwLTksIG9yIGNvbnRhaW4gdW5kZXJzY29y
+ZXMgYW5kIGRhc2hlcywgd2l0aCBhIG1heGltdW0KIGxlbmd0aCBvZiA2My4KCg0KBQQOAgEF
+EgTkAgIICg0KBQQOAgEBEgTkAgkNCg0KBQQOAgEDEgTkAhARCg0KBQQOAgEIEgTkAhI6ChAK
+CAQOAgEInAgAEgTkAhM5CkYKBAQOAgISBOcCAk8aOCBSZXF1aXJlZC4gVGhlIGZ1bmN0aW9u
+IHJlc3BvbnNlIGluIEpTT04gb2JqZWN0IGZvcm1hdC4KCg0KBQQOAgIGEgTnAgIYCg0KBQQO
+AgIBEgTnAhkhCg0KBQQOAgIDEgTnAiQlCg0KBQQOAgIIEgTnAiZOChAKCAQOAgIInAgAEgTn
+AidNCoQCCgIEDxIG7gIAkwMBGvUBIFRoZSBgU2NoZW1hYCBvYmplY3QgYWxsb3dzIHRoZSBk
+ZWZpbml0aW9uIG9mIGlucHV0IGFuZCBvdXRwdXQgZGF0YSB0eXBlcy4KIFRoZXNlIHR5cGVz
+IGNhbiBiZSBvYmplY3RzLCBidXQgYWxzbyBwcmltaXRpdmVzIGFuZCBhcnJheXMuCiBSZXBy
+ZXNlbnRzIGEgc2VsZWN0IHN1YnNldCBvZiBhbiBbT3BlbkFQSSAzLjAgc2NoZW1hCiBvYmpl
+Y3RdKGh0dHBzOi8vc3BlYy5vcGVuYXBpcy5vcmcvb2FzL3YzLjAuMyNzY2hlbWEpLgoKCwoD
+BA8BEgTuAggOCiQKBAQPAgASBPACAjkaFiBSZXF1aXJlZC4gRGF0YSB0eXBlLgoKDQoFBA8C
+AAYSBPACAgYKDQoFBA8CAAESBPACBwsKDQoFBA8CAAMSBPACDg8KDQoFBA8CAAgSBPACEDgK
+EAoIBA8CAAicCAASBPACETcKywEKBAQPAgESBPcCAj0avAEgT3B0aW9uYWwuIFRoZSBmb3Jt
+YXQgb2YgdGhlIGRhdGEuIFRoaXMgaXMgdXNlZCBvbmx5IGZvciBwcmltaXRpdmUKIGRhdGF0
+eXBlcy4gU3VwcG9ydGVkIGZvcm1hdHM6CiAgZm9yIE5VTUJFUiB0eXBlOiBmbG9hdCwgZG91
+YmxlCiAgZm9yIElOVEVHRVIgdHlwZTogaW50MzIsIGludDY0CiAgZm9yIFNUUklORyB0eXBl
+OiBlbnVtCgoNCgUEDwIBBRIE9wICCAoNCgUEDwIBARIE9wIJDwoNCgUEDwIBAxIE9wISEwoN
+CgUEDwIBCBIE9wIUPAoQCggEDwIBCJwIABIE9wIVOwqZAQoEBA8CAhIE+wICQhqKASBPcHRp
+b25hbC4gQSBicmllZiBkZXNjcmlwdGlvbiBvZiB0aGUgcGFyYW1ldGVyLiBUaGlzIGNvdWxk
+IGNvbnRhaW4gZXhhbXBsZXMKIG9mIHVzZS4gUGFyYW1ldGVyIGRlc2NyaXB0aW9uIG1heSBi
+ZSBmb3JtYXR0ZWQgYXMgTWFya2Rvd24uCgoNCgUEDwICBRIE+wICCAoNCgUEDwICARIE+wIJ
+FAoNCgUEDwICAxIE+wIXGAoNCgUEDwICCBIE+wIZQQoQCggEDwICCJwIABIE+wIaQAo9CgQE
+DwIDEgT+AgI9Gi8gT3B0aW9uYWwuIEluZGljYXRlcyBpZiB0aGUgdmFsdWUgbWF5IGJlIG51
+bGwuCgoNCgUEDwIDBRIE/gICBgoNCgUEDwIDARIE/gIHDwoNCgUEDwIDAxIE/gISEwoNCgUE
+DwIDCBIE/gIUPAoQCggEDwIDCJwIABIE/gIVOwrQAQoEBA8CBBIEgwMCRBrBASBPcHRpb25h
+bC4gUG9zc2libGUgdmFsdWVzIG9mIHRoZSBlbGVtZW50IG9mIFR5cGUuU1RSSU5HIHdpdGgg
+ZW51bSBmb3JtYXQuCiBGb3IgZXhhbXBsZSB3ZSBjYW4gZGVmaW5lIGFuIEVudW0gRGlyZWN0
+aW9uIGFzIDoKIHt0eXBlOlNUUklORywgZm9ybWF0OmVudW0sIGVudW06WyJFQVNUIiwgTk9S
+VEgiLCAiU09VVEgiLCAiV0VTVCJdfQoKDQoFBA8CBAQSBIMDAgoKDQoFBA8CBAUSBIMDCxEK
+DQoFBA8CBAESBIMDEhYKDQoFBA8CBAMSBIMDGRoKDQoFBA8CBAgSBIMDG0MKEAoIBA8CBAic
+CAASBIMDHEIKPwoEBA8CBRIEhgMCRRoxIE9wdGlvbmFsLiBTY2hlbWEgb2YgdGhlIGVsZW1l
+bnRzIG9mIFR5cGUuQVJSQVkuCgoNCgUEDwIFBBIEhgMCCgoNCgUEDwIFBhIEhgMLEQoNCgUE
+DwIFARIEhgMSFwoNCgUEDwIFAxIEhgMaGwoNCgUEDwIFCBIEhgMcRAoQCggEDwIFCJwIABIE
+hgMdQwpICgQEDwIGEgSJAwJAGjogT3B0aW9uYWwuIE1heGltdW0gbnVtYmVyIG9mIHRoZSBl
+bGVtZW50cyBmb3IgVHlwZS5BUlJBWS4KCg0KBQQPAgYFEgSJAwIHCg0KBQQPAgYBEgSJAwgR
+Cg0KBQQPAgYDEgSJAxQWCg0KBQQPAgYIEgSJAxc/ChAKCAQPAgYInAgAEgSJAxg+CkgKBAQP
+AgcSBIwDAkAaOiBPcHRpb25hbC4gTWluaW11bSBudW1iZXIgb2YgdGhlIGVsZW1lbnRzIGZv
+ciBUeXBlLkFSUkFZLgoKDQoFBA8CBwUSBIwDAgcKDQoFBA8CBwESBIwDCBEKDQoFBA8CBwMS
+BIwDFBYKDQoFBA8CBwgSBIwDFz8KEAoIBA8CBwicCAASBIwDGD4KNAoEBA8CCBIEjwMCThom
+IE9wdGlvbmFsLiBQcm9wZXJ0aWVzIG9mIFR5cGUuT0JKRUNULgoKDQoFBA8CCAYSBI8DAhUK
+DQoFBA8CCAESBI8DFiAKDQoFBA8CCAMSBI8DIyQKDQoFBA8CCAgSBI8DJU0KEAoIBA8CCAic
+CAASBI8DJkwKPQoEBA8CCRIEkgMCSBovIE9wdGlvbmFsLiBSZXF1aXJlZCBwcm9wZXJ0aWVz
+IG9mIFR5cGUuT0JKRUNULgoKDQoFBA8CCQQSBJIDAgoKDQoFBA8CCQUSBJIDCxEKDQoFBA8C
+CQESBJIDEhoKDQoFBA8CCQMSBJIDHR4KDQoFBA8CCQgSBJIDH0cKEAoIBA8CCQicCAASBJID
+IEYKRwoCBBASBpYDAJ0DARo5IFBhc3NhZ2UgaW5jbHVkZWQgaW5saW5lIHdpdGggYSBncm91
+bmRpbmcgY29uZmlndXJhdGlvbi4KCgsKAwQQARIElgMIGApdCgQEEAIAEgSZAwIQGk8gSWRl
+bnRpZmllciBmb3IgdGhlIHBhc3NhZ2UgZm9yIGF0dHJpYnV0aW5nIHRoaXMgcGFzc2FnZSBp
+biBncm91bmRlZAogYW5zd2Vycy4KCg0KBQQQAgAFEgSZAwIICg0KBQQQAgABEgSZAwkLCg0K
+BQQQAgADEgSZAw4PCicKBAQQAgESBJwDAhYaGSBDb250ZW50IG9mIHRoZSBwYXNzYWdlLgoK
+DQoFBBACAQYSBJwDAgkKDQoFBBACAQESBJwDChEKDQoFBBACAQMSBJwDFBUKLAoCBBESBqAD
+AKMDARoeIEEgcmVwZWF0ZWQgbGlzdCBvZiBwYXNzYWdlcy4KCgsKAwQRARIEoAMIGQohCgQE
+EQIAEgSiAwIpGhMgTGlzdCBvZiBwYXNzYWdlcy4KCg0KBQQRAgAEEgSiAwIKCg0KBQQRAgAG
+EgSiAwsbCg0KBQQRAgABEgSiAxwkCg0KBQQRAgADEgSiAycoYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::Content ===
+    # Fields for Content
+    # Field: parts Type: 11 (.google.ai.generativelanguage.v1alpha.Part)
+    # Field: role Type: 9 ()
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::Part ===
+    # Fields for Part
+    # Field: text Type: 9 ()
+    # Field: inline_data Type: 11 (.google.ai.generativelanguage.v1alpha.Blob)
+    # Field: function_call Type: 11 (.google.ai.generativelanguage.v1alpha.FunctionCall)
+    # Field: function_response Type: 11 (.google.ai.generativelanguage.v1alpha.FunctionResponse)
+    # Field: file_data Type: 11 (.google.ai.generativelanguage.v1alpha.FileData)
+    # Field: executable_code Type: 11 (.google.ai.generativelanguage.v1alpha.ExecutableCode)
+    # Field: code_execution_result Type: 11 (.google.ai.generativelanguage.v1alpha.CodeExecutionResult)
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::Blob ===
+    # Fields for Blob
+    # Field: mime_type Type: 9 ()
+    # Field: data Type: 12 ()
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::FileData ===
+    # Fields for FileData
+    # Field: mime_type Type: 9 ()
+    # Field: file_uri Type: 9 ()
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::ExecutableCode ===
+    # Fields for ExecutableCode
+    # Field: language Type: 14 (.google.ai.generativelanguage.v1alpha.ExecutableCode.Language)
+    # Field: code Type: 9 ()
+
+# Enum: ExecutableCode::Language
+our $ExecutableCode_LANGUAGE_UNSPECIFIED = 0;
+our $ExecutableCode_PYTHON = 1;
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::CodeExecutionResult ===
+    # Fields for CodeExecutionResult
+    # Field: outcome Type: 14 (.google.ai.generativelanguage.v1alpha.CodeExecutionResult.Outcome)
+    # Field: output Type: 9 ()
+
+# Enum: CodeExecutionResult::Outcome
+our $CodeExecutionResult_OUTCOME_UNSPECIFIED = 0;
+our $CodeExecutionResult_OUTCOME_OK = 1;
+our $CodeExecutionResult_OUTCOME_FAILED = 2;
+our $CodeExecutionResult_OUTCOME_DEADLINE_EXCEEDED = 3;
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::Tool ===
+    # Fields for Tool
+    # Field: function_declarations Type: 11 (.google.ai.generativelanguage.v1alpha.FunctionDeclaration)
+    # Field: google_search_retrieval Type: 11 (.google.ai.generativelanguage.v1alpha.GoogleSearchRetrieval)
+    # Field: code_execution Type: 11 (.google.ai.generativelanguage.v1alpha.CodeExecution)
+    # Field: google_search Type: 11 (.google.ai.generativelanguage.v1alpha.Tool.GoogleSearch)
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::GoogleSearchRetrieval ===
+    # Fields for GoogleSearchRetrieval
+    # Field: dynamic_retrieval_config Type: 11 (.google.ai.generativelanguage.v1alpha.DynamicRetrievalConfig)
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::DynamicRetrievalConfig ===
+    # Fields for DynamicRetrievalConfig
+    # Field: mode Type: 14 (.google.ai.generativelanguage.v1alpha.DynamicRetrievalConfig.Mode)
+    # Field: dynamic_threshold Type: 2 ()
+
+# Enum: DynamicRetrievalConfig::Mode
+our $DynamicRetrievalConfig_MODE_UNSPECIFIED = 0;
+our $DynamicRetrievalConfig_MODE_DYNAMIC = 1;
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::CodeExecution ===
+    # Fields for CodeExecution
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::ToolConfig ===
+    # Fields for ToolConfig
+    # Field: function_calling_config Type: 11 (.google.ai.generativelanguage.v1alpha.FunctionCallingConfig)
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::FunctionCallingConfig ===
+    # Fields for FunctionCallingConfig
+    # Field: mode Type: 14 (.google.ai.generativelanguage.v1alpha.FunctionCallingConfig.Mode)
+    # Field: allowed_function_names Type: 9 ()
+
+# Enum: FunctionCallingConfig::Mode
+our $FunctionCallingConfig_MODE_UNSPECIFIED = 0;
+our $FunctionCallingConfig_AUTO = 1;
+our $FunctionCallingConfig_ANY = 2;
+our $FunctionCallingConfig_NONE = 3;
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::FunctionDeclaration ===
+    # Fields for FunctionDeclaration
+    # Field: name Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: parameters Type: 11 (.google.ai.generativelanguage.v1alpha.Schema)
+    # Field: response Type: 11 (.google.ai.generativelanguage.v1alpha.Schema)
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::FunctionCall ===
+    # Fields for FunctionCall
+    # Field: id Type: 9 ()
+    # Field: name Type: 9 ()
+    # Field: args Type: 11 (.google.protobuf.Struct)
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::FunctionResponse ===
+    # Fields for FunctionResponse
+    # Field: id Type: 9 ()
+    # Field: name Type: 9 ()
+    # Field: response Type: 11 (.google.protobuf.Struct)
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::Schema ===
+    # Fields for Schema
+    # Field: type Type: 14 (.google.ai.generativelanguage.v1alpha.Type)
+    # Field: format Type: 9 ()
+    # Field: description Type: 9 ()
+    # Field: nullable Type: 8 ()
+    # Field: enum Type: 9 ()
+    # Field: items Type: 11 (.google.ai.generativelanguage.v1alpha.Schema)
+    # Field: max_items Type: 3 ()
+    # Field: min_items Type: 3 ()
+    # Field: properties Type: 11 (.google.ai.generativelanguage.v1alpha.Schema.PropertiesEntry)
+    # Field: required Type: 9 ()
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::GroundingPassage ===
+    # Fields for GroundingPassage
+    # Field: id Type: 9 ()
+    # Field: content Type: 11 (.google.ai.generativelanguage.v1alpha.Content)
+
+# === Message: Google::Ai::Generativelanguage::V1alpha::Content::GroundingPassages ===
+    # Fields for GroundingPassages
+    # Field: passages Type: 11 (.google.ai.generativelanguage.v1alpha.GroundingPassage)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Ai::Generativelanguage::V1alpha::Content - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1alpha/content.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1alpha::Content;
+
+    my $msg = Google::Ai::Generativelanguage::V1alpha::Content::Content->new({
+        parts => $parts,
+        role => $role,
+    });
+
+    # Read or update a field
+    my $val = $msg->parts();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1alpha::Content::Content->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1alpha/content.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::Content
+
+The base structured datatype containing multi-part content of a message.
+
+A `Content` includes a `role` field designating the producer of the `Content`
+and a `parts` field containing multi-part data that contains the content of
+the message turn.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parts() >> / C<< $msg->parts($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::Part>)
+
+Ordered `Parts` that constitute a single message. Parts may have different
+MIME types.
+
+=item * C<< $msg->role() >> / C<< $msg->role($value) >>
+
+Type: C<String>
+
+Optional. The producer of the content. Must be either 'user' or 'model'.
+
+Useful to set for multi-turn conversations, otherwise can be left blank
+or unset.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::Part
+
+A datatype containing media that is part of a multi-part `Content` message.
+
+A `Part` consists of data which has an associated datatype. A `Part` can only
+contain one of the accepted types in `Part.data`.
+
+A `Part` must have a fixed IANA MIME type identifying the type and subtype
+of the media if the `inline_data` field is filled with raw bytes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->text() >> / C<< $msg->text($value) >>
+
+Type: C<String>
+
+Inline text.
+
+=item * C<< $msg->inline_data() >> / C<< $msg->inline_data($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::Blob>)
+
+Inline media bytes.
+
+=item * C<< $msg->function_call() >> / C<< $msg->function_call($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::FunctionCall>)
+
+A predicted `FunctionCall` returned from the model that contains
+a string representing the `FunctionDeclaration.name` with the
+arguments and their values.
+
+=item * C<< $msg->function_response() >> / C<< $msg->function_response($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::FunctionResponse>)
+
+The result output of a `FunctionCall` that contains a string
+representing the `FunctionDeclaration.name` and a structured JSON
+object containing any output from the function is used as context to
+the model.
+
+=item * C<< $msg->file_data() >> / C<< $msg->file_data($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::FileData>)
+
+URI based data.
+
+=item * C<< $msg->executable_code() >> / C<< $msg->executable_code($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::ExecutableCode>)
+
+Code generated by the model that is meant to be executed.
+
+=item * C<< $msg->code_execution_result() >> / C<< $msg->code_execution_result($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::CodeExecutionResult>)
+
+Result of executing the `ExecutableCode`.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::Blob
+
+Raw media bytes.
+
+Text should not be sent as raw bytes, use the 'text' field.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mime_type() >> / C<< $msg->mime_type($value) >>
+
+Type: C<String>
+
+The IANA standard MIME type of the source data.
+Examples:
+  - image/png
+  - image/jpeg
+If an unsupported MIME type is provided, an error will be returned. For a
+complete list of supported types, see [Supported file
+formats](https://ai.google.dev/gemini-api/docs/prompting_with_media#supported_file_formats).
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+Raw bytes for media formats.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::FileData
+
+URI based data.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mime_type() >> / C<< $msg->mime_type($value) >>
+
+Type: C<String>
+
+Optional. The IANA standard MIME type of the source data.
+
+=item * C<< $msg->file_uri() >> / C<< $msg->file_uri($value) >>
+
+Type: C<String>
+
+Required. URI.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::ExecutableCode
+
+Code generated by the model that is meant to be executed, and the result
+returned to the model.
+
+Only generated when using the `CodeExecution` tool, in which the code will
+be automatically executed, and a corresponding `CodeExecutionResult` will
+also be generated.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->language() >> / C<< $msg->language($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1alpha::ExecutableCode::Language>)
+
+Required. Programming language of the `code`.
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<String>
+
+Required. The code to be executed.
+
+=back
+
+=head3 Enum: ExecutableCode::Language
+
+=over 4
+
+=item * C<LANGUAGE_UNSPECIFIED> => C<0>
+
+=item * C<PYTHON> => C<1>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::CodeExecutionResult
+
+Result of executing the `ExecutableCode`.
+
+Only generated when using the `CodeExecution`, and always follows a `part`
+containing the `ExecutableCode`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->outcome() >> / C<< $msg->outcome($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1alpha::CodeExecutionResult::Outcome>)
+
+Required. Outcome of the code execution.
+
+=item * C<< $msg->output() >> / C<< $msg->output($value) >>
+
+Type: C<String>
+
+Optional. Contains stdout when code execution is successful, stderr or
+other description otherwise.
+
+=back
+
+=head3 Enum: CodeExecutionResult::Outcome
+
+=over 4
+
+=item * C<OUTCOME_UNSPECIFIED> => C<0>
+
+=item * C<OUTCOME_OK> => C<1>
+
+=item * C<OUTCOME_FAILED> => C<2>
+
+=item * C<OUTCOME_DEADLINE_EXCEEDED> => C<3>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::Tool
+
+Tool details that the model may use to generate response.
+
+A `Tool` is a piece of code that enables the system to interact with
+external systems to perform an action, or set of actions, outside of
+knowledge and scope of the model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->function_declarations() >> / C<< $msg->function_declarations($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::FunctionDeclaration>)
+
+Optional. A list of `FunctionDeclarations` available to the model that can
+be used for function calling.
+
+The model or system does not execute the function. Instead the defined
+function may be returned as a
+[FunctionCall][google.ai.generativelanguage.v1alpha.Part.function_call]
+with arguments to the client side for execution. The model may decide to
+call a subset of these functions by populating
+[FunctionCall][google.ai.generativelanguage.v1alpha.Part.function_call] in
+the response. The next conversation turn may contain a
+[FunctionResponse][google.ai.generativelanguage.v1alpha.Part.function_response]
+with the [Content.role][google.ai.generativelanguage.v1alpha.Content.role]
+"function" generation context for the next model turn.
+
+=item * C<< $msg->google_search_retrieval() >> / C<< $msg->google_search_retrieval($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::GoogleSearchRetrieval>)
+
+Optional. Retrieval tool that is powered by Google search.
+
+=item * C<< $msg->code_execution() >> / C<< $msg->code_execution($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::CodeExecution>)
+
+Optional. Enables the model to execute code as part of generation.
+
+=item * C<< $msg->google_search() >> / C<< $msg->google_search($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::Tool::GoogleSearch>)
+
+Optional. GoogleSearch tool type.
+Tool to support Google Search in Model. Powered by Google.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::GoogleSearchRetrieval
+
+Tool to retrieve public web data for grounding, powered by Google.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dynamic_retrieval_config() >> / C<< $msg->dynamic_retrieval_config($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::DynamicRetrievalConfig>)
+
+Specifies the dynamic retrieval configuration for the given source.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::DynamicRetrievalConfig
+
+Describes the options to customize dynamic retrieval.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mode() >> / C<< $msg->mode($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1alpha::DynamicRetrievalConfig::Mode>)
+
+The mode of the predictor to be used in dynamic retrieval.
+
+=item * C<< $msg->dynamic_threshold() >> / C<< $msg->dynamic_threshold($value) >>
+
+Type: C<Float>
+
+The threshold to be used in dynamic retrieval.
+If not set, a system default value is used.
+
+=back
+
+=head3 Enum: DynamicRetrievalConfig::Mode
+
+=over 4
+
+=item * C<MODE_UNSPECIFIED> => C<0>
+
+=item * C<MODE_DYNAMIC> => C<1>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::CodeExecution
+
+Tool that executes code generated by the model, and automatically returns
+the result to the model.
+
+See also `ExecutableCode` and `CodeExecutionResult` which are only generated
+when using this tool.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::ToolConfig
+
+The Tool configuration containing parameters for specifying `Tool` use
+in the request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->function_calling_config() >> / C<< $msg->function_calling_config($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::FunctionCallingConfig>)
+
+Optional. Function calling config.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::FunctionCallingConfig
+
+Configuration for specifying function calling behavior.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mode() >> / C<< $msg->mode($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1alpha::FunctionCallingConfig::Mode>)
+
+Optional. Specifies the mode in which function calling should execute. If
+unspecified, the default value will be set to AUTO.
+
+=item * C<< $msg->allowed_function_names() >> / C<< $msg->allowed_function_names($value) >>
+
+Type: C<String>
+
+Optional. A set of function names that, when provided, limits the functions
+the model will call.
+
+This should only be set when the Mode is ANY. Function names
+should match [FunctionDeclaration.name]. With mode set to ANY, model will
+predict a function call from the set of function names provided.
+
+=back
+
+=head3 Enum: FunctionCallingConfig::Mode
+
+=over 4
+
+=item * C<MODE_UNSPECIFIED> => C<0>
+
+=item * C<AUTO> => C<1>
+
+=item * C<ANY> => C<2>
+
+=item * C<NONE> => C<3>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::FunctionDeclaration
+
+Structured representation of a function declaration as defined by the
+[OpenAPI 3.03 specification](https://spec.openapis.org/oas/v3.0.3). Included
+in this declaration are the function name and parameters. This
+FunctionDeclaration is a representation of a block of code that can be used
+as a `Tool` by the model and executed by the client.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the function.
+Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum
+length of 63.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Required. A brief description of the function.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::Schema>)
+
+Optional. Describes the parameters to this function. Reflects the Open
+API 3.03 Parameter Object string Key: the name of the parameter. Parameter
+names are case sensitive. Schema Value: the Schema defining the type used
+for the parameter.
+
+=item * C<< $msg->response() >> / C<< $msg->response($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::Schema>)
+
+Optional. Describes the output from this function in JSON Schema format.
+Reflects the Open API 3.03 Response Object. The Schema defines the type
+used for the response value of the function.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::FunctionCall
+
+A predicted `FunctionCall` returned from the model that contains
+a string representing the `FunctionDeclaration.name` with the
+arguments and their values.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Optional. The unique id of the function call. If populated, the client to
+execute the `function_call` and return the response with the matching `id`.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the function to call.
+Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum
+length of 63.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Optional. The function parameters and values in JSON object format.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::FunctionResponse
+
+The result output from a `FunctionCall` that contains a string
+representing the `FunctionDeclaration.name` and a structured JSON
+object containing any output from the function is used as context to
+the model. This should contain the result of a`FunctionCall` made
+based on model prediction.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Optional. The id of the function call this response is for. Populated by
+the client to match the corresponding function call `id`.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the function to call.
+Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum
+length of 63.
+
+=item * C<< $msg->response() >> / C<< $msg->response($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Required. The function response in JSON object format.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::Schema
+
+The `Schema` object allows the definition of input and output data types.
+These types can be objects, but also primitives and arrays.
+Represents a select subset of an [OpenAPI 3.0 schema
+object](https://spec.openapis.org/oas/v3.0.3#schema).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1alpha::Type>)
+
+Required. Data type.
+
+=item * C<< $msg->format() >> / C<< $msg->format($value) >>
+
+Type: C<String>
+
+Optional. The format of the data. This is used only for primitive
+datatypes. Supported formats:
+ for NUMBER type: float, double
+ for INTEGER type: int32, int64
+ for STRING type: enum
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A brief description of the parameter. This could contain examples
+of use. Parameter description may be formatted as Markdown.
+
+=item * C<< $msg->nullable() >> / C<< $msg->nullable($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates if the value may be null.
+
+=item * C<< $msg->enum() >> / C<< $msg->enum($value) >>
+
+Type: C<String>
+
+Optional. Possible values of the element of Type.STRING with enum format.
+For example we can define an Enum Direction as :
+{type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::Schema>)
+
+Optional. Schema of the elements of Type.ARRAY.
+
+=item * C<< $msg->max_items() >> / C<< $msg->max_items($value) >>
+
+Type: C<Int64>
+
+Optional. Maximum number of the elements for Type.ARRAY.
+
+=item * C<< $msg->min_items() >> / C<< $msg->min_items($value) >>
+
+Type: C<Int64>
+
+Optional. Minimum number of the elements for Type.ARRAY.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::Schema::PropertiesEntry>)
+
+Optional. Properties of Type.OBJECT.
+
+=item * C<< $msg->required() >> / C<< $msg->required($value) >>
+
+Type: C<String>
+
+Optional. Required properties of Type.OBJECT.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::GroundingPassage
+
+Passage included inline with a grounding configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Identifier for the passage for attributing this passage in grounded
+answers.
+
+=item * C<< $msg->content() >> / C<< $msg->content($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::Content>)
+
+Content of the passage.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1alpha::Content::GroundingPassages
+
+A repeated list of passages.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->passages() >> / C<< $msg->passages($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1alpha::Content::GroundingPassage>)
+
+List of passages.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1alpha::Content::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

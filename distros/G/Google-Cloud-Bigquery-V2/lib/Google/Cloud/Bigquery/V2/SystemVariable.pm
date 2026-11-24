@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::SystemVariable;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -56,47 +56,70 @@ EOF
     # Field: types Type: 11 (.google.cloud.bigquery.v2.SystemVariables.TypesEntry)
     # Field: values Type: 11 (.google.protobuf.Struct)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::SystemVariable::SystemVariables - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::SystemVariable - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/system_variable.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::SystemVariable;
 
-    my $msg = Google::Cloud::Bigquery::V2::SystemVariable::SystemVariables->new(
-        types => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::SystemVariable::SystemVariables->new({
+        types => $types,
+        values => $values,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->types();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::SystemVariable::SystemVariables->parse($bytes);
 
-=item * B<types>
-
-Type: Message (.google.cloud.bigquery.v2.SystemVariables.TypesEntry)
-
-=item * B<values>
-
-Type: Message (.google.protobuf.Struct)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::SystemVariable - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/system_variable.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::SystemVariable::SystemVariables
+
+System variables given to a query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->types() >> / C<< $msg->types($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::SystemVariable::SystemVariables::TypesEntry>)
+
+Output only. Data type for each system variable.
+
+=item * C<< $msg->values() >> / C<< $msg->values($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Output only. Value for each system variable.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::SystemVariable::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

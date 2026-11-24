@@ -7,7 +7,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 1; # End of Google::Cloud::Compute::V1::ReservationSubBlocksClient
 
 __END__

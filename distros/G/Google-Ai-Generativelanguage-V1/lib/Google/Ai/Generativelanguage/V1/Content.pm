@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1::Content;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -120,110 +120,16 @@ EOF
     # Field: parts Type: 11 (.google.ai.generativelanguage.v1.Part)
     # Field: role Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Content::Content - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1::Content::Content->new(
-        parts => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parts>
-
-Type: Message (.google.ai.generativelanguage.v1.Part)
-
-=item * B<role>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1::Content::Part ===
     # Fields for Part
     # Field: text Type: 9 ()
     # Field: inline_data Type: 11 (.google.ai.generativelanguage.v1.Blob)
     # Field: video_metadata Type: 11 (.google.ai.generativelanguage.v1.VideoMetadata)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Content::Part - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1::Content::Part->new(
-        text => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<text>
-
-Type: String
-
-=item * B<inline_data>
-
-Type: Message (.google.ai.generativelanguage.v1.Blob)
-
-=item * B<video_metadata>
-
-Type: Message (.google.ai.generativelanguage.v1.VideoMetadata)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1::Content::Blob ===
     # Fields for Blob
     # Field: mime_type Type: 9 ()
     # Field: data Type: 12 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Content::Blob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1::Content::Blob->new(
-        mime_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mime_type>
-
-Type: String
-
-=item * B<data>
-
-Type: Bytes
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1::Content::VideoMetadata ===
     # Fields for VideoMetadata
@@ -231,86 +137,207 @@ Type: Bytes
     # Field: end_offset Type: 11 (.google.protobuf.Duration)
     # Field: fps Type: 1 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Content::VideoMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1::Content::VideoMetadata->new(
-        start_offset => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start_offset>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<end_offset>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<fps>
-
-Type: Double
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1::Content::ModalityTokenCount ===
     # Fields for ModalityTokenCount
     # Field: modality Type: 14 (.google.ai.generativelanguage.v1.Modality)
     # Field: token_count Type: 5 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1::Content::ModalityTokenCount - Compiled Protocol Buffers message class
+Google::Ai::Generativelanguage::V1::Content - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1/content.proto
 
 =head1 SYNOPSIS
 
     use Google::Ai::Generativelanguage::V1::Content;
 
-    my $msg = Google::Ai::Generativelanguage::V1::Content::ModalityTokenCount->new(
-        modality => $value,
-    );
+    my $msg = Google::Ai::Generativelanguage::V1::Content::Content->new({
+        parts => $parts,
+        role => $role,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->parts();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1::Content::Content->parse($bytes);
 
-=item * B<modality>
-
-Type: Enum (.google.ai.generativelanguage.v1.Modality)
-
-=item * B<token_count>
-
-Type: Int32
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::Content - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1/content.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1::Content::Content
+
+The base structured datatype containing multi-part content of a message.
+
+A `Content` includes a `role` field designating the producer of the `Content`
+and a `parts` field containing multi-part data that contains the content of
+the message turn.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parts() >> / C<< $msg->parts($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1::Content::Part>)
+
+Ordered `Parts` that constitute a single message. Parts may have different
+MIME types.
+
+=item * C<< $msg->role() >> / C<< $msg->role($value) >>
+
+Type: C<String>
+
+Optional. The producer of the content. Must be either 'user' or 'model'.
+
+Useful to set for multi-turn conversations, otherwise can be left blank
+or unset.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1::Content::Part
+
+A datatype containing media that is part of a multi-part `Content` message.
+
+A `Part` consists of data which has an associated datatype. A `Part` can only
+contain one of the accepted types in `Part.data`.
+
+A `Part` must have a fixed IANA MIME type identifying the type and subtype
+of the media if the `inline_data` field is filled with raw bytes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->text() >> / C<< $msg->text($value) >>
+
+Type: C<String>
+
+Inline text.
+
+=item * C<< $msg->inline_data() >> / C<< $msg->inline_data($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1::Content::Blob>)
+
+Inline media bytes.
+
+=item * C<< $msg->video_metadata() >> / C<< $msg->video_metadata($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1::Content::VideoMetadata>)
+
+Optional. Video metadata. The metadata should only be specified while the
+video data is presented in inline_data or file_data.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1::Content::Blob
+
+Raw media bytes.
+
+Text should not be sent as raw bytes, use the 'text' field.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mime_type() >> / C<< $msg->mime_type($value) >>
+
+Type: C<String>
+
+The IANA standard MIME type of the source data.
+Examples:
+  - image/png
+  - image/jpeg
+If an unsupported MIME type is provided, an error will be returned. For a
+complete list of supported types, see [Supported file
+formats](https://ai.google.dev/gemini-api/docs/prompting_with_media#supported_file_formats).
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+Raw bytes for media formats.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1::Content::VideoMetadata
+
+Metadata describes the input video content.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_offset() >> / C<< $msg->start_offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The start offset of the video.
+
+=item * C<< $msg->end_offset() >> / C<< $msg->end_offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The end offset of the video.
+
+=item * C<< $msg->fps() >> / C<< $msg->fps($value) >>
+
+Type: C<Double>
+
+Optional. The frame rate of the video sent to the model. If not specified,
+the default value will be 1.0. The fps range is (0.0, 24.0].
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1::Content::ModalityTokenCount
+
+Represents token counting info for a single modality.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->modality() >> / C<< $msg->modality($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1::Modality>)
+
+The modality associated with this token count.
+
+=item * C<< $msg->token_count() >> / C<< $msg->token_count($value) >>
+
+Type: C<Int32>
+
+Number of tokens.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1::Content::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

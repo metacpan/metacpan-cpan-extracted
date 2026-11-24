@@ -1,0 +1,1093 @@
+package Google::Cloud::Bigquery::Datatransfer::V1::Transfer;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Protobuf::Struct };
+    eval { require Google::Protobuf::Timestamp };
+    eval { require Google::Protobuf::Wrappers };
+    eval { require Google::Rpc::Status };
+    my $descriptor_b64 = <<'EOF';
+CjRnb29nbGUvY2xvdWQvYmlncXVlcnkvZGF0YXRyYW5zZmVyL3YxL3RyYW5zZmVyLnByb3Rv
+EiVnb29nbGUuY2xvdWQuYmlncXVlcnkuZGF0YXRyYW5zZmVyLnYxGh9nb29nbGUvYXBpL2Zp
+ZWxkX2JlaGF2aW9yLnByb3RvGhlnb29nbGUvYXBpL3Jlc291cmNlLnByb3RvGhxnb29nbGUv
+cHJvdG9idWYvc3RydWN0LnByb3RvGh9nb29nbGUvcHJvdG9idWYvdGltZXN0YW1wLnByb3Rv
+Gh5nb29nbGUvcHJvdG9idWYvd3JhcHBlcnMucHJvdG8aF2dvb2dsZS9ycGMvc3RhdHVzLnBy
+b3RvIkQKEEVtYWlsUHJlZmVyZW5jZXMSMAoUZW5hYmxlX2ZhaWx1cmVfZW1haWwYASABKAhS
+EmVuYWJsZUZhaWx1cmVFbWFpbCK7AQoPU2NoZWR1bGVPcHRpb25zEjYKF2Rpc2FibGVfYXV0
+b19zY2hlZHVsaW5nGAMgASgIUhVkaXNhYmxlQXV0b1NjaGVkdWxpbmcSOQoKc3RhcnRfdGlt
+ZRgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCXN0YXJ0VGltZRI1CghlbmRf
+dGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSB2VuZFRpbWUi3wIKEVNj
+aGVkdWxlT3B0aW9uc1YyEmoKE3RpbWVfYmFzZWRfc2NoZWR1bGUYASABKAsyOC5nb29nbGUu
+Y2xvdWQuYmlncXVlcnkuZGF0YXRyYW5zZmVyLnYxLlRpbWVCYXNlZFNjaGVkdWxlSABSEXRp
+bWVCYXNlZFNjaGVkdWxlEmAKD21hbnVhbF9zY2hlZHVsZRgCIAEoCzI1Lmdvb2dsZS5jbG91
+ZC5iaWdxdWVyeS5kYXRhdHJhbnNmZXIudjEuTWFudWFsU2NoZWR1bGVIAFIObWFudWFsU2No
+ZWR1bGUScAoVZXZlbnRfZHJpdmVuX3NjaGVkdWxlGAMgASgLMjouZ29vZ2xlLmNsb3VkLmJp
+Z3F1ZXJ5LmRhdGF0cmFuc2Zlci52MS5FdmVudERyaXZlblNjaGVkdWxlSABSE2V2ZW50RHJp
+dmVuU2NoZWR1bGVCCgoIc2NoZWR1bGUioQEKEVRpbWVCYXNlZFNjaGVkdWxlEhoKCHNjaGVk
+dWxlGAEgASgJUghzY2hlZHVsZRI5CgpzdGFydF90aW1lGAIgASgLMhouZ29vZ2xlLnByb3Rv
+YnVmLlRpbWVzdGFtcFIJc3RhcnRUaW1lEjUKCGVuZF90aW1lGAMgASgLMhouZ29vZ2xlLnBy
+b3RvYnVmLlRpbWVzdGFtcFIHZW5kVGltZSIQCg5NYW51YWxTY2hlZHVsZSJGChNFdmVudERy
+aXZlblNjaGVkdWxlEi8KE3B1YnN1Yl9zdWJzY3JpcHRpb24YASABKAlSEnB1YnN1YlN1YnNj
+cmlwdGlvbiIvCghVc2VySW5mbxIZCgVlbWFpbBgBIAEoCUgAUgVlbWFpbIgBAUIICgZfZW1h
+aWwitgsKDlRyYW5zZmVyQ29uZmlnEhcKBG5hbWUYASABKAlCA+BBCFIEbmFtZRI2ChZkZXN0
+aW5hdGlvbl9kYXRhc2V0X2lkGAIgASgJSABSFGRlc3RpbmF0aW9uRGF0YXNldElkEiEKDGRp
+c3BsYXlfbmFtZRgDIAEoCVILZGlzcGxheU5hbWUSJAoOZGF0YV9zb3VyY2VfaWQYBSABKAlS
+DGRhdGFTb3VyY2VJZBIvCgZwYXJhbXMYCSABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0
+UgZwYXJhbXMSGgoIc2NoZWR1bGUYByABKAlSCHNjaGVkdWxlEmEKEHNjaGVkdWxlX29wdGlv
+bnMYGCABKAsyNi5nb29nbGUuY2xvdWQuYmlncXVlcnkuZGF0YXRyYW5zZmVyLnYxLlNjaGVk
+dWxlT3B0aW9uc1IPc2NoZWR1bGVPcHRpb25zEmgKE3NjaGVkdWxlX29wdGlvbnNfdjIYHyAB
+KAsyOC5nb29nbGUuY2xvdWQuYmlncXVlcnkuZGF0YXRyYW5zZmVyLnYxLlNjaGVkdWxlT3B0
+aW9uc1YyUhFzY2hlZHVsZU9wdGlvbnNWMhI3ChhkYXRhX3JlZnJlc2hfd2luZG93X2RheXMY
+DCABKAVSFWRhdGFSZWZyZXNoV2luZG93RGF5cxIaCghkaXNhYmxlZBgNIAEoCFIIZGlzYWJs
+ZWQSQAoLdXBkYXRlX3RpbWUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPg
+QQNSCnVwZGF0ZVRpbWUSQwoNbmV4dF9ydW5fdGltZRgIIAEoCzIaLmdvb2dsZS5wcm90b2J1
+Zi5UaW1lc3RhbXBCA+BBA1ILbmV4dFJ1blRpbWUSTwoFc3RhdGUYCiABKA4yNC5nb29nbGUu
+Y2xvdWQuYmlncXVlcnkuZGF0YXRyYW5zZmVyLnYxLlRyYW5zZmVyU3RhdGVCA+BBA1IFc3Rh
+dGUSFwoHdXNlcl9pZBgLIAEoA1IGdXNlcklkEioKDmRhdGFzZXRfcmVnaW9uGA4gASgJQgPg
+QQNSDWRhdGFzZXRSZWdpb24SOgoZbm90aWZpY2F0aW9uX3B1YnN1Yl90b3BpYxgPIAEoCVIX
+bm90aWZpY2F0aW9uUHVic3ViVG9waWMSZAoRZW1haWxfcHJlZmVyZW5jZXMYEiABKAsyNy5n
+b29nbGUuY2xvdWQuYmlncXVlcnkuZGF0YXRyYW5zZmVyLnYxLkVtYWlsUHJlZmVyZW5jZXNS
+EGVtYWlsUHJlZmVyZW5jZXMSWAoKb3duZXJfaW5mbxgbIAEoCzIvLmdvb2dsZS5jbG91ZC5i
+aWdxdWVyeS5kYXRhdHJhbnNmZXIudjEuVXNlckluZm9CA+BBA0gBUglvd25lckluZm+IAQES
+eQoYZW5jcnlwdGlvbl9jb25maWd1cmF0aW9uGBwgASgLMj4uZ29vZ2xlLmNsb3VkLmJpZ3F1
+ZXJ5LmRhdGF0cmFuc2Zlci52MS5FbmNyeXB0aW9uQ29uZmlndXJhdGlvblIXZW5jcnlwdGlv
+bkNvbmZpZ3VyYXRpb24SLQoFZXJyb3IYICABKAsyEi5nb29nbGUucnBjLlN0YXR1c0ID4EED
+UgVlcnJvcjq5AepBtQEKMmJpZ3F1ZXJ5ZGF0YXRyYW5zZmVyLmdvb2dsZWFwaXMuY29tL1Ry
+YW5zZmVyQ29uZmlnEjRwcm9qZWN0cy97cHJvamVjdH0vdHJhbnNmZXJDb25maWdzL3t0cmFu
+c2Zlcl9jb25maWd9Eklwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25zL3tsb2NhdGlvbn0v
+dHJhbnNmZXJDb25maWdzL3t0cmFuc2Zlcl9jb25maWd9Qg0KC2Rlc3RpbmF0aW9uQg0KC19v
+d25lcl9pbmZvIlkKF0VuY3J5cHRpb25Db25maWd1cmF0aW9uEj4KDGttc19rZXlfbmFtZRgB
+IAEoCzIcLmdvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZVIKa21zS2V5TmFtZSK5CAoLVHJh
+bnNmZXJSdW4SFwoEbmFtZRgBIAEoCUID4EEIUgRuYW1lEj8KDXNjaGVkdWxlX3RpbWUYAyAB
+KAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgxzY2hlZHVsZVRpbWUSNQoIcnVuX3Rp
+bWUYCiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUgdydW5UaW1lEjUKDGVycm9y
+X3N0YXR1cxgVIAEoCzISLmdvb2dsZS5ycGMuU3RhdHVzUgtlcnJvclN0YXR1cxI+CgpzdGFy
+dF90aW1lGAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEID4EEDUglzdGFydFRp
+bWUSOgoIZW5kX3RpbWUYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNS
+B2VuZFRpbWUSQAoLdXBkYXRlX3RpbWUYBiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0
+YW1wQgPgQQNSCnVwZGF0ZVRpbWUSNAoGcGFyYW1zGAkgASgLMhcuZ29vZ2xlLnByb3RvYnVm
+LlN0cnVjdEID4EEDUgZwYXJhbXMSOwoWZGVzdGluYXRpb25fZGF0YXNldF9pZBgCIAEoCUID
+4EEDSABSFGRlc3RpbmF0aW9uRGF0YXNldElkEikKDmRhdGFfc291cmNlX2lkGAcgASgJQgPg
+QQNSDGRhdGFTb3VyY2VJZBJKCgVzdGF0ZRgIIAEoDjI0Lmdvb2dsZS5jbG91ZC5iaWdxdWVy
+eS5kYXRhdHJhbnNmZXIudjEuVHJhbnNmZXJTdGF0ZVIFc3RhdGUSFwoHdXNlcl9pZBgLIAEo
+A1IGdXNlcklkEh8KCHNjaGVkdWxlGAwgASgJQgPgQQNSCHNjaGVkdWxlEj8KGW5vdGlmaWNh
+dGlvbl9wdWJzdWJfdG9waWMYFyABKAlCA+BBA1IXbm90aWZpY2F0aW9uUHVic3ViVG9waWMS
+aQoRZW1haWxfcHJlZmVyZW5jZXMYGSABKAsyNy5nb29nbGUuY2xvdWQuYmlncXVlcnkuZGF0
+YXRyYW5zZmVyLnYxLkVtYWlsUHJlZmVyZW5jZXNCA+BBA1IQZW1haWxQcmVmZXJlbmNlczrE
+AepBwAEKJ2JpZ3F1ZXJ5ZGF0YXRyYW5zZmVyLmdvb2dsZWFwaXMuY29tL1J1bhI/cHJvamVj
+dHMve3Byb2plY3R9L3RyYW5zZmVyQ29uZmlncy97dHJhbnNmZXJfY29uZmlnfS9ydW5zL3ty
+dW59ElRwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25zL3tsb2NhdGlvbn0vdHJhbnNmZXJD
+b25maWdzL3t0cmFuc2Zlcl9jb25maWd9L3J1bnMve3J1bn1CDQoLZGVzdGluYXRpb24irgIK
+D1RyYW5zZmVyTWVzc2FnZRI9CgxtZXNzYWdlX3RpbWUYASABKAsyGi5nb29nbGUucHJvdG9i
+dWYuVGltZXN0YW1wUgttZXNzYWdlVGltZRJiCghzZXZlcml0eRgCIAEoDjJGLmdvb2dsZS5j
+bG91ZC5iaWdxdWVyeS5kYXRhdHJhbnNmZXIudjEuVHJhbnNmZXJNZXNzYWdlLk1lc3NhZ2VT
+ZXZlcml0eVIIc2V2ZXJpdHkSIQoMbWVzc2FnZV90ZXh0GAMgASgJUgttZXNzYWdlVGV4dCJV
+Cg9NZXNzYWdlU2V2ZXJpdHkSIAocTUVTU0FHRV9TRVZFUklUWV9VTlNQRUNJRklFRBAAEggK
+BElORk8QARILCgdXQVJOSU5HEAISCQoFRVJST1IQAypLCgxUcmFuc2ZlclR5cGUSHQoZVFJB
+TlNGRVJfVFlQRV9VTlNQRUNJRklFRBAAEgkKBUJBVENIEAESDQoJU1RSRUFNSU5HEAIaAhgB
+KnMKDVRyYW5zZmVyU3RhdGUSHgoaVFJBTlNGRVJfU1RBVEVfVU5TUEVDSUZJRUQQABILCgdQ
+RU5ESU5HEAISCwoHUlVOTklORxADEg0KCVNVQ0NFRURFRBAEEgoKBkZBSUxFRBAFEg0KCUNB
+TkNFTExFRBAGQo8CCiljb20uZ29vZ2xlLmNsb3VkLmJpZ3F1ZXJ5LmRhdGF0cmFuc2Zlci52
+MUINVHJhbnNmZXJQcm90b1ABWk1jbG91ZC5nb29nbGUuY29tL2dvL2JpZ3F1ZXJ5L2RhdGF0
+cmFuc2Zlci9hcGl2MS9kYXRhdHJhbnNmZXJwYjtkYXRhdHJhbnNmZXJwYqICBUdDQkRUqgIl
+R29vZ2xlLkNsb3VkLkJpZ1F1ZXJ5LkRhdGFUcmFuc2Zlci5WMcoCJUdvb2dsZVxDbG91ZFxC
+aWdRdWVyeVxEYXRhVHJhbnNmZXJcVjHqAilHb29nbGU6OkNsb3VkOjpCaWdxdWVyeTo6RGF0
+YVRyYW5zZmVyOjpWMUr3egoHEgUOAJYDAQq8BAoBDBIDDgASMrEEIENvcHlyaWdodCAyMDI1
+IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNp
+b24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhj
+ZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlvdSBtYXkgb2J0YWluIGEg
+Y29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3LmFwYWNoZS5vcmcvbGlj
+ZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcg
+b3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0cmlidXRlZCB1bmRlciB0
+aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lTLAogV0lUSE9V
+VCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNz
+IG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFn
+ZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGlj
+ZW5zZS4KCggKAQISAxAALgoJCgIDABIDEgApCgkKAgMBEgMTACMKCQoCAwISAxQAJgoJCgID
+AxIDFQApCgkKAgMEEgMWACgKCQoCAwUSAxcAIQoICgEIEgMZAEIKCQoCCCUSAxkAQgoICgEI
+EgMaAGQKCQoCCAsSAxoAZAoICgEIEgMbACIKCQoCCAoSAxsAIgoICgEIEgMcAC4KCQoCCAgS
+AxwALgoICgEIEgMdAEIKCQoCCAESAx0AQgoICgEIEgMeACMKCQoCCCQSAx4AIwoICgEIEgMf
+AEMKCQoCCCkSAx8AQwoICgEIEgMgAEIKCQoCCC0SAyAAQgo4CgIFABIEIwAvARosIERFUFJF
+Q0FURUQuIFJlcHJlc2VudHMgZGF0YSB0cmFuc2ZlciB0eXBlLgoKCgoDBQABEgMjBREKCgoD
+BQADEgMkAhsKCwoEBQADAxIDJAIbCjwKBAUAAgASAycCIBovIEludmFsaWQgb3IgVW5rbm93
+biB0cmFuc2ZlciB0eXBlIHBsYWNlaG9sZGVyLgoKDAoFBQACAAESAycCGwoMCgUFAAIAAhID
+Jx4fCiMKBAUAAgESAyoCDBoWIEJhdGNoIGRhdGEgdHJhbnNmZXIuCgoMCgUFAAIBARIDKgIH
+CgwKBQUAAgECEgMqCgsKfwoEBQACAhIDLgIQGnIgU3RyZWFtaW5nIGRhdGEgdHJhbnNmZXIu
+IFN0cmVhbWluZyBkYXRhIHNvdXJjZSBjdXJyZW50bHkgZG9lc24ndAogc3VwcG9ydCBtdWx0
+aXBsZSB0cmFuc2ZlciBjb25maWdzIHBlciBwcm9qZWN0LgoKDAoFBQACAgESAy4CCwoMCgUF
+AAICAhIDLg4PCjEKAgUBEgQyAEUBGiUgUmVwcmVzZW50cyBkYXRhIHRyYW5zZmVyIHJ1biBz
+dGF0ZS4KCgoKAwUBARIDMgUSCiUKBAUBAgASAzQCIRoYIFN0YXRlIHBsYWNlaG9sZGVyICgw
+KS4KCgwKBQUBAgABEgM0AhwKDAoFBQECAAISAzQfIApnCgQFAQIBEgM4Ag4aWiBEYXRhIHRy
+YW5zZmVyIGlzIHNjaGVkdWxlZCBhbmQgaXMgd2FpdGluZyB0byBiZSBwaWNrZWQgdXAgYnkK
+IGRhdGEgdHJhbnNmZXIgYmFja2VuZCAoMikuCgoMCgUFAQIBARIDOAIJCgwKBQUBAgECEgM4
+DA0KMAoEBQECAhIDOwIOGiMgRGF0YSB0cmFuc2ZlciBpcyBpbiBwcm9ncmVzcyAoMykuCgoM
+CgUFAQICARIDOwIJCgwKBQUBAgICEgM7DA0KOAoEBQECAxIDPgIQGisgRGF0YSB0cmFuc2Zl
+ciBjb21wbGV0ZWQgc3VjY2Vzc2Z1bGx5ICg0KS4KCgwKBQUBAgMBEgM+AgsKDAoFBQECAwIS
+Az4ODwooCgQFAQIEEgNBAg0aGyBEYXRhIHRyYW5zZmVyIGZhaWxlZCAoNSkuCgoMCgUFAQIE
+ARIDQQIICgwKBQUBAgQCEgNBCwwKLgoEBQECBRIDRAIQGiEgRGF0YSB0cmFuc2ZlciBpcyBj
+YW5jZWxsZWQgKDYpLgoKDAoFBQECBQESA0QCCwoMCgUFAQIFAhIDRA4PCl4KAgQAEgRJAEwB
+GlIgUmVwcmVzZW50cyBwcmVmZXJlbmNlcyBmb3Igc2VuZGluZyBlbWFpbCBub3RpZmljYXRp
+b25zIGZvciB0cmFuc2ZlciBydW4KIGV2ZW50cy4KCgoKAwQAARIDSQgYClIKBAQAAgASA0sC
+IBpFIElmIHRydWUsIGVtYWlsIG5vdGlmaWNhdGlvbnMgd2lsbCBiZSBzZW50IG9uIHRyYW5z
+ZmVyIHJ1biBmYWlsdXJlcy4KCgwKBQQAAgAFEgNLAgYKDAoFBAACAAESA0sHGwoMCgUEAAIA
+AxIDSx4fCj0KAgQBEgRPAGIBGjEgT3B0aW9ucyBjdXN0b21pemluZyB0aGUgZGF0YSB0cmFu
+c2ZlciBzY2hlZHVsZS4KCgoKAwQBARIDTwgXCpQCCgQEAQIAEgNUAiMahgIgSWYgdHJ1ZSwg
+YXV0b21hdGljIHNjaGVkdWxpbmcgb2YgZGF0YSB0cmFuc2ZlciBydW5zIGZvciB0aGlzIGNv
+bmZpZ3VyYXRpb24KIHdpbGwgYmUgZGlzYWJsZWQuIFRoZSBydW5zIGNhbiBiZSBzdGFydGVk
+IG9uIGFkLWhvYyBiYXNpcyB1c2luZwogU3RhcnRNYW51YWxUcmFuc2ZlclJ1bnMgQVBJLiBX
+aGVuIGF1dG9tYXRpYyBzY2hlZHVsaW5nIGlzIGRpc2FibGVkLCB0aGUKIFRyYW5zZmVyQ29u
+ZmlnLnNjaGVkdWxlIGZpZWxkIHdpbGwgYmUgaWdub3JlZC4KCgwKBQQBAgAFEgNUAgYKDAoF
+BAECAAESA1QHHgoMCgUEAQIAAxIDVCEiCsYCCgQEAQIBEgNbAisauAIgU3BlY2lmaWVzIHRp
+bWUgdG8gc3RhcnQgc2NoZWR1bGluZyB0cmFuc2ZlciBydW5zLiBUaGUgZmlyc3QgcnVuIHdp
+bGwgYmUKIHNjaGVkdWxlZCBhdCBvciBhZnRlciB0aGUgc3RhcnQgdGltZSBhY2NvcmRpbmcg
+dG8gYSByZWN1cnJlbmNlIHBhdHRlcm4KIGRlZmluZWQgaW4gdGhlIHNjaGVkdWxlIHN0cmlu
+Zy4gVGhlIHN0YXJ0IHRpbWUgY2FuIGJlIGNoYW5nZWQgYXQgYW55CiBtb21lbnQuIFRoZSB0
+aW1lIHdoZW4gYSBkYXRhIHRyYW5zZmVyIGNhbiBiZSB0cmlnZ2VyZWQgbWFudWFsbHkgaXMg
+bm90CiBsaW1pdGVkIGJ5IHRoaXMgb3B0aW9uLgoKDAoFBAECAQYSA1sCGwoMCgUEAQIBARID
+WxwmCgwKBQQBAgEDEgNbKSoKgAIKBAQBAgISA2ECKRryASBEZWZpbmVzIHRpbWUgdG8gc3Rv
+cCBzY2hlZHVsaW5nIHRyYW5zZmVyIHJ1bnMuIEEgdHJhbnNmZXIgcnVuIGNhbm5vdCBiZQog
+c2NoZWR1bGVkIGF0IG9yIGFmdGVyIHRoZSBlbmQgdGltZS4gVGhlIGVuZCB0aW1lIGNhbiBi
+ZSBjaGFuZ2VkIGF0IGFueQogbW9tZW50LiBUaGUgdGltZSB3aGVuIGEgZGF0YSB0cmFuc2Zl
+ciBjYW4gYmUgdHJpZ2dlcmVkIG1hbnVhbGx5IGlzIG5vdAogbGltaXRlZCBieSB0aGlzIG9w
+dGlvbi4KCgwKBQQBAgIGEgNhAhsKDAoFBAECAgESA2EcJAoMCgUEAQICAxIDYScoCpACCgIE
+AhIEaAB5ARqDAiBWMiBvcHRpb25zIGN1c3RvbWl6aW5nIGRpZmZlcmVudCB0eXBlcyBvZiBk
+YXRhIHRyYW5zZmVyIHNjaGVkdWxlLgogVGhpcyBmaWVsZCBzdXBwb3J0cyBleGlzdGluZyB0
+aW1lLWJhc2VkIGFuZCBtYW51YWwgdHJhbnNmZXIgc2NoZWR1bGUuIEFsc28KIHN1cHBvcnRz
+IEV2ZW50LURyaXZlbiB0cmFuc2ZlciBzY2hlZHVsZS4gU2NoZWR1bGVPcHRpb25zVjIgY2Fu
+bm90IGJlIHVzZWQKIHRvZ2V0aGVyIHdpdGggU2NoZWR1bGVPcHRpb25zL1NjaGVkdWxlLgoK
+CgoDBAIBEgNoCBkKKAoEBAIIABIEagJ4AxoaIERhdGEgdHJhbnNmZXIgc2NoZWR1bGVzLgoK
+DAoFBAIIAAESA2oIEApaCgQEAgIAEgNtBC4aTSBUaW1lIGJhc2VkIHRyYW5zZmVyIHNjaGVk
+dWxlIG9wdGlvbnMuIFRoaXMgaXMgdGhlIGRlZmF1bHQgc2NoZWR1bGUKIG9wdGlvbi4KCgwK
+BQQCAgAGEgNtBBUKDAoFBAICAAESA20WKQoMCgUEAgIAAxIDbSwtCtkBCgQEAgIBEgNzBCca
+ywEgTWFudWFsIHRyYW5zZmVyIHNjaGVkdWxlLiBJZiBzZXQsIHRoZSB0cmFuc2ZlciBydW4g
+d2lsbCBub3QgYmUKIGF1dG8tc2NoZWR1bGVkIGJ5IHRoZSBzeXN0ZW0sIHVubGVzcyB0aGUg
+Y2xpZW50IGludm9rZXMKIFN0YXJ0TWFudWFsVHJhbnNmZXJSdW5zLiAgVGhpcyBpcyBlcXVp
+dmFsZW50IHRvCiBkaXNhYmxlX2F1dG9fc2NoZWR1bGluZyA9IHRydWUuCgoMCgUEAgIBBhID
+cwQSCgwKBQQCAgEBEgNzEyIKDAoFBAICAQMSA3MlJgpyCgQEAgICEgN3BDIaZSBFdmVudCBk
+cml2ZW4gdHJhbnNmZXIgc2NoZWR1bGUgb3B0aW9ucy4gSWYgc2V0LCB0aGUgdHJhbnNmZXIg
+d2lsbCBiZQogc2NoZWR1bGVkIHVwb24gZXZlbnRzIGFycmlhbC4KCgwKBQQCAgIGEgN3BBcK
+DAoFBAICAgESA3cYLQoMCgUEAgICAxIDdzAxCoUBCgIEAxIFfQCXAQEaeCBPcHRpb25zIGN1
+c3RvbWl6aW5nIHRoZSB0aW1lIGJhc2VkIHRyYW5zZmVyIHNjaGVkdWxlLgogT3B0aW9ucyBh
+cmUgbWlncmF0ZWQgZnJvbSB0aGUgb3JpZ2luYWwgU2NoZWR1bGVPcHRpb25zIG1lc3NhZ2Uu
+CgoKCgMEAwESA30IGQqHBQoEBAMCABIEiwECFhr4BCBEYXRhIHRyYW5zZmVyIHNjaGVkdWxl
+LgogSWYgdGhlIGRhdGEgc291cmNlIGRvZXMgbm90IHN1cHBvcnQgYSBjdXN0b20gc2NoZWR1
+bGUsIHRoaXMgc2hvdWxkIGJlCiBlbXB0eS4gSWYgaXQgaXMgZW1wdHksIHRoZSBkZWZhdWx0
+IHZhbHVlIGZvciB0aGUgZGF0YSBzb3VyY2Ugd2lsbCBiZSB1c2VkLgogVGhlIHNwZWNpZmll
+ZCB0aW1lcyBhcmUgaW4gVVRDLgogRXhhbXBsZXMgb2YgdmFsaWQgZm9ybWF0OgogYDFzdCwz
+cmQgbW9uZGF5IG9mIG1vbnRoIDE1OjMwYCwKIGBldmVyeSB3ZWQsZnJpIG9mIGphbixqdW4g
+MTM6MTVgLCBhbmQKIGBmaXJzdCBzdW5kYXkgb2YgcXVhcnRlciAwMDowMGAuCiBTZWUgbW9y
+ZSBleHBsYW5hdGlvbiBhYm91dCB0aGUgZm9ybWF0IGhlcmU6CiBodHRwczovL2Nsb3VkLmdv
+b2dsZS5jb20vYXBwZW5naW5lL2RvY3MvZmxleGlibGUvcHl0aG9uL3NjaGVkdWxpbmctam9i
+cy13aXRoLWNyb24teWFtbCN0aGVfc2NoZWR1bGVfZm9ybWF0CgogTk9URTogVGhlIG1pbmlt
+dW0gaW50ZXJ2YWwgdGltZSBiZXR3ZWVuIHJlY3VycmluZyB0cmFuc2ZlcnMgZGVwZW5kcyBv
+biB0aGUKIGRhdGEgc291cmNlOyByZWZlciB0byB0aGUgZG9jdW1lbnRhdGlvbiBmb3IgeW91
+ciBkYXRhIHNvdXJjZS4KCg0KBQQDAgAFEgSLAQIICg0KBQQDAgABEgSLAQkRCg0KBQQDAgAD
+EgSLARQVCu8BCgQEAwIBEgSRAQIrGuABIFNwZWNpZmllcyB0aW1lIHRvIHN0YXJ0IHNjaGVk
+dWxpbmcgdHJhbnNmZXIgcnVucy4gVGhlIGZpcnN0IHJ1biB3aWxsIGJlCiBzY2hlZHVsZWQg
+YXQgb3IgYWZ0ZXIgdGhlIHN0YXJ0IHRpbWUgYWNjb3JkaW5nIHRvIGEgcmVjdXJyZW5jZSBw
+YXR0ZXJuCiBkZWZpbmVkIGluIHRoZSBzY2hlZHVsZSBzdHJpbmcuIFRoZSBzdGFydCB0aW1l
+IGNhbiBiZSBjaGFuZ2VkIGF0IGFueQogbW9tZW50LgoKDQoFBAMCAQYSBJEBAhsKDQoFBAMC
+AQESBJEBHCYKDQoFBAMCAQMSBJEBKSoKqQEKBAQDAgISBJYBAikamgEgRGVmaW5lcyB0aW1l
+IHRvIHN0b3Agc2NoZWR1bGluZyB0cmFuc2ZlciBydW5zLiBBIHRyYW5zZmVyIHJ1biBjYW5u
+b3QgYmUKIHNjaGVkdWxlZCBhdCBvciBhZnRlciB0aGUgZW5kIHRpbWUuIFRoZSBlbmQgdGlt
+ZSBjYW4gYmUgY2hhbmdlZCBhdCBhbnkKIG1vbWVudC4KCg0KBQQDAgIGEgSWAQIbCg0KBQQD
+AgIBEgSWARwkCg0KBQQDAgIDEgSWAScoCjwKAgQEEgSaAQAZGjAgT3B0aW9ucyBjdXN0b21p
+emluZyBtYW51YWwgdHJhbnNmZXJzIHNjaGVkdWxlLgoKCwoDBAQBEgSaAQgWCkMKAgQFEgad
+AQCiAQEaNSBPcHRpb25zIGN1c3RvbWl6aW5nIEV2ZW50RHJpdmVuIHRyYW5zZmVycyBzY2hl
+ZHVsZS4KCgsKAwQFARIEnQEIGwq3AQoEBAUCABIEoQECIRqoASBQdWIvU3ViIHN1YnNjcmlw
+dGlvbiBuYW1lIHVzZWQgdG8gcmVjZWl2ZSBldmVudHMuCiBPbmx5IEdvb2dsZSBDbG91ZCBT
+dG9yYWdlIGRhdGEgc291cmNlIHN1cHBvcnQgdGhpcyBvcHRpb24uCiBGb3JtYXQ6IHByb2pl
+Y3RzL3twcm9qZWN0fS9zdWJzY3JpcHRpb25zL3tzdWJzY3JpcHRpb259CgoNCgUEBQIABRIE
+oQECCAoNCgUEBQIAARIEoQEJHAoNCgUEBQIAAxIEoQEfIAopCgIEBhIGpQEAqAEBGhsgSW5m
+b3JtYXRpb24gYWJvdXQgYSB1c2VyLgoKCwoDBAYBEgSlAQgQCisKBAQGAgASBKcBAhwaHSBF
+LW1haWwgYWRkcmVzcyBvZiB0aGUgdXNlci4KCg0KBQQGAgAEEgSnAQIKCg0KBQQGAgAFEgSn
+AQsRCg0KBQQGAgABEgSnARIXCg0KBQQGAgADEgSnARobCocDCgIEBxIGsAEAogIBGvgCIFJl
+cHJlc2VudHMgYSBkYXRhIHRyYW5zZmVyIGNvbmZpZ3VyYXRpb24uIEEgdHJhbnNmZXIgY29u
+ZmlndXJhdGlvbgogY29udGFpbnMgYWxsIG1ldGFkYXRhIG5lZWRlZCB0byBwZXJmb3JtIGEg
+ZGF0YSB0cmFuc2Zlci4gRm9yIGV4YW1wbGUsCiBgZGVzdGluYXRpb25fZGF0YXNldF9pZGAg
+c3BlY2lmaWVzIHdoZXJlIGRhdGEgc2hvdWxkIGJlIHN0b3JlZC4KIFdoZW4gYSBuZXcgdHJh
+bnNmZXIgY29uZmlndXJhdGlvbiBpcyBjcmVhdGVkLCB0aGUgc3BlY2lmaWVkCiBgZGVzdGlu
+YXRpb25fZGF0YXNldF9pZGAgaXMgY3JlYXRlZCB3aGVuIG5lZWRlZCBhbmQgc2hhcmVkIHdp
+dGggdGhlCiBhcHByb3ByaWF0ZSBkYXRhIHNvdXJjZSBzZXJ2aWNlIGFjY291bnQuCgoLCgME
+BwESBLABCBYKDQoDBAcHEgaxAQK1AQQKDwoFBAcHnQgSBrEBArUBBAr+AgoEBAcCABIEvgEC
+PRrvAiBJZGVudGlmaWVyLiBUaGUgcmVzb3VyY2UgbmFtZSBvZiB0aGUgdHJhbnNmZXIgY29u
+ZmlnLgogVHJhbnNmZXIgY29uZmlnIG5hbWVzIGhhdmUgdGhlIGZvcm0gZWl0aGVyCiBgcHJv
+amVjdHMve3Byb2plY3RfaWR9L2xvY2F0aW9ucy97cmVnaW9ufS90cmFuc2ZlckNvbmZpZ3Mv
+e2NvbmZpZ19pZH1gIG9yCiBgcHJvamVjdHMve3Byb2plY3RfaWR9L3RyYW5zZmVyQ29uZmln
+cy97Y29uZmlnX2lkfWAsCiB3aGVyZSBgY29uZmlnX2lkYCBpcyB1c3VhbGx5IGEgVVVJRCwg
+ZXZlbiB0aG91Z2ggaXQgaXMgbm90CiBndWFyYW50ZWVkIG9yIHJlcXVpcmVkLiBUaGUgbmFt
+ZSBpcyBpZ25vcmVkIHdoZW4gY3JlYXRpbmcgYSB0cmFuc2ZlcgogY29uZmlnLgoKDQoFBAcC
+AAUSBL4BAggKDQoFBAcCAAESBL4BCQ0KDQoFBAcCAAMSBL4BEBEKDQoFBAcCAAgSBL4BEjwK
+EAoIBAcCAAicCAASBL4BEzsKOAoEBAcIABIGwQECxAEDGiggVGhlIGRlc2luYXRpb24gb2Yg
+dGhlIHRyYW5zZmVyIGNvbmZpZy4KCg0KBQQHCAABEgTBAQgTCi8KBAQHAgESBMMBBCYaISBU
+aGUgQmlnUXVlcnkgdGFyZ2V0IGRhdGFzZXQgaWQuCgoNCgUEBwIBBRIEwwEECgoNCgUEBwIB
+ARIEwwELIQoNCgUEBwIBAxIEwwEkJQpCCgQEBwICEgTHAQIaGjQgVXNlciBzcGVjaWZpZWQg
+ZGlzcGxheSBuYW1lIGZvciB0aGUgZGF0YSB0cmFuc2Zlci4KCg0KBQQHAgIFEgTHAQIICg0K
+BQQHAgIBEgTHAQkVCg0KBQQHAgIDEgTHARgZCpsCCgQEBwIDEgTMAQIcGowCIERhdGEgc291
+cmNlIElELiBUaGlzIGNhbm5vdCBiZSBjaGFuZ2VkIG9uY2UgZGF0YSB0cmFuc2ZlciBpcyBj
+cmVhdGVkLiBUaGUKIGZ1bGwgbGlzdCBvZiBhdmFpbGFibGUgZGF0YSBzb3VyY2UgSURzIGNh
+biBiZSByZXR1cm5lZCB0aHJvdWdoIGFuIEFQSSBjYWxsOgogaHR0cHM6Ly9jbG91ZC5nb29n
+bGUuY29tL2JpZ3F1ZXJ5LXRyYW5zZmVyL2RvY3MvcmVmZXJlbmNlL2RhdGF0cmFuc2Zlci9y
+ZXN0L3YxL3Byb2plY3RzLmxvY2F0aW9ucy5kYXRhU291cmNlcy9saXN0CgoNCgUEBwIDBRIE
+zAECCAoNCgUEBwIDARIEzAEJFwoNCgUEBwIDAxIEzAEaGwq0AgoEBAcCBBIE0gECJBqlAiBQ
+YXJhbWV0ZXJzIHNwZWNpZmljIHRvIGVhY2ggZGF0YSBzb3VyY2UuIEZvciBtb3JlIGluZm9y
+bWF0aW9uIHNlZSB0aGUKIGJxIHRhYiBpbiB0aGUgJ1NldHRpbmcgdXAgYSBkYXRhIHRyYW5z
+ZmVyJyBzZWN0aW9uIGZvciBlYWNoIGRhdGEgc291cmNlLgogRm9yIGV4YW1wbGUgdGhlIHBh
+cmFtZXRlcnMgZm9yIENsb3VkIFN0b3JhZ2UgdHJhbnNmZXJzIGFyZSBsaXN0ZWQgaGVyZToK
+IGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9iaWdxdWVyeS10cmFuc2Zlci9kb2NzL2Nsb3Vk
+LXN0b3JhZ2UtdHJhbnNmZXIjYnEKCg0KBQQHAgQGEgTSAQIYCg0KBQQHAgQBEgTSARkfCg0K
+BQQHAgQDEgTSASIjCocFCgQEBwIFEgThAQIWGvgEIERhdGEgdHJhbnNmZXIgc2NoZWR1bGUu
+CiBJZiB0aGUgZGF0YSBzb3VyY2UgZG9lcyBub3Qgc3VwcG9ydCBhIGN1c3RvbSBzY2hlZHVs
+ZSwgdGhpcyBzaG91bGQgYmUKIGVtcHR5LiBJZiBpdCBpcyBlbXB0eSwgdGhlIGRlZmF1bHQg
+dmFsdWUgZm9yIHRoZSBkYXRhIHNvdXJjZSB3aWxsIGJlIHVzZWQuCiBUaGUgc3BlY2lmaWVk
+IHRpbWVzIGFyZSBpbiBVVEMuCiBFeGFtcGxlcyBvZiB2YWxpZCBmb3JtYXQ6CiBgMXN0LDNy
+ZCBtb25kYXkgb2YgbW9udGggMTU6MzBgLAogYGV2ZXJ5IHdlZCxmcmkgb2YgamFuLGp1biAx
+MzoxNWAsIGFuZAogYGZpcnN0IHN1bmRheSBvZiBxdWFydGVyIDAwOjAwYC4KIFNlZSBtb3Jl
+IGV4cGxhbmF0aW9uIGFib3V0IHRoZSBmb3JtYXQgaGVyZToKIGh0dHBzOi8vY2xvdWQuZ29v
+Z2xlLmNvbS9hcHBlbmdpbmUvZG9jcy9mbGV4aWJsZS9weXRob24vc2NoZWR1bGluZy1qb2Jz
+LXdpdGgtY3Jvbi15YW1sI3RoZV9zY2hlZHVsZV9mb3JtYXQKCiBOT1RFOiBUaGUgbWluaW11
+bSBpbnRlcnZhbCB0aW1lIGJldHdlZW4gcmVjdXJyaW5nIHRyYW5zZmVycyBkZXBlbmRzIG9u
+IHRoZQogZGF0YSBzb3VyY2U7IHJlZmVyIHRvIHRoZSBkb2N1bWVudGF0aW9uIGZvciB5b3Vy
+IGRhdGEgc291cmNlLgoKDQoFBAcCBQUSBOEBAggKDQoFBAcCBQESBOEBCREKDQoFBAcCBQMS
+BOEBFBUKPwoEBAcCBhIE5AECKBoxIE9wdGlvbnMgY3VzdG9taXppbmcgdGhlIGRhdGEgdHJh
+bnNmZXIgc2NoZWR1bGUuCgoNCgUEBwIGBhIE5AECEQoNCgUEBwIGARIE5AESIgoNCgUEBwIG
+AxIE5AElJwrYAQoEBAcCBxIE6QECLRrJASBPcHRpb25zIGN1c3RvbWl6aW5nIGRpZmZlcmVu
+dCB0eXBlcyBvZiBkYXRhIHRyYW5zZmVyIHNjaGVkdWxlLgogVGhpcyBmaWVsZCByZXBsYWNl
+cyAic2NoZWR1bGUiIGFuZCAic2NoZWR1bGVfb3B0aW9ucyIgZmllbGRzLgogU2NoZWR1bGVP
+cHRpb25zVjIgY2Fubm90IGJlIHVzZWQgdG9nZXRoZXIgd2l0aCBTY2hlZHVsZU9wdGlvbnMv
+U2NoZWR1bGUuCgoNCgUEBwIHBhIE6QECEwoNCgUEBwIHARIE6QEUJwoNCgUEBwIHAxIE6QEq
+LArZAgoEBAcCCBIE8QECJhrKAiBUaGUgbnVtYmVyIG9mIGRheXMgdG8gbG9vayBiYWNrIHRv
+IGF1dG9tYXRpY2FsbHkgcmVmcmVzaCB0aGUgZGF0YS4KIEZvciBleGFtcGxlLCBpZiBgZGF0
+YV9yZWZyZXNoX3dpbmRvd19kYXlzID0gMTBgLCB0aGVuIGV2ZXJ5IGRheQogQmlnUXVlcnkg
+cmVpbmdlc3RzIGRhdGEgZm9yIFt0b2RheS0xMCwgdG9kYXktMV0sIHJhdGhlciB0aGFuIGlu
+Z2VzdGluZyBkYXRhCiBmb3IganVzdCBbdG9kYXktMV0uCiBPbmx5IHZhbGlkIGlmIHRoZSBk
+YXRhIHNvdXJjZSBzdXBwb3J0cyB0aGUgZmVhdHVyZS4gU2V0IHRoZSB2YWx1ZSB0byAwCiB0
+byB1c2UgdGhlIGRlZmF1bHQgdmFsdWUuCgoNCgUEBwIIBRIE8QECBwoNCgUEBwIIARIE8QEI
+IAoNCgUEBwIIAxIE8QEjJQpvCgQEBwIJEgT1AQIVGmEgSXMgdGhpcyBjb25maWcgZGlzYWJs
+ZWQuIFdoZW4gc2V0IHRvIHRydWUsIG5vIHJ1bnMgd2lsbCBiZSBzY2hlZHVsZWQgZm9yCiB0
+aGlzIHRyYW5zZmVyIGNvbmZpZy4KCg0KBQQHAgkFEgT1AQIGCg0KBQQHAgkBEgT1AQcPCg0K
+BQQHAgkDEgT1ARIUClsKBAQHAgoSBvgBAvkBMhpLIE91dHB1dCBvbmx5LiBEYXRhIHRyYW5z
+ZmVyIG1vZGlmaWNhdGlvbiB0aW1lLiBJZ25vcmVkIGJ5IHNlcnZlciBvbiBpbnB1dC4KCg0K
+BQQHAgoGEgT4AQIbCg0KBQQHAgoBEgT4ARwnCg0KBQQHAgoDEgT4ASorCg0KBQQHAgoIEgT5
+AQYxChAKCAQHAgoInAgAEgT5AQcwCkUKBAQHAgsSBvwBAv0BMho1IE91dHB1dCBvbmx5LiBO
+ZXh0IHRpbWUgd2hlbiBkYXRhIHRyYW5zZmVyIHdpbGwgcnVuLgoKDQoFBAcCCwYSBPwBAhsK
+DQoFBAcCCwESBPwBHCkKDQoFBAcCCwMSBPwBLC0KDQoFBAcCCwgSBP0BBjEKEAoIBAcCCwic
+CAASBP0BBzAKTQoEBAcCDBIEgAICRxo/IE91dHB1dCBvbmx5LiBTdGF0ZSBvZiB0aGUgbW9z
+dCByZWNlbnRseSB1cGRhdGVkIHRyYW5zZmVyIHJ1bi4KCg0KBQQHAgwGEgSAAgIPCg0KBQQH
+AgwBEgSAAhAVCg0KBQQHAgwDEgSAAhgaCg0KBQQHAgwIEgSAAhtGChAKCAQHAgwInAgAEgSA
+AhxFClMKBAQHAg0SBIMCAhUaRSBEZXByZWNhdGVkLiBVbmlxdWUgSUQgb2YgdGhlIHVzZXIg
+b24gd2hvc2UgYmVoYWxmIHRyYW5zZmVyIGlzIGRvbmUuCgoNCgUEBwINBRIEgwICBwoNCgUE
+BwINARIEgwIIDwoNCgUEBwINAxIEgwISFApJCgQEBwIOEgSGAgJJGjsgT3V0cHV0IG9ubHku
+IFJlZ2lvbiBpbiB3aGljaCBCaWdRdWVyeSBkYXRhc2V0IGlzIGxvY2F0ZWQuCgoNCgUEBwIO
+BRIEhgICCAoNCgUEBwIOARIEhgIJFwoNCgUEBwIOAxIEhgIaHAoNCgUEBwIOCBIEhgIdSAoQ
+CggEBwIOCJwIABIEhgIeRwrbAQoEBAcCDxIEjQICKBrMASBQdWIvU3ViIHRvcGljIHdoZXJl
+IG5vdGlmaWNhdGlvbnMgd2lsbCBiZSBzZW50IGFmdGVyIHRyYW5zZmVyIHJ1bnMKIGFzc29j
+aWF0ZWQgd2l0aCB0aGlzIHRyYW5zZmVyIGNvbmZpZyBmaW5pc2guCgogVGhlIGZvcm1hdCBm
+b3Igc3BlY2lmeWluZyBhIHB1YnN1YiB0b3BpYyBpczoKIGBwcm9qZWN0cy97cHJvamVjdF9p
+ZH0vdG9waWNzL3t0b3BpY19pZH1gCgoNCgUEBwIPBRIEjQICCAoNCgUEBwIPARIEjQIJIgoN
+CgUEBwIPAxIEjQIlJwqRAQoEBAcCEBIEkQICKhqCASBFbWFpbCBub3RpZmljYXRpb25zIHdp
+bGwgYmUgc2VudCBhY2NvcmRpbmcgdG8gdGhlc2UgcHJlZmVyZW5jZXMKIHRvIHRoZSBlbWFp
+bCBhZGRyZXNzIG9mIHRoZSB1c2VyIHdobyBvd25zIHRoaXMgdHJhbnNmZXIgY29uZmlnLgoK
+DQoFBAcCEAYSBJECAhIKDQoFBAcCEAESBJECEyQKDQoFBAcCEAMSBJECJykK6wEKBAQHAhES
+BJYCAlAa3AEgT3V0cHV0IG9ubHkuIEluZm9ybWF0aW9uIGFib3V0IHRoZSB1c2VyIHdob3Nl
+IGNyZWRlbnRpYWxzIGFyZSB1c2VkIHRvCiB0cmFuc2ZlciBkYXRhLiBQb3B1bGF0ZWQgb25s
+eSBmb3IgYHRyYW5zZmVyQ29uZmlncy5nZXRgIHJlcXVlc3RzLiBJbiBjYXNlCiB0aGUgdXNl
+ciBpbmZvcm1hdGlvbiBpcyBub3QgYXZhaWxhYmxlLCB0aGlzIGZpZWxkIHdpbGwgbm90IGJl
+IHBvcHVsYXRlZC4KCg0KBQQHAhEEEgSWAgIKCg0KBQQHAhEGEgSWAgsTCg0KBQQHAhEBEgSW
+AhQeCg0KBQQHAhEDEgSWAiEjCg0KBQQHAhEIEgSWAiRPChAKCAQHAhEInAgAEgSWAiVOCvYC
+CgQEBwISEgSdAgI4GucCIFRoZSBlbmNyeXB0aW9uIGNvbmZpZ3VyYXRpb24gcGFydC4gQ3Vy
+cmVudGx5LCBpdCBpcyBvbmx5IHVzZWQgZm9yIHRoZQogb3B0aW9uYWwgS01TIGtleSBuYW1l
+LiBUaGUgQmlnUXVlcnkgc2VydmljZSBhY2NvdW50IG9mIHlvdXIgcHJvamVjdCBtdXN0IGJl
+CiBncmFudGVkIHBlcm1pc3Npb25zIHRvIHVzZSB0aGUga2V5LiBSZWFkIG1ldGhvZHMgd2ls
+bCByZXR1cm4gdGhlIGtleSBuYW1lCiBhcHBsaWVkIGluIGVmZmVjdC4gV3JpdGUgbWV0aG9k
+cyB3aWxsIGFwcGx5IHRoZSBrZXkgaWYgaXQgaXMgcHJlc2VudCwgb3IKIG90aGVyd2lzZSB0
+cnkgdG8gYXBwbHkgcHJvamVjdCBkZWZhdWx0IGtleXMgaWYgaXQgaXMgYWJzZW50LgoKDQoF
+BAcCEgYSBJ0CAhkKDQoFBAcCEgESBJ0CGjIKDQoFBAcCEgMSBJ0CNTcKbQoEBAcCExIEoQIC
+SxpfIE91dHB1dCBvbmx5LiBFcnJvciBjb2RlIHdpdGggZGV0YWlsZWQgaW5mb3JtYXRpb24g
+YWJvdXQgcmVhc29uIG9mIHRoZQogbGF0ZXN0IGNvbmZpZyBmYWlsdXJlLgoKDQoFBAcCEwYS
+BKECAhMKDQoFBAcCEwESBKECFBkKDQoFBAcCEwMSBKECHB4KDQoFBAcCEwgSBKECH0oKEAoI
+BAcCEwicCAASBKECIEkKRwoCBAgSBqUCAKgCARo5IFJlcHJlc2VudHMgdGhlIGVuY3J5cHRp
+b24gY29uZmlndXJhdGlvbiBmb3IgYSB0cmFuc2Zlci4KCgsKAwQIARIEpQIIHwpKCgQECAIA
+EgSnAgIvGjwgVGhlIG5hbWUgb2YgdGhlIEtNUyBrZXkgdXNlZCBmb3IgZW5jcnlwdGluZyBC
+aWdRdWVyeSBkYXRhLgoKDQoFBAgCAAYSBKcCAh0KDQoFBAgCAAESBKcCHioKDQoFBAgCAAMS
+BKcCLS4KLwoCBAkSBqsCAPsCARohIFJlcHJlc2VudHMgYSBkYXRhIHRyYW5zZmVyIHJ1bi4K
+CgsKAwQJARIEqwIIEwoNCgMECQcSBqwCArACBAoPCgUECQedCBIGrAICsAIECvEBCgQECQIA
+EgS2AgI9GuIBIElkZW50aWZpZXIuIFRoZSByZXNvdXJjZSBuYW1lIG9mIHRoZSB0cmFuc2Zl
+ciBydW4uCiBUcmFuc2ZlciBydW4gbmFtZXMgaGF2ZSB0aGUgZm9ybQogYHByb2plY3RzL3tw
+cm9qZWN0X2lkfS9sb2NhdGlvbnMve2xvY2F0aW9ufS90cmFuc2ZlckNvbmZpZ3Mve2NvbmZp
+Z19pZH0vcnVucy97cnVuX2lkfWAuCiBUaGUgbmFtZSBpcyBpZ25vcmVkIHdoZW4gY3JlYXRp
+bmcgYSB0cmFuc2ZlciBydW4uCgoNCgUECQIABRIEtgICCAoNCgUECQIAARIEtgIJDQoNCgUE
+CQIAAxIEtgIQEQoNCgUECQIACBIEtgISPAoQCggECQIACJwIABIEtgITOwpHCgQECQIBEgS5
+AgIuGjkgTWluaW11bSB0aW1lIGFmdGVyIHdoaWNoIGEgdHJhbnNmZXIgcnVuIGNhbiBiZSBz
+dGFydGVkLgoKDQoFBAkCAQYSBLkCAhsKDQoFBAkCAQESBLkCHCkKDQoFBAkCAQMSBLkCLC0K
+ZQoEBAkCAhIEvQICKhpXIEZvciBiYXRjaCB0cmFuc2ZlciBydW5zLCBzcGVjaWZpZXMgdGhl
+IGRhdGUgYW5kIHRpbWUgb2YgdGhlIGRhdGEgc2hvdWxkIGJlCiBpbmdlc3RlZC4KCg0KBQQJ
+AgIGEgS9AgIbCg0KBQQJAgIBEgS9AhwkCg0KBQQJAgIDEgS9AicpCisKBAQJAgMSBMACAiYa
+HSBTdGF0dXMgb2YgdGhlIHRyYW5zZmVyIHJ1bi4KCg0KBQQJAgMGEgTAAgITCg0KBQQJAgMB
+EgTAAhQgCg0KBQQJAgMDEgTAAiMlCnMKBAQJAgQSBsQCAsUCMhpjIE91dHB1dCBvbmx5LiBU
+aW1lIHdoZW4gdHJhbnNmZXIgcnVuIHdhcyBzdGFydGVkLgogUGFyYW1ldGVyIGlnbm9yZWQg
+Ynkgc2VydmVyIGZvciBpbnB1dCByZXF1ZXN0cy4KCg0KBQQJAgQGEgTEAgIbCg0KBQQJAgQB
+EgTEAhwmCg0KBQQJAgQDEgTEAikqCg0KBQQJAgQIEgTFAgYxChAKCAQJAgQInAgAEgTFAgcw
+Cm0KBAQJAgUSBskCAsoCMhpdIE91dHB1dCBvbmx5LiBUaW1lIHdoZW4gdHJhbnNmZXIgcnVu
+IGVuZGVkLgogUGFyYW1ldGVyIGlnbm9yZWQgYnkgc2VydmVyIGZvciBpbnB1dCByZXF1ZXN0
+cy4KCg0KBQQJAgUGEgTJAgIbCg0KBQQJAgUBEgTJAhwkCg0KBQQJAgUDEgTJAicoCg0KBQQJ
+AgUIEgTKAgYxChAKCAQJAgUInAgAEgTKAgcwClEKBAQJAgYSBs0CAs4CMhpBIE91dHB1dCBv
+bmx5LiBMYXN0IHRpbWUgdGhlIGRhdGEgdHJhbnNmZXIgcnVuIHN0YXRlIHdhcyB1cGRhdGVk
+LgoKDQoFBAkCBgYSBM0CAhsKDQoFBAkCBgESBM0CHCcKDQoFBAkCBgMSBM0CKisKDQoFBAkC
+BggSBM4CBjEKEAoIBAkCBgicCAASBM4CBzAKwgIKBAQJAgcSBNUCAlAaswIgT3V0cHV0IG9u
+bHkuIFBhcmFtZXRlcnMgc3BlY2lmaWMgdG8gZWFjaCBkYXRhIHNvdXJjZS4gRm9yIG1vcmUg
+aW5mb3JtYXRpb24KIHNlZSB0aGUgYnEgdGFiIGluIHRoZSAnU2V0dGluZyB1cCBhIGRhdGEg
+dHJhbnNmZXInIHNlY3Rpb24gZm9yIGVhY2ggZGF0YQogc291cmNlLiBGb3IgZXhhbXBsZSB0
+aGUgcGFyYW1ldGVycyBmb3IgQ2xvdWQgU3RvcmFnZSB0cmFuc2ZlcnMgYXJlIGxpc3RlZAog
+aGVyZToKIGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9iaWdxdWVyeS10cmFuc2Zlci9kb2Nz
+L2Nsb3VkLXN0b3JhZ2UtdHJhbnNmZXIjYnEKCg0KBQQJAgcGEgTVAgIYCg0KBQQJAgcBEgTV
+AhkfCg0KBQQJAgcDEgTVAiIjCg0KBQQJAgcIEgTVAiRPChAKCAQJAgcInAgAEgTVAiVOCiwK
+BAQJCAASBtgCAtwCAxocIERhdGEgdHJhbnNmZXIgZGVzdGluYXRpb24uCgoNCgUECQgAARIE
+2AIIEwo+CgQECQIIEgbaAgTbAjQaLiBPdXRwdXQgb25seS4gVGhlIEJpZ1F1ZXJ5IHRhcmdl
+dCBkYXRhc2V0IGlkLgoKDQoFBAkCCAUSBNoCBAoKDQoFBAkCCAESBNoCCyEKDQoFBAkCCAMS
+BNoCJCUKDQoFBAkCCAgSBNsCCDMKEAoIBAkCCAicCAASBNsCCTIKLAoEBAkCCRIE3wICSBoe
+IE91dHB1dCBvbmx5LiBEYXRhIHNvdXJjZSBpZC4KCg0KBQQJAgkFEgTfAgIICg0KBQQJAgkB
+EgTfAgkXCg0KBQQJAgkDEgTfAhobCg0KBQQJAgkIEgTfAhxHChAKCAQJAgkInAgAEgTfAh1G
+CkQKBAQJAgoSBOICAhoaNiBEYXRhIHRyYW5zZmVyIHJ1biBzdGF0ZS4gSWdub3JlZCBmb3Ig
+aW5wdXQgcmVxdWVzdHMuCgoNCgUECQIKBhIE4gICDwoNCgUECQIKARIE4gIQFQoNCgUECQIK
+AxIE4gIYGQpTCgQECQILEgTlAgIVGkUgRGVwcmVjYXRlZC4gVW5pcXVlIElEIG9mIHRoZSB1
+c2VyIG9uIHdob3NlIGJlaGFsZiB0cmFuc2ZlciBpcyBkb25lLgoKDQoFBAkCCwUSBOUCAgcK
+DQoFBAkCCwESBOUCCA8KDQoFBAkCCwMSBOUCEhQKwwIKBAQJAgwSBOwCAkMatAIgT3V0cHV0
+IG9ubHkuIERlc2NyaWJlcyB0aGUgc2NoZWR1bGUgb2YgdGhpcyB0cmFuc2ZlciBydW4gaWYg
+aXQgd2FzCiBjcmVhdGVkIGFzIHBhcnQgb2YgYSByZWd1bGFyIHNjaGVkdWxlLiBGb3IgYmF0
+Y2ggdHJhbnNmZXIgcnVucyB0aGF0IGFyZQogc2NoZWR1bGVkIG1hbnVhbGx5LCB0aGlzIGlz
+IGVtcHR5LgogTk9URTogdGhlIHN5c3RlbSBtaWdodCBjaG9vc2UgdG8gZGVsYXkgdGhlIHNj
+aGVkdWxlIGRlcGVuZGluZyBvbiB0aGUKIGN1cnJlbnQgbG9hZCwgc28gYHNjaGVkdWxlX3Rp
+bWVgIGRvZXNuJ3QgYWx3YXlzIG1hdGNoIHRoaXMuCgoNCgUECQIMBRIE7AICCAoNCgUECQIM
+ARIE7AIJEQoNCgUECQIMAxIE7AIUFgoNCgUECQIMCBIE7AIXQgoQCggECQIMCJwIABIE7AIY
+QQrMAQoEBAkCDRIG8wIC9AIyGrsBIE91dHB1dCBvbmx5LiBQdWIvU3ViIHRvcGljIHdoZXJl
+IGEgbm90aWZpY2F0aW9uIHdpbGwgYmUgc2VudCBhZnRlciB0aGlzCiB0cmFuc2ZlciBydW4g
+ZmluaXNoZXMuCgogVGhlIGZvcm1hdCBmb3Igc3BlY2lmeWluZyBhIHB1YnN1YiB0b3BpYyBp
+czoKIGBwcm9qZWN0cy97cHJvamVjdF9pZH0vdG9waWNzL3t0b3BpY19pZH1gCgoNCgUECQIN
+BRIE8wICCAoNCgUECQINARIE8wIJIgoNCgUECQINAxIE8wIlJwoNCgUECQINCBIE9AIGMQoQ
+CggECQINCJwIABIE9AIHMAq6AQoEBAkCDhIG+QIC+gIyGqkBIE91dHB1dCBvbmx5LiBFbWFp
+bCBub3RpZmljYXRpb25zIHdpbGwgYmUgc2VudCBhY2NvcmRpbmcgdG8gdGhlc2UKIHByZWZl
+cmVuY2VzIHRvIHRoZSBlbWFpbCBhZGRyZXNzIG9mIHRoZSB1c2VyIHdobyBvd25zIHRoZSB0
+cmFuc2ZlciBjb25maWcKIHRoaXMgcnVuIHdhcyBkZXJpdmVkIGZyb20uCgoNCgUECQIOBhIE
++QICEgoNCgUECQIOARIE+QITJAoNCgUECQIOAxIE+QInKQoNCgUECQIOCBIE+gIGMQoQCggE
+CQIOCJwIABIE+gIHMApUCgIEChIG/gIAlgMBGkYgUmVwcmVzZW50cyBhIHVzZXIgZmFjaW5n
+IG1lc3NhZ2UgZm9yIGEgcGFydGljdWxhciBkYXRhIHRyYW5zZmVyIHJ1bi4KCgsKAwQKARIE
+/gIIFwpICgQECgQAEgaAAwKMAwMaOCBSZXByZXNlbnRzIGRhdGEgdHJhbnNmZXIgdXNlciBm
+YWNpbmcgbWVzc2FnZSBzZXZlcml0eS4KCg0KBQQKBAABEgSAAwcWCigKBgQKBAACABIEggME
+JRoYIE5vIHNldmVyaXR5IHNwZWNpZmllZC4KCg8KBwQKBAACAAESBIIDBCAKDwoHBAoEAAIA
+AhIEggMjJAooCgYECgQAAgESBIUDBA0aGCBJbmZvcm1hdGlvbmFsIG1lc3NhZ2UuCgoPCgcE
+CgQAAgEBEgSFAwQICg8KBwQKBAACAQISBIUDCwwKIgoGBAoEAAICEgSIAwQQGhIgV2Fybmlu
+ZyBtZXNzYWdlLgoKDwoHBAoEAAICARIEiAMECwoPCgcECgQAAgICEgSIAw4PCiAKBgQKBAAC
+AxIEiwMEDhoQIEVycm9yIG1lc3NhZ2UuCgoPCgcECgQAAgMBEgSLAwQJCg8KBwQKBAACAwIS
+BIsDDA0KLQoEBAoCABIEjwMCLRofIFRpbWUgd2hlbiBtZXNzYWdlIHdhcyBsb2dnZWQuCgoN
+CgUECgIABhIEjwMCGwoNCgUECgIAARIEjwMcKAoNCgUECgIAAxIEjwMrLAohCgQECgIBEgSS
+AwIfGhMgTWVzc2FnZSBzZXZlcml0eS4KCg0KBQQKAgEGEgSSAwIRCg0KBQQKAgEBEgSSAxIa
+Cg0KBQQKAgEDEgSSAx0eCh0KBAQKAgISBJUDAhoaDyBNZXNzYWdlIHRleHQuCgoNCgUECgIC
+BRIElQMCCAoNCgUECgICARIElQMJFQoNCgUECgICAxIElQMYGWIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EmailPreferences ===
+    # Fields for EmailPreferences
+    # Field: enable_failure_email Type: 8 ()
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::ScheduleOptions ===
+    # Fields for ScheduleOptions
+    # Field: disable_auto_scheduling Type: 8 ()
+    # Field: start_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: end_time Type: 11 (.google.protobuf.Timestamp)
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::ScheduleOptionsV2 ===
+    # Fields for ScheduleOptionsV2
+    # Field: time_based_schedule Type: 11 (.google.cloud.bigquery.datatransfer.v1.TimeBasedSchedule)
+    # Field: manual_schedule Type: 11 (.google.cloud.bigquery.datatransfer.v1.ManualSchedule)
+    # Field: event_driven_schedule Type: 11 (.google.cloud.bigquery.datatransfer.v1.EventDrivenSchedule)
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::TimeBasedSchedule ===
+    # Fields for TimeBasedSchedule
+    # Field: schedule Type: 9 ()
+    # Field: start_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: end_time Type: 11 (.google.protobuf.Timestamp)
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::ManualSchedule ===
+    # Fields for ManualSchedule
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EventDrivenSchedule ===
+    # Fields for EventDrivenSchedule
+    # Field: pubsub_subscription Type: 9 ()
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::UserInfo ===
+    # Fields for UserInfo
+    # Field: email Type: 9 ()
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::TransferConfig ===
+    # Fields for TransferConfig
+    # Field: name Type: 9 ()
+    # Field: destination_dataset_id Type: 9 ()
+    # Field: display_name Type: 9 ()
+    # Field: data_source_id Type: 9 ()
+    # Field: params Type: 11 (.google.protobuf.Struct)
+    # Field: schedule Type: 9 ()
+    # Field: schedule_options Type: 11 (.google.cloud.bigquery.datatransfer.v1.ScheduleOptions)
+    # Field: schedule_options_v2 Type: 11 (.google.cloud.bigquery.datatransfer.v1.ScheduleOptionsV2)
+    # Field: data_refresh_window_days Type: 5 ()
+    # Field: disabled Type: 8 ()
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: next_run_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: state Type: 14 (.google.cloud.bigquery.datatransfer.v1.TransferState)
+    # Field: user_id Type: 3 ()
+    # Field: dataset_region Type: 9 ()
+    # Field: notification_pubsub_topic Type: 9 ()
+    # Field: email_preferences Type: 11 (.google.cloud.bigquery.datatransfer.v1.EmailPreferences)
+    # Field: owner_info Type: 11 (.google.cloud.bigquery.datatransfer.v1.UserInfo)
+    # Field: encryption_configuration Type: 11 (.google.cloud.bigquery.datatransfer.v1.EncryptionConfiguration)
+    # Field: error Type: 11 (.google.rpc.Status)
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EncryptionConfiguration ===
+    # Fields for EncryptionConfiguration
+    # Field: kms_key_name Type: 11 (.google.protobuf.StringValue)
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::TransferRun ===
+    # Fields for TransferRun
+    # Field: name Type: 9 ()
+    # Field: schedule_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: run_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: error_status Type: 11 (.google.rpc.Status)
+    # Field: start_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: end_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: params Type: 11 (.google.protobuf.Struct)
+    # Field: destination_dataset_id Type: 9 ()
+    # Field: data_source_id Type: 9 ()
+    # Field: state Type: 14 (.google.cloud.bigquery.datatransfer.v1.TransferState)
+    # Field: user_id Type: 3 ()
+    # Field: schedule Type: 9 ()
+    # Field: notification_pubsub_topic Type: 9 ()
+    # Field: email_preferences Type: 11 (.google.cloud.bigquery.datatransfer.v1.EmailPreferences)
+
+# === Message: Google::Cloud::Bigquery::Datatransfer::V1::Transfer::TransferMessage ===
+    # Fields for TransferMessage
+    # Field: message_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: severity Type: 14 (.google.cloud.bigquery.datatransfer.v1.TransferMessage.MessageSeverity)
+    # Field: message_text Type: 9 ()
+
+# Enum: TransferMessage::MessageSeverity
+our $TransferMessage_MESSAGE_SEVERITY_UNSPECIFIED = 0;
+our $TransferMessage_INFO = 1;
+our $TransferMessage_WARNING = 2;
+our $TransferMessage_ERROR = 3;
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Bigquery::Datatransfer::V1::Transfer - Compiled Protocol Buffers messages for google/cloud/bigquery/datatransfer/v1/transfer.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::Datatransfer::V1::Transfer;
+
+    my $msg = Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EmailPreferences->new({
+        enable_failure_email => $enable_failure_email,
+    });
+
+    # Read or update a field
+    my $val = $msg->enable_failure_email();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EmailPreferences->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/datatransfer/v1/transfer.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EmailPreferences
+
+Represents preferences for sending email notifications for transfer run
+events.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enable_failure_email() >> / C<< $msg->enable_failure_email($value) >>
+
+Type: C<Bool>
+
+If true, email notifications will be sent on transfer run failures.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::ScheduleOptions
+
+Options customizing the data transfer schedule.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->disable_auto_scheduling() >> / C<< $msg->disable_auto_scheduling($value) >>
+
+Type: C<Bool>
+
+If true, automatic scheduling of data transfer runs for this configuration
+will be disabled. The runs can be started on ad-hoc basis using
+StartManualTransferRuns API. When automatic scheduling is disabled, the
+TransferConfig.schedule field will be ignored.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Specifies time to start scheduling transfer runs. The first run will be
+scheduled at or after the start time according to a recurrence pattern
+defined in the schedule string. The start time can be changed at any
+moment. The time when a data transfer can be triggered manually is not
+limited by this option.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Defines time to stop scheduling transfer runs. A transfer run cannot be
+scheduled at or after the end time. The end time can be changed at any
+moment. The time when a data transfer can be triggered manually is not
+limited by this option.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::ScheduleOptionsV2
+
+V2 options customizing different types of data transfer schedule.
+This field supports existing time-based and manual transfer schedule. Also
+supports Event-Driven transfer schedule. ScheduleOptionsV2 cannot be used
+together with ScheduleOptions/Schedule.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->time_based_schedule() >> / C<< $msg->time_based_schedule($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::TimeBasedSchedule>)
+
+Time based transfer schedule options. This is the default schedule
+option.
+
+=item * C<< $msg->manual_schedule() >> / C<< $msg->manual_schedule($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::ManualSchedule>)
+
+Manual transfer schedule. If set, the transfer run will not be
+auto-scheduled by the system, unless the client invokes
+StartManualTransferRuns.  This is equivalent to
+disable_auto_scheduling = true.
+
+=item * C<< $msg->event_driven_schedule() >> / C<< $msg->event_driven_schedule($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EventDrivenSchedule>)
+
+Event driven transfer schedule options. If set, the transfer will be
+scheduled upon events arrial.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::TimeBasedSchedule
+
+Options customizing the time based transfer schedule.
+Options are migrated from the original ScheduleOptions message.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->schedule() >> / C<< $msg->schedule($value) >>
+
+Type: C<String>
+
+Data transfer schedule.
+If the data source does not support a custom schedule, this should be
+empty. If it is empty, the default value for the data source will be used.
+The specified times are in UTC.
+Examples of valid format:
+`1st,3rd monday of month 15:30`,
+`every wed,fri of jan,jun 13:15`, and
+`first sunday of quarter 00:00`.
+See more explanation about the format here:
+https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#the_schedule_format
+
+NOTE: The minimum interval time between recurring transfers depends on the
+data source; refer to the documentation for your data source.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Specifies time to start scheduling transfer runs. The first run will be
+scheduled at or after the start time according to a recurrence pattern
+defined in the schedule string. The start time can be changed at any
+moment.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Defines time to stop scheduling transfer runs. A transfer run cannot be
+scheduled at or after the end time. The end time can be changed at any
+moment.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::ManualSchedule
+
+Options customizing manual transfers schedule.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EventDrivenSchedule
+
+Options customizing EventDriven transfers schedule.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->pubsub_subscription() >> / C<< $msg->pubsub_subscription($value) >>
+
+Type: C<String>
+
+Pub/Sub subscription name used to receive events.
+Only Google Cloud Storage data source support this option.
+Format: projects/{project}/subscriptions/{subscription}
+
+=back
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::UserInfo
+
+Information about a user.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->email() >> / C<< $msg->email($value) >>
+
+Type: C<String>
+
+E-mail address of the user.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::TransferConfig
+
+Represents a data transfer configuration. A transfer configuration
+contains all metadata needed to perform a data transfer. For example,
+`destination_dataset_id` specifies where data should be stored.
+When a new transfer configuration is created, the specified
+`destination_dataset_id` is created when needed and shared with the
+appropriate data source service account.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The resource name of the transfer config.
+Transfer config names have the form either
+`projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or
+`projects/{project_id}/transferConfigs/{config_id}`,
+where `config_id` is usually a UUID, even though it is not
+guaranteed or required. The name is ignored when creating a transfer
+config.
+
+=item * C<< $msg->destination_dataset_id() >> / C<< $msg->destination_dataset_id($value) >>
+
+Type: C<String>
+
+The BigQuery target dataset id.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+User specified display name for the data transfer.
+
+=item * C<< $msg->data_source_id() >> / C<< $msg->data_source_id($value) >>
+
+Type: C<String>
+
+Data source ID. This cannot be changed once data transfer is created. The
+full list of available data source IDs can be returned through an API call:
+https://cloud.google.com/bigquery-transfer/docs/reference/datatransfer/rest/v1/projects.locations.dataSources/list
+
+=item * C<< $msg->params() >> / C<< $msg->params($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Parameters specific to each data source. For more information see the
+bq tab in the 'Setting up a data transfer' section for each data source.
+For example the parameters for Cloud Storage transfers are listed here:
+https://cloud.google.com/bigquery-transfer/docs/cloud-storage-transfer#bq
+
+=item * C<< $msg->schedule() >> / C<< $msg->schedule($value) >>
+
+Type: C<String>
+
+Data transfer schedule.
+If the data source does not support a custom schedule, this should be
+empty. If it is empty, the default value for the data source will be used.
+The specified times are in UTC.
+Examples of valid format:
+`1st,3rd monday of month 15:30`,
+`every wed,fri of jan,jun 13:15`, and
+`first sunday of quarter 00:00`.
+See more explanation about the format here:
+https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#the_schedule_format
+
+NOTE: The minimum interval time between recurring transfers depends on the
+data source; refer to the documentation for your data source.
+
+=item * C<< $msg->schedule_options() >> / C<< $msg->schedule_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::ScheduleOptions>)
+
+Options customizing the data transfer schedule.
+
+=item * C<< $msg->schedule_options_v2() >> / C<< $msg->schedule_options_v2($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::ScheduleOptionsV2>)
+
+Options customizing different types of data transfer schedule.
+This field replaces "schedule" and "schedule_options" fields.
+ScheduleOptionsV2 cannot be used together with ScheduleOptions/Schedule.
+
+=item * C<< $msg->data_refresh_window_days() >> / C<< $msg->data_refresh_window_days($value) >>
+
+Type: C<Int32>
+
+The number of days to look back to automatically refresh the data.
+For example, if `data_refresh_window_days = 10`, then every day
+BigQuery reingests data for [today-10, today-1], rather than ingesting data
+for just [today-1].
+Only valid if the data source supports the feature. Set the value to 0
+to use the default value.
+
+=item * C<< $msg->disabled() >> / C<< $msg->disabled($value) >>
+
+Type: C<Bool>
+
+Is this config disabled. When set to true, no runs will be scheduled for
+this transfer config.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Data transfer modification time. Ignored by server on input.
+
+=item * C<< $msg->next_run_time() >> / C<< $msg->next_run_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Next time when data transfer will run.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Datatransfer::V1::TransferState>)
+
+Output only. State of the most recently updated transfer run.
+
+=item * C<< $msg->user_id() >> / C<< $msg->user_id($value) >>
+
+Type: C<Int64>
+
+Deprecated. Unique ID of the user on whose behalf transfer is done.
+
+=item * C<< $msg->dataset_region() >> / C<< $msg->dataset_region($value) >>
+
+Type: C<String>
+
+Output only. Region in which BigQuery dataset is located.
+
+=item * C<< $msg->notification_pubsub_topic() >> / C<< $msg->notification_pubsub_topic($value) >>
+
+Type: C<String>
+
+Pub/Sub topic where notifications will be sent after transfer runs
+associated with this transfer config finish.
+
+The format for specifying a pubsub topic is:
+`projects/{project_id}/topics/{topic_id}`
+
+=item * C<< $msg->email_preferences() >> / C<< $msg->email_preferences($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EmailPreferences>)
+
+Email notifications will be sent according to these preferences
+to the email address of the user who owns this transfer config.
+
+=item * C<< $msg->owner_info() >> / C<< $msg->owner_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::UserInfo>)
+
+Output only. Information about the user whose credentials are used to
+transfer data. Populated only for `transferConfigs.get` requests. In case
+the user information is not available, this field will not be populated.
+
+=item * C<< $msg->encryption_configuration() >> / C<< $msg->encryption_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EncryptionConfiguration>)
+
+The encryption configuration part. Currently, it is only used for the
+optional KMS key name. The BigQuery service account of your project must be
+granted permissions to use the key. Read methods will return the key name
+applied in effect. Write methods will apply the key if it is present, or
+otherwise try to apply project default keys if it is absent.
+
+=item * C<< $msg->error() >> / C<< $msg->error($value) >>
+
+Type: C<Message> (L<Google::Rpc::Status::Status>)
+
+Output only. Error code with detailed information about reason of the
+latest config failure.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EncryptionConfiguration
+
+Represents the encryption configuration for a transfer.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+The name of the KMS key used for encrypting BigQuery data.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::TransferRun
+
+Represents a data transfer run.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The resource name of the transfer run.
+Transfer run names have the form
+`projects/{project_id}/locations/{location}/transferConfigs/{config_id}/runs/{run_id}`.
+The name is ignored when creating a transfer run.
+
+=item * C<< $msg->schedule_time() >> / C<< $msg->schedule_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Minimum time after which a transfer run can be started.
+
+=item * C<< $msg->run_time() >> / C<< $msg->run_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+For batch transfer runs, specifies the date and time of the data should be
+ingested.
+
+=item * C<< $msg->error_status() >> / C<< $msg->error_status($value) >>
+
+Type: C<Message> (L<Google::Rpc::Status::Status>)
+
+Status of the transfer run.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time when transfer run was started.
+Parameter ignored by server for input requests.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time when transfer run ended.
+Parameter ignored by server for input requests.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Last time the data transfer run state was updated.
+
+=item * C<< $msg->params() >> / C<< $msg->params($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Output only. Parameters specific to each data source. For more information
+see the bq tab in the 'Setting up a data transfer' section for each data
+source. For example the parameters for Cloud Storage transfers are listed
+here:
+https://cloud.google.com/bigquery-transfer/docs/cloud-storage-transfer#bq
+
+=item * C<< $msg->destination_dataset_id() >> / C<< $msg->destination_dataset_id($value) >>
+
+Type: C<String>
+
+Output only. The BigQuery target dataset id.
+
+=item * C<< $msg->data_source_id() >> / C<< $msg->data_source_id($value) >>
+
+Type: C<String>
+
+Output only. Data source id.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Datatransfer::V1::TransferState>)
+
+Data transfer run state. Ignored for input requests.
+
+=item * C<< $msg->user_id() >> / C<< $msg->user_id($value) >>
+
+Type: C<Int64>
+
+Deprecated. Unique ID of the user on whose behalf transfer is done.
+
+=item * C<< $msg->schedule() >> / C<< $msg->schedule($value) >>
+
+Type: C<String>
+
+Output only. Describes the schedule of this transfer run if it was
+created as part of a regular schedule. For batch transfer runs that are
+scheduled manually, this is empty.
+NOTE: the system might choose to delay the schedule depending on the
+current load, so `schedule_time` doesn't always match this.
+
+=item * C<< $msg->notification_pubsub_topic() >> / C<< $msg->notification_pubsub_topic($value) >>
+
+Type: C<String>
+
+Output only. Pub/Sub topic where a notification will be sent after this
+transfer run finishes.
+
+The format for specifying a pubsub topic is:
+`projects/{project_id}/topics/{topic_id}`
+
+=item * C<< $msg->email_preferences() >> / C<< $msg->email_preferences($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::EmailPreferences>)
+
+Output only. Email notifications will be sent according to these
+preferences to the email address of the user who owns the transfer config
+this run was derived from.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Datatransfer::V1::Transfer::TransferMessage
+
+Represents a user facing message for a particular data transfer run.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message_time() >> / C<< $msg->message_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Time when message was logged.
+
+=item * C<< $msg->severity() >> / C<< $msg->severity($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Datatransfer::V1::TransferMessage::MessageSeverity>)
+
+Message severity.
+
+=item * C<< $msg->message_text() >> / C<< $msg->message_text($value) >>
+
+Type: C<String>
+
+Message text.
+
+=back
+
+=head3 Enum: TransferMessage::MessageSeverity
+
+=over 4
+
+=item * C<MESSAGE_SEVERITY_UNSPECIFIED> => C<0>
+
+=item * C<INFO> => C<1>
+
+=item * C<WARNING> => C<2>
+
+=item * C<ERROR> => C<3>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::Datatransfer::V1::Transfer::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

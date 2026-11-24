@@ -23,20 +23,34 @@
 	</display>
 	<databases>
 		<!--
-			Each <database> names a Web::VWF::Data:: module (a name with :: in it
-			is used as written).  A <directory> here, or inside a <database>, is
-			where the module's .pm file is, instead of @INC; the files that hold
-			the data are in database_dir.
+			Where the data files (CSV, XML, SQLite) are.  Relative to cgi-bin; the
+			default, if this is left out, is ../databases.  The drivers that read them
+			are looked for here too, unless <data> says otherwise.
 		-->
-		<database>
+		<directory>../databases</directory>
+	</databases>
+	<data>
+		<!--
+			The drivers (Database::Abstraction subclasses) pages use.  Each <driver>
+			names a Web::VWF::Data:: class (a name with :: in it is used as written).
+			A <directory> here, or inside a <driver>, is where the driver's .pm file
+			is.  Without one it is the databases directory.  A driver not found in the
+			directory is taken from @INC, which is where index is found: it is
+			Web::VWF::Data::index, from the distribution.  Only a <directory> inside
+			a <driver> is strict.
+			Here the example's own driver, states.pm, is in ../data (relative to
+			cgi-bin) and its data file, states.csv, is in ../databases.
+		-->
+		<directory>../data</directory>
+		<driver>
 			<name>index</name>
 			<description>The people who can be contacted from the index page (index.csv)</description>
-		</database>
-		<database>
+		</driver>
+		<driver>
 			<name>states</name>
-			<description>List of data about the U.S. states</description>
-		</database>
-	</databases>
+			<description>List of data about the U.S. states (states.csv, with the driver, states.pm)</description>
+		</driver>
+	</data>
 	<memory_cache>
 		<driver>Null</driver>
 	</memory_cache>

@@ -3,7 +3,7 @@ package Google::Spanner::V1::Transaction;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -317,70 +317,10 @@ EOF
     # Field: exclude_txn_from_change_streams Type: 8 ()
     # Field: isolation_level Type: 14 (.google.spanner.v1.TransactionOptions.IsolationLevel)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Transaction::TransactionOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Transaction;
-
-    my $msg = Google::Spanner::V1::Transaction::TransactionOptions->new(
-        read_write => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<read_write>
-
-Type: Message (.google.spanner.v1.TransactionOptions.ReadWrite)
-
-=item * B<partitioned_dml>
-
-Type: Message (.google.spanner.v1.TransactionOptions.PartitionedDml)
-
-=item * B<read_only>
-
-Type: Message (.google.spanner.v1.TransactionOptions.ReadOnly)
-
-=item * B<exclude_txn_from_change_streams>
-
-Type: Bool
-
-=item * B<isolation_level>
-
-Type: Enum (.google.spanner.v1.TransactionOptions.IsolationLevel)
-
-=back
-
-=cut
-
 # Enum: TransactionOptions::IsolationLevel
 our $TransactionOptions_ISOLATION_LEVEL_UNSPECIFIED = 0;
 our $TransactionOptions_SERIALIZABLE = 1;
 our $TransactionOptions_REPEATABLE_READ = 2;
-
-=pod
-
-=head2 Enum: TransactionOptions::IsolationLevel
-
-Values:
-
-=over 4
-
-=item * C<ISOLATION_LEVEL_UNSPECIFIED> => 0
-
-=item * C<SERIALIZABLE> => 1
-
-=item * C<REPEATABLE_READ> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Transaction::Transaction ===
     # Fields for Transaction
@@ -389,130 +329,272 @@ Values:
     # Field: precommit_token Type: 11 (.google.spanner.v1.MultiplexedSessionPrecommitToken)
     # Field: cache_update Type: 11 (.google.spanner.v1.CacheUpdate)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Transaction::Transaction - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Transaction;
-
-    my $msg = Google::Spanner::V1::Transaction::Transaction->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: Bytes
-
-=item * B<read_timestamp>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<precommit_token>
-
-Type: Message (.google.spanner.v1.MultiplexedSessionPrecommitToken)
-
-=item * B<cache_update>
-
-Type: Message (.google.spanner.v1.CacheUpdate)
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Transaction::TransactionSelector ===
     # Fields for TransactionSelector
     # Field: single_use Type: 11 (.google.spanner.v1.TransactionOptions)
     # Field: id Type: 12 ()
     # Field: begin Type: 11 (.google.spanner.v1.TransactionOptions)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Transaction::TransactionSelector - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Transaction;
-
-    my $msg = Google::Spanner::V1::Transaction::TransactionSelector->new(
-        single_use => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<single_use>
-
-Type: Message (.google.spanner.v1.TransactionOptions)
-
-=item * B<id>
-
-Type: Bytes
-
-=item * B<begin>
-
-Type: Message (.google.spanner.v1.TransactionOptions)
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Transaction::MultiplexedSessionPrecommitToken ===
     # Fields for MultiplexedSessionPrecommitToken
     # Field: precommit_token Type: 12 ()
     # Field: seq_num Type: 5 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Spanner::V1::Transaction::MultiplexedSessionPrecommitToken - Compiled Protocol Buffers message class
+Google::Spanner::V1::Transaction - Compiled Protocol Buffers messages for google/spanner/v1/transaction.proto
 
 =head1 SYNOPSIS
 
     use Google::Spanner::V1::Transaction;
 
-    my $msg = Google::Spanner::V1::Transaction::MultiplexedSessionPrecommitToken->new(
-        precommit_token => $value,
-    );
+    my $msg = Google::Spanner::V1::Transaction::TransactionOptions->new({
+        read_write => $read_write,
+        partitioned_dml => $partitioned_dml,
+        read_only => $read_only,
+        exclude_txn_from_change_streams => $exclude_txn_from_change_streams,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->read_write();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Spanner::V1::Transaction::TransactionOptions->parse($bytes);
 
-=item * B<precommit_token>
-
-Type: Bytes
-
-=item * B<seq_num>
-
-Type: Int32
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Spanner::V1::Transaction - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/spanner/v1/transaction.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Spanner::V1::Transaction::TransactionOptions
+
+Options to use for transactions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->read_write() >> / C<< $msg->read_write($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionOptions::ReadWrite>)
+
+Transaction may write.
+
+Authorization to begin a read-write transaction requires
+`spanner.databases.beginOrRollbackReadWriteTransaction` permission
+on the `session` resource.
+
+=item * C<< $msg->partitioned_dml() >> / C<< $msg->partitioned_dml($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionOptions::PartitionedDml>)
+
+Partitioned DML transaction.
+
+Authorization to begin a Partitioned DML transaction requires
+`spanner.databases.beginPartitionedDmlTransaction` permission
+on the `session` resource.
+
+=item * C<< $msg->read_only() >> / C<< $msg->read_only($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionOptions::ReadOnly>)
+
+Transaction does not write.
+
+Authorization to begin a read-only transaction requires
+`spanner.databases.beginReadOnlyTransaction` permission
+on the `session` resource.
+
+=item * C<< $msg->exclude_txn_from_change_streams() >> / C<< $msg->exclude_txn_from_change_streams($value) >>
+
+Type: C<Bool>
+
+When `exclude_txn_from_change_streams` is set to `true`, it prevents read
+or write transactions from being tracked in change streams.
+
+* If the DDL option `allow_txn_exclusion` is set to `true`, then the
+updates
+ made within this transaction aren't recorded in the change stream.
+
+* If you don't set the DDL option `allow_txn_exclusion` or if it's
+ set to `false`, then the updates made within this transaction are
+ recorded in the change stream.
+
+When `exclude_txn_from_change_streams` is set to `false` or not set,
+modifications from this transaction are recorded in all change streams
+that are tracking columns modified by these transactions.
+
+The `exclude_txn_from_change_streams` option can only be specified
+for read-write or partitioned DML transactions, otherwise the API returns
+an `INVALID_ARGUMENT` error.
+
+=item * C<< $msg->isolation_level() >> / C<< $msg->isolation_level($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::TransactionOptions::IsolationLevel>)
+
+Isolation level for the transaction.
+
+=back
+
+=head3 Enum: TransactionOptions::IsolationLevel
+
+=over 4
+
+=item * C<ISOLATION_LEVEL_UNSPECIFIED> => C<0>
+
+=item * C<SERIALIZABLE> => C<1>
+
+=item * C<REPEATABLE_READ> => C<2>
+
+=back
+
+=head2 Google::Spanner::V1::Transaction::Transaction
+
+A transaction.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<Bytes>
+
+`id` may be used to identify the transaction in subsequent
+[Read][google.spanner.v1.Spanner.Read],
+[ExecuteSql][google.spanner.v1.Spanner.ExecuteSql],
+[Commit][google.spanner.v1.Spanner.Commit], or
+[Rollback][google.spanner.v1.Spanner.Rollback] calls.
+
+Single-use read-only transactions do not have IDs, because
+single-use transactions do not support multiple requests.
+
+=item * C<< $msg->read_timestamp() >> / C<< $msg->read_timestamp($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+For snapshot read-only transactions, the read timestamp chosen
+for the transaction. Not returned by default: see
+[TransactionOptions.ReadOnly.return_read_timestamp][google.spanner.v1.TransactionOptions.ReadOnly.return_read_timestamp].
+
+A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
+Example: `"2014-10-02T15:01:23.045123456Z"`.
+
+=item * C<< $msg->precommit_token() >> / C<< $msg->precommit_token($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::MultiplexedSessionPrecommitToken>)
+
+A precommit token is included in the response of a BeginTransaction
+request if the read-write transaction is on a multiplexed session and
+a mutation_key was specified in the
+[BeginTransaction][google.spanner.v1.BeginTransactionRequest].
+The precommit token with the highest sequence number from this transaction
+attempt should be passed to the [Commit][google.spanner.v1.Spanner.Commit]
+request for this transaction.
+
+=item * C<< $msg->cache_update() >> / C<< $msg->cache_update($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::CacheUpdate>)
+
+Optional. A cache update expresses a set of changes the client should
+incorporate into its location cache. The client should discard the changes
+if they are older than the data it already has. This data can be obtained
+in response to requests that included a `RoutingHint` field, but may also
+be obtained by explicit location-fetching RPCs which may be added in the
+future.
+
+=back
+
+=head2 Google::Spanner::V1::Transaction::TransactionSelector
+
+This message is used to select the transaction in which a
+[Read][google.spanner.v1.Spanner.Read] or
+[ExecuteSql][google.spanner.v1.Spanner.ExecuteSql] call runs.
+
+See [TransactionOptions][google.spanner.v1.TransactionOptions] for more
+information about transactions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->single_use() >> / C<< $msg->single_use($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionOptions>)
+
+Execute the read or SQL query in a temporary transaction.
+This is the most efficient way to execute a transaction that
+consists of a single SQL query.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<Bytes>
+
+Execute the read or SQL query in a previously-started transaction.
+
+=item * C<< $msg->begin() >> / C<< $msg->begin($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Transaction::TransactionOptions>)
+
+Begin a new transaction and execute this read or SQL query in
+it. The transaction ID of the new transaction is returned in
+[ResultSetMetadata.transaction][google.spanner.v1.ResultSetMetadata.transaction],
+which is a [Transaction][google.spanner.v1.Transaction].
+
+=back
+
+=head2 Google::Spanner::V1::Transaction::MultiplexedSessionPrecommitToken
+
+When a read-write transaction is executed on a multiplexed session,
+this precommit token is sent back to the client
+as a part of the [Transaction][google.spanner.v1.Transaction] message in the
+[BeginTransaction][google.spanner.v1.BeginTransactionRequest] response and
+also as a part of the [ResultSet][google.spanner.v1.ResultSet] and
+[PartialResultSet][google.spanner.v1.PartialResultSet] responses.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->precommit_token() >> / C<< $msg->precommit_token($value) >>
+
+Type: C<Bytes>
+
+Opaque precommit token.
+
+=item * C<< $msg->seq_num() >> / C<< $msg->seq_num($value) >>
+
+Type: C<Int32>
+
+An incrementing seq number is generated on every precommit token
+that is returned. Clients should remember the precommit token with the
+highest sequence number from the current transaction attempt.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Spanner::V1::Transaction::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

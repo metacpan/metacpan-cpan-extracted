@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::PrivacyPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -206,36 +206,6 @@ EOF
     # Field: threshold Type: 3 ()
     # Field: privacy_unit_columns Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::PrivacyPolicy::AggregationThresholdPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::PrivacyPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::PrivacyPolicy::AggregationThresholdPolicy->new(
-        threshold => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<threshold>
-
-Type: Int64
-
-=item * B<privacy_unit_columns>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::PrivacyPolicy::DifferentialPrivacyPolicy ===
     # Fields for DifferentialPrivacyPolicy
     # Field: max_epsilon_per_query Type: 1 ()
@@ -247,94 +217,10 @@ Type: String
     # Field: epsilon_budget_remaining Type: 1 ()
     # Field: delta_budget_remaining Type: 1 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::PrivacyPolicy::DifferentialPrivacyPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::PrivacyPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::PrivacyPolicy::DifferentialPrivacyPolicy->new(
-        max_epsilon_per_query => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<max_epsilon_per_query>
-
-Type: Double
-
-=item * B<delta_per_query>
-
-Type: Double
-
-=item * B<max_groups_contributed>
-
-Type: Int64
-
-=item * B<privacy_unit_column>
-
-Type: String
-
-=item * B<epsilon_budget>
-
-Type: Double
-
-=item * B<delta_budget>
-
-Type: Double
-
-=item * B<epsilon_budget_remaining>
-
-Type: Double
-
-=item * B<delta_budget_remaining>
-
-Type: Double
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::PrivacyPolicy::JoinRestrictionPolicy ===
     # Fields for JoinRestrictionPolicy
     # Field: join_condition Type: 14 (.google.cloud.bigquery.v2.JoinRestrictionPolicy.JoinCondition)
     # Field: join_allowed_columns Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::PrivacyPolicy::JoinRestrictionPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::PrivacyPolicy;
-
-    my $msg = Google::Cloud::Bigquery::V2::PrivacyPolicy::JoinRestrictionPolicy->new(
-        join_condition => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<join_condition>
-
-Type: Enum (.google.cloud.bigquery.v2.JoinRestrictionPolicy.JoinCondition)
-
-=item * B<join_allowed_columns>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: JoinRestrictionPolicy::JoinCondition
 our $JoinRestrictionPolicy_JOIN_CONDITION_UNSPECIFIED = 0;
@@ -343,79 +229,261 @@ our $JoinRestrictionPolicy_JOIN_ALL = 2;
 our $JoinRestrictionPolicy_JOIN_NOT_REQUIRED = 3;
 our $JoinRestrictionPolicy_JOIN_BLOCKED = 4;
 
-=pod
-
-=head2 Enum: JoinRestrictionPolicy::JoinCondition
-
-Values:
-
-=over 4
-
-=item * C<JOIN_CONDITION_UNSPECIFIED> => 0
-
-=item * C<JOIN_ANY> => 1
-
-=item * C<JOIN_ALL> => 2
-
-=item * C<JOIN_NOT_REQUIRED> => 3
-
-=item * C<JOIN_BLOCKED> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::PrivacyPolicy::PrivacyPolicy ===
     # Fields for PrivacyPolicy
     # Field: aggregation_threshold_policy Type: 11 (.google.cloud.bigquery.v2.AggregationThresholdPolicy)
     # Field: differential_privacy_policy Type: 11 (.google.cloud.bigquery.v2.DifferentialPrivacyPolicy)
     # Field: join_restriction_policy Type: 11 (.google.cloud.bigquery.v2.JoinRestrictionPolicy)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::PrivacyPolicy::PrivacyPolicy - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::PrivacyPolicy - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/privacy_policy.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::PrivacyPolicy;
 
-    my $msg = Google::Cloud::Bigquery::V2::PrivacyPolicy::PrivacyPolicy->new(
-        aggregation_threshold_policy => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::PrivacyPolicy::AggregationThresholdPolicy->new({
+        threshold => $threshold,
+        privacy_unit_columns => $privacy_unit_columns,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->threshold();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::PrivacyPolicy::AggregationThresholdPolicy->parse($bytes);
 
-=item * B<aggregation_threshold_policy>
-
-Type: Message (.google.cloud.bigquery.v2.AggregationThresholdPolicy)
-
-=item * B<differential_privacy_policy>
-
-Type: Message (.google.cloud.bigquery.v2.DifferentialPrivacyPolicy)
-
-=item * B<join_restriction_policy>
-
-Type: Message (.google.cloud.bigquery.v2.JoinRestrictionPolicy)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::PrivacyPolicy - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/privacy_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::PrivacyPolicy::AggregationThresholdPolicy
+
+Represents privacy policy associated with "aggregation threshold" method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->threshold() >> / C<< $msg->threshold($value) >>
+
+Type: C<Int64>
+
+Optional. The threshold for the "aggregation threshold" policy.
+
+=item * C<< $msg->privacy_unit_columns() >> / C<< $msg->privacy_unit_columns($value) >>
+
+Type: C<String>
+
+Optional. The privacy unit column(s) associated with this policy.
+For now, only one column per data source object (table, view) is allowed as
+a privacy unit column.
+Representing as a repeated field in metadata for extensibility to
+multiple columns in future.
+Duplicates and Repeated struct fields are not allowed.
+For nested fields, use dot notation ("outer.inner")
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::PrivacyPolicy::DifferentialPrivacyPolicy
+
+Represents privacy policy associated with "differential privacy" method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->max_epsilon_per_query() >> / C<< $msg->max_epsilon_per_query($value) >>
+
+Type: C<Double>
+
+Optional. The maximum epsilon value that a query can consume. If the
+subscriber specifies epsilon as a parameter in a SELECT query, it must be
+less than or equal to this value. The epsilon parameter controls the amount
+of noise that is added to the groups — a higher epsilon means less noise.
+
+=item * C<< $msg->delta_per_query() >> / C<< $msg->delta_per_query($value) >>
+
+Type: C<Double>
+
+Optional. The delta value that is used per query. Delta represents the
+probability that any row will fail to be epsilon differentially private.
+Indicates the risk associated with exposing aggregate rows in the result of
+a query.
+
+=item * C<< $msg->max_groups_contributed() >> / C<< $msg->max_groups_contributed($value) >>
+
+Type: C<Int64>
+
+Optional. The maximum groups contributed value that is used per query.
+Represents the maximum number of groups to which each protected entity can
+contribute. Changing this value does not improve or worsen privacy. The
+best value for accuracy and utility depends on the query and data.
+
+=item * C<< $msg->privacy_unit_column() >> / C<< $msg->privacy_unit_column($value) >>
+
+Type: C<String>
+
+Optional. The privacy unit column associated with this policy. Differential
+privacy policies can only have one privacy unit column per data source
+object (table, view).
+
+=item * C<< $msg->epsilon_budget() >> / C<< $msg->epsilon_budget($value) >>
+
+Type: C<Double>
+
+Optional. The total epsilon budget for all queries against the
+privacy-protected view. Each subscriber query against this view charges the
+amount of epsilon they request in their query. If there is sufficient
+budget, then the subscriber query attempts to complete. It might still fail
+due to other reasons, in which case the charge is refunded. If there is
+insufficient budget the query is rejected. There might be multiple charge
+attempts if a single query references multiple views. In this case there
+must be sufficient budget for all charges or the query is rejected and
+charges are refunded in best effort. The budget does not have a refresh
+policy and can only be updated via ALTER VIEW or circumvented by creating a
+new view that can be queried with a fresh budget.
+
+=item * C<< $msg->delta_budget() >> / C<< $msg->delta_budget($value) >>
+
+Type: C<Double>
+
+Optional. The total delta budget for all queries against the
+privacy-protected view. Each subscriber query against this view charges the
+amount of delta that is pre-defined by the contributor through the privacy
+policy delta_per_query field. If there is sufficient budget, then the
+subscriber query attempts to complete. It might still fail due to other
+reasons, in which case the charge is refunded. If there is insufficient
+budget the query is rejected. There might be multiple charge attempts if a
+single query references multiple views. In this case there must be
+sufficient budget for all charges or the query is rejected and charges are
+refunded in best effort. The budget does not have a refresh policy and can
+only be updated via ALTER VIEW or circumvented by creating a new view that
+can be queried with a fresh budget.
+
+=item * C<< $msg->epsilon_budget_remaining() >> / C<< $msg->epsilon_budget_remaining($value) >>
+
+Type: C<Double>
+
+Output only. The epsilon budget remaining. If budget is exhausted, no more
+queries are allowed. Note that the budget for queries that are in progress
+is deducted before the query executes. If the query fails or is cancelled
+then the budget is refunded. In this case the amount of budget remaining
+can increase.
+
+=item * C<< $msg->delta_budget_remaining() >> / C<< $msg->delta_budget_remaining($value) >>
+
+Type: C<Double>
+
+Output only. The delta budget remaining. If budget is exhausted, no more
+queries are allowed. Note that the budget for queries that are in progress
+is deducted before the query executes. If the query fails or is cancelled
+then the budget is refunded. In this case the amount of budget remaining
+can increase.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::PrivacyPolicy::JoinRestrictionPolicy
+
+Represents privacy policy associated with "join restrictions". Join
+restriction gives data providers the ability to enforce joins on the
+'join_allowed_columns' when data is queried from a privacy protected view.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->join_condition() >> / C<< $msg->join_condition($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::JoinRestrictionPolicy::JoinCondition>)
+
+Optional. Specifies if a join is required or not on queries for the view.
+Default is JOIN_CONDITION_UNSPECIFIED.
+
+=item * C<< $msg->join_allowed_columns() >> / C<< $msg->join_allowed_columns($value) >>
+
+Type: C<String>
+
+Optional. The only columns that joins are allowed on.
+This field is must be specified for join_conditions JOIN_ANY and JOIN_ALL
+and it cannot be set for JOIN_BLOCKED.
+
+=back
+
+=head3 Enum: JoinRestrictionPolicy::JoinCondition
+
+=over 4
+
+=item * C<JOIN_CONDITION_UNSPECIFIED> => C<0>
+
+=item * C<JOIN_ANY> => C<1>
+
+=item * C<JOIN_ALL> => C<2>
+
+=item * C<JOIN_NOT_REQUIRED> => C<3>
+
+=item * C<JOIN_BLOCKED> => C<4>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::PrivacyPolicy::PrivacyPolicy
+
+Represents privacy policy that contains the privacy requirements specified by
+the data owner. Currently, this is only supported on views.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->aggregation_threshold_policy() >> / C<< $msg->aggregation_threshold_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::PrivacyPolicy::AggregationThresholdPolicy>)
+
+Optional. Policy used for aggregation thresholds.
+
+=item * C<< $msg->differential_privacy_policy() >> / C<< $msg->differential_privacy_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::PrivacyPolicy::DifferentialPrivacyPolicy>)
+
+Optional. Policy used for differential privacy.
+
+=item * C<< $msg->join_restriction_policy() >> / C<< $msg->join_restriction_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::PrivacyPolicy::JoinRestrictionPolicy>)
+
+Optional. Join restriction policy is outside of the one of policies, since
+this policy can be set along with other policies. This policy gives data
+providers the ability to enforce joins on the 'join_allowed_columns' when
+data is queried from a privacy protected view.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::PrivacyPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

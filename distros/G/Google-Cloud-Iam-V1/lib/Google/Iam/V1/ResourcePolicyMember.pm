@@ -3,7 +3,7 @@ package Google::Iam::V1::ResourcePolicyMember;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -64,47 +64,83 @@ EOF
     # Field: iam_policy_name_principal Type: 9 ()
     # Field: iam_policy_uid_principal Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Iam::V1::ResourcePolicyMember::ResourcePolicyMember - Compiled Protocol Buffers message class
+Google::Iam::V1::ResourcePolicyMember - Compiled Protocol Buffers messages for google/iam/v1/resource_policy_member.proto
 
 =head1 SYNOPSIS
 
     use Google::Iam::V1::ResourcePolicyMember;
 
-    my $msg = Google::Iam::V1::ResourcePolicyMember::ResourcePolicyMember->new(
-        iam_policy_name_principal => $value,
-    );
+    my $msg = Google::Iam::V1::ResourcePolicyMember::ResourcePolicyMember->new({
+        iam_policy_name_principal => $iam_policy_name_principal,
+        iam_policy_uid_principal => $iam_policy_uid_principal,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->iam_policy_name_principal();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Iam::V1::ResourcePolicyMember::ResourcePolicyMember->parse($bytes);
 
-=item * B<iam_policy_name_principal>
-
-Type: String
-
-=item * B<iam_policy_uid_principal>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Iam::V1::ResourcePolicyMember - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/iam/v1/resource_policy_member.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Iam::V1::ResourcePolicyMember::ResourcePolicyMember
+
+Output-only policy member strings of a Google Cloud resource's built-in
+identity.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->iam_policy_name_principal() >> / C<< $msg->iam_policy_name_principal($value) >>
+
+Type: C<String>
+
+IAM policy binding member referring to a Google Cloud resource by
+user-assigned name (https://google.aip.dev/122). If a resource is deleted
+and recreated with the same name, the binding will be applicable to the new
+resource.
+
+Example:
+`principal://parametermanager.googleapis.com/projects/12345/name/locations/us-central1-a/parameters/my-parameter`
+
+=item * C<< $msg->iam_policy_uid_principal() >> / C<< $msg->iam_policy_uid_principal($value) >>
+
+Type: C<String>
+
+IAM policy binding member referring to a Google Cloud resource by
+system-assigned unique identifier (https://google.aip.dev/148#uid). If a
+resource is deleted and recreated with the same name, the binding will not
+be applicable to the new resource
+
+Example:
+`principal://parametermanager.googleapis.com/projects/12345/uid/locations/us-central1-a/parameters/a918fed5`
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Iam::V1::ResourcePolicyMember::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

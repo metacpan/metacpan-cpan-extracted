@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::PredictionService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -140,228 +140,31 @@ EOF
     # Field: instances Type: 11 (.google.protobuf.Value)
     # Field: parameters Type: 11 (.google.protobuf.Value)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PredictionService::PredictRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PredictionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PredictionService::PredictRequest->new(
-        model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<model>
-
-Type: String
-
-=item * B<instances>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<parameters>
-
-Type: Message (.google.protobuf.Value)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningRequest ===
     # Fields for PredictLongRunningRequest
     # Field: model Type: 9 ()
     # Field: instances Type: 11 (.google.protobuf.Value)
     # Field: parameters Type: 11 (.google.protobuf.Value)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PredictionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningRequest->new(
-        model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<model>
-
-Type: String
-
-=item * B<instances>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<parameters>
-
-Type: Message (.google.protobuf.Value)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::PredictionService::PredictResponse ===
     # Fields for PredictResponse
     # Field: predictions Type: 11 (.google.protobuf.Value)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PredictionService::PredictResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PredictionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PredictionService::PredictResponse->new(
-        predictions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<predictions>
-
-Type: Message (.google.protobuf.Value)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningResponse ===
     # Fields for PredictLongRunningResponse
     # Field: generate_video_response Type: 11 (.google.ai.generativelanguage.v1beta.PredictLongRunningGeneratedVideoResponse)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PredictionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningResponse->new(
-        generate_video_response => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<generate_video_response>
-
-Type: Message (.google.ai.generativelanguage.v1beta.PredictLongRunningGeneratedVideoResponse)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningMetadata ===
     # Fields for PredictLongRunningMetadata
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PredictionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningMetadata->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::PredictionService::Media ===
     # Fields for Media
     # Field: video Type: 11 (.google.ai.generativelanguage.v1beta.Video)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PredictionService::Media - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PredictionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PredictionService::Media->new(
-        video => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<video>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Video)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::PredictionService::Video ===
     # Fields for Video
     # Field: video Type: 12 ()
     # Field: uri Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PredictionService::Video - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PredictionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PredictionService::Video->new(
-        video => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<video>
-
-Type: Bytes
-
-=item * B<uri>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningGeneratedVideoResponse ===
     # Fields for PredictLongRunningGeneratedVideoResponse
@@ -369,62 +172,20 @@ Type: String
     # Field: rai_media_filtered_count Type: 5 ()
     # Field: rai_media_filtered_reasons Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningGeneratedVideoResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::PredictionService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningGeneratedVideoResponse->new(
-        generated_samples => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<generated_samples>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Media)
-
-=item * B<rai_media_filtered_count>
-
-Type: Int32
-
-=item * B<rai_media_filtered_reasons>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Ai::Generativelanguage::V1beta::PredictionService::PredictionServiceClient ===
 package Google::Ai::Generativelanguage::V1beta::PredictionService::PredictionServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Ai::Generativelanguage::V1beta::PredictionService::PredictionServiceClient
 
-Google::Ai::Generativelanguage::V1beta::PredictionService::PredictionServiceClient - Client stub representing the remote PredictionService service
+Client stub representing the remote C<PredictionService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<ai.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -479,13 +240,220 @@ sub predict_long_running {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::PredictionService - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::PredictionService - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/prediction_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::PredictionService;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::PredictionService::PredictRequest->new({
+        model => $model,
+        instances => $instances,
+        parameters => $parameters,
+    });
+
+    # Read or update a field
+    my $val = $msg->model();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::PredictionService::PredictRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/prediction_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::PredictionService::PredictRequest
+
+Request message for
+[PredictionService.Predict][google.ai.generativelanguage.v1beta.PredictionService.Predict].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Required. The name of the model for prediction.
+Format: `name=models/{model}`.
+
+=item * C<< $msg->instances() >> / C<< $msg->instances($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Required. The instances that are the input to the prediction call.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Optional. The parameters that govern the prediction call.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningRequest
+
+Request message for [PredictionService.PredictLongRunning].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->model() >> / C<< $msg->model($value) >>
+
+Type: C<String>
+
+Required. The name of the model for prediction.
+Format: `name=models/{model}`.
+
+=item * C<< $msg->instances() >> / C<< $msg->instances($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Required. The instances that are the input to the prediction call.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Optional. The parameters that govern the prediction call.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PredictionService::PredictResponse
+
+Response message for [PredictionService.Predict].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->predictions() >> / C<< $msg->predictions($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+The outputs of the prediction call.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningResponse
+
+Response message for [PredictionService.PredictLongRunning]
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->generate_video_response() >> / C<< $msg->generate_video_response($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningGeneratedVideoResponse>)
+
+The response of the video generation prediction.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningMetadata
+
+Metadata for PredictLongRunning long running operations.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Ai::Generativelanguage::V1beta::PredictionService::Media
+
+A proto encapsulate various type of media.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->video() >> / C<< $msg->video($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::PredictionService::Video>)
+
+Video as the only one for now.  This is mimicking Vertex proto.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PredictionService::Video
+
+Representation of a video.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->video() >> / C<< $msg->video($value) >>
+
+Type: C<Bytes>
+
+Raw bytes.
+
+=item * C<< $msg->uri() >> / C<< $msg->uri($value) >>
+
+Type: C<String>
+
+Path to another storage.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningGeneratedVideoResponse
+
+Veo response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->generated_samples() >> / C<< $msg->generated_samples($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::PredictionService::Media>)
+
+The generated samples.
+
+=item * C<< $msg->rai_media_filtered_count() >> / C<< $msg->rai_media_filtered_count($value) >>
+
+Type: C<Int32>
+
+Returns if any videos were filtered due to RAI policies.
+
+=item * C<< $msg->rai_media_filtered_reasons() >> / C<< $msg->rai_media_filtered_reasons($value) >>
+
+Type: C<String>
+
+Returns rai failure reasons if any.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::PredictionService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

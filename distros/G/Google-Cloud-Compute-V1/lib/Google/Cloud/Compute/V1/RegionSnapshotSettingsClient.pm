@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -192,11 +192,58 @@ The following RPC methods are available in this client:
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.RegionSnapshotSettings>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRegionSnapshotSettingRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SnapshotSettings>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        snapshot_settings_resource => $snapshot_settings_resource,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.RegionSnapshotSettings>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchRegionSnapshotSettingRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<snapshot_settings_resource> - L<Google::Cloud::Compute::V1::Compute::SnapshotSettings>
+
+=item * C<update_mask> - C<string>
+
+=back
 
 =back
 

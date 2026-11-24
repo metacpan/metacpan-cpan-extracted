@@ -21,7 +21,7 @@ use Google::Cloud::Dataproc::V1::SessionTemplates;
 use Google::Cloud::Dataproc::V1::NodeGroups;
 use Google::Cloud::Dataproc::V1::WorkflowTemplates;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -348,9 +348,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/dataproc/v1/operations.proto>
 
-=item * C<googleapis/google/cloud/dataproc/v1/sessions.proto>
-
 =item * C<googleapis/google/cloud/dataproc/v1/session_templates.proto>
+
+=item * C<googleapis/google/cloud/dataproc/v1/sessions.proto>
 
 =item * C<googleapis/google/cloud/dataproc/v1/shared.proto>
 
@@ -389,31 +389,209 @@ The following RPC methods are available in this client:
 
 =item * B<submit_job>
 
-Calls the RPC method C<SubmitJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->submit_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job                      => $job,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SubmitJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::SubmitJobRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job> - L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<submit_job_as_operation>
 
-Calls the RPC method C<SubmitJobAsOperation> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->submit_job_as_operation(
+        project_id               => $project_id,
+        region                   => $region,
+        job                      => $job,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SubmitJobAsOperation> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::SubmitJobRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job> - L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get_job>
 
-Calls the RPC method C<GetJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job_id                   => $job_id,
+    );
+
+Calls the RPC method C<GetJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::GetJobRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job_id> - C<string>
+
+=back
 
 =item * B<list_jobs>
 
-Calls the RPC method C<ListJobs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_jobs(
+        project_id               => $project_id,
+        region                   => $region,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        cluster_name             => $cluster_name,
+        job_state_matcher        => $job_state_matcher,
+        filter                   => $filter,
+    );
+
+Calls the RPC method C<ListJobs> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::ListJobsRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::ListJobsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<cluster_name> - C<string>
+
+=item * C<job_state_matcher> - L<Google::Cloud::Dataproc::V1::Jobs::JobStateMatcher>
+
+=item * C<filter> - C<string>
+
+=back
 
 =item * B<update_job>
 
-Calls the RPC method C<UpdateJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job_id                   => $job_id,
+        job                      => $job,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<UpdateJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::UpdateJobRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<job> - L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<cancel_job>
 
-Calls the RPC method C<CancelJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->cancel_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job_id                   => $job_id,
+    );
+
+Calls the RPC method C<CancelJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::CancelJobRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job_id> - C<string>
+
+=back
 
 =item * B<delete_job>
 
-Calls the RPC method C<DeleteJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job_id                   => $job_id,
+    );
+
+Calls the RPC method C<DeleteJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::DeleteJobRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job_id> - C<string>
+
+=back
 
 =back
 

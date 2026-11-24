@@ -356,23 +356,6 @@ subtest 'create_node_group method' => sub {
     done_testing();
 };
 
-subtest 'create_session method' => sub {
-    $client->transport->{mock_call} = sub {
-        my ($args) = @_;
-        is($args->{service}, 'google.cloud.dataproc.v1.SessionController', 'Correct service path');
-        is($args->{method}, 'CreateSession', 'Correct RPC method');
-        isa_ok($args->{request}, 'Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest', 'Request object');
-        
-        my $response = 'Google::Longrunning::Operations::Operation'->new();
-        return $response;
-    };
-    
-    my $res = $client->create_session();
-    ok($res, 'Method returned a response');
-    isa_ok($res, 'Google::Longrunning::Operations::Operation', 'Response object class');
-    done_testing();
-};
-
 subtest 'create_session_template method' => sub {
     $client->transport->{mock_call} = sub {
         my ($args) = @_;
@@ -387,6 +370,23 @@ subtest 'create_session_template method' => sub {
     my $res = $client->create_session_template();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate', 'Response object class');
+    done_testing();
+};
+
+subtest 'create_session method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.dataproc.v1.SessionController', 'Correct service path');
+        is($args->{method}, 'CreateSession', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest', 'Request object');
+        
+        my $response = 'Google::Longrunning::Operations::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->create_session();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Longrunning::Operations::Operation', 'Response object class');
     done_testing();
 };
 

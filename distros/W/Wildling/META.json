@@ -48,6 +48,6 @@
          "web" : "https://github.com/dotmonk/wildling/tree/main/perl"
       }
    },
-   "version" : "v2.0.7",
+   "version" : "v2.0.8",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

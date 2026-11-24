@@ -1,0 +1,32 @@
+Changes
+lib/Google/Cloud/Gkehub/Cloudauditlogging/V1alpha/Cloudauditlogging.pm
+lib/Google/Cloud/Gkehub/Cloudauditlogging/V1alpha/Cloudauditlogging/Types.pm
+lib/Google/Cloud/Gkehub/Configmanagement/V1alpha/Configmanagement.pm
+lib/Google/Cloud/Gkehub/Configmanagement/V1alpha/Configmanagement/Types.pm
+lib/Google/Cloud/Gkehub/Metering/V1alpha/Metering.pm
+lib/Google/Cloud/Gkehub/Metering/V1alpha/Metering/Types.pm
+lib/Google/Cloud/Gkehub/Multiclusteringress/V1alpha/Multiclusteringress.pm
+lib/Google/Cloud/Gkehub/Multiclusteringress/V1alpha/Multiclusteringress/Types.pm
+lib/Google/Cloud/Gkehub/Servicemesh/V1alpha/Servicemesh.pm
+lib/Google/Cloud/Gkehub/Servicemesh/V1alpha/Servicemesh/Types.pm
+lib/Google/Cloud/Gkehub/V1alpha.pm
+lib/Google/Cloud/Gkehub/V1alpha/Feature.pm
+lib/Google/Cloud/Gkehub/V1alpha/Feature/Types.pm
+lib/Google/Cloud/Gkehub/V1alpha/GkeHubClient.pm
+lib/Google/Cloud/Gkehub/V1alpha/Service.pm
+lib/Google/Cloud/Gkehub/V1alpha/Service/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-GkeHub.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-GkeHub.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

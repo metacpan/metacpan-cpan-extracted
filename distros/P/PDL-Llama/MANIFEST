@@ -1,0 +1,9 @@
+Changes
+lib/PDL/Llama.pm
+Llama.xs
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/01-llama.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

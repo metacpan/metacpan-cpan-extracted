@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1::ModelService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -101,124 +101,30 @@ EOF
     # Fields for GetModelRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::ModelService::GetModelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1::ModelService::GetModelRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1::ModelService::ListModelsRequest ===
     # Fields for ListModelsRequest
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::ModelService::ListModelsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1::ModelService::ListModelsRequest->new(
-        page_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1::ModelService::ListModelsResponse ===
     # Fields for ListModelsResponse
     # Field: models Type: 11 (.google.ai.generativelanguage.v1.Model)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1::ModelService::ListModelsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1::ModelService;
-
-    my $msg = Google::Ai::Generativelanguage::V1::ModelService::ListModelsResponse->new(
-        models => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<models>
-
-Type: Message (.google.ai.generativelanguage.v1.Model)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Ai::Generativelanguage::V1::ModelService::ModelServiceClient ===
 package Google::Ai::Generativelanguage::V1::ModelService::ModelServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Ai::Generativelanguage::V1::ModelService::ModelServiceClient
 
-Google::Ai::Generativelanguage::V1::ModelService::ModelServiceClient - Client stub representing the remote ModelService service
+Client stub representing the remote C<ModelService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<ai.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -273,13 +179,123 @@ sub list_models {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1::ModelService - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1::ModelService - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1/model_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1::ModelService;
+
+    my $msg = Google::Ai::Generativelanguage::V1::ModelService::GetModelRequest->new({
+        name => $name,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1::ModelService::GetModelRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1/model_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1::ModelService::GetModelRequest
+
+Request for getting information about a specific Model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the model.
+
+This name should match a model name returned by the `ListModels` method.
+
+Format: `models/{model}`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1::ModelService::ListModelsRequest
+
+Request for listing all Models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of `Models` to return (per page).
+
+If unspecified, 50 models will be returned per page.
+This method returns at most 1000 models per page, even if you pass a larger
+page_size.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A page token, received from a previous `ListModels` call.
+
+Provide the `page_token` returned by one request as an argument to the next
+request to retrieve the next page.
+
+When paginating, all other parameters provided to `ListModels` must match
+the call that provided the page token.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1::ModelService::ListModelsResponse
+
+Response from `ListModel` containing a paginated list of Models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->models() >> / C<< $msg->models($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1::Model::Model>)
+
+The returned Models.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+
+If this field is omitted, there are no more pages.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1::ModelService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -50,5 +50,5 @@ resources:
   bugtracker: https://github.com/viasnake/Discord-Client/issues
   homepage: https://github.com/viasnake/Discord-Client
   repository: https://github.com/viasnake/Discord-Client.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

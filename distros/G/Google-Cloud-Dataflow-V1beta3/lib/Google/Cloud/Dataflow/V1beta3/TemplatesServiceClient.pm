@@ -11,14 +11,14 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Dataflow::V1beta3::Streaming;
-use Google::Dataflow::V1beta3::Environment;
-use Google::Dataflow::V1beta3::Messages;
 use Google::Dataflow::V1beta3::Snapshots;
+use Google::Dataflow::V1beta3::Messages;
 use Google::Dataflow::V1beta3::Metrics;
+use Google::Dataflow::V1beta3::Environment;
 use Google::Dataflow::V1beta3::Jobs;
 use Google::Dataflow::V1beta3::Templates;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -244,15 +244,90 @@ The following RPC methods are available in this client:
 
 =item * B<create_job_from_template>
 
-Calls the RPC method C<CreateJobFromTemplate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_job_from_template(
+        project_id               => $project_id,
+        job_name                 => $job_name,
+        parameters               => { ... },
+        environment              => $environment,
+        location                 => $location,
+    );
+
+Calls the RPC method C<CreateJobFromTemplate> on C<google.dataflow.v1beta3.TemplatesService>.
+
+Request: L<Google::Dataflow::V1beta3::Templates::CreateJobFromTemplateRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_name> - C<string>
+
+=item * C<parameters> - C<map<string, string>> (HashRef)
+
+=item * C<environment> - L<Google::Dataflow::V1beta3::Templates::RuntimeEnvironment>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<launch_template>
 
-Calls the RPC method C<LaunchTemplate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->launch_template(
+        project_id               => $project_id,
+        validate_only            => $validate_only,
+        launch_parameters        => $launch_parameters,
+        location                 => $location,
+    );
+
+Calls the RPC method C<LaunchTemplate> on C<google.dataflow.v1beta3.TemplatesService>.
+
+Request: L<Google::Dataflow::V1beta3::Templates::LaunchTemplateRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Templates::LaunchTemplateResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<validate_only> - C<bool>
+
+=item * C<launch_parameters> - L<Google::Dataflow::V1beta3::Templates::LaunchTemplateParameters>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<get_template>
 
-Calls the RPC method C<GetTemplate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_template(
+        project_id               => $project_id,
+        view                     => $view,
+        location                 => $location,
+    );
+
+Calls the RPC method C<GetTemplate> on C<google.dataflow.v1beta3.TemplatesService>.
+
+Request: L<Google::Dataflow::V1beta3::Templates::GetTemplateRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Templates::GetTemplateResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<view> - L<Google::Dataflow::V1beta3::Templates::TemplateView>
+
+=item * C<location> - C<string>
+
+=back
 
 =back
 

@@ -20,6 +20,7 @@ badges = ["github-actions/test.yml"]
 # rather than Minilla's {{$NEXT}}.
 manage_changes = false
 
-# Files for the maintainers, not for CPAN.
+# Files for the maintainers, not for CPAN. The logos are for the README
+# on GitHub, which shows them from the repository.
 [FileGatherer]
-exclude_match = ['^CLAUDE\.md$', '^ROADMAP\.md$', '^TODO\.md$', '^docs/', '^scripts/']
+exclude_match = ['^CLAUDE\.md$', '^ROADMAP\.md$', '^TODO\.md$', '^docs/', '^scripts/', '^logo/']

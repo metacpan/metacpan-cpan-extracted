@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/tecolicom/getoptlong/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tecolicom/getoptlong/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Getopt-Long-Bash.svg)](https://metacpan.org/release/Getopt-Long-Bash)
+[![Actions Status](https://github.com/tecolicom/getoptlong-bash/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tecolicom/getoptlong-bash/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/Getopt-Long-Bash.svg)](https://metacpan.org/release/Getopt-Long-Bash)
 # NAME
 
 getoptlong - Option parsing that does what you mean, for Bash
@@ -36,7 +36,7 @@ getoptlong - Option parsing that does what you mean, for Bash
 
 # VERSION
 
-1.5.0
+2.0.0
 
 # DESCRIPTION
 
@@ -250,12 +250,23 @@ to specify a custom function. Can combine with any type (`+!`, `:!`,
 
 ## REGISTRATION
 
-Register callbacks with `getoptlong callback`. If function name is
-omitted or `-`, uses option name (hyphens to underscores). Additional
-`args` are passed to the callback function after the option name and value.
+Register a callback with `getoptlong callback`.  If function name is
+omitted or `-`, uses option name (hyphens to underscores).  The
+option can be given by its alias name.  An undefined option is an
+error.
 
-    getoptlong callback <option> [function] [args...]
-    getoptlong callback --before <option> [function] [args...]
+    getoptlong callback <option> [function [args...]]
+    getoptlong callback --before <option> [function [args...]]
+
+The arguments after the function are fixed arguments.  They are
+passed before the option name and value, so that a common function
+can be called from several options and behave differently by the
+arguments.  The function name and the arguments must be words
+without white space.
+
+    set_level() { level=$1 ; }
+    getoptlong callback quiet   set_level 0
+    getoptlong callback verbose set_level 2
 
 ## CALLBACK TIMING
 
@@ -263,8 +274,8 @@ Normal callbacks are called **after** value is set, receiving the option
 name and value. Pre-processing callbacks (`--before`/`-b`) are called
 **before** value is set, without the value argument.
 
-    callback_func "option_name" "value" [args...]   # normal
-    callback_func "option_name" [args...]           # --before
+    callback_func [args...] "option_name" "value"   # normal
+    callback_func [args...] "option_name"           # --before
 
 ## ERROR HANDLING
 
@@ -272,7 +283,7 @@ Callbacks must handle their own errors. `EXIT_ON_ERROR` only applies
 to parsing errors, not callback failures. Use explicit `exit` if needed.
 
     validate_file() {
-        [[ -r "$2" ]] || { echo "Cannot read: $2" >&2; exit 1; }
+        [[ -r $2 ]] || { echo "Cannot read: $2" >&2; exit 1; }
     }
     getoptlong callback input-file validate_file
 
@@ -322,10 +333,11 @@ Option values can be validated using type specifiers or regex patterns:
 definition, including any `)` in the description. Avoid using `)`
 in comments when using regex validation.
 
-Validation occurs before the value is stored or callbacks are invoked.
+Validation occurs before the value is stored and normal callbacks are
+invoked; `--before` callbacks are called before validation.
 For array options, each element is validated; for hash options, each
-`key=value` pair is matched as a whole. Error on validation failure
-(see [EXIT\_ON\_ERROR](#configuration)).
+`key=value` pair is matched as a whole. A validation failure exits
+the script with an error message, regardless of `EXIT_ON_ERROR`.
 
 # HELP MESSAGE
 
@@ -369,19 +381,21 @@ See ["CONFIGURATION"](#configuration) for available parameters.
 
 ## getoptlong parse
 
-Parse arguments. Returns 0 on success, non-zero on error. Always
-quote `"$@"`. By default, script exits on error.
+Parse arguments. Always quote `"$@"`. On a parse error, such as an
+undefined option or a missing required argument, the script exits
+with an error message.
 
     getoptlong parse "$@"
 
-To handle errors manually, disable `EXIT_ON_ERROR`
-(see ["CONFIGURATION"](#configuration)) and check return value:
+To leave undefined options in the arguments instead, disable
+`EXIT_ON_ERROR` (see ["CONFIGURATION"](#configuration)).  They are kept with the
+non-option arguments, and `parse` returns 0.  A short option without
+its required argument is left as well.  A long option without its
+required argument and a validation failure still exit the script.
+Set `SILENT` to suppress the error messages of **getopts**.
 
-    getoptlong configure EXIT_ON_ERROR=
-    if ! getoptlong parse "$@"; then
-        echo "Parse error" >&2
-        exit 1
-    fi
+    getoptlong configure EXIT_ON_ERROR= SILENT=1
+    getoptlong parse "$@"
 
 ## getoptlong set
 
@@ -393,10 +407,11 @@ Variables are actually set during `parse`; this updates `$@`.
 ## getoptlong callback
 
 Register callback function for option. Use `-b`/`--before` to call
-before value is set. If `func` is omitted, uses option name (hyphens
-to underscores). Additional `args` are passed to the callback.
+before value is set. If `func` is omitted or `-`, uses option name
+(hyphens to underscores). `args` are fixed arguments passed before
+the option name and value.
 
-    getoptlong callback [-b|--before] <opt> [func] [args...]
+    getoptlong callback [-b|--before] <opt> [func [args...]]
 
 ## getoptlong configure
 
@@ -461,8 +476,9 @@ Configuration parameters can be specified either as arguments to
 - **EXIT\_ON\_ERROR**
 
     Exit immediately on parse error. Default: enabled.
-    Set to empty string to disable and handle errors manually by checking
-    return value.
+    Set to empty string to disable: undefined options are left in the
+    arguments (see ["getoptlong parse"](#getoptlong-parse)).  Note that `0` is not empty,
+    and does not disable it.
 
 - **SILENT**
 
@@ -521,7 +537,7 @@ Term::ANSIColor::Concise.
 - [Getopt::Long::Bash::Tutorial](https://metacpan.org/pod/Getopt%3A%3ALong%3A%3ABash%3A%3ATutorial) - getting started guide
 - [Getopt::Long::Bash](https://metacpan.org/pod/Getopt%3A%3ALong%3A%3ABash) - module information
 - [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong) - Perl module inspiration
-- [https://github.com/tecolicom/getoptlong](https://github.com/tecolicom/getoptlong) - repository
+- [https://github.com/tecolicom/getoptlong-bash](https://github.com/tecolicom/getoptlong-bash) - repository
 - [https://qiita.com/kaz-utashiro/items/75a7df9e1a1e92797376](https://qiita.com/kaz-utashiro/items/75a7df9e1a1e92797376) - introduction article (Japanese)
 
 # AUTHOR

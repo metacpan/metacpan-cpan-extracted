@@ -24,7 +24,7 @@ use warnings;
 
 use Data::Throttler ();	# For Data::Throttler::Backend::YAML, which this extends
 
-use version; our $VERSION = version->declare('0.003.1');
+use version; our $VERSION = version->declare('0.004.1');
 
 =encoding utf8
 
@@ -34,7 +34,7 @@ Web::VWF::Throttle - persistent request throttling that works on Windows too
 
 =head1 VERSION
 
-Version 0.003.1
+Version 0.004.1
 
 =head1 SYNOPSIS
 
@@ -54,6 +54,9 @@ C<Data::Throttler> builds its backend class name from the C<backend> option, so
 requesting C<< backend => 'VWF' >> asks for C<Data::Throttler::Backend::VWF>.
 This module provides that class, inheriting everything from
 C<Data::Throttler::Backend::YAML> except the two methods that touch the store.
+The package is deliberately in Data::Throttler's namespace, because that is where
+Data::Throttler looks, so it is not indexed by PAUSE as part of this distribution
+(see C<no_index> in F<Makefile.PL>) and nothing else here should be added to it.
 
 The YAML backend locks the store and then opens it again by name to read it and
 to rewrite it.  That is fine where locks are advisory, which is what they are on

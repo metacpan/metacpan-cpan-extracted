@@ -10,32 +10,32 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Networksecurity::V1::Common;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
-use Google::Cloud::Networksecurity::V1::Tls;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupIntercept;
-use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
-use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
-use Google::Cloud::Networksecurity::V1::AuthzPolicy;
-use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
-use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
-use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
 use Google::Cloud::Networksecurity::V1::UrlList;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
+use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
+use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
+use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring;
+use Google::Cloud::Networksecurity::V1::Tls;
+use Google::Cloud::Networksecurity::V1::Common;
 use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicyRule;
-use Google::Cloud::Networksecurity::V1::AddressGroup;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupIntercept;
+use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
+use Google::Cloud::Networksecurity::V1::AuthzPolicy;
+use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
+use Google::Cloud::Networksecurity::V1::ClientTlsPolicy;
+use Google::Cloud::Networksecurity::V1::Mirroring;
 use Google::Cloud::Networksecurity::V1::FirewallActivation;
 use Google::Cloud::Networksecurity::V1::SseRealm;
 use Google::Cloud::Networksecurity::V1::Intercept;
-use Google::Cloud::Networksecurity::V1::Mirroring;
-use Google::Cloud::Networksecurity::V1::ClientTlsPolicy;
-use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
+use Google::Cloud::Networksecurity::V1::AddressGroup;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroup;
 use Google::Cloud::Networksecurity::V1::NetworkSecurity;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -172,11 +172,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/networksecurity/v1/network_security.proto>
 
+=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group.proto>
+
 =item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_intercept.proto>
 
 =item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_mirroring.proto>
-
-=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group.proto>
 
 =item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_service.proto>
 
@@ -188,9 +188,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/networksecurity/v1/sse_realm.proto>
 
-=item * C<googleapis/google/cloud/networksecurity/v1/tls_inspection_policy.proto>
-
 =item * C<googleapis/google/cloud/networksecurity/v1/tls.proto>
+
+=item * C<googleapis/google/cloud/networksecurity/v1/tls_inspection_policy.proto>
 
 =item * C<googleapis/google/cloud/networksecurity/v1/url_list.proto>
 
@@ -227,7 +227,29 @@ The following RPC methods are available in this client:
 
 =item * B<list_dns_threat_detectors>
 
-Calls the RPC method C<ListDnsThreatDetectors> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_dns_threat_detectors(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListDnsThreatDetectors> on C<google.cloud.networksecurity.v1.DnsThreatDetectorService>.
+
+Request: L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsRequest>
+
+Returns: L<Google::Cloud::Networksecurity::V1::DnsThreatDetector::ListDnsThreatDetectorsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =back
 

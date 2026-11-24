@@ -1,0 +1,38 @@
+Changes
+lib/Google/Cloud/Datalabeling/V1beta1.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Annotation.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Annotation/Types.pm
+lib/Google/Cloud/Datalabeling/V1beta1/AnnotationSpecSet.pm
+lib/Google/Cloud/Datalabeling/V1beta1/AnnotationSpecSet/Types.pm
+lib/Google/Cloud/Datalabeling/V1beta1/DataLabelingService.pm
+lib/Google/Cloud/Datalabeling/V1beta1/DataLabelingService/Types.pm
+lib/Google/Cloud/Datalabeling/V1beta1/DataLabelingServiceClient.pm
+lib/Google/Cloud/Datalabeling/V1beta1/DataPayloads.pm
+lib/Google/Cloud/Datalabeling/V1beta1/DataPayloads/Types.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Dataset.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Dataset/Types.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Evaluation.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Evaluation/Types.pm
+lib/Google/Cloud/Datalabeling/V1beta1/EvaluationJob.pm
+lib/Google/Cloud/Datalabeling/V1beta1/EvaluationJob/Types.pm
+lib/Google/Cloud/Datalabeling/V1beta1/HumanAnnotationConfig.pm
+lib/Google/Cloud/Datalabeling/V1beta1/HumanAnnotationConfig/Types.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Instruction.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Instruction/Types.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Operations.pm
+lib/Google/Cloud/Datalabeling/V1beta1/Operations/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-DataLabelingService.t
+t/01-service-Default.t
+t/02-rest-transport-DataLabelingService.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

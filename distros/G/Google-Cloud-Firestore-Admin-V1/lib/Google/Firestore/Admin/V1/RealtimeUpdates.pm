@@ -1,0 +1,78 @@
+package Google::Firestore::Admin::V1::RealtimeUpdates;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+CjBnb29nbGUvZmlyZXN0b3JlL2FkbWluL3YxL3JlYWx0aW1lX3VwZGF0ZXMucHJvdG8SGWdv
+b2dsZS5maXJlc3RvcmUuYWRtaW4udjEqgwEKE1JlYWx0aW1lVXBkYXRlc01vZGUSJQohUkVB
+TFRJTUVfVVBEQVRFU19NT0RFX1VOU1BFQ0lGSUVEEAASIQodUkVBTFRJTUVfVVBEQVRFU19N
+T0RFX0VOQUJMRUQQARIiCh5SRUFMVElNRV9VUERBVEVTX01PREVfRElTQUJMRUQQAkLjAQod
+Y29tLmdvb2dsZS5maXJlc3RvcmUuYWRtaW4udjFCFFJlYWx0aW1lVXBkYXRlc1Byb3RvUAFa
+OWNsb3VkLmdvb2dsZS5jb20vZ28vZmlyZXN0b3JlL2FwaXYxL2FkbWluL2FkbWlucGI7YWRt
+aW5wYqICBEdDRlOqAh9Hb29nbGUuQ2xvdWQuRmlyZXN0b3JlLkFkbWluLlYxygIfR29vZ2xl
+XENsb3VkXEZpcmVzdG9yZVxBZG1pblxWMeoCI0dvb2dsZTo6Q2xvdWQ6OkZpcmVzdG9yZTo6
+QWRtaW46OlYxSpEJCgYSBA4AJwEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNiBHb29n
+bGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIu
+MCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBp
+biBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkg
+b2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2Vz
+L0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFn
+cmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExp
+Y2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FS
+UkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBp
+bXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292
+ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2Uu
+CgoICgECEgMQACIKCAoBCBIDEgA8CgkKAgglEgMSADwKCAoBCBIDEwBQCgkKAggLEgMTAFAK
+CAoBCBIDFAAiCgkKAggKEgMUACIKCAoBCBIDFQA1CgkKAggIEgMVADUKCAoBCBIDFgA2CgkK
+AggBEgMWADYKCAoBCBIDFwAiCgkKAggkEgMXACIKCAoBCBIDGAA9CgkKAggpEgMYAD0KCAoB
+CBIDGQA8CgkKAggtEgMZADwKKAoCBQASBBwAJwEaHCBUaGUgUmVhbHRpbWUgVXBkYXRlcyBt
+b2RlLgoKCgoDBQABEgMcBRgKPQoEBQACABIDHgIoGjAgVGhlIFJlYWx0aW1lIFVwZGF0ZXMg
+ZmVhdHVyZSBpcyBub3Qgc3BlY2lmaWVkLgoKDAoFBQACAAESAx4CIwoMCgUFAAIAAhIDHiYn
+CocBCgQFAAIBEgMjAiQaeiBUaGUgUmVhbHRpbWUgVXBkYXRlcyBmZWF0dXJlIGlzIGVuYWJs
+ZWQgYnkgZGVmYXVsdC4KCiBUaGlzIGNvdWxkIHBvdGVudGlhbGx5IGRlZ3JhZGUgd3JpdGUg
+cGVyZm9ybWFuY2UgZm9yIHRoZSBkYXRhYmFzZS4KCgwKBQUAAgEBEgMjAh8KDAoFBQACAQIS
+AyMiIwpDCgQFAAICEgMmAiUaNiBUaGUgUmVhbHRpbWUgVXBkYXRlcyBmZWF0dXJlIGlzIGRp
+c2FibGVkIGJ5IGRlZmF1bHQuCgoMCgUFAAICARIDJgIgCgwKBQUAAgICEgMmIyRiBnByb3Rv
+Mw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Firestore::Admin::V1::RealtimeUpdates - Compiled Protocol Buffers messages for google/firestore/admin/v1/realtime_updates.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/firestore/admin/v1/realtime_updates.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Firestore::Admin::V1::RealtimeUpdates::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::ServiceBinding;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -189,95 +189,11 @@ EOF
     # Field: service_id Type: 9 ()
     # Field: labels Type: 11 (.google.cloud.networkservices.v1.ServiceBinding.LabelsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceBinding::ServiceBinding - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceBinding;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceBinding::ServiceBinding->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<service>
-
-Type: String
-
-=item * B<service_id>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceBinding.LabelsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::ServiceBinding::ListServiceBindingsRequest ===
     # Fields for ListServiceBindingsRequest
     # Field: parent Type: 9 ()
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceBinding::ListServiceBindingsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceBinding;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceBinding::ListServiceBindingsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::ServiceBinding::ListServiceBindingsResponse ===
     # Fields for ListServiceBindingsResponse
@@ -285,69 +201,9 @@ Type: String
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceBinding::ListServiceBindingsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceBinding;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceBinding::ListServiceBindingsResponse->new(
-        service_bindings => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<service_bindings>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceBinding)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::ServiceBinding::GetServiceBindingRequest ===
     # Fields for GetServiceBindingRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceBinding::GetServiceBindingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceBinding;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceBinding::GetServiceBindingRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::ServiceBinding::CreateServiceBindingRequest ===
     # Fields for CreateServiceBindingRequest
@@ -355,116 +211,290 @@ Type: String
     # Field: service_binding_id Type: 9 ()
     # Field: service_binding Type: 11 (.google.cloud.networkservices.v1.ServiceBinding)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceBinding::CreateServiceBindingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceBinding;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceBinding::CreateServiceBindingRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<service_binding_id>
-
-Type: String
-
-=item * B<service_binding>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceBinding)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::ServiceBinding::UpdateServiceBindingRequest ===
     # Fields for UpdateServiceBindingRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: service_binding Type: 11 (.google.cloud.networkservices.v1.ServiceBinding)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceBinding::UpdateServiceBindingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceBinding;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceBinding::UpdateServiceBindingRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<service_binding>
-
-Type: Message (.google.cloud.networkservices.v1.ServiceBinding)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::ServiceBinding::DeleteServiceBindingRequest ===
     # Fields for DeleteServiceBindingRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::ServiceBinding::DeleteServiceBindingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::ServiceBinding;
-
-    my $msg = Google::Cloud::Networkservices::V1::ServiceBinding::DeleteServiceBindingRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::ServiceBinding - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::ServiceBinding - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/service_binding.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networkservices::V1::ServiceBinding;
+
+    my $msg = Google::Cloud::Networkservices::V1::ServiceBinding::ServiceBinding->new({
+        name => $name,
+        description => $description,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::ServiceBinding::ServiceBinding->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/service_binding.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::ServiceBinding::ServiceBinding
+
+ServiceBinding can be used to:
+- Bind a Service Directory Service to be used in a BackendService resource.
+  This feature will be deprecated soon.
+- Bind a Private Service Connect producer service to be used in consumer
+  Cloud Service Mesh or Application Load Balancers.
+- Bind a Cloud Run service to be used in consumer Cloud Service Mesh or
+  Application Load Balancers.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the ServiceBinding resource. It matches pattern
+`projects/*/locations/*/serviceBindings/<service_binding_name>`.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A free-text description of the resource. Max length 1024
+characters.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->service() >> / C<< $msg->service($value) >>
+
+Type: C<String>
+
+Optional. The full Service Directory Service name of the format
+`projects/*/locations/*/namespaces/*/services/*`.
+This field is for Service Directory integration which will be deprecated
+soon.
+
+=item * C<< $msg->service_id() >> / C<< $msg->service_id($value) >>
+
+Type: C<String>
+
+Output only. The unique identifier of the Service Directory Service against
+which the ServiceBinding resource is validated. This is populated when the
+Service Binding resource is used in another resource (like Backend
+Service). This is of the UUID4 format. This field is for Service Directory
+integration which will be deprecated soon.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceBinding::ServiceBinding::LabelsEntry>)
+
+Optional. Set of label tags associated with the ServiceBinding resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceBinding::ListServiceBindingsRequest
+
+Request used with the ListServiceBindings method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the ServiceBindings should be
+listed, specified in the format `projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of ServiceBindings to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListServiceBindingsResponse`
+Indicates that this is a continuation of a prior `ListRouters` call,
+and that the system should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceBinding::ListServiceBindingsResponse
+
+Response returned by the ListServiceBindings method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->service_bindings() >> / C<< $msg->service_bindings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceBinding::ServiceBinding>)
+
+List of ServiceBinding resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request attempts to list all
+resources across all supported locations, while some locations are
+temporarily unavailable.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceBinding::GetServiceBindingRequest
+
+Request used by the GetServiceBinding method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the ServiceBinding to get. Must be in the format
+`projects/*/locations/*/serviceBindings/*`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceBinding::CreateServiceBindingRequest
+
+Request used by the ServiceBinding method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the ServiceBinding. Must be in the
+format `projects/*/locations/*`.
+
+=item * C<< $msg->service_binding_id() >> / C<< $msg->service_binding_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the ServiceBinding resource to be created.
+
+=item * C<< $msg->service_binding() >> / C<< $msg->service_binding($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceBinding::ServiceBinding>)
+
+Required. ServiceBinding resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceBinding::UpdateServiceBindingRequest
+
+Request used by the UpdateServiceBinding method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+ServiceBinding resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->service_binding() >> / C<< $msg->service_binding($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::ServiceBinding::ServiceBinding>)
+
+Required. Updated ServiceBinding resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::ServiceBinding::DeleteServiceBindingRequest
+
+Request used by the DeleteServiceBinding method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the ServiceBinding to delete. Must be in the format
+`projects/*/locations/*/serviceBindings/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::ServiceBinding::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

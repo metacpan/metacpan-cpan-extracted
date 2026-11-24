@@ -10,26 +10,26 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Ai::Generativelanguage::V1beta::Citation;
 use Google::Ai::Generativelanguage::V1beta::Safety;
-use Google::Ai::Generativelanguage::V1beta::Content;
 use Google::Ai::Generativelanguage::V1beta::Permission;
-use Google::Ai::Generativelanguage::V1beta::TunedModel;
+use Google::Ai::Generativelanguage::V1beta::Citation;
 use Google::Ai::Generativelanguage::V1beta::Retriever;
+use Google::Ai::Generativelanguage::V1beta::TunedModel;
+use Google::Ai::Generativelanguage::V1beta::Content;
 use Google::Ai::Generativelanguage::V1beta::Model;
 use Google::Ai::Generativelanguage::V1beta::File;
 use Google::Ai::Generativelanguage::V1beta::PredictionService;
-use Google::Ai::Generativelanguage::V1beta::TextService;
-use Google::Ai::Generativelanguage::V1beta::DiscussService;
-use Google::Ai::Generativelanguage::V1beta::CachedContent;
 use Google::Ai::Generativelanguage::V1beta::PermissionService;
+use Google::Ai::Generativelanguage::V1beta::DiscussService;
+use Google::Ai::Generativelanguage::V1beta::TextService;
 use Google::Ai::Generativelanguage::V1beta::RetrieverService;
+use Google::Ai::Generativelanguage::V1beta::CachedContent;
 use Google::Ai::Generativelanguage::V1beta::GenerativeService;
 use Google::Ai::Generativelanguage::V1beta::ModelService;
 use Google::Ai::Generativelanguage::V1beta::FileService;
 use Google::Ai::Generativelanguage::V1beta::CacheService;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -1330,9 +1330,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
-
 =item * C<googleapis/google/ai/generativelanguage/v1beta/cache_service.proto>
+
+=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
 
 =item * C<googleapis/google/ai/generativelanguage/v1beta/citation.proto>
 
@@ -1399,147 +1399,884 @@ The following RPC methods are available in this client:
 
 =item * B<list_cached_contents>
 
-Calls the RPC method C<ListCachedContents> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_cached_contents(
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListCachedContents> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<create_cached_content>
 
-Calls the RPC method C<CreateCachedContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_cached_content(
+        cached_content           => $cached_content,
+    );
+
+Calls the RPC method C<CreateCachedContent> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::CreateCachedContentRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+Parameters:
+
+=over 4
+
+=item * C<cached_content> - L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+=back
 
 =item * B<get_cached_content>
 
-Calls the RPC method C<GetCachedContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_cached_content(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetCachedContent> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::GetCachedContentRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<update_cached_content>
 
-Calls the RPC method C<UpdateCachedContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_cached_content(
+        cached_content           => $cached_content,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<UpdateCachedContent> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::UpdateCachedContentRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+Parameters:
+
+=over 4
+
+=item * C<cached_content> - L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<delete_cached_content>
 
-Calls the RPC method C<DeleteCachedContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_cached_content(
+        name                     => $name,
+    );
+
+Calls the RPC method C<DeleteCachedContent> on C<google.ai.generativelanguage.v1beta.CacheService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::CacheService::DeleteCachedContentRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<generate_message>
 
-Calls the RPC method C<GenerateMessage> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->generate_message(
+        model                    => $model,
+        prompt                   => $prompt,
+        temperature              => $temperature,
+        candidate_count          => $candidate_count,
+        top_p                    => $top_p,
+        top_k                    => $top_k,
+    );
+
+Calls the RPC method C<GenerateMessage> on C<google.ai.generativelanguage.v1beta.DiscussService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::DiscussService::GenerateMessageResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<prompt> - L<Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt>
+
+=item * C<temperature> - C<float>
+
+=item * C<candidate_count> - C<int32>
+
+=item * C<top_p> - C<float>
+
+=item * C<top_k> - C<int32>
+
+=back
 
 =item * B<count_message_tokens>
 
-Calls the RPC method C<CountMessageTokens> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->count_message_tokens(
+        model                    => $model,
+        prompt                   => $prompt,
+    );
+
+Calls the RPC method C<CountMessageTokens> on C<google.ai.generativelanguage.v1beta.DiscussService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::DiscussService::CountMessageTokensResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<prompt> - L<Google::Ai::Generativelanguage::V1beta::DiscussService::MessagePrompt>
+
+=back
 
 =item * B<create_file>
 
-Calls the RPC method C<CreateFile> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_file(
+        file                     => $file,
+    );
+
+Calls the RPC method C<CreateFile> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::CreateFileRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::FileService::CreateFileResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<file> - L<Google::Ai::Generativelanguage::V1beta::File::File>
+
+=back
 
 =item * B<list_files>
 
-Calls the RPC method C<ListFiles> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_files(
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListFiles> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::ListFilesRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::FileService::ListFilesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<get_file>
 
-Calls the RPC method C<GetFile> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_file(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetFile> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::GetFileRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::File::File>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<delete_file>
 
-Calls the RPC method C<DeleteFile> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_file(
+        name                     => $name,
+    );
+
+Calls the RPC method C<DeleteFile> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::DeleteFileRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<download_file>
 
-Calls the RPC method C<DownloadFile> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->download_file(
+        name                     => $name,
+    );
+
+Calls the RPC method C<DownloadFile> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<generate_content>
 
-Calls the RPC method C<GenerateContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->generate_content(
+        model                    => $model,
+        system_instruction       => $system_instruction,
+        contents                 => [ ... ],
+        tools                    => [ ... ],
+        tool_config              => $tool_config,
+        safety_settings          => [ ... ],
+        generation_config        => $generation_config,
+        cached_content           => $cached_content,
+    );
+
+Calls the RPC method C<GenerateContent> on C<google.ai.generativelanguage.v1beta.GenerativeService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::GenerateContentRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::GenerateContentResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<system_instruction> - L<Google::Ai::Generativelanguage::V1beta::Content::Content>
+
+=item * C<contents> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Content::Content>
+
+=item * C<tools> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Content::Tool>
+
+=item * C<tool_config> - L<Google::Ai::Generativelanguage::V1beta::Content::ToolConfig>
+
+=item * C<safety_settings> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Safety::SafetySetting>
+
+=item * C<generation_config> - L<Google::Ai::Generativelanguage::V1beta::GenerativeService::GenerationConfig>
+
+=item * C<cached_content> - C<string>
+
+=back
 
 =item * B<generate_answer>
 
-Calls the RPC method C<GenerateAnswer> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->generate_answer(
+        model                    => $model,
+        contents                 => [ ... ],
+        answer_style             => $answer_style,
+        safety_settings          => [ ... ],
+        temperature              => $temperature,
+    );
+
+Calls the RPC method C<GenerateAnswer> on C<google.ai.generativelanguage.v1beta.GenerativeService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::GenerateAnswerRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::GenerateAnswerResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<contents> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Content::Content>
+
+=item * C<answer_style> - L<Google::Ai::Generativelanguage::V1beta::GenerativeService::AnswerStyle>
+
+=item * C<safety_settings> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Safety::SafetySetting>
+
+=item * C<temperature> - C<float>
+
+=back
 
 =item * B<stream_generate_content>
 
-Calls the RPC method C<StreamGenerateContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stream_generate_content(
+        model                    => $model,
+        system_instruction       => $system_instruction,
+        contents                 => [ ... ],
+        tools                    => [ ... ],
+        tool_config              => $tool_config,
+        safety_settings          => [ ... ],
+        generation_config        => $generation_config,
+        cached_content           => $cached_content,
+    );
+
+Calls the RPC method C<StreamGenerateContent> on C<google.ai.generativelanguage.v1beta.GenerativeService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::GenerateContentRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::GenerateContentResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<system_instruction> - L<Google::Ai::Generativelanguage::V1beta::Content::Content>
+
+=item * C<contents> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Content::Content>
+
+=item * C<tools> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Content::Tool>
+
+=item * C<tool_config> - L<Google::Ai::Generativelanguage::V1beta::Content::ToolConfig>
+
+=item * C<safety_settings> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Safety::SafetySetting>
+
+=item * C<generation_config> - L<Google::Ai::Generativelanguage::V1beta::GenerativeService::GenerationConfig>
+
+=item * C<cached_content> - C<string>
+
+=back
 
 =item * B<embed_content>
 
-Calls the RPC method C<EmbedContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->embed_content(
+        model                    => $model,
+        content                  => $content,
+        task_type                => $task_type,
+        title                    => $title,
+        output_dimensionality    => $output_dimensionality,
+    );
+
+Calls the RPC method C<EmbedContent> on C<google.ai.generativelanguage.v1beta.GenerativeService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::EmbedContentRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::EmbedContentResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<content> - L<Google::Ai::Generativelanguage::V1beta::Content::Content>
+
+=item * C<task_type> - L<Google::Ai::Generativelanguage::V1beta::GenerativeService::TaskType>
+
+=item * C<title> - C<string>
+
+=item * C<output_dimensionality> - C<int32>
+
+=back
 
 =item * B<batch_embed_contents>
 
-Calls the RPC method C<BatchEmbedContents> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->batch_embed_contents(
+        model                    => $model,
+        requests                 => [ ... ],
+    );
+
+Calls the RPC method C<BatchEmbedContents> on C<google.ai.generativelanguage.v1beta.GenerativeService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::BatchEmbedContentsRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::BatchEmbedContentsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<requests> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::GenerativeService::EmbedContentRequest>
+
+=back
 
 =item * B<count_tokens>
 
-Calls the RPC method C<CountTokens> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->count_tokens(
+        model                    => $model,
+        contents                 => [ ... ],
+        generate_content_request => $generate_content_request,
+    );
+
+Calls the RPC method C<CountTokens> on C<google.ai.generativelanguage.v1beta.GenerativeService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::CountTokensRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::CountTokensResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<contents> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Content::Content>
+
+=item * C<generate_content_request> - L<Google::Ai::Generativelanguage::V1beta::GenerativeService::GenerateContentRequest>
+
+=back
 
 =item * B<bidi_generate_content>
 
-Calls the RPC method C<BidiGenerateContent> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->bidi_generate_content();
+
+Calls the RPC method C<BidiGenerateContent> on C<google.ai.generativelanguage.v1beta.GenerativeService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::BidiGenerateContentClientMessage>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::GenerativeService::BidiGenerateContentServerMessage>
 
 =item * B<get_model>
 
-Calls the RPC method C<GetModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_model(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::GetModelRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::Model::Model>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<list_models>
 
-Calls the RPC method C<ListModels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_models(
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListModels> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<get_tuned_model>
 
-Calls the RPC method C<GetTunedModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_tuned_model(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetTunedModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::GetTunedModelRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<list_tuned_models>
 
-Calls the RPC method C<ListTunedModels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_tuned_models(
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+    );
+
+Calls the RPC method C<ListTunedModels> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=back
 
 =item * B<create_tuned_model>
 
-Calls the RPC method C<CreateTunedModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_tuned_model(
+        tuned_model_id           => $tuned_model_id,
+        tuned_model              => $tuned_model,
+    );
+
+Calls the RPC method C<CreateTunedModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<tuned_model_id> - C<string>
+
+=item * C<tuned_model> - L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>
+
+=back
 
 =item * B<update_tuned_model>
 
-Calls the RPC method C<UpdateTunedModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_tuned_model(
+        tuned_model              => $tuned_model,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<UpdateTunedModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::UpdateTunedModelRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>
+
+Parameters:
+
+=over 4
+
+=item * C<tuned_model> - L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<delete_tuned_model>
 
-Calls the RPC method C<DeleteTunedModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_tuned_model(
+        name                     => $name,
+    );
+
+Calls the RPC method C<DeleteTunedModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::DeleteTunedModelRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<create_permission>
 
-Calls the RPC method C<CreatePermission> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_permission(
+        parent                   => $parent,
+        permission               => $permission,
+    );
+
+Calls the RPC method C<CreatePermission> on C<google.ai.generativelanguage.v1beta.PermissionService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::PermissionService::CreatePermissionRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::Permission::Permission>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<permission> - L<Google::Ai::Generativelanguage::V1beta::Permission::Permission>
+
+=back
 
 =item * B<transfer_ownership>
 
-Calls the RPC method C<TransferOwnership> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->transfer_ownership(
+        name                     => $name,
+        email_address            => $email_address,
+    );
+
+Calls the RPC method C<TransferOwnership> on C<google.ai.generativelanguage.v1beta.PermissionService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::PermissionService::TransferOwnershipResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=item * C<email_address> - C<string>
+
+=back
 
 =item * B<predict>
 
-Calls the RPC method C<Predict> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->predict(
+        model                    => $model,
+        instances                => [ ... ],
+        parameters               => $parameters,
+    );
+
+Calls the RPC method C<Predict> on C<google.ai.generativelanguage.v1beta.PredictionService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::PredictionService::PredictRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::PredictionService::PredictResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<instances> - ArrayRef of L<Google::Protobuf::Value::Value>
+
+=item * C<parameters> - L<Google::Protobuf::Value::Value>
+
+=back
 
 =item * B<predict_long_running>
 
-Calls the RPC method C<PredictLongRunning> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->predict_long_running(
+        model                    => $model,
+        instances                => [ ... ],
+        parameters               => $parameters,
+    );
+
+Calls the RPC method C<PredictLongRunning> on C<google.ai.generativelanguage.v1beta.PredictionService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<instances> - ArrayRef of L<Google::Protobuf::Value::Value>
+
+=item * C<parameters> - L<Google::Protobuf::Value::Value>
+
+=back
 
 =item * B<create_corpus>
 
-Calls the RPC method C<CreateCorpus> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_corpus(
+        corpus                   => $corpus,
+    );
+
+Calls the RPC method C<CreateCorpus> on C<google.ai.generativelanguage.v1beta.RetrieverService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateCorpusRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::Retriever::Corpus>
+
+Parameters:
+
+=over 4
+
+=item * C<corpus> - L<Google::Ai::Generativelanguage::V1beta::Retriever::Corpus>
+
+=back
 
 =item * B<get_corpus>
 
-Calls the RPC method C<GetCorpus> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_corpus(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetCorpus> on C<google.ai.generativelanguage.v1beta.RetrieverService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::RetrieverService::GetCorpusRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::Retriever::Corpus>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<generate_text>
 
-Calls the RPC method C<GenerateText> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->generate_text(
+        model                    => $model,
+        prompt                   => $prompt,
+        temperature              => $temperature,
+        candidate_count          => $candidate_count,
+        max_output_tokens        => $max_output_tokens,
+        top_p                    => $top_p,
+        top_k                    => $top_k,
+        safety_settings          => [ ... ],
+        stop_sequences           => [ ... ],
+    );
+
+Calls the RPC method C<GenerateText> on C<google.ai.generativelanguage.v1beta.TextService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<prompt> - L<Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt>
+
+=item * C<temperature> - C<float>
+
+=item * C<candidate_count> - C<int32>
+
+=item * C<max_output_tokens> - C<int32>
+
+=item * C<top_p> - C<float>
+
+=item * C<top_k> - C<int32>
+
+=item * C<safety_settings> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Safety::SafetySetting>
+
+=item * C<stop_sequences> - ArrayRef of C<string>
+
+=back
 
 =item * B<embed_text>
 
-Calls the RPC method C<EmbedText> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->embed_text(
+        model                    => $model,
+        text                     => $text,
+    );
+
+Calls the RPC method C<EmbedText> on C<google.ai.generativelanguage.v1beta.TextService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<text> - C<string>
+
+=back
 
 =item * B<batch_embed_text>
 
-Calls the RPC method C<BatchEmbedText> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->batch_embed_text(
+        model                    => $model,
+        texts                    => [ ... ],
+        requests                 => [ ... ],
+    );
+
+Calls the RPC method C<BatchEmbedText> on C<google.ai.generativelanguage.v1beta.TextService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<texts> - ArrayRef of C<string>
+
+=item * C<requests> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextRequest>
+
+=back
 
 =item * B<count_text_tokens>
 
-Calls the RPC method C<CountTextTokens> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->count_text_tokens(
+        model                    => $model,
+        prompt                   => $prompt,
+    );
+
+Calls the RPC method C<CountTextTokens> on C<google.ai.generativelanguage.v1beta.TextService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<prompt> - L<Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt>
+
+=back
 
 =back
 

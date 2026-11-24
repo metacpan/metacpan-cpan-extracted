@@ -2,6 +2,7 @@
 # Patterns are regexes matched against the whole path — keep them anchored.
 ^build\.sh$
 ^shell\.sh$
+^post-release-smoke\.sh$
 ^bin/wildling$
 ^\.git
 ^Wildling-

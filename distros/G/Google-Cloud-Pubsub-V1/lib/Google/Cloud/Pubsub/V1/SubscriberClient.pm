@@ -8,7 +8,7 @@ use Google::Api::Common;
 use Google::Pubsub::V1::Schema;
 use Google::Pubsub::V1::Pubsub;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 1; # End of Google::Cloud::Pubsub::V1::SubscriberClient
 
 __END__

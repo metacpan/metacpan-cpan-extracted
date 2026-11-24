@@ -289,7 +289,7 @@ sub main {
                 }
             }
         }
-        exit $oor ? 1 : 0;
+        exit( $oor ? 1 : 0 );
     }
 
     my $value = $wildcard->next();

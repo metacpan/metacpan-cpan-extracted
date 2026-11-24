@@ -3,7 +3,7 @@ package Google::Dataflow::V1beta3::Environment;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -634,187 +634,17 @@ EOF
     # Field: streaming_mode Type: 14 (.google.dataflow.v1beta3.StreamingMode)
     # Field: use_public_ips Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment::Environment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Environment;
-
-    my $msg = Google::Dataflow::V1beta3::Environment::Environment->new(
-        temp_storage_prefix => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<temp_storage_prefix>
-
-Type: String
-
-=item * B<cluster_manager_api_service>
-
-Type: String
-
-=item * B<experiments>
-
-Type: String
-
-=item * B<service_options>
-
-Type: String
-
-=item * B<service_kms_key_name>
-
-Type: String
-
-=item * B<worker_pools>
-
-Type: Message (.google.dataflow.v1beta3.WorkerPool)
-
-=item * B<user_agent>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<version>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<dataset>
-
-Type: String
-
-=item * B<sdk_pipeline_options>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<internal_experiments>
-
-Type: Message (.google.protobuf.Any)
-
-=item * B<service_account_email>
-
-Type: String
-
-=item * B<flex_resource_scheduling_goal>
-
-Type: Enum (.google.dataflow.v1beta3.FlexResourceSchedulingGoal)
-
-=item * B<worker_region>
-
-Type: String
-
-=item * B<worker_zone>
-
-Type: String
-
-=item * B<shuffle_mode>
-
-Type: Enum (.google.dataflow.v1beta3.ShuffleMode)
-
-=item * B<debug_options>
-
-Type: Message (.google.dataflow.v1beta3.DebugOptions)
-
-=item * B<use_streaming_engine_resource_based_billing>
-
-Type: Bool
-
-=item * B<streaming_mode>
-
-Type: Enum (.google.dataflow.v1beta3.StreamingMode)
-
-=item * B<use_public_ips>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Environment::Package ===
     # Fields for Package
     # Field: name Type: 9 ()
     # Field: location Type: 9 ()
     # Field: sha256 Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment::Package - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Environment;
-
-    my $msg = Google::Dataflow::V1beta3::Environment::Package->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=item * B<sha256>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Environment::Disk ===
     # Fields for Disk
     # Field: size_gb Type: 5 ()
     # Field: disk_type Type: 9 ()
     # Field: mount_point Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment::Disk - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Environment;
-
-    my $msg = Google::Dataflow::V1beta3::Environment::Disk->new(
-        size_gb => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<size_gb>
-
-Type: Int32
-
-=item * B<disk_type>
-
-Type: String
-
-=item * B<mount_point>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Environment::WorkerSettings ===
     # Fields for WorkerSettings
@@ -824,52 +654,6 @@ Type: String
     # Field: shuffle_service_path Type: 9 ()
     # Field: worker_id Type: 9 ()
     # Field: temp_storage_prefix Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment::WorkerSettings - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Environment;
-
-    my $msg = Google::Dataflow::V1beta3::Environment::WorkerSettings->new(
-        base_url => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<base_url>
-
-Type: String
-
-=item * B<reporting_enabled>
-
-Type: Bool
-
-=item * B<service_path>
-
-Type: String
-
-=item * B<shuffle_service_path>
-
-Type: String
-
-=item * B<worker_id>
-
-Type: String
-
-=item * B<temp_storage_prefix>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Environment::TaskRunnerSettings ===
     # Fields for TaskRunnerSettings
@@ -893,138 +677,10 @@ Type: String
     # Field: language_hint Type: 9 ()
     # Field: streaming_worker_main_class Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment::TaskRunnerSettings - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Environment;
-
-    my $msg = Google::Dataflow::V1beta3::Environment::TaskRunnerSettings->new(
-        task_user => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<task_user>
-
-Type: String
-
-=item * B<task_group>
-
-Type: String
-
-=item * B<oauth_scopes>
-
-Type: String
-
-=item * B<base_url>
-
-Type: String
-
-=item * B<dataflow_api_version>
-
-Type: String
-
-=item * B<parallel_worker_settings>
-
-Type: Message (.google.dataflow.v1beta3.WorkerSettings)
-
-=item * B<base_task_dir>
-
-Type: String
-
-=item * B<continue_on_exception>
-
-Type: Bool
-
-=item * B<log_to_serialconsole>
-
-Type: Bool
-
-=item * B<alsologtostderr>
-
-Type: Bool
-
-=item * B<log_upload_location>
-
-Type: String
-
-=item * B<log_dir>
-
-Type: String
-
-=item * B<temp_storage_prefix>
-
-Type: String
-
-=item * B<harness_command>
-
-Type: String
-
-=item * B<workflow_file_name>
-
-Type: String
-
-=item * B<commandlines_file_name>
-
-Type: String
-
-=item * B<vm_id>
-
-Type: String
-
-=item * B<language_hint>
-
-Type: String
-
-=item * B<streaming_worker_main_class>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Environment::AutoscalingSettings ===
     # Fields for AutoscalingSettings
     # Field: algorithm Type: 14 (.google.dataflow.v1beta3.AutoscalingAlgorithm)
     # Field: max_num_workers Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment::AutoscalingSettings - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Environment;
-
-    my $msg = Google::Dataflow::V1beta3::Environment::AutoscalingSettings->new(
-        algorithm => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<algorithm>
-
-Type: Enum (.google.dataflow.v1beta3.AutoscalingAlgorithm)
-
-=item * B<max_num_workers>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Environment::SdkHarnessContainerImage ===
     # Fields for SdkHarnessContainerImage
@@ -1032,44 +688,6 @@ Type: Int32
     # Field: use_single_core_per_container Type: 8 ()
     # Field: environment_id Type: 9 ()
     # Field: capabilities Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment::SdkHarnessContainerImage - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Environment;
-
-    my $msg = Google::Dataflow::V1beta3::Environment::SdkHarnessContainerImage->new(
-        container_image => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<container_image>
-
-Type: String
-
-=item * B<use_single_core_per_container>
-
-Type: Bool
-
-=item * B<environment_id>
-
-Type: String
-
-=item * B<capabilities>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Environment::WorkerPool ===
     # Fields for WorkerPool
@@ -1098,153 +716,9 @@ Type: String
     # Field: ip_configuration Type: 14 (.google.dataflow.v1beta3.WorkerIPAddressConfiguration)
     # Field: sdk_harness_container_images Type: 11 (.google.dataflow.v1beta3.SdkHarnessContainerImage)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment::WorkerPool - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Environment;
-
-    my $msg = Google::Dataflow::V1beta3::Environment::WorkerPool->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<num_workers>
-
-Type: Int32
-
-=item * B<packages>
-
-Type: Message (.google.dataflow.v1beta3.Package)
-
-=item * B<default_package_set>
-
-Type: Enum (.google.dataflow.v1beta3.DefaultPackageSet)
-
-=item * B<machine_type>
-
-Type: String
-
-=item * B<teardown_policy>
-
-Type: Enum (.google.dataflow.v1beta3.TeardownPolicy)
-
-=item * B<disk_size_gb>
-
-Type: Int32
-
-=item * B<disk_type>
-
-Type: String
-
-=item * B<disk_provisioned_iops>
-
-Type: Int64
-
-=item * B<disk_provisioned_throughput_mibps>
-
-Type: Int64
-
-=item * B<disk_source_image>
-
-Type: String
-
-=item * B<zone>
-
-Type: String
-
-=item * B<taskrunner_settings>
-
-Type: Message (.google.dataflow.v1beta3.TaskRunnerSettings)
-
-=item * B<on_host_maintenance>
-
-Type: String
-
-=item * B<data_disks>
-
-Type: Message (.google.dataflow.v1beta3.Disk)
-
-=item * B<metadata>
-
-Type: Message (.google.dataflow.v1beta3.WorkerPool.MetadataEntry)
-
-=item * B<autoscaling_settings>
-
-Type: Message (.google.dataflow.v1beta3.AutoscalingSettings)
-
-=item * B<pool_args>
-
-Type: Message (.google.protobuf.Any)
-
-=item * B<network>
-
-Type: String
-
-=item * B<subnetwork>
-
-Type: String
-
-=item * B<worker_harness_container_image>
-
-Type: String
-
-=item * B<num_threads_per_worker>
-
-Type: Int32
-
-=item * B<ip_configuration>
-
-Type: Enum (.google.dataflow.v1beta3.WorkerIPAddressConfiguration)
-
-=item * B<sdk_harness_container_images>
-
-Type: Message (.google.dataflow.v1beta3.SdkHarnessContainerImage)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Environment::DataSamplingConfig ===
     # Fields for DataSamplingConfig
     # Field: behaviors Type: 14 (.google.dataflow.v1beta3.DataSamplingConfig.DataSamplingBehavior)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment::DataSamplingConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Environment;
-
-    my $msg = Google::Dataflow::V1beta3::Environment::DataSamplingConfig->new(
-        behaviors => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<behaviors>
-
-Type: Enum (.google.dataflow.v1beta3.DataSamplingConfig.DataSamplingBehavior)
-
-=back
-
-=cut
 
 # Enum: DataSamplingConfig::DataSamplingBehavior
 our $DataSamplingConfig_DATA_SAMPLING_BEHAVIOR_UNSPECIFIED = 0;
@@ -1252,72 +726,877 @@ our $DataSamplingConfig_DISABLED = 1;
 our $DataSamplingConfig_ALWAYS_ON = 2;
 our $DataSamplingConfig_EXCEPTIONS = 3;
 
-=pod
-
-=head2 Enum: DataSamplingConfig::DataSamplingBehavior
-
-Values:
-
-=over 4
-
-=item * C<DATA_SAMPLING_BEHAVIOR_UNSPECIFIED> => 0
-
-=item * C<DISABLED> => 1
-
-=item * C<ALWAYS_ON> => 2
-
-=item * C<EXCEPTIONS> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Environment::DebugOptions ===
     # Fields for DebugOptions
     # Field: enable_hot_key_logging Type: 8 ()
     # Field: data_sampling Type: 11 (.google.dataflow.v1beta3.DataSamplingConfig)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Dataflow::V1beta3::Environment::DebugOptions - Compiled Protocol Buffers message class
+Google::Dataflow::V1beta3::Environment - Compiled Protocol Buffers messages for google/dataflow/v1beta3/environment.proto
 
 =head1 SYNOPSIS
 
     use Google::Dataflow::V1beta3::Environment;
 
-    my $msg = Google::Dataflow::V1beta3::Environment::DebugOptions->new(
-        enable_hot_key_logging => $value,
-    );
+    my $msg = Google::Dataflow::V1beta3::Environment::Environment->new({
+        temp_storage_prefix => $temp_storage_prefix,
+        cluster_manager_api_service => $cluster_manager_api_service,
+        experiments => $experiments,
+        service_options => $service_options,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->temp_storage_prefix();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Dataflow::V1beta3::Environment::Environment->parse($bytes);
 
-=item * B<enable_hot_key_logging>
-
-Type: Bool
-
-=item * B<data_sampling>
-
-Type: Message (.google.dataflow.v1beta3.DataSamplingConfig)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Environment - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/dataflow/v1beta3/environment.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Dataflow::V1beta3::Environment::Environment
+
+Describes the environment in which a Dataflow Job runs.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->temp_storage_prefix() >> / C<< $msg->temp_storage_prefix($value) >>
+
+Type: C<String>
+
+The prefix of the resources the system should use for temporary
+storage.  The system will append the suffix "/temp-{JOBNAME} to
+this resource prefix, where {JOBNAME} is the value of the
+job_name field.  The resulting bucket and object prefix is used
+as the prefix of the resources used to store temporary data
+needed during the job execution.  NOTE: This will override the
+value in taskrunner_settings.
+The supported resource type is:
+
+Google Cloud Storage:
+
+  storage.googleapis.com/{bucket}/{object}
+  bucket.storage.googleapis.com/{object}
+
+=item * C<< $msg->cluster_manager_api_service() >> / C<< $msg->cluster_manager_api_service($value) >>
+
+Type: C<String>
+
+The type of cluster manager API to use.  If unknown or
+unspecified, the service will attempt to choose a reasonable
+default.  This should be in the form of the API service name,
+e.g. "compute.googleapis.com".
+
+=item * C<< $msg->experiments() >> / C<< $msg->experiments($value) >>
+
+Type: C<String>
+
+The list of experiments to enable. This field should be used for SDK
+related experiments and not for service related experiments. The proper
+field for service related experiments is service_options.
+
+=item * C<< $msg->service_options() >> / C<< $msg->service_options($value) >>
+
+Type: C<String>
+
+Optional. The list of service options to enable. This field should be used
+for service related experiments only. These experiments, when graduating to
+GA, should be replaced by dedicated fields or become default (i.e. always
+on).
+
+=item * C<< $msg->service_kms_key_name() >> / C<< $msg->service_kms_key_name($value) >>
+
+Type: C<String>
+
+Optional. If set, contains the Cloud KMS key identifier used to encrypt
+data at rest, AKA a Customer Managed Encryption Key (CMEK).
+
+Format:
+  projects/PROJECT_ID/locations/LOCATION/keyRings/KEY_RING/cryptoKeys/KEY
+
+=item * C<< $msg->worker_pools() >> / C<< $msg->worker_pools($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::WorkerPool>)
+
+The worker pools. At least one "harness" worker pool must be
+specified in order for the job to have workers.
+
+=item * C<< $msg->user_agent() >> / C<< $msg->user_agent($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Optional. A description of the process that generated the request.
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+A structure describing which components and their versions of the service
+are required in order to run the job.
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<String>
+
+Optional. The dataset for the current project where various workflow
+related tables are stored.
+
+The supported resource type is:
+
+Google BigQuery:
+  bigquery.googleapis.com/{dataset}
+
+=item * C<< $msg->sdk_pipeline_options() >> / C<< $msg->sdk_pipeline_options($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+The Cloud Dataflow SDK pipeline options specified by the user. These
+options are passed through the service and are used to recreate the
+SDK pipeline options on the worker in a language agnostic and platform
+independent way.
+
+=item * C<< $msg->internal_experiments() >> / C<< $msg->internal_experiments($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Any::Any>)
+
+Experimental settings.
+
+=item * C<< $msg->service_account_email() >> / C<< $msg->service_account_email($value) >>
+
+Type: C<String>
+
+Optional. Identity to run virtual machines as. Defaults to the default
+account.
+
+=item * C<< $msg->flex_resource_scheduling_goal() >> / C<< $msg->flex_resource_scheduling_goal($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::FlexResourceSchedulingGoal>)
+
+Optional. Which Flexible Resource Scheduling mode to run in.
+
+=item * C<< $msg->worker_region() >> / C<< $msg->worker_region($value) >>
+
+Type: C<String>
+
+Optional. The Compute Engine region
+(https://cloud.google.com/compute/docs/regions-zones/regions-zones) in
+which worker processing should occur, e.g. "us-west1". Mutually exclusive
+with worker_zone. If neither worker_region nor worker_zone is specified,
+default to the control plane's region.
+
+=item * C<< $msg->worker_zone() >> / C<< $msg->worker_zone($value) >>
+
+Type: C<String>
+
+Optional. The Compute Engine zone
+(https://cloud.google.com/compute/docs/regions-zones/regions-zones) in
+which worker processing should occur, e.g. "us-west1-a". Mutually exclusive
+with worker_region. If neither worker_region nor worker_zone is specified,
+a zone in the control plane's region is chosen based on available capacity.
+
+=item * C<< $msg->shuffle_mode() >> / C<< $msg->shuffle_mode($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::ShuffleMode>)
+
+Output only. The shuffle mode used for the job.
+
+=item * C<< $msg->debug_options() >> / C<< $msg->debug_options($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::DebugOptions>)
+
+Optional. Any debugging options to be supplied to the job.
+
+=item * C<< $msg->use_streaming_engine_resource_based_billing() >> / C<< $msg->use_streaming_engine_resource_based_billing($value) >>
+
+Type: C<Bool>
+
+Output only. Whether the job uses the Streaming Engine resource-based
+billing model.
+
+=item * C<< $msg->streaming_mode() >> / C<< $msg->streaming_mode($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::StreamingMode>)
+
+Optional. Specifies the Streaming Engine message processing guarantees.
+Reduces cost and latency but might result in duplicate messages committed
+to storage. Designed to run simple mapping streaming ETL jobs at the lowest
+cost. For example, Change Data Capture (CDC) to BigQuery is a canonical use
+case. For more information, see
+[Set the pipeline streaming
+mode](https://cloud.google.com/dataflow/docs/guides/streaming-modes).
+
+=item * C<< $msg->use_public_ips() >> / C<< $msg->use_public_ips($value) >>
+
+Type: C<Bool>
+
+Optional. True when any worker pool that uses public IPs is present.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Environment::Package
+
+The packages that must be installed in order for a worker to run the
+steps of the Cloud Dataflow job that will be assigned to its worker
+pool.
+
+This is the mechanism by which the Cloud Dataflow SDK causes code to
+be loaded onto the workers. For example, the Cloud Dataflow Java SDK
+might use this to install jars containing the user's code and all of the
+various dependencies (libraries, data files, etc.) required in order
+for that code to run.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The name of the package.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The resource to read the package from. The supported resource type is:
+
+Google Cloud Storage:
+
+  storage.googleapis.com/{bucket}
+  bucket.storage.googleapis.com/
+
+=item * C<< $msg->sha256() >> / C<< $msg->sha256($value) >>
+
+Type: C<String>
+
+Optional. The hex-encoded SHA256 checksum of the package.
+If the checksum is provided, the worker will verify the checksum of the
+package before using it. If the checksum does not match, the worker will
+fail to start.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Environment::Disk
+
+Describes the data disk used by a workflow job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->size_gb() >> / C<< $msg->size_gb($value) >>
+
+Type: C<Int32>
+
+Size of disk in GB.  If zero or unspecified, the service will
+attempt to choose a reasonable default.
+
+=item * C<< $msg->disk_type() >> / C<< $msg->disk_type($value) >>
+
+Type: C<String>
+
+Disk storage type, as defined by Google Compute Engine.  This
+must be a disk type appropriate to the project and zone in which
+the workers will run.  If unknown or unspecified, the service
+will attempt to choose a reasonable default.
+
+For example, the standard persistent disk type is a resource name
+typically ending in "pd-standard".  If SSD persistent disks are
+available, the resource name typically ends with "pd-ssd".  The
+actual valid values are defined the Google Compute Engine API,
+not by the Cloud Dataflow API; consult the Google Compute Engine
+documentation for more information about determining the set of
+available disk types for a particular project and zone.
+
+Google Compute Engine Disk types are local to a particular
+project in a particular zone, and so the resource name will
+typically look something like this:
+
+compute.googleapis.com/projects/project-id/zones/zone/diskTypes/pd-standard
+
+=item * C<< $msg->mount_point() >> / C<< $msg->mount_point($value) >>
+
+Type: C<String>
+
+Directory in a VM where disk is mounted.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Environment::WorkerSettings
+
+Provides data to pass through to the worker harness.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->base_url() >> / C<< $msg->base_url($value) >>
+
+Type: C<String>
+
+The base URL for accessing Google Cloud APIs.
+
+When workers access Google Cloud APIs, they logically do so via
+relative URLs.  If this field is specified, it supplies the base
+URL to use for resolving these relative URLs.  The normative
+algorithm used is defined by RFC 1808, "Relative Uniform Resource
+Locators".
+
+If not specified, the default value is "http://www.googleapis.com/"
+
+=item * C<< $msg->reporting_enabled() >> / C<< $msg->reporting_enabled($value) >>
+
+Type: C<Bool>
+
+Whether to send work progress updates to the service.
+
+=item * C<< $msg->service_path() >> / C<< $msg->service_path($value) >>
+
+Type: C<String>
+
+The Cloud Dataflow service path relative to the root URL, for example,
+"dataflow/v1b3/projects".
+
+=item * C<< $msg->shuffle_service_path() >> / C<< $msg->shuffle_service_path($value) >>
+
+Type: C<String>
+
+The Shuffle service path relative to the root URL, for example,
+"shuffle/v1beta1".
+
+=item * C<< $msg->worker_id() >> / C<< $msg->worker_id($value) >>
+
+Type: C<String>
+
+The ID of the worker running this pipeline.
+
+=item * C<< $msg->temp_storage_prefix() >> / C<< $msg->temp_storage_prefix($value) >>
+
+Type: C<String>
+
+The prefix of the resources the system should use for temporary
+storage.
+
+The supported resource type is:
+
+Google Cloud Storage:
+
+  storage.googleapis.com/{bucket}/{object}
+  bucket.storage.googleapis.com/{object}
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Environment::TaskRunnerSettings
+
+Taskrunner configuration settings.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->task_user() >> / C<< $msg->task_user($value) >>
+
+Type: C<String>
+
+The UNIX user ID on the worker VM to use for tasks launched by
+taskrunner; e.g. "root".
+
+=item * C<< $msg->task_group() >> / C<< $msg->task_group($value) >>
+
+Type: C<String>
+
+The UNIX group ID on the worker VM to use for tasks launched by
+taskrunner; e.g. "wheel".
+
+=item * C<< $msg->oauth_scopes() >> / C<< $msg->oauth_scopes($value) >>
+
+Type: C<String>
+
+The OAuth2 scopes to be requested by the taskrunner in order to
+access the Cloud Dataflow API.
+
+=item * C<< $msg->base_url() >> / C<< $msg->base_url($value) >>
+
+Type: C<String>
+
+The base URL for the taskrunner to use when accessing Google Cloud APIs.
+
+When workers access Google Cloud APIs, they logically do so via
+relative URLs.  If this field is specified, it supplies the base
+URL to use for resolving these relative URLs.  The normative
+algorithm used is defined by RFC 1808, "Relative Uniform Resource
+Locators".
+
+If not specified, the default value is "http://www.googleapis.com/"
+
+=item * C<< $msg->dataflow_api_version() >> / C<< $msg->dataflow_api_version($value) >>
+
+Type: C<String>
+
+The API version of endpoint, e.g. "v1b3"
+
+=item * C<< $msg->parallel_worker_settings() >> / C<< $msg->parallel_worker_settings($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::WorkerSettings>)
+
+The settings to pass to the parallel worker harness.
+
+=item * C<< $msg->base_task_dir() >> / C<< $msg->base_task_dir($value) >>
+
+Type: C<String>
+
+The location on the worker for task-specific subdirectories.
+
+=item * C<< $msg->continue_on_exception() >> / C<< $msg->continue_on_exception($value) >>
+
+Type: C<Bool>
+
+Whether to continue taskrunner if an exception is hit.
+
+=item * C<< $msg->log_to_serialconsole() >> / C<< $msg->log_to_serialconsole($value) >>
+
+Type: C<Bool>
+
+Whether to send taskrunner log info to Google Compute Engine VM serial
+console.
+
+=item * C<< $msg->alsologtostderr() >> / C<< $msg->alsologtostderr($value) >>
+
+Type: C<Bool>
+
+Whether to also send taskrunner log info to stderr.
+
+=item * C<< $msg->log_upload_location() >> / C<< $msg->log_upload_location($value) >>
+
+Type: C<String>
+
+Indicates where to put logs.  If this is not specified, the logs
+will not be uploaded.
+
+The supported resource type is:
+
+Google Cloud Storage:
+  storage.googleapis.com/{bucket}/{object}
+  bucket.storage.googleapis.com/{object}
+
+=item * C<< $msg->log_dir() >> / C<< $msg->log_dir($value) >>
+
+Type: C<String>
+
+The directory on the VM to store logs.
+
+=item * C<< $msg->temp_storage_prefix() >> / C<< $msg->temp_storage_prefix($value) >>
+
+Type: C<String>
+
+The prefix of the resources the taskrunner should use for
+temporary storage.
+
+The supported resource type is:
+
+Google Cloud Storage:
+  storage.googleapis.com/{bucket}/{object}
+  bucket.storage.googleapis.com/{object}
+
+=item * C<< $msg->harness_command() >> / C<< $msg->harness_command($value) >>
+
+Type: C<String>
+
+The command to launch the worker harness.
+
+=item * C<< $msg->workflow_file_name() >> / C<< $msg->workflow_file_name($value) >>
+
+Type: C<String>
+
+The file to store the workflow in.
+
+=item * C<< $msg->commandlines_file_name() >> / C<< $msg->commandlines_file_name($value) >>
+
+Type: C<String>
+
+The file to store preprocessing commands in.
+
+=item * C<< $msg->vm_id() >> / C<< $msg->vm_id($value) >>
+
+Type: C<String>
+
+The ID string of the VM.
+
+=item * C<< $msg->language_hint() >> / C<< $msg->language_hint($value) >>
+
+Type: C<String>
+
+The suggested backend language.
+
+=item * C<< $msg->streaming_worker_main_class() >> / C<< $msg->streaming_worker_main_class($value) >>
+
+Type: C<String>
+
+The streaming worker main class name.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Environment::AutoscalingSettings
+
+Settings for WorkerPool autoscaling.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->algorithm() >> / C<< $msg->algorithm($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::AutoscalingAlgorithm>)
+
+The algorithm to use for autoscaling.
+
+=item * C<< $msg->max_num_workers() >> / C<< $msg->max_num_workers($value) >>
+
+Type: C<Int32>
+
+The maximum number of workers to cap scaling at.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Environment::SdkHarnessContainerImage
+
+Defines an SDK harness container for executing Dataflow pipelines.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->container_image() >> / C<< $msg->container_image($value) >>
+
+Type: C<String>
+
+A docker container image that resides in Google Container Registry.
+
+=item * C<< $msg->use_single_core_per_container() >> / C<< $msg->use_single_core_per_container($value) >>
+
+Type: C<Bool>
+
+If true, recommends the Dataflow service to use only one core per SDK
+container instance with this image. If false (or unset) recommends using
+more than one core per SDK container instance with this image for
+efficiency. Note that Dataflow service may choose to override this property
+if needed.
+
+=item * C<< $msg->environment_id() >> / C<< $msg->environment_id($value) >>
+
+Type: C<String>
+
+Environment ID for the Beam runner API proto Environment that corresponds
+to the current SDK Harness.
+
+=item * C<< $msg->capabilities() >> / C<< $msg->capabilities($value) >>
+
+Type: C<String>
+
+The set of capabilities enumerated in the above Environment proto. See also
+[beam_runner_api.proto](https://github.com/apache/beam/blob/master/model/pipeline/src/main/proto/org/apache/beam/model/pipeline/v1/beam_runner_api.proto)
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Environment::WorkerPool
+
+Describes one particular pool of Cloud Dataflow workers to be
+instantiated by the Cloud Dataflow service in order to perform the
+computations required by a job.  Note that a workflow job may use
+multiple pools, in order to match the various computational
+requirements of the various stages of the job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The kind of the worker pool; currently only `harness` and `shuffle`
+are supported.
+
+=item * C<< $msg->num_workers() >> / C<< $msg->num_workers($value) >>
+
+Type: C<Int32>
+
+Number of Google Compute Engine workers in this pool needed to
+execute the job.  If zero or unspecified, the service will
+attempt to choose a reasonable default.
+
+=item * C<< $msg->packages() >> / C<< $msg->packages($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::Package>)
+
+Packages to be installed on workers.
+
+=item * C<< $msg->default_package_set() >> / C<< $msg->default_package_set($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::DefaultPackageSet>)
+
+The default package set to install.  This allows the service to
+select a default set of packages which are useful to worker
+harnesses written in a particular language.
+
+=item * C<< $msg->machine_type() >> / C<< $msg->machine_type($value) >>
+
+Type: C<String>
+
+Machine type (e.g. "n1-standard-1").  If empty or unspecified, the
+service will attempt to choose a reasonable default.
+
+=item * C<< $msg->teardown_policy() >> / C<< $msg->teardown_policy($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::TeardownPolicy>)
+
+Sets the policy for determining when to turndown worker pool.
+Allowed values are: `TEARDOWN_ALWAYS`, `TEARDOWN_ON_SUCCESS`, and
+`TEARDOWN_NEVER`.
+`TEARDOWN_ALWAYS` means workers are always torn down regardless of whether
+the job succeeds. `TEARDOWN_ON_SUCCESS` means workers are torn down
+if the job succeeds. `TEARDOWN_NEVER` means the workers are never torn
+down.
+
+If the workers are not torn down by the service, they will
+continue to run and use Google Compute Engine VM resources in the
+user's project until they are explicitly terminated by the user.
+Because of this, Google recommends using the `TEARDOWN_ALWAYS`
+policy except for small, manually supervised test jobs.
+
+If unknown or unspecified, the service will attempt to choose a reasonable
+default.
+
+=item * C<< $msg->disk_size_gb() >> / C<< $msg->disk_size_gb($value) >>
+
+Type: C<Int32>
+
+Size of root disk for VMs, in GB.  If zero or unspecified, the service will
+attempt to choose a reasonable default.
+
+=item * C<< $msg->disk_type() >> / C<< $msg->disk_type($value) >>
+
+Type: C<String>
+
+Type of root disk for VMs.  If empty or unspecified, the service will
+attempt to choose a reasonable default.
+
+=item * C<< $msg->disk_provisioned_iops() >> / C<< $msg->disk_provisioned_iops($value) >>
+
+Type: C<Int64>
+
+Optional. IOPS provisioned for the root disk for VMs.
+
+=item * C<< $msg->disk_provisioned_throughput_mibps() >> / C<< $msg->disk_provisioned_throughput_mibps($value) >>
+
+Type: C<Int64>
+
+Optional. Throughput provisioned for the root disk for VMs.
+
+=item * C<< $msg->disk_source_image() >> / C<< $msg->disk_source_image($value) >>
+
+Type: C<String>
+
+Fully qualified source image for disks.
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<String>
+
+Zone to run the worker pools in.  If empty or unspecified, the service
+will attempt to choose a reasonable default.
+
+=item * C<< $msg->taskrunner_settings() >> / C<< $msg->taskrunner_settings($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::TaskRunnerSettings>)
+
+Settings passed through to Google Compute Engine workers when
+using the standard Dataflow task runner.  Users should ignore
+this field.
+
+=item * C<< $msg->on_host_maintenance() >> / C<< $msg->on_host_maintenance($value) >>
+
+Type: C<String>
+
+The action to take on host maintenance, as defined by the Google
+Compute Engine API.
+
+=item * C<< $msg->data_disks() >> / C<< $msg->data_disks($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::Disk>)
+
+Data disks that are used by a VM in this workflow.
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::WorkerPool::MetadataEntry>)
+
+Metadata to set on the Google Compute Engine VMs.
+
+=item * C<< $msg->autoscaling_settings() >> / C<< $msg->autoscaling_settings($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::AutoscalingSettings>)
+
+Settings for autoscaling of this WorkerPool.
+
+=item * C<< $msg->pool_args() >> / C<< $msg->pool_args($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Any::Any>)
+
+Extra arguments for this worker pool.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Network to which VMs will be assigned.  If empty or unspecified,
+the service will use the network "default".
+
+=item * C<< $msg->subnetwork() >> / C<< $msg->subnetwork($value) >>
+
+Type: C<String>
+
+Subnetwork to which VMs will be assigned, if desired.  Expected to be of
+the form "regions/REGION/subnetworks/SUBNETWORK".
+
+=item * C<< $msg->worker_harness_container_image() >> / C<< $msg->worker_harness_container_image($value) >>
+
+Type: C<String>
+
+Required. Docker container image that executes the Cloud Dataflow worker
+harness, residing in Google Container Registry.
+
+Deprecated for the Fn API path. Use sdk_harness_container_images instead.
+
+=item * C<< $msg->num_threads_per_worker() >> / C<< $msg->num_threads_per_worker($value) >>
+
+Type: C<Int32>
+
+The number of threads per worker harness. If empty or unspecified, the
+service will choose a number of threads (according to the number of cores
+on the selected machine type for batch, or 1 by convention for streaming).
+
+=item * C<< $msg->ip_configuration() >> / C<< $msg->ip_configuration($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::WorkerIPAddressConfiguration>)
+
+Configuration for VM IPs.
+
+=item * C<< $msg->sdk_harness_container_images() >> / C<< $msg->sdk_harness_container_images($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::SdkHarnessContainerImage>)
+
+Set of SDK harness containers needed to execute this pipeline. This will
+only be set in the Fn API path. For non-cross-language pipelines this
+should have only one entry. Cross-language pipelines will have two or more
+entries.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Environment::DataSamplingConfig
+
+Configuration options for sampling elements.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->behaviors() >> / C<< $msg->behaviors($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::DataSamplingConfig::DataSamplingBehavior>)
+
+List of given sampling behaviors to enable. For example, specifying
+behaviors = [ALWAYS_ON] samples in-flight elements but does not sample
+exceptions. Can be used to specify multiple behaviors like,
+behaviors = [ALWAYS_ON, EXCEPTIONS] for specifying periodic sampling and
+exception sampling.
+
+If DISABLED is in the list, then sampling will be disabled and ignore the
+other given behaviors.
+
+Ordering does not matter.
+
+=back
+
+=head3 Enum: DataSamplingConfig::DataSamplingBehavior
+
+=over 4
+
+=item * C<DATA_SAMPLING_BEHAVIOR_UNSPECIFIED> => C<0>
+
+=item * C<DISABLED> => C<1>
+
+=item * C<ALWAYS_ON> => C<2>
+
+=item * C<EXCEPTIONS> => C<3>
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Environment::DebugOptions
+
+Describes any options that have an effect on the debugging of pipelines.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enable_hot_key_logging() >> / C<< $msg->enable_hot_key_logging($value) >>
+
+Type: C<Bool>
+
+Optional. When true, enables the logging of the literal hot key to the
+user's Cloud Logging.
+
+=item * C<< $msg->data_sampling() >> / C<< $msg->data_sampling($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Environment::DataSamplingConfig>)
+
+Configuration options for sampling elements from a running pipeline.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Dataflow::V1beta3::Environment::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

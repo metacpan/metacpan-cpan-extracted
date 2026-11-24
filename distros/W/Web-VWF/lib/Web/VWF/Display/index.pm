@@ -7,7 +7,7 @@ package Web::VWF::Display::index;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.003.1');
+use version; our $VERSION = version->declare('0.004.1');
 
 use Carp;
 use Web::VWF::Display;
@@ -163,7 +163,7 @@ Web::VWF::Display::index - The home page, with its contact form
 
 =head1 VERSION
 
-Version 0.003.1
+Version 0.004.1
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,1203 @@
+package Google::Cloud::Baremetalsolution::V2::Baremetalsolution;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Cloud::Baremetalsolution::V2::Instance };
+    eval { require Google::Cloud::Baremetalsolution::V2::Lun };
+    eval { require Google::Cloud::Baremetalsolution::V2::Network };
+    eval { require Google::Cloud::Baremetalsolution::V2::NfsShare };
+    eval { require Google::Cloud::Baremetalsolution::V2::Osimage };
+    eval { require Google::Cloud::Baremetalsolution::V2::Provisioning };
+    eval { require Google::Cloud::Baremetalsolution::V2::SshKey };
+    eval { require Google::Cloud::Baremetalsolution::V2::Volume };
+    eval { require Google::Cloud::Baremetalsolution::V2::VolumeSnapshot };
+    eval { require Google::Longrunning::Operations };
+    eval { require Google::Protobuf::Empty };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+Cjlnb29nbGUvY2xvdWQvYmFyZW1ldGFsc29sdXRpb24vdjIvYmFyZW1ldGFsc29sdXRpb24u
+cHJvdG8SIWdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1dGlvbi52MhocZ29vZ2xlL2FwaS9h
+bm5vdGF0aW9ucy5wcm90bxoXZ29vZ2xlL2FwaS9jbGllbnQucHJvdG8aH2dvb2dsZS9hcGkv
+ZmllbGRfYmVoYXZpb3IucHJvdG8aMGdvb2dsZS9jbG91ZC9iYXJlbWV0YWxzb2x1dGlvbi92
+Mi9pbnN0YW5jZS5wcm90bxorZ29vZ2xlL2Nsb3VkL2JhcmVtZXRhbHNvbHV0aW9uL3YyL2x1
+bi5wcm90bxovZ29vZ2xlL2Nsb3VkL2JhcmVtZXRhbHNvbHV0aW9uL3YyL25ldHdvcmsucHJv
+dG8aMWdvb2dsZS9jbG91ZC9iYXJlbWV0YWxzb2x1dGlvbi92Mi9uZnNfc2hhcmUucHJvdG8a
+L2dvb2dsZS9jbG91ZC9iYXJlbWV0YWxzb2x1dGlvbi92Mi9vc2ltYWdlLnByb3RvGjRnb29n
+bGUvY2xvdWQvYmFyZW1ldGFsc29sdXRpb24vdjIvcHJvdmlzaW9uaW5nLnByb3RvGi9nb29n
+bGUvY2xvdWQvYmFyZW1ldGFsc29sdXRpb24vdjIvc3NoX2tleS5wcm90bxouZ29vZ2xlL2Ns
+b3VkL2JhcmVtZXRhbHNvbHV0aW9uL3YyL3ZvbHVtZS5wcm90bxo3Z29vZ2xlL2Nsb3VkL2Jh
+cmVtZXRhbHNvbHV0aW9uL3YyL3ZvbHVtZV9zbmFwc2hvdC5wcm90bxojZ29vZ2xlL2xvbmdy
+dW5uaW5nL29wZXJhdGlvbnMucHJvdG8aG2dvb2dsZS9wcm90b2J1Zi9lbXB0eS5wcm90bxof
+Z29vZ2xlL3Byb3RvYnVmL3RpbWVzdGFtcC5wcm90byLVAgoRT3BlcmF0aW9uTWV0YWRhdGES
+QAoLY3JlYXRlX3RpbWUYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNS
+CmNyZWF0ZVRpbWUSOgoIZW5kX3RpbWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0
+YW1wQgPgQQNSB2VuZFRpbWUSGwoGdGFyZ2V0GAMgASgJQgPgQQNSBnRhcmdldBIXCgR2ZXJi
+GAQgASgJQgPgQQNSBHZlcmISKgoOc3RhdHVzX21lc3NhZ2UYBSABKAlCA+BBA1INc3RhdHVz
+TWVzc2FnZRI6ChZyZXF1ZXN0ZWRfY2FuY2VsbGF0aW9uGAYgASgIQgPgQQNSFXJlcXVlc3Rl
+ZENhbmNlbGxhdGlvbhIkCgthcGlfdmVyc2lvbhgHIAEoCUID4EEDUgphcGlWZXJzaW9uIhcK
+FVJlc2V0SW5zdGFuY2VSZXNwb25zZTK6SwoRQmFyZU1ldGFsU29sdXRpb24SwgEKDUxpc3RJ
+bnN0YW5jZXMSNy5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlzdEluc3Rh
+bmNlc1JlcXVlc3QaOC5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlzdElu
+c3RhbmNlc1Jlc3BvbnNlIj6C0+STAi8SLS92Mi97cGFyZW50PXByb2plY3RzLyovbG9jYXRp
+b25zLyp9L2luc3RhbmNlc9pBBnBhcmVudBKvAQoLR2V0SW5zdGFuY2USNS5nb29nbGUuY2xv
+dWQuYmFyZW1ldGFsc29sdXRpb24udjIuR2V0SW5zdGFuY2VSZXF1ZXN0GisuZ29vZ2xlLmNs
+b3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkluc3RhbmNlIjyC0+STAi8SLS92Mi97bmFtZT1w
+cm9qZWN0cy8qL2xvY2F0aW9ucy8qL2luc3RhbmNlcy8qfdpBBG5hbWUS6gEKDlVwZGF0ZUlu
+c3RhbmNlEjguZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLlVwZGF0ZUluc3Rh
+bmNlUmVxdWVzdBodLmdvb2dsZS5sb25ncnVubmluZy5PcGVyYXRpb24if4LT5JMCQjI2L3Yy
+L3tpbnN0YW5jZS5uYW1lPXByb2plY3RzLyovbG9jYXRpb25zLyovaW5zdGFuY2VzLyp9Oghp
+bnN0YW5jZdpBFGluc3RhbmNlLHVwZGF0ZV9tYXNrykEdCghJbnN0YW5jZRIRT3BlcmF0aW9u
+TWV0YWRhdGESzwEKDlJlbmFtZUluc3RhbmNlEjguZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNv
+bHV0aW9uLnYyLlJlbmFtZUluc3RhbmNlUmVxdWVzdBorLmdvb2dsZS5jbG91ZC5iYXJlbWV0
+YWxzb2x1dGlvbi52Mi5JbnN0YW5jZSJWgtPkkwI5IjQvdjIve25hbWU9cHJvamVjdHMvKi9s
+b2NhdGlvbnMvKi9pbnN0YW5jZXMvKn06cmVuYW1lOgEq2kEUbmFtZSxuZXdfaW5zdGFuY2Vf
+aWQS2wEKDVJlc2V0SW5zdGFuY2USNy5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24u
+djIuUmVzZXRJbnN0YW5jZVJlcXVlc3QaHS5nb29nbGUubG9uZ3J1bm5pbmcuT3BlcmF0aW9u
+InKC0+STAjgiMy92Mi97bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL2luc3RhbmNlcy8q
+fTpyZXNldDoBKtpBBG5hbWXKQSoKFVJlc2V0SW5zdGFuY2VSZXNwb25zZRIRT3BlcmF0aW9u
+TWV0YWRhdGES2wEKDVN0YXJ0SW5zdGFuY2USNy5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29s
+dXRpb24udjIuU3RhcnRJbnN0YW5jZVJlcXVlc3QaHS5nb29nbGUubG9uZ3J1bm5pbmcuT3Bl
+cmF0aW9uInKC0+STAjgiMy92Mi97bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL2luc3Rh
+bmNlcy8qfTpzdGFydDoBKtpBBG5hbWXKQSoKFVN0YXJ0SW5zdGFuY2VSZXNwb25zZRIRT3Bl
+cmF0aW9uTWV0YWRhdGES1wEKDFN0b3BJbnN0YW5jZRI2Lmdvb2dsZS5jbG91ZC5iYXJlbWV0
+YWxzb2x1dGlvbi52Mi5TdG9wSW5zdGFuY2VSZXF1ZXN0Gh0uZ29vZ2xlLmxvbmdydW5uaW5n
+Lk9wZXJhdGlvbiJwgtPkkwI3IjIvdjIve25hbWU9cHJvamVjdHMvKi9sb2NhdGlvbnMvKi9p
+bnN0YW5jZXMvKn06c3RvcDoBKtpBBG5hbWXKQSkKFFN0b3BJbnN0YW5jZVJlc3BvbnNlEhFP
+cGVyYXRpb25NZXRhZGF0YRKoAgoeRW5hYmxlSW50ZXJhY3RpdmVTZXJpYWxDb25zb2xlEkgu
+Z29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkVuYWJsZUludGVyYWN0aXZlU2Vy
+aWFsQ29uc29sZVJlcXVlc3QaHS5nb29nbGUubG9uZ3J1bm5pbmcuT3BlcmF0aW9uIpwBgtPk
+kwJRIkwvdjIve25hbWU9cHJvamVjdHMvKi9sb2NhdGlvbnMvKi9pbnN0YW5jZXMvKn06ZW5h
+YmxlSW50ZXJhY3RpdmVTZXJpYWxDb25zb2xlOgEq2kEEbmFtZcpBOwomRW5hYmxlSW50ZXJh
+Y3RpdmVTZXJpYWxDb25zb2xlUmVzcG9uc2USEU9wZXJhdGlvbk1ldGFkYXRhEqwCCh9EaXNh
+YmxlSW50ZXJhY3RpdmVTZXJpYWxDb25zb2xlEkkuZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNv
+bHV0aW9uLnYyLkRpc2FibGVJbnRlcmFjdGl2ZVNlcmlhbENvbnNvbGVSZXF1ZXN0Gh0uZ29v
+Z2xlLmxvbmdydW5uaW5nLk9wZXJhdGlvbiKeAYLT5JMCUiJNL3YyL3tuYW1lPXByb2plY3Rz
+LyovbG9jYXRpb25zLyovaW5zdGFuY2VzLyp9OmRpc2FibGVJbnRlcmFjdGl2ZVNlcmlhbENv
+bnNvbGU6ASraQQRuYW1lykE8CidEaXNhYmxlSW50ZXJhY3RpdmVTZXJpYWxDb25zb2xlUmVz
+cG9uc2USEU9wZXJhdGlvbk1ldGFkYXRhEtYBCglEZXRhY2hMdW4SMy5nb29nbGUuY2xvdWQu
+YmFyZW1ldGFsc29sdXRpb24udjIuRGV0YWNoTHVuUmVxdWVzdBodLmdvb2dsZS5sb25ncnVu
+bmluZy5PcGVyYXRpb24idYLT5JMCQCI7L3YyL3tpbnN0YW5jZT1wcm9qZWN0cy8qL2xvY2F0
+aW9ucy8qL2luc3RhbmNlcy8qfTpkZXRhY2hMdW46ASraQQxpbnN0YW5jZSxsdW7KQR0KCElu
+c3RhbmNlEhFPcGVyYXRpb25NZXRhZGF0YRK6AQoLTGlzdFNTSEtleXMSNS5nb29nbGUuY2xv
+dWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlzdFNTSEtleXNSZXF1ZXN0GjYuZ29vZ2xlLmNs
+b3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkxpc3RTU0hLZXlzUmVzcG9uc2UiPILT5JMCLRIr
+L3YyL3twYXJlbnQ9cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vc3NoS2V5c9pBBnBhcmVudBLL
+AQoMQ3JlYXRlU1NIS2V5EjYuZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkNy
+ZWF0ZVNTSEtleVJlcXVlc3QaKS5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIu
+U1NIS2V5IliC0+STAjYiKy92Mi97cGFyZW50PXByb2plY3RzLyovbG9jYXRpb25zLyp9L3Nz
+aEtleXM6B3NzaF9rZXnaQRlwYXJlbnQsc3NoX2tleSxzc2hfa2V5X2lkEpoBCgxEZWxldGVT
+U0hLZXkSNi5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuRGVsZXRlU1NIS2V5
+UmVxdWVzdBoWLmdvb2dsZS5wcm90b2J1Zi5FbXB0eSI6gtPkkwItKisvdjIve25hbWU9cHJv
+amVjdHMvKi9sb2NhdGlvbnMvKi9zc2hLZXlzLyp92kEEbmFtZRK6AQoLTGlzdFZvbHVtZXMS
+NS5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlzdFZvbHVtZXNSZXF1ZXN0
+GjYuZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkxpc3RWb2x1bWVzUmVzcG9u
+c2UiPILT5JMCLRIrL3YyL3twYXJlbnQ9cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vdm9sdW1l
+c9pBBnBhcmVudBKnAQoJR2V0Vm9sdW1lEjMuZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0
+aW9uLnYyLkdldFZvbHVtZVJlcXVlc3QaKS5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRp
+b24udjIuVm9sdW1lIjqC0+STAi0SKy92Mi97bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9ucy8q
+L3ZvbHVtZXMvKn3aQQRuYW1lEtwBCgxVcGRhdGVWb2x1bWUSNi5nb29nbGUuY2xvdWQuYmFy
+ZW1ldGFsc29sdXRpb24udjIuVXBkYXRlVm9sdW1lUmVxdWVzdBodLmdvb2dsZS5sb25ncnVu
+bmluZy5PcGVyYXRpb24idYLT5JMCPDIyL3YyL3t2b2x1bWUubmFtZT1wcm9qZWN0cy8qL2xv
+Y2F0aW9ucy8qL3ZvbHVtZXMvKn06BnZvbHVtZdpBEnZvbHVtZSx1cGRhdGVfbWFza8pBGwoG
+Vm9sdW1lEhFPcGVyYXRpb25NZXRhZGF0YRLFAQoMUmVuYW1lVm9sdW1lEjYuZ29vZ2xlLmNs
+b3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLlJlbmFtZVZvbHVtZVJlcXVlc3QaKS5nb29nbGUu
+Y2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuVm9sdW1lIlKC0+STAjciMi92Mi97bmFtZT1w
+cm9qZWN0cy8qL2xvY2F0aW9ucy8qL3ZvbHVtZXMvKn06cmVuYW1lOgEq2kESbmFtZSxuZXdf
+dm9sdW1lX2lkEtUBCgtFdmljdFZvbHVtZRI1Lmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1
+dGlvbi52Mi5FdmljdFZvbHVtZVJlcXVlc3QaHS5nb29nbGUubG9uZ3J1bm5pbmcuT3BlcmF0
+aW9uInCC0+STAjYiMS92Mi97bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL3ZvbHVtZXMv
+Kn06ZXZpY3Q6ASraQQRuYW1lykEqChVnb29nbGUucHJvdG9idWYuRW1wdHkSEU9wZXJhdGlv
+bk1ldGFkYXRhEtYBCgxSZXNpemVWb2x1bWUSNi5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29s
+dXRpb24udjIuUmVzaXplVm9sdW1lUmVxdWVzdBodLmdvb2dsZS5sb25ncnVubmluZy5PcGVy
+YXRpb24ib4LT5JMCOSI0L3YyL3t2b2x1bWU9cHJvamVjdHMvKi9sb2NhdGlvbnMvKi92b2x1
+bWVzLyp9OnJlc2l6ZToBKtpBD3ZvbHVtZSxzaXplX2dpYspBGwoGVm9sdW1lEhFPcGVyYXRp
+b25NZXRhZGF0YRK+AQoMTGlzdE5ldHdvcmtzEjYuZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNv
+bHV0aW9uLnYyLkxpc3ROZXR3b3Jrc1JlcXVlc3QaNy5nb29nbGUuY2xvdWQuYmFyZW1ldGFs
+c29sdXRpb24udjIuTGlzdE5ldHdvcmtzUmVzcG9uc2UiPYLT5JMCLhIsL3YyL3twYXJlbnQ9
+cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vbmV0d29ya3PaQQZwYXJlbnQS3wEKEExpc3ROZXR3
+b3JrVXNhZ2USOi5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlzdE5ldHdv
+cmtVc2FnZVJlcXVlc3QaOy5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlz
+dE5ldHdvcmtVc2FnZVJlc3BvbnNlIlKC0+STAkESPy92Mi97bG9jYXRpb249cHJvamVjdHMv
+Ki9sb2NhdGlvbnMvKn0vbmV0d29ya3M6bGlzdE5ldHdvcmtVc2FnZdpBCGxvY2F0aW9uEqsB
+CgpHZXROZXR3b3JrEjQuZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkdldE5l
+dHdvcmtSZXF1ZXN0GiouZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLk5ldHdv
+cmsiO4LT5JMCLhIsL3YyL3tuYW1lPXByb2plY3RzLyovbG9jYXRpb25zLyovbmV0d29ya3Mv
+Kn3aQQRuYW1lEuMBCg1VcGRhdGVOZXR3b3JrEjcuZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNv
+bHV0aW9uLnYyLlVwZGF0ZU5ldHdvcmtSZXF1ZXN0Gh0uZ29vZ2xlLmxvbmdydW5uaW5nLk9w
+ZXJhdGlvbiJ6gtPkkwI/MjQvdjIve25ldHdvcmsubmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9u
+cy8qL25ldHdvcmtzLyp9OgduZXR3b3Jr2kETbmV0d29yayx1cGRhdGVfbWFza8pBHAoHTmV0
+d29yaxIRT3BlcmF0aW9uTWV0YWRhdGES9AEKFENyZWF0ZVZvbHVtZVNuYXBzaG90Ej4uZ29v
+Z2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkNyZWF0ZVZvbHVtZVNuYXBzaG90UmVx
+dWVzdBoxLmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1dGlvbi52Mi5Wb2x1bWVTbmFwc2hv
+dCJpgtPkkwJKIjcvdjIve3BhcmVudD1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL3ZvbHVtZXMv
+Kn0vc25hcHNob3RzOg92b2x1bWVfc25hcHNob3TaQRZwYXJlbnQsdm9sdW1lX3NuYXBzaG90
+EpUCChVSZXN0b3JlVm9sdW1lU25hcHNob3QSPy5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29s
+dXRpb24udjIuUmVzdG9yZVZvbHVtZVNuYXBzaG90UmVxdWVzdBodLmdvb2dsZS5sb25ncnVu
+bmluZy5PcGVyYXRpb24imwGC0+STAl0iWC92Mi97dm9sdW1lX3NuYXBzaG90PXByb2plY3Rz
+LyovbG9jYXRpb25zLyovdm9sdW1lcy8qL3NuYXBzaG90cy8qfTpyZXN0b3JlVm9sdW1lU25h
+cHNob3Q6ASraQQ92b2x1bWVfc25hcHNob3TKQSMKDlZvbHVtZVNuYXBzaG90EhFPcGVyYXRp
+b25NZXRhZGF0YRK2AQoURGVsZXRlVm9sdW1lU25hcHNob3QSPi5nb29nbGUuY2xvdWQuYmFy
+ZW1ldGFsc29sdXRpb24udjIuRGVsZXRlVm9sdW1lU25hcHNob3RSZXF1ZXN0GhYuZ29vZ2xl
+LnByb3RvYnVmLkVtcHR5IkaC0+STAjkqNy92Mi97bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9u
+cy8qL3ZvbHVtZXMvKi9zbmFwc2hvdHMvKn3aQQRuYW1lEssBChFHZXRWb2x1bWVTbmFwc2hv
+dBI7Lmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1dGlvbi52Mi5HZXRWb2x1bWVTbmFwc2hv
+dFJlcXVlc3QaMS5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuVm9sdW1lU25h
+cHNob3QiRoLT5JMCORI3L3YyL3tuYW1lPXByb2plY3RzLyovbG9jYXRpb25zLyovdm9sdW1l
+cy8qL3NuYXBzaG90cy8qfdpBBG5hbWUS3gEKE0xpc3RWb2x1bWVTbmFwc2hvdHMSPS5nb29n
+bGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlzdFZvbHVtZVNuYXBzaG90c1JlcXVl
+c3QaPi5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlzdFZvbHVtZVNuYXBz
+aG90c1Jlc3BvbnNlIkiC0+STAjkSNy92Mi97cGFyZW50PXByb2plY3RzLyovbG9jYXRpb25z
+Lyovdm9sdW1lcy8qfS9zbmFwc2hvdHPaQQZwYXJlbnQSpQEKBkdldEx1bhIwLmdvb2dsZS5j
+bG91ZC5iYXJlbWV0YWxzb2x1dGlvbi52Mi5HZXRMdW5SZXF1ZXN0GiYuZ29vZ2xlLmNsb3Vk
+LmJhcmVtZXRhbHNvbHV0aW9uLnYyLkx1biJBgtPkkwI0EjIvdjIve25hbWU9cHJvamVjdHMv
+Ki9sb2NhdGlvbnMvKi92b2x1bWVzLyovbHVucy8qfdpBBG5hbWUSuAEKCExpc3RMdW5zEjIu
+Z29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkxpc3RMdW5zUmVxdWVzdBozLmdv
+b2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1dGlvbi52Mi5MaXN0THVuc1Jlc3BvbnNlIkOC0+ST
+AjQSMi92Mi97cGFyZW50PXByb2plY3RzLyovbG9jYXRpb25zLyovdm9sdW1lcy8qfS9sdW5z
+2kEGcGFyZW50EtYBCghFdmljdEx1bhIyLmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1dGlv
+bi52Mi5FdmljdEx1blJlcXVlc3QaHS5nb29nbGUubG9uZ3J1bm5pbmcuT3BlcmF0aW9uIneC
+0+STAj0iOC92Mi97bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL3ZvbHVtZXMvKi9sdW5z
+Lyp9OmV2aWN0OgEq2kEEbmFtZcpBKgoVZ29vZ2xlLnByb3RvYnVmLkVtcHR5EhFPcGVyYXRp
+b25NZXRhZGF0YRKvAQoLR2V0TmZzU2hhcmUSNS5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29s
+dXRpb24udjIuR2V0TmZzU2hhcmVSZXF1ZXN0GisuZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNv
+bHV0aW9uLnYyLk5mc1NoYXJlIjyC0+STAi8SLS92Mi97bmFtZT1wcm9qZWN0cy8qL2xvY2F0
+aW9ucy8qL25mc1NoYXJlcy8qfdpBBG5hbWUSwgEKDUxpc3ROZnNTaGFyZXMSNy5nb29nbGUu
+Y2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlzdE5mc1NoYXJlc1JlcXVlc3QaOC5nb29n
+bGUuY2xvdWQuYmFyZW1ldGFsc29sdXRpb24udjIuTGlzdE5mc1NoYXJlc1Jlc3BvbnNlIj6C
+0+STAi8SLS92Mi97cGFyZW50PXByb2plY3RzLyovbG9jYXRpb25zLyp9L25mc1NoYXJlc9pB
+BnBhcmVudBLuAQoOVXBkYXRlTmZzU2hhcmUSOC5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29s
+dXRpb24udjIuVXBkYXRlTmZzU2hhcmVSZXF1ZXN0Gh0uZ29vZ2xlLmxvbmdydW5uaW5nLk9w
+ZXJhdGlvbiKCAYLT5JMCRDI3L3YyL3tuZnNfc2hhcmUubmFtZT1wcm9qZWN0cy8qL2xvY2F0
+aW9ucy8qL25mc1NoYXJlcy8qfToJbmZzX3NoYXJl2kEVbmZzX3NoYXJlLHVwZGF0ZV9tYXNr
+ykEdCghOZnNTaGFyZRIRT3BlcmF0aW9uTWV0YWRhdGES3gEKDkNyZWF0ZU5mc1NoYXJlEjgu
+Z29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkNyZWF0ZU5mc1NoYXJlUmVxdWVz
+dBodLmdvb2dsZS5sb25ncnVubmluZy5PcGVyYXRpb24ic4LT5JMCOiItL3YyL3twYXJlbnQ9
+cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vbmZzU2hhcmVzOgluZnNfc2hhcmXaQRBwYXJlbnQs
+bmZzX3NoYXJlykEdCghOZnNTaGFyZRIRT3BlcmF0aW9uTWV0YWRhdGESzwEKDlJlbmFtZU5m
+c1NoYXJlEjguZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLlJlbmFtZU5mc1No
+YXJlUmVxdWVzdBorLmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1dGlvbi52Mi5OZnNTaGFy
+ZSJWgtPkkwI5IjQvdjIve25hbWU9cHJvamVjdHMvKi9sb2NhdGlvbnMvKi9uZnNTaGFyZXMv
+Kn06cmVuYW1lOgEq2kEUbmFtZSxuZXdfbmZzc2hhcmVfaWQS1AEKDkRlbGV0ZU5mc1NoYXJl
+EjguZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLkRlbGV0ZU5mc1NoYXJlUmVx
+dWVzdBodLmdvb2dsZS5sb25ncnVubmluZy5PcGVyYXRpb24iaYLT5JMCLyotL3YyL3tuYW1l
+PXByb2plY3RzLyovbG9jYXRpb25zLyovbmZzU2hhcmVzLyp92kEEbmFtZcpBKgoVZ29vZ2xl
+LnByb3RvYnVmLkVtcHR5EhFPcGVyYXRpb25NZXRhZGF0YRLmAQoWTGlzdFByb3Zpc2lvbmlu
+Z1F1b3RhcxJALmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1dGlvbi52Mi5MaXN0UHJvdmlz
+aW9uaW5nUXVvdGFzUmVxdWVzdBpBLmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1dGlvbi52
+Mi5MaXN0UHJvdmlzaW9uaW5nUXVvdGFzUmVzcG9uc2UiR4LT5JMCOBI2L3YyL3twYXJlbnQ9
+cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vcHJvdmlzaW9uaW5nUXVvdGFz2kEGcGFyZW50EosC
+ChhTdWJtaXRQcm92aXNpb25pbmdDb25maWcSQi5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29s
+dXRpb24udjIuU3VibWl0UHJvdmlzaW9uaW5nQ29uZmlnUmVxdWVzdBpDLmdvb2dsZS5jbG91
+ZC5iYXJlbWV0YWxzb2x1dGlvbi52Mi5TdWJtaXRQcm92aXNpb25pbmdDb25maWdSZXNwb25z
+ZSJmgtPkkwJDIj4vdjIve3BhcmVudD1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qfS9wcm92aXNp
+b25pbmdDb25maWdzOnN1Ym1pdDoBKtpBGnBhcmVudCxwcm92aXNpb25pbmdfY29uZmlnEtcB
+ChVHZXRQcm92aXNpb25pbmdDb25maWcSPy5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRp
+b24udjIuR2V0UHJvdmlzaW9uaW5nQ29uZmlnUmVxdWVzdBo1Lmdvb2dsZS5jbG91ZC5iYXJl
+bWV0YWxzb2x1dGlvbi52Mi5Qcm92aXNpb25pbmdDb25maWciRoLT5JMCORI3L3YyL3tuYW1l
+PXByb2plY3RzLyovbG9jYXRpb25zLyovcHJvdmlzaW9uaW5nQ29uZmlncy8qfdpBBG5hbWUS
+iAIKGENyZWF0ZVByb3Zpc2lvbmluZ0NvbmZpZxJCLmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxz
+b2x1dGlvbi52Mi5DcmVhdGVQcm92aXNpb25pbmdDb25maWdSZXF1ZXN0GjUuZ29vZ2xlLmNs
+b3VkLmJhcmVtZXRhbHNvbHV0aW9uLnYyLlByb3Zpc2lvbmluZ0NvbmZpZyJxgtPkkwJOIjcv
+djIve3BhcmVudD1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qfS9wcm92aXNpb25pbmdDb25maWdz
+OhNwcm92aXNpb25pbmdfY29uZmln2kEacGFyZW50LHByb3Zpc2lvbmluZ19jb25maWcSogIK
+GFVwZGF0ZVByb3Zpc2lvbmluZ0NvbmZpZxJCLmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1
+dGlvbi52Mi5VcGRhdGVQcm92aXNpb25pbmdDb25maWdSZXF1ZXN0GjUuZ29vZ2xlLmNsb3Vk
+LmJhcmVtZXRhbHNvbHV0aW9uLnYyLlByb3Zpc2lvbmluZ0NvbmZpZyKKAYLT5JMCYjJLL3Yy
+L3twcm92aXNpb25pbmdfY29uZmlnLm5hbWU9cHJvamVjdHMvKi9sb2NhdGlvbnMvKi9wcm92
+aXNpb25pbmdDb25maWdzLyp9OhNwcm92aXNpb25pbmdfY29uZmln2kEfcHJvdmlzaW9uaW5n
+X2NvbmZpZyx1cGRhdGVfbWFzaxLKAQoNUmVuYW1lTmV0d29yaxI3Lmdvb2dsZS5jbG91ZC5i
+YXJlbWV0YWxzb2x1dGlvbi52Mi5SZW5hbWVOZXR3b3JrUmVxdWVzdBoqLmdvb2dsZS5jbG91
+ZC5iYXJlbWV0YWxzb2x1dGlvbi52Mi5OZXR3b3JrIlSC0+STAjgiMy92Mi97bmFtZT1wcm9q
+ZWN0cy8qL2xvY2F0aW9ucy8qL25ldHdvcmtzLyp9OnJlbmFtZToBKtpBE25hbWUsbmV3X25l
+dHdvcmtfaWQSvgEKDExpc3RPU0ltYWdlcxI2Lmdvb2dsZS5jbG91ZC5iYXJlbWV0YWxzb2x1
+dGlvbi52Mi5MaXN0T1NJbWFnZXNSZXF1ZXN0GjcuZ29vZ2xlLmNsb3VkLmJhcmVtZXRhbHNv
+bHV0aW9uLnYyLkxpc3RPU0ltYWdlc1Jlc3BvbnNlIj2C0+STAi4SLC92Mi97cGFyZW50PXBy
+b2plY3RzLyovbG9jYXRpb25zLyp9L29zSW1hZ2Vz2kEGcGFyZW50GlTKQSBiYXJlbWV0YWxz
+b2x1dGlvbi5nb29nbGVhcGlzLmNvbdJBLmh0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL2F1
+dGgvY2xvdWQtcGxhdGZvcm1ChQIKJWNvbS5nb29nbGUuY2xvdWQuYmFyZW1ldGFsc29sdXRp
+b24udjJCFkJhcmVNZXRhbFNvbHV0aW9uUHJvdG9QAVpTY2xvdWQuZ29vZ2xlLmNvbS9nby9i
+YXJlbWV0YWxzb2x1dGlvbi9hcGl2Mi9iYXJlbWV0YWxzb2x1dGlvbnBiO2JhcmVtZXRhbHNv
+bHV0aW9ucGKqAiFHb29nbGUuQ2xvdWQuQmFyZU1ldGFsU29sdXRpb24uVjLKAiFHb29nbGVc
+Q2xvdWRcQmFyZU1ldGFsU29sdXRpb25cVjLqAiRHb29nbGU6OkNsb3VkOjpCYXJlTWV0YWxT
+b2x1dGlvbjo6VjJKoV8KBxIFDgCyBCAKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNSBH
+b29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9u
+IDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2Vw
+dCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNv
+cHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vu
+c2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9y
+IGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhl
+IExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQg
+V0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBv
+ciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2Ug
+Z292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vu
+c2UuCgoICgECEgMQACoKCQoCAwASAxIAJgoJCgIDARIDEwAhCgkKAgMCEgMUACkKCQoCAwMS
+AxUAOgoJCgIDBBIDFgA1CgkKAgMFEgMXADkKCQoCAwYSAxgAOwoJCgIDBxIDGQA5CgkKAgMI
+EgMaAD4KCQoCAwkSAxsAOQoJCgIDChIDHAA4CgkKAgMLEgMdAEEKCQoCAwwSAx4ALQoJCgID
+DRIDHwAlCgkKAgMOEgMgACkKCAoBCBIDIgA+CgkKAgglEgMiAD4KCAoBCBIDIwBqCgkKAggL
+EgMjAGoKCAoBCBIDJAAiCgkKAggKEgMkACIKCAoBCBIDJQA3CgkKAggIEgMlADcKCAoBCBID
+JgA+CgkKAggBEgMmAD4KCAoBCBIDJwA+CgkKAggpEgMnAD4KCAoBCBIDKAA9CgkKAggtEgMo
+AD0K7QMKAgYAEgUyAJEEARrfAyBQZXJmb3JtcyBtYW5hZ2VtZW50IG9wZXJhdGlvbnMgb24g
+QmFyZSBNZXRhbCBTb2x1dGlvbiBzZXJ2ZXJzLgoKIFRoZSBgYmFyZW1ldGFsc29sdXRpb24u
+Z29vZ2xlYXBpcy5jb21gIHNlcnZpY2UgcHJvdmlkZXMgbWFuYWdlbWVudAogY2FwYWJpbGl0
+aWVzIGZvciBCYXJlIE1ldGFsIFNvbHV0aW9uIHNlcnZlcnMuIFRvIGFjY2VzcyB0aGUgQVBJ
+IG1ldGhvZHMsIHlvdQogbXVzdCBhc3NpZ24gQmFyZSBNZXRhbCBTb2x1dGlvbiBJQU0gcm9s
+ZXMgY29udGFpbmluZyB0aGUgZGVzaXJlZCBwZXJtaXNzaW9ucwogdG8geW91ciBzdGFmZiBp
+biB5b3VyIEdvb2dsZSBDbG91ZCBwcm9qZWN0LiBZb3UgbXVzdCBhbHNvIGVuYWJsZSB0aGUg
+QmFyZQogTWV0YWwgU29sdXRpb24gQVBJLiBPbmNlIGVuYWJsZWQsIHRoZSBtZXRob2RzIGFj
+dAogdXBvbiBzcGVjaWZpYyBzZXJ2ZXJzIGluIHlvdXIgQmFyZSBNZXRhbCBTb2x1dGlvbiBl
+bnZpcm9ubWVudC4KCgoKAwYAARIDMggZCgoKAwYAAxIDMwJICgwKBQYAA5kIEgMzAkgKCwoD
+BgADEgQ0AjU3Cg0KBQYAA5oIEgQ0AjU3Cj0KBAYAAgASBDgCPQMaLyBMaXN0IHNlcnZlcnMg
+aW4gYSBnaXZlbiBwcm9qZWN0IGFuZCBsb2NhdGlvbi4KCgwKBQYAAgABEgM4BhMKDAoFBgAC
+AAISAzgUKAoMCgUGAAIAAxIDODNICg0KBQYAAgAEEgQ5BDsGChEKCQYAAgAEsMq8IhIEOQQ7
+BgoMCgUGAAIABBIDPAQ0Cg8KCAYAAgAEmwgAEgM8BDQKMgoEBgACARIEQAJFAxokIEdldCBk
+ZXRhaWxzIGFib3V0IGEgc2luZ2xlIHNlcnZlci4KCgwKBQYAAgEBEgNABhEKDAoFBgACAQIS
+A0ASJAoMCgUGAAIBAxIDQC83Cg0KBQYAAgEEEgRBBEMGChEKCQYAAgEEsMq8IhIEQQRDBgoM
+CgUGAAIBBBIDRAQyCg8KCAYAAgEEmwgAEgNEBDIKMgoEBgACAhIESAJTAxokIFVwZGF0ZSBk
+ZXRhaWxzIG9mIGEgc2luZ2xlIHNlcnZlci4KCgwKBQYAAgIBEgNIBhQKDAoFBgACAgISA0gV
+KgoMCgUGAAICAxIDSQ8rCg0KBQYAAgIEEgRKBE0GChEKCQYAAgIEsMq8IhIESgRNBgoMCgUG
+AAICBBIDTgRCCg8KCAYAAgIEmwgAEgNOBEIKDQoFBgACAgQSBE8EUgYKDwoHBgACAgSZCBIE
+TwRSBgqBAQoEBgACAxIEVwJdAxpzIFJlbmFtZUluc3RhbmNlIHNldHMgYSBuZXcgbmFtZSBm
+b3IgYW4gaW5zdGFuY2UuCiBVc2Ugd2l0aCBjYXV0aW9uLCBwcmV2aW91cyBuYW1lcyBiZWNv
+bWUgaW1tZWRpYXRlbHkgaW52YWxpZGF0ZWQuCgoMCgUGAAIDARIDVwYUCgwKBQYAAgMCEgNX
+FSoKDAoFBgACAwMSA1c1PQoNCgUGAAIDBBIEWARbBgoRCgkGAAIDBLDKvCISBFgEWwYKDAoF
+BgACAwQSA1wEQgoPCggGAAIDBJsIABIDXARCCoEBCgQGAAIEEgRhAmwDGnMgUGVyZm9ybSBh
+biB1bmdyYWNlZnVsLCBoYXJkIHJlc2V0IG9uIGEgc2VydmVyLiBFcXVpdmFsZW50IHRvIHNo
+dXR0aW5nIHRoZQogcG93ZXIgb2ZmIGFuZCB0aGVuIHR1cm5pbmcgaXQgYmFjayBvbi4KCgwK
+BQYAAgQBEgNhBhMKDAoFBgACBAISA2EUKAoMCgUGAAIEAxIDYg8rCg0KBQYAAgQEEgRjBGYG
+ChEKCQYAAgQEsMq8IhIEYwRmBgoMCgUGAAIEBBIDZwQyCg8KCAYAAgQEmwgAEgNnBDIKDQoF
+BgACBAQSBGgEawYKDwoHBgACBASZCBIEaARrBgoyCgQGAAIFEgRvAnoDGiQgU3RhcnRzIGEg
+c2VydmVyIHRoYXQgd2FzIHNodXRkb3duLgoKDAoFBgACBQESA28GEwoMCgUGAAIFAhIDbxQo
+CgwKBQYAAgUDEgNwDysKDQoFBgACBQQSBHEEdAYKEQoJBgACBQSwyrwiEgRxBHQGCgwKBQYA
+AgUEEgN1BDIKDwoIBgACBQSbCAASA3UEMgoNCgUGAAIFBBIEdgR5BgoPCgcGAAIFBJkIEgR2
+BHkGCicKBAYAAgYSBX0ChwEDGhggU3RvcCBhIHJ1bm5pbmcgc2VydmVyLgoKDAoFBgACBgES
+A30GEgoMCgUGAAIGAhIDfRMmCgwKBQYAAgYDEgN9MU0KDgoFBgACBgQSBX4EgQEGChIKCQYA
+AgYEsMq8IhIFfgSBAQYKDQoFBgACBgQSBIIBBDIKEAoIBgACBgSbCAASBIIBBDIKDwoFBgAC
+BgQSBoMBBIYBBgoRCgcGAAIGBJkIEgaDAQSGAQYKTwoEBgACBxIGigEClQEDGj8gRW5hYmxl
+IHRoZSBpbnRlcmFjdGl2ZSBzZXJpYWwgY29uc29sZSBmZWF0dXJlIG9uIGFuIGluc3RhbmNl
+LgoKDQoFBgACBwESBIoBBiQKDQoFBgACBwISBIoBJUoKDQoFBgACBwMSBIsBDysKDwoFBgAC
+BwQSBowBBI8BBgoTCgkGAAIHBLDKvCISBowBBI8BBgoNCgUGAAIHBBIEkAEEMgoQCggGAAIH
+BJsIABIEkAEEMgoPCgUGAAIHBBIGkQEElAEGChEKBwYAAgcEmQgSBpEBBJQBBgpQCgQGAAII
+EgaYAQKjAQMaQCBEaXNhYmxlIHRoZSBpbnRlcmFjdGl2ZSBzZXJpYWwgY29uc29sZSBmZWF0
+dXJlIG9uIGFuIGluc3RhbmNlLgoKDQoFBgACCAESBJgBBiUKDQoFBgACCAISBJgBJkwKDQoF
+BgACCAMSBJkBDysKDwoFBgACCAQSBpoBBJ0BBgoTCgkGAAIIBLDKvCISBpoBBJ0BBgoNCgUG
+AAIIBBIEngEEMgoQCggGAAIIBJsIABIEngEEMgoPCgUGAAIIBBIGnwEEogEGChEKBwYAAggE
+mQgSBp8BBKIBBgorCgQGAAIJEgamAQKwAQMaGyBEZXRhY2ggTFVOIGZyb20gSW5zdGFuY2Uu
+CgoNCgUGAAIJARIEpgEGDwoNCgUGAAIJAhIEpgEQIAoNCgUGAAIJAxIEpgErRwoPCgUGAAIJ
+BBIGpwEEqgEGChMKCQYAAgkEsMq8IhIGpwEEqgEGCg0KBQYAAgkEEgSrAQQ6ChAKCAYAAgkE
+mwgAEgSrAQQ6Cg8KBQYAAgkEEgasAQSvAQYKEQoHBgACCQSZCBIGrAEErwEGCpwBCgQGAAIK
+Ega0AQK5AQMaiwEgTGlzdHMgdGhlIHB1YmxpYyBTU0gga2V5cyByZWdpc3RlcmVkIGZvciB0
+aGUgc3BlY2lmaWVkIHByb2plY3QuCiBUaGVzZSBTU0gga2V5cyBhcmUgdXNlZCBvbmx5IGZv
+ciB0aGUgaW50ZXJhY3RpdmUgc2VyaWFsIGNvbnNvbGUgZmVhdHVyZS4KCg0KBQYAAgoBEgS0
+AQYRCg0KBQYAAgoCEgS0ARIkCg0KBQYAAgoDEgS0AS9CCg8KBQYAAgoEEga1AQS3AQYKEwoJ
+BgACCgSwyrwiEga1AQS3AQYKDQoFBgACCgQSBLgBBDQKEAoIBgACCgSbCAASBLgBBDQKegoE
+BgACCxIGvQECwwEDGmogUmVnaXN0ZXIgYSBwdWJsaWMgU1NIIGtleSBpbiB0aGUgc3BlY2lm
+aWVkIHByb2plY3QgZm9yIHVzZSB3aXRoIHRoZQogaW50ZXJhY3RpdmUgc2VyaWFsIGNvbnNv
+bGUgZmVhdHVyZS4KCg0KBQYAAgsBEgS9AQYSCg0KBQYAAgsCEgS9ARMmCg0KBQYAAgsDEgS9
+ATE3Cg8KBQYAAgsEEga+AQTBAQYKEwoJBgACCwSwyrwiEga+AQTBAQYKDQoFBgACCwQSBMIB
+BEcKEAoIBgACCwSbCAASBMIBBEcKTwoEBgACDBIGxgECywEDGj8gRGVsZXRlcyBhIHB1Ymxp
+YyBTU0gga2V5IHJlZ2lzdGVyZWQgaW4gdGhlIHNwZWNpZmllZCBwcm9qZWN0LgoKDQoFBgAC
+DAESBMYBBhIKDQoFBgACDAISBMYBEyYKDQoFBgACDAMSBMYBMUYKDwoFBgACDAQSBscBBMkB
+BgoTCgkGAAIMBLDKvCISBscBBMkBBgoNCgUGAAIMBBIEygEEMgoQCggGAAIMBJsIABIEygEE
+MgpHCgQGAAINEgbOAQLTAQMaNyBMaXN0IHN0b3JhZ2Ugdm9sdW1lcyBpbiBhIGdpdmVuIHBy
+b2plY3QgYW5kIGxvY2F0aW9uLgoKDQoFBgACDQESBM4BBhEKDQoFBgACDQISBM4BEiQKDQoF
+BgACDQMSBM4BL0IKDwoFBgACDQQSBs8BBNEBBgoTCgkGAAINBLDKvCISBs8BBNEBBgoNCgUG
+AAINBBIE0gEENAoQCggGAAINBJsIABIE0gEENAo5CgQGAAIOEgbWAQLbAQMaKSBHZXQgZGV0
+YWlscyBvZiBhIHNpbmdsZSBzdG9yYWdlIHZvbHVtZS4KCg0KBQYAAg4BEgTWAQYPCg0KBQYA
+Ag4CEgTWARAgCg0KBQYAAg4DEgTWASsxCg8KBQYAAg4EEgbXAQTZAQYKEwoJBgACDgSwyrwi
+EgbXAQTZAQYKDQoFBgACDgQSBNoBBDIKEAoIBgACDgSbCAASBNoBBDIKPAoEBgACDxIG3gEC
+6AEDGiwgVXBkYXRlIGRldGFpbHMgb2YgYSBzaW5nbGUgc3RvcmFnZSB2b2x1bWUuCgoNCgUG
+AAIPARIE3gEGEgoNCgUGAAIPAhIE3gETJgoNCgUGAAIPAxIE3gExTQoPCgUGAAIPBBIG3wEE
+4gEGChMKCQYAAg8EsMq8IhIG3wEE4gEGCg0KBQYAAg8EEgTjAQRAChAKCAYAAg8EmwgAEgTj
+AQRACg8KBQYAAg8EEgbkAQTnAQYKEQoHBgACDwSZCBIG5AEE5wEGCn4KBAYAAhASBuwBAvIB
+AxpuIFJlbmFtZVZvbHVtZSBzZXRzIGEgbmV3IG5hbWUgZm9yIGEgdm9sdW1lLgogVXNlIHdp
+dGggY2F1dGlvbiwgcHJldmlvdXMgbmFtZXMgYmVjb21lIGltbWVkaWF0ZWx5IGludmFsaWRh
+dGVkLgoKDQoFBgACEAESBOwBBhIKDQoFBgACEAISBOwBEyYKDQoFBgACEAMSBOwBMTcKDwoF
+BgACEAQSBu0BBPABBgoTCgkGAAIQBLDKvCISBu0BBPABBgoNCgUGAAIQBBIE8QEEQAoQCggG
+AAIQBJsIABIE8QEEQApeCgQGAAIREgb2AQKAAgMaTiBTa2lwcyB2b2x1bWUncyBjb29sb2Zm
+IGFuZCBkZWxldGVzIGl0IG5vdy4KIFZvbHVtZSBtdXN0IGJlIGluIGNvb2xvZmYgc3RhdGUu
+CgoNCgUGAAIRARIE9gEGEQoNCgUGAAIRAhIE9gESJAoNCgUGAAIRAxIE9gEvSwoPCgUGAAIR
+BBIG9wEE+gEGChMKCQYAAhEEsMq8IhIG9wEE+gEGCg0KBQYAAhEEEgT7AQQyChAKCAYAAhEE
+mwgAEgT7AQQyCg8KBQYAAhEEEgb8AQT/AQYKEQoHBgACEQSZCBIG/AEE/wEGCioKBAYAAhIS
+BoMCAo0CAxoaIEVtZXJnZW5jeSBWb2x1bWUgcmVzaXplLgoKDQoFBgACEgESBIMCBhIKDQoF
+BgACEgISBIMCEyYKDQoFBgACEgMSBIMCMU0KDwoFBgACEgQSBoQCBIcCBgoTCgkGAAISBLDK
+vCISBoQCBIcCBgoNCgUGAAISBBIEiAIEPQoQCggGAAISBJsIABIEiAIEPQoPCgUGAAISBBIG
+iQIEjAIGChEKBwYAAhIEmQgSBokCBIwCBgo/CgQGAAITEgaQAgKVAgMaLyBMaXN0IG5ldHdv
+cmsgaW4gYSBnaXZlbiBwcm9qZWN0IGFuZCBsb2NhdGlvbi4KCg0KBQYAAhMBEgSQAgYSCg0K
+BQYAAhMCEgSQAhMmCg0KBQYAAhMDEgSQAjFFCg8KBQYAAhMEEgaRAgSTAgYKEwoJBgACEwSw
+yrwiEgaRAgSTAgYKDQoFBgACEwQSBJQCBDQKEAoIBgACEwSbCAASBJQCBDQKgQEKBAYAAhQS
+BpkCAp8CAxpxIExpc3QgYWxsIE5ldHdvcmtzIChhbmQgdXNlZCBJUHMgZm9yIGVhY2ggTmV0
+d29yaykgaW4gdGhlIHZlbmRvciBhY2NvdW50CiBhc3NvY2lhdGVkIHdpdGggdGhlIHNwZWNp
+ZmllZCBwcm9qZWN0LgoKDQoFBgACFAESBJkCBhYKDQoFBgACFAISBJkCFy4KDQoFBgACFAMS
+BJoCDycKDwoFBgACFAQSBpsCBJ0CBgoTCgkGAAIUBLDKvCISBpsCBJ0CBgoNCgUGAAIUBBIE
+ngIENgoQCggGAAIUBJsIABIEngIENgoyCgQGAAIVEgaiAgKnAgMaIiBHZXQgZGV0YWlscyBv
+ZiBhIHNpbmdsZSBuZXR3b3JrLgoKDQoFBgACFQESBKICBhAKDQoFBgACFQISBKICESIKDQoF
+BgACFQMSBKICLTQKDwoFBgACFQQSBqMCBKUCBgoTCgkGAAIVBLDKvCISBqMCBKUCBgoNCgUG
+AAIVBBIEpgIEMgoQCggGAAIVBJsIABIEpgIEMgo1CgQGAAIWEgaqAgK1AgMaJSBVcGRhdGUg
+ZGV0YWlscyBvZiBhIHNpbmdsZSBuZXR3b3JrLgoKDQoFBgACFgESBKoCBhMKDQoFBgACFgIS
+BKoCFCgKDQoFBgACFgMSBKsCDysKDwoFBgACFgQSBqwCBK8CBgoTCgkGAAIWBLDKvCISBqwC
+BK8CBgoNCgUGAAIWBBIEsAIEQQoQCggGAAIWBJsIABIEsAIEQQoPCgUGAAIWBBIGsQIEtAIG
+ChEKBwYAAhYEmQgSBrECBLQCBgpvCgQGAAIXEga5AgLAAgMaXyBUYWtlcyBhIHNuYXBzaG90
+IG9mIGEgYm9vdCB2b2x1bWUuCiBSZXR1cm5zIElOVkFMSURfQVJHVU1FTlQgaWYgY2FsbGVk
+IGZvciBhIG5vbi1ib290IHZvbHVtZS4KCg0KBQYAAhcBEgS5AgYaCg0KBQYAAhcCEgS5Ahs2
+Cg0KBQYAAhcDEgS6Ag8dCg8KBQYAAhcEEga7AgS+AgYKEwoJBgACFwSwyrwiEga7AgS+AgYK
+DQoFBgACFwQSBL8CBEQKEAoIBgACFwSbCAASBL8CBEQKhgEKBAYAAhgSBsQCAs8CAxp2IFVz
+ZXMgdGhlIHNwZWNpZmllZCBzbmFwc2hvdCB0byByZXN0b3JlIGl0cyBwYXJlbnQgdm9sdW1l
+LgogUmV0dXJucyBJTlZBTElEX0FSR1VNRU5UIGlmIGNhbGxlZCBmb3IgYSBub24tYm9vdCB2
+b2x1bWUuCgoNCgUGAAIYARIExAIGGwoNCgUGAAIYAhIExAIcOAoNCgUGAAIYAxIExQIPKwoP
+CgUGAAIYBBIGxgIEyQIGChMKCQYAAhgEsMq8IhIGxgIEyQIGCg0KBQYAAhgEEgTKAgQ9ChAK
+CAYAAhgEmwgAEgTKAgQ9Cg8KBQYAAhgEEgbLAgTOAgYKEQoHBgACGASZCBIGywIEzgIGCmcK
+BAYAAhkSBtMCAtkCAxpXIERlbGV0ZXMgYSB2b2x1bWUgc25hcHNob3QuCiBSZXR1cm5zIElO
+VkFMSURfQVJHVU1FTlQgaWYgY2FsbGVkIGZvciBhIG5vbi1ib290IHZvbHVtZS4KCg0KBQYA
+AhkBEgTTAgYaCg0KBQYAAhkCEgTTAhs2Cg0KBQYAAhkDEgTUAg8kCg8KBQYAAhkEEgbVAgTX
+AgYKEwoJBgACGQSwyrwiEgbVAgTXAgYKDQoFBgACGQQSBNgCBDIKEAoIBgACGQSbCAASBNgC
+BDIKdQoEBgACGhIG3QIC4gIDGmUgUmV0dXJucyB0aGUgc3BlY2lmaWVkIHNuYXBzaG90IHJl
+c291cmNlLgogUmV0dXJucyBJTlZBTElEX0FSR1VNRU5UIGlmIGNhbGxlZCBmb3IgYSBub24t
+Ym9vdCB2b2x1bWUuCgoNCgUGAAIaARIE3QIGFwoNCgUGAAIaAhIE3QIYMAoNCgUGAAIaAxIE
+3QI7SQoPCgUGAAIaBBIG3gIE4AIGChMKCQYAAhoEsMq8IhIG3gIE4AIGCg0KBQYAAhoEEgTh
+AgQyChAKCAYAAhoEmwgAEgThAgQyCqIBCgQGAAIbEgbnAgLtAgMakQEgUmV0cmlldmVzIHRo
+ZSBsaXN0IG9mIHNuYXBzaG90cyBmb3IgdGhlIHNwZWNpZmllZCB2b2x1bWUuCiBSZXR1cm5z
+IGEgcmVzcG9uc2Ugd2l0aCBhbiBlbXB0eSBsaXN0IG9mIHNuYXBzaG90cyBpZiBjYWxsZWQK
+IGZvciBhIG5vbi1ib290IHZvbHVtZS4KCg0KBQYAAhsBEgTnAgYZCg0KBQYAAhsCEgTnAho0
+Cg0KBQYAAhsDEgToAg8qCg8KBQYAAhsEEgbpAgTrAgYKEwoJBgACGwSwyrwiEgbpAgTrAgYK
+DQoFBgACGwQSBOwCBDQKEAoIBgACGwSbCAASBOwCBDQKSwoEBgACHBIG8AIC9QIDGjsgR2V0
+IGRldGFpbHMgb2YgYSBzaW5nbGUgc3RvcmFnZSBsb2dpY2FsIHVuaXQgbnVtYmVyKExVTiku
+CgoNCgUGAAIcARIE8AIGDAoNCgUGAAIcAhIE8AINGgoNCgUGAAIcAxIE8AIlKAoPCgUGAAIc
+BBIG8QIE8wIGChMKCQYAAhwEsMq8IhIG8QIE8wIGCg0KBQYAAhwEEgT0AgQyChAKCAYAAhwE
+mwgAEgT0AgQyCkQKBAYAAh0SBvgCAv0CAxo0IExpc3Qgc3RvcmFnZSB2b2x1bWUgbHVucyBm
+b3IgZ2l2ZW4gc3RvcmFnZSB2b2x1bWUuCgoNCgUGAAIdARIE+AIGDgoNCgUGAAIdAhIE+AIP
+HgoNCgUGAAIdAxIE+AIpOQoPCgUGAAIdBBIG+QIE+wIGChMKCQYAAh0EsMq8IhIG+QIE+wIG
+Cg0KBQYAAh0EEgT8AgQ0ChAKCAYAAh0EmwgAEgT8AgQ0ClgKBAYAAh4SBoEDAosDAxpIIFNr
+aXBzIGx1bidzIGNvb2xvZmYgYW5kIGRlbGV0ZXMgaXQgbm93LgogTHVuIG11c3QgYmUgaW4g
+Y29vbG9mZiBzdGF0ZS4KCg0KBQYAAh4BEgSBAwYOCg0KBQYAAh4CEgSBAw8eCg0KBQYAAh4D
+EgSBAylFCg8KBQYAAh4EEgaCAwSFAwYKEwoJBgACHgSwyrwiEgaCAwSFAwYKDQoFBgACHgQS
+BIYDBDIKEAoIBgACHgSbCAASBIYDBDIKDwoFBgACHgQSBocDBIoDBgoRCgcGAAIeBJkIEgaH
+AwSKAwYKNAoEBgACHxIGjgMCkwMDGiQgR2V0IGRldGFpbHMgb2YgYSBzaW5nbGUgTkZTIHNo
+YXJlLgoKDQoFBgACHwESBI4DBhEKDQoFBgACHwISBI4DEiQKDQoFBgACHwMSBI4DLzcKDwoF
+BgACHwQSBo8DBJEDBgoTCgkGAAIfBLDKvCISBo8DBJEDBgoNCgUGAAIfBBIEkgMEMgoQCggG
+AAIfBJsIABIEkgMEMgoiCgQGAAIgEgaWAwKbAwMaEiBMaXN0IE5GUyBzaGFyZXMuCgoNCgUG
+AAIgARIElgMGEwoNCgUGAAIgAhIElgMUKAoNCgUGAAIgAxIElgMzSAoPCgUGAAIgBBIGlwME
+mQMGChMKCQYAAiAEsMq8IhIGlwMEmQMGCg0KBQYAAiAEEgSaAwQ0ChAKCAYAAiAEmwgAEgSa
+AwQ0CjcKBAYAAiESBp4DAqkDAxonIFVwZGF0ZSBkZXRhaWxzIG9mIGEgc2luZ2xlIE5GUyBz
+aGFyZS4KCg0KBQYAAiEBEgSeAwYUCg0KBQYAAiECEgSeAxUqCg0KBQYAAiEDEgSfAw8rCg8K
+BQYAAiEEEgagAwSjAwYKEwoJBgACIQSwyrwiEgagAwSjAwYKDQoFBgACIQQSBKQDBEMKEAoI
+BgACIQSbCAASBKQDBEMKDwoFBgACIQQSBqUDBKgDBgoRCgcGAAIhBJkIEgalAwSoAwYKJgoE
+BgACIhIGrAMCtwMDGhYgQ3JlYXRlIGFuIE5GUyBzaGFyZS4KCg0KBQYAAiIBEgSsAwYUCg0K
+BQYAAiICEgSsAxUqCg0KBQYAAiIDEgStAw8rCg8KBQYAAiIEEgauAwSxAwYKEwoJBgACIgSw
+yrwiEgauAwSxAwYKDQoFBgACIgQSBLIDBD4KEAoIBgACIgSbCAASBLIDBD4KDwoFBgACIgQS
+BrMDBLYDBgoRCgcGAAIiBJkIEgazAwS2AwYKgwEKBAYAAiMSBrsDAsEDAxpzIFJlbmFtZU5m
+c1NoYXJlIHNldHMgYSBuZXcgbmFtZSBmb3IgYW4gbmZzc2hhcmUuCiBVc2Ugd2l0aCBjYXV0
+aW9uLCBwcmV2aW91cyBuYW1lcyBiZWNvbWUgaW1tZWRpYXRlbHkgaW52YWxpZGF0ZWQuCgoN
+CgUGAAIjARIEuwMGFAoNCgUGAAIjAhIEuwMVKgoNCgUGAAIjAxIEuwM1PQoPCgUGAAIjBBIG
+vAMEvwMGChMKCQYAAiMEsMq8IhIGvAMEvwMGCg0KBQYAAiMEEgTAAwRCChAKCAYAAiMEmwgA
+EgTAAwRCClYKBAYAAiQSBsQDAs4DAxpGIERlbGV0ZSBhbiBORlMgc2hhcmUuIFRoZSB1bmRl
+cmx5aW5nIHZvbHVtZSBpcyBhdXRvbWF0aWNhbGx5IGRlbGV0ZWQuCgoNCgUGAAIkARIExAMG
+FAoNCgUGAAIkAhIExAMVKgoNCgUGAAIkAxIExQMPKwoPCgUGAAIkBBIGxgMEyAMGChMKCQYA
+AiQEsMq8IhIGxgMEyAMGCg0KBQYAAiQEEgTJAwQyChAKCAYAAiQEmwgAEgTJAwQyCg8KBQYA
+AiQEEgbKAwTNAwYKEQoHBgACJASZCBIGygMEzQMGClQKBAYAAiUSBtEDAtcDAxpEIExpc3Qg
+dGhlIGJ1ZGdldCBkZXRhaWxzIHRvIHByb3Zpc2lvbiByZXNvdXJjZXMgb24gYSBnaXZlbiBw
+cm9qZWN0LgoKDQoFBgACJQESBNEDBhwKDQoFBgACJQISBNEDHToKDQoFBgACJQMSBNIDDy0K
+DwoFBgACJQQSBtMDBNUDBgoTCgkGAAIlBLDKvCISBtMDBNUDBgoNCgUGAAIlBBIE1gMENAoQ
+CggGAAIlBJsIABIE1gMENApICgQGAAImEgbaAwLhAwMaOCBTdWJtaXQgYSBwcm92aXNpb25n
+IGNvbmZpZ3VyYXRpb24gZm9yIGEgZ2l2ZW4gcHJvamVjdC4KCg0KBQYAAiYBEgTaAwYeCg0K
+BQYAAiYCEgTaAx8+Cg0KBQYAAiYDEgTbAw8vCg8KBQYAAiYEEgbcAwTfAwYKEwoJBgACJgSw
+yrwiEgbcAwTfAwYKDQoFBgACJgQSBOADBEgKEAoIBgACJgSbCAASBOADBEgKMQoEBgACJxIG
+5AMC6gMDGiEgR2V0IFByb3Zpc2lvbmluZ0NvbmZpZyBieSBuYW1lLgoKDQoFBgACJwESBOQD
+BhsKDQoFBgACJwISBOQDHDgKDQoFBgACJwMSBOUDDyEKDwoFBgACJwQSBuYDBOgDBgoTCgkG
+AAInBLDKvCISBuYDBOgDBgoNCgUGAAInBBIE6QMEMgoQCggGAAInBJsIABIE6QMEMgowCgQG
+AAIoEgbtAwL0AwMaICBDcmVhdGUgbmV3IFByb3Zpc2lvbmluZ0NvbmZpZy4KCg0KBQYAAigB
+EgTtAwYeCg0KBQYAAigCEgTtAx8+Cg0KBQYAAigDEgTuAw8hCg8KBQYAAigEEgbvAwTyAwYK
+EwoJBgACKASwyrwiEgbvAwTyAwYKDQoFBgACKAQSBPMDBEgKEAoIBgACKASbCAASBPMDBEgK
+NQoEBgACKRIG9wMC/gMDGiUgVXBkYXRlIGV4aXN0aW5nIFByb3Zpc2lvbmluZ0NvbmZpZy4K
+Cg0KBQYAAikBEgT3AwYeCg0KBQYAAikCEgT3Ax8+Cg0KBQYAAikDEgT4Aw8hCg8KBQYAAikE
+Egb5AwT8AwYKEwoJBgACKQSwyrwiEgb5AwT8AwYKDQoFBgACKQQSBP0DBE0KEAoIBgACKQSb
+CAASBP0DBE0KgAEKBAYAAioSBoIEAogEAxpwIFJlbmFtZU5ldHdvcmsgc2V0cyBhIG5ldyBu
+YW1lIGZvciBhIG5ldHdvcmsuCiBVc2Ugd2l0aCBjYXV0aW9uLCBwcmV2aW91cyBuYW1lcyBi
+ZWNvbWUgaW1tZWRpYXRlbHkgaW52YWxpZGF0ZWQuCgoNCgUGAAIqARIEggQGEwoNCgUGAAIq
+AhIEggQUKAoNCgUGAAIqAxIEggQzOgoPCgUGAAIqBBIGgwQEhgQGChMKCQYAAioEsMq8IhIG
+gwQEhgQGCg0KBQYAAioEEgSHBARBChAKCAYAAioEmwgAEgSHBARBCk8KBAYAAisSBosEApAE
+Axo/IFJldHJpZXZlcyB0aGUgbGlzdCBvZiBPUyBpbWFnZXMgd2hpY2ggYXJlIGN1cnJlbnRs
+eSBhcHByb3ZlZC4KCg0KBQYAAisBEgSLBAYSCg0KBQYAAisCEgSLBBMmCg0KBQYAAisDEgSL
+BDFFCg8KBQYAAisEEgaMBASOBAYKEwoJBgACKwSwyrwiEgaMBASOBAYKDQoFBgACKwQSBI8E
+BDQKEAoIBgACKwSbCAASBI8EBDQKRgoCBAASBpQEAK8EARo4IFJlcHJlc2VudHMgdGhlIG1l
+dGFkYXRhIGZyb20gYSBsb25nLXJ1bm5pbmcgb3BlcmF0aW9uLgoKCwoDBAABEgSUBAgZCkIK
+BAQAAgASBpYEApcEMhoyIE91dHB1dCBvbmx5LiBUaGUgdGltZSB0aGUgb3BlcmF0aW9uIHdh
+cyBjcmVhdGVkLgoKDQoFBAACAAYSBJYEAhsKDQoFBAACAAESBJYEHCcKDQoFBAACAAMSBJYE
+KisKDQoFBAACAAgSBJcEBjEKEAoIBAACAAicCAASBJcEBzAKRwoEBAACARIGmgQCmwQyGjcg
+T3V0cHV0IG9ubHkuIFRoZSB0aW1lIHRoZSBvcGVyYXRpb24gZmluaXNoZWQgcnVubmluZy4K
+Cg0KBQQAAgEGEgSaBAIbCg0KBQQAAgEBEgSaBBwkCg0KBQQAAgEDEgSaBCcoCg0KBQQAAgEI
+EgSbBAYxChAKCAQAAgEInAgAEgSbBAcwCloKBAQAAgISBJ4EAkAaTCBPdXRwdXQgb25seS4g
+U2VydmVyLWRlZmluZWQgcmVzb3VyY2UgcGF0aCBmb3IgdGhlIHRhcmdldCBvZiB0aGUgb3Bl
+cmF0aW9uLgoKDQoFBAACAgUSBJ4EAggKDQoFBAACAgESBJ4ECQ8KDQoFBAACAgMSBJ4EEhMK
+DQoFBAACAggSBJ4EFD8KEAoIBAACAgicCAASBJ4EFT4KSgoEBAACAxIEoQQCPho8IE91dHB1
+dCBvbmx5LiBOYW1lIG9mIHRoZSBhY3Rpb24gZXhlY3V0ZWQgYnkgdGhlIG9wZXJhdGlvbi4K
+Cg0KBQQAAgMFEgShBAIICg0KBQQAAgMBEgShBAkNCg0KBQQAAgMDEgShBBARCg0KBQQAAgMI
+EgShBBI9ChAKCAQAAgMInAgAEgShBBM8CkwKBAQAAgQSBKQEAkgaPiBPdXRwdXQgb25seS4g
+SHVtYW4tcmVhZGFibGUgc3RhdHVzIG9mIHRoZSBvcGVyYXRpb24sIGlmIGFueS4KCg0KBQQA
+AgQFEgSkBAIICg0KBQQAAgQBEgSkBAkXCg0KBQQAAgQDEgSkBBobCg0KBQQAAgQIEgSkBBxH
+ChAKCAQAAgQInAgAEgSkBB1GCpsCCgQEAAIFEgSrBAJOGowCIE91dHB1dCBvbmx5LiBJZGVu
+dGlmaWVzIHdoZXRoZXIgdGhlIHVzZXIgcmVxdWVzdGVkIHRoZSBjYW5jZWxsYXRpb24KIG9m
+IHRoZSBvcGVyYXRpb24uIE9wZXJhdGlvbnMgdGhhdCBoYXZlIGJlZW4gc3VjY2Vzc2Z1bGx5
+IGNhbmNlbGxlZAogaGF2ZSBbT3BlcmF0aW9uLmVycm9yXVtdIHZhbHVlIHdpdGggYQogW2dv
+b2dsZS5ycGMuU3RhdHVzLmNvZGVdW2dvb2dsZS5ycGMuU3RhdHVzLmNvZGVdIG9mIDEsIGNv
+cnJlc3BvbmRpbmcgdG8KIGBDb2RlLkNBTkNFTExFRGAuCgoNCgUEAAIFBRIEqwQCBgoNCgUE
+AAIFARIEqwQHHQoNCgUEAAIFAxIEqwQgIQoNCgUEAAIFCBIEqwQiTQoQCggEAAIFCJwIABIE
+qwQjTApBCgQEAAIGEgSuBAJFGjMgT3V0cHV0IG9ubHkuIEFQSSB2ZXJzaW9uIHVzZWQgd2l0
+aCB0aGUgb3BlcmF0aW9uLgoKDQoFBAACBgUSBK4EAggKDQoFBAACBgESBK4ECRQKDQoFBAAC
+BgMSBK4EFxgKDQoFBAACBggSBK4EGUQKEAoIBAACBgicCAASBK4EGkMKNwoCBAESBLIEACAa
+KyBSZXNwb25zZSBtZXNzYWdlIGZyb20gcmVzZXR0aW5nIGEgc2VydmVyLgoKCwoDBAEBEgSy
+BAgdYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Baremetalsolution::V2::Baremetalsolution::OperationMetadata ===
+    # Fields for OperationMetadata
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: end_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: target Type: 9 ()
+    # Field: verb Type: 9 ()
+    # Field: status_message Type: 9 ()
+    # Field: requested_cancellation Type: 8 ()
+    # Field: api_version Type: 9 ()
+
+# === Message: Google::Cloud::Baremetalsolution::V2::Baremetalsolution::ResetInstanceResponse ===
+    # Fields for ResetInstanceResponse
+
+# === Service Client: Google::Cloud::Baremetalsolution::V2::Baremetalsolution::BareMetalSolutionClient ===
+package Google::Cloud::Baremetalsolution::V2::Baremetalsolution::BareMetalSolutionClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Baremetalsolution::V2::Baremetalsolution::BareMetalSolutionClient
+
+Client stub representing the remote C<BareMetalSolution> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<baremetalsolution.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'baremetalsolution.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub list_instances {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::ListInstancesRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListInstances',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Instance::ListInstancesResponse',
+    });
+}
+
+sub get_instance {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::GetInstanceRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'GetInstance',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Instance::Instance',
+    });
+}
+
+sub update_instance {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::UpdateInstanceRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'UpdateInstance',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub rename_instance {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::RenameInstanceRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'RenameInstance',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Instance::Instance',
+    });
+}
+
+sub reset_instance {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::ResetInstanceRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ResetInstance',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub start_instance {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::StartInstanceRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'StartInstance',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub stop_instance {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::StopInstanceRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'StopInstance',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub enable_interactive_serial_console {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::EnableInteractiveSerialConsoleRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'EnableInteractiveSerialConsole',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub disable_interactive_serial_console {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::DisableInteractiveSerialConsoleRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'DisableInteractiveSerialConsole',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub detach_lun {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Instance::DetachLunRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'DetachLun',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub list_s_s_h_keys {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::SshKey::ListSSHKeysRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListSSHKeys',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::SshKey::ListSSHKeysResponse',
+    });
+}
+
+sub create_s_s_h_key {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::SshKey::CreateSSHKeyRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'CreateSSHKey',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::SshKey::SSHKey',
+    });
+}
+
+sub delete_s_s_h_key {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::SshKey::DeleteSSHKeyRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'DeleteSSHKey',
+        request        => $req,
+        response_class => 'Google::Protobuf::Empty::Empty',
+    });
+}
+
+sub list_volumes {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Volume::ListVolumesRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListVolumes',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Volume::ListVolumesResponse',
+    });
+}
+
+sub get_volume {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Volume::GetVolumeRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'GetVolume',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Volume::Volume',
+    });
+}
+
+sub update_volume {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Volume::UpdateVolumeRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'UpdateVolume',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub rename_volume {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Volume::RenameVolumeRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'RenameVolume',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Volume::Volume',
+    });
+}
+
+sub evict_volume {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Volume::EvictVolumeRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'EvictVolume',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub resize_volume {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Volume::ResizeVolumeRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ResizeVolume',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub list_networks {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Network::ListNetworksRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListNetworks',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Network::ListNetworksResponse',
+    });
+}
+
+sub list_network_usage {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Network::ListNetworkUsageRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListNetworkUsage',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Network::ListNetworkUsageResponse',
+    });
+}
+
+sub get_network {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Network::GetNetworkRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'GetNetwork',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Network::Network',
+    });
+}
+
+sub update_network {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Network::UpdateNetworkRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'UpdateNetwork',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub create_volume_snapshot {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::VolumeSnapshot::CreateVolumeSnapshotRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'CreateVolumeSnapshot',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::VolumeSnapshot::VolumeSnapshot',
+    });
+}
+
+sub restore_volume_snapshot {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::VolumeSnapshot::RestoreVolumeSnapshotRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'RestoreVolumeSnapshot',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub delete_volume_snapshot {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::VolumeSnapshot::DeleteVolumeSnapshotRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'DeleteVolumeSnapshot',
+        request        => $req,
+        response_class => 'Google::Protobuf::Empty::Empty',
+    });
+}
+
+sub get_volume_snapshot {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::VolumeSnapshot::GetVolumeSnapshotRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'GetVolumeSnapshot',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::VolumeSnapshot::VolumeSnapshot',
+    });
+}
+
+sub list_volume_snapshots {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::VolumeSnapshot::ListVolumeSnapshotsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListVolumeSnapshots',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::VolumeSnapshot::ListVolumeSnapshotsResponse',
+    });
+}
+
+sub get_lun {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Lun::GetLunRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'GetLun',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Lun::Lun',
+    });
+}
+
+sub list_luns {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Lun::ListLunsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListLuns',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Lun::ListLunsResponse',
+    });
+}
+
+sub evict_lun {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Lun::EvictLunRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'EvictLun',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub get_nfs_share {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::NfsShare::GetNfsShareRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'GetNfsShare',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::NfsShare::NfsShare',
+    });
+}
+
+sub list_nfs_shares {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::NfsShare::ListNfsSharesRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListNfsShares',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::NfsShare::ListNfsSharesResponse',
+    });
+}
+
+sub update_nfs_share {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::NfsShare::UpdateNfsShareRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'UpdateNfsShare',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub create_nfs_share {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::NfsShare::CreateNfsShareRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'CreateNfsShare',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub rename_nfs_share {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::NfsShare::RenameNfsShareRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'RenameNfsShare',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::NfsShare::NfsShare',
+    });
+}
+
+sub delete_nfs_share {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::NfsShare::DeleteNfsShareRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'DeleteNfsShare',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub list_provisioning_quotas {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Provisioning::ListProvisioningQuotasRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListProvisioningQuotas',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Provisioning::ListProvisioningQuotasResponse',
+    });
+}
+
+sub submit_provisioning_config {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Provisioning::SubmitProvisioningConfigRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'SubmitProvisioningConfig',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Provisioning::SubmitProvisioningConfigResponse',
+    });
+}
+
+sub get_provisioning_config {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Provisioning::GetProvisioningConfigRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'GetProvisioningConfig',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Provisioning::ProvisioningConfig',
+    });
+}
+
+sub create_provisioning_config {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Provisioning::CreateProvisioningConfigRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'CreateProvisioningConfig',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Provisioning::ProvisioningConfig',
+    });
+}
+
+sub update_provisioning_config {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Provisioning::UpdateProvisioningConfigRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'UpdateProvisioningConfig',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Provisioning::ProvisioningConfig',
+    });
+}
+
+sub rename_network {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Network::RenameNetworkRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'RenameNetwork',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Network::Network',
+    });
+}
+
+sub list_o_s_images {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Baremetalsolution::V2::Osimage::ListOSImagesRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.baremetalsolution.v2.BareMetalSolution',
+        method         => 'ListOSImages',
+        request        => $req,
+        response_class => 'Google::Cloud::Baremetalsolution::V2::Osimage::ListOSImagesResponse',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Baremetalsolution::V2::Baremetalsolution - Compiled Protocol Buffers messages for google/cloud/baremetalsolution/v2/baremetalsolution.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Baremetalsolution::V2::Baremetalsolution;
+
+    my $msg = Google::Cloud::Baremetalsolution::V2::Baremetalsolution::OperationMetadata->new({
+        create_time => $create_time,
+        end_time => $end_time,
+        target => $target,
+        verb => $verb,
+    });
+
+    # Read or update a field
+    my $val = $msg->create_time();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Baremetalsolution::V2::Baremetalsolution::OperationMetadata->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/baremetalsolution/v2/baremetalsolution.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Baremetalsolution::V2::Baremetalsolution::OperationMetadata
+
+Represents the metadata from a long-running operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the operation was created.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the operation finished running.
+
+=item * C<< $msg->target() >> / C<< $msg->target($value) >>
+
+Type: C<String>
+
+Output only. Server-defined resource path for the target of the operation.
+
+=item * C<< $msg->verb() >> / C<< $msg->verb($value) >>
+
+Type: C<String>
+
+Output only. Name of the action executed by the operation.
+
+=item * C<< $msg->status_message() >> / C<< $msg->status_message($value) >>
+
+Type: C<String>
+
+Output only. Human-readable status of the operation, if any.
+
+=item * C<< $msg->requested_cancellation() >> / C<< $msg->requested_cancellation($value) >>
+
+Type: C<Bool>
+
+Output only. Identifies whether the user requested the cancellation
+of the operation. Operations that have been successfully cancelled
+have [Operation.error][] value with a
+[google.rpc.Status.code][google.rpc.Status.code] of 1, corresponding to
+`Code.CANCELLED`.
+
+=item * C<< $msg->api_version() >> / C<< $msg->api_version($value) >>
+
+Type: C<String>
+
+Output only. API version used with the operation.
+
+=back
+
+=head2 Google::Cloud::Baremetalsolution::V2::Baremetalsolution::ResetInstanceResponse
+
+Response message from resetting a server.
+
+Inherits from L<Protobuf::Message>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Baremetalsolution::V2::Baremetalsolution::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -67,12 +67,6 @@ sub _md_feature(@) {
 
 $remark
 
-```perl
-my $var = $pkg->new;
-
-${var}->$has # -> .5
-```
-
 END
 }
 
@@ -198,14 +192,6 @@ my ${\_var $pkg} = $pkg->new;
 .
 
 # SUBROUTINES
-
-# INSTALL
-
-For install this module in your system run next [command](https://metacpan.org/pod/App::cpm):
-
-```sh
-sudo cpm install -gvv $pkg
-```
 
 # AUTHOR
 
@@ -346,14 +332,6 @@ File lib/Alt/The/Plan.md is:
 	\```perl
 	my $plan = Alt::The::Plan->new;
 	$plan->miting($meet, $man, $woman)  # -> .3
-	\```
-	
-	# INSTALL
-	
-	For install this module in your system run next [command](https://metacpan.org/pod/App::cpm):
-	
-	\```sh
-	sudo cpm install -gvv Alt::The::Plan
 	\```
 	
 	# AUTHOR

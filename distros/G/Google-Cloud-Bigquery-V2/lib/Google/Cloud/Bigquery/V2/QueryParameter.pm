@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::QueryParameter;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -130,40 +130,6 @@ EOF
     # Field: type Type: 11 (.google.cloud.bigquery.v2.QueryParameterType)
     # Field: description Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterStructType - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::QueryParameter;
-
-    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterStructType->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<type>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterType)
-
-=item * B<description>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType ===
     # Fields for QueryParameterType
     # Field: type Type: 9 ()
@@ -172,82 +138,10 @@ Type: String
     # Field: struct_types Type: 11 (.google.cloud.bigquery.v2.QueryParameterStructType)
     # Field: range_element_type Type: 11 (.google.cloud.bigquery.v2.QueryParameterType)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::QueryParameter;
-
-    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType->new(
-        type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<type>
-
-Type: String
-
-=item * B<timestamp_precision>
-
-Type: Int64
-
-=item * B<array_type>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterType)
-
-=item * B<struct_types>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterStructType)
-
-=item * B<range_element_type>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterType)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::QueryParameter::RangeValue ===
     # Fields for RangeValue
     # Field: start Type: 11 (.google.cloud.bigquery.v2.QueryParameterValue)
     # Field: end Type: 11 (.google.cloud.bigquery.v2.QueryParameterValue)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::QueryParameter::RangeValue - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::QueryParameter;
-
-    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::RangeValue->new(
-        start => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterValue)
-
-=item * B<end>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterValue)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue ===
     # Fields for QueryParameterValue
@@ -257,99 +151,230 @@ Type: Message (.google.cloud.bigquery.v2.QueryParameterValue)
     # Field: range_value Type: 11 (.google.cloud.bigquery.v2.RangeValue)
     # Field: alt_struct_values Type: 11 (.google.protobuf.Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::QueryParameter;
-
-    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<array_values>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterValue)
-
-=item * B<struct_values>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterValue.StructValuesEntry)
-
-=item * B<range_value>
-
-Type: Message (.google.cloud.bigquery.v2.RangeValue)
-
-=item * B<alt_struct_values>
-
-Type: Message (.google.protobuf.Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter ===
     # Fields for QueryParameter
     # Field: name Type: 9 ()
     # Field: parameter_type Type: 11 (.google.cloud.bigquery.v2.QueryParameterType)
     # Field: parameter_value Type: 11 (.google.cloud.bigquery.v2.QueryParameterValue)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::QueryParameter - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/query_parameter.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::QueryParameter;
 
-    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter->new(
-        name => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterStructType->new({
+        name => $name,
+        type => $type,
+        description => $description,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterStructType->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<parameter_type>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterType)
-
-=item * B<parameter_value>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameterValue)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::QueryParameter - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/query_parameter.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterStructType
+
+The type of a struct parameter.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. The name of this field.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType>)
+
+Required. The type of this field.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Human-oriented description of the field.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType
+
+The type of a query parameter.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+Required. The top level type of this field.
+
+=item * C<< $msg->timestamp_precision() >> / C<< $msg->timestamp_precision($value) >>
+
+Type: C<Int64>
+
+Optional. Precision (maximum number of total digits in base 10) for seconds
+of TIMESTAMP type.
+
+Possible values include:
+* 6 (Default, for TIMESTAMP type with microsecond precision)
+* 12 (For TIMESTAMP type with picosecond precision)
+
+=item * C<< $msg->array_type() >> / C<< $msg->array_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType>)
+
+Optional. The type of the array's elements, if this is an array.
+
+=item * C<< $msg->struct_types() >> / C<< $msg->struct_types($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterStructType>)
+
+Optional. The types of the fields of this struct, in order, if this is a
+struct.
+
+=item * C<< $msg->range_element_type() >> / C<< $msg->range_element_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType>)
+
+Optional. The element type of the range, if this is a range.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::QueryParameter::RangeValue
+
+Represents the value of a range.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start() >> / C<< $msg->start($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue>)
+
+Optional. The start value of the range. A missing value represents an
+unbounded start.
+
+=item * C<< $msg->end() >> / C<< $msg->end($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue>)
+
+Optional. The end value of the range. A missing value represents an
+unbounded end.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue
+
+The value of a query parameter.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. The value of this value, if a simple scalar type.
+
+=item * C<< $msg->array_values() >> / C<< $msg->array_values($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue>)
+
+Optional. The array values, if this is an array type.
+
+=item * C<< $msg->struct_values() >> / C<< $msg->struct_values($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue::StructValuesEntry>)
+
+The struct field values.
+
+=item * C<< $msg->range_value() >> / C<< $msg->range_value($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::RangeValue>)
+
+Optional. The range value, if this is a range type.
+
+=item * C<< $msg->alt_struct_values() >> / C<< $msg->alt_struct_values($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+This field should not be used.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter
+
+A parameter given to a query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. If unset, this is a positional parameter. Otherwise, should be
+unique within a query.
+
+=item * C<< $msg->parameter_type() >> / C<< $msg->parameter_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterType>)
+
+Required. The type of this parameter.
+
+=item * C<< $msg->parameter_value() >> / C<< $msg->parameter_value($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameterValue>)
+
+Required. The value of this parameter.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::QueryParameter::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

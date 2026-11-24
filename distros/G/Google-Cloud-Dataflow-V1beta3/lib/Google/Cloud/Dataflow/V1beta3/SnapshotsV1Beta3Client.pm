@@ -12,13 +12,13 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Dataflow::V1beta3::Streaming;
 use Google::Dataflow::V1beta3::Environment;
+use Google::Dataflow::V1beta3::Metrics;
 use Google::Dataflow::V1beta3::Snapshots;
 use Google::Dataflow::V1beta3::Messages;
-use Google::Dataflow::V1beta3::Metrics;
 use Google::Dataflow::V1beta3::Jobs;
 use Google::Dataflow::V1beta3::Templates;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -244,15 +244,81 @@ The following RPC methods are available in this client:
 
 =item * B<get_snapshot>
 
-Calls the RPC method C<GetSnapshot> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_snapshot(
+        project_id               => $project_id,
+        snapshot_id              => $snapshot_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<GetSnapshot> on C<google.dataflow.v1beta3.SnapshotsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Snapshots::GetSnapshotRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Snapshots::Snapshot>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<snapshot_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<delete_snapshot>
 
-Calls the RPC method C<DeleteSnapshot> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_snapshot(
+        project_id               => $project_id,
+        snapshot_id              => $snapshot_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<DeleteSnapshot> on C<google.dataflow.v1beta3.SnapshotsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<snapshot_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<list_snapshots>
 
-Calls the RPC method C<ListSnapshots> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_snapshots(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ListSnapshots> on C<google.dataflow.v1beta3.SnapshotsV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Snapshots::ListSnapshotsRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Snapshots::ListSnapshotsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =back
 

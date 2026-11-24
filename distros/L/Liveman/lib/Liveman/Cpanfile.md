@@ -40,17 +40,17 @@ on 'test' => sub {
 	requires 'File::Path';
 	requires 'File::Slurper';
 	requires 'File::Spec';
+	requires 'open';
 	requires 'Scalar::Util';
 	requires 'String::Diff';
 	requires 'Term::ANSIColor';
 	requires 'Test::More';
 	requires 'Turbin';
-	requires 'open';
 };
 
+requires 'common::sense';
 requires 'Data::Printer';
 requires 'List::Util';
-requires 'common::sense';
 requires 'strict';
 requires 'warnings';
 END
@@ -162,7 +162,7 @@ use Car::Auto;
 Список зависимостей явно указанных в скриптах и модулях без пакетов проекта.
 
 ```perl
-[$::cpanfile->deps]  # --> [qw!Data::Printer List::Util common::sense strict warnings!]
+[$::cpanfile->deps]  # --> [qw!common::sense Data::Printer List::Util strict warnings!]
 ```
 
 ## t_deps ()
@@ -174,7 +174,7 @@ use Car::Auto;
 3. Внедрённых в `*.md` пакетов.
 
 ```perl
-[$::cpanfile->t_deps]  # --> [qw!Car::Auto Carp Cwd Data::Dumper File::Basename File::Find File::Path File::Slurper File::Spec Scalar::Util String::Diff Term::ANSIColor Test::More Turbin open!]
+[$::cpanfile->t_deps]  # --> [qw!Car::Auto Carp Cwd Data::Dumper File::Basename File::Find File::Path File::Slurper File::Spec open Scalar::Util String::Diff Term::ANSIColor Test::More Turbin!]
 ```
 
 ## cpanfile ()

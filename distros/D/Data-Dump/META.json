@@ -52,6 +52,6 @@
          "url" : "http://github.com/garu/data-dump"
       }
    },
-   "version" : "1.27",
+   "version" : "1.28",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

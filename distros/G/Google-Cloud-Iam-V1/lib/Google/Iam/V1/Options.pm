@@ -3,7 +3,7 @@ package Google::Iam::V1::Options;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -57,43 +57,80 @@ EOF
     # Fields for GetPolicyOptions
     # Field: requested_policy_version Type: 5 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Iam::V1::Options::GetPolicyOptions - Compiled Protocol Buffers message class
+Google::Iam::V1::Options - Compiled Protocol Buffers messages for google/iam/v1/options.proto
 
 =head1 SYNOPSIS
 
     use Google::Iam::V1::Options;
 
-    my $msg = Google::Iam::V1::Options::GetPolicyOptions->new(
-        requested_policy_version => $value,
-    );
+    my $msg = Google::Iam::V1::Options::GetPolicyOptions->new({
+        requested_policy_version => $requested_policy_version,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->requested_policy_version();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Iam::V1::Options::GetPolicyOptions->parse($bytes);
 
-=item * B<requested_policy_version>
-
-Type: Int32
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Iam::V1::Options - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/iam/v1/options.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Iam::V1::Options::GetPolicyOptions
+
+Encapsulates settings provided to GetIamPolicy.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->requested_policy_version() >> / C<< $msg->requested_policy_version($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum policy version that will be used to format the
+policy.
+
+Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+rejected.
+
+Requests for policies with any conditional role bindings must specify
+version 3. Policies with no conditional role bindings may specify any valid
+value or leave the field unset.
+
+The policy in the response might use the policy version that you specified,
+or it might use a lower policy version. For example, if you specify version
+3, but the policy has no conditional role bindings, the response uses
+version 1.
+
+To learn which resources support conditions in their IAM policies, see the
+[IAM
+documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Iam::V1::Options::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -67,6 +67,9 @@ msgid "* *PACKAGE* — это имя нового пакета, например
 msgstr "* *PACKAGE* - this is the name of the new package, for example, `Aion::View`.\n"
 "* *License* is a license name, for example, GPLv3 or perl_5."
 
+msgid "Добавляет версию в `requires` выводимым `-D`/`--cpanfile` и `-d`/`--diff-cpanfile`"
+msgstr "Adds version to `requires` by outputting `-D`/`--cpanfile` and `-d`/`--diff-cpanfile`"
+
 msgid "Распечатать примерный cpanfile."
 msgstr "Print a sample cpanfile."
 

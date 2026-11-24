@@ -1,0 +1,33 @@
+Changes
+lib/Google/Cloud/Alloydb/V1beta.pm
+lib/Google/Cloud/Alloydb/V1beta/AlloyDBAdminClient.pm
+lib/Google/Cloud/Alloydb/V1beta/AlloyDBCSQLAdminClient.pm
+lib/Google/Cloud/Alloydb/V1beta/CsqlResources.pm
+lib/Google/Cloud/Alloydb/V1beta/CsqlResources/Types.pm
+lib/Google/Cloud/Alloydb/V1beta/CsqlService.pm
+lib/Google/Cloud/Alloydb/V1beta/CsqlService/Types.pm
+lib/Google/Cloud/Alloydb/V1beta/DataModel.pm
+lib/Google/Cloud/Alloydb/V1beta/DataModel/Types.pm
+lib/Google/Cloud/Alloydb/V1beta/Gemini.pm
+lib/Google/Cloud/Alloydb/V1beta/Gemini/Types.pm
+lib/Google/Cloud/Alloydb/V1beta/Resources.pm
+lib/Google/Cloud/Alloydb/V1beta/Resources/Types.pm
+lib/Google/Cloud/Alloydb/V1beta/Service.pm
+lib/Google/Cloud/Alloydb/V1beta/Service/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-AlloyDBAdmin.t
+t/01-service-AlloyDBCSQLAdmin.t
+t/01-service-Default.t
+t/02-rest-transport-AlloyDBAdmin.t
+t/02-rest-transport-AlloyDBCSQLAdmin.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

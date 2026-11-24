@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Worksheet;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2026, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -31,10 +31,13 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
                                     xl_range
                                     xl_cell_autofit_width
                                     quote_sheetname
-                                    get_image_properties);
+                                    get_image_properties
+                                    _utf16_len
+                                    _utf16_truncate
+                                    _has_invalid_name_chars);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 
 ###############################################################################
@@ -77,6 +80,7 @@ sub new {
     $self->{_embedded_image_indexes} = $_[14];
     $self->{_embedded_images}        = $_[15];
 
+    $self->{_is_chartsheet} = 0;
     $self->{_ext_sheets}    = [];
     $self->{_fileclosed}    = 0;
     $self->{_excel_version} = 2007;
@@ -155,6 +159,7 @@ sub new {
 
     $self->{_zoom}              = 100;
     $self->{_zoom_scale_normal} = 1;
+    $self->{_zoom_to_fit}       = 0;
     $self->{_print_scale}       = 100;
     $self->{_right_to_left}     = 0;
     $self->{_show_zeros}        = 1;
@@ -252,6 +257,7 @@ sub new {
 
     $self->{_validations}        = [];
     $self->{_cond_formats}       = {};
+    $self->{_cond_formats_order} = [];
     $self->{_data_bars_2010}     = [];
     $self->{_use_data_bars_2010} = 0;
     $self->{_dxf_priority}       = 1;
@@ -1193,7 +1199,7 @@ sub set_header {
     # Replace the Excel placeholder &[Picture] with the internal &G.
     $string =~ s/&\[Picture\]/&G/g;
 
-    if ( length $string > 255 ) {
+    if ( _utf16_len( $string ) > 255 ) {
         carp "Header string cannot be longer than Excel's " .
              "limit of 255 characters";
         return;
@@ -1259,7 +1265,7 @@ sub set_footer {
     # Replace the Excel placeholder &[Picture] with the internal &G.
     $string =~ s/&\[Picture\]/&G/g;
 
-    if ( length $string > 255 ) {
+    if ( _utf16_len( $string ) > 255 ) {
         carp "Footer string cannot be longer than Excel's " .
              "limit of 255 characters";
         return;
@@ -2112,6 +2118,20 @@ sub set_zoom {
 
 ###############################################################################
 #
+# set_zoom_to_fit()
+#
+# Set the worksheet zoom  to selection/fit. Only works for chartsheets.
+#
+sub set_zoom_to_fit {
+
+    my $self = shift;
+
+    $self->{_zoom_to_fit} = 1;
+}
+
+
+###############################################################################
+#
 # set_print_scale($scale)
 #
 # Set the scale factor for the printed page.
@@ -2258,7 +2278,8 @@ sub set_start_page {
     my $self = shift;
     return unless defined $_[0];
 
-    $self->{_page_start}   = $_[0];
+    $self->{_page_start}         = $_[0];
+    $self->{_page_setup_changed} = 1;
 }
 
 
@@ -2606,9 +2627,12 @@ sub write_string {
     # Check that row and col are valid and store max and min values
     return -2 if $self->_check_dimensions( $row, $col );
 
-    # Check that the string is < 32767 chars
-    if ( length $str > $self->{_xls_strmax} ) {
-        $str = substr( $str, 0, $self->{_xls_strmax} );
+    # Check that the string is < 32767 UTF-16 units. A string can't exceed
+    # the limit if it is less than half of it, so skip the slower check.
+    if (   length $str > $self->{_xls_strmax} / 2
+        && _utf16_len( $str ) > $self->{_xls_strmax} )
+    {
+        $str = _utf16_truncate( $str, $self->{_xls_strmax} );
         $str_error = -3;
     }
 
@@ -2757,7 +2781,7 @@ sub write_rich_string {
     }
 
     # Check that the string is < 32767 chars.
-    if ( length $raw_string > $self->{_xls_strmax} ) {
+    if ( _utf16_len( $raw_string ) > $self->{_xls_strmax} ) {
         return -3;
     }
 
@@ -3393,8 +3417,8 @@ sub write_url {
 
     # Check that the string is < 32767 chars
     my $str_error = 0;
-    if ( length $str > $self->{_xls_strmax} ) {
-        $str = substr( $str, 0, $self->{_xls_strmax} );
+    if ( _utf16_len( $str ) > $self->{_xls_strmax} ) {
+        $str = _utf16_truncate( $str, $self->{_xls_strmax} );
         $str_error = -3;
     }
 
@@ -3429,10 +3453,19 @@ sub write_url {
     my $tmp_url_str = $url_str || '';
     my $max_url     = $self->{_max_url_length};
 
-    if ( length $url > $max_url || length $tmp_url_str > $max_url ) {
+    if (   _utf16_len( $url ) > $max_url
+        || _utf16_len( $tmp_url_str ) > $max_url )
+    {
         carp "Ignoring URL '$url' where link or anchor > $max_url characters "
           . "since it exceeds Excel's limit for URLS. See LIMITATIONS "
           . "section of the Excel::Writer::XLSX documentation.";
+        return -4;
+    }
+
+    # Excel limits the tool tip to 255 characters.
+    if ( defined $tip && _utf16_len( $tip ) > 255 ) {
+        carp "Ignoring URL '$url' since the tool tip exceeds Excel's limit "
+          . "of 255 characters.";
         return -4;
     }
 
@@ -4156,28 +4189,28 @@ sub data_validation {
     }
 
     # Check that the input title doesn't exceed the maximum length.
-    if ( $param->{input_title} and length $param->{input_title} > 32 ) {
+    if ( $param->{input_title} and _utf16_len( $param->{input_title} ) > 32 ) {
         carp "Length of input title '$param->{input_title}'"
           . " exceeds Excel's limit of 32";
         return -3;
     }
 
     # Check that the error title don't exceed the maximum length.
-    if ( $param->{error_title} and length $param->{error_title} > 32 ) {
+    if ( $param->{error_title} and _utf16_len( $param->{error_title} ) > 32 ) {
         carp "Length of error title '$param->{error_title}'"
           . " exceeds Excel's limit of 32";
         return -3;
     }
 
     # Check that the input message don't exceed the maximum length.
-    if ( $param->{input_message} and length $param->{input_message} > 255 ) {
+    if ( $param->{input_message} and _utf16_len( $param->{input_message} ) > 255 ) {
         carp "Length of input message '$param->{input_message}'"
           . " exceeds Excel's limit of 255";
         return -3;
     }
 
     # Check that the error message don't exceed the maximum length.
-    if ( $param->{error_message} and length $param->{error_message} > 255 ) {
+    if ( $param->{error_message} and _utf16_len( $param->{error_message} ) > 255 ) {
         carp "Length of error message '$param->{error_message}'"
           . " exceeds Excel's limit of 255";
         return -3;
@@ -4189,7 +4222,7 @@ sub data_validation {
         if ( ref $param->{value} eq 'ARRAY' ) {
 
             my $formula = join ',', @{ $param->{value} };
-            if ( length $formula > 255 ) {
+            if ( _utf16_len( $formula ) > 255 ) {
                 carp "Length of list items '$formula' exceeds Excel's "
                   . "limit of 255, use a formula range instead";
                 return -3;
@@ -4779,6 +4812,10 @@ sub conditional_formatting {
     $param->{mid_value} =~ s/^=// if defined $param->{mid_value};
     $param->{max_value} =~ s/^=// if defined $param->{max_value};
 
+    # Store the order that the ranges are added in.
+    push @{ $self->{_cond_formats_order} }, $range
+      unless exists $self->{_cond_formats}->{$range};
+
     # Store the validation information until we close the worksheet.
     push @{ $self->{_cond_formats}->{$range} }, $param;
 }
@@ -4948,6 +4985,8 @@ sub add_table {
         name           => 1,
         style          => 1,
         total_row      => 1,
+        description    => 1,
+        title          => 1,
     );
 
     # Check for valid input parameters.
@@ -4979,15 +5018,23 @@ sub add_table {
     $table{_show_col_stripes} = $param->{banded_columns} ? 1 : 0;
     $table{_header_row_count} = $param->{header_row}     ? 1 : 0;
     $table{_totals_row_shown} = $param->{total_row}      ? 1 : 0;
-
+    $table{_description}      = $param->{description};
+    $table{_title}            = $param->{title};
 
     # Set the table name.
     if ( defined $param->{name} ) {
         my $name = $param->{name};
 
-        # Warn if the name contains invalid chars as defined by Excel help.
-        if ( $name !~ m/^[\w\\][\w\\.]*$/ || $name =~ m/^\d/ ) {
+        # Warn if the name contains invalid chars as defined by Excel.
+        if ( _has_invalid_name_chars( $name ) ) {
             carp "Invalid character in name '$name' used in add_table()";
+            return -3;
+        }
+
+        # Warn if the name exceeds Excel's maximum length.
+        if ( _utf16_len( $name ) > 255 ) {
+            carp "Name '$name' in add_table() exceeds Excel's limit of 255 "
+              . "characters";
             return -3;
         }
 
@@ -6718,10 +6765,14 @@ sub _prepare_image {
         }
 
         my $max_url = $self->{_max_url_length};
-        if ( length $target > $max_url ) {
+        if ( _utf16_len( $target ) > $max_url ) {
             carp "Ignoring URL '$url' where link or anchor > $max_url characters "
               . "since it exceeds Excel's limit for URLS. See LIMITATIONS "
               . "section of the Excel::Writer::XLSX documentation.";
+        }
+        elsif ( defined $tip && _utf16_len( $tip ) > 255 ) {
+            carp "Ignoring URL '$url' since the tool tip exceeds Excel's "
+              . "limit of 255 characters.";
         }
         else {
             if ( $target && !exists $self->{_drawing_rels}->{$url} ) {
@@ -7290,8 +7341,8 @@ sub _comment_params {
     # Limit the string to the max number of chars.
     my $max_len = 32767;
 
-    if ( length( $string ) > $max_len ) {
-        $string = substr( $string, 0, $max_len );
+    if ( _utf16_len( $string ) > $max_len ) {
+        $string = _utf16_truncate( $string, $max_len );
     }
 
 
@@ -7842,6 +7893,7 @@ sub _write_sheet_view {
     my $tab_selected     = $self->{_selected};
     my $view             = $self->{_page_view} || 0;
     my $zoom             = $self->{_zoom};
+    my $zoom_to_fit      = $self->{_zoom_to_fit};
     my $row_col_headers  = $self->{_hide_row_col_headers};
     my $top_left_cell    = $self->{_top_left_cell};
     my $workbook_view_id = 0;
@@ -7907,6 +7959,12 @@ sub _write_sheet_view {
     }
 
     push @attributes, ( 'workbookViewId' => $workbook_view_id );
+
+    if ( $self->{_is_chartsheet} ) {
+        if ( $zoom_to_fit ) {
+            push @attributes, ( 'zoomToFit' => 1 );
+        }
+    }
 
     if ( @{ $self->{_panes} } || @{ $self->{_selections} } ) {
         $self->xml_start_tag( 'sheetView', @attributes );
@@ -10204,12 +10262,10 @@ sub _write_formula_2 {
 #
 sub _write_conditional_formats {
 
-    my $self   = shift;
-    my @ranges = sort keys %{ $self->{_cond_formats} };
+    my $self = shift;
 
-    return unless scalar @ranges;
-
-    for my $range ( @ranges ) {
+    # Write the ranges in the order that they were added in.
+    for my $range ( @{ $self->{_cond_formats_order} } ) {
         $self->_write_conditional_formatting( $range,
             $self->{_cond_formats}->{$range} );
     }

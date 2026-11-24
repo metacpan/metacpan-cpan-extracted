@@ -1,0 +1,1151 @@
+package Google::Cloud::Documentai::V1beta3::DocumentService;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Documentai::V1beta3::Dataset };
+    eval { require Google::Cloud::Documentai::V1beta3::Document };
+    eval { require Google::Cloud::Documentai::V1beta3::DocumentIo };
+    eval { require Google::Cloud::Documentai::V1beta3::OperationMetadata };
+    eval { require Google::Longrunning::Operations };
+    eval { require Google::Protobuf::FieldMask };
+    eval { require Google::Rpc::Status };
+    my $descriptor_b64 = <<'EOF';
+CjZnb29nbGUvY2xvdWQvZG9jdW1lbnRhaS92MWJldGEzL2RvY3VtZW50X3NlcnZpY2UucHJv
+dG8SH2dvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMaHGdvb2dsZS9hcGkvYW5ub3Rh
+dGlvbnMucHJvdG8aF2dvb2dsZS9hcGkvY2xpZW50LnByb3RvGh9nb29nbGUvYXBpL2ZpZWxk
+X2JlaGF2aW9yLnByb3RvGhlnb29nbGUvYXBpL3Jlc291cmNlLnByb3RvGi1nb29nbGUvY2xv
+dWQvZG9jdW1lbnRhaS92MWJldGEzL2RhdGFzZXQucHJvdG8aLmdvb2dsZS9jbG91ZC9kb2N1
+bWVudGFpL3YxYmV0YTMvZG9jdW1lbnQucHJvdG8aMWdvb2dsZS9jbG91ZC9kb2N1bWVudGFp
+L3YxYmV0YTMvZG9jdW1lbnRfaW8ucHJvdG8aOGdvb2dsZS9jbG91ZC9kb2N1bWVudGFpL3Yx
+YmV0YTMvb3BlcmF0aW9uX21ldGFkYXRhLnByb3RvGiNnb29nbGUvbG9uZ3J1bm5pbmcvb3Bl
+cmF0aW9ucy5wcm90bxogZ29vZ2xlL3Byb3RvYnVmL2ZpZWxkX21hc2sucHJvdG8aF2dvb2ds
+ZS9ycGMvc3RhdHVzLnByb3RvIpwBChRVcGRhdGVEYXRhc2V0UmVxdWVzdBJHCgdkYXRhc2V0
+GAEgASgLMiguZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5EYXRhc2V0QgPgQQJS
+B2RhdGFzZXQSOwoLdXBkYXRlX21hc2sYAiABKAsyGi5nb29nbGUucHJvdG9idWYuRmllbGRN
+YXNrUgp1cGRhdGVNYXNrIoMBCh5VcGRhdGVEYXRhc2V0T3BlcmF0aW9uTWV0YWRhdGESYQoP
+Y29tbW9uX21ldGFkYXRhGAEgASgLMjguZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRh
+My5Db21tb25PcGVyYXRpb25NZXRhZGF0YVIOY29tbW9uTWV0YWRhdGEi9gUKFkltcG9ydERv
+Y3VtZW50c1JlcXVlc3QSQwoHZGF0YXNldBgBIAEoCUIp4EEC+kEjCiFkb2N1bWVudGFpLmdv
+b2dsZWFwaXMuY29tL0RhdGFzZXRSB2RhdGFzZXQSnAEKHmJhdGNoX2RvY3VtZW50c19pbXBv
+cnRfY29uZmlncxgEIAMoCzJSLmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuSW1w
+b3J0RG9jdW1lbnRzUmVxdWVzdC5CYXRjaERvY3VtZW50c0ltcG9ydENvbmZpZ0ID4EECUhti
+YXRjaERvY3VtZW50c0ltcG9ydENvbmZpZ3Ma9wMKGkJhdGNoRG9jdW1lbnRzSW1wb3J0Q29u
+ZmlnElgKDWRhdGFzZXRfc3BsaXQYAiABKA4yMS5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52
+MWJldGEzLkRhdGFzZXRTcGxpdFR5cGVIAFIMZGF0YXNldFNwbGl0EpABChFhdXRvX3NwbGl0
+X2NvbmZpZxgDIAEoCzJiLmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuSW1wb3J0
+RG9jdW1lbnRzUmVxdWVzdC5CYXRjaERvY3VtZW50c0ltcG9ydENvbmZpZy5BdXRvU3BsaXRD
+b25maWdIAFIPYXV0b1NwbGl0Q29uZmlnEmgKEmJhdGNoX2lucHV0X2NvbmZpZxgBIAEoCzI6
+Lmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuQmF0Y2hEb2N1bWVudHNJbnB1dENv
+bmZpZ1IQYmF0Y2hJbnB1dENvbmZpZxIoCg1kb2N1bWVudF90eXBlGAYgASgJQgPgQQFSDGRv
+Y3VtZW50VHlwZRpDCg9BdXRvU3BsaXRDb25maWcSMAoUdHJhaW5pbmdfc3BsaXRfcmF0aW8Y
+ASABKAJSEnRyYWluaW5nU3BsaXRSYXRpb0ITChFzcGxpdF90eXBlX2NvbmZpZyIZChdJbXBv
+cnREb2N1bWVudHNSZXNwb25zZSKhBgoXSW1wb3J0RG9jdW1lbnRzTWV0YWRhdGESYQoPY29t
+bW9uX21ldGFkYXRhGAEgASgLMjguZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5D
+b21tb25PcGVyYXRpb25NZXRhZGF0YVIOY29tbW9uTWV0YWRhdGESjQEKGmluZGl2aWR1YWxf
+aW1wb3J0X3N0YXR1c2VzGAIgAygLMk8uZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRh
+My5JbXBvcnREb2N1bWVudHNNZXRhZGF0YS5JbmRpdmlkdWFsSW1wb3J0U3RhdHVzUhhpbmRp
+dmlkdWFsSW1wb3J0U3RhdHVzZXMSngEKIGltcG9ydF9jb25maWdfdmFsaWRhdGlvbl9yZXN1
+bHRzGAQgAygLMlUuZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5JbXBvcnREb2N1
+bWVudHNNZXRhZGF0YS5JbXBvcnRDb25maWdWYWxpZGF0aW9uUmVzdWx0Uh1pbXBvcnRDb25m
+aWdWYWxpZGF0aW9uUmVzdWx0cxIwChR0b3RhbF9kb2N1bWVudF9jb3VudBgDIAEoBVISdG90
+YWxEb2N1bWVudENvdW50GskBChZJbmRpdmlkdWFsSW1wb3J0U3RhdHVzEigKEGlucHV0X2dj
+c19zb3VyY2UYASABKAlSDmlucHV0R2NzU291cmNlEioKBnN0YXR1cxgCIAEoCzISLmdvb2ds
+ZS5ycGMuU3RhdHVzUgZzdGF0dXMSWQoSb3V0cHV0X2RvY3VtZW50X2lkGAQgASgLMisuZ29v
+Z2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5Eb2N1bWVudElkUhBvdXRwdXREb2N1bWVu
+dElkGnQKHEltcG9ydENvbmZpZ1ZhbGlkYXRpb25SZXN1bHQSKAoQaW5wdXRfZ2NzX3NvdXJj
+ZRgBIAEoCVIOaW5wdXRHY3NTb3VyY2USKgoGc3RhdHVzGAIgASgLMhIuZ29vZ2xlLnJwYy5T
+dGF0dXNSBnN0YXR1cyK4AgoSR2V0RG9jdW1lbnRSZXF1ZXN0EkMKB2RhdGFzZXQYASABKAlC
+KeBBAvpBIwohZG9jdW1lbnRhaS5nb29nbGVhcGlzLmNvbS9EYXRhc2V0UgdkYXRhc2V0ElEK
+C2RvY3VtZW50X2lkGAIgASgLMisuZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5E
+b2N1bWVudElkQgPgQQJSCmRvY3VtZW50SWQSNwoJcmVhZF9tYXNrGAMgASgLMhouZ29vZ2xl
+LnByb3RvYnVmLkZpZWxkTWFza1IIcmVhZE1hc2sSUQoKcGFnZV9yYW5nZRgEIAEoCzIyLmdv
+b2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuRG9jdW1lbnRQYWdlUmFuZ2VSCXBhZ2VS
+YW5nZSJcChNHZXREb2N1bWVudFJlc3BvbnNlEkUKCGRvY3VtZW50GAEgASgLMikuZ29vZ2xl
+LmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5Eb2N1bWVudFIIZG9jdW1lbnQi/gEKFExpc3RE
+b2N1bWVudHNSZXF1ZXN0EkMKB2RhdGFzZXQYASABKAlCKeBBAvpBIwohZG9jdW1lbnRhaS5n
+b29nbGVhcGlzLmNvbS9EYXRhc2V0UgdkYXRhc2V0EhsKCXBhZ2Vfc2l6ZRgCIAEoBVIIcGFn
+ZVNpemUSHQoKcGFnZV90b2tlbhgDIAEoCVIJcGFnZVRva2VuEhsKBmZpbHRlchgEIAEoCUID
+4EEBUgZmaWx0ZXISLwoRcmV0dXJuX3RvdGFsX3NpemUYBiABKAhCA+BBAVIPcmV0dXJuVG90
+YWxTaXplEhcKBHNraXAYCCABKAVCA+BBAVIEc2tpcCK+AQoVTGlzdERvY3VtZW50c1Jlc3Bv
+bnNlEl4KEWRvY3VtZW50X21ldGFkYXRhGAEgAygLMjEuZ29vZ2xlLmNsb3VkLmRvY3VtZW50
+YWkudjFiZXRhMy5Eb2N1bWVudE1ldGFkYXRhUhBkb2N1bWVudE1ldGFkYXRhEiYKD25leHRf
+cGFnZV90b2tlbhgCIAEoCVINbmV4dFBhZ2VUb2tlbhIdCgp0b3RhbF9zaXplGAMgASgFUgl0
+b3RhbFNpemUipgEKG0JhdGNoRGVsZXRlRG9jdW1lbnRzUmVxdWVzdBIdCgdkYXRhc2V0GAEg
+ASgJQgPgQQJSB2RhdGFzZXQSaAoRZGF0YXNldF9kb2N1bWVudHMYAyABKAsyNi5nb29nbGUu
+Y2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkJhdGNoRGF0YXNldERvY3VtZW50c0ID4EECUhBk
+YXRhc2V0RG9jdW1lbnRzIh4KHEJhdGNoRGVsZXRlRG9jdW1lbnRzUmVzcG9uc2UipAQKHEJh
+dGNoRGVsZXRlRG9jdW1lbnRzTWV0YWRhdGESYQoPY29tbW9uX21ldGFkYXRhGAEgASgLMjgu
+Z29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5Db21tb25PcGVyYXRpb25NZXRhZGF0
+YVIOY29tbW9uTWV0YWRhdGESogEKIGluZGl2aWR1YWxfYmF0Y2hfZGVsZXRlX3N0YXR1c2Vz
+GAIgAygLMlkuZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5CYXRjaERlbGV0ZURv
+Y3VtZW50c01ldGFkYXRhLkluZGl2aWR1YWxCYXRjaERlbGV0ZVN0YXR1c1IdaW5kaXZpZHVh
+bEJhdGNoRGVsZXRlU3RhdHVzZXMSMAoUdG90YWxfZG9jdW1lbnRfY291bnQYAyABKAVSEnRv
+dGFsRG9jdW1lbnRDb3VudBIwChRlcnJvcl9kb2N1bWVudF9jb3VudBgEIAEoBVISZXJyb3JE
+b2N1bWVudENvdW50GpcBChtJbmRpdmlkdWFsQmF0Y2hEZWxldGVTdGF0dXMSTAoLZG9jdW1l
+bnRfaWQYASABKAsyKy5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkRvY3VtZW50
+SWRSCmRvY3VtZW50SWQSKgoGc3RhdHVzGAIgASgLMhIuZ29vZ2xlLnJwYy5TdGF0dXNSBnN0
+YXR1cyKOAQoXR2V0RGF0YXNldFNjaGVtYVJlcXVlc3QSQwoEbmFtZRgBIAEoCUIv4EEC+kEp
+Cidkb2N1bWVudGFpLmdvb2dsZWFwaXMuY29tL0RhdGFzZXRTY2hlbWFSBG5hbWUSLgoTdmlz
+aWJsZV9maWVsZHNfb25seRgCIAEoCFIRdmlzaWJsZUZpZWxkc09ubHkitQEKGlVwZGF0ZURh
+dGFzZXRTY2hlbWFSZXF1ZXN0EloKDmRhdGFzZXRfc2NoZW1hGAEgASgLMi4uZ29vZ2xlLmNs
+b3VkLmRvY3VtZW50YWkudjFiZXRhMy5EYXRhc2V0U2NoZW1hQgPgQQJSDWRhdGFzZXRTY2hl
+bWESOwoLdXBkYXRlX21hc2sYAiABKAsyGi5nb29nbGUucHJvdG9idWYuRmllbGRNYXNrUgp1
+cGRhdGVNYXNrIjsKEURvY3VtZW50UGFnZVJhbmdlEhQKBXN0YXJ0GAEgASgFUgVzdGFydBIQ
+CgNlbmQYAiABKAVSA2VuZCLXAgoQRG9jdW1lbnRNZXRhZGF0YRJMCgtkb2N1bWVudF9pZBgB
+IAEoCzIrLmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuRG9jdW1lbnRJZFIKZG9j
+dW1lbnRJZBIdCgpwYWdlX2NvdW50GAIgASgFUglwYWdlQ291bnQSVAoMZGF0YXNldF90eXBl
+GAMgASgOMjEuZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5EYXRhc2V0U3BsaXRU
+eXBlUgtkYXRhc2V0VHlwZRJdCg5sYWJlbGluZ19zdGF0ZRgFIAEoDjI2Lmdvb2dsZS5jbG91
+ZC5kb2N1bWVudGFpLnYxYmV0YTMuRG9jdW1lbnRMYWJlbGluZ1N0YXRlUg1sYWJlbGluZ1N0
+YXRlEiEKDGRpc3BsYXlfbmFtZRgGIAEoCVILZGlzcGxheU5hbWUqhQEKEERhdGFzZXRTcGxp
+dFR5cGUSIgoeREFUQVNFVF9TUExJVF9UWVBFX1VOU1BFQ0lGSUVEEAASFwoTREFUQVNFVF9T
+UExJVF9UUkFJThABEhYKEkRBVEFTRVRfU1BMSVRfVEVTVBACEhwKGERBVEFTRVRfU1BMSVRf
+VU5BU1NJR05FRBADKokBChVEb2N1bWVudExhYmVsaW5nU3RhdGUSJwojRE9DVU1FTlRfTEFC
+RUxJTkdfU1RBVEVfVU5TUEVDSUZJRUQQABIUChBET0NVTUVOVF9MQUJFTEVEEAESFgoSRE9D
+VU1FTlRfVU5MQUJFTEVEEAISGQoVRE9DVU1FTlRfQVVUT19MQUJFTEVEEAMysw4KD0RvY3Vt
+ZW50U2VydmljZRL+AQoNVXBkYXRlRGF0YXNldBI1Lmdvb2dsZS5jbG91ZC5kb2N1bWVudGFp
+LnYxYmV0YTMuVXBkYXRlRGF0YXNldFJlcXVlc3QaHS5nb29nbGUubG9uZ3J1bm5pbmcuT3Bl
+cmF0aW9uIpYBgtPkkwJOMkMvdjFiZXRhMy97ZGF0YXNldC5uYW1lPXByb2plY3RzLyovbG9j
+YXRpb25zLyovcHJvY2Vzc29ycy8qL2RhdGFzZXR9OgdkYXRhc2V02kETZGF0YXNldCx1cGRh
+dGVfbWFza8pBKQoHRGF0YXNldBIeVXBkYXRlRGF0YXNldE9wZXJhdGlvbk1ldGFkYXRhEoQC
+Cg9JbXBvcnREb2N1bWVudHMSNy5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLklt
+cG9ydERvY3VtZW50c1JlcXVlc3QaHS5nb29nbGUubG9uZ3J1bm5pbmcuT3BlcmF0aW9uIpgB
+gtPkkwJTIk4vdjFiZXRhMy97ZGF0YXNldD1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL3Byb2Nl
+c3NvcnMvKi9kYXRhc2V0fTppbXBvcnREb2N1bWVudHM6ASraQQdkYXRhc2V0ykEyChdJbXBv
+cnREb2N1bWVudHNSZXNwb25zZRIXSW1wb3J0RG9jdW1lbnRzTWV0YWRhdGES1gEKC0dldERv
+Y3VtZW50EjMuZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5HZXREb2N1bWVudFJl
+cXVlc3QaNC5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkdldERvY3VtZW50UmVz
+cG9uc2UiXILT5JMCTBJKL3YxYmV0YTMve2RhdGFzZXQ9cHJvamVjdHMvKi9sb2NhdGlvbnMv
+Ki9wcm9jZXNzb3JzLyovZGF0YXNldH06Z2V0RG9jdW1lbnTaQQdkYXRhc2V0EuEBCg1MaXN0
+RG9jdW1lbnRzEjUuZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5MaXN0RG9jdW1l
+bnRzUmVxdWVzdBo2Lmdvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuTGlzdERvY3Vt
+ZW50c1Jlc3BvbnNlImGC0+STAlEiTC92MWJldGEzL3tkYXRhc2V0PXByb2plY3RzLyovbG9j
+YXRpb25zLyovcHJvY2Vzc29ycy8qL2RhdGFzZXR9Omxpc3REb2N1bWVudHM6ASraQQdkYXRh
+c2V0Ep0CChRCYXRjaERlbGV0ZURvY3VtZW50cxI8Lmdvb2dsZS5jbG91ZC5kb2N1bWVudGFp
+LnYxYmV0YTMuQmF0Y2hEZWxldGVEb2N1bWVudHNSZXF1ZXN0Gh0uZ29vZ2xlLmxvbmdydW5u
+aW5nLk9wZXJhdGlvbiKnAYLT5JMCWCJTL3YxYmV0YTMve2RhdGFzZXQ9cHJvamVjdHMvKi9s
+b2NhdGlvbnMvKi9wcm9jZXNzb3JzLyovZGF0YXNldH06YmF0Y2hEZWxldGVEb2N1bWVudHM6
+ASraQQdkYXRhc2V0ykE8ChxCYXRjaERlbGV0ZURvY3VtZW50c1Jlc3BvbnNlEhxCYXRjaERl
+bGV0ZURvY3VtZW50c01ldGFkYXRhEtYBChBHZXREYXRhc2V0U2NoZW1hEjguZ29vZ2xlLmNs
+b3VkLmRvY3VtZW50YWkudjFiZXRhMy5HZXREYXRhc2V0U2NoZW1hUmVxdWVzdBouLmdvb2ds
+ZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuRGF0YXNldFNjaGVtYSJYgtPkkwJLEkkvdjFi
+ZXRhMy97bmFtZT1wcm9qZWN0cy8qL2xvY2F0aW9ucy8qL3Byb2Nlc3NvcnMvKi9kYXRhc2V0
+L2RhdGFzZXRTY2hlbWF92kEEbmFtZRKSAgoTVXBkYXRlRGF0YXNldFNjaGVtYRI7Lmdvb2ds
+ZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuVXBkYXRlRGF0YXNldFNjaGVtYVJlcXVlc3Qa
+Li5nb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkRhdGFzZXRTY2hlbWEijQGC0+ST
+AmoyWC92MWJldGEzL3tkYXRhc2V0X3NjaGVtYS5uYW1lPXByb2plY3RzLyovbG9jYXRpb25z
+LyovcHJvY2Vzc29ycy8qL2RhdGFzZXQvZGF0YXNldFNjaGVtYX06DmRhdGFzZXRfc2NoZW1h
+2kEaZGF0YXNldF9zY2hlbWEsdXBkYXRlX21hc2saTcpBGWRvY3VtZW50YWkuZ29vZ2xlYXBp
+cy5jb23SQS5odHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9hdXRoL2Nsb3VkLXBsYXRmb3Jt
+QvABCiNjb20uZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhM0IZRG9jdW1lbnRBaURv
+Y3VtZW50U2VydmljZVABWkNjbG91ZC5nb29nbGUuY29tL2dvL2RvY3VtZW50YWkvYXBpdjFi
+ZXRhMy9kb2N1bWVudGFpcGI7ZG9jdW1lbnRhaXBiqgIfR29vZ2xlLkNsb3VkLkRvY3VtZW50
+QUkuVjFCZXRhM8oCH0dvb2dsZVxDbG91ZFxEb2N1bWVudEFJXFYxYmV0YTPqAiJHb29nbGU6
+OkNsb3VkOjpEb2N1bWVudEFJOjpWMWJldGEzSuBvCgcSBQ4AxwMBCrwECgEMEgMOABIysQQg
+Q29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUg
+TGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNl
+IHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91
+IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cu
+YXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBh
+cHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3Ry
+aWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIg
+QkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwg
+ZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNw
+ZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25z
+IHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAoCgkKAgMAEgMSACYKCQoCAwESAxMAIQoJ
+CgIDAhIDFAApCgkKAgMDEgMVACMKCQoCAwQSAxYANwoJCgIDBRIDFwA4CgkKAgMGEgMYADsK
+CQoCAwcSAxkAQgoJCgIDCBIDGgAtCgkKAgMJEgMbACoKCQoCAwoSAxwAIQoICgEIEgMeADwK
+CQoCCCUSAx4APAoICgEIEgMfAFoKCQoCCAsSAx8AWgoICgEIEgMgACIKCQoCCAoSAyAAIgoI
+CgEIEgMhADoKCQoCCAgSAyEAOgoICgEIEgMiADwKCQoCCAESAyIAPAoICgEIEgMjADwKCQoC
+CCkSAyMAPAoICgEIEgMkADsKCQoCCC0SAyQAOwpXCgIGABIEJwB8ARpLIFNlcnZpY2UgdG8g
+Y2FsbCBDbG91ZCBEb2N1bWVudEFJIHRvIG1hbmFnZSBkb2N1bWVudCBjb2xsZWN0aW9uIChk
+YXRhc2V0KS4KCgoKAwYAARIDJwgXCgoKAwYAAxIDKAJBCgwKBQYAA5kIEgMoAkEKCwoDBgAD
+EgQpAio3Cg0KBQYAA5oIEgQpAio3CscCCgQGAAIAEgQyAj0DGrgCIFVwZGF0ZXMgbWV0YWRh
+dGEgYXNzb2NpYXRlZCB3aXRoIGEgZGF0YXNldC4KIE5vdGUgdGhhdCB0aGlzIG1ldGhvZCBy
+ZXF1aXJlcyB0aGUKIGBkb2N1bWVudGFpLmdvb2dsZWFwaXMuY29tL2RhdGFzZXRzLnVwZGF0
+ZWAgcGVybWlzc2lvbiBvbiB0aGUgcHJvamVjdCwKIHdoaWNoIGlzIGhpZ2hseSBwcml2aWxl
+Z2VkLiBBIHVzZXIgb3Igc2VydmljZSBhY2NvdW50IHdpdGggdGhpcyBwZXJtaXNzaW9uCiBj
+YW4gY3JlYXRlIG5ldyBwcm9jZXNzb3JzIHRoYXQgY2FuIGludGVyYWN0IHdpdGggYW55IGdj
+cyBidWNrZXQgaW4geW91cgogcHJvamVjdC4KCgwKBQYAAgABEgMyBhMKDAoFBgACAAISAzIU
+KAoMCgUGAAIAAxIDMw8rCg0KBQYAAgAEEgQ0BDcGChEKCQYAAgAEsMq8IhIENAQ3BgoMCgUG
+AAIABBIDOARBCg8KCAYAAgAEmwgAEgM4BEEKDQoFBgACAAQSBDkEPAYKDwoHBgACAASZCBIE
+OQQ8BgowCgQGAAIBEgRAAksDGiIgSW1wb3J0IGRvY3VtZW50cyBpbnRvIGEgZGF0YXNldC4K
+CgwKBQYAAgEBEgNABhUKDAoFBgACAQISA0AWLAoMCgUGAAIBAxIDQQ8rCg0KBQYAAgEEEgRC
+BEUGChEKCQYAAgEEsMq8IhIEQgRFBgoMCgUGAAIBBBIDRgQ1Cg8KCAYAAgEEmwgAEgNGBDUK
+DQoFBgACAQQSBEcESgYKDwoHBgACAQSZCBIERwRKBgpKCgQGAAICEgROAlMDGjwgUmV0dXJu
+cyByZWxldmFudCBmaWVsZHMgcHJlc2VudCBpbiB0aGUgcmVxdWVzdGVkIGRvY3VtZW50LgoK
+DAoFBgACAgESA04GEQoMCgUGAAICAhIDThIkCgwKBQYAAgIDEgNOL0IKDQoFBgACAgQSBE8E
+UQYKEQoJBgACAgSwyrwiEgRPBFEGCgwKBQYAAgIEEgNSBDUKDwoIBgACAgSbCAASA1IENQpD
+CgQGAAIDEgRWAlwDGjUgUmV0dXJucyBhIGxpc3Qgb2YgZG9jdW1lbnRzIHByZXNlbnQgaW4g
+dGhlIGRhdGFzZXQuCgoMCgUGAAIDARIDVgYTCgwKBQYAAgMCEgNWFCgKDAoFBgACAwMSA1Yz
+SAoNCgUGAAIDBBIEVwRaBgoRCgkGAAIDBLDKvCISBFcEWgYKDAoFBgACAwQSA1sENQoPCggG
+AAIDBJsIABIDWwQ1CisKBAYAAgQSBF8CagMaHSBEZWxldGVzIGEgc2V0IG9mIGRvY3VtZW50
+cy4KCgwKBQYAAgQBEgNfBhoKDAoFBgACBAISA18bNgoMCgUGAAIEAxIDYA8rCg0KBQYAAgQE
+EgRhBGQGChEKCQYAAgQEsMq8IhIEYQRkBgoMCgUGAAIEBBIDZQQ1Cg8KCAYAAgQEmwgAEgNl
+BDUKDQoFBgACBAQSBGYEaQYKDwoHBgACBASZCBIEZgRpBgo4CgQGAAIFEgRtAnIDGiogR2V0
+cyB0aGUgYERhdGFzZXRTY2hlbWFgIG9mIGEgYERhdGFzZXRgLgoKDAoFBgACBQESA20GFgoM
+CgUGAAIFAhIDbRcuCgwKBQYAAgUDEgNtOUYKDQoFBgACBQQSBG4EcAYKEQoJBgACBQSwyrwi
+EgRuBHAGCgwKBQYAAgUEEgNxBDIKDwoIBgACBQSbCAASA3EEMgoqCgQGAAIGEgR1AnsDGhwg
+VXBkYXRlcyBhIGBEYXRhc2V0U2NoZW1hYC4KCgwKBQYAAgYBEgN1BhkKDAoFBgACBgISA3Ua
+NAoMCgUGAAIGAxIDdT9MCg0KBQYAAgYEEgR2BHkGChEKCQYAAgYEsMq8IhIEdgR5BgoMCgUG
+AAIGBBIDegRICg8KCAYAAgYEmwgAEgN6BEgKeQoCBQASBoABAIwBARprIERvY3VtZW50cyBi
+ZWxvbmdpbmcgdG8gYSBkYXRhc2V0IHdpbGwgYmUgc3BsaXQgaW50byBkaWZmZXJlbnQgZ3Jv
+dXBzCiByZWZlcnJlZCB0byBhcyBzcGxpdHM6IHRyYWluLCB0ZXN0LgoKCwoDBQABEgSAAQUV
+CjUKBAUAAgASBIIBAiUaJyBEZWZhdWx0IHZhbHVlIGlmIHRoZSBlbnVtIGlzIG5vdCBzZXQu
+CgoNCgUFAAIAARIEggECIAoNCgUFAAIAAhIEggEjJAovCgQFAAIBEgSFAQIaGiEgSWRlbnRp
+ZmllcyB0aGUgdHJhaW4gZG9jdW1lbnRzLgoKDQoFBQACAQESBIUBAhUKDQoFBQACAQISBIUB
+GBkKLgoEBQACAhIEiAECGRogIElkZW50aWZpZXMgdGhlIHRlc3QgZG9jdW1lbnRzLgoKDQoF
+BQACAgESBIgBAhQKDQoFBQACAgISBIgBFxgKNAoEBQACAxIEiwECHxomIElkZW50aWZpZXMg
+dGhlIHVuYXNzaWduZWQgZG9jdW1lbnRzLgoKDQoFBQACAwESBIsBAhoKDQoFBQACAwISBIsB
+HR4KPAoCBQESBo8BAJsBARouIERlc2NyaWJlcyB0aGUgbGFiZWxpbmcgc3RhdHVzIG9mIGEg
+ZG9jdW1lbnQuCgoLCgMFAQESBI8BBRoKNQoEBQECABIEkQECKhonIERlZmF1bHQgdmFsdWUg
+aWYgdGhlIGVudW0gaXMgbm90IHNldC4KCg0KBQUBAgABEgSRAQIlCg0KBQUBAgACEgSRASgp
+CioKBAUBAgESBJQBAhcaHCBEb2N1bWVudCBoYXMgYmVlbiBsYWJlbGVkLgoKDQoFBQECAQES
+BJQBAhIKDQoFBQECAQISBJQBFRYKLgoEBQECAhIElwECGRogIERvY3VtZW50IGhhcyBub3Qg
+YmVlbiBsYWJlbGVkLgoKDQoFBQECAgESBJcBAhQKDQoFBQECAgISBJcBFxgKLwoEBQECAxIE
+mgECHBohIERvY3VtZW50IGhhcyBiZWVuIGF1dG8tbGFiZWxlZC4KCg0KBQUBAgMBEgSaAQIX
+Cg0KBQUBAgMCEgSaARobCgwKAgQAEgadAQCkAQEKCwoDBAABEgSdAQgcCmwKBAQAAgASBKAB
+Aj8aXiBSZXF1aXJlZC4gVGhlIGBuYW1lYCBmaWVsZCBvZiB0aGUgYERhdGFzZXRgIGlzIHVz
+ZWQgdG8gaWRlbnRpZnkgdGhlCiByZXNvdXJjZSB0byBiZSB1cGRhdGVkLgoKDQoFBAACAAYS
+BKABAgkKDQoFBAACAAESBKABChEKDQoFBAACAAMSBKABFBUKDQoFBAACAAgSBKABFj4KEAoI
+BAACAAicCAASBKABFz0KOAoEBAACARIEowECLBoqIFRoZSB1cGRhdGUgbWFzayBhcHBsaWVz
+IHRvIHRoZSByZXNvdXJjZS4KCg0KBQQAAgEGEgSjAQIbCg0KBQQAAgEBEgSjARwnCg0KBQQA
+AgEDEgSjASorCgwKAgQBEgamAQCpAQEKCwoDBAEBEgSmAQgmCkEKBAQBAgASBKgBAi4aMyBU
+aGUgYmFzaWMgbWV0YWRhdGEgb2YgdGhlIGxvbmctcnVubmluZyBvcGVyYXRpb24uCgoNCgUE
+AQIABhIEqAECGQoNCgUEAQIAARIEqAEaKQoNCgUEAQIAAxIEqAEsLQoMCgIEAhIGqwEA1wEB
+CgsKAwQCARIEqwEIHgpiCgQEAgMAEgauAQLHAQMaUiBDb25maWcgZm9yIGltcG9ydGluZyBk
+b2N1bWVudHMuCiBFYWNoIGJhdGNoIGNhbiBoYXZlIGl0cyBvd24gZGF0YXNldCBzcGxpdCB0
+eXBlLgoKDQoFBAIDAAESBK4BCiQKLgoGBAIDAAMAEgawAQSzAQUaHCBUaGUgY29uZmlnIGZv
+ciBhdXRvLXNwbGl0LgoKDwoHBAIDAAMAARIEsAEMGwo0CggEAgMAAwACABIEsgEGJRoiIFJh
+dGlvIG9mIHRyYWluaW5nIGRhdGFzZXQgc3BsaXQuCgoRCgkEAgMAAwACAAUSBLIBBgsKEQoJ
+BAIDAAMAAgABEgSyAQwgChEKCQQCAwADAAIAAxIEsgEjJAoQCgYEAgMACAASBrUBBLwBBQoP
+CgcEAgMACAABEgS1AQobCkoKBgQCAwACABIEtwEGKRo6IFRhcmdldCBkYXRhc2V0IHNwbGl0
+IHdoZXJlIHRoZSBkb2N1bWVudHMgbXVzdCBiZSBzdG9yZWQuCgoPCgcEAgMAAgAGEgS3AQYW
+Cg8KBwQCAwACAAESBLcBFyQKDwoHBAIDAAIAAxIEtwEnKAqAAQoGBAIDAAIBEgS7AQYsGnAg
+SWYgc2V0LCBkb2N1bWVudHMgd2lsbCBiZSBhdXRvbWF0aWNhbGx5IHNwbGl0IGludG8gdHJh
+aW5pbmcgYW5kIHRlc3QKIHNwbGl0IGNhdGVnb3J5IHdpdGggdGhlIHNwZWNpZmllZCByYXRp
+by4KCg8KBwQCAwACAQYSBLsBBhUKDwoHBAIDAAIBARIEuwEWJwoPCgcEAgMAAgEDEgS7ASor
+ClAKBgQCAwACAhIEvwEENRpAIFRoZSBjb21tb24gY29uZmlnIHRvIHNwZWNpZnkgYSBzZXQg
+b2YgZG9jdW1lbnRzIHVzZWQgYXMgaW5wdXQuCgoPCgcEAgMAAgIGEgS/AQQdCg8KBwQCAwAC
+AgESBL8BHjAKDwoHBAIDAAICAxIEvwEzNArdAgoGBAIDAAIDEgTGAQRGGswCIE9wdGlvbmFs
+LiBJZiBzZXQsIGRldGVybWluZXMgdGhlIHR5cGUgb2YgdGhlIGRvY3VtZW50cyB0byBiZSBp
+bXBvcnRlZCBpbgogdGhpcyBiYXRjaC4gSXQgY2FuIGJlIHVzZWQgdG8gYXV0by1sYWJlbCB0
+aGUgZG9jdW1lbnRzIHdpdGggYSBzaW5nbGUKIGVudGl0eSBvZiB0aGUgcHJvdmlkZWQgdHlw
+ZS4gVGhpcyBmaWVsZCBjYW4gb25seSBiZSB1c2VkIHdpdGggYQogY2xhc3NpZmllciBvciBz
+cGxpdHRlciBwcm9jZXNzb3IuIFByb3ZpZGluZyB0aGlzIGZpZWxkIGlzIG11dHVhbGx5CiBl
+eGNsdXNpdmUgd2l0aCBgZW50aXRpZXNgIGFuZCBgYXV0b19sYWJlbGluZ19jb25maWdgLgoK
+DwoHBAIDAAIDBRIExgEECgoPCgcEAgMAAgMBEgTGAQsYCg8KBwQCAwACAwMSBMYBGxwKDwoH
+BAIDAAIDCBIExgEdRQoSCgoEAgMAAgMInAgAEgTGAR5ECocBCgQEAgIAEgbMAQLRAQQadyBS
+ZXF1aXJlZC4gVGhlIGRhdGFzZXQgcmVzb3VyY2UgbmFtZS4KIEZvcm1hdDoKIHByb2plY3Rz
+L3twcm9qZWN0fS9sb2NhdGlvbnMve2xvY2F0aW9ufS9wcm9jZXNzb3JzL3twcm9jZXNzb3J9
+L2RhdGFzZXQKCg0KBQQCAgAFEgTMAQIICg0KBQQCAgABEgTMAQkQCg0KBQQCAgADEgTMARMU
+Cg8KBQQCAgAIEgbMARXRAQMKEAoIBAICAAicCAASBM0BBCoKEQoHBAICAAifCBIGzgEE0AEF
+CmIKBAQCAgESBtUBAtYBLxpSIFJlcXVpcmVkLiBUaGUgQ2xvdWQgU3RvcmFnZSB1cmkgY29u
+dGFpbmluZyByYXcgZG9jdW1lbnRzIHRoYXQgbXVzdCBiZQogaW1wb3J0ZWQuCgoNCgUEAgIB
+BBIE1QECCgoNCgUEAgIBBhIE1QELJQoNCgUEAgIBARIE1QEmRAoNCgUEAgIBAxIE1QFHSAoN
+CgUEAgIBCBIE1gEGLgoQCggEAgIBCJwIABIE1gEHLQo4CgIEAxIE2gEAIhosIFJlc3BvbnNl
+IG9mIHRoZSBpbXBvcnQgZG9jdW1lbnQgb3BlcmF0aW9uLgoKCwoDBAMBEgTaAQgfCjoKAgQE
+EgbdAQCBAgEaLCBNZXRhZGF0YSBvZiB0aGUgaW1wb3J0IGRvY3VtZW50IG9wZXJhdGlvbi4K
+CgsKAwQEARIE3QEIHwpPCgQEBAMAEgbfAQLpAQMaPyBUaGUgc3RhdHVzIG9mIGVhY2ggaW5k
+aXZpZHVhbCBkb2N1bWVudCBpbiB0aGUgaW1wb3J0IHByb2Nlc3MuCgoNCgUEBAMAARIE3wEK
+IAo/CgYEBAMAAgASBOEBBCAaLyBUaGUgc291cmNlIENsb3VkIFN0b3JhZ2UgVVJJIG9mIHRo
+ZSBkb2N1bWVudC4KCg8KBwQEAwACAAUSBOEBBAoKDwoHBAQDAAIAARIE4QELGwoPCgcEBAMA
+AgADEgThAR4fCj4KBgQEAwACARIE5AEEIRouIFRoZSBzdGF0dXMgb2YgdGhlIGltcG9ydGlu
+ZyBvZiB0aGUgZG9jdW1lbnQuCgoPCgcEBAMAAgEGEgTkAQQVCg8KBwQEAwACAQESBOQBFhwK
+DwoHBAQDAAIBAxIE5AEfIApeCgYEBAMAAgISBOgBBCYaTiBUaGUgZG9jdW1lbnQgaWQgb2Yg
+aW1wb3J0ZWQgZG9jdW1lbnQgaWYgaXQgd2FzIHN1Y2Nlc3NmdWwsIG90aGVyd2lzZQogZW1w
+dHkuCgoPCgcEBAMAAgIGEgToAQQOCg8KBwQEAwACAgESBOgBDyEKDwoHBAQDAAICAxIE6AEk
+JQrgAQoEBAQDARIG7gEC9AEDGs8BIFRoZSB2YWxpZGF0aW9uIHN0YXR1cyBvZiBlYWNoIGlt
+cG9ydCBjb25maWcuIFN0YXR1cyBpcyBzZXQgdG8gYW4gZXJyb3IgaWYKIHRoZXJlIGFyZSBu
+byBkb2N1bWVudHMgdG8gaW1wb3J0IGluIHRoZSBgaW1wb3J0X2NvbmZpZ2AsIG9yIGBPS2Ag
+aWYgdGhlCiBvcGVyYXRpb24gd2lsbCB0cnkgdG8gcHJvY2VlZCB3aXRoIGF0IGxlYXN0IG9u
+ZSBkb2N1bWVudC4KCg0KBQQEAwEBEgTuAQomCk4KBgQEAwECABIE8AEEIBo+IFRoZSBzb3Vy
+Y2UgQ2xvdWQgU3RvcmFnZSBVUkkgc3BlY2lmaWVkIGluIHRoZSBpbXBvcnQgY29uZmlnLgoK
+DwoHBAQDAQIABRIE8AEECgoPCgcEBAMBAgABEgTwAQsbCg8KBwQEAwECAAMSBPABHh8KOQoG
+BAQDAQIBEgTzAQQhGikgVGhlIHZhbGlkYXRpb24gc3RhdHVzIG9mIGltcG9ydCBjb25maWcu
+CgoPCgcEBAMBAgEGEgTzAQQVCg8KBwQEAwECAQESBPMBFhwKDwoHBAQDAQIBAxIE8wEfIApB
+CgQEBAIAEgT3AQIuGjMgVGhlIGJhc2ljIG1ldGFkYXRhIG9mIHRoZSBsb25nLXJ1bm5pbmcg
+b3BlcmF0aW9uLgoKDQoFBAQCAAYSBPcBAhkKDQoFBAQCAAESBPcBGikKDQoFBAQCAAMSBPcB
+LC0KPgoEBAQCARIE+gECQRowIFRoZSBsaXN0IG9mIHJlc3BvbnNlIGRldGFpbHMgb2YgZWFj
+aCBkb2N1bWVudC4KCg0KBQQEAgEEEgT6AQIKCg0KBQQEAgEGEgT6AQshCg0KBQQEAgEBEgT6
+ASI8Cg0KBQQEAgEDEgT6AT9ACkkKBAQEAgISBP0BAk0aOyBWYWxpZGF0aW9uIHN0YXR1c2Vz
+IG9mIHRoZSBiYXRjaCBkb2N1bWVudHMgaW1wb3J0IGNvbmZpZy4KCg0KBQQEAgIEEgT9AQIK
+Cg0KBQQEAgIGEgT9AQsnCg0KBQQEAgIBEgT9AShICg0KBQQEAgIDEgT9AUtMCk8KBAQEAgMS
+BIACAiEaQSBUb3RhbCBudW1iZXIgb2YgdGhlIGRvY3VtZW50cyB0aGF0IGFyZSBxdWFsaWZp
+ZWQgZm9yIGltcG9ydGluZy4KCg0KBQQEAgMFEgSAAgIHCg0KBQQEAgMBEgSAAggcCg0KBQQE
+AgMDEgSAAh8gCgwKAgQFEgaDAgCYAgEKCwoDBAUBEgSDAggaCq0BCgQEBQIAEgaHAgKMAgQa
+nAEgUmVxdWlyZWQuIFRoZSByZXNvdXJjZSBuYW1lIG9mIHRoZSBkYXRhc2V0IHRoYXQgdGhl
+IGRvY3VtZW50IGJlbG9uZ3MgdG8gLgogRm9ybWF0OgogcHJvamVjdHMve3Byb2plY3R9L2xv
+Y2F0aW9ucy97bG9jYXRpb259L3Byb2Nlc3NvcnMve3Byb2Nlc3Nvcn0vZGF0YXNldAoKDQoF
+BAUCAAUSBIcCAggKDQoFBAUCAAESBIcCCRAKDQoFBAUCAAMSBIcCExQKDwoFBAUCAAgSBocC
+FYwCAwoQCggEBQIACJwIABIEiAIEKgoRCgcEBQIACJ8IEgaJAgSLAgUKLgoEBAUCARIEjwIC
+RhogIFJlcXVpcmVkLiBEb2N1bWVudCBpZGVudGlmaWVyLgoKDQoFBAUCAQYSBI8CAgwKDQoF
+BAUCAQESBI8CDRgKDQoFBAUCAQMSBI8CGxwKDQoFBAUCAQgSBI8CHUUKEAoIBAUCAQicCAAS
+BI8CHkQKdQoEBAUCAhIEkwICKhpnIElmIHNldCwgb25seSBmaWVsZHMgbGlzdGVkIGhlcmUg
+d2lsbCBiZSByZXR1cm5lZC4gT3RoZXJ3aXNlLCBhbGwgZmllbGRzCiB3aWxsIGJlIHJldHVy
+bmVkIGJ5IGRlZmF1bHQuCgoNCgUEBQICBhIEkwICGwoNCgUEBQICARIEkwIcJQoNCgUEBQIC
+AxIEkwIoKQpgCgQEBQIDEgSXAgIjGlIgTGlzdCBvZiBwYWdlcyBmb3Igd2hpY2ggdGhlIGZp
+ZWxkcyBzcGVjaWZpZWQgaW4gdGhlIGByZWFkX21hc2tgIG11c3QKIGJlIHNlcnZlZC4KCg0K
+BQQFAgMGEgSXAgITCg0KBQQFAgMBEgSXAhQeCg0KBQQFAgMDEgSXAiEiCgwKAgQGEgaaAgCc
+AgEKCwoDBAYBEgSaAggbCgwKBAQGAgASBJsCAhgKDQoFBAYCAAYSBJsCAgoKDQoFBAYCAAES
+BJsCCxMKDQoFBAYCAAMSBJsCFhcKDAoCBAcSBp4CANwCAQoLCgMEBwESBJ4CCBwKnAEKBAQH
+AgASBqICAqcCBBqLASBSZXF1aXJlZC4gVGhlIHJlc291cmNlIG5hbWUgb2YgdGhlIGRhdGFz
+ZXQgdG8gYmUgbGlzdGVkLgogRm9ybWF0OgogcHJvamVjdHMve3Byb2plY3R9L2xvY2F0aW9u
+cy97bG9jYXRpb259L3Byb2Nlc3NvcnMve3Byb2Nlc3Nvcn0vZGF0YXNldAoKDQoFBAcCAAUS
+BKICAggKDQoFBAcCAAESBKICCRAKDQoFBAcCAAMSBKICExQKDwoFBAcCAAgSBqICFacCAwoQ
+CggEBwIACJwIABIEowIEKgoRCgcEBwIACJ8IEgakAgSmAgUK5gEKBAQHAgESBK0CAhYa1wEg
+VGhlIG1heGltdW0gbnVtYmVyIG9mIGRvY3VtZW50cyB0byByZXR1cm4uIFRoZSBzZXJ2aWNl
+IG1heSByZXR1cm4KIGZld2VyIHRoYW4gdGhpcyB2YWx1ZS4KIElmIHVuc3BlY2lmaWVkLCBh
+dCBtb3N0IDIwIGRvY3VtZW50cyB3aWxsIGJlIHJldHVybmVkLgogVGhlIG1heGltdW0gdmFs
+dWUgaXMgMTAwOyB2YWx1ZXMgYWJvdmUgMTAwIHdpbGwgYmUgY29lcmNlZCB0byAxMDAuCgoN
+CgUEBwIBBRIErQICBwoNCgUEBwIBARIErQIIEQoNCgUEBwIBAxIErQIUFQrzAQoEBAcCAhIE
+tAICGBrkASBBIHBhZ2UgdG9rZW4sIHJlY2VpdmVkIGZyb20gYSBwcmV2aW91cyBgTGlzdERv
+Y3VtZW50c2AgY2FsbC4KIFByb3ZpZGUgdGhpcyB0byByZXRyaWV2ZSB0aGUgc3Vic2VxdWVu
+dCBwYWdlLgoKIFdoZW4gcGFnaW5hdGluZywgYWxsIG90aGVyIHBhcmFtZXRlcnMgcHJvdmlk
+ZWQgdG8gYExpc3REb2N1bWVudHNgCiBtdXN0IG1hdGNoIHRoZSBjYWxsIHRoYXQgcHJvdmlk
+ZWQgdGhlIHBhZ2UgdG9rZW4uCgoNCgUEBwICBRIEtAICCAoNCgUEBwICARIEtAIJEwoNCgUE
+BwICAxIEtAIWFwrzBQoEBAcCAxIExwICPRrkBSBPcHRpb25hbC4gUXVlcnkgdG8gZmlsdGVy
+IHRoZSBkb2N1bWVudHMgYmFzZWQgb24KIGh0dHBzOi8vZ29vZ2xlLmFpcC5kZXYvMTYwLgog
+IyMgQ3VycmVudGx5IHN1cHBvcnQgcXVlcnkgc3RyaW5ncyBhcmU6CgogYFNwbGl0VHlwZT1E
+QVRBU0VUX1NQTElUX1RFU1R8REFUQVNFVF9TUExJVF9UUkFJTnxEQVRBU0VUX1NQTElUX1VO
+QVNTSUdORURgCiAtIGBMYWJlbGluZ1N0YXRlPURPQ1VNRU5UX0xBQkVMRUR8RE9DVU1FTlRf
+VU5MQUJFTEVEfERPQ1VNRU5UX0FVVE9fTEFCRUxFRGAKIC0gYERpc3BsYXlOYW1lPVwiZmls
+ZV9uYW1lLnBkZlwiYAogLSBgRW50aXR5VHlwZT1hYmMvZGVmYAogLSBgVGFnTmFtZT1cImF1
+dG8tbGFiZWxpbmctcnVubmluZ1wifFwic2FtcGxlZFwiYAoKIE5vdGU6CiAtIE9ubHkgYEFO
+RGAsIGA9YCBhbmQgYCE9YCBhcmUgc3VwcG9ydGVkLgogICAgIGUuZy4gYERpc3BsYXlOYW1l
+PWZpbGVfbmFtZSBBTkQgRW50aXR5VHlwZSE9YWJjYCBJUyBzdXBwb3J0ZWQuCiAtIFdpbGRj
+YXJkIGAqYCBpcyBzdXBwb3J0ZWQgb25seSBpbiBgRGlzcGxheU5hbWVgIGZpbHRlcgogLSBO
+byBkdXBsaWNhdGUgZmlsdGVyIGtleXMgYXJlIGFsbG93ZWQsCiAgICAgZS5nLiBgRW50aXR5
+VHlwZT1hIEFORCBFbnRpdHlUeXBlPWJgIGlzIE5PVCBzdXBwb3J0ZWQuCiAtIFN0cmluZyBt
+YXRjaCBpcyBjYXNlIHNlbnNpdGl2ZSAoZm9yIGZpbHRlciBgRGlzcGxheU5hbWVgICYgYEVu
+dGl0eVR5cGVgKS4KCg0KBQQHAgMFEgTHAgIICg0KBQQHAgMBEgTHAgkPCg0KBQQHAgMDEgTH
+AhITCg0KBQQHAgMIEgTHAhQ8ChAKCAQHAgMInAgAEgTHAhU7CpYCCgQEBwIEEgTQAgJGGocC
+IE9wdGlvbmFsLiBDb250cm9scyBpZiB0aGUgcmVxdWVzdCByZXF1aXJlcyBhIHRvdGFsIHNp
+emUgb2YgbWF0Y2hlZAogZG9jdW1lbnRzLiBTZWUKIFtMaXN0RG9jdW1lbnRzUmVzcG9uc2Uu
+dG90YWxfc2l6ZV1bZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFiZXRhMy5MaXN0RG9jdW1l
+bnRzUmVzcG9uc2UudG90YWxfc2l6ZV0uCgogRW5hYmxpbmcgdGhpcyBmbGFnIG1heSBhZHZl
+cnNlbHkgaW1wYWN0IHBlcmZvcm1hbmNlLgoKIERlZmF1bHRzIHRvIGZhbHNlLgoKDQoFBAcC
+BAUSBNACAgYKDQoFBAcCBAESBNACBxgKDQoFBAcCBAMSBNACGxwKDQoFBAcCBAgSBNACHUUK
+EAoIBAcCBAicCAASBNACHkQKxAQKBAQHAgUSBNsCAjoatQQgT3B0aW9uYWwuIE51bWJlciBv
+ZiByZXN1bHRzIHRvIHNraXAgYmVnaW5uaW5nIGZyb20gdGhlIGBwYWdlX3Rva2VuYCBpZgog
+cHJvdmlkZWQuIGh0dHBzOi8vZ29vZ2xlLmFpcC5kZXYvMTU4I3NraXBwaW5nLXJlc3VsdHMu
+IEl0IG11c3QgYmUgYQogbm9uLW5lZ2F0aXZlIGludGVnZXIuIE5lZ2F0aXZlIHZhbHVlcyB3
+aWxsIGJlIHJlamVjdGVkLiBOb3RlIHRoYXQgdGhpcyBpcwogbm90IHRoZSBudW1iZXIgb2Yg
+cGFnZXMgdG8gc2tpcC4gSWYgdGhpcyB2YWx1ZSBjYXVzZXMgdGhlIGN1cnNvciB0byBtb3Zl
+CiBwYXN0IHRoZSBlbmQgb2YgcmVzdWx0cywKIFtMaXN0RG9jdW1lbnRzUmVzcG9uc2UuZG9j
+dW1lbnRfbWV0YWRhdGFdW2dvb2dsZS5jbG91ZC5kb2N1bWVudGFpLnYxYmV0YTMuTGlzdERv
+Y3VtZW50c1Jlc3BvbnNlLmRvY3VtZW50X21ldGFkYXRhXQogYW5kCiBbTGlzdERvY3VtZW50
+c1Jlc3BvbnNlLm5leHRfcGFnZV90b2tlbl1bZ29vZ2xlLmNsb3VkLmRvY3VtZW50YWkudjFi
+ZXRhMy5MaXN0RG9jdW1lbnRzUmVzcG9uc2UubmV4dF9wYWdlX3Rva2VuXQogd2lsbCBiZSBl
+bXB0eS4KCg0KBQQHAgUFEgTbAgIHCg0KBQQHAgUBEgTbAggMCg0KBQQHAgUDEgTbAg8QCg0K
+BQQHAgUIEgTbAhE5ChAKCAQHAgUInAgAEgTbAhI4CgwKAgQIEgbeAgDqAgEKCwoDBAgBEgTe
+AggdCkgKBAQIAgASBOACAjIaOiBEb2N1bWVudCBtZXRhZGF0YSBjb3JyZXNwb25kaW5nIHRv
+IHRoZSBsaXN0ZWQgZG9jdW1lbnRzLgoKDQoFBAgCAAQSBOACAgoKDQoFBAgCAAYSBOACCxsK
+DQoFBAgCAAESBOACHC0KDQoFBAgCAAMSBOACMDEK6AEKBAQIAgESBOYCAh0a2QEgQSB0b2tl
+biwgd2hpY2ggY2FuIGJlIHNlbnQgYXMKIFtMaXN0RG9jdW1lbnRzUmVxdWVzdC5wYWdlX3Rv
+a2VuXVtnb29nbGUuY2xvdWQuZG9jdW1lbnRhaS52MWJldGEzLkxpc3REb2N1bWVudHNSZXF1
+ZXN0LnBhZ2VfdG9rZW5dCiB0byByZXRyaWV2ZSB0aGUgbmV4dCBwYWdlLiBJZiB0aGlzIGZp
+ZWxkIGlzIG9taXR0ZWQsIHRoZXJlIGFyZSBubwogc3Vic2VxdWVudCBwYWdlcy4KCg0KBQQI
+AgEFEgTmAgIICg0KBQQIAgEBEgTmAgkYCg0KBQQIAgEDEgTmAhscCjEKBAQIAgISBOkCAhca
+IyBUb3RhbCBjb3VudCBvZiBkb2N1bWVudHMgcXVlcmllZC4KCg0KBQQIAgIFEgTpAgIHCg0K
+BQQIAgIBEgTpAggSCg0KBQQIAgIDEgTpAhUWCgwKAgQJEgbsAgD4AgEKCwoDBAkBEgTsAggj
+CoUBCgQECQIAEgTwAgI+GncgUmVxdWlyZWQuIFRoZSBkYXRhc2V0IHJlc291cmNlIG5hbWUu
+CiBGb3JtYXQ6CiBwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25zL3tsb2NhdGlvbn0vcHJv
+Y2Vzc29ycy97cHJvY2Vzc29yfS9kYXRhc2V0CgoNCgUECQIABRIE8AICCAoNCgUECQIAARIE
+8AIJEAoNCgUECQIAAxIE8AITFAoNCgUECQIACBIE8AIVPQoQCggECQIACJwIABIE8AIWPAqT
+AgoEBAkCARIG9gIC9wIvGoICIFJlcXVpcmVkLiBEYXRhc2V0IGRvY3VtZW50cyBpbnB1dC4g
+SWYgZ2l2ZW4gYGZpbHRlcmAsIGFsbCBkb2N1bWVudHMKIHNhdGlzZnlpbmcgdGhlIGZpbHRl
+ciB3aWxsIGJlIGRlbGV0ZWQuIElmIGdpdmVuIGRvY3VtZW50SWRzLCBhIG1heGltdW0gb2YK
+IDUwIGRvY3VtZW50cyBjYW4gYmUgZGVsZXRlZCBpbiBhIGJhdGNoLiBUaGUgcmVxdWVzdCB3
+aWxsIGJlIHJlamVjdGVkIGlmCiBtb3JlIHRoYW4gNTAgZG9jdW1lbnRfaWRzIGFyZSBwcm92
+aWRlZC4KCg0KBQQJAgEGEgT2AgIXCg0KBQQJAgEBEgT2AhgpCg0KBQQJAgEDEgT2AiwtCg0K
+BQQJAgEIEgT3AgYuChAKCAQJAgEInAgAEgT3AgctCjkKAgQKEgT7AgAnGi0gUmVzcG9uc2Ug
+b2YgdGhlIGRlbGV0ZSBkb2N1bWVudHMgb3BlcmF0aW9uLgoKCwoDBAoBEgT7AggkCgwKAgQL
+Egb9AgCSAwEKCwoDBAsBEgT9AggkClUKBAQLAwASBv8CAoUDAxpFIFRoZSBzdGF0dXMgb2Yg
+ZWFjaCBpbmRpdmlkdWFsIGRvY3VtZW50IGluIHRoZSBiYXRjaCBkZWxldGUgcHJvY2Vzcy4K
+Cg0KBQQLAwABEgT/AgolCjIKBgQLAwACABIEgQMEHxoiIFRoZSBkb2N1bWVudCBpZCBvZiB0
+aGUgZG9jdW1lbnQuCgoPCgcECwMAAgAGEgSBAwQOCg8KBwQLAwACAAESBIEDDxoKDwoHBAsD
+AAIAAxIEgQMdHgpBCgYECwMAAgESBIQDBCEaMSBUaGUgc3RhdHVzIG9mIGRlbGV0aW5nIHRo
+ZSBkb2N1bWVudCBpbiBzdG9yYWdlLgoKDwoHBAsDAAIBBhIEhAMEFQoPCgcECwMAAgEBEgSE
+AxYcCg8KBwQLAwACAQMSBIQDHyAKQQoEBAsCABIEiAMCLhozIFRoZSBiYXNpYyBtZXRhZGF0
+YSBvZiB0aGUgbG9uZy1ydW5uaW5nIG9wZXJhdGlvbi4KCg0KBQQLAgAGEgSIAwIZCg0KBQQL
+AgABEgSIAxopCg0KBQQLAgADEgSIAywtCj4KBAQLAgESBIsDAkwaMCBUaGUgbGlzdCBvZiBy
+ZXNwb25zZSBkZXRhaWxzIG9mIGVhY2ggZG9jdW1lbnQuCgoNCgUECwIBBBIEiwMCCgoNCgUE
+CwIBBhIEiwMLJgoNCgUECwIBARIEiwMnRwoNCgUECwIBAxIEiwNKSwpACgQECwICEgSOAwIh
+GjIgVG90YWwgbnVtYmVyIG9mIGRvY3VtZW50cyBkZWxldGluZyBmcm9tIGRhdGFzZXQuCgoN
+CgUECwICBRIEjgMCBwoNCgUECwICARIEjgMIHAoNCgUECwICAxIEjgMfIApPCgQECwIDEgSR
+AwIhGkEgVG90YWwgbnVtYmVyIG9mIGRvY3VtZW50cyB0aGF0IGZhaWxlZCB0byBiZSBkZWxl
+dGVkIGluIHN0b3JhZ2UuCgoNCgUECwIDBRIEkQMCBwoNCgUECwIDARIEkQMIHAoNCgUECwID
+AxIEkQMfIAovCgIEDBIGlQMAogMBGiEgUmVxdWVzdCBmb3IgYEdldERhdGFzZXRTY2hlbWFg
+LgoKCwoDBAwBEgSVAwgfCp0BCgQEDAIAEgaZAwKeAwQajAEgUmVxdWlyZWQuIFRoZSBkYXRh
+c2V0IHNjaGVtYSByZXNvdXJjZSBuYW1lLgogRm9ybWF0OgogcHJvamVjdHMve3Byb2plY3R9
+L2xvY2F0aW9ucy97bG9jYXRpb259L3Byb2Nlc3NvcnMve3Byb2Nlc3Nvcn0vZGF0YXNldC9k
+YXRhc2V0U2NoZW1hCgoNCgUEDAIABRIEmQMCCAoNCgUEDAIAARIEmQMJDQoNCgUEDAIAAxIE
+mQMQEQoPCgUEDAIACBIGmQMSngMDChAKCAQMAgAInAgAEgSaAwQqChEKBwQMAgAInwgSBpsD
+BJ0DBQpGCgQEDAIBEgShAwIfGjggSWYgc2V0LCBvbmx5IHJldHVybnMgdGhlIHZpc2libGUg
+ZmllbGRzIG9mIHRoZSBzY2hlbWEuCgoNCgUEDAIBBRIEoQMCBgoNCgUEDAIBARIEoQMHGgoN
+CgUEDAIBAxIEoQMdHgoyCgIEDRIGpQMArAMBGiQgUmVxdWVzdCBmb3IgYFVwZGF0ZURhdGFz
+ZXRTY2hlbWFgLgoKCwoDBA0BEgSlAwgiCnAKBAQNAgASBKgDAkwaYiBSZXF1aXJlZC4gVGhl
+IG5hbWUgZmllbGQgb2YgdGhlIGBEYXRhc2V0U2NoZW1hYCBpcyB1c2VkIHRvIGlkZW50aWZ5
+IHRoZQogcmVzb3VyY2UgdG8gYmUgdXBkYXRlZC4KCg0KBQQNAgAGEgSoAwIPCg0KBQQNAgAB
+EgSoAxAeCg0KBQQNAgADEgSoAyEiCg0KBQQNAgAIEgSoAyNLChAKCAQNAgAInAgAEgSoAyRK
+CjgKBAQNAgESBKsDAiwaKiBUaGUgdXBkYXRlIG1hc2sgYXBwbGllcyB0byB0aGUgcmVzb3Vy
+Y2UuCgoNCgUEDQIBBhIEqwMCGwoNCgUEDQIBARIEqwMcJwoNCgUEDQIBAxIEqwMqKwo1CgIE
+DhIGrwMAtQMBGicgUmFuZ2Ugb2YgcGFnZXMgcHJlc2VudCBpbiBhIGRvY3VtZW50LgoKCwoD
+BA4BEgSvAwgZCkMKBAQOAgASBLEDAhIaNSBGaXJzdCBwYWdlIG51bWJlciAob25lLWJhc2Vk
+IGluZGV4KSB0byBiZSByZXR1cm5lZC4KCg0KBQQOAgAFEgSxAwIHCg0KBQQOAgABEgSxAwgN
+Cg0KBQQOAgADEgSxAxARCkIKBAQOAgESBLQDAhAaNCBMYXN0IHBhZ2UgbnVtYmVyIChvbmUt
+YmFzZWQgaW5kZXgpIHRvIGJlIHJldHVybmVkLgoKDQoFBA4CAQUSBLQDAgcKDQoFBA4CAQES
+BLQDCAsKDQoFBA4CAQMSBLQDDg8KKgoCBA8SBrgDAMcDARocIE1ldGFkYXRhIGFib3V0IGEg
+ZG9jdW1lbnQuCgoLCgMEDwESBLgDCBgKJAoEBA8CABIEugMCHRoWIERvY3VtZW50IGlkZW50
+aWZpZXIuCgoNCgUEDwIABhIEugMCDAoNCgUEDwIAARIEugMNGAoNCgUEDwIAAxIEugMbHAow
+CgQEDwIBEgS9AwIXGiIgTnVtYmVyIG9mIHBhZ2VzIGluIHRoZSBkb2N1bWVudC4KCg0KBQQP
+AgEFEgS9AwIHCg0KBQQPAgEBEgS9AwgSCg0KBQQPAgEDEgS9AxUWCkgKBAQPAgISBMADAiQa
+OiBUeXBlIG9mIHRoZSBkYXRhc2V0IHNwbGl0IHRvIHdoaWNoIHRoZSBkb2N1bWVudCBiZWxv
+bmdzLgoKDQoFBA8CAgYSBMADAhIKDQoFBA8CAgESBMADEx8KDQoFBA8CAgMSBMADIiMKLwoE
+BA8CAxIEwwMCKxohIExhYmVsaW5nIHN0YXRlIG9mIHRoZSBkb2N1bWVudC4KCg0KBQQPAgMG
+EgTDAwIXCg0KBQQPAgMBEgTDAxgmCg0KBQQPAgMDEgTDAykqCjEKBAQPAgQSBMYDAhoaIyBU
+aGUgZGlzcGxheSBuYW1lIG9mIHRoZSBkb2N1bWVudC4KCg0KBQQPAgQFEgTGAwIICg0KBQQP
+AgQBEgTGAwkVCg0KBQQPAgQDEgTGAxgZYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetRequest ===
+    # Fields for UpdateDatasetRequest
+    # Field: dataset Type: 11 (.google.cloud.documentai.v1beta3.Dataset)
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetOperationMetadata ===
+    # Fields for UpdateDatasetOperationMetadata
+    # Field: common_metadata Type: 11 (.google.cloud.documentai.v1beta3.CommonOperationMetadata)
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsRequest ===
+    # Fields for ImportDocumentsRequest
+    # Field: dataset Type: 9 ()
+    # Field: batch_documents_import_configs Type: 11 (.google.cloud.documentai.v1beta3.ImportDocumentsRequest.BatchDocumentsImportConfig)
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsResponse ===
+    # Fields for ImportDocumentsResponse
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsMetadata ===
+    # Fields for ImportDocumentsMetadata
+    # Field: common_metadata Type: 11 (.google.cloud.documentai.v1beta3.CommonOperationMetadata)
+    # Field: individual_import_statuses Type: 11 (.google.cloud.documentai.v1beta3.ImportDocumentsMetadata.IndividualImportStatus)
+    # Field: import_config_validation_results Type: 11 (.google.cloud.documentai.v1beta3.ImportDocumentsMetadata.ImportConfigValidationResult)
+    # Field: total_document_count Type: 5 ()
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::GetDocumentRequest ===
+    # Fields for GetDocumentRequest
+    # Field: dataset Type: 9 ()
+    # Field: document_id Type: 11 (.google.cloud.documentai.v1beta3.DocumentId)
+    # Field: read_mask Type: 11 (.google.protobuf.FieldMask)
+    # Field: page_range Type: 11 (.google.cloud.documentai.v1beta3.DocumentPageRange)
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::GetDocumentResponse ===
+    # Fields for GetDocumentResponse
+    # Field: document Type: 11 (.google.cloud.documentai.v1beta3.Document)
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::ListDocumentsRequest ===
+    # Fields for ListDocumentsRequest
+    # Field: dataset Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: return_total_size Type: 8 ()
+    # Field: skip Type: 5 ()
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::ListDocumentsResponse ===
+    # Fields for ListDocumentsResponse
+    # Field: document_metadata Type: 11 (.google.cloud.documentai.v1beta3.DocumentMetadata)
+    # Field: next_page_token Type: 9 ()
+    # Field: total_size Type: 5 ()
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::BatchDeleteDocumentsRequest ===
+    # Fields for BatchDeleteDocumentsRequest
+    # Field: dataset Type: 9 ()
+    # Field: dataset_documents Type: 11 (.google.cloud.documentai.v1beta3.BatchDatasetDocuments)
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::BatchDeleteDocumentsResponse ===
+    # Fields for BatchDeleteDocumentsResponse
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::BatchDeleteDocumentsMetadata ===
+    # Fields for BatchDeleteDocumentsMetadata
+    # Field: common_metadata Type: 11 (.google.cloud.documentai.v1beta3.CommonOperationMetadata)
+    # Field: individual_batch_delete_statuses Type: 11 (.google.cloud.documentai.v1beta3.BatchDeleteDocumentsMetadata.IndividualBatchDeleteStatus)
+    # Field: total_document_count Type: 5 ()
+    # Field: error_document_count Type: 5 ()
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::GetDatasetSchemaRequest ===
+    # Fields for GetDatasetSchemaRequest
+    # Field: name Type: 9 ()
+    # Field: visible_fields_only Type: 8 ()
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetSchemaRequest ===
+    # Fields for UpdateDatasetSchemaRequest
+    # Field: dataset_schema Type: 11 (.google.cloud.documentai.v1beta3.DatasetSchema)
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::DocumentPageRange ===
+    # Fields for DocumentPageRange
+    # Field: start Type: 5 ()
+    # Field: end Type: 5 ()
+
+# === Message: Google::Cloud::Documentai::V1beta3::DocumentService::DocumentMetadata ===
+    # Fields for DocumentMetadata
+    # Field: document_id Type: 11 (.google.cloud.documentai.v1beta3.DocumentId)
+    # Field: page_count Type: 5 ()
+    # Field: dataset_type Type: 14 (.google.cloud.documentai.v1beta3.DatasetSplitType)
+    # Field: labeling_state Type: 14 (.google.cloud.documentai.v1beta3.DocumentLabelingState)
+    # Field: display_name Type: 9 ()
+
+# === Service Client: Google::Cloud::Documentai::V1beta3::DocumentService::DocumentServiceClient ===
+package Google::Cloud::Documentai::V1beta3::DocumentService::DocumentServiceClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Documentai::V1beta3::DocumentService::DocumentServiceClient
+
+Client stub representing the remote C<DocumentService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<documentai.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'documentai.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub update_dataset {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.documentai.v1beta3.DocumentService',
+        method         => 'UpdateDataset',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub import_documents {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.documentai.v1beta3.DocumentService',
+        method         => 'ImportDocuments',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub get_document {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Documentai::V1beta3::DocumentService::GetDocumentRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.documentai.v1beta3.DocumentService',
+        method         => 'GetDocument',
+        request        => $req,
+        response_class => 'Google::Cloud::Documentai::V1beta3::DocumentService::GetDocumentResponse',
+    });
+}
+
+sub list_documents {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Documentai::V1beta3::DocumentService::ListDocumentsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.documentai.v1beta3.DocumentService',
+        method         => 'ListDocuments',
+        request        => $req,
+        response_class => 'Google::Cloud::Documentai::V1beta3::DocumentService::ListDocumentsResponse',
+    });
+}
+
+sub batch_delete_documents {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Documentai::V1beta3::DocumentService::BatchDeleteDocumentsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.documentai.v1beta3.DocumentService',
+        method         => 'BatchDeleteDocuments',
+        request        => $req,
+        response_class => 'Google::Longrunning::Operations::Operation',
+    });
+}
+
+sub get_dataset_schema {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Documentai::V1beta3::DocumentService::GetDatasetSchemaRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.documentai.v1beta3.DocumentService',
+        method         => 'GetDatasetSchema',
+        request        => $req,
+        response_class => 'Google::Cloud::Documentai::V1beta3::Dataset::DatasetSchema',
+    });
+}
+
+sub update_dataset_schema {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetSchemaRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.documentai.v1beta3.DocumentService',
+        method         => 'UpdateDatasetSchema',
+        request        => $req,
+        response_class => 'Google::Cloud::Documentai::V1beta3::Dataset::DatasetSchema',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Documentai::V1beta3::DocumentService - Compiled Protocol Buffers messages for google/cloud/documentai/v1beta3/document_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Documentai::V1beta3::DocumentService;
+
+    my $msg = Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetRequest->new({
+        dataset => $dataset,
+        update_mask => $update_mask,
+    });
+
+    # Read or update a field
+    my $val = $msg->dataset();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/documentai/v1beta3/document_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Dataset::Dataset>)
+
+Required. The `name` field of the `Dataset` is used to identify the
+resource to be updated.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+The update mask applies to the resource.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetOperationMetadata
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->common_metadata() >> / C<< $msg->common_metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::OperationMetadata::CommonOperationMetadata>)
+
+The basic metadata of the long-running operation.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<String>
+
+Required. The dataset resource name.
+Format:
+projects/{project}/locations/{location}/processors/{processor}/dataset
+
+=item * C<< $msg->batch_documents_import_configs() >> / C<< $msg->batch_documents_import_configs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsRequest::BatchDocumentsImportConfig>)
+
+Required. The Cloud Storage uri containing raw documents that must be
+imported.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsResponse
+
+Response of the import document operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsMetadata
+
+Metadata of the import document operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->common_metadata() >> / C<< $msg->common_metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::OperationMetadata::CommonOperationMetadata>)
+
+The basic metadata of the long-running operation.
+
+=item * C<< $msg->individual_import_statuses() >> / C<< $msg->individual_import_statuses($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsMetadata::IndividualImportStatus>)
+
+The list of response details of each document.
+
+=item * C<< $msg->import_config_validation_results() >> / C<< $msg->import_config_validation_results($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentService::ImportDocumentsMetadata::ImportConfigValidationResult>)
+
+Validation statuses of the batch documents import config.
+
+=item * C<< $msg->total_document_count() >> / C<< $msg->total_document_count($value) >>
+
+Type: C<Int32>
+
+Total number of the documents that are qualified for importing.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::GetDocumentRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<String>
+
+Required. The resource name of the dataset that the document belongs to .
+Format:
+projects/{project}/locations/{location}/processors/{processor}/dataset
+
+=item * C<< $msg->document_id() >> / C<< $msg->document_id($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Dataset::DocumentId>)
+
+Required. Document identifier.
+
+=item * C<< $msg->read_mask() >> / C<< $msg->read_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+If set, only fields listed here will be returned. Otherwise, all fields
+will be returned by default.
+
+=item * C<< $msg->page_range() >> / C<< $msg->page_range($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentService::DocumentPageRange>)
+
+List of pages for which the fields specified in the `read_mask` must
+be served.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::GetDocumentResponse
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->document() >> / C<< $msg->document($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Document::Document>)
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::ListDocumentsRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<String>
+
+Required. The resource name of the dataset to be listed.
+Format:
+projects/{project}/locations/{location}/processors/{processor}/dataset
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of documents to return. The service may return
+fewer than this value.
+If unspecified, at most 20 documents will be returned.
+The maximum value is 100; values above 100 will be coerced to 100.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A page token, received from a previous `ListDocuments` call.
+Provide this to retrieve the subsequent page.
+
+When paginating, all other parameters provided to `ListDocuments`
+must match the call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Query to filter the documents based on
+https://google.aip.dev/160.
+## Currently support query strings are:
+
+`SplitType=DATASET_SPLIT_TEST|DATASET_SPLIT_TRAIN|DATASET_SPLIT_UNASSIGNED`
+- `LabelingState=DOCUMENT_LABELED|DOCUMENT_UNLABELED|DOCUMENT_AUTO_LABELED`
+- `DisplayName=\"file_name.pdf\"`
+- `EntityType=abc/def`
+- `TagName=\"auto-labeling-running\"|\"sampled\"`
+
+Note:
+- Only `AND`, `=` and `!=` are supported.
+    e.g. `DisplayName=file_name AND EntityType!=abc` IS supported.
+- Wildcard `*` is supported only in `DisplayName` filter
+- No duplicate filter keys are allowed,
+    e.g. `EntityType=a AND EntityType=b` is NOT supported.
+- String match is case sensitive (for filter `DisplayName` & `EntityType`).
+
+=item * C<< $msg->return_total_size() >> / C<< $msg->return_total_size($value) >>
+
+Type: C<Bool>
+
+Optional. Controls if the request requires a total size of matched
+documents. See
+[ListDocumentsResponse.total_size][google.cloud.documentai.v1beta3.ListDocumentsResponse.total_size].
+
+Enabling this flag may adversely impact performance.
+
+Defaults to false.
+
+=item * C<< $msg->skip() >> / C<< $msg->skip($value) >>
+
+Type: C<Int32>
+
+Optional. Number of results to skip beginning from the `page_token` if
+provided. https://google.aip.dev/158#skipping-results. It must be a
+non-negative integer. Negative values will be rejected. Note that this is
+not the number of pages to skip. If this value causes the cursor to move
+past the end of results,
+[ListDocumentsResponse.document_metadata][google.cloud.documentai.v1beta3.ListDocumentsResponse.document_metadata]
+and
+[ListDocumentsResponse.next_page_token][google.cloud.documentai.v1beta3.ListDocumentsResponse.next_page_token]
+will be empty.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::ListDocumentsResponse
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->document_metadata() >> / C<< $msg->document_metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentService::DocumentMetadata>)
+
+Document metadata corresponding to the listed documents.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as
+[ListDocumentsRequest.page_token][google.cloud.documentai.v1beta3.ListDocumentsRequest.page_token]
+to retrieve the next page. If this field is omitted, there are no
+subsequent pages.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+Total count of documents queried.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::BatchDeleteDocumentsRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<String>
+
+Required. The dataset resource name.
+Format:
+projects/{project}/locations/{location}/processors/{processor}/dataset
+
+=item * C<< $msg->dataset_documents() >> / C<< $msg->dataset_documents($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Dataset::BatchDatasetDocuments>)
+
+Required. Dataset documents input. If given `filter`, all documents
+satisfying the filter will be deleted. If given documentIds, a maximum of
+50 documents can be deleted in a batch. The request will be rejected if
+more than 50 document_ids are provided.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::BatchDeleteDocumentsResponse
+
+Response of the delete documents operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::BatchDeleteDocumentsMetadata
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->common_metadata() >> / C<< $msg->common_metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::OperationMetadata::CommonOperationMetadata>)
+
+The basic metadata of the long-running operation.
+
+=item * C<< $msg->individual_batch_delete_statuses() >> / C<< $msg->individual_batch_delete_statuses($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::DocumentService::BatchDeleteDocumentsMetadata::IndividualBatchDeleteStatus>)
+
+The list of response details of each document.
+
+=item * C<< $msg->total_document_count() >> / C<< $msg->total_document_count($value) >>
+
+Type: C<Int32>
+
+Total number of documents deleting from dataset.
+
+=item * C<< $msg->error_document_count() >> / C<< $msg->error_document_count($value) >>
+
+Type: C<Int32>
+
+Total number of documents that failed to be deleted in storage.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::GetDatasetSchemaRequest
+
+Request for `GetDatasetSchema`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The dataset schema resource name.
+Format:
+projects/{project}/locations/{location}/processors/{processor}/dataset/datasetSchema
+
+=item * C<< $msg->visible_fields_only() >> / C<< $msg->visible_fields_only($value) >>
+
+Type: C<Bool>
+
+If set, only returns the visible fields of the schema.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::UpdateDatasetSchemaRequest
+
+Request for `UpdateDatasetSchema`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataset_schema() >> / C<< $msg->dataset_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Dataset::DatasetSchema>)
+
+Required. The name field of the `DatasetSchema` is used to identify the
+resource to be updated.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+The update mask applies to the resource.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::DocumentPageRange
+
+Range of pages present in a document.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start() >> / C<< $msg->start($value) >>
+
+Type: C<Int32>
+
+First page number (one-based index) to be returned.
+
+=item * C<< $msg->end() >> / C<< $msg->end($value) >>
+
+Type: C<Int32>
+
+Last page number (one-based index) to be returned.
+
+=back
+
+=head2 Google::Cloud::Documentai::V1beta3::DocumentService::DocumentMetadata
+
+Metadata about a document.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->document_id() >> / C<< $msg->document_id($value) >>
+
+Type: C<Message> (L<Google::Cloud::Documentai::V1beta3::Dataset::DocumentId>)
+
+Document identifier.
+
+=item * C<< $msg->page_count() >> / C<< $msg->page_count($value) >>
+
+Type: C<Int32>
+
+Number of pages in the document.
+
+=item * C<< $msg->dataset_type() >> / C<< $msg->dataset_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Documentai::V1beta3::DatasetSplitType>)
+
+Type of the dataset split to which the document belongs.
+
+=item * C<< $msg->labeling_state() >> / C<< $msg->labeling_state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Documentai::V1beta3::DocumentLabelingState>)
+
+Labeling state of the document.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+The display name of the document.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Documentai::V1beta3::DocumentService::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

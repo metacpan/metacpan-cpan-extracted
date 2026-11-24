@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::DataDocumentation;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -250,61 +250,11 @@ EOF
     # Field: catalog_publishing_enabled Type: 8 ()
     # Field: generation_scopes Type: 14 (.google.cloud.dataplex.v1.DataDocumentationSpec.GenerationScope)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationSpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataDocumentation;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationSpec->new(
-        catalog_publishing_enabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<catalog_publishing_enabled>
-
-Type: Bool
-
-=item * B<generation_scopes>
-
-Type: Enum (.google.cloud.dataplex.v1.DataDocumentationSpec.GenerationScope)
-
-=back
-
-=cut
-
 # Enum: DataDocumentationSpec::GenerationScope
 our $DataDocumentationSpec_GENERATION_SCOPE_UNSPECIFIED = 0;
 our $DataDocumentationSpec_ALL = 1;
 our $DataDocumentationSpec_TABLE_AND_COLUMN_DESCRIPTIONS = 2;
 our $DataDocumentationSpec_SQL_QUERIES = 3;
-
-=pod
-
-=head2 Enum: DataDocumentationSpec::GenerationScope
-
-Values:
-
-=over 4
-
-=item * C<GENERATION_SCOPE_UNSPECIFIED> => 0
-
-=item * C<ALL> => 1
-
-=item * C<TABLE_AND_COLUMN_DESCRIPTIONS> => 2
-
-=item * C<SQL_QUERIES> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult ===
     # Fields for DataDocumentationResult
@@ -312,51 +262,117 @@ Values:
     # Field: table_result Type: 11 (.google.cloud.dataplex.v1.DataDocumentationResult.TableResult)
     # Field: data_product_result Type: 11 (.google.cloud.dataplex.v1.DataDocumentationResult.DataProductResult)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult - Compiled Protocol Buffers message class
+Google::Cloud::Dataplex::V1::DataDocumentation - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/data_documentation.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Dataplex::V1::DataDocumentation;
 
-    my $msg = Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult->new(
-        dataset_result => $value,
-    );
+    my $msg = Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationSpec->new({
+        catalog_publishing_enabled => $catalog_publishing_enabled,
+        generation_scopes => $generation_scopes,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->catalog_publishing_enabled();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationSpec->parse($bytes);
 
-=item * B<dataset_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataDocumentationResult.DatasetResult)
-
-=item * B<table_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataDocumentationResult.TableResult)
-
-=item * B<data_product_result>
-
-Type: Message (.google.cloud.dataplex.v1.DataDocumentationResult.DataProductResult)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataDocumentation - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/data_documentation.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationSpec
+
+DataDocumentation scan related spec.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->catalog_publishing_enabled() >> / C<< $msg->catalog_publishing_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to publish result to Dataplex Catalog.
+
+=item * C<< $msg->generation_scopes() >> / C<< $msg->generation_scopes($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::DataDocumentationSpec::GenerationScope>)
+
+Optional. Specifies which components of the data documentation to generate.
+Any component that is required to generate the specified components will
+also be generated. If no generation scope is specified, all available
+documentation components will be generated.
+
+=back
+
+=head3 Enum: DataDocumentationSpec::GenerationScope
+
+=over 4
+
+=item * C<GENERATION_SCOPE_UNSPECIFIED> => C<0>
+
+=item * C<ALL> => C<1>
+
+=item * C<TABLE_AND_COLUMN_DESCRIPTIONS> => C<2>
+
+=item * C<SQL_QUERIES> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult
+
+The output of a DataDocumentation scan.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataset_result() >> / C<< $msg->dataset_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::DatasetResult>)
+
+Output only. Insights for a Dataset resource.
+
+=item * C<< $msg->table_result() >> / C<< $msg->table_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::TableResult>)
+
+Output only. Insights for a Table resource.
+
+=item * C<< $msg->data_product_result() >> / C<< $msg->data_product_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDocumentation::DataDocumentationResult::DataProductResult>)
+
+Output only. Insights for a data product.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::DataDocumentation::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

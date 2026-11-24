@@ -1,0 +1,11 @@
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^Llama\.c$
+^Llama\.bs$
+\.o$
+^PDL-Llama-.*\.tar\.gz$
+\.bak$
+\.swp$

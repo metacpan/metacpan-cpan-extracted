@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlOperations;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -120,40 +120,6 @@ EOF
     # Field: project Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsGetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlOperations;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsGetRequest->new(
-        operation => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<operation>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsListRequest ===
     # Fields for SqlOperationsListRequest
     # Field: instance Type: 9 ()
@@ -162,87 +128,11 @@ Type: String
     # Field: project Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlOperations;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsListRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<max_results>
-
-Type: UInt32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlOperations::OperationsListResponse ===
     # Fields for OperationsListResponse
     # Field: kind Type: 9 ()
     # Field: items Type: 11 (.google.cloud.sql.v1.Operation)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlOperations::OperationsListResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlOperations;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlOperations::OperationsListResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<items>
-
-Type: Message (.google.cloud.sql.v1.Operation)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsCancelRequest ===
     # Fields for SqlOperationsCancelRequest
@@ -250,62 +140,20 @@ Type: String
     # Field: project Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsCancelRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlOperations;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsCancelRequest->new(
-        operation => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<operation>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsServiceClient - Client stub representing the remote SqlOperationsService service
+Client stub representing the remote C<SqlOperationsService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -373,13 +221,177 @@ sub cancel {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlOperations - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlOperations - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_operations.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlOperations;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsGetRequest->new({
+        operation => $operation,
+        project => $project,
+        location => $location,
+    });
+
+    # Read or update a field
+    my $val = $msg->operation();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsGetRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_operations.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsGetRequest
+
+Operations get request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->operation() >> / C<< $msg->operation($value) >>
+
+Type: C<String>
+
+Required. Instance operation ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Required. Project ID of the project that contains the instance.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsListRequest
+
+Operations list request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->max_results() >> / C<< $msg->max_results($value) >>
+
+Type: C<UInt32>
+
+Maximum number of operations per response.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A previously-returned page token representing part of the larger set of
+results to view.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlOperations::OperationsListResponse
+
+Operations list response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#operationsList`.
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>)
+
+List of operation resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+The continuation token, used to page through large result sets. Provide
+this value in a subsequent request to return the next page of results.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlOperations::SqlOperationsCancelRequest
+
+Operations cancel request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->operation() >> / C<< $msg->operation($value) >>
+
+Type: C<String>
+
+Instance operation ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlOperations::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -11,14 +11,14 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Dataflow::V1beta3::Streaming;
-use Google::Dataflow::V1beta3::Environment;
 use Google::Dataflow::V1beta3::Snapshots;
-use Google::Dataflow::V1beta3::Messages;
+use Google::Dataflow::V1beta3::Environment;
 use Google::Dataflow::V1beta3::Metrics;
+use Google::Dataflow::V1beta3::Messages;
 use Google::Dataflow::V1beta3::Jobs;
 use Google::Dataflow::V1beta3::Templates;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -176,7 +176,32 @@ The following RPC methods are available in this client:
 
 =item * B<launch_flex_template>
 
-Calls the RPC method C<LaunchFlexTemplate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->launch_flex_template(
+        project_id               => $project_id,
+        launch_parameter         => $launch_parameter,
+        location                 => $location,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<LaunchFlexTemplate> on C<google.dataflow.v1beta3.FlexTemplatesService>.
+
+Request: L<Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<launch_parameter> - L<Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateParameter>
+
+=item * C<location> - C<string>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =back
 

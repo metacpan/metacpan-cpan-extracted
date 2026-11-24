@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Storage::V2::Storage;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -221,7 +221,7 @@ sub lock_bucket_retention_policy {
 sub get_iam_policy {
     my ($self, %params) = @_;
 
-    my $request_class = 'Google::Iam::V1::GetIamPolicyRequest::GetIamPolicyRequest';
+    my $request_class = 'Google::Iam::V1::IamPolicy::GetIamPolicyRequest';
     my $request = eval { $request_class->new(\%params) };
     my $new_err = $@;
     if (!$request) {
@@ -362,31 +362,211 @@ The following RPC methods are available in this client:
 
 =item * B<delete_bucket>
 
-Calls the RPC method C<DeleteBucket> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_bucket(
+        name                     => $name,
+        if_metageneration_match  => $if_metageneration_match,
+        if_metageneration_not_match => $if_metageneration_not_match,
+    );
+
+Calls the RPC method C<DeleteBucket> on C<google.storage.v2.Storage>.
+
+Request: L<Google::Storage::V2::Storage::DeleteBucketRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=item * C<if_metageneration_match> - C<int64>
+
+=item * C<if_metageneration_not_match> - C<int64>
+
+=back
 
 =item * B<get_bucket>
 
-Calls the RPC method C<GetBucket> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_bucket(
+        name                     => $name,
+        if_metageneration_match  => $if_metageneration_match,
+        if_metageneration_not_match => $if_metageneration_not_match,
+        read_mask                => $read_mask,
+    );
+
+Calls the RPC method C<GetBucket> on C<google.storage.v2.Storage>.
+
+Request: L<Google::Storage::V2::Storage::GetBucketRequest>
+
+Returns: L<Google::Storage::V2::Storage::Bucket>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=item * C<if_metageneration_match> - C<int64>
+
+=item * C<if_metageneration_not_match> - C<int64>
+
+=item * C<read_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<create_bucket>
 
-Calls the RPC method C<CreateBucket> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_bucket(
+        parent                   => $parent,
+        bucket                   => $bucket,
+        bucket_id                => $bucket_id,
+        predefined_acl           => $predefined_acl,
+        predefined_default_object_acl => $predefined_default_object_acl,
+        enable_object_retention  => $enable_object_retention,
+    );
+
+Calls the RPC method C<CreateBucket> on C<google.storage.v2.Storage>.
+
+Request: L<Google::Storage::V2::Storage::CreateBucketRequest>
+
+Returns: L<Google::Storage::V2::Storage::Bucket>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<bucket> - L<Google::Storage::V2::Storage::Bucket>
+
+=item * C<bucket_id> - C<string>
+
+=item * C<predefined_acl> - C<string>
+
+=item * C<predefined_default_object_acl> - C<string>
+
+=item * C<enable_object_retention> - C<bool>
+
+=back
 
 =item * B<list_buckets>
 
-Calls the RPC method C<ListBuckets> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_buckets(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        prefix                   => $prefix,
+        read_mask                => $read_mask,
+        return_partial_success   => $return_partial_success,
+    );
+
+Calls the RPC method C<ListBuckets> on C<google.storage.v2.Storage>.
+
+Request: L<Google::Storage::V2::Storage::ListBucketsRequest>
+
+Returns: L<Google::Storage::V2::Storage::ListBucketsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<prefix> - C<string>
+
+=item * C<read_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=item * C<return_partial_success> - C<bool>
+
+=back
 
 =item * B<lock_bucket_retention_policy>
 
-Calls the RPC method C<LockBucketRetentionPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->lock_bucket_retention_policy(
+        bucket                   => $bucket,
+        if_metageneration_match  => $if_metageneration_match,
+    );
+
+Calls the RPC method C<LockBucketRetentionPolicy> on C<google.storage.v2.Storage>.
+
+Request: L<Google::Storage::V2::Storage::LockBucketRetentionPolicyRequest>
+
+Returns: L<Google::Storage::V2::Storage::Bucket>
+
+Parameters:
+
+=over 4
+
+=item * C<bucket> - C<string>
+
+=item * C<if_metageneration_match> - C<int64>
+
+=back
 
 =item * B<get_iam_policy>
 
-Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_iam_policy();
+
+Calls the RPC method C<GetIamPolicy> on C<google.storage.v2.Storage>.
+
+Request: L<Google::Iam::V1::IamPolicy::GetIamPolicyRequest>
+
+Returns: L<Google::Iam::V1::Policy::Policy>
 
 =item * B<move_object>
 
-Calls the RPC method C<MoveObject> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->move_object(
+        bucket                   => $bucket,
+        source_object            => $source_object,
+        destination_object       => $destination_object,
+        if_source_generation_match => $if_source_generation_match,
+        if_source_generation_not_match => $if_source_generation_not_match,
+        if_source_metageneration_match => $if_source_metageneration_match,
+        if_source_metageneration_not_match => $if_source_metageneration_not_match,
+        if_generation_match      => $if_generation_match,
+        if_generation_not_match  => $if_generation_not_match,
+        if_metageneration_match  => $if_metageneration_match,
+        if_metageneration_not_match => $if_metageneration_not_match,
+    );
+
+Calls the RPC method C<MoveObject> on C<google.storage.v2.Storage>.
+
+Request: L<Google::Storage::V2::Storage::MoveObjectRequest>
+
+Returns: L<Google::Storage::V2::Storage::Object>
+
+Parameters:
+
+=over 4
+
+=item * C<bucket> - C<string>
+
+=item * C<source_object> - C<string>
+
+=item * C<destination_object> - C<string>
+
+=item * C<if_source_generation_match> - C<int64>
+
+=item * C<if_source_generation_not_match> - C<int64>
+
+=item * C<if_source_metageneration_match> - C<int64>
+
+=item * C<if_source_metageneration_not_match> - C<int64>
+
+=item * C<if_generation_match> - C<int64>
+
+=item * C<if_generation_not_match> - C<int64>
+
+=item * C<if_metageneration_match> - C<int64>
+
+=item * C<if_metageneration_not_match> - C<int64>
+
+=back
 
 =back
 

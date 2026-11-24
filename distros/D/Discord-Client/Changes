@@ -1,5 +1,10 @@
 Revision history for Discord-Client
 
+0.003  2026-11-21
+    Improve replay cleanup performance for interaction delivery.
+    Use monotonic integration watchdogs to avoid clock-correction failures.
+    Replace cached channel data when its obfuscation state changes.
+
 0.002  2026-11-07
     Fix a Future::XS crash when cancelling chained REST requests.
     Stabilize HTTP and Gateway integration tests and bound asynchronous waits.

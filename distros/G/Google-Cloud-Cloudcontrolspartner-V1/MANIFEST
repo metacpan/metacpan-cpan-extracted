@@ -1,0 +1,41 @@
+Changes
+lib/Google/Cloud/Cloudcontrolspartner/V1.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/AccessApprovalRequests.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/AccessApprovalRequests/Types.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/CloudControlsPartnerCoreClient.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/CloudControlsPartnerMonitoringClient.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/CompletionState.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/CompletionState/Types.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Core.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Core/Types.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Customers.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Customers/Types.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/CustomerWorkloads.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/CustomerWorkloads/Types.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/EkmConnections.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/EkmConnections/Types.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Monitoring.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Monitoring/Types.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/PartnerPermissions.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/PartnerPermissions/Types.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Partners.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Partners/Types.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Violations.pm
+lib/Google/Cloud/Cloudcontrolspartner/V1/Violations/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-CloudControlsPartnerCore.t
+t/01-service-CloudControlsPartnerMonitoring.t
+t/01-service-Default.t
+t/02-rest-transport-CloudControlsPartnerCore.t
+t/02-rest-transport-CloudControlsPartnerMonitoring.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

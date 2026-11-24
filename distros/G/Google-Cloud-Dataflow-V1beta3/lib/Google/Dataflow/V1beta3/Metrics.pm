@@ -3,7 +3,7 @@ package Google::Dataflow::V1beta3::Metrics;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -456,40 +456,6 @@ EOF
     # Field: name Type: 9 ()
     # Field: context Type: 11 (.google.dataflow.v1beta3.MetricStructuredName.ContextEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::MetricStructuredName - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::MetricStructuredName->new(
-        origin => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<origin>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<context>
-
-Type: Message (.google.dataflow.v1beta3.MetricStructuredName.ContextEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::MetricUpdate ===
     # Fields for MetricUpdate
     # Field: name Type: 11 (.google.dataflow.v1beta3.MetricStructuredName)
@@ -506,80 +472,6 @@ Type: Message (.google.dataflow.v1beta3.MetricStructuredName.ContextEntry)
     # Field: internal Type: 11 (.google.protobuf.Value)
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::MetricUpdate - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::MetricUpdate->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: Message (.google.dataflow.v1beta3.MetricStructuredName)
-
-=item * B<kind>
-
-Type: String
-
-=item * B<cumulative>
-
-Type: Bool
-
-=item * B<scalar>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<mean_sum>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<mean_count>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<set>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<trie>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<bounded_trie>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<distribution>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<gauge>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<internal>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::GetJobMetricsRequest ===
     # Fields for GetJobMetricsRequest
     # Field: project_id Type: 9 ()
@@ -587,78 +479,10 @@ Type: Message (.google.protobuf.Timestamp)
     # Field: start_time Type: 11 (.google.protobuf.Timestamp)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::GetJobMetricsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::GetJobMetricsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::JobMetrics ===
     # Fields for JobMetrics
     # Field: metric_time Type: 11 (.google.protobuf.Timestamp)
     # Field: metrics Type: 11 (.google.dataflow.v1beta3.MetricUpdate)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::JobMetrics - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::JobMetrics->new(
-        metric_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<metric_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<metrics>
-
-Type: Message (.google.dataflow.v1beta3.MetricUpdate)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Metrics::GetJobExecutionDetailsRequest ===
     # Fields for GetJobExecutionDetailsRequest
@@ -668,117 +492,15 @@ Type: Message (.google.dataflow.v1beta3.MetricUpdate)
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::GetJobExecutionDetailsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::GetJobExecutionDetailsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::ProgressTimeseries ===
     # Fields for ProgressTimeseries
     # Field: current_progress Type: 1 ()
     # Field: data_points Type: 11 (.google.dataflow.v1beta3.ProgressTimeseries.Point)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::ProgressTimeseries - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::ProgressTimeseries->new(
-        current_progress => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<current_progress>
-
-Type: Double
-
-=item * B<data_points>
-
-Type: Message (.google.dataflow.v1beta3.ProgressTimeseries.Point)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::StragglerInfo ===
     # Fields for StragglerInfo
     # Field: start_time Type: 11 (.google.protobuf.Timestamp)
     # Field: causes Type: 11 (.google.dataflow.v1beta3.StragglerInfo.CausesEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::StragglerInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::StragglerInfo->new(
-        start_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<causes>
-
-Type: Message (.google.dataflow.v1beta3.StragglerInfo.CausesEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Metrics::StreamingStragglerInfo ===
     # Fields for StreamingStragglerInfo
@@ -788,152 +510,20 @@ Type: Message (.google.dataflow.v1beta3.StragglerInfo.CausesEntry)
     # Field: data_watermark_lag Type: 11 (.google.protobuf.Duration)
     # Field: system_watermark_lag Type: 11 (.google.protobuf.Duration)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::StreamingStragglerInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::StreamingStragglerInfo->new(
-        start_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<worker_name>
-
-Type: String
-
-=item * B<data_watermark_lag>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<system_watermark_lag>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::Straggler ===
     # Fields for Straggler
     # Field: batch_straggler Type: 11 (.google.dataflow.v1beta3.StragglerInfo)
     # Field: streaming_straggler Type: 11 (.google.dataflow.v1beta3.StreamingStragglerInfo)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::Straggler - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::Straggler->new(
-        batch_straggler => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<batch_straggler>
-
-Type: Message (.google.dataflow.v1beta3.StragglerInfo)
-
-=item * B<streaming_straggler>
-
-Type: Message (.google.dataflow.v1beta3.StreamingStragglerInfo)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::HotKeyDebuggingInfo ===
     # Fields for HotKeyDebuggingInfo
     # Field: detected_hot_keys Type: 11 (.google.dataflow.v1beta3.HotKeyDebuggingInfo.DetectedHotKeysEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::HotKeyDebuggingInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::HotKeyDebuggingInfo->new(
-        detected_hot_keys => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<detected_hot_keys>
-
-Type: Message (.google.dataflow.v1beta3.HotKeyDebuggingInfo.DetectedHotKeysEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Metrics::StragglerSummary ===
     # Fields for StragglerSummary
     # Field: total_straggler_count Type: 3 ()
     # Field: straggler_cause_count Type: 11 (.google.dataflow.v1beta3.StragglerSummary.StragglerCauseCountEntry)
     # Field: recent_stragglers Type: 11 (.google.dataflow.v1beta3.Straggler)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::StragglerSummary - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::StragglerSummary->new(
-        total_straggler_count => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<total_straggler_count>
-
-Type: Int64
-
-=item * B<straggler_cause_count>
-
-Type: Message (.google.dataflow.v1beta3.StragglerSummary.StragglerCauseCountEntry)
-
-=item * B<recent_stragglers>
-
-Type: Message (.google.dataflow.v1beta3.Straggler)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Metrics::StageSummary ===
     # Fields for StageSummary
@@ -945,90 +535,10 @@ Type: Message (.google.dataflow.v1beta3.Straggler)
     # Field: metrics Type: 11 (.google.dataflow.v1beta3.MetricUpdate)
     # Field: straggler_summary Type: 11 (.google.dataflow.v1beta3.StragglerSummary)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::StageSummary - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::StageSummary->new(
-        stage_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<stage_id>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.dataflow.v1beta3.ExecutionState)
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<progress>
-
-Type: Message (.google.dataflow.v1beta3.ProgressTimeseries)
-
-=item * B<metrics>
-
-Type: Message (.google.dataflow.v1beta3.MetricUpdate)
-
-=item * B<straggler_summary>
-
-Type: Message (.google.dataflow.v1beta3.StragglerSummary)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::JobExecutionDetails ===
     # Fields for JobExecutionDetails
     # Field: stages Type: 11 (.google.dataflow.v1beta3.StageSummary)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::JobExecutionDetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::JobExecutionDetails->new(
-        stages => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<stages>
-
-Type: Message (.google.dataflow.v1beta3.StageSummary)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Metrics::GetStageExecutionDetailsRequest ===
     # Fields for GetStageExecutionDetailsRequest
@@ -1041,60 +551,6 @@ Type: String
     # Field: start_time Type: 11 (.google.protobuf.Timestamp)
     # Field: end_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::GetStageExecutionDetailsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::GetStageExecutionDetailsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=item * B<stage_id>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::WorkItemDetails ===
     # Fields for WorkItemDetails
     # Field: task_id Type: 9 ()
@@ -1106,152 +562,30 @@ Type: Message (.google.protobuf.Timestamp)
     # Field: metrics Type: 11 (.google.dataflow.v1beta3.MetricUpdate)
     # Field: straggler_info Type: 11 (.google.dataflow.v1beta3.StragglerInfo)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::WorkItemDetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::WorkItemDetails->new(
-        task_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<task_id>
-
-Type: String
-
-=item * B<attempt_id>
-
-Type: String
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.dataflow.v1beta3.ExecutionState)
-
-=item * B<progress>
-
-Type: Message (.google.dataflow.v1beta3.ProgressTimeseries)
-
-=item * B<metrics>
-
-Type: Message (.google.dataflow.v1beta3.MetricUpdate)
-
-=item * B<straggler_info>
-
-Type: Message (.google.dataflow.v1beta3.StragglerInfo)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Metrics::WorkerDetails ===
     # Fields for WorkerDetails
     # Field: worker_name Type: 9 ()
     # Field: work_items Type: 11 (.google.dataflow.v1beta3.WorkItemDetails)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::WorkerDetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::WorkerDetails->new(
-        worker_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<worker_name>
-
-Type: String
-
-=item * B<work_items>
-
-Type: Message (.google.dataflow.v1beta3.WorkItemDetails)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Metrics::StageExecutionDetails ===
     # Fields for StageExecutionDetails
     # Field: workers Type: 11 (.google.dataflow.v1beta3.WorkerDetails)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Metrics::StageExecutionDetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Metrics;
-
-    my $msg = Google::Dataflow::V1beta3::Metrics::StageExecutionDetails->new(
-        workers => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<workers>
-
-Type: Message (.google.dataflow.v1beta3.WorkerDetails)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Dataflow::V1beta3::Metrics::MetricsV1Beta3Client ===
 package Google::Dataflow::V1beta3::Metrics::MetricsV1Beta3Client;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Dataflow::V1beta3::Metrics::MetricsV1Beta3Client
 
-Google::Dataflow::V1beta3::Metrics::MetricsV1Beta3Client - Client stub representing the remote MetricsV1Beta3 service
+Client stub representing the remote C<MetricsV1Beta3> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataflow.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1319,13 +653,747 @@ sub get_stage_execution_details {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Dataflow::V1beta3::Metrics - Protocol Buffers schema definition
+Google::Dataflow::V1beta3::Metrics - Compiled Protocol Buffers messages for google/dataflow/v1beta3/metrics.proto
+
+=head1 SYNOPSIS
+
+    use Google::Dataflow::V1beta3::Metrics;
+
+    my $msg = Google::Dataflow::V1beta3::Metrics::MetricStructuredName->new({
+        origin => $origin,
+        name => $name,
+        context => $context,
+    });
+
+    # Read or update a field
+    my $val = $msg->origin();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Dataflow::V1beta3::Metrics::MetricStructuredName->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/dataflow/v1beta3/metrics.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Dataflow::V1beta3::Metrics::MetricStructuredName
+
+Identifies a metric, by describing the source which generated the
+metric.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->origin() >> / C<< $msg->origin($value) >>
+
+Type: C<String>
+
+Origin (namespace) of metric name. May be blank for user-define metrics;
+will be "dataflow" for metrics defined by the Dataflow service or SDK.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Worker-defined metric name.
+
+=item * C<< $msg->context() >> / C<< $msg->context($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::MetricStructuredName::ContextEntry>)
+
+Zero or more labeled fields which identify the part of the job this
+metric is associated with, such as the name of a step or collection.
+
+For example, built-in counters associated with steps will have
+context['step'] = <step-name>. Counters associated with PCollections
+in the SDK will have context['pcollection'] = <pcollection-name>.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::MetricUpdate
+
+Describes the state of a metric.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::MetricStructuredName>)
+
+Name of the metric.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+Metric aggregation kind.  The possible metric aggregation kinds are
+"Sum", "Max", "Min", "Mean", "Set", "And", "Or", and "Distribution".
+The specified aggregation kind is case-insensitive.
+
+If omitted, this is not an aggregated value but instead
+a single metric sample value.
+
+=item * C<< $msg->cumulative() >> / C<< $msg->cumulative($value) >>
+
+Type: C<Bool>
+
+True if this metric is reported as the total cumulative aggregate
+value accumulated since the worker started working on this WorkItem.
+By default this is false, indicating that this metric is reported
+as a delta that is not associated with any WorkItem.
+
+=item * C<< $msg->scalar() >> / C<< $msg->scalar($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Worker-computed aggregate value for aggregation kinds "Sum", "Max", "Min",
+"And", and "Or".  The possible value types are Long, Double, and Boolean.
+
+=item * C<< $msg->mean_sum() >> / C<< $msg->mean_sum($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Worker-computed aggregate value for the "Mean" aggregation kind.
+This holds the sum of the aggregated values and is used in combination
+with mean_count below to obtain the actual mean aggregate value.
+The only possible value types are Long and Double.
+
+=item * C<< $msg->mean_count() >> / C<< $msg->mean_count($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Worker-computed aggregate value for the "Mean" aggregation kind.
+This holds the count of the aggregated values and is used in combination
+with mean_sum above to obtain the actual mean aggregate value.
+The only possible value type is Long.
+
+=item * C<< $msg->set() >> / C<< $msg->set($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Worker-computed aggregate value for the "Set" aggregation kind.  The only
+possible value type is a list of Values whose type can be Long, Double,
+String, or BoundedTrie according to the metric's type.  All Values in the
+list must be of the same type.
+
+=item * C<< $msg->trie() >> / C<< $msg->trie($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Worker-computed aggregate value for the "Trie" aggregation kind.  The only
+possible value type is a BoundedTrieNode.
+
+=item * C<< $msg->bounded_trie() >> / C<< $msg->bounded_trie($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Worker-computed aggregate value for the "Trie" aggregation kind.  The only
+possible value type is a BoundedTrieNode.
+Introduced this field to avoid breaking older SDKs when Dataflow service
+starts to populate the `bounded_trie` field.
+
+=item * C<< $msg->distribution() >> / C<< $msg->distribution($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+A struct value describing properties of a distribution of numeric values.
+
+=item * C<< $msg->gauge() >> / C<< $msg->gauge($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+A struct value describing properties of a Gauge.
+Metrics of gauge type show the value of a metric across time, and is
+aggregated based on the newest value.
+
+=item * C<< $msg->internal() >> / C<< $msg->internal($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Worker-computed aggregate value for internal use by the Dataflow
+service.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Timestamp associated with the metric value. Optional when workers are
+reporting work progress; it will be filled in responses from the
+metrics API.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::GetJobMetricsRequest
+
+Request to get job metrics.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+A project id.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+The job to get metrics for.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Return only metric data that has changed since this time.
+Default is to return all information about all metrics for the job.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+contains the job specified by job_id.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::JobMetrics
+
+JobMetrics contains a collection of metrics describing the detailed progress
+of a Dataflow job. Metrics correspond to user-defined and system-defined
+metrics in the job. For more information, see [Dataflow job metrics]
+(https://cloud.google.com/dataflow/docs/guides/using-monitoring-intf).
+
+This resource captures only the most recent values of each metric;
+time-series data can be queried for them (under the same metric names)
+from Cloud Monitoring.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->metric_time() >> / C<< $msg->metric_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Timestamp as of which metric values are current.
+
+=item * C<< $msg->metrics() >> / C<< $msg->metrics($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::MetricUpdate>)
+
+All metrics for this job.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::GetJobExecutionDetailsRequest
+
+Request to get job execution details.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+A project id.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+The job to get execution details for.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+contains the job specified by job_id.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+If specified, determines the maximum number of stages to
+return.  If unspecified, the service may choose an appropriate
+default, or may return an arbitrarily large number of results.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+If supplied, this should be the value of next_page_token returned
+by an earlier call. This will cause the next page of results to
+be returned.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::ProgressTimeseries
+
+Information about the progress of some component of job execution.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->current_progress() >> / C<< $msg->current_progress($value) >>
+
+Type: C<Double>
+
+The current progress of the component, in the range [0,1].
+
+=item * C<< $msg->data_points() >> / C<< $msg->data_points($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::ProgressTimeseries::Point>)
+
+History of progress for the component.
+
+Points are sorted by time.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::StragglerInfo
+
+Information useful for straggler identification and debugging.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the work item attempt became a straggler.
+
+=item * C<< $msg->causes() >> / C<< $msg->causes($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::StragglerInfo::CausesEntry>)
+
+The straggler causes, keyed by the string representation of the
+StragglerCause enum and contains specialized debugging information for each
+straggler cause.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::StreamingStragglerInfo
+
+Information useful for streaming straggler identification and debugging.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Start time of this straggler.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+End time of this straggler.
+
+=item * C<< $msg->worker_name() >> / C<< $msg->worker_name($value) >>
+
+Type: C<String>
+
+Name of the worker where the straggler was detected.
+
+=item * C<< $msg->data_watermark_lag() >> / C<< $msg->data_watermark_lag($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+The event-time watermark lag at the time of the straggler detection.
+
+=item * C<< $msg->system_watermark_lag() >> / C<< $msg->system_watermark_lag($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+The system watermark lag at the time of the straggler detection.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::Straggler
+
+Information for a straggler.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->batch_straggler() >> / C<< $msg->batch_straggler($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::StragglerInfo>)
+
+Batch straggler identification and debugging information.
+
+=item * C<< $msg->streaming_straggler() >> / C<< $msg->streaming_straggler($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::StreamingStragglerInfo>)
+
+Streaming straggler identification and debugging information.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::HotKeyDebuggingInfo
+
+Information useful for debugging a hot key detection.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->detected_hot_keys() >> / C<< $msg->detected_hot_keys($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::HotKeyDebuggingInfo::DetectedHotKeysEntry>)
+
+Debugging information for each detected hot key. Keyed by a hash of the
+key.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::StragglerSummary
+
+Summarized straggler identification details.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->total_straggler_count() >> / C<< $msg->total_straggler_count($value) >>
+
+Type: C<Int64>
+
+The total count of stragglers.
+
+=item * C<< $msg->straggler_cause_count() >> / C<< $msg->straggler_cause_count($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::StragglerSummary::StragglerCauseCountEntry>)
+
+Aggregated counts of straggler causes, keyed by the string representation
+of the StragglerCause enum.
+
+=item * C<< $msg->recent_stragglers() >> / C<< $msg->recent_stragglers($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::Straggler>)
+
+The most recent stragglers.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::StageSummary
+
+Information about a particular execution stage of a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->stage_id() >> / C<< $msg->stage_id($value) >>
+
+Type: C<String>
+
+ID of this stage
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::ExecutionState>)
+
+State of this stage.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Start time of this stage.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+End time of this stage.
+
+If the work item is completed, this is the actual end time of the stage.
+Otherwise, it is the predicted end time.
+
+=item * C<< $msg->progress() >> / C<< $msg->progress($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::ProgressTimeseries>)
+
+Progress for this stage.
+Only applicable to Batch jobs.
+
+=item * C<< $msg->metrics() >> / C<< $msg->metrics($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::MetricUpdate>)
+
+Metrics for this stage.
+
+=item * C<< $msg->straggler_summary() >> / C<< $msg->straggler_summary($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::StragglerSummary>)
+
+Straggler summary for this stage.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::JobExecutionDetails
+
+Information about the execution of a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->stages() >> / C<< $msg->stages($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::StageSummary>)
+
+The stages of the job execution.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If present, this response does not contain all requested tasks.  To obtain
+the next page of results, repeat the request with page_token set to this
+value.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::GetStageExecutionDetailsRequest
+
+Request to get information about a particular execution stage of a job.
+Currently only tracked for Batch jobs.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+A project id.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+The job to get execution details for.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) that
+contains the job specified by job_id.
+
+=item * C<< $msg->stage_id() >> / C<< $msg->stage_id($value) >>
+
+Type: C<String>
+
+The stage for which to fetch information.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+If specified, determines the maximum number of work items to
+return.  If unspecified, the service may choose an appropriate
+default, or may return an arbitrarily large number of results.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+If supplied, this should be the value of next_page_token returned
+by an earlier call. This will cause the next page of results to
+be returned.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Lower time bound of work items to include, by start time.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Upper time bound of work items to include, by start time.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::WorkItemDetails
+
+Information about an individual work item execution.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->task_id() >> / C<< $msg->task_id($value) >>
+
+Type: C<String>
+
+Name of this work item.
+
+=item * C<< $msg->attempt_id() >> / C<< $msg->attempt_id($value) >>
+
+Type: C<String>
+
+Attempt ID of this work item
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Start time of this work item attempt.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+End time of this work item attempt.
+
+If the work item is completed, this is the actual end time of the work
+item.  Otherwise, it is the predicted end time.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::ExecutionState>)
+
+State of this work item.
+
+=item * C<< $msg->progress() >> / C<< $msg->progress($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::ProgressTimeseries>)
+
+Progress of this work item.
+
+=item * C<< $msg->metrics() >> / C<< $msg->metrics($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::MetricUpdate>)
+
+Metrics for this work item.
+
+=item * C<< $msg->straggler_info() >> / C<< $msg->straggler_info($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::StragglerInfo>)
+
+Information about straggler detections for this work item.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::WorkerDetails
+
+Information about a worker
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->worker_name() >> / C<< $msg->worker_name($value) >>
+
+Type: C<String>
+
+Name of this worker
+
+=item * C<< $msg->work_items() >> / C<< $msg->work_items($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::WorkItemDetails>)
+
+Work items processed by this worker, sorted by time.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Metrics::StageExecutionDetails
+
+Information about the workers and work items within a stage.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->workers() >> / C<< $msg->workers($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Metrics::WorkerDetails>)
+
+Workers that have done work on the stage.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If present, this response does not contain all requested tasks.  To obtain
+the next page of results, repeat the request with page_token set to this
+value.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Dataflow::V1beta3::Metrics::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::UrlList;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -154,87 +154,11 @@ EOF
     # Field: description Type: 9 ()
     # Field: values Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::UrlList::UrlList - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::UrlList;
-
-    my $msg = Google::Cloud::Networksecurity::V1::UrlList::UrlList->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<values>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::UrlList::ListUrlListsRequest ===
     # Fields for ListUrlListsRequest
     # Field: parent Type: 9 ()
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::UrlList::ListUrlListsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::UrlList;
-
-    my $msg = Google::Cloud::Networksecurity::V1::UrlList::ListUrlListsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::UrlList::ListUrlListsResponse ===
     # Fields for ListUrlListsResponse
@@ -242,69 +166,9 @@ Type: String
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::UrlList::ListUrlListsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::UrlList;
-
-    my $msg = Google::Cloud::Networksecurity::V1::UrlList::ListUrlListsResponse->new(
-        url_lists => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<url_lists>
-
-Type: Message (.google.cloud.networksecurity.v1.UrlList)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::UrlList::GetUrlListRequest ===
     # Fields for GetUrlListRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::UrlList::GetUrlListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::UrlList;
-
-    my $msg = Google::Cloud::Networksecurity::V1::UrlList::GetUrlListRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::UrlList::CreateUrlListRequest ===
     # Fields for CreateUrlListRequest
@@ -312,116 +176,271 @@ Type: String
     # Field: url_list_id Type: 9 ()
     # Field: url_list Type: 11 (.google.cloud.networksecurity.v1.UrlList)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::UrlList::CreateUrlListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::UrlList;
-
-    my $msg = Google::Cloud::Networksecurity::V1::UrlList::CreateUrlListRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<url_list_id>
-
-Type: String
-
-=item * B<url_list>
-
-Type: Message (.google.cloud.networksecurity.v1.UrlList)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::UrlList::UpdateUrlListRequest ===
     # Fields for UpdateUrlListRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: url_list Type: 11 (.google.cloud.networksecurity.v1.UrlList)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::UrlList::UpdateUrlListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::UrlList;
-
-    my $msg = Google::Cloud::Networksecurity::V1::UrlList::UpdateUrlListRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<url_list>
-
-Type: Message (.google.cloud.networksecurity.v1.UrlList)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::UrlList::DeleteUrlListRequest ===
     # Fields for DeleteUrlListRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::UrlList::DeleteUrlListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::UrlList;
-
-    my $msg = Google::Cloud::Networksecurity::V1::UrlList::DeleteUrlListRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::UrlList - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::UrlList - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/url_list.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::UrlList;
+
+    my $msg = Google::Cloud::Networksecurity::V1::UrlList::UrlList->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        description => $description,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::UrlList::UrlList->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/url_list.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::UrlList::UrlList
+
+UrlList proto helps users to set reusable, independently manageable lists
+of hosts, host patterns, URLs, URL patterns.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource provided by the user.
+Name is of the form
+projects/{project}/locations/{location}/urlLists/{url_list}
+url_list should match the
+pattern:(^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$).
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time when the security policy was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time when the security policy was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Free-text description of the resource.
+
+=item * C<< $msg->values() >> / C<< $msg->values($value) >>
+
+Type: C<String>
+
+Required. FQDNs and URLs.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::UrlList::ListUrlListsRequest
+
+Request used by the ListUrlList method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the UrlLists should
+be listed, specified in the format
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of UrlLists to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListUrlListsResponse`
+Indicates that this is a continuation of a prior
+`ListUrlLists` call, and that the system
+should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::UrlList::ListUrlListsResponse
+
+Response returned by the ListUrlLists method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->url_lists() >> / C<< $msg->url_lists($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::UrlList::UrlList>)
+
+List of UrlList resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::UrlList::GetUrlListRequest
+
+Request used by the GetUrlList method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the UrlList to get. Must be in the format
+`projects/*/locations/{location}/urlLists/*`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::UrlList::CreateUrlListRequest
+
+Request used by the CreateUrlList method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the UrlList. Must be in
+the format `projects/*/locations/{location}`.
+
+=item * C<< $msg->url_list_id() >> / C<< $msg->url_list_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the UrlList resource to be created. This value
+should be 1-63 characters long, containing only letters, numbers, hyphens,
+and underscores, and should not start with a number. E.g. "url_list".
+
+=item * C<< $msg->url_list() >> / C<< $msg->url_list($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::UrlList::UrlList>)
+
+Required. UrlList resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::UrlList::UpdateUrlListRequest
+
+Request used by UpdateUrlList method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+UrlList resource by the update.  The fields
+specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the
+mask. If the user does not provide a mask then all fields will be
+overwritten.
+
+=item * C<< $msg->url_list() >> / C<< $msg->url_list($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::UrlList::UrlList>)
+
+Required. Updated UrlList resource.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::UrlList::DeleteUrlListRequest
+
+Request used by the DeleteUrlList method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the UrlList to delete. Must be in
+the format `projects/*/locations/{location}/urlLists/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::UrlList::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

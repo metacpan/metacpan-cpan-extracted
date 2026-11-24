@@ -10,27 +10,27 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
-use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
-use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
 use Google::Cloud::Sql::V1::CloudSqlTiers;
+use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
+use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
 use Google::Cloud::Sql::V1::CloudSqlRegions;
 use Google::Cloud::Sql::V1::CloudSqlEvents;
-use Google::Cloud::Sql::V1::CloudSqlResources;
 use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
-use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-use Google::Cloud::Sql::V1::CloudSqlConnect;
-use Google::Cloud::Sql::V1::CloudSqlOperations;
-use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-use Google::Cloud::Sql::V1::CloudSqlUsers;
-use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-use Google::Cloud::Sql::V1::CloudSqlDatabases;
+use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
+use Google::Cloud::Sql::V1::CloudSqlResources;
 use Google::Cloud::Sql::V1::CloudSqlInstances;
+use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
+use Google::Cloud::Sql::V1::CloudSqlDatabases;
+use Google::Cloud::Sql::V1::CloudSqlConnect;
+use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+use Google::Cloud::Sql::V1::CloudSqlSslCerts;
+use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
+use Google::Cloud::Sql::V1::CloudSqlUsers;
 use Google::Cloud::Sql::V1::CloudSqlFlags;
+use Google::Cloud::Sql::V1::CloudSqlOperations;
 use Google::Cloud::Sql::V1::CloudSqlBackups;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -348,23 +348,169 @@ The following RPC methods are available in this client:
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        host                     => $host,
+        instance                 => $instance,
+        name                     => $name,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.sql.v1.SqlUsersService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersDeleteRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<host> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<name> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        instance                 => $instance,
+        name                     => $name,
+        project                  => $project,
+        host                     => $host,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.sql.v1.SqlUsersService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersGetRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlUsers::User>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<name> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<host> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.sql.v1.SqlUsersService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersInsertRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlUsers::User>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.sql.v1.SqlUsersService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersListRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlUsers::UsersListResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<update>
 
-Calls the RPC method C<Update> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update(
+        host                     => $host,
+        instance                 => $instance,
+        name                     => $name,
+        project                  => $project,
+        database_roles           => [ ... ],
+        revoke_existing_roles    => $revoke_existing_roles,
+        server_roles             => [ ... ],
+        revoke_existing_server_roles => $revoke_existing_server_roles,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Update> on C<google.cloud.sql.v1.SqlUsersService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersUpdateRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<host> - C<string>
+
+=item * C<instance> - C<string>
+
+=item * C<name> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<database_roles> - ArrayRef of C<string>
+
+=item * C<revoke_existing_roles> - C<bool>
+
+=item * C<server_roles> - ArrayRef of C<string>
+
+=item * C<revoke_existing_server_roles> - C<bool>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlUsers::User>
+
+=item * C<location> - C<string>
+
+=back
 
 =back
 

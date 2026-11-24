@@ -1,0 +1,31 @@
+Changes
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/Common.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/Common/Types.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/DeploymentsResources.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/DeploymentsResources/Types.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/DeploymentsService.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/DeploymentsService/Types.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/RolloutsResources.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/RolloutsResources/Types.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/RolloutsService.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/RolloutsService/Types.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/SaasDeploymentsClient.pm
+lib/Google/Cloud/Saasplatform/Saasservicemgmt/V1/SaasRolloutsClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-SaasDeployments.t
+t/01-service-SaasRollouts.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-SaasDeployments.t
+t/02-rest-transport-SaasRollouts.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::NetworkServices;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -596,23 +596,15 @@ package Google::Cloud::Networkservices::V1::NetworkServices::NetworkServicesClie
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networkservices::V1::NetworkServices::NetworkServicesClient
 
-Google::Cloud::Networkservices::V1::NetworkServices::NetworkServicesClient - Client stub representing the remote NetworkServices service
+Client stub representing the remote C<NetworkServices> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networkservices.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1460,13 +1452,21 @@ sub delete_agent_gateway {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::NetworkServices - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::NetworkServices - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/network_services.proto
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/network_services.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::NetworkServices::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

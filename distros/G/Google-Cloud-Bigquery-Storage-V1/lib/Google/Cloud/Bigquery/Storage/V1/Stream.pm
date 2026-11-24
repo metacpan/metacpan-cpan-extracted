@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::Storage::V1::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -338,109 +338,9 @@ EOF
     # Field: estimated_row_count Type: 3 ()
     # Field: trace_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Stream;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<expire_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<data_format>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.DataFormat)
-
-=item * B<avro_schema>
-
-Type: Message (.google.cloud.bigquery.storage.v1.AvroSchema)
-
-=item * B<arrow_schema>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ArrowSchema)
-
-=item * B<table>
-
-Type: String
-
-=item * B<table_modifiers>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ReadSession.TableModifiers)
-
-=item * B<read_options>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ReadSession.TableReadOptions)
-
-=item * B<streams>
-
-Type: Message (.google.cloud.bigquery.storage.v1.ReadStream)
-
-=item * B<estimated_total_bytes_scanned>
-
-Type: Int64
-
-=item * B<estimated_total_physical_file_size>
-
-Type: Int64
-
-=item * B<estimated_row_count>
-
-Type: Int64
-
-=item * B<trace_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Stream::ReadStream ===
     # Fields for ReadStream
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Stream::ReadStream - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Stream;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Stream::ReadStream->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::Storage::V1::Stream::WriteStream ===
     # Fields for WriteStream
@@ -452,113 +352,282 @@ Type: String
     # Field: write_mode Type: 14 (.google.cloud.bigquery.storage.v1.WriteStream.WriteMode)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Stream::WriteStream - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Stream;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Stream::WriteStream->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.WriteStream.Type)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<commit_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<table_schema>
-
-Type: Message (.google.cloud.bigquery.storage.v1.TableSchema)
-
-=item * B<write_mode>
-
-Type: Enum (.google.cloud.bigquery.storage.v1.WriteStream.WriteMode)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: WriteStream::Type
 our $WriteStream_TYPE_UNSPECIFIED = 0;
 our $WriteStream_COMMITTED = 1;
 our $WriteStream_PENDING = 2;
 our $WriteStream_BUFFERED = 3;
 
-=pod
-
-=head2 Enum: WriteStream::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<COMMITTED> => 1
-
-=item * C<PENDING> => 2
-
-=item * C<BUFFERED> => 3
-
-=back
-
-=cut
-
 # Enum: WriteStream::WriteMode
 our $WriteStream_WRITE_MODE_UNSPECIFIED = 0;
 our $WriteStream_INSERT = 1;
-
-=pod
-
-=head2 Enum: WriteStream::WriteMode
-
-Values:
-
-=over 4
-
-=item * C<WRITE_MODE_UNSPECIFIED> => 0
-
-=item * C<INSERT> => 1
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::Storage::V1::Stream - Protocol Buffers schema definition
+Google::Cloud::Bigquery::Storage::V1::Stream - Compiled Protocol Buffers messages for google/cloud/bigquery/storage/v1/stream.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::Storage::V1::Stream;
+
+    my $msg = Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession->new({
+        name => $name,
+        expire_time => $expire_time,
+        data_format => $data_format,
+        avro_schema => $avro_schema,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/storage/v1/stream.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession
+
+Information about the ReadSession.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Unique identifier for the session, in the form
+`projects/{project_id}/locations/{location}/sessions/{session_id}`.
+
+=item * C<< $msg->expire_time() >> / C<< $msg->expire_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time at which the session becomes invalid. After this time,
+subsequent requests to read this Session will return errors. The
+expire_time is automatically assigned and currently cannot be specified or
+updated.
+
+=item * C<< $msg->data_format() >> / C<< $msg->data_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::DataFormat>)
+
+Immutable. Data format of the output data. DATA_FORMAT_UNSPECIFIED not
+supported.
+
+=item * C<< $msg->avro_schema() >> / C<< $msg->avro_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Avro::AvroSchema>)
+
+Output only. Avro schema.
+
+=item * C<< $msg->arrow_schema() >> / C<< $msg->arrow_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Arrow::ArrowSchema>)
+
+Output only. Arrow schema.
+
+=item * C<< $msg->table() >> / C<< $msg->table($value) >>
+
+Type: C<String>
+
+Immutable. Table that this ReadSession is reading from, in the form
+`projects/{project_id}/datasets/{dataset_id}/tables/{table_id}`
+
+=item * C<< $msg->table_modifiers() >> / C<< $msg->table_modifiers($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession::TableModifiers>)
+
+Optional. Any modifiers which are applied when reading from the specified
+table.
+
+=item * C<< $msg->read_options() >> / C<< $msg->read_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession::TableReadOptions>)
+
+Optional. Read options for this session (e.g. column selection, filters).
+
+=item * C<< $msg->streams() >> / C<< $msg->streams($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Stream::ReadStream>)
+
+Output only. A list of streams created with the session.
+
+At least one stream is created with the session. In the future, larger
+request_stream_count values *may* result in this list being unpopulated,
+in that case, the user will need to use a List method to get the streams
+instead, which is not yet available.
+
+=item * C<< $msg->estimated_total_bytes_scanned() >> / C<< $msg->estimated_total_bytes_scanned($value) >>
+
+Type: C<Int64>
+
+Output only. An estimate on the number of bytes this session will scan when
+all streams are completely consumed. This estimate is based on
+metadata from the table which might be incomplete or stale.
+
+=item * C<< $msg->estimated_total_physical_file_size() >> / C<< $msg->estimated_total_physical_file_size($value) >>
+
+Type: C<Int64>
+
+Output only. A pre-projected estimate of the total physical size of files
+(in bytes) that this session will scan when all streams are consumed. This
+estimate is independent of the selected columns and can be based on
+incomplete or stale metadata from the table.  This field is only set for
+BigLake tables.
+
+=item * C<< $msg->estimated_row_count() >> / C<< $msg->estimated_row_count($value) >>
+
+Type: C<Int64>
+
+Output only. An estimate on the number of rows present in this session's
+streams. This estimate is based on metadata from the table which might be
+incomplete or stale.
+
+=item * C<< $msg->trace_id() >> / C<< $msg->trace_id($value) >>
+
+Type: C<String>
+
+Optional. ID set by client to annotate a session identity.  This does not
+need to be strictly unique, but instead the same ID should be used to group
+logically connected sessions (e.g. All using the same ID for all sessions
+needed to complete a Spark SQL query is reasonable).
+
+Maximum length is 256 bytes.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Stream::ReadStream
+
+Information about a single stream that gets data out of the storage system.
+Most of the information about `ReadStream` instances is aggregated, making
+`ReadStream` lightweight.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Name of the stream, in the form
+`projects/{project_id}/locations/{location}/sessions/{session_id}/streams/{stream_id}`.
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Stream::WriteStream
+
+Information about a single stream that gets data inside the storage system.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Name of the stream, in the form
+`projects/{project}/datasets/{dataset}/tables/{table}/streams/{stream}`.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::WriteStream::Type>)
+
+Immutable. Type of the stream.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Create time of the stream. For the _default stream, this is
+the creation_time of the table.
+
+=item * C<< $msg->commit_time() >> / C<< $msg->commit_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Commit time of the stream.
+If a stream is of `COMMITTED` type, then it will have a commit_time same as
+`create_time`. If the stream is of `PENDING` type, empty commit_time
+means it is not committed.
+
+=item * C<< $msg->table_schema() >> / C<< $msg->table_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::Storage::V1::Table::TableSchema>)
+
+Output only. The schema of the destination table. It is only returned in
+`CreateWriteStream` response. Caller should generate data that's
+compatible with this schema to send in initial `AppendRowsRequest`.
+The table schema could go out of date during the life time of the stream.
+
+=item * C<< $msg->write_mode() >> / C<< $msg->write_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::Storage::V1::WriteStream::WriteMode>)
+
+Immutable. Mode of the stream.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Output only. The geographic location where the stream's dataset resides.
+See https://cloud.google.com/bigquery/docs/locations for supported
+locations.
+
+=back
+
+=head3 Enum: WriteStream::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<COMMITTED> => C<1>
+
+=item * C<PENDING> => C<2>
+
+=item * C<BUFFERED> => C<3>
+
+=back
+
+=head3 Enum: WriteStream::WriteMode
+
+=over 4
+
+=item * C<WRITE_MODE_UNSPECIFIED> => C<0>
+
+=item * C<INSERT> => C<1>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::Storage::V1::Stream::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::TableSchema;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -334,145 +334,21 @@ EOF
     # Field: fields Type: 11 (.google.cloud.bigquery.v2.TableFieldSchema)
     # Field: foreign_type_info Type: 11 (.google.cloud.bigquery.v2.ForeignTypeInfo)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TableSchema::TableSchema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::TableSchema;
-
-    my $msg = Google::Cloud::Bigquery::V2::TableSchema::TableSchema->new(
-        fields => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<fields>
-
-Type: Message (.google.cloud.bigquery.v2.TableFieldSchema)
-
-=item * B<foreign_type_info>
-
-Type: Message (.google.cloud.bigquery.v2.ForeignTypeInfo)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::TableSchema::ForeignTypeInfo ===
     # Fields for ForeignTypeInfo
     # Field: type_system Type: 14 (.google.cloud.bigquery.v2.ForeignTypeInfo.TypeSystem)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TableSchema::ForeignTypeInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::TableSchema;
-
-    my $msg = Google::Cloud::Bigquery::V2::TableSchema::ForeignTypeInfo->new(
-        type_system => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<type_system>
-
-Type: Enum (.google.cloud.bigquery.v2.ForeignTypeInfo.TypeSystem)
-
-=back
-
-=cut
 
 # Enum: ForeignTypeInfo::TypeSystem
 our $ForeignTypeInfo_TYPE_SYSTEM_UNSPECIFIED = 0;
 our $ForeignTypeInfo_HIVE = 1;
 
-=pod
-
-=head2 Enum: ForeignTypeInfo::TypeSystem
-
-Values:
-
-=over 4
-
-=item * C<TYPE_SYSTEM_UNSPECIFIED> => 0
-
-=item * C<HIVE> => 1
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::TableSchema::DataPolicyOption ===
     # Fields for DataPolicyOption
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TableSchema::DataPolicyOption - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::TableSchema;
-
-    my $msg = Google::Cloud::Bigquery::V2::TableSchema::DataPolicyOption->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::TableSchema::DataPolicyList ===
     # Fields for DataPolicyList
     # Field: data_policies Type: 11 (.google.cloud.bigquery.v2.DataPolicyOption)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TableSchema::DataPolicyList - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::TableSchema;
-
-    my $msg = Google::Cloud::Bigquery::V2::TableSchema::DataPolicyList->new(
-        data_policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_policies>
-
-Type: Message (.google.cloud.bigquery.v2.DataPolicyOption)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema ===
     # Fields for TableFieldSchema
@@ -496,138 +372,390 @@ Type: Message (.google.cloud.bigquery.v2.DataPolicyOption)
     # Field: foreign_type_definition Type: 9 ()
     # Field: generated_column Type: 11 (.google.cloud.bigquery.v2.TableFieldSchema.GeneratedColumn)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::TableSchema;
-
-    my $msg = Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<type>
-
-Type: String
-
-=item * B<mode>
-
-Type: String
-
-=item * B<fields>
-
-Type: Message (.google.cloud.bigquery.v2.TableFieldSchema)
-
-=item * B<description>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<policy_tags>
-
-Type: Message (.google.cloud.bigquery.v2.TableFieldSchema.PolicyTagList)
-
-=item * B<data_governance_tags_info>
-
-Type: Message (.google.cloud.bigquery.v2.TableFieldSchema.DataGovernanceTagsInfo)
-
-=item * B<data_policies>
-
-Type: Message (.google.cloud.bigquery.v2.DataPolicyOption)
-
-=item * B<data_policy_list>
-
-Type: Message (.google.cloud.bigquery.v2.DataPolicyList)
-
-=item * B<max_length>
-
-Type: Int64
-
-=item * B<precision>
-
-Type: Int64
-
-=item * B<scale>
-
-Type: Int64
-
-=item * B<timestamp_precision>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<rounding_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.TableFieldSchema.RoundingMode)
-
-=item * B<collation>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<default_value_expression>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<range_element_type>
-
-Type: Message (.google.cloud.bigquery.v2.TableFieldSchema.FieldElementType)
-
-=item * B<foreign_type_definition>
-
-Type: String
-
-=item * B<generated_column>
-
-Type: Message (.google.cloud.bigquery.v2.TableFieldSchema.GeneratedColumn)
-
-=back
-
-=cut
-
 # Enum: TableFieldSchema::RoundingMode
 our $TableFieldSchema_ROUNDING_MODE_UNSPECIFIED = 0;
 our $TableFieldSchema_ROUND_HALF_AWAY_FROM_ZERO = 1;
 our $TableFieldSchema_ROUND_HALF_EVEN = 2;
 
-=pod
-
-=head2 Enum: TableFieldSchema::RoundingMode
-
-Values:
-
-=over 4
-
-=item * C<ROUNDING_MODE_UNSPECIFIED> => 0
-
-=item * C<ROUND_HALF_AWAY_FROM_ZERO> => 1
-
-=item * C<ROUND_HALF_EVEN> => 2
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::TableSchema - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::TableSchema - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/table_schema.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::TableSchema;
+
+    my $msg = Google::Cloud::Bigquery::V2::TableSchema::TableSchema->new({
+        fields => $fields,
+        foreign_type_info => $foreign_type_info,
+    });
+
+    # Read or update a field
+    my $val = $msg->fields();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::TableSchema::TableSchema->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/table_schema.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::TableSchema::TableSchema
+
+Schema of a table
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema>)
+
+Describes the fields in a table.
+
+=item * C<< $msg->foreign_type_info() >> / C<< $msg->foreign_type_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::ForeignTypeInfo>)
+
+Optional. Specifies metadata of the foreign data type definition in field
+schema
+([TableFieldSchema.foreign_type_definition][google.cloud.bigquery.v2.TableFieldSchema.foreign_type_definition]).
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::TableSchema::ForeignTypeInfo
+
+Metadata about the foreign data type definition such as the system
+in which the type is defined.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type_system() >> / C<< $msg->type_system($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ForeignTypeInfo::TypeSystem>)
+
+Required. Specifies the system which defines the foreign data type.
+
+=back
+
+=head3 Enum: ForeignTypeInfo::TypeSystem
+
+=over 4
+
+=item * C<TYPE_SYSTEM_UNSPECIFIED> => C<0>
+
+=item * C<HIVE> => C<1>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::TableSchema::DataPolicyOption
+
+Data policy option. For more information, see
+[Mask data by applying data policies to a
+column](https://docs.cloud.google.com/bigquery/docs/column-data-masking#data-policies-on-column).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Data policy resource name in the form of
+projects/project_id/locations/location_id/dataPolicies/data_policy_id.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::TableSchema::DataPolicyList
+
+A list of data policy options. For more information, see
+[Mask data by applying data policies to a
+column](https://docs.cloud.google.com/bigquery/docs/column-data-masking#data-policies-on-column).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_policies() >> / C<< $msg->data_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::DataPolicyOption>)
+
+Contains a list of data policy options. At most 9 data policies are
+allowed per field.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema
+
+A field in TableSchema
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The field name. The name must contain only letters (a-z, A-Z),
+numbers (0-9), or underscores (_), and must start with a letter or
+underscore. The maximum length is 300 characters.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+Required. The field data type. Possible values include:
+
+* STRING
+* BYTES
+* INTEGER (or INT64)
+* FLOAT (or FLOAT64)
+* BOOLEAN (or BOOL)
+* TIMESTAMP
+* DATE
+* TIME
+* DATETIME
+* GEOGRAPHY
+* NUMERIC
+* BIGNUMERIC
+* JSON
+* RECORD (or STRUCT)
+* RANGE
+
+Use of RECORD/STRUCT indicates that the field contains a nested schema.
+
+=item * C<< $msg->mode() >> / C<< $msg->mode($value) >>
+
+Type: C<String>
+
+Optional. The field mode. Possible values include NULLABLE, REQUIRED and
+REPEATED. The default value is NULLABLE.
+
+=item * C<< $msg->fields() >> / C<< $msg->fields($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema>)
+
+Optional. Describes the nested schema fields if the type property is set
+to RECORD.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. The field description. The maximum length is 1,024 characters.
+
+=item * C<< $msg->policy_tags() >> / C<< $msg->policy_tags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema::PolicyTagList>)
+
+Optional. The policy tags attached to this field, used for field-level
+access control. If not set, defaults to empty policy_tags.
+
+=item * C<< $msg->data_governance_tags_info() >> / C<< $msg->data_governance_tags_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema::DataGovernanceTagsInfo>)
+
+Optional. Specifies the data governance tags on this field. This field
+works with other column-level security fields as follows:
+
+*   B<Precedence>: If a data governance tag is attached to a column, it
+    takes precedence over the policy tag attached to the column. However,
+    if a data policy is attached to a column, it takes precedence over the
+    data governance tag.
+*   B<Patching behavior>: Describes how this field behaves during a
+    `Table.patch` schema update:
+    *   B<Unset>: If the `data_governance_tags_info` field is omitted from
+        the update request, the existing tags on the column are preserved.
+    *   B<Empty Field>: To clear data governance tags from a column, send
+        the `data_governance_tags_info` field as an empty object. This
+        removes all tags from the column.
+    *   B<Updating tags>: To replace an existing tag, send the field with
+        the new tag.
+
+=item * C<< $msg->data_policies() >> / C<< $msg->data_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::DataPolicyOption>)
+
+Optional. Data policies attached to this field, used for field-level access
+control.
+
+=item * C<< $msg->data_policy_list() >> / C<< $msg->data_policy_list($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::DataPolicyList>)
+
+Optional. Specifies data policies attached to this field, used for
+field-level access control. When set, this will be the source of truth for
+data policy information.
+
+=item * C<< $msg->max_length() >> / C<< $msg->max_length($value) >>
+
+Type: C<Int64>
+
+Optional. Maximum length of values of this field for STRINGS or BYTES.
+
+If max_length is not specified, no maximum length constraint is imposed
+on this field.
+
+If type = "STRING", then max_length represents the maximum UTF-8
+length of strings in this field.
+
+If type = "BYTES", then max_length represents the maximum number of
+bytes in this field.
+
+It is invalid to set this field if type &ne; "STRING" and &ne; "BYTES".
+
+=item * C<< $msg->precision() >> / C<< $msg->precision($value) >>
+
+Type: C<Int64>
+
+Optional. Precision (maximum number of total digits in base 10) and scale
+(maximum number of digits in the fractional part in base 10) constraints
+for values of this field for NUMERIC or BIGNUMERIC.
+
+It is invalid to set precision or scale if type &ne; "NUMERIC" and &ne;
+"BIGNUMERIC".
+
+If precision and scale are not specified, no value range constraint is
+imposed on this field insofar as values are permitted by the type.
+
+Values of this NUMERIC or BIGNUMERIC field must be in this range when:
+
+* Precision (<var>P</var>) and scale (<var>S</var>) are specified:
+  [-10<sup><var>P</var>-<var>S</var></sup> + 10<sup>-<var>S</var></sup>,
+   10<sup><var>P</var>-<var>S</var></sup> - 10<sup>-<var>S</var></sup>]
+* Precision (<var>P</var>) is specified but not scale (and thus scale is
+  interpreted to be equal to zero):
+  [-10<sup><var>P</var></sup> + 1, 10<sup><var>P</var></sup> - 1].
+
+Acceptable values for precision and scale if both are specified:
+
+* If type = "NUMERIC":
+  1 &le; precision - scale &le; 29 and 0 &le; scale &le; 9.
+* If type = "BIGNUMERIC":
+  1 &le; precision - scale &le; 38 and 0 &le; scale &le; 38.
+
+Acceptable values for precision if only precision is specified but not
+scale (and thus scale is interpreted to be equal to zero):
+
+* If type = "NUMERIC": 1 &le; precision &le; 29.
+* If type = "BIGNUMERIC": 1 &le; precision &le; 38.
+
+If scale is specified but not precision, then it is invalid.
+
+=item * C<< $msg->scale() >> / C<< $msg->scale($value) >>
+
+Type: C<Int64>
+
+Optional. See documentation for precision.
+
+=item * C<< $msg->timestamp_precision() >> / C<< $msg->timestamp_precision($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. Precision (maximum number of total digits in base 10) for seconds
+of TIMESTAMP type.
+
+Possible values include:
+* 6 (Default, for TIMESTAMP type with microsecond precision)
+* 12 (For TIMESTAMP type with picosecond precision)
+
+=item * C<< $msg->rounding_mode() >> / C<< $msg->rounding_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::TableFieldSchema::RoundingMode>)
+
+Optional. Specifies the rounding mode to be used when storing values of
+NUMERIC and BIGNUMERIC type.
+
+=item * C<< $msg->collation() >> / C<< $msg->collation($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. Field collation can be set only when the type of field is STRING.
+The following values are supported:
+
+* 'und:ci': undetermined locale, case insensitive.
+* '': empty string. Default to case-sensitive behavior.
+
+=item * C<< $msg->default_value_expression() >> / C<< $msg->default_value_expression($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. A SQL expression to specify the [default value]
+(https://cloud.google.com/bigquery/docs/default-values) for this field.
+
+=item * C<< $msg->range_element_type() >> / C<< $msg->range_element_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema::FieldElementType>)
+
+Optional. The subtype of the RANGE, if the type of this field is RANGE. If
+the type is RANGE, this field is required. Values for the field element
+type can be the following:
+
+* DATE
+* DATETIME
+* TIMESTAMP
+
+=item * C<< $msg->foreign_type_definition() >> / C<< $msg->foreign_type_definition($value) >>
+
+Type: C<String>
+
+Optional. Definition of the foreign data type.
+Only valid for top-level schema fields (not nested fields).
+If the type is FOREIGN, this field is required.
+
+=item * C<< $msg->generated_column() >> / C<< $msg->generated_column($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableFieldSchema::GeneratedColumn>)
+
+Optional. Definition of how values are generated for the field.
+Only valid for top-level schema fields (not nested fields).
+
+=back
+
+=head3 Enum: TableFieldSchema::RoundingMode
+
+=over 4
+
+=item * C<ROUNDING_MODE_UNSPECIFIED> => C<0>
+
+=item * C<ROUND_HALF_AWAY_FROM_ZERO> => C<1>
+
+=item * C<ROUND_HALF_EVEN> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::TableSchema::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

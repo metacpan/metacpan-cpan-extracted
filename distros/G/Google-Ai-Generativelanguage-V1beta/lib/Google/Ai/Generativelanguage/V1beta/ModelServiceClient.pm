@@ -11,25 +11,25 @@ use Carp qw(croak);
 use Protobuf;
 use Google::Api::Common;
 use Google::Ai::Generativelanguage::V1beta::Safety;
-use Google::Ai::Generativelanguage::V1beta::Retriever;
-use Google::Ai::Generativelanguage::V1beta::Model;
-use Google::Ai::Generativelanguage::V1beta::TunedModel;
 use Google::Ai::Generativelanguage::V1beta::Citation;
 use Google::Ai::Generativelanguage::V1beta::Permission;
-use Google::Ai::Generativelanguage::V1beta::Content;
+use Google::Ai::Generativelanguage::V1beta::Model;
+use Google::Ai::Generativelanguage::V1beta::TunedModel;
+use Google::Ai::Generativelanguage::V1beta::Retriever;
 use Google::Ai::Generativelanguage::V1beta::PredictionService;
 use Google::Ai::Generativelanguage::V1beta::File;
-use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-use Google::Ai::Generativelanguage::V1beta::ModelService;
+use Google::Ai::Generativelanguage::V1beta::Content;
 use Google::Ai::Generativelanguage::V1beta::DiscussService;
 use Google::Ai::Generativelanguage::V1beta::TextService;
 use Google::Ai::Generativelanguage::V1beta::PermissionService;
-use Google::Ai::Generativelanguage::V1beta::GenerativeService;
-use Google::Ai::Generativelanguage::V1beta::CachedContent;
+use Google::Ai::Generativelanguage::V1beta::ModelService;
+use Google::Ai::Generativelanguage::V1beta::RetrieverService;
 use Google::Ai::Generativelanguage::V1beta::FileService;
+use Google::Ai::Generativelanguage::V1beta::CachedContent;
+use Google::Ai::Generativelanguage::V1beta::GenerativeService;
 use Google::Ai::Generativelanguage::V1beta::CacheService;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -344,9 +344,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
-
 =item * C<googleapis/google/ai/generativelanguage/v1beta/cache_service.proto>
+
+=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
 
 =item * C<googleapis/google/ai/generativelanguage/v1beta/citation.proto>
 
@@ -413,31 +413,158 @@ The following RPC methods are available in this client:
 
 =item * B<get_model>
 
-Calls the RPC method C<GetModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_model(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::GetModelRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::Model::Model>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<list_models>
 
-Calls the RPC method C<ListModels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_models(
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListModels> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::ModelService::ListModelsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<get_tuned_model>
 
-Calls the RPC method C<GetTunedModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_tuned_model(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetTunedModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::GetTunedModelRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<list_tuned_models>
 
-Calls the RPC method C<ListTunedModels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_tuned_models(
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+    );
+
+Calls the RPC method C<ListTunedModels> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::ModelService::ListTunedModelsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=back
 
 =item * B<create_tuned_model>
 
-Calls the RPC method C<CreateTunedModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_tuned_model(
+        tuned_model_id           => $tuned_model_id,
+        tuned_model              => $tuned_model,
+    );
+
+Calls the RPC method C<CreateTunedModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::CreateTunedModelRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<tuned_model_id> - C<string>
+
+=item * C<tuned_model> - L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>
+
+=back
 
 =item * B<update_tuned_model>
 
-Calls the RPC method C<UpdateTunedModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_tuned_model(
+        tuned_model              => $tuned_model,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<UpdateTunedModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::UpdateTunedModelRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>
+
+Parameters:
+
+=over 4
+
+=item * C<tuned_model> - L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<delete_tuned_model>
 
-Calls the RPC method C<DeleteTunedModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_tuned_model(
+        name                     => $name,
+    );
+
+Calls the RPC method C<DeleteTunedModel> on C<google.ai.generativelanguage.v1beta.ModelService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::ModelService::DeleteTunedModelRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =back
 

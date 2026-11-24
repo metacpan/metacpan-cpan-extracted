@@ -3,7 +3,7 @@ package Google::Cloud::Secretmanager::V1::OperationsService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -385,117 +385,15 @@ EOF
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::OperationsService;
-
-    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsResponse ===
     # Fields for ListBackupsResponse
     # Field: backups Type: 11 (.google.cloud.secretmanager.v1.Backup)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::OperationsService;
-
-    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsResponse->new(
-        backups => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<backups>
-
-Type: Message (.google.cloud.secretmanager.v1.Backup)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::OperationsService::GetBackupRequest ===
     # Fields for GetBackupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::OperationsService::GetBackupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::OperationsService;
-
-    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::GetBackupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::OperationsService::CreateBackupRequest ===
     # Fields for CreateBackupRequest
@@ -503,109 +401,15 @@ Type: String
     # Field: backup_id Type: 9 ()
     # Field: backup Type: 11 (.google.cloud.secretmanager.v1.Backup)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::OperationsService::CreateBackupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::OperationsService;
-
-    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::CreateBackupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<backup_id>
-
-Type: String
-
-=item * B<backup>
-
-Type: Message (.google.cloud.secretmanager.v1.Backup)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::OperationsService::UpdateBackupRequest ===
     # Fields for UpdateBackupRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: backup Type: 11 (.google.cloud.secretmanager.v1.Backup)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::OperationsService::UpdateBackupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::OperationsService;
-
-    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::UpdateBackupRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<backup>
-
-Type: Message (.google.cloud.secretmanager.v1.Backup)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::OperationsService::DeleteBackupRequest ===
     # Fields for DeleteBackupRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::OperationsService::DeleteBackupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::OperationsService;
-
-    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::DeleteBackupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::OperationsService::RestoreBackupRequest ===
     # Fields for RestoreBackupRequest
@@ -613,44 +417,6 @@ Type: String
     # Field: destination_secret_parent Type: 9 ()
     # Field: destination_secret_id Type: 9 ()
     # Field: kms_key_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::OperationsService::RestoreBackupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::OperationsService;
-
-    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::RestoreBackupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<destination_secret_parent>
-
-Type: String
-
-=item * B<destination_secret_id>
-
-Type: String
-
-=item * B<kms_key_name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::OperationsService::OperationMetadata ===
     # Fields for OperationMetadata
@@ -662,60 +428,6 @@ Type: String
     # Field: requested_cancellation Type: 8 ()
     # Field: api_version Type: 9 ()
     # Field: progress Type: 11 (.google.cloud.secretmanager.v1.OperationMetadata.Progress)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::OperationsService::OperationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::OperationsService;
-
-    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::OperationMetadata->new(
-        create_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<target>
-
-Type: String
-
-=item * B<verb>
-
-Type: String
-
-=item * B<status_message>
-
-Type: String
-
-=item * B<requested_cancellation>
-
-Type: Bool
-
-=item * B<api_version>
-
-Type: String
-
-=item * B<progress>
-
-Type: Message (.google.cloud.secretmanager.v1.OperationMetadata.Progress)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::OperationsService::Backup ===
     # Fields for Backup
@@ -729,64 +441,6 @@ Type: Message (.google.cloud.secretmanager.v1.OperationMetadata.Progress)
     # Field: state Type: 14 (.google.cloud.secretmanager.v1.Backup.State)
     # Field: etag Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::OperationsService::Backup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::OperationsService;
-
-    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::Backup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<source_secret>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<source_secret_create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<version_count>
-
-Type: Int32
-
-=item * B<labels>
-
-Type: Message (.google.cloud.secretmanager.v1.Backup.LabelsEntry)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.secretmanager.v1.Backup.State)
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: Backup::State
 our $Backup_STATE_UNSPECIFIED = 0;
 our $Backup_CREATING = 1;
@@ -794,50 +448,20 @@ our $Backup_ACTIVE = 2;
 our $Backup_UPDATING = 3;
 our $Backup_FAILED = 4;
 
-=pod
-
-=head2 Enum: Backup::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<UPDATING> => 3
-
-=item * C<FAILED> => 4
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Secretmanager::V1::OperationsService::SecretOperationsServiceClient ===
 package Google::Cloud::Secretmanager::V1::OperationsService::SecretOperationsServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Secretmanager::V1::OperationsService::SecretOperationsServiceClient
 
-Google::Cloud::Secretmanager::V1::OperationsService::SecretOperationsServiceClient - Client stub representing the remote SecretOperationsService service
+Client stub representing the remote C<SecretOperationsService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<secretmanager.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -944,13 +568,451 @@ sub restore_backup {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Secretmanager::V1::OperationsService - Protocol Buffers schema definition
+Google::Cloud::Secretmanager::V1::OperationsService - Compiled Protocol Buffers messages for google/cloud/secretmanager/v1/operations_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Secretmanager::V1::OperationsService;
+
+    my $msg = Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsRequest->new({
+        parent => $parent,
+        page_size => $page_size,
+        page_token => $page_token,
+        filter => $filter,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/secretmanager/v1/operations_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsRequest
+
+Request message for
+[SecretOperationsService.ListBackups][google.cloud.secretmanager.v1.SecretOperationsService.ListBackups].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the location associated with the
+[Backups][google.cloud.secretmanager.v1.Backup], in the format
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of backups to return. The service may return fewer
+than this value. If unspecified, at most 50 backups will be returned. The
+maximum value is 1000; values above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results the server should return.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression to restrict the returned
+[Backups][google.cloud.secretmanager.v1.Backup].
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Field specification for sorting the results in the response.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::OperationsService::ListBackupsResponse
+
+Response message for
+[SecretOperationsService.ListBackups][google.cloud.secretmanager.v1.SecretOperationsService.ListBackups].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->backups() >> / C<< $msg->backups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::OperationsService::Backup>)
+
+The list of [Backups][google.cloud.secretmanager.v1.Backup] in the
+location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results the server should return.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unordered list. Resource names of the unreachable locations.
+Format: `projects/{project}/locations/{location}`
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::OperationsService::GetBackupRequest
+
+Request message for
+[SecretOperationsService.GetBackup][google.cloud.secretmanager.v1.SecretOperationsService.GetBackup].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[Backup][google.cloud.secretmanager.v1.Backup], in the format
+`projects/{project}/locations/{location}/backups/{backup}`.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::OperationsService::CreateBackupRequest
+
+Request message for
+[SecretOperationsService.CreateBackup][google.cloud.secretmanager.v1.SecretOperationsService.CreateBackup].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the location where the
+[Backup][google.cloud.secretmanager.v1.Backup] will be created, in the
+format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->backup_id() >> / C<< $msg->backup_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for the backup, which will become the final
+component of the backup's resource name.
+
+=item * C<< $msg->backup() >> / C<< $msg->backup($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::OperationsService::Backup>)
+
+Required. The [Backup][google.cloud.secretmanager.v1.Backup] resource to
+create.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::OperationsService::UpdateBackupRequest
+
+Request message for
+[SecretOperationsService.UpdateBackup][google.cloud.secretmanager.v1.SecretOperationsService.UpdateBackup].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+[Backup][google.cloud.secretmanager.v1.Backup] resource by the update.
+The fields specified in the `update_mask` are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields present in the request will be
+overwritten.
+
+=item * C<< $msg->backup() >> / C<< $msg->backup($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::OperationsService::Backup>)
+
+Required. The [Backup][google.cloud.secretmanager.v1.Backup] resource with
+updated fields.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::OperationsService::DeleteBackupRequest
+
+Request message for
+[SecretOperationsService.DeleteBackup][google.cloud.secretmanager.v1.SecretOperationsService.DeleteBackup].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[Backup][google.cloud.secretmanager.v1.Backup] to delete, in the format
+`projects/{project}/locations/{location}/backups/{backup}`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. If set, the request will only succeed if it matches the etag of
+the currently stored [Backup][google.cloud.secretmanager.v1.Backup].
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::OperationsService::RestoreBackupRequest
+
+Request message for
+[SecretOperationsService.RestoreBackup][google.cloud.secretmanager.v1.SecretOperationsService.RestoreBackup].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[Backup][google.cloud.secretmanager.v1.Backup] to restore from. Format:
+`projects/{project}/locations/{location}/backups/{backup}`
+
+=item * C<< $msg->destination_secret_parent() >> / C<< $msg->destination_secret_parent($value) >>
+
+Type: C<String>
+
+Required. Parent of the new [Secret][google.cloud.secretmanager.v1.Secret]
+to be created from this backup. Formats:
+- `projects/{project}/locations/{location}` (for regional secrets)
+- `projects/{project}` (for global secrets)
+
+=item * C<< $msg->destination_secret_id() >> / C<< $msg->destination_secret_id($value) >>
+
+Type: C<String>
+
+Required. ID of the new [Secret][google.cloud.secretmanager.v1.Secret] to
+be created from this backup. This must be unique within the project.
+
+A secret ID is a string with a maximum length of 255 characters and can
+contain uppercase and lowercase letters, numerals, and the hyphen (`-`)
+and underscore (`_`) characters.
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<String>
+
+Optional. The resource name of the Cloud KMS CryptoKey to be used to
+encrypt the [Secret][google.cloud.secretmanager.v1.Secret].
+Format:
+`projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::OperationsService::OperationMetadata
+
+Represents the metadata of the long-running operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time the operation was created.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time the operation finished running.
+
+=item * C<< $msg->target() >> / C<< $msg->target($value) >>
+
+Type: C<String>
+
+Output only. Server-defined resource path for the target of the operation.
+
+=item * C<< $msg->verb() >> / C<< $msg->verb($value) >>
+
+Type: C<String>
+
+Output only. Name of the verb executed by the operation.
+
+=item * C<< $msg->status_message() >> / C<< $msg->status_message($value) >>
+
+Type: C<String>
+
+Output only. Human-readable status of the operation, if any.
+
+=item * C<< $msg->requested_cancellation() >> / C<< $msg->requested_cancellation($value) >>
+
+Type: C<Bool>
+
+Output only. Identifies whether the user has requested cancellation
+of the operation. Operations that have been cancelled successfully
+have
+[google.longrunning.Operation.error][google.longrunning.Operation.error]
+value with a [google.rpc.Status.code][google.rpc.Status.code] of `1`,
+corresponding to `Code.CANCELLED`.
+
+=item * C<< $msg->api_version() >> / C<< $msg->api_version($value) >>
+
+Type: C<String>
+
+Output only. API version used to start the operation.
+
+=item * C<< $msg->progress() >> / C<< $msg->progress($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::OperationsService::OperationMetadata::Progress>)
+
+Output only. Represents the progress of the operation. This field is
+populated for operations that involve processing multiple secret versions.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::OperationsService::Backup
+
+A Backup of a Secret.
+Backups are regional resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Resource name of the backup.
+Format: `projects/{project}/locations/{location}/backups/{backup}`
+
+=item * C<< $msg->source_secret() >> / C<< $msg->source_secret($value) >>
+
+Type: C<String>
+
+Required. Immutable. Resource name of the
+[Secret][google.cloud.secretmanager.v1.Secret] that this backup is for. The
+source [Secret][google.cloud.secretmanager.v1.Secret] can be in a different
+region than the [Backup][google.cloud.secretmanager.v1.Backup]. This field
+is immutable after creation. Formats:
+- `projects/{project}/locations/{location}/secrets/{secret}` (for regional
+secrets)
+- `projects/{project}/secrets/{secret}` (for global secrets)
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time at which the backup resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Time at which the backup resource was last updated.
+
+=item * C<< $msg->source_secret_create_time() >> / C<< $msg->source_secret_create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Creation time of the source
+[Secret][google.cloud.secretmanager.v1.Secret] at the moment the backup was
+initiated.
+
+=item * C<< $msg->version_count() >> / C<< $msg->version_count($value) >>
+
+Type: C<Int32>
+
+Output only. Number of non-destroyed secret versions contained in this
+backup.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::OperationsService::Backup::LabelsEntry>)
+
+Optional. Labels with user-defined metadata.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Secretmanager::V1::Backup::State>)
+
+Output only. Current state of the Backup.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Used for optimistic concurrency control as a way to help prevent
+simultaneous updates of a backup from overwriting each other.
+
+=back
+
+=head3 Enum: Backup::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<UPDATING> => C<3>
+
+=item * C<FAILED> => C<4>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Secretmanager::V1::OperationsService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

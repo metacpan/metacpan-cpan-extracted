@@ -10,56 +10,56 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Bigquery::V2::JsonExtension;
-use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
-use Google::Cloud::Bigquery::V2::Error;
-use Google::Cloud::Bigquery::V2::Clustering;
-use Google::Cloud::Bigquery::V2::MapTargetType;
-use Google::Cloud::Bigquery::V2::ManagedTableType;
-use Google::Cloud::Bigquery::V2::LocationMetadata;
-use Google::Cloud::Bigquery::V2::GenAiStats;
-use Google::Cloud::Bigquery::V2::Arrow;
 use Google::Cloud::Bigquery::V2::DecimalTargetTypes;
-use Google::Cloud::Bigquery::V2::UdfResource;
-use Google::Cloud::Bigquery::V2::RestrictionConfig;
-use Google::Cloud::Bigquery::V2::PrivacyPolicy;
-use Google::Cloud::Bigquery::V2::TimePartitioning;
-use Google::Cloud::Bigquery::V2::JobCreationReason;
-use Google::Cloud::Bigquery::V2::RoutineReference;
-use Google::Cloud::Bigquery::V2::TableSchema;
-use Google::Cloud::Bigquery::V2::JobReference;
-use Google::Cloud::Bigquery::V2::SessionInfo;
-use Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
-use Google::Cloud::Bigquery::V2::QueryParameter;
-use Google::Cloud::Bigquery::V2::JobStatus;
+use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
+use Google::Cloud::Bigquery::V2::MapTargetType;
+use Google::Cloud::Bigquery::V2::Clustering;
+use Google::Cloud::Bigquery::V2::JsonExtension;
+use Google::Cloud::Bigquery::V2::LocationMetadata;
+use Google::Cloud::Bigquery::V2::Error;
+use Google::Cloud::Bigquery::V2::Arrow;
+use Google::Cloud::Bigquery::V2::ManagedTableType;
+use Google::Cloud::Bigquery::V2::GenAiStats;
 use Google::Cloud::Bigquery::V2::BiglakeConfig;
+use Google::Cloud::Bigquery::V2::Project;
+use Google::Cloud::Bigquery::V2::SessionInfo;
+use Google::Cloud::Bigquery::V2::JobStatus;
 use Google::Cloud::Bigquery::V2::TableReference;
 use Google::Cloud::Bigquery::V2::DatasetReference;
-use Google::Cloud::Bigquery::V2::RangePartitioning;
-use Google::Cloud::Bigquery::V2::StandardSql;
-use Google::Cloud::Bigquery::V2::EncryptionConfig;
-use Google::Cloud::Bigquery::V2::HivePartitioning;
-use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
-use Google::Cloud::Bigquery::V2::ModelReference;
-use Google::Cloud::Bigquery::V2::PartitioningDefinition;
-use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
-use Google::Cloud::Bigquery::V2::PropertyGraphReference;
 use Google::Cloud::Bigquery::V2::DataFormatOptions;
+use Google::Cloud::Bigquery::V2::RoutineReference;
+use Google::Cloud::Bigquery::V2::StandardSql;
 use Google::Cloud::Bigquery::V2::ExternalDatasetReference;
-use Google::Cloud::Bigquery::V2::Project;
-use Google::Cloud::Bigquery::V2::RowAccessPolicy;
+use Google::Cloud::Bigquery::V2::JobCreationReason;
+use Google::Cloud::Bigquery::V2::PartitioningDefinition;
+use Google::Cloud::Bigquery::V2::RestrictionConfig;
+use Google::Cloud::Bigquery::V2::ModelReference;
+use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
+use Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
+use Google::Cloud::Bigquery::V2::RangePartitioning;
+use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
+use Google::Cloud::Bigquery::V2::PrivacyPolicy;
+use Google::Cloud::Bigquery::V2::PropertyGraphReference;
+use Google::Cloud::Bigquery::V2::JobReference;
+use Google::Cloud::Bigquery::V2::UdfResource;
+use Google::Cloud::Bigquery::V2::EncryptionConfig;
+use Google::Cloud::Bigquery::V2::QueryParameter;
+use Google::Cloud::Bigquery::V2::TableSchema;
+use Google::Cloud::Bigquery::V2::HivePartitioning;
+use Google::Cloud::Bigquery::V2::TimePartitioning;
 use Google::Cloud::Bigquery::V2::TableConstraints;
 use Google::Cloud::Bigquery::V2::Routine;
 use Google::Cloud::Bigquery::V2::SystemVariable;
-use Google::Cloud::Bigquery::V2::ExternalDataConfig;
+use Google::Cloud::Bigquery::V2::RowAccessPolicy;
 use Google::Cloud::Bigquery::V2::Model;
 use Google::Cloud::Bigquery::V2::Dataset;
-use Google::Cloud::Bigquery::V2::Table;
-use Google::Cloud::Bigquery::V2::JobConfig;
+use Google::Cloud::Bigquery::V2::ExternalDataConfig;
 use Google::Cloud::Bigquery::V2::JobStats;
+use Google::Cloud::Bigquery::V2::JobConfig;
+use Google::Cloud::Bigquery::V2::Table;
 use Google::Cloud::Bigquery::V2::Job;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -202,11 +202,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/hive_partitioning.proto>
 
+=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
+
 =item * C<googleapis/google/cloud/bigquery/v2/job_config.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_creation_reason.proto>
-
-=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_reference.proto>
 
@@ -254,9 +254,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/system_variable.proto>
 
-=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
-
 =item * C<googleapis/google/cloud/bigquery/v2/table.proto>
+
+=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/table_reference.proto>
 
@@ -299,7 +299,23 @@ The following RPC methods are available in this client:
 
 =item * B<get_service_account>
 
-Calls the RPC method C<GetServiceAccount> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_service_account(
+        project_id               => $project_id,
+    );
+
+Calls the RPC method C<GetServiceAccount> on C<google.cloud.bigquery.v2.ProjectService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Project::GetServiceAccountRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Project::GetServiceAccountResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=back
 
 =back
 

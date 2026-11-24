@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::Gateway;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -326,173 +326,19 @@ EOF
     # Field: routing_mode Type: 14 (.google.cloud.networkservices.v1.Gateway.RoutingMode)
     # Field: allow_global_access Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Gateway::Gateway - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Gateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::Gateway::Gateway->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networkservices.v1.Gateway.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.networkservices.v1.Gateway.Type)
-
-=item * B<addresses>
-
-Type: String
-
-=item * B<ports>
-
-Type: Int32
-
-=item * B<all_ports>
-
-Type: Bool
-
-=item * B<scope>
-
-Type: String
-
-=item * B<server_tls_policy>
-
-Type: String
-
-=item * B<certificate_urls>
-
-Type: String
-
-=item * B<gateway_security_policy>
-
-Type: String
-
-=item * B<network>
-
-Type: String
-
-=item * B<subnetwork>
-
-Type: String
-
-=item * B<ip_version>
-
-Type: Enum (.google.cloud.networkservices.v1.Gateway.IpVersion)
-
-=item * B<envoy_headers>
-
-Type: Enum (.google.cloud.networkservices.v1.EnvoyHeaders)
-
-=item * B<routing_mode>
-
-Type: Enum (.google.cloud.networkservices.v1.Gateway.RoutingMode)
-
-=item * B<allow_global_access>
-
-Type: Bool
-
-=back
-
-=cut
-
 # Enum: Gateway::Type
 our $Gateway_TYPE_UNSPECIFIED = 0;
 our $Gateway_OPEN_MESH = 1;
 our $Gateway_SECURE_WEB_GATEWAY = 2;
-
-=pod
-
-=head2 Enum: Gateway::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<OPEN_MESH> => 1
-
-=item * C<SECURE_WEB_GATEWAY> => 2
-
-=back
-
-=cut
 
 # Enum: Gateway::IpVersion
 our $Gateway_IP_VERSION_UNSPECIFIED = 0;
 our $Gateway_IPV4 = 1;
 our $Gateway_IPV6 = 2;
 
-=pod
-
-=head2 Enum: Gateway::IpVersion
-
-Values:
-
-=over 4
-
-=item * C<IP_VERSION_UNSPECIFIED> => 0
-
-=item * C<IPV4> => 1
-
-=item * C<IPV6> => 2
-
-=back
-
-=cut
-
 # Enum: Gateway::RoutingMode
 our $Gateway_EXPLICIT_ROUTING_MODE = 0;
 our $Gateway_NEXT_HOP_ROUTING_MODE = 1;
-
-=pod
-
-=head2 Enum: Gateway::RoutingMode
-
-Values:
-
-=over 4
-
-=item * C<EXPLICIT_ROUTING_MODE> => 0
-
-=item * C<NEXT_HOP_ROUTING_MODE> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Gateway::ListGatewaysRequest ===
     # Fields for ListGatewaysRequest
@@ -500,109 +346,15 @@ Values:
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Gateway::ListGatewaysRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Gateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::Gateway::ListGatewaysRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Gateway::ListGatewaysResponse ===
     # Fields for ListGatewaysResponse
     # Field: gateways Type: 11 (.google.cloud.networkservices.v1.Gateway)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Gateway::ListGatewaysResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Gateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::Gateway::ListGatewaysResponse->new(
-        gateways => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<gateways>
-
-Type: Message (.google.cloud.networkservices.v1.Gateway)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Gateway::GetGatewayRequest ===
     # Fields for GetGatewayRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Gateway::GetGatewayRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Gateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::Gateway::GetGatewayRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::Gateway::CreateGatewayRequest ===
     # Fields for CreateGatewayRequest
@@ -610,116 +362,434 @@ Type: String
     # Field: gateway_id Type: 9 ()
     # Field: gateway Type: 11 (.google.cloud.networkservices.v1.Gateway)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Gateway::CreateGatewayRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Gateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::Gateway::CreateGatewayRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<gateway_id>
-
-Type: String
-
-=item * B<gateway>
-
-Type: Message (.google.cloud.networkservices.v1.Gateway)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Gateway::UpdateGatewayRequest ===
     # Fields for UpdateGatewayRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: gateway Type: 11 (.google.cloud.networkservices.v1.Gateway)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Gateway::UpdateGatewayRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Gateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::Gateway::UpdateGatewayRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<gateway>
-
-Type: Message (.google.cloud.networkservices.v1.Gateway)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::Gateway::DeleteGatewayRequest ===
     # Fields for DeleteGatewayRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::Gateway::DeleteGatewayRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::Gateway;
-
-    my $msg = Google::Cloud::Networkservices::V1::Gateway::DeleteGatewayRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::Gateway - Protocol Buffers schema definition
+Google::Cloud::Networkservices::V1::Gateway - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/gateway.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networkservices::V1::Gateway;
+
+    my $msg = Google::Cloud::Networkservices::V1::Gateway::Gateway->new({
+        name => $name,
+        self_link => $self_link,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::Gateway::Gateway->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/gateway.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::Gateway::Gateway
+
+Gateway represents the configuration for a proxy, typically a load balancer.
+It captures the ip:port over which the services are exposed by the proxy,
+along with any policy configurations. Routes have reference to to Gateways to
+dictate how requests should be routed by this Gateway.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Name of the Gateway resource. It matches pattern
+`projects/*/locations/*/gateways/<gateway_name>`.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+Output only. Server-defined URL of this resource
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Gateway::Gateway::LabelsEntry>)
+
+Optional. Set of label tags associated with the Gateway resource.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A free-text description of the resource. Max length 1024
+characters.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::Gateway::Type>)
+
+Immutable. The type of the customer managed gateway.
+This field is required. If unspecified, an error is returned.
+
+=item * C<< $msg->addresses() >> / C<< $msg->addresses($value) >>
+
+Type: C<String>
+
+Optional. Zero or one IPv4 or IPv6 address on which the Gateway will
+receive the traffic. When no address is provided, an IP from the subnetwork
+is allocated
+
+This field only applies to gateways of type 'SECURE_WEB_GATEWAY'.
+Gateways of type 'OPEN_MESH' listen on 0.0.0.0 for IPv4 and :: for IPv6.
+
+=item * C<< $msg->ports() >> / C<< $msg->ports($value) >>
+
+Type: C<Int32>
+
+Required. One or more port numbers (1-65535), on which the Gateway will
+receive traffic. The proxy binds to the specified ports.
+Gateways of type 'SECURE_WEB_GATEWAY' are limited to 5 ports.
+Gateways of type 'OPEN_MESH' listen on 0.0.0.0 for IPv4 and :: for IPv6 and
+support multiple ports.
+
+=item * C<< $msg->all_ports() >> / C<< $msg->all_ports($value) >>
+
+Type: C<Bool>
+
+Optional. If true, the Gateway will listen on all ports. This is mutually
+exclusive with the `ports` field. This field only applies to gateways of
+type 'SECURE_WEB_GATEWAY'.
+
+=item * C<< $msg->scope() >> / C<< $msg->scope($value) >>
+
+Type: C<String>
+
+Optional. Scope determines how configuration across multiple Gateway
+instances are merged. The configuration for multiple Gateway instances with
+the same scope will be merged as presented as a single configuration to the
+proxy/load balancer.
+
+Max length 64 characters.
+Scope should start with a letter and can only have letters, numbers,
+hyphens.
+
+=item * C<< $msg->server_tls_policy() >> / C<< $msg->server_tls_policy($value) >>
+
+Type: C<String>
+
+Optional. A fully-qualified ServerTLSPolicy URL reference. Specifies how
+TLS traffic is terminated. If empty, TLS termination is disabled.
+
+=item * C<< $msg->certificate_urls() >> / C<< $msg->certificate_urls($value) >>
+
+Type: C<String>
+
+Optional. A fully-qualified Certificates URL reference. The proxy presents
+a Certificate (selected based on SNI) when establishing a TLS connection.
+This feature only applies to gateways of type 'SECURE_WEB_GATEWAY'.
+
+=item * C<< $msg->gateway_security_policy() >> / C<< $msg->gateway_security_policy($value) >>
+
+Type: C<String>
+
+Optional. A fully-qualified GatewaySecurityPolicy URL reference.
+Defines how a server should apply security policy to inbound
+(VM to Proxy) initiated connections.
+
+For example:
+`projects/*/locations/*/gatewaySecurityPolicies/swg-policy`.
+
+This policy is specific to gateways of type 'SECURE_WEB_GATEWAY'.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Optional. The relative resource name identifying the VPC network that is
+using this configuration. For example:
+`projects/*/global/networks/network-1`.
+
+Currently, this field is specific to gateways of type 'SECURE_WEB_GATEWAY'.
+
+=item * C<< $msg->subnetwork() >> / C<< $msg->subnetwork($value) >>
+
+Type: C<String>
+
+Optional. The relative resource name identifying  the subnetwork in which
+this SWG is allocated. For example:
+`projects/*/regions/us-central1/subnetworks/network-1`
+
+Currently, this field is specific to gateways of type 'SECURE_WEB_GATEWAY".
+
+=item * C<< $msg->ip_version() >> / C<< $msg->ip_version($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::Gateway::IpVersion>)
+
+Optional. The IP Version that will be used by this gateway. Valid options
+are IPV4 or IPV6. Default is IPV4.
+
+=item * C<< $msg->envoy_headers() >> / C<< $msg->envoy_headers($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::EnvoyHeaders>)
+
+Optional. Determines if envoy will insert internal debug headers into
+upstream requests. Other Envoy headers may still be injected. By default,
+envoy will not insert any debug headers.
+
+=item * C<< $msg->routing_mode() >> / C<< $msg->routing_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networkservices::V1::Gateway::RoutingMode>)
+
+Optional. The routing mode of the Gateway.
+This field is configurable only for gateways of type SECURE_WEB_GATEWAY.
+This field is required for gateways of type SECURE_WEB_GATEWAY.
+
+=item * C<< $msg->allow_global_access() >> / C<< $msg->allow_global_access($value) >>
+
+Type: C<Bool>
+
+Optional. If true, the gateway will allow traffic from clients outside of
+the region where the gateway is located.
+This field is configurable only for gateways of type SECURE_WEB_GATEWAY.
+
+=back
+
+=head3 Enum: Gateway::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<OPEN_MESH> => C<1>
+
+=item * C<SECURE_WEB_GATEWAY> => C<2>
+
+=back
+
+=head3 Enum: Gateway::IpVersion
+
+=over 4
+
+=item * C<IP_VERSION_UNSPECIFIED> => C<0>
+
+=item * C<IPV4> => C<1>
+
+=item * C<IPV6> => C<2>
+
+=back
+
+=head3 Enum: Gateway::RoutingMode
+
+=over 4
+
+=item * C<EXPLICIT_ROUTING_MODE> => C<0>
+
+=item * C<NEXT_HOP_ROUTING_MODE> => C<1>
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Gateway::ListGatewaysRequest
+
+Request used with the ListGateways method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the Gateways should be
+listed, specified in the format `projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of Gateways to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListGatewaysResponse`
+Indicates that this is a continuation of a prior `ListGateways` call,
+and that the system should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Gateway::ListGatewaysResponse
+
+Response returned by the ListGateways method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->gateways() >> / C<< $msg->gateways($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Gateway::Gateway>)
+
+List of Gateway resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Gateway::GetGatewayRequest
+
+Request used by the GetGateway method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the Gateway to get. Must be in the format
+`projects/*/locations/*/gateways/*`.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Gateway::CreateGatewayRequest
+
+Request used by the CreateGateway method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the Gateway. Must be in the
+format `projects/*/locations/*`.
+
+=item * C<< $msg->gateway_id() >> / C<< $msg->gateway_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the Gateway resource to be created.
+
+=item * C<< $msg->gateway() >> / C<< $msg->gateway($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Gateway::Gateway>)
+
+Required. Gateway resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Gateway::UpdateGatewayRequest
+
+Request used by the UpdateGateway method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+Gateway resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->gateway() >> / C<< $msg->gateway($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::Gateway::Gateway>)
+
+Required. Updated Gateway resource.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::Gateway::DeleteGatewayRequest
+
+Request used by the DeleteGateway method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the Gateway to delete. Must be in the format
+`projects/*/locations/*/gateways/*`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::Gateway::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

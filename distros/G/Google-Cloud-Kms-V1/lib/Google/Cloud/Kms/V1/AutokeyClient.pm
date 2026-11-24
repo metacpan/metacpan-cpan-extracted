@@ -10,14 +10,14 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Kms::V1::HsmManagement;
-use Google::Cloud::Kms::V1::AutokeyAdmin;
-use Google::Cloud::Kms::V1::Autokey;
-use Google::Cloud::Kms::V1::EkmService;
 use Google::Cloud::Kms::V1::Resources;
+use Google::Cloud::Kms::V1::EkmService;
+use Google::Cloud::Kms::V1::AutokeyAdmin;
+use Google::Cloud::Kms::V1::HsmManagement;
+use Google::Cloud::Kms::V1::Autokey;
 use Google::Cloud::Kms::V1::Service;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -128,9 +128,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/cloud/kms/v1/autokey_admin.proto>
-
 =item * C<googleapis/google/cloud/kms/v1/autokey.proto>
+
+=item * C<googleapis/google/cloud/kms/v1/autokey_admin.proto>
 
 =item * C<googleapis/google/cloud/kms/v1/ekm_service.proto>
 
@@ -173,7 +173,29 @@ The following RPC methods are available in this client:
 
 =item * B<create_key_handle>
 
-Calls the RPC method C<CreateKeyHandle> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_key_handle(
+        parent                   => $parent,
+        key_handle_id            => $key_handle_id,
+        key_handle               => $key_handle,
+    );
+
+Calls the RPC method C<CreateKeyHandle> on C<google.cloud.kms.v1.Autokey>.
+
+Request: L<Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<key_handle_id> - C<string>
+
+=item * C<key_handle> - L<Google::Cloud::Kms::V1::Autokey::KeyHandle>
+
+=back
 
 =back
 

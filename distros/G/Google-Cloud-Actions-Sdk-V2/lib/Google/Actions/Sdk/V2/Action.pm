@@ -1,0 +1,185 @@
+package Google::Actions::Sdk::V2::Action;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+CiJnb29nbGUvYWN0aW9ucy9zZGsvdjIvYWN0aW9uLnByb3RvEhVnb29nbGUuYWN0aW9ucy5z
+ZGsudjIiuwYKB0FjdGlvbnMSQgoGY3VzdG9tGAMgAygLMiouZ29vZ2xlLmFjdGlvbnMuc2Rr
+LnYyLkFjdGlvbnMuQ3VzdG9tRW50cnlSBmN1c3RvbRqoBAoKRW5nYWdlbWVudBIUCgV0aXRs
+ZRgBIAEoCVIFdGl0bGUSZwoRcHVzaF9ub3RpZmljYXRpb24YAiABKAsyOi5nb29nbGUuYWN0
+aW9ucy5zZGsudjIuQWN0aW9ucy5FbmdhZ2VtZW50LlB1c2hOb3RpZmljYXRpb25SEHB1c2hO
+b3RpZmljYXRpb24SWgoMZGFpbHlfdXBkYXRlGAMgASgLMjUuZ29vZ2xlLmFjdGlvbnMuc2Rr
+LnYyLkFjdGlvbnMuRW5nYWdlbWVudC5EYWlseVVwZGF0ZUgAUgtkYWlseVVwZGF0ZRJZCgth
+Y3Rpb25fbGluaxgEIAEoCzI0Lmdvb2dsZS5hY3Rpb25zLnNkay52Mi5BY3Rpb25zLkVuZ2Fn
+ZW1lbnQuQWN0aW9uTGlua0ICGAFSCmFjdGlvbkxpbmsSXgoOYXNzaXN0YW50X2xpbmsYBiAB
+KAsyNy5nb29nbGUuYWN0aW9ucy5zZGsudjIuQWN0aW9ucy5FbmdhZ2VtZW50LkFzc2lzdGFu
+dExpbmtSDWFzc2lzdGFudExpbmsaEgoQUHVzaE5vdGlmaWNhdGlvbhoNCgtEYWlseVVwZGF0
+ZRomCgpBY3Rpb25MaW5rEhQKBXRpdGxlGAEgASgJUgV0aXRsZToCGAEaJQoNQXNzaXN0YW50
+TGluaxIUCgV0aXRsZRgBIAEoCVIFdGl0bGVCEgoQcmVjdXJyaW5nX3VwZGF0ZRpZCgxDdXN0
+b21BY3Rpb24SSQoKZW5nYWdlbWVudBgCIAEoCzIpLmdvb2dsZS5hY3Rpb25zLnNkay52Mi5B
+Y3Rpb25zLkVuZ2FnZW1lbnRSCmVuZ2FnZW1lbnQaZgoLQ3VzdG9tRW50cnkSEAoDa2V5GAEg
+ASgJUgNrZXkSQQoFdmFsdWUYAiABKAsyKy5nb29nbGUuYWN0aW9ucy5zZGsudjIuQWN0aW9u
+cy5DdXN0b21BY3Rpb25SBXZhbHVlOgI4AUJkChljb20uZ29vZ2xlLmFjdGlvbnMuc2RrLnYy
+QgtBY3Rpb25Qcm90b1ABWjhnb29nbGUuZ29sYW5nLm9yZy9nZW5wcm90by9nb29nbGVhcGlz
+L2FjdGlvbnMvc2RrL3YyO3Nka0ryHgoGEgQOAGYBCrwECgEMEgMOABIysQQgQ29weXJpZ2h0
+IDIwMjUgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwg
+VmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNlIHRoaXMgZmls
+ZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91IG1heSBvYnRh
+aW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cuYXBhY2hlLm9y
+Zy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxl
+IGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3RyaWJ1dGVkIHVu
+ZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIgQkFTSVMsCiBX
+SVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwgZWl0aGVyIGV4
+cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNwZWNpZmljIGxh
+bmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25zIHVuZGVyIHRo
+ZSBMaWNlbnNlLgoKCAoBAhIDEAAeCggKAQgSAxIATwoJCgIICxIDEgBPCggKAQgSAxMAIgoJ
+CgIIChIDEwAiCggKAQgSAxQALAoJCgIICBIDFAAsCggKAQgSAxUAMgoJCgIIARIDFQAyCkIK
+AgQAEgQYAGYBGjYgUmVwcmVzZW50cyB0aGUgbGlzdCBvZiBBY3Rpb25zIGRlZmluZWQgaW4g
+YSBwcm9qZWN0LgoKCgoDBAABEgMYCA8KmgEKBAQAAwASBBsCVAMaiwEgRGVmaW5lcyB0aGUg
+ZW5nYWdlbWVudCBtZWNoYW5pc21zIGFzc29jaWF0ZWQgd2l0aCB0aGlzIGFjdGlvbi4gVGhp
+cwogYWxsb3dzIGVuZCB1c2VycyB0byBzdWJzY3JpYmUgdG8gcHVzaCBub3RpZmljYXRpb24g
+YW5kIGRhaWx5IHVwZGF0ZS4KCgwKBQQAAwABEgMbChQKUwoGBAADAAMAEgQdBB8FGkMgRGVm
+aW5lcyBwdXNoIG5vdGlmaWNhdGlvbiBzZXR0aW5ncyB0aGF0IHRoaXMgZW5nYWdlbWVudCBz
+dXBwb3J0cy4KCg4KBwQAAwADAAESAx0MHApOCgYEAAMAAwESBCIEJAUaPiBEZWZpbmVzIGRh
+aWx5IHVwZGF0ZSBzZXR0aW5ncyB0aGF0IHRoaXMgZW5nYWdlbWVudCBzdXBwb3J0cy4KCg4K
+BwQAAwADAQESAyIMFwrnAQoGBAADAAMCEgQqBC8FGtYBIEluZGljYXRlcyB3aGV0aGVyIHNo
+YXJpbmcgbGlua3MgaXMgZW5hYmxlZCBmb3IgdGhpcyBhY3Rpb24gYW5kIHRoZQogY29ycmVz
+cG9uZGluZyBzZXR0aW5ncy4gQWN0aW9uIGxpbmtzIGFyZSB1c2VkIHRvIGRlZXAgbGluayBh
+IHVzZXIgaW50byBhCiBzcGVjaWZpYyBhY3Rpb24uCiBBY3Rpb25MaW5rIGlzIGRlcHJlY2F0
+ZWQuIFVzZSBBc3Npc3RhbnRMaW5rIGluc3RlYWQuCgoOCgcEAAMAAwIBEgMqDBYKDgoHBAAD
+AAMCBxIDKwYfCg8KCAQAAwADAgcDEgMrBh8KPAoIBAADAAMCAgASAy4GFxorIFVzZXIgZnJp
+ZW5kbHkgZGlzcGxheSB0aXRsZSBmb3IgdGhlIGxpbmsuCgoQCgkEAAMAAwICAAUSAy4GDAoQ
+CgkEAAMAAwICAAESAy4NEgoQCgkEAAMAAwICAAMSAy4VFgq0AQoGBAADAAMDEgQ0BDcFGqMB
+IEluZGljYXRlcyB3aGV0aGVyIHNoYXJpbmcgbGlua3MgaXMgZW5hYmxlZCBmb3IgdGhpcyBh
+Y3Rpb24gYW5kIHRoZQogY29ycmVzcG9uZGluZyBzZXR0aW5ncy4gQXNzaXN0YW50IGxpbmtz
+IGFyZSB1c2VkIHRvIGRlZXAgbGluayBhIHVzZXIgaW50bwogYSBzcGVjaWZpYyBhY3Rpb24u
+CgoOCgcEAAMAAwMBEgM0DBkKPAoIBAADAAMDAgASAzYGFxorIFVzZXIgZnJpZW5kbHkgZGlz
+cGxheSB0aXRsZSBmb3IgdGhlIGxpbmsuCgoQCgkEAAMAAwMCAAUSAzYGDAoQCgkEAAMAAwMC
+AAESAzYNEgoQCgkEAAMAAwMCAAMSAzYVFgr2AgoGBAADAAIAEgM/BBUa5gIgVGhlIHRpdGxl
+IG9mIHRoZSBlbmdhZ2VtZW50IHRoYXQgd2lsbCBiZSBzZW50IHRvIGVuZCB1c2VycyBhc2tp
+bmcgZm9yCiB0aGVpciBwZXJtaXNzaW9uIHRvIHJlY2VpdmUgdXBkYXRlcy4gVGhlIHByb21w
+dCBzZW50IHRvIGVuZCB1c2VycyBmb3IKIGRhaWx5IHVwZGF0ZXMgd2lsbCBsb29rIGxpa2Ug
+IldoYXQgdGltZSB3b3VsZCB5b3UgbGlrZSBtZSB0byBzZW5kIHlvdXIKIGRhaWx5IHt0aXRs
+ZX0iIGFuZCBmb3IgcHVzaCBub3RpZmljYXRpb25zIHdpbGwgbG9vayBsaWtlCiAiSXMgaXQg
+b2sgaWYgSSBzZW5kIHB1c2ggbm90aWZpY2F0aW9ucyBmb3Ige3RpdGxlfSIuCiAqKlRoaXMg
+ZmllbGQgaXMgbG9jYWxpemFibGUuKioKCg4KBwQAAwACAAUSAz8ECgoOCgcEAAMAAgABEgM/
+CxAKDgoHBAADAAIAAxIDPxMUCkoKBgQAAwACARIDQgQrGjsgUHVzaCBub3RpZmljYXRpb24g
+c2V0dGluZ3MgdGhhdCB0aGlzIGVuZ2FnZW1lbnQgc3VwcG9ydHMuCgoOCgcEAAMAAgEGEgNC
+BBQKDgoHBAADAAIBARIDQhUmCg4KBwQAAwACAQMSA0IpKgpKCgYEAAMACAASBEUESAUaOiBS
+ZWN1cnJpbmcgdXBkYXRlIHNldHRpbmdzIHRoYXQgdGhpcyBlbmdhZ2VtZW50IHN1cHBvcnRz
+LgoKDgoHBAADAAgAARIDRQoaCkUKBgQAAwACAhIDRwYjGjYgRGFpbHkgdXBkYXRlIHNldHRp
+bmdzIHRoYXQgdGhpcyBlbmdhZ2VtZW50IHN1cHBvcnRzLgoKDgoHBAADAAICBhIDRwYRCg4K
+BwQAAwACAgESA0cSHgoOCgcEAAMAAgIDEgNHISIK5QEKBgQAAwACAxIDTgQzGtUBIExpbmsg
+Y29uZmlnIGZvciBhbiBhY3Rpb24gd2hpY2ggZGV0ZXJtaW5lcyB3aGV0aGVyIHNoYXJpbmcg
+bGlua3MgaXMKIGVuYWJsZWQgZm9yIHRoZSBhY3Rpb24gYW5kIGlmIHNvLCBjb250YWlucyB0
+aGUgdXNlciBmcmllbmRseSBkaXNwbGF5IG5hbWUKIGZvciB0aGUgbGluay4KIEFjdGlvbkxp
+bmsgaXMgZGVwcmVjYXRlZC4gVXNlIEFzc2lzdGFudExpbmsgaW5zdGVhZC4KCg4KBwQAAwAC
+AwYSA04EDgoOCgcEAAMAAgMBEgNODxoKDgoHBAADAAIDAxIDTh0eCg4KBwQAAwACAwgSA04f
+MgoPCggEAAMAAgMIAxIDTiAxCq8BCgYEAAMAAgQSA1MEJRqfASBMaW5rIGNvbmZpZyBmb3Ig
+YW4gYWN0aW9uIHdoaWNoIGRldGVybWluZXMgd2hldGhlciBzaGFyaW5nIGxpbmtzIGlzCiBl
+bmFibGVkIGZvciB0aGUgYWN0aW9uIGFuZCBpZiBzbywgY29udGFpbnMgdGhlIHVzZXIgZnJp
+ZW5kbHkgZGlzcGxheSBuYW1lCiBmb3IgdGhlIGxpbmsuCgoOCgcEAAMAAgQGEgNTBBEKDgoH
+BAADAAIEARIDUxIgCg4KBwQAAwACBAMSA1MjJAoyCgQEAAMBEgRXAl4DGiQgRGV0YWlscyBy
+ZWdhcmRpbmcgYSBjdXN0b20gYWN0aW9uLgoKDAoFBAADAQESA1cKFgrDAgoGBAADAQIAEgNd
+BB4aswIgRW5nYWdlbWVudCBtZWNoYW5pc21zIGFzc29jaWF0ZWQgd2l0aCB0aGUgYWN0aW9u
+IHRvIGhlbHAgZW5kIHVzZXJzCiBzdWJzY3JpYmUgdG8gcHVzaCBub3RpZmljYXRpb25zIGFu
+ZCBkYWlseSB1cGRhdGVzLgogTm90ZSB0aGF0IHRoZSBpbnRlbnQgbmFtZSBzcGVjaWZpZWQg
+aW4gZGFpbHkgdXBkYXRlcy9wdXNoIG5vdGlmaWNhdGlvbnMKIHNsb3QgY29uZmlnIG5lZWRz
+IHRvIG1hdGNoIHRoZSBpbnRlbnQgY29ycmVzcG9uZGluZyB0byB0aGlzIGFjdGlvbiBmb3IK
+IGVuZCB1c2VycyB0byBzdWJzY3JpYmUgdG8gdGhlc2UgdXBkYXRlcy4KCg4KBwQAAwECAAYS
+A10EDgoOCgcEAAMBAgABEgNdDxkKDgoHBAADAQIAAxIDXRwdCssCCgQEAAIAEgNlAicavQIg
+TWFwIGZyb20gaW50ZW50cyB0byBjdXN0b20gQWN0aW9ucyB0byBjb25maWd1cmUgaW52b2Nh
+dGlvbiBmb3IgdGhlIHByb2plY3QuCiBUaGUgaW52b2NhdGlvbiBpbnRlbnRzIGNvdWxkIGVp
+dGhlciBiZSBzeXN0ZW0gb3IgY3VzdG9tIGludGVudHMgZGVmaW5lZAogaW4gdGhlICJjdXN0
+b20vaW50ZW50cy8iIHBhY2thZ2UuIEFsbCBpbnRlbnRzIGRlZmluZWQgaGVyZSAoc3lzdGVt
+CiBpbnRlbnRzICYgY3VzdG9tIGludGVudHMpIG11c3QgaGF2ZSBhIGNvcnJlc3BvbmRpbmcg
+aW50ZW50IGZpbGUgaW4gdGhlCiAiY3VzdG9tL2dsb2JhbC8iIHBhY2thZ2UuCgoMCgUEAAIA
+BhIDZQIbCgwKBQQAAgABEgNlHCIKDAoFBAACAAMSA2UlJmIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Actions::Sdk::V2::Action::Actions ===
+    # Fields for Actions
+    # Field: custom Type: 11 (.google.actions.sdk.v2.Actions.CustomEntry)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Actions::Sdk::V2::Action - Compiled Protocol Buffers messages for google/actions/sdk/v2/action.proto
+
+=head1 SYNOPSIS
+
+    use Google::Actions::Sdk::V2::Action;
+
+    my $msg = Google::Actions::Sdk::V2::Action::Actions->new({
+        custom => $custom,
+    });
+
+    # Read or update a field
+    my $val = $msg->custom();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Actions::Sdk::V2::Action::Actions->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/actions/sdk/v2/action.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Actions::Sdk::V2::Action::Actions
+
+Represents the list of Actions defined in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->custom() >> / C<< $msg->custom($value) >>
+
+Type: C<Message> (L<Google::Actions::Sdk::V2::Action::Actions::CustomEntry>)
+
+Map from intents to custom Actions to configure invocation for the project.
+The invocation intents could either be system or custom intents defined
+in the "custom/intents/" package. All intents defined here (system
+intents & custom intents) must have a corresponding intent file in the
+"custom/global/" package.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Actions::Sdk::V2::Action::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

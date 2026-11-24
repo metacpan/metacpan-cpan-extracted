@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::FileService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -127,268 +127,49 @@ EOF
     # Fields for CreateFileRequest
     # Field: file Type: 11 (.google.ai.generativelanguage.v1beta.File)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::FileService::CreateFileRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::FileService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::FileService::CreateFileRequest->new(
-        file => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<file>
-
-Type: Message (.google.ai.generativelanguage.v1beta.File)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::FileService::CreateFileResponse ===
     # Fields for CreateFileResponse
     # Field: file Type: 11 (.google.ai.generativelanguage.v1beta.File)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::FileService::CreateFileResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::FileService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::FileService::CreateFileResponse->new(
-        file => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<file>
-
-Type: Message (.google.ai.generativelanguage.v1beta.File)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::FileService::ListFilesRequest ===
     # Fields for ListFilesRequest
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::FileService::ListFilesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::FileService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::FileService::ListFilesRequest->new(
-        page_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::FileService::ListFilesResponse ===
     # Fields for ListFilesResponse
     # Field: files Type: 11 (.google.ai.generativelanguage.v1beta.File)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::FileService::ListFilesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::FileService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::FileService::ListFilesResponse->new(
-        files => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<files>
-
-Type: Message (.google.ai.generativelanguage.v1beta.File)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::FileService::GetFileRequest ===
     # Fields for GetFileRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::FileService::GetFileRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::FileService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::FileService::GetFileRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::FileService::DeleteFileRequest ===
     # Fields for DeleteFileRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::FileService::DeleteFileRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::FileService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::FileService::DeleteFileRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileRequest ===
     # Fields for DownloadFileRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::FileService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileResponse ===
     # Fields for DownloadFileResponse
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::FileService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Service Client: Google::Ai::Generativelanguage::V1beta::FileService::FileServiceClient ===
 package Google::Ai::Generativelanguage::V1beta::FileService::FileServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Ai::Generativelanguage::V1beta::FileService::FileServiceClient
 
-Google::Ai::Generativelanguage::V1beta::FileService::FileServiceClient - Client stub representing the remote FileService service
+Client stub representing the remote C<FileService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<ai.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -482,13 +263,190 @@ sub download_file {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::FileService - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::FileService - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/file_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::FileService;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::FileService::CreateFileRequest->new({
+        file => $file,
+    });
+
+    # Read or update a field
+    my $val = $msg->file();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::FileService::CreateFileRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/file_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::FileService::CreateFileRequest
+
+Request for `CreateFile`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->file() >> / C<< $msg->file($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::File::File>)
+
+Optional. Metadata for the file to create.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::FileService::CreateFileResponse
+
+Response for `CreateFile`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->file() >> / C<< $msg->file($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::File::File>)
+
+Metadata for the created file.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::FileService::ListFilesRequest
+
+Request for `ListFiles`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of `File`s to return per page.
+If unspecified, defaults to 10. Maximum `page_size` is 100.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token from a previous `ListFiles` call.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::FileService::ListFilesResponse
+
+Response for `ListFiles`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->files() >> / C<< $msg->files($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::File::File>)
+
+The list of `File`s.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as a `page_token` into a subsequent `ListFiles`
+call.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::FileService::GetFileRequest
+
+Request for `GetFile`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `File` to get.
+Example: `files/abc-123`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::FileService::DeleteFileRequest
+
+Request for `DeleteFile`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `File` to delete.
+Example: `files/abc-123`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileRequest
+
+Request for `DownloadFile`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `File` to download.
+Example: `files/abc-123`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileResponse
+
+Response for `DownloadFile`.
+
+Inherits from L<Protobuf::Message>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::FileService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

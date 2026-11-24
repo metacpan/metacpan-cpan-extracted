@@ -13,7 +13,7 @@ use Google::Api::Common;
 use Google::Pubsub::V1::Schema;
 use Google::Pubsub::V1::Pubsub;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -161,7 +161,13 @@ The following RPC methods are available in this client:
 
 =item * B<create_topic>
 
-Calls the RPC method C<CreateTopic> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_topic();
+
+Calls the RPC method C<CreateTopic> on C<google.pubsub.v1.Publisher>.
+
+Request: L<Google::Pubsub::V1::Pubsub::Topic>
+
+Returns: L<Google::Pubsub::V1::Pubsub::Topic>
 
 =back
 

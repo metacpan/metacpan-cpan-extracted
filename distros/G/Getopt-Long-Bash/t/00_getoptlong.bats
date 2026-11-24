@@ -889,11 +889,11 @@ END
         show() { printf '[%s]' "$@" ; echo ; }
         declare -A OPTS=([action|a:]=)
         getoptlong init OPTS
-        getoptlong callback action 'show * ?'
+        getoptlong callback action show '*' '?'
         getoptlong parse --action go
     END
     assert_success
-    assert_output '[action][*][?][go]'
+    assert_output '[*][?][action][go]'
 }
 
 # Test: Callback execution
@@ -903,13 +903,13 @@ END
         my_callback() { echo "Callback invoked with value: $*"; }
         declare -A OPTS=([action|a:]=)
         getoptlong init OPTS
-        getoptlong callback action "my_callback --with-option" # Register callback
+        getoptlong callback action my_callback --with-option # Register callback
         getoptlong parse --action perform_action # Parse options
         eval "$(getoptlong set)" # Set variables
         # Callback output should be part of stdout if it echos.
     '
     assert_success
-    assert_output --partial "Callback invoked with value: action --with-option perform_action"
+    assert_output --partial "Callback invoked with value: --with-option action perform_action"
 }
 
 @test "getoptlong: callback --before" {
@@ -918,13 +918,117 @@ END
         my_callback() { echo "Callback invoked with value: $*"; }
         declare -A OPTS=([action|a:]=)
         getoptlong init OPTS
-        getoptlong callback --before action "my_callback --with-option" # Register callback
+        getoptlong callback --before action my_callback --with-option # Register callback
         getoptlong parse --action perform_action # Parse options
         eval "$(getoptlong set)" # Set variables
         # Callback output should be part of stdout if it echos.
     '
     assert_success
-    assert_output --partial "Callback invoked with value: action --with-option"
+    assert_output --partial "Callback invoked with value: --with-option action"
+}
+
+# Test: a common callback function called with different fixed arguments
+@test "getoptlong: callback - common function with fixed arguments" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        set_level() { printf '[%s]' "$@" ; echo ; }
+        declare -A OPTS=([quiet|q]= [verbose|v]= [mode|m:]=)
+        getoptlong init OPTS
+        getoptlong callback quiet set_level 0
+        getoptlong callback verbose set_level 2
+        getoptlong callback mode set_level 9 x
+        getoptlong callback --before mode set_level -1
+        getoptlong parse -q --verbose --mode fast
+    END
+    assert_success
+    assert_line --index 0 '[0][quiet][1]'
+    assert_line --index 1 '[2][verbose][1]'
+    assert_line --index 2 '[-1][mode]'
+    assert_line --index 3 '[9][x][mode][fast]'
+}
+
+# Test: a fixed argument with white space is an error
+@test "getoptlong: callback - fixed argument with white space" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        show() { : ; }
+        declare -A OPTS=([action|a:]=)
+        getoptlong init OPTS
+        getoptlong callback action show "a b"
+        echo not reached
+    END
+    assert_failure
+    assert_output "'a b': invalid callback argument"
+}
+
+# Test: an empty fixed argument is an error
+@test "getoptlong: callback - empty fixed argument" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        show() { : ; }
+        declare -A OPTS=([action|a:]=)
+        getoptlong init OPTS
+        getoptlong callback action show ""
+        echo not reached
+    END
+    assert_failure
+    assert_output "'': invalid callback argument"
+}
+
+# Test: "-" stands for the default function name
+@test "getoptlong: callback - default function with fixed arguments" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        my_action() { printf '[%s]' "$@" ; echo ; }
+        declare -A OPTS=([my-action|a:]=)
+        getoptlong init OPTS
+        getoptlong callback my-action - x
+        getoptlong parse --my-action go
+    END
+    assert_success
+    assert_output '[x][my-action][go]'
+}
+
+# Test: a callback registered with an alias name
+@test "getoptlong: callback - registered with alias" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        show() { printf '[%s]' "$@" ; echo ; }
+        declare -A OPTS=([action|a:]=)
+        getoptlong init OPTS
+        getoptlong callback a show
+        getoptlong parse -a go
+    END
+    assert_success
+    assert_output '[action][go]'
+}
+
+# Test: a callback for an undefined option is an error
+@test "getoptlong: callback - undefined option" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        show() { : ; }
+        declare -A OPTS=([action|a:]=)
+        getoptlong init OPTS
+        getoptlong callback actoin show
+        echo not reached
+    END
+    assert_failure
+    assert_output "actoin: no such option"
+}
+
+# Test: a function name with white space is an error
+@test "getoptlong: callback - function name with white space" {
+    run $BASH <<'    END'
+        . ../script/getoptlong.sh
+        show() { : ; }
+        declare -A OPTS=([action|a:]=)
+        getoptlong init OPTS
+        getoptlong callback action "show x"
+        echo not reached
+    END
+    assert_failure
+    assert_output "show x: invalid function name"
 }
 
 @test "getoptlong: callback type option" {

@@ -1,0 +1,1153 @@
+package Google::Cloud::Translation::V3::AdaptiveMt;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Translation::V3::Common };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+Citnb29nbGUvY2xvdWQvdHJhbnNsYXRlL3YzL2FkYXB0aXZlX210LnByb3RvEhtnb29nbGUu
+Y2xvdWQudHJhbnNsYXRpb24udjMaH2dvb2dsZS9hcGkvZmllbGRfYmVoYXZpb3IucHJvdG8a
+GWdvb2dsZS9hcGkvcmVzb3VyY2UucHJvdG8aJmdvb2dsZS9jbG91ZC90cmFuc2xhdGUvdjMv
+Y29tbW9uLnByb3RvGh9nb29nbGUvcHJvdG9idWYvdGltZXN0YW1wLnByb3RvIoIEChFBZGFw
+dGl2ZU10RGF0YXNldBJGCgRuYW1lGAEgASgJQjLgQQL6QSwKKnRyYW5zbGF0ZS5nb29nbGVh
+cGlzLmNvbS9BZGFwdGl2ZU10RGF0YXNldFIEbmFtZRIhCgxkaXNwbGF5X25hbWUYAiABKAlS
+C2Rpc3BsYXlOYW1lEjAKFHNvdXJjZV9sYW5ndWFnZV9jb2RlGAMgASgJUhJzb3VyY2VMYW5n
+dWFnZUNvZGUSMAoUdGFyZ2V0X2xhbmd1YWdlX2NvZGUYBCABKAlSEnRhcmdldExhbmd1YWdl
+Q29kZRIjCg1leGFtcGxlX2NvdW50GAUgASgFUgxleGFtcGxlQ291bnQSQAoLY3JlYXRlX3Rp
+bWUYCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNSCmNyZWF0ZVRpbWUS
+QAoLdXBkYXRlX3RpbWUYCiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNS
+CnVwZGF0ZVRpbWU6depBcgoqdHJhbnNsYXRlLmdvb2dsZWFwaXMuY29tL0FkYXB0aXZlTXRE
+YXRhc2V0EkRwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25zL3tsb2NhdGlvbn0vYWRhcHRp
+dmVNdERhdGFzZXRzL3tkYXRhc2V0fSLIAQoeQ3JlYXRlQWRhcHRpdmVNdERhdGFzZXRSZXF1
+ZXN0EkEKBnBhcmVudBgBIAEoCUIp4EEC+kEjCiFsb2NhdGlvbnMuZ29vZ2xlYXBpcy5jb20v
+TG9jYXRpb25SBnBhcmVudBJjChNhZGFwdGl2ZV9tdF9kYXRhc2V0GAIgASgLMi4uZ29vZ2xl
+LmNsb3VkLnRyYW5zbGF0aW9uLnYzLkFkYXB0aXZlTXREYXRhc2V0QgPgQQJSEWFkYXB0aXZl
+TXREYXRhc2V0ImgKHkRlbGV0ZUFkYXB0aXZlTXREYXRhc2V0UmVxdWVzdBJGCgRuYW1lGAEg
+ASgJQjLgQQL6QSwKKnRyYW5zbGF0ZS5nb29nbGVhcGlzLmNvbS9BZGFwdGl2ZU10RGF0YXNl
+dFIEbmFtZSJlChtHZXRBZGFwdGl2ZU10RGF0YXNldFJlcXVlc3QSRgoEbmFtZRgBIAEoCUIy
+4EEC+kEsCip0cmFuc2xhdGUuZ29vZ2xlYXBpcy5jb20vQWRhcHRpdmVNdERhdGFzZXRSBG5h
+bWUixQEKHUxpc3RBZGFwdGl2ZU10RGF0YXNldHNSZXF1ZXN0EkEKBnBhcmVudBgBIAEoCUIp
+4EEC+kEjCiFsb2NhdGlvbnMuZ29vZ2xlYXBpcy5jb20vTG9jYXRpb25SBnBhcmVudBIgCglw
+YWdlX3NpemUYAiABKAVCA+BBAVIIcGFnZVNpemUSIgoKcGFnZV90b2tlbhgDIAEoCUID4EEB
+UglwYWdlVG9rZW4SGwoGZmlsdGVyGAQgASgJQgPgQQFSBmZpbHRlciK0AQoeTGlzdEFkYXB0
+aXZlTXREYXRhc2V0c1Jlc3BvbnNlEmUKFGFkYXB0aXZlX210X2RhdGFzZXRzGAEgAygLMi4u
+Z29vZ2xlLmNsb3VkLnRyYW5zbGF0aW9uLnYzLkFkYXB0aXZlTXREYXRhc2V0QgPgQQNSEmFk
+YXB0aXZlTXREYXRhc2V0cxIrCg9uZXh0X3BhZ2VfdG9rZW4YAiABKAlCA+BBAVINbmV4dFBh
+Z2VUb2tlbiKeCgoaQWRhcHRpdmVNdFRyYW5zbGF0ZVJlcXVlc3QSQQoGcGFyZW50GAEgASgJ
+QingQQL6QSMKIWxvY2F0aW9ucy5nb29nbGVhcGlzLmNvbS9Mb2NhdGlvblIGcGFyZW50EkwK
+B2RhdGFzZXQYAiABKAlCMuBBAvpBLAoqdHJhbnNsYXRlLmdvb2dsZWFwaXMuY29tL0FkYXB0
+aXZlTXREYXRhc2V0UgdkYXRhc2V0Eh0KB2NvbnRlbnQYAyADKAlCA+BBAlIHY29udGVudBIb
+CgltaW1lX3R5cGUYBCABKAlSCG1pbWVUeXBlEpABChlyZWZlcmVuY2Vfc2VudGVuY2VfY29u
+ZmlnGAYgASgLMk8uZ29vZ2xlLmNsb3VkLnRyYW5zbGF0aW9uLnYzLkFkYXB0aXZlTXRUcmFu
+c2xhdGVSZXF1ZXN0LlJlZmVyZW5jZVNlbnRlbmNlQ29uZmlnSABSF3JlZmVyZW5jZVNlbnRl
+bmNlQ29uZmlniAEBEnkKD2dsb3NzYXJ5X2NvbmZpZxgHIAEoCzJGLmdvb2dsZS5jbG91ZC50
+cmFuc2xhdGlvbi52My5BZGFwdGl2ZU10VHJhbnNsYXRlUmVxdWVzdC5HbG9zc2FyeUNvbmZp
+Z0ID4EEBSAFSDmdsb3NzYXJ5Q29uZmlniAEBGmkKFVJlZmVyZW5jZVNlbnRlbmNlUGFpchIn
+Cg9zb3VyY2Vfc2VudGVuY2UYASABKAlSDnNvdXJjZVNlbnRlbmNlEicKD3RhcmdldF9zZW50
+ZW5jZRgCIAEoCVIOdGFyZ2V0U2VudGVuY2UapQEKGVJlZmVyZW5jZVNlbnRlbmNlUGFpckxp
+c3QShwEKGHJlZmVyZW5jZV9zZW50ZW5jZV9wYWlycxgBIAMoCzJNLmdvb2dsZS5jbG91ZC50
+cmFuc2xhdGlvbi52My5BZGFwdGl2ZU10VHJhbnNsYXRlUmVxdWVzdC5SZWZlcmVuY2VTZW50
+ZW5jZVBhaXJSFnJlZmVyZW5jZVNlbnRlbmNlUGFpcnMalAIKF1JlZmVyZW5jZVNlbnRlbmNl
+Q29uZmlnEpQBCh1yZWZlcmVuY2Vfc2VudGVuY2VfcGFpcl9saXN0cxgBIAMoCzJRLmdvb2ds
+ZS5jbG91ZC50cmFuc2xhdGlvbi52My5BZGFwdGl2ZU10VHJhbnNsYXRlUmVxdWVzdC5SZWZl
+cmVuY2VTZW50ZW5jZVBhaXJMaXN0UhpyZWZlcmVuY2VTZW50ZW5jZVBhaXJMaXN0cxIwChRz
+b3VyY2VfbGFuZ3VhZ2VfY29kZRgCIAEoCVISc291cmNlTGFuZ3VhZ2VDb2RlEjAKFHRhcmdl
+dF9sYW5ndWFnZV9jb2RlGAMgASgJUhJ0YXJnZXRMYW5ndWFnZUNvZGUayAEKDkdsb3NzYXJ5
+Q29uZmlnEkUKCGdsb3NzYXJ5GAEgASgJQingQQL6QSMKIXRyYW5zbGF0ZS5nb29nbGVhcGlz
+LmNvbS9HbG9zc2FyeVIIZ2xvc3NhcnkSJAoLaWdub3JlX2Nhc2UYAiABKAhCA+BBAVIKaWdu
+b3JlQ2FzZRJJCh5jb250ZXh0dWFsX3RyYW5zbGF0aW9uX2VuYWJsZWQYBCABKAhCA+BBAVIc
+Y29udGV4dHVhbFRyYW5zbGF0aW9uRW5hYmxlZEIcChpfcmVmZXJlbmNlX3NlbnRlbmNlX2Nv
+bmZpZ0ISChBfZ2xvc3NhcnlfY29uZmlnIkUKFUFkYXB0aXZlTXRUcmFuc2xhdGlvbhIsCg90
+cmFuc2xhdGVkX3RleHQYASABKAlCA+BBA1IOdHJhbnNsYXRlZFRleHQijQIKG0FkYXB0aXZl
+TXRUcmFuc2xhdGVSZXNwb25zZRJbCgx0cmFuc2xhdGlvbnMYASADKAsyMi5nb29nbGUuY2xv
+dWQudHJhbnNsYXRpb24udjMuQWRhcHRpdmVNdFRyYW5zbGF0aW9uQgPgQQNSDHRyYW5zbGF0
+aW9ucxIoCg1sYW5ndWFnZV9jb2RlGAIgASgJQgPgQQNSDGxhbmd1YWdlQ29kZRJnChVnbG9z
+c2FyeV90cmFuc2xhdGlvbnMYBCADKAsyMi5nb29nbGUuY2xvdWQudHJhbnNsYXRpb24udjMu
+QWRhcHRpdmVNdFRyYW5zbGF0aW9uUhRnbG9zc2FyeVRyYW5zbGF0aW9ucyLLAwoOQWRhcHRp
+dmVNdEZpbGUSQwoEbmFtZRgBIAEoCUIv4EEC+kEpCid0cmFuc2xhdGUuZ29vZ2xlYXBpcy5j
+b20vQWRhcHRpdmVNdEZpbGVSBG5hbWUSIQoMZGlzcGxheV9uYW1lGAIgASgJUgtkaXNwbGF5
+TmFtZRIfCgtlbnRyeV9jb3VudBgDIAEoBVIKZW50cnlDb3VudBJACgtjcmVhdGVfdGltZRgE
+IAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCA+BBA1IKY3JlYXRlVGltZRJACgt1
+cGRhdGVfdGltZRgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBCA+BBA1IKdXBk
+YXRlVGltZTqrAepBpwEKJ3RyYW5zbGF0ZS5nb29nbGVhcGlzLmNvbS9BZGFwdGl2ZU10Rmls
+ZRJbcHJvamVjdHMve3Byb2plY3R9L2xvY2F0aW9ucy97bG9jYXRpb259L2FkYXB0aXZlTXRE
+YXRhc2V0cy97ZGF0YXNldH0vYWRhcHRpdmVNdEZpbGVzL3tmaWxlfSoPYWRhcHRpdmVNdEZp
+bGVzMg5hZGFwdGl2ZU10RmlsZSJfChhHZXRBZGFwdGl2ZU10RmlsZVJlcXVlc3QSQwoEbmFt
+ZRgBIAEoCUIv4EEC+kEpCid0cmFuc2xhdGUuZ29vZ2xlYXBpcy5jb20vQWRhcHRpdmVNdEZp
+bGVSBG5hbWUiYgobRGVsZXRlQWRhcHRpdmVNdEZpbGVSZXF1ZXN0EkMKBG5hbWUYASABKAlC
+L+BBAvpBKQondHJhbnNsYXRlLmdvb2dsZWFwaXMuY29tL0FkYXB0aXZlTXRGaWxlUgRuYW1l
+IqgCChtJbXBvcnRBZGFwdGl2ZU10RmlsZVJlcXVlc3QSSgoGcGFyZW50GAEgASgJQjLgQQL6
+QSwKKnRyYW5zbGF0ZS5nb29nbGVhcGlzLmNvbS9BZGFwdGl2ZU10RGF0YXNldFIGcGFyZW50
+EloKEWZpbGVfaW5wdXRfc291cmNlGAIgASgLMiwuZ29vZ2xlLmNsb3VkLnRyYW5zbGF0aW9u
+LnYzLkZpbGVJbnB1dFNvdXJjZUgAUg9maWxlSW5wdXRTb3VyY2USVwoQZ2NzX2lucHV0X3Nv
+dXJjZRgDIAEoCzIrLmdvb2dsZS5jbG91ZC50cmFuc2xhdGlvbi52My5HY3NJbnB1dFNvdXJj
+ZUgAUg5nY3NJbnB1dFNvdXJjZUIICgZzb3VyY2UiegocSW1wb3J0QWRhcHRpdmVNdEZpbGVS
+ZXNwb25zZRJaChBhZGFwdGl2ZV9tdF9maWxlGAEgASgLMisuZ29vZ2xlLmNsb3VkLnRyYW5z
+bGF0aW9uLnYzLkFkYXB0aXZlTXRGaWxlQgPgQQNSDmFkYXB0aXZlTXRGaWxlIq4BChpMaXN0
+QWRhcHRpdmVNdEZpbGVzUmVxdWVzdBJKCgZwYXJlbnQYASABKAlCMuBBAvpBLAoqdHJhbnNs
+YXRlLmdvb2dsZWFwaXMuY29tL0FkYXB0aXZlTXREYXRhc2V0UgZwYXJlbnQSIAoJcGFnZV9z
+aXplGAIgASgFQgPgQQFSCHBhZ2VTaXplEiIKCnBhZ2VfdG9rZW4YAyABKAlCA+BBAVIJcGFn
+ZVRva2VuIqgBChtMaXN0QWRhcHRpdmVNdEZpbGVzUmVzcG9uc2USXAoRYWRhcHRpdmVfbXRf
+ZmlsZXMYASADKAsyKy5nb29nbGUuY2xvdWQudHJhbnNsYXRpb24udjMuQWRhcHRpdmVNdEZp
+bGVCA+BBA1IPYWRhcHRpdmVNdEZpbGVzEisKD25leHRfcGFnZV90b2tlbhgDIAEoCUID4EEB
+Ug1uZXh0UGFnZVRva2VuIpYEChJBZGFwdGl2ZU10U2VudGVuY2USRwoEbmFtZRgBIAEoCUIz
+4EEC+kEtCit0cmFuc2xhdGUuZ29vZ2xlYXBpcy5jb20vQWRhcHRpdmVNdFNlbnRlbmNlUgRu
+YW1lEiwKD3NvdXJjZV9zZW50ZW5jZRgCIAEoCUID4EECUg5zb3VyY2VTZW50ZW5jZRIsCg90
+YXJnZXRfc2VudGVuY2UYAyABKAlCA+BBAlIOdGFyZ2V0U2VudGVuY2USQAoLY3JlYXRlX3Rp
+bWUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNSCmNyZWF0ZVRpbWUS
+QAoLdXBkYXRlX3RpbWUYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wQgPgQQNS
+CnVwZGF0ZVRpbWU61gHqQdIBCit0cmFuc2xhdGUuZ29vZ2xlYXBpcy5jb20vQWRhcHRpdmVN
+dFNlbnRlbmNlEnpwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25zL3tsb2NhdGlvbn0vYWRh
+cHRpdmVNdERhdGFzZXRzL3tkYXRhc2V0fS9hZGFwdGl2ZU10RmlsZXMve2ZpbGV9L2FkYXB0
+aXZlTXRTZW50ZW5jZXMve3NlbnRlbmNlfSoTYWRhcHRpdmVNdFNlbnRlbmNlczISYWRhcHRp
+dmVNdFNlbnRlbmNlIqUBCh5MaXN0QWRhcHRpdmVNdFNlbnRlbmNlc1JlcXVlc3QSRwoGcGFy
+ZW50GAEgASgJQi/gQQL6QSkKJ3RyYW5zbGF0ZS5nb29nbGVhcGlzLmNvbS9BZGFwdGl2ZU10
+RmlsZVIGcGFyZW50EhsKCXBhZ2Vfc2l6ZRgCIAEoBVIIcGFnZVNpemUSHQoKcGFnZV90b2tl
+bhgDIAEoCVIJcGFnZVRva2VuIrgBCh9MaXN0QWRhcHRpdmVNdFNlbnRlbmNlc1Jlc3BvbnNl
+EmgKFWFkYXB0aXZlX210X3NlbnRlbmNlcxgBIAMoCzIvLmdvb2dsZS5jbG91ZC50cmFuc2xh
+dGlvbi52My5BZGFwdGl2ZU10U2VudGVuY2VCA+BBA1ITYWRhcHRpdmVNdFNlbnRlbmNlcxIr
+Cg9uZXh0X3BhZ2VfdG9rZW4YAiABKAlCA+BBAVINbmV4dFBhZ2VUb2tlbkLGAQodY29tLmdv
+b2dsZS5jbG91ZC50cmFuc2xhdGUudjNCD0FkYXB0aXZlTXRQcm90b1ABWjtjbG91ZC5nb29n
+bGUuY29tL2dvL3RyYW5zbGF0ZS9hcGl2My90cmFuc2xhdGVwYjt0cmFuc2xhdGVwYqoCGUdv
+b2dsZS5DbG91ZC5UcmFuc2xhdGUuVjPKAhlHb29nbGVcQ2xvdWRcVHJhbnNsYXRlXFYz6gIc
+R29vZ2xlOjpDbG91ZDo6VHJhbnNsYXRlOjpWM0qodAoHEgUOAMEDAQq8BAoBDBIDDgASMrEE
+IENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hl
+IExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVz
+ZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlv
+dSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3
+LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkg
+YXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0
+cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMi
+IEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQs
+IGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBz
+cGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9u
+cyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAJAoJCgIDABIDEgApCgkKAgMBEgMTACMK
+CQoCAwISAxQAMAoJCgIDAxIDFQApCggKAQgSAxcANgoJCgIIJRIDFwA2CggKAQgSAxgAUgoJ
+CgIICxIDGABSCggKAQgSAxkAIgoJCgIIChIDGQAiCggKAQgSAxoAMAoJCgIICBIDGgAwCggK
+AQgSAxsANgoJCgIIARIDGwA2CggKAQgSAxwANgoJCgIIKRIDHAA2CggKAQgSAx0ANQoJCgII
+LRIDHQA1CiUKAgQAEgQgAEQBGhkgQW4gQWRhcHRpdmUgTVQgRGF0YXNldC4KCgoKAwQAARID
+IAgZCgsKAwQABxIEIQIkBAoNCgUEAAedCBIEIQIkBAqiAQoEBAACABIEKAItBBqTASBSZXF1
+aXJlZC4gVGhlIHJlc291cmNlIG5hbWUgb2YgdGhlIGRhdGFzZXQsIGluIGZvcm0gb2YKIGBw
+cm9qZWN0cy97cHJvamVjdC1udW1iZXItb3ItaWR9L2xvY2F0aW9ucy97bG9jYXRpb25faWR9
+L2FkYXB0aXZlTXREYXRhc2V0cy97ZGF0YXNldF9pZH1gCgoMCgUEAAIABRIDKAIICgwKBQQA
+AgABEgMoCQ0KDAoFBAACAAMSAygQEQoNCgUEAAIACBIEKBItAwoPCggEAAIACJwIABIDKQQq
+Cg8KBwQAAgAInwgSBCoELAUKzAEKBAQAAgESAzICGhq+ASBUaGUgbmFtZSBvZiB0aGUgZGF0
+YXNldCB0byBzaG93IGluIHRoZSBpbnRlcmZhY2UuIFRoZSBuYW1lIGNhbiBiZQogdXAgdG8g
+MzIgY2hhcmFjdGVycyBsb25nIGFuZCBjYW4gY29uc2lzdCBvbmx5IG9mIEFTQ0lJIExhdGlu
+IGxldHRlcnMgQS1aCiBhbmQgYS16LCB1bmRlcnNjb3JlcyAoXyksIGFuZCBBU0NJSSBkaWdp
+dHMgMC05LgoKDAoFBAACAQUSAzICCAoMCgUEAAIBARIDMgkVCgwKBQQAAgEDEgMyGBkKPwoE
+BAACAhIDNQIiGjIgVGhlIEJDUC00NyBsYW5ndWFnZSBjb2RlIG9mIHRoZSBzb3VyY2UgbGFu
+Z3VhZ2UuCgoMCgUEAAICBRIDNQIICgwKBQQAAgIBEgM1CR0KDAoFBAACAgMSAzUgIQo/CgQE
+AAIDEgM4AiIaMiBUaGUgQkNQLTQ3IGxhbmd1YWdlIGNvZGUgb2YgdGhlIHRhcmdldCBsYW5n
+dWFnZS4KCgwKBQQAAgMFEgM4AggKDAoFBAACAwESAzgJHQoMCgUEAAIDAxIDOCAhCjUKBAQA
+AgQSAzsCGhooIFRoZSBudW1iZXIgb2YgZXhhbXBsZXMgaW4gdGhlIGRhdGFzZXQuCgoMCgUE
+AAIEBRIDOwIHCgwKBQQAAgQBEgM7CBUKDAoFBAACBAMSAzsYGQpFCgQEAAIFEgQ+Aj8yGjcg
+T3V0cHV0IG9ubHkuIFRpbWVzdGFtcCB3aGVuIHRoaXMgZGF0YXNldCB3YXMgY3JlYXRlZC4K
+CgwKBQQAAgUGEgM+AhsKDAoFBAACBQESAz4cJwoMCgUEAAIFAxIDPiorCgwKBQQAAgUIEgM/
+BjEKDwoIBAACBQicCAASAz8HMApKCgQEAAIGEgRCAkMyGjwgT3V0cHV0IG9ubHkuIFRpbWVz
+dGFtcCB3aGVuIHRoaXMgZGF0YXNldCB3YXMgbGFzdCB1cGRhdGVkLgoKDAoFBAACBgYSA0IC
+GwoMCgUEAAIGARIDQhwnCgwKBQQAAgYDEgNCKiwKDAoFBAACBggSA0MGMQoPCggEAAIGCJwI
+ABIDQwcwCkIKAgQBEgRHAFQBGjYgwqBSZXF1ZXN0IG1lc3NhZ2UgZm9yIGNyZWF0aW5nIGFu
+IEFkYXB0aXZlTXREYXRhc2V0LgoKCgoDBAEBEgNHCCYKewoEBAECABIESgJPBBptIFJlcXVp
+cmVkLiBOYW1lIG9mIHRoZSBwYXJlbnQgcHJvamVjdC4gSW4gZm9ybSBvZgogYHByb2plY3Rz
+L3twcm9qZWN0LW51bWJlci1vci1pZH0vbG9jYXRpb25zL3tsb2NhdGlvbi1pZH1gCgoMCgUE
+AQIABRIDSgIICgwKBQQBAgABEgNKCQ8KDAoFBAECAAMSA0oSEwoNCgUEAQIACBIEShRPAwoP
+CggEAQIACJwIABIDSwQqCg8KBwQBAgAInwgSBEwETgUKPgoEBAECARIEUgJTLxowIFJlcXVp
+cmVkLiBUaGUgQWRhcHRpdmVNdERhdGFzZXQgdG8gYmUgY3JlYXRlZC4KCgwKBQQBAgEGEgNS
+AhMKDAoFBAECAQESA1IUJwoMCgUEAQIBAxIDUiorCgwKBQQBAgEIEgNTBi4KDwoIBAECAQic
+CAASA1MHLQpACgIEAhIEVwBgARo0IFJlcXVlc3QgbWVzc2FnZSBmb3IgZGVsZXRpbmcgYW4g
+QWRhcHRpdmVNdERhdGFzZXQuCgoKCgMEAgESA1cIJgqlAQoEBAICABIEWgJfBBqWASBSZXF1
+aXJlZC4gTmFtZSBvZiB0aGUgZGF0YXNldC4gSW4gdGhlIGZvcm0gb2YKIGBwcm9qZWN0cy97
+cHJvamVjdC1udW1iZXItb3ItaWR9L2xvY2F0aW9ucy97bG9jYXRpb24taWR9L2FkYXB0aXZl
+TXREYXRhc2V0cy97YWRhcHRpdmUtbXQtZGF0YXNldC1pZH1gCgoMCgUEAgIABRIDWgIICgwK
+BQQCAgABEgNaCQ0KDAoFBAICAAMSA1oQEQoNCgUEAgIACBIEWhJfAwoPCggEAgIACJwIABID
+WwQqCg8KBwQCAgAInwgSBFwEXgUKQQoCBAMSBGMAbAEaNSBSZXF1ZXN0IG1lc3NhZ2UgZm9y
+IGdldHRpbmcgYW4gQWRhcHRpdmUgTVQgZGF0YXNldC4KCgoKAwQDARIDYwgjCqUBCgQEAwIA
+EgRmAmsEGpYBIFJlcXVpcmVkLiBOYW1lIG9mIHRoZSBkYXRhc2V0LiBJbiB0aGUgZm9ybSBv
+ZgogYHByb2plY3RzL3twcm9qZWN0LW51bWJlci1vci1pZH0vbG9jYXRpb25zL3tsb2NhdGlv
+bi1pZH0vYWRhcHRpdmVNdERhdGFzZXRzL3thZGFwdGl2ZS1tdC1kYXRhc2V0LWlkfWAKCgwK
+BQQDAgAFEgNmAggKDAoFBAMCAAESA2YJDQoMCgUEAwIAAxIDZhARCg0KBQQDAgAIEgRmEmsD
+Cg8KCAQDAgAInAgAEgNnBCoKDwoHBAMCAAifCBIEaARqBQpmCgIEBBIFcACIAQEaWSBSZXF1
+ZXN0IG1lc3NhZ2UgZm9yIGxpc3RpbmcgYWxsIEFkYXB0aXZlIE1UIGRhdGFzZXRzIHRoYXQg
+dGhlIHJlcXVlc3RvciBoYXMKIGFjY2VzcyB0by4KCgoKAwQEARIDcAglCqMBCgQEBAIAEgRz
+AngEGpQBIFJlcXVpcmVkLiBUaGUgcmVzb3VyY2UgbmFtZSBvZiB0aGUgcHJvamVjdCBmcm9t
+IHdoaWNoIHRvIGxpc3QgdGhlIEFkYXB0aXZlCiBNVCBkYXRhc2V0cy4gYHByb2plY3RzL3tw
+cm9qZWN0LW51bWJlci1vci1pZH0vbG9jYXRpb25zL3tsb2NhdGlvbi1pZH1gCgoMCgUEBAIA
+BRIDcwIICgwKBQQEAgABEgNzCQ8KDAoFBAQCAAMSA3MSEwoNCgUEBAIACBIEcxR4AwoPCggE
+BAIACJwIABIDdAQqCg8KBwQEAgAInwgSBHUEdwUKnAEKBAQEAgESA3wCPxqOASBPcHRpb25h
+bC4gUmVxdWVzdGVkIHBhZ2Ugc2l6ZS4gVGhlIHNlcnZlciBtYXkgcmV0dXJuIGZld2VyIHJl
+c3VsdHMgdGhhbgogcmVxdWVzdGVkLiBJZiB1bnNwZWNpZmllZCwgdGhlIHNlcnZlciBwaWNr
+cyBhbiBhcHByb3ByaWF0ZSBkZWZhdWx0LgoKDAoFBAQCAQUSA3wCBwoMCgUEBAIBARIDfAgR
+CgwKBQQEAgEDEgN8FBUKDAoFBAQCAQgSA3wWPgoPCggEBAIBCJwIABIDfBc9CrACCgQEBAIC
+EgSDAQJBGqECIE9wdGlvbmFsLiBBIHRva2VuIGlkZW50aWZ5aW5nIGEgcGFnZSBvZiByZXN1
+bHRzIHRoZSBzZXJ2ZXIgc2hvdWxkIHJldHVybi4KIFR5cGljYWxseSwgdGhpcyBpcyB0aGUg
+dmFsdWUgb2YKIExpc3RBZGFwdGl2ZU10RGF0YXNldHNSZXNwb25zZS5uZXh0X3BhZ2VfdG9r
+ZW4gcmV0dXJuZWQgZnJvbSB0aGUKIHByZXZpb3VzIGNhbGwgdG8gYExpc3RBZGFwdGl2ZU10
+RGF0YXNldHNgIG1ldGhvZC4gVGhlIGZpcnN0IHBhZ2UgaXMKIHJldHVybmVkIGlmIGBwYWdl
+X3Rva2VuYGlzIGVtcHR5IG9yIG1pc3NpbmcuCgoNCgUEBAICBRIEgwECCAoNCgUEBAICARIE
+gwEJEwoNCgUEBAICAxIEgwEWFwoNCgUEBAICCBIEgwEYQAoQCggEBAICCJwIABIEgwEZPwpv
+CgQEBAIDEgSHAQI9GmEgT3B0aW9uYWwuIEFuIGV4cHJlc3Npb24gZm9yIGZpbHRlcmluZyB0
+aGUgcmVzdWx0cyBvZiB0aGUgcmVxdWVzdC4KIEZpbHRlciBpcyBub3Qgc3VwcG9ydGVkIHll
+dC4KCg0KBQQEAgMFEgSHAQIICg0KBQQEAgMBEgSHAQkPCg0KBQQEAgMDEgSHARITCg0KBQQE
+AgMIEgSHARQ8ChAKCAQEAgMInAgAEgSHARU7Ci0KAgQFEgaLAQCUAQEaHyBBIGxpc3Qgb2Yg
+QWRhcHRpdmVNdERhdGFzZXRzLgoKCwoDBAUBEgSLAQgmCj4KBAQFAgASBo0BAo4BMhouIE91
+dHB1dCBvbmx5LiBBIGxpc3Qgb2YgQWRhcHRpdmUgTVQgZGF0YXNldHMuCgoNCgUEBQIABBIE
+jQECCgoNCgUEBQIABhIEjQELHAoNCgUEBQIAARIEjQEdMQoNCgUEBQIAAxIEjQE0NQoNCgUE
+BQIACBIEjgEGMQoQCggEBQIACJwIABIEjgEHMArrAQoEBAUCARIEkwECRhrcASBPcHRpb25h
+bC4gQSB0b2tlbiB0byByZXRyaWV2ZSBhIHBhZ2Ugb2YgcmVzdWx0cy4gUGFzcyB0aGlzIHZh
+bHVlIGluIHRoZQogW0xpc3RBZGFwdGl2ZU10RGF0YXNldHNSZXF1ZXN0LnBhZ2VfdG9rZW5d
+IGZpZWxkIGluIHRoZSBzdWJzZXF1ZW50IGNhbGwgdG8KIGBMaXN0QWRhcHRpdmVNdERhdGFz
+ZXRzYCBtZXRob2QgdG8gcmV0cmlldmUgdGhlIG5leHQgcGFnZSBvZiByZXN1bHRzLgoKDQoF
+BAUCAQUSBJMBAggKDQoFBAUCAQESBJMBCRgKDQoFBAUCAQMSBJMBGxwKDQoFBAUCAQgSBJMB
+HUUKEAoIBAUCAQicCAASBJMBHkQKSAoCBAYSBpcBAPIBARo6IFRoZSByZXF1ZXN0IGZvciBz
+ZW5kaW5nIGFuIEFkYXB0aXZlTXQgdHJhbnNsYXRpb24gcXVlcnkuCgoLCgMEBgESBJcBCCIK
+VwoEBAYDABIGmQECnwEDGkcgQSBwYWlyIG9mIHNlbnRlbmNlcyB1c2VkIGFzIHJlZmVyZW5j
+ZSBpbiBzb3VyY2UgYW5kIHRhcmdldCBsYW5ndWFnZXMuCgoNCgUEBgMAARIEmQEKHwo3CgYE
+BgMAAgASBJsBBB8aJyBTb3VyY2Ugc2VudGVuY2UgaW4gdGhlIHNlbnRlbmNlIHBhaXIuCgoP
+CgcEBgMAAgAFEgSbAQQKCg8KBwQGAwACAAESBJsBCxoKDwoHBAYDAAIAAxIEmwEdHgo3CgYE
+BgMAAgESBJ4BBB8aJyBUYXJnZXQgc2VudGVuY2UgaW4gdGhlIHNlbnRlbmNlIHBhaXIuCgoP
+CgcEBgMAAgEFEgSeAQQKCg8KBwQGAwACAQESBJ4BCxoKDwoHBAYDAAIBAxIEngEdHgo1CgQE
+BgMBEgaiAQKlAQMaJSBBIGxpc3Qgb2YgcmVmZXJlbmNlIHNlbnRlbmNlIHBhaXJzLgoKDQoF
+BAYDAQESBKIBCiMKKwoGBAYDAQIAEgSkAQRAGhsgUmVmZXJlbmNlIHNlbnRlbmNlIHBhaXJz
+LgoKDwoHBAYDAQIABBIEpAEEDAoPCgcEBgMBAgAGEgSkAQ0iCg8KBwQGAwECAAESBKQBIzsK
+DwoHBAYDAQIAAxIEpAE+PwpFCgQEBgMCEgaoAQK0AQMaNSBNZXNzYWdlIG9mIGNhbGxlci1w
+cm92aWRlZCByZWZlcmVuY2UgY29uZmlndXJhdGlvbi4KCg0KBQQGAwIBEgSoAQohCvcBCgYE
+BgMCAgASBK0BBEka5gEgUmVmZXJlbmNlIHNlbnRlbmNlcyBwYWlyIGxpc3RzLiBFYWNoIGxp
+c3Qgd2lsbCBiZSB1c2VkIGFzIHRoZSByZWZlcmVuY2VzCiB0byB0cmFuc2xhdGUgdGhlIHNl
+bnRlbmNlIHVuZGVyICJjb250ZW50IiBmaWVsZCBhdCB0aGUgY29ycmVzcG9uZGluZwogaW5k
+ZXguIExlbmd0aCBvZiB0aGUgbGlzdCBpcyByZXF1aXJlZCB0byBiZSBlcXVhbCB0byB0aGUg
+bGVuZ3RoIG9mCiAiY29udGVudCIgZmllbGQuCgoPCgcEBgMCAgAEEgStAQQMCg8KBwQGAwIC
+AAYSBK0BDSYKDwoHBAYDAgIAARIErQEnRAoPCgcEBgMCAgADEgStAUdICicKBgQGAwICARIE
+sAEEJBoXIFNvdXJjZSBsYW5ndWFnZSBjb2RlLgoKDwoHBAYDAgIBBRIEsAEECgoPCgcEBgMC
+AgEBEgSwAQsfCg8KBwQGAwICAQMSBLABIiMKJwoGBAYDAgICEgSzAQQkGhcgVGFyZ2V0IGxh
+bmd1YWdlIGNvZGUuCgoPCgcEBgMCAgIFEgSzAQQKCg8KBwQGAwICAgESBLMBCx8KDwoHBAYD
+AgICAxIEswEiIwqEAQoEBAYDAxIGuQECzwEDGnQgQ29uZmlndXJlcyB3aGljaCBnbG9zc2Fy
+eSBpcyB1c2VkIGZvciBhIHNwZWNpZmljIHRhcmdldCBsYW5ndWFnZSBhbmQKIGRlZmluZXMK
+IG9wdGlvbnMgZm9yIGFwcGx5aW5nIHRoYXQgZ2xvc3NhcnkuCgoNCgUEBgMDARIEuQEKGArw
+AQoGBAYDAwIAEgbAAQTFAQYa3QEgUmVxdWlyZWQuIFRoZSBgZ2xvc3NhcnlgIHRvIGJlIGFw
+cGxpZWQgZm9yIHRoaXMgdHJhbnNsYXRpb24uCgogVGhlIGZvcm1hdCBkZXBlbmRzIG9uIHRo
+ZSBnbG9zc2FyeToKCiAtIFVzZXItcHJvdmlkZWQgY3VzdG9tIGdsb3NzYXJ5OgogICBgcHJv
+amVjdHMve3Byb2plY3QtbnVtYmVyLW9yLWlkfS9sb2NhdGlvbnMve2xvY2F0aW9uLWlkfS9n
+bG9zc2FyaWVzL3tnbG9zc2FyeS1pZH1gCgoPCgcEBgMDAgAFEgTAAQQKCg8KBwQGAwMCAAES
+BMABCxMKDwoHBAYDAwIAAxIEwAEWFwoRCgcEBgMDAgAIEgbAARjFAQUKEgoKBAYDAwIACJwI
+ABIEwQEGLAoTCgkEBgMDAgAInwgSBsIBBsQBBwpqCgYEBgMDAgESBMkBBEIaWiBPcHRpb25h
+bC4gSW5kaWNhdGVzIG1hdGNoIGlzIGNhc2UgaW5zZW5zaXRpdmUuIFRoZSBkZWZhdWx0IHZh
+bHVlIGlzCiBgZmFsc2VgIGlmIG1pc3NpbmcuCgoPCgcEBgMDAgEFEgTJAQQICg8KBwQGAwMC
+AQESBMkBCRQKDwoHBAYDAwIBAxIEyQEXGAoPCgcEBgMDAgEIEgTJARlBChIKCgQGAwMCAQic
+CAASBMkBGkAKZAoGBAYDAwICEgbNAQTOATEaUiBPcHRpb25hbC4gSWYgc2V0IHRvIHRydWUs
+IHRoZSBnbG9zc2FyeSB3aWxsIGJlIHVzZWQgZm9yIGNvbnRleHR1YWwKIHRyYW5zbGF0aW9u
+LgoKDwoHBAYDAwICBRIEzQEECAoPCgcEBgMDAgIBEgTNAQknCg8KBwQGAwMCAgMSBM0BKisK
+DwoHBAYDAwICCBIEzgEIMAoSCgoEBgMDAgIInAgAEgTOAQkvCoIBCgQEBgIAEgbUAQLZAQQa
+ciBSZXF1aXJlZC4gTG9jYXRpb24gdG8gbWFrZSBhIHJlZ2lvbmFsIGNhbGwuCgogRm9ybWF0
+OiBgcHJvamVjdHMve3Byb2plY3QtbnVtYmVyLW9yLWlkfS9sb2NhdGlvbnMve2xvY2F0aW9u
+LWlkfWAuCgoNCgUEBgIABRIE1AECCAoNCgUEBgIAARIE1AEJDwoNCgUEBgIAAxIE1AESEwoP
+CgUEBgIACBIG1AEU2QEDChAKCAQGAgAInAgAEgTVAQQqChEKBwQGAgAInwgSBtYBBNgBBQqh
+AQoEBAYCARIG3QEC4gEEGpABIFJlcXVpcmVkLiBUaGUgcmVzb3VyY2UgbmFtZSBmb3IgdGhl
+IGRhdGFzZXQgdG8gdXNlIGZvciBhZGFwdGl2ZSBNVC4KIGBwcm9qZWN0cy97cHJvamVjdH0v
+bG9jYXRpb25zL3tsb2NhdGlvbi1pZH0vYWRhcHRpdmVNdERhdGFzZXRzL3tkYXRhc2V0fWAK
+Cg0KBQQGAgEFEgTdAQIICg0KBQQGAgEBEgTdAQkQCg0KBQQGAgEDEgTdARMUCg8KBQQGAgEI
+EgbdARXiAQMKEAoIBAYCAQicCAASBN4BBCoKEQoHBAYCAQifCBIG3wEE4QEFCkQKBAQGAgIS
+BOUBAkcaNiBSZXF1aXJlZC4gVGhlIGNvbnRlbnQgb2YgdGhlIGlucHV0IGluIHN0cmluZyBm
+b3JtYXQuCgoNCgUEBgICBBIE5QECCgoNCgUEBgICBRIE5QELEQoNCgUEBgICARIE5QESGQoN
+CgUEBgICAxIE5QEcHQoNCgUEBgICCBIE5QEeRgoQCggEBgICCJwIABIE5QEfRQouCgQEBgID
+EgToAQIXGiAgVGhlIGZvcm1hdCBvZiB0aGUgc291cmNlIHRleHQuCgoNCgUEBgIDBRIE6AEC
+CAoNCgUEBgIDARIE6AEJEgoNCgUEBgIDAxIE6AEVFgpGCgQEBgIEEgTrAQJBGjggQ29uZmln
+dXJhdGlvbiBmb3IgY2FsbGVyIHByb3ZpZGVkIHJlZmVyZW5jZSBzZW50ZW5jZXMuCgoNCgUE
+BgIEBBIE6wECCgoNCgUEBgIEBhIE6wELIgoNCgUEBgIEARIE6wEjPAoNCgUEBgIEAxIE6wE/
+QArDAQoEBAYCBRIG8AEC8QEvGrIBIE9wdGlvbmFsLiBHbG9zc2FyeSB0byBiZSBhcHBsaWVk
+LiBUaGUgZ2xvc3NhcnkgbXVzdCBiZQogd2l0aGluIHRoZSBzYW1lIHJlZ2lvbiAoaGF2ZSB0
+aGUgc2FtZSBsb2NhdGlvbi1pZCkgYXMgdGhlIG1vZGVsLCBvdGhlcndpc2UKIGFuIElOVkFM
+SURfQVJHVU1FTlQgKDQwMCkgZXJyb3IgaXMgcmV0dXJuZWQuCgoNCgUEBgIFBBIE8AECCgoN
+CgUEBgIFBhIE8AELGQoNCgUEBgIFARIE8AEaKQoNCgUEBgIFAxIE8AEsLQoNCgUEBgIFCBIE
+8QEGLgoQCggEBgIFCJwIABIE8QEHLQoqCgIEBxIG9QEA+AEBGhwgQW4gQWRhcHRpdmVNdCB0
+cmFuc2xhdGlvbi4KCgsKAwQHARIE9QEIHQoxCgQEBwIAEgT3AQJJGiMgT3V0cHV0IG9ubHku
+IFRoZSB0cmFuc2xhdGVkIHRleHQuCgoNCgUEBwIABRIE9wECCAoNCgUEBwIAARIE9wEJGAoN
+CgUEBwIAAxIE9wEbHAoNCgUEBwIACBIE9wEdSAoQCggEBwIACJwIABIE9wEeRwowCgIECBIG
++wEAhgIBGiIgQW4gQWRhcHRpdmVNdFRyYW5zbGF0ZSByZXNwb25zZS4KCgsKAwQIARIE+wEI
+IwovCgQECAIAEgb9AQL+ATIaHyBPdXRwdXQgb25seS4gVGhlIHRyYW5zbGF0aW9uLgoKDQoF
+BAgCAAQSBP0BAgoKDQoFBAgCAAYSBP0BCyAKDQoFBAgCAAESBP0BIS0KDQoFBAgCAAMSBP0B
+MDEKDQoFBAgCAAgSBP4BBjEKEAoIBAgCAAicCAASBP4BBzAKPQoEBAgCARIEgQICRxovIE91
+dHB1dCBvbmx5LiBUaGUgdHJhbnNsYXRpb24ncyBsYW5ndWFnZSBjb2RlLgoKDQoFBAgCAQUS
+BIECAggKDQoFBAgCAQESBIECCRYKDQoFBAgCAQMSBIECGRoKDQoFBAgCAQgSBIECG0YKEAoI
+BAgCAQicCAASBIECHEUKlgEKBAQIAgISBIUCAjsahwEgVGV4dCB0cmFuc2xhdGlvbiByZXNw
+b25zZSBpZiBhIGdsb3NzYXJ5IGlzIHByb3ZpZGVkIGluIHRoZSByZXF1ZXN0LiBUaGlzCiBj
+b3VsZCBiZSB0aGUgc2FtZSBhcyAndHJhbnNsYXRpb24nIGFib3ZlIGlmIG5vIHRlcm1zIGFw
+cGx5LgoKDQoFBAgCAgQSBIUCAgoKDQoFBAgCAgYSBIUCCyAKDQoFBAgCAgESBIUCITYKDQoF
+BAgCAgMSBIUCOToKIgoCBAkSBokCAKcCARoUIEFuIEFkYXB0aXZlTXRGaWxlLgoKCwoDBAkB
+EgSJAggWCg0KAwQJBxIGigICjwIECg8KBQQJB50IEgaKAgKPAgQKtQEKBAQJAgASBpMCApgC
+BBqkASBSZXF1aXJlZC4gVGhlIHJlc291cmNlIG5hbWUgb2YgdGhlIGZpbGUsIGluIGZvcm0g
+b2YKIGBwcm9qZWN0cy97cHJvamVjdC1udW1iZXItb3ItaWR9L2xvY2F0aW9ucy97bG9jYXRp
+b25faWR9L2FkYXB0aXZlTXREYXRhc2V0cy97ZGF0YXNldH0vYWRhcHRpdmVNdEZpbGVzL3tm
+aWxlfWAKCg0KBQQJAgAFEgSTAgIICg0KBQQJAgABEgSTAgkNCg0KBQQJAgADEgSTAhARCg8K
+BQQJAgAIEgaTAhKYAgMKEAoIBAkCAAicCAASBJQCBCoKEQoHBAkCAAifCBIGlQIElwIFCigK
+BAQJAgESBJsCAhoaGiBUaGUgZmlsZSdzIGRpc3BsYXkgbmFtZS4KCg0KBQQJAgEFEgSbAgII
+Cg0KBQQJAgEBEgSbAgkVCg0KBQQJAgEDEgSbAhgZCj0KBAQJAgISBJ4CAhgaLyBUaGUgbnVt
+YmVyIG9mIGVudHJpZXMgdGhhdCB0aGUgZmlsZSBjb250YWlucy4KCg0KBQQJAgIFEgSeAgIH
+Cg0KBQQJAgIBEgSeAggTCg0KBQQJAgIDEgSeAhYXCkQKBAQJAgMSBqECAqICMho0IE91dHB1
+dCBvbmx5LiBUaW1lc3RhbXAgd2hlbiB0aGlzIGZpbGUgd2FzIGNyZWF0ZWQuCgoNCgUECQID
+BhIEoQICGwoNCgUECQIDARIEoQIcJwoNCgUECQIDAxIEoQIqKwoNCgUECQIDCBIEogIGMQoQ
+CggECQIDCJwIABIEogIHMApJCgQECQIEEgalAgKmAjIaOSBPdXRwdXQgb25seS4gVGltZXN0
+YW1wIHdoZW4gdGhpcyBmaWxlIHdhcyBsYXN0IHVwZGF0ZWQuCgoNCgUECQIEBhIEpQICGwoN
+CgUECQIEARIEpQIcJwoNCgUECQIEAxIEpQIqKwoNCgUECQIECBIEpgIGMQoQCggECQIECJwI
+ABIEpgIHMAo6CgIEChIGqgIAswIBGiwgVGhlIHJlcXVlc3QgZm9yIGdldHRpbmcgYW4gQWRh
+cHRpdmVNdEZpbGUuCgoLCgMECgESBKoCCCAKtQEKBAQKAgASBq0CArICBBqkASBSZXF1aXJl
+ZC4gVGhlIHJlc291cmNlIG5hbWUgb2YgdGhlIGZpbGUsIGluIGZvcm0gb2YKIGBwcm9qZWN0
+cy97cHJvamVjdC1udW1iZXItb3ItaWR9L2xvY2F0aW9ucy97bG9jYXRpb25faWR9L2FkYXB0
+aXZlTXREYXRhc2V0cy97ZGF0YXNldH0vYWRhcHRpdmVNdEZpbGVzL3tmaWxlfWAKCg0KBQQK
+AgAFEgStAgIICg0KBQQKAgABEgStAgkNCg0KBQQKAgADEgStAhARCg8KBQQKAgAIEgatAhKy
+AgMKEAoIBAoCAAicCAASBK4CBCoKEQoHBAoCAAifCBIGrwIEsQIFCjwKAgQLEga2AgC/AgEa
+LiBUaGUgcmVxdWVzdCBmb3IgZGVsZXRpbmcgYW4gQWRhcHRpdmVNdCBmaWxlLgoKCwoDBAsB
+EgS2AggjCr8BCgQECwIAEga5AgK+AgQargEgUmVxdWlyZWQuIFRoZSByZXNvdXJjZSBuYW1l
+IG9mIHRoZSBmaWxlIHRvIGRlbGV0ZSwgaW4gZm9ybSBvZgogYHByb2plY3RzL3twcm9qZWN0
+LW51bWJlci1vci1pZH0vbG9jYXRpb25zL3tsb2NhdGlvbl9pZH0vYWRhcHRpdmVNdERhdGFz
+ZXRzL3tkYXRhc2V0fS9hZGFwdGl2ZU10RmlsZXMve2ZpbGV9YAoKDQoFBAsCAAUSBLkCAggK
+DQoFBAsCAAESBLkCCQ0KDQoFBAsCAAMSBLkCEBEKDwoFBAsCAAgSBrkCEr4CAwoQCggECwIA
+CJwIABIEugIEKgoRCgcECwIACJ8IEga7AgS9AgUKVgoCBAwSBsICANQCARpIIFRoZSByZXF1
+ZXN0IGZvciBpbXBvcnRpbmcgYW4gQWRhcHRpdmVNdCBmaWxlIGFsb25nIHdpdGggaXRzIHNl
+bnRlbmNlcy4KCgsKAwQMARIEwgIIIwqeAQoEBAwCABIGxQICygIEGo0BIFJlcXVpcmVkLiBU
+aGUgcmVzb3VyY2UgbmFtZSBvZiB0aGUgZmlsZSwgaW4gZm9ybSBvZgogYHByb2plY3RzL3tw
+cm9qZWN0LW51bWJlci1vci1pZH0vbG9jYXRpb25zL3tsb2NhdGlvbl9pZH0vYWRhcHRpdmVN
+dERhdGFzZXRzL3tkYXRhc2V0fWAKCg0KBQQMAgAFEgTFAgIICg0KBQQMAgABEgTFAgkPCg0K
+BQQMAgADEgTFAhITCg8KBQQMAgAIEgbFAhTKAgMKEAoIBAwCAAicCAASBMYCBCoKEQoHBAwC
+AAifCBIGxwIEyQIFCi4KBAQMCAASBs0CAtMCAxoeIFRoZSBzb3VyY2UgZm9yIHRoZSBkb2N1
+bWVudC4KCg0KBQQMCAABEgTNAggOCiMKBAQMAgESBM8CBCoaFSBJbmxpbmUgZmlsZSBzb3Vy
+Y2UuCgoNCgUEDAIBBhIEzwIEEwoNCgUEDAIBARIEzwIUJQoNCgUEDAIBAxIEzwIoKQoxCgQE
+DAICEgTSAgQoGiMgR29vZ2xlIENsb3VkIFN0b3JhZ2UgZmlsZSBzb3VyY2UuCgoNCgUEDAIC
+BhIE0gIEEgoNCgUEDAICARIE0gITIwoNCgUEDAICAxIE0gImJwo8CgIEDRIG1wIA2wIBGi4g
+VGhlIHJlc3BvbnNlIGZvciBpbXBvcnRpbmcgYW4gQWRhcHRpdmVNdEZpbGUKCgsKAwQNARIE
+1wIIJApGCgQEDQIAEgbZAgLaAjIaNiBPdXRwdXQgb25seS4gVGhlIEFkYXB0aXZlIE1UIGZp
+bGUgdGhhdCB3YXMgaW1wb3J0ZWQuCgoNCgUEDQIABhIE2QICEAoNCgUEDQIAARIE2QIRIQoN
+CgUEDQIAAxIE2QIkJQoNCgUEDQIACBIE2gIGMQoQCggEDQIACJwIABIE2gIHMApPCgIEDhIG
+3gIA8gIBGkEgVGhlIHJlcXVlc3QgdG8gbGlzdCBhbGwgQWRhcHRpdmVNdCBmaWxlcyB1bmRl
+ciBhIGdpdmVuIGRhdGFzZXQuCgoLCgMEDgESBN4CCCIKsAEKBAQOAgASBuICAucCBBqfASBS
+ZXF1aXJlZC4gVGhlIHJlc291cmNlIG5hbWUgb2YgdGhlIHByb2plY3QgZnJvbSB3aGljaCB0
+byBsaXN0IHRoZSBBZGFwdGl2ZQogTVQgZmlsZXMuCiBgcHJvamVjdHMve3Byb2plY3R9L2xv
+Y2F0aW9ucy97bG9jYXRpb259L2FkYXB0aXZlTXREYXRhc2V0cy97ZGF0YXNldH1gCgoNCgUE
+DgIABRIE4gICCAoNCgUEDgIAARIE4gIJDwoNCgUEDgIAAxIE4gISEwoPCgUEDgIACBIG4gIU
+5wIDChAKCAQOAgAInAgAEgTjAgQqChEKBwQOAgAInwgSBuQCBOYCBQoZCgQEDgIBEgTqAgI/
+GgsgT3B0aW9uYWwuCgoNCgUEDgIBBRIE6gICBwoNCgUEDgIBARIE6gIIEQoNCgUEDgIBAxIE
+6gIUFQoNCgUEDgIBCBIE6gIWPgoQCggEDgIBCJwIABIE6gIXPQqqAgoEBA4CAhIE8QICQRqb
+AiBPcHRpb25hbC4gQSB0b2tlbiBpZGVudGlmeWluZyBhIHBhZ2Ugb2YgcmVzdWx0cyB0aGUg
+c2VydmVyIHNob3VsZCByZXR1cm4uCiBUeXBpY2FsbHksIHRoaXMgaXMgdGhlIHZhbHVlIG9m
+CiBMaXN0QWRhcHRpdmVNdEZpbGVzUmVzcG9uc2UubmV4dF9wYWdlX3Rva2VuIHJldHVybmVk
+IGZyb20gdGhlCiBwcmV2aW91cyBjYWxsIHRvIGBMaXN0QWRhcHRpdmVNdEZpbGVzYCBtZXRo
+b2QuIFRoZSBmaXJzdCBwYWdlIGlzCiByZXR1cm5lZCBpZiBgcGFnZV90b2tlbmBpcyBlbXB0
+eSBvciBtaXNzaW5nLgoKDQoFBA4CAgUSBPECAggKDQoFBA4CAgESBPECCRMKDQoFBA4CAgMS
+BPECFhcKDQoFBA4CAggSBPECGEAKEAoIBA4CAgicCAASBPECGT8KVAoCBA8SBvUCAP4CARpG
+IFRoZSByZXNwb25zZSBmb3IgbGlzdGluZyBhbGwgQWRhcHRpdmVNdCBmaWxlcyB1bmRlciBh
+IGdpdmVuIGRhdGFzZXQuCgoLCgMEDwESBPUCCCMKNQoEBA8CABIG9wIC+AIyGiUgT3V0cHV0
+IG9ubHkuIFRoZSBBZGFwdGl2ZSBNVCBmaWxlcy4KCg0KBQQPAgAEEgT3AgIKCg0KBQQPAgAG
+EgT3AgsZCg0KBQQPAgABEgT3AhorCg0KBQQPAgADEgT3Ai4vCg0KBQQPAgAIEgT4AgYxChAK
+CAQPAgAInAgAEgT4AgcwCuMBCgQEDwIBEgT9AgJGGtQBIE9wdGlvbmFsLiBBIHRva2VuIHRv
+IHJldHJpZXZlIGEgcGFnZSBvZiByZXN1bHRzLiBQYXNzIHRoaXMgdmFsdWUgaW4gdGhlCiBM
+aXN0QWRhcHRpdmVNdEZpbGVzUmVxdWVzdC5wYWdlX3Rva2VuIGZpZWxkIGluIHRoZSBzdWJz
+ZXF1ZW50IGNhbGwgdG8KIGBMaXN0QWRhcHRpdmVNdEZpbGVzYCBtZXRob2QgdG8gcmV0cmll
+dmUgdGhlIG5leHQgcGFnZSBvZiByZXN1bHRzLgoKDQoFBA8CAQUSBP0CAggKDQoFBA8CAQES
+BP0CCRgKDQoFBA8CAQMSBP0CGxwKDQoFBA8CAQgSBP0CHUUKEAoIBA8CAQicCAASBP0CHkQK
+LQoCBBASBoEDAJ8DARofIEFuIEFkYXB0aXZlTXQgc2VudGVuY2UgZW50cnkuCgoLCgMEEAES
+BIEDCBoKDQoDBBAHEgaCAwKHAwQKDwoFBBAHnQgSBoIDAocDBArUAQoEBBACABIGiwMCkAME
+GsMBIFJlcXVpcmVkLiBUaGUgcmVzb3VyY2UgbmFtZSBvZiB0aGUgZmlsZSwgaW4gZm9ybSBv
+ZgogYHByb2plY3RzL3twcm9qZWN0LW51bWJlci1vci1pZH0vbG9jYXRpb25zL3tsb2NhdGlv
+bl9pZH0vYWRhcHRpdmVNdERhdGFzZXRzL3tkYXRhc2V0fS9hZGFwdGl2ZU10RmlsZXMve2Zp
+bGV9L2FkYXB0aXZlTXRTZW50ZW5jZXMve3NlbnRlbmNlfWAKCg0KBQQQAgAFEgSLAwIICg0K
+BQQQAgABEgSLAwkNCg0KBQQQAgADEgSLAxARCg8KBQQQAgAIEgaLAxKQAwMKEAoIBBACAAic
+CAASBIwDBCoKEQoHBBACAAifCBIGjQMEjwMFCi4KBAQQAgESBJMDAkYaICBSZXF1aXJlZC4g
+VGhlIHNvdXJjZSBzZW50ZW5jZS4KCg0KBQQQAgEFEgSTAwIICg0KBQQQAgEBEgSTAwkYCg0K
+BQQQAgEDEgSTAxscCg0KBQQQAgEIEgSTAx1FChAKCAQQAgEInAgAEgSTAx5ECi4KBAQQAgIS
+BJYDAkYaICBSZXF1aXJlZC4gVGhlIHRhcmdldCBzZW50ZW5jZS4KCg0KBQQQAgIFEgSWAwII
+Cg0KBQQQAgIBEgSWAwkYCg0KBQQQAgIDEgSWAxscCg0KBQQQAgIIEgSWAx1FChAKCAQQAgII
+nAgAEgSWAx5ECkgKBAQQAgMSBpkDApoDMho4IE91dHB1dCBvbmx5LiBUaW1lc3RhbXAgd2hl
+biB0aGlzIHNlbnRlbmNlIHdhcyBjcmVhdGVkLgoKDQoFBBACAwYSBJkDAhsKDQoFBBACAwES
+BJkDHCcKDQoFBBACAwMSBJkDKisKDQoFBBACAwgSBJoDBjEKEAoIBBACAwicCAASBJoDBzAK
+TQoEBBACBBIGnQMCngMyGj0gT3V0cHV0IG9ubHkuIFRpbWVzdGFtcCB3aGVuIHRoaXMgc2Vu
+dGVuY2Ugd2FzIGxhc3QgdXBkYXRlZC4KCg0KBQQQAgQGEgSdAwIbCg0KBQQQAgQBEgSdAxwn
+Cg0KBQQQAgQDEgSdAyorCg0KBQQQAgQIEgSeAwYxChAKCAQQAgQInAgAEgSeAwcwClIKAgQR
+EgaiAwC3AwEaRCBUaGUgcmVxdWVzdCBmb3IgbGlzdGluZyBBZGFwdGl2ZSBNVCBzZW50ZW5j
+ZXMgZnJvbSBhIERhdGFzZXQvRmlsZS4KCgsKAwQRARIEogMIJgqCAwoEBBECABIGqAMCrQME
+GvECIFJlcXVpcmVkLiBUaGUgcmVzb3VyY2UgbmFtZSBvZiB0aGUgcHJvamVjdCBmcm9tIHdo
+aWNoIHRvIGxpc3QgdGhlIEFkYXB0aXZlCiBNVCBmaWxlcy4gVGhlIGZvbGxvd2luZyBmb3Jt
+YXQgbGlzdHMgYWxsIHNlbnRlbmNlcyB1bmRlciBhIGZpbGUuCiBgcHJvamVjdHMve3Byb2pl
+Y3R9L2xvY2F0aW9ucy97bG9jYXRpb259L2FkYXB0aXZlTXREYXRhc2V0cy97ZGF0YXNldH0v
+YWRhcHRpdmVNdEZpbGVzL3tmaWxlfWAKIFRoZSBmb2xsb3dpbmcgZm9ybWF0IGxpc3RzIGFs
+bCBzZW50ZW5jZXMgd2l0aGluIGEgZGF0YXNldC4KIGBwcm9qZWN0cy97cHJvamVjdH0vbG9j
+YXRpb25zL3tsb2NhdGlvbn0vYWRhcHRpdmVNdERhdGFzZXRzL3tkYXRhc2V0fWAKCg0KBQQR
+AgAFEgSoAwIICg0KBQQRAgABEgSoAwkPCg0KBQQRAgADEgSoAxITCg8KBQQRAgAIEgaoAxSt
+AwMKEAoIBBECAAicCAASBKkDBCoKEQoHBBECAAifCBIGqgMErAMFCgwKBAQRAgESBK8DAhYK
+DQoFBBECAQUSBK8DAgcKDQoFBBECAQESBK8DCBEKDQoFBBECAQMSBK8DFBUKqAIKBAQRAgIS
+BLYDAhgamQIgQSB0b2tlbiBpZGVudGlmeWluZyBhIHBhZ2Ugb2YgcmVzdWx0cyB0aGUgc2Vy
+dmVyIHNob3VsZCByZXR1cm4uCiBUeXBpY2FsbHksIHRoaXMgaXMgdGhlIHZhbHVlIG9mCiBM
+aXN0QWRhcHRpdmVNdFNlbnRlbmNlc1JlcXVlc3QubmV4dF9wYWdlX3Rva2VuIHJldHVybmVk
+IGZyb20gdGhlCiBwcmV2aW91cyBjYWxsIHRvIGBMaXN0VHJhbnNsYXRpb25NZW1vcmllc2Ag
+bWV0aG9kLiBUaGUgZmlyc3QgcGFnZSBpcwogcmV0dXJuZWQgaWYgYHBhZ2VfdG9rZW5gIGlz
+IGVtcHR5IG9yIG1pc3NpbmcuCgoNCgUEEQICBRIEtgMCCAoNCgUEEQICARIEtgMJEwoNCgUE
+EQICAxIEtgMWFwozCgIEEhIGugMAwQMBGiUgTGlzdCBBZGFwdGl2ZU10IHNlbnRlbmNlcyBy
+ZXNwb25zZS4KCgsKAwQSARIEugMIJwo/CgQEEgIAEga8AwK9AzIaLyBPdXRwdXQgb25seS4g
+VGhlIGxpc3Qgb2YgQWRhcHRpdmVNdFNlbnRlbmNlcy4KCg0KBQQSAgAEEgS8AwIKCg0KBQQS
+AgAGEgS8AwsdCg0KBQQSAgABEgS8Ax4zCg0KBQQSAgADEgS8AzY3Cg0KBQQSAgAIEgS9AwYx
+ChAKCAQSAgAInAgAEgS9AwcwChkKBAQSAgESBMADAkYaCyBPcHRpb25hbC4KCg0KBQQSAgEF
+EgTAAwIICg0KBQQSAgEBEgTAAwkYCg0KBQQSAgEDEgTAAxscCg0KBQQSAgEIEgTAAx1FChAK
+CAQSAgEInAgAEgTAAx5EYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtDataset ===
+    # Fields for AdaptiveMtDataset
+    # Field: name Type: 9 ()
+    # Field: display_name Type: 9 ()
+    # Field: source_language_code Type: 9 ()
+    # Field: target_language_code Type: 9 ()
+    # Field: example_count Type: 5 ()
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::CreateAdaptiveMtDatasetRequest ===
+    # Fields for CreateAdaptiveMtDatasetRequest
+    # Field: parent Type: 9 ()
+    # Field: adaptive_mt_dataset Type: 11 (.google.cloud.translation.v3.AdaptiveMtDataset)
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::DeleteAdaptiveMtDatasetRequest ===
+    # Fields for DeleteAdaptiveMtDatasetRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::GetAdaptiveMtDatasetRequest ===
+    # Fields for GetAdaptiveMtDatasetRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtDatasetsRequest ===
+    # Fields for ListAdaptiveMtDatasetsRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtDatasetsResponse ===
+    # Fields for ListAdaptiveMtDatasetsResponse
+    # Field: adaptive_mt_datasets Type: 11 (.google.cloud.translation.v3.AdaptiveMtDataset)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslateRequest ===
+    # Fields for AdaptiveMtTranslateRequest
+    # Field: parent Type: 9 ()
+    # Field: dataset Type: 9 ()
+    # Field: content Type: 9 ()
+    # Field: mime_type Type: 9 ()
+    # Field: reference_sentence_config Type: 11 (.google.cloud.translation.v3.AdaptiveMtTranslateRequest.ReferenceSentenceConfig)
+    # Field: glossary_config Type: 11 (.google.cloud.translation.v3.AdaptiveMtTranslateRequest.GlossaryConfig)
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslation ===
+    # Fields for AdaptiveMtTranslation
+    # Field: translated_text Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslateResponse ===
+    # Fields for AdaptiveMtTranslateResponse
+    # Field: translations Type: 11 (.google.cloud.translation.v3.AdaptiveMtTranslation)
+    # Field: language_code Type: 9 ()
+    # Field: glossary_translations Type: 11 (.google.cloud.translation.v3.AdaptiveMtTranslation)
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtFile ===
+    # Fields for AdaptiveMtFile
+    # Field: name Type: 9 ()
+    # Field: display_name Type: 9 ()
+    # Field: entry_count Type: 5 ()
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::GetAdaptiveMtFileRequest ===
+    # Fields for GetAdaptiveMtFileRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::DeleteAdaptiveMtFileRequest ===
+    # Fields for DeleteAdaptiveMtFileRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::ImportAdaptiveMtFileRequest ===
+    # Fields for ImportAdaptiveMtFileRequest
+    # Field: parent Type: 9 ()
+    # Field: file_input_source Type: 11 (.google.cloud.translation.v3.FileInputSource)
+    # Field: gcs_input_source Type: 11 (.google.cloud.translation.v3.GcsInputSource)
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::ImportAdaptiveMtFileResponse ===
+    # Fields for ImportAdaptiveMtFileResponse
+    # Field: adaptive_mt_file Type: 11 (.google.cloud.translation.v3.AdaptiveMtFile)
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtFilesRequest ===
+    # Fields for ListAdaptiveMtFilesRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtFilesResponse ===
+    # Fields for ListAdaptiveMtFilesResponse
+    # Field: adaptive_mt_files Type: 11 (.google.cloud.translation.v3.AdaptiveMtFile)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtSentence ===
+    # Fields for AdaptiveMtSentence
+    # Field: name Type: 9 ()
+    # Field: source_sentence Type: 9 ()
+    # Field: target_sentence Type: 9 ()
+    # Field: create_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: update_time Type: 11 (.google.protobuf.Timestamp)
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtSentencesRequest ===
+    # Fields for ListAdaptiveMtSentencesRequest
+    # Field: parent Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+
+# === Message: Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtSentencesResponse ===
+    # Fields for ListAdaptiveMtSentencesResponse
+    # Field: adaptive_mt_sentences Type: 11 (.google.cloud.translation.v3.AdaptiveMtSentence)
+    # Field: next_page_token Type: 9 ()
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Translation::V3::AdaptiveMt - Compiled Protocol Buffers messages for google/cloud/translate/v3/adaptive_mt.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Translation::V3::AdaptiveMt;
+
+    my $msg = Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtDataset->new({
+        name => $name,
+        display_name => $display_name,
+        source_language_code => $source_language_code,
+        target_language_code => $target_language_code,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtDataset->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/translate/v3/adaptive_mt.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtDataset
+
+An Adaptive MT Dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the dataset, in form of
+`projects/{project-number-or-id}/locations/{location_id}/adaptiveMtDatasets/{dataset_id}`
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+The name of the dataset to show in the interface. The name can be
+up to 32 characters long and can consist only of ASCII Latin letters A-Z
+and a-z, underscores (_), and ASCII digits 0-9.
+
+=item * C<< $msg->source_language_code() >> / C<< $msg->source_language_code($value) >>
+
+Type: C<String>
+
+The BCP-47 language code of the source language.
+
+=item * C<< $msg->target_language_code() >> / C<< $msg->target_language_code($value) >>
+
+Type: C<String>
+
+The BCP-47 language code of the target language.
+
+=item * C<< $msg->example_count() >> / C<< $msg->example_count($value) >>
+
+Type: C<Int32>
+
+The number of examples in the dataset.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when this dataset was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when this dataset was last updated.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::CreateAdaptiveMtDatasetRequest
+
+ Request message for creating an AdaptiveMtDataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Name of the parent project. In form of
+`projects/{project-number-or-id}/locations/{location-id}`
+
+=item * C<< $msg->adaptive_mt_dataset() >> / C<< $msg->adaptive_mt_dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtDataset>)
+
+Required. The AdaptiveMtDataset to be created.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::DeleteAdaptiveMtDatasetRequest
+
+Request message for deleting an AdaptiveMtDataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the dataset. In the form of
+`projects/{project-number-or-id}/locations/{location-id}/adaptiveMtDatasets/{adaptive-mt-dataset-id}`
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::GetAdaptiveMtDatasetRequest
+
+Request message for getting an Adaptive MT dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the dataset. In the form of
+`projects/{project-number-or-id}/locations/{location-id}/adaptiveMtDatasets/{adaptive-mt-dataset-id}`
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtDatasetsRequest
+
+Request message for listing all Adaptive MT datasets that the requestor has
+access to.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the project from which to list the Adaptive
+MT datasets. `projects/{project-number-or-id}/locations/{location-id}`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. The server may return fewer results than
+requested. If unspecified, the server picks an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results the server should return.
+Typically, this is the value of
+ListAdaptiveMtDatasetsResponse.next_page_token returned from the
+previous call to `ListAdaptiveMtDatasets` method. The first page is
+returned if `page_token`is empty or missing.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. An expression for filtering the results of the request.
+Filter is not supported yet.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtDatasetsResponse
+
+A list of AdaptiveMtDatasets.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->adaptive_mt_datasets() >> / C<< $msg->adaptive_mt_datasets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtDataset>)
+
+Output only. A list of Adaptive MT datasets.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Optional. A token to retrieve a page of results. Pass this value in the
+[ListAdaptiveMtDatasetsRequest.page_token] field in the subsequent call to
+`ListAdaptiveMtDatasets` method to retrieve the next page of results.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslateRequest
+
+The request for sending an AdaptiveMt translation query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Location to make a regional call.
+
+Format: `projects/{project-number-or-id}/locations/{location-id}`.
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<String>
+
+Required. The resource name for the dataset to use for adaptive MT.
+`projects/{project}/locations/{location-id}/adaptiveMtDatasets/{dataset}`
+
+=item * C<< $msg->content() >> / C<< $msg->content($value) >>
+
+Type: C<String>
+
+Required. The content of the input in string format.
+
+=item * C<< $msg->mime_type() >> / C<< $msg->mime_type($value) >>
+
+Type: C<String>
+
+The format of the source text.
+
+=item * C<< $msg->reference_sentence_config() >> / C<< $msg->reference_sentence_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslateRequest::ReferenceSentenceConfig>)
+
+Configuration for caller provided reference sentences.
+
+=item * C<< $msg->glossary_config() >> / C<< $msg->glossary_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslateRequest::GlossaryConfig>)
+
+Optional. Glossary to be applied. The glossary must be
+within the same region (have the same location-id) as the model, otherwise
+an INVALID_ARGUMENT (400) error is returned.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslation
+
+An AdaptiveMt translation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->translated_text() >> / C<< $msg->translated_text($value) >>
+
+Type: C<String>
+
+Output only. The translated text.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslateResponse
+
+An AdaptiveMtTranslate response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->translations() >> / C<< $msg->translations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslation>)
+
+Output only. The translation.
+
+=item * C<< $msg->language_code() >> / C<< $msg->language_code($value) >>
+
+Type: C<String>
+
+Output only. The translation's language code.
+
+=item * C<< $msg->glossary_translations() >> / C<< $msg->glossary_translations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtTranslation>)
+
+Text translation response if a glossary is provided in the request. This
+could be the same as 'translation' above if no terms apply.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtFile
+
+An AdaptiveMtFile.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the file, in form of
+`projects/{project-number-or-id}/locations/{location_id}/adaptiveMtDatasets/{dataset}/adaptiveMtFiles/{file}`
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+The file's display name.
+
+=item * C<< $msg->entry_count() >> / C<< $msg->entry_count($value) >>
+
+Type: C<Int32>
+
+The number of entries that the file contains.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when this file was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when this file was last updated.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::GetAdaptiveMtFileRequest
+
+The request for getting an AdaptiveMtFile.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the file, in form of
+`projects/{project-number-or-id}/locations/{location_id}/adaptiveMtDatasets/{dataset}/adaptiveMtFiles/{file}`
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::DeleteAdaptiveMtFileRequest
+
+The request for deleting an AdaptiveMt file.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the file to delete, in form of
+`projects/{project-number-or-id}/locations/{location_id}/adaptiveMtDatasets/{dataset}/adaptiveMtFiles/{file}`
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::ImportAdaptiveMtFileRequest
+
+The request for importing an AdaptiveMt file along with its sentences.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the file, in form of
+`projects/{project-number-or-id}/locations/{location_id}/adaptiveMtDatasets/{dataset}`
+
+=item * C<< $msg->file_input_source() >> / C<< $msg->file_input_source($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::Common::FileInputSource>)
+
+Inline file source.
+
+=item * C<< $msg->gcs_input_source() >> / C<< $msg->gcs_input_source($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::Common::GcsInputSource>)
+
+Google Cloud Storage file source.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::ImportAdaptiveMtFileResponse
+
+The response for importing an AdaptiveMtFile
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->adaptive_mt_file() >> / C<< $msg->adaptive_mt_file($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtFile>)
+
+Output only. The Adaptive MT file that was imported.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtFilesRequest
+
+The request to list all AdaptiveMt files under a given dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the project from which to list the Adaptive
+MT files.
+`projects/{project}/locations/{location}/adaptiveMtDatasets/{dataset}`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A token identifying a page of results the server should return.
+Typically, this is the value of
+ListAdaptiveMtFilesResponse.next_page_token returned from the
+previous call to `ListAdaptiveMtFiles` method. The first page is
+returned if `page_token`is empty or missing.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtFilesResponse
+
+The response for listing all AdaptiveMt files under a given dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->adaptive_mt_files() >> / C<< $msg->adaptive_mt_files($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtFile>)
+
+Output only. The Adaptive MT files.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Optional. A token to retrieve a page of results. Pass this value in the
+ListAdaptiveMtFilesRequest.page_token field in the subsequent call to
+`ListAdaptiveMtFiles` method to retrieve the next page of results.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtSentence
+
+An AdaptiveMt sentence entry.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the file, in form of
+`projects/{project-number-or-id}/locations/{location_id}/adaptiveMtDatasets/{dataset}/adaptiveMtFiles/{file}/adaptiveMtSentences/{sentence}`
+
+=item * C<< $msg->source_sentence() >> / C<< $msg->source_sentence($value) >>
+
+Type: C<String>
+
+Required. The source sentence.
+
+=item * C<< $msg->target_sentence() >> / C<< $msg->target_sentence($value) >>
+
+Type: C<String>
+
+Required. The target sentence.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when this sentence was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Timestamp when this sentence was last updated.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtSentencesRequest
+
+The request for listing Adaptive MT sentences from a Dataset/File.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the project from which to list the Adaptive
+MT files. The following format lists all sentences under a file.
+`projects/{project}/locations/{location}/adaptiveMtDatasets/{dataset}/adaptiveMtFiles/{file}`
+The following format lists all sentences within a dataset.
+`projects/{project}/locations/{location}/adaptiveMtDatasets/{dataset}`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results the server should return.
+Typically, this is the value of
+ListAdaptiveMtSentencesRequest.next_page_token returned from the
+previous call to `ListTranslationMemories` method. The first page is
+returned if `page_token` is empty or missing.
+
+=back
+
+=head2 Google::Cloud::Translation::V3::AdaptiveMt::ListAdaptiveMtSentencesResponse
+
+List AdaptiveMt sentences response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->adaptive_mt_sentences() >> / C<< $msg->adaptive_mt_sentences($value) >>
+
+Type: C<Message> (L<Google::Cloud::Translation::V3::AdaptiveMt::AdaptiveMtSentence>)
+
+Output only. The list of AdaptiveMtSentences.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Optional.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Translation::V3::AdaptiveMt::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

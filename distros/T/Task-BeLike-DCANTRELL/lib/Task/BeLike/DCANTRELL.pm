@@ -1,6 +1,6 @@
 package Task::BeLike::DCANTRELL;
 
-$VERSION = '2';
+$VERSION = '3';
 
 =head1 NAME
 

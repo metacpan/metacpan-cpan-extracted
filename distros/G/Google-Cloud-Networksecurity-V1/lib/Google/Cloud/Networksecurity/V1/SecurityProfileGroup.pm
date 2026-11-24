@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::SecurityProfileGroup;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -205,72 +205,6 @@ EOF
     # Field: custom_intercept_profile Type: 9 ()
     # Field: url_filtering_profile Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfileGroup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfileGroup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<data_path_id>
-
-Type: UInt64
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.SecurityProfileGroup.LabelsEntry)
-
-=item * B<threat_prevention_profile>
-
-Type: String
-
-=item * B<custom_mirroring_profile>
-
-Type: String
-
-=item * B<custom_intercept_profile>
-
-Type: String
-
-=item * B<url_filtering_profile>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfile ===
     # Fields for SecurityProfile
     # Field: threat_prevention_profile Type: 11 (.google.cloud.networksecurity.v1.ThreatPreventionProfile)
@@ -285,72 +219,6 @@ Type: String
     # Field: labels Type: 11 (.google.cloud.networksecurity.v1.SecurityProfile.LabelsEntry)
     # Field: type Type: 14 (.google.cloud.networksecurity.v1.SecurityProfile.ProfileType)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfile - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::SecurityProfileGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfile->new(
-        threat_prevention_profile => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<threat_prevention_profile>
-
-Type: Message (.google.cloud.networksecurity.v1.ThreatPreventionProfile)
-
-=item * B<custom_mirroring_profile>
-
-Type: Message (.google.cloud.networksecurity.v1.CustomMirroringProfile)
-
-=item * B<custom_intercept_profile>
-
-Type: Message (.google.cloud.networksecurity.v1.CustomInterceptProfile)
-
-=item * B<url_filtering_profile>
-
-Type: Message (.google.cloud.networksecurity.v1.UrlFilteringProfile)
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.SecurityProfile.LabelsEntry)
-
-=item * B<type>
-
-Type: Enum (.google.cloud.networksecurity.v1.SecurityProfile.ProfileType)
-
-=back
-
-=cut
-
 # Enum: SecurityProfile::ProfileType
 our $SecurityProfile_PROFILE_TYPE_UNSPECIFIED = 0;
 our $SecurityProfile_THREAT_PREVENTION = 1;
@@ -358,39 +226,238 @@ our $SecurityProfile_CUSTOM_MIRRORING = 2;
 our $SecurityProfile_CUSTOM_INTERCEPT = 3;
 our $SecurityProfile_URL_FILTERING = 5;
 
-=pod
-
-=head2 Enum: SecurityProfile::ProfileType
-
-Values:
-
-=over 4
-
-=item * C<PROFILE_TYPE_UNSPECIFIED> => 0
-
-=item * C<THREAT_PREVENTION> => 1
-
-=item * C<CUSTOM_MIRRORING> => 2
-
-=item * C<CUSTOM_INTERCEPT> => 3
-
-=item * C<URL_FILTERING> => 5
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::SecurityProfileGroup - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::SecurityProfileGroup - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/security_profile_group.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::SecurityProfileGroup;
+
+    my $msg = Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfileGroup->new({
+        name => $name,
+        description => $description,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfileGroup->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/security_profile_group.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfileGroup
+
+SecurityProfileGroup is a resource that defines the behavior for various
+ProfileTypes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. Name of the SecurityProfileGroup resource. It
+matches pattern
+`projects|organizations/*/locations/{location}/securityProfileGroups/{security_profile_group}`.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. An optional description of the profile group. Max length 2048
+characters.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Resource creation timestamp.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Last resource update timestamp.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. This checksum is computed by the server based on the value of
+other fields, and may be sent on update and delete requests to ensure the
+client has an up-to-date value before proceeding.
+
+=item * C<< $msg->data_path_id() >> / C<< $msg->data_path_id($value) >>
+
+Type: C<UInt64>
+
+Output only. Identifier used by the data-path. Unique within `{container,
+location}`.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfileGroup::LabelsEntry>)
+
+Optional. Labels as key value pairs.
+
+=item * C<< $msg->threat_prevention_profile() >> / C<< $msg->threat_prevention_profile($value) >>
+
+Type: C<String>
+
+Optional. Reference to a SecurityProfile with the ThreatPrevention
+configuration.
+
+=item * C<< $msg->custom_mirroring_profile() >> / C<< $msg->custom_mirroring_profile($value) >>
+
+Type: C<String>
+
+Optional. Reference to a SecurityProfile with the CustomMirroring
+configuration.
+
+=item * C<< $msg->custom_intercept_profile() >> / C<< $msg->custom_intercept_profile($value) >>
+
+Type: C<String>
+
+Optional. Reference to a SecurityProfile with the CustomIntercept
+configuration.
+
+=item * C<< $msg->url_filtering_profile() >> / C<< $msg->url_filtering_profile($value) >>
+
+Type: C<String>
+
+Optional. Reference to a SecurityProfile with the UrlFiltering
+configuration.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfile
+
+SecurityProfile is a resource that defines the behavior for one of many
+ProfileTypes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->threat_prevention_profile() >> / C<< $msg->threat_prevention_profile($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention::ThreatPreventionProfile>)
+
+The threat prevention configuration for the SecurityProfile.
+
+=item * C<< $msg->custom_mirroring_profile() >> / C<< $msg->custom_mirroring_profile($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring::CustomMirroringProfile>)
+
+The custom Packet Mirroring v2 configuration for the SecurityProfile.
+
+=item * C<< $msg->custom_intercept_profile() >> / C<< $msg->custom_intercept_profile($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupIntercept::CustomInterceptProfile>)
+
+The custom TPPI configuration for the SecurityProfile.
+
+=item * C<< $msg->url_filtering_profile() >> / C<< $msg->url_filtering_profile($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering::UrlFilteringProfile>)
+
+The URL filtering configuration for the SecurityProfile.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. Name of the SecurityProfile resource. It matches
+pattern
+`projects|organizations/*/locations/{location}/securityProfiles/{security_profile}`.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. An optional description of the profile. Max length 512
+characters.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Resource creation timestamp.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Last resource update timestamp.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. This checksum is computed by the server based on the value of
+other fields, and may be sent on update and delete requests to ensure the
+client has an up-to-date value before proceeding.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::SecurityProfileGroup::SecurityProfile::LabelsEntry>)
+
+Optional. Labels as key value pairs.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::SecurityProfile::ProfileType>)
+
+Immutable. The single ProfileType that the SecurityProfile resource
+configures.
+
+=back
+
+=head3 Enum: SecurityProfile::ProfileType
+
+=over 4
+
+=item * C<PROFILE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<THREAT_PREVENTION> => C<1>
+
+=item * C<CUSTOM_MIRRORING> => C<2>
+
+=item * C<CUSTOM_INTERCEPT> => C<3>
+
+=item * C<URL_FILTERING> => C<5>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::SecurityProfileGroup::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

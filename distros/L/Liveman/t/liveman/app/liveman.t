@@ -82,6 +82,10 @@ subtest 'OPTIONS' => sub {
 # * *PACKAGE* — это имя нового пакета, например, `Aion::View`.
 # * *LICENSE* — это имя лицензии, например, GPLv3 или perl_5.
 # 
+# **-V**, **--with-version**
+# 
+# Добавляет версию в `requires` выводимым `-D`/`--cpanfile` и `-d`/`--diff-cpanfile`
+# 
 # **-D**, **--cpanfile**
 # 
 # Распечатать примерный cpanfile.

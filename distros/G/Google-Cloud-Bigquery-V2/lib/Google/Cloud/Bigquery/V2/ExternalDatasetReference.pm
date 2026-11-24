@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::ExternalDatasetReference;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -59,47 +59,73 @@ EOF
     # Field: external_source Type: 9 ()
     # Field: connection Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::ExternalDatasetReference::ExternalDatasetReference - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::ExternalDatasetReference - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/external_dataset_reference.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::ExternalDatasetReference;
 
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDatasetReference::ExternalDatasetReference->new(
-        external_source => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::ExternalDatasetReference::ExternalDatasetReference->new({
+        external_source => $external_source,
+        connection => $connection,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->external_source();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::ExternalDatasetReference::ExternalDatasetReference->parse($bytes);
 
-=item * B<external_source>
-
-Type: String
-
-=item * B<connection>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDatasetReference - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/external_dataset_reference.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDatasetReference::ExternalDatasetReference
+
+Configures the access a dataset defined in an external metadata storage.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->external_source() >> / C<< $msg->external_source($value) >>
+
+Type: C<String>
+
+Required. External source that backs this dataset.
+
+=item * C<< $msg->connection() >> / C<< $msg->connection($value) >>
+
+Type: C<String>
+
+Required. The connection id that is used to access the external_source.
+
+Format:
+  projects/{project_id}/locations/{location_id}/connections/{connection_id}
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::ExternalDatasetReference::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

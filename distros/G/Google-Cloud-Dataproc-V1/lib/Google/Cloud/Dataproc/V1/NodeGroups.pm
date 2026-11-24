@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::NodeGroups;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -177,44 +177,6 @@ EOF
     # Field: node_group_id Type: 9 ()
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::NodeGroups::CreateNodeGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::NodeGroups;
-
-    my $msg = Google::Cloud::Dataproc::V1::NodeGroups::CreateNodeGroupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<node_group>
-
-Type: Message (.google.cloud.dataproc.v1.NodeGroup)
-
-=item * B<node_group_id>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::NodeGroups::ResizeNodeGroupRequest ===
     # Fields for ResizeNodeGroupRequest
     # Field: name Type: 9 ()
@@ -222,96 +184,24 @@ Type: String
     # Field: request_id Type: 9 ()
     # Field: graceful_decommission_timeout Type: 11 (.google.protobuf.Duration)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::NodeGroups::ResizeNodeGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::NodeGroups;
-
-    my $msg = Google::Cloud::Dataproc::V1::NodeGroups::ResizeNodeGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<size>
-
-Type: Int32
-
-=item * B<request_id>
-
-Type: String
-
-=item * B<graceful_decommission_timeout>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::NodeGroups::GetNodeGroupRequest ===
     # Fields for GetNodeGroupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::NodeGroups::GetNodeGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::NodeGroups;
-
-    my $msg = Google::Cloud::Dataproc::V1::NodeGroups::GetNodeGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Dataproc::V1::NodeGroups::NodeGroupControllerClient ===
 package Google::Cloud::Dataproc::V1::NodeGroups::NodeGroupControllerClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataproc::V1::NodeGroups::NodeGroupControllerClient
 
-Google::Cloud::Dataproc::V1::NodeGroups::NodeGroupControllerClient - Client stub representing the remote NodeGroupController service
+Client stub representing the remote C<NodeGroupController> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataproc.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -379,13 +269,178 @@ sub get_node_group {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::NodeGroups - Protocol Buffers schema definition
+Google::Cloud::Dataproc::V1::NodeGroups - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/node_groups.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataproc::V1::NodeGroups;
+
+    my $msg = Google::Cloud::Dataproc::V1::NodeGroups::CreateNodeGroupRequest->new({
+        parent => $parent,
+        node_group => $node_group,
+        node_group_id => $node_group_id,
+        request_id => $request_id,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::NodeGroups::CreateNodeGroupRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/node_groups.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::NodeGroups::CreateNodeGroupRequest
+
+A request to create a node group.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this node group will be created.
+Format: `projects/{project}/regions/{region}/clusters/{cluster}`
+
+=item * C<< $msg->node_group() >> / C<< $msg->node_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Clusters::NodeGroup>)
+
+Required. The node group to create.
+
+=item * C<< $msg->node_group_id() >> / C<< $msg->node_group_id($value) >>
+
+Type: C<String>
+
+Optional. An optional node group ID. Generated if not specified.
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). Cannot begin or end with underscore
+or hyphen. Must consist of from 3 to 33 characters.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the server receives
+two
+[CreateNodeGroupRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.CreateNodeGroupRequests)
+with the same ID, the second request is ignored and the
+first [google.longrunning.Operation][google.longrunning.Operation] created
+and stored in the backend is returned.
+
+Recommendation: Set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::NodeGroups::ResizeNodeGroupRequest
+
+A request to resize a node group.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the node group to resize.
+Format:
+`projects/{project}/regions/{region}/clusters/{cluster}/nodeGroups/{nodeGroup}`
+
+=item * C<< $msg->size() >> / C<< $msg->size($value) >>
+
+Type: C<Int32>
+
+Required. The number of running instances for the node group to maintain.
+The group adds or removes instances to maintain the number of instances
+specified by this parameter.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the server receives
+two
+[ResizeNodeGroupRequest](https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#google.cloud.dataproc.v1.ResizeNodeGroupRequests)
+with the same ID, the second request is ignored and the
+first [google.longrunning.Operation][google.longrunning.Operation] created
+and stored in the backend is returned.
+
+Recommendation: Set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The ID must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=item * C<< $msg->graceful_decommission_timeout() >> / C<< $msg->graceful_decommission_timeout($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Timeout for graceful YARN decommissioning. [Graceful
+decommissioning]
+(https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/scaling-clusters#graceful_decommissioning)
+allows the removal of nodes from the Compute Engine node group
+without interrupting jobs in progress. This timeout specifies how long to
+wait for jobs in progress to finish before forcefully removing nodes (and
+potentially interrupting jobs). Default timeout is 0 (for forceful
+decommission), and the maximum allowed timeout is 1 day. (see JSON
+representation of
+[Duration](https://developers.google.com/protocol-buffers/docs/proto3#json)).
+
+Only supported on Dataproc image versions 1.2 and higher.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::NodeGroups::GetNodeGroupRequest
+
+A request to get a node group .
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the node group to retrieve.
+Format:
+`projects/{project}/regions/{region}/clusters/{cluster}/nodeGroups/{nodeGroup}`
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::NodeGroups::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

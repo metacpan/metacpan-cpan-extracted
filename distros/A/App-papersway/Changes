@@ -1,5 +1,9 @@
 Revision history for App::papersway
 
+4.001     2026-11-23 20:06:06+00:00 Europe/London
+    - 'workspace back_and_forth' falls back to using the other workspace when
+      the output has exactly two.
+
 4.000     2026-11-22 22:36:01+00:00 Europe/London
     - New commands 'send-to-workspace', 'send-to-output', 'move-to-output'.
     - New command 'output back_and_forth'.

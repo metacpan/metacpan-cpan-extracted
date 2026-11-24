@@ -1,0 +1,4 @@
+Revision history for PDL-ML-Preprocess
+
+0.01    2026-11-24
+        - Initial release: train_test_split, standard_scale, minmax_scale, l2_normalize, one_hot_encode.

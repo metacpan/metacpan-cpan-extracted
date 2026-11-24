@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -97,59 +97,95 @@ EOF
     # Field: input_parameters Type: 11 (.google.cloud.dataplex.v1.DataQualityRuleTemplate.InputParametersEntry)
     # Field: capabilities Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate - Compiled Protocol Buffers message class
+Google::Cloud::Dataplex::V1::DataQualityRuleTemplate - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/data_quality_rule_template.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
 
-    my $msg = Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate->new(
-        name => $value,
-    );
+    my $msg = Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate->new({
+        name => $name,
+        dimension => $dimension,
+        sql_collection => $sql_collection,
+        input_parameters => $input_parameters,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<dimension>
-
-Type: String
-
-=item * B<sql_collection>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRuleTemplate.Sql)
-
-=item * B<input_parameters>
-
-Type: Message (.google.cloud.dataplex.v1.DataQualityRuleTemplate.InputParametersEntry)
-
-=item * B<capabilities>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataQualityRuleTemplate - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/data_quality_rule_template.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate
+
+DataQualityRuleTemplate represents a template which can be reused across
+multiple data quality rules.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The name of the rule template in the format:
+`projects/{project_id_or_number}/locations/{location_id}/entryGroups/{entry_group_id}/entries/{entry_id}`
+
+=item * C<< $msg->dimension() >> / C<< $msg->dimension($value) >>
+
+Type: C<String>
+
+Output only. The dimension a rule template belongs to. Rule level results
+are also aggregated at the dimension level.
+
+=item * C<< $msg->sql_collection() >> / C<< $msg->sql_collection($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate::Sql>)
+
+Output only. Collection of SQLs for data quality rules. Currently only one
+SQL is supported.
+
+=item * C<< $msg->input_parameters() >> / C<< $msg->input_parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::DataQualityRuleTemplate::InputParametersEntry>)
+
+Output only. Description for input parameters
+
+=item * C<< $msg->capabilities() >> / C<< $msg->capabilities($value) >>
+
+Type: C<String>
+
+Output only. A list of features or properties supported by this rule
+template.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::DataQualityRuleTemplate::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

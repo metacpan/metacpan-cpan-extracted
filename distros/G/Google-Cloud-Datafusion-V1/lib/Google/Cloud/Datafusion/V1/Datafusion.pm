@@ -3,7 +3,7 @@ package Google::Cloud::Datafusion::V1::Datafusion;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -531,36 +531,6 @@ EOF
     # Field: network Type: 9 ()
     # Field: ip_allocation Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::NetworkConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::NetworkConfig->new(
-        network => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<network>
-
-Type: String
-
-=item * B<ip_allocation>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::Version ===
     # Fields for Version
     # Field: version_number Type: 9 ()
@@ -568,101 +538,15 @@ Type: String
     # Field: available_features Type: 9 ()
     # Field: type Type: 14 (.google.cloud.datafusion.v1.Version.Type)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::Version - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::Version->new(
-        version_number => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<version_number>
-
-Type: String
-
-=item * B<default_version>
-
-Type: Bool
-
-=item * B<available_features>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.datafusion.v1.Version.Type)
-
-=back
-
-=cut
-
 # Enum: Version::Type
 our $Version_TYPE_UNSPECIFIED = 0;
 our $Version_TYPE_PREVIEW = 1;
 our $Version_TYPE_GENERAL_AVAILABILITY = 2;
 
-=pod
-
-=head2 Enum: Version::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<TYPE_PREVIEW> => 1
-
-=item * C<TYPE_GENERAL_AVAILABILITY> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::Accelerator ===
     # Fields for Accelerator
     # Field: accelerator_type Type: 14 (.google.cloud.datafusion.v1.Accelerator.AcceleratorType)
     # Field: state Type: 14 (.google.cloud.datafusion.v1.Accelerator.State)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::Accelerator - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::Accelerator->new(
-        accelerator_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<accelerator_type>
-
-Type: Enum (.google.cloud.datafusion.v1.Accelerator.AcceleratorType)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.datafusion.v1.Accelerator.State)
-
-=back
-
-=cut
 
 # Enum: Accelerator::AcceleratorType
 our $Accelerator_ACCELERATOR_TYPE_UNSPECIFIED = 0;
@@ -670,81 +554,15 @@ our $Accelerator_CDC = 1;
 our $Accelerator_HEALTHCARE = 2;
 our $Accelerator_CCAI_INSIGHTS = 3;
 
-=pod
-
-=head2 Enum: Accelerator::AcceleratorType
-
-Values:
-
-=over 4
-
-=item * C<ACCELERATOR_TYPE_UNSPECIFIED> => 0
-
-=item * C<CDC> => 1
-
-=item * C<HEALTHCARE> => 2
-
-=item * C<CCAI_INSIGHTS> => 3
-
-=back
-
-=cut
-
 # Enum: Accelerator::State
 our $Accelerator_STATE_UNSPECIFIED = 0;
 our $Accelerator_ENABLED = 1;
 our $Accelerator_DISABLED = 2;
 our $Accelerator_UNKNOWN = 3;
 
-=pod
-
-=head2 Enum: Accelerator::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<ENABLED> => 1
-
-=item * C<DISABLED> => 2
-
-=item * C<UNKNOWN> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::CryptoKeyConfig ===
     # Fields for CryptoKeyConfig
     # Field: key_reference Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::CryptoKeyConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::CryptoKeyConfig->new(
-        key_reference => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<key_reference>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::Instance ===
     # Fields for Instance
@@ -777,165 +595,11 @@ Type: String
     # Field: crypto_key_config Type: 11 (.google.cloud.datafusion.v1.CryptoKeyConfig)
     # Field: disabled_reason Type: 14 (.google.cloud.datafusion.v1.Instance.DisabledReason)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::Instance - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::Instance->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.datafusion.v1.Instance.Type)
-
-=item * B<enable_stackdriver_logging>
-
-Type: Bool
-
-=item * B<enable_stackdriver_monitoring>
-
-Type: Bool
-
-=item * B<private_instance>
-
-Type: Bool
-
-=item * B<network_config>
-
-Type: Message (.google.cloud.datafusion.v1.NetworkConfig)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.datafusion.v1.Instance.LabelsEntry)
-
-=item * B<options>
-
-Type: Message (.google.cloud.datafusion.v1.Instance.OptionsEntry)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.datafusion.v1.Instance.State)
-
-=item * B<state_message>
-
-Type: String
-
-=item * B<service_endpoint>
-
-Type: String
-
-=item * B<zone>
-
-Type: String
-
-=item * B<version>
-
-Type: String
-
-=item * B<service_account>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<available_version>
-
-Type: Message (.google.cloud.datafusion.v1.Version)
-
-=item * B<api_endpoint>
-
-Type: String
-
-=item * B<gcs_bucket>
-
-Type: String
-
-=item * B<accelerators>
-
-Type: Message (.google.cloud.datafusion.v1.Accelerator)
-
-=item * B<p4_service_account>
-
-Type: String
-
-=item * B<tenant_project_id>
-
-Type: String
-
-=item * B<dataproc_service_account>
-
-Type: String
-
-=item * B<enable_rbac>
-
-Type: Bool
-
-=item * B<crypto_key_config>
-
-Type: Message (.google.cloud.datafusion.v1.CryptoKeyConfig)
-
-=item * B<disabled_reason>
-
-Type: Enum (.google.cloud.datafusion.v1.Instance.DisabledReason)
-
-=back
-
-=cut
-
 # Enum: Instance::Type
 our $Instance_TYPE_UNSPECIFIED = 0;
 our $Instance_BASIC = 1;
 our $Instance_ENTERPRISE = 2;
 our $Instance_DEVELOPER = 3;
-
-=pod
-
-=head2 Enum: Instance::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<BASIC> => 1
-
-=item * C<ENTERPRISE> => 2
-
-=item * C<DEVELOPER> => 3
-
-=back
-
-=cut
 
 # Enum: Instance::State
 our $Instance_STATE_UNSPECIFIED = 0;
@@ -950,59 +614,9 @@ our $Instance_AUTO_UPDATING = 8;
 our $Instance_AUTO_UPGRADING = 9;
 our $Instance_DISABLED = 10;
 
-=pod
-
-=head2 Enum: Instance::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<FAILED> => 3
-
-=item * C<DELETING> => 4
-
-=item * C<UPGRADING> => 5
-
-=item * C<RESTARTING> => 6
-
-=item * C<UPDATING> => 7
-
-=item * C<AUTO_UPDATING> => 8
-
-=item * C<AUTO_UPGRADING> => 9
-
-=item * C<DISABLED> => 10
-
-=back
-
-=cut
-
 # Enum: Instance::DisabledReason
 our $Instance_DISABLED_REASON_UNSPECIFIED = 0;
 our $Instance_KMS_KEY_ISSUE = 1;
-
-=pod
-
-=head2 Enum: Instance::DisabledReason
-
-Values:
-
-=over 4
-
-=item * C<DISABLED_REASON_UNSPECIFIED> => 0
-
-=item * C<KMS_KEY_ISSUE> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::ListInstancesRequest ===
     # Fields for ListInstancesRequest
@@ -1012,87 +626,11 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::ListInstancesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::ListInstancesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::ListInstancesResponse ===
     # Fields for ListInstancesResponse
     # Field: instances Type: 11 (.google.cloud.datafusion.v1.Instance)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::ListInstancesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::ListInstancesResponse->new(
-        instances => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instances>
-
-Type: Message (.google.cloud.datafusion.v1.Instance)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsRequest ===
     # Fields for ListAvailableVersionsRequest
@@ -1101,108 +639,14 @@ Type: String
     # Field: page_token Type: 9 ()
     # Field: latest_patch_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<latest_patch_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsResponse ===
     # Fields for ListAvailableVersionsResponse
     # Field: available_versions Type: 11 (.google.cloud.datafusion.v1.Version)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsResponse->new(
-        available_versions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<available_versions>
-
-Type: Message (.google.cloud.datafusion.v1.Version)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::GetInstanceRequest ===
     # Fields for GetInstanceRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::GetInstanceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::GetInstanceRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::CreateInstanceRequest ===
     # Fields for CreateInstanceRequest
@@ -1210,134 +654,18 @@ Type: String
     # Field: instance_id Type: 9 ()
     # Field: instance Type: 11 (.google.cloud.datafusion.v1.Instance)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::CreateInstanceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::CreateInstanceRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<instance_id>
-
-Type: String
-
-=item * B<instance>
-
-Type: Message (.google.cloud.datafusion.v1.Instance)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::DeleteInstanceRequest ===
     # Fields for DeleteInstanceRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::DeleteInstanceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::DeleteInstanceRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::UpdateInstanceRequest ===
     # Fields for UpdateInstanceRequest
     # Field: instance Type: 11 (.google.cloud.datafusion.v1.Instance)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::UpdateInstanceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::UpdateInstanceRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: Message (.google.cloud.datafusion.v1.Instance)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::RestartInstanceRequest ===
     # Fields for RestartInstanceRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::RestartInstanceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::RestartInstanceRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Datafusion::V1::Datafusion::OperationMetadata ===
     # Fields for OperationMetadata
@@ -1350,82 +678,20 @@ Type: String
     # Field: api_version Type: 9 ()
     # Field: additional_status Type: 11 (.google.cloud.datafusion.v1.OperationMetadata.AdditionalStatusEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Datafusion::V1::Datafusion::OperationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Datafusion::V1::Datafusion;
-
-    my $msg = Google::Cloud::Datafusion::V1::Datafusion::OperationMetadata->new(
-        create_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<target>
-
-Type: String
-
-=item * B<verb>
-
-Type: String
-
-=item * B<status_detail>
-
-Type: String
-
-=item * B<requested_cancellation>
-
-Type: Bool
-
-=item * B<api_version>
-
-Type: String
-
-=item * B<additional_status>
-
-Type: Message (.google.cloud.datafusion.v1.OperationMetadata.AdditionalStatusEntry)
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Datafusion::V1::Datafusion::DataFusionClient ===
 package Google::Cloud::Datafusion::V1::Datafusion::DataFusionClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Datafusion::V1::Datafusion::DataFusionClient
 
-Google::Cloud::Datafusion::V1::Datafusion::DataFusionClient - Client stub representing the remote DataFusion service
+Client stub representing the remote C<DataFusion> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<datafusion.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1545,13 +811,774 @@ sub restart_instance {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Datafusion::V1::Datafusion - Protocol Buffers schema definition
+Google::Cloud::Datafusion::V1::Datafusion - Compiled Protocol Buffers messages for google/cloud/datafusion/v1/datafusion.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Datafusion::V1::Datafusion;
+
+    my $msg = Google::Cloud::Datafusion::V1::Datafusion::NetworkConfig->new({
+        network => $network,
+        ip_allocation => $ip_allocation,
+    });
+
+    # Read or update a field
+    my $val = $msg->network();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Datafusion::V1::Datafusion::NetworkConfig->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/datafusion/v1/datafusion.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::NetworkConfig
+
+Network configuration for a Data Fusion instance. These configurations
+are used for peering with the customer network. Configurations are optional
+when a public Data Fusion instance is to be created. However, providing
+these configurations allows several benefits, such as reduced network latency
+while accessing the customer resources from managed Data Fusion instance
+nodes, as well as access to the customer on-prem resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Name of the network in the customer project with which the Tenant Project
+will be peered for executing pipelines. In case of shared VPC where the
+network resides in another host project the network should specified in
+the form of projects/{host-project-id}/global/networks/{network}
+
+=item * C<< $msg->ip_allocation() >> / C<< $msg->ip_allocation($value) >>
+
+Type: C<String>
+
+The IP range in CIDR notation to use for the managed Data Fusion instance
+nodes. This range must not overlap with any other ranges used in the
+customer network.
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::Version
+
+The Data Fusion version. This proto message stores information about certain
+Data Fusion version, which is used for Data Fusion version upgrade.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->version_number() >> / C<< $msg->version_number($value) >>
+
+Type: C<String>
+
+The version number of the Data Fusion instance, such as '6.0.1.0'.
+
+=item * C<< $msg->default_version() >> / C<< $msg->default_version($value) >>
+
+Type: C<Bool>
+
+Whether this is currently the default version for Cloud Data Fusion
+
+=item * C<< $msg->available_features() >> / C<< $msg->available_features($value) >>
+
+Type: C<String>
+
+Represents a list of available feature names for a given version.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Datafusion::V1::Version::Type>)
+
+Type represents the release availability of the version
+
+=back
+
+=head3 Enum: Version::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<TYPE_PREVIEW> => C<1>
+
+=item * C<TYPE_GENERAL_AVAILABILITY> => C<2>
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::Accelerator
+
+Identifies Data Fusion accelerators for an instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->accelerator_type() >> / C<< $msg->accelerator_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Datafusion::V1::Accelerator::AcceleratorType>)
+
+The type of an accelator for a CDF instance.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Datafusion::V1::Accelerator::State>)
+
+The state of the accelerator
+
+=back
+
+=head3 Enum: Accelerator::AcceleratorType
+
+=over 4
+
+=item * C<ACCELERATOR_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<CDC> => C<1>
+
+=item * C<HEALTHCARE> => C<2>
+
+=item * C<CCAI_INSIGHTS> => C<3>
+
+=back
+
+=head3 Enum: Accelerator::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<ENABLED> => C<1>
+
+=item * C<DISABLED> => C<2>
+
+=item * C<UNKNOWN> => C<3>
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::CryptoKeyConfig
+
+The crypto key configuration. This field is used by the Customer-managed
+encryption keys (CMEK) feature.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->key_reference() >> / C<< $msg->key_reference($value) >>
+
+Type: C<String>
+
+The name of the key which is used to encrypt/decrypt customer data. For key
+in Cloud KMS, the key should be in the format of
+`projects/*/locations/*/keyRings/*/cryptoKeys/*`.
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::Instance
+
+Represents a Data Fusion instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The name of this instance is in the form of
+projects/{project}/locations/{location}/instances/{instance}.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+A description of this instance.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Datafusion::V1::Instance::Type>)
+
+Required. Instance type.
+
+=item * C<< $msg->enable_stackdriver_logging() >> / C<< $msg->enable_stackdriver_logging($value) >>
+
+Type: C<Bool>
+
+Option to enable Stackdriver Logging.
+
+=item * C<< $msg->enable_stackdriver_monitoring() >> / C<< $msg->enable_stackdriver_monitoring($value) >>
+
+Type: C<Bool>
+
+Option to enable Stackdriver Monitoring.
+
+=item * C<< $msg->private_instance() >> / C<< $msg->private_instance($value) >>
+
+Type: C<Bool>
+
+Specifies whether the Data Fusion instance should be private. If set to
+true, all Data Fusion nodes will have private IP addresses and will not be
+able to access the public internet.
+
+=item * C<< $msg->network_config() >> / C<< $msg->network_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::NetworkConfig>)
+
+Network configuration options. These are required when a private Data
+Fusion instance is to be created.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::Instance::LabelsEntry>)
+
+The resource labels for instance to use to annotate any related underlying
+resources such as Compute Engine VMs. The character '=' is not allowed to
+be used within the labels.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::Instance::OptionsEntry>)
+
+Map of additional options used to configure the behavior of
+Data Fusion instance.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the instance was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time the instance was last updated.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Datafusion::V1::Instance::State>)
+
+Output only. The current state of this Data Fusion instance.
+
+=item * C<< $msg->state_message() >> / C<< $msg->state_message($value) >>
+
+Type: C<String>
+
+Output only. Additional information about the current state of this Data
+Fusion instance if available.
+
+=item * C<< $msg->service_endpoint() >> / C<< $msg->service_endpoint($value) >>
+
+Type: C<String>
+
+Output only. Endpoint on which the Data Fusion UI is accessible.
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<String>
+
+Name of the zone in which the Data Fusion instance will be created. Only
+DEVELOPER instances use this field.
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Current version of the Data Fusion. Only specifiable in Update.
+
+=item * C<< $msg->service_account() >> / C<< $msg->service_account($value) >>
+
+Type: C<String>
+
+Output only. Deprecated. Use tenant_project_id instead to extract the tenant project ID.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Display name for an instance.
+
+=item * C<< $msg->available_version() >> / C<< $msg->available_version($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::Version>)
+
+Available versions that the instance can be upgraded to using
+UpdateInstanceRequest.
+
+=item * C<< $msg->api_endpoint() >> / C<< $msg->api_endpoint($value) >>
+
+Type: C<String>
+
+Output only. Endpoint on which the REST APIs is accessible.
+
+=item * C<< $msg->gcs_bucket() >> / C<< $msg->gcs_bucket($value) >>
+
+Type: C<String>
+
+Output only. Cloud Storage bucket generated by Data Fusion in the customer project.
+
+=item * C<< $msg->accelerators() >> / C<< $msg->accelerators($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::Accelerator>)
+
+List of accelerators enabled for this CDF instance.
+
+=item * C<< $msg->p4_service_account() >> / C<< $msg->p4_service_account($value) >>
+
+Type: C<String>
+
+Output only. P4 service account for the customer project.
+
+=item * C<< $msg->tenant_project_id() >> / C<< $msg->tenant_project_id($value) >>
+
+Type: C<String>
+
+Output only. The name of the tenant project.
+
+=item * C<< $msg->dataproc_service_account() >> / C<< $msg->dataproc_service_account($value) >>
+
+Type: C<String>
+
+User-managed service account to set on Dataproc when Cloud Data Fusion
+creates Dataproc to run data processing pipelines.
+
+This allows users to have fine-grained access control on Dataproc's
+accesses to cloud resources.
+
+=item * C<< $msg->enable_rbac() >> / C<< $msg->enable_rbac($value) >>
+
+Type: C<Bool>
+
+Option to enable granular role-based access control.
+
+=item * C<< $msg->crypto_key_config() >> / C<< $msg->crypto_key_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::CryptoKeyConfig>)
+
+The crypto key configuration. This field is used by the Customer-Managed
+Encryption Keys (CMEK) feature.
+
+=item * C<< $msg->disabled_reason() >> / C<< $msg->disabled_reason($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Datafusion::V1::Instance::DisabledReason>)
+
+Output only. If the instance state is DISABLED, the reason for disabling the instance.
+
+=back
+
+=head3 Enum: Instance::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<BASIC> => C<1>
+
+=item * C<ENTERPRISE> => C<2>
+
+=item * C<DEVELOPER> => C<3>
+
+=back
+
+=head3 Enum: Instance::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<FAILED> => C<3>
+
+=item * C<DELETING> => C<4>
+
+=item * C<UPGRADING> => C<5>
+
+=item * C<RESTARTING> => C<6>
+
+=item * C<UPDATING> => C<7>
+
+=item * C<AUTO_UPDATING> => C<8>
+
+=item * C<AUTO_UPGRADING> => C<9>
+
+=item * C<DISABLED> => C<10>
+
+=back
+
+=head3 Enum: Instance::DisabledReason
+
+=over 4
+
+=item * C<DISABLED_REASON_UNSPECIFIED> => C<0>
+
+=item * C<KMS_KEY_ISSUE> => C<1>
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::ListInstancesRequest
+
+Request message for listing Data Fusion instances.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location for which to retrieve instance information
+in the format projects/{project}/locations/{location}. If the location is
+specified as '-' (wildcard), then all regions available to the project
+are queried, and the results are aggregated.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of items to return.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The next_page_token value to use if there are additional
+results to retrieve for this list request.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+List filter.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Sort results. Supported values are "name", "name desc",  or "" (unsorted).
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::ListInstancesResponse
+
+Response message for the list instance request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instances() >> / C<< $msg->instances($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::Instance>)
+
+Represents a list of Data Fusion instances.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsRequest
+
+Request message for the list available versions request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location for which to retrieve instance information
+in the format projects/{project}/locations/{location}.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of items to return.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The next_page_token value to use if there are additional
+results to retrieve for this list request.
+
+=item * C<< $msg->latest_patch_only() >> / C<< $msg->latest_patch_only($value) >>
+
+Type: C<Bool>
+
+Whether or not to return the latest patch of every available minor version.
+If true, only the latest patch will be returned. Ex. if allowed versions is
+[6.1.1, 6.1.2, 6.2.0] then response will be [6.1.2, 6.2.0]
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::ListAvailableVersionsResponse
+
+Response message for the list available versions request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->available_versions() >> / C<< $msg->available_versions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::Version>)
+
+Represents a list of versions that are supported.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results or empty if there are no more
+results in the list.
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::GetInstanceRequest
+
+Request message for getting details about a Data Fusion instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The instance resource name in the format
+projects/{project}/locations/{location}/instances/{instance}.
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::CreateInstanceRequest
+
+Request message for creating a Data Fusion instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The instance's project and location in the format
+projects/{project}/locations/{location}.
+
+=item * C<< $msg->instance_id() >> / C<< $msg->instance_id($value) >>
+
+Type: C<String>
+
+Required. The name of the instance to create.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::Instance>)
+
+An instance resource.
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::DeleteInstanceRequest
+
+Request message for deleting a Data Fusion instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The instance resource name in the format
+projects/{project}/locations/{location}/instances/{instance}
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::UpdateInstanceRequest
+
+Request message for updating a Data Fusion instance.
+Data Fusion allows updating the labels, options, and stack driver settings.
+This is also used for CDF version upgrade.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::Instance>)
+
+Required. The instance resource that replaces the resource on the server. Currently,
+Data Fusion only allows replacing labels, options, and stack driver
+settings. All other fields will be ignored.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Field mask is used to specify the fields that the update will overwrite
+in an instance resource. The fields specified in the update_mask are
+relative to the resource, not the full request.
+A field will be overwritten if it is in the mask.
+If the user does not provide a mask, all the supported fields (labels,
+options, and version currently) will be overwritten.
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::RestartInstanceRequest
+
+Request message for restarting a Data Fusion instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the Data Fusion instance which need to be restarted in the form of
+projects/{project}/locations/{location}/instances/{instance}
+
+=back
+
+=head2 Google::Cloud::Datafusion::V1::Datafusion::OperationMetadata
+
+Represents the metadata of a long-running operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time the operation was created.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time the operation finished running.
+
+=item * C<< $msg->target() >> / C<< $msg->target($value) >>
+
+Type: C<String>
+
+Server-defined resource path for the target of the operation.
+
+=item * C<< $msg->verb() >> / C<< $msg->verb($value) >>
+
+Type: C<String>
+
+Name of the verb executed by the operation.
+
+=item * C<< $msg->status_detail() >> / C<< $msg->status_detail($value) >>
+
+Type: C<String>
+
+Human-readable status of the operation if any.
+
+=item * C<< $msg->requested_cancellation() >> / C<< $msg->requested_cancellation($value) >>
+
+Type: C<Bool>
+
+Identifies whether the user has requested cancellation
+of the operation. Operations that have successfully been cancelled
+have [Operation.error][] value with a [google.rpc.Status.code][google.rpc.Status.code] of 1,
+corresponding to `Code.CANCELLED`.
+
+=item * C<< $msg->api_version() >> / C<< $msg->api_version($value) >>
+
+Type: C<String>
+
+API version used to start the operation.
+
+=item * C<< $msg->additional_status() >> / C<< $msg->additional_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Datafusion::V1::Datafusion::OperationMetadata::AdditionalStatusEntry>)
+
+Map to hold any additional status info for the operation
+If there is an accelerator being enabled/disabled/deleted, this will be
+populated with accelerator name as key and status as
+ENABLING, DISABLING or DELETING
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Datafusion::V1::Datafusion::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

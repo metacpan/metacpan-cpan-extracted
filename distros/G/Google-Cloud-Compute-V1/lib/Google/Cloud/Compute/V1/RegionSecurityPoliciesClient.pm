@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -464,43 +464,320 @@ The following RPC methods are available in this client:
 
 =item * B<add_rule>
 
-Calls the RPC method C<AddRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_rule(
+        project                  => $project,
+        region                   => $region,
+        security_policy          => $security_policy,
+        security_policy_rule_resource => $security_policy_rule_resource,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<AddRule> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddRuleRegionSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=item * C<security_policy_rule_resource> - L<Google::Cloud::Compute::V1::Compute::SecurityPolicyRule>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteRegionSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        region                   => $region,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRegionSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SecurityPolicy>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<get_rule>
 
-Calls the RPC method C<GetRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_rule(
+        priority                 => $priority,
+        project                  => $project,
+        region                   => $region,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<GetRule> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRuleRegionSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SecurityPolicyRule>
+
+Parameters:
+
+=over 4
+
+=item * C<priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        security_policy_resource => $security_policy_resource,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertRegionSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy_resource> - L<Google::Cloud::Compute::V1::Compute::SecurityPolicy>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListRegionSecurityPoliciesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::SecurityPolicyList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        security_policy          => $security_policy,
+        security_policy_resource => $security_policy_resource,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchRegionSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=item * C<security_policy_resource> - L<Google::Cloud::Compute::V1::Compute::SecurityPolicy>
+
+=item * C<update_mask> - C<string>
+
+=back
 
 =item * B<patch_rule>
 
-Calls the RPC method C<PatchRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_rule(
+        priority                 => $priority,
+        project                  => $project,
+        region                   => $region,
+        security_policy          => $security_policy,
+        security_policy_rule_resource => $security_policy_rule_resource,
+        update_mask              => $update_mask,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<PatchRule> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchRuleRegionSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=item * C<security_policy_rule_resource> - L<Google::Cloud::Compute::V1::Compute::SecurityPolicyRule>
+
+=item * C<update_mask> - C<string>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =item * B<remove_rule>
 
-Calls the RPC method C<RemoveRule> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->remove_rule(
+        priority                 => $priority,
+        project                  => $project,
+        region                   => $region,
+        security_policy          => $security_policy,
+    );
+
+Calls the RPC method C<RemoveRule> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RemoveRuleRegionSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<priority> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<security_policy> - C<string>
+
+=back
 
 =item * B<set_labels>
 
-Calls the RPC method C<SetLabels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_labels(
+        project                  => $project,
+        region                   => $region,
+        region_set_labels_request_resource => $region_set_labels_request_resource,
+        request_id               => $request_id,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<SetLabels> on C<google.cloud.compute.v1.RegionSecurityPolicies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetLabelsRegionSecurityPolicyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_set_labels_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionSetLabelsRequest>
+
+=item * C<request_id> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =back
 

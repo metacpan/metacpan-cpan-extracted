@@ -1,5 +1,18 @@
 Revision history for XML-Sig
 
+0.74 -- Mon Nov 23 22:12:34 AST 2026
+
+  [Notable Changes]
+  - Security fix: CVE-2026-134880 restrict DigestMethod and
+    SignatureMethod algorithm names read from a document to
+    the supported hash algorithms
+    (Upgrade immediately)
+
+  [Change Log]
+  - f52f3f6 Update version for a release
+  - 6a964c1 Correct DSA skip counts in tests
+  - 140489c CVE-2026-134880: Use Allow-list hash algorithm names when verifying
+
 0.73 -- Sat Aug 08 09:28:27 ADT 2026
 
   [Notable Changes]

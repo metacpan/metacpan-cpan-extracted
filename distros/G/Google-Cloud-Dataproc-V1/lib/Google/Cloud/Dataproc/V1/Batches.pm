@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::Batches;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -450,73 +450,9 @@ EOF
     # Field: batch_id Type: 9 ()
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::CreateBatchRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::CreateBatchRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<batch>
-
-Type: Message (.google.cloud.dataproc.v1.Batch)
-
-=item * B<batch_id>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Batches::GetBatchRequest ===
     # Fields for GetBatchRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::GetBatchRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::GetBatchRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Batches::ListBatchesRequest ===
     # Fields for ListBatchesRequest
@@ -526,117 +462,15 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::ListBatchesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::ListBatchesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Batches::ListBatchesResponse ===
     # Fields for ListBatchesResponse
     # Field: batches Type: 11 (.google.cloud.dataproc.v1.Batch)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::ListBatchesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::ListBatchesResponse->new(
-        batches => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<batches>
-
-Type: Message (.google.cloud.dataproc.v1.Batch)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Batches::DeleteBatchRequest ===
     # Fields for DeleteBatchRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::DeleteBatchRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::DeleteBatchRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Batches::Batch ===
     # Fields for Batch
@@ -659,100 +493,6 @@ Type: String
     # Field: operation Type: 9 ()
     # Field: state_history Type: 11 (.google.cloud.dataproc.v1.Batch.StateHistory)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::Batch - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::Batch->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uuid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<pyspark_batch>
-
-Type: Message (.google.cloud.dataproc.v1.PySparkBatch)
-
-=item * B<spark_batch>
-
-Type: Message (.google.cloud.dataproc.v1.SparkBatch)
-
-=item * B<spark_r_batch>
-
-Type: Message (.google.cloud.dataproc.v1.SparkRBatch)
-
-=item * B<spark_sql_batch>
-
-Type: Message (.google.cloud.dataproc.v1.SparkSqlBatch)
-
-=item * B<pyspark_notebook_batch>
-
-Type: Message (.google.cloud.dataproc.v1.PySparkNotebookBatch)
-
-=item * B<runtime_info>
-
-Type: Message (.google.cloud.dataproc.v1.RuntimeInfo)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataproc.v1.Batch.State)
-
-=item * B<state_message>
-
-Type: String
-
-=item * B<state_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<creator>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.Batch.LabelsEntry)
-
-=item * B<runtime_config>
-
-Type: Message (.google.cloud.dataproc.v1.RuntimeConfig)
-
-=item * B<environment_config>
-
-Type: Message (.google.cloud.dataproc.v1.EnvironmentConfig)
-
-=item * B<operation>
-
-Type: String
-
-=item * B<state_history>
-
-Type: Message (.google.cloud.dataproc.v1.Batch.StateHistory)
-
-=back
-
-=cut
-
 # Enum: Batch::State
 our $Batch_STATE_UNSPECIFIED = 0;
 our $Batch_PENDING = 1;
@@ -761,32 +501,6 @@ our $Batch_CANCELLING = 3;
 our $Batch_CANCELLED = 4;
 our $Batch_SUCCEEDED = 5;
 our $Batch_FAILED = 6;
-
-=pod
-
-=head2 Enum: Batch::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<PENDING> => 1
-
-=item * C<RUNNING> => 2
-
-=item * C<CANCELLING> => 3
-
-=item * C<CANCELLED> => 4
-
-=item * C<SUCCEEDED> => 5
-
-=item * C<FAILED> => 6
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Batches::PySparkBatch ===
     # Fields for PySparkBatch
@@ -797,52 +511,6 @@ Values:
     # Field: file_uris Type: 9 ()
     # Field: archive_uris Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::PySparkBatch - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::PySparkBatch->new(
-        main_python_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<main_python_file_uri>
-
-Type: String
-
-=item * B<args>
-
-Type: String
-
-=item * B<python_file_uris>
-
-Type: String
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=item * B<file_uris>
-
-Type: String
-
-=item * B<archive_uris>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Batches::SparkBatch ===
     # Fields for SparkBatch
     # Field: main_jar_file_uri Type: 9 ()
@@ -852,52 +520,6 @@ Type: String
     # Field: file_uris Type: 9 ()
     # Field: archive_uris Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::SparkBatch - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::SparkBatch->new(
-        main_jar_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<main_jar_file_uri>
-
-Type: String
-
-=item * B<main_class>
-
-Type: String
-
-=item * B<args>
-
-Type: String
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=item * B<file_uris>
-
-Type: String
-
-=item * B<archive_uris>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Batches::SparkRBatch ===
     # Fields for SparkRBatch
     # Field: main_r_file_uri Type: 9 ()
@@ -905,83 +527,11 @@ Type: String
     # Field: file_uris Type: 9 ()
     # Field: archive_uris Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::SparkRBatch - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::SparkRBatch->new(
-        main_r_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<main_r_file_uri>
-
-Type: String
-
-=item * B<args>
-
-Type: String
-
-=item * B<file_uris>
-
-Type: String
-
-=item * B<archive_uris>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Batches::SparkSqlBatch ===
     # Fields for SparkSqlBatch
     # Field: query_file_uri Type: 9 ()
     # Field: query_variables Type: 11 (.google.cloud.dataproc.v1.SparkSqlBatch.QueryVariablesEntry)
     # Field: jar_file_uris Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::SparkSqlBatch - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::SparkSqlBatch->new(
-        query_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query_file_uri>
-
-Type: String
-
-=item * B<query_variables>
-
-Type: Message (.google.cloud.dataproc.v1.SparkSqlBatch.QueryVariablesEntry)
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Batches::PySparkNotebookBatch ===
     # Fields for PySparkNotebookBatch
@@ -992,74 +542,20 @@ Type: String
     # Field: file_uris Type: 9 ()
     # Field: archive_uris Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Batches::PySparkNotebookBatch - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Batches;
-
-    my $msg = Google::Cloud::Dataproc::V1::Batches::PySparkNotebookBatch->new(
-        notebook_file_uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<notebook_file_uri>
-
-Type: String
-
-=item * B<params>
-
-Type: Message (.google.cloud.dataproc.v1.PySparkNotebookBatch.ParamsEntry)
-
-=item * B<python_file_uris>
-
-Type: String
-
-=item * B<jar_file_uris>
-
-Type: String
-
-=item * B<file_uris>
-
-Type: String
-
-=item * B<archive_uris>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Dataproc::V1::Batches::BatchControllerClient ===
 package Google::Cloud::Dataproc::V1::Batches::BatchControllerClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataproc::V1::Batches::BatchControllerClient
 
-Google::Cloud::Dataproc::V1::Batches::BatchControllerClient - Client stub representing the remote BatchController service
+Client stub representing the remote C<BatchController> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataproc.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1140,13 +636,622 @@ sub delete_batch {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::Batches - Protocol Buffers schema definition
+Google::Cloud::Dataproc::V1::Batches - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/batches.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataproc::V1::Batches;
+
+    my $msg = Google::Cloud::Dataproc::V1::Batches::CreateBatchRequest->new({
+        parent => $parent,
+        batch => $batch,
+        batch_id => $batch_id,
+        request_id => $request_id,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::Batches::CreateBatchRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/batches.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::Batches::CreateBatchRequest
+
+A request to create a batch workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this batch will be created.
+
+=item * C<< $msg->batch() >> / C<< $msg->batch($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::Batch>)
+
+Required. The batch to create.
+
+=item * C<< $msg->batch_id() >> / C<< $msg->batch_id($value) >>
+
+Type: C<String>
+
+Optional. The ID to use for the batch, which will become the final
+component of the batch's resource name.
+
+This value must be 4-63 characters. Valid characters are `/[a-z][0-9]-/`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique ID used to identify the request. If the service
+receives two
+`CreateBatchRequests` with the same `request_id`, the second request is
+ignored and the operation that corresponds to the first Batch created and
+stored in the backend is returned.
+
+Recommendation: Set this value to a
+[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier).
+
+The value must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). The maximum length is 40 characters.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::GetBatchRequest
+
+A request to get the resource representation for a batch workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The fully qualified name of the batch to retrieve
+in the format
+"projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID"
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::ListBatchesRequest
+
+A request to list batch workloads in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which owns this collection of batches.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of batches to return in each response.
+The service may return fewer than this value.
+The default page size is 20; the maximum page size is 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token received from a previous `ListBatches` call.
+Provide this token to retrieve the subsequent page.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. A filter for the batches to return in the response.
+
+A filter is a logical expression constraining the values of various fields
+in each batch resource. Filters are case sensitive, and may contain
+multiple clauses combined with logical operators (AND/OR).
+Supported fields are `batch_id`, `batch_uuid`, `state`, `create_time`, and
+`labels`.
+
+e.g. `state = RUNNING and create_time < "2023-01-01T00:00:00Z"`
+filters for batches in state RUNNING that were created before 2023-01-01.
+`state = RUNNING and labels.environment=production` filters for batches in
+state in a RUNNING state that have a production environment label.
+
+See https://google.aip.dev/assets/misc/ebnf-filtering.txt for a detailed
+description of the filter syntax and a list of supported comparisons.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Field(s) on which to sort the list of batches.
+
+Currently the only supported sort orders are unspecified (empty) and
+`create_time desc` to sort by most recently created batches first.
+
+See https://google.aip.dev/132#ordering for more details.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::ListBatchesResponse
+
+A list of batch workloads.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->batches() >> / C<< $msg->batches($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::Batch>)
+
+Output only. The batches from the specified collection.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Output only. List of Batches that could not be included in the response.
+Attempting to get one of these resources may indicate why it was not
+included in the list response.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::DeleteBatchRequest
+
+A request to delete a batch workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The fully qualified name of the batch to retrieve
+in the format
+"projects/PROJECT_ID/locations/DATAPROC_REGION/batches/BATCH_ID"
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::Batch
+
+A representation of a batch workload in the service.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name of the batch.
+
+=item * C<< $msg->uuid() >> / C<< $msg->uuid($value) >>
+
+Type: C<String>
+
+Output only. A batch UUID (Unique Universal Identifier). The service
+generates this value when it creates the batch.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the batch was created.
+
+=item * C<< $msg->pyspark_batch() >> / C<< $msg->pyspark_batch($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::PySparkBatch>)
+
+Optional. PySpark batch config.
+
+=item * C<< $msg->spark_batch() >> / C<< $msg->spark_batch($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::SparkBatch>)
+
+Optional. Spark batch config.
+
+=item * C<< $msg->spark_r_batch() >> / C<< $msg->spark_r_batch($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::SparkRBatch>)
+
+Optional. SparkR batch config.
+
+=item * C<< $msg->spark_sql_batch() >> / C<< $msg->spark_sql_batch($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::SparkSqlBatch>)
+
+Optional. SparkSql batch config.
+
+=item * C<< $msg->pyspark_notebook_batch() >> / C<< $msg->pyspark_notebook_batch($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::PySparkNotebookBatch>)
+
+Optional. PySpark notebook batch config.
+
+=item * C<< $msg->runtime_info() >> / C<< $msg->runtime_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::RuntimeInfo>)
+
+Output only. Runtime information about batch execution.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::Batch::State>)
+
+Output only. The state of the batch.
+
+=item * C<< $msg->state_message() >> / C<< $msg->state_message($value) >>
+
+Type: C<String>
+
+Output only. Batch state details, such as a failure
+description if the state is `FAILED`.
+
+=item * C<< $msg->state_time() >> / C<< $msg->state_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the batch entered a current state.
+
+=item * C<< $msg->creator() >> / C<< $msg->creator($value) >>
+
+Type: C<String>
+
+Output only. The email address of the user who created the batch.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::Batch::LabelsEntry>)
+
+Optional. The labels to associate with this batch.
+Label B<keys> must contain 1 to 63 characters, and must conform to
+[RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).
+Label B<values> may be empty, but, if present, must contain 1 to 63
+characters, and must conform to [RFC
+1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be
+associated with a batch.
+
+=item * C<< $msg->runtime_config() >> / C<< $msg->runtime_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::RuntimeConfig>)
+
+Optional. Runtime configuration for the batch execution.
+
+=item * C<< $msg->environment_config() >> / C<< $msg->environment_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Shared::EnvironmentConfig>)
+
+Optional. Environment configuration for the batch execution.
+
+=item * C<< $msg->operation() >> / C<< $msg->operation($value) >>
+
+Type: C<String>
+
+Output only. The resource name of the operation associated with this batch.
+
+=item * C<< $msg->state_history() >> / C<< $msg->state_history($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::Batch::StateHistory>)
+
+Output only. Historical state information for the batch.
+
+=back
+
+=head3 Enum: Batch::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<PENDING> => C<1>
+
+=item * C<RUNNING> => C<2>
+
+=item * C<CANCELLING> => C<3>
+
+=item * C<CANCELLED> => C<4>
+
+=item * C<SUCCEEDED> => C<5>
+
+=item * C<FAILED> => C<6>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::PySparkBatch
+
+A configuration for running an
+[Apache
+PySpark](https://spark.apache.org/docs/latest/api/python/getting_started/quickstart.html)
+batch workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->main_python_file_uri() >> / C<< $msg->main_python_file_uri($value) >>
+
+Type: C<String>
+
+Required. The HCFS URI of the main Python file to use as the Spark driver.
+Must be a .py file.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<String>
+
+Optional. The arguments to pass to the driver. Do not include arguments
+that can be set as batch properties, such as `--conf`, since a collision
+can occur that causes an incorrect batch submission.
+
+=item * C<< $msg->python_file_uris() >> / C<< $msg->python_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS file URIs of Python files to pass to the PySpark
+framework. Supported file types: `.py`, `.egg`, and `.zip`.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to add to the classpath of the
+Spark driver and tasks.
+
+=item * C<< $msg->file_uris() >> / C<< $msg->file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of files to be placed in the working directory of
+each executor.
+
+=item * C<< $msg->archive_uris() >> / C<< $msg->archive_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of archives to be extracted into the working directory
+of each executor. Supported file types:
+`.jar`, `.tar`, `.tar.gz`, `.tgz`, and `.zip`.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::SparkBatch
+
+A configuration for running an [Apache Spark](https://spark.apache.org/)
+batch workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->main_jar_file_uri() >> / C<< $msg->main_jar_file_uri($value) >>
+
+Type: C<String>
+
+Optional. The HCFS URI of the jar file that contains the main class.
+
+=item * C<< $msg->main_class() >> / C<< $msg->main_class($value) >>
+
+Type: C<String>
+
+Optional. The name of the driver main class. The jar file that contains
+the class must be in the classpath or specified in `jar_file_uris`.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<String>
+
+Optional. The arguments to pass to the driver. Do not include arguments
+that can be set as batch properties, such as `--conf`, since a collision
+can occur that causes an incorrect batch submission.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to add to the classpath of the
+Spark driver and tasks.
+
+=item * C<< $msg->file_uris() >> / C<< $msg->file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of files to be placed in the working directory of
+each executor.
+
+=item * C<< $msg->archive_uris() >> / C<< $msg->archive_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of archives to be extracted into the working directory
+of each executor. Supported file types:
+`.jar`, `.tar`, `.tar.gz`, `.tgz`, and `.zip`.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::SparkRBatch
+
+A configuration for running an
+[Apache SparkR](https://spark.apache.org/docs/latest/sparkr.html)
+batch workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->main_r_file_uri() >> / C<< $msg->main_r_file_uri($value) >>
+
+Type: C<String>
+
+Required. The HCFS URI of the main R file to use as the driver.
+Must be a `.R` or `.r` file.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<String>
+
+Optional. The arguments to pass to the Spark driver. Do not include
+arguments that can be set as batch properties, such as `--conf`, since a
+collision can occur that causes an incorrect batch submission.
+
+=item * C<< $msg->file_uris() >> / C<< $msg->file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of files to be placed in the working directory of
+each executor.
+
+=item * C<< $msg->archive_uris() >> / C<< $msg->archive_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of archives to be extracted into the working directory
+of each executor. Supported file types:
+`.jar`, `.tar`, `.tar.gz`, `.tgz`, and `.zip`.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::SparkSqlBatch
+
+A configuration for running
+[Apache Spark SQL](https://spark.apache.org/sql/) queries as a batch
+workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query_file_uri() >> / C<< $msg->query_file_uri($value) >>
+
+Type: C<String>
+
+Required. The HCFS URI of the script that contains Spark SQL queries to
+execute.
+
+=item * C<< $msg->query_variables() >> / C<< $msg->query_variables($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::SparkSqlBatch::QueryVariablesEntry>)
+
+Optional. Mapping of query variable names to values (equivalent to the
+Spark SQL command: `SET name="value";`).
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to be added to the Spark CLASSPATH.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Batches::PySparkNotebookBatch
+
+A configuration for running a PySpark Notebook batch workload.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->notebook_file_uri() >> / C<< $msg->notebook_file_uri($value) >>
+
+Type: C<String>
+
+Required. The HCFS URI of the notebook file to execute.
+
+=item * C<< $msg->params() >> / C<< $msg->params($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Batches::PySparkNotebookBatch::ParamsEntry>)
+
+Optional. The parameters to pass to the notebook.
+
+=item * C<< $msg->python_file_uris() >> / C<< $msg->python_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of Python files to pass to the PySpark framework.
+
+=item * C<< $msg->jar_file_uris() >> / C<< $msg->jar_file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of jar files to be added to the Spark CLASSPATH.
+
+=item * C<< $msg->file_uris() >> / C<< $msg->file_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of files to be placed in the working directory of
+each executor
+
+=item * C<< $msg->archive_uris() >> / C<< $msg->archive_uris($value) >>
+
+Type: C<String>
+
+Optional. HCFS URIs of archives to be extracted into the working directory
+of each executor. Supported file types:
+`.jar`, `.tar`, `.tar.gz`, `.tgz`, and `.zip`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::Batches::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

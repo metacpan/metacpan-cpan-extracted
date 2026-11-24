@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -171,87 +171,11 @@ EOF
     # Field: description Type: 9 ()
     # Field: tls_inspection_policy Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GatewaySecurityPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GatewaySecurityPolicy->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<tls_inspection_policy>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::CreateGatewaySecurityPolicyRequest ===
     # Fields for CreateGatewaySecurityPolicyRequest
     # Field: parent Type: 9 ()
     # Field: gateway_security_policy_id Type: 9 ()
     # Field: gateway_security_policy Type: 11 (.google.cloud.networksecurity.v1.GatewaySecurityPolicy)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::CreateGatewaySecurityPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::CreateGatewaySecurityPolicyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<gateway_security_policy_id>
-
-Type: String
-
-=item * B<gateway_security_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.GatewaySecurityPolicy)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::ListGatewaySecurityPoliciesRequest ===
     # Fields for ListGatewaySecurityPoliciesRequest
@@ -259,186 +183,281 @@ Type: Message (.google.cloud.networksecurity.v1.GatewaySecurityPolicy)
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::ListGatewaySecurityPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::ListGatewaySecurityPoliciesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::ListGatewaySecurityPoliciesResponse ===
     # Fields for ListGatewaySecurityPoliciesResponse
     # Field: gateway_security_policies Type: 11 (.google.cloud.networksecurity.v1.GatewaySecurityPolicy)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::ListGatewaySecurityPoliciesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::ListGatewaySecurityPoliciesResponse->new(
-        gateway_security_policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<gateway_security_policies>
-
-Type: Message (.google.cloud.networksecurity.v1.GatewaySecurityPolicy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GetGatewaySecurityPolicyRequest ===
     # Fields for GetGatewaySecurityPolicyRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GetGatewaySecurityPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GetGatewaySecurityPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::DeleteGatewaySecurityPolicyRequest ===
     # Fields for DeleteGatewaySecurityPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::DeleteGatewaySecurityPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
-
-    my $msg = Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::DeleteGatewaySecurityPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::UpdateGatewaySecurityPolicyRequest ===
     # Fields for UpdateGatewaySecurityPolicyRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: gateway_security_policy Type: 11 (.google.cloud.networksecurity.v1.GatewaySecurityPolicy)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::UpdateGatewaySecurityPolicyRequest - Compiled Protocol Buffers message class
+Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/gateway_security_policy.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
 
-    my $msg = Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::UpdateGatewaySecurityPolicyRequest->new(
-        update_mask => $value,
-    );
+    my $msg = Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GatewaySecurityPolicy->new({
+        name => $name,
+        create_time => $create_time,
+        update_time => $update_time,
+        description => $description,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GatewaySecurityPolicy->parse($bytes);
 
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<gateway_security_policy>
-
-Type: Message (.google.cloud.networksecurity.v1.GatewaySecurityPolicy)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/gateway_security_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GatewaySecurityPolicy
+
+The GatewaySecurityPolicy resource contains a collection of
+GatewaySecurityPolicyRules and associated metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource. Name is of the form
+projects/{project}/locations/{location}/gatewaySecurityPolicies/{gateway_security_policy}
+gateway_security_policy should match the
+pattern:(^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$).
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Free-text description of the resource.
+
+=item * C<< $msg->tls_inspection_policy() >> / C<< $msg->tls_inspection_policy($value) >>
+
+Type: C<String>
+
+Optional. Name of a TLS Inspection Policy resource that defines how TLS
+inspection will be performed for any rule(s) which enables it.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::CreateGatewaySecurityPolicyRequest
+
+Request used by the CreateGatewaySecurityPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the GatewaySecurityPolicy. Must be in the
+format `projects/{project}/locations/{location}`.
+
+=item * C<< $msg->gateway_security_policy_id() >> / C<< $msg->gateway_security_policy_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the GatewaySecurityPolicy resource to be created.
+This value should be 1-63 characters long, containing only
+letters, numbers, hyphens, and underscores, and should not start
+with a number. E.g. "gateway_security_policy1".
+
+=item * C<< $msg->gateway_security_policy() >> / C<< $msg->gateway_security_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GatewaySecurityPolicy>)
+
+Required. GatewaySecurityPolicy resource to be created.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::ListGatewaySecurityPoliciesRequest
+
+Request used with the ListGatewaySecurityPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the GatewaySecurityPolicies
+should be listed, specified in the format
+`projects/{project}/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of GatewaySecurityPolicies to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last
+'ListGatewaySecurityPoliciesResponse' Indicates that this is a
+continuation of a prior 'ListGatewaySecurityPolicies' call, and
+that the system should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::ListGatewaySecurityPoliciesResponse
+
+Response returned by the ListGatewaySecurityPolicies method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->gateway_security_policies() >> / C<< $msg->gateway_security_policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GatewaySecurityPolicy>)
+
+List of GatewaySecurityPolicies resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+'next_page_token' is included. To get the next set of results, call this
+method again using the value of 'next_page_token' as 'page_token'.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GetGatewaySecurityPolicyRequest
+
+Request used by the GetGatewaySecurityPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the GatewaySecurityPolicy to get. Must be in the format
+`projects/{project}/locations/{location}/gatewaySecurityPolicies/*`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::DeleteGatewaySecurityPolicyRequest
+
+Request used by the DeleteGatewaySecurityPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the GatewaySecurityPolicy to delete. Must be in the
+format `projects/{project}/locations/{location}/gatewaySecurityPolicies/*`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::UpdateGatewaySecurityPolicyRequest
+
+Request used by the UpdateGatewaySecurityPolicy method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+GatewaySecurityPolicy resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->gateway_security_policy() >> / C<< $msg->gateway_security_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::GatewaySecurityPolicy>)
+
+Required. Updated GatewaySecurityPolicy resource.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

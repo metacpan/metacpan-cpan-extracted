@@ -13,7 +13,7 @@ use Google::Api::Common;
 use Google::Cloud::Metastore::V1::Metastore;
 use Google::Cloud::Metastore::V1::MetastoreFederation;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -49,40 +49,6 @@ sub BUILD {
     }
 }
 
-sub list_federations {
-    my ($self, %params) = @_;
-
-    my $request_class = 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsRequest';
-    my $request = eval { $request_class->new(\%params) };
-    my $new_err = $@;
-    if (!$request) {
-        $request = eval { $request_class->new(%params) };
-        $new_err ||= $@;
-    }
-    if (!$request) {
-        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
-    }
-
-    my $response_class = 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse';
-    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
-        return $self->transport->call({
-            http_method    => 'POST',
-            path           => '/google.cloud.metastore.v1.DataprocMetastoreFederation/ListFederations',
-            request        => $request,
-            response_class => $response_class,
-        });
-    }
-
-    my $response = $self->transport->call({
-        service        => 'google.cloud.metastore.v1.DataprocMetastoreFederation',
-        method         => 'ListFederations',
-        request        => $request,
-        response_class => $response_class,
-    });
-
-    return $response;
-}
-
 sub list_services {
     my ($self, %params) = @_;
 
@@ -110,6 +76,40 @@ sub list_services {
     my $response = $self->transport->call({
         service        => 'google.cloud.metastore.v1.DataprocMetastore',
         method         => 'ListServices',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub list_federations {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.metastore.v1.DataprocMetastoreFederation/ListFederations',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.metastore.v1.DataprocMetastoreFederation',
+        method         => 'ListFederations',
         request        => $request,
         response_class => $response_class,
     });
@@ -158,9 +158,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/cloud/metastore/v1/metastore_federation.proto>
-
 =item * C<googleapis/google/cloud/metastore/v1/metastore.proto>
+
+=item * C<googleapis/google/cloud/metastore/v1/metastore_federation.proto>
 
 
 
@@ -193,13 +193,69 @@ The following RPC methods are available in this client:
 
 =over 4
 
-=item * B<list_federations>
-
-Calls the RPC method C<ListFederations> on the service. Takes a hash of parameters representing the request.
-
 =item * B<list_services>
 
-Calls the RPC method C<ListServices> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_services(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListServices> on C<google.cloud.metastore.v1.DataprocMetastore>.
+
+Request: L<Google::Cloud::Metastore::V1::Metastore::ListServicesRequest>
+
+Returns: L<Google::Cloud::Metastore::V1::Metastore::ListServicesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
+
+=item * B<list_federations>
+
+    my $response = $client->list_federations(
+        parent                   => $parent,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        filter                   => $filter,
+        order_by                 => $order_by,
+    );
+
+Calls the RPC method C<ListFederations> on C<google.cloud.metastore.v1.DataprocMetastoreFederation>.
+
+Request: L<Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsRequest>
+
+Returns: L<Google::Cloud::Metastore::V1::MetastoreFederation::ListFederationsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<order_by> - C<string>
+
+=back
 
 =back
 

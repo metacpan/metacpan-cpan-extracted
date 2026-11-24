@@ -10,30 +10,30 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Dataplex::V1::Processing;
-use Google::Cloud::Dataplex::V1::DataDocumentation;
-use Google::Cloud::Dataplex::V1::Content;
-use Google::Cloud::Dataplex::V1::Security;
-use Google::Cloud::Dataplex::V1::DataDiscovery;
-use Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
 use Google::Cloud::Dataplex::V1::DatascansCommon;
+use Google::Cloud::Dataplex::V1::Security;
+use Google::Cloud::Dataplex::V1::DataQualityRuleTemplate;
+use Google::Cloud::Dataplex::V1::Content;
 use Google::Cloud::Dataplex::V1::Resources;
+use Google::Cloud::Dataplex::V1::DataDocumentation;
 use Google::Cloud::Dataplex::V1::Metadata;
-use Google::Cloud::Dataplex::V1::DataQuality;
-use Google::Cloud::Dataplex::V1::DataProfile;
+use Google::Cloud::Dataplex::V1::DataDiscovery;
+use Google::Cloud::Dataplex::V1::Processing;
 use Google::Cloud::Dataplex::V1::Logs;
 use Google::Cloud::Dataplex::V1::Analyze;
 use Google::Cloud::Dataplex::V1::Tasks;
+use Google::Cloud::Dataplex::V1::DataQuality;
+use Google::Cloud::Dataplex::V1::DataProfile;
 use Google::Cloud::Dataplex::V1::Service;
 use Google::Cloud::Dataplex::V1::Datascans;
+use Google::Cloud::Dataplex::V1::DataTaxonomy;
 use Google::Cloud::Dataplex::V1::BusinessGlossary;
 use Google::Cloud::Dataplex::V1::Cmek;
 use Google::Cloud::Dataplex::V1::Catalog;
-use Google::Cloud::Dataplex::V1::DataTaxonomy;
 use Google::Cloud::Dataplex::V1::ApprovalWorkflow;
 use Google::Cloud::Dataplex::V1::DataProducts;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -168,11 +168,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/dataplex/v1/data_quality_rule_template.proto>
 
-=item * C<googleapis/google/cloud/dataplex/v1/datascans_common.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/data_taxonomy.proto>
 
 =item * C<googleapis/google/cloud/dataplex/v1/datascans.proto>
 
-=item * C<googleapis/google/cloud/dataplex/v1/data_taxonomy.proto>
+=item * C<googleapis/google/cloud/dataplex/v1/datascans_common.proto>
 
 =item * C<googleapis/google/cloud/dataplex/v1/logs.proto>
 
@@ -221,7 +221,32 @@ The following RPC methods are available in this client:
 
 =item * B<create_lake>
 
-Calls the RPC method C<CreateLake> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_lake(
+        parent                   => $parent,
+        lake_id                  => $lake_id,
+        lake                     => $lake,
+        validate_only            => $validate_only,
+    );
+
+Calls the RPC method C<CreateLake> on C<google.cloud.dataplex.v1.DataplexService>.
+
+Request: L<Google::Cloud::Dataplex::V1::Service::CreateLakeRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<lake_id> - C<string>
+
+=item * C<lake> - L<Google::Cloud::Dataplex::V1::Resources::Lake>
+
+=item * C<validate_only> - C<bool>
+
+=back
 
 =back
 

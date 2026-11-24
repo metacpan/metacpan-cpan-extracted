@@ -3,7 +3,7 @@ package Google::Cloud::Secretmanager::V1::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -544,83 +544,11 @@ EOF
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::ListSecretsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::ListSecretsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Service::ListSecretsResponse ===
     # Fields for ListSecretsResponse
     # Field: secrets Type: 11 (.google.cloud.secretmanager.v1.Secret)
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::ListSecretsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::ListSecretsResponse->new(
-        secrets => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<secrets>
-
-Type: Message (.google.cloud.secretmanager.v1.Secret)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Service::CreateSecretRequest ===
     # Fields for CreateSecretRequest
@@ -628,169 +556,23 @@ Type: Int32
     # Field: secret_id Type: 9 ()
     # Field: secret Type: 11 (.google.cloud.secretmanager.v1.Secret)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::CreateSecretRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::CreateSecretRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<secret_id>
-
-Type: String
-
-=item * B<secret>
-
-Type: Message (.google.cloud.secretmanager.v1.Secret)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Service::AddSecretVersionRequest ===
     # Fields for AddSecretVersionRequest
     # Field: parent Type: 9 ()
     # Field: payload Type: 11 (.google.cloud.secretmanager.v1.SecretPayload)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::AddSecretVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::AddSecretVersionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<payload>
-
-Type: Message (.google.cloud.secretmanager.v1.SecretPayload)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Service::EnableManagedRotationRequest ===
     # Fields for EnableManagedRotationRequest
     # Field: parent Type: 9 ()
     # Field: cloud_sql_single_user_credentials Type: 11 (.google.cloud.secretmanager.v1.CloudSqlSingleUserCredentials)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::EnableManagedRotationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::EnableManagedRotationRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<cloud_sql_single_user_credentials>
-
-Type: Message (.google.cloud.secretmanager.v1.CloudSqlSingleUserCredentials)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Service::RotateSecretRequest ===
     # Fields for RotateSecretRequest
     # Field: parent Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::RotateSecretRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::RotateSecretRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Service::GetSecretRequest ===
     # Fields for GetSecretRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::GetSecretRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::GetSecretRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Service::ListSecretVersionsRequest ===
     # Fields for ListSecretVersionsRequest
@@ -799,376 +581,64 @@ Type: String
     # Field: page_token Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::ListSecretVersionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::ListSecretVersionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Service::ListSecretVersionsResponse ===
     # Fields for ListSecretVersionsResponse
     # Field: versions Type: 11 (.google.cloud.secretmanager.v1.SecretVersion)
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::ListSecretVersionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::ListSecretVersionsResponse->new(
-        versions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<versions>
-
-Type: Message (.google.cloud.secretmanager.v1.SecretVersion)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Service::GetSecretVersionRequest ===
     # Fields for GetSecretVersionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::GetSecretVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::GetSecretVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Service::UpdateSecretRequest ===
     # Fields for UpdateSecretRequest
     # Field: secret Type: 11 (.google.cloud.secretmanager.v1.Secret)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::UpdateSecretRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::UpdateSecretRequest->new(
-        secret => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<secret>
-
-Type: Message (.google.cloud.secretmanager.v1.Secret)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Service::AccessSecretVersionRequest ===
     # Fields for AccessSecretVersionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::AccessSecretVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::AccessSecretVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Service::AccessSecretVersionResponse ===
     # Fields for AccessSecretVersionResponse
     # Field: name Type: 9 ()
     # Field: payload Type: 11 (.google.cloud.secretmanager.v1.SecretPayload)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::AccessSecretVersionResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::AccessSecretVersionResponse->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<payload>
-
-Type: Message (.google.cloud.secretmanager.v1.SecretPayload)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Service::DeleteSecretRequest ===
     # Fields for DeleteSecretRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::DeleteSecretRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::DeleteSecretRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Service::DisableSecretVersionRequest ===
     # Fields for DisableSecretVersionRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::DisableSecretVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::DisableSecretVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Secretmanager::V1::Service::EnableSecretVersionRequest ===
     # Fields for EnableSecretVersionRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::EnableSecretVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::EnableSecretVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Secretmanager::V1::Service::DestroySecretVersionRequest ===
     # Fields for DestroySecretVersionRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Secretmanager::V1::Service::DestroySecretVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Secretmanager::V1::Service;
-
-    my $msg = Google::Cloud::Secretmanager::V1::Service::DestroySecretVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Secretmanager::V1::Service::SecretManagerServiceClient ===
 package Google::Cloud::Secretmanager::V1::Service::SecretManagerServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Secretmanager::V1::Service::SecretManagerServiceClient
 
-Google::Cloud::Secretmanager::V1::Service::SecretManagerServiceClient - Client stub representing the remote SecretManagerService service
+Client stub representing the remote C<SecretManagerService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<secretmanager.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1418,13 +888,580 @@ sub rotate_secret {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Secretmanager::V1::Service - Protocol Buffers schema definition
+Google::Cloud::Secretmanager::V1::Service - Compiled Protocol Buffers messages for google/cloud/secretmanager/v1/service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Secretmanager::V1::Service;
+
+    my $msg = Google::Cloud::Secretmanager::V1::Service::ListSecretsRequest->new({
+        parent => $parent,
+        page_size => $page_size,
+        page_token => $page_token,
+        filter => $filter,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Secretmanager::V1::Service::ListSecretsRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/secretmanager/v1/service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Secretmanager::V1::Service::ListSecretsRequest
+
+Request message for
+[SecretManagerService.ListSecrets][google.cloud.secretmanager.v1.SecretManagerService.ListSecrets].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the project associated with the
+[Secrets][google.cloud.secretmanager.v1.Secret], in the format `projects/*`
+or `projects/*/locations/*`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of results to be returned in a single page. If
+set to 0, the server decides the number of results to return. If the
+number is greater than 25000, it is capped at 25000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Pagination token, returned earlier via
+[ListSecretsResponse.next_page_token][google.cloud.secretmanager.v1.ListSecretsResponse.next_page_token].
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter string, adhering to the rules in
+[List-operation
+filtering](https://cloud.google.com/secret-manager/docs/filtering). List
+only secrets matching the filter. If filter is empty, all secrets are
+listed.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::ListSecretsResponse
+
+Response message for
+[SecretManagerService.ListSecrets][google.cloud.secretmanager.v1.SecretManagerService.ListSecrets].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->secrets() >> / C<< $msg->secrets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Secret>)
+
+The list of [Secrets][google.cloud.secretmanager.v1.Secret] sorted in
+reverse by create_time (newest first).
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve the next page of results. Pass this value in
+[ListSecretsRequest.page_token][google.cloud.secretmanager.v1.ListSecretsRequest.page_token]
+to retrieve the next page.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The total number of [Secrets][google.cloud.secretmanager.v1.Secret] but 0
+when the
+[ListSecretsRequest.filter][google.cloud.secretmanager.v1.ListSecretsRequest.filter]
+field is set.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::CreateSecretRequest
+
+Request message for
+[SecretManagerService.CreateSecret][google.cloud.secretmanager.v1.SecretManagerService.CreateSecret].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the project to associate with the
+[Secret][google.cloud.secretmanager.v1.Secret], in the format `projects/*`
+or `projects/*/locations/*`.
+
+=item * C<< $msg->secret_id() >> / C<< $msg->secret_id($value) >>
+
+Type: C<String>
+
+Required. This must be unique within the project.
+
+A secret ID is a string with a maximum length of 255 characters and can
+contain uppercase and lowercase letters, numerals, and the hyphen (`-`) and
+underscore (`_`) characters.
+
+=item * C<< $msg->secret() >> / C<< $msg->secret($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Secret>)
+
+Required. A [Secret][google.cloud.secretmanager.v1.Secret] with initial
+field values.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::AddSecretVersionRequest
+
+Request message for
+[SecretManagerService.AddSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AddSecretVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[Secret][google.cloud.secretmanager.v1.Secret] to associate with the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+`projects/*/secrets/*` or `projects/*/locations/*/secrets/*`.
+
+=item * C<< $msg->payload() >> / C<< $msg->payload($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::SecretPayload>)
+
+Required. The secret payload of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::EnableManagedRotationRequest
+
+Request message for
+[SecretManagerService.EnableManagedRotation][google.cloud.secretmanager.v1.SecretManagerService.EnableManagedRotation].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[Secret][google.cloud.secretmanager.v1.Secret] to associate with the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+`projects/*/secrets/*` or `projects/*/locations/*/secrets/*`.
+
+=item * C<< $msg->cloud_sql_single_user_credentials() >> / C<< $msg->cloud_sql_single_user_credentials($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::CloudSqlSingleUserCredentials>)
+
+Credentials required for Cloud SQL DB for Single user Managed Rotation.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::RotateSecretRequest
+
+Request message for
+[SecretManagerService.RotateSecret][google.cloud.secretmanager.v1.SecretManagerService.RotateSecret].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[Secret][google.cloud.secretmanager.v1.Secret] to associate with the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+`projects/*/secrets/*` or `projects/*/locations/*/secrets/*`.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::GetSecretRequest
+
+Request message for
+[SecretManagerService.GetSecret][google.cloud.secretmanager.v1.SecretManagerService.GetSecret].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[Secret][google.cloud.secretmanager.v1.Secret], in the format
+`projects/*/secrets/*` or `projects/*/locations/*/secrets/*`.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::ListSecretVersionsRequest
+
+Request message for
+[SecretManagerService.ListSecretVersions][google.cloud.secretmanager.v1.SecretManagerService.ListSecretVersions].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[Secret][google.cloud.secretmanager.v1.Secret] associated with the
+[SecretVersions][google.cloud.secretmanager.v1.SecretVersion] to list, in
+the format `projects/*/secrets/*` or `projects/*/locations/*/secrets/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of results to be returned in a single page. If
+set to 0, the server decides the number of results to return. If the
+number is greater than 25000, it is capped at 25000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Pagination token, returned earlier via
+ListSecretVersionsResponse.next_page_token][].
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter string, adhering to the rules in
+[List-operation
+filtering](https://cloud.google.com/secret-manager/docs/filtering). List
+only secret versions matching the filter. If filter is empty, all secret
+versions are listed.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::ListSecretVersionsResponse
+
+Response message for
+[SecretManagerService.ListSecretVersions][google.cloud.secretmanager.v1.SecretManagerService.ListSecretVersions].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->versions() >> / C<< $msg->versions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::SecretVersion>)
+
+The list of [SecretVersions][google.cloud.secretmanager.v1.SecretVersion]
+sorted in reverse by create_time (newest first).
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve the next page of results. Pass this value in
+[ListSecretVersionsRequest.page_token][google.cloud.secretmanager.v1.ListSecretVersionsRequest.page_token]
+to retrieve the next page.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The total number of
+[SecretVersions][google.cloud.secretmanager.v1.SecretVersion] but 0 when
+the
+[ListSecretsRequest.filter][google.cloud.secretmanager.v1.ListSecretsRequest.filter]
+field is set.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::GetSecretVersionRequest
+
+Request message for
+[SecretManagerService.GetSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.GetSecretVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+`projects/*/secrets/*/versions/*` or
+`projects/*/locations/*/secrets/*/versions/*`.
+
+`projects/*/secrets/*/versions/latest` or
+`projects/*/locations/*/secrets/*/versions/latest` is an alias to the most
+recently created
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::UpdateSecretRequest
+
+Request message for
+[SecretManagerService.UpdateSecret][google.cloud.secretmanager.v1.SecretManagerService.UpdateSecret].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->secret() >> / C<< $msg->secret($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::Secret>)
+
+Required. [Secret][google.cloud.secretmanager.v1.Secret] with updated field
+values.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Specifies the fields to be updated.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::AccessSecretVersionRequest
+
+Request message for
+[SecretManagerService.AccessSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AccessSecretVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+`projects/*/secrets/*/versions/*` or
+`projects/*/locations/*/secrets/*/versions/*`.
+
+`projects/*/secrets/*/versions/latest` or
+`projects/*/locations/*/secrets/*/versions/latest` is an alias to the most
+recently created
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion].
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::AccessSecretVersionResponse
+
+Response message for
+[SecretManagerService.AccessSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.AccessSecretVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The resource name of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] in the format
+`projects/*/secrets/*/versions/*` or
+`projects/*/locations/*/secrets/*/versions/*`.
+
+=item * C<< $msg->payload() >> / C<< $msg->payload($value) >>
+
+Type: C<Message> (L<Google::Cloud::Secretmanager::V1::Resources::SecretPayload>)
+
+Secret payload
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::DeleteSecretRequest
+
+Request message for
+[SecretManagerService.DeleteSecret][google.cloud.secretmanager.v1.SecretManagerService.DeleteSecret].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[Secret][google.cloud.secretmanager.v1.Secret] to delete in the format
+`projects/*/secrets/*`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag of the [Secret][google.cloud.secretmanager.v1.Secret]. The
+request succeeds if it matches the etag of the currently stored secret
+object. If the etag is omitted, the request succeeds.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::DisableSecretVersionRequest
+
+Request message for
+[SecretManagerService.DisableSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.DisableSecretVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] to disable in
+the format `projects/*/secrets/*/versions/*` or
+`projects/*/locations/*/secrets/*/versions/*`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. The request
+succeeds if it matches the etag of the currently stored secret version
+object. If the etag is omitted, the request succeeds.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::EnableSecretVersionRequest
+
+Request message for
+[SecretManagerService.EnableSecretVersion][google.cloud.secretmanager.v1.SecretManagerService.EnableSecretVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] to enable in
+the format `projects/*/secrets/*/versions/*` or
+`projects/*/locations/*/secrets/*/versions/*`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. The request
+succeeds if it matches the etag of the currently stored secret version
+object. If the etag is omitted, the request succeeds.
+
+=back
+
+=head2 Google::Cloud::Secretmanager::V1::Service::DestroySecretVersionRequest
+
+Request message for
+[SecretManagerService.DestroySecretVersion][google.cloud.secretmanager.v1.SecretManagerService.DestroySecretVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] to destroy in
+the format `projects/*/secrets/*/versions/*` or
+`projects/*/locations/*/secrets/*/versions/*`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. Etag of the
+[SecretVersion][google.cloud.secretmanager.v1.SecretVersion]. The request
+succeeds if it matches the etag of the currently stored secret version
+object. If the etag is omitted, the request succeeds.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Secretmanager::V1::Service::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,22 @@
+Changes
+lib/Google/Cloud/Contactcenterinsights/V1.pm
+lib/Google/Cloud/Contactcenterinsights/V1/ContactCenterInsights.pm
+lib/Google/Cloud/Contactcenterinsights/V1/ContactCenterInsights/Types.pm
+lib/Google/Cloud/Contactcenterinsights/V1/ContactCenterInsightsClient.pm
+lib/Google/Cloud/Contactcenterinsights/V1/Resources.pm
+lib/Google/Cloud/Contactcenterinsights/V1/Resources/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-ContactCenterInsights.t
+t/01-service-Default.t
+t/02-rest-transport-ContactCenterInsights.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

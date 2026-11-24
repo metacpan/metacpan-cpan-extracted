@@ -59,6 +59,35 @@ local ($::_g0 = do {$req->stringify}, $::_e0 = "req name => (is => 'rw', isa => 
 # 
 # Сравнивает с фичей, но только указанные аспекты.
 # 
+::done_testing; }; subtest 'compare ($feature)' => sub { 
+package Float { use Aion }
+
+package Fpu { use Aion -role;
+	req float => (is => 'ro');
+}
+
+package Cpu { use Aion; with 'Fpu';
+	has float => (is => 'ro', isa => Object['Float']);
+}
+
+local ($::_g0 = do {ref Cpu->new(float => Float->new)->float}, $::_e0 = "Float"); ::ok $::_g0 eq $::_e0, 'ref Cpu->new(float => Float->new)->float # => Float' or ::diag ::_string_diff($::_g0, $::_e0); undef $::_g0; undef $::_e0;
+
+# 
+# И выбрасывает исключение, если они не подходят:
+# 
+
+package Fpu { use Aion -role;
+	req int => (is => 'ro', isa => Object['Int']);
+}
+
+eval {
+	package Cpu { use Aion; with 'Fpu';
+		has int => (is => 'ro', isa => Object['Float']);
+	}
+};
+local ($::_g0 = do {$@}, $::_e0 = "Feature mismatch (isa => Object['Int'] != Object['Float']) with req int => (is => 'ro', isa => Object['Int']) of Fpu"); ::ok $::_g0 =~ /^${\quotemeta $::_e0}/, '$@ # ^=> Feature mismatch (isa => Object[\'Int\'] != Object[\'Float\']) with req int => (is => \'ro\', isa => Object[\'Int\']) of Fpu' or ::diag ::_string_diff($::_g0, $::_e0, 1); undef $::_g0; undef $::_e0;
+
+# 
 # # AUTHOR
 # 
 # Yaroslav O. Kosmina <dart@cpan.org>

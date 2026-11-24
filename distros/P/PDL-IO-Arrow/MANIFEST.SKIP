@@ -1,0 +1,10 @@
+^\.git/
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^PDL-IO-Arrow-
+\.tar\.gz$
+~$
+\.bak$

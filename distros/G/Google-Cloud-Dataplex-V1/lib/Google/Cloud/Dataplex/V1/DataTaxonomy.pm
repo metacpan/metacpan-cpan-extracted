@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::DataTaxonomy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -718,68 +718,6 @@ EOF
     # Field: etag Type: 9 ()
     # Field: class_count Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.DataTaxonomy.LabelsEntry)
-
-=item * B<attribute_count>
-
-Type: Int32
-
-=item * B<etag>
-
-Type: String
-
-=item * B<class_count>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttribute ===
     # Fields for DataAttribute
     # Field: name Type: 9 ()
@@ -795,76 +733,6 @@ Type: Int32
     # Field: resource_access_spec Type: 11 (.google.cloud.dataplex.v1.ResourceAccessSpec)
     # Field: data_access_spec Type: 11 (.google.cloud.dataplex.v1.DataAccessSpec)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttribute - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttribute->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.DataAttribute.LabelsEntry)
-
-=item * B<parent_id>
-
-Type: String
-
-=item * B<attribute_count>
-
-Type: Int32
-
-=item * B<etag>
-
-Type: String
-
-=item * B<resource_access_spec>
-
-Type: Message (.google.cloud.dataplex.v1.ResourceAccessSpec)
-
-=item * B<data_access_spec>
-
-Type: Message (.google.cloud.dataplex.v1.DataAccessSpec)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttributeBinding ===
     # Fields for DataAttributeBinding
     # Field: name Type: 9 ()
@@ -879,72 +747,6 @@ Type: Message (.google.cloud.dataplex.v1.DataAccessSpec)
     # Field: attributes Type: 9 ()
     # Field: paths Type: 11 (.google.cloud.dataplex.v1.DataAttributeBinding.Path)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttributeBinding - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttributeBinding->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<description>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.DataAttributeBinding.LabelsEntry)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<resource>
-
-Type: String
-
-=item * B<attributes>
-
-Type: String
-
-=item * B<paths>
-
-Type: Message (.google.cloud.dataplex.v1.DataAttributeBinding.Path)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataTaxonomyRequest ===
     # Fields for CreateDataTaxonomyRequest
     # Field: parent Type: 9 ()
@@ -952,113 +754,15 @@ Type: Message (.google.cloud.dataplex.v1.DataAttributeBinding.Path)
     # Field: data_taxonomy Type: 11 (.google.cloud.dataplex.v1.DataTaxonomy)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataTaxonomyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataTaxonomyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<data_taxonomy_id>
-
-Type: String
-
-=item * B<data_taxonomy>
-
-Type: Message (.google.cloud.dataplex.v1.DataTaxonomy)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataTaxonomyRequest ===
     # Fields for UpdateDataTaxonomyRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: data_taxonomy Type: 11 (.google.cloud.dataplex.v1.DataTaxonomy)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataTaxonomyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataTaxonomyRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<data_taxonomy>
-
-Type: Message (.google.cloud.dataplex.v1.DataTaxonomy)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataTaxonomyRequest ===
     # Fields for GetDataTaxonomyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataTaxonomyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataTaxonomyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataTaxonomiesRequest ===
     # Fields for ListDataTaxonomiesRequest
@@ -1068,122 +772,16 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataTaxonomiesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataTaxonomiesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataTaxonomiesResponse ===
     # Fields for ListDataTaxonomiesResponse
     # Field: data_taxonomies Type: 11 (.google.cloud.dataplex.v1.DataTaxonomy)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataTaxonomiesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataTaxonomiesResponse->new(
-        data_taxonomies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_taxonomies>
-
-Type: Message (.google.cloud.dataplex.v1.DataTaxonomy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataTaxonomyRequest ===
     # Fields for DeleteDataTaxonomyRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataTaxonomyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataTaxonomyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataAttributeRequest ===
     # Fields for CreateDataAttributeRequest
@@ -1192,113 +790,15 @@ Type: String
     # Field: data_attribute Type: 11 (.google.cloud.dataplex.v1.DataAttribute)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataAttributeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataAttributeRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<data_attribute_id>
-
-Type: String
-
-=item * B<data_attribute>
-
-Type: Message (.google.cloud.dataplex.v1.DataAttribute)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataAttributeRequest ===
     # Fields for UpdateDataAttributeRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: data_attribute Type: 11 (.google.cloud.dataplex.v1.DataAttribute)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataAttributeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataAttributeRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<data_attribute>
-
-Type: Message (.google.cloud.dataplex.v1.DataAttribute)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataAttributeRequest ===
     # Fields for GetDataAttributeRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataAttributeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataAttributeRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributesRequest ===
     # Fields for ListDataAttributesRequest
@@ -1308,122 +808,16 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributesResponse ===
     # Fields for ListDataAttributesResponse
     # Field: data_attributes Type: 11 (.google.cloud.dataplex.v1.DataAttribute)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributesResponse->new(
-        data_attributes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_attributes>
-
-Type: Message (.google.cloud.dataplex.v1.DataAttribute)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataAttributeRequest ===
     # Fields for DeleteDataAttributeRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataAttributeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataAttributeRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataAttributeBindingRequest ===
     # Fields for CreateDataAttributeBindingRequest
@@ -1432,113 +826,15 @@ Type: String
     # Field: data_attribute_binding Type: 11 (.google.cloud.dataplex.v1.DataAttributeBinding)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataAttributeBindingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataAttributeBindingRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<data_attribute_binding_id>
-
-Type: String
-
-=item * B<data_attribute_binding>
-
-Type: Message (.google.cloud.dataplex.v1.DataAttributeBinding)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataAttributeBindingRequest ===
     # Fields for UpdateDataAttributeBindingRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: data_attribute_binding Type: 11 (.google.cloud.dataplex.v1.DataAttributeBinding)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataAttributeBindingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataAttributeBindingRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<data_attribute_binding>
-
-Type: Message (.google.cloud.dataplex.v1.DataAttributeBinding)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataAttributeBindingRequest ===
     # Fields for GetDataAttributeBindingRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataAttributeBindingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataAttributeBindingRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributeBindingsRequest ===
     # Fields for ListDataAttributeBindingsRequest
@@ -1548,145 +844,31 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributeBindingsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributeBindingsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributeBindingsResponse ===
     # Fields for ListDataAttributeBindingsResponse
     # Field: data_attribute_bindings Type: 11 (.google.cloud.dataplex.v1.DataAttributeBinding)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable_locations Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributeBindingsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributeBindingsResponse->new(
-        data_attribute_bindings => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_attribute_bindings>
-
-Type: Message (.google.cloud.dataplex.v1.DataAttributeBinding)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable_locations>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataAttributeBindingRequest ===
     # Fields for DeleteDataAttributeBindingRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataAttributeBindingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataTaxonomy;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataAttributeBindingRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomyServiceClient ===
 package Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomyServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomyServiceClient
 
-Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomyServiceClient - Client stub representing the remote DataTaxonomyService service
+Client stub representing the remote C<DataTaxonomyService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataplex.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1910,13 +1092,919 @@ sub get_data_attribute {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::DataTaxonomy - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::DataTaxonomy - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/data_taxonomy.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::DataTaxonomy;
+
+    my $msg = Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy->new({
+        name => $name,
+        uid => $uid,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/data_taxonomy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy
+
+DataTaxonomy represents a set of hierarchical DataAttributes resources,
+grouped with a common theme Eg: 'SensitiveDataTaxonomy' can have attributes
+to manage PII data. It is defined at project level.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the DataTaxonomy, of the form:
+projects/{project_number}/locations/{location_id}/dataTaxonomies/{data_taxonomy_id}.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the dataTaxonomy. This
+ID will be different if the DataTaxonomy is deleted and re-created with the
+same name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the DataTaxonomy was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the DataTaxonomy was last updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the DataTaxonomy.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy::LabelsEntry>)
+
+Optional. User-defined labels for the DataTaxonomy.
+
+=item * C<< $msg->attribute_count() >> / C<< $msg->attribute_count($value) >>
+
+Type: C<Int32>
+
+Output only. The number of attributes in the DataTaxonomy.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+This checksum is computed by the server based on the value of other
+fields, and may be sent on update and delete requests to ensure the
+client has an up-to-date value before proceeding.
+
+=item * C<< $msg->class_count() >> / C<< $msg->class_count($value) >>
+
+Type: C<Int32>
+
+Output only. The number of classes in the DataTaxonomy.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttribute
+
+Denotes one dataAttribute in a dataTaxonomy, for example, PII.
+DataAttribute resources can be defined in a hierarchy.
+A single dataAttribute resource can contain specs of multiple types
+
+```
+PII
+  - ResourceAccessSpec :
+                - readers :foo@bar.com
+  - DataAccessSpec :
+                - readers :bar@foo.com
+```
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the dataAttribute, of the form:
+projects/{project_number}/locations/{location_id}/dataTaxonomies/{dataTaxonomy}/attributes/{data_attribute_id}.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the DataAttribute.
+This ID will be different if the DataAttribute is deleted and re-created
+with the same name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the DataAttribute was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the DataAttribute was last updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the DataAttribute.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttribute::LabelsEntry>)
+
+Optional. User-defined labels for the DataAttribute.
+
+=item * C<< $msg->parent_id() >> / C<< $msg->parent_id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the parent DataAttribute resource, should belong to the
+same data taxonomy. Circular dependency in parent chain is not valid.
+Maximum depth of the hierarchy allowed is 4.
+[a -> b -> c -> d -> e, depth = 4]
+
+=item * C<< $msg->attribute_count() >> / C<< $msg->attribute_count($value) >>
+
+Type: C<Int32>
+
+Output only. The number of child attributes present for this attribute.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+This checksum is computed by the server based on the value of other
+fields, and may be sent on update and delete requests to ensure the
+client has an up-to-date value before proceeding.
+
+=item * C<< $msg->resource_access_spec() >> / C<< $msg->resource_access_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Security::ResourceAccessSpec>)
+
+Optional. Specified when applied to a resource (eg: Cloud Storage bucket,
+BigQuery dataset, BigQuery table).
+
+=item * C<< $msg->data_access_spec() >> / C<< $msg->data_access_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Security::DataAccessSpec>)
+
+Optional. Specified when applied to data stored on the resource (eg: rows,
+columns in BigQuery Tables).
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttributeBinding
+
+DataAttributeBinding represents binding of attributes to resources. Eg: Bind
+'CustomerInfo' entity with 'PII' attribute.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the Data Attribute Binding, of
+the form:
+projects/{project_number}/locations/{location}/dataAttributeBindings/{data_attribute_binding_id}
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the
+DataAttributeBinding. This ID will be different if the DataAttributeBinding
+is deleted and re-created with the same name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the DataAttributeBinding was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the DataAttributeBinding was last updated.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the DataAttributeBinding.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttributeBinding::LabelsEntry>)
+
+Optional. User-defined labels for the DataAttributeBinding.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+This checksum is computed by the server based on the value of other
+fields, and may be sent on update and delete requests to ensure the
+client has an up-to-date value before proceeding.
+Etags must be used when calling the DeleteDataAttributeBinding and the
+UpdateDataAttributeBinding method.
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+Optional. Immutable. The resource name of the resource that is associated
+to attributes. Presently, only entity resource is supported in the form:
+projects/{project}/locations/{location}/lakes/{lake}/zones/{zone}/entities/{entity_id}
+Must belong in the same project and region as the attribute binding, and
+there can only exist one active binding for a resource.
+
+=item * C<< $msg->attributes() >> / C<< $msg->attributes($value) >>
+
+Type: C<String>
+
+Optional. List of attributes to be associated with the resource, provided
+in the form:
+projects/{project}/locations/{location}/dataTaxonomies/{dataTaxonomy}/attributes/{data_attribute_id}
+
+=item * C<< $msg->paths() >> / C<< $msg->paths($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttributeBinding::Path>)
+
+Optional. The list of paths for items within the associated resource (eg.
+columns and partitions within a table) along with attribute bindings.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataTaxonomyRequest
+
+Create DataTaxonomy request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->data_taxonomy_id() >> / C<< $msg->data_taxonomy_id($value) >>
+
+Type: C<String>
+
+Required. DataTaxonomy identifier.
+* Must contain only lowercase letters, numbers and hyphens.
+* Must start with a letter.
+* Must be between 1-63 characters.
+* Must end with a number or a letter.
+* Must be unique within the Project.
+
+=item * C<< $msg->data_taxonomy() >> / C<< $msg->data_taxonomy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy>)
+
+Required. DataTaxonomy resource.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataTaxonomyRequest
+
+Update DataTaxonomy request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->data_taxonomy() >> / C<< $msg->data_taxonomy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy>)
+
+Required. Only fields specified in `update_mask` are updated.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataTaxonomyRequest
+
+Get DataTaxonomy request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataTaxonomiesRequest
+
+List DataTaxonomies request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the DataTaxonomy location, of the form:
+projects/{project_number}/locations/{location_id}
+where `location_id` refers to a Google Cloud region.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of DataTaxonomies to return. The service may
+return fewer than this value. If unspecified, at most 10 DataTaxonomies
+will be returned. The maximum value is 1000; values above 1000 will be
+coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous ` ListDataTaxonomies` call.
+Provide this to retrieve the subsequent page. When paginating, all other
+parameters provided to ` ListDataTaxonomies` must match the call that
+provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields for the result.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataTaxonomiesResponse
+
+List DataTaxonomies response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_taxonomies() >> / C<< $msg->data_taxonomies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataTaxonomy>)
+
+DataTaxonomies under the given parent location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataTaxonomyRequest
+
+Delete DataTaxonomy request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the DataTaxonomy:
+projects/{project_number}/locations/{location_id}/dataTaxonomies/{data_taxonomy_id}
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. If the client provided etag value does not match the current etag
+value,the DeleteDataTaxonomy method returns an ABORTED error.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataAttributeRequest
+
+Create DataAttribute request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent data taxonomy
+projects/{project_number}/locations/{location_id}/dataTaxonomies/{data_taxonomy_id}
+
+=item * C<< $msg->data_attribute_id() >> / C<< $msg->data_attribute_id($value) >>
+
+Type: C<String>
+
+Required. DataAttribute identifier.
+* Must contain only lowercase letters, numbers and hyphens.
+* Must start with a letter.
+* Must be between 1-63 characters.
+* Must end with a number or a letter.
+* Must be unique within the DataTaxonomy.
+
+=item * C<< $msg->data_attribute() >> / C<< $msg->data_attribute($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttribute>)
+
+Required. DataAttribute resource.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataAttributeRequest
+
+Update DataAttribute request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->data_attribute() >> / C<< $msg->data_attribute($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttribute>)
+
+Required. Only fields specified in `update_mask` are updated.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataAttributeRequest
+
+Get DataAttribute request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the dataAttribute:
+projects/{project_number}/locations/{location_id}/dataTaxonomies/{dataTaxonomy}/attributes/{data_attribute_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributesRequest
+
+List DataAttributes request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the DataTaxonomy:
+projects/{project_number}/locations/{location_id}/dataTaxonomies/{data_taxonomy_id}
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of DataAttributes to return. The service may
+return fewer than this value. If unspecified, at most 10 dataAttributes
+will be returned. The maximum value is 1000; values above 1000 will be
+coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListDataAttributes` call.
+Provide this to retrieve the subsequent page. When paginating, all other
+parameters provided to `ListDataAttributes` must match the call that
+provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields for the result.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributesResponse
+
+List DataAttributes response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_attributes() >> / C<< $msg->data_attributes($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttribute>)
+
+DataAttributes under the given parent DataTaxonomy.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataAttributeRequest
+
+Delete DataAttribute request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the DataAttribute:
+projects/{project_number}/locations/{location_id}/dataTaxonomies/{dataTaxonomy}/attributes/{data_attribute_id}
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. If the client provided etag value does not match the current etag
+value, the DeleteDataAttribute method returns an ABORTED error response.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::CreateDataAttributeBindingRequest
+
+Create DataAttributeBinding request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the parent data taxonomy
+projects/{project_number}/locations/{location_id}
+
+=item * C<< $msg->data_attribute_binding_id() >> / C<< $msg->data_attribute_binding_id($value) >>
+
+Type: C<String>
+
+Required. DataAttributeBinding identifier.
+* Must contain only lowercase letters, numbers and hyphens.
+* Must start with a letter.
+* Must be between 1-63 characters.
+* Must end with a number or a letter.
+* Must be unique within the Location.
+
+=item * C<< $msg->data_attribute_binding() >> / C<< $msg->data_attribute_binding($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttributeBinding>)
+
+Required. DataAttributeBinding resource.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::UpdateDataAttributeBindingRequest
+
+Update DataAttributeBinding request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Mask of fields to update.
+
+=item * C<< $msg->data_attribute_binding() >> / C<< $msg->data_attribute_binding($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttributeBinding>)
+
+Required. Only fields specified in `update_mask` are updated.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Only validate the request, but do not perform mutations.
+The default is false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::GetDataAttributeBindingRequest
+
+Get DataAttributeBinding request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the DataAttributeBinding:
+projects/{project_number}/locations/{location_id}/dataAttributeBindings/{data_attribute_binding_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributeBindingsRequest
+
+List DataAttributeBindings request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the Location:
+projects/{project_number}/locations/{location_id}
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of DataAttributeBindings to return. The service
+may return fewer than this value. If unspecified, at most 10
+DataAttributeBindings will be returned. The maximum value is 1000; values
+above 1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Page token received from a previous `ListDataAttributeBindings`
+call. Provide this to retrieve the subsequent page. When paginating, all
+other parameters provided to `ListDataAttributeBindings` must match the
+call that provided the page token.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter request.
+Filter using resource: filter=resource:"resource-name"
+Filter using attribute: filter=attributes:"attribute-name"
+Filter using attribute in paths list:
+filter=paths.attributes:"attribute-name"
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by fields for the result.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::ListDataAttributeBindingsResponse
+
+List DataAttributeBindings response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_attribute_bindings() >> / C<< $msg->data_attribute_bindings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataTaxonomy::DataAttributeBinding>)
+
+DataAttributeBindings under the given parent Location.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Token to retrieve the next page of results, or empty if there are no more
+results in the list.
+
+=item * C<< $msg->unreachable_locations() >> / C<< $msg->unreachable_locations($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataTaxonomy::DeleteDataAttributeBindingRequest
+
+Delete DataAttributeBinding request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the DataAttributeBinding:
+projects/{project_number}/locations/{location_id}/dataAttributeBindings/{data_attribute_binding_id}
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Required. If the client provided etag value does not match the current etag
+value, the DeleteDataAttributeBindingRequest method returns an ABORTED
+error response. Etags must be used when calling the
+DeleteDataAttributeBinding.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::DataTaxonomy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

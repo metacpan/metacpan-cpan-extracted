@@ -1,0 +1,46 @@
+package Google::Cloud::Ces::V1beta::FileSearchTool::Types;
+
+use strict;
+use warnings;
+
+use Type::Library -base;
+use Type::Utils -all;
+use Types::Standard -types;
+
+declare 'FileSearchTool',
+    as InstanceOf['Google::Cloud::Ces::V1beta::FileSearchTool::FileSearchTool'];
+
+coerce 'FileSearchTool',
+    from HashRef, via { 'Google::Cloud::Ces::V1beta::FileSearchTool::FileSearchTool'->new($_) };
+
+declare 'RepeatedFileSearchTool',
+    as ArrayRef[FileSearchTool()];
+
+coerce 'RepeatedFileSearchTool',
+    from ArrayRef[HashRef], via { [ map { 'Google::Cloud::Ces::V1beta::FileSearchTool::FileSearchTool'->new($_) } @$_ ] };
+
+declare 'MapStringFileSearchTool',
+    as HashRef[FileSearchTool()];
+
+declare 'CorpusType',
+    as (Int | Str);
+
+1;
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Ces::V1beta::FileSearchTool::Types - Type definitions and coercions
+
+=head1 DESCRIPTION
+
+Auto-generated Type::Tiny definitions and coercions for Protocol Buffers.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

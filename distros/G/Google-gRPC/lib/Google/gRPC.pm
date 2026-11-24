@@ -3,7 +3,7 @@ package Google::gRPC;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 1;
 
@@ -17,7 +17,7 @@ Google::gRPC - High-performance gRPC client library for Perl over HTTP/2
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -81,6 +81,8 @@ It provides:
 =over 4
 
 =item * L<Google::gRPC::Client> - High-level unary (C<call>) and streaming (C<stream>) gRPC client with retries, auth headers, and deadlines.
+
+=item * L<Google::gRPC::Server> - HTTP/2 gRPC server supporting service/method registration, Protobuf framing, and L<AnyEvent> TCP listeners.
 
 =item * L<Google::gRPC::Channel> - Single HTTP/2 channel managing multiplexed gRPC streams and keepalive state.
 

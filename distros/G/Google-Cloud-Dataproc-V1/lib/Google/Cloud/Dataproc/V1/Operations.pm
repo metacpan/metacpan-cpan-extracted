@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::Operations;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -221,79 +221,9 @@ EOF
     # Field: labels Type: 11 (.google.cloud.dataproc.v1.BatchOperationMetadata.LabelsEntry)
     # Field: warnings Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Operations::BatchOperationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Operations;
-
-    my $msg = Google::Cloud::Dataproc::V1::Operations::BatchOperationMetadata->new(
-        batch => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<batch>
-
-Type: String
-
-=item * B<batch_uuid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<done_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<operation_type>
-
-Type: Enum (.google.cloud.dataproc.v1.BatchOperationMetadata.BatchOperationType)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.BatchOperationMetadata.LabelsEntry)
-
-=item * B<warnings>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: BatchOperationMetadata::BatchOperationType
 our $BatchOperationMetadata_BATCH_OPERATION_TYPE_UNSPECIFIED = 0;
 our $BatchOperationMetadata_BATCH = 1;
-
-=pod
-
-=head2 Enum: BatchOperationMetadata::BatchOperationType
-
-Values:
-
-=over 4
-
-=item * C<BATCH_OPERATION_TYPE_UNSPECIFIED> => 0
-
-=item * C<BATCH> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Operations::SessionOperationMetadata ===
     # Fields for SessionOperationMetadata
@@ -306,85 +236,11 @@ Values:
     # Field: labels Type: 11 (.google.cloud.dataproc.v1.SessionOperationMetadata.LabelsEntry)
     # Field: warnings Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Operations::SessionOperationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Operations;
-
-    my $msg = Google::Cloud::Dataproc::V1::Operations::SessionOperationMetadata->new(
-        session => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<session>
-
-Type: String
-
-=item * B<session_uuid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<done_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<operation_type>
-
-Type: Enum (.google.cloud.dataproc.v1.SessionOperationMetadata.SessionOperationType)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.SessionOperationMetadata.LabelsEntry)
-
-=item * B<warnings>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: SessionOperationMetadata::SessionOperationType
 our $SessionOperationMetadata_SESSION_OPERATION_TYPE_UNSPECIFIED = 0;
 our $SessionOperationMetadata_CREATE = 1;
 our $SessionOperationMetadata_TERMINATE = 2;
 our $SessionOperationMetadata_DELETE = 3;
-
-=pod
-
-=head2 Enum: SessionOperationMetadata::SessionOperationType
-
-Values:
-
-=over 4
-
-=item * C<SESSION_OPERATION_TYPE_UNSPECIFIED> => 0
-
-=item * C<CREATE> => 1
-
-=item * C<TERMINATE> => 2
-
-=item * C<DELETE> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Operations::ClusterOperationStatus ===
     # Fields for ClusterOperationStatus
@@ -393,69 +249,11 @@ Values:
     # Field: details Type: 9 ()
     # Field: state_start_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Operations::ClusterOperationStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Operations;
-
-    my $msg = Google::Cloud::Dataproc::V1::Operations::ClusterOperationStatus->new(
-        state => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataproc.v1.ClusterOperationStatus.State)
-
-=item * B<inner_state>
-
-Type: String
-
-=item * B<details>
-
-Type: String
-
-=item * B<state_start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # Enum: ClusterOperationStatus::State
 our $ClusterOperationStatus_UNKNOWN = 0;
 our $ClusterOperationStatus_PENDING = 1;
 our $ClusterOperationStatus_RUNNING = 2;
 our $ClusterOperationStatus_DONE = 3;
-
-=pod
-
-=head2 Enum: ClusterOperationStatus::State
-
-Values:
-
-=over 4
-
-=item * C<UNKNOWN> => 0
-
-=item * C<PENDING> => 1
-
-=item * C<RUNNING> => 2
-
-=item * C<DONE> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::Operations::ClusterOperationMetadata ===
     # Fields for ClusterOperationMetadata
@@ -469,64 +267,6 @@ Values:
     # Field: warnings Type: 9 ()
     # Field: child_operation_ids Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Operations::ClusterOperationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Operations;
-
-    my $msg = Google::Cloud::Dataproc::V1::Operations::ClusterOperationMetadata->new(
-        cluster_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cluster_name>
-
-Type: String
-
-=item * B<cluster_uuid>
-
-Type: String
-
-=item * B<status>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterOperationStatus)
-
-=item * B<status_history>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterOperationStatus)
-
-=item * B<operation_type>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterOperationMetadata.LabelsEntry)
-
-=item * B<warnings>
-
-Type: String
-
-=item * B<child_operation_ids>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::Operations::NodeGroupOperationMetadata ===
     # Fields for NodeGroupOperationMetadata
     # Field: node_group_id Type: 9 ()
@@ -538,60 +278,6 @@ Type: String
     # Field: labels Type: 11 (.google.cloud.dataproc.v1.NodeGroupOperationMetadata.LabelsEntry)
     # Field: warnings Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::Operations::NodeGroupOperationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::Operations;
-
-    my $msg = Google::Cloud::Dataproc::V1::Operations::NodeGroupOperationMetadata->new(
-        node_group_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<node_group_id>
-
-Type: String
-
-=item * B<cluster_uuid>
-
-Type: String
-
-=item * B<status>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterOperationStatus)
-
-=item * B<status_history>
-
-Type: Message (.google.cloud.dataproc.v1.ClusterOperationStatus)
-
-=item * B<operation_type>
-
-Type: Enum (.google.cloud.dataproc.v1.NodeGroupOperationMetadata.NodeGroupOperationType)
-
-=item * B<description>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.NodeGroupOperationMetadata.LabelsEntry)
-
-=item * B<warnings>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: NodeGroupOperationMetadata::NodeGroupOperationType
 our $NodeGroupOperationMetadata_NODE_GROUP_OPERATION_TYPE_UNSPECIFIED = 0;
 our $NodeGroupOperationMetadata_CREATE = 1;
@@ -599,39 +285,384 @@ our $NodeGroupOperationMetadata_UPDATE = 2;
 our $NodeGroupOperationMetadata_DELETE = 3;
 our $NodeGroupOperationMetadata_RESIZE = 4;
 
-=pod
-
-=head2 Enum: NodeGroupOperationMetadata::NodeGroupOperationType
-
-Values:
-
-=over 4
-
-=item * C<NODE_GROUP_OPERATION_TYPE_UNSPECIFIED> => 0
-
-=item * C<CREATE> => 1
-
-=item * C<UPDATE> => 2
-
-=item * C<DELETE> => 3
-
-=item * C<RESIZE> => 4
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::Operations - Protocol Buffers schema definition
+Google::Cloud::Dataproc::V1::Operations - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/operations.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataproc::V1::Operations;
+
+    my $msg = Google::Cloud::Dataproc::V1::Operations::BatchOperationMetadata->new({
+        batch => $batch,
+        batch_uuid => $batch_uuid,
+        create_time => $create_time,
+        done_time => $done_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->batch();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::Operations::BatchOperationMetadata->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/operations.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::Operations::BatchOperationMetadata
+
+Metadata describing the Batch operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->batch() >> / C<< $msg->batch($value) >>
+
+Type: C<String>
+
+Name of the batch for the operation.
+
+=item * C<< $msg->batch_uuid() >> / C<< $msg->batch_uuid($value) >>
+
+Type: C<String>
+
+Batch UUID for the operation.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the operation was created.
+
+=item * C<< $msg->done_time() >> / C<< $msg->done_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the operation finished.
+
+=item * C<< $msg->operation_type() >> / C<< $msg->operation_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::BatchOperationMetadata::BatchOperationType>)
+
+The operation type.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Short description of the operation.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Operations::BatchOperationMetadata::LabelsEntry>)
+
+Labels associated with the operation.
+
+=item * C<< $msg->warnings() >> / C<< $msg->warnings($value) >>
+
+Type: C<String>
+
+Warnings encountered during operation execution.
+
+=back
+
+=head3 Enum: BatchOperationMetadata::BatchOperationType
+
+=over 4
+
+=item * C<BATCH_OPERATION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<BATCH> => C<1>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Operations::SessionOperationMetadata
+
+Metadata describing the Session operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->session() >> / C<< $msg->session($value) >>
+
+Type: C<String>
+
+Name of the session for the operation.
+
+=item * C<< $msg->session_uuid() >> / C<< $msg->session_uuid($value) >>
+
+Type: C<String>
+
+Session UUID for the operation.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the operation was created.
+
+=item * C<< $msg->done_time() >> / C<< $msg->done_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the operation was finished.
+
+=item * C<< $msg->operation_type() >> / C<< $msg->operation_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::SessionOperationMetadata::SessionOperationType>)
+
+The operation type.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Short description of the operation.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Operations::SessionOperationMetadata::LabelsEntry>)
+
+Labels associated with the operation.
+
+=item * C<< $msg->warnings() >> / C<< $msg->warnings($value) >>
+
+Type: C<String>
+
+Warnings encountered during operation execution.
+
+=back
+
+=head3 Enum: SessionOperationMetadata::SessionOperationType
+
+=over 4
+
+=item * C<SESSION_OPERATION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<CREATE> => C<1>
+
+=item * C<TERMINATE> => C<2>
+
+=item * C<DELETE> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Operations::ClusterOperationStatus
+
+The status of the operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::ClusterOperationStatus::State>)
+
+Output only. A message containing the operation state.
+
+=item * C<< $msg->inner_state() >> / C<< $msg->inner_state($value) >>
+
+Type: C<String>
+
+Output only. A message containing the detailed operation state.
+
+=item * C<< $msg->details() >> / C<< $msg->details($value) >>
+
+Type: C<String>
+
+Output only. A message containing any operation metadata details.
+
+=item * C<< $msg->state_start_time() >> / C<< $msg->state_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time this state was entered.
+
+=back
+
+=head3 Enum: ClusterOperationStatus::State
+
+=over 4
+
+=item * C<UNKNOWN> => C<0>
+
+=item * C<PENDING> => C<1>
+
+=item * C<RUNNING> => C<2>
+
+=item * C<DONE> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Operations::ClusterOperationMetadata
+
+Metadata describing the operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cluster_name() >> / C<< $msg->cluster_name($value) >>
+
+Type: C<String>
+
+Output only. Name of the cluster for the operation.
+
+=item * C<< $msg->cluster_uuid() >> / C<< $msg->cluster_uuid($value) >>
+
+Type: C<String>
+
+Output only. Cluster UUID for the operation.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Operations::ClusterOperationStatus>)
+
+Output only. Current operation status.
+
+=item * C<< $msg->status_history() >> / C<< $msg->status_history($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Operations::ClusterOperationStatus>)
+
+Output only. The previous operation status.
+
+=item * C<< $msg->operation_type() >> / C<< $msg->operation_type($value) >>
+
+Type: C<String>
+
+Output only. The operation type.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Output only. Short description of operation.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Operations::ClusterOperationMetadata::LabelsEntry>)
+
+Output only. Labels associated with the operation
+
+=item * C<< $msg->warnings() >> / C<< $msg->warnings($value) >>
+
+Type: C<String>
+
+Output only. Errors encountered during operation execution.
+
+=item * C<< $msg->child_operation_ids() >> / C<< $msg->child_operation_ids($value) >>
+
+Type: C<String>
+
+Output only. Child operation ids
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::Operations::NodeGroupOperationMetadata
+
+Metadata describing the node group operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->node_group_id() >> / C<< $msg->node_group_id($value) >>
+
+Type: C<String>
+
+Output only. Node group ID for the operation.
+
+=item * C<< $msg->cluster_uuid() >> / C<< $msg->cluster_uuid($value) >>
+
+Type: C<String>
+
+Output only. Cluster UUID associated with the node group operation.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Operations::ClusterOperationStatus>)
+
+Output only. Current operation status.
+
+=item * C<< $msg->status_history() >> / C<< $msg->status_history($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Operations::ClusterOperationStatus>)
+
+Output only. The previous operation status.
+
+=item * C<< $msg->operation_type() >> / C<< $msg->operation_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::NodeGroupOperationMetadata::NodeGroupOperationType>)
+
+The operation type.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Output only. Short description of operation.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::Operations::NodeGroupOperationMetadata::LabelsEntry>)
+
+Output only. Labels associated with the operation.
+
+=item * C<< $msg->warnings() >> / C<< $msg->warnings($value) >>
+
+Type: C<String>
+
+Output only. Errors encountered during operation execution.
+
+=back
+
+=head3 Enum: NodeGroupOperationMetadata::NodeGroupOperationType
+
+=over 4
+
+=item * C<NODE_GROUP_OPERATION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<CREATE> => C<1>
+
+=item * C<UPDATE> => C<2>
+
+=item * C<DELETE> => C<3>
+
+=item * C<RESIZE> => C<4>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::Operations::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

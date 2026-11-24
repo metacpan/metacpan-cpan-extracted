@@ -3,6 +3,9 @@ runtime:
     perl: '5.008001'
     parent: 0
     Alien::Base: 0
+build:
+  requires:
+    Archive::Tar: '3.12' # local symlink extraction
 test:
   requires:
     Test::More: '0.88'

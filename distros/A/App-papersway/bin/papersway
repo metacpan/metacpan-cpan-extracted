@@ -17,7 +17,7 @@ package main;			# for Dist::Zilla::Plugin::PkgVersion
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-$main::VERSION = '4.000';
+$main::VERSION = '4.001';
 
 use 5.032;
 use warnings;
@@ -760,7 +760,7 @@ sub normalise_ws_cols {
 {
     # Simple class to batch up commands before sending them.
     package App::papersway::cmds;
-$App::papersway::cmds::VERSION = '4.000';
+$App::papersway::cmds::VERSION = '4.001';
 sub new {
 	bless { cmds => [], need_ignore => 0, need_signal => 0 } => shift
     };
@@ -1093,12 +1093,17 @@ sub process_msg {
     elsif ($cmd =~ /^(?:(move|send)-to-)?workspace back_and_forth$/) {
 	my ($go, $move) = (!($1 && $1 eq "send"), !!$1);
 	my $target_ws = $output_last_ws{$o};
-	return unless $target_ws
-	  && exists $paper_ws{$target_ws->{id}}
-	  && $paper_ws{$target_ws->{id}} == $target_ws
-	  && $target_ws->{output} eq $o
-	  && $target_ws->{id} != $focused_ws;
-	move_to_ws_same_output($target_ws->{id}, $go, $move);
+	if ($target_ws
+	    && exists $paper_ws{$target_ws->{id}}
+	    && $paper_ws{$target_ws->{id}} == $target_ws
+	    && $target_ws->{output} eq $o
+	    && $target_ws->{id} != $focused_ws) {
+	    move_to_ws_same_output($target_ws->{id}, $go, $move);
+	} else {
+	    my @ws = grep $paper_ws{$_}{output} eq $o && $_ != $focused_ws,
+	      keys %paper_ws;
+	    move_to_ws_same_output($ws[0], $go, $move) if @ws == 1;
+	}
     }
 
     elsif ($cmd =~ /^(?:(move|send)-to-)?output back_and_forth$/) {
@@ -1512,7 +1517,7 @@ sub show_and_move_out_con {
 {
     # Class representing entries in %paper_ws.
     package App::papersway::paper_ws;
-$App::papersway::paper_ws::VERSION = '4.000';
+$App::papersway::paper_ws::VERSION = '4.001';
     # We can't always populate this value when a workspace is initialised
     # because we might not know the output's width yet.  This happens when
     # initialising a new workspace on a newly enabled output.
@@ -1558,7 +1563,7 @@ papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 4.000
+version 4.001
 
 =head1 SYNOPSIS
 

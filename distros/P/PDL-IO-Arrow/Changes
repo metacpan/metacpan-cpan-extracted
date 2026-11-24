@@ -1,0 +1,4 @@
+Revision history for PDL-IO-Arrow
+
+0.01    2026-11-23
+    - Initial release for Apache Arrow IPC and Parquet I/O with PDL type mapping.

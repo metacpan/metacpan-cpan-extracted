@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::File;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -146,109 +146,11 @@ EOF
     # Field: source Type: 14 (.google.ai.generativelanguage.v1beta.File.Source)
     # Field: error Type: 11 (.google.rpc.Status)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::File::File - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::File;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::File::File->new(
-        video_metadata => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<video_metadata>
-
-Type: Message (.google.ai.generativelanguage.v1beta.VideoFileMetadata)
-
-=item * B<name>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<mime_type>
-
-Type: String
-
-=item * B<size_bytes>
-
-Type: Int64
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<expiration_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<sha256_hash>
-
-Type: Bytes
-
-=item * B<uri>
-
-Type: String
-
-=item * B<download_uri>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.File.State)
-
-=item * B<source>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.File.Source)
-
-=item * B<error>
-
-Type: Message (.google.rpc.Status)
-
-=back
-
-=cut
-
 # Enum: File::State
 our $File_STATE_UNSPECIFIED = 0;
 our $File_PROCESSING = 1;
 our $File_ACTIVE = 2;
 our $File_FAILED = 10;
-
-=pod
-
-=head2 Enum: File::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<PROCESSING> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<FAILED> => 10
-
-=back
-
-=cut
 
 # Enum: File::Source
 our $File_SOURCE_UNSPECIFIED = 0;
@@ -256,67 +158,202 @@ our $File_UPLOADED = 1;
 our $File_GENERATED = 2;
 our $File_REGISTERED = 3;
 
-=pod
-
-=head2 Enum: File::Source
-
-Values:
-
-=over 4
-
-=item * C<SOURCE_UNSPECIFIED> => 0
-
-=item * C<UPLOADED> => 1
-
-=item * C<GENERATED> => 2
-
-=item * C<REGISTERED> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::File::VideoFileMetadata ===
     # Fields for VideoFileMetadata
     # Field: video_duration Type: 11 (.google.protobuf.Duration)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::File::VideoFileMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::File;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::File::VideoFileMetadata->new(
-        video_duration => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<video_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::File - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::File - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/file.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::File;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::File::File->new({
+        video_metadata => $video_metadata,
+        name => $name,
+        display_name => $display_name,
+        mime_type => $mime_type,
+    });
+
+    # Read or update a field
+    my $val = $msg->video_metadata();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::File::File->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/file.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::File::File
+
+A file uploaded to the API.
+Next ID: 15
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->video_metadata() >> / C<< $msg->video_metadata($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::File::VideoFileMetadata>)
+
+Output only. Metadata for a video.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The `File` resource name. The ID (name excluding the
+"files/" prefix) can contain up to 40 characters that are lowercase
+alphanumeric or dashes (-). The ID cannot start or end with a dash. If the
+name is empty on create, a unique name will be generated. Example:
+`files/123-456`
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. The human-readable display name for the `File`. The display name
+must be no more than 512 characters in length, including spaces. Example:
+"Welcome Image"
+
+=item * C<< $msg->mime_type() >> / C<< $msg->mime_type($value) >>
+
+Type: C<String>
+
+Output only. MIME type of the file.
+
+=item * C<< $msg->size_bytes() >> / C<< $msg->size_bytes($value) >>
+
+Type: C<Int64>
+
+Output only. Size of the file in bytes.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp of when the `File` was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp of when the `File` was last updated.
+
+=item * C<< $msg->expiration_time() >> / C<< $msg->expiration_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp of when the `File` will be deleted. Only set if
+the `File` is scheduled to expire.
+
+=item * C<< $msg->sha256_hash() >> / C<< $msg->sha256_hash($value) >>
+
+Type: C<Bytes>
+
+Output only. SHA-256 hash of the uploaded bytes.
+
+=item * C<< $msg->uri() >> / C<< $msg->uri($value) >>
+
+Type: C<String>
+
+Output only. The uri of the `File`.
+
+=item * C<< $msg->download_uri() >> / C<< $msg->download_uri($value) >>
+
+Type: C<String>
+
+Output only. The download uri of the `File`.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::File::State>)
+
+Output only. Processing state of the File.
+
+=item * C<< $msg->source() >> / C<< $msg->source($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::File::Source>)
+
+Source of the File.
+
+=item * C<< $msg->error() >> / C<< $msg->error($value) >>
+
+Type: C<Message> (L<Google::Rpc::Status::Status>)
+
+Output only. Error status if File processing failed.
+
+=back
+
+=head3 Enum: File::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<PROCESSING> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<FAILED> => C<10>
+
+=back
+
+=head3 Enum: File::Source
+
+=over 4
+
+=item * C<SOURCE_UNSPECIFIED> => C<0>
+
+=item * C<UPLOADED> => C<1>
+
+=item * C<GENERATED> => C<2>
+
+=item * C<REGISTERED> => C<3>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::File::VideoFileMetadata
+
+Metadata for a video `File`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->video_duration() >> / C<< $msg->video_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Duration of the video.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::File::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

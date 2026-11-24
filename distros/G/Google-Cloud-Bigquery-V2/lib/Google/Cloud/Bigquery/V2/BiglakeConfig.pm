@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::BiglakeConfig;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -80,95 +80,118 @@ EOF
     # Field: file_format Type: 14 (.google.cloud.bigquery.v2.BigLakeConfiguration.FileFormat)
     # Field: table_format Type: 14 (.google.cloud.bigquery.v2.BigLakeConfiguration.TableFormat)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::BiglakeConfig::BigLakeConfiguration - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::BiglakeConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::BiglakeConfig::BigLakeConfiguration->new(
-        connection_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<connection_id>
-
-Type: String
-
-=item * B<storage_uri>
-
-Type: String
-
-=item * B<file_format>
-
-Type: Enum (.google.cloud.bigquery.v2.BigLakeConfiguration.FileFormat)
-
-=item * B<table_format>
-
-Type: Enum (.google.cloud.bigquery.v2.BigLakeConfiguration.TableFormat)
-
-=back
-
-=cut
-
 # Enum: BigLakeConfiguration::FileFormat
 our $BigLakeConfiguration_FILE_FORMAT_UNSPECIFIED = 0;
 our $BigLakeConfiguration_PARQUET = 1;
-
-=pod
-
-=head2 Enum: BigLakeConfiguration::FileFormat
-
-Values:
-
-=over 4
-
-=item * C<FILE_FORMAT_UNSPECIFIED> => 0
-
-=item * C<PARQUET> => 1
-
-=back
-
-=cut
 
 # Enum: BigLakeConfiguration::TableFormat
 our $BigLakeConfiguration_TABLE_FORMAT_UNSPECIFIED = 0;
 our $BigLakeConfiguration_ICEBERG = 1;
 
-=pod
-
-=head2 Enum: BigLakeConfiguration::TableFormat
-
-Values:
-
-=over 4
-
-=item * C<TABLE_FORMAT_UNSPECIFIED> => 0
-
-=item * C<ICEBERG> => 1
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::BiglakeConfig - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::BiglakeConfig - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/biglake_config.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::BiglakeConfig;
+
+    my $msg = Google::Cloud::Bigquery::V2::BiglakeConfig::BigLakeConfiguration->new({
+        connection_id => $connection_id,
+        storage_uri => $storage_uri,
+        file_format => $file_format,
+        table_format => $table_format,
+    });
+
+    # Read or update a field
+    my $val = $msg->connection_id();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::BiglakeConfig::BigLakeConfiguration->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/biglake_config.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::BiglakeConfig::BigLakeConfiguration
+
+Configuration for BigQuery tables for Apache Iceberg (formerly BigLake
+managed tables.)
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->connection_id() >> / C<< $msg->connection_id($value) >>
+
+Type: C<String>
+
+Optional. The connection specifying the credentials to be used to read and
+write to external storage, such as Cloud Storage. The connection_id can
+have the form `{project}.{location}.{connection_id}` or
+`projects/{project}/locations/{location}/connections/{connection_id}".
+
+=item * C<< $msg->storage_uri() >> / C<< $msg->storage_uri($value) >>
+
+Type: C<String>
+
+Optional. The fully qualified location prefix of the external folder where
+table data is stored. The '*' wildcard character is not allowed. The URI
+should be in the format `gs://bucket/path_to_table/`
+
+=item * C<< $msg->file_format() >> / C<< $msg->file_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::BigLakeConfiguration::FileFormat>)
+
+Optional. The file format the table data is stored in.
+
+=item * C<< $msg->table_format() >> / C<< $msg->table_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::BigLakeConfiguration::TableFormat>)
+
+Optional. The table format the metadata only snapshots are stored in.
+
+=back
+
+=head3 Enum: BigLakeConfiguration::FileFormat
+
+=over 4
+
+=item * C<FILE_FORMAT_UNSPECIFIED> => C<0>
+
+=item * C<PARQUET> => C<1>
+
+=back
+
+=head3 Enum: BigLakeConfiguration::TableFormat
+
+=over 4
+
+=item * C<TABLE_FORMAT_UNSPECIFIED> => C<0>
+
+=item * C<ICEBERG> => C<1>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::BiglakeConfig::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Storage::V2::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -3196,84 +3196,12 @@ EOF
     # Field: if_metageneration_match Type: 3 ()
     # Field: if_metageneration_not_match Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::DeleteBucketRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::DeleteBucketRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::GetBucketRequest ===
     # Fields for GetBucketRequest
     # Field: name Type: 9 ()
     # Field: if_metageneration_match Type: 3 ()
     # Field: if_metageneration_not_match Type: 3 ()
     # Field: read_mask Type: 11 (.google.protobuf.FieldMask)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::GetBucketRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::GetBucketRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<read_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::CreateBucketRequest ===
     # Fields for CreateBucketRequest
@@ -3284,52 +3212,6 @@ Type: Message (.google.protobuf.FieldMask)
     # Field: predefined_default_object_acl Type: 9 ()
     # Field: enable_object_retention Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::CreateBucketRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::CreateBucketRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<bucket>
-
-Type: Message (.google.storage.v2.Bucket)
-
-=item * B<bucket_id>
-
-Type: String
-
-=item * B<predefined_acl>
-
-Type: String
-
-=item * B<predefined_default_object_acl>
-
-Type: String
-
-=item * B<enable_object_retention>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ListBucketsRequest ===
     # Fields for ListBucketsRequest
     # Field: parent Type: 9 ()
@@ -3339,126 +3221,16 @@ Type: Bool
     # Field: read_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: return_partial_success Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ListBucketsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ListBucketsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<prefix>
-
-Type: String
-
-=item * B<read_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<return_partial_success>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ListBucketsResponse ===
     # Fields for ListBucketsResponse
     # Field: buckets Type: 11 (.google.storage.v2.Bucket)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ListBucketsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ListBucketsResponse->new(
-        buckets => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<buckets>
-
-Type: Message (.google.storage.v2.Bucket)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::LockBucketRetentionPolicyRequest ===
     # Fields for LockBucketRetentionPolicyRequest
     # Field: bucket Type: 9 ()
     # Field: if_metageneration_match Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::LockBucketRetentionPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::LockBucketRetentionPolicyRequest->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::UpdateBucketRequest ===
     # Fields for UpdateBucketRequest
@@ -3468,52 +3240,6 @@ Type: Int64
     # Field: predefined_acl Type: 9 ()
     # Field: predefined_default_object_acl Type: 9 ()
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::UpdateBucketRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::UpdateBucketRequest->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: Message (.google.storage.v2.Bucket)
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<predefined_acl>
-
-Type: String
-
-=item * B<predefined_default_object_acl>
-
-Type: String
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::ComposeObjectRequest ===
     # Fields for ComposeObjectRequest
@@ -3527,64 +3253,6 @@ Type: Message (.google.protobuf.FieldMask)
     # Field: object_checksums Type: 11 (.google.storage.v2.ObjectChecksums)
     # Field: delete_source_objects Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ComposeObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ComposeObjectRequest->new(
-        destination => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<destination>
-
-Type: Message (.google.storage.v2.Object)
-
-=item * B<source_objects>
-
-Type: Message (.google.storage.v2.ComposeObjectRequest.SourceObject)
-
-=item * B<destination_predefined_acl>
-
-Type: String
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<kms_key>
-
-Type: String
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=item * B<object_checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=item * B<delete_source_objects>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::DeleteObjectRequest ===
     # Fields for DeleteObjectRequest
     # Field: bucket Type: 9 ()
@@ -3595,60 +3263,6 @@ Type: Bool
     # Field: if_metageneration_match Type: 3 ()
     # Field: if_metageneration_not_match Type: 3 ()
     # Field: common_object_request_params Type: 11 (.google.storage.v2.CommonObjectRequestParams)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::DeleteObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::DeleteObjectRequest->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<object>
-
-Type: String
-
-=item * B<generation>
-
-Type: Int64
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_generation_not_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::RestoreObjectRequest ===
     # Fields for RestoreObjectRequest
@@ -3663,121 +3277,12 @@ Type: Message (.google.storage.v2.CommonObjectRequestParams)
     # Field: copy_source_acl Type: 8 ()
     # Field: common_object_request_params Type: 11 (.google.storage.v2.CommonObjectRequestParams)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::RestoreObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::RestoreObjectRequest->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<object>
-
-Type: String
-
-=item * B<generation>
-
-Type: Int64
-
-=item * B<restore_token>
-
-Type: String
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_generation_not_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<copy_source_acl>
-
-Type: Bool
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::CancelResumableWriteRequest ===
     # Fields for CancelResumableWriteRequest
     # Field: upload_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::CancelResumableWriteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::CancelResumableWriteRequest->new(
-        upload_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<upload_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::CancelResumableWriteResponse ===
     # Fields for CancelResumableWriteResponse
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::CancelResumableWriteResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::CancelResumableWriteResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::ReadObjectRequest ===
     # Fields for ReadObjectRequest
@@ -3793,72 +3298,6 @@ Google::Storage::V2::Storage::CancelResumableWriteResponse - Compiled Protocol B
     # Field: common_object_request_params Type: 11 (.google.storage.v2.CommonObjectRequestParams)
     # Field: read_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ReadObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ReadObjectRequest->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<object>
-
-Type: String
-
-=item * B<generation>
-
-Type: Int64
-
-=item * B<read_offset>
-
-Type: Int64
-
-=item * B<read_limit>
-
-Type: Int64
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_generation_not_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=item * B<read_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::GetObjectRequest ===
     # Fields for GetObjectRequest
     # Field: bucket Type: 9 ()
@@ -3873,116 +3312,12 @@ Type: Message (.google.protobuf.FieldMask)
     # Field: read_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: restore_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::GetObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::GetObjectRequest->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<object>
-
-Type: String
-
-=item * B<generation>
-
-Type: Int64
-
-=item * B<soft_deleted>
-
-Type: Bool
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_generation_not_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=item * B<read_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<restore_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ReadObjectResponse ===
     # Fields for ReadObjectResponse
     # Field: checksummed_data Type: 11 (.google.storage.v2.ChecksummedData)
     # Field: object_checksums Type: 11 (.google.storage.v2.ObjectChecksums)
     # Field: content_range Type: 11 (.google.storage.v2.ContentRange)
     # Field: metadata Type: 11 (.google.storage.v2.Object)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ReadObjectResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ReadObjectResponse->new(
-        checksummed_data => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<checksummed_data>
-
-Type: Message (.google.storage.v2.ChecksummedData)
-
-=item * B<object_checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=item * B<content_range>
-
-Type: Message (.google.storage.v2.ContentRange)
-
-=item * B<metadata>
-
-Type: Message (.google.storage.v2.Object)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::BidiReadObjectSpec ===
     # Fields for BidiReadObjectSpec
@@ -3998,106 +3333,10 @@ Type: Message (.google.storage.v2.Object)
     # Field: read_handle Type: 11 (.google.storage.v2.BidiReadHandle)
     # Field: routing_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiReadObjectSpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiReadObjectSpec->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<object>
-
-Type: String
-
-=item * B<generation>
-
-Type: Int64
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_generation_not_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=item * B<read_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<read_handle>
-
-Type: Message (.google.storage.v2.BidiReadHandle)
-
-=item * B<routing_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::BidiReadObjectRequest ===
     # Fields for BidiReadObjectRequest
     # Field: read_object_spec Type: 11 (.google.storage.v2.BidiReadObjectSpec)
     # Field: read_ranges Type: 11 (.google.storage.v2.ReadRange)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiReadObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiReadObjectRequest->new(
-        read_object_spec => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<read_object_spec>
-
-Type: Message (.google.storage.v2.BidiReadObjectSpec)
-
-=item * B<read_ranges>
-
-Type: Message (.google.storage.v2.ReadRange)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::BidiReadObjectResponse ===
     # Fields for BidiReadObjectResponse
@@ -4105,74 +3344,10 @@ Type: Message (.google.storage.v2.ReadRange)
     # Field: metadata Type: 11 (.google.storage.v2.Object)
     # Field: read_handle Type: 11 (.google.storage.v2.BidiReadHandle)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiReadObjectResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiReadObjectResponse->new(
-        object_data_ranges => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<object_data_ranges>
-
-Type: Message (.google.storage.v2.ObjectRangeData)
-
-=item * B<metadata>
-
-Type: Message (.google.storage.v2.Object)
-
-=item * B<read_handle>
-
-Type: Message (.google.storage.v2.BidiReadHandle)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::BidiReadObjectRedirectedError ===
     # Fields for BidiReadObjectRedirectedError
     # Field: read_handle Type: 11 (.google.storage.v2.BidiReadHandle)
     # Field: routing_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiReadObjectRedirectedError - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiReadObjectRedirectedError->new(
-        read_handle => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<read_handle>
-
-Type: Message (.google.storage.v2.BidiReadHandle)
-
-=item * B<routing_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::BidiWriteObjectRedirectedError ===
     # Fields for BidiWriteObjectRedirectedError
@@ -4180,104 +3355,14 @@ Type: String
     # Field: write_handle Type: 11 (.google.storage.v2.BidiWriteHandle)
     # Field: generation Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiWriteObjectRedirectedError - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiWriteObjectRedirectedError->new(
-        routing_token => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<routing_token>
-
-Type: String
-
-=item * B<write_handle>
-
-Type: Message (.google.storage.v2.BidiWriteHandle)
-
-=item * B<generation>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::BidiReadObjectError ===
     # Fields for BidiReadObjectError
     # Field: read_range_errors Type: 11 (.google.storage.v2.ReadRangeError)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiReadObjectError - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiReadObjectError->new(
-        read_range_errors => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<read_range_errors>
-
-Type: Message (.google.storage.v2.ReadRangeError)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::ReadRangeError ===
     # Fields for ReadRangeError
     # Field: read_id Type: 3 ()
     # Field: status Type: 11 (.google.rpc.Status)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ReadRangeError - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ReadRangeError->new(
-        read_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<read_id>
-
-Type: Int64
-
-=item * B<status>
-
-Type: Message (.google.rpc.Status)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::ReadRange ===
     # Fields for ReadRange
@@ -4285,139 +3370,19 @@ Type: Message (.google.rpc.Status)
     # Field: read_length Type: 3 ()
     # Field: read_id Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ReadRange - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ReadRange->new(
-        read_offset => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<read_offset>
-
-Type: Int64
-
-=item * B<read_length>
-
-Type: Int64
-
-=item * B<read_id>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ObjectRangeData ===
     # Fields for ObjectRangeData
     # Field: checksummed_data Type: 11 (.google.storage.v2.ChecksummedData)
     # Field: read_range Type: 11 (.google.storage.v2.ReadRange)
     # Field: range_end Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ObjectRangeData - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ObjectRangeData->new(
-        checksummed_data => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<checksummed_data>
-
-Type: Message (.google.storage.v2.ChecksummedData)
-
-=item * B<read_range>
-
-Type: Message (.google.storage.v2.ReadRange)
-
-=item * B<range_end>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::BidiReadHandle ===
     # Fields for BidiReadHandle
     # Field: handle Type: 12 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiReadHandle - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiReadHandle->new(
-        handle => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<handle>
-
-Type: Bytes
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::BidiWriteHandle ===
     # Fields for BidiWriteHandle
     # Field: handle Type: 12 ()
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiWriteHandle - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiWriteHandle->new(
-        handle => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<handle>
-
-Type: Bytes
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::WriteObjectSpec ===
     # Fields for WriteObjectSpec
@@ -4430,60 +3395,6 @@ Type: Bytes
     # Field: object_size Type: 3 ()
     # Field: appendable Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::WriteObjectSpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::WriteObjectSpec->new(
-        resource => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<resource>
-
-Type: Message (.google.storage.v2.Object)
-
-=item * B<predefined_acl>
-
-Type: String
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_generation_not_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<object_size>
-
-Type: Int64
-
-=item * B<appendable>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::WriteObjectRequest ===
     # Fields for WriteObjectRequest
     # Field: upload_id Type: 9 ()
@@ -4494,95 +3405,11 @@ Type: Bool
     # Field: finish_write Type: 8 ()
     # Field: common_object_request_params Type: 11 (.google.storage.v2.CommonObjectRequestParams)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::WriteObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::WriteObjectRequest->new(
-        upload_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<upload_id>
-
-Type: String
-
-=item * B<write_object_spec>
-
-Type: Message (.google.storage.v2.WriteObjectSpec)
-
-=item * B<write_offset>
-
-Type: Int64
-
-=item * B<checksummed_data>
-
-Type: Message (.google.storage.v2.ChecksummedData)
-
-=item * B<object_checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=item * B<finish_write>
-
-Type: Bool
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::WriteObjectResponse ===
     # Fields for WriteObjectResponse
     # Field: persisted_size Type: 3 ()
     # Field: resource Type: 11 (.google.storage.v2.Object)
     # Field: persisted_data_checksums Type: 11 (.google.storage.v2.ObjectChecksums)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::WriteObjectResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::WriteObjectResponse->new(
-        persisted_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<persisted_size>
-
-Type: Int64
-
-=item * B<resource>
-
-Type: Message (.google.storage.v2.Object)
-
-=item * B<persisted_data_checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::AppendObjectSpec ===
     # Fields for AppendObjectSpec
@@ -4593,56 +3420,6 @@ Type: Message (.google.storage.v2.ObjectChecksums)
     # Field: if_metageneration_not_match Type: 3 ()
     # Field: routing_token Type: 9 ()
     # Field: write_handle Type: 11 (.google.storage.v2.BidiWriteHandle)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::AppendObjectSpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::AppendObjectSpec->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<object>
-
-Type: String
-
-=item * B<generation>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<routing_token>
-
-Type: String
-
-=item * B<write_handle>
-
-Type: Message (.google.storage.v2.BidiWriteHandle)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::BidiWriteObjectRequest ===
     # Fields for BidiWriteObjectRequest
@@ -4657,112 +3434,12 @@ Type: Message (.google.storage.v2.BidiWriteHandle)
     # Field: finish_write Type: 8 ()
     # Field: common_object_request_params Type: 11 (.google.storage.v2.CommonObjectRequestParams)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiWriteObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiWriteObjectRequest->new(
-        upload_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<upload_id>
-
-Type: String
-
-=item * B<write_object_spec>
-
-Type: Message (.google.storage.v2.WriteObjectSpec)
-
-=item * B<append_object_spec>
-
-Type: Message (.google.storage.v2.AppendObjectSpec)
-
-=item * B<write_offset>
-
-Type: Int64
-
-=item * B<checksummed_data>
-
-Type: Message (.google.storage.v2.ChecksummedData)
-
-=item * B<object_checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=item * B<state_lookup>
-
-Type: Bool
-
-=item * B<flush>
-
-Type: Bool
-
-=item * B<finish_write>
-
-Type: Bool
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::BidiWriteObjectResponse ===
     # Fields for BidiWriteObjectResponse
     # Field: persisted_size Type: 3 ()
     # Field: resource Type: 11 (.google.storage.v2.Object)
     # Field: persisted_data_checksums Type: 11 (.google.storage.v2.ObjectChecksums)
     # Field: write_handle Type: 11 (.google.storage.v2.BidiWriteHandle)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BidiWriteObjectResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BidiWriteObjectResponse->new(
-        persisted_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<persisted_size>
-
-Type: Int64
-
-=item * B<resource>
-
-Type: Message (.google.storage.v2.Object)
-
-=item * B<persisted_data_checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=item * B<write_handle>
-
-Type: Message (.google.storage.v2.BidiWriteHandle)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::ListObjectsRequest ===
     # Fields for ListObjectsRequest
@@ -4781,158 +3458,16 @@ Type: Message (.google.storage.v2.BidiWriteHandle)
     # Field: match_glob Type: 9 ()
     # Field: filter Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ListObjectsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ListObjectsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<delimiter>
-
-Type: String
-
-=item * B<include_trailing_delimiter>
-
-Type: Bool
-
-=item * B<prefix>
-
-Type: String
-
-=item * B<versions>
-
-Type: Bool
-
-=item * B<read_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<lexicographic_start>
-
-Type: String
-
-=item * B<lexicographic_end>
-
-Type: String
-
-=item * B<soft_deleted>
-
-Type: Bool
-
-=item * B<include_folders_as_prefixes>
-
-Type: Bool
-
-=item * B<match_glob>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::QueryWriteStatusRequest ===
     # Fields for QueryWriteStatusRequest
     # Field: upload_id Type: 9 ()
     # Field: common_object_request_params Type: 11 (.google.storage.v2.CommonObjectRequestParams)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::QueryWriteStatusRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::QueryWriteStatusRequest->new(
-        upload_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<upload_id>
-
-Type: String
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::QueryWriteStatusResponse ===
     # Fields for QueryWriteStatusResponse
     # Field: persisted_size Type: 3 ()
     # Field: resource Type: 11 (.google.storage.v2.Object)
     # Field: persisted_data_checksums Type: 11 (.google.storage.v2.ObjectChecksums)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::QueryWriteStatusResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::QueryWriteStatusResponse->new(
-        persisted_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<persisted_size>
-
-Type: Int64
-
-=item * B<resource>
-
-Type: Message (.google.storage.v2.Object)
-
-=item * B<persisted_data_checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::RewriteObjectRequest ===
     # Fields for RewriteObjectRequest
@@ -4960,120 +3495,6 @@ Type: Message (.google.storage.v2.ObjectChecksums)
     # Field: common_object_request_params Type: 11 (.google.storage.v2.CommonObjectRequestParams)
     # Field: object_checksums Type: 11 (.google.storage.v2.ObjectChecksums)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::RewriteObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::RewriteObjectRequest->new(
-        destination_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<destination_name>
-
-Type: String
-
-=item * B<destination_bucket>
-
-Type: String
-
-=item * B<destination_kms_key>
-
-Type: String
-
-=item * B<destination>
-
-Type: Message (.google.storage.v2.Object)
-
-=item * B<source_bucket>
-
-Type: String
-
-=item * B<source_object>
-
-Type: String
-
-=item * B<source_generation>
-
-Type: Int64
-
-=item * B<rewrite_token>
-
-Type: String
-
-=item * B<destination_predefined_acl>
-
-Type: String
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_generation_not_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<if_source_generation_match>
-
-Type: Int64
-
-=item * B<if_source_generation_not_match>
-
-Type: Int64
-
-=item * B<if_source_metageneration_match>
-
-Type: Int64
-
-=item * B<if_source_metageneration_not_match>
-
-Type: Int64
-
-=item * B<max_bytes_rewritten_per_call>
-
-Type: Int64
-
-=item * B<copy_source_encryption_algorithm>
-
-Type: String
-
-=item * B<copy_source_encryption_key_bytes>
-
-Type: Bytes
-
-=item * B<copy_source_encryption_key_sha256_bytes>
-
-Type: Bytes
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=item * B<object_checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::RewriteResponse ===
     # Fields for RewriteResponse
     # Field: total_bytes_rewritten Type: 3 ()
@@ -5081,48 +3502,6 @@ Type: Message (.google.storage.v2.ObjectChecksums)
     # Field: done Type: 8 ()
     # Field: rewrite_token Type: 9 ()
     # Field: resource Type: 11 (.google.storage.v2.Object)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::RewriteResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::RewriteResponse->new(
-        total_bytes_rewritten => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<total_bytes_rewritten>
-
-Type: Int64
-
-=item * B<object_size>
-
-Type: Int64
-
-=item * B<done>
-
-Type: Bool
-
-=item * B<rewrite_token>
-
-Type: String
-
-=item * B<resource>
-
-Type: Message (.google.storage.v2.Object)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::MoveObjectRequest ===
     # Fields for MoveObjectRequest
@@ -5138,141 +3517,15 @@ Type: Message (.google.storage.v2.Object)
     # Field: if_metageneration_match Type: 3 ()
     # Field: if_metageneration_not_match Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::MoveObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::MoveObjectRequest->new(
-        bucket => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<source_object>
-
-Type: String
-
-=item * B<destination_object>
-
-Type: String
-
-=item * B<if_source_generation_match>
-
-Type: Int64
-
-=item * B<if_source_generation_not_match>
-
-Type: Int64
-
-=item * B<if_source_metageneration_match>
-
-Type: Int64
-
-=item * B<if_source_metageneration_not_match>
-
-Type: Int64
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_generation_not_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::StartResumableWriteRequest ===
     # Fields for StartResumableWriteRequest
     # Field: write_object_spec Type: 11 (.google.storage.v2.WriteObjectSpec)
     # Field: common_object_request_params Type: 11 (.google.storage.v2.CommonObjectRequestParams)
     # Field: object_checksums Type: 11 (.google.storage.v2.ObjectChecksums)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::StartResumableWriteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::StartResumableWriteRequest->new(
-        write_object_spec => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<write_object_spec>
-
-Type: Message (.google.storage.v2.WriteObjectSpec)
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=item * B<object_checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::StartResumableWriteResponse ===
     # Fields for StartResumableWriteResponse
     # Field: upload_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::StartResumableWriteResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::StartResumableWriteResponse->new(
-        upload_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<upload_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::UpdateObjectRequest ===
     # Fields for UpdateObjectRequest
@@ -5286,127 +3539,14 @@ Type: String
     # Field: common_object_request_params Type: 11 (.google.storage.v2.CommonObjectRequestParams)
     # Field: override_unlocked_retention Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::UpdateObjectRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::UpdateObjectRequest->new(
-        object => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<object>
-
-Type: Message (.google.storage.v2.Object)
-
-=item * B<if_generation_match>
-
-Type: Int64
-
-=item * B<if_generation_not_match>
-
-Type: Int64
-
-=item * B<if_metageneration_match>
-
-Type: Int64
-
-=item * B<if_metageneration_not_match>
-
-Type: Int64
-
-=item * B<predefined_acl>
-
-Type: String
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<common_object_request_params>
-
-Type: Message (.google.storage.v2.CommonObjectRequestParams)
-
-=item * B<override_unlocked_retention>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::CommonObjectRequestParams ===
     # Fields for CommonObjectRequestParams
     # Field: encryption_algorithm Type: 9 ()
     # Field: encryption_key_bytes Type: 12 ()
     # Field: encryption_key_sha256_bytes Type: 12 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::CommonObjectRequestParams - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::CommonObjectRequestParams->new(
-        encryption_algorithm => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<encryption_algorithm>
-
-Type: String
-
-=item * B<encryption_key_bytes>
-
-Type: Bytes
-
-=item * B<encryption_key_sha256_bytes>
-
-Type: Bytes
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ServiceConstants ===
     # Fields for ServiceConstants
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ServiceConstants - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ServiceConstants->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # Enum: ServiceConstants::Values
 our $ServiceConstants_VALUES_UNSPECIFIED = 0;
@@ -5427,54 +3567,6 @@ our $ServiceConstants_MAX_LABELS_KEY_VALUE_LENGTH = 63;
 our $ServiceConstants_MAX_LABELS_KEY_VALUE_BYTES = 128;
 our $ServiceConstants_MAX_OBJECT_IDS_PER_DELETE_OBJECTS_REQUEST = 1000;
 our $ServiceConstants_SPLIT_TOKEN_MAX_VALID_DAYS = 14;
-
-=pod
-
-=head2 Enum: ServiceConstants::Values
-
-Values:
-
-=over 4
-
-=item * C<VALUES_UNSPECIFIED> => 0
-
-=item * C<MAX_READ_CHUNK_BYTES> => 2097152
-
-=item * C<MAX_WRITE_CHUNK_BYTES> => 2097152
-
-=item * C<MAX_OBJECT_SIZE_MB> => 5242880
-
-=item * C<MAX_CUSTOM_METADATA_FIELD_NAME_BYTES> => 1024
-
-=item * C<MAX_CUSTOM_METADATA_FIELD_VALUE_BYTES> => 4096
-
-=item * C<MAX_CUSTOM_METADATA_TOTAL_SIZE_BYTES> => 8192
-
-=item * C<MAX_BUCKET_METADATA_TOTAL_SIZE_BYTES> => 20480
-
-=item * C<MAX_NOTIFICATION_CONFIGS_PER_BUCKET> => 100
-
-=item * C<MAX_LIFECYCLE_RULES_PER_BUCKET> => 100
-
-=item * C<MAX_NOTIFICATION_CUSTOM_ATTRIBUTES> => 5
-
-=item * C<MAX_NOTIFICATION_CUSTOM_ATTRIBUTE_KEY_LENGTH> => 256
-
-=item * C<MAX_NOTIFICATION_CUSTOM_ATTRIBUTE_VALUE_LENGTH> => 1024
-
-=item * C<MAX_LABELS_ENTRIES_COUNT> => 64
-
-=item * C<MAX_LABELS_KEY_VALUE_LENGTH> => 63
-
-=item * C<MAX_LABELS_KEY_VALUE_BYTES> => 128
-
-=item * C<MAX_OBJECT_IDS_PER_DELETE_OBJECTS_REQUEST> => 1000
-
-=item * C<SPLIT_TOKEN_MAX_VALID_DAYS> => 14
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::Bucket ===
     # Fields for Bucket
@@ -5511,156 +3603,6 @@ Values:
     # Field: object_retention Type: 11 (.google.storage.v2.Bucket.ObjectRetention)
     # Field: ip_filter Type: 11 (.google.storage.v2.Bucket.IpFilter)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::Bucket - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::Bucket->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<bucket_id>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<metageneration>
-
-Type: Int64
-
-=item * B<location>
-
-Type: String
-
-=item * B<location_type>
-
-Type: String
-
-=item * B<storage_class>
-
-Type: String
-
-=item * B<rpo>
-
-Type: String
-
-=item * B<acl>
-
-Type: Message (.google.storage.v2.BucketAccessControl)
-
-=item * B<default_object_acl>
-
-Type: Message (.google.storage.v2.ObjectAccessControl)
-
-=item * B<lifecycle>
-
-Type: Message (.google.storage.v2.Bucket.Lifecycle)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<cors>
-
-Type: Message (.google.storage.v2.Bucket.Cors)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<default_event_based_hold>
-
-Type: Bool
-
-=item * B<labels>
-
-Type: Message (.google.storage.v2.Bucket.LabelsEntry)
-
-=item * B<website>
-
-Type: Message (.google.storage.v2.Bucket.Website)
-
-=item * B<versioning>
-
-Type: Message (.google.storage.v2.Bucket.Versioning)
-
-=item * B<logging>
-
-Type: Message (.google.storage.v2.Bucket.Logging)
-
-=item * B<owner>
-
-Type: Message (.google.storage.v2.Owner)
-
-=item * B<encryption>
-
-Type: Message (.google.storage.v2.Bucket.Encryption)
-
-=item * B<billing>
-
-Type: Message (.google.storage.v2.Bucket.Billing)
-
-=item * B<retention_policy>
-
-Type: Message (.google.storage.v2.Bucket.RetentionPolicy)
-
-=item * B<iam_config>
-
-Type: Message (.google.storage.v2.Bucket.IamConfig)
-
-=item * B<satisfies_pzs>
-
-Type: Bool
-
-=item * B<custom_placement_config>
-
-Type: Message (.google.storage.v2.Bucket.CustomPlacementConfig)
-
-=item * B<autoclass>
-
-Type: Message (.google.storage.v2.Bucket.Autoclass)
-
-=item * B<hierarchical_namespace>
-
-Type: Message (.google.storage.v2.Bucket.HierarchicalNamespace)
-
-=item * B<soft_delete_policy>
-
-Type: Message (.google.storage.v2.Bucket.SoftDeletePolicy)
-
-=item * B<object_retention>
-
-Type: Message (.google.storage.v2.Bucket.ObjectRetention)
-
-=item * B<ip_filter>
-
-Type: Message (.google.storage.v2.Bucket.IpFilter)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::BucketAccessControl ===
     # Fields for BucketAccessControl
     # Field: role Type: 9 ()
@@ -5673,133 +3615,15 @@ Type: Message (.google.storage.v2.Bucket.IpFilter)
     # Field: domain Type: 9 ()
     # Field: project_team Type: 11 (.google.storage.v2.ProjectTeam)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::BucketAccessControl - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::BucketAccessControl->new(
-        role => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<role>
-
-Type: String
-
-=item * B<id>
-
-Type: String
-
-=item * B<entity>
-
-Type: String
-
-=item * B<entity_alt>
-
-Type: String
-
-=item * B<entity_id>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<email>
-
-Type: String
-
-=item * B<domain>
-
-Type: String
-
-=item * B<project_team>
-
-Type: Message (.google.storage.v2.ProjectTeam)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ChecksummedData ===
     # Fields for ChecksummedData
     # Field: content Type: 12 ()
     # Field: crc32c Type: 7 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ChecksummedData - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ChecksummedData->new(
-        content => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<content>
-
-Type: Bytes
-
-=item * B<crc32c>
-
-Type: Fixed32
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ObjectChecksums ===
     # Fields for ObjectChecksums
     # Field: crc32c Type: 7 ()
     # Field: md5_hash Type: 12 ()
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ObjectChecksums - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ObjectChecksums->new(
-        crc32c => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<crc32c>
-
-Type: Fixed32
-
-=item * B<md5_hash>
-
-Type: Bytes
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::ObjectCustomContextPayload ===
     # Fields for ObjectCustomContextPayload
@@ -5807,104 +3631,14 @@ Type: Bytes
     # Field: create_time Type: 11 (.google.protobuf.Timestamp)
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ObjectCustomContextPayload - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ObjectCustomContextPayload->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ObjectContexts ===
     # Fields for ObjectContexts
     # Field: custom Type: 11 (.google.storage.v2.ObjectContexts.CustomEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ObjectContexts - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ObjectContexts->new(
-        custom => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<custom>
-
-Type: Message (.google.storage.v2.ObjectContexts.CustomEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::CustomerEncryption ===
     # Fields for CustomerEncryption
     # Field: encryption_algorithm Type: 9 ()
     # Field: key_sha256_bytes Type: 12 ()
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::CustomerEncryption - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::CustomerEncryption->new(
-        encryption_algorithm => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<encryption_algorithm>
-
-Type: String
-
-=item * B<key_sha256_bytes>
-
-Type: Bytes
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::Object ===
     # Fields for Object
@@ -5942,160 +3676,6 @@ Type: Bytes
     # Field: hard_delete_time Type: 11 (.google.protobuf.Timestamp)
     # Field: retention Type: 11 (.google.storage.v2.Object.Retention)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::Object - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::Object->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<generation>
-
-Type: Int64
-
-=item * B<restore_token>
-
-Type: String
-
-=item * B<metageneration>
-
-Type: Int64
-
-=item * B<storage_class>
-
-Type: String
-
-=item * B<size>
-
-Type: Int64
-
-=item * B<content_encoding>
-
-Type: String
-
-=item * B<content_disposition>
-
-Type: String
-
-=item * B<cache_control>
-
-Type: String
-
-=item * B<acl>
-
-Type: Message (.google.storage.v2.ObjectAccessControl)
-
-=item * B<content_language>
-
-Type: String
-
-=item * B<delete_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<finalize_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<content_type>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<component_count>
-
-Type: Int32
-
-=item * B<checksums>
-
-Type: Message (.google.storage.v2.ObjectChecksums)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<kms_key>
-
-Type: String
-
-=item * B<update_storage_class_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<temporary_hold>
-
-Type: Bool
-
-=item * B<retention_expire_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<metadata>
-
-Type: Message (.google.storage.v2.Object.MetadataEntry)
-
-=item * B<contexts>
-
-Type: Message (.google.storage.v2.ObjectContexts)
-
-=item * B<event_based_hold>
-
-Type: Bool
-
-=item * B<owner>
-
-Type: Message (.google.storage.v2.Owner)
-
-=item * B<customer_encryption>
-
-Type: Message (.google.storage.v2.CustomerEncryption)
-
-=item * B<custom_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<soft_delete_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<hard_delete_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<retention>
-
-Type: Message (.google.storage.v2.Object.Retention)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ObjectAccessControl ===
     # Fields for ObjectAccessControl
     # Field: role Type: 9 ()
@@ -6108,173 +3688,21 @@ Type: Message (.google.storage.v2.Object.Retention)
     # Field: domain Type: 9 ()
     # Field: project_team Type: 11 (.google.storage.v2.ProjectTeam)
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ObjectAccessControl - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ObjectAccessControl->new(
-        role => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<role>
-
-Type: String
-
-=item * B<id>
-
-Type: String
-
-=item * B<entity>
-
-Type: String
-
-=item * B<entity_alt>
-
-Type: String
-
-=item * B<entity_id>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<email>
-
-Type: String
-
-=item * B<domain>
-
-Type: String
-
-=item * B<project_team>
-
-Type: Message (.google.storage.v2.ProjectTeam)
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ListObjectsResponse ===
     # Fields for ListObjectsResponse
     # Field: objects Type: 11 (.google.storage.v2.Object)
     # Field: prefixes Type: 9 ()
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ListObjectsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ListObjectsResponse->new(
-        objects => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<objects>
-
-Type: Message (.google.storage.v2.Object)
-
-=item * B<prefixes>
-
-Type: String
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::ProjectTeam ===
     # Fields for ProjectTeam
     # Field: project_number Type: 9 ()
     # Field: team Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ProjectTeam - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ProjectTeam->new(
-        project_number => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_number>
-
-Type: String
-
-=item * B<team>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Storage::V2::Storage::Owner ===
     # Fields for Owner
     # Field: entity Type: 9 ()
     # Field: entity_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::Owner - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::Owner->new(
-        entity => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<entity>
-
-Type: String
-
-=item * B<entity_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Storage::V2::Storage::ContentRange ===
     # Fields for ContentRange
@@ -6282,62 +3710,20 @@ Type: String
     # Field: end Type: 3 ()
     # Field: complete_length Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Storage::V2::Storage::ContentRange - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Storage::V2::Storage;
-
-    my $msg = Google::Storage::V2::Storage::ContentRange->new(
-        start => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start>
-
-Type: Int64
-
-=item * B<end>
-
-Type: Int64
-
-=item * B<complete_length>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Service Client: Google::Storage::V2::Storage::StorageClient ===
 package Google::Storage::V2::Storage::StorageClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Storage::V2::Storage::StorageClient
 
-Google::Storage::V2::Storage::StorageClient - Client stub representing the remote Storage service
+Client stub representing the remote C<Storage> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<storage.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -6678,13 +4064,3414 @@ sub move_object {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Storage::V2::Storage - Protocol Buffers schema definition
+Google::Storage::V2::Storage - Compiled Protocol Buffers messages for google/storage/v2/storage.proto
+
+=head1 SYNOPSIS
+
+    use Google::Storage::V2::Storage;
+
+    my $msg = Google::Storage::V2::Storage::DeleteBucketRequest->new({
+        name => $name,
+        if_metageneration_match => $if_metageneration_match,
+        if_metageneration_not_match => $if_metageneration_not_match,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Storage::V2::Storage::DeleteBucketRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/storage/v2/storage.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Storage::V2::Storage::DeleteBucketRequest
+
+Request message for [DeleteBucket][google.storage.v2.Storage.DeleteBucket].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of a bucket to delete.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+If set, only deletes the bucket if its metageneration matches this value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+If set, only deletes the bucket if its metageneration does not match this
+value.
+
+=back
+
+=head2 Google::Storage::V2::Storage::GetBucketRequest
+
+Request message for [GetBucket][google.storage.v2.Storage.GetBucket].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of a bucket.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+If set, only gets the bucket metadata if its metageneration matches this
+value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+If set, and if the bucket's current metageneration matches the specified
+value, the request returns an error.
+
+=item * C<< $msg->read_mask() >> / C<< $msg->read_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Mask specifying which fields to read.
+A `*` field might be used to indicate all fields.
+If no mask is specified, it defaults to all fields.
+
+=back
+
+=head2 Google::Storage::V2::Storage::CreateBucketRequest
+
+Request message for [CreateBucket][google.storage.v2.Storage.CreateBucket].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project to which this bucket belongs. This field must either
+be empty or `projects/_`. The project ID that owns this bucket should be
+specified in the `bucket.project` field.
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket>)
+
+Optional. Properties of the new bucket being inserted.
+The name of the bucket is specified in the `bucket_id` field. Populating
+`bucket.name` field results in an error.
+The project of the bucket must be specified in the `bucket.project` field.
+This field must be in `projects/{projectIdentifier}` format,
+{projectIdentifier} can be the project ID or project number. The `parent`
+field must be either empty or `projects/_`.
+
+=item * C<< $msg->bucket_id() >> / C<< $msg->bucket_id($value) >>
+
+Type: C<String>
+
+Required. The ID to use for this bucket, which becomes the final component
+of the bucket's resource name. For example, the value `foo` might result in
+a bucket with the name `projects/123456/buckets/foo`.
+
+=item * C<< $msg->predefined_acl() >> / C<< $msg->predefined_acl($value) >>
+
+Type: C<String>
+
+Optional. Apply a predefined set of access controls to this bucket.
+Valid values are `authenticatedRead`, `private`, `projectPrivate`,
+`publicRead`, or `publicReadWrite`.
+
+=item * C<< $msg->predefined_default_object_acl() >> / C<< $msg->predefined_default_object_acl($value) >>
+
+Type: C<String>
+
+Optional. Apply a predefined set of default object access controls to this
+bucket. Valid values are `authenticatedRead`, `bucketOwnerFullControl`,
+`bucketOwnerRead`, `private`, `projectPrivate`, or `publicRead`.
+
+=item * C<< $msg->enable_object_retention() >> / C<< $msg->enable_object_retention($value) >>
+
+Type: C<Bool>
+
+Optional. If true, enable object retention on the bucket.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ListBucketsRequest
+
+Request message for [ListBuckets][google.storage.v2.Storage.ListBuckets].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project whose buckets we are listing.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of buckets to return in a single response. The
+service uses this parameter or `1,000` items, whichever is smaller. If
+`acl` is present in the `read_mask`, the service uses this parameter of
+`200` items, whichever is smaller.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A previously-returned page token representing part of the larger
+set of results to view.
+
+=item * C<< $msg->prefix() >> / C<< $msg->prefix($value) >>
+
+Type: C<String>
+
+Optional. Filter results to buckets whose names begin with this prefix.
+
+=item * C<< $msg->read_mask() >> / C<< $msg->read_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Mask specifying which fields to read from each result.
+If no mask is specified, it defaults to all fields except `items.
+owner`, `items.acl`, and `items.default_object_acl`.
+`*` might be used to mean "all fields".
+
+=item * C<< $msg->return_partial_success() >> / C<< $msg->return_partial_success($value) >>
+
+Type: C<Bool>
+
+Optional. Allows listing of buckets, even if there are buckets that are
+unreachable.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ListBucketsResponse
+
+Response message for [ListBuckets][google.storage.v2.Storage.ListBuckets].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->buckets() >> / C<< $msg->buckets($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket>)
+
+The list of items.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+The continuation token, used to page through large result sets. Provide
+this value in a subsequent request to return the next page of results.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources.
+This field can only be present if the caller specified
+return_partial_success to be true in the request to receive indications
+of temporarily missing resources.
+unreachable might be:
+unreachable = [
+ "projects/_/buckets/bucket1",
+ "projects/_/buckets/bucket2",
+ "projects/_/buckets/bucket3",
+]
+
+=back
+
+=head2 Google::Storage::V2::Storage::LockBucketRetentionPolicyRequest
+
+Request message for
+[LockBucketRetentionPolicy][google.storage.v2.Storage.LockBucketRetentionPolicy].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Required. Name of a bucket.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Required. Makes the operation conditional on whether bucket's current
+metageneration matches the given value. Must be positive.
+
+=back
+
+=head2 Google::Storage::V2::Storage::UpdateBucketRequest
+
+Request for [UpdateBucket][google.storage.v2.Storage.UpdateBucket] method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket>)
+
+Required. The bucket to update.
+The bucket's `name` field is used to identify the bucket.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+If set, the request modifies the bucket if its metageneration matches this
+value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+If set, the request modifies the bucket if its metageneration doesn't
+match this value.
+
+=item * C<< $msg->predefined_acl() >> / C<< $msg->predefined_acl($value) >>
+
+Type: C<String>
+
+Optional. Apply a predefined set of access controls to this bucket.
+Valid values are `authenticatedRead`, `private`, `projectPrivate`,
+`publicRead`, or `publicReadWrite`.
+
+=item * C<< $msg->predefined_default_object_acl() >> / C<< $msg->predefined_default_object_acl($value) >>
+
+Type: C<String>
+
+Optional. Apply a predefined set of default object access controls to this
+bucket. Valid values are `authenticatedRead`, `bucketOwnerFullControl`,
+`bucketOwnerRead`, `private`, `projectPrivate`, or `publicRead`.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. List of fields to be updated.
+
+To specify ALL fields, equivalent to the JSON API's "update" function,
+specify a single field with the value `*`. Note: not recommended. If a new
+field is introduced at a later time, an older client updating with the `*`
+might accidentally reset the new field's value.
+
+Not specifying any fields is an error.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ComposeObjectRequest
+
+Request message for [ComposeObject][google.storage.v2.Storage.ComposeObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->destination() >> / C<< $msg->destination($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+Required. Properties of the resulting object.
+
+=item * C<< $msg->source_objects() >> / C<< $msg->source_objects($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ComposeObjectRequest::SourceObject>)
+
+Optional. The list of source objects that is concatenated into a single
+object.
+
+=item * C<< $msg->destination_predefined_acl() >> / C<< $msg->destination_predefined_acl($value) >>
+
+Type: C<String>
+
+Optional. Apply a predefined set of access controls to the destination
+object. Valid values are `authenticatedRead`, `bucketOwnerFullControl`,
+`bucketOwnerRead`, `private`, `projectPrivate`, or `publicRead`.
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current generation
+matches the given value. Setting to 0 makes the operation succeed only if
+there are no live versions of the object.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration matches the given value.
+
+=item * C<< $msg->kms_key() >> / C<< $msg->kms_key($value) >>
+
+Type: C<String>
+
+Optional. Resource name of the Cloud KMS key, of the form
+`projects/my-project/locations/my-location/keyRings/my-kr/cryptoKeys/my-key`,
+that is used to encrypt the object. Overrides the object
+metadata's `kms_key_name` value, if any.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=item * C<< $msg->object_checksums() >> / C<< $msg->object_checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+Optional. The checksums of the complete object. This is validated against
+the combined checksums of the component objects.
+
+=item * C<< $msg->delete_source_objects() >> / C<< $msg->delete_source_objects($value) >>
+
+Type: C<Bool>
+
+Whether the source objects should be deleted in the compose request.
+
+=back
+
+=head2 Google::Storage::V2::Storage::DeleteObjectRequest
+
+Request message for deleting an object.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Required. Name of the bucket in which the object resides.
+
+=item * C<< $msg->object() >> / C<< $msg->object($value) >>
+
+Type: C<String>
+
+Required. The name of the finalized object to delete.
+Note: If you want to delete an unfinalized resumable upload please use
+`CancelResumableWrite`.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Int64>
+
+Optional. If present, permanently deletes a specific revision of this
+object (as opposed to the latest version, the default).
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current generation
+matches the given value. Setting to 0 makes the operation succeed only if
+there are no live versions of the object.
+
+=item * C<< $msg->if_generation_not_match() >> / C<< $msg->if_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's live generation
+does not match the given value. If no live object exists, the precondition
+fails. Setting to 0 makes the operation succeed only if there is a live
+version of the object.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration matches the given value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration does not match the given value.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=back
+
+=head2 Google::Storage::V2::Storage::RestoreObjectRequest
+
+Request message for
+[RestoreObject][google.storage.v2.Storage.RestoreObject].
+`bucket`, `object`, and `generation` B<must> be set.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Required. Name of the bucket in which the object resides.
+
+=item * C<< $msg->object() >> / C<< $msg->object($value) >>
+
+Type: C<String>
+
+Required. The name of the object to restore.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Int64>
+
+Required. The specific revision of the object to restore.
+
+=item * C<< $msg->restore_token() >> / C<< $msg->restore_token($value) >>
+
+Type: C<String>
+
+Optional. Restore token used to differentiate soft-deleted objects with the
+same name and generation. Only applicable for hierarchical namespace
+buckets. This parameter is optional, and is only required in the rare case
+when there are multiple soft-deleted objects with the same name and
+generation.
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current generation
+matches the given value. Setting to 0 makes the operation succeed only if
+there are no live versions of the object.
+
+=item * C<< $msg->if_generation_not_match() >> / C<< $msg->if_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's live generation
+does not match the given value. If no live object exists, the precondition
+fails. Setting to 0 makes the operation succeed only if there is a live
+version of the object.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration matches the given value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration does not match the given value.
+
+=item * C<< $msg->copy_source_acl() >> / C<< $msg->copy_source_acl($value) >>
+
+Type: C<Bool>
+
+If false or unset, the bucket's default object ACL is used.
+If true, copy the source object's access controls.
+Return an error if bucket has UBLA enabled.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=back
+
+=head2 Google::Storage::V2::Storage::CancelResumableWriteRequest
+
+Request message for
+[CancelResumableWrite][google.storage.v2.Storage.CancelResumableWrite].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->upload_id() >> / C<< $msg->upload_id($value) >>
+
+Type: C<String>
+
+Required. The upload_id of the resumable upload to cancel. This should be
+copied from the `upload_id` field of `StartResumableWriteResponse`.
+
+=back
+
+=head2 Google::Storage::V2::Storage::CancelResumableWriteResponse
+
+Empty response message for canceling an in-progress resumable upload, is
+extended as needed.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Storage::V2::Storage::ReadObjectRequest
+
+Request message for [ReadObject][google.storage.v2.Storage.ReadObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Required. The name of the bucket containing the object to read.
+
+=item * C<< $msg->object() >> / C<< $msg->object($value) >>
+
+Type: C<String>
+
+Required. The name of the object to read.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Int64>
+
+Optional. If present, selects a specific revision of this object (as
+opposed to the latest version, the default).
+
+=item * C<< $msg->read_offset() >> / C<< $msg->read_offset($value) >>
+
+Type: C<Int64>
+
+Optional. The offset for the first byte to return in the read, relative to
+the start of the object.
+
+A negative `read_offset` value is interpreted as the number of bytes
+back from the end of the object to be returned. For example, if an object's
+length is `15` bytes, a `ReadObjectRequest` with `read_offset` = `-5` and
+`read_limit` = `3` would return bytes `10` through `12` of the object.
+Requesting a negative offset with magnitude larger than the size of the
+object returns the entire object.
+
+=item * C<< $msg->read_limit() >> / C<< $msg->read_limit($value) >>
+
+Type: C<Int64>
+
+Optional. The maximum number of `data` bytes the server is allowed to
+return in the sum of all `Object` messages. A `read_limit` of zero
+indicates that there is no limit, and a negative `read_limit` causes an
+error.
+
+If the stream returns fewer bytes than allowed by the `read_limit` and no
+error occurred, the stream includes all data from the `read_offset` to the
+end of the resource.
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current generation
+matches the given value. Setting to 0 makes the operation succeed only if
+there are no live versions of the object.
+
+=item * C<< $msg->if_generation_not_match() >> / C<< $msg->if_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's live generation
+does not match the given value. If no live object exists, the precondition
+fails. Setting to 0 makes the operation succeed only if there is a live
+version of the object.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration matches the given value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration does not match the given value.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=item * C<< $msg->read_mask() >> / C<< $msg->read_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Mask specifying which fields to read.
+The `checksummed_data` field and its children are always present.
+If no mask is specified, it defaults to all fields except `metadata.
+owner` and `metadata.acl`.
+`*` might be used to mean "all fields".
+
+=back
+
+=head2 Google::Storage::V2::Storage::GetObjectRequest
+
+Request message for [GetObject][google.storage.v2.Storage.GetObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Required. Name of the bucket in which the object resides.
+
+=item * C<< $msg->object() >> / C<< $msg->object($value) >>
+
+Type: C<String>
+
+Required. Name of the object.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Int64>
+
+Optional. If present, selects a specific revision of this object (as
+opposed to the latest version, the default).
+
+=item * C<< $msg->soft_deleted() >> / C<< $msg->soft_deleted($value) >>
+
+Type: C<Bool>
+
+If true, return the soft-deleted version of this object.
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current generation
+matches the given value. Setting to 0 makes the operation succeed only if
+there are no live versions of the object.
+
+=item * C<< $msg->if_generation_not_match() >> / C<< $msg->if_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's live generation
+does not match the given value. If no live object exists, the precondition
+fails. Setting to 0 makes the operation succeed only if there is a live
+version of the object.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration matches the given value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration does not match the given value.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=item * C<< $msg->read_mask() >> / C<< $msg->read_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Mask specifying which fields to read.
+If no mask is specified, it defaults to all fields except `metadata.
+acl` and `metadata.owner`.
+`*` might be used to mean "all fields".
+
+=item * C<< $msg->restore_token() >> / C<< $msg->restore_token($value) >>
+
+Type: C<String>
+
+Optional. Restore token used to differentiate soft-deleted objects with the
+same name and generation. Only applicable for hierarchical namespace
+buckets and if `soft_deleted` is set to `true`. This parameter is optional,
+and is only required in the rare case when there are multiple soft-deleted
+objects with the same `name` and `generation`.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ReadObjectResponse
+
+Response message for [ReadObject][google.storage.v2.Storage.ReadObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->checksummed_data() >> / C<< $msg->checksummed_data($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ChecksummedData>)
+
+A portion of the data for the object. The service might leave `data`
+empty for any given `ReadResponse`. This enables the service to inform the
+client that the request is still live while it is running an operation to
+generate more data.
+
+=item * C<< $msg->object_checksums() >> / C<< $msg->object_checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+The checksums of the complete object. If the object is downloaded in full,
+the client should compute one of these checksums over the downloaded object
+and compare it against the value provided here.
+
+=item * C<< $msg->content_range() >> / C<< $msg->content_range($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ContentRange>)
+
+If `read_offset` and or `read_limit` is specified on the
+`ReadObjectRequest`, `ContentRange` is populated on the first
+`ReadObjectResponse` message of the read stream.
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+Metadata of the object whose media is being returned.
+Only populated in the first response in the stream.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiReadObjectSpec
+
+Describes the object to read in a BidiReadObject request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Required. The name of the bucket containing the object to read.
+
+=item * C<< $msg->object() >> / C<< $msg->object($value) >>
+
+Type: C<String>
+
+Required. The name of the object to read.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Int64>
+
+Optional. If present, selects a specific revision of this object (as
+opposed to the latest version, the default).
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current generation
+matches the given value. Setting to 0 makes the operation succeed only if
+there are no live versions of the object.
+
+=item * C<< $msg->if_generation_not_match() >> / C<< $msg->if_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's live generation
+does not match the given value. If no live object exists, the precondition
+fails. Setting to 0 makes the operation succeed only if there is a live
+version of the object.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration matches the given value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration does not match the given value.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=item * C<< $msg->read_mask() >> / C<< $msg->read_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Mask specifying which fields to read.
+The `checksummed_data` field and its children are always present.
+If no mask is specified, it defaults to all fields except `metadata.
+owner` and `metadata.acl`.
+`*` might be used to mean "all fields".
+As per https://google.aip.dev/161, this field is deprecated.
+As an alternative, `grpc metadata` can be used:
+
+=item * C<< $msg->read_handle() >> / C<< $msg->read_handle($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::BidiReadHandle>)
+
+The client can optionally set this field. The read handle is an optimized
+way of creating new streams. Read handles are generated and periodically
+refreshed from prior reads.
+
+=item * C<< $msg->routing_token() >> / C<< $msg->routing_token($value) >>
+
+Type: C<String>
+
+The routing token that influences request routing for the stream. Must be
+provided if a BidiReadObjectRedirectedError is returned.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiReadObjectRequest
+
+Request message for
+[BidiReadObject][google.storage.v2.Storage.BidiReadObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->read_object_spec() >> / C<< $msg->read_object_spec($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::BidiReadObjectSpec>)
+
+Optional. The first message of each stream should set this field. If this
+is not the first message, an error is returned. Describes the object to
+read.
+
+=item * C<< $msg->read_ranges() >> / C<< $msg->read_ranges($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ReadRange>)
+
+Optional. Provides a list of 0 or more (up to 100) ranges to read. If a
+single range is large enough to require multiple responses, they are
+delivered in increasing offset order. There are no ordering guarantees
+across ranges. When no ranges are provided, the response message
+doesn't  include `ObjectRangeData`. For full object downloads, the
+offset and size can be set to `0`.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiReadObjectResponse
+
+Response message for
+[BidiReadObject][google.storage.v2.Storage.BidiReadObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->object_data_ranges() >> / C<< $msg->object_data_ranges($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectRangeData>)
+
+A portion of the object's data. The service might leave data
+empty for any given `ReadResponse`. This enables the service to inform the
+client that the request is still live while it is running an operation to
+generate more data.
+The service might pipeline multiple responses belonging to different read
+requests. Each `ObjectRangeData` entry has a `read_id` that is set
+to the same value as the corresponding source read request.
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+Metadata of the object whose media is being returned.
+Only populated in the first response in the stream and not populated when
+the stream is opened with a read handle.
+
+=item * C<< $msg->read_handle() >> / C<< $msg->read_handle($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::BidiReadHandle>)
+
+This field is periodically refreshed, however it might not be set in
+every response. It allows the client to more efficiently open subsequent
+bidirectional streams to the same object.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiReadObjectRedirectedError
+
+Error proto containing details for a redirected read. This error might be
+attached as details for an ABORTED response to BidiReadObject.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->read_handle() >> / C<< $msg->read_handle($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::BidiReadHandle>)
+
+The read handle for the redirected read. If set, the client might use this
+in the BidiReadObjectSpec when retrying the read stream.
+
+=item * C<< $msg->routing_token() >> / C<< $msg->routing_token($value) >>
+
+Type: C<String>
+
+The routing token the client must use when retrying the read stream.
+This value must be provided in the header `x-goog-request-params`, with key
+`routing_token` and this string verbatim as the value.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiWriteObjectRedirectedError
+
+Error proto containing details for a redirected write. This error might be
+attached as details for an ABORTED response to BidiWriteObject.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->routing_token() >> / C<< $msg->routing_token($value) >>
+
+Type: C<String>
+
+The routing token the client must use when retrying the write stream.
+This value must be provided in the header `x-goog-request-params`, with key
+`routing_token` and this string verbatim as the value.
+
+=item * C<< $msg->write_handle() >> / C<< $msg->write_handle($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::BidiWriteHandle>)
+
+Opaque value describing a previous write. If set, the client must use this
+in an AppendObjectSpec first_message when retrying the write stream. If not
+set, clients might retry the original request.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Int64>
+
+The generation of the object that triggered the redirect. This is set
+iff `write_handle` is set. If set, the client must use this in an
+`AppendObjectSpec` first_message when retrying the write stream.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiReadObjectError
+
+Error extension proto containing details for all outstanding reads on the
+failed stream
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->read_range_errors() >> / C<< $msg->read_range_errors($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ReadRangeError>)
+
+The error code for each outstanding read_range
+
+=back
+
+=head2 Google::Storage::V2::Storage::ReadRangeError
+
+Error extension proto containing details for a single range read
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->read_id() >> / C<< $msg->read_id($value) >>
+
+Type: C<Int64>
+
+The id of the corresponding read_range
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Rpc::Status::Status>)
+
+The status which should be an enum value of [google.rpc.Code].
+
+=back
+
+=head2 Google::Storage::V2::Storage::ReadRange
+
+Describes a range of bytes to read in a `BidiReadObjectRanges` request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->read_offset() >> / C<< $msg->read_offset($value) >>
+
+Type: C<Int64>
+
+Required. The offset for the first byte to return in the read, relative to
+the start of the object.
+
+A negative read_offset value is interpreted as the number of bytes
+back from the end of the object to be returned. For example, if an object's
+length is 15 bytes, a `ReadObjectRequest` with `read_offset` = -5 and
+`read_length` = 3 would return bytes 10 through 12 of the object.
+Requesting a negative offset with magnitude larger than the size of the
+object is equivalent to `read_offset` = 0. A `read_offset` larger than the
+size of the object results in an `OutOfRange` error.
+
+=item * C<< $msg->read_length() >> / C<< $msg->read_length($value) >>
+
+Type: C<Int64>
+
+Optional. The maximum number of data bytes the server is allowed to return
+across all response messages with the same `read_id`. A `read_length` of
+zero indicates to read until the resource end, and a negative `read_length`
+causes an `OutOfRange` error. If the stream returns fewer bytes than
+allowed by the `read_length` and no error occurred, the stream includes all
+data from the `read_offset` to the resource end.
+
+=item * C<< $msg->read_id() >> / C<< $msg->read_id($value) >>
+
+Type: C<Int64>
+
+Required. Read identifier provided by the client. When the client issues
+more than one outstanding `ReadRange` on the same stream, responses can be
+mapped back to their corresponding requests using this value. Clients must
+ensure that all outstanding requests have different read_id values. The
+server might close the stream with an error if this condition is not met.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ObjectRangeData
+
+Contains data and metadata for a range of an object.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->checksummed_data() >> / C<< $msg->checksummed_data($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ChecksummedData>)
+
+A portion of the data for the object.
+
+=item * C<< $msg->read_range() >> / C<< $msg->read_range($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ReadRange>)
+
+The `ReadRange` describes the content being returned with `read_id` set to
+the corresponding `ReadObjectRequest` in the stream. Multiple
+`ObjectRangeData` messages might have the same read_id but increasing
+offsets. `ReadObjectResponse` messages with the same `read_id` are
+guaranteed to be delivered in increasing offset order.
+
+=item * C<< $msg->range_end() >> / C<< $msg->range_end($value) >>
+
+Type: C<Bool>
+
+If set, indicates there are no more bytes to read for the given ReadRange.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiReadHandle
+
+`BidiReadHandle` contains a handle from a previous `BiDiReadObject`
+invocation. The client can use this instead of `BidiReadObjectSpec` as an
+optimized way of opening subsequent bidirectional streams to the same object.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->handle() >> / C<< $msg->handle($value) >>
+
+Type: C<Bytes>
+
+Required. Opaque value describing a previous read.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiWriteHandle
+
+`BidiWriteHandle` contains a handle from a previous `BidiWriteObject`
+invocation. The client can use this instead of `BidiReadObjectSpec` as an
+optimized way of opening subsequent bidirectional streams to the same object.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->handle() >> / C<< $msg->handle($value) >>
+
+Type: C<Bytes>
+
+Required. Opaque value describing a previous write.
+
+=back
+
+=head2 Google::Storage::V2::Storage::WriteObjectSpec
+
+Describes an attempt to insert an object, possibly over multiple requests.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+Required. Destination object, including its name and its metadata.
+
+=item * C<< $msg->predefined_acl() >> / C<< $msg->predefined_acl($value) >>
+
+Type: C<String>
+
+Optional. Apply a predefined set of access controls to this object.
+Valid values are `authenticatedRead`, `bucketOwnerFullControl`,
+`bucketOwnerRead`, `private`, `projectPrivate`, or `publicRead`.
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+generation matches the given value. Setting to `0` makes the operation
+succeed only if there are no live versions of the object.
+
+=item * C<< $msg->if_generation_not_match() >> / C<< $msg->if_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's live
+generation does not match the given value. If no live object exists, the
+precondition fails. Setting to `0` makes the operation succeed only if
+there is a live version of the object.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration matches the given value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration does not match the given value.
+
+=item * C<< $msg->object_size() >> / C<< $msg->object_size($value) >>
+
+Type: C<Int64>
+
+The expected final object size being uploaded.
+If this value is set, closing the stream after writing fewer or more than
+`object_size` bytes results in an `OUT_OF_RANGE` error.
+
+This situation is considered a client error, and if such an error occurs
+you must start the upload over from scratch, this time sending the correct
+number of bytes.
+
+=item * C<< $msg->appendable() >> / C<< $msg->appendable($value) >>
+
+Type: C<Bool>
+
+If `true`, the object is created in appendable mode.
+This field might only be set when using `BidiWriteObject`.
+
+=back
+
+=head2 Google::Storage::V2::Storage::WriteObjectRequest
+
+Request message for [WriteObject][google.storage.v2.Storage.WriteObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->upload_id() >> / C<< $msg->upload_id($value) >>
+
+Type: C<String>
+
+For resumable uploads. This should be the `upload_id` returned from a
+call to `StartResumableWriteResponse`.
+
+=item * C<< $msg->write_object_spec() >> / C<< $msg->write_object_spec($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::WriteObjectSpec>)
+
+For non-resumable uploads. Describes the overall upload, including the
+destination bucket and object name, preconditions, etc.
+
+=item * C<< $msg->write_offset() >> / C<< $msg->write_offset($value) >>
+
+Type: C<Int64>
+
+Required. The offset from the beginning of the object at which the data
+should be written.
+
+In the first `WriteObjectRequest` of a `WriteObject()` action, it
+indicates the initial offset for the `Write()` call. The value B<must> be
+equal to the `persisted_size` that a call to `QueryWriteStatus()` would
+return (0 if this is the first write to the object).
+
+On subsequent calls, this value B<must> be no larger than the sum of the
+first `write_offset` and the sizes of all `data` chunks sent previously on
+this stream.
+
+An incorrect value causes an error.
+
+=item * C<< $msg->checksummed_data() >> / C<< $msg->checksummed_data($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ChecksummedData>)
+
+The data to insert. If a crc32c checksum is provided that doesn't match
+the checksum computed by the service, the request fails.
+
+=item * C<< $msg->object_checksums() >> / C<< $msg->object_checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+Optional. Checksums for the complete object. If the checksums computed by
+the service don't match the specified checksums the call fails. This field
+might only be provided in the first or last request (either with
+`first_message`, or `finish_write` set).
+
+=item * C<< $msg->finish_write() >> / C<< $msg->finish_write($value) >>
+
+Type: C<Bool>
+
+Optional. If `true`, this indicates that the write is complete. Sending any
+`WriteObjectRequest`s subsequent to one in which `finish_write` is `true`
+causes an error.
+For a non-resumable write (where the `upload_id` was not set in the first
+message), it is an error not to set this field in the final message of the
+stream.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Cloud Storage API requests
+concerning an object.
+
+=back
+
+=head2 Google::Storage::V2::Storage::WriteObjectResponse
+
+Response message for
+[WriteObject][google.storage.v2.Storage.WriteObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->persisted_size() >> / C<< $msg->persisted_size($value) >>
+
+Type: C<Int64>
+
+The total number of bytes that have been processed for the given object
+from all `WriteObject` calls. Only set if the upload has not finalized.
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+A resource containing the metadata for the uploaded object. Only set if
+the upload has finalized.
+
+=item * C<< $msg->persisted_data_checksums() >> / C<< $msg->persisted_data_checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+If persisted_size is set, contains checksums of persisted data.
+
+=back
+
+=head2 Google::Storage::V2::Storage::AppendObjectSpec
+
+Describes an attempt to append to an object, possibly over multiple requests.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Required. The name of the bucket containing the object to write.
+
+=item * C<< $msg->object() >> / C<< $msg->object($value) >>
+
+Type: C<String>
+
+Required. The name of the object to open for writing.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Int64>
+
+Required. The generation number of the object to open for writing.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration matches the given value.
+
+Note that metageneration preconditions are only checked if `write_handle`
+is empty.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration does not match the given value.
+
+Note that metageneration preconditions are only checked if `write_handle`
+is empty.
+
+=item * C<< $msg->routing_token() >> / C<< $msg->routing_token($value) >>
+
+Type: C<String>
+
+An optional routing token that influences request routing for the stream.
+Must be provided if a `BidiWriteObjectRedirectedError` is returned.
+
+=item * C<< $msg->write_handle() >> / C<< $msg->write_handle($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::BidiWriteHandle>)
+
+An optional write handle returned from a previous BidiWriteObjectResponse
+message or a BidiWriteObjectRedirectedError error.
+
+Note that metageneration preconditions are only checked if `write_handle`
+is empty.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiWriteObjectRequest
+
+Request message for
+[BidiWriteObject][google.storage.v2.Storage.BidiWriteObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->upload_id() >> / C<< $msg->upload_id($value) >>
+
+Type: C<String>
+
+For resumable uploads. This should be the `upload_id` returned from a
+call to `StartResumableWriteResponse`.
+
+=item * C<< $msg->write_object_spec() >> / C<< $msg->write_object_spec($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::WriteObjectSpec>)
+
+For non-resumable uploads. Describes the overall upload, including the
+destination bucket and object name, preconditions, etc.
+
+=item * C<< $msg->append_object_spec() >> / C<< $msg->append_object_spec($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::AppendObjectSpec>)
+
+For appendable uploads. Describes the object to append to.
+
+=item * C<< $msg->write_offset() >> / C<< $msg->write_offset($value) >>
+
+Type: C<Int64>
+
+Required. The offset from the beginning of the object at which the data
+should be written.
+
+In the first `WriteObjectRequest` of a `WriteObject()` action, it
+indicates the initial offset for the `Write()` call. The value must be
+equal to the `persisted_size` that a call to `QueryWriteStatus()` would
+return (0 if this is the first write to the object).
+
+On subsequent calls, this value must be no larger than the sum of the
+first `write_offset` and the sizes of all `data` chunks sent previously on
+this stream.
+
+An invalid value causes an error.
+
+=item * C<< $msg->checksummed_data() >> / C<< $msg->checksummed_data($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ChecksummedData>)
+
+The data to insert. If a crc32c checksum is provided that doesn't match
+the checksum computed by the service, the request fails.
+
+=item * C<< $msg->object_checksums() >> / C<< $msg->object_checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+Optional. Checksums for the complete object. If the checksums computed by
+the service don't match the specified checksums the call fails. May be
+provided in the last request (with finish_write set). For non-appendable
+objects only, may also be provided in the first request.
+
+=item * C<< $msg->state_lookup() >> / C<< $msg->state_lookup($value) >>
+
+Type: C<Bool>
+
+Optional. For each `BidiWriteObjectRequest` where `state_lookup` is `true`
+or the client closes the stream, the service sends a
+`BidiWriteObjectResponse` containing the current persisted size. The
+persisted size sent in responses covers all the bytes the server has
+persisted thus far and can be used to decide what data is safe for the
+client to drop. Note that the object's current size reported by the
+`BidiWriteObjectResponse` might lag behind the number of bytes written by
+the client. This field is ignored if `finish_write` is set to true.
+
+=item * C<< $msg->flush() >> / C<< $msg->flush($value) >>
+
+Type: C<Bool>
+
+Optional. Persists data written on the stream, up to and including the
+current message, to permanent storage. This option should be used sparingly
+as it might reduce performance. Ongoing writes are periodically persisted
+on the server even when `flush` is not set. This field is ignored if
+`finish_write` is set to true since there's no need to checkpoint or flush
+if this message completes the write.
+
+=item * C<< $msg->finish_write() >> / C<< $msg->finish_write($value) >>
+
+Type: C<Bool>
+
+Optional. If `true`, this indicates that the write is complete. Sending any
+`WriteObjectRequest`s subsequent to one in which `finish_write` is `true`
+causes an error.
+For a non-resumable write (where the `upload_id` was not set in the first
+message), it is an error not to set this field in the final message of the
+stream.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BidiWriteObjectResponse
+
+Response message for BidiWriteObject.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->persisted_size() >> / C<< $msg->persisted_size($value) >>
+
+Type: C<Int64>
+
+The total number of bytes that have been processed for the given object
+from all `WriteObject` calls. Only set if the upload has not finalized.
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+A resource containing the metadata for the uploaded object. Only set if
+the upload has finalized.
+
+=item * C<< $msg->persisted_data_checksums() >> / C<< $msg->persisted_data_checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+If persisted_size is set, contains checksums of persisted data.
+
+=item * C<< $msg->write_handle() >> / C<< $msg->write_handle($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::BidiWriteHandle>)
+
+An optional write handle that is returned periodically in response
+messages. Clients should save it for later use in establishing a new stream
+if a connection is interrupted.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ListObjectsRequest
+
+Request message for [ListObjects][google.storage.v2.Storage.ListObjects].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Name of the bucket in which to look for objects.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Maximum number of `items` plus `prefixes` to return
+in a single page of responses. As duplicate `prefixes` are
+omitted, fewer total results might be returned than requested. The service
+uses this parameter or 1,000 items, whichever is smaller.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A previously-returned page token representing part of the larger
+set of results to view.
+
+=item * C<< $msg->delimiter() >> / C<< $msg->delimiter($value) >>
+
+Type: C<String>
+
+Optional. If set, returns results in a directory-like mode. `items`
+contains only objects whose names, aside from the `prefix`, do not contain
+`delimiter`. Objects whose names, aside from the `prefix`, contain
+`delimiter` has their name, truncated after the `delimiter`, returned in
+`prefixes`. Duplicate `prefixes` are omitted.
+
+=item * C<< $msg->include_trailing_delimiter() >> / C<< $msg->include_trailing_delimiter($value) >>
+
+Type: C<Bool>
+
+Optional. If true, objects that end in exactly one instance of `delimiter`
+has their metadata included in `items` in addition to
+`prefixes`.
+
+=item * C<< $msg->prefix() >> / C<< $msg->prefix($value) >>
+
+Type: C<String>
+
+Optional. Filter results to objects whose names begin with this prefix.
+
+=item * C<< $msg->versions() >> / C<< $msg->versions($value) >>
+
+Type: C<Bool>
+
+Optional. If `true`, lists all versions of an object as distinct results.
+
+=item * C<< $msg->read_mask() >> / C<< $msg->read_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Mask specifying which fields to read from each result.
+If no mask is specified, defaults to all fields except `items.acl` and
+`items.owner`.
+`*` might be used to mean all fields.
+
+=item * C<< $msg->lexicographic_start() >> / C<< $msg->lexicographic_start($value) >>
+
+Type: C<String>
+
+Optional. Filter results to objects whose names are lexicographically equal
+to or after `lexicographic_start`. If `lexicographic_end` is also set, the
+objects listed have names between `lexicographic_start` (inclusive) and
+`lexicographic_end` (exclusive).
+
+=item * C<< $msg->lexicographic_end() >> / C<< $msg->lexicographic_end($value) >>
+
+Type: C<String>
+
+Optional. Filter results to objects whose names are lexicographically
+before `lexicographic_end`. If `lexicographic_start` is also set, the
+objects listed have names between `lexicographic_start` (inclusive) and
+`lexicographic_end` (exclusive).
+
+=item * C<< $msg->soft_deleted() >> / C<< $msg->soft_deleted($value) >>
+
+Type: C<Bool>
+
+Optional. If true, only list all soft-deleted versions of the object.
+Soft delete policy is required to set this option.
+
+=item * C<< $msg->include_folders_as_prefixes() >> / C<< $msg->include_folders_as_prefixes($value) >>
+
+Type: C<Bool>
+
+Optional. If true, includes folders and managed folders (besides objects)
+in the returned `prefixes`. Requires `delimiter` to be set to '/'.
+
+=item * C<< $msg->match_glob() >> / C<< $msg->match_glob($value) >>
+
+Type: C<String>
+
+Optional. Filter results to objects and prefixes that match this glob
+pattern. See [List objects using
+glob](https://cloud.google.com/storage/docs/json_api/v1/objects/list#list-objects-and-prefixes-using-glob)
+for the full syntax.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. An expression used to filter the returned objects by the
+`context` field. For the full syntax, see [Filter objects by contexts
+syntax](https://cloud.google.com/storage/docs/listing-objects#filter-by-object-contexts-syntax).
+If a `delimiter` is set, the returned `prefixes` are exempt from this
+filter.
+
+=back
+
+=head2 Google::Storage::V2::Storage::QueryWriteStatusRequest
+
+Request object for
+[QueryWriteStatus][google.storage.v2.Storage.QueryWriteStatus].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->upload_id() >> / C<< $msg->upload_id($value) >>
+
+Type: C<String>
+
+Required. The name of the resume token for the object whose write status is
+being requested.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=back
+
+=head2 Google::Storage::V2::Storage::QueryWriteStatusResponse
+
+Response object for
+[QueryWriteStatus][google.storage.v2.Storage.QueryWriteStatus].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->persisted_size() >> / C<< $msg->persisted_size($value) >>
+
+Type: C<Int64>
+
+The total number of bytes that have been processed for the given object
+from all `WriteObject` calls. This is the correct value for the
+'write_offset' field to use when resuming the `WriteObject` operation.
+Only set if the upload has not finalized.
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+A resource containing the metadata for the uploaded object. Only set if
+the upload has finalized.
+
+=item * C<< $msg->persisted_data_checksums() >> / C<< $msg->persisted_data_checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+If persisted_size is set, contains checksums of persisted data.
+
+=back
+
+=head2 Google::Storage::V2::Storage::RewriteObjectRequest
+
+Request message for [RewriteObject][google.storage.v2.Storage.RewriteObject].
+If the source object is encrypted using a Customer-Supplied Encryption Key
+the key information must be provided in the
+`copy_source_encryption_algorithm`, `copy_source_encryption_key_bytes`, and
+`copy_source_encryption_key_sha256_bytes` fields. If the destination object
+should be encrypted the keying information should be provided in the
+`encryption_algorithm`, `encryption_key_bytes`, and
+`encryption_key_sha256_bytes` fields of the
+`common_object_request_params.customer_encryption` field.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->destination_name() >> / C<< $msg->destination_name($value) >>
+
+Type: C<String>
+
+Required. Immutable. The name of the destination object.
+See the
+[Naming Guidelines](https://cloud.google.com/storage/docs/objects#naming).
+Example: `test.txt`
+The `name` field by itself does not uniquely identify a Cloud Storage
+object. A Cloud Storage object is uniquely identified by the tuple of
+(bucket, object, generation).
+
+=item * C<< $msg->destination_bucket() >> / C<< $msg->destination_bucket($value) >>
+
+Type: C<String>
+
+Required. Immutable. The name of the bucket containing the destination
+object.
+
+=item * C<< $msg->destination_kms_key() >> / C<< $msg->destination_kms_key($value) >>
+
+Type: C<String>
+
+Optional. The name of the Cloud KMS key that is used to encrypt the
+destination object. The Cloud KMS key must be located in same location as
+the object. If the parameter is not specified, the request uses the
+destination bucket's default encryption key, if any, or else the
+Google-managed encryption key.
+
+=item * C<< $msg->destination() >> / C<< $msg->destination($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+Optional. Properties of the destination, post-rewrite object.
+The `name`, `bucket` and `kms_key` fields must not be populated (these
+values are specified in the `destination_name`, `destination_bucket`, and
+`destination_kms_key` fields).
+If `destination` is present it is used to construct the destination
+object's metadata; otherwise the destination object's metadata is
+copied from the source object.
+
+=item * C<< $msg->source_bucket() >> / C<< $msg->source_bucket($value) >>
+
+Type: C<String>
+
+Required. Name of the bucket in which to find the source object.
+
+=item * C<< $msg->source_object() >> / C<< $msg->source_object($value) >>
+
+Type: C<String>
+
+Required. Name of the source object.
+
+=item * C<< $msg->source_generation() >> / C<< $msg->source_generation($value) >>
+
+Type: C<Int64>
+
+Optional. If present, selects a specific revision of the source object (as
+opposed to the latest version, the default).
+
+=item * C<< $msg->rewrite_token() >> / C<< $msg->rewrite_token($value) >>
+
+Type: C<String>
+
+Optional. Include this field (from the previous rewrite response) on each
+rewrite request after the first one, until the rewrite response 'done' flag
+is true. Calls that provide a rewriteToken can omit all other request
+fields, but if included those fields must match the values provided in the
+first rewrite request.
+
+=item * C<< $msg->destination_predefined_acl() >> / C<< $msg->destination_predefined_acl($value) >>
+
+Type: C<String>
+
+Optional. Apply a predefined set of access controls to the destination
+object. Valid values are `authenticatedRead`, `bucketOwnerFullControl`,
+`bucketOwnerRead`, `private`, `projectPrivate`, or `publicRead`.
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current generation
+matches the given value. Setting to 0 makes the operation succeed only if
+there are no live versions of the object.
+
+=item * C<< $msg->if_generation_not_match() >> / C<< $msg->if_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's live generation
+does not match the given value. If no live object exists, the precondition
+fails. Setting to 0 makes the operation succeed only if there is a live
+version of the object.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the destination object's current
+metageneration matches the given value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the destination object's current
+metageneration does not match the given value.
+
+=item * C<< $msg->if_source_generation_match() >> / C<< $msg->if_source_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the source object's live
+generation matches the given value.
+
+=item * C<< $msg->if_source_generation_not_match() >> / C<< $msg->if_source_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the source object's live
+generation does not match the given value.
+
+=item * C<< $msg->if_source_metageneration_match() >> / C<< $msg->if_source_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the source object's current
+metageneration matches the given value.
+
+=item * C<< $msg->if_source_metageneration_not_match() >> / C<< $msg->if_source_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the source object's current
+metageneration does not match the given value.
+
+=item * C<< $msg->max_bytes_rewritten_per_call() >> / C<< $msg->max_bytes_rewritten_per_call($value) >>
+
+Type: C<Int64>
+
+Optional. The maximum number of bytes that are rewritten per rewrite
+request. Most callers shouldn't need to specify this parameter - it is
+primarily in place to support testing. If specified the value must be an
+integral multiple of 1 MiB (1048576). Also, this only applies to requests
+where the source and destination span locations and/or storage classes.
+Finally, this value must not change across rewrite calls else you'll get an
+error that the `rewriteToken` is invalid.
+
+=item * C<< $msg->copy_source_encryption_algorithm() >> / C<< $msg->copy_source_encryption_algorithm($value) >>
+
+Type: C<String>
+
+Optional. The algorithm used to encrypt the source object, if any. Used if
+the source object was encrypted with a Customer-Supplied Encryption Key.
+
+=item * C<< $msg->copy_source_encryption_key_bytes() >> / C<< $msg->copy_source_encryption_key_bytes($value) >>
+
+Type: C<Bytes>
+
+Optional. The raw bytes (not base64-encoded) AES-256 encryption key used to
+encrypt the source object, if it was encrypted with a Customer-Supplied
+Encryption Key.
+
+=item * C<< $msg->copy_source_encryption_key_sha256_bytes() >> / C<< $msg->copy_source_encryption_key_sha256_bytes($value) >>
+
+Type: C<Bytes>
+
+Optional. The raw bytes (not base64-encoded) SHA256 hash of the encryption
+key used to encrypt the source object, if it was encrypted with a
+Customer-Supplied Encryption Key.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=item * C<< $msg->object_checksums() >> / C<< $msg->object_checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+Optional. The checksums of the complete object. This is used to validate
+the destination object after rewriting.
+
+=back
+
+=head2 Google::Storage::V2::Storage::RewriteResponse
+
+A rewrite response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->total_bytes_rewritten() >> / C<< $msg->total_bytes_rewritten($value) >>
+
+Type: C<Int64>
+
+The total bytes written so far, which can be used to provide a waiting user
+with a progress indicator. This property is always present in the response.
+
+=item * C<< $msg->object_size() >> / C<< $msg->object_size($value) >>
+
+Type: C<Int64>
+
+The total size of the object being copied in bytes. This property is always
+present in the response.
+
+=item * C<< $msg->done() >> / C<< $msg->done($value) >>
+
+Type: C<Bool>
+
+`true` if the copy is finished; otherwise, `false` if
+the copy is in progress. This property is always present in the response.
+
+=item * C<< $msg->rewrite_token() >> / C<< $msg->rewrite_token($value) >>
+
+Type: C<String>
+
+A token to use in subsequent requests to continue copying data. This token
+is present in the response only when there is more data to copy.
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+A resource containing the metadata for the copied-to object. This property
+is present in the response only when copying completes.
+
+=back
+
+=head2 Google::Storage::V2::Storage::MoveObjectRequest
+
+Request message for [MoveObject][google.storage.v2.Storage.MoveObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Required. Name of the bucket in which the object resides.
+
+=item * C<< $msg->source_object() >> / C<< $msg->source_object($value) >>
+
+Type: C<String>
+
+Required. Name of the source object.
+
+=item * C<< $msg->destination_object() >> / C<< $msg->destination_object($value) >>
+
+Type: C<String>
+
+Required. Name of the destination object.
+
+=item * C<< $msg->if_source_generation_match() >> / C<< $msg->if_source_generation_match($value) >>
+
+Type: C<Int64>
+
+Optional. Makes the operation conditional on whether the source object's
+current generation matches the given value. `if_source_generation_match`
+and `if_source_generation_not_match` conditions are mutually exclusive:
+it's an error for both of them to be set in the request.
+
+=item * C<< $msg->if_source_generation_not_match() >> / C<< $msg->if_source_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Optional. Makes the operation conditional on whether the source object's
+current generation does not match the given value.
+`if_source_generation_match` and `if_source_generation_not_match`
+conditions are mutually exclusive: it's an error for both of them to be set
+in the request.
+
+=item * C<< $msg->if_source_metageneration_match() >> / C<< $msg->if_source_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Optional. Makes the operation conditional on whether the source object's
+current metageneration matches the given value.
+`if_source_metageneration_match` and `if_source_metageneration_not_match`
+conditions are mutually exclusive: it's an error for both of them to be set
+in the request.
+
+=item * C<< $msg->if_source_metageneration_not_match() >> / C<< $msg->if_source_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Optional. Makes the operation conditional on whether the source object's
+current metageneration does not match the given value.
+`if_source_metageneration_match` and `if_source_metageneration_not_match`
+conditions are mutually exclusive: it's an error for both of them to be set
+in the request.
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Optional. Makes the operation conditional on whether the destination
+object's current generation matches the given value. Setting to 0 makes the
+operation succeed only if there are no live versions of the object.
+`if_generation_match` and `if_generation_not_match` conditions are mutually
+exclusive: it's an error for both of them to be set in the request.
+
+=item * C<< $msg->if_generation_not_match() >> / C<< $msg->if_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Optional. Makes the operation conditional on whether the destination
+object's current generation does not match the given value. If no live
+object exists, the precondition fails. Setting to 0 makes the operation
+succeed only if there is a live version of the object.
+`if_generation_match` and `if_generation_not_match` conditions are mutually
+exclusive: it's an error for both of them to be set in the request.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Optional. Makes the operation conditional on whether the destination
+object's current metageneration matches the given value.
+`if_metageneration_match` and `if_metageneration_not_match` conditions are
+mutually exclusive: it's an error for both of them to be set in the
+request.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Optional. Makes the operation conditional on whether the destination
+object's current metageneration does not match the given value.
+`if_metageneration_match` and `if_metageneration_not_match` conditions are
+mutually exclusive: it's an error for both of them to be set in the
+request.
+
+=back
+
+=head2 Google::Storage::V2::Storage::StartResumableWriteRequest
+
+Request message for
+[StartResumableWrite][google.storage.v2.Storage.StartResumableWrite].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->write_object_spec() >> / C<< $msg->write_object_spec($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::WriteObjectSpec>)
+
+Required. Contains the information necessary to start a resumable write.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests related to an
+object.
+
+=item * C<< $msg->object_checksums() >> / C<< $msg->object_checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+Optional. The checksums of the complete object. This is used to validate
+the uploaded object. For each upload, `object_checksums` can be provided
+when initiating a resumable upload with`StartResumableWriteRequest` or when
+completing a write with `WriteObjectRequest` with
+`finish_write` set to `true`.
+
+=back
+
+=head2 Google::Storage::V2::Storage::StartResumableWriteResponse
+
+Response object for
+[StartResumableWrite][google.storage.v2.Storage.StartResumableWrite].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->upload_id() >> / C<< $msg->upload_id($value) >>
+
+Type: C<String>
+
+A unique identifier for the initiated resumable write operation.
+As the ID grants write access, you should keep it confidential during
+the upload to prevent unauthorized access and data tampering during your
+upload. This ID should be included in subsequent `WriteObject` requests to
+upload the object data.
+
+=back
+
+=head2 Google::Storage::V2::Storage::UpdateObjectRequest
+
+Request message for [UpdateObject][google.storage.v2.Storage.UpdateObject].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->object() >> / C<< $msg->object($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+Required. The object to update.
+The object's bucket and name fields are used to identify the object to
+update. If present, the object's generation field selects a specific
+revision of this object whose metadata should be updated. Otherwise,
+assumes the live version of the object.
+
+=item * C<< $msg->if_generation_match() >> / C<< $msg->if_generation_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current generation
+matches the given value. Setting to 0 makes the operation succeed only if
+there are no live versions of the object.
+
+=item * C<< $msg->if_generation_not_match() >> / C<< $msg->if_generation_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's live generation
+does not match the given value. If no live object exists, the precondition
+fails. Setting to 0 makes the operation succeed only if there is a live
+version of the object.
+
+=item * C<< $msg->if_metageneration_match() >> / C<< $msg->if_metageneration_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration matches the given value.
+
+=item * C<< $msg->if_metageneration_not_match() >> / C<< $msg->if_metageneration_not_match($value) >>
+
+Type: C<Int64>
+
+Makes the operation conditional on whether the object's current
+metageneration does not match the given value.
+
+=item * C<< $msg->predefined_acl() >> / C<< $msg->predefined_acl($value) >>
+
+Type: C<String>
+
+Optional. Apply a predefined set of access controls to this object.
+Valid values are "authenticatedRead", "bucketOwnerFullControl",
+"bucketOwnerRead", "private", "projectPrivate", or "publicRead".
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. List of fields to be updated.
+
+To specify ALL fields, equivalent to the JSON API's "update" function,
+specify a single field with the value `*`. Note: not recommended. If a new
+field is introduced at a later time, an older client updating with the `*`
+might accidentally reset the new field's value.
+
+Not specifying any fields is an error.
+
+=item * C<< $msg->common_object_request_params() >> / C<< $msg->common_object_request_params($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CommonObjectRequestParams>)
+
+Optional. A set of parameters common to Storage API requests concerning an
+object.
+
+=item * C<< $msg->override_unlocked_retention() >> / C<< $msg->override_unlocked_retention($value) >>
+
+Type: C<Bool>
+
+Optional. Overrides the unlocked retention config on the object.
+
+=back
+
+=head2 Google::Storage::V2::Storage::CommonObjectRequestParams
+
+Parameters that can be passed to any object request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->encryption_algorithm() >> / C<< $msg->encryption_algorithm($value) >>
+
+Type: C<String>
+
+Optional. Encryption algorithm used with the Customer-Supplied Encryption
+Keys feature.
+
+=item * C<< $msg->encryption_key_bytes() >> / C<< $msg->encryption_key_bytes($value) >>
+
+Type: C<Bytes>
+
+Optional. Encryption key used with the Customer-Supplied Encryption Keys
+feature. In raw bytes format (not base64-encoded).
+
+=item * C<< $msg->encryption_key_sha256_bytes() >> / C<< $msg->encryption_key_sha256_bytes($value) >>
+
+Type: C<Bytes>
+
+Optional. SHA256 hash of encryption key used with the Customer-supplied
+encryption keys feature.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ServiceConstants
+
+Shared constants.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Enum: ServiceConstants::Values
+
+=over 4
+
+=item * C<VALUES_UNSPECIFIED> => C<0>
+
+=item * C<MAX_READ_CHUNK_BYTES> => C<2097152>
+
+=item * C<MAX_WRITE_CHUNK_BYTES> => C<2097152>
+
+=item * C<MAX_OBJECT_SIZE_MB> => C<5242880>
+
+=item * C<MAX_CUSTOM_METADATA_FIELD_NAME_BYTES> => C<1024>
+
+=item * C<MAX_CUSTOM_METADATA_FIELD_VALUE_BYTES> => C<4096>
+
+=item * C<MAX_CUSTOM_METADATA_TOTAL_SIZE_BYTES> => C<8192>
+
+=item * C<MAX_BUCKET_METADATA_TOTAL_SIZE_BYTES> => C<20480>
+
+=item * C<MAX_NOTIFICATION_CONFIGS_PER_BUCKET> => C<100>
+
+=item * C<MAX_LIFECYCLE_RULES_PER_BUCKET> => C<100>
+
+=item * C<MAX_NOTIFICATION_CUSTOM_ATTRIBUTES> => C<5>
+
+=item * C<MAX_NOTIFICATION_CUSTOM_ATTRIBUTE_KEY_LENGTH> => C<256>
+
+=item * C<MAX_NOTIFICATION_CUSTOM_ATTRIBUTE_VALUE_LENGTH> => C<1024>
+
+=item * C<MAX_LABELS_ENTRIES_COUNT> => C<64>
+
+=item * C<MAX_LABELS_KEY_VALUE_LENGTH> => C<63>
+
+=item * C<MAX_LABELS_KEY_VALUE_BYTES> => C<128>
+
+=item * C<MAX_OBJECT_IDS_PER_DELETE_OBJECTS_REQUEST> => C<1000>
+
+=item * C<SPLIT_TOKEN_MAX_VALID_DAYS> => C<14>
+
+=back
+
+=head2 Google::Storage::V2::Storage::Bucket
+
+A bucket.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The name of the bucket.
+Format: `projects/{project}/buckets/{bucket}`
+
+=item * C<< $msg->bucket_id() >> / C<< $msg->bucket_id($value) >>
+
+Type: C<String>
+
+Output only. The user-chosen part of the bucket name. The `{bucket}`
+portion of the `name` field. For globally unique buckets, this is equal to
+the `bucket name` of other Cloud Storage APIs. Example: `pub`.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+The etag of the bucket.
+If included in the metadata of an `UpdateBucketRequest`, the operation is
+only performed if the `etag` matches that of the bucket.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Immutable. The project which owns this bucket, in the format of
+`projects/{projectIdentifier}`.
+`{projectIdentifier}` can be the project ID or project number.
+Output values are always in the project number format.
+
+=item * C<< $msg->metageneration() >> / C<< $msg->metageneration($value) >>
+
+Type: C<Int64>
+
+Output only. The metadata generation of this bucket.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Immutable. The location of the bucket. Object data for objects in the
+bucket resides in physical storage within this region.  Defaults to `US`.
+Attempting to update this field after the bucket is created results in an
+error.
+
+=item * C<< $msg->location_type() >> / C<< $msg->location_type($value) >>
+
+Type: C<String>
+
+Output only. The location type of the bucket (region, dual-region,
+multi-region, etc).
+
+=item * C<< $msg->storage_class() >> / C<< $msg->storage_class($value) >>
+
+Type: C<String>
+
+Optional. The bucket's default storage class, used whenever no storageClass
+is specified for a newly-created object. This defines how objects in the
+bucket are stored and determines the SLA and the cost of storage.
+If this value is not specified when the bucket is created, it defaults
+to `STANDARD`. For more information, see [Storage
+classes](https://developers.google.com/storage/docs/storage-classes).
+
+=item * C<< $msg->rpo() >> / C<< $msg->rpo($value) >>
+
+Type: C<String>
+
+Optional. The recovery point objective for cross-region replication of the
+bucket. Applicable only for dual- and multi-region buckets. `DEFAULT` uses
+default replication. `ASYNC_TURBO` enables turbo replication, valid for
+dual-region buckets only. If rpo is not specified when the bucket is
+created, it defaults to `DEFAULT`. For more information, see [Turbo
+replication](https://cloud.google.com/storage/docs/availability-durability#turbo-replication).
+
+=item * C<< $msg->acl() >> / C<< $msg->acl($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::BucketAccessControl>)
+
+Optional. Access controls on the bucket.
+If `iam_config.uniform_bucket_level_access` is enabled on this bucket,
+requests to set, read, or modify acl is an error.
+
+=item * C<< $msg->default_object_acl() >> / C<< $msg->default_object_acl($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectAccessControl>)
+
+Optional. Default access controls to apply to new objects when no ACL is
+provided. If `iam_config.uniform_bucket_level_access` is enabled on this
+bucket, requests to set, read, or modify acl is an error.
+
+=item * C<< $msg->lifecycle() >> / C<< $msg->lifecycle($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::Lifecycle>)
+
+Optional. The bucket's lifecycle configuration. See [Lifecycle
+Management](https://developers.google.com/storage/docs/lifecycle) for more
+information.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The creation time of the bucket.
+
+=item * C<< $msg->cors() >> / C<< $msg->cors($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::Cors>)
+
+Optional. The bucket's [CORS](https://www.w3.org/TR/cors/)
+configuration.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The modification time of the bucket.
+
+=item * C<< $msg->default_event_based_hold() >> / C<< $msg->default_event_based_hold($value) >>
+
+Type: C<Bool>
+
+Optional. The default value for event-based hold on newly created objects
+in this bucket.  Event-based hold is a way to retain objects indefinitely
+until an event occurs, signified by the hold's release. After being
+released, such objects are subject to bucket-level retention (if any).  One
+sample use case of this flag is for banks to hold loan documents for at
+least 3 years after loan is paid in full. Here, bucket-level retention is 3
+years and the event is loan being paid in full. In this example, these
+objects are held intact for any number of years until the event has
+occurred (event-based hold on the object is released) and then 3 more years
+after that. That means retention duration of the objects begins from the
+moment event-based hold transitioned from true to false.  Objects under
+event-based hold cannot be deleted, overwritten or archived until the hold
+is removed.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::LabelsEntry>)
+
+Optional. User-provided labels, in key/value pairs.
+
+=item * C<< $msg->website() >> / C<< $msg->website($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::Website>)
+
+Optional. The bucket's website config, controlling how the service behaves
+when accessing bucket contents as a web site. See the [Static website
+examples](https://cloud.google.com/storage/docs/static-website) for more
+information.
+
+=item * C<< $msg->versioning() >> / C<< $msg->versioning($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::Versioning>)
+
+Optional. The bucket's versioning configuration.
+
+=item * C<< $msg->logging() >> / C<< $msg->logging($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::Logging>)
+
+Optional. The bucket's logging config, which defines the destination bucket
+and name prefix (if any) for the current bucket's logs.
+
+=item * C<< $msg->owner() >> / C<< $msg->owner($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Owner>)
+
+Output only. The owner of the bucket. This is always the project team's
+owner group.
+
+=item * C<< $msg->encryption() >> / C<< $msg->encryption($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::Encryption>)
+
+Optional. Encryption config for a bucket.
+
+=item * C<< $msg->billing() >> / C<< $msg->billing($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::Billing>)
+
+Optional. The bucket's billing configuration.
+
+=item * C<< $msg->retention_policy() >> / C<< $msg->retention_policy($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::RetentionPolicy>)
+
+Optional. The bucket's retention policy. The retention policy enforces a
+minimum retention time for all objects contained in the bucket, based on
+their creation time. Any attempt to overwrite or delete objects younger
+than the retention period results in a `PERMISSION_DENIED` error.  An
+unlocked retention policy can be modified or removed from the bucket via a
+storage.buckets.update operation. A locked retention policy cannot be
+removed or shortened in duration for the lifetime of the bucket.
+Attempting to remove or decrease period of a locked retention policy
+results in a `PERMISSION_DENIED` error.
+
+=item * C<< $msg->iam_config() >> / C<< $msg->iam_config($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::IamConfig>)
+
+Optional. The bucket's IAM configuration.
+
+=item * C<< $msg->satisfies_pzs() >> / C<< $msg->satisfies_pzs($value) >>
+
+Type: C<Bool>
+
+Optional. Reserved for future use.
+
+=item * C<< $msg->custom_placement_config() >> / C<< $msg->custom_placement_config($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::CustomPlacementConfig>)
+
+Optional. Configuration that, if present, specifies the data placement for
+a [configurable
+dual-region](https://cloud.google.com/storage/docs/locations#location-dr).
+
+=item * C<< $msg->autoclass() >> / C<< $msg->autoclass($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::Autoclass>)
+
+Optional. The bucket's Autoclass configuration. If there is no
+configuration, the Autoclass feature is disabled and has no effect on the
+bucket.
+
+=item * C<< $msg->hierarchical_namespace() >> / C<< $msg->hierarchical_namespace($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::HierarchicalNamespace>)
+
+Optional. The bucket's hierarchical namespace configuration. If there is no
+configuration, the hierarchical namespace feature is disabled and has
+no effect on the bucket.
+
+=item * C<< $msg->soft_delete_policy() >> / C<< $msg->soft_delete_policy($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::SoftDeletePolicy>)
+
+Optional. The bucket's soft delete policy. The soft delete policy prevents
+soft-deleted objects from being permanently deleted.
+
+=item * C<< $msg->object_retention() >> / C<< $msg->object_retention($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::ObjectRetention>)
+
+Optional. The bucket's object retention configuration. Must be enabled
+before objects in the bucket might have retention configured.
+
+=item * C<< $msg->ip_filter() >> / C<< $msg->ip_filter($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Bucket::IpFilter>)
+
+Optional. The bucket's IP filter configuration.
+
+=back
+
+=head2 Google::Storage::V2::Storage::BucketAccessControl
+
+An access-control entry.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->role() >> / C<< $msg->role($value) >>
+
+Type: C<String>
+
+Optional. The access permission for the entity.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the access-control entry.
+
+=item * C<< $msg->entity() >> / C<< $msg->entity($value) >>
+
+Type: C<String>
+
+Optional. The entity holding the permission, in one of the following forms:
+* `user-{userid}`
+* `user-{email}`
+* `group-{groupid}`
+* `group-{email}`
+* `domain-{domain}`
+* `project-{team}-{projectnumber}`
+* `project-{team}-{projectid}`
+* `allUsers`
+* `allAuthenticatedUsers`
+Examples:
+* The user `liz@example.com` would be `user-liz@example.com`.
+* The group `example@googlegroups.com` would be
+`group-example@googlegroups.com`
+* All members of the Google Apps for Business domain `example.com` would be
+`domain-example.com`
+For project entities, `project-{team}-{projectnumber}` format is
+returned on response.
+
+=item * C<< $msg->entity_alt() >> / C<< $msg->entity_alt($value) >>
+
+Type: C<String>
+
+Output only. The alternative entity format, if exists. For project
+entities, `project-{team}-{projectid}` format is returned in the response.
+
+=item * C<< $msg->entity_id() >> / C<< $msg->entity_id($value) >>
+
+Type: C<String>
+
+Optional. The ID for the entity, if any.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. The `etag` of the `BucketAccessControl`.
+If included in the metadata of an update or delete request message, the
+operation operation is only performed if the etag matches that of the
+bucket's `BucketAccessControl`.
+
+=item * C<< $msg->email() >> / C<< $msg->email($value) >>
+
+Type: C<String>
+
+Optional. The email address associated with the entity, if any.
+
+=item * C<< $msg->domain() >> / C<< $msg->domain($value) >>
+
+Type: C<String>
+
+Optional. The domain associated with the entity, if any.
+
+=item * C<< $msg->project_team() >> / C<< $msg->project_team($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ProjectTeam>)
+
+Optional. The project team associated with the entity, if any.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ChecksummedData
+
+Message used to convey content being read or written, along with an optional
+checksum.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->content() >> / C<< $msg->content($value) >>
+
+Type: C<Bytes>
+
+Optional. The data.
+
+=item * C<< $msg->crc32c() >> / C<< $msg->crc32c($value) >>
+
+Type: C<Fixed32>
+
+If set, the CRC32C digest of the content field.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ObjectChecksums
+
+Message used for storing full (not subrange) object checksums.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->crc32c() >> / C<< $msg->crc32c($value) >>
+
+Type: C<Fixed32>
+
+CRC32C digest of the object data. Computed by the Cloud Storage service for
+all written objects.
+If set in a WriteObjectRequest, service validates that the stored
+object matches this checksum.
+
+=item * C<< $msg->md5_hash() >> / C<< $msg->md5_hash($value) >>
+
+Type: C<Bytes>
+
+Optional. 128 bit MD5 hash of the object data. For more information about
+using the MD5 hash, see [Data validation and change
+detection](https://cloud.google.com/storage/docs/data-validation). Not all
+objects provide an MD5 hash. For example, composite objects provide only
+crc32c hashes. This value is equivalent to running `cat object.txt |
+openssl md5 -binary`
+
+=back
+
+=head2 Google::Storage::V2::Storage::ObjectCustomContextPayload
+
+The payload of a single user-defined object context.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<String>
+
+Required. The value of the object context.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the object context was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the object context was last updated.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ObjectContexts
+
+All contexts of an object grouped by type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->custom() >> / C<< $msg->custom($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectContexts::CustomEntry>)
+
+Optional. User-defined object contexts.
+The maximum key or value size is `256` characters.
+The maximum number of entries is `50`.
+The maximum total serialized size of all entries is `25KiB`.
+
+=back
+
+=head2 Google::Storage::V2::Storage::CustomerEncryption
+
+Describes the customer-supplied encryption key mechanism used to store an
+object's data at rest.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->encryption_algorithm() >> / C<< $msg->encryption_algorithm($value) >>
+
+Type: C<String>
+
+Optional. The encryption algorithm.
+
+=item * C<< $msg->key_sha256_bytes() >> / C<< $msg->key_sha256_bytes($value) >>
+
+Type: C<Bytes>
+
+Optional. SHA256 hash value of the encryption key.
+In raw bytes format (not base64-encoded).
+
+=back
+
+=head2 Google::Storage::V2::Storage::Object
+
+An object.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. The name of this object. Nearly any sequence of unicode
+characters is valid. See
+[Guidelines](https://cloud.google.com/storage/docs/objects#naming).
+Example: `test.txt`
+The `name` field by itself does not uniquely identify a Cloud Storage
+object. A Cloud Storage object is uniquely identified by the tuple of
+(bucket, object, generation).
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+Immutable. The name of the bucket containing this object.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. The `etag` of an object.
+If included in the metadata of an update or delete request message, the
+operation is only performed if the etag matches that of the live
+object.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Int64>
+
+Immutable. The content generation of this object. Used for object
+versioning.
+
+=item * C<< $msg->restore_token() >> / C<< $msg->restore_token($value) >>
+
+Type: C<String>
+
+Output only. Restore token used to differentiate deleted objects with the
+same name and generation. This field is output only, and only set for
+deleted objects in HNS buckets.
+
+=item * C<< $msg->metageneration() >> / C<< $msg->metageneration($value) >>
+
+Type: C<Int64>
+
+Output only. The version of the metadata for this generation of this
+object. Used for preconditions and for detecting changes in metadata. A
+metageneration number is only meaningful in the context of a particular
+generation of a particular object.
+
+=item * C<< $msg->storage_class() >> / C<< $msg->storage_class($value) >>
+
+Type: C<String>
+
+Optional. Storage class of the object.
+
+=item * C<< $msg->size() >> / C<< $msg->size($value) >>
+
+Type: C<Int64>
+
+Output only. Content-Length of the object data in bytes, matching
+[RFC 7230 §3.3.2](https://tools.ietf.org/html/rfc7230#section-3.3.2]).
+
+=item * C<< $msg->content_encoding() >> / C<< $msg->content_encoding($value) >>
+
+Type: C<String>
+
+Optional. Content-Encoding of the object data, matching
+[RFC 7231 §3.1.2.2](https://tools.ietf.org/html/rfc7231#section-3.1.2.2)
+
+=item * C<< $msg->content_disposition() >> / C<< $msg->content_disposition($value) >>
+
+Type: C<String>
+
+Optional. Content-Disposition of the object data, matching
+[RFC 6266](https://tools.ietf.org/html/rfc6266).
+
+=item * C<< $msg->cache_control() >> / C<< $msg->cache_control($value) >>
+
+Type: C<String>
+
+Optional. Cache-Control directive for the object data, matching
+[RFC 7234 §5.2](https://tools.ietf.org/html/rfc7234#section-5.2).
+If omitted, and the object is accessible to all anonymous users, the
+default is `public, max-age=3600`.
+
+=item * C<< $msg->acl() >> / C<< $msg->acl($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectAccessControl>)
+
+Optional. Access controls on the object.
+If `iam_config.uniform_bucket_level_access` is enabled on the parent
+bucket, requests to set, read, or modify acl is an error.
+
+=item * C<< $msg->content_language() >> / C<< $msg->content_language($value) >>
+
+Type: C<String>
+
+Optional. Content-Language of the object data, matching
+[RFC 7231 §3.1.3.2](https://tools.ietf.org/html/rfc7231#section-3.1.3.2).
+
+=item * C<< $msg->delete_time() >> / C<< $msg->delete_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. If this object is noncurrent, this is the time when the object
+became noncurrent.
+
+=item * C<< $msg->finalize_time() >> / C<< $msg->finalize_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the object was finalized.
+
+=item * C<< $msg->content_type() >> / C<< $msg->content_type($value) >>
+
+Type: C<String>
+
+Optional. Content-Type of the object data, matching
+[RFC 7231 §3.1.1.5](https://tools.ietf.org/html/rfc7231#section-3.1.1.5).
+If an object is stored without a Content-Type, it is served as
+`application/octet-stream`.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The creation time of the object.
+
+=item * C<< $msg->component_count() >> / C<< $msg->component_count($value) >>
+
+Type: C<Int32>
+
+Output only. Number of underlying components that make up this object.
+Components are accumulated by compose operations.
+
+=item * C<< $msg->checksums() >> / C<< $msg->checksums($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectChecksums>)
+
+Output only. Hashes for the data part of this object. This field is used
+for output only and is silently ignored if provided in requests. The
+checksums of the complete object regardless of data range. If the object is
+downloaded in full, the client should compute one of these checksums over
+the downloaded object and compare it against the value provided here.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The modification time of the object metadata.
+Set initially to object creation time and then updated whenever any
+metadata of the object changes. This includes changes made by a requester,
+such as modifying custom metadata, as well as changes made by Cloud Storage
+on behalf of a requester, such as changing the storage class based on an
+Object Lifecycle Configuration.
+
+=item * C<< $msg->kms_key() >> / C<< $msg->kms_key($value) >>
+
+Type: C<String>
+
+Optional. Cloud KMS Key used to encrypt this object, if the object is
+encrypted by such a key.
+
+=item * C<< $msg->update_storage_class_time() >> / C<< $msg->update_storage_class_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the object's storage class was last changed.
+When the object is initially created, it is set to `time_created`.
+
+=item * C<< $msg->temporary_hold() >> / C<< $msg->temporary_hold($value) >>
+
+Type: C<Bool>
+
+Optional. Whether an object is under temporary hold. While this flag is set
+to true, the object is protected against deletion and overwrites.  A common
+use case of this flag is regulatory investigations where objects need to be
+retained while the investigation is ongoing. Note that unlike event-based
+hold, temporary hold does not impact retention expiration time of an
+object.
+
+=item * C<< $msg->retention_expire_time() >> / C<< $msg->retention_expire_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. A server-determined value that specifies the earliest time that
+the object's retention period expires. Note 1: This field is not provided
+for objects with an active event-based hold, since retention expiration is
+unknown until the hold is removed. Note 2: This value can be provided even
+when temporary hold is set (so that the user can reason about policy
+without having to first unset the temporary hold).
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object::MetadataEntry>)
+
+Optional. User-provided metadata, in key/value pairs.
+
+=item * C<< $msg->contexts() >> / C<< $msg->contexts($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ObjectContexts>)
+
+Optional. User-defined or system-defined object contexts. Each object
+context is a key-payload pair, where the key provides the identification
+and the payload holds the associated value and additional metadata.
+
+=item * C<< $msg->event_based_hold() >> / C<< $msg->event_based_hold($value) >>
+
+Type: C<Bool>
+
+Whether an object is under event-based hold.
+An event-based hold is a way to force the retention of an object until
+after some event occurs. Once the hold is released by explicitly setting
+this field to `false`, the object becomes subject to any bucket-level
+retention policy, except that the retention duration is calculated
+from the time the event based hold was lifted, rather than the time the
+object was created.
+
+In a `WriteObject` request, not setting this field implies that the value
+should be taken from the parent bucket's `default_event_based_hold` field.
+In a response, this field is always set to `true` or `false`.
+
+=item * C<< $msg->owner() >> / C<< $msg->owner($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Owner>)
+
+Output only. The owner of the object. This is always the uploader of the
+object.
+
+=item * C<< $msg->customer_encryption() >> / C<< $msg->customer_encryption($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::CustomerEncryption>)
+
+Optional. Metadata of customer-supplied encryption key, if the object is
+encrypted by such a key.
+
+=item * C<< $msg->custom_time() >> / C<< $msg->custom_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. A user-specified timestamp set on an object.
+
+=item * C<< $msg->soft_delete_time() >> / C<< $msg->soft_delete_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. This is the time when the object became soft-deleted.
+
+Soft-deleted objects are only accessible if a soft_delete_policy is
+enabled. Also see `hard_delete_time`.
+
+=item * C<< $msg->hard_delete_time() >> / C<< $msg->hard_delete_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the object is permanently deleted.
+
+Only set when an object becomes soft-deleted with a `soft_delete_policy`.
+Otherwise, the object is not accessible.
+
+=item * C<< $msg->retention() >> / C<< $msg->retention($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object::Retention>)
+
+Optional. Retention configuration of this object.
+Might only be configured if the bucket has object retention enabled.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ObjectAccessControl
+
+An access-control entry.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->role() >> / C<< $msg->role($value) >>
+
+Type: C<String>
+
+Optional. The access permission for the entity. One of the following
+values:
+* `READER`
+* `WRITER`
+* `OWNER`
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the access-control entry.
+
+=item * C<< $msg->entity() >> / C<< $msg->entity($value) >>
+
+Type: C<String>
+
+Optional. The entity holding the permission, in one of the following forms:
+* `user-{userid}`
+* `user-{email}`
+* `group-{groupid}`
+* `group-{email}`
+* `domain-{domain}`
+* `project-{team}-{projectnumber}`
+* `project-{team}-{projectid}`
+* `allUsers`
+* `allAuthenticatedUsers`
+Examples:
+* The user `liz@example.com` would be `user-liz@example.com`.
+* The group `example@googlegroups.com` would be
+`group-example@googlegroups.com`.
+* All members of the Google Apps for Business domain `example.com` would be
+`domain-example.com`.
+For project entities, `project-{team}-{projectnumber}` format is
+returned in the response.
+
+=item * C<< $msg->entity_alt() >> / C<< $msg->entity_alt($value) >>
+
+Type: C<String>
+
+Output only. The alternative entity format, if exists. For project
+entities, `project-{team}-{projectid}` format is returned in the response.
+
+=item * C<< $msg->entity_id() >> / C<< $msg->entity_id($value) >>
+
+Type: C<String>
+
+Optional. The ID for the entity, if any.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. The etag of the ObjectAccessControl.
+If included in the metadata of an update or delete request message, the
+operation is only performed if the etag matches that of the live
+object's ObjectAccessControl.
+
+=item * C<< $msg->email() >> / C<< $msg->email($value) >>
+
+Type: C<String>
+
+Optional. The email address associated with the entity, if any.
+
+=item * C<< $msg->domain() >> / C<< $msg->domain($value) >>
+
+Type: C<String>
+
+Optional. The domain associated with the entity, if any.
+
+=item * C<< $msg->project_team() >> / C<< $msg->project_team($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::ProjectTeam>)
+
+Optional. The project team associated with the entity, if any.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ListObjectsResponse
+
+The result of a call to Objects.ListObjects
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->objects() >> / C<< $msg->objects($value) >>
+
+Type: C<Message> (L<Google::Storage::V2::Storage::Object>)
+
+The list of items.
+
+=item * C<< $msg->prefixes() >> / C<< $msg->prefixes($value) >>
+
+Type: C<String>
+
+The list of prefixes of objects matching-but-not-listed up to and including
+the requested delimiter.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+The continuation token, used to page through large result sets. Provide
+this value in a subsequent request to return the next page of results.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ProjectTeam
+
+Represents the Viewers, Editors, or Owners of a given project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_number() >> / C<< $msg->project_number($value) >>
+
+Type: C<String>
+
+Optional. The project number.
+
+=item * C<< $msg->team() >> / C<< $msg->team($value) >>
+
+Type: C<String>
+
+Optional. The team.
+
+=back
+
+=head2 Google::Storage::V2::Storage::Owner
+
+The owner of a specific resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->entity() >> / C<< $msg->entity($value) >>
+
+Type: C<String>
+
+Optional. The entity, in the form `user-`*userId*.
+
+=item * C<< $msg->entity_id() >> / C<< $msg->entity_id($value) >>
+
+Type: C<String>
+
+Optional. The ID for the entity.
+
+=back
+
+=head2 Google::Storage::V2::Storage::ContentRange
+
+Specifies a requested range of bytes to download.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start() >> / C<< $msg->start($value) >>
+
+Type: C<Int64>
+
+The starting offset of the object data. This value is inclusive.
+
+=item * C<< $msg->end() >> / C<< $msg->end($value) >>
+
+Type: C<Int64>
+
+The ending offset of the object data. This value is exclusive.
+
+=item * C<< $msg->complete_length() >> / C<< $msg->complete_length($value) >>
+
+Type: C<Int64>
+
+The complete length of the object data.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Storage::V2::Storage::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

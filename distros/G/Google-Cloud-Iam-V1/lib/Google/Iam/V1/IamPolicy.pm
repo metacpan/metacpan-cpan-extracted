@@ -3,7 +3,7 @@ package Google::Iam::V1::IamPolicy;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -148,162 +148,34 @@ EOF
     # Field: policy Type: 11 (.google.iam.v1.Policy)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Iam::V1::IamPolicy::SetIamPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Iam::V1::IamPolicy;
-
-    my $msg = Google::Iam::V1::IamPolicy::SetIamPolicyRequest->new(
-        resource => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<resource>
-
-Type: String
-
-=item * B<policy>
-
-Type: Message (.google.iam.v1.Policy)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Iam::V1::IamPolicy::GetIamPolicyRequest ===
     # Fields for GetIamPolicyRequest
     # Field: resource Type: 9 ()
     # Field: options Type: 11 (.google.iam.v1.GetPolicyOptions)
-
-=pod
-
-=head1 NAME
-
-Google::Iam::V1::IamPolicy::GetIamPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Iam::V1::IamPolicy;
-
-    my $msg = Google::Iam::V1::IamPolicy::GetIamPolicyRequest->new(
-        resource => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<resource>
-
-Type: String
-
-=item * B<options>
-
-Type: Message (.google.iam.v1.GetPolicyOptions)
-
-=back
-
-=cut
 
 # === Message: Google::Iam::V1::IamPolicy::TestIamPermissionsRequest ===
     # Fields for TestIamPermissionsRequest
     # Field: resource Type: 9 ()
     # Field: permissions Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Iam::V1::IamPolicy::TestIamPermissionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Iam::V1::IamPolicy;
-
-    my $msg = Google::Iam::V1::IamPolicy::TestIamPermissionsRequest->new(
-        resource => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<resource>
-
-Type: String
-
-=item * B<permissions>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Iam::V1::IamPolicy::TestIamPermissionsResponse ===
     # Fields for TestIamPermissionsResponse
     # Field: permissions Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Iam::V1::IamPolicy::TestIamPermissionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Iam::V1::IamPolicy;
-
-    my $msg = Google::Iam::V1::IamPolicy::TestIamPermissionsResponse->new(
-        permissions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<permissions>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Iam::V1::IamPolicy::IAMPolicyClient ===
 package Google::Iam::V1::IamPolicy::IAMPolicyClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Iam::V1::IamPolicy::IAMPolicyClient
 
-Google::Iam::V1::IamPolicy::IAMPolicyClient - Client stub representing the remote IAMPolicy service
+Client stub representing the remote C<IAMPolicy> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<iam.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -371,13 +243,154 @@ sub test_iam_permissions {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Iam::V1::IamPolicy - Protocol Buffers schema definition
+Google::Iam::V1::IamPolicy - Compiled Protocol Buffers messages for google/iam/v1/iam_policy.proto
+
+=head1 SYNOPSIS
+
+    use Google::Iam::V1::IamPolicy;
+
+    my $msg = Google::Iam::V1::IamPolicy::SetIamPolicyRequest->new({
+        resource => $resource,
+        policy => $policy,
+        update_mask => $update_mask,
+    });
+
+    # Read or update a field
+    my $val = $msg->resource();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Iam::V1::IamPolicy::SetIamPolicyRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/iam/v1/iam_policy.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Iam::V1::IamPolicy::SetIamPolicyRequest
+
+Request message for `SetIamPolicy` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+REQUIRED: The resource for which the policy is being specified.
+See the operation documentation for the appropriate value for this field.
+
+=item * C<< $msg->policy() >> / C<< $msg->policy($value) >>
+
+Type: C<Message> (L<Google::Iam::V1::Policy::Policy>)
+
+REQUIRED: The complete policy to be applied to the `resource`. The size of
+the policy is limited to a few 10s of KB. An empty policy is a
+valid policy but certain Cloud Platform services (such as Projects)
+might reject them.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
+the fields in the mask will be modified. If no mask is provided, the
+following default mask is used:
+
+`paths: "bindings, etag"`
+
+=back
+
+=head2 Google::Iam::V1::IamPolicy::GetIamPolicyRequest
+
+Request message for `GetIamPolicy` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+REQUIRED: The resource for which the policy is being requested.
+See the operation documentation for the appropriate value for this field.
+
+=item * C<< $msg->options() >> / C<< $msg->options($value) >>
+
+Type: C<Message> (L<Google::Iam::V1::Options::GetPolicyOptions>)
+
+OPTIONAL: A `GetPolicyOptions` object for specifying options to
+`GetIamPolicy`.
+
+=back
+
+=head2 Google::Iam::V1::IamPolicy::TestIamPermissionsRequest
+
+Request message for `TestIamPermissions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+REQUIRED: The resource for which the policy detail is being requested.
+See the operation documentation for the appropriate value for this field.
+
+=item * C<< $msg->permissions() >> / C<< $msg->permissions($value) >>
+
+Type: C<String>
+
+The set of permissions to check for the `resource`. Permissions with
+wildcards (such as '*' or 'storage.*') are not allowed. For more
+information see
+[IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+
+=back
+
+=head2 Google::Iam::V1::IamPolicy::TestIamPermissionsResponse
+
+Response message for `TestIamPermissions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->permissions() >> / C<< $msg->permissions($value) >>
+
+Type: C<String>
+
+A subset of `TestPermissionsRequest.permissions` that the caller is
+allowed.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Iam::V1::IamPolicy::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

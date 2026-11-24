@@ -1,6 +1,6 @@
 package Getopt::Long::Bash;
 
-our $VERSION = "1.5.0";
+our $VERSION = "2.0.0";
 
 1;
 
@@ -182,12 +182,12 @@ After installation, C<getoptlong.sh> is in your PATH.
 =head2 Direct Download
 
     curl -o getoptlong.sh \
-      https://raw.githubusercontent.com/tecolicom/getoptlong/dist/getoptlong.sh
+      https://raw.githubusercontent.com/tecolicom/getoptlong-bash/dist/getoptlong.sh
 
 =head2 Source Directly (For Quick Tests)
 
     source <(curl -fsSL \
-      https://raw.githubusercontent.com/tecolicom/getoptlong/dist/getoptlong.sh)
+      https://raw.githubusercontent.com/tecolicom/getoptlong-bash/dist/getoptlong.sh)
 
 =head1 REQUIREMENTS
 
@@ -202,7 +202,7 @@ C<${parameter@Q}>).
 
 =item L<Getopt::Long::Bash::Tutorial> - Step-by-step getting started guide
 
-=item L<https://github.com/tecolicom/getoptlong> - Source repository
+=item L<https://github.com/tecolicom/getoptlong-bash> - Source repository
 
 =item L<https://qiita.com/kaz-utashiro/items/75a7df9e1a1e92797376> - Introduction article (Japanese)
 

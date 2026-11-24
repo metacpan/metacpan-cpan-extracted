@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::ApprovalWorkflow;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -282,140 +282,6 @@ EOF
     # Field: approver Type: 9 ()
     # Field: etag Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::ApprovalWorkflow::ChangeRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::ApprovalWorkflow;
-
-    my $msg = Google::Cloud::Dataplex::V1::ApprovalWorkflow::ChangeRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<justification>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.ChangeRequest.LabelsEntry)
-
-=item * B<author>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.ChangeRequest.State)
-
-=item * B<resource>
-
-Type: String
-
-=item * B<create_entry>
-
-Type: Message (.google.cloud.dataplex.v1.CreateEntryRequest)
-
-=item * B<update_entry>
-
-Type: Message (.google.cloud.dataplex.v1.UpdateEntryRequest)
-
-=item * B<delete_entry>
-
-Type: Message (.google.cloud.dataplex.v1.DeleteEntryRequest)
-
-=item * B<create_entry_link>
-
-Type: Message (.google.cloud.dataplex.v1.CreateEntryLinkRequest)
-
-=item * B<delete_entry_link>
-
-Type: Message (.google.cloud.dataplex.v1.DeleteEntryLinkRequest)
-
-=item * B<create_glossary>
-
-Type: Message (.google.cloud.dataplex.v1.CreateGlossaryRequest)
-
-=item * B<update_glossary>
-
-Type: Message (.google.cloud.dataplex.v1.UpdateGlossaryRequest)
-
-=item * B<delete_glossary>
-
-Type: Message (.google.cloud.dataplex.v1.DeleteGlossaryRequest)
-
-=item * B<create_glossary_category>
-
-Type: Message (.google.cloud.dataplex.v1.CreateGlossaryCategoryRequest)
-
-=item * B<update_glossary_category>
-
-Type: Message (.google.cloud.dataplex.v1.UpdateGlossaryCategoryRequest)
-
-=item * B<delete_glossary_category>
-
-Type: Message (.google.cloud.dataplex.v1.DeleteGlossaryCategoryRequest)
-
-=item * B<create_glossary_term>
-
-Type: Message (.google.cloud.dataplex.v1.CreateGlossaryTermRequest)
-
-=item * B<update_glossary_term>
-
-Type: Message (.google.cloud.dataplex.v1.UpdateGlossaryTermRequest)
-
-=item * B<delete_glossary_term>
-
-Type: Message (.google.cloud.dataplex.v1.DeleteGlossaryTermRequest)
-
-=item * B<data_product_access_request>
-
-Type: Message (.google.cloud.dataplex.v1.DataProductAccessRequest)
-
-=item * B<change_type>
-
-Type: Enum (.google.cloud.dataplex.v1.ChangeRequest.ChangeType)
-
-=item * B<rejection_comment>
-
-Type: String
-
-=item * B<approver>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: ChangeRequest::State
 our $ChangeRequest_STATE_UNSPECIFIED = 0;
 our $ChangeRequest_NEW = 1;
@@ -423,30 +289,6 @@ our $ChangeRequest_APPROVED = 2;
 our $ChangeRequest_REJECTED = 3;
 our $ChangeRequest_EXPIRED = 4;
 our $ChangeRequest_REVOKED = 5;
-
-=pod
-
-=head2 Enum: ChangeRequest::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<NEW> => 1
-
-=item * C<APPROVED> => 2
-
-=item * C<REJECTED> => 3
-
-=item * C<EXPIRED> => 4
-
-=item * C<REVOKED> => 5
-
-=back
-
-=cut
 
 # Enum: ChangeRequest::ChangeType
 our $ChangeRequest_CHANGE_TYPE_UNSPECIFIED = 0;
@@ -466,50 +308,6 @@ our $ChangeRequest_UPDATE_GLOSSARY_TERM = 15;
 our $ChangeRequest_DELETE_GLOSSARY_TERM = 17;
 our $ChangeRequest_REQUEST_DATA_PRODUCT_ACCESS = 33;
 
-=pod
-
-=head2 Enum: ChangeRequest::ChangeType
-
-Values:
-
-=over 4
-
-=item * C<CHANGE_TYPE_UNSPECIFIED> => 0
-
-=item * C<CREATE_ENTRY> => 1
-
-=item * C<UPDATE_ENTRY> => 2
-
-=item * C<DELETE_ENTRY> => 3
-
-=item * C<CREATE_ENTRY_LINK> => 4
-
-=item * C<DELETE_ENTRY_LINK> => 5
-
-=item * C<CREATE_GLOSSARY> => 7
-
-=item * C<UPDATE_GLOSSARY> => 8
-
-=item * C<DELETE_GLOSSARY> => 9
-
-=item * C<CREATE_GLOSSARY_CATEGORY> => 10
-
-=item * C<UPDATE_GLOSSARY_CATEGORY> => 11
-
-=item * C<DELETE_GLOSSARY_CATEGORY> => 13
-
-=item * C<CREATE_GLOSSARY_TERM> => 14
-
-=item * C<UPDATE_GLOSSARY_TERM> => 15
-
-=item * C<DELETE_GLOSSARY_TERM> => 17
-
-=item * C<REQUEST_DATA_PRODUCT_ACCESS> => 33
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::ApprovalWorkflow::DataProductAccessRequest ===
     # Fields for DataProductAccessRequest
     # Field: parent Type: 9 ()
@@ -517,55 +315,338 @@ Values:
     # Field: access_group_display_name Type: 9 ()
     # Field: requested_principal Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::ApprovalWorkflow::DataProductAccessRequest - Compiled Protocol Buffers message class
+Google::Cloud::Dataplex::V1::ApprovalWorkflow - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/approval_workflow.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Dataplex::V1::ApprovalWorkflow;
 
-    my $msg = Google::Cloud::Dataplex::V1::ApprovalWorkflow::DataProductAccessRequest->new(
-        parent => $value,
-    );
+    my $msg = Google::Cloud::Dataplex::V1::ApprovalWorkflow::ChangeRequest->new({
+        name => $name,
+        uid => $uid,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::ApprovalWorkflow::ChangeRequest->parse($bytes);
 
-=item * B<parent>
-
-Type: String
-
-=item * B<access_group_id>
-
-Type: String
-
-=item * B<access_group_display_name>
-
-Type: String
-
-=item * B<requested_principal>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::ApprovalWorkflow - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/approval_workflow.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::ApprovalWorkflow::ChangeRequest
+
+Represents a proposed change to a metadata resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. The relative resource name of the ChangeRequest, of the form:
+projects/{project_number}/locations/{location_id}/changeRequests/{change_request_id}
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the ChangeRequest.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the ChangeRequest was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the ChangeRequest was last updated.
+
+=item * C<< $msg->justification() >> / C<< $msg->justification($value) >>
+
+Type: C<String>
+
+Optional. Justification of the ChangeRequest. This should explain
+*why* the change is needed or why it should be approved.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::ApprovalWorkflow::ChangeRequest::LabelsEntry>)
+
+Optional. User-defined labels for the ChangeRequest.
+
+=item * C<< $msg->author() >> / C<< $msg->author($value) >>
+
+Type: C<String>
+
+Output only. The email address of the user who created the ChangeRequest.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::ChangeRequest::State>)
+
+Output only. The current state of the ChangeRequest.
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+Output only. The full resource name of the target resource to be modified.
+Example:
+//dataplex.googleapis.com/projects/my-project/locations/us-central1/entryGroups/my-group/entries/my-entry
+
+=item * C<< $msg->create_entry() >> / C<< $msg->create_entry($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::CreateEntryRequest>)
+
+Payload for creating an Entry.
+
+=item * C<< $msg->update_entry() >> / C<< $msg->update_entry($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::UpdateEntryRequest>)
+
+Payload for updating an Entry.
+
+=item * C<< $msg->delete_entry() >> / C<< $msg->delete_entry($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::DeleteEntryRequest>)
+
+Payload for deleting an Entry.
+
+=item * C<< $msg->create_entry_link() >> / C<< $msg->create_entry_link($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::CreateEntryLinkRequest>)
+
+Payload for creating an EntryLink.
+
+=item * C<< $msg->delete_entry_link() >> / C<< $msg->delete_entry_link($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Catalog::DeleteEntryLinkRequest>)
+
+Payload for deleting an EntryLink.
+
+=item * C<< $msg->create_glossary() >> / C<< $msg->create_glossary($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryRequest>)
+
+Payload for creating a Glossary.
+
+=item * C<< $msg->update_glossary() >> / C<< $msg->update_glossary($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryRequest>)
+
+Payload for updating a Glossary.
+
+=item * C<< $msg->delete_glossary() >> / C<< $msg->delete_glossary($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryRequest>)
+
+Payload for deleting a Glossary.
+
+=item * C<< $msg->create_glossary_category() >> / C<< $msg->create_glossary_category($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryCategoryRequest>)
+
+Payload for creating a GlossaryCategory.
+
+=item * C<< $msg->update_glossary_category() >> / C<< $msg->update_glossary_category($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryCategoryRequest>)
+
+Payload for updating a GlossaryCategory.
+
+=item * C<< $msg->delete_glossary_category() >> / C<< $msg->delete_glossary_category($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryCategoryRequest>)
+
+Payload for deleting a GlossaryCategory.
+
+=item * C<< $msg->create_glossary_term() >> / C<< $msg->create_glossary_term($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::CreateGlossaryTermRequest>)
+
+Payload for creating a GlossaryTerm.
+
+=item * C<< $msg->update_glossary_term() >> / C<< $msg->update_glossary_term($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::UpdateGlossaryTermRequest>)
+
+Payload for updating a GlossaryTerm.
+
+=item * C<< $msg->delete_glossary_term() >> / C<< $msg->delete_glossary_term($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::BusinessGlossary::DeleteGlossaryTermRequest>)
+
+Payload for deleting a GlossaryTerm.
+
+=item * C<< $msg->data_product_access_request() >> / C<< $msg->data_product_access_request($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::ApprovalWorkflow::DataProductAccessRequest>)
+
+Payload for Data Product access request.
+
+=item * C<< $msg->change_type() >> / C<< $msg->change_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::ChangeRequest::ChangeType>)
+
+Output only. The type of change represented by the change_payload.
+This field is derived from the populated field in the change_payload oneof.
+
+=item * C<< $msg->rejection_comment() >> / C<< $msg->rejection_comment($value) >>
+
+Type: C<String>
+
+Output only. The reason provided for rejecting the ChangeRequest.
+
+=item * C<< $msg->approver() >> / C<< $msg->approver($value) >>
+
+Type: C<String>
+
+Output only. The email address of the user who approved/rejected the
+ChangeRequest.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. This checksum is computed by the service. It can be sent on
+update and delete requests to ensure the client has an up-to-date value
+before proceeding.
+
+=back
+
+=head3 Enum: ChangeRequest::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<NEW> => C<1>
+
+=item * C<APPROVED> => C<2>
+
+=item * C<REJECTED> => C<3>
+
+=item * C<EXPIRED> => C<4>
+
+=item * C<REVOKED> => C<5>
+
+=back
+
+=head3 Enum: ChangeRequest::ChangeType
+
+=over 4
+
+=item * C<CHANGE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<CREATE_ENTRY> => C<1>
+
+=item * C<UPDATE_ENTRY> => C<2>
+
+=item * C<DELETE_ENTRY> => C<3>
+
+=item * C<CREATE_ENTRY_LINK> => C<4>
+
+=item * C<DELETE_ENTRY_LINK> => C<5>
+
+=item * C<CREATE_GLOSSARY> => C<7>
+
+=item * C<UPDATE_GLOSSARY> => C<8>
+
+=item * C<DELETE_GLOSSARY> => C<9>
+
+=item * C<CREATE_GLOSSARY_CATEGORY> => C<10>
+
+=item * C<UPDATE_GLOSSARY_CATEGORY> => C<11>
+
+=item * C<DELETE_GLOSSARY_CATEGORY> => C<13>
+
+=item * C<CREATE_GLOSSARY_TERM> => C<14>
+
+=item * C<UPDATE_GLOSSARY_TERM> => C<15>
+
+=item * C<DELETE_GLOSSARY_TERM> => C<17>
+
+=item * C<REQUEST_DATA_PRODUCT_ACCESS> => C<33>
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::ApprovalWorkflow::DataProductAccessRequest
+
+Message for requesting access to a Data Product. This will be used to
+create a ChangeRequest of type REQUEST_DATA_PRODUCT_ACCESS.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the data product.
+Format:
+projects/{project_number}/locations/{location_id}/dataProducts/{data_product_id}
+
+=item * C<< $msg->access_group_id() >> / C<< $msg->access_group_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the access group for which access is being requested.
+This corresponds to the unique identifier of the AccessGroup defined in the
+Data Product.
+
+=item * C<< $msg->access_group_display_name() >> / C<< $msg->access_group_display_name($value) >>
+
+Type: C<String>
+
+Output only. The display name of the access group defined in the Data
+Product for which access is being requested.
+
+=item * C<< $msg->requested_principal() >> / C<< $msg->requested_principal($value) >>
+
+Type: C<String>
+
+Optional. The principal for which access is being requested in IAM format.
+If not specified, the requestor's principal will be used.
+Example: `serviceAccount:my-sa@my-project.iam.gserviceaccount.com`.
+Only service account principals are currently supported.
+https://cloud.google.com/iam/docs/principal-identifiers
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::ApprovalWorkflow::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

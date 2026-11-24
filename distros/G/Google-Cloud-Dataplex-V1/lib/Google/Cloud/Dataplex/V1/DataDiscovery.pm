@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::DataDiscovery;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -251,82 +251,99 @@ EOF
     # Field: bigquery_publishing_config Type: 11 (.google.cloud.dataplex.v1.DataDiscoverySpec.BigQueryPublishingConfig)
     # Field: storage_config Type: 11 (.google.cloud.dataplex.v1.DataDiscoverySpec.StorageConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoverySpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataDiscovery;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoverySpec->new(
-        bigquery_publishing_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bigquery_publishing_config>
-
-Type: Message (.google.cloud.dataplex.v1.DataDiscoverySpec.BigQueryPublishingConfig)
-
-=item * B<storage_config>
-
-Type: Message (.google.cloud.dataplex.v1.DataDiscoverySpec.StorageConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoveryResult ===
     # Fields for DataDiscoveryResult
     # Field: bigquery_publishing Type: 11 (.google.cloud.dataplex.v1.DataDiscoveryResult.BigQueryPublishing)
     # Field: scan_statistics Type: 11 (.google.cloud.dataplex.v1.DataDiscoveryResult.ScanStatistics)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoveryResult - Compiled Protocol Buffers message class
+Google::Cloud::Dataplex::V1::DataDiscovery - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/data_discovery.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Dataplex::V1::DataDiscovery;
 
-    my $msg = Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoveryResult->new(
-        bigquery_publishing => $value,
-    );
+    my $msg = Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoverySpec->new({
+        bigquery_publishing_config => $bigquery_publishing_config,
+        storage_config => $storage_config,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->bigquery_publishing_config();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoverySpec->parse($bytes);
 
-=item * B<bigquery_publishing>
-
-Type: Message (.google.cloud.dataplex.v1.DataDiscoveryResult.BigQueryPublishing)
-
-=item * B<scan_statistics>
-
-Type: Message (.google.cloud.dataplex.v1.DataDiscoveryResult.ScanStatistics)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataDiscovery - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/data_discovery.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoverySpec
+
+Spec for a data discovery scan.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bigquery_publishing_config() >> / C<< $msg->bigquery_publishing_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoverySpec::BigQueryPublishingConfig>)
+
+Optional. Configuration for metadata publishing.
+
+=item * C<< $msg->storage_config() >> / C<< $msg->storage_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoverySpec::StorageConfig>)
+
+Cloud Storage related configurations.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoveryResult
+
+The output of a data discovery scan.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bigquery_publishing() >> / C<< $msg->bigquery_publishing($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoveryResult::BigQueryPublishing>)
+
+Output only. Configuration for metadata publishing.
+
+=item * C<< $msg->scan_statistics() >> / C<< $msg->scan_statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataDiscovery::DataDiscoveryResult::ScanStatistics>)
+
+Output only. Describes result statistics of a data scan discovery job.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::DataDiscovery::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

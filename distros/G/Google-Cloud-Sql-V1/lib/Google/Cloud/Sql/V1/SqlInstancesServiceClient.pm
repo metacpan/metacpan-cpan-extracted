@@ -10,27 +10,27 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
-use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
-use Google::Cloud::Sql::V1::CloudSqlRegions;
-use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
-use Google::Cloud::Sql::V1::CloudSqlEvents;
 use Google::Cloud::Sql::V1::CloudSqlTiers;
+use Google::Cloud::Sql::V1::CloudSqlIamPolicies;
+use Google::Cloud::Sql::V1::CloudSqlInstanceNames;
+use Google::Cloud::Sql::V1::CloudSqlRegions;
+use Google::Cloud::Sql::V1::CloudSqlEvents;
 use Google::Cloud::Sql::V1::CloudSqlAvailableDatabaseVersions;
+use Google::Cloud::Sql::V1::CloudSqlFeatureEligibility;
 use Google::Cloud::Sql::V1::CloudSqlResources;
-use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
-use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-use Google::Cloud::Sql::V1::CloudSqlConnect;
-use Google::Cloud::Sql::V1::CloudSqlOperations;
-use Google::Cloud::Sql::V1::CloudSqlSslCerts;
-use Google::Cloud::Sql::V1::CloudSqlUsers;
-use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
-use Google::Cloud::Sql::V1::CloudSqlDatabases;
 use Google::Cloud::Sql::V1::CloudSqlInstances;
+use Google::Cloud::Sql::V1::CloudSqlWorkloadCaptures;
+use Google::Cloud::Sql::V1::CloudSqlDatabases;
+use Google::Cloud::Sql::V1::CloudSqlConnect;
+use Google::Cloud::Sql::V1::CloudSqlBlueGreenDeployments;
+use Google::Cloud::Sql::V1::CloudSqlSslCerts;
+use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
+use Google::Cloud::Sql::V1::CloudSqlUsers;
 use Google::Cloud::Sql::V1::CloudSqlFlags;
+use Google::Cloud::Sql::V1::CloudSqlOperations;
 use Google::Cloud::Sql::V1::CloudSqlBackups;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -440,7 +440,7 @@ sub get {
     return $response;
 }
 
-sub import {
+sub import_rpc {
     my ($self, %params) = @_;
 
     my $request_class = 'Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesImportRequest';
@@ -1776,191 +1776,1348 @@ The following RPC methods are available in this client:
 
 =item * B<add_server_ca>
 
-Calls the RPC method C<AddServerCa> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_server_ca(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<AddServerCa> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAddServerCaRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<add_server_certificate>
 
-Calls the RPC method C<AddServerCertificate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_server_certificate(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<AddServerCertificate> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAddServerCertificateRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<add_entra_id_certificate>
 
-Calls the RPC method C<AddEntraIdCertificate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_entra_id_certificate(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<AddEntraIdCertificate> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAddEntraIdCertificateRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<clone>
 
-Calls the RPC method C<Clone> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->clone(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Clone> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesCloneRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesCloneRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        instance                 => $instance,
+        project                  => $project,
+        enable_final_backup      => $enable_final_backup,
+        final_backup_description => $final_backup_description,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesDeleteRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<enable_final_backup> - C<bool>
+
+=item * C<final_backup_description> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<demote_master>
 
-Calls the RPC method C<DemoteMaster> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->demote_master(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<DemoteMaster> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesDemoteMasterRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesDemoteMasterRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<demote>
 
-Calls the RPC method C<Demote> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->demote(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Demote> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesDemoteRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesDemoteRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<export>
 
-Calls the RPC method C<Export> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->export(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Export> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExportRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesExportRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<failover>
 
-Calls the RPC method C<Failover> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->failover(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Failover> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesFailoverRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesFailoverRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<reencrypt>
 
-Calls the RPC method C<Reencrypt> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->reencrypt(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Reencrypt> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReencryptRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesReencryptRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
 
-=item * B<import>
+Calls the RPC method C<Get> on C<google.cloud.sql.v1.SqlInstancesService>.
 
-Calls the RPC method C<Import> on the service. Takes a hash of parameters representing the request.
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::DatabaseInstance>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
+
+=item * B<import_rpc>
+
+    my $response = $client->import_rpc(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Import> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesImportRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesImportRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesInsertRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::DatabaseInstance>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        page_token               => $page_token,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesListRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<list_server_cas>
 
-Calls the RPC method C<ListServerCas> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_server_cas(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ListServerCas> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesListServerCasRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListServerCasResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<list_server_certificates>
 
-Calls the RPC method C<ListServerCertificates> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_server_certificates(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ListServerCertificates> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesListServerCertificatesRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListServerCertificatesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<list_entra_id_certificates>
 
-Calls the RPC method C<ListEntraIdCertificates> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_entra_id_certificates(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ListEntraIdCertificates> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesListEntraIdCertificatesRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesListEntraIdCertificatesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        instance                 => $instance,
+        project                  => $project,
+        reconcile_psc_networking => $reconcile_psc_networking,
+        reconcile_psc_networking_force => $reconcile_psc_networking_force,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPatchRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<reconcile_psc_networking> - C<bool>
+
+=item * C<reconcile_psc_networking_force> - C<bool>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::DatabaseInstance>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<promote_replica>
 
-Calls the RPC method C<PromoteReplica> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->promote_replica(
+        instance                 => $instance,
+        project                  => $project,
+        failover                 => $failover,
+        location                 => $location,
+    );
+
+Calls the RPC method C<PromoteReplica> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPromoteReplicaRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<failover> - C<bool>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<switchover>
 
-Calls the RPC method C<Switchover> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->switchover(
+        instance                 => $instance,
+        project                  => $project,
+        db_timeout               => $db_timeout,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Switchover> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesSwitchoverRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<db_timeout> - L<Google::Protobuf::Duration::Duration>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<reset_ssl_config>
 
-Calls the RPC method C<ResetSslConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->reset_ssl_config(
+        instance                 => $instance,
+        project                  => $project,
+        mode                     => $mode,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ResetSslConfig> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesResetSslConfigRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<mode> - L<Google::Cloud::Sql::V1::CloudSqlInstances::ResetSslMode>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<restart>
 
-Calls the RPC method C<Restart> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->restart(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Restart> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRestartRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<start>
 
-Calls the RPC method C<Start> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Start> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<stop>
 
-Calls the RPC method C<Stop> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stop(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Stop> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStopRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<restore_backup>
 
-Calls the RPC method C<RestoreBackup> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->restore_backup(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<RestoreBackup> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRestoreBackupRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesRestoreBackupRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<rotate_server_ca>
 
-Calls the RPC method C<RotateServerCa> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->rotate_server_ca(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<RotateServerCa> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRotateServerCaRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesRotateServerCaRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<rotate_server_certificate>
 
-Calls the RPC method C<RotateServerCertificate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->rotate_server_certificate(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<RotateServerCertificate> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRotateServerCertificateRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesRotateServerCertificateRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<rotate_entra_id_certificate>
 
-Calls the RPC method C<RotateEntraIdCertificate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->rotate_entra_id_certificate(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<RotateEntraIdCertificate> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRotateEntraIdCertificateRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesRotateEntraIdCertificateRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<start_replica>
 
-Calls the RPC method C<StartReplica> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start_replica(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<StartReplica> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartReplicaRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<stop_replica>
 
-Calls the RPC method C<StopReplica> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stop_replica(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<StopReplica> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStopReplicaRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<truncate_log>
 
-Calls the RPC method C<TruncateLog> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->truncate_log(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<TruncateLog> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesTruncateLogRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesTruncateLogRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<update>
 
-Calls the RPC method C<Update> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<Update> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesUpdateRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::DatabaseInstance>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<create_ephemeral>
 
-Calls the RPC method C<CreateEphemeral> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_ephemeral(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<CreateEphemeral> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesCreateEphemeralCertRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::SslCert>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::SslCertsCreateEphemeralRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<reschedule_maintenance>
 
-Calls the RPC method C<RescheduleMaintenance> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->reschedule_maintenance(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<RescheduleMaintenance> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRescheduleMaintenanceRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesRescheduleMaintenanceRequestBody>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<verify_external_sync_settings>
 
-Calls the RPC method C<VerifyExternalSyncSettings> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->verify_external_sync_settings(
+        instance                 => $instance,
+        project                  => $project,
+        verify_connection_only   => $verify_connection_only,
+        sync_mode                => $sync_mode,
+        verify_replication_only  => $verify_replication_only,
+        migration_type           => $migration_type,
+        sync_parallel_level      => $sync_parallel_level,
+        selected_objects         => [ ... ],
+        location                 => $location,
+    );
+
+Calls the RPC method C<VerifyExternalSyncSettings> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesVerifyExternalSyncSettingsRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesVerifyExternalSyncSettingsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<verify_connection_only> - C<bool>
+
+=item * C<sync_mode> - L<Google::Cloud::Sql::V1::CloudSqlInstances::ExternalSyncMode>
+
+=item * C<verify_replication_only> - C<bool>
+
+=item * C<migration_type> - L<Google::Cloud::Sql::V1::CloudSqlInstances::MigrationType>
+
+=item * C<sync_parallel_level> - L<Google::Cloud::Sql::V1::CloudSqlInstances::ExternalSyncParallelLevel>
+
+=item * C<selected_objects> - ArrayRef of L<Google::Cloud::Sql::V1::CloudSqlInstances::ExternalSyncSelectedObject>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<start_external_sync>
 
-Calls the RPC method C<StartExternalSync> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start_external_sync(
+        instance                 => $instance,
+        project                  => $project,
+        sync_mode                => $sync_mode,
+        skip_verification        => $skip_verification,
+        sync_parallel_level      => $sync_parallel_level,
+        migration_type           => $migration_type,
+        replica_overwrite_enabled => $replica_overwrite_enabled,
+        location                 => $location,
+    );
+
+Calls the RPC method C<StartExternalSync> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesStartExternalSyncRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<sync_mode> - L<SqlInstancesVerifyExternalSyncSettingsRequest::ExternalSyncMode::ExternalSyncMode>
+
+=item * C<skip_verification> - C<bool>
+
+=item * C<sync_parallel_level> - L<Google::Cloud::Sql::V1::CloudSqlInstances::ExternalSyncParallelLevel>
+
+=item * C<migration_type> - L<SqlInstancesVerifyExternalSyncSettingsRequest::MigrationType::MigrationType>
+
+=item * C<replica_overwrite_enabled> - C<bool>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<perform_disk_shrink>
 
-Calls the RPC method C<PerformDiskShrink> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->perform_disk_shrink(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<PerformDiskShrink> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPerformDiskShrinkRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlResources::PerformDiskShrinkContext>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<get_disk_shrink_config>
 
-Calls the RPC method C<GetDiskShrinkConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_disk_shrink_config(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<GetDiskShrinkConfig> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetDiskShrinkConfigRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetDiskShrinkConfigResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<reset_replica_size>
 
-Calls the RPC method C<ResetReplicaSize> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->reset_replica_size(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ResetReplicaSize> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesResetReplicaSizeRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<get_latest_recovery_time>
 
-Calls the RPC method C<GetLatestRecoveryTime> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_latest_recovery_time(
+        instance                 => $instance,
+        project                  => $project,
+        source_instance_deletion_time => $source_instance_deletion_time,
+        location                 => $location,
+    );
+
+Calls the RPC method C<GetLatestRecoveryTime> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetLatestRecoveryTimeRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesGetLatestRecoveryTimeResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<source_instance_deletion_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<execute_sql_read_only>
 
-Calls the RPC method C<ExecuteSqlReadOnly> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->execute_sql_read_only(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ExecuteSqlReadOnly> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlReadOnlyResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::ExecuteSqlReadOnlyPayload>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<execute_sql>
 
-Calls the RPC method C<ExecuteSql> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->execute_sql(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ExecuteSql> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesExecuteSqlResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::ExecuteSqlPayload>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<acquire_ssrs_lease>
 
-Calls the RPC method C<AcquireSsrsLease> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->acquire_ssrs_lease(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<AcquireSsrsLease> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAcquireSsrsLeaseRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesAcquireSsrsLeaseResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesAcquireSsrsLeaseRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<release_ssrs_lease>
 
-Calls the RPC method C<ReleaseSsrsLease> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->release_ssrs_lease(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ReleaseSsrsLease> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReleaseSsrsLeaseRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReleaseSsrsLeaseResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<pre_check_major_version_upgrade>
 
-Calls the RPC method C<PreCheckMajorVersionUpgrade> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->pre_check_major_version_upgrade(
+        instance                 => $instance,
+        project                  => $project,
+        body                     => $body,
+        location                 => $location,
+    );
+
+Calls the RPC method C<PreCheckMajorVersionUpgrade> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPreCheckMajorVersionUpgradeRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<body> - L<Google::Cloud::Sql::V1::CloudSqlInstances::InstancesPreCheckMajorVersionUpgradeRequest>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<point_in_time_restore>
 
-Calls the RPC method C<PointInTimeRestore> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->point_in_time_restore(
+        parent                   => $parent,
+        context                  => $context,
+    );
+
+Calls the RPC method C<PointInTimeRestore> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesPointInTimeRestoreRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<context> - L<Google::Cloud::Sql::V1::CloudSqlInstances::PointInTimeRestoreContext>
+
+=back
 
 =item * B<reconcile_networking>
 
-Calls the RPC method C<ReconcileNetworking> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->reconcile_networking(
+        instance                 => $instance,
+        project                  => $project,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ReconcileNetworking> on C<google.cloud.sql.v1.SqlInstancesService>.
+
+Request: L<Google::Cloud::Sql::V1::CloudSqlInstances::SqlInstancesReconcileNetworkingRequest>
+
+Returns: L<Google::Cloud::Sql::V1::CloudSqlResources::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =back
 

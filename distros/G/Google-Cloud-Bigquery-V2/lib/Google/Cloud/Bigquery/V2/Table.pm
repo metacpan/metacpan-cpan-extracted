@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -804,76 +804,12 @@ EOF
     # Field: replication_status Type: 14 (.google.cloud.bigquery.v2.TableReplicationInfo.ReplicationStatus)
     # Field: replication_error Type: 11 (.google.cloud.bigquery.v2.ErrorProto)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::TableReplicationInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::TableReplicationInfo->new(
-        source_table => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<source_table>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<replication_interval_ms>
-
-Type: Int64
-
-=item * B<replicated_source_last_refresh_time>
-
-Type: Int64
-
-=item * B<replication_status>
-
-Type: Enum (.google.cloud.bigquery.v2.TableReplicationInfo.ReplicationStatus)
-
-=item * B<replication_error>
-
-Type: Message (.google.cloud.bigquery.v2.ErrorProto)
-
-=back
-
-=cut
-
 # Enum: TableReplicationInfo::ReplicationStatus
 our $TableReplicationInfo_REPLICATION_STATUS_UNSPECIFIED = 0;
 our $TableReplicationInfo_ACTIVE = 1;
 our $TableReplicationInfo_SOURCE_DELETED = 2;
 our $TableReplicationInfo_PERMISSION_DENIED = 3;
 our $TableReplicationInfo_UNSUPPORTED_CONFIGURATION = 4;
-
-=pod
-
-=head2 Enum: TableReplicationInfo::ReplicationStatus
-
-Values:
-
-=over 4
-
-=item * C<REPLICATION_STATUS_UNSPECIFIED> => 0
-
-=item * C<ACTIVE> => 1
-
-=item * C<SOURCE_DELETED> => 2
-
-=item * C<PERMISSION_DENIED> => 3
-
-=item * C<UNSUPPORTED_CONFIGURATION> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Table::ViewDefinition ===
     # Fields for ViewDefinition
@@ -884,86 +820,10 @@ Values:
     # Field: privacy_policy Type: 11 (.google.cloud.bigquery.v2.PrivacyPolicy)
     # Field: foreign_definitions Type: 11 (.google.cloud.bigquery.v2.ForeignViewDefinition)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::ViewDefinition - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::ViewDefinition->new(
-        query => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query>
-
-Type: String
-
-=item * B<user_defined_function_resources>
-
-Type: Message (.google.cloud.bigquery.v2.UserDefinedFunctionResource)
-
-=item * B<use_legacy_sql>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<use_explicit_column_names>
-
-Type: Bool
-
-=item * B<privacy_policy>
-
-Type: Message (.google.cloud.bigquery.v2.PrivacyPolicy)
-
-=item * B<foreign_definitions>
-
-Type: Message (.google.cloud.bigquery.v2.ForeignViewDefinition)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Table::ForeignViewDefinition ===
     # Fields for ForeignViewDefinition
     # Field: query Type: 9 ()
     # Field: dialect Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::ForeignViewDefinition - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::ForeignViewDefinition->new(
-        query => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query>
-
-Type: String
-
-=item * B<dialect>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Table::MaterializedViewDefinition ===
     # Fields for MaterializedViewDefinition
@@ -973,192 +833,26 @@ Type: String
     # Field: refresh_interval_ms Type: 11 (.google.protobuf.UInt64Value)
     # Field: allow_non_incremental_definition Type: 11 (.google.protobuf.BoolValue)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::MaterializedViewDefinition - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::MaterializedViewDefinition->new(
-        query => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query>
-
-Type: String
-
-=item * B<last_refresh_time>
-
-Type: Int64
-
-=item * B<enable_refresh>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<refresh_interval_ms>
-
-Type: Message (.google.protobuf.UInt64Value)
-
-=item * B<allow_non_incremental_definition>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Table::MaterializedViewStatus ===
     # Fields for MaterializedViewStatus
     # Field: refresh_watermark Type: 11 (.google.protobuf.Timestamp)
     # Field: last_refresh_status Type: 11 (.google.cloud.bigquery.v2.ErrorProto)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::MaterializedViewStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::MaterializedViewStatus->new(
-        refresh_watermark => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<refresh_watermark>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<last_refresh_status>
-
-Type: Message (.google.cloud.bigquery.v2.ErrorProto)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Table::SnapshotDefinition ===
     # Fields for SnapshotDefinition
     # Field: base_table_reference Type: 11 (.google.cloud.bigquery.v2.TableReference)
     # Field: snapshot_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::SnapshotDefinition - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::SnapshotDefinition->new(
-        base_table_reference => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<base_table_reference>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<snapshot_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Table::CloneDefinition ===
     # Fields for CloneDefinition
     # Field: base_table_reference Type: 11 (.google.cloud.bigquery.v2.TableReference)
     # Field: clone_time Type: 11 (.google.protobuf.Timestamp)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::CloneDefinition - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::CloneDefinition->new(
-        base_table_reference => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<base_table_reference>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<clone_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Table::Streamingbuffer ===
     # Fields for Streamingbuffer
     # Field: estimated_bytes Type: 4 ()
     # Field: estimated_rows Type: 4 ()
     # Field: oldest_entry_time Type: 6 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::Streamingbuffer - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::Streamingbuffer->new(
-        estimated_bytes => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<estimated_bytes>
-
-Type: UInt64
-
-=item * B<estimated_rows>
-
-Type: UInt64
-
-=item * B<oldest_entry_time>
-
-Type: Fixed64
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Table::Table ===
     # Fields for Table
@@ -1214,232 +908,6 @@ Type: Fixed64
     # Field: replicas Type: 11 (.google.cloud.bigquery.v2.TableReference)
     # Field: external_catalog_table_options Type: 11 (.google.cloud.bigquery.v2.ExternalCatalogTableOptions)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::Table - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::Table->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<id>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<table_reference>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<friendly_name>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<description>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.bigquery.v2.Table.LabelsEntry)
-
-=item * B<schema>
-
-Type: Message (.google.cloud.bigquery.v2.TableSchema)
-
-=item * B<time_partitioning>
-
-Type: Message (.google.cloud.bigquery.v2.TimePartitioning)
-
-=item * B<range_partitioning>
-
-Type: Message (.google.cloud.bigquery.v2.RangePartitioning)
-
-=item * B<clustering>
-
-Type: Message (.google.cloud.bigquery.v2.Clustering)
-
-=item * B<require_partition_filter>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<partition_definition>
-
-Type: Message (.google.cloud.bigquery.v2.PartitioningDefinition)
-
-=item * B<num_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_physical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_long_term_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_rows>
-
-Type: Message (.google.protobuf.UInt64Value)
-
-=item * B<creation_time>
-
-Type: Int64
-
-=item * B<expiration_time>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<last_modified_time>
-
-Type: Fixed64
-
-=item * B<type>
-
-Type: String
-
-=item * B<view>
-
-Type: Message (.google.cloud.bigquery.v2.ViewDefinition)
-
-=item * B<materialized_view>
-
-Type: Message (.google.cloud.bigquery.v2.MaterializedViewDefinition)
-
-=item * B<materialized_view_status>
-
-Type: Message (.google.cloud.bigquery.v2.MaterializedViewStatus)
-
-=item * B<external_data_configuration>
-
-Type: Message (.google.cloud.bigquery.v2.ExternalDataConfiguration)
-
-=item * B<biglake_configuration>
-
-Type: Message (.google.cloud.bigquery.v2.BigLakeConfiguration)
-
-=item * B<managed_table_type>
-
-Type: Enum (.google.cloud.bigquery.v2.ManagedTableType)
-
-=item * B<location>
-
-Type: String
-
-=item * B<streaming_buffer>
-
-Type: Message (.google.cloud.bigquery.v2.Streamingbuffer)
-
-=item * B<encryption_configuration>
-
-Type: Message (.google.cloud.bigquery.v2.EncryptionConfiguration)
-
-=item * B<snapshot_definition>
-
-Type: Message (.google.cloud.bigquery.v2.SnapshotDefinition)
-
-=item * B<default_collation>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<default_rounding_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.TableFieldSchema.RoundingMode)
-
-=item * B<clone_definition>
-
-Type: Message (.google.cloud.bigquery.v2.CloneDefinition)
-
-=item * B<num_time_travel_physical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_total_logical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_active_logical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_long_term_logical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_current_physical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_total_physical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_active_physical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_long_term_physical_bytes>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<num_partitions>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<max_staleness>
-
-Type: String
-
-=item * B<restrictions>
-
-Type: Message (.google.cloud.bigquery.v2.RestrictionConfig)
-
-=item * B<table_constraints>
-
-Type: Message (.google.cloud.bigquery.v2.TableConstraints)
-
-=item * B<resource_tags>
-
-Type: Message (.google.cloud.bigquery.v2.Table.ResourceTagsEntry)
-
-=item * B<table_replication_info>
-
-Type: Message (.google.cloud.bigquery.v2.TableReplicationInfo)
-
-=item * B<replicas>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<external_catalog_table_options>
-
-Type: Message (.google.cloud.bigquery.v2.ExternalCatalogTableOptions)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Table::GetTableRequest ===
     # Fields for GetTableRequest
     # Field: project_id Type: 9 ()
@@ -1448,113 +916,17 @@ Type: Message (.google.cloud.bigquery.v2.ExternalCatalogTableOptions)
     # Field: selected_fields Type: 9 ()
     # Field: view Type: 14 (.google.cloud.bigquery.v2.GetTableRequest.TableMetadataView)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::GetTableRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::GetTableRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=item * B<selected_fields>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.cloud.bigquery.v2.GetTableRequest.TableMetadataView)
-
-=back
-
-=cut
-
 # Enum: GetTableRequest::TableMetadataView
 our $GetTableRequest_TABLE_METADATA_VIEW_UNSPECIFIED = 0;
 our $GetTableRequest_BASIC = 1;
 our $GetTableRequest_STORAGE_STATS = 2;
 our $GetTableRequest_FULL = 3;
 
-=pod
-
-=head2 Enum: GetTableRequest::TableMetadataView
-
-Values:
-
-=over 4
-
-=item * C<TABLE_METADATA_VIEW_UNSPECIFIED> => 0
-
-=item * C<BASIC> => 1
-
-=item * C<STORAGE_STATS> => 2
-
-=item * C<FULL> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Table::InsertTableRequest ===
     # Fields for InsertTableRequest
     # Field: project_id Type: 9 ()
     # Field: dataset_id Type: 9 ()
     # Field: table Type: 11 (.google.cloud.bigquery.v2.Table)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::InsertTableRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::InsertTableRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table>
-
-Type: Message (.google.cloud.bigquery.v2.Table)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Table::UpdateOrPatchTableRequest ===
     # Fields for UpdateOrPatchTableRequest
@@ -1564,87 +936,11 @@ Type: Message (.google.cloud.bigquery.v2.Table)
     # Field: table Type: 11 (.google.cloud.bigquery.v2.Table)
     # Field: autodetect_schema Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::UpdateOrPatchTableRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::UpdateOrPatchTableRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=item * B<table>
-
-Type: Message (.google.cloud.bigquery.v2.Table)
-
-=item * B<autodetect_schema>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Table::DeleteTableRequest ===
     # Fields for DeleteTableRequest
     # Field: project_id Type: 9 ()
     # Field: dataset_id Type: 9 ()
     # Field: table_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::DeleteTableRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::DeleteTableRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Table::ListTablesRequest ===
     # Fields for ListTablesRequest
@@ -1653,78 +949,10 @@ Type: String
     # Field: max_results Type: 11 (.google.protobuf.UInt32Value)
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::ListTablesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::ListTablesRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<max_results>
-
-Type: Message (.google.protobuf.UInt32Value)
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Table::ListFormatView ===
     # Fields for ListFormatView
     # Field: use_legacy_sql Type: 11 (.google.protobuf.BoolValue)
     # Field: privacy_policy Type: 11 (.google.cloud.bigquery.v2.PrivacyPolicy)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::ListFormatView - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::ListFormatView->new(
-        use_legacy_sql => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<use_legacy_sql>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<privacy_policy>
-
-Type: Message (.google.cloud.bigquery.v2.PrivacyPolicy)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Table::ListFormatTable ===
     # Fields for ListFormatTable
@@ -1742,80 +970,6 @@ Type: Message (.google.cloud.bigquery.v2.PrivacyPolicy)
     # Field: expiration_time Type: 3 ()
     # Field: require_partition_filter Type: 11 (.google.protobuf.BoolValue)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::ListFormatTable - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::ListFormatTable->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<id>
-
-Type: String
-
-=item * B<table_reference>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<friendly_name>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<type>
-
-Type: String
-
-=item * B<time_partitioning>
-
-Type: Message (.google.cloud.bigquery.v2.TimePartitioning)
-
-=item * B<range_partitioning>
-
-Type: Message (.google.cloud.bigquery.v2.RangePartitioning)
-
-=item * B<clustering>
-
-Type: Message (.google.cloud.bigquery.v2.Clustering)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.bigquery.v2.ListFormatTable.LabelsEntry)
-
-=item * B<view>
-
-Type: Message (.google.cloud.bigquery.v2.ListFormatView)
-
-=item * B<creation_time>
-
-Type: Int64
-
-=item * B<expiration_time>
-
-Type: Int64
-
-=item * B<require_partition_filter>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Table::TableList ===
     # Fields for TableList
     # Field: kind Type: 9 ()
@@ -1824,70 +978,20 @@ Type: Message (.google.protobuf.BoolValue)
     # Field: tables Type: 11 (.google.cloud.bigquery.v2.ListFormatTable)
     # Field: total_items Type: 11 (.google.protobuf.Int32Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Table::TableList - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Table;
-
-    my $msg = Google::Cloud::Bigquery::V2::Table::TableList->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<tables>
-
-Type: Message (.google.cloud.bigquery.v2.ListFormatTable)
-
-=item * B<total_items>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Bigquery::V2::Table::TableServiceClient ===
 package Google::Cloud::Bigquery::V2::Table::TableServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Bigquery::V2::Table::TableServiceClient
 
-Google::Cloud::Bigquery::V2::Table::TableServiceClient - Client stub representing the remote TableService service
+Client stub representing the remote C<TableService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1994,13 +1098,1108 @@ sub list_tables {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::Table - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::Table - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/table.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::Table;
+
+    my $msg = Google::Cloud::Bigquery::V2::Table::TableReplicationInfo->new({
+        source_table => $source_table,
+        replication_interval_ms => $replication_interval_ms,
+        replicated_source_last_refresh_time => $replicated_source_last_refresh_time,
+        replication_status => $replication_status,
+    });
+
+    # Read or update a field
+    my $val = $msg->source_table();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::Table::TableReplicationInfo->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/table.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::Table::TableReplicationInfo
+
+Replication info of a table created using `AS REPLICA` DDL like:
+`CREATE MATERIALIZED VIEW mv1 AS REPLICA OF src_mv`
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->source_table() >> / C<< $msg->source_table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Required. Source table reference that is replicated.
+
+=item * C<< $msg->replication_interval_ms() >> / C<< $msg->replication_interval_ms($value) >>
+
+Type: C<Int64>
+
+Optional. Specifies the interval at which the source table is polled for
+updates.
+It's Optional. If not specified, default replication interval would be
+applied.
+
+=item * C<< $msg->replicated_source_last_refresh_time() >> / C<< $msg->replicated_source_last_refresh_time($value) >>
+
+Type: C<Int64>
+
+Optional. Output only. If source is a materialized view, this field
+signifies the last refresh time of the source.
+
+=item * C<< $msg->replication_status() >> / C<< $msg->replication_status($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::TableReplicationInfo::ReplicationStatus>)
+
+Optional. Output only. Replication status of configured replication.
+
+=item * C<< $msg->replication_error() >> / C<< $msg->replication_error($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Error::ErrorProto>)
+
+Optional. Output only. Replication error that will permanently stopped
+table replication.
+
+=back
+
+=head3 Enum: TableReplicationInfo::ReplicationStatus
+
+=over 4
+
+=item * C<REPLICATION_STATUS_UNSPECIFIED> => C<0>
+
+=item * C<ACTIVE> => C<1>
+
+=item * C<SOURCE_DELETED> => C<2>
+
+=item * C<PERMISSION_DENIED> => C<3>
+
+=item * C<UNSUPPORTED_CONFIGURATION> => C<4>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::ViewDefinition
+
+Describes the definition of a logical view.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Required. A query that BigQuery executes when the view is referenced.
+
+=item * C<< $msg->user_defined_function_resources() >> / C<< $msg->user_defined_function_resources($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::UdfResource::UserDefinedFunctionResource>)
+
+Describes user-defined function resources used in the query.
+
+=item * C<< $msg->use_legacy_sql() >> / C<< $msg->use_legacy_sql($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Specifies whether to use BigQuery's legacy SQL for this view.
+The default value is true. If set to false, the view uses
+BigQuery's
+[GoogleSQL](https://docs.cloud.google.com/bigquery/docs/introduction-sql).
+
+Queries and views that reference this view must use the same flag value.
+A wrapper is used here because the default value is True.
+
+=item * C<< $msg->use_explicit_column_names() >> / C<< $msg->use_explicit_column_names($value) >>
+
+Type: C<Bool>
+
+True if the column names are explicitly specified. For example by using the
+'CREATE VIEW v(c1, c2) AS ...' syntax.
+Can only be set for GoogleSQL views.
+
+=item * C<< $msg->privacy_policy() >> / C<< $msg->privacy_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::PrivacyPolicy::PrivacyPolicy>)
+
+Optional. Specifies the privacy policy for the view.
+
+=item * C<< $msg->foreign_definitions() >> / C<< $msg->foreign_definitions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::ForeignViewDefinition>)
+
+Optional. Foreign view representations.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::ForeignViewDefinition
+
+A view can be represented in multiple ways. Each representation has its own
+dialect. This message stores the metadata required for these representations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Required. The query that defines the view.
+
+=item * C<< $msg->dialect() >> / C<< $msg->dialect($value) >>
+
+Type: C<String>
+
+Optional. Represents the dialect of the query.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::MaterializedViewDefinition
+
+Definition and configuration of a materialized view.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Required. A query whose results are persisted.
+
+=item * C<< $msg->last_refresh_time() >> / C<< $msg->last_refresh_time($value) >>
+
+Type: C<Int64>
+
+Output only. The time when this materialized view was last refreshed, in
+milliseconds since the epoch.
+
+=item * C<< $msg->enable_refresh() >> / C<< $msg->enable_refresh($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Enable automatic refresh of the materialized view when the base
+table is updated. The default value is "true".
+
+=item * C<< $msg->refresh_interval_ms() >> / C<< $msg->refresh_interval_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt64Value>)
+
+Optional. The maximum frequency at which this materialized view will be
+refreshed. The default value is "1800000" (30 minutes).
+
+=item * C<< $msg->allow_non_incremental_definition() >> / C<< $msg->allow_non_incremental_definition($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. This option declares the intention to construct a materialized
+view that isn't refreshed incrementally. Non-incremental materialized views
+support an expanded range of SQL queries. The
+`allow_non_incremental_definition` option can't be changed after the
+materialized view is created.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::MaterializedViewStatus
+
+Status of a materialized view.
+The last refresh timestamp status is omitted here, but is present in the
+MaterializedViewDefinition message.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->refresh_watermark() >> / C<< $msg->refresh_watermark($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Refresh watermark of materialized view. The base tables' data
+were collected into the materialized view cache until this time.
+
+=item * C<< $msg->last_refresh_status() >> / C<< $msg->last_refresh_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Error::ErrorProto>)
+
+Output only. Error result of the last automatic refresh. If present,
+indicates that the last automatic refresh was unsuccessful.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::SnapshotDefinition
+
+Information about base table and snapshot time of the snapshot.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->base_table_reference() >> / C<< $msg->base_table_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Required. Reference describing the ID of the table that was snapshot.
+
+=item * C<< $msg->snapshot_time() >> / C<< $msg->snapshot_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Required. The time at which the base table was snapshot. This value is
+reported in the JSON response using RFC3339 format.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::CloneDefinition
+
+Information about base table and clone time of a table clone.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->base_table_reference() >> / C<< $msg->base_table_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Required. Reference describing the ID of the table that was cloned.
+
+=item * C<< $msg->clone_time() >> / C<< $msg->clone_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Required. The time at which the base table was cloned. This value is
+reported in the JSON response using RFC3339 format.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::Streamingbuffer
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->estimated_bytes() >> / C<< $msg->estimated_bytes($value) >>
+
+Type: C<UInt64>
+
+Output only. A lower-bound estimate of the number of bytes currently in
+the streaming buffer.
+
+=item * C<< $msg->estimated_rows() >> / C<< $msg->estimated_rows($value) >>
+
+Type: C<UInt64>
+
+Output only. A lower-bound estimate of the number of rows currently in the
+streaming buffer.
+
+=item * C<< $msg->oldest_entry_time() >> / C<< $msg->oldest_entry_time($value) >>
+
+Type: C<Fixed64>
+
+Output only. Contains the timestamp of the oldest entry in the streaming
+buffer, in milliseconds since the epoch, if the streaming buffer is
+available.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::Table
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The type of resource ID.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. A hash of this resource.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Output only. An opaque ID uniquely identifying the table.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+Output only. A URL that can be used to access this resource again.
+
+=item * C<< $msg->table_reference() >> / C<< $msg->table_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Required. Reference describing the ID of this table.
+
+=item * C<< $msg->friendly_name() >> / C<< $msg->friendly_name($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. A descriptive name for this table.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. A user-friendly description of this table.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::Table::LabelsEntry>)
+
+The labels associated with this table. You can use these to organize and
+group your tables. Label keys and values can be no longer than 63
+characters, can only contain lowercase letters, numeric characters,
+underscores and dashes. International characters are allowed. Label values
+are optional. Label keys must start with a letter and each label in the
+list must have a different key.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableSchema>)
+
+Optional. Describes the schema of this table.
+
+=item * C<< $msg->time_partitioning() >> / C<< $msg->time_partitioning($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TimePartitioning::TimePartitioning>)
+
+If specified, configures time-based partitioning for this table.
+
+=item * C<< $msg->range_partitioning() >> / C<< $msg->range_partitioning($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RangePartitioning::RangePartitioning>)
+
+If specified, configures range partitioning for this table.
+
+=item * C<< $msg->clustering() >> / C<< $msg->clustering($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Clustering::Clustering>)
+
+Clustering specification for the table. Must be specified with time-based
+partitioning, data in the table will be first partitioned and subsequently
+clustered.
+
+=item * C<< $msg->require_partition_filter() >> / C<< $msg->require_partition_filter($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If set to true, queries over this table require
+a partition filter that can be used for partition elimination to be
+specified.
+
+=item * C<< $msg->partition_definition() >> / C<< $msg->partition_definition($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitioningDefinition>)
+
+Optional. The partition information for all table formats, including
+managed partitioned tables, hive partitioned tables, iceberg partitioned,
+and metastore partitioned tables. This field is only populated for
+metastore partitioned tables. For other table formats, this is an output
+only field.
+
+=item * C<< $msg->num_bytes() >> / C<< $msg->num_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The size of this table in logical bytes, excluding any data in
+the streaming buffer.
+
+=item * C<< $msg->num_physical_bytes() >> / C<< $msg->num_physical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The physical size of this table in bytes. This includes
+storage used for time travel.
+
+=item * C<< $msg->num_long_term_bytes() >> / C<< $msg->num_long_term_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The number of logical bytes in the table that are considered
+"long-term storage".
+
+=item * C<< $msg->num_rows() >> / C<< $msg->num_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt64Value>)
+
+Output only. The number of rows of data in this table, excluding any data
+in the streaming buffer.
+
+=item * C<< $msg->creation_time() >> / C<< $msg->creation_time($value) >>
+
+Type: C<Int64>
+
+Output only. The time when this table was created, in milliseconds since
+the epoch.
+
+=item * C<< $msg->expiration_time() >> / C<< $msg->expiration_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. The time when this table expires, in milliseconds since the
+epoch. If not present, the table will persist indefinitely. Expired tables
+will be deleted and their storage reclaimed.  The defaultTableExpirationMs
+property of the encapsulating dataset can be used to set a default
+expirationTime on newly created tables.
+
+=item * C<< $msg->last_modified_time() >> / C<< $msg->last_modified_time($value) >>
+
+Type: C<Fixed64>
+
+Output only. The time when this table was last modified, in milliseconds
+since the epoch.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+Output only. Describes the table type. The following values are supported:
+
+* `TABLE`: A normal BigQuery table.
+* `VIEW`: A virtual table defined by a SQL query.
+* `EXTERNAL`: A table that references data stored in an external storage
+  system, such as Google Cloud Storage.
+* `MATERIALIZED_VIEW`: A precomputed view defined by a SQL query.
+* `SNAPSHOT`: An immutable BigQuery table that preserves the contents of a
+  base table at a particular time. See additional information on
+  [table
+  snapshots](https://cloud.google.com/bigquery/docs/table-snapshots-intro).
+
+The default value is `TABLE`.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::ViewDefinition>)
+
+Optional. The view definition.
+
+=item * C<< $msg->materialized_view() >> / C<< $msg->materialized_view($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::MaterializedViewDefinition>)
+
+Optional. The materialized view definition.
+
+=item * C<< $msg->materialized_view_status() >> / C<< $msg->materialized_view_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::MaterializedViewStatus>)
+
+Output only. The materialized view status.
+
+=item * C<< $msg->external_data_configuration() >> / C<< $msg->external_data_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::ExternalDataConfiguration>)
+
+Optional. Describes the data format, location, and other properties of
+a table stored outside of BigQuery. By defining these properties, the data
+source can then be queried as if it were a standard BigQuery table.
+
+=item * C<< $msg->biglake_configuration() >> / C<< $msg->biglake_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::BiglakeConfig::BigLakeConfiguration>)
+
+Optional. Specifies the configuration of a BigQuery table for Apache
+Iceberg.
+
+=item * C<< $msg->managed_table_type() >> / C<< $msg->managed_table_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ManagedTableType>)
+
+Optional. If set, overrides the default managed table type configured in
+the dataset.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Output only. The geographic location where the table resides. This value
+is inherited from the dataset.
+
+=item * C<< $msg->streaming_buffer() >> / C<< $msg->streaming_buffer($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::Streamingbuffer>)
+
+Output only. Contains information regarding this table's streaming buffer,
+if one is present. This field will be absent if the table is not being
+streamed to or if there is no data in the streaming buffer.
+
+=item * C<< $msg->encryption_configuration() >> / C<< $msg->encryption_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration>)
+
+Custom encryption configuration (e.g., Cloud KMS keys).
+
+=item * C<< $msg->snapshot_definition() >> / C<< $msg->snapshot_definition($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::SnapshotDefinition>)
+
+Output only. Contains information about the snapshot. This value is set via
+snapshot creation.
+
+=item * C<< $msg->default_collation() >> / C<< $msg->default_collation($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. Defines the default collation specification of new STRING fields
+in the table. During table creation or update, if a STRING field is added
+to this table without explicit collation specified, then the table inherits
+the table default collation. A change to this field affects only fields
+added afterwards, and does not alter the existing fields.
+The following values are supported:
+
+* 'und:ci': undetermined locale, case insensitive.
+* '': empty string. Default to case-sensitive behavior.
+
+=item * C<< $msg->default_rounding_mode() >> / C<< $msg->default_rounding_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::TableFieldSchema::RoundingMode>)
+
+Optional. Defines the default rounding mode specification of new decimal
+fields (NUMERIC OR BIGNUMERIC) in the table. During table creation or
+update, if a decimal field is added to this table without an explicit
+rounding mode specified, then the field inherits the table default
+rounding mode. Changing this field doesn't affect existing fields.
+
+=item * C<< $msg->clone_definition() >> / C<< $msg->clone_definition($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::CloneDefinition>)
+
+Output only. Contains information about the clone. This value is set via
+the clone operation.
+
+=item * C<< $msg->num_time_travel_physical_bytes() >> / C<< $msg->num_time_travel_physical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of physical bytes used by time travel storage (deleted
+or changed data). This data is not kept in real time, and might be delayed
+by a few seconds to a few minutes.
+
+=item * C<< $msg->num_total_logical_bytes() >> / C<< $msg->num_total_logical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Total number of logical bytes in the table or materialized
+view.
+
+=item * C<< $msg->num_active_logical_bytes() >> / C<< $msg->num_active_logical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of logical bytes that are less than 90 days old.
+
+=item * C<< $msg->num_long_term_logical_bytes() >> / C<< $msg->num_long_term_logical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of logical bytes that are more than 90 days old.
+
+=item * C<< $msg->num_current_physical_bytes() >> / C<< $msg->num_current_physical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of physical bytes used by current live data storage.
+This data is not kept in real time, and might be delayed by a few seconds
+to a few minutes.
+
+=item * C<< $msg->num_total_physical_bytes() >> / C<< $msg->num_total_physical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The physical size of this table in bytes. This also includes
+storage used for time travel. This data is not kept in real time, and might
+be delayed by a few seconds to a few minutes.
+
+=item * C<< $msg->num_active_physical_bytes() >> / C<< $msg->num_active_physical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of physical bytes less than 90 days old. This data is
+not kept in real time, and might be delayed by a few seconds to a few
+minutes.
+
+=item * C<< $msg->num_long_term_physical_bytes() >> / C<< $msg->num_long_term_physical_bytes($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. Number of physical bytes more than 90 days old.
+This data is not kept in real time, and might be delayed by a few seconds
+to a few minutes.
+
+=item * C<< $msg->num_partitions() >> / C<< $msg->num_partitions($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The number of partitions present in the table or materialized
+view. This data is not kept in real time, and might be delayed by a few
+seconds to a few minutes.
+
+=item * C<< $msg->max_staleness() >> / C<< $msg->max_staleness($value) >>
+
+Type: C<String>
+
+Optional. The maximum staleness of data that could be returned when the
+table (or stale MV) is queried. Staleness encoded as a string encoding
+of sql IntervalValue type.
+
+=item * C<< $msg->restrictions() >> / C<< $msg->restrictions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig>)
+
+Optional. Output only. Restriction config for table. If set, restrict
+certain accesses on the table based on the config. See [Data
+egress](https://cloud.google.com/bigquery/docs/analytics-hub-introduction#data_egress)
+for more details.
+
+=item * C<< $msg->table_constraints() >> / C<< $msg->table_constraints($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableConstraints::TableConstraints>)
+
+Optional. Tables Primary Key and Foreign Key information
+
+=item * C<< $msg->resource_tags() >> / C<< $msg->resource_tags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::Table::ResourceTagsEntry>)
+
+Optional. The [tags](https://cloud.google.com/bigquery/docs/tags) attached
+to this table. Tag keys are globally unique. Tag key is expected to be in
+the namespaced format, for example "123456789012/environment" where
+123456789012 is the ID of the parent organization or project resource for
+this tag key. Tag value is expected to be the short name, for example
+"Production". See [Tag
+definitions](https://cloud.google.com/iam/docs/tags-access-control#definitions)
+for more details.
+
+=item * C<< $msg->table_replication_info() >> / C<< $msg->table_replication_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::TableReplicationInfo>)
+
+Optional. Table replication info for table created `AS REPLICA` DDL like:
+`CREATE MATERIALIZED VIEW mv1 AS REPLICA OF src_mv`
+
+=item * C<< $msg->replicas() >> / C<< $msg->replicas($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+Optional. Output only. Table references of all replicas currently active on
+the table.
+
+=item * C<< $msg->external_catalog_table_options() >> / C<< $msg->external_catalog_table_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions::ExternalCatalogTableOptions>)
+
+Optional. Options defining open source compatible table.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::GetTableRequest
+
+Request format for getting table metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the requested table
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the requested table
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. Table ID of the requested table
+
+=item * C<< $msg->selected_fields() >> / C<< $msg->selected_fields($value) >>
+
+Type: C<String>
+
+List of table schema fields to return (comma-separated).
+If unspecified, all fields are returned.
+A fieldMask cannot be used here because the fields will automatically be
+converted from camelCase to snake_case and the conversion will fail if
+there are underscores. Since these are fields in BigQuery table schemas,
+underscores are allowed.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::GetTableRequest::TableMetadataView>)
+
+Optional. Specifies the view that determines which table information is
+returned. By default, basic table information and storage statistics
+(STORAGE_STATS) are returned.
+
+=back
+
+=head3 Enum: GetTableRequest::TableMetadataView
+
+=over 4
+
+=item * C<TABLE_METADATA_VIEW_UNSPECIFIED> => C<0>
+
+=item * C<BASIC> => C<1>
+
+=item * C<STORAGE_STATS> => C<2>
+
+=item * C<FULL> => C<3>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::InsertTableRequest
+
+Request format for inserting table metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the new table
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the new table
+
+=item * C<< $msg->table() >> / C<< $msg->table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::Table>)
+
+Required. A tables resource to insert
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::UpdateOrPatchTableRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the table to update
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the table to update
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. Table ID of the table to update
+
+=item * C<< $msg->table() >> / C<< $msg->table($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::Table>)
+
+Required. A tables resource which will replace or patch the specified table
+
+=item * C<< $msg->autodetect_schema() >> / C<< $msg->autodetect_schema($value) >>
+
+Type: C<Bool>
+
+Optional. When true will autodetect schema, else will keep original schema.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::DeleteTableRequest
+
+Request format for deleting a table.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the table to delete
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the table to delete
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. Table ID of the table to delete
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::ListTablesRequest
+
+Request format for enumerating tables.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the tables to list
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the tables to list
+
+=item * C<< $msg->max_results() >> / C<< $msg->max_results($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt32Value>)
+
+The maximum number of results to return in a single response page.
+Leverage the page tokens to iterate through the entire collection.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Page token, returned by a previous call, to request the next page of
+results
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::ListFormatView
+
+Information about a logical view.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->use_legacy_sql() >> / C<< $msg->use_legacy_sql($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+True if view is defined in legacy SQL dialect,
+false if in GoogleSQL.
+
+=item * C<< $msg->privacy_policy() >> / C<< $msg->privacy_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::PrivacyPolicy::PrivacyPolicy>)
+
+Specifies the privacy policy for the view.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::ListFormatTable
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The resource type.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+An opaque ID of the table.
+
+=item * C<< $msg->table_reference() >> / C<< $msg->table_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+A reference uniquely identifying table.
+
+=item * C<< $msg->friendly_name() >> / C<< $msg->friendly_name($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+The user-friendly name for this table.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+The type of table.
+
+=item * C<< $msg->time_partitioning() >> / C<< $msg->time_partitioning($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TimePartitioning::TimePartitioning>)
+
+The time-based partitioning for this table.
+
+=item * C<< $msg->range_partitioning() >> / C<< $msg->range_partitioning($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RangePartitioning::RangePartitioning>)
+
+The range partitioning for this table.
+
+=item * C<< $msg->clustering() >> / C<< $msg->clustering($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Clustering::Clustering>)
+
+Clustering specification for this table, if configured.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::ListFormatTable::LabelsEntry>)
+
+The labels associated with this table. You can use these to organize
+and group your tables.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::ListFormatView>)
+
+Additional details for a view.
+
+=item * C<< $msg->creation_time() >> / C<< $msg->creation_time($value) >>
+
+Type: C<Int64>
+
+Output only. The time when this table was created, in milliseconds since
+the epoch.
+
+=item * C<< $msg->expiration_time() >> / C<< $msg->expiration_time($value) >>
+
+Type: C<Int64>
+
+The time when this table expires, in milliseconds since the
+epoch. If not present, the table will persist indefinitely. Expired tables
+will be deleted and their storage reclaimed.
+
+=item * C<< $msg->require_partition_filter() >> / C<< $msg->require_partition_filter($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If set to true, queries including this table must specify a
+partition filter. This filter is used for partition elimination.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Table::TableList
+
+Partial projection of the metadata for a given table in a list response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The type of list.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+A hash of this page of results.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to request the next page of results.
+
+=item * C<< $msg->tables() >> / C<< $msg->tables($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Table::ListFormatTable>)
+
+Tables in the requested dataset.
+
+=item * C<< $msg->total_items() >> / C<< $msg->total_items($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+The total number of tables in the dataset.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::Table::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

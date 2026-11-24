@@ -1,0 +1,12 @@
+Changes
+FAISS.xs
+faiss_bridge.cc
+faiss_bridge.h
+lib/PDL/FAISS.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.md
+t/00-load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

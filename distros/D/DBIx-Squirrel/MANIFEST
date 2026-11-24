@@ -62,5 +62,6 @@ xt/ekorn-tooling.t
 xt/examples.t
 xt/manuals.t
 xt/reference-index.t
+xt/spelling.t
 META.yml
 MANIFEST

@@ -10,15 +10,15 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Bigquery::Storage::V1::Avro;
 use Google::Cloud::Bigquery::Storage::V1::Arrow;
+use Google::Cloud::Bigquery::Storage::V1::Avro;
 use Google::Cloud::Bigquery::Storage::V1::Annotations;
 use Google::Cloud::Bigquery::Storage::V1::Protobuf;
 use Google::Cloud::Bigquery::Storage::V1::Table;
 use Google::Cloud::Bigquery::Storage::V1::Stream;
 use Google::Cloud::Bigquery::Storage::V1::Storage;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -176,7 +176,32 @@ The following RPC methods are available in this client:
 
 =item * B<create_read_session>
 
-Calls the RPC method C<CreateReadSession> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_read_session(
+        parent                   => $parent,
+        read_session             => $read_session,
+        max_stream_count         => $max_stream_count,
+        preferred_min_stream_count => $preferred_min_stream_count,
+    );
+
+Calls the RPC method C<CreateReadSession> on C<google.cloud.bigquery.storage.v1.BigQueryRead>.
+
+Request: L<Google::Cloud::Bigquery::Storage::V1::Storage::CreateReadSessionRequest>
+
+Returns: L<Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<read_session> - L<Google::Cloud::Bigquery::Storage::V1::Stream::ReadSession>
+
+=item * C<max_stream_count> - C<int32>
+
+=item * C<preferred_min_stream_count> - C<int32>
+
+=back
 
 =back
 

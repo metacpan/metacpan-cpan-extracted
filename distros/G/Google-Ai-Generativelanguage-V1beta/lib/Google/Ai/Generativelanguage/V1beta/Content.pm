@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::Content;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -748,36 +748,6 @@ EOF
     # Field: parts Type: 11 (.google.ai.generativelanguage.v1beta.Part)
     # Field: role Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::Content - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::Content->new(
-        parts => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parts>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Part)
-
-=item * B<role>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::Part ===
     # Fields for Part
     # Field: text Type: 9 ()
@@ -792,206 +762,24 @@ Type: String
     # Field: thought_signature Type: 12 ()
     # Field: part_metadata Type: 11 (.google.protobuf.Struct)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::Part - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::Part->new(
-        text => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<text>
-
-Type: String
-
-=item * B<inline_data>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Blob)
-
-=item * B<function_call>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FunctionCall)
-
-=item * B<function_response>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FunctionResponse)
-
-=item * B<file_data>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FileData)
-
-=item * B<executable_code>
-
-Type: Message (.google.ai.generativelanguage.v1beta.ExecutableCode)
-
-=item * B<code_execution_result>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CodeExecutionResult)
-
-=item * B<video_metadata>
-
-Type: Message (.google.ai.generativelanguage.v1beta.VideoMetadata)
-
-=item * B<thought>
-
-Type: Bool
-
-=item * B<thought_signature>
-
-Type: Bytes
-
-=item * B<part_metadata>
-
-Type: Message (.google.protobuf.Struct)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::FunctionResponsePart ===
     # Fields for FunctionResponsePart
     # Field: inline_data Type: 11 (.google.ai.generativelanguage.v1beta.FunctionResponseBlob)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::FunctionResponsePart - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::FunctionResponsePart->new(
-        inline_data => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<inline_data>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FunctionResponseBlob)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::Blob ===
     # Fields for Blob
     # Field: mime_type Type: 9 ()
     # Field: data Type: 12 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::Blob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::Blob->new(
-        mime_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mime_type>
-
-Type: String
-
-=item * B<data>
-
-Type: Bytes
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::FunctionResponseBlob ===
     # Fields for FunctionResponseBlob
     # Field: mime_type Type: 9 ()
     # Field: data Type: 12 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::FunctionResponseBlob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::FunctionResponseBlob->new(
-        mime_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mime_type>
-
-Type: String
-
-=item * B<data>
-
-Type: Bytes
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::FileData ===
     # Fields for FileData
     # Field: mime_type Type: 9 ()
     # Field: file_uri Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::FileData - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::FileData->new(
-        mime_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mime_type>
-
-Type: String
-
-=item * B<file_uri>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::VideoMetadata ===
     # Fields for VideoMetadata
@@ -999,155 +787,25 @@ Type: String
     # Field: end_offset Type: 11 (.google.protobuf.Duration)
     # Field: fps Type: 1 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::VideoMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::VideoMetadata->new(
-        start_offset => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start_offset>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<end_offset>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<fps>
-
-Type: Double
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::ExecutableCode ===
     # Fields for ExecutableCode
     # Field: language Type: 14 (.google.ai.generativelanguage.v1beta.ExecutableCode.Language)
     # Field: code Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::ExecutableCode - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::ExecutableCode->new(
-        language => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<language>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.ExecutableCode.Language)
-
-=item * B<code>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: ExecutableCode::Language
 our $ExecutableCode_LANGUAGE_UNSPECIFIED = 0;
 our $ExecutableCode_PYTHON = 1;
-
-=pod
-
-=head2 Enum: ExecutableCode::Language
-
-Values:
-
-=over 4
-
-=item * C<LANGUAGE_UNSPECIFIED> => 0
-
-=item * C<PYTHON> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::CodeExecutionResult ===
     # Fields for CodeExecutionResult
     # Field: outcome Type: 14 (.google.ai.generativelanguage.v1beta.CodeExecutionResult.Outcome)
     # Field: output Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::CodeExecutionResult - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::CodeExecutionResult->new(
-        outcome => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<outcome>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.CodeExecutionResult.Outcome)
-
-=item * B<output>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: CodeExecutionResult::Outcome
 our $CodeExecutionResult_OUTCOME_UNSPECIFIED = 0;
 our $CodeExecutionResult_OUTCOME_OK = 1;
 our $CodeExecutionResult_OUTCOME_FAILED = 2;
 our $CodeExecutionResult_OUTCOME_DEADLINE_EXCEEDED = 3;
-
-=pod
-
-=head2 Enum: CodeExecutionResult::Outcome
-
-Values:
-
-=over 4
-
-=item * C<OUTCOME_UNSPECIFIED> => 0
-
-=item * C<OUTCOME_OK> => 1
-
-=item * C<OUTCOME_FAILED> => 2
-
-=item * C<OUTCOME_DEADLINE_EXCEEDED> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::Tool ===
     # Fields for Tool
@@ -1160,362 +818,48 @@ Values:
     # Field: file_search Type: 11 (.google.ai.generativelanguage.v1beta.FileSearch)
     # Field: google_maps Type: 11 (.google.ai.generativelanguage.v1beta.GoogleMaps)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::Tool - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::Tool->new(
-        function_declarations => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<function_declarations>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FunctionDeclaration)
-
-=item * B<google_search_retrieval>
-
-Type: Message (.google.ai.generativelanguage.v1beta.GoogleSearchRetrieval)
-
-=item * B<code_execution>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CodeExecution)
-
-=item * B<google_search>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Tool.GoogleSearch)
-
-=item * B<computer_use>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Tool.ComputerUse)
-
-=item * B<url_context>
-
-Type: Message (.google.ai.generativelanguage.v1beta.UrlContext)
-
-=item * B<file_search>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FileSearch)
-
-=item * B<google_maps>
-
-Type: Message (.google.ai.generativelanguage.v1beta.GoogleMaps)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::GoogleMaps ===
     # Fields for GoogleMaps
     # Field: enable_widget Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::GoogleMaps - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::GoogleMaps->new(
-        enable_widget => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enable_widget>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::UrlContext ===
     # Fields for UrlContext
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::UrlContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::UrlContext->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::FileSearch ===
     # Fields for FileSearch
     # Field: retrieval_resources Type: 11 (.google.ai.generativelanguage.v1beta.FileSearch.RetrievalResource)
     # Field: retrieval_config Type: 11 (.google.ai.generativelanguage.v1beta.FileSearch.RetrievalConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::FileSearch - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::FileSearch->new(
-        retrieval_resources => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<retrieval_resources>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FileSearch.RetrievalResource)
-
-=item * B<retrieval_config>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FileSearch.RetrievalConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::GoogleSearchRetrieval ===
     # Fields for GoogleSearchRetrieval
     # Field: dynamic_retrieval_config Type: 11 (.google.ai.generativelanguage.v1beta.DynamicRetrievalConfig)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::GoogleSearchRetrieval - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::GoogleSearchRetrieval->new(
-        dynamic_retrieval_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dynamic_retrieval_config>
-
-Type: Message (.google.ai.generativelanguage.v1beta.DynamicRetrievalConfig)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::DynamicRetrievalConfig ===
     # Fields for DynamicRetrievalConfig
     # Field: mode Type: 14 (.google.ai.generativelanguage.v1beta.DynamicRetrievalConfig.Mode)
     # Field: dynamic_threshold Type: 2 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::DynamicRetrievalConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::DynamicRetrievalConfig->new(
-        mode => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mode>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.DynamicRetrievalConfig.Mode)
-
-=item * B<dynamic_threshold>
-
-Type: Float
-
-=back
-
-=cut
-
 # Enum: DynamicRetrievalConfig::Mode
 our $DynamicRetrievalConfig_MODE_UNSPECIFIED = 0;
 our $DynamicRetrievalConfig_MODE_DYNAMIC = 1;
 
-=pod
-
-=head2 Enum: DynamicRetrievalConfig::Mode
-
-Values:
-
-=over 4
-
-=item * C<MODE_UNSPECIFIED> => 0
-
-=item * C<MODE_DYNAMIC> => 1
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::CodeExecution ===
     # Fields for CodeExecution
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::CodeExecution - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::CodeExecution->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::ToolConfig ===
     # Fields for ToolConfig
     # Field: function_calling_config Type: 11 (.google.ai.generativelanguage.v1beta.FunctionCallingConfig)
     # Field: retrieval_config Type: 11 (.google.ai.generativelanguage.v1beta.RetrievalConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::ToolConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::ToolConfig->new(
-        function_calling_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<function_calling_config>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FunctionCallingConfig)
-
-=item * B<retrieval_config>
-
-Type: Message (.google.ai.generativelanguage.v1beta.RetrievalConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::RetrievalConfig ===
     # Fields for RetrievalConfig
     # Field: lat_lng Type: 11 (.google.type.LatLng)
     # Field: language_code Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::RetrievalConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::RetrievalConfig->new(
-        lat_lng => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<lat_lng>
-
-Type: Message (.google.type.LatLng)
-
-=item * B<language_code>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::FunctionCallingConfig ===
     # Fields for FunctionCallingConfig
     # Field: mode Type: 14 (.google.ai.generativelanguage.v1beta.FunctionCallingConfig.Mode)
     # Field: allowed_function_names Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::FunctionCallingConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::FunctionCallingConfig->new(
-        mode => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<mode>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.FunctionCallingConfig.Mode)
-
-=item * B<allowed_function_names>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: FunctionCallingConfig::Mode
 our $FunctionCallingConfig_MODE_UNSPECIFIED = 0;
@@ -1523,28 +867,6 @@ our $FunctionCallingConfig_AUTO = 1;
 our $FunctionCallingConfig_ANY = 2;
 our $FunctionCallingConfig_NONE = 3;
 our $FunctionCallingConfig_VALIDATED = 4;
-
-=pod
-
-=head2 Enum: FunctionCallingConfig::Mode
-
-Values:
-
-=over 4
-
-=item * C<MODE_UNSPECIFIED> => 0
-
-=item * C<AUTO> => 1
-
-=item * C<ANY> => 2
-
-=item * C<NONE> => 3
-
-=item * C<VALIDATED> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::FunctionDeclaration ===
     # Fields for FunctionDeclaration
@@ -1556,118 +878,16 @@ Values:
     # Field: response_json_schema Type: 11 (.google.protobuf.Value)
     # Field: behavior Type: 14 (.google.ai.generativelanguage.v1beta.FunctionDeclaration.Behavior)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::FunctionDeclaration - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::FunctionDeclaration->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<parameters>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Schema)
-
-=item * B<parameters_json_schema>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<response>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Schema)
-
-=item * B<response_json_schema>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<behavior>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.FunctionDeclaration.Behavior)
-
-=back
-
-=cut
-
 # Enum: FunctionDeclaration::Behavior
 our $FunctionDeclaration_UNSPECIFIED = 0;
 our $FunctionDeclaration_BLOCKING = 1;
 our $FunctionDeclaration_NON_BLOCKING = 2;
-
-=pod
-
-=head2 Enum: FunctionDeclaration::Behavior
-
-Values:
-
-=over 4
-
-=item * C<UNSPECIFIED> => 0
-
-=item * C<BLOCKING> => 1
-
-=item * C<NON_BLOCKING> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::FunctionCall ===
     # Fields for FunctionCall
     # Field: id Type: 9 ()
     # Field: name Type: 9 ()
     # Field: args Type: 11 (.google.protobuf.Struct)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::FunctionCall - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::FunctionCall->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<args>
-
-Type: Message (.google.protobuf.Struct)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::FunctionResponse ===
     # Fields for FunctionResponse
@@ -1678,77 +898,11 @@ Type: Message (.google.protobuf.Struct)
     # Field: will_continue Type: 8 ()
     # Field: scheduling Type: 14 (.google.ai.generativelanguage.v1beta.FunctionResponse.Scheduling)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::FunctionResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::FunctionResponse->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<response>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<parts>
-
-Type: Message (.google.ai.generativelanguage.v1beta.FunctionResponsePart)
-
-=item * B<will_continue>
-
-Type: Bool
-
-=item * B<scheduling>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.FunctionResponse.Scheduling)
-
-=back
-
-=cut
-
 # Enum: FunctionResponse::Scheduling
 our $FunctionResponse_SCHEDULING_UNSPECIFIED = 0;
 our $FunctionResponse_SILENT = 1;
 our $FunctionResponse_WHEN_IDLE = 2;
 our $FunctionResponse_INTERRUPT = 3;
-
-=pod
-
-=head2 Enum: FunctionResponse::Scheduling
-
-Values:
-
-=over 4
-
-=item * C<SCHEDULING_UNSPECIFIED> => 0
-
-=item * C<SILENT> => 1
-
-=item * C<WHEN_IDLE> => 2
-
-=item * C<INTERRUPT> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::Schema ===
     # Fields for Schema
@@ -1775,227 +929,1154 @@ Values:
     # Field: property_ordering Type: 9 ()
     # Field: default Type: 11 (.google.protobuf.Value)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::Schema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::Schema->new(
-        type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<type>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.Type)
-
-=item * B<format>
-
-Type: String
-
-=item * B<title>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<nullable>
-
-Type: Bool
-
-=item * B<enum>
-
-Type: String
-
-=item * B<items>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Schema)
-
-=item * B<max_items>
-
-Type: Int64
-
-=item * B<min_items>
-
-Type: Int64
-
-=item * B<properties>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Schema.PropertiesEntry)
-
-=item * B<required>
-
-Type: String
-
-=item * B<min_properties>
-
-Type: Int64
-
-=item * B<max_properties>
-
-Type: Int64
-
-=item * B<minimum>
-
-Type: Double
-
-=item * B<maximum>
-
-Type: Double
-
-=item * B<min_length>
-
-Type: Int64
-
-=item * B<max_length>
-
-Type: Int64
-
-=item * B<pattern>
-
-Type: String
-
-=item * B<example>
-
-Type: Message (.google.protobuf.Value)
-
-=item * B<any_of>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Schema)
-
-=item * B<property_ordering>
-
-Type: String
-
-=item * B<default>
-
-Type: Message (.google.protobuf.Value)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::GroundingPassage ===
     # Fields for GroundingPassage
     # Field: id Type: 9 ()
     # Field: content Type: 11 (.google.ai.generativelanguage.v1beta.Content)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::GroundingPassage - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::GroundingPassage->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: String
-
-=item * B<content>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Content)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::GroundingPassages ===
     # Fields for GroundingPassages
     # Field: passages Type: 11 (.google.ai.generativelanguage.v1beta.GroundingPassage)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content::GroundingPassages - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Content;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::GroundingPassages->new(
-        passages => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<passages>
-
-Type: Message (.google.ai.generativelanguage.v1beta.GroundingPassage)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Content::ModalityTokenCount ===
     # Fields for ModalityTokenCount
     # Field: modality Type: 14 (.google.ai.generativelanguage.v1beta.Modality)
     # Field: token_count Type: 5 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::Content::ModalityTokenCount - Compiled Protocol Buffers message class
+Google::Ai::Generativelanguage::V1beta::Content - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/content.proto
 
 =head1 SYNOPSIS
 
     use Google::Ai::Generativelanguage::V1beta::Content;
 
-    my $msg = Google::Ai::Generativelanguage::V1beta::Content::ModalityTokenCount->new(
-        modality => $value,
-    );
+    my $msg = Google::Ai::Generativelanguage::V1beta::Content::Content->new({
+        parts => $parts,
+        role => $role,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->parts();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::Content::Content->parse($bytes);
 
-=item * B<modality>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.Modality)
-
-=item * B<token_count>
-
-Type: Int32
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Content - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/content.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::Content
+
+The base structured datatype containing multi-part content of a message.
+
+A `Content` includes a `role` field designating the producer of the `Content`
+and a `parts` field containing multi-part data that contains the content of
+the message turn.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parts() >> / C<< $msg->parts($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Part>)
+
+Ordered `Parts` that constitute a single message. Parts may have different
+MIME types.
+
+=item * C<< $msg->role() >> / C<< $msg->role($value) >>
+
+Type: C<String>
+
+Optional. The producer of the content. Must be either 'user' or 'model'.
+
+Useful to set for multi-turn conversations, otherwise can be left blank
+or unset.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::Part
+
+A datatype containing media that is part of a multi-part `Content` message.
+
+A `Part` consists of data which has an associated datatype. A `Part` can only
+contain one of the accepted types in `Part.data`.
+
+A `Part` must have a fixed IANA MIME type identifying the type and subtype
+of the media if the `inline_data` field is filled with raw bytes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->text() >> / C<< $msg->text($value) >>
+
+Type: C<String>
+
+Inline text.
+
+=item * C<< $msg->inline_data() >> / C<< $msg->inline_data($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Blob>)
+
+Inline media bytes.
+
+=item * C<< $msg->function_call() >> / C<< $msg->function_call($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FunctionCall>)
+
+A predicted `FunctionCall` returned from the model that contains
+a string representing the `FunctionDeclaration.name` with the
+arguments and their values.
+
+=item * C<< $msg->function_response() >> / C<< $msg->function_response($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FunctionResponse>)
+
+The result output of a `FunctionCall` that contains a string
+representing the `FunctionDeclaration.name` and a structured JSON
+object containing any output from the function is used as context to
+the model.
+
+=item * C<< $msg->file_data() >> / C<< $msg->file_data($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FileData>)
+
+URI based data.
+
+=item * C<< $msg->executable_code() >> / C<< $msg->executable_code($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::ExecutableCode>)
+
+Code generated by the model that is meant to be executed.
+
+=item * C<< $msg->code_execution_result() >> / C<< $msg->code_execution_result($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::CodeExecutionResult>)
+
+Result of executing the `ExecutableCode`.
+
+=item * C<< $msg->video_metadata() >> / C<< $msg->video_metadata($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::VideoMetadata>)
+
+Optional. Video metadata. The metadata should only be specified while the
+video data is presented in inline_data or file_data.
+
+=item * C<< $msg->thought() >> / C<< $msg->thought($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates if the part is thought from the model.
+
+=item * C<< $msg->thought_signature() >> / C<< $msg->thought_signature($value) >>
+
+Type: C<Bytes>
+
+Optional. An opaque signature for the thought so it can be reused in
+subsequent requests.
+
+=item * C<< $msg->part_metadata() >> / C<< $msg->part_metadata($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Custom metadata associated with the Part.
+Agents using genai.Part as content representation may need to keep track
+of the additional information. For example it can be name of a file/source
+from which the Part originates or a way to multiplex multiple Part streams.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::FunctionResponsePart
+
+A datatype containing media that is part of a `FunctionResponse` message.
+
+A `FunctionResponsePart` consists of data which has an associated datatype. A
+`FunctionResponsePart` can only contain one of the accepted types in
+`FunctionResponsePart.data`.
+
+A `FunctionResponsePart` must have a fixed IANA MIME type identifying the
+type and subtype of the media if the `inline_data` field is filled with raw
+bytes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->inline_data() >> / C<< $msg->inline_data($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FunctionResponseBlob>)
+
+Inline media bytes.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::Blob
+
+Raw media bytes.
+
+Text should not be sent as raw bytes, use the 'text' field.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mime_type() >> / C<< $msg->mime_type($value) >>
+
+Type: C<String>
+
+The IANA standard MIME type of the source data.
+Examples:
+  - image/png
+  - image/jpeg
+If an unsupported MIME type is provided, an error will be returned. For a
+complete list of supported types, see [Supported file
+formats](https://ai.google.dev/gemini-api/docs/prompting_with_media#supported_file_formats).
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+Raw bytes for media formats.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::FunctionResponseBlob
+
+Raw media bytes for function response.
+
+Text should not be sent as raw bytes, use the 'FunctionResponse.response'
+field.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mime_type() >> / C<< $msg->mime_type($value) >>
+
+Type: C<String>
+
+The IANA standard MIME type of the source data.
+Examples:
+  - image/png
+  - image/jpeg
+If an unsupported MIME type is provided, an error will be returned. For a
+complete list of supported types, see [Supported file
+formats](https://ai.google.dev/gemini-api/docs/prompting_with_media#supported_file_formats).
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+Raw bytes for media formats.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::FileData
+
+URI based data.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mime_type() >> / C<< $msg->mime_type($value) >>
+
+Type: C<String>
+
+Optional. The IANA standard MIME type of the source data.
+
+=item * C<< $msg->file_uri() >> / C<< $msg->file_uri($value) >>
+
+Type: C<String>
+
+Required. URI.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::VideoMetadata
+
+Metadata describes the input video content.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_offset() >> / C<< $msg->start_offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The start offset of the video.
+
+=item * C<< $msg->end_offset() >> / C<< $msg->end_offset($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The end offset of the video.
+
+=item * C<< $msg->fps() >> / C<< $msg->fps($value) >>
+
+Type: C<Double>
+
+Optional. The frame rate of the video sent to the model. If not specified,
+the default value will be 1.0. The fps range is (0.0, 24.0].
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::ExecutableCode
+
+Code generated by the model that is meant to be executed, and the result
+returned to the model.
+
+Only generated when using the `CodeExecution` tool, in which the code will
+be automatically executed, and a corresponding `CodeExecutionResult` will
+also be generated.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->language() >> / C<< $msg->language($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::ExecutableCode::Language>)
+
+Required. Programming language of the `code`.
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<String>
+
+Required. The code to be executed.
+
+=back
+
+=head3 Enum: ExecutableCode::Language
+
+=over 4
+
+=item * C<LANGUAGE_UNSPECIFIED> => C<0>
+
+=item * C<PYTHON> => C<1>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::CodeExecutionResult
+
+Result of executing the `ExecutableCode`.
+
+Only generated when using the `CodeExecution`, and always follows a `part`
+containing the `ExecutableCode`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->outcome() >> / C<< $msg->outcome($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::CodeExecutionResult::Outcome>)
+
+Required. Outcome of the code execution.
+
+=item * C<< $msg->output() >> / C<< $msg->output($value) >>
+
+Type: C<String>
+
+Optional. Contains stdout when code execution is successful, stderr or
+other description otherwise.
+
+=back
+
+=head3 Enum: CodeExecutionResult::Outcome
+
+=over 4
+
+=item * C<OUTCOME_UNSPECIFIED> => C<0>
+
+=item * C<OUTCOME_OK> => C<1>
+
+=item * C<OUTCOME_FAILED> => C<2>
+
+=item * C<OUTCOME_DEADLINE_EXCEEDED> => C<3>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::Tool
+
+Tool details that the model may use to generate response.
+
+A `Tool` is a piece of code that enables the system to interact with
+external systems to perform an action, or set of actions, outside of
+knowledge and scope of the model.
+
+Next ID: 12
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->function_declarations() >> / C<< $msg->function_declarations($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FunctionDeclaration>)
+
+Optional. A list of `FunctionDeclarations` available to the model that can
+be used for function calling.
+
+The model or system does not execute the function. Instead the defined
+function may be returned as a
+[FunctionCall][google.ai.generativelanguage.v1beta.Part.function_call] with
+arguments to the client side for execution. The model may decide to call a
+subset of these functions by populating
+[FunctionCall][google.ai.generativelanguage.v1beta.Part.function_call] in
+the response. The next conversation turn may contain a
+[FunctionResponse][google.ai.generativelanguage.v1beta.Part.function_response]
+with the [Content.role][google.ai.generativelanguage.v1beta.Content.role]
+"function" generation context for the next model turn.
+
+=item * C<< $msg->google_search_retrieval() >> / C<< $msg->google_search_retrieval($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::GoogleSearchRetrieval>)
+
+Optional. Retrieval tool that is powered by Google search.
+
+=item * C<< $msg->code_execution() >> / C<< $msg->code_execution($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::CodeExecution>)
+
+Optional. Enables the model to execute code as part of generation.
+
+=item * C<< $msg->google_search() >> / C<< $msg->google_search($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Tool::GoogleSearch>)
+
+Optional. GoogleSearch tool type.
+Tool to support Google Search in Model. Powered by Google.
+
+=item * C<< $msg->computer_use() >> / C<< $msg->computer_use($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Tool::ComputerUse>)
+
+Optional. Tool to support the model interacting directly with the computer.
+If enabled, it automatically populates computer-use specific Function
+Declarations.
+
+=item * C<< $msg->url_context() >> / C<< $msg->url_context($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::UrlContext>)
+
+Optional. Tool to support URL context retrieval.
+
+=item * C<< $msg->file_search() >> / C<< $msg->file_search($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FileSearch>)
+
+Optional. FileSearch tool type.
+Tool to retrieve knowledge from Semantic Retrieval corpora.
+
+=item * C<< $msg->google_maps() >> / C<< $msg->google_maps($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::GoogleMaps>)
+
+Optional. Tool that allows grounding the model's response with geospatial
+context related to the user's query.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::GoogleMaps
+
+The GoogleMaps Tool that provides geospatial context for the user's query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enable_widget() >> / C<< $msg->enable_widget($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to return a widget context token in the GroundingMetadata
+of the response. Developers can use the widget context token to render a
+Google Maps widget with geospatial context related to the places that the
+model references in the response.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::UrlContext
+
+Tool to support URL context retrieval.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::FileSearch
+
+The FileSearch tool that retrieves knowledge from Semantic Retrieval corpora.
+Files are imported to Semantic Retrieval corpora using the ImportFile API.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->retrieval_resources() >> / C<< $msg->retrieval_resources($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FileSearch::RetrievalResource>)
+
+Required. Semantic retrieval resources to retrieve from.
+Currently only supports one corpus. In the future we may open up multiple
+corpora support.
+
+=item * C<< $msg->retrieval_config() >> / C<< $msg->retrieval_config($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FileSearch::RetrievalConfig>)
+
+Optional. The configuration for the retrieval.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::GoogleSearchRetrieval
+
+Tool to retrieve public web data for grounding, powered by Google.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dynamic_retrieval_config() >> / C<< $msg->dynamic_retrieval_config($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::DynamicRetrievalConfig>)
+
+Specifies the dynamic retrieval configuration for the given source.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::DynamicRetrievalConfig
+
+Describes the options to customize dynamic retrieval.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mode() >> / C<< $msg->mode($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::DynamicRetrievalConfig::Mode>)
+
+The mode of the predictor to be used in dynamic retrieval.
+
+=item * C<< $msg->dynamic_threshold() >> / C<< $msg->dynamic_threshold($value) >>
+
+Type: C<Float>
+
+The threshold to be used in dynamic retrieval.
+If not set, a system default value is used.
+
+=back
+
+=head3 Enum: DynamicRetrievalConfig::Mode
+
+=over 4
+
+=item * C<MODE_UNSPECIFIED> => C<0>
+
+=item * C<MODE_DYNAMIC> => C<1>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::CodeExecution
+
+Tool that executes code generated by the model, and automatically returns
+the result to the model.
+
+See also `ExecutableCode` and `CodeExecutionResult` which are only generated
+when using this tool.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::ToolConfig
+
+The Tool configuration containing parameters for specifying `Tool` use
+in the request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->function_calling_config() >> / C<< $msg->function_calling_config($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FunctionCallingConfig>)
+
+Optional. Function calling config.
+
+=item * C<< $msg->retrieval_config() >> / C<< $msg->retrieval_config($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::RetrievalConfig>)
+
+Optional. Retrieval config.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::RetrievalConfig
+
+Retrieval config.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->lat_lng() >> / C<< $msg->lat_lng($value) >>
+
+Type: C<Message> (L<Google::Type::Latlng::LatLng>)
+
+Optional. The location of the user.
+
+=item * C<< $msg->language_code() >> / C<< $msg->language_code($value) >>
+
+Type: C<String>
+
+Optional. The language code of the user.
+Language code for content. Use language tags defined by
+[BCP47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt).
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::FunctionCallingConfig
+
+Configuration for specifying function calling behavior.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mode() >> / C<< $msg->mode($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::FunctionCallingConfig::Mode>)
+
+Optional. Specifies the mode in which function calling should execute. If
+unspecified, the default value will be set to AUTO.
+
+=item * C<< $msg->allowed_function_names() >> / C<< $msg->allowed_function_names($value) >>
+
+Type: C<String>
+
+Optional. A set of function names that, when provided, limits the functions
+the model will call.
+
+This should only be set when the Mode is ANY or VALIDATED. Function names
+should match [FunctionDeclaration.name]. When set, model will
+predict a function call from only allowed function names.
+
+=back
+
+=head3 Enum: FunctionCallingConfig::Mode
+
+=over 4
+
+=item * C<MODE_UNSPECIFIED> => C<0>
+
+=item * C<AUTO> => C<1>
+
+=item * C<ANY> => C<2>
+
+=item * C<NONE> => C<3>
+
+=item * C<VALIDATED> => C<4>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::FunctionDeclaration
+
+Structured representation of a function declaration as defined by the
+[OpenAPI 3.03 specification](https://spec.openapis.org/oas/v3.0.3). Included
+in this declaration are the function name and parameters. This
+FunctionDeclaration is a representation of a block of code that can be used
+as a `Tool` by the model and executed by the client.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the function.
+Must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes,
+with a maximum length of 64.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Required. A brief description of the function.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Schema>)
+
+Optional. Describes the parameters to this function. Reflects the Open
+API 3.03 Parameter Object string Key: the name of the parameter. Parameter
+names are case sensitive. Schema Value: the Schema defining the type used
+for the parameter.
+
+=item * C<< $msg->parameters_json_schema() >> / C<< $msg->parameters_json_schema($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Optional. Describes the parameters to the function in JSON Schema format.
+The schema must describe an object where the properties are the parameters
+to the function. For example:
+
+```
+{
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "age": { "type": "integer" }
+  },
+  "additionalProperties": false,
+  "required": ["name", "age"],
+  "propertyOrdering": ["name", "age"]
+}
+```
+
+This field is mutually exclusive with `parameters`.
+
+=item * C<< $msg->response() >> / C<< $msg->response($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Schema>)
+
+Optional. Describes the output from this function in JSON Schema format.
+Reflects the Open API 3.03 Response Object. The Schema defines the type
+used for the response value of the function.
+
+=item * C<< $msg->response_json_schema() >> / C<< $msg->response_json_schema($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Optional. Describes the output from this function in JSON Schema format.
+The value specified by the schema is the response value of the function.
+
+This field is mutually exclusive with `response`.
+
+=item * C<< $msg->behavior() >> / C<< $msg->behavior($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::FunctionDeclaration::Behavior>)
+
+Optional. Specifies the function Behavior.
+Currently only supported by the BidiGenerateContent method.
+
+=back
+
+=head3 Enum: FunctionDeclaration::Behavior
+
+=over 4
+
+=item * C<UNSPECIFIED> => C<0>
+
+=item * C<BLOCKING> => C<1>
+
+=item * C<NON_BLOCKING> => C<2>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::FunctionCall
+
+A predicted `FunctionCall` returned from the model that contains
+a string representing the `FunctionDeclaration.name` with the
+arguments and their values.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Optional. The unique id of the function call. If populated, the client to
+execute the `function_call` and return the response with the matching `id`.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the function to call.
+Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum
+length of 64.
+
+=item * C<< $msg->args() >> / C<< $msg->args($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Optional. The function parameters and values in JSON object format.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::FunctionResponse
+
+The result output from a `FunctionCall` that contains a string
+representing the `FunctionDeclaration.name` and a structured JSON
+object containing any output from the function is used as context to
+the model. This should contain the result of a`FunctionCall` made
+based on model prediction.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Optional. The id of the function call this response is for. Populated by
+the client to match the corresponding function call `id`.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the function to call.
+Must be a-z, A-Z, 0-9, or contain underscores and dashes, with a maximum
+length of 64.
+
+=item * C<< $msg->response() >> / C<< $msg->response($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+Required. The function response in JSON object format.
+Callers can use any keys of their choice that fit the function's syntax
+to return the function output, e.g. "output", "result", etc.
+In particular, if the function call failed to execute, the response can
+have an "error" key to return error details to the model.
+
+=item * C<< $msg->parts() >> / C<< $msg->parts($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::FunctionResponsePart>)
+
+Optional. Ordered `Parts` that constitute a function response. Parts may
+have different IANA MIME types.
+
+=item * C<< $msg->will_continue() >> / C<< $msg->will_continue($value) >>
+
+Type: C<Bool>
+
+Optional. Signals that function call continues, and more responses will be
+returned, turning the function call into a generator.
+Is only applicable to NON_BLOCKING function calls, is ignored otherwise.
+If set to false, future responses will not be considered.
+It is allowed to return empty `response` with `will_continue=False` to
+signal that the function call is finished. This may still trigger the model
+generation. To avoid triggering the generation and finish the function
+call, additionally set `scheduling` to `SILENT`.
+
+=item * C<< $msg->scheduling() >> / C<< $msg->scheduling($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::FunctionResponse::Scheduling>)
+
+Optional. Specifies how the response should be scheduled in the
+conversation. Only applicable to NON_BLOCKING function calls, is ignored
+otherwise. Defaults to WHEN_IDLE.
+
+=back
+
+=head3 Enum: FunctionResponse::Scheduling
+
+=over 4
+
+=item * C<SCHEDULING_UNSPECIFIED> => C<0>
+
+=item * C<SILENT> => C<1>
+
+=item * C<WHEN_IDLE> => C<2>
+
+=item * C<INTERRUPT> => C<3>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::Schema
+
+The `Schema` object allows the definition of input and output data types.
+These types can be objects, but also primitives and arrays.
+Represents a select subset of an [OpenAPI 3.0 schema
+object](https://spec.openapis.org/oas/v3.0.3#schema).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::Type>)
+
+Required. Data type.
+
+=item * C<< $msg->format() >> / C<< $msg->format($value) >>
+
+Type: C<String>
+
+Optional. The format of the data. Any value is allowed, but most do not
+trigger any special functionality.
+
+=item * C<< $msg->title() >> / C<< $msg->title($value) >>
+
+Type: C<String>
+
+Optional. The title of the schema.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A brief description of the parameter. This could contain examples
+of use. Parameter description may be formatted as Markdown.
+
+=item * C<< $msg->nullable() >> / C<< $msg->nullable($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates if the value may be null.
+
+=item * C<< $msg->enum() >> / C<< $msg->enum($value) >>
+
+Type: C<String>
+
+Optional. Possible values of the element of Type.STRING with enum format.
+For example we can define an Enum Direction as :
+{type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Schema>)
+
+Optional. Schema of the elements of Type.ARRAY.
+
+=item * C<< $msg->max_items() >> / C<< $msg->max_items($value) >>
+
+Type: C<Int64>
+
+Optional. Maximum number of the elements for Type.ARRAY.
+
+=item * C<< $msg->min_items() >> / C<< $msg->min_items($value) >>
+
+Type: C<Int64>
+
+Optional. Minimum number of the elements for Type.ARRAY.
+
+=item * C<< $msg->properties() >> / C<< $msg->properties($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Schema::PropertiesEntry>)
+
+Optional. Properties of Type.OBJECT.
+
+=item * C<< $msg->required() >> / C<< $msg->required($value) >>
+
+Type: C<String>
+
+Optional. Required properties of Type.OBJECT.
+
+=item * C<< $msg->min_properties() >> / C<< $msg->min_properties($value) >>
+
+Type: C<Int64>
+
+Optional. Minimum number of the properties for Type.OBJECT.
+
+=item * C<< $msg->max_properties() >> / C<< $msg->max_properties($value) >>
+
+Type: C<Int64>
+
+Optional. Maximum number of the properties for Type.OBJECT.
+
+=item * C<< $msg->minimum() >> / C<< $msg->minimum($value) >>
+
+Type: C<Double>
+
+Optional. SCHEMA FIELDS FOR TYPE INTEGER and NUMBER
+Minimum value of the Type.INTEGER and Type.NUMBER
+
+=item * C<< $msg->maximum() >> / C<< $msg->maximum($value) >>
+
+Type: C<Double>
+
+Optional. Maximum value of the Type.INTEGER and Type.NUMBER
+
+=item * C<< $msg->min_length() >> / C<< $msg->min_length($value) >>
+
+Type: C<Int64>
+
+Optional. SCHEMA FIELDS FOR TYPE STRING
+Minimum length of the Type.STRING
+
+=item * C<< $msg->max_length() >> / C<< $msg->max_length($value) >>
+
+Type: C<Int64>
+
+Optional. Maximum length of the Type.STRING
+
+=item * C<< $msg->pattern() >> / C<< $msg->pattern($value) >>
+
+Type: C<String>
+
+Optional. Pattern of the Type.STRING to restrict a string to a regular
+expression.
+
+=item * C<< $msg->example() >> / C<< $msg->example($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Optional. Example of the object. Will only populated when the object is the
+root.
+
+=item * C<< $msg->any_of() >> / C<< $msg->any_of($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Schema>)
+
+Optional. The value should be validated against any (one or more) of the
+subschemas in the list.
+
+=item * C<< $msg->property_ordering() >> / C<< $msg->property_ordering($value) >>
+
+Type: C<String>
+
+Optional. The order of the properties.
+Not a standard field in open api spec. Used to determine the order of the
+properties in the response.
+
+=item * C<< $msg->default() >> / C<< $msg->default($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Value>)
+
+Optional. Default value of the field. Per JSON Schema, this field is
+intended for documentation generators and doesn't affect validation. Thus
+it's included here and ignored so that developers who send schemas with a
+`default` field don't get unknown-field errors.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::GroundingPassage
+
+Passage included inline with a grounding configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Identifier for the passage for attributing this passage in grounded
+answers.
+
+=item * C<< $msg->content() >> / C<< $msg->content($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::Content>)
+
+Content of the passage.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::GroundingPassages
+
+A repeated list of passages.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->passages() >> / C<< $msg->passages($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Content::GroundingPassage>)
+
+List of passages.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Content::ModalityTokenCount
+
+Represents token counting info for a single modality.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->modality() >> / C<< $msg->modality($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::Modality>)
+
+The modality associated with this token count.
+
+=item * C<< $msg->token_count() >> / C<< $msg->token_count($value) >>
+
+Type: C<Int32>
+
+Number of tokens.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::Content::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

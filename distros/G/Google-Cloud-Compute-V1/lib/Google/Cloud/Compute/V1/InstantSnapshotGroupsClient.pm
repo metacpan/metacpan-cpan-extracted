@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -362,31 +362,212 @@ The following RPC methods are available in this client:
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        instant_snapshot_group   => $instant_snapshot_group,
+        project                  => $project,
+        request_id               => $request_id,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.InstantSnapshotGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteInstantSnapshotGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instant_snapshot_group> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        instant_snapshot_group   => $instant_snapshot_group,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.InstantSnapshotGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetInstantSnapshotGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstantSnapshotGroup>
+
+Parameters:
+
+=over 4
+
+=item * C<instant_snapshot_group> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<get_iam_policy>
 
-Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_iam_policy(
+        options_requested_policy_version => $options_requested_policy_version,
+        project                  => $project,
+        resource                 => $resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<GetIamPolicy> on C<google.cloud.compute.v1.InstantSnapshotGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetIamPolicyInstantSnapshotGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<options_requested_policy_version> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        instant_snapshot_group_resource => $instant_snapshot_group_resource,
+        project                  => $project,
+        request_id               => $request_id,
+        source_consistency_group => $source_consistency_group,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.InstantSnapshotGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertInstantSnapshotGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instant_snapshot_group_resource> - L<Google::Cloud::Compute::V1::Compute::InstantSnapshotGroup>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<source_consistency_group> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.InstantSnapshotGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListInstantSnapshotGroupsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::ListInstantSnapshotGroups>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<zone> - C<string>
+
+=back
 
 =item * B<set_iam_policy>
 
-Calls the RPC method C<SetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_iam_policy(
+        project                  => $project,
+        resource                 => $resource,
+        zone                     => $zone,
+        zone_set_policy_request_resource => $zone_set_policy_request_resource,
+    );
+
+Calls the RPC method C<SetIamPolicy> on C<google.cloud.compute.v1.InstantSnapshotGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetIamPolicyInstantSnapshotGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<zone> - C<string>
+
+=item * C<zone_set_policy_request_resource> - L<Google::Cloud::Compute::V1::Compute::ZoneSetPolicyRequest>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+        zone                     => $zone,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.InstantSnapshotGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsInstantSnapshotGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=item * C<zone> - C<string>
+
+=back
 
 =back
 

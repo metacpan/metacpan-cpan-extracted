@@ -1,0 +1,17 @@
+Changes
+lib/Google/Cloud/Faulttesting/V1alpha.pm
+lib/Google/Cloud/Faulttesting/V1alpha/Logging.pm
+lib/Google/Cloud/Faulttesting/V1alpha/Logging/Types.pm
+lib/Google/Cloud/Faulttesting/V1alpha/State.pm
+lib/Google/Cloud/Faulttesting/V1alpha/State/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

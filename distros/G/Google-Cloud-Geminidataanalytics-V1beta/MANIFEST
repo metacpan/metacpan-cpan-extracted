@@ -1,0 +1,41 @@
+Changes
+lib/Google/Cloud/Geminidataanalytics/V1beta.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/AgentContext.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/AgentContext/Types.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Context.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Context/Types.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Conversation.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Conversation/Types.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Credentials.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Credentials/Types.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataAgent.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataAgent/Types.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataAgentService.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataAgentService/Types.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataAgentServiceClient.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataAnalyticsAgent.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataAnalyticsAgent/Types.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataChatService.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataChatService/Types.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/DataChatServiceClient.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Datasource.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Datasource/Types.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Usage.pm
+lib/Google/Cloud/Geminidataanalytics/V1beta/Usage/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-DataAgentService.t
+t/01-service-DataChatService.t
+t/01-service-Default.t
+t/02-rest-transport-DataAgentService.t
+t/02-rest-transport-DataChatService.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

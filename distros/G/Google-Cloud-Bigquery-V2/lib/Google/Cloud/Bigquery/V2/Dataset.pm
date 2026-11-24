@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::Dataset;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -778,58 +778,10 @@ EOF
     # Field: dataset Type: 11 (.google.cloud.bigquery.v2.DatasetReference)
     # Field: target_types Type: 14 (.google.cloud.bigquery.v2.DatasetAccessEntry.TargetType)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::DatasetAccessEntry - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::DatasetAccessEntry->new(
-        dataset => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dataset>
-
-Type: Message (.google.cloud.bigquery.v2.DatasetReference)
-
-=item * B<target_types>
-
-Type: Enum (.google.cloud.bigquery.v2.DatasetAccessEntry.TargetType)
-
-=back
-
-=cut
-
 # Enum: DatasetAccessEntry::TargetType
 our $DatasetAccessEntry_TARGET_TYPE_UNSPECIFIED = 0;
 our $DatasetAccessEntry_VIEWS = 1;
 our $DatasetAccessEntry_ROUTINES = 2;
-
-=pod
-
-=head2 Enum: DatasetAccessEntry::TargetType
-
-Values:
-
-=over 4
-
-=item * C<TARGET_TYPE_UNSPECIFIED> => 0
-
-=item * C<VIEWS> => 1
-
-=item * C<ROUTINES> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Dataset::Access ===
     # Fields for Access
@@ -843,68 +795,6 @@ Values:
     # Field: routine Type: 11 (.google.cloud.bigquery.v2.RoutineReference)
     # Field: dataset Type: 11 (.google.cloud.bigquery.v2.DatasetAccessEntry)
     # Field: condition Type: 11 (.google.type.Expr)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::Access - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::Access->new(
-        role => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<role>
-
-Type: String
-
-=item * B<user_by_email>
-
-Type: String
-
-=item * B<group_by_email>
-
-Type: String
-
-=item * B<domain>
-
-Type: String
-
-=item * B<special_group>
-
-Type: String
-
-=item * B<iam_member>
-
-Type: String
-
-=item * B<view>
-
-Type: Message (.google.cloud.bigquery.v2.TableReference)
-
-=item * B<routine>
-
-Type: Message (.google.cloud.bigquery.v2.RoutineReference)
-
-=item * B<dataset>
-
-Type: Message (.google.cloud.bigquery.v2.DatasetAccessEntry)
-
-=item * B<condition>
-
-Type: Message (.google.type.Expr)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Dataset::Dataset ===
     # Fields for Dataset
@@ -940,292 +830,28 @@ Type: Message (.google.type.Expr)
     # Field: restrictions Type: 11 (.google.cloud.bigquery.v2.RestrictionConfig)
     # Field: resource_tags Type: 11 (.google.cloud.bigquery.v2.Dataset.ResourceTagsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::Dataset - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::Dataset->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<id>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<dataset_reference>
-
-Type: Message (.google.cloud.bigquery.v2.DatasetReference)
-
-=item * B<friendly_name>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<description>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<default_table_expiration_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<default_partition_expiration_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.bigquery.v2.Dataset.LabelsEntry)
-
-=item * B<access>
-
-Type: Message (.google.cloud.bigquery.v2.Access)
-
-=item * B<creation_time>
-
-Type: Int64
-
-=item * B<last_modified_time>
-
-Type: Int64
-
-=item * B<location>
-
-Type: String
-
-=item * B<default_encryption_configuration>
-
-Type: Message (.google.cloud.bigquery.v2.EncryptionConfiguration)
-
-=item * B<satisfies_pzs>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<satisfies_pzi>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<type>
-
-Type: String
-
-=item * B<catalog_source>
-
-Type: String
-
-=item * B<linked_dataset_source>
-
-Type: Message (.google.cloud.bigquery.v2.LinkedDatasetSource)
-
-=item * B<linked_dataset_metadata>
-
-Type: Message (.google.cloud.bigquery.v2.LinkedDatasetMetadata)
-
-=item * B<external_dataset_reference>
-
-Type: Message (.google.cloud.bigquery.v2.ExternalDatasetReference)
-
-=item * B<external_catalog_dataset_options>
-
-Type: Message (.google.cloud.bigquery.v2.ExternalCatalogDatasetOptions)
-
-=item * B<is_case_insensitive>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<default_collation>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<default_rounding_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.TableFieldSchema.RoundingMode)
-
-=item * B<max_time_travel_hours>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<tags>
-
-Type: Message (.google.cloud.bigquery.v2.GcpTag)
-
-=item * B<storage_billing_model>
-
-Type: Enum (.google.cloud.bigquery.v2.Dataset.StorageBillingModel)
-
-=item * B<restrictions>
-
-Type: Message (.google.cloud.bigquery.v2.RestrictionConfig)
-
-=item * B<resource_tags>
-
-Type: Message (.google.cloud.bigquery.v2.Dataset.ResourceTagsEntry)
-
-=back
-
-=cut
-
 # Enum: Dataset::StorageBillingModel
 our $Dataset_STORAGE_BILLING_MODEL_UNSPECIFIED = 0;
 our $Dataset_LOGICAL = 1;
 our $Dataset_PHYSICAL = 2;
-
-=pod
-
-=head2 Enum: Dataset::StorageBillingModel
-
-Values:
-
-=over 4
-
-=item * C<STORAGE_BILLING_MODEL_UNSPECIFIED> => 0
-
-=item * C<LOGICAL> => 1
-
-=item * C<PHYSICAL> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Dataset::GcpTag ===
     # Fields for GcpTag
     # Field: tag_key Type: 9 ()
     # Field: tag_value Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::GcpTag - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::GcpTag->new(
-        tag_key => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tag_key>
-
-Type: String
-
-=item * B<tag_value>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetSource ===
     # Fields for LinkedDatasetSource
     # Field: source_dataset Type: 11 (.google.cloud.bigquery.v2.DatasetReference)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetSource - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetSource->new(
-        source_dataset => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<source_dataset>
-
-Type: Message (.google.cloud.bigquery.v2.DatasetReference)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetMetadata ===
     # Fields for LinkedDatasetMetadata
     # Field: link_state Type: 14 (.google.cloud.bigquery.v2.LinkedDatasetMetadata.LinkState)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetMetadata->new(
-        link_state => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<link_state>
-
-Type: Enum (.google.cloud.bigquery.v2.LinkedDatasetMetadata.LinkState)
-
-=back
-
-=cut
-
 # Enum: LinkedDatasetMetadata::LinkState
 our $LinkedDatasetMetadata_LINK_STATE_UNSPECIFIED = 0;
 our $LinkedDatasetMetadata_LINKED = 1;
 our $LinkedDatasetMetadata_UNLINKED = 2;
-
-=pod
-
-=head2 Enum: LinkedDatasetMetadata::LinkState
-
-Values:
-
-=over 4
-
-=item * C<LINK_STATE_UNSPECIFIED> => 0
-
-=item * C<LINKED> => 1
-
-=item * C<UNLINKED> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Dataset::GetDatasetRequest ===
     # Fields for GetDatasetRequest
@@ -1234,109 +860,17 @@ Values:
     # Field: dataset_view Type: 14 (.google.cloud.bigquery.v2.GetDatasetRequest.DatasetView)
     # Field: access_policy_version Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::GetDatasetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::GetDatasetRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<dataset_view>
-
-Type: Enum (.google.cloud.bigquery.v2.GetDatasetRequest.DatasetView)
-
-=item * B<access_policy_version>
-
-Type: Int32
-
-=back
-
-=cut
-
 # Enum: GetDatasetRequest::DatasetView
 our $GetDatasetRequest_DATASET_VIEW_UNSPECIFIED = 0;
 our $GetDatasetRequest_METADATA = 1;
 our $GetDatasetRequest_ACL = 2;
 our $GetDatasetRequest_FULL = 3;
 
-=pod
-
-=head2 Enum: GetDatasetRequest::DatasetView
-
-Values:
-
-=over 4
-
-=item * C<DATASET_VIEW_UNSPECIFIED> => 0
-
-=item * C<METADATA> => 1
-
-=item * C<ACL> => 2
-
-=item * C<FULL> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Dataset::InsertDatasetRequest ===
     # Fields for InsertDatasetRequest
     # Field: project_id Type: 9 ()
     # Field: dataset Type: 11 (.google.cloud.bigquery.v2.Dataset)
     # Field: access_policy_version Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::InsertDatasetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::InsertDatasetRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset>
-
-Type: Message (.google.cloud.bigquery.v2.Dataset)
-
-=item * B<access_policy_version>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Dataset::UpdateOrPatchDatasetRequest ===
     # Fields for UpdateOrPatchDatasetRequest
@@ -1346,113 +880,17 @@ Type: Int32
     # Field: update_mode Type: 14 (.google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode)
     # Field: access_policy_version Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::UpdateOrPatchDatasetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::UpdateOrPatchDatasetRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<dataset>
-
-Type: Message (.google.cloud.bigquery.v2.Dataset)
-
-=item * B<update_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.UpdateOrPatchDatasetRequest.UpdateMode)
-
-=item * B<access_policy_version>
-
-Type: Int32
-
-=back
-
-=cut
-
 # Enum: UpdateOrPatchDatasetRequest::UpdateMode
 our $UpdateOrPatchDatasetRequest_UPDATE_MODE_UNSPECIFIED = 0;
 our $UpdateOrPatchDatasetRequest_UPDATE_METADATA = 1;
 our $UpdateOrPatchDatasetRequest_UPDATE_ACL = 2;
 our $UpdateOrPatchDatasetRequest_UPDATE_FULL = 3;
 
-=pod
-
-=head2 Enum: UpdateOrPatchDatasetRequest::UpdateMode
-
-Values:
-
-=over 4
-
-=item * C<UPDATE_MODE_UNSPECIFIED> => 0
-
-=item * C<UPDATE_METADATA> => 1
-
-=item * C<UPDATE_ACL> => 2
-
-=item * C<UPDATE_FULL> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Dataset::DeleteDatasetRequest ===
     # Fields for DeleteDatasetRequest
     # Field: project_id Type: 9 ()
     # Field: dataset_id Type: 9 ()
     # Field: delete_contents Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::DeleteDatasetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::DeleteDatasetRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<delete_contents>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Dataset::ListDatasetsRequest ===
     # Fields for ListDatasetsRequest
@@ -1461,48 +899,6 @@ Type: Bool
     # Field: page_token Type: 9 ()
     # Field: all Type: 8 ()
     # Field: filter Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::ListDatasetsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::ListDatasetsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<max_results>
-
-Type: Message (.google.protobuf.UInt32Value)
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<all>
-
-Type: Bool
-
-=item * B<filter>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Dataset::ListFormatDataset ===
     # Fields for ListFormatDataset
@@ -1516,64 +912,6 @@ Type: String
     # Field: catalog_source Type: 9 ()
     # Field: external_dataset_reference Type: 11 (.google.cloud.bigquery.v2.ExternalDatasetReference)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::ListFormatDataset - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::ListFormatDataset->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<id>
-
-Type: String
-
-=item * B<dataset_reference>
-
-Type: Message (.google.cloud.bigquery.v2.DatasetReference)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.bigquery.v2.ListFormatDataset.LabelsEntry)
-
-=item * B<friendly_name>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<location>
-
-Type: String
-
-=item * B<type>
-
-Type: String
-
-=item * B<catalog_source>
-
-Type: String
-
-=item * B<external_dataset_reference>
-
-Type: Message (.google.cloud.bigquery.v2.ExternalDatasetReference)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Dataset::DatasetList ===
     # Fields for DatasetList
     # Field: kind Type: 9 ()
@@ -1582,110 +920,26 @@ Type: Message (.google.cloud.bigquery.v2.ExternalDatasetReference)
     # Field: datasets Type: 11 (.google.cloud.bigquery.v2.ListFormatDataset)
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::DatasetList - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::DatasetList->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<datasets>
-
-Type: Message (.google.cloud.bigquery.v2.ListFormatDataset)
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Dataset::UndeleteDatasetRequest ===
     # Fields for UndeleteDatasetRequest
     # Field: project_id Type: 9 ()
     # Field: dataset_id Type: 9 ()
     # Field: deletion_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Dataset::UndeleteDatasetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Dataset;
-
-    my $msg = Google::Cloud::Bigquery::V2::Dataset::UndeleteDatasetRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<deletion_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Bigquery::V2::Dataset::DatasetServiceClient ===
 package Google::Cloud::Bigquery::V2::Dataset::DatasetServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Bigquery::V2::Dataset::DatasetServiceClient
 
-Google::Cloud::Bigquery::V2::Dataset::DatasetServiceClient - Client stub representing the remote DatasetService service
+Client stub representing the remote C<DatasetService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1805,13 +1059,1029 @@ sub undelete_dataset {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::Dataset - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::Dataset - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/dataset.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::Dataset;
+
+    my $msg = Google::Cloud::Bigquery::V2::Dataset::DatasetAccessEntry->new({
+        dataset => $dataset,
+        target_types => $target_types,
+    });
+
+    # Read or update a field
+    my $val = $msg->dataset();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::Dataset::DatasetAccessEntry->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/dataset.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::DatasetAccessEntry
+
+Grants all resources of particular types in a particular dataset read access
+to the current dataset.
+
+Similar to how individually authorized views work, updates to any resource
+granted through its dataset (including creation of new resources) requires
+read permission to referenced resources, plus write permission to the
+authorizing dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference>)
+
+The dataset this entry applies to
+
+=item * C<< $msg->target_types() >> / C<< $msg->target_types($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::DatasetAccessEntry::TargetType>)
+
+Which resources in the dataset this entry applies to. Currently, only
+views are supported, but additional target types may be added in the
+future.
+
+=back
+
+=head3 Enum: DatasetAccessEntry::TargetType
+
+=over 4
+
+=item * C<TARGET_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<VIEWS> => C<1>
+
+=item * C<ROUTINES> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::Access
+
+An object that defines dataset access for an entity.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->role() >> / C<< $msg->role($value) >>
+
+Type: C<String>
+
+An IAM role ID that should be granted to the user, group,
+or domain specified in this access entry.
+The following legacy mappings will be applied:
+
+* `OWNER`: `roles/bigquery.dataOwner`
+* `WRITER`: `roles/bigquery.dataEditor`
+* `READER`: `roles/bigquery.dataViewer`
+
+This field will accept any of the above formats, but will return only
+the legacy format. For example, if you set this field to
+"roles/bigquery.dataOwner", it will be returned back as "OWNER".
+
+=item * C<< $msg->user_by_email() >> / C<< $msg->user_by_email($value) >>
+
+Type: C<String>
+
+[Pick one] An email address of a user to grant access to. For example:
+fred@example.com. Maps to IAM policy member "user:EMAIL" or
+"serviceAccount:EMAIL".
+
+=item * C<< $msg->group_by_email() >> / C<< $msg->group_by_email($value) >>
+
+Type: C<String>
+
+[Pick one] An email address of a Google Group to grant access to.
+Maps to IAM policy member "group:GROUP".
+
+=item * C<< $msg->domain() >> / C<< $msg->domain($value) >>
+
+Type: C<String>
+
+[Pick one] A domain to grant access to. Any users signed in with the domain
+specified will be granted the specified access. Example: "example.com".
+Maps to IAM policy member "domain:DOMAIN".
+
+=item * C<< $msg->special_group() >> / C<< $msg->special_group($value) >>
+
+Type: C<String>
+
+[Pick one] A special group to grant access to. Possible values include:
+
+  * projectOwners: Owners of the enclosing project.
+  * projectReaders: Readers of the enclosing project.
+  * projectWriters: Writers of the enclosing project.
+  * allAuthenticatedUsers: All authenticated BigQuery users.
+
+Maps to similarly-named IAM members.
+
+=item * C<< $msg->iam_member() >> / C<< $msg->iam_member($value) >>
+
+Type: C<String>
+
+[Pick one] Some other type of member that appears in the IAM Policy but
+isn't a user, group, domain, or special group.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableReference::TableReference>)
+
+[Pick one] A view from a different dataset to grant access to. Queries
+executed against that view will have read access to views/tables/routines
+in this dataset.
+The role field is not required when this field is set. If that view is
+updated by any user, access to the view needs to be granted again via an
+update operation.
+
+=item * C<< $msg->routine() >> / C<< $msg->routine($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RoutineReference::RoutineReference>)
+
+[Pick one] A routine from a different dataset to grant access to. Queries
+executed against that routine will have read access to
+views/tables/routines in this dataset. Only UDF is supported for now.
+The role field is not required when this field is set. If that routine is
+updated by any user, access to the routine needs to be granted again via
+an update operation.
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::DatasetAccessEntry>)
+
+[Pick one] A grant authorizing all resources of a particular type in a
+particular dataset access to this dataset. Only views are supported for
+now. The role field is not required when this field is set. If that dataset
+is deleted and re-created, its access needs to be granted again via an
+update operation.
+
+=item * C<< $msg->condition() >> / C<< $msg->condition($value) >>
+
+Type: C<Message> (L<Google::Type::Expr::Expr>)
+
+Optional. condition for the binding. If CEL expression in this field is
+true, this access binding will be considered
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::Dataset
+
+Represents a BigQuery dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+Output only. The resource type.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. A hash of the resource.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Output only. The fully-qualified unique name of the dataset in the format
+projectId:datasetId. The dataset name without the project name is given in
+the datasetId field. When creating a new dataset, leave this field blank,
+and instead specify the datasetId field.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+Output only. A URL that can be used to access the resource again. You can
+use this URL in Get or Update requests to the resource.
+
+=item * C<< $msg->dataset_reference() >> / C<< $msg->dataset_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference>)
+
+Required. A reference that identifies the dataset.
+
+=item * C<< $msg->friendly_name() >> / C<< $msg->friendly_name($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. A descriptive name for the dataset.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. A user-friendly description of the dataset.
+
+=item * C<< $msg->default_table_expiration_ms() >> / C<< $msg->default_table_expiration_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. The default lifetime of all tables in the dataset, in
+milliseconds. The minimum lifetime value is 3600000 milliseconds (one
+hour). To clear an existing default expiration with a PATCH request, set to
+0. Once this property is set, all newly-created tables in the dataset will
+have an expirationTime property set to the creation time plus the value in
+this property, and changing the value will only affect new tables, not
+existing ones. When the expirationTime for a given table is reached, that
+table will be deleted automatically.
+If a table's expirationTime is modified or removed before the table
+expires, or if you provide an explicit expirationTime when creating a
+table, that value takes precedence over the default expiration time
+indicated by this property.
+
+=item * C<< $msg->default_partition_expiration_ms() >> / C<< $msg->default_partition_expiration_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+This default partition expiration, expressed in milliseconds.
+
+When new time-partitioned tables are created in a dataset where this
+property is set, the table will inherit this value, propagated as the
+`TimePartitioning.expirationMs` property on the new table.  If you set
+`TimePartitioning.expirationMs` explicitly when creating a table,
+the `defaultPartitionExpirationMs` of the containing dataset is ignored.
+
+When creating a partitioned table, if `defaultPartitionExpirationMs`
+is set, the `defaultTableExpirationMs` value is ignored and the table
+will not be inherit a table expiration deadline.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::Dataset::LabelsEntry>)
+
+The labels associated with this dataset. You can use these
+to organize and group your datasets.
+You can set this property when inserting or updating a dataset.
+See [Creating and Updating Dataset
+Labels](https://cloud.google.com/bigquery/docs/creating-managing-labels#creating_and_updating_dataset_labels)
+for more information.
+
+=item * C<< $msg->access() >> / C<< $msg->access($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::Access>)
+
+Optional. An array of objects that define dataset access for one or more
+entities. You can set this property when inserting or updating a dataset in
+order to control who is allowed to access the data. If unspecified at
+dataset creation time, BigQuery adds default dataset access for the
+following entities: access.specialGroup: projectReaders; access.role:
+READER; access.specialGroup: projectWriters; access.role: WRITER;
+access.specialGroup: projectOwners; access.role: OWNER;
+access.userByEmail: [dataset creator email]; access.role: OWNER;
+If you patch a dataset, then this field is overwritten by the patched
+dataset's access field. To add entities, you must supply the entire
+existing access array in addition to any new entities that you want to add.
+
+=item * C<< $msg->creation_time() >> / C<< $msg->creation_time($value) >>
+
+Type: C<Int64>
+
+Output only. The time when this dataset was created, in milliseconds since
+the epoch.
+
+=item * C<< $msg->last_modified_time() >> / C<< $msg->last_modified_time($value) >>
+
+Type: C<Int64>
+
+Output only. The date when this dataset was last modified, in milliseconds
+since the epoch.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The geographic location where the dataset should reside. See
+https://cloud.google.com/bigquery/docs/locations for supported
+locations.
+
+=item * C<< $msg->default_encryption_configuration() >> / C<< $msg->default_encryption_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration>)
+
+The default encryption key for all tables in the dataset.
+After this property is set, the encryption key of all newly-created tables
+in the dataset is set to this value unless the table creation request or
+query explicitly overrides the key.
+
+=item * C<< $msg->satisfies_pzs() >> / C<< $msg->satisfies_pzs($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Output only. Reserved for future use.
+
+=item * C<< $msg->satisfies_pzi() >> / C<< $msg->satisfies_pzi($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Output only. Reserved for future use.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+Output only. Same as `type` in `ListFormatDataset`.
+The type of the dataset, one of:
+
+* DEFAULT - only accessible by owner and authorized accounts,
+* PUBLIC - accessible by everyone,
+* LINKED - linked dataset,
+* EXTERNAL - dataset with definition in external metadata catalog,
+* BIGLAKE_ICEBERG - a Biglake dataset accessible through the Iceberg API,
+* BIGLAKE_HIVE - a Biglake dataset accessible through the Hive API.
+
+=item * C<< $msg->catalog_source() >> / C<< $msg->catalog_source($value) >>
+
+Type: C<String>
+
+Output only. The origin of the dataset, one of:
+
+* (Unset) - Native BigQuery Dataset
+* BIGLAKE - Dataset is backed by a namespace stored natively in Biglake
+
+=item * C<< $msg->linked_dataset_source() >> / C<< $msg->linked_dataset_source($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetSource>)
+
+Optional. The source dataset reference when the dataset is of type LINKED.
+For all other dataset types it is not set. This field cannot be updated
+once it is set. Any attempt to update this field using Update and Patch API
+Operations will be ignored.
+
+=item * C<< $msg->linked_dataset_metadata() >> / C<< $msg->linked_dataset_metadata($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetMetadata>)
+
+Output only. Metadata about the LinkedDataset. Filled out when the dataset
+type is LINKED.
+
+=item * C<< $msg->external_dataset_reference() >> / C<< $msg->external_dataset_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDatasetReference::ExternalDatasetReference>)
+
+Optional. Reference to a read-only external dataset defined in data
+catalogs outside of BigQuery. Filled out when the dataset type is EXTERNAL.
+
+=item * C<< $msg->external_catalog_dataset_options() >> / C<< $msg->external_catalog_dataset_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions::ExternalCatalogDatasetOptions>)
+
+Optional. Options defining open source compatible datasets living in the
+BigQuery catalog. Contains metadata of open source database, schema or
+namespace represented by the current dataset.
+
+=item * C<< $msg->is_case_insensitive() >> / C<< $msg->is_case_insensitive($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. TRUE if the dataset and its table names are case-insensitive,
+otherwise FALSE. By default, this is FALSE, which means the dataset and its
+table names are case-sensitive. This field does not affect routine
+references.
+
+=item * C<< $msg->default_collation() >> / C<< $msg->default_collation($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. Defines the default collation specification of future tables
+created in the dataset. If a table is created in this dataset without
+table-level default collation, then the table inherits the dataset default
+collation, which is applied to the string fields that do not have explicit
+collation specified. A change to this field affects only tables created
+afterwards, and does not alter the existing tables.
+The following values are supported:
+
+* 'und:ci': undetermined locale, case insensitive.
+* '': empty string. Default to case-sensitive behavior.
+
+=item * C<< $msg->default_rounding_mode() >> / C<< $msg->default_rounding_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::TableFieldSchema::RoundingMode>)
+
+Optional. Defines the default rounding mode specification of new tables
+created within this dataset. During table creation, if this field is
+specified, the table within this dataset will inherit the default rounding
+mode of the dataset. Setting the default rounding mode on a table overrides
+this option. Existing tables in the dataset are unaffected.
+If columns are defined during that table creation,
+they will immediately inherit the table's default rounding mode,
+unless otherwise specified.
+
+=item * C<< $msg->max_time_travel_hours() >> / C<< $msg->max_time_travel_hours($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. Defines the time travel window in hours. The value can be from 48
+to 168 hours (2 to 7 days). The default value is 168 hours if this is not
+set.
+
+=item * C<< $msg->tags() >> / C<< $msg->tags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::GcpTag>)
+
+Output only. Tags for the dataset. To provide tags as inputs, use the
+`resourceTags` field.
+
+=item * C<< $msg->storage_billing_model() >> / C<< $msg->storage_billing_model($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::Dataset::StorageBillingModel>)
+
+Optional. Updates storage_billing_model for the dataset.
+
+=item * C<< $msg->restrictions() >> / C<< $msg->restrictions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::RestrictionConfig::RestrictionConfig>)
+
+Optional. Output only. Restriction config for all tables and dataset. If
+set, restrict certain accesses on the dataset and all its tables based on
+the config. See [Data
+egress](https://cloud.google.com/bigquery/docs/analytics-hub-introduction#data_egress)
+for more details.
+
+=item * C<< $msg->resource_tags() >> / C<< $msg->resource_tags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::Dataset::ResourceTagsEntry>)
+
+Optional. The [tags](https://cloud.google.com/bigquery/docs/tags) attached
+to this dataset. Tag keys are globally unique. Tag key is expected to be in
+the namespaced format, for example "123456789012/environment" where
+123456789012 is the ID of the parent organization or project resource for
+this tag key. Tag value is expected to be the short name, for example
+"Production". See [Tag
+definitions](https://cloud.google.com/iam/docs/tags-access-control#definitions)
+for more details.
+
+=back
+
+=head3 Enum: Dataset::StorageBillingModel
+
+=over 4
+
+=item * C<STORAGE_BILLING_MODEL_UNSPECIFIED> => C<0>
+
+=item * C<LOGICAL> => C<1>
+
+=item * C<PHYSICAL> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::GcpTag
+
+A global tag managed by Resource Manager.
+https://cloud.google.com/iam/docs/tags-access-control#definitions
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tag_key() >> / C<< $msg->tag_key($value) >>
+
+Type: C<String>
+
+Required. The namespaced friendly name of the tag key, e.g.
+"12345/environment" where 12345 is org id.
+
+=item * C<< $msg->tag_value() >> / C<< $msg->tag_value($value) >>
+
+Type: C<String>
+
+Required. The friendly short name of the tag value, e.g. "production".
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetSource
+
+A dataset source type which refers to another BigQuery dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->source_dataset() >> / C<< $msg->source_dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference>)
+
+The source dataset reference contains project numbers and not project ids.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::LinkedDatasetMetadata
+
+Metadata about the Linked Dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->link_state() >> / C<< $msg->link_state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::LinkedDatasetMetadata::LinkState>)
+
+Output only. Specifies whether Linked Dataset is currently in a linked
+state or not.
+
+=back
+
+=head3 Enum: LinkedDatasetMetadata::LinkState
+
+=over 4
+
+=item * C<LINK_STATE_UNSPECIFIED> => C<0>
+
+=item * C<LINKED> => C<1>
+
+=item * C<UNLINKED> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::GetDatasetRequest
+
+Request format for getting information about a dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the requested dataset
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the requested dataset
+
+=item * C<< $msg->dataset_view() >> / C<< $msg->dataset_view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::GetDatasetRequest::DatasetView>)
+
+Optional. Specifies the view that determines which dataset information is
+returned. By default, metadata and ACL information are returned.
+
+=item * C<< $msg->access_policy_version() >> / C<< $msg->access_policy_version($value) >>
+
+Type: C<Int32>
+
+Optional. The version of the access policy schema to fetch.
+Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+rejected.
+
+Requests for conditional access policy binding in datasets must specify
+version 3. Dataset with no conditional role bindings in access policy may
+specify any valid value or leave the field unset.
+
+This field will be mapped to [IAM Policy version]
+(https://cloud.google.com/iam/docs/policies#versions) and will be used to
+fetch policy from IAM.
+
+If unset or if 0 or 1 value is used for dataset with conditional bindings,
+access entry with condition will have role string appended by
+'withcond' string followed by a hash value. For example :
+{
+  "access": [
+     {
+        "role":
+        "roles/bigquery.dataViewer_with_conditionalbinding_7a34awqsda",
+        "userByEmail": "user@example.com",
+     }
+  ]
+}
+Please refer https://cloud.google.com/iam/docs/troubleshooting-withcond for
+more details.
+
+=back
+
+=head3 Enum: GetDatasetRequest::DatasetView
+
+=over 4
+
+=item * C<DATASET_VIEW_UNSPECIFIED> => C<0>
+
+=item * C<METADATA> => C<1>
+
+=item * C<ACL> => C<2>
+
+=item * C<FULL> => C<3>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::InsertDatasetRequest
+
+Request format for inserting a dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the new dataset
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::Dataset>)
+
+Required. Datasets resource to use for the new dataset
+
+=item * C<< $msg->access_policy_version() >> / C<< $msg->access_policy_version($value) >>
+
+Type: C<Int32>
+
+Optional. The version of the provided access policy schema.
+Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+rejected.
+
+This version refers to the schema version of the access policy and not the
+version of access policy. This field's value can be equal or more
+than the access policy schema provided in the request.
+For example,
+  * Requests with conditional access policy binding in datasets must
+  specify
+    version 3.
+  * But dataset with no conditional role bindings in access policy
+    may specify any valid value or leave the field unset.
+If unset or if 0 or 1 value is used for dataset with conditional
+bindings, request will be rejected.
+
+This field will be mapped to IAM Policy version
+(https://cloud.google.com/iam/docs/policies#versions) and will be used to
+set policy in IAM.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::UpdateOrPatchDatasetRequest
+
+Message for updating or patching a dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the dataset being updated
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of the dataset being updated
+
+=item * C<< $msg->dataset() >> / C<< $msg->dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::Dataset>)
+
+Required. Datasets resource which will replace or patch the specified
+dataset.
+
+=item * C<< $msg->update_mode() >> / C<< $msg->update_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::UpdateOrPatchDatasetRequest::UpdateMode>)
+
+Optional. Specifies the fields of dataset that update/patch operation is
+targeting By default, both metadata and ACL fields are updated.
+
+=item * C<< $msg->access_policy_version() >> / C<< $msg->access_policy_version($value) >>
+
+Type: C<Int32>
+
+Optional. The version of the provided access policy schema.
+Valid values are 0, 1, and 3. Requests specifying an invalid value will be
+rejected.
+
+This version refers to the schema version of the access policy and not the
+version of access policy. This field's value can be equal or more
+than the access policy schema provided in the request.
+For example,
+  * Operations updating conditional access policy binding in datasets must
+  specify
+    version 3. Some of the operations are :
+      -  Adding a new access policy entry with condition.
+      -  Removing an access policy entry with condition.
+      -  Updating an access policy entry with condition.
+  * But dataset with no conditional role bindings in access policy
+    may specify any valid value or leave the field unset.
+If unset or if 0 or 1 value is used for dataset with conditional
+bindings, request will be rejected.
+
+This field will be mapped to IAM Policy version
+(https://cloud.google.com/iam/docs/policies#versions) and will be used to
+set policy in IAM.
+
+=back
+
+=head3 Enum: UpdateOrPatchDatasetRequest::UpdateMode
+
+=over 4
+
+=item * C<UPDATE_MODE_UNSPECIFIED> => C<0>
+
+=item * C<UPDATE_METADATA> => C<1>
+
+=item * C<UPDATE_ACL> => C<2>
+
+=item * C<UPDATE_FULL> => C<3>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::DeleteDatasetRequest
+
+Request format for deleting a dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the dataset being deleted
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of dataset being deleted
+
+=item * C<< $msg->delete_contents() >> / C<< $msg->delete_contents($value) >>
+
+Type: C<Bool>
+
+If True, delete all the tables in the dataset.
+If False and the dataset contains tables, the request will fail.
+Default is False
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::ListDatasetsRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the datasets to be listed
+
+=item * C<< $msg->max_results() >> / C<< $msg->max_results($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt32Value>)
+
+The maximum number of results to return in a single response page.
+Leverage the page tokens to iterate through the entire collection.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Page token, returned by a previous call, to request the next page of
+results
+
+=item * C<< $msg->all() >> / C<< $msg->all($value) >>
+
+Type: C<Bool>
+
+Whether to list all datasets, including hidden ones
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+An expression for filtering the results of the request by label.
+The syntax is `labels.<name>[:<value>]`.
+Multiple filters can be AND-ed together by connecting with a space.
+Example: `labels.department:receiving labels.active`.
+See [Filtering datasets using
+labels](https://cloud.google.com/bigquery/docs/filtering-labels#filtering_datasets_using_labels)
+for details.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::ListFormatDataset
+
+A dataset resource with only a subset of fields, to be returned in a list of
+datasets.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The resource type.
+This property always returns the value "bigquery#dataset"
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+The fully-qualified, unique, opaque ID of the dataset.
+
+=item * C<< $msg->dataset_reference() >> / C<< $msg->dataset_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference>)
+
+The dataset reference.
+Use this property to access specific parts of the dataset's ID, such as
+project ID or dataset ID.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::ListFormatDataset::LabelsEntry>)
+
+The labels associated with this dataset.
+You can use these to organize and group your datasets.
+
+=item * C<< $msg->friendly_name() >> / C<< $msg->friendly_name($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+An alternate name for the dataset.  The friendly name is purely
+decorative in nature.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The geographic location where the dataset resides.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+Output only. Same as `type` in `Dataset`.
+The type of the dataset, one of:
+
+* DEFAULT - only accessible by owner and authorized accounts,
+* PUBLIC - accessible by everyone,
+* LINKED - linked dataset,
+* EXTERNAL - dataset with definition in external metadata catalog,
+* BIGLAKE_ICEBERG - a Biglake dataset accessible through the Iceberg API,
+* BIGLAKE_HIVE - a Biglake dataset accessible through the Hive API.
+
+=item * C<< $msg->catalog_source() >> / C<< $msg->catalog_source($value) >>
+
+Type: C<String>
+
+Output only. The origin of the dataset, one of:
+
+* (Unset) - Native BigQuery Dataset.
+* BIGLAKE - Dataset is backed by a namespace stored natively in Biglake.
+
+=item * C<< $msg->external_dataset_reference() >> / C<< $msg->external_dataset_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDatasetReference::ExternalDatasetReference>)
+
+Output only. Reference to a read-only external dataset defined in data
+catalogs outside of BigQuery. Filled out when the dataset type is EXTERNAL.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::DatasetList
+
+Response format for a page of results when listing datasets.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+Output only. The resource type.
+This property always returns the value "bigquery#datasetList"
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. A hash value of the results page. You can use this property to
+determine if the page has changed since the last request.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be used to request the next results page. This property is
+omitted on the final results page.
+
+=item * C<< $msg->datasets() >> / C<< $msg->datasets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Dataset::ListFormatDataset>)
+
+An array of the dataset resources in the project.
+Each resource contains basic information.
+For full information about a particular dataset resource, use the Datasets:
+get method. This property is omitted when there are no datasets in the
+project.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+A list of skipped locations that were unreachable. For more information
+about BigQuery locations, see:
+https://cloud.google.com/bigquery/docs/locations. Example: "europe-west5"
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Dataset::UndeleteDatasetRequest
+
+Request format for undeleting a dataset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the dataset to be undeleted
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. Dataset ID of dataset being deleted
+
+=item * C<< $msg->deletion_time() >> / C<< $msg->deletion_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Optional. The exact time when the dataset was deleted. If not specified,
+the most recently deleted version is undeleted. Undeleting a dataset
+using deletion time is not supported.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::Dataset::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

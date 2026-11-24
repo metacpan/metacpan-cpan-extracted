@@ -6,7 +6,7 @@ use strict;
 use warnings;
 # use diagnostics;
 
-use version; our $VERSION = version->declare('0.003.1');
+use version; our $VERSION = version->declare('0.004.1');
 
 # TODO: Try Log::Any::Adapter::Abstraction instead of Log::Any
 
@@ -44,6 +44,7 @@ use File::Spec;
 use Params::Get;
 use POSIX qw(strftime);
 use Readonly;
+use Scalar::Util;
 use Module::Runtime qw(require_module);	# Safe dynamic module loading; avoids string eval
 use Timer::Simple;
 use Time::HiRes;
@@ -123,7 +124,7 @@ our $RUNNING;
 # that says nothing behaves exactly as it did before.  The settings are resolved
 # by _site_setup() on the first request, because the configuration cannot be read
 # until the domain is known.
-Readonly my $DEFAULT_DATABASE_DIR => 'data';		# beside cgi-bin/
+Readonly my $DEFAULT_DATABASE_DIR => 'databases';		# beside cgi-bin/
 Readonly my @DEFAULT_DATA_MODULES => qw(Web::VWF::Data::index);
 Readonly my @DEFAULT_SUPPORTED_LANGUAGES => qw(en-gb);
 # One site's own address, kept so that a site that came from this script and says
@@ -192,7 +193,7 @@ Web::VWF - Versatile Web Framework - easily build a website to support different
 
 =head1 VERSION
 
-Version 0.003.1
+Version 0.004.1
 
 =head1 SYNOPSIS
 
@@ -344,37 +345,53 @@ F<../lib/Web/VWF/Display> beside the script.
 The old C<pages> is read when there is no C<display>, as is its old form of one
 string of names, C<< <pages>index, meta_data</pages> >>.
 
-=head2 Data: C<databases>
+=head2 Data: C<databases> and C<data>
 
 	<databases>
-		<directory>/path/to/modules</directory>
-		<database>
+		<directory>/path/to/files</directory>
+	</databases>
+	<data>
+		<directory>/path/to/drivers</directory>
+		<driver>
 			<name>states</name>
 			<description>List of data about the U.S. states</description>
-			<directory>/path/to/this/module</directory>
-		</database>
-	</databases>
+			<directory>/path/to/this/driver</directory>
+		</driver>
+	</data>
 
-One C<database> for each data module a page may use.  A page is given each as
+C<databases> says where the data files are (CSV, XML, SQLite), and C<data> where the
+drivers that read them are: the L<Database::Abstraction> subclasses.  They are
+separate so that the files may be kept apart from code.
+
+C<databases>'s C<directory> is the directory of the data files.  Default:
+F<../databases> beside the script.  Pages are told it as C<database_dir> and
+C<databasedir>.  The old top-level C<database_dir> is read when there is no
+C<directory> in C<databases>.
+
+One C<driver> in C<data> for each driver a page may use.  A page is given each as
 a variable named for the last part of its class, lower-cased: the module
 C<Web::VWF::Data::states> is C<$states> in the page.  A C<name> with no C<::> in it is
 a C<Web::VWF::Data::> module; one with C<::>, such as C<Bands::Data::bands>, is
 used as written.  The C<description> is only logged.
 
-C<directory> is where the module's F<.pm> file is, in the same way as for
-C<display>, named for the last part of the class.  It is not where the
-database's own files are: that is C<database_dir>.
+C<directory> is where the driver's F<.pm> file is, named for the last part of the
+class: in the C<driver> for that driver alone, in C<data> for all of them.  With
+neither, the drivers are looked for in the C<databases> directory.  A driver that
+is not in the C<data> or C<databases> directory is taken from C<@INC>, which is
+how a site uses the distribution's own C<Web::VWF::Data::index>.  Only the
+C<directory> of a C<driver> is strict: a driver that is not in it is not loaded.
 
 What is loaded, in order of preference:
 
 =over 4
 
-=item 1. the C<database> elements;
+=item 1. the C<driver> elements;
 
 =item 2. the old C<data_modules>, one string of names, C<index, states> (an empty
 one means none);
 
-=item 3. with only a C<databases> C<directory>, every F<.pm> in it;
+=item 3. every F<.pm> in the C<data> directory, or failing that the C<databases>
+directory;
 
 =item 4. the default, C<Web::VWF::Data::index>.
 
@@ -383,19 +400,14 @@ one means none);
 A module that cannot be loaded is logged and skipped; the pages that do not
 need it still work.
 
-This is not called C<data> because the data modules are given the configuration's top-level
-keys as their constructor arguments, and a key called C<data> replaces the rows
-of every database.
+Take care in naming a driver's own configuration: the drivers are given the
+configuration's top-level keys as their constructor arguments, so a key called
+C<data> would replace the rows of every database.  The framework discards those
+rows, but a driver of your own that is constructed elsewhere must do the same.
 
 =head2 Other settings
 
 =over 4
-
-=item C<database_dir>
-
-The directory of the database files (CSV, XML, SQLite) read by the data
-modules.  Default: F<../data> beside the script.  Pages are told it as
-C<database_dir> and C<databasedir>.
 
 =item C<supported_languages>
 
@@ -711,6 +723,139 @@ sub _config
 		directory => $self->_directory(),
 	});
 }
+
+=head2 sig_handler
+
+Internal: not part of the public interface, though it is a plain function, not a
+method.  The handler for TERM and USR1.  It sets the flag that makes C<run> leave its loop and, if no
+request is being handled, flushes the response cache and statistics, detaches
+L<Log::WarnDie> and exits at once.  Mid-request it only sets the flag, so the
+response in flight is sent whole.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{ signal => { type => 'string' } }
+
+=head4 OUTPUT
+
+	{ type => 'undef' }
+
+=head2 choose
+
+Internal: a plain function.  Sends the C<300 Multiple Choices> response: plain
+text that lists C<?page=> and the description of each page the site serves, with
+a C<Last-Modified> header from the page script.  The list is left out for
+C<HEAD>.  It does nothing when the status of the request is already not 200,
+as for an unknown page, where the status line is sent elsewhere.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{}
+
+=head4 OUTPUT
+
+	{ type => 'undef' }
+
+=head2 send_error
+
+Internal: a plain function.  Sends a short plain-text error response, and
+records the status in the request's L<CGI::Info>.  Takes a hash or a hashref:
+
+=over 4
+
+=item C<status>
+
+The HTTP status code.  Required.
+
+=item C<body>
+
+The text to send.  It is not sent for C<HEAD>.
+
+=item C<headers>
+
+Extra header lines, each ending in a newline, such as C<Retry-After>.
+
+=item C<buffered>
+
+True once L<FCGI::Buffer> is capturing the output: it sends the C<Status> line
+itself, so this does not.
+
+=back
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{
+		status => { type => 'integer', min => 100, max => 599 },
+		body => { type => 'string', optional => 1 },
+		headers => { type => 'string', optional => 1 },
+		buffered => { type => 'boolean', optional => 1 },
+	}
+
+=head4 OUTPUT
+
+	{ type => 'integer', value => 1 }
+
+=head2 duration_seconds
+
+Internal: a plain function.  Converts a duration such as C<60s>, C<2 minutes> or
+C<90> to whole seconds, with L<Time::Duration::Parse>.  A string of digits is
+already seconds.  One that cannot be parsed is logged as a warning, and
+counts as 60 seconds.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{ duration => { type => 'string' } }
+
+=head4 OUTPUT
+
+	{ type => 'integer', min => 0 }
+
+=head2 blacklisted
+
+Internal: a plain function.  Takes the request's L<CGI::Info> and says whether
+the request looks like an SQL injection attempt.  The address that sent one is
+remembered by the worker, so its later requests are refused without scanning
+them again.  It is only a filter for noise, see L<Web::VWF::Blacklist>.  A
+request of more than 8192 characters is not scanned.  There is nothing to check
+without C<REMOTE_ADDR>.  When it returns true the status of the request has been
+set to 403.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{ info => { type => 'object', isa => 'CGI::Info' } }
+
+=head4 OUTPUT
+
+	{ type => 'boolean' }
+
+=head2 filter
+
+Internal: a plain function, registered with L<Log::WarnDie>.  Called with a
+warning, returns false for the few harmless ones that are not worth logging
+(two missing optional modules under L<Net::OAuth> and L<NetAddr::IP>, and an
+C<S_IFFIFO> message from Fcntl) and true for all the rest.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{ message => { type => 'string' } }
+
+=head4 OUTPUT
+
+	{ type => 'boolean' }
+
+=cut
 
 # Deferred shutdown handler: set the exit flag and, if we are between requests,
 # flush caches and exit immediately.  If we are mid-request, the flag is checked
@@ -1085,6 +1230,7 @@ sub _doit
 		no_entry => 1,
 		logger => $logger,
 	});
+	_discard_config_rows($self->{vwf_log});
 	my $log = Class::Simple->new();
 
 	# Stores things for a month or longer
@@ -1702,28 +1848,71 @@ sub _page_descriptions
 	return map { $_->{'name'} => $_->{'description'} } grep { length($_->{'description'}) } $self->_config_pages($config);
 }
 
-# The data modules the site declares, as a list of
-# { name, module, description, directory } in the order they were written:
-#	<databases>
-#		<directory>/path/to/modules</directory>
-#		<database>
+# The directory the site's data files (CSV, XML, SQLite) are in:
+#	<databases><directory>/path/to/files</directory></databases>
+# else the old <database_dir>, else ../databases beside the script.  Data drivers are
+# looked for here unless <data> says otherwise.
+sub _database_directory_is_set
+{
+	my (undef, $config) = @_;
+
+	my $databases = $config->{'databases'};
+	return 1 if(ref($databases) eq 'HASH' && defined(_resolve_directory($databases->{'directory'})));
+	return $config->{'database_dir'} ? 1 : 0;
+}
+
+sub _database_directory
+{
+	my (undef, $config) = @_;
+
+	my $databases = $config->{'databases'};
+	my $directory = (ref($databases) eq 'HASH') ? _resolve_directory($databases->{'directory'}) : undef;
+	return $directory // $config->{'database_dir'} || File::Spec->catdir($script_dir // File::Spec->curdir(), File::Spec->updir(), $DEFAULT_DATABASE_DIR);
+}
+
+# The database directory, and a message in the log about it: info when it is there,
+# notice when only the default is missing (a site may have no data files at all; the
+# drivers it declares itself are still tried and report their own failure), and an
+# error when the site named a directory that is not there, which is a mistake.
+sub _check_database_directory
+{
+	my ($self, $config, $logger) = @_;
+
+	my $directory = $self->_database_directory($config);
+	if(-d $directory) {
+		$logger->info('Reading databases from ', $directory);
+	} elsif($self->_database_directory_is_set($config)) {
+		$logger->error("The databases directory $directory does not exist");
+	} else {
+		$logger->notice("No databases directory $directory: assuming there are no data files");
+	}
+	return $directory;
+}
+
+# The data drivers (Database::Abstraction subclasses) the site declares, as a list of
+# { name, module, description, file, soft } in the order they were written:
+#	<data>
+#		<directory>/path/to/drivers</directory>
+#		<driver>
 #			<name>states</name>
 #			<description>List of data about the U.S. states</description>
-#			<directory>/path/to/states/module</directory>
-#		</database>
-#	</databases>
-# The container is <databases>, not <data>: the data modules take their
-# constructor arguments from the configuration's top-level keys, and a key called
-# data would replace the rows of every database with the setting itself.
+#			<directory>/path/to/states/driver</directory>
+#		</driver>
+#	</data>
+# <databases> says where the data files are and <data> where the drivers that read
+# them are.  (<data> as a top-level key is also handed to Database::Abstraction as
+# a constructor argument, which _site_setup() undoes.)
 # name is what the page is given (lower-cased last part), module the class, and
-# directory where its .pm file is, or undef to find the class in @INC.  A
-# <directory> in a <database> beats the one in <databases>.  The directories are those
-# of the modules, not of the databases' files: those are <database_dir>.
+# file where its .pm file is, or undef to find the class in @INC.  A <directory>
+# in a <driver> beats the one in <data>, which beats the database directory, the
+# default.  Only the <driver> one is strict: a driver that is not in the others is
+# looked for in @INC, so a site need not copy this distribution's own drivers into
+# its data directory.
 # What is declared, in order of preference:
-#	1. the <database> elements;
+#	1. the <driver> elements;
 #	2. the old <data_modules>index, states</data_modules> string, which is also
 #	   how a site says "none" by leaving it empty;
-#	3. with a <databases><directory> and no <database>, every *.pm in that directory;
+#	3. every *.pm in the <data> directory, or failing that in the database directory;
 #	4. the default, Web::VWF::Data::index.
 # A name with no :: is one of this distribution's own, so index is
 # Web::VWF::Data::index; a name that has :: is used as written, which is how a
@@ -1733,17 +1922,27 @@ sub _data_modules
 {
 	my ($self, $config) = @_;
 
-	my $databases = $config->{'databases'};
-	my $default_dir = (ref($databases) eq 'HASH') ? _resolve_directory($databases->{'directory'}) : undef;
+	my $data = $config->{'data'};
+	my $named_dir = (ref($data) eq 'HASH') ? _resolve_directory($data->{'directory'}) : undef;
+	my $default_dir = $named_dir // $self->_database_directory($config);
 
-	my @entries = _config_entries($databases, 'database');
+	my @entries = _config_entries($data, 'driver');
 	unless(@entries) {
 		if(defined($config->{'data_modules'})) {
 			@entries = map { +{ name => $_, description => '', directory => '' } } $self->_config_list($config, 'data_modules');
-		} elsif(defined($default_dir)) {
-			@entries = map { +{ name => $_, description => '', directory => '' } } sort(map { basename($_, '.pm') } glob(File::Spec->catfile($default_dir, '*.pm')));
 		} else {
-			@entries = map { +{ name => $_, description => '', directory => '' } } @DEFAULT_DATA_MODULES;
+			@entries = map { +{ name => $_, description => '', directory => '' } } sort(map { basename($_, '.pm') } glob(File::Spec->catfile($default_dir, '*.pm')));
+			unless(@entries) {
+				# Nothing declared and nothing in the directory.  The built-in
+				# driver reads files from the databases directory, so with no
+				# such directory the site has no data files and needs no driver
+				# (its own access log is read by vwf_log, which is separate).
+				# A directory the site named that is missing is a mistake, which
+				# the driver then reports.
+				return () unless(-d $default_dir || $self->_database_directory_is_set($config));
+				# This distribution's own, from @INC
+				return map { +{ name => lc((split(/::/, $_))[-1]), module => $_, description => '', file => undef } } @DEFAULT_DATA_MODULES;
+			}
 		}
 	}
 
@@ -1751,12 +1950,14 @@ sub _data_modules
 	foreach my $entry (@entries) {
 		my $module = ($entry->{'name'} =~ /::/) ? $entry->{'name'} : "Web::VWF::Data::$entry->{'name'}";
 		my $last = (split(/::/, $module))[-1];
-		my $dir = _resolve_directory($entry->{'directory'}) // $default_dir;
+		my $own = _resolve_directory($entry->{'directory'});
+		my $dir = $own // $default_dir;
 		push @modules, {
 			name => lc($last),
 			module => $module,
 			description => $entry->{'description'},
-			file => defined($dir) ? File::Spec->catfile($dir, "$last.pm") : undef,
+			file => File::Spec->catfile($dir, "$last.pm"),
+			soft => defined($own) ? 0 : 1,
 		};
 	}
 	return @modules;
@@ -1780,9 +1981,13 @@ sub _site_setup
 
 	# Where the site's own databases are.  Database::Abstraction reads them, and
 	# the pages are told the directory as databasedir and database_dir.
-	$database_dir = $config->{'database_dir'}
-		|| File::Spec->catdir($script_dir, File::Spec->updir(), $DEFAULT_DATABASE_DIR);
-	$logger->debug('Reading databases from ', $database_dir);
+	$database_dir = $self->_check_database_directory($config, $logger);
+
+	# <databases><database> was how a site declared its drivers before 0.004.0.
+	# It is no longer read, so say so rather than leaving the pages without data.
+	if(ref($config->{'databases'}) eq 'HASH' && exists($config->{'databases'}{'database'})) {
+		$logger->warn('<databases><database> is no longer read: declare each driver as <data><driver>');
+	}
 
 	Database::Abstraction::init({
 		cache => CHI->new(driver => 'Memory', datastore => {}),
@@ -1806,15 +2011,18 @@ sub _site_setup
 		my $module = $database->{'module'};
 		my $handle;
 		eval {
-			if(defined($database->{'file'})) {
+			if(defined($database->{'file'}) && (-f $database->{'file'} || !$database->{'soft'})) {
 				# From the directory the site gave, not from @INC
 				-f $database->{'file'} or die "No such file $database->{'file'}\n";
 				require $database->{'file'};
 			} else {
+				# No directory given, or only the database directory by default
+				# and the driver is not in it
 				require_module($module);
 			}
 			$module->import() if($module->can('import'));
 			$handle = $module->new();
+			_discard_config_rows($handle);
 		};
 		if(!defined($handle)) {
 			# A module the site named that cannot be loaded is reported and
@@ -1831,6 +2039,18 @@ sub _site_setup
 	}
 
 	return 1;
+}
+
+# <data> is a top-level configuration key, so a Database::Abstraction handle
+# built while the site configures it takes the setting for the rows of its table,
+# and then never opens its file ("Where did the data come from?").  Discard them
+# so that the handle reads its own file.  Every handle this module makes needs it.
+sub _discard_config_rows
+{
+	my $handle = shift;
+
+	delete $handle->{'data'} if(Scalar::Util::blessed($handle) && exists($handle->{'data'}));
+	return $handle;
 }
 
 # Give the current logger to every data handle.  This runs before each request,

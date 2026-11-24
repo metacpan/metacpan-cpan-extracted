@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlBackupRuns;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -244,79 +244,11 @@ EOF
     # Field: instance Type: 9 ()
     # Field: project Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsDeleteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsDeleteRequest->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: Int64
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsGetRequest ===
     # Fields for SqlBackupRunsGetRequest
     # Field: id Type: 3 ()
     # Field: instance Type: 9 ()
     # Field: project Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsGetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsGetRequest->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: Int64
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsInsertRequest ===
     # Fields for SqlBackupRunsInsertRequest
@@ -324,84 +256,12 @@ Type: String
     # Field: project Type: 9 ()
     # Field: body Type: 11 (.google.cloud.sql.v1.BackupRun)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsInsertRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsInsertRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<body>
-
-Type: Message (.google.cloud.sql.v1.BackupRun)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsListRequest ===
     # Fields for SqlBackupRunsListRequest
     # Field: instance Type: 9 ()
     # Field: max_results Type: 5 ()
     # Field: page_token Type: 9 ()
     # Field: project Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsListRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<max_results>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRun ===
     # Fields for BackupRun
@@ -425,166 +285,26 @@ Type: String
     # Field: time_zone Type: 9 ()
     # Field: max_chargeable_bytes Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRun - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRun->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<status>
-
-Type: Enum (.google.cloud.sql.v1.SqlBackupRunStatus)
-
-=item * B<enqueued_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<id>
-
-Type: Int64
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<error>
-
-Type: Message (.google.cloud.sql.v1.OperationError)
-
-=item * B<type>
-
-Type: Enum (.google.cloud.sql.v1.SqlBackupRunType)
-
-=item * B<description>
-
-Type: String
-
-=item * B<window_start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<instance>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=item * B<database_version>
-
-Type: Enum (.google.cloud.sql.v1.SqlDatabaseVersion)
-
-=item * B<disk_encryption_configuration>
-
-Type: Message (.google.cloud.sql.v1.DiskEncryptionConfiguration)
-
-=item * B<disk_encryption_status>
-
-Type: Message (.google.cloud.sql.v1.DiskEncryptionStatus)
-
-=item * B<backup_kind>
-
-Type: Enum (.google.cloud.sql.v1.SqlBackupKind)
-
-=item * B<time_zone>
-
-Type: String
-
-=item * B<max_chargeable_bytes>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRunsListResponse ===
     # Fields for BackupRunsListResponse
     # Field: kind Type: 9 ()
     # Field: items Type: 11 (.google.cloud.sql.v1.BackupRun)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRunsListResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRunsListResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<items>
-
-Type: Message (.google.cloud.sql.v1.BackupRun)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsServiceClient - Client stub representing the remote SqlBackupRunsService service
+Client stub representing the remote C<SqlBackupRunsService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -665,13 +385,342 @@ sub list {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlBackupRuns - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlBackupRuns - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_backup_runs.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlBackupRuns;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsDeleteRequest->new({
+        id => $id,
+        instance => $instance,
+        project => $project,
+    });
+
+    # Read or update a field
+    my $val = $msg->id();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsDeleteRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_backup_runs.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsDeleteRequest
+
+Backup runs delete request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<Int64>
+
+The ID of the backup run to delete. To find a backup run ID, use the
+[list](https://cloud.google.com/sql/docs/mysql/admin-api/rest/v1/backupRuns/list)
+method.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsGetRequest
+
+Backup runs get request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<Int64>
+
+The ID of this backup run.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsInsertRequest
+
+Backup runs insert request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->body() >> / C<< $msg->body($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRun>)
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBackupRuns::SqlBackupRunsListRequest
+
+Backup runs list request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Cloud SQL instance ID, or "-" for all instances. This does not include
+the project ID.
+
+=item * C<< $msg->max_results() >> / C<< $msg->max_results($value) >>
+
+Type: C<Int32>
+
+Maximum number of backup runs per response.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A previously-returned page token representing part of the larger set of
+results to view.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRun
+
+A BackupRun resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#backupRun`.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlBackupRunStatus>)
+
+The status of this run.
+
+=item * C<< $msg->enqueued_time() >> / C<< $msg->enqueued_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time the run was enqueued in UTC timezone in
+[RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<Int64>
+
+The identifier for this backup run. Unique only for a specific Cloud SQL
+instance.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time the backup operation actually started in UTC timezone in
+[RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time the backup operation completed in UTC timezone in
+[RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`.
+
+=item * C<< $msg->error() >> / C<< $msg->error($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::OperationError>)
+
+Information about why the backup operation failed. This is only present if
+the run has the FAILED status.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlBackupRunType>)
+
+The type of this run; can be either "AUTOMATED" or "ON_DEMAND" or "FINAL".
+This field defaults to "ON_DEMAND" and is ignored, when specified for
+insert requests.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+The description of this run, only applicable to on-demand backups.
+
+=item * C<< $msg->window_start_time() >> / C<< $msg->window_start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The start time of the backup window during which this the backup was
+attempted in [RFC 3339](https://tools.ietf.org/html/rfc3339) format, for
+example `2012-11-15T16:19:00.094Z`.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Name of the database instance.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+The URI of this resource.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Location of the backups.
+
+=item * C<< $msg->database_version() >> / C<< $msg->database_version($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlDatabaseVersion>)
+
+Output only. The instance database version at the time this backup was
+made.
+
+=item * C<< $msg->disk_encryption_configuration() >> / C<< $msg->disk_encryption_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionConfiguration>)
+
+Encryption configuration specific to a backup.
+
+=item * C<< $msg->disk_encryption_status() >> / C<< $msg->disk_encryption_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionStatus>)
+
+Encryption status specific to a backup.
+
+=item * C<< $msg->backup_kind() >> / C<< $msg->backup_kind($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlBackupKind>)
+
+Specifies the kind of backup, PHYSICAL or DEFAULT_SNAPSHOT.
+
+=item * C<< $msg->time_zone() >> / C<< $msg->time_zone($value) >>
+
+Type: C<String>
+
+Backup time zone to prevent restores to an instance with
+a different time zone. Now relevant only for SQL Server.
+
+=item * C<< $msg->max_chargeable_bytes() >> / C<< $msg->max_chargeable_bytes($value) >>
+
+Type: C<Int64>
+
+Output only. The maximum chargeable bytes for the backup.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRunsListResponse
+
+Backup run list results.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#backupRunsList`.
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlBackupRuns::BackupRun>)
+
+A list of backup runs in reverse chronological order of the enqueued time.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+The continuation token, used to page through large result sets. Provide
+this value in a subsequent request to return the next page of results.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlBackupRuns::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

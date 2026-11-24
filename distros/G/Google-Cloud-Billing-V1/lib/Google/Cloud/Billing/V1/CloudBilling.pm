@@ -1,0 +1,1160 @@
+package Google::Cloud::Billing::V1::CloudBilling;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Iam::V1::IamPolicy };
+    eval { require Google::Iam::V1::Policy };
+    eval { require Google::Protobuf::FieldMask };
+    my $descriptor_b64 = <<'EOF';
+Citnb29nbGUvY2xvdWQvYmlsbGluZy92MS9jbG91ZF9iaWxsaW5nLnByb3RvEhdnb29nbGUu
+Y2xvdWQuYmlsbGluZy52MRocZ29vZ2xlL2FwaS9hbm5vdGF0aW9ucy5wcm90bxoXZ29vZ2xl
+L2FwaS9jbGllbnQucHJvdG8aH2dvb2dsZS9hcGkvZmllbGRfYmVoYXZpb3IucHJvdG8aGWdv
+b2dsZS9hcGkvcmVzb3VyY2UucHJvdG8aHmdvb2dsZS9pYW0vdjEvaWFtX3BvbGljeS5wcm90
+bxoaZ29vZ2xlL2lhbS92MS9wb2xpY3kucHJvdG8aIGdvb2dsZS9wcm90b2J1Zi9maWVsZF9t
+YXNrLnByb3RvIsgDCg5CaWxsaW5nQWNjb3VudBJGCgRuYW1lGAEgASgJQjLgQQP6QSwKKmNs
+b3VkYmlsbGluZy5nb29nbGVhcGlzLmNvbS9CaWxsaW5nQWNjb3VudFIEbmFtZRIXCgRvcGVu
+GAIgASgIQgPgQQNSBG9wZW4SIQoMZGlzcGxheV9uYW1lGAMgASgJUgtkaXNwbGF5TmFtZRI0
+ChZtYXN0ZXJfYmlsbGluZ19hY2NvdW50GAQgASgJUhRtYXN0ZXJCaWxsaW5nQWNjb3VudBIb
+CgZwYXJlbnQYBiABKAlCA+BBA1IGcGFyZW50EigKDWN1cnJlbmN5X2NvZGUYByABKAlCA+BB
+AVIMY3VycmVuY3lDb2RlOrQB6kGwAQoqY2xvdWRiaWxsaW5nLmdvb2dsZWFwaXMuY29tL0Jp
+bGxpbmdBY2NvdW50EiFiaWxsaW5nQWNjb3VudHMve2JpbGxpbmdfYWNjb3VudH0SPm9yZ2Fu
+aXphdGlvbnMve29yZ2FuaXphdGlvbn0vYmlsbGluZ0FjY291bnRzL3tiaWxsaW5nX2FjY291
+bnR9Kg9iaWxsaW5nQWNjb3VudHMyDmJpbGxpbmdBY2NvdW50IoYCChJQcm9qZWN0QmlsbGlu
+Z0luZm8SFwoEbmFtZRgBIAEoCUID4EEDUgRuYW1lEiIKCnByb2plY3RfaWQYAiABKAlCA+BB
+A1IJcHJvamVjdElkEjAKFGJpbGxpbmdfYWNjb3VudF9uYW1lGAMgASgJUhJiaWxsaW5nQWNj
+b3VudE5hbWUSLAoPYmlsbGluZ19lbmFibGVkGAQgASgIQgPgQQNSDmJpbGxpbmdFbmFibGVk
+OlPqQVAKLmNsb3VkYmlsbGluZy5nb29nbGVhcGlzLmNvbS9Qcm9qZWN0QmlsbGluZ0luZm8S
+HnByb2plY3RzL3twcm9qZWN0fS9iaWxsaW5nSW5mbyJiChhHZXRCaWxsaW5nQWNjb3VudFJl
+cXVlc3QSRgoEbmFtZRgBIAEoCUIy4EEC+kEsCipjbG91ZGJpbGxpbmcuZ29vZ2xlYXBpcy5j
+b20vQmlsbGluZ0FjY291bnRSBG5hbWUijQEKGkxpc3RCaWxsaW5nQWNjb3VudHNSZXF1ZXN0
+EhsKCXBhZ2Vfc2l6ZRgBIAEoBVIIcGFnZVNpemUSHQoKcGFnZV90b2tlbhgCIAEoCVIJcGFn
+ZVRva2VuEhYKBmZpbHRlchgDIAEoCVIGZmlsdGVyEhsKBnBhcmVudBgEIAEoCUID4EEBUgZw
+YXJlbnQimQEKG0xpc3RCaWxsaW5nQWNjb3VudHNSZXNwb25zZRJSChBiaWxsaW5nX2FjY291
+bnRzGAEgAygLMicuZ29vZ2xlLmNsb3VkLmJpbGxpbmcudjEuQmlsbGluZ0FjY291bnRSD2Jp
+bGxpbmdBY2NvdW50cxImCg9uZXh0X3BhZ2VfdG9rZW4YAiABKAlSDW5leHRQYWdlVG9rZW4i
+kQEKG0NyZWF0ZUJpbGxpbmdBY2NvdW50UmVxdWVzdBJVCg9iaWxsaW5nX2FjY291bnQYASAB
+KAsyJy5nb29nbGUuY2xvdWQuYmlsbGluZy52MS5CaWxsaW5nQWNjb3VudEID4EECUg5iaWxs
+aW5nQWNjb3VudBIbCgZwYXJlbnQYAiABKAlCA+BBAVIGcGFyZW50IuoBChtVcGRhdGVCaWxs
+aW5nQWNjb3VudFJlcXVlc3QSRgoEbmFtZRgBIAEoCUIy4EEC+kEsCipjbG91ZGJpbGxpbmcu
+Z29vZ2xlYXBpcy5jb20vQmlsbGluZ0FjY291bnRSBG5hbWUSRgoHYWNjb3VudBgCIAEoCzIn
+Lmdvb2dsZS5jbG91ZC5iaWxsaW5nLnYxLkJpbGxpbmdBY2NvdW50QgPgQQJSB2FjY291bnQS
+OwoLdXBkYXRlX21hc2sYAyABKAsyGi5nb29nbGUucHJvdG9idWYuRmllbGRNYXNrUgp1cGRh
+dGVNYXNrIqMBCh1MaXN0UHJvamVjdEJpbGxpbmdJbmZvUmVxdWVzdBJGCgRuYW1lGAEgASgJ
+QjLgQQL6QSwKKmNsb3VkYmlsbGluZy5nb29nbGVhcGlzLmNvbS9CaWxsaW5nQWNjb3VudFIE
+bmFtZRIbCglwYWdlX3NpemUYAiABKAVSCHBhZ2VTaXplEh0KCnBhZ2VfdG9rZW4YAyABKAlS
+CXBhZ2VUb2tlbiKnAQoeTGlzdFByb2plY3RCaWxsaW5nSW5mb1Jlc3BvbnNlEl0KFHByb2pl
+Y3RfYmlsbGluZ19pbmZvGAEgAygLMisuZ29vZ2xlLmNsb3VkLmJpbGxpbmcudjEuUHJvamVj
+dEJpbGxpbmdJbmZvUhJwcm9qZWN0QmlsbGluZ0luZm8SJgoPbmV4dF9wYWdlX3Rva2VuGAIg
+ASgJUg1uZXh0UGFnZVRva2VuImcKHEdldFByb2plY3RCaWxsaW5nSW5mb1JlcXVlc3QSRwoE
+bmFtZRgBIAEoCUIz4EEC+kEtCitjbG91ZHJlc291cmNlbWFuYWdlci5nb29nbGVhcGlzLmNv
+bS9Qcm9qZWN0UgRuYW1lIpkBCh9VcGRhdGVQcm9qZWN0QmlsbGluZ0luZm9SZXF1ZXN0EhcK
+BG5hbWUYASABKAlCA+BBAlIEbmFtZRJdChRwcm9qZWN0X2JpbGxpbmdfaW5mbxgCIAEoCzIr
+Lmdvb2dsZS5jbG91ZC5iaWxsaW5nLnYxLlByb2plY3RCaWxsaW5nSW5mb1IScHJvamVjdEJp
+bGxpbmdJbmZvIswBChlNb3ZlQmlsbGluZ0FjY291bnRSZXF1ZXN0EkYKBG5hbWUYASABKAlC
+MuBBAvpBLAoqY2xvdWRiaWxsaW5nLmdvb2dsZWFwaXMuY29tL0JpbGxpbmdBY2NvdW50UgRu
+YW1lEmcKEmRlc3RpbmF0aW9uX3BhcmVudBgCIAEoCUI44EEC+kEyCjBjbG91ZHJlc291cmNl
+bWFuYWdlci5nb29nbGVhcGlzLmNvbS9Pcmdhbml6YXRpb25SEWRlc3RpbmF0aW9uUGFyZW50
+MqETCgxDbG91ZEJpbGxpbmcSnAEKEUdldEJpbGxpbmdBY2NvdW50EjEuZ29vZ2xlLmNsb3Vk
+LmJpbGxpbmcudjEuR2V0QmlsbGluZ0FjY291bnRSZXF1ZXN0GicuZ29vZ2xlLmNsb3VkLmJp
+bGxpbmcudjEuQmlsbGluZ0FjY291bnQiK4LT5JMCHhIcL3YxL3tuYW1lPWJpbGxpbmdBY2Nv
+dW50cy8qfdpBBG5hbWUSiAIKE0xpc3RCaWxsaW5nQWNjb3VudHMSMy5nb29nbGUuY2xvdWQu
+YmlsbGluZy52MS5MaXN0QmlsbGluZ0FjY291bnRzUmVxdWVzdBo0Lmdvb2dsZS5jbG91ZC5i
+aWxsaW5nLnYxLkxpc3RCaWxsaW5nQWNjb3VudHNSZXNwb25zZSKFAYLT5JMCcxITL3YxL2Jp
+bGxpbmdBY2NvdW50c1ouEiwvdjEve3BhcmVudD1vcmdhbml6YXRpb25zLyp9L2JpbGxpbmdB
+Y2NvdW50c1osEiovdjEve3BhcmVudD1iaWxsaW5nQWNjb3VudHMvKn0vc3ViQWNjb3VudHPa
+QQDaQQZwYXJlbnQSswEKFFVwZGF0ZUJpbGxpbmdBY2NvdW50EjQuZ29vZ2xlLmNsb3VkLmJp
+bGxpbmcudjEuVXBkYXRlQmlsbGluZ0FjY291bnRSZXF1ZXN0GicuZ29vZ2xlLmNsb3VkLmJp
+bGxpbmcudjEuQmlsbGluZ0FjY291bnQiPILT5JMCJzIcL3YxL3tuYW1lPWJpbGxpbmdBY2Nv
+dW50cy8qfToHYWNjb3VudNpBDG5hbWUsYWNjb3VudBLQAgoUQ3JlYXRlQmlsbGluZ0FjY291
+bnQSNC5nb29nbGUuY2xvdWQuYmlsbGluZy52MS5DcmVhdGVCaWxsaW5nQWNjb3VudFJlcXVl
+c3QaJy5nb29nbGUuY2xvdWQuYmlsbGluZy52MS5CaWxsaW5nQWNjb3VudCLYAYLT5JMCpgEi
+Ey92MS9iaWxsaW5nQWNjb3VudHM6D2JpbGxpbmdfYWNjb3VudFo/IiwvdjEve3BhcmVudD1v
+cmdhbml6YXRpb25zLyp9L2JpbGxpbmdBY2NvdW50czoPYmlsbGluZ19hY2NvdW50Wj0iKi92
+MS97cGFyZW50PWJpbGxpbmdBY2NvdW50cy8qfS9zdWJBY2NvdW50czoPYmlsbGluZ19hY2Nv
+dW502kEPYmlsbGluZ19hY2NvdW502kEWYmlsbGluZ19hY2NvdW50LHBhcmVudBK/AQoWTGlz
+dFByb2plY3RCaWxsaW5nSW5mbxI2Lmdvb2dsZS5jbG91ZC5iaWxsaW5nLnYxLkxpc3RQcm9q
+ZWN0QmlsbGluZ0luZm9SZXF1ZXN0GjcuZ29vZ2xlLmNsb3VkLmJpbGxpbmcudjEuTGlzdFBy
+b2plY3RCaWxsaW5nSW5mb1Jlc3BvbnNlIjSC0+STAicSJS92MS97bmFtZT1iaWxsaW5nQWNj
+b3VudHMvKn0vcHJvamVjdHPaQQRuYW1lEq0BChVHZXRQcm9qZWN0QmlsbGluZ0luZm8SNS5n
+b29nbGUuY2xvdWQuYmlsbGluZy52MS5HZXRQcm9qZWN0QmlsbGluZ0luZm9SZXF1ZXN0Gisu
+Z29vZ2xlLmNsb3VkLmJpbGxpbmcudjEuUHJvamVjdEJpbGxpbmdJbmZvIjCC0+STAiMSIS92
+MS97bmFtZT1wcm9qZWN0cy8qfS9iaWxsaW5nSW5mb9pBBG5hbWUS3gEKGFVwZGF0ZVByb2pl
+Y3RCaWxsaW5nSW5mbxI4Lmdvb2dsZS5jbG91ZC5iaWxsaW5nLnYxLlVwZGF0ZVByb2plY3RC
+aWxsaW5nSW5mb1JlcXVlc3QaKy5nb29nbGUuY2xvdWQuYmlsbGluZy52MS5Qcm9qZWN0Qmls
+bGluZ0luZm8iW4LT5JMCORohL3YxL3tuYW1lPXByb2plY3RzLyp9L2JpbGxpbmdJbmZvOhRw
+cm9qZWN0X2JpbGxpbmdfaW5mb9pBGW5hbWUscHJvamVjdF9iaWxsaW5nX2luZm8SiwEKDEdl
+dElhbVBvbGljeRIiLmdvb2dsZS5pYW0udjEuR2V0SWFtUG9saWN5UmVxdWVzdBoVLmdvb2ds
+ZS5pYW0udjEuUG9saWN5IkCC0+STAi8SLS92MS97cmVzb3VyY2U9YmlsbGluZ0FjY291bnRz
+Lyp9OmdldElhbVBvbGljedpBCHJlc291cmNlEpUBCgxTZXRJYW1Qb2xpY3kSIi5nb29nbGUu
+aWFtLnYxLlNldElhbVBvbGljeVJlcXVlc3QaFS5nb29nbGUuaWFtLnYxLlBvbGljeSJKgtPk
+kwIyIi0vdjEve3Jlc291cmNlPWJpbGxpbmdBY2NvdW50cy8qfTpzZXRJYW1Qb2xpY3k6ASra
+QQ9yZXNvdXJjZSxwb2xpY3kSwAEKElRlc3RJYW1QZXJtaXNzaW9ucxIoLmdvb2dsZS5pYW0u
+djEuVGVzdElhbVBlcm1pc3Npb25zUmVxdWVzdBopLmdvb2dsZS5pYW0udjEuVGVzdElhbVBl
+cm1pc3Npb25zUmVzcG9uc2UiVYLT5JMCOCIzL3YxL3tyZXNvdXJjZT1iaWxsaW5nQWNjb3Vu
+dHMvKn06dGVzdElhbVBlcm1pc3Npb25zOgEq2kEUcmVzb3VyY2UscGVybWlzc2lvbnMS6QEK
+Ek1vdmVCaWxsaW5nQWNjb3VudBIyLmdvb2dsZS5jbG91ZC5iaWxsaW5nLnYxLk1vdmVCaWxs
+aW5nQWNjb3VudFJlcXVlc3QaJy5nb29nbGUuY2xvdWQuYmlsbGluZy52MS5CaWxsaW5nQWNj
+b3VudCJ2gtPkkwJwIiEvdjEve25hbWU9YmlsbGluZ0FjY291bnRzLyp9Om1vdmU6ASpaSBJG
+L3YxL3tkZXN0aW5hdGlvbl9wYXJlbnQ9b3JnYW5pemF0aW9ucy8qfS97bmFtZT1iaWxsaW5n
+QWNjb3VudHMvKn06bW92ZRq1AcpBG2Nsb3VkYmlsbGluZy5nb29nbGVhcGlzLmNvbdJBkwFo
+dHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9hdXRoL2Nsb3VkLWJpbGxpbmcsaHR0cHM6Ly93
+d3cuZ29vZ2xlYXBpcy5jb20vYXV0aC9jbG91ZC1iaWxsaW5nLnJlYWRvbmx5LGh0dHBzOi8v
+d3d3Lmdvb2dsZWFwaXMuY29tL2F1dGgvY2xvdWQtcGxhdGZvcm1CgAIKG2NvbS5nb29nbGUu
+Y2xvdWQuYmlsbGluZy52MUIRQ2xvdWRCaWxsaW5nUHJvdG9QAVo1Y2xvdWQuZ29vZ2xlLmNv
+bS9nby9iaWxsaW5nL2FwaXYxL2JpbGxpbmdwYjtiaWxsaW5ncGLqQUEKK2Nsb3VkcmVzb3Vy
+Y2VtYW5hZ2VyLmdvb2dsZWFwaXMuY29tL1Byb2plY3QSEnByb2plY3RzL3twcm9qZWN0fepB
+UAowY2xvdWRyZXNvdXJjZW1hbmFnZXIuZ29vZ2xlYXBpcy5jb20vT3JnYW5pemF0aW9uEhxv
+cmdhbml6YXRpb25zL3tvcmdhbml6YXRpb259SsqFAQoHEgUOAPIDAQq8BAoBDBIDDgASMrEE
+IENvcHlyaWdodCAyMDI1IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hl
+IExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVz
+ZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlv
+dSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3
+LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkg
+YXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0
+cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMi
+IEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQs
+IGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBz
+cGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9u
+cyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAIAoJCgIDABIDEgAmCgkKAgMBEgMTACEK
+CQoCAwISAxQAKQoJCgIDAxIDFQAjCgkKAgMEEgMWACgKCQoCAwUSAxcAJAoJCgIDBhIDGAAq
+CggKAQgSAxoATAoJCgIICxIDGgBMCggKAQgSAxsAIgoJCgIIChIDGwAiCggKAQgSAxwAMgoJ
+CgIICBIDHAAyCggKAQgSAx0ANAoJCgIIARIDHQA0CgkKAQgSBB4AIQIKDAoECJ0IABIEHgAh
+AgoJCgEIEgQiACUCCgwKBAidCAESBCIAJQIKZgoCBgASBSkA7AEBGlkgUmV0cmlldmVzIHRo
+ZSBHb29nbGUgQ2xvdWQgQ29uc29sZSBiaWxsaW5nIGFjY291bnRzIGFuZCBhc3NvY2lhdGVz
+IHRoZW0gd2l0aAogcHJvamVjdHMuCgoKCgMGAAESAykIFAoKCgMGAAMSAyoCQwoMCgUGAAOZ
+CBIDKgJDCgsKAwYAAxIEKwIuNwoNCgUGAAOaCBIEKwIuNwrDAQoEBgACABIEMwI4Axq0ASBH
+ZXRzIGluZm9ybWF0aW9uIGFib3V0IGEgYmlsbGluZyBhY2NvdW50LiBUaGUgY3VycmVudCBh
+dXRoZW50aWNhdGVkIHVzZXIKIG11c3QgYmUgYSBbdmlld2VyIG9mIHRoZSBiaWxsaW5nCiBh
+Y2NvdW50XShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYmlsbGluZy9kb2NzL2hvdy10by9i
+aWxsaW5nLWFjY2VzcykuCgoMCgUGAAIAARIDMwYXCgwKBQYAAgACEgMzGDAKDAoFBgACAAMS
+AzM7SQoNCgUGAAIABBIENAQ2BgoRCgkGAAIABLDKvCISBDQENgYKDAoFBgACAAQSAzcEMgoP
+CggGAAIABJsIABIDNwQyCqgBCgQGAAIBEgQ9AkgDGpkBIExpc3RzIHRoZSBiaWxsaW5nIGFj
+Y291bnRzIHRoYXQgdGhlIGN1cnJlbnQgYXV0aGVudGljYXRlZCB1c2VyIGhhcwogcGVybWlz
+c2lvbiB0bwogW3ZpZXddKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9iaWxsaW5nL2RvY3Mv
+aG93LXRvL2JpbGxpbmctYWNjZXNzKS4KCgwKBQYAAgEBEgM9BhkKDAoFBgACAQISAz0aNAoM
+CgUGAAIBAxIDPg8qCg0KBQYAAgEEEgQ/BEUGChEKCQYAAgEEsMq8IhIEPwRFBgoMCgUGAAIB
+BBIDRgQuCg8KCAYAAgEEmwgAEgNGBC4KDAoFBgACAQQSA0cENAoPCggGAAIBBJsIARIDRwQ0
+CtQCCgQGAAICEgRQAlcDGsUCIFVwZGF0ZXMgYSBiaWxsaW5nIGFjY291bnQncyBmaWVsZHMu
+CiBDdXJyZW50bHkgdGhlIG9ubHkgZmllbGQgdGhhdCBjYW4gYmUgZWRpdGVkIGlzIGBkaXNw
+bGF5X25hbWVgLgogVGhlIGN1cnJlbnQgYXV0aGVudGljYXRlZCB1c2VyIG11c3QgaGF2ZSB0
+aGUgYGJpbGxpbmcuYWNjb3VudHMudXBkYXRlYAogSUFNIHBlcm1pc3Npb24sIHdoaWNoIGlz
+IHR5cGljYWxseSBnaXZlbiB0byB0aGUKIFthZG1pbmlzdHJhdG9yXShodHRwczovL2Nsb3Vk
+Lmdvb2dsZS5jb20vYmlsbGluZy9kb2NzL2hvdy10by9iaWxsaW5nLWFjY2VzcykKIG9mIHRo
+ZSBiaWxsaW5nIGFjY291bnQuCgoMCgUGAAICARIDUAYaCgwKBQYAAgICEgNQGzYKDAoFBgAC
+AgMSA1EPHQoNCgUGAAICBBIEUgRVBgoRCgkGAAICBLDKvCISBFIEVQYKDAoFBgACAgQSA1YE
+OgoPCggGAAICBJsIABIDVgQ6CqQGCgQGAAIDEgRoAngDGpUGIFRoaXMgbWV0aG9kIGNyZWF0
+ZXMgW2JpbGxpbmcKIHN1YmFjY291bnRzXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYmls
+bGluZy9kb2NzL2NvbmNlcHRzI3N1YmFjY291bnRzKS4KCiBHb29nbGUgQ2xvdWQgcmVzZWxs
+ZXJzIHNob3VsZCB1c2UgdGhlCiBDaGFubmVsIFNlcnZpY2VzIEFQSXMsCiBbYWNjb3VudHMu
+Y3VzdG9tZXJzLmNyZWF0ZV0oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2NoYW5uZWwvZG9j
+cy9yZWZlcmVuY2UvcmVzdC92MS9hY2NvdW50cy5jdXN0b21lcnMvY3JlYXRlKQogYW5kCiBb
+YWNjb3VudHMuY3VzdG9tZXJzLmVudGl0bGVtZW50cy5jcmVhdGVdKGh0dHBzOi8vY2xvdWQu
+Z29vZ2xlLmNvbS9jaGFubmVsL2RvY3MvcmVmZXJlbmNlL3Jlc3QvdjEvYWNjb3VudHMuY3Vz
+dG9tZXJzLmVudGl0bGVtZW50cy9jcmVhdGUpLgoKIFdoZW4gY3JlYXRpbmcgYSBzdWJhY2Nv
+dW50LCB0aGUgY3VycmVudCBhdXRoZW50aWNhdGVkIHVzZXIgbXVzdCBoYXZlIHRoZQogYGJp
+bGxpbmcuYWNjb3VudHMudXBkYXRlYCBJQU0gcGVybWlzc2lvbiBvbiB0aGUgcGFyZW50IGFj
+Y291bnQsIHdoaWNoIGlzCiB0eXBpY2FsbHkgZ2l2ZW4gdG8gYmlsbGluZyBhY2NvdW50CiBb
+YWRtaW5pc3RyYXRvcnNdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9iaWxsaW5nL2RvY3Mv
+aG93LXRvL2JpbGxpbmctYWNjZXNzKS4KIFRoaXMgbWV0aG9kIHdpbGwgcmV0dXJuIGFuIGVy
+cm9yIGlmIHRoZSBwYXJlbnQgYWNjb3VudCBoYXMgbm90IGJlZW4KIHByb3Zpc2lvbmVkIGZv
+ciBzdWJhY2NvdW50cy4KCgwKBQYAAgMBEgNoBhoKDAoFBgACAwISA2gbNgoMCgUGAAIDAxID
+aQ8dCg0KBQYAAgMEEgRqBHUGChEKCQYAAgMEsMq8IhIEagR1BgoMCgUGAAIDBBIDdgQ9Cg8K
+CAYAAgMEmwgAEgN2BD0KDAoFBgACAwQSA3cERAoPCggGAAIDBJsIARIDdwRECpsCCgQGAAIE
+EgV+AoQBAxqLAiBMaXN0cyB0aGUgcHJvamVjdHMgYXNzb2NpYXRlZCB3aXRoIGEgYmlsbGlu
+ZyBhY2NvdW50LiBUaGUgY3VycmVudAogYXV0aGVudGljYXRlZCB1c2VyIG11c3QgaGF2ZSB0
+aGUgYGJpbGxpbmcucmVzb3VyY2VBc3NvY2lhdGlvbnMubGlzdGAgSUFNCiBwZXJtaXNzaW9u
+LCB3aGljaCBpcyBvZnRlbiBnaXZlbiB0byBiaWxsaW5nIGFjY291bnQKIFt2aWV3ZXJzXSho
+dHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYmlsbGluZy9kb2NzL2hvdy10by9iaWxsaW5nLWFj
+Y2VzcykuCgoMCgUGAAIEARIDfgYcCgwKBQYAAgQCEgN+HToKDAoFBgACBAMSA38PLQoPCgUG
+AAIEBBIGgAEEggEGChMKCQYAAgQEsMq8IhIGgAEEggEGCg0KBQYAAgQEEgSDAQQyChAKCAYA
+AgQEmwgAEgSDAQQyCq8CCgQGAAIFEgaLAQKRAQMangIgR2V0cyB0aGUgYmlsbGluZyBpbmZv
+cm1hdGlvbiBmb3IgYSBwcm9qZWN0LiBUaGUgY3VycmVudCBhdXRoZW50aWNhdGVkIHVzZXIK
+IG11c3QgaGF2ZSB0aGUgYHJlc291cmNlbWFuYWdlci5wcm9qZWN0cy5nZXRgIHBlcm1pc3Np
+b24gZm9yIHRoZSBwcm9qZWN0LAogd2hpY2ggY2FuIGJlIGdyYW50ZWQgYnkgYXNzaWduaW5n
+IHRoZSBbUHJvamVjdAogVmlld2VyXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vaWFtL2Rv
+Y3MvdW5kZXJzdGFuZGluZy1yb2xlcyNwcmVkZWZpbmVkX3JvbGVzKQogcm9sZS4KCg0KBQYA
+AgUBEgSLAQYbCg0KBQYAAgUCEgSLARw4Cg0KBQYAAgUDEgSMAQ8hCg8KBQYAAgUEEgaNAQSP
+AQYKEwoJBgACBQSwyrwiEgaNAQSPAQYKDQoFBgACBQQSBJABBDIKEAoIBgACBQSbCAASBJAB
+BDIK+Q0KBAYAAgYSBrMBAroBAxroDSBTZXRzIG9yIHVwZGF0ZXMgdGhlIGJpbGxpbmcgYWNj
+b3VudCBhc3NvY2lhdGVkIHdpdGggYSBwcm9qZWN0LiBZb3Ugc3BlY2lmeQogdGhlIG5ldyBi
+aWxsaW5nIGFjY291bnQgYnkgc2V0dGluZyB0aGUgYGJpbGxpbmdfYWNjb3VudF9uYW1lYCBp
+biB0aGUKIGBQcm9qZWN0QmlsbGluZ0luZm9gIHJlc291cmNlIHRvIHRoZSByZXNvdXJjZSBu
+YW1lIG9mIGEgYmlsbGluZyBhY2NvdW50LgogQXNzb2NpYXRpbmcgYSBwcm9qZWN0IHdpdGgg
+YW4gb3BlbiBiaWxsaW5nIGFjY291bnQgZW5hYmxlcyBiaWxsaW5nIG9uIHRoZQogcHJvamVj
+dCBhbmQgYWxsb3dzIGNoYXJnZXMgZm9yIHJlc291cmNlIHVzYWdlLiBJZiB0aGUgcHJvamVj
+dCBhbHJlYWR5IGhhZCBhCiBiaWxsaW5nIGFjY291bnQsIHRoaXMgbWV0aG9kIGNoYW5nZXMg
+dGhlIGJpbGxpbmcgYWNjb3VudCB1c2VkIGZvciByZXNvdXJjZQogdXNhZ2UgY2hhcmdlcy4K
+CiAqTm90ZToqIEluY3VycmVkIGNoYXJnZXMgdGhhdCBoYXZlIG5vdCB5ZXQgYmVlbiByZXBv
+cnRlZCBpbiB0aGUgdHJhbnNhY3Rpb24KIGhpc3Rvcnkgb2YgdGhlIEdvb2dsZSBDbG91ZCBD
+b25zb2xlIG1pZ2h0IGJlIGJpbGxlZCB0byB0aGUgbmV3IGJpbGxpbmcKIGFjY291bnQsIGV2
+ZW4gaWYgdGhlIGNoYXJnZSBvY2N1cnJlZCBiZWZvcmUgdGhlIG5ldyBiaWxsaW5nIGFjY291
+bnQgd2FzCiBhc3NpZ25lZCB0byB0aGUgcHJvamVjdC4KCiBUaGUgY3VycmVudCBhdXRoZW50
+aWNhdGVkIHVzZXIgbXVzdCBoYXZlIG93bmVyc2hpcCBwcml2aWxlZ2VzIGZvciBib3RoCiB0
+aGUKIFtwcm9qZWN0XShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vZG9jcy9wZXJtaXNzaW9u
+cy1vdmVydmlldyNoLmJnczBveG9mdm5vbwogKSBhbmQgdGhlIFtiaWxsaW5nCiBhY2NvdW50
+XShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYmlsbGluZy9kb2NzL2hvdy10by9iaWxsaW5n
+LWFjY2VzcykuCgogWW91IGNhbiBkaXNhYmxlIGJpbGxpbmcgb24gdGhlIHByb2plY3QgYnkg
+c2V0dGluZyB0aGUKIGBiaWxsaW5nX2FjY291bnRfbmFtZWAgZmllbGQgdG8gZW1wdHkuIFRo
+aXMgYWN0aW9uIGRpc2Fzc29jaWF0ZXMgdGhlCiBjdXJyZW50IGJpbGxpbmcgYWNjb3VudCBm
+cm9tIHRoZSBwcm9qZWN0LiBBbnkgYmlsbGFibGUgYWN0aXZpdHkgb2YgeW91cgogaW4tdXNl
+IHNlcnZpY2VzIHdpbGwgc3RvcCwgYW5kIHlvdXIgYXBwbGljYXRpb24gY291bGQgc3RvcCBm
+dW5jdGlvbmluZyBhcwogZXhwZWN0ZWQuIEFueSB1bmJpbGxlZCBjaGFyZ2VzIHRvIGRhdGUg
+d2lsbCBiZSBiaWxsZWQgdG8gdGhlIHByZXZpb3VzbHkKIGFzc29jaWF0ZWQgYWNjb3VudC4g
+VGhlIGN1cnJlbnQgYXV0aGVudGljYXRlZCB1c2VyIG11c3QgYmUgZWl0aGVyIGFuIG93bmVy
+CiBvZiB0aGUgcHJvamVjdCBvciBhbiBvd25lciBvZiB0aGUgYmlsbGluZyBhY2NvdW50IGZv
+ciB0aGUgcHJvamVjdC4KCiBOb3RlIHRoYXQgYXNzb2NpYXRpbmcgYSBwcm9qZWN0IHdpdGgg
+YSAqY2xvc2VkKiBiaWxsaW5nIGFjY291bnQgd2lsbCBoYXZlCiBtdWNoIHRoZSBzYW1lIGVm
+ZmVjdCBhcyBkaXNhYmxpbmcgYmlsbGluZyBvbiB0aGUgcHJvamVjdDogYW55IHBhaWQKIHJl
+c291cmNlcyB1c2VkIGJ5IHRoZSBwcm9qZWN0IHdpbGwgYmUgc2h1dCBkb3duLiBUaHVzLCB1
+bmxlc3MgeW91IHdpc2ggdG8KIGRpc2FibGUgYmlsbGluZywgeW91IHNob3VsZCBhbHdheXMg
+Y2FsbCB0aGlzIG1ldGhvZCB3aXRoIHRoZSBuYW1lIG9mIGFuCiAqb3BlbiogYmlsbGluZyBh
+Y2NvdW50LgoKDQoFBgACBgESBLMBBh4KDQoFBgACBgISBLMBHz4KDQoFBgACBgMSBLQBDyEK
+DwoFBgACBgQSBrUBBLgBBgoTCgkGAAIGBLDKvCISBrUBBLgBBgoNCgUGAAIGBBIEuQEERwoQ
+CggGAAIGBJsIABIEuQEERwqPAgoEBgACBxIGwAECxgEDGv4BIEdldHMgdGhlIGFjY2VzcyBj
+b250cm9sIHBvbGljeSBmb3IgYSBiaWxsaW5nIGFjY291bnQuCiBUaGUgY2FsbGVyIG11c3Qg
+aGF2ZSB0aGUgYGJpbGxpbmcuYWNjb3VudHMuZ2V0SWFtUG9saWN5YCBwZXJtaXNzaW9uIG9u
+IHRoZQogYWNjb3VudCwgd2hpY2ggaXMgb2Z0ZW4gZ2l2ZW4gdG8gYmlsbGluZyBhY2NvdW50
+CiBbdmlld2Vyc10oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2JpbGxpbmcvZG9jcy9ob3ct
+dG8vYmlsbGluZy1hY2Nlc3MpLgoKDQoFBgACBwESBMABBhIKDQoFBgACBwISBMABEzQKDQoF
+BgACBwMSBMEBDyMKDwoFBgACBwQSBsIBBMQBBgoTCgkGAAIHBLDKvCISBsIBBMQBBgoNCgUG
+AAIHBBIExQEENgoQCggGAAIHBJsIABIExQEENgq1AgoEBgACCBIGzQEC1AEDGqQCIFNldHMg
+dGhlIGFjY2VzcyBjb250cm9sIHBvbGljeSBmb3IgYSBiaWxsaW5nIGFjY291bnQuIFJlcGxh
+Y2VzIGFueSBleGlzdGluZwogcG9saWN5LgogVGhlIGNhbGxlciBtdXN0IGhhdmUgdGhlIGBi
+aWxsaW5nLmFjY291bnRzLnNldElhbVBvbGljeWAgcGVybWlzc2lvbiBvbiB0aGUKIGFjY291
+bnQsIHdoaWNoIGlzIG9mdGVuIGdpdmVuIHRvIGJpbGxpbmcgYWNjb3VudAogW2FkbWluaXN0
+cmF0b3JzXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYmlsbGluZy9kb2NzL2hvdy10by9i
+aWxsaW5nLWFjY2VzcykuCgoNCgUGAAIIARIEzQEGEgoNCgUGAAIIAhIEzQETNAoNCgUGAAII
+AxIEzgEPIwoPCgUGAAIIBBIGzwEE0gEGChMKCQYAAggEsMq8IhIGzwEE0gEGCg0KBQYAAggE
+EgTTAQQ9ChAKCAYAAggEmwgAEgTTAQQ9CuoBCgQGAAIJEgbZAQLgAQMa2QEgVGVzdHMgdGhl
+IGFjY2VzcyBjb250cm9sIHBvbGljeSBmb3IgYSBiaWxsaW5nIGFjY291bnQuIFRoaXMgbWV0
+aG9kIHRha2VzCiB0aGUgcmVzb3VyY2UgYW5kIGEgc2V0IG9mIHBlcm1pc3Npb25zIGFzIGlu
+cHV0IGFuZCByZXR1cm5zIHRoZSBzdWJzZXQgb2YKIHRoZSBpbnB1dCBwZXJtaXNzaW9ucyB0
+aGF0IHRoZSBjYWxsZXIgaXMgYWxsb3dlZCBmb3IgdGhhdCByZXNvdXJjZS4KCg0KBQYAAgkB
+EgTZAQYYCg0KBQYAAgkCEgTZARlACg0KBQYAAgkDEgTaAQ83Cg8KBQYAAgkEEgbbAQTeAQYK
+EwoJBgACCQSwyrwiEgbbAQTeAQYKDQoFBgACCQQSBN8BBEIKEAoIBgACCQSbCAASBN8BBEIK
+UQoEBgACChIG4wEC6wEDGkEgQ2hhbmdlcyB3aGljaCBwYXJlbnQgb3JnYW5pemF0aW9uIGEg
+YmlsbGluZyBhY2NvdW50IGJlbG9uZ3MgdG8uCgoNCgUGAAIKARIE4wEGGAoNCgUGAAIKAhIE
+4wEZMgoNCgUGAAIKAxIE4wE9SwoPCgUGAAIKBBIG5AEE6gEGChMKCQYAAgoEsMq8IhIG5AEE
+6gEGCqABCgIEABIG8QEAqgIBGpEBIEEgYmlsbGluZyBhY2NvdW50IGluIHRoZQogW0dvb2ds
+ZSBDbG91ZCBDb25zb2xlXShodHRwczovL2NvbnNvbGUuY2xvdWQuZ29vZ2xlLmNvbS8pLiBZ
+b3UgY2FuIGFzc2lnbiBhCiBiaWxsaW5nIGFjY291bnQgdG8gb25lIG9yIG1vcmUgcHJvamVj
+dHMuCgoLCgMEAAESBPEBCBYKDQoDBAAHEgbyAQL4AQQKDwoFBAAHnQgSBvIBAvgBBAqOAgoE
+BAACABIG/gECgwIEGv0BIE91dHB1dCBvbmx5LiBUaGUgcmVzb3VyY2UgbmFtZSBvZiB0aGUg
+YmlsbGluZyBhY2NvdW50LiBUaGUgcmVzb3VyY2UgbmFtZQogaGFzIHRoZSBmb3JtIGBiaWxs
+aW5nQWNjb3VudHMve2JpbGxpbmdfYWNjb3VudF9pZH1gLiBGb3IgZXhhbXBsZSwKIGBiaWxs
+aW5nQWNjb3VudHMvMDEyMzQ1LTU2Nzg5MC1BQkNERUZgIHdvdWxkIGJlIHRoZSByZXNvdXJj
+ZSBuYW1lIGZvcgogYmlsbGluZyBhY2NvdW50IGAwMTIzNDUtNTY3ODkwLUFCQ0RFRmAuCgoN
+CgUEAAIABRIE/gECCAoNCgUEAAIAARIE/gEJDQoNCgUEAAIAAxIE/gEQEQoPCgUEAAIACBIG
+/gESgwIDChAKCAQAAgAInAgAEgT/AQQtChEKBwQAAgAInwgSBoACBIICBQr8AQoEBAACARIE
+iQICPBrtASBPdXRwdXQgb25seS4gVHJ1ZSBpZiB0aGUgYmlsbGluZyBhY2NvdW50IGlzIG9w
+ZW4sIGFuZCB3aWxsIHRoZXJlZm9yZSBiZQogY2hhcmdlZCBmb3IgYW55IHVzYWdlIG9uIGFz
+c29jaWF0ZWQgcHJvamVjdHMuIEZhbHNlIGlmIHRoZSBiaWxsaW5nIGFjY291bnQKIGlzIGNs
+b3NlZCwgYW5kIHRoZXJlZm9yZSBwcm9qZWN0cyBhc3NvY2lhdGVkIHdpdGggaXQgYXJlIHVu
+YWJsZSB0byB1c2UgcGFpZAogc2VydmljZXMuCgoNCgUEAAIBBRIEiQICBgoNCgUEAAIBARIE
+iQIHCwoNCgUEAAIBAxIEiQIODwoNCgUEAAIBCBIEiQIQOwoQCggEAAIBCJwIABIEiQIROgqS
+AQoEBAACAhIEjQICGhqDASBUaGUgZGlzcGxheSBuYW1lIGdpdmVuIHRvIHRoZSBiaWxsaW5n
+IGFjY291bnQsIHN1Y2ggYXMgYE15IEJpbGxpbmcKIEFjY291bnRgLiBUaGlzIG5hbWUgaXMg
+ZGlzcGxheWVkIGluIHRoZSBHb29nbGUgQ2xvdWQgQ29uc29sZS4KCg0KBQQAAgIFEgSNAgII
+Cg0KBQQAAgIBEgSNAgkVCg0KBQQAAgIDEgSNAhgZCugBCgQEAAIDEgSUAgIkGtkBIElmIHRo
+aXMgYWNjb3VudCBpcyBhCiBbc3ViYWNjb3VudF0oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29t
+L2JpbGxpbmcvZG9jcy9jb25jZXB0cyksIHRoZW4gdGhpcwogd2lsbCBiZSB0aGUgcmVzb3Vy
+Y2UgbmFtZSBvZiB0aGUgcGFyZW50IGJpbGxpbmcgYWNjb3VudCB0aGF0IGl0IGlzIGJlaW5n
+CiByZXNvbGQgdGhyb3VnaC4KIE90aGVyd2lzZSB0aGlzIHdpbGwgYmUgZW1wdHkuCgoNCgUE
+AAIDBRIElAICCAoNCgUEAAIDARIElAIJHwoNCgUEAAIDAxIElAIiIwr4AgoEBAACBBIEngIC
+QBrpAiBPdXRwdXQgb25seS4gVGhlIGJpbGxpbmcgYWNjb3VudCdzIHBhcmVudCByZXNvdXJj
+ZSBpZGVudGlmaWVyLgogVXNlIHRoZSBgTW92ZUJpbGxpbmdBY2NvdW50YCBtZXRob2QgdG8g
+dXBkYXRlIHRoZSBhY2NvdW50J3MgcGFyZW50IHJlc291cmNlCiBpZiBpdCBpcyBhIG9yZ2Fu
+aXphdGlvbi4KIEZvcm1hdDoKICAgLSBgb3JnYW5pemF0aW9ucy97b3JnYW5pemF0aW9uX2lk
+fWAsIGZvciBleGFtcGxlLAogICAgIGBvcmdhbml6YXRpb25zLzEyMzQ1Njc4YAogICAtIGBi
+aWxsaW5nQWNjb3VudHMve2JpbGxpbmdfYWNjb3VudF9pZH1gLCBmb3IgZXhhbXBsZSwKICAg
+ICBgYmlsbGluZ0FjY291bnRzLzAxMjM0NS01Njc4OTAtQUJDREVGYAoKDQoFBAACBAUSBJ4C
+AggKDQoFBAACBAESBJ4CCQ8KDQoFBAACBAMSBJ4CEhMKDQoFBAACBAgSBJ4CFD8KEAoIBAAC
+BAicCAASBJ4CFT4KpQQKBAQAAgUSBKkCAkQalgQgT3B0aW9uYWwuIFRoZSBjdXJyZW5jeSBp
+biB3aGljaCB0aGUgYmlsbGluZyBhY2NvdW50IGlzIGJpbGxlZCBhbmQgY2hhcmdlZCwKIHJl
+cHJlc2VudGVkIGFzIGFuIElTTyA0MjE3IGNvZGUgc3VjaCBhcyBgVVNEYC4KCiBCaWxsaW5n
+IGFjY291bnQgY3VycmVuY3kgaXMgZGV0ZXJtaW5lZCBhdCB0aGUgdGltZSBvZiBiaWxsaW5n
+IGFjY291bnQKIGNyZWF0aW9uIGFuZCBjYW5ub3QgYmUgdXBkYXRlZCBzdWJzZXF1ZW50bHks
+IHNvIHRoaXMgZmllbGQgc2hvdWxkIG5vdCBiZQogc2V0IG9uIHVwZGF0ZSByZXF1ZXN0cy4g
+SW4gYWRkaXRpb24sIGEgc3ViYWNjb3VudCBhbHdheXMgbWF0Y2hlcyB0aGUKIGN1cnJlbmN5
+IG9mIGl0cyBwYXJlbnQgYmlsbGluZyBhY2NvdW50LCBzbyB0aGlzIGZpZWxkIHNob3VsZCBu
+b3QgYmUgc2V0IG9uCiBzdWJhY2NvdW50IGNyZWF0aW9uIHJlcXVlc3RzLiBDbGllbnRzIGNh
+biByZWFkIHRoaXMgZmllbGQgdG8gZGV0ZXJtaW5lIHRoZQogY3VycmVuY3kgb2YgYW4gZXhp
+c3RpbmcgYmlsbGluZyBhY2NvdW50LgoKDQoFBAACBQUSBKkCAggKDQoFBAACBQESBKkCCRYK
+DQoFBAACBQMSBKkCGRoKDQoFBAACBQgSBKkCG0MKEAoIBAACBQicCAASBKkCHEIK2AEKAgQB
+EgavAgDJAgEayQEgRW5jYXBzdWxhdGlvbiBvZiBiaWxsaW5nIGluZm9ybWF0aW9uIGZvciBh
+IEdvb2dsZSBDbG91ZCBDb25zb2xlIHByb2plY3QuIEEKIHByb2plY3QgaGFzIGF0IG1vc3Qg
+b25lIGFzc29jaWF0ZWQgYmlsbGluZyBhY2NvdW50IGF0IGEgdGltZSAoYnV0IGEgYmlsbGlu
+ZwogYWNjb3VudCBjYW4gYmUgYXNzaWduZWQgdG8gbXVsdGlwbGUgcHJvamVjdHMpLgoKCwoD
+BAEBEgSvAggaCg0KAwQBBxIGsAICswIECg8KBQQBB50IEgawAgKzAgQKigIKBAQBAgASBLkC
+Aj4a+wEgT3V0cHV0IG9ubHkuIFRoZSByZXNvdXJjZSBuYW1lIGZvciB0aGUgYFByb2plY3RC
+aWxsaW5nSW5mb2A7IGhhcyB0aGUgZm9ybQogYHByb2plY3RzL3twcm9qZWN0X2lkfS9iaWxs
+aW5nSW5mb2AuIEZvciBleGFtcGxlLCB0aGUgcmVzb3VyY2UgbmFtZSBmb3IgdGhlCiBiaWxs
+aW5nIGluZm9ybWF0aW9uIGZvciBwcm9qZWN0IGB0b2t5by1yYWluLTEyM2Agd291bGQgYmUK
+IGBwcm9qZWN0cy90b2t5by1yYWluLTEyMy9iaWxsaW5nSW5mb2AuCgoNCgUEAQIABRIEuQIC
+CAoNCgUEAQIAARIEuQIJDQoNCgUEAQIAAxIEuQIQEQoNCgUEAQIACBIEuQISPQoQCggEAQIA
+CJwIABIEuQITPArfAQoEBAECARIEvgICRBrQASBPdXRwdXQgb25seS4gVGhlIElEIG9mIHRo
+ZSBwcm9qZWN0IHRoYXQgdGhpcyBgUHJvamVjdEJpbGxpbmdJbmZvYAogcmVwcmVzZW50cywg
+c3VjaCBhcyBgdG9reW8tcmFpbi0xMjNgLiBUaGlzIGlzIGEgY29udmVuaWVuY2UgZmllbGQg
+c28gdGhhdAogeW91IGRvbid0IG5lZWQgdG8gcGFyc2UgdGhlIGBuYW1lYCBmaWVsZCB0byBv
+YnRhaW4gYSBwcm9qZWN0IElELgoKDQoFBAECAQUSBL4CAggKDQoFBAECAQESBL4CCRMKDQoF
+BAECAQMSBL4CFhcKDQoFBAECAQgSBL4CGEMKEAoIBAECAQicCAASBL4CGUIKlAEKBAQBAgIS
+BMICAiIahQEgVGhlIHJlc291cmNlIG5hbWUgb2YgdGhlIGJpbGxpbmcgYWNjb3VudCBhc3Nv
+Y2lhdGVkIHdpdGggdGhlIHByb2plY3QsIGlmCiBhbnkuIEZvciBleGFtcGxlLCBgYmlsbGlu
+Z0FjY291bnRzLzAxMjM0NS01Njc4OTAtQUJDREVGYC4KCg0KBQQBAgIFEgTCAgIICg0KBQQB
+AgIBEgTCAgkdCg0KBQQBAgIDEgTCAiAhCpICCgQEAQIDEgTIAgJHGoMCIE91dHB1dCBvbmx5
+LiBUcnVlIGlmIHRoZSBwcm9qZWN0IGlzIGFzc29jaWF0ZWQgd2l0aCBhbiBvcGVuIGJpbGxp
+bmcKIGFjY291bnQsIHRvIHdoaWNoIHVzYWdlIG9uIHRoZSBwcm9qZWN0IGlzIGNoYXJnZWQu
+IEZhbHNlIGlmIHRoZSBwcm9qZWN0IGlzCiBhc3NvY2lhdGVkIHdpdGggYSBjbG9zZWQgYmls
+bGluZyBhY2NvdW50LCBvciBubyBiaWxsaW5nIGFjY291bnQgYXQgYWxsLCBhbmQKIHRoZXJl
+Zm9yZSBjYW5ub3QgdXNlIHBhaWQgc2VydmljZXMuCgoNCgUEAQIDBRIEyAICBgoNCgUEAQID
+ARIEyAIHFgoNCgUEAQIDAxIEyAIZGgoNCgUEAQIDCBIEyAIbRgoQCggEAQIDCJwIABIEyAIc
+RQo4CgIEAhIGzAIA1QIBGiogUmVxdWVzdCBtZXNzYWdlIGZvciBgR2V0QmlsbGluZ0FjY291
+bnRgLgoKCwoDBAIBEgTMAgggCocBCgQEAgIAEgbPAgLUAgQadyBSZXF1aXJlZC4gVGhlIHJl
+c291cmNlIG5hbWUgb2YgdGhlIGJpbGxpbmcgYWNjb3VudCB0byByZXRyaWV2ZS4gRm9yCiBl
+eGFtcGxlLCBgYmlsbGluZ0FjY291bnRzLzAxMjM0NS01Njc4OTAtQUJDREVGYC4KCg0KBQQC
+AgAFEgTPAgIICg0KBQQCAgABEgTPAgkNCg0KBQQCAgADEgTPAhARCg8KBQQCAgAIEgbPAhLU
+AgMKEAoIBAICAAicCAASBNACBCoKEQoHBAICAAifCBIG0QIE0wIFCjoKAgQDEgbYAgDyAgEa
+LCBSZXF1ZXN0IG1lc3NhZ2UgZm9yIGBMaXN0QmlsbGluZ0FjY291bnRzYC4KCgsKAwQDARIE
+2AIIIgpdCgQEAwIAEgTbAgIWGk8gUmVxdWVzdGVkIHBhZ2Ugc2l6ZS4gVGhlIG1heGltdW0g
+cGFnZSBzaXplIGlzIDEwMDsgdGhpcyBpcyBhbHNvIHRoZQogZGVmYXVsdC4KCg0KBQQDAgAF
+EgTbAgIHCg0KBQQDAgABEgTbAggRCg0KBQQDAgADEgTbAhQVCtgBCgQEAwIBEgTgAgIYGskB
+IEEgdG9rZW4gaWRlbnRpZnlpbmcgYSBwYWdlIG9mIHJlc3VsdHMgdG8gcmV0dXJuLiBUaGlz
+IHNob3VsZCBiZSBhCiBgbmV4dF9wYWdlX3Rva2VuYCB2YWx1ZSByZXR1cm5lZCBmcm9tIGEg
+cHJldmlvdXMgYExpc3RCaWxsaW5nQWNjb3VudHNgCiBjYWxsLiBJZiB1bnNwZWNpZmllZCwg
+dGhlIGZpcnN0IHBhZ2Ugb2YgcmVzdWx0cyBpcyByZXR1cm5lZC4KCg0KBQQDAgEFEgTgAgII
+Cg0KBQQDAgEBEgTgAgkTCg0KBQQDAgEDEgTgAhYXCuoCCgQEAwICEgTpAgIUGtsCIE9wdGlv
+bnMgZm9yIGhvdyB0byBmaWx0ZXIgdGhlIHJldHVybmVkIGJpbGxpbmcgYWNjb3VudHMuCiBU
+aGlzIG9ubHkgc3VwcG9ydHMgZmlsdGVyaW5nIGZvcgogW3N1YmFjY291bnRzXShodHRwczov
+L2Nsb3VkLmdvb2dsZS5jb20vYmlsbGluZy9kb2NzL2NvbmNlcHRzKSB1bmRlciBhCiBzaW5n
+bGUgcHJvdmlkZWQgcGFyZW50IGJpbGxpbmcgYWNjb3VudC4KIChmb3IgZXhhbXBsZSwKIGBt
+YXN0ZXJfYmlsbGluZ19hY2NvdW50PWJpbGxpbmdBY2NvdW50cy8wMTIzNDUtNjc4OTAxLUFC
+Q0RFRmApLgogQm9vbGVhbiBhbGdlYnJhIGFuZCBvdGhlciBmaWVsZHMgYXJlIG5vdCBjdXJy
+ZW50bHkgc3VwcG9ydGVkLgoKDQoFBAMCAgUSBOkCAggKDQoFBAMCAgESBOkCCQ8KDQoFBAMC
+AgMSBOkCEhMKjwIKBAQDAgMSBPECAj0agAIgT3B0aW9uYWwuIFRoZSBwYXJlbnQgcmVzb3Vy
+Y2UgdG8gbGlzdCBiaWxsaW5nIGFjY291bnRzIGZyb20uCiBGb3JtYXQ6CiAgIC0gYG9yZ2Fu
+aXphdGlvbnMve29yZ2FuaXphdGlvbl9pZH1gLCBmb3IgZXhhbXBsZSwKICAgICBgb3JnYW5p
+emF0aW9ucy8xMjM0NTY3OGAKICAgLSBgYmlsbGluZ0FjY291bnRzL3tiaWxsaW5nX2FjY291
+bnRfaWR9YCwgZm9yIGV4YW1wbGUsCiAgICAgYGJpbGxpbmdBY2NvdW50cy8wMTIzNDUtNTY3
+ODkwLUFCQ0RFRmAKCg0KBQQDAgMFEgTxAgIICg0KBQQDAgMBEgTxAgkPCg0KBQQDAgMDEgTx
+AhITCg0KBQQDAgMIEgTxAhQ8ChAKCAQDAgMInAgAEgTxAhU7CjsKAgQEEgb1AgD9AgEaLSBS
+ZXNwb25zZSBtZXNzYWdlIGZvciBgTGlzdEJpbGxpbmdBY2NvdW50c2AuCgoLCgMEBAESBPUC
+CCMKKwoEBAQCABIE9wICLxodIEEgbGlzdCBvZiBiaWxsaW5nIGFjY291bnRzLgoKDQoFBAQC
+AAQSBPcCAgoKDQoFBAQCAAYSBPcCCxkKDQoFBAQCAAESBPcCGioKDQoFBAQCAAMSBPcCLS4K
+6QEKBAQEAgESBPwCAh0a2gEgQSB0b2tlbiB0byByZXRyaWV2ZSB0aGUgbmV4dCBwYWdlIG9m
+IHJlc3VsdHMuIFRvIHJldHJpZXZlIHRoZSBuZXh0IHBhZ2UsCiBjYWxsIGBMaXN0QmlsbGlu
+Z0FjY291bnRzYCBhZ2FpbiB3aXRoIHRoZSBgcGFnZV90b2tlbmAgZmllbGQgc2V0IHRvIHRo
+aXMKIHZhbHVlLiBUaGlzIGZpZWxkIGlzIGVtcHR5IGlmIHRoZXJlIGFyZSBubyBtb3JlIHJl
+c3VsdHMgdG8gcmV0cmlldmUuCgoNCgUEBAIBBRIE/AICCAoNCgUEBAIBARIE/AIJGAoNCgUE
+BAIBAxIE/AIbHAo7CgIEBRIGgAMAjAMBGi0gUmVxdWVzdCBtZXNzYWdlIGZvciBgQ3JlYXRl
+QmlsbGluZ0FjY291bnRgLgoKCwoDBAUBEgSAAwgjCtgBCgQEBQIAEgSFAwJOGskBIFJlcXVp
+cmVkLiBUaGUgYmlsbGluZyBhY2NvdW50IHJlc291cmNlIHRvIGNyZWF0ZS4KIEN1cnJlbnRs
+eSBDcmVhdGVCaWxsaW5nQWNjb3VudCBvbmx5IHN1cHBvcnRzIHN1YmFjY291bnQgY3JlYXRp
+b24sIHNvCiBhbnkgY3JlYXRlZCBiaWxsaW5nIGFjY291bnRzIG11c3QgYmUgdW5kZXIgYSBw
+cm92aWRlZCBwYXJlbnQgYmlsbGluZwogYWNjb3VudC4KCg0KBQQFAgAGEgSFAwIQCg0KBQQF
+AgABEgSFAxEgCg0KBQQFAgADEgSFAyMkCg0KBQQFAgAIEgSFAyVNChAKCAQFAgAInAgAEgSF
+AyZMCrcBCgQEBQIBEgSLAwI9GqgBIE9wdGlvbmFsLiBUaGUgcGFyZW50IHRvIGNyZWF0ZSBh
+IGJpbGxpbmcgYWNjb3VudCBmcm9tLgogRm9ybWF0OgogICAtIGBiaWxsaW5nQWNjb3VudHMv
+e2JpbGxpbmdfYWNjb3VudF9pZH1gLCBmb3IgZXhhbXBsZSwKICAgICAgYGJpbGxpbmdBY2Nv
+dW50cy8wMTIzNDUtNTY3ODkwLUFCQ0RFRmAKCg0KBQQFAgEFEgSLAwIICg0KBQQFAgEBEgSL
+AwkPCg0KBQQFAgEDEgSLAxITCg0KBQQFAgEIEgSLAxQ8ChAKCAQFAgEInAgAEgSLAxU7CjsK
+AgQGEgaPAwCfAwEaLSBSZXF1ZXN0IG1lc3NhZ2UgZm9yIGBVcGRhdGVCaWxsaW5nQWNjb3Vu
+dGAuCgoLCgMEBgESBI8DCCMKUwoEBAYCABIGkQMClgMEGkMgUmVxdWlyZWQuIFRoZSBuYW1l
+IG9mIHRoZSBiaWxsaW5nIGFjY291bnQgcmVzb3VyY2UgdG8gYmUgdXBkYXRlZC4KCg0KBQQG
+AgAFEgSRAwIICg0KBQQGAgABEgSRAwkNCg0KBQQGAgADEgSRAxARCg8KBQQGAgAIEgaRAxKW
+AwMKEAoIBAYCAAicCAASBJIDBCoKEQoHBAYCAAifCBIGkwMElQMFCl4KBAQGAgESBJoDAkYa
+UCBSZXF1aXJlZC4gVGhlIGJpbGxpbmcgYWNjb3VudCByZXNvdXJjZSB0byByZXBsYWNlIHRo
+ZSByZXNvdXJjZSBvbiB0aGUKIHNlcnZlci4KCg0KBQQGAgEGEgSaAwIQCg0KBQQGAgEBEgSa
+AxEYCg0KBQQGAgEDEgSaAxscCg0KBQQGAgEIEgSaAx1FChAKCAQGAgEInAgAEgSaAx5ECmUK
+BAQGAgISBJ4DAiwaVyBUaGUgdXBkYXRlIG1hc2sgYXBwbGllZCB0byB0aGUgcmVzb3VyY2Uu
+CiBPbmx5ICJkaXNwbGF5X25hbWUiIGlzIGN1cnJlbnRseSBzdXBwb3J0ZWQuCgoNCgUEBgIC
+BhIEngMCGwoNCgUEBgICARIEngMcJwoNCgUEBgICAxIEngMqKwo9CgIEBxIGogMAtQMBGi8g
+UmVxdWVzdCBtZXNzYWdlIGZvciBgTGlzdFByb2plY3RCaWxsaW5nSW5mb2AuCgoLCgMEBwES
+BKIDCCUKsAEKBAQHAgASBqYDAqsDBBqfASBSZXF1aXJlZC4gVGhlIHJlc291cmNlIG5hbWUg
+b2YgdGhlIGJpbGxpbmcgYWNjb3VudCBhc3NvY2lhdGVkIHdpdGggdGhlCiBwcm9qZWN0cyB0
+aGF0IHlvdSB3YW50IHRvIGxpc3QuIEZvciBleGFtcGxlLAogYGJpbGxpbmdBY2NvdW50cy8w
+MTIzNDUtNTY3ODkwLUFCQ0RFRmAuCgoNCgUEBwIABRIEpgMCCAoNCgUEBwIAARIEpgMJDQoN
+CgUEBwIAAxIEpgMQEQoPCgUEBwIACBIGpgMSqwMDChAKCAQHAgAInAgAEgSnAwQqChEKBwQH
+AgAInwgSBqgDBKoDBQpdCgQEBwIBEgSvAwIWGk8gUmVxdWVzdGVkIHBhZ2Ugc2l6ZS4gVGhl
+IG1heGltdW0gcGFnZSBzaXplIGlzIDEwMDsgdGhpcyBpcyBhbHNvIHRoZQogZGVmYXVsdC4K
+Cg0KBQQHAgEFEgSvAwIHCg0KBQQHAgEBEgSvAwgRCg0KBQQHAgEDEgSvAxQVCuABCgQEBwIC
+EgS0AwIYGtEBIEEgdG9rZW4gaWRlbnRpZnlpbmcgYSBwYWdlIG9mIHJlc3VsdHMgdG8gYmUg
+cmV0dXJuZWQuIFRoaXMgc2hvdWxkIGJlIGEKIGBuZXh0X3BhZ2VfdG9rZW5gIHZhbHVlIHJl
+dHVybmVkIGZyb20gYSBwcmV2aW91cyBgTGlzdFByb2plY3RCaWxsaW5nSW5mb2AKIGNhbGwu
+IElmIHVuc3BlY2lmaWVkLCB0aGUgZmlyc3QgcGFnZSBvZiByZXN1bHRzIGlzIHJldHVybmVk
+LgoKDQoFBAcCAgUSBLQDAggKDQoFBAcCAgESBLQDCRMKDQoFBAcCAgMSBLQDFhcKRQoCBAgS
+BrgDAMEDARo3IFJlcXVlc3QgbWVzc2FnZSBmb3IgYExpc3RQcm9qZWN0QmlsbGluZ0luZm9S
+ZXNwb25zZWAuCgoLCgMECAESBLgDCCYKeAoEBAgCABIEuwMCNxpqIEEgbGlzdCBvZiBgUHJv
+amVjdEJpbGxpbmdJbmZvYCByZXNvdXJjZXMgcmVwcmVzZW50aW5nIHRoZSBwcm9qZWN0cwog
+YXNzb2NpYXRlZCB3aXRoIHRoZSBiaWxsaW5nIGFjY291bnQuCgoNCgUECAIABBIEuwMCCgoN
+CgUECAIABhIEuwMLHQoNCgUECAIAARIEuwMeMgoNCgUECAIAAxIEuwM1NgrsAQoEBAgCARIE
+wAMCHRrdASBBIHRva2VuIHRvIHJldHJpZXZlIHRoZSBuZXh0IHBhZ2Ugb2YgcmVzdWx0cy4g
+VG8gcmV0cmlldmUgdGhlIG5leHQgcGFnZSwKIGNhbGwgYExpc3RQcm9qZWN0QmlsbGluZ0lu
+Zm9gIGFnYWluIHdpdGggdGhlIGBwYWdlX3Rva2VuYCBmaWVsZCBzZXQgdG8gdGhpcwogdmFs
+dWUuIFRoaXMgZmllbGQgaXMgZW1wdHkgaWYgdGhlcmUgYXJlIG5vIG1vcmUgcmVzdWx0cyB0
+byByZXRyaWV2ZS4KCg0KBQQIAgEFEgTAAwIICg0KBQQIAgEBEgTAAwkYCg0KBQQIAgEDEgTA
+AxscCjwKAgQJEgbEAwDNAwEaLiBSZXF1ZXN0IG1lc3NhZ2UgZm9yIGBHZXRQcm9qZWN0Qmls
+bGluZ0luZm9gLgoKCwoDBAkBEgTEAwgkCpIBCgQECQIAEgbHAwLMAwQagQEgUmVxdWlyZWQu
+IFRoZSByZXNvdXJjZSBuYW1lIG9mIHRoZSBwcm9qZWN0IGZvciB3aGljaCBiaWxsaW5nIGlu
+Zm9ybWF0aW9uIGlzCiByZXRyaWV2ZWQuIEZvciBleGFtcGxlLCBgcHJvamVjdHMvdG9reW8t
+cmFpbi0xMjNgLgoKDQoFBAkCAAUSBMcDAggKDQoFBAkCAAESBMcDCQ0KDQoFBAkCAAMSBMcD
+EBEKDwoFBAkCAAgSBscDEswDAwoQCggECQIACJwIABIEyAMEKgoRCgcECQIACJ8IEgbJAwTL
+AwUKPwoCBAoSBtADANoDARoxIFJlcXVlc3QgbWVzc2FnZSBmb3IgYFVwZGF0ZVByb2plY3RC
+aWxsaW5nSW5mb2AuCgoLCgMECgESBNADCCcKpgEKBAQKAgASBNQDAjsalwEgUmVxdWlyZWQu
+IFRoZSByZXNvdXJjZSBuYW1lIG9mIHRoZSBwcm9qZWN0IGFzc29jaWF0ZWQgd2l0aCB0aGUg
+YmlsbGluZwogaW5mb3JtYXRpb24gdGhhdCB5b3Ugd2FudCB0byB1cGRhdGUuIEZvciBleGFt
+cGxlLAogYHByb2plY3RzL3Rva3lvLXJhaW4tMTIzYC4KCg0KBQQKAgAFEgTUAwIICg0KBQQK
+AgABEgTUAwkNCg0KBQQKAgADEgTUAxARCg0KBQQKAgAIEgTUAxI6ChAKCAQKAgAInAgAEgTU
+AxM5CqMBCgQECgIBEgTZAwIuGpQBIFRoZSBuZXcgYmlsbGluZyBpbmZvcm1hdGlvbiBmb3Ig
+dGhlIHByb2plY3QuIE91dHB1dC1vbmx5IGZpZWxkcyBhcmUKIGlnbm9yZWQ7IHRodXMsIHlv
+dSBjYW4gbGVhdmUgZW1wdHkgYWxsIGZpZWxkcyBleGNlcHQKIGBiaWxsaW5nX2FjY291bnRf
+bmFtZWAuCgoNCgUECgIBBhIE2QMCFAoNCgUECgIBARIE2QMVKQoNCgUECgIBAxIE2QMsLQo9
+CgIECxIG3QMA8gMBGi8gUmVxdWVzdCBtZXNzYWdlIGZvciBgTW92ZUJpbGxpbmdBY2NvdW50
+YCBSUEMuCgoLCgMECwESBN0DCCEKlQIKBAQLAgASBuIDAucDBBqEAiBSZXF1aXJlZC4gVGhl
+IHJlc291cmNlIG5hbWUgb2YgdGhlIGJpbGxpbmcgYWNjb3VudCB0byBtb3ZlLgogTXVzdCBi
+ZSBvZiB0aGUgZm9ybSBgYmlsbGluZ0FjY291bnRzL3tiaWxsaW5nX2FjY291bnRfaWR9YC4K
+IFRoZSBzcGVjaWZpZWQgYmlsbGluZyBhY2NvdW50IGNhbm5vdCBiZSBhIHN1YmFjY291bnQs
+IHNpbmNlIGEgc3ViYWNjb3VudAogYWx3YXlzIGJlbG9uZ3MgdG8gdGhlIHNhbWUgb3JnYW5p
+emF0aW9uIGFzIGl0cyBwYXJlbnQgYWNjb3VudC4KCg0KBQQLAgAFEgTiAwIICg0KBQQLAgAB
+EgTiAwkNCg0KBQQLAgADEgTiAxARCg8KBQQLAgAIEgbiAxLnAwMKEAoIBAsCAAicCAASBOMD
+BCoKEQoHBAsCAAifCBIG5AME5gMFCp4BCgQECwIBEgbsAwLxAwQajQEgUmVxdWlyZWQuIFRo
+ZSByZXNvdXJjZSBuYW1lIG9mIHRoZSBPcmdhbml6YXRpb24gdG8gbW92ZQogdGhlIGJpbGxp
+bmcgYWNjb3VudCB1bmRlci4KIE11c3QgYmUgb2YgdGhlIGZvcm0gYG9yZ2FuaXphdGlvbnMv
+e29yZ2FuaXphdGlvbl9pZH1gLgoKDQoFBAsCAQUSBOwDAggKDQoFBAsCAQESBOwDCRsKDQoF
+BAsCAQMSBOwDHh8KDwoFBAsCAQgSBuwDIPEDAwoQCggECwIBCJwIABIE7QMEKgoRCgcECwIB
+CJ8IEgbuAwTwAwViBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::BillingAccount ===
+    # Fields for BillingAccount
+    # Field: name Type: 9 ()
+    # Field: open Type: 8 ()
+    # Field: display_name Type: 9 ()
+    # Field: master_billing_account Type: 9 ()
+    # Field: parent Type: 9 ()
+    # Field: currency_code Type: 9 ()
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::ProjectBillingInfo ===
+    # Fields for ProjectBillingInfo
+    # Field: name Type: 9 ()
+    # Field: project_id Type: 9 ()
+    # Field: billing_account_name Type: 9 ()
+    # Field: billing_enabled Type: 8 ()
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::GetBillingAccountRequest ===
+    # Fields for GetBillingAccountRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::ListBillingAccountsRequest ===
+    # Fields for ListBillingAccountsRequest
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: parent Type: 9 ()
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::ListBillingAccountsResponse ===
+    # Fields for ListBillingAccountsResponse
+    # Field: billing_accounts Type: 11 (.google.cloud.billing.v1.BillingAccount)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::CreateBillingAccountRequest ===
+    # Fields for CreateBillingAccountRequest
+    # Field: billing_account Type: 11 (.google.cloud.billing.v1.BillingAccount)
+    # Field: parent Type: 9 ()
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::UpdateBillingAccountRequest ===
+    # Fields for UpdateBillingAccountRequest
+    # Field: name Type: 9 ()
+    # Field: account Type: 11 (.google.cloud.billing.v1.BillingAccount)
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::ListProjectBillingInfoRequest ===
+    # Fields for ListProjectBillingInfoRequest
+    # Field: name Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::ListProjectBillingInfoResponse ===
+    # Fields for ListProjectBillingInfoResponse
+    # Field: project_billing_info Type: 11 (.google.cloud.billing.v1.ProjectBillingInfo)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::GetProjectBillingInfoRequest ===
+    # Fields for GetProjectBillingInfoRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::UpdateProjectBillingInfoRequest ===
+    # Fields for UpdateProjectBillingInfoRequest
+    # Field: name Type: 9 ()
+    # Field: project_billing_info Type: 11 (.google.cloud.billing.v1.ProjectBillingInfo)
+
+# === Message: Google::Cloud::Billing::V1::CloudBilling::MoveBillingAccountRequest ===
+    # Fields for MoveBillingAccountRequest
+    # Field: name Type: 9 ()
+    # Field: destination_parent Type: 9 ()
+
+# === Service Client: Google::Cloud::Billing::V1::CloudBilling::CloudBillingClient ===
+package Google::Cloud::Billing::V1::CloudBilling::CloudBillingClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Billing::V1::CloudBilling::CloudBillingClient
+
+Client stub representing the remote C<CloudBilling> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<billing.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'billing.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub get_billing_account {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Billing::V1::CloudBilling::GetBillingAccountRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'GetBillingAccount',
+        request        => $req,
+        response_class => 'Google::Cloud::Billing::V1::CloudBilling::BillingAccount',
+    });
+}
+
+sub list_billing_accounts {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Billing::V1::CloudBilling::ListBillingAccountsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'ListBillingAccounts',
+        request        => $req,
+        response_class => 'Google::Cloud::Billing::V1::CloudBilling::ListBillingAccountsResponse',
+    });
+}
+
+sub update_billing_account {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Billing::V1::CloudBilling::UpdateBillingAccountRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'UpdateBillingAccount',
+        request        => $req,
+        response_class => 'Google::Cloud::Billing::V1::CloudBilling::BillingAccount',
+    });
+}
+
+sub create_billing_account {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Billing::V1::CloudBilling::CreateBillingAccountRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'CreateBillingAccount',
+        request        => $req,
+        response_class => 'Google::Cloud::Billing::V1::CloudBilling::BillingAccount',
+    });
+}
+
+sub list_project_billing_info {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Billing::V1::CloudBilling::ListProjectBillingInfoRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'ListProjectBillingInfo',
+        request        => $req,
+        response_class => 'Google::Cloud::Billing::V1::CloudBilling::ListProjectBillingInfoResponse',
+    });
+}
+
+sub get_project_billing_info {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Billing::V1::CloudBilling::GetProjectBillingInfoRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'GetProjectBillingInfo',
+        request        => $req,
+        response_class => 'Google::Cloud::Billing::V1::CloudBilling::ProjectBillingInfo',
+    });
+}
+
+sub update_project_billing_info {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Billing::V1::CloudBilling::UpdateProjectBillingInfoRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'UpdateProjectBillingInfo',
+        request        => $req,
+        response_class => 'Google::Cloud::Billing::V1::CloudBilling::ProjectBillingInfo',
+    });
+}
+
+sub get_iam_policy {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Iam::V1::IamPolicy::GetIamPolicyRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'GetIamPolicy',
+        request        => $req,
+        response_class => 'Google::Iam::V1::Policy::Policy',
+    });
+}
+
+sub set_iam_policy {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Iam::V1::IamPolicy::SetIamPolicyRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'SetIamPolicy',
+        request        => $req,
+        response_class => 'Google::Iam::V1::Policy::Policy',
+    });
+}
+
+sub test_iam_permissions {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Iam::V1::IamPolicy::TestIamPermissionsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'TestIamPermissions',
+        request        => $req,
+        response_class => 'Google::Iam::V1::IamPolicy::TestIamPermissionsResponse',
+    });
+}
+
+sub move_billing_account {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Billing::V1::CloudBilling::MoveBillingAccountRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.billing.v1.CloudBilling',
+        method         => 'MoveBillingAccount',
+        request        => $req,
+        response_class => 'Google::Cloud::Billing::V1::CloudBilling::BillingAccount',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Billing::V1::CloudBilling - Compiled Protocol Buffers messages for google/cloud/billing/v1/cloud_billing.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Billing::V1::CloudBilling;
+
+    my $msg = Google::Cloud::Billing::V1::CloudBilling::BillingAccount->new({
+        name => $name,
+        open => $open,
+        display_name => $display_name,
+        master_billing_account => $master_billing_account,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Billing::V1::CloudBilling::BillingAccount->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/billing/v1/cloud_billing.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::BillingAccount
+
+A billing account in the
+[Google Cloud Console](https://console.cloud.google.com/). You can assign a
+billing account to one or more projects.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name of the billing account. The resource name
+has the form `billingAccounts/{billing_account_id}`. For example,
+`billingAccounts/012345-567890-ABCDEF` would be the resource name for
+billing account `012345-567890-ABCDEF`.
+
+=item * C<< $msg->open() >> / C<< $msg->open($value) >>
+
+Type: C<Bool>
+
+Output only. True if the billing account is open, and will therefore be
+charged for any usage on associated projects. False if the billing account
+is closed, and therefore projects associated with it are unable to use paid
+services.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+The display name given to the billing account, such as `My Billing
+Account`. This name is displayed in the Google Cloud Console.
+
+=item * C<< $msg->master_billing_account() >> / C<< $msg->master_billing_account($value) >>
+
+Type: C<String>
+
+If this account is a
+[subaccount](https://cloud.google.com/billing/docs/concepts), then this
+will be the resource name of the parent billing account that it is being
+resold through.
+Otherwise this will be empty.
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Output only. The billing account's parent resource identifier.
+Use the `MoveBillingAccount` method to update the account's parent resource
+if it is a organization.
+Format:
+  - `organizations/{organization_id}`, for example,
+    `organizations/12345678`
+  - `billingAccounts/{billing_account_id}`, for example,
+    `billingAccounts/012345-567890-ABCDEF`
+
+=item * C<< $msg->currency_code() >> / C<< $msg->currency_code($value) >>
+
+Type: C<String>
+
+Optional. The currency in which the billing account is billed and charged,
+represented as an ISO 4217 code such as `USD`.
+
+Billing account currency is determined at the time of billing account
+creation and cannot be updated subsequently, so this field should not be
+set on update requests. In addition, a subaccount always matches the
+currency of its parent billing account, so this field should not be set on
+subaccount creation requests. Clients can read this field to determine the
+currency of an existing billing account.
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::ProjectBillingInfo
+
+Encapsulation of billing information for a Google Cloud Console project. A
+project has at most one associated billing account at a time (but a billing
+account can be assigned to multiple projects).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The resource name for the `ProjectBillingInfo`; has the form
+`projects/{project_id}/billingInfo`. For example, the resource name for the
+billing information for project `tokyo-rain-123` would be
+`projects/tokyo-rain-123/billingInfo`.
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Output only. The ID of the project that this `ProjectBillingInfo`
+represents, such as `tokyo-rain-123`. This is a convenience field so that
+you don't need to parse the `name` field to obtain a project ID.
+
+=item * C<< $msg->billing_account_name() >> / C<< $msg->billing_account_name($value) >>
+
+Type: C<String>
+
+The resource name of the billing account associated with the project, if
+any. For example, `billingAccounts/012345-567890-ABCDEF`.
+
+=item * C<< $msg->billing_enabled() >> / C<< $msg->billing_enabled($value) >>
+
+Type: C<Bool>
+
+Output only. True if the project is associated with an open billing
+account, to which usage on the project is charged. False if the project is
+associated with a closed billing account, or no billing account at all, and
+therefore cannot use paid services.
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::GetBillingAccountRequest
+
+Request message for `GetBillingAccount`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the billing account to retrieve. For
+example, `billingAccounts/012345-567890-ABCDEF`.
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::ListBillingAccountsRequest
+
+Request message for `ListBillingAccounts`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Requested page size. The maximum page size is 100; this is also the
+default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results to return. This should be a
+`next_page_token` value returned from a previous `ListBillingAccounts`
+call. If unspecified, the first page of results is returned.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Options for how to filter the returned billing accounts.
+This only supports filtering for
+[subaccounts](https://cloud.google.com/billing/docs/concepts) under a
+single provided parent billing account.
+(for example,
+`master_billing_account=billingAccounts/012345-678901-ABCDEF`).
+Boolean algebra and other fields are not currently supported.
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Optional. The parent resource to list billing accounts from.
+Format:
+  - `organizations/{organization_id}`, for example,
+    `organizations/12345678`
+  - `billingAccounts/{billing_account_id}`, for example,
+    `billingAccounts/012345-567890-ABCDEF`
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::ListBillingAccountsResponse
+
+Response message for `ListBillingAccounts`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->billing_accounts() >> / C<< $msg->billing_accounts($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::V1::CloudBilling::BillingAccount>)
+
+A list of billing accounts.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve the next page of results. To retrieve the next page,
+call `ListBillingAccounts` again with the `page_token` field set to this
+value. This field is empty if there are no more results to retrieve.
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::CreateBillingAccountRequest
+
+Request message for `CreateBillingAccount`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->billing_account() >> / C<< $msg->billing_account($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::V1::CloudBilling::BillingAccount>)
+
+Required. The billing account resource to create.
+Currently CreateBillingAccount only supports subaccount creation, so
+any created billing accounts must be under a provided parent billing
+account.
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Optional. The parent to create a billing account from.
+Format:
+  - `billingAccounts/{billing_account_id}`, for example,
+     `billingAccounts/012345-567890-ABCDEF`
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::UpdateBillingAccountRequest
+
+Request message for `UpdateBillingAccount`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the billing account resource to be updated.
+
+=item * C<< $msg->account() >> / C<< $msg->account($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::V1::CloudBilling::BillingAccount>)
+
+Required. The billing account resource to replace the resource on the
+server.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+The update mask applied to the resource.
+Only "display_name" is currently supported.
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::ListProjectBillingInfoRequest
+
+Request message for `ListProjectBillingInfo`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the billing account associated with the
+projects that you want to list. For example,
+`billingAccounts/012345-567890-ABCDEF`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Requested page size. The maximum page size is 100; this is also the
+default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results to be returned. This should be a
+`next_page_token` value returned from a previous `ListProjectBillingInfo`
+call. If unspecified, the first page of results is returned.
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::ListProjectBillingInfoResponse
+
+Request message for `ListProjectBillingInfoResponse`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_billing_info() >> / C<< $msg->project_billing_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::V1::CloudBilling::ProjectBillingInfo>)
+
+A list of `ProjectBillingInfo` resources representing the projects
+associated with the billing account.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve the next page of results. To retrieve the next page,
+call `ListProjectBillingInfo` again with the `page_token` field set to this
+value. This field is empty if there are no more results to retrieve.
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::GetProjectBillingInfoRequest
+
+Request message for `GetProjectBillingInfo`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the project for which billing information is
+retrieved. For example, `projects/tokyo-rain-123`.
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::UpdateProjectBillingInfoRequest
+
+Request message for `UpdateProjectBillingInfo`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the project associated with the billing
+information that you want to update. For example,
+`projects/tokyo-rain-123`.
+
+=item * C<< $msg->project_billing_info() >> / C<< $msg->project_billing_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Billing::V1::CloudBilling::ProjectBillingInfo>)
+
+The new billing information for the project. Output-only fields are
+ignored; thus, you can leave empty all fields except
+`billing_account_name`.
+
+=back
+
+=head2 Google::Cloud::Billing::V1::CloudBilling::MoveBillingAccountRequest
+
+Request message for `MoveBillingAccount` RPC.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the billing account to move.
+Must be of the form `billingAccounts/{billing_account_id}`.
+The specified billing account cannot be a subaccount, since a subaccount
+always belongs to the same organization as its parent account.
+
+=item * C<< $msg->destination_parent() >> / C<< $msg->destination_parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the Organization to move
+the billing account under.
+Must be of the form `organizations/{organization_id}`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Billing::V1::CloudBilling::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

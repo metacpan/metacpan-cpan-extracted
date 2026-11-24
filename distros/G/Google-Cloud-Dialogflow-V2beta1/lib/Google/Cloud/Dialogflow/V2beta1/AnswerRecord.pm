@@ -1,0 +1,1018 @@
+package Google::Cloud::Dialogflow::V2beta1::AnswerRecord;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Dialogflow::V2beta1::Generator };
+    eval { require Google::Cloud::Dialogflow::V2beta1::Participant };
+    eval { require Google::Protobuf::FieldMask };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+CjNnb29nbGUvY2xvdWQvZGlhbG9nZmxvdy92MmJldGExL2Fuc3dlcl9yZWNvcmQucHJvdG8S
+H2dvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEaHGdvb2dsZS9hcGkvYW5ub3RhdGlv
+bnMucHJvdG8aF2dvb2dsZS9hcGkvY2xpZW50LnByb3RvGh9nb29nbGUvYXBpL2ZpZWxkX2Jl
+aGF2aW9yLnByb3RvGhlnb29nbGUvYXBpL3Jlc291cmNlLnByb3RvGi9nb29nbGUvY2xvdWQv
+ZGlhbG9nZmxvdy92MmJldGExL2dlbmVyYXRvci5wcm90bxoxZ29vZ2xlL2Nsb3VkL2RpYWxv
+Z2Zsb3cvdjJiZXRhMS9wYXJ0aWNpcGFudC5wcm90bxogZ29vZ2xlL3Byb3RvYnVmL2ZpZWxk
+X21hc2sucHJvdG8aH2dvb2dsZS9wcm90b2J1Zi90aW1lc3RhbXAucHJvdG8inQMKDEFuc3dl
+clJlY29yZBISCgRuYW1lGAEgASgJUgRuYW1lElgKD2Fuc3dlcl9mZWVkYmFjaxgDIAEoCzIv
+Lmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEuQW5zd2VyRmVlZGJhY2tSDmFuc3dl
+ckZlZWRiYWNrEm0KFmFnZW50X2Fzc2lzdGFudF9yZWNvcmQYBCABKAsyNS5nb29nbGUuY2xv
+dWQuZGlhbG9nZmxvdy52MmJldGExLkFnZW50QXNzaXN0YW50UmVjb3JkSABSFGFnZW50QXNz
+aXN0YW50UmVjb3JkOqUB6kGhAQomZGlhbG9nZmxvdy5nb29nbGVhcGlzLmNvbS9BbnN3ZXJS
+ZWNvcmQSMHByb2plY3RzL3twcm9qZWN0fS9hbnN3ZXJSZWNvcmRzL3thbnN3ZXJfcmVjb3Jk
+fRJFcHJvamVjdHMve3Byb2plY3R9L2xvY2F0aW9ucy97bG9jYXRpb259L2Fuc3dlclJlY29y
+ZHMve2Fuc3dlcl9yZWNvcmR9QggKBnJlY29yZCLwBQoUQWdlbnRBc3Npc3RhbnRSZWNvcmQS
+cQoZYXJ0aWNsZV9zdWdnZXN0aW9uX2Fuc3dlchgFIAEoCzIuLmdvb2dsZS5jbG91ZC5kaWFs
+b2dmbG93LnYyYmV0YTEuQXJ0aWNsZUFuc3dlckID4EEDSABSF2FydGljbGVTdWdnZXN0aW9u
+QW5zd2VyElAKCmZhcV9hbnN3ZXIYBiABKAsyKi5nb29nbGUuY2xvdWQuZGlhbG9nZmxvdy52
+MmJldGExLkZhcUFuc3dlckID4EEDSABSCWZhcUFuc3dlchJ4ChhkaWFsb2dmbG93X2Fzc2lz
+dF9hbnN3ZXIYByABKAsyNy5nb29nbGUuY2xvdWQuZGlhbG9nZmxvdy52MmJldGExLkRpYWxv
+Z2Zsb3dBc3Npc3RBbnN3ZXJCA+BBA0gAUhZkaWFsb2dmbG93QXNzaXN0QW5zd2VyEm4KFGdl
+bmVyYXRvcl9zdWdnZXN0aW9uGAggASgLMjQuZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJi
+ZXRhMS5HZW5lcmF0b3JTdWdnZXN0aW9uQgPgQQNIAFITZ2VuZXJhdG9yU3VnZ2VzdGlvbhJu
+ChRjb21wYW5pb25fc3VnZ2VzdGlvbhgJIAEoCzI0Lmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93
+LnYyYmV0YTEuQ29tcGFuaW9uU3VnZ2VzdGlvbkID4EEDSABSE2NvbXBhbmlvblN1Z2dlc3Rp
+b24SrgEKHXJlYWN0aXZlX2NvbXBhbmlvbl9zdWdnZXN0aW9uGAogASgLMmMuZ29vZ2xlLmNs
+b3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5TdHJlYW1pbmdSZWFjdGl2ZUNvbXBhbmlvblN1Z2dl
+c3Rpb25zUmVzcG9uc2UuUmVhY3RpdmVNb2RlUmVzcG9uc2VCA+BBA0gAUhtyZWFjdGl2ZUNv
+bXBhbmlvblN1Z2dlc3Rpb25CCAoGYW5zd2VyIrkECg5BbnN3ZXJGZWVkYmFjaxJtChFjb3Jy
+ZWN0bmVzc19sZXZlbBgBIAEoDjJALmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEu
+QW5zd2VyRmVlZGJhY2suQ29ycmVjdG5lc3NMZXZlbFIQY29ycmVjdG5lc3NMZXZlbBKAAQof
+YWdlbnRfYXNzaXN0YW50X2RldGFpbF9mZWVkYmFjaxgCIAEoCzI3Lmdvb2dsZS5jbG91ZC5k
+aWFsb2dmbG93LnYyYmV0YTEuQWdlbnRBc3Npc3RhbnRGZWVkYmFja0gAUhxhZ2VudEFzc2lz
+dGFudERldGFpbEZlZWRiYWNrEhgKB2NsaWNrZWQYAyABKAhSB2NsaWNrZWQSOQoKY2xpY2tf
+dGltZRgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCWNsaWNrVGltZRIcCglk
+aXNwbGF5ZWQYBCABKAhSCWRpc3BsYXllZBI9CgxkaXNwbGF5X3RpbWUYBiABKAsyGi5nb29n
+bGUucHJvdG9idWYuVGltZXN0YW1wUgtkaXNwbGF5VGltZSJwChBDb3JyZWN0bmVzc0xldmVs
+EiEKHUNPUlJFQ1RORVNTX0xFVkVMX1VOU1BFQ0lGSUVEEAASDwoLTk9UX0NPUlJFQ1QQARIV
+ChFQQVJUSUFMTFlfQ09SUkVDVBACEhEKDUZVTExZX0NPUlJFQ1QQA0IRCg9kZXRhaWxfZmVl
+ZGJhY2sirQ4KFkFnZW50QXNzaXN0YW50RmVlZGJhY2sScgoQYW5zd2VyX3JlbGV2YW5jZRgB
+IAEoDjJHLmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEuQWdlbnRBc3Npc3RhbnRG
+ZWVkYmFjay5BbnN3ZXJSZWxldmFuY2VSD2Fuc3dlclJlbGV2YW5jZRJ+ChRkb2N1bWVudF9j
+b3JyZWN0bmVzcxgCIAEoDjJLLmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEuQWdl
+bnRBc3Npc3RhbnRGZWVkYmFjay5Eb2N1bWVudENvcnJlY3RuZXNzUhNkb2N1bWVudENvcnJl
+Y3RuZXNzEnsKE2RvY3VtZW50X2VmZmljaWVuY3kYAyABKA4ySi5nb29nbGUuY2xvdWQuZGlh
+bG9nZmxvdy52MmJldGExLkFnZW50QXNzaXN0YW50RmVlZGJhY2suRG9jdW1lbnRFZmZpY2ll
+bmN5UhJkb2N1bWVudEVmZmljaWVuY3kShAEKFnN1bW1hcml6YXRpb25fZmVlZGJhY2sYBCAB
+KAsyTS5nb29nbGUuY2xvdWQuZGlhbG9nZmxvdy52MmJldGExLkFnZW50QXNzaXN0YW50RmVl
+ZGJhY2suU3VtbWFyaXphdGlvbkZlZWRiYWNrUhVzdW1tYXJpemF0aW9uRmVlZGJhY2sSkAEK
+GWtub3dsZWRnZV9zZWFyY2hfZmVlZGJhY2sYBSABKAsyTy5nb29nbGUuY2xvdWQuZGlhbG9n
+Zmxvdy52MmJldGExLkFnZW50QXNzaXN0YW50RmVlZGJhY2suS25vd2xlZGdlU2VhcmNoRmVl
+ZGJhY2tCA+BBAVIXa25vd2xlZGdlU2VhcmNoRmVlZGJhY2sSkAEKGWtub3dsZWRnZV9hc3Np
+c3RfZmVlZGJhY2sYBiABKAsyTy5nb29nbGUuY2xvdWQuZGlhbG9nZmxvdy52MmJldGExLkFn
+ZW50QXNzaXN0YW50RmVlZGJhY2suS25vd2xlZGdlQXNzaXN0RmVlZGJhY2tCA+BBAVIXa25v
+d2xlZGdlQXNzaXN0RmVlZGJhY2sSfQoSY29tcGFuaW9uX2ZlZWRiYWNrGAggASgLMkkuZ29v
+Z2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5BZ2VudEFzc2lzdGFudEZlZWRiYWNrLkNv
+bXBhbmlvbkZlZWRiYWNrQgPgQQFSEWNvbXBhbmlvbkZlZWRiYWNrGpMDChVTdW1tYXJpemF0
+aW9uRmVlZGJhY2sSQwoPc3RhcnRfdGltZXN0YW1wGAEgASgLMhouZ29vZ2xlLnByb3RvYnVm
+LlRpbWVzdGFtcFIOc3RhcnRUaW1lc3RhbXASRQoQc3VibWl0X3RpbWVzdGFtcBgCIAEoCzIa
+Lmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSD3N1Ym1pdFRpbWVzdGFtcBIhCgxzdW1tYXJ5
+X3RleHQYAyABKAlSC3N1bW1hcnlUZXh0EokBCg10ZXh0X3NlY3Rpb25zGAQgAygLMl8uZ29v
+Z2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5BZ2VudEFzc2lzdGFudEZlZWRiYWNrLlN1
+bW1hcml6YXRpb25GZWVkYmFjay5UZXh0U2VjdGlvbnNFbnRyeUID4EEBUgx0ZXh0U2VjdGlv
+bnMaPwoRVGV4dFNlY3Rpb25zRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiAB
+KAlSBXZhbHVlOgI4ARphChdLbm93bGVkZ2VTZWFyY2hGZWVkYmFjaxIjCg1hbnN3ZXJfY29w
+aWVkGAEgASgIUgxhbnN3ZXJDb3BpZWQSIQoMY2xpY2tlZF91cmlzGAIgAygJUgtjbGlja2Vk
+VXJpcxphChdLbm93bGVkZ2VBc3Npc3RGZWVkYmFjaxIjCg1hbnN3ZXJfY29waWVkGAEgASgI
+UgxhbnN3ZXJDb3BpZWQSIQoMY2xpY2tlZF91cmlzGAIgAygJUgtjbGlja2VkVXJpcxoTChFD
+b21wYW5pb25GZWVkYmFjayJRCg9BbnN3ZXJSZWxldmFuY2USIAocQU5TV0VSX1JFTEVWQU5D
+RV9VTlNQRUNJRklFRBAAEg4KCklSUkVMRVZBTlQQARIMCghSRUxFVkFOVBACIlcKE0RvY3Vt
+ZW50Q29ycmVjdG5lc3MSJAogRE9DVU1FTlRfQ09SUkVDVE5FU1NfVU5TUEVDSUZJRUQQABIN
+CglJTkNPUlJFQ1QQARILCgdDT1JSRUNUEAIiWQoSRG9jdW1lbnRFZmZpY2llbmN5EiMKH0RP
+Q1VNRU5UX0VGRklDSUVOQ1lfVU5TUEVDSUZJRUQQABIPCgtJTkVGRklDSUVOVBABEg0KCUVG
+RklDSUVOVBACIiwKFkdldEFuc3dlclJlY29yZFJlcXVlc3QSEgoEbmFtZRgBIAEoCVIEbmFt
+ZSK4AQoYTGlzdEFuc3dlclJlY29yZHNSZXF1ZXN0EkMKBnBhcmVudBgBIAEoCUIr+kEoEiZk
+aWFsb2dmbG93Lmdvb2dsZWFwaXMuY29tL0Fuc3dlclJlY29yZFIGcGFyZW50EhsKBmZpbHRl
+chgCIAEoCUID4EEBUgZmaWx0ZXISGwoJcGFnZV9zaXplGAMgASgFUghwYWdlU2l6ZRIdCgpw
+YWdlX3Rva2VuGAQgASgJUglwYWdlVG9rZW4imQEKGUxpc3RBbnN3ZXJSZWNvcmRzUmVzcG9u
+c2USVAoOYW5zd2VyX3JlY29yZHMYASADKAsyLS5nb29nbGUuY2xvdWQuZGlhbG9nZmxvdy52
+MmJldGExLkFuc3dlclJlY29yZFINYW5zd2VyUmVjb3JkcxImCg9uZXh0X3BhZ2VfdG9rZW4Y
+AiABKAlSDW5leHRQYWdlVG9rZW4isQEKGVVwZGF0ZUFuc3dlclJlY29yZFJlcXVlc3QSVwoN
+YW5zd2VyX3JlY29yZBgBIAEoCzItLmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEu
+QW5zd2VyUmVjb3JkQgPgQQJSDGFuc3dlclJlY29yZBI7Cgt1cGRhdGVfbWFzaxgCIAEoCzIa
+Lmdvb2dsZS5wcm90b2J1Zi5GaWVsZE1hc2tSCnVwZGF0ZU1hc2sywgcKDUFuc3dlclJlY29y
+ZHMS6gEKD0dldEFuc3dlclJlY29yZBI3Lmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0
+YTEuR2V0QW5zd2VyUmVjb3JkUmVxdWVzdBotLmdvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYy
+YmV0YTEuQW5zd2VyUmVjb3JkIm+IAgGC0+STAmYSKi92MmJldGExL3tuYW1lPXByb2plY3Rz
+LyovYW5zd2VyUmVjb3Jkcy8qfVo4EjYvdjJiZXRhMS97bmFtZT1wcm9qZWN0cy8qL2xvY2F0
+aW9ucy8qL2Fuc3dlclJlY29yZHMvKn0SgQIKEUxpc3RBbnN3ZXJSZWNvcmRzEjkuZ29vZ2xl
+LmNsb3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5MaXN0QW5zd2VyUmVjb3Jkc1JlcXVlc3QaOi5n
+b29nbGUuY2xvdWQuZGlhbG9nZmxvdy52MmJldGExLkxpc3RBbnN3ZXJSZWNvcmRzUmVzcG9u
+c2UidYLT5JMCZhIqL3YyYmV0YTEve3BhcmVudD1wcm9qZWN0cy8qfS9hbnN3ZXJSZWNvcmRz
+WjgSNi92MmJldGExL3twYXJlbnQ9cHJvamVjdHMvKi9sb2NhdGlvbnMvKn0vYW5zd2VyUmVj
+b3Jkc9pBBnBhcmVudBLFAgoSVXBkYXRlQW5zd2VyUmVjb3JkEjouZ29vZ2xlLmNsb3VkLmRp
+YWxvZ2Zsb3cudjJiZXRhMS5VcGRhdGVBbnN3ZXJSZWNvcmRSZXF1ZXN0Gi0uZ29vZ2xlLmNs
+b3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5BbnN3ZXJSZWNvcmQiwwGC0+STAqABMjgvdjJiZXRh
+MS97YW5zd2VyX3JlY29yZC5uYW1lPXByb2plY3RzLyovYW5zd2VyUmVjb3Jkcy8qfToNYW5z
+d2VyX3JlY29yZFpVMkQvdjJiZXRhMS97YW5zd2VyX3JlY29yZC5uYW1lPXByb2plY3RzLyov
+bG9jYXRpb25zLyovYW5zd2VyUmVjb3Jkcy8qfToNYW5zd2VyX3JlY29yZNpBGWFuc3dlcl9y
+ZWNvcmQsdXBkYXRlX21hc2saeMpBGWRpYWxvZ2Zsb3cuZ29vZ2xlYXBpcy5jb23SQVlodHRw
+czovL3d3dy5nb29nbGVhcGlzLmNvbS9hdXRoL2Nsb3VkLXBsYXRmb3JtLGh0dHBzOi8vd3d3
+Lmdvb2dsZWFwaXMuY29tL2F1dGgvZGlhbG9nZmxvd0KnAQojY29tLmdvb2dsZS5jbG91ZC5k
+aWFsb2dmbG93LnYyYmV0YTFCEkFuc3dlclJlY29yZHNQcm90b1ABWkNjbG91ZC5nb29nbGUu
+Y29tL2dvL2RpYWxvZ2Zsb3cvYXBpdjJiZXRhMS9kaWFsb2dmbG93cGI7ZGlhbG9nZmxvd3Bi
+ogICREaqAh9Hb29nbGUuQ2xvdWQuRGlhbG9nZmxvdy5WMkJldGExSoVtCgcSBQ4AoAMBCrwE
+CgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVy
+IHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91
+IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBM
+aWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAg
+IGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyBy
+ZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29m
+dHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9u
+IGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBP
+RiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5z
+ZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQK
+IGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAoCgkKAgMAEgMSACYK
+CQoCAwESAxMAIQoJCgIDAhIDFAApCgkKAgMDEgMVACMKCQoCAwQSAxYAOQoJCgIDBRIDFwA7
+CgkKAgMGEgMYACoKCQoCAwcSAxkAKQoICgEIEgMbADwKCQoCCCUSAxsAPAoICgEIEgMcAFoK
+CQoCCAsSAxwAWgoICgEIEgMdACIKCQoCCAoSAx0AIgoICgEIEgMeADMKCQoCCAgSAx4AMwoI
+CgEIEgMfADwKCQoCCAESAx8APAoICgEIEgMgACAKCQoCCCQSAyAAIApiCgIGABIEJABPARpW
+IFNlcnZpY2UgZm9yIG1hbmFnaW5nCiBbQW5zd2VyUmVjb3Jkc11bZ29vZ2xlLmNsb3VkLmRp
+YWxvZ2Zsb3cudjJiZXRhMS5BbnN3ZXJSZWNvcmRdLgoKCgoDBgABEgMkCBUKCgoDBgADEgMl
+AkEKDAoFBgADmQgSAyUCQQoLCgMGAAMSBCYCKDMKDQoFBgADmggSBCYCKDMKQAoEBgACABIE
+LAI0AxoyIERlcHJlY2F0ZWQuCiBSZXRyaWV2ZXMgYSBzcGVjaWZpYyBhbnN3ZXIgcmVjb3Jk
+LgoKDAoFBgACAAESAywGFQoMCgUGAAIAAhIDLBYsCgwKBQYAAgADEgMsN0MKDAoFBgACAAQS
+Ay0EHQoNCgYGAAIABCESAy0EHQoNCgUGAAIABBIELgQzBgoRCgkGAAIABLDKvCISBC4EMwYK
+cAoEBgACARIEOAJBAxpiIFJldHVybnMgdGhlIGxpc3Qgb2YgYWxsIGFuc3dlciByZWNvcmRz
+IGluIHRoZSBzcGVjaWZpZWQgcHJvamVjdCBpbiByZXZlcnNlCiBjaHJvbm9sb2dpY2FsIG9y
+ZGVyLgoKDAoFBgACAQESAzgGFwoMCgUGAAIBAhIDOBgwCgwKBQYAAgEDEgM5DygKDQoFBgAC
+AQQSBDoEPwYKEQoJBgACAQSwyrwiEgQ6BD8GCgwKBQYAAgEEEgNABDQKDwoIBgACAQSbCAAS
+A0AENAo0CgQGAAICEgREAk4DGiYgVXBkYXRlcyB0aGUgc3BlY2lmaWVkIGFuc3dlciByZWNv
+cmQuCgoMCgUGAAICARIDRAYYCgwKBQYAAgICEgNEGTIKDAoFBgACAgMSA0Q9SQoNCgUGAAIC
+BBIERQRMBgoRCgkGAAICBLDKvCISBEUETAYKDAoFBgACAgQSA00ERwoPCggGAAICBJsIABID
+TQRHCrEICgIEABIFbgCGAQEaowggQW5zd2VyIHJlY29yZHMgYXJlIHJlY29yZHMgdG8gbWFu
+YWdlIGFuc3dlciBoaXN0b3J5IGFuZCBmZWVkYmFja3MgZm9yCiBEaWFsb2dmbG93LgoKIEN1
+cnJlbnRseSwgYW5zd2VyIHJlY29yZCBpbmNsdWRlczoKCiAtIGh1bWFuIGFnZW50IGFzc2lz
+dGFudCBhcnRpY2xlIHN1Z2dlc3Rpb24KIC0gaHVtYW4gYWdlbnQgYXNzaXN0YW50IGZhcSBh
+cnRpY2xlCgogSXQgZG9lc24ndCBpbmNsdWRlOgoKIC0gYERldGVjdEludGVudGAgaW50ZW50
+IG1hdGNoaW5nCiAtIGBEZXRlY3RJbnRlbnRgIGtub3dsZWRnZQoKIEFuc3dlciByZWNvcmRz
+IGFyZSBub3QgcmVsYXRlZCB0byB0aGUgY29udmVyc2F0aW9uIGhpc3RvcnkgaW4gdGhlCiBE
+aWFsb2dmbG93IENvbnNvbGUuIEEgUmVjb3JkIGlzIGdlbmVyYXRlZCBldmVuIHdoZW4gdGhl
+IGVuZC11c2VyIGRpc2FibGVzCiBjb252ZXJzYXRpb24gaGlzdG9yeSBpbiB0aGUgY29uc29s
+ZS4gUmVjb3JkcyBhcmUgY3JlYXRlZCB3aGVuIHRoZXJlJ3MgYSBodW1hbgogYWdlbnQgYXNz
+aXN0YW50IHN1Z2dlc3Rpb24gZ2VuZXJhdGVkLgoKIEEgdHlwaWNhbCB3b3JrZmxvdyBmb3Ig
+Y3VzdG9tZXJzIHByb3ZpZGUgZmVlZGJhY2sgdG8gYW4gYW5zd2VyIGlzOgoKIDEuIEZvciBo
+dW1hbiBhZ2VudCBhc3Npc3RhbnQsIGN1c3RvbWVycyBnZXQgc3VnZ2VzdGlvbiB2aWEgTGlz
+dFN1Z2dlc3Rpb25zCiAgICBBUEkuIFRvZ2V0aGVyIHdpdGggdGhlIGFuc3dlcnMsCiAgICBb
+QW5zd2VyUmVjb3JkLm5hbWVdW2dvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEuQW5z
+d2VyUmVjb3JkLm5hbWVdIGFyZQogICAgcmV0dXJuZWQgdG8gdGhlIGN1c3RvbWVycy4KIDIu
+IFRoZSBjdXN0b21lciB1c2VzIHRoZQogW0Fuc3dlclJlY29yZC5uYW1lXVtnb29nbGUuY2xv
+dWQuZGlhbG9nZmxvdy52MmJldGExLkFuc3dlclJlY29yZC5uYW1lXSB0bwogY2FsbCB0aGUK
+ICAgIFtVcGRhdGVBbnN3ZXJSZWNvcmRdW10gbWV0aG9kIHRvIHNlbmQgZmVlZGJhY2sgYWJv
+dXQgYSBzcGVjaWZpYyBhbnN3ZXIKICAgIHRoYXQgdGhleSBiZWxpZXZlIGlzIHdyb25nLgoK
+CgoDBAABEgNuCBQKCwoDBAAHEgRvAnMECg0KBQQAB50IEgRvAnMECpQCCgQEAAIAEgN6AhIa
+hgIgVGhlIHVuaXF1ZSBpZGVudGlmaWVyIG9mIHRoaXMgYW5zd2VyIHJlY29yZC4KIFJlcXVp
+cmVkIGZvcgogW0Fuc3dlclJlY29yZHMuVXBkYXRlQW5zd2VyUmVjb3JkXVtnb29nbGUuY2xv
+dWQuZGlhbG9nZmxvdy52MmJldGExLkFuc3dlclJlY29yZHMuVXBkYXRlQW5zd2VyUmVjb3Jk
+XQogbWV0aG9kLiBGb3JtYXQ6IGBwcm9qZWN0cy88UHJvamVjdCBJRD4vbG9jYXRpb25zLzxM
+b2NhdGlvbgogSUQ+L2Fuc3dlclJlY29yZHMvPEFuc3dlciBSZWNvcmQgSUQ+YC4KCgwKBQQA
+AgAFEgN6AggKDAoFBAACAAESA3oJDQoMCgUEAAIAAxIDehARCuoBCgQEAAIBEgN/AiUa3AEg
+T3B0aW9uYWwuIFRoZSBBbnN3ZXJGZWVkYmFjayBmb3IgdGhpcyByZWNvcmQuIFlvdSBjYW4g
+c2V0IHRoaXMgd2l0aAogW0Fuc3dlclJlY29yZHMuVXBkYXRlQW5zd2VyUmVjb3JkXVtnb29n
+bGUuY2xvdWQuZGlhbG9nZmxvdy52MmJldGExLkFuc3dlclJlY29yZHMuVXBkYXRlQW5zd2Vy
+UmVjb3JkXQogaW4gb3JkZXIgdG8gZ2l2ZSB1cyBmZWVkYmFjayBhYm91dCB0aGlzIGFuc3dl
+ci4KCgwKBQQAAgEGEgN/AhAKDAoFBAACAQESA38RIAoMCgUEAAIBAxIDfyMkCjoKBAQACAAS
+BoIBAoUBAxoqIE91dHB1dCBvbmx5LiBUaGUgcmVjb3JkIGZvciB0aGlzIGFuc3dlci4KCg0K
+BQQACAABEgSCAQgOCkIKBAQAAgISBIQBBDQaNCBPdXRwdXQgb25seS4gVGhlIHJlY29yZCBm
+b3IgaHVtYW4gYWdlbnQgYXNzaXN0YW50LgoKDQoFBAACAgYSBIQBBBgKDQoFBAACAgESBIQB
+GS8KDQoFBAACAgMSBIQBMjMKRgoCBAESBokBAKQBARo4IFJlcHJlc2VudHMgYSByZWNvcmQg
+b2YgYSBodW1hbiBhZ2VudCBhc3Npc3RhbnQgYW5zd2VyLgoKCwoDBAEBEgSJAQgcCjoKBAQB
+CAASBosBAqMBAxoqIE91dHB1dCBvbmx5LiBUaGUgYWdlbnQgYXNzaXN0YW50IGFuc3dlci4K
+Cg0KBQQBCAABEgSLAQgOCj0KBAQBAgASBo0BBI4BNBotIE91dHB1dCBvbmx5LiBUaGUgYXJ0
+aWNsZSBzdWdnZXN0aW9uIGFuc3dlci4KCg0KBQQBAgAGEgSNAQQRCg0KBQQBAgABEgSNARIr
+Cg0KBQQBAgADEgSNAS4vCg0KBQQBAgAIEgSOAQgzChAKCAQBAgAInAgAEgSOAQkyCiwKBAQB
+AgESBJEBBEkaHiBPdXRwdXQgb25seS4gVGhlIEZBUSBhbnN3ZXIuCgoNCgUEAQIBBhIEkQEE
+DQoNCgUEAQIBARIEkQEOGAoNCgUEAQIBAxIEkQEbHAoNCgUEAQIBCBIEkQEdSAoQCggEAQIB
+CJwIABIEkQEeRwo8CgQEAQICEgaUAQSVATQaLCBPdXRwdXQgb25seS4gVGhlIERpYWxvZ2Zs
+b3cgYXNzaXN0IGFuc3dlci4KCg0KBQQBAgIGEgSUAQQaCg0KBQQBAgIBEgSUARszCg0KBQQB
+AgIDEgSUATY3Cg0KBQQBAgIIEgSVAQgzChAKCAQBAgIInAgAEgSVAQkyCjgKBAQBAgMSBpgB
+BJkBNBooIE91dHB1dCBvbmx5LiBUaGUgZ2VuZXJhdG9yIHN1Z2dlc3Rpb24uCgoNCgUEAQID
+BhIEmAEEFwoNCgUEAQIDARIEmAEYLAoNCgUEAQIDAxIEmAEvMAoNCgUEAQIDCBIEmQEIMwoQ
+CggEAQIDCJwIABIEmQEJMgo4CgQEAQIEEgacAQSdATQaKCBPdXRwdXQgb25seS4gVGhlIGNv
+bXBhbmlvbiBzdWdnZXN0aW9uLgoKDQoFBAECBAYSBJwBBBcKDQoFBAECBAESBJwBGCwKDQoF
+BAECBAMSBJwBLzAKDQoFBAECBAgSBJ0BCDMKEAoIBAECBAicCAASBJ0BCTIKQQoEBAECBRIG
+oAEEogE0GjEgT3V0cHV0IG9ubHkuIFRoZSByZWFjdGl2ZSBjb21wYW5pb24gc3VnZ2VzdGlv
+bi4KCg0KBQQBAgUGEgSgAQRGCg0KBQQBAgUBEgShAQglCg0KBQQBAgUDEgShASgqCg0KBQQB
+AgUIEgSiAQgzChAKCAQBAgUInAgAEgSiAQkyCnwKAgQCEgaoAQDQAQEabiBSZXByZXNlbnRz
+IGZlZWRiYWNrIHRoZSBjdXN0b21lciBoYXMgYWJvdXQgdGhlIHF1YWxpdHkgJiBjb3JyZWN0
+bmVzcyBvZiBhCiBjZXJ0YWluIGFuc3dlciBpbiBhIGNvbnZlcnNhdGlvbi4KCgsKAwQCARIE
+qAEIFgo1CgQEAgQAEgaqAQK2AQMaJSBUaGUgY29ycmVjdG5lc3MgbGV2ZWwgb2YgYW4gYW5z
+d2VyLgoKDQoFBAIEAAESBKoBBxcKMAoGBAIEAAIAEgSsAQQmGiAgQ29ycmVjdG5lc3MgbGV2
+ZWwgdW5zcGVjaWZpZWQuCgoPCgcEAgQAAgABEgSsAQQhCg8KBwQCBAACAAISBKwBJCUKKgoG
+BAIEAAIBEgSvAQQUGhogQW5zd2VyIGlzIHRvdGFsbHkgd3JvbmcuCgoPCgcEAgQAAgEBEgSv
+AQQPCg8KBwQCBAACAQISBK8BEhMKLgoGBAIEAAICEgSyAQQaGh4gQW5zd2VyIGlzIHBhcnRp
+YWxseSBjb3JyZWN0LgoKDwoHBAIEAAICARIEsgEEFQoPCgcEAgQAAgICEgSyARgZCioKBgQC
+BAACAxIEtQEEFhoaIEFuc3dlciBpcyBmdWxseSBjb3JyZWN0LgoKDwoHBAIEAAIDARIEtQEE
+EQoPCgcEAgQAAgMCEgS1ARQVCj0KBAQCAgASBLkBAikaLyBUaGUgY29ycmVjdG5lc3MgbGV2
+ZWwgb2YgdGhlIHNwZWNpZmljIGFuc3dlci4KCg0KBQQCAgAGEgS5AQISCg0KBQQCAgABEgS5
+ARMkCg0KBQQCAgADEgS5AScoClkKBAQCCAASBrwBAr8BAxpJIE5vcm1hbGx5LCBkZXRhaWwg
+ZmVlZGJhY2sgaXMgcHJvdmlkZWQgd2hlbiBhbnN3ZXIgaXMgbm90IGZ1bGx5IGNvcnJlY3Qu
+CgoNCgUEAggAARIEvAEIFwpJCgQEAgIBEgS+AQQ/GjsgT3B0aW9uYWwuIERldGFpbCBmZWVk
+YmFjayBvZiBhZ2VudCBhc3Npc3RhbnQgc3VnZ2VzdGlvbnMuCgoNCgUEAgIBBhIEvgEEGgoN
+CgUEAgIBARIEvgEbOgoNCgUEAgIBAxIEvgE9PgrjAQoEBAICAhIExQECExrUASBJbmRpY2F0
+ZXMgd2hldGhlciB0aGUgYW5zd2VyL2l0ZW0gd2FzIGNsaWNrZWQgYnkgdGhlIGh1bWFuIGFn
+ZW50CiBvciBub3QuIERlZmF1bHQgdG8gZmFsc2UuCiBGb3Iga25vd2xlZGdlIHNlYXJjaCwg
+dGhlIGFuc3dlciByZWNvcmQgaXMgY29uc2lkZXJlZCB0byBiZSBjbGlja2VkIGlmIHRoZQog
+YW5zd2VyIHdhcyBjb3BpZWQgb3IgYW55IFVSSSB3YXMgY2xpY2tlZC4KCg0KBQQCAgIFEgTF
+AQIGCg0KBQQCAgIBEgTFAQcOCg0KBQQCAgIDEgTFARESCjYKBAQCAgMSBMgBAisaKCBUaW1l
+IHdoZW4gdGhlIGFuc3dlci9pdGVtIHdhcyBjbGlja2VkLgoKDQoFBAICAwYSBMgBAhsKDQoF
+BAICAwESBMgBHCYKDQoFBAICAwMSBMgBKSoKfgoEBAICBBIEzAECFRpwIEluZGljYXRlcyB3
+aGV0aGVyIHRoZSBhbnN3ZXIvaXRlbSB3YXMgZGlzcGxheWVkIHRvIHRoZSBodW1hbgogYWdl
+bnQgaW4gdGhlIGFnZW50IGRlc2t0b3AgVUkuIERlZmF1bHQgdG8gZmFsc2UuCgoNCgUEAgIE
+BRIEzAECBgoNCgUEAgIEARIEzAEHEAoNCgUEAgIEAxIEzAETFAo4CgQEAgIFEgTPAQItGiog
+VGltZSB3aGVuIHRoZSBhbnN3ZXIvaXRlbSB3YXMgZGlzcGxheWVkLgoKDQoFBAICBQYSBM8B
+AhsKDQoFBAICBQESBM8BHCgKDQoFBAICBQMSBM8BKywKOgoCBAMSBtMBANYCARosIERldGFp
+bCBmZWVkYmFjayBvZiBBZ2VudCBBc3Npc3RhbnQgcmVzdWx0LgoKCwoDBAMBEgTTAQgeCikK
+BAQDBAASBtUBAt4BAxoZIFJlbGV2YW5jZSBvZiBhbiBhbnN3ZXIuCgoNCgUEAwQAARIE1QEH
+FgovCgYEAwQAAgASBNcBBCUaHyBBbnN3ZXIgcmVsZXZhbmNlIHVuc3BlY2lmaWVkLgoKDwoH
+BAMEAAIAARIE1wEEIAoPCgcEAwQAAgACEgTXASMkCjAKBgQDBAACARIE2gEEExogIEFuc3dl
+ciBpcyBpcnJlbGV2YW50IHRvIHF1ZXJ5LgoKDwoHBAMEAAIBARIE2gEEDgoPCgcEAwQAAgEC
+EgTaARESCi4KBgQDBAACAhIE3QEEERoeIEFuc3dlciBpcyByZWxldmFudCB0byBxdWVyeS4K
+Cg8KBwQDBAACAgESBN0BBAwKDwoHBAMEAAICAhIE3QEPEAoqCgQEAwQBEgbhAQLqAQMaGiBD
+b3JyZWN0bmVzcyBvZiBkb2N1bWVudC4KCg0KBQQDBAEBEgThAQcaCjMKBgQDBAECABIE4wEE
+KRojIERvY3VtZW50IGNvcnJlY3RuZXNzIHVuc3BlY2lmaWVkLgoKDwoHBAMEAQIAARIE4wEE
+JAoPCgcEAwQBAgACEgTjAScoCjcKBgQDBAECARIE5gEEEhonIEluZm9ybWF0aW9uIGluIGRv
+Y3VtZW50IGlzIGluY29ycmVjdC4KCg8KBwQDBAECAQESBOYBBA0KDwoHBAMEAQIBAhIE5gEQ
+EQo1CgYEAwQBAgISBOkBBBAaJSBJbmZvcm1hdGlvbiBpbiBkb2N1bWVudCBpcyBjb3JyZWN0
+LgoKDwoHBAMEAQICARIE6QEECwoPCgcEAwQBAgICEgTpAQ4PCikKBAQDBAISBu0BAvYBAxoZ
+IEVmZmljaWVuY3kgb2YgZG9jdW1lbnQuCgoNCgUEAwQCARIE7QEHGQoyCgYEAwQCAgASBO8B
+BCgaIiBEb2N1bWVudCBlZmZpY2llbmN5IHVuc3BlY2lmaWVkLgoKDwoHBAMEAgIAARIE7wEE
+IwoPCgcEAwQCAgACEgTvASYnCioKBgQDBAICARIE8gEEFBoaIERvY3VtZW50IGlzIGluZWZm
+aWNpZW50LgoKDwoHBAMEAgIBARIE8gEEDwoPCgcEAwQCAgECEgTyARITCigKBgQDBAICAhIE
+9QEEEhoYIERvY3VtZW50IGlzIGVmZmljaWVudC4KCg8KBwQDBAICAgESBPUBBA0KDwoHBAME
+AgICAhIE9QEQEQo6CgQEAwMAEgb5AQKGAgMaKiBGZWVkYmFjayBmb3IgY29udmVyc2F0aW9u
+IHN1bW1hcml6YXRpb24uCgoNCgUEAwMAARIE+QEKHwpBCgYEAwMAAgASBPsBBDIaMSBUaW1l
+c3RhbXAgd2hlbiBjb21wb3Npbmcgb2YgdGhlIHN1bW1hcnkgc3RhcnRzLgoKDwoHBAMDAAIA
+BhIE+wEEHQoPCgcEAwMAAgABEgT7AR4tCg8KBwQDAwACAAMSBPsBMDEKOwoGBAMDAAIBEgT+
+AQQzGisgVGltZXN0YW1wIHdoZW4gdGhlIHN1bW1hcnkgd2FzIHN1Ym1pdHRlZC4KCg8KBwQD
+AwACAQYSBP4BBB0KDwoHBAMDAAIBARIE/gEeLgoPCgcEAwMAAgEDEgT+ATEyCjMKBgQDAwAC
+AhIEgQIEHBojIFRleHQgb2YgYWN0dWFsIHN1Ym1pdHRlZCBzdW1tYXJ5LgoKDwoHBAMDAAIC
+BRIEgQIECgoPCgcEAwMAAgIBEgSBAgsXCg8KBwQDAwACAgMSBIECGhsKSAoGBAMDAAIDEgaE
+AgSFAjEaNiBPcHRpb25hbC4gQWN0dWFsIHRleHQgc2VjdGlvbnMgb2Ygc3VibWl0dGVkIHN1
+bW1hcnkuCgoPCgcEAwMAAgMGEgSEAgQXCg8KBwQDAwACAwESBIQCGCUKDwoHBAMDAAIDAxIE
+hAIoKQoPCgcEAwMAAgMIEgSFAggwChIKCgQDAwACAwicCAASBIUCCS8KMAoEBAMDARIGiQIC
+lgIDGiAgRmVlZGJhY2sgZm9yIGtub3dsZWRnZSBzZWFyY2guCgoNCgUEAwMBARIEiQIKIQrb
+AQoGBAMDAQIAEgSOAgQbGsoBIFdoZXRoZXIgdGhlIGFuc3dlciB3YXMgY29waWVkIGJ5IHRo
+ZSBodW1hbiBhZ2VudCBvciBub3QuCiBJZiB0aGUgdmFsdWUgaXMgc2V0IHRvIGJlIHRydWUs
+CiBbQW5zd2VyRmVlZGJhY2suY2xpY2tlZF1bZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJi
+ZXRhMS5BbnN3ZXJGZWVkYmFjay5jbGlja2VkXQogd2lsbCBiZSB1cGRhdGVkIHRvIGJlIHRy
+dWUuCgoPCgcEAwMBAgAFEgSOAgQICg8KBwQDAwECAAESBI4CCRYKDwoHBAMDAQIAAxIEjgIZ
+Ggr9AQoGBAMDAQIBEgSVAgQlGuwBIFRoZSBVUklzIGNsaWNrZWQgYnkgdGhlIGh1bWFuIGFn
+ZW50LiBUaGUgdmFsdWUgaXMgYXBwZW5kZWQgZm9yIGVhY2gKIFVwZGF0ZUFuc3dlclJlY29y
+ZFJlcXVlc3QuCiBJZiB0aGUgdmFsdWUgaXMgbm90IGVtcHR5LAogW0Fuc3dlckZlZWRiYWNr
+LmNsaWNrZWRdW2dvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEuQW5zd2VyRmVlZGJh
+Y2suY2xpY2tlZF0KIHdpbGwgYmUgdXBkYXRlZCB0byBiZSB0cnVlLgoKDwoHBAMDAQIBBBIE
+lQIEDAoPCgcEAwMBAgEFEgSVAg0TCg8KBwQDAwECAQESBJUCFCAKDwoHBAMDAQIBAxIElQIj
+JAowCgQEAwMCEgaZAgKmAgMaICBGZWVkYmFjayBmb3Iga25vd2xlZGdlIGFzc2lzdC4KCg0K
+BQQDAwIBEgSZAgohCt4BCgYEAwMCAgASBJ4CBBsazQEgV2hldGhlciB0aGUgc3VnZ2VzdGVk
+IGFuc3dlciB3YXMgY29waWVkIGJ5IHRoZSBodW1hbiBhZ2VudC4KIElmIHRoZSB2YWx1ZSBp
+cyBzZXQgdG8gYmUgdHJ1ZSwKIFtBbnN3ZXJGZWVkYmFjay5jbGlja2VkXVtnb29nbGUuY2xv
+dWQuZGlhbG9nZmxvdy52MmJldGExLkFuc3dlckZlZWRiYWNrLmNsaWNrZWRdCiB3aWxsIGJl
+IHVwZGF0ZWQgdG8gYmUgdHJ1ZS4KCg8KBwQDAwICAAUSBJ4CBAgKDwoHBAMDAgIAARIEngIJ
+FgoPCgcEAwMCAgADEgSeAhkaCroCCgYEAwMCAgESBKUCBCUaqQIgVGhlIFVSSXMgY2xpY2tl
+ZCBieSB0aGUgaHVtYW4gYWdlbnQuIFRoZSB2YWx1ZSBpcyBhcHBlbmRlZCBmb3IgZWFjaAog
+W1VwZGF0ZUFuc3dlclJlY29yZFJlcXVlc3RdW2dvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYy
+YmV0YTEuVXBkYXRlQW5zd2VyUmVjb3JkUmVxdWVzdF0uCiBJZiB0aGUgdmFsdWUgaXMgbm90
+IGVtcHR5LAogW0Fuc3dlckZlZWRiYWNrLmNsaWNrZWRdW2dvb2dsZS5jbG91ZC5kaWFsb2dm
+bG93LnYyYmV0YTEuQW5zd2VyRmVlZGJhY2suY2xpY2tlZF0KIHdpbGwgYmUgdXBkYXRlZCB0
+byBiZSB0cnVlLgoKDwoHBAMDAgIBBBIEpQIEDAoPCgcEAwMCAgEFEgSlAg0TCg8KBwQDAwIC
+AQESBKUCFCAKDwoHBAMDAgIBAxIEpQIjJAotCgQEAwMDEgSpAgIeGh8gRmVlZGJhY2sgZm9y
+IGNvbXBhbmlvbiBhZ2VudC4KCg0KBQQDAwMBEgSpAgobCr8DCgQEAwIAEgSzAgInGrADIE9w
+dGlvbmFsLiBXaGV0aGVyIG9yIG5vdCB0aGUgc3VnZ2VzdGVkIGFuc3dlciBpcyByZWxldmFu
+dC4KCiBGb3IgZXhhbXBsZToKCiAqIFF1ZXJ5OiAiQ2FuIEkgY2hhbmdlIG15IG1haWxpbmcg
+YWRkcmVzcz8iCiAqIFN1Z2dlc3RlZCBkb2N1bWVudCBzYXlzOiAiSXRlbXMgbXVzdCBiZSBy
+ZXR1cm5lZC9leGNoYW5nZWQgd2l0aGluIDYwCiAgIGRheXMgb2YgdGhlIHB1cmNoYXNlIGRh
+dGUuIgogKiBbYW5zd2VyX3JlbGV2YW5jZV1bZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJi
+ZXRhMS5BZ2VudEFzc2lzdGFudEZlZWRiYWNrLmFuc3dlcl9yZWxldmFuY2VdOiBbQW5zd2Vy
+UmVsZXZhbmNlLklSUkVMRVZBTlRdW2dvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEu
+QWdlbnRBc3Npc3RhbnRGZWVkYmFjay5BbnN3ZXJSZWxldmFuY2UuSVJSRUxFVkFOVF0KCg0K
+BQQDAgAGEgSzAgIRCg0KBQQDAgABEgSzAhIiCg0KBQQDAgADEgSzAiUmCokECgQEAwIBEgS+
+AgIvGvoDIE9wdGlvbmFsLiBXaGV0aGVyIG9yIG5vdCB0aGUgaW5mb3JtYXRpb24gaW4gdGhl
+IGRvY3VtZW50IGlzIGNvcnJlY3QuCgogRm9yIGV4YW1wbGU6CgogKiBRdWVyeTogIkNhbiBJ
+IHJldHVybiB0aGUgcGFja2FnZSBpbiAyIGRheXMgb25jZSByZWNlaXZlZD8iCiAqIFN1Z2dl
+c3RlZCBkb2N1bWVudCBzYXlzOiAiSXRlbXMgbXVzdCBiZSByZXR1cm5lZC9leGNoYW5nZWQg
+d2l0aGluIDYwCiAgIGRheXMgb2YgdGhlIHB1cmNoYXNlIGRhdGUuIgogKiBHcm91bmQgdHJ1
+dGg6ICJObyByZXR1cm4gb3IgZXhjaGFuZ2UgaXMgYWxsb3dlZC4iCiAqIFtkb2N1bWVudF9j
+b3JyZWN0bmVzc11bZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5BZ2VudEFzc2lz
+dGFudEZlZWRiYWNrLmRvY3VtZW50X2NvcnJlY3RuZXNzXTogW0lOQ09SUkVDVF1bZ29vZ2xl
+LmNsb3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5BZ2VudEFzc2lzdGFudEZlZWRiYWNrLkRvY3Vt
+ZW50Q29ycmVjdG5lc3MuSU5DT1JSRUNUXQoKDQoFBAMCAQYSBL4CAhUKDQoFBAMCAQESBL4C
+FioKDQoFBAMCAQMSBL4CLS4KqQMKBAQDAgISBMYCAi0amgMgT3B0aW9uYWwuIFdoZXRoZXIg
+b3Igbm90IHRoZSBzdWdnZXN0ZWQgZG9jdW1lbnQgaXMgZWZmaWNpZW50LiBGb3IgZXhhbXBs
+ZSwKIGlmIHRoZSBkb2N1bWVudCBpcyBwb29ybHkgd3JpdHRlbiwgaGFyZCB0byB1bmRlcnN0
+YW5kLCBoYXJkIHRvIHVzZSBvcgogdG9vIGxvbmcgdG8gZmluZCB1c2VmdWwgaW5mb3JtYXRp
+b24sCiBbZG9jdW1lbnRfZWZmaWNpZW5jeV1bZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJi
+ZXRhMS5BZ2VudEFzc2lzdGFudEZlZWRiYWNrLmRvY3VtZW50X2VmZmljaWVuY3ldCiBpcwog
+W0RvY3VtZW50RWZmaWNpZW5jeS5JTkVGRklDSUVOVF1bZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zs
+b3cudjJiZXRhMS5BZ2VudEFzc2lzdGFudEZlZWRiYWNrLkRvY3VtZW50RWZmaWNpZW5jeS5J
+TkVGRklDSUVOVF0uCgoNCgUEAwICBhIExgICFAoNCgUEAwICARIExgIVKAoNCgUEAwICAxIE
+xgIrLAo4CgQEAwIDEgTJAgIzGiogRmVlZGJhY2sgZm9yIGNvbnZlcnNhdGlvbiBzdW1tYXJp
+emF0aW9uLgoKDQoFBAMCAwYSBMkCAhcKDQoFBAMCAwESBMkCGC4KDQoFBAMCAwMSBMkCMTIK
+OgoEBAMCBBIGzAICzQIvGiogT3B0aW9uYWwuIEZlZWRiYWNrIGZvciBrbm93bGVkZ2Ugc2Vh
+cmNoLgoKDQoFBAMCBAYSBMwCAhkKDQoFBAMCBAESBMwCGjMKDQoFBAMCBAMSBMwCNjcKDQoF
+BAMCBAgSBM0CBi4KEAoIBAMCBAicCAASBM0CBy0KOgoEBAMCBRIG0AIC0QIvGiogT3B0aW9u
+YWwuIEZlZWRiYWNrIGZvciBrbm93bGVkZ2UgYXNzaXN0LgoKDQoFBAMCBQYSBNACAhkKDQoF
+BAMCBQESBNACGjMKDQoFBAMCBQMSBNACNjcKDQoFBAMCBQgSBNECBi4KEAoIBAMCBQicCAAS
+BNECBy0KOQoEBAMCBhIG1AIC1QIvGikgT3B0aW9uYWwuIEZlZWRiYWNrIGZvciBjb21wYW5p
+b24gYWdlbnQuCgoNCgUEAwIGBhIE1AICEwoNCgUEAwIGARIE1AIUJgoNCgUEAwIGAxIE1AIp
+KgoNCgUEAwIGCBIE1QIGLgoQCggEAwIGCJwIABIE1QIHLQqEAQoCBAQSBtoCAN8CARp2IFJl
+cXVlc3QgbWVzc2FnZSBmb3IKIFtBbnN3ZXJSZWNvcmRzLkdldEFuc3dlclJlY29yZF1bZ29v
+Z2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5BbnN3ZXJSZWNvcmRzLkdldEFuc3dlclJl
+Y29yZF0uCgoLCgMEBAESBNoCCB4KoQEKBAQEAgASBN4CAhIakgEgUmVxdWlyZWQuIFRoZSBu
+YW1lIG9mIHRoZSBhbnN3ZXIgcmVjb3JkIHRvIHJldHJpZXZlLgogRm9ybWF0OiBgcHJvamVj
+dHMvPFByb2plY3QgSUQ+L2xvY2F0aW9ucy88TG9jYXRpb24KIElEPi9hbnN3ZXJSZWNvcmRz
+LzxBbnN3ZXIgUmVjb3JkIElkPmAuCgoNCgUEBAIABRIE3gICCAoNCgUEBAIAARIE3gIJDQoN
+CgUEBAIAAxIE3gIQEQqIAQoCBAUSBuMCAIcDARp6IFJlcXVlc3QgbWVzc2FnZSBmb3IKIFtB
+bnN3ZXJSZWNvcmRzLkxpc3RBbnN3ZXJSZWNvcmRzXVtnb29nbGUuY2xvdWQuZGlhbG9nZmxv
+dy52MmJldGExLkFuc3dlclJlY29yZHMuTGlzdEFuc3dlclJlY29yZHNdLgoKCwoDBAUBEgTj
+AgggCqIBCgQEBQIAEgbnAgLpAgUakQEgUmVxdWlyZWQuIFRoZSBwcm9qZWN0IHRvIGxpc3Qg
+YWxsIGFuc3dlciByZWNvcmRzIGZvciBpbiByZXZlcnNlCiBjaHJvbm9sb2dpY2FsIG9yZGVy
+LiBGb3JtYXQ6IGBwcm9qZWN0cy88UHJvamVjdCBJRD4vbG9jYXRpb25zLzxMb2NhdGlvbgog
+SUQ+YC4KCg0KBQQFAgAFEgTnAgIICg0KBQQFAgABEgTnAgkPCg0KBQQFAgADEgTnAhITCg8K
+BQQFAgAIEgbnAhTpAgQKEQoHBAUCAAifCBIG5wIV6QIDCrEECgQEBQIBEgT7AgI9GqIEIE9w
+dGlvbmFsLiBGaWx0ZXJzIHRvIHJlc3RyaWN0IHJlc3VsdHMgdG8gc3BlY2lmaWMgYW5zd2Vy
+IHJlY29yZHMuIFRoZQogZXhwcmVzc2lvbiBoYXMgdGhlIGZvbGxvd2luZyBzeW50YXg6Cgog
+ICA8ZmllbGQ+IDxvcGVyYXRvcj4gPHZhbHVlPiBbQU5EIDxmaWVsZD4gPG9wZXJhdG9yPiA8
+dmFsdWU+XSAuLi4KCiBUaGUgZm9sbG93aW5nIGZpZWxkcyBhbmQgb3BlcmF0b3JzIGFyZSBz
+dXBwb3J0ZWQ6CiAqIGNvbnZlcnNhdGlvbl9pZCB3aXRoIGVxdWFscyg9KSBvcGVyYXRvcgoK
+IEV4YW1wbGVzOgoKICogImNvbnZlcnNhdGlvbl9pZD1iYXIiIG1hdGNoZXMgYW5zd2VyIHJl
+Y29yZHMgaW4gdGhlCiAgIHByb2plY3RzL2Zvby9sb2NhdGlvbnMvZ2xvYmFsL2NvbnZlcnNh
+dGlvbnMvYmFyIGNvbnZlcnNhdGlvbgogICAoYXNzdW1pbmcgdGhlIHBhcmVudCBpcyBwcm9q
+ZWN0cy9mb28vbG9jYXRpb25zL2dsb2JhbCkuCgogRm9yIG1vcmUgaW5mb3JtYXRpb24gYWJv
+dXQgZmlsdGVyaW5nLCBzZWUKIFtBUEkgRmlsdGVyaW5nXShodHRwczovL2FpcC5kZXYvMTYw
+KS4KCg0KBQQFAgEFEgT7AgIICg0KBQQFAgEBEgT7AgkPCg0KBQQFAgEDEgT7AhITCg0KBQQF
+AgEIEgT7AhQ8ChAKCAQFAgEInAgAEgT7AhU7CrQBCgQEBQICEgSAAwIWGqUBIE9wdGlvbmFs
+LiBUaGUgbWF4aW11bSBudW1iZXIgb2YgcmVjb3JkcyB0byByZXR1cm4gaW4gYSBzaW5nbGUg
+cGFnZS4KIFRoZSBzZXJ2ZXIgbWF5IHJldHVybiBmZXdlciByZWNvcmRzIHRoYW4gdGhpcy4g
+SWYgdW5zcGVjaWZpZWQsIHdlIHVzZSAxMC4KIFRoZSBtYXhpbXVtIGlzIDEwMC4KCg0KBQQF
+AgIFEgSAAwIHCg0KBQQFAgIBEgSAAwgRCg0KBQQFAgIDEgSAAxQVCu8BCgQEBQIDEgSGAwIY
+GuABIE9wdGlvbmFsLiBUaGUKIFtMaXN0QW5zd2VyUmVjb3Jkc1Jlc3BvbnNlLm5leHRfcGFn
+ZV90b2tlbl1bZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5MaXN0QW5zd2VyUmVj
+b3Jkc1Jlc3BvbnNlLm5leHRfcGFnZV90b2tlbl0KIHZhbHVlIHJldHVybmVkIGZyb20gYSBw
+cmV2aW91cyBsaXN0IHJlcXVlc3QgdXNlZCB0byBjb250aW51ZSBsaXN0aW5nIG9uCiB0aGUg
+bmV4dCBwYWdlLgoKDQoFBAUCAwUSBIYDAggKDQoFBAUCAwESBIYDCRMKDQoFBAUCAwMSBIYD
+FhcKiQEKAgQGEgaLAwCWAwEaeyBSZXNwb25zZSBtZXNzYWdlIGZvcgogW0Fuc3dlclJlY29y
+ZHMuTGlzdEFuc3dlclJlY29yZHNdW2dvb2dsZS5jbG91ZC5kaWFsb2dmbG93LnYyYmV0YTEu
+QW5zd2VyUmVjb3Jkcy5MaXN0QW5zd2VyUmVjb3Jkc10uCgoLCgMEBgESBIsDCCEKKwoEBAYC
+ABIEjQMCKxodIFRoZSBsaXN0IG9mIGFuc3dlciByZWNvcmRzLgoKDQoFBAYCAAQSBI0DAgoK
+DQoFBAYCAAYSBI0DCxcKDQoFBAYCAAESBI0DGCYKDQoFBAYCAAMSBI0DKSoKyQIKBAQGAgES
+BJUDAh0augIgQSB0b2tlbiB0byByZXRyaWV2ZSBuZXh0IHBhZ2Ugb2YgcmVzdWx0cy4gT3Ig
+ZW1wdHkgaWYgdGhlcmUgYXJlIG5vIG1vcmUKIHJlc3VsdHMuCiBQYXNzIHRoaXMgdmFsdWUg
+aW4gdGhlCiBbTGlzdEFuc3dlclJlY29yZHNSZXF1ZXN0LnBhZ2VfdG9rZW5dW2dvb2dsZS5j
+bG91ZC5kaWFsb2dmbG93LnYyYmV0YTEuTGlzdEFuc3dlclJlY29yZHNSZXF1ZXN0LnBhZ2Vf
+dG9rZW5dCiBmaWVsZCBpbiB0aGUgc3Vic2VxdWVudCBjYWxsIHRvIGBMaXN0QW5zd2VyUmVj
+b3Jkc2AgbWV0aG9kIHRvIHJldHJpZXZlIHRoZQogbmV4dCBwYWdlIG9mIHJlc3VsdHMuCgoN
+CgUEBgIBBRIElQMCCAoNCgUEBgIBARIElQMJGAoNCgUEBgIBAxIElQMbHAqKAQoCBAcSBpoD
+AKADARp8IFJlcXVlc3QgbWVzc2FnZSBmb3IKIFtBbnN3ZXJSZWNvcmRzLlVwZGF0ZUFuc3dl
+clJlY29yZF1bZ29vZ2xlLmNsb3VkLmRpYWxvZ2Zsb3cudjJiZXRhMS5BbnN3ZXJSZWNvcmRz
+LlVwZGF0ZUFuc3dlclJlY29yZF0uCgoLCgMEBwESBJoDCCEKMgoEBAcCABIEnAMCShokIFJl
+cXVpcmVkLiBBbnN3ZXIgcmVjb3JkIHRvIHVwZGF0ZS4KCg0KBQQHAgAGEgScAwIOCg0KBQQH
+AgABEgScAw8cCg0KBQQHAgADEgScAx8gCg0KBQQHAgAIEgScAyFJChAKCAQHAgAInAgAEgSc
+AyJICkcKBAQHAgESBJ8DAiwaOSBSZXF1aXJlZC4gVGhlIG1hc2sgdG8gY29udHJvbCB3aGlj
+aCBmaWVsZHMgZ2V0IHVwZGF0ZWQuCgoNCgUEBwIBBhIEnwMCGwoNCgUEBwIBARIEnwMcJwoN
+CgUEBwIBAxIEnwMqK2IGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecord ===
+    # Fields for AnswerRecord
+    # Field: name Type: 9 ()
+    # Field: answer_feedback Type: 11 (.google.cloud.dialogflow.v2beta1.AnswerFeedback)
+    # Field: agent_assistant_record Type: 11 (.google.cloud.dialogflow.v2beta1.AgentAssistantRecord)
+
+# === Message: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantRecord ===
+    # Fields for AgentAssistantRecord
+    # Field: article_suggestion_answer Type: 11 (.google.cloud.dialogflow.v2beta1.ArticleAnswer)
+    # Field: faq_answer Type: 11 (.google.cloud.dialogflow.v2beta1.FaqAnswer)
+    # Field: dialogflow_assist_answer Type: 11 (.google.cloud.dialogflow.v2beta1.DialogflowAssistAnswer)
+    # Field: generator_suggestion Type: 11 (.google.cloud.dialogflow.v2beta1.GeneratorSuggestion)
+    # Field: companion_suggestion Type: 11 (.google.cloud.dialogflow.v2beta1.CompanionSuggestion)
+    # Field: reactive_companion_suggestion Type: 11 (.google.cloud.dialogflow.v2beta1.StreamingReactiveCompanionSuggestionsResponse.ReactiveModeResponse)
+
+# === Message: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerFeedback ===
+    # Fields for AnswerFeedback
+    # Field: correctness_level Type: 14 (.google.cloud.dialogflow.v2beta1.AnswerFeedback.CorrectnessLevel)
+    # Field: agent_assistant_detail_feedback Type: 11 (.google.cloud.dialogflow.v2beta1.AgentAssistantFeedback)
+    # Field: clicked Type: 8 ()
+    # Field: click_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: displayed Type: 8 ()
+    # Field: display_time Type: 11 (.google.protobuf.Timestamp)
+
+# Enum: AnswerFeedback::CorrectnessLevel
+our $AnswerFeedback_CORRECTNESS_LEVEL_UNSPECIFIED = 0;
+our $AnswerFeedback_NOT_CORRECT = 1;
+our $AnswerFeedback_PARTIALLY_CORRECT = 2;
+our $AnswerFeedback_FULLY_CORRECT = 3;
+
+# === Message: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantFeedback ===
+    # Fields for AgentAssistantFeedback
+    # Field: answer_relevance Type: 14 (.google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.AnswerRelevance)
+    # Field: document_correctness Type: 14 (.google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.DocumentCorrectness)
+    # Field: document_efficiency Type: 14 (.google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.DocumentEfficiency)
+    # Field: summarization_feedback Type: 11 (.google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.SummarizationFeedback)
+    # Field: knowledge_search_feedback Type: 11 (.google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.KnowledgeSearchFeedback)
+    # Field: knowledge_assist_feedback Type: 11 (.google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.KnowledgeAssistFeedback)
+    # Field: companion_feedback Type: 11 (.google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.CompanionFeedback)
+
+# Enum: AgentAssistantFeedback::AnswerRelevance
+our $AgentAssistantFeedback_ANSWER_RELEVANCE_UNSPECIFIED = 0;
+our $AgentAssistantFeedback_IRRELEVANT = 1;
+our $AgentAssistantFeedback_RELEVANT = 2;
+
+# Enum: AgentAssistantFeedback::DocumentCorrectness
+our $AgentAssistantFeedback_DOCUMENT_CORRECTNESS_UNSPECIFIED = 0;
+our $AgentAssistantFeedback_INCORRECT = 1;
+our $AgentAssistantFeedback_CORRECT = 2;
+
+# Enum: AgentAssistantFeedback::DocumentEfficiency
+our $AgentAssistantFeedback_DOCUMENT_EFFICIENCY_UNSPECIFIED = 0;
+our $AgentAssistantFeedback_INEFFICIENT = 1;
+our $AgentAssistantFeedback_EFFICIENT = 2;
+
+# === Message: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::GetAnswerRecordRequest ===
+    # Fields for GetAnswerRecordRequest
+    # Field: name Type: 9 ()
+
+# === Message: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::ListAnswerRecordsRequest ===
+    # Fields for ListAnswerRecordsRequest
+    # Field: parent Type: 9 ()
+    # Field: filter Type: 9 ()
+    # Field: page_size Type: 5 ()
+    # Field: page_token Type: 9 ()
+
+# === Message: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::ListAnswerRecordsResponse ===
+    # Fields for ListAnswerRecordsResponse
+    # Field: answer_records Type: 11 (.google.cloud.dialogflow.v2beta1.AnswerRecord)
+    # Field: next_page_token Type: 9 ()
+
+# === Message: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::UpdateAnswerRecordRequest ===
+    # Fields for UpdateAnswerRecordRequest
+    # Field: answer_record Type: 11 (.google.cloud.dialogflow.v2beta1.AnswerRecord)
+    # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
+
+# === Service Client: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecordsClient ===
+package Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecordsClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecordsClient
+
+Client stub representing the remote C<AnswerRecords> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<dialogflow.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'dialogflow.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub get_answer_record {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Dialogflow::V2beta1::AnswerRecord::GetAnswerRecordRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.dialogflow.v2beta1.AnswerRecords',
+        method         => 'GetAnswerRecord',
+        request        => $req,
+        response_class => 'Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecord',
+    });
+}
+
+sub list_answer_records {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Dialogflow::V2beta1::AnswerRecord::ListAnswerRecordsRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.dialogflow.v2beta1.AnswerRecords',
+        method         => 'ListAnswerRecords',
+        request        => $req,
+        response_class => 'Google::Cloud::Dialogflow::V2beta1::AnswerRecord::ListAnswerRecordsResponse',
+    });
+}
+
+sub update_answer_record {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Dialogflow::V2beta1::AnswerRecord::UpdateAnswerRecordRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.dialogflow.v2beta1.AnswerRecords',
+        method         => 'UpdateAnswerRecord',
+        request        => $req,
+        response_class => 'Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecord',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Dialogflow::V2beta1::AnswerRecord - Compiled Protocol Buffers messages for google/cloud/dialogflow/v2beta1/answer_record.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dialogflow::V2beta1::AnswerRecord;
+
+    my $msg = Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecord->new({
+        name => $name,
+        answer_feedback => $answer_feedback,
+        agent_assistant_record => $agent_assistant_record,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecord->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dialogflow/v2beta1/answer_record.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecord
+
+Answer records are records to manage answer history and feedbacks for
+Dialogflow.
+
+Currently, answer record includes:
+
+- human agent assistant article suggestion
+- human agent assistant faq article
+
+It doesn't include:
+
+- `DetectIntent` intent matching
+- `DetectIntent` knowledge
+
+Answer records are not related to the conversation history in the
+Dialogflow Console. A Record is generated even when the end-user disables
+conversation history in the console. Records are created when there's a human
+agent assistant suggestion generated.
+
+A typical workflow for customers provide feedback to an answer is:
+
+1. For human agent assistant, customers get suggestion via ListSuggestions
+   API. Together with the answers,
+   [AnswerRecord.name][google.cloud.dialogflow.v2beta1.AnswerRecord.name] are
+   returned to the customers.
+2. The customer uses the
+[AnswerRecord.name][google.cloud.dialogflow.v2beta1.AnswerRecord.name] to
+call the
+   [UpdateAnswerRecord][] method to send feedback about a specific answer
+   that they believe is wrong.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The unique identifier of this answer record.
+Required for
+[AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2beta1.AnswerRecords.UpdateAnswerRecord]
+method. Format: `projects/<Project ID>/locations/<Location
+ID>/answerRecords/<Answer Record ID>`.
+
+=item * C<< $msg->answer_feedback() >> / C<< $msg->answer_feedback($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerFeedback>)
+
+Optional. The AnswerFeedback for this record. You can set this with
+[AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2beta1.AnswerRecords.UpdateAnswerRecord]
+in order to give us feedback about this answer.
+
+=item * C<< $msg->agent_assistant_record() >> / C<< $msg->agent_assistant_record($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantRecord>)
+
+Output only. The record for human agent assistant.
+
+=back
+
+=head2 Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantRecord
+
+Represents a record of a human agent assistant answer.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->article_suggestion_answer() >> / C<< $msg->article_suggestion_answer($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::Participant::ArticleAnswer>)
+
+Output only. The article suggestion answer.
+
+=item * C<< $msg->faq_answer() >> / C<< $msg->faq_answer($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::Participant::FaqAnswer>)
+
+Output only. The FAQ answer.
+
+=item * C<< $msg->dialogflow_assist_answer() >> / C<< $msg->dialogflow_assist_answer($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::Participant::DialogflowAssistAnswer>)
+
+Output only. The Dialogflow assist answer.
+
+=item * C<< $msg->generator_suggestion() >> / C<< $msg->generator_suggestion($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::Generator::GeneratorSuggestion>)
+
+Output only. The generator suggestion.
+
+=item * C<< $msg->companion_suggestion() >> / C<< $msg->companion_suggestion($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::Participant::CompanionSuggestion>)
+
+Output only. The companion suggestion.
+
+=item * C<< $msg->reactive_companion_suggestion() >> / C<< $msg->reactive_companion_suggestion($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::Participant::StreamingReactiveCompanionSuggestionsResponse::ReactiveModeResponse>)
+
+Output only. The reactive companion suggestion.
+
+=back
+
+=head2 Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerFeedback
+
+Represents feedback the customer has about the quality & correctness of a
+certain answer in a conversation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->correctness_level() >> / C<< $msg->correctness_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dialogflow::V2beta1::AnswerFeedback::CorrectnessLevel>)
+
+The correctness level of the specific answer.
+
+=item * C<< $msg->agent_assistant_detail_feedback() >> / C<< $msg->agent_assistant_detail_feedback($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantFeedback>)
+
+Optional. Detail feedback of agent assistant suggestions.
+
+=item * C<< $msg->clicked() >> / C<< $msg->clicked($value) >>
+
+Type: C<Bool>
+
+Indicates whether the answer/item was clicked by the human agent
+or not. Default to false.
+For knowledge search, the answer record is considered to be clicked if the
+answer was copied or any URI was clicked.
+
+=item * C<< $msg->click_time() >> / C<< $msg->click_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Time when the answer/item was clicked.
+
+=item * C<< $msg->displayed() >> / C<< $msg->displayed($value) >>
+
+Type: C<Bool>
+
+Indicates whether the answer/item was displayed to the human
+agent in the agent desktop UI. Default to false.
+
+=item * C<< $msg->display_time() >> / C<< $msg->display_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Time when the answer/item was displayed.
+
+=back
+
+=head3 Enum: AnswerFeedback::CorrectnessLevel
+
+=over 4
+
+=item * C<CORRECTNESS_LEVEL_UNSPECIFIED> => C<0>
+
+=item * C<NOT_CORRECT> => C<1>
+
+=item * C<PARTIALLY_CORRECT> => C<2>
+
+=item * C<FULLY_CORRECT> => C<3>
+
+=back
+
+=head2 Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantFeedback
+
+Detail feedback of Agent Assistant result.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->answer_relevance() >> / C<< $msg->answer_relevance($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dialogflow::V2beta1::AgentAssistantFeedback::AnswerRelevance>)
+
+Optional. Whether or not the suggested answer is relevant.
+
+For example:
+
+* Query: "Can I change my mailing address?"
+* Suggested document says: "Items must be returned/exchanged within 60
+  days of the purchase date."
+* [answer_relevance][google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.answer_relevance]: [AnswerRelevance.IRRELEVANT][google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.AnswerRelevance.IRRELEVANT]
+
+=item * C<< $msg->document_correctness() >> / C<< $msg->document_correctness($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dialogflow::V2beta1::AgentAssistantFeedback::DocumentCorrectness>)
+
+Optional. Whether or not the information in the document is correct.
+
+For example:
+
+* Query: "Can I return the package in 2 days once received?"
+* Suggested document says: "Items must be returned/exchanged within 60
+  days of the purchase date."
+* Ground truth: "No return or exchange is allowed."
+* [document_correctness][google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.document_correctness]: [INCORRECT][google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.DocumentCorrectness.INCORRECT]
+
+=item * C<< $msg->document_efficiency() >> / C<< $msg->document_efficiency($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dialogflow::V2beta1::AgentAssistantFeedback::DocumentEfficiency>)
+
+Optional. Whether or not the suggested document is efficient. For example,
+if the document is poorly written, hard to understand, hard to use or
+too long to find useful information,
+[document_efficiency][google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.document_efficiency]
+is
+[DocumentEfficiency.INEFFICIENT][google.cloud.dialogflow.v2beta1.AgentAssistantFeedback.DocumentEfficiency.INEFFICIENT].
+
+=item * C<< $msg->summarization_feedback() >> / C<< $msg->summarization_feedback($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantFeedback::SummarizationFeedback>)
+
+Feedback for conversation summarization.
+
+=item * C<< $msg->knowledge_search_feedback() >> / C<< $msg->knowledge_search_feedback($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantFeedback::KnowledgeSearchFeedback>)
+
+Optional. Feedback for knowledge search.
+
+=item * C<< $msg->knowledge_assist_feedback() >> / C<< $msg->knowledge_assist_feedback($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantFeedback::KnowledgeAssistFeedback>)
+
+Optional. Feedback for knowledge assist.
+
+=item * C<< $msg->companion_feedback() >> / C<< $msg->companion_feedback($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AgentAssistantFeedback::CompanionFeedback>)
+
+Optional. Feedback for companion agent.
+
+=back
+
+=head3 Enum: AgentAssistantFeedback::AnswerRelevance
+
+=over 4
+
+=item * C<ANSWER_RELEVANCE_UNSPECIFIED> => C<0>
+
+=item * C<IRRELEVANT> => C<1>
+
+=item * C<RELEVANT> => C<2>
+
+=back
+
+=head3 Enum: AgentAssistantFeedback::DocumentCorrectness
+
+=over 4
+
+=item * C<DOCUMENT_CORRECTNESS_UNSPECIFIED> => C<0>
+
+=item * C<INCORRECT> => C<1>
+
+=item * C<CORRECT> => C<2>
+
+=back
+
+=head3 Enum: AgentAssistantFeedback::DocumentEfficiency
+
+=over 4
+
+=item * C<DOCUMENT_EFFICIENCY_UNSPECIFIED> => C<0>
+
+=item * C<INEFFICIENT> => C<1>
+
+=item * C<EFFICIENT> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dialogflow::V2beta1::AnswerRecord::GetAnswerRecordRequest
+
+Request message for
+[AnswerRecords.GetAnswerRecord][google.cloud.dialogflow.v2beta1.AnswerRecords.GetAnswerRecord].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the answer record to retrieve.
+Format: `projects/<Project ID>/locations/<Location
+ID>/answerRecords/<Answer Record Id>`.
+
+=back
+
+=head2 Google::Cloud::Dialogflow::V2beta1::AnswerRecord::ListAnswerRecordsRequest
+
+Request message for
+[AnswerRecords.ListAnswerRecords][google.cloud.dialogflow.v2beta1.AnswerRecords.ListAnswerRecords].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project to list all answer records for in reverse
+chronological order. Format: `projects/<Project ID>/locations/<Location
+ID>`.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filters to restrict results to specific answer records. The
+expression has the following syntax:
+
+  <field> <operator> <value> [AND <field> <operator> <value>] ...
+
+The following fields and operators are supported:
+* conversation_id with equals(=) operator
+
+Examples:
+
+* "conversation_id=bar" matches answer records in the
+  projects/foo/locations/global/conversations/bar conversation
+  (assuming the parent is projects/foo/locations/global).
+
+For more information about filtering, see
+[API Filtering](https://aip.dev/160).
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of records to return in a single page.
+The server may return fewer records than this. If unspecified, we use 10.
+The maximum is 100.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The
+[ListAnswerRecordsResponse.next_page_token][google.cloud.dialogflow.v2beta1.ListAnswerRecordsResponse.next_page_token]
+value returned from a previous list request used to continue listing on
+the next page.
+
+=back
+
+=head2 Google::Cloud::Dialogflow::V2beta1::AnswerRecord::ListAnswerRecordsResponse
+
+Response message for
+[AnswerRecords.ListAnswerRecords][google.cloud.dialogflow.v2beta1.AnswerRecords.ListAnswerRecords].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->answer_records() >> / C<< $msg->answer_records($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecord>)
+
+The list of answer records.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve next page of results. Or empty if there are no more
+results.
+Pass this value in the
+[ListAnswerRecordsRequest.page_token][google.cloud.dialogflow.v2beta1.ListAnswerRecordsRequest.page_token]
+field in the subsequent call to `ListAnswerRecords` method to retrieve the
+next page of results.
+
+=back
+
+=head2 Google::Cloud::Dialogflow::V2beta1::AnswerRecord::UpdateAnswerRecordRequest
+
+Request message for
+[AnswerRecords.UpdateAnswerRecord][google.cloud.dialogflow.v2beta1.AnswerRecords.UpdateAnswerRecord].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->answer_record() >> / C<< $msg->answer_record($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::AnswerRecord>)
+
+Required. Answer record to update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. The mask to control which fields get updated.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dialogflow::V2beta1::AnswerRecord::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -430,39 +430,240 @@ The following RPC methods are available in this client:
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        interconnect             => $interconnect,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.Interconnects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteInterconnectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        interconnect             => $interconnect,
+        project                  => $project,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.Interconnects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetInterconnectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Interconnect>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<get_diagnostics>
 
-Calls the RPC method C<GetDiagnostics> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_diagnostics(
+        interconnect             => $interconnect,
+        project                  => $project,
+    );
+
+Calls the RPC method C<GetDiagnostics> on C<google.cloud.compute.v1.Interconnects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetDiagnosticsInterconnectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InterconnectsGetDiagnosticsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<get_macsec_config>
 
-Calls the RPC method C<GetMacsecConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_macsec_config(
+        interconnect             => $interconnect,
+        project                  => $project,
+    );
+
+Calls the RPC method C<GetMacsecConfig> on C<google.cloud.compute.v1.Interconnects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetMacsecConfigInterconnectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InterconnectsGetMacsecConfigResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        interconnect_resource    => $interconnect_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.Interconnects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertInterconnectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect_resource> - L<Google::Cloud::Compute::V1::Compute::Interconnect>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.Interconnects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListInterconnectsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InterconnectList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<patch>
 
-Calls the RPC method C<Patch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch(
+        interconnect             => $interconnect,
+        interconnect_resource    => $interconnect_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Patch> on C<google.cloud.compute.v1.Interconnects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::PatchInterconnectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect> - C<string>
+
+=item * C<interconnect_resource> - L<Google::Cloud::Compute::V1::Compute::Interconnect>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<set_labels>
 
-Calls the RPC method C<SetLabels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_labels(
+        global_set_labels_request_resource => $global_set_labels_request_resource,
+        project                  => $project,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<SetLabels> on C<google.cloud.compute.v1.Interconnects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetLabelsInterconnectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<global_set_labels_request_resource> - L<Google::Cloud::Compute::V1::Compute::GlobalSetLabelsRequest>
+
+=item * C<project> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<set_name>
 
-Calls the RPC method C<SetName> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_name(
+        interconnect             => $interconnect,
+        interconnects_set_name_request_resource => $interconnects_set_name_request_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SetName> on C<google.cloud.compute.v1.Interconnects>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetNameInterconnectRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<interconnect> - C<string>
+
+=item * C<interconnects_set_name_request_resource> - L<Google::Cloud::Compute::V1::Compute::InterconnectsSetNameRequest>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =back
 

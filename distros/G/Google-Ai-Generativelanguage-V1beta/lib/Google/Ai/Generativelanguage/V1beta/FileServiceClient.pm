@@ -10,26 +10,26 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
+use Google::Ai::Generativelanguage::V1beta::Safety;
 use Google::Ai::Generativelanguage::V1beta::Citation;
 use Google::Ai::Generativelanguage::V1beta::Permission;
-use Google::Ai::Generativelanguage::V1beta::Safety;
 use Google::Ai::Generativelanguage::V1beta::Model;
+use Google::Ai::Generativelanguage::V1beta::Content;
 use Google::Ai::Generativelanguage::V1beta::TunedModel;
 use Google::Ai::Generativelanguage::V1beta::Retriever;
-use Google::Ai::Generativelanguage::V1beta::Content;
-use Google::Ai::Generativelanguage::V1beta::File;
 use Google::Ai::Generativelanguage::V1beta::PredictionService;
-use Google::Ai::Generativelanguage::V1beta::PermissionService;
+use Google::Ai::Generativelanguage::V1beta::File;
 use Google::Ai::Generativelanguage::V1beta::DiscussService;
 use Google::Ai::Generativelanguage::V1beta::TextService;
+use Google::Ai::Generativelanguage::V1beta::PermissionService;
+use Google::Ai::Generativelanguage::V1beta::CachedContent;
 use Google::Ai::Generativelanguage::V1beta::ModelService;
 use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-use Google::Ai::Generativelanguage::V1beta::CachedContent;
 use Google::Ai::Generativelanguage::V1beta::GenerativeService;
 use Google::Ai::Generativelanguage::V1beta::FileService;
 use Google::Ai::Generativelanguage::V1beta::CacheService;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -276,9 +276,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
-
 =item * C<googleapis/google/ai/generativelanguage/v1beta/cache_service.proto>
+
+=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
 
 =item * C<googleapis/google/ai/generativelanguage/v1beta/citation.proto>
 
@@ -345,23 +345,106 @@ The following RPC methods are available in this client:
 
 =item * B<create_file>
 
-Calls the RPC method C<CreateFile> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_file(
+        file                     => $file,
+    );
+
+Calls the RPC method C<CreateFile> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::CreateFileRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::FileService::CreateFileResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<file> - L<Google::Ai::Generativelanguage::V1beta::File::File>
+
+=back
 
 =item * B<list_files>
 
-Calls the RPC method C<ListFiles> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_files(
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListFiles> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::ListFilesRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::FileService::ListFilesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<get_file>
 
-Calls the RPC method C<GetFile> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_file(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetFile> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::GetFileRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::File::File>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<delete_file>
 
-Calls the RPC method C<DeleteFile> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_file(
+        name                     => $name,
+    );
+
+Calls the RPC method C<DeleteFile> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::DeleteFileRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<download_file>
 
-Calls the RPC method C<DownloadFile> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->download_file(
+        name                     => $name,
+    );
+
+Calls the RPC method C<DownloadFile> on C<google.ai.generativelanguage.v1beta.FileService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::FileService::DownloadFileResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =back
 

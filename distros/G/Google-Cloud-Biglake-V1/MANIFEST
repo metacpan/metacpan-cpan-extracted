@@ -1,0 +1,20 @@
+Changes
+lib/Google/Cloud/Biglake/V1.pm
+lib/Google/Cloud/Biglake/V1/IcebergCatalogServiceClient.pm
+lib/Google/Cloud/Biglake/V1/IcebergRestCatalog.pm
+lib/Google/Cloud/Biglake/V1/IcebergRestCatalog/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-IcebergCatalogService.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-IcebergCatalogService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,81 @@
+package Google::Cloud::Integrations::V1alpha::JsonValidation;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Cjdnb29nbGUvY2xvdWQvaW50ZWdyYXRpb25zL3YxYWxwaGEvanNvbl92YWxpZGF0aW9uLnBy
+b3RvEiFnb29nbGUuY2xvdWQuaW50ZWdyYXRpb25zLnYxYWxwaGEqhwEKFEpzb25WYWxpZGF0
+aW9uT3B0aW9uEiYKIkpTT05fVkFMSURBVElPTl9PUFRJT05fVU5TUEVDSUZJRUQQABIICgRT
+S0lQEAESEQoNUFJFX0VYRUNVVElPThACEhIKDlBPU1RfRVhFQ1VUSU9OEAMSFgoSUFJFX1BP
+U1RfRVhFQ1VUSU9OEARCrQEKJWNvbS5nb29nbGUuY2xvdWQuaW50ZWdyYXRpb25zLnYxYWxw
+aGFCE0pzb25WYWxpZGF0aW9uUHJvdG9QAVpJY2xvdWQuZ29vZ2xlLmNvbS9nby9pbnRlZ3Jh
+dGlvbnMvYXBpdjFhbHBoYS9pbnRlZ3JhdGlvbnNwYjtpbnRlZ3JhdGlvbnNwYqoCIUdvb2ds
+ZS5DbG91ZC5JbnRlZ3JhdGlvbnMuVjFBbHBoYUruCgoGEgQOACsBCrwECgEMEgMOABIysQQg
+Q29weXJpZ2h0IDIwMjUgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUg
+TGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1heSBub3QgdXNl
+IHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLgogWW91
+IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0dHA6Ly93d3cu
+YXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1aXJlZCBieSBh
+cHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmUKIGRpc3Ry
+aWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuICJBUyBJUyIg
+QkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBBTlkgS0lORCwg
+ZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBmb3IgdGhlIHNw
+ZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxpbWl0YXRpb25z
+IHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAqCggKAQgSAxIAPgoJCgIIJRIDEgA+CggK
+AQgSAxMAYAoJCgIICxIDEwBgCggKAQgSAxQAIgoJCgIIChIDFAAiCggKAQgSAxUANAoJCgII
+CBIDFQA0CggKAQgSAxYAPgoJCgIIARIDFgA+CjcKAgUAEgQZACsBGisgT3B0aW9ucyBmb3Ig
+aG93IHRvIHZhbGlkYXRlIGpzb24gc2NoZW1hcy4KCgoKAwUAARIDGQUZCnMKBAUAAgASAxwC
+KRpmIEFzIHBlciB0aGUgZGVmYXVsdCBiZWhhdmlvciwgbm8gdmFsaWRhdGlvbiB3aWxsIGJl
+IHJ1bi4gV2lsbCBub3Qgb3ZlcnJpZGUKIGFueSBvcHRpb24gc2V0IGluIGEgVGFzay4KCgwK
+BQUAAgABEgMcAiQKDAoFBQACAAISAxwnKAo+CgQFAAIBEgMfAgsaMSBEbyBub3QgcnVuIGFu
+eSB2YWxpZGF0aW9uIGFnYWluc3QgSlNPTiBzY2hlbWFzLgoKDAoFBQACAQESAx8CBgoMCgUF
+AAIBAhIDHwkKCm8KBAUAAgISAyMCFBpiIFZhbGlkYXRlIGFsbCBwb3RlbnRpYWwgaW5wdXQg
+SlNPTiBwYXJhbWV0ZXJzIGFnYWluc3Qgc2NoZW1hcyBzcGVjaWZpZWQgaW4KIEludGVncmF0
+aW9uUGFyYW1ldGVyLgoKDAoFBQACAgESAyMCDwoMCgUFAAICAhIDIxITCnAKBAUAAgMSAycC
+FRpjIFZhbGlkYXRlIGFsbCBwb3RlbnRpYWwgb3V0cHV0IEpTT04gcGFyYW1ldGVycyBhZ2Fp
+bnN0IHNjaGVtYXMgc3BlY2lmaWVkIGluCiBJbnRlZ3JhdGlvblBhcmFtZXRlci4KCgwKBQUA
+AgMBEgMnAhAKDAoFBQACAwISAycTFApJCgQFAAIEEgMqAhkaPCBQZXJmb3JtIGJvdGggUFJF
+X0VYRUNVVElPTiBhbmQgUE9TVF9FWEVDVVRJT04gdmFsaWRhdGlvbnMuCgoMCgUFAAIEARID
+KgIUCgwKBQUAAgQCEgMqFxhiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Integrations::V1alpha::JsonValidation - Compiled Protocol Buffers messages for google/cloud/integrations/v1alpha/json_validation.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/integrations/v1alpha/json_validation.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Integrations::V1alpha::JsonValidation::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

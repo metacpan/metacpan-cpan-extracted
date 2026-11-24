@@ -1,0 +1,78 @@
+package Google::Cloud::Cloudcontrolspartner::V1::CompletionState;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Cjtnb29nbGUvY2xvdWQvY2xvdWRjb250cm9sc3BhcnRuZXIvdjEvY29tcGxldGlvbl9zdGF0
+ZS5wcm90bxIkZ29vZ2xlLmNsb3VkLmNsb3VkY29udHJvbHNwYXJ0bmVyLnYxKm8KD0NvbXBs
+ZXRpb25TdGF0ZRIgChxDT01QTEVUSU9OX1NUQVRFX1VOU1BFQ0lGSUVEEAASCwoHUEVORElO
+RxABEg0KCVNVQ0NFRURFRBACEgoKBkZBSUxFRBADEhIKDk5PVF9BUFBMSUNBQkxFEARCmAIK
+KGNvbS5nb29nbGUuY2xvdWQuY2xvdWRjb250cm9sc3BhcnRuZXIudjFCFENvbXBsZXRpb25T
+dGF0ZVByb3RvUAFaXGNsb3VkLmdvb2dsZS5jb20vZ28vY2xvdWRjb250cm9sc3BhcnRuZXIv
+YXBpdjEvY2xvdWRjb250cm9sc3BhcnRuZXJwYjtjbG91ZGNvbnRyb2xzcGFydG5lcnBiqgIk
+R29vZ2xlLkNsb3VkLkNsb3VkQ29udHJvbHNQYXJ0bmVyLlYxygIkR29vZ2xlXENsb3VkXENs
+b3VkQ29udHJvbHNQYXJ0bmVyXFYx6gInR29vZ2xlOjpDbG91ZDo6Q2xvdWRDb250cm9sc1Bh
+cnRuZXI6OlYxSogJCgYSBA4AKgEKvAQKAQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNSBHb29n
+bGUgTExDCgogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIu
+MCAodGhlICJMaWNlbnNlIik7CiB5b3UgbWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBp
+biBjb21wbGlhbmNlIHdpdGggdGhlIExpY2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkg
+b2YgdGhlIExpY2Vuc2UgYXQKCiAgICAgaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2Vz
+L0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFn
+cmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExp
+Y2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FS
+UkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBp
+bXBsaWVkLgogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292
+ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2Uu
+CgoICgECEgMQAC0KCAoBCBIDEgBBCgkKAgglEgMSAEEKCAoBCBIDEwBzCgkKAggLEgMTAHMK
+CAoBCBIDFAAiCgkKAggKEgMUACIKCAoBCBIDFQA1CgkKAggIEgMVADUKCAoBCBIDFgBBCgkK
+AggBEgMWAEEKCAoBCBIDFwBBCgkKAggpEgMXAEEKCAoBCBIDGABACgkKAggtEgMYAEAKMgoC
+BQASBBsAKgEaJiBFbnVtIGZvciBwb3NzaWJsZSBjb21wbGV0aW9uIHN0YXRlcy4KCgoKAwUA
+ARIDGwUUCiwKBAUAAgASAx0CIxofIFVuc3BlY2lmaWVkIGNvbXBsZXRpb24gc3RhdGUuCgoM
+CgUFAAIAARIDHQIeCgwKBQUAAgACEgMdISIKQwoEBQACARIDIAIOGjYgVGFzayBzdGFydGVk
+IChoYXMgc3RhcnQgZGF0ZSkgYnV0IG5vdCB5ZXQgY29tcGxldGVkLgoKDAoFBQACAQESAyAC
+CQoMCgUFAAIBAhIDIAwNCh8KBAUAAgISAyMCEBoSIFN1Y2NlZWRlZCBzdGF0ZS4KCgwKBQUA
+AgIBEgMjAgsKDAoFBQACAgISAyMODwocCgQFAAIDEgMmAg0aDyBGYWlsZWQgc3RhdGUuCgoM
+CgUFAAIDARIDJgIICgwKBQUAAgMCEgMmCwwKJAoEBQACBBIDKQIVGhcgTm90IGFwcGxpY2Fi
+bGUgc3RhdGUuCgoMCgUFAAIEARIDKQIQCgwKBQUAAgQCEgMpExRiBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Cloudcontrolspartner::V1::CompletionState - Compiled Protocol Buffers messages for google/cloud/cloudcontrolspartner/v1/completion_state.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/cloudcontrolspartner/v1/completion_state.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Cloudcontrolspartner::V1::CompletionState::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

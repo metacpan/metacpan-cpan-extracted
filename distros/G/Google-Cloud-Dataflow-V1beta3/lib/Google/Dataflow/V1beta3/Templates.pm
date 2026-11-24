@@ -3,7 +3,7 @@ package Google::Dataflow::V1beta3::Templates;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -777,32 +777,6 @@ EOF
     # Fields for LaunchFlexTemplateResponse
     # Field: job Type: 11 (.google.dataflow.v1beta3.Job)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateResponse->new(
-        job => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<job>
-
-Type: Message (.google.dataflow.v1beta3.Job)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Templates::ContainerSpec ===
     # Fields for ContainerSpec
     # Field: image Type: 9 ()
@@ -812,56 +786,6 @@ Type: Message (.google.dataflow.v1beta3.Job)
     # Field: image_repository_username_secret_id Type: 9 ()
     # Field: image_repository_password_secret_id Type: 9 ()
     # Field: image_repository_cert_path Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::ContainerSpec - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::ContainerSpec->new(
-        image => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<image>
-
-Type: String
-
-=item * B<metadata>
-
-Type: Message (.google.dataflow.v1beta3.TemplateMetadata)
-
-=item * B<sdk_info>
-
-Type: Message (.google.dataflow.v1beta3.SDKInfo)
-
-=item * B<default_environment>
-
-Type: Message (.google.dataflow.v1beta3.FlexTemplateRuntimeEnvironment)
-
-=item * B<image_repository_username_secret_id>
-
-Type: String
-
-=item * B<image_repository_password_secret_id>
-
-Type: String
-
-=item * B<image_repository_cert_path>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateParameter ===
     # Fields for LaunchFlexTemplateParameter
@@ -873,60 +797,6 @@ Type: String
     # Field: environment Type: 11 (.google.dataflow.v1beta3.FlexTemplateRuntimeEnvironment)
     # Field: update Type: 8 ()
     # Field: transform_name_mappings Type: 11 (.google.dataflow.v1beta3.LaunchFlexTemplateParameter.TransformNameMappingsEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateParameter - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateParameter->new(
-        job_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<job_name>
-
-Type: String
-
-=item * B<container_spec>
-
-Type: Message (.google.dataflow.v1beta3.ContainerSpec)
-
-=item * B<container_spec_gcs_path>
-
-Type: String
-
-=item * B<parameters>
-
-Type: Message (.google.dataflow.v1beta3.LaunchFlexTemplateParameter.ParametersEntry)
-
-=item * B<launch_options>
-
-Type: Message (.google.dataflow.v1beta3.LaunchFlexTemplateParameter.LaunchOptionsEntry)
-
-=item * B<environment>
-
-Type: Message (.google.dataflow.v1beta3.FlexTemplateRuntimeEnvironment)
-
-=item * B<update>
-
-Type: Bool
-
-=item * B<transform_name_mappings>
-
-Type: Message (.google.dataflow.v1beta3.LaunchFlexTemplateParameter.TransformNameMappingsEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Templates::FlexTemplateRuntimeEnvironment ===
     # Fields for FlexTemplateRuntimeEnvironment
@@ -957,176 +827,12 @@ Type: Message (.google.dataflow.v1beta3.LaunchFlexTemplateParameter.TransformNam
     # Field: streaming_mode Type: 14 (.google.dataflow.v1beta3.StreamingMode)
     # Field: additional_pipeline_options Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::FlexTemplateRuntimeEnvironment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::FlexTemplateRuntimeEnvironment->new(
-        num_workers => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<num_workers>
-
-Type: Int32
-
-=item * B<max_workers>
-
-Type: Int32
-
-=item * B<zone>
-
-Type: String
-
-=item * B<service_account_email>
-
-Type: String
-
-=item * B<temp_location>
-
-Type: String
-
-=item * B<machine_type>
-
-Type: String
-
-=item * B<additional_experiments>
-
-Type: String
-
-=item * B<network>
-
-Type: String
-
-=item * B<subnetwork>
-
-Type: String
-
-=item * B<additional_user_labels>
-
-Type: Message (.google.dataflow.v1beta3.FlexTemplateRuntimeEnvironment.AdditionalUserLabelsEntry)
-
-=item * B<kms_key_name>
-
-Type: String
-
-=item * B<ip_configuration>
-
-Type: Enum (.google.dataflow.v1beta3.WorkerIPAddressConfiguration)
-
-=item * B<worker_region>
-
-Type: String
-
-=item * B<worker_zone>
-
-Type: String
-
-=item * B<enable_streaming_engine>
-
-Type: Bool
-
-=item * B<flexrs_goal>
-
-Type: Enum (.google.dataflow.v1beta3.FlexResourceSchedulingGoal)
-
-=item * B<staging_location>
-
-Type: String
-
-=item * B<sdk_container_image>
-
-Type: String
-
-=item * B<disk_size_gb>
-
-Type: Int32
-
-=item * B<autoscaling_algorithm>
-
-Type: Enum (.google.dataflow.v1beta3.AutoscalingAlgorithm)
-
-=item * B<dump_heap_on_oom>
-
-Type: Bool
-
-=item * B<save_heap_dumps_to_gcs_path>
-
-Type: String
-
-=item * B<launcher_machine_type>
-
-Type: String
-
-=item * B<enable_launcher_vm_serial_port_logging>
-
-Type: Bool
-
-=item * B<streaming_mode>
-
-Type: Enum (.google.dataflow.v1beta3.StreamingMode)
-
-=item * B<additional_pipeline_options>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateRequest ===
     # Fields for LaunchFlexTemplateRequest
     # Field: project_id Type: 9 ()
     # Field: launch_parameter Type: 11 (.google.dataflow.v1beta3.LaunchFlexTemplateParameter)
     # Field: location Type: 9 ()
     # Field: validate_only Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<launch_parameter>
-
-Type: Message (.google.dataflow.v1beta3.LaunchFlexTemplateParameter)
-
-=item * B<location>
-
-Type: String
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Templates::RuntimeEnvironment ===
     # Fields for RuntimeEnvironment
@@ -1150,143 +856,11 @@ Type: Bool
     # Field: streaming_mode Type: 14 (.google.dataflow.v1beta3.StreamingMode)
     # Field: additional_pipeline_options Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::RuntimeEnvironment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::RuntimeEnvironment->new(
-        num_workers => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<num_workers>
-
-Type: Int32
-
-=item * B<max_workers>
-
-Type: Int32
-
-=item * B<zone>
-
-Type: String
-
-=item * B<service_account_email>
-
-Type: String
-
-=item * B<temp_location>
-
-Type: String
-
-=item * B<bypass_temp_dir_validation>
-
-Type: Bool
-
-=item * B<machine_type>
-
-Type: String
-
-=item * B<additional_experiments>
-
-Type: String
-
-=item * B<network>
-
-Type: String
-
-=item * B<subnetwork>
-
-Type: String
-
-=item * B<additional_user_labels>
-
-Type: Message (.google.dataflow.v1beta3.RuntimeEnvironment.AdditionalUserLabelsEntry)
-
-=item * B<kms_key_name>
-
-Type: String
-
-=item * B<ip_configuration>
-
-Type: Enum (.google.dataflow.v1beta3.WorkerIPAddressConfiguration)
-
-=item * B<worker_region>
-
-Type: String
-
-=item * B<worker_zone>
-
-Type: String
-
-=item * B<enable_streaming_engine>
-
-Type: Bool
-
-=item * B<disk_size_gb>
-
-Type: Int32
-
-=item * B<streaming_mode>
-
-Type: Enum (.google.dataflow.v1beta3.StreamingMode)
-
-=item * B<additional_pipeline_options>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Templates::ParameterMetadataEnumOption ===
     # Fields for ParameterMetadataEnumOption
     # Field: value Type: 9 ()
     # Field: label Type: 9 ()
     # Field: description Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::ParameterMetadataEnumOption - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::ParameterMetadataEnumOption->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: String
-
-=item * B<label>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Templates::ParameterMetadata ===
     # Fields for ParameterMetadata
@@ -1304,80 +878,6 @@ Type: String
     # Field: default_value Type: 9 ()
     # Field: hidden_ui Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::ParameterMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::ParameterMetadata->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<label>
-
-Type: String
-
-=item * B<help_text>
-
-Type: String
-
-=item * B<is_optional>
-
-Type: Bool
-
-=item * B<regexes>
-
-Type: String
-
-=item * B<param_type>
-
-Type: Enum (.google.dataflow.v1beta3.ParameterType)
-
-=item * B<custom_metadata>
-
-Type: Message (.google.dataflow.v1beta3.ParameterMetadata.CustomMetadataEntry)
-
-=item * B<group_name>
-
-Type: String
-
-=item * B<parent_name>
-
-Type: String
-
-=item * B<parent_trigger_values>
-
-Type: String
-
-=item * B<enum_options>
-
-Type: Message (.google.dataflow.v1beta3.ParameterMetadataEnumOption)
-
-=item * B<default_value>
-
-Type: String
-
-=item * B<hidden_ui>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Templates::TemplateMetadata ===
     # Fields for TemplateMetadata
     # Field: name Type: 9 ()
@@ -1388,90 +888,10 @@ Type: Bool
     # Field: supports_exactly_once Type: 8 ()
     # Field: default_streaming_mode Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::TemplateMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::TemplateMetadata->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<parameters>
-
-Type: Message (.google.dataflow.v1beta3.ParameterMetadata)
-
-=item * B<streaming>
-
-Type: Bool
-
-=item * B<supports_at_least_once>
-
-Type: Bool
-
-=item * B<supports_exactly_once>
-
-Type: Bool
-
-=item * B<default_streaming_mode>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Templates::SDKInfo ===
     # Fields for SDKInfo
     # Field: language Type: 14 (.google.dataflow.v1beta3.SDKInfo.Language)
     # Field: version Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::SDKInfo - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::SDKInfo->new(
-        language => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<language>
-
-Type: Enum (.google.dataflow.v1beta3.SDKInfo.Language)
-
-=item * B<version>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: SDKInfo::Language
 our $SDKInfo_UNKNOWN = 0;
@@ -1480,62 +900,10 @@ our $SDKInfo_PYTHON = 2;
 our $SDKInfo_GO = 3;
 our $SDKInfo_YAML = 4;
 
-=pod
-
-=head2 Enum: SDKInfo::Language
-
-Values:
-
-=over 4
-
-=item * C<UNKNOWN> => 0
-
-=item * C<JAVA> => 1
-
-=item * C<PYTHON> => 2
-
-=item * C<GO> => 3
-
-=item * C<YAML> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Templates::RuntimeMetadata ===
     # Fields for RuntimeMetadata
     # Field: sdk_info Type: 11 (.google.dataflow.v1beta3.SDKInfo)
     # Field: parameters Type: 11 (.google.dataflow.v1beta3.ParameterMetadata)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::RuntimeMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::RuntimeMetadata->new(
-        sdk_info => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<sdk_info>
-
-Type: Message (.google.dataflow.v1beta3.SDKInfo)
-
-=item * B<parameters>
-
-Type: Message (.google.dataflow.v1beta3.ParameterMetadata)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Templates::CreateJobFromTemplateRequest ===
     # Fields for CreateJobFromTemplateRequest
@@ -1546,52 +914,6 @@ Type: Message (.google.dataflow.v1beta3.ParameterMetadata)
     # Field: environment Type: 11 (.google.dataflow.v1beta3.RuntimeEnvironment)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::CreateJobFromTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::CreateJobFromTemplateRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_name>
-
-Type: String
-
-=item * B<gcs_path>
-
-Type: String
-
-=item * B<parameters>
-
-Type: Message (.google.dataflow.v1beta3.CreateJobFromTemplateRequest.ParametersEntry)
-
-=item * B<environment>
-
-Type: Message (.google.dataflow.v1beta3.RuntimeEnvironment)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Templates::GetTemplateRequest ===
     # Fields for GetTemplateRequest
     # Field: project_id Type: 9 ()
@@ -1599,60 +921,8 @@ Type: String
     # Field: view Type: 14 (.google.dataflow.v1beta3.GetTemplateRequest.TemplateView)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::GetTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::GetTemplateRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<gcs_path>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.dataflow.v1beta3.GetTemplateRequest.TemplateView)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: GetTemplateRequest::TemplateView
 our $GetTemplateRequest_METADATA_ONLY = 0;
-
-=pod
-
-=head2 Enum: GetTemplateRequest::TemplateView
-
-Values:
-
-=over 4
-
-=item * C<METADATA_ONLY> => 0
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Templates::GetTemplateResponse ===
     # Fields for GetTemplateResponse
@@ -1661,66 +931,10 @@ Values:
     # Field: template_type Type: 14 (.google.dataflow.v1beta3.GetTemplateResponse.TemplateType)
     # Field: runtime_metadata Type: 11 (.google.dataflow.v1beta3.RuntimeMetadata)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::GetTemplateResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::GetTemplateResponse->new(
-        status => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<status>
-
-Type: Message (.google.rpc.Status)
-
-=item * B<metadata>
-
-Type: Message (.google.dataflow.v1beta3.TemplateMetadata)
-
-=item * B<template_type>
-
-Type: Enum (.google.dataflow.v1beta3.GetTemplateResponse.TemplateType)
-
-=item * B<runtime_metadata>
-
-Type: Message (.google.dataflow.v1beta3.RuntimeMetadata)
-
-=back
-
-=cut
-
 # Enum: GetTemplateResponse::TemplateType
 our $GetTemplateResponse_UNKNOWN = 0;
 our $GetTemplateResponse_LEGACY = 1;
 our $GetTemplateResponse_FLEX = 2;
-
-=pod
-
-=head2 Enum: GetTemplateResponse::TemplateType
-
-Values:
-
-=over 4
-
-=item * C<UNKNOWN> => 0
-
-=item * C<LEGACY> => 1
-
-=item * C<FLEX> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Templates::LaunchTemplateParameters ===
     # Fields for LaunchTemplateParameters
@@ -1729,48 +943,6 @@ Values:
     # Field: environment Type: 11 (.google.dataflow.v1beta3.RuntimeEnvironment)
     # Field: update Type: 8 ()
     # Field: transform_name_mapping Type: 11 (.google.dataflow.v1beta3.LaunchTemplateParameters.TransformNameMappingEntry)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::LaunchTemplateParameters - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::LaunchTemplateParameters->new(
-        job_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<job_name>
-
-Type: String
-
-=item * B<parameters>
-
-Type: Message (.google.dataflow.v1beta3.LaunchTemplateParameters.ParametersEntry)
-
-=item * B<environment>
-
-Type: Message (.google.dataflow.v1beta3.RuntimeEnvironment)
-
-=item * B<update>
-
-Type: Bool
-
-=item * B<transform_name_mapping>
-
-Type: Message (.google.dataflow.v1beta3.LaunchTemplateParameters.TransformNameMappingEntry)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Templates::LaunchTemplateRequest ===
     # Fields for LaunchTemplateRequest
@@ -1781,169 +953,33 @@ Type: Message (.google.dataflow.v1beta3.LaunchTemplateParameters.TransformNameMa
     # Field: launch_parameters Type: 11 (.google.dataflow.v1beta3.LaunchTemplateParameters)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::LaunchTemplateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::LaunchTemplateRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<validate_only>
-
-Type: Bool
-
-=item * B<gcs_path>
-
-Type: String
-
-=item * B<dynamic_template>
-
-Type: Message (.google.dataflow.v1beta3.DynamicTemplateLaunchParams)
-
-=item * B<launch_parameters>
-
-Type: Message (.google.dataflow.v1beta3.LaunchTemplateParameters)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Templates::LaunchTemplateResponse ===
     # Fields for LaunchTemplateResponse
     # Field: job Type: 11 (.google.dataflow.v1beta3.Job)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::LaunchTemplateResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::LaunchTemplateResponse->new(
-        job => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<job>
-
-Type: Message (.google.dataflow.v1beta3.Job)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Templates::InvalidTemplateParameters ===
     # Fields for InvalidTemplateParameters
     # Field: parameter_violations Type: 11 (.google.dataflow.v1beta3.InvalidTemplateParameters.ParameterViolation)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::InvalidTemplateParameters - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::InvalidTemplateParameters->new(
-        parameter_violations => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parameter_violations>
-
-Type: Message (.google.dataflow.v1beta3.InvalidTemplateParameters.ParameterViolation)
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Templates::DynamicTemplateLaunchParams ===
     # Fields for DynamicTemplateLaunchParams
     # Field: gcs_path Type: 9 ()
     # Field: staging_location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Templates::DynamicTemplateLaunchParams - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Templates;
-
-    my $msg = Google::Dataflow::V1beta3::Templates::DynamicTemplateLaunchParams->new(
-        gcs_path => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<gcs_path>
-
-Type: String
-
-=item * B<staging_location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Dataflow::V1beta3::Templates::TemplatesServiceClient ===
 package Google::Dataflow::V1beta3::Templates::TemplatesServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Dataflow::V1beta3::Templates::TemplatesServiceClient
 
-Google::Dataflow::V1beta3::Templates::TemplatesServiceClient - Client stub representing the remote TemplatesService service
+Client stub representing the remote C<TemplatesService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataflow.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2012,23 +1048,15 @@ package Google::Dataflow::V1beta3::Templates::FlexTemplatesServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Dataflow::V1beta3::Templates::FlexTemplatesServiceClient
 
-Google::Dataflow::V1beta3::Templates::FlexTemplatesServiceClient - Client stub representing the remote FlexTemplatesService service
+Client stub representing the remote C<FlexTemplatesService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataflow.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2070,13 +1098,1170 @@ sub launch_flex_template {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Dataflow::V1beta3::Templates - Protocol Buffers schema definition
+Google::Dataflow::V1beta3::Templates - Compiled Protocol Buffers messages for google/dataflow/v1beta3/templates.proto
+
+=head1 SYNOPSIS
+
+    use Google::Dataflow::V1beta3::Templates;
+
+    my $msg = Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateResponse->new({
+        job => $job,
+    });
+
+    # Read or update a field
+    my $val = $msg->job();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateResponse->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/dataflow/v1beta3/templates.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateResponse
+
+Response to the request to launch a job from Flex Template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::Job>)
+
+The job that was launched, if the request was not a dry run and
+the job was successfully launched.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::ContainerSpec
+
+Container Spec.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->image() >> / C<< $msg->image($value) >>
+
+Type: C<String>
+
+Name of the docker container image. E.g., gcr.io/project/some-image
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::TemplateMetadata>)
+
+Metadata describing a template including description and validation rules.
+
+=item * C<< $msg->sdk_info() >> / C<< $msg->sdk_info($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::SDKInfo>)
+
+Required. SDK info of the Flex Template.
+
+=item * C<< $msg->default_environment() >> / C<< $msg->default_environment($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::FlexTemplateRuntimeEnvironment>)
+
+Default runtime environment for the job.
+
+=item * C<< $msg->image_repository_username_secret_id() >> / C<< $msg->image_repository_username_secret_id($value) >>
+
+Type: C<String>
+
+Secret Manager secret id for username to authenticate to private registry.
+
+=item * C<< $msg->image_repository_password_secret_id() >> / C<< $msg->image_repository_password_secret_id($value) >>
+
+Type: C<String>
+
+Secret Manager secret id for password to authenticate to private registry.
+
+=item * C<< $msg->image_repository_cert_path() >> / C<< $msg->image_repository_cert_path($value) >>
+
+Type: C<String>
+
+Cloud Storage path to self-signed certificate of private registry.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateParameter
+
+Launch FlexTemplate Parameter.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job_name() >> / C<< $msg->job_name($value) >>
+
+Type: C<String>
+
+Required. The job name to use for the created job. For update job request,
+job name should be same as the existing running job.
+
+=item * C<< $msg->container_spec() >> / C<< $msg->container_spec($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::ContainerSpec>)
+
+Spec about the container image to launch.
+
+=item * C<< $msg->container_spec_gcs_path() >> / C<< $msg->container_spec_gcs_path($value) >>
+
+Type: C<String>
+
+Cloud Storage path to a file with json serialized ContainerSpec as
+content.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateParameter::ParametersEntry>)
+
+The parameters for FlexTemplate.
+Ex. {"num_workers":"5"}
+
+=item * C<< $msg->launch_options() >> / C<< $msg->launch_options($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateParameter::LaunchOptionsEntry>)
+
+Launch options for this flex template job. This is a common set of options
+across languages and templates. This should not be used to pass job
+parameters.
+
+=item * C<< $msg->environment() >> / C<< $msg->environment($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::FlexTemplateRuntimeEnvironment>)
+
+The runtime environment for the FlexTemplate job
+
+=item * C<< $msg->update() >> / C<< $msg->update($value) >>
+
+Type: C<Bool>
+
+Set this to true if you are sending a request to update a running
+streaming job. When set, the job name should be the same as the
+running job.
+
+=item * C<< $msg->transform_name_mappings() >> / C<< $msg->transform_name_mappings($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateParameter::TransformNameMappingsEntry>)
+
+Use this to pass transform_name_mappings for streaming update jobs.
+Ex:{"oldTransformName":"newTransformName",...}'
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::FlexTemplateRuntimeEnvironment
+
+The environment values to be set at runtime for flex template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->num_workers() >> / C<< $msg->num_workers($value) >>
+
+Type: C<Int32>
+
+The initial number of Google Compute Engine instances for the job.
+
+=item * C<< $msg->max_workers() >> / C<< $msg->max_workers($value) >>
+
+Type: C<Int32>
+
+The maximum number of Google Compute Engine instances to be made
+available to your pipeline during execution, from 1 to 1000.
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<String>
+
+The Compute Engine [availability
+zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones)
+for launching worker instances to run your pipeline.
+In the future, worker_zone will take precedence.
+
+=item * C<< $msg->service_account_email() >> / C<< $msg->service_account_email($value) >>
+
+Type: C<String>
+
+The email address of the service account to run the job as.
+
+=item * C<< $msg->temp_location() >> / C<< $msg->temp_location($value) >>
+
+Type: C<String>
+
+The Cloud Storage path to use for temporary files.
+Must be a valid Cloud Storage URL, beginning with `gs://`.
+
+=item * C<< $msg->machine_type() >> / C<< $msg->machine_type($value) >>
+
+Type: C<String>
+
+The machine type to use for the job. Defaults to the value from the
+template if not specified.
+
+=item * C<< $msg->additional_experiments() >> / C<< $msg->additional_experiments($value) >>
+
+Type: C<String>
+
+Additional experiment flags for the job.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Network to which VMs will be assigned.  If empty or unspecified,
+the service will use the network "default".
+
+=item * C<< $msg->subnetwork() >> / C<< $msg->subnetwork($value) >>
+
+Type: C<String>
+
+Subnetwork to which VMs will be assigned, if desired. You can specify a
+subnetwork using either a complete URL or an abbreviated path. Expected to
+be of the form
+"https://www.googleapis.com/compute/v1/projects/HOST_PROJECT_ID/regions/REGION/subnetworks/SUBNETWORK"
+or "regions/REGION/subnetworks/SUBNETWORK". If the subnetwork is located in
+a Shared VPC network, you must use the complete URL.
+
+=item * C<< $msg->additional_user_labels() >> / C<< $msg->additional_user_labels($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::FlexTemplateRuntimeEnvironment::AdditionalUserLabelsEntry>)
+
+Additional user labels to be specified for the job.
+Keys and values must follow the restrictions specified in the [labeling
+restrictions](https://cloud.google.com/compute/docs/labeling-resources#restrictions)
+page.
+An object containing a list of "key": value pairs.
+Example: { "name": "wrench", "mass": "1kg", "count": "3" }.
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<String>
+
+Name for the Cloud KMS key for the job.
+Key format is:
+projects/<project>/locations/<location>/keyRings/<keyring>/cryptoKeys/<key>
+
+=item * C<< $msg->ip_configuration() >> / C<< $msg->ip_configuration($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::WorkerIPAddressConfiguration>)
+
+Configuration for VM IPs.
+
+=item * C<< $msg->worker_region() >> / C<< $msg->worker_region($value) >>
+
+Type: C<String>
+
+The Compute Engine region
+(https://cloud.google.com/compute/docs/regions-zones/regions-zones) in
+which worker processing should occur, e.g. "us-west1". Mutually exclusive
+with worker_zone. If neither worker_region nor worker_zone is specified,
+default to the control plane's region.
+
+=item * C<< $msg->worker_zone() >> / C<< $msg->worker_zone($value) >>
+
+Type: C<String>
+
+The Compute Engine zone
+(https://cloud.google.com/compute/docs/regions-zones/regions-zones) in
+which worker processing should occur, e.g. "us-west1-a". Mutually exclusive
+with worker_region. If neither worker_region nor worker_zone is specified,
+a zone in the control plane's region is chosen based on available capacity.
+If both `worker_zone` and `zone` are set, `worker_zone` takes precedence.
+
+=item * C<< $msg->enable_streaming_engine() >> / C<< $msg->enable_streaming_engine($value) >>
+
+Type: C<Bool>
+
+Whether to enable Streaming Engine for the job.
+
+=item * C<< $msg->flexrs_goal() >> / C<< $msg->flexrs_goal($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::FlexResourceSchedulingGoal>)
+
+Set FlexRS goal for the job.
+https://cloud.google.com/dataflow/docs/guides/flexrs
+
+=item * C<< $msg->staging_location() >> / C<< $msg->staging_location($value) >>
+
+Type: C<String>
+
+The Cloud Storage path for staging local files.
+Must be a valid Cloud Storage URL, beginning with `gs://`.
+
+=item * C<< $msg->sdk_container_image() >> / C<< $msg->sdk_container_image($value) >>
+
+Type: C<String>
+
+Docker registry location of container image to use for the 'worker harness.
+Default is the container for the version of the SDK. Note this field is
+only valid for portable pipelines.
+
+=item * C<< $msg->disk_size_gb() >> / C<< $msg->disk_size_gb($value) >>
+
+Type: C<Int32>
+
+Worker disk size, in gigabytes.
+
+=item * C<< $msg->autoscaling_algorithm() >> / C<< $msg->autoscaling_algorithm($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::AutoscalingAlgorithm>)
+
+The algorithm to use for autoscaling
+
+=item * C<< $msg->dump_heap_on_oom() >> / C<< $msg->dump_heap_on_oom($value) >>
+
+Type: C<Bool>
+
+If true, when processing time is spent almost entirely
+on garbage collection (GC), saves a heap dump before ending the thread
+or process. If false, ends the thread or process without saving a heap
+dump. Does not save a heap dump when the Java Virtual Machine (JVM) has an
+out of memory error during processing. The location of the heap file is
+either echoed back to the user, or the user is given the opportunity to
+download the heap file.
+
+=item * C<< $msg->save_heap_dumps_to_gcs_path() >> / C<< $msg->save_heap_dumps_to_gcs_path($value) >>
+
+Type: C<String>
+
+Cloud Storage bucket (directory) to upload heap dumps to.
+Enabling this field implies that `dump_heap_on_oom` is set to true.
+
+=item * C<< $msg->launcher_machine_type() >> / C<< $msg->launcher_machine_type($value) >>
+
+Type: C<String>
+
+The machine type to use for launching the job. The default is
+n1-standard-1.
+
+=item * C<< $msg->enable_launcher_vm_serial_port_logging() >> / C<< $msg->enable_launcher_vm_serial_port_logging($value) >>
+
+Type: C<Bool>
+
+If true serial port logging will be enabled for the launcher VM.
+
+=item * C<< $msg->streaming_mode() >> / C<< $msg->streaming_mode($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::StreamingMode>)
+
+Optional. Specifies the Streaming Engine message processing guarantees.
+Reduces cost and latency but might result in duplicate messages committed
+to storage. Designed to run simple mapping streaming ETL jobs at the lowest
+cost. For example, Change Data Capture (CDC) to BigQuery is a canonical use
+case. For more information, see
+[Set the pipeline streaming
+mode](https://cloud.google.com/dataflow/docs/guides/streaming-modes).
+
+=item * C<< $msg->additional_pipeline_options() >> / C<< $msg->additional_pipeline_options($value) >>
+
+Type: C<String>
+
+Optional. Additional pipeline option flags for the job.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateRequest
+
+A request to launch a Cloud Dataflow job from a FlexTemplate.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Cloud Platform project that the job belongs to.
+
+=item * C<< $msg->launch_parameter() >> / C<< $msg->launch_parameter($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::LaunchFlexTemplateParameter>)
+
+Required. Parameter to launch a job form Flex Template.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Required. The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+which to direct the request. E.g., us-central1, us-west1.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+If true, the request is validated but not actually executed.
+Defaults to false.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::RuntimeEnvironment
+
+The environment values to set at runtime.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->num_workers() >> / C<< $msg->num_workers($value) >>
+
+Type: C<Int32>
+
+Optional. The initial number of Google Compute Engine instances for the
+job. The default value is 11.
+
+=item * C<< $msg->max_workers() >> / C<< $msg->max_workers($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of Google Compute Engine instances to be made
+available to your pipeline during execution, from 1 to 1000. The default
+value is 1.
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<String>
+
+Optional. The Compute Engine [availability
+zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones)
+for launching worker instances to run your pipeline.
+In the future, worker_zone will take precedence.
+
+=item * C<< $msg->service_account_email() >> / C<< $msg->service_account_email($value) >>
+
+Type: C<String>
+
+Optional. The email address of the service account to run the job as.
+
+=item * C<< $msg->temp_location() >> / C<< $msg->temp_location($value) >>
+
+Type: C<String>
+
+Required. The Cloud Storage path to use for temporary files.
+Must be a valid Cloud Storage URL, beginning with `gs://`.
+
+=item * C<< $msg->bypass_temp_dir_validation() >> / C<< $msg->bypass_temp_dir_validation($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to bypass the safety checks for the job's temporary
+directory. Use with caution.
+
+=item * C<< $msg->machine_type() >> / C<< $msg->machine_type($value) >>
+
+Type: C<String>
+
+Optional. The machine type to use for the job. Defaults to the value from
+the template if not specified.
+
+=item * C<< $msg->additional_experiments() >> / C<< $msg->additional_experiments($value) >>
+
+Type: C<String>
+
+Optional. Additional experiment flags for the job, specified with the
+`--experiments` option.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Optional. Network to which VMs will be assigned.  If empty or unspecified,
+the service will use the network "default".
+
+=item * C<< $msg->subnetwork() >> / C<< $msg->subnetwork($value) >>
+
+Type: C<String>
+
+Optional. Subnetwork to which VMs will be assigned, if desired. You can
+specify a subnetwork using either a complete URL or an abbreviated path.
+ Expected to be of the form
+"https://www.googleapis.com/compute/v1/projects/HOST_PROJECT_ID/regions/REGION/subnetworks/SUBNETWORK"
+or "regions/REGION/subnetworks/SUBNETWORK". If the subnetwork is located in
+a Shared VPC network, you must use the complete URL.
+
+=item * C<< $msg->additional_user_labels() >> / C<< $msg->additional_user_labels($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::RuntimeEnvironment::AdditionalUserLabelsEntry>)
+
+Optional. Additional user labels to be specified for the job.
+Keys and values should follow the restrictions specified in the [labeling
+restrictions](https://cloud.google.com/compute/docs/labeling-resources#restrictions)
+page.
+An object containing a list of "key": value pairs.
+Example: { "name": "wrench", "mass": "1kg", "count": "3" }.
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<String>
+
+Optional. Name for the Cloud KMS key for the job.
+Key format is:
+projects/<project>/locations/<location>/keyRings/<keyring>/cryptoKeys/<key>
+
+=item * C<< $msg->ip_configuration() >> / C<< $msg->ip_configuration($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::WorkerIPAddressConfiguration>)
+
+Optional. Configuration for VM IPs.
+
+=item * C<< $msg->worker_region() >> / C<< $msg->worker_region($value) >>
+
+Type: C<String>
+
+Required. The Compute Engine region
+(https://cloud.google.com/compute/docs/regions-zones/regions-zones) in
+which worker processing should occur, e.g. "us-west1". Mutually exclusive
+with worker_zone. If neither worker_region nor worker_zone is specified,
+default to the control plane's region.
+
+=item * C<< $msg->worker_zone() >> / C<< $msg->worker_zone($value) >>
+
+Type: C<String>
+
+Optional. The Compute Engine zone
+(https://cloud.google.com/compute/docs/regions-zones/regions-zones) in
+which worker processing should occur, e.g. "us-west1-a". Mutually exclusive
+with worker_region. If neither worker_region nor worker_zone is specified,
+a zone in the control plane's region is chosen based on available capacity.
+If both `worker_zone` and `zone` are set, `worker_zone` takes precedence.
+
+=item * C<< $msg->enable_streaming_engine() >> / C<< $msg->enable_streaming_engine($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to enable Streaming Engine for the job.
+
+=item * C<< $msg->disk_size_gb() >> / C<< $msg->disk_size_gb($value) >>
+
+Type: C<Int32>
+
+Optional. The disk size, in gigabytes, to use on each remote Compute Engine
+worker instance.
+
+=item * C<< $msg->streaming_mode() >> / C<< $msg->streaming_mode($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::StreamingMode>)
+
+Optional. Specifies the Streaming Engine message processing guarantees.
+Reduces cost and latency but might result in duplicate messages committed
+to storage. Designed to run simple mapping streaming ETL jobs at the lowest
+cost. For example, Change Data Capture (CDC) to BigQuery is a canonical use
+case. For more information, see
+[Set the pipeline streaming
+mode](https://cloud.google.com/dataflow/docs/guides/streaming-modes).
+
+=item * C<< $msg->additional_pipeline_options() >> / C<< $msg->additional_pipeline_options($value) >>
+
+Type: C<String>
+
+Optional. Additional pipeline option flags for the job.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::ParameterMetadataEnumOption
+
+ParameterMetadataEnumOption specifies the option shown in the enum form.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<String>
+
+Required. The value of the enum option.
+
+=item * C<< $msg->label() >> / C<< $msg->label($value) >>
+
+Type: C<String>
+
+Optional. The label to display for the enum option.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. The description to display for the enum option.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::ParameterMetadata
+
+Metadata for a specific parameter.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the parameter.
+
+=item * C<< $msg->label() >> / C<< $msg->label($value) >>
+
+Type: C<String>
+
+Required. The label to display for the parameter.
+
+=item * C<< $msg->help_text() >> / C<< $msg->help_text($value) >>
+
+Type: C<String>
+
+Required. The help text to display for the parameter.
+
+=item * C<< $msg->is_optional() >> / C<< $msg->is_optional($value) >>
+
+Type: C<Bool>
+
+Optional. Whether the parameter is optional. Defaults to false.
+
+=item * C<< $msg->regexes() >> / C<< $msg->regexes($value) >>
+
+Type: C<String>
+
+Optional. Regexes that the parameter must match.
+
+=item * C<< $msg->param_type() >> / C<< $msg->param_type($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::ParameterType>)
+
+Optional. The type of the parameter.
+Used for selecting input picker.
+
+=item * C<< $msg->custom_metadata() >> / C<< $msg->custom_metadata($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::ParameterMetadata::CustomMetadataEntry>)
+
+Optional. Additional metadata for describing this parameter.
+
+=item * C<< $msg->group_name() >> / C<< $msg->group_name($value) >>
+
+Type: C<String>
+
+Optional. Specifies a group name for this parameter to be rendered under.
+Group header text will be rendered exactly as specified in this field. Only
+considered when parent_name is NOT provided.
+
+=item * C<< $msg->parent_name() >> / C<< $msg->parent_name($value) >>
+
+Type: C<String>
+
+Optional. Specifies the name of the parent parameter. Used in conjunction
+with 'parent_trigger_values' to make this parameter conditional (will only
+be rendered conditionally). Should be mappable to a ParameterMetadata.name
+field.
+
+=item * C<< $msg->parent_trigger_values() >> / C<< $msg->parent_trigger_values($value) >>
+
+Type: C<String>
+
+Optional. The value(s) of the 'parent_name' parameter which will trigger
+this parameter to be shown. If left empty, ANY non-empty value in
+parent_name will trigger this parameter to be shown. Only considered when
+this parameter is conditional (when 'parent_name' has been provided).
+
+=item * C<< $msg->enum_options() >> / C<< $msg->enum_options($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::ParameterMetadataEnumOption>)
+
+Optional. The options shown when ENUM ParameterType is specified.
+
+=item * C<< $msg->default_value() >> / C<< $msg->default_value($value) >>
+
+Type: C<String>
+
+Optional. The default values will pre-populate the parameter with the
+given value from the proto. If default_value is left empty, the parameter
+will be populated with a default of the relevant type, e.g. false for a
+boolean.
+
+=item * C<< $msg->hidden_ui() >> / C<< $msg->hidden_ui($value) >>
+
+Type: C<Bool>
+
+Optional. Whether the parameter should be hidden in the UI.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::TemplateMetadata
+
+Metadata describing a template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the template.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A description of the template.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::ParameterMetadata>)
+
+The parameters for the template.
+
+=item * C<< $msg->streaming() >> / C<< $msg->streaming($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates if the template is streaming or not.
+
+=item * C<< $msg->supports_at_least_once() >> / C<< $msg->supports_at_least_once($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates if the streaming template supports at least once mode.
+
+=item * C<< $msg->supports_exactly_once() >> / C<< $msg->supports_exactly_once($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates if the streaming template supports exactly once mode.
+
+=item * C<< $msg->default_streaming_mode() >> / C<< $msg->default_streaming_mode($value) >>
+
+Type: C<String>
+
+Optional. Indicates the default streaming mode for a streaming template.
+Only valid if both supports_at_least_once and supports_exactly_once are
+true. Possible values: UNSPECIFIED, EXACTLY_ONCE and AT_LEAST_ONCE
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::SDKInfo
+
+SDK Information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->language() >> / C<< $msg->language($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::SDKInfo::Language>)
+
+Required. The SDK Language.
+
+=item * C<< $msg->version() >> / C<< $msg->version($value) >>
+
+Type: C<String>
+
+Optional. The SDK version.
+
+=back
+
+=head3 Enum: SDKInfo::Language
+
+=over 4
+
+=item * C<UNKNOWN> => C<0>
+
+=item * C<JAVA> => C<1>
+
+=item * C<PYTHON> => C<2>
+
+=item * C<GO> => C<3>
+
+=item * C<YAML> => C<4>
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::RuntimeMetadata
+
+RuntimeMetadata describing a runtime environment.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->sdk_info() >> / C<< $msg->sdk_info($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::SDKInfo>)
+
+SDK Info for the template.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::ParameterMetadata>)
+
+The parameters for the template.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::CreateJobFromTemplateRequest
+
+A request to create a Cloud Dataflow job from a template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Cloud Platform project that the job belongs to.
+
+=item * C<< $msg->job_name() >> / C<< $msg->job_name($value) >>
+
+Type: C<String>
+
+Required. The job name to use for the created job.
+
+=item * C<< $msg->gcs_path() >> / C<< $msg->gcs_path($value) >>
+
+Type: C<String>
+
+Required. A Cloud Storage path to the template from which to
+create the job.
+Must be a valid Cloud Storage URL, beginning with `gs://`.
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::CreateJobFromTemplateRequest::ParametersEntry>)
+
+The runtime parameters to pass to the job.
+
+=item * C<< $msg->environment() >> / C<< $msg->environment($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::RuntimeEnvironment>)
+
+The runtime environment for the job.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+which to direct the request.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::GetTemplateRequest
+
+A request to retrieve a Cloud Dataflow job template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Cloud Platform project that the job belongs to.
+
+=item * C<< $msg->gcs_path() >> / C<< $msg->gcs_path($value) >>
+
+Type: C<String>
+
+Required. A Cloud Storage path to the template from which to
+create the job.
+Must be valid Cloud Storage URL, beginning with 'gs://'.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::GetTemplateRequest::TemplateView>)
+
+The view to retrieve. Defaults to METADATA_ONLY.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+which to direct the request.
+
+=back
+
+=head3 Enum: GetTemplateRequest::TemplateView
+
+=over 4
+
+=item * C<METADATA_ONLY> => C<0>
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::GetTemplateResponse
+
+The response to a GetTemplate request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Rpc::Status::Status>)
+
+The status of the get template request. Any problems with the
+request will be indicated in the error_details.
+
+=item * C<< $msg->metadata() >> / C<< $msg->metadata($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::TemplateMetadata>)
+
+The template metadata describing the template name, available
+parameters, etc.
+
+=item * C<< $msg->template_type() >> / C<< $msg->template_type($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::GetTemplateResponse::TemplateType>)
+
+Template Type.
+
+=item * C<< $msg->runtime_metadata() >> / C<< $msg->runtime_metadata($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::RuntimeMetadata>)
+
+Describes the runtime metadata with SDKInfo and available parameters.
+
+=back
+
+=head3 Enum: GetTemplateResponse::TemplateType
+
+=over 4
+
+=item * C<UNKNOWN> => C<0>
+
+=item * C<LEGACY> => C<1>
+
+=item * C<FLEX> => C<2>
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::LaunchTemplateParameters
+
+Parameters to provide to the template being launched. Note that the
+[metadata in the pipeline code]
+(https://cloud.google.com/dataflow/docs/guides/templates/creating-templates#metadata)
+determines which runtime parameters are valid.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job_name() >> / C<< $msg->job_name($value) >>
+
+Type: C<String>
+
+Required. The job name to use for the created job.
+
+The name must match the regular expression
+`[a-z]([-a-z0-9]{0,1022}[a-z0-9])?`
+
+=item * C<< $msg->parameters() >> / C<< $msg->parameters($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::LaunchTemplateParameters::ParametersEntry>)
+
+The runtime parameters to pass to the job.
+
+=item * C<< $msg->environment() >> / C<< $msg->environment($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::RuntimeEnvironment>)
+
+The runtime environment for the job.
+
+=item * C<< $msg->update() >> / C<< $msg->update($value) >>
+
+Type: C<Bool>
+
+If set, replace the existing pipeline with the name specified by jobName
+with this pipeline, preserving state.
+
+=item * C<< $msg->transform_name_mapping() >> / C<< $msg->transform_name_mapping($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::LaunchTemplateParameters::TransformNameMappingEntry>)
+
+Only applicable when updating a pipeline. Map of transform name prefixes of
+the job to be replaced to the corresponding name prefixes of the new job.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::LaunchTemplateRequest
+
+A request to launch a template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the Cloud Platform project that the job belongs to.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+If true, the request is validated but not actually executed.
+Defaults to false.
+
+=item * C<< $msg->gcs_path() >> / C<< $msg->gcs_path($value) >>
+
+Type: C<String>
+
+A Cloud Storage path to the template to use to create
+the job.
+Must be valid Cloud Storage URL, beginning with `gs://`.
+
+=item * C<< $msg->dynamic_template() >> / C<< $msg->dynamic_template($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::DynamicTemplateLaunchParams>)
+
+Parameters for launching a dynamic template.
+
+=item * C<< $msg->launch_parameters() >> / C<< $msg->launch_parameters($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::LaunchTemplateParameters>)
+
+The parameters of the template to launch. Part of the
+body of the POST request.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+which to direct the request.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::LaunchTemplateResponse
+
+Response to the request to launch a template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Jobs::Job>)
+
+The job that was launched, if the request was not a dry run and
+the job was successfully launched.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::InvalidTemplateParameters
+
+Used in the error_details field of a google.rpc.Status message, this
+indicates problems with the template parameter.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parameter_violations() >> / C<< $msg->parameter_violations($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Templates::InvalidTemplateParameters::ParameterViolation>)
+
+Describes all parameter violations in a template request.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Templates::DynamicTemplateLaunchParams
+
+Parameters to pass when launching a dynamic template.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->gcs_path() >> / C<< $msg->gcs_path($value) >>
+
+Type: C<String>
+
+Path to the dynamic template specification file on Cloud Storage.
+The file must be a JSON serialized `DynamicTemplateFileSpec` object.
+
+=item * C<< $msg->staging_location() >> / C<< $msg->staging_location($value) >>
+
+Type: C<String>
+
+Cloud Storage path for staging dependencies.
+Must be a valid Cloud Storage URL, beginning with `gs://`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Dataflow::V1beta3::Templates::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

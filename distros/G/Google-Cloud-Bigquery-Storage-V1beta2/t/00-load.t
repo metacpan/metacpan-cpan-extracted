@@ -1,0 +1,15 @@
+#!perl
+use 5.008003;
+use strict;
+use warnings;
+use Test::More;
+
+plan tests => 3;
+
+BEGIN {
+    use_ok( 'Google::Cloud::Bigquery::Storage::V1beta2' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Bigquery::Storage::V1beta2::BigQueryReadClient' ) || print "Bail out!\n";
+    use_ok( 'Google::Cloud::Bigquery::Storage::V1beta2::BigQueryWriteClient' ) || print "Bail out!\n";
+}
+
+diag( "Testing Google::Cloud::Bigquery::Storage::V1beta2 $Google::Cloud::Bigquery::Storage::V1beta2::VERSION, Perl $], $^X" );

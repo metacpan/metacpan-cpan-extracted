@@ -362,7 +362,8 @@ subtest '_cache_key' => sub {
 	my ($euid, $egids) = ($>, $));
 	is($key, join("\0", 'read', $euid, $egids, "dir:$dir"), 'kind, euid, egids, directory');
 	Test::Permissions::set_cache_scope('device');
-	like($k->('read', $dir), qr/\0dev:\d+$/, 'device scope');
+	# st_dev can be negative on FreeBSD with older perls (Perl/perl5#18837)
+	like($k->('read', $dir), qr/\0dev:-?\d+$/, 'device scope');
 	like($k->('read', "$dir/missing"), qr/\0dir:/, 'device scope falls back to the directory when stat fails');
 	Test::Permissions::set_cache_scope('directory');
 };

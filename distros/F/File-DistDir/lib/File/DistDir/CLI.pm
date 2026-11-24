@@ -9,17 +9,22 @@ use File::Spec;
 
 use parent qw(CLI::Simple);
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 ########################################################################
 sub init {
 ########################################################################
   my ($self) = @_;
 
-  die "ERROR: --distribution is a required argument\n"
-    if !$self->get_distribution;
+  die "ERROR: specify either --distribution or --module\n"
+    if !!$self->get_distribution == !!$self->get_module;
 
-  $self->set_resource_dir( File::DistDir->new( distribution => $self->get_distribution ) );
+  my %options
+    = $self->get_module
+    ? ( module => $self->get_module )
+    : ( distribution => $self->get_distribution );
+
+  $self->set_resource_dir( File::DistDir->new(%options) );
 
   return $self;
 }
@@ -58,17 +63,35 @@ sub cmd_ls {
 }
 
 ########################################################################
+sub cmd_find {
+########################################################################
+  my ($self) = @_;
+
+  my @args = $self->get_args;
+  die "ERROR: usage: dist-dir (-d DISTRIBUTION | -m MODULE) find PATTERN\n"
+    if @args != 1;
+
+  foreach my $path ( $self->get_resource_dir->find( $args[0] ) ) {
+    print {*STDOUT} "$path\n";
+  }
+
+  return $SUCCESS;
+}
+
+########################################################################
 sub main {
 ########################################################################
   my @option_specs = qw(
     help|h
     distribution|d=s
+    module|m=s
     recursive|r
   );
 
   my %commands = (
     cp      => \&cmd_copy,
     dir     => \&cmd_dir,
+    find    => \&cmd_find,
     ls      => \&cmd_ls,
     default => 'dir',
   );
@@ -127,6 +150,7 @@ File::DistDir::CLI - command-line interface for installed distribution resources
 
   dist-dir -d Bedrock dir
   dist-dir -d Bedrock ls
+  dist-dir -m BLM::Startup::RedisSession find '*.xml'
   dist-dir -d Bedrock cp config/tagx.xml ./config/
   dist-dir -d Bedrock -r cp config config
   dist-dir -d Bedrock -r cp .
@@ -135,7 +159,8 @@ File::DistDir::CLI - command-line interface for installed distribution resources
 
 This module implements C<dist-dir>, a command-line wrapper around the
 L<File::DistDir> object interface. The distribution name is a CPAN
-distribution name, not a Perl package name.
+distribution name, not a Perl package name. Alternatively, C<-m> resolves
+the installed distribution owning a Perl module.
 
 =head2 Commands
 
@@ -148,6 +173,11 @@ Print the installed share-directory path.
 =item ls
 
 Print a recursive tree of resources.
+
+=item find PATTERN
+
+Print matching resource-file paths, one per line. C<*> and C<?> match
+filename globs recursively. Paths are relative to the share directory.
 
 =item cp SOURCE [DESTINATION]
 
@@ -164,7 +194,12 @@ restrictions see L<File::DistDir/copy(SOURCE, DESTINATION, recursive => 1)>.
 
 =item B<-d, --distribution NAME>
 
-Required distribution name.
+Distribution name (mutually exclusive with C<-m>).
+
+=item B<-m, --module PACKAGE>
+
+Resolve a distribution from an installed module and its package ownership
+metadata. Requires an installed packlist. Mutually exclusive with C<-d>.
 
 =item B<-r, --recursive>
 

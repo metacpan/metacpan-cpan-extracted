@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::DataProducts;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -627,80 +627,6 @@ EOF
     # Field: access_groups Type: 11 (.google.cloud.dataplex.v1.DataProduct.AccessGroupsEntry)
     # Field: access_approval_config Type: 11 (.google.cloud.dataplex.v1.DataProduct.AccessApprovalConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::DataProduct - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::DataProduct->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.DataProduct.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<icon>
-
-Type: Bytes
-
-=item * B<owner_emails>
-
-Type: String
-
-=item * B<asset_count>
-
-Type: Int32
-
-=item * B<access_groups>
-
-Type: Message (.google.cloud.dataplex.v1.DataProduct.AccessGroupsEntry)
-
-=item * B<access_approval_config>
-
-Type: Message (.google.cloud.dataplex.v1.DataProduct.AccessApprovalConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::DataAsset ===
     # Fields for DataAsset
     # Field: name Type: 9 ()
@@ -712,60 +638,6 @@ Type: Message (.google.cloud.dataplex.v1.DataProduct.AccessApprovalConfig)
     # Field: resource Type: 9 ()
     # Field: access_group_configs Type: 11 (.google.cloud.dataplex.v1.DataAsset.AccessGroupConfigsEntry)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::DataAsset - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::DataAsset->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<etag>
-
-Type: String
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.DataAsset.LabelsEntry)
-
-=item * B<resource>
-
-Type: String
-
-=item * B<access_group_configs>
-
-Type: Message (.google.cloud.dataplex.v1.DataAsset.AccessGroupConfigsEntry)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::CreateDataProductRequest ===
     # Fields for CreateDataProductRequest
     # Field: parent Type: 9 ()
@@ -773,113 +645,15 @@ Type: Message (.google.cloud.dataplex.v1.DataAsset.AccessGroupConfigsEntry)
     # Field: data_product Type: 11 (.google.cloud.dataplex.v1.DataProduct)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::CreateDataProductRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::CreateDataProductRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<data_product_id>
-
-Type: String
-
-=item * B<data_product>
-
-Type: Message (.google.cloud.dataplex.v1.DataProduct)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::DeleteDataProductRequest ===
     # Fields for DeleteDataProductRequest
     # Field: name Type: 9 ()
     # Field: etag Type: 9 ()
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::DeleteDataProductRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::DeleteDataProductRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::GetDataProductRequest ===
     # Fields for GetDataProductRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::GetDataProductRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::GetDataProductRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::ListDataProductsRequest ===
     # Fields for ListDataProductsRequest
@@ -889,87 +663,11 @@ Type: String
     # Field: page_token Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::ListDataProductsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::ListDataProductsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::ListDataProductsResponse ===
     # Fields for ListDataProductsResponse
     # Field: data_products Type: 11 (.google.cloud.dataplex.v1.DataProduct)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::ListDataProductsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::ListDataProductsResponse->new(
-        data_products => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_products>
-
-Type: Message (.google.cloud.dataplex.v1.DataProduct)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::UpdateDataProductRequest ===
     # Fields for UpdateDataProductRequest
@@ -977,109 +675,15 @@ Type: String
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::UpdateDataProductRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::UpdateDataProductRequest->new(
-        data_product => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_product>
-
-Type: Message (.google.cloud.dataplex.v1.DataProduct)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::RequestDataProductAccessRequest ===
     # Fields for RequestDataProductAccessRequest
     # Field: parent Type: 9 ()
     # Field: change_request Type: 11 (.google.cloud.dataplex.v1.ChangeRequest)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::RequestDataProductAccessRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::RequestDataProductAccessRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<change_request>
-
-Type: Message (.google.cloud.dataplex.v1.ChangeRequest)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::RequestDataProductAccessResponse ===
     # Fields for RequestDataProductAccessResponse
     # Field: change_request_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::RequestDataProductAccessResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::RequestDataProductAccessResponse->new(
-        change_request_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<change_request_name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::CreateDataAssetRequest ===
     # Fields for CreateDataAssetRequest
@@ -1088,83 +692,11 @@ Type: String
     # Field: data_asset Type: 11 (.google.cloud.dataplex.v1.DataAsset)
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::CreateDataAssetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::CreateDataAssetRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<data_asset_id>
-
-Type: String
-
-=item * B<data_asset>
-
-Type: Message (.google.cloud.dataplex.v1.DataAsset)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::UpdateDataAssetRequest ===
     # Fields for UpdateDataAssetRequest
     # Field: data_asset Type: 11 (.google.cloud.dataplex.v1.DataAsset)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: validate_only Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::UpdateDataAssetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::UpdateDataAssetRequest->new(
-        data_asset => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_asset>
-
-Type: Message (.google.cloud.dataplex.v1.DataAsset)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::DeleteDataAssetRequest ===
     # Fields for DeleteDataAssetRequest
@@ -1172,69 +704,9 @@ Type: Bool
     # Field: etag Type: 9 ()
     # Field: validate_only Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::DeleteDataAssetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::DeleteDataAssetRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<validate_only>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::GetDataAssetRequest ===
     # Fields for GetDataAssetRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::GetDataAssetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::GetDataAssetRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::ListDataAssetsRequest ===
     # Fields for ListDataAssetsRequest
@@ -1244,105 +716,25 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::ListDataAssetsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::ListDataAssetsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::DataProducts::ListDataAssetsResponse ===
     # Fields for ListDataAssetsResponse
     # Field: data_assets Type: 11 (.google.cloud.dataplex.v1.DataAsset)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::DataProducts::ListDataAssetsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::DataProducts;
-
-    my $msg = Google::Cloud::Dataplex::V1::DataProducts::ListDataAssetsResponse->new(
-        data_assets => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_assets>
-
-Type: Message (.google.cloud.dataplex.v1.DataAsset)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Dataplex::V1::DataProducts::DataProductServiceClient ===
 package Google::Cloud::Dataplex::V1::DataProducts::DataProductServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataplex::V1::DataProducts::DataProductServiceClient
 
-Google::Cloud::Dataplex::V1::DataProducts::DataProductServiceClient - Client stub representing the remote DataProductService service
+Client stub representing the remote C<DataProductService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataplex.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1514,13 +906,771 @@ sub list_data_assets {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::DataProducts - Protocol Buffers schema definition
+Google::Cloud::Dataplex::V1::DataProducts - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/data_products.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataplex::V1::DataProducts;
+
+    my $msg = Google::Cloud::Dataplex::V1::DataProducts::DataProduct->new({
+        name => $name,
+        uid => $uid,
+        display_name => $display_name,
+        create_time => $create_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::DataProducts::DataProduct->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/data_products.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::DataProduct
+
+A data product is a curated collection of data assets, packaged to address
+specific use cases. It's a way to manage and share data in a more organized,
+product-like manner.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Resource name of the data product.
+Format:
+`projects/{project_id_or_number}/locations/{location_id}/dataProducts/{data_product_id}`.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated unique ID for the data product.
+This ID will be different if the data product is deleted and re-created
+with the same name.
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Required. User-friendly display name of the data product.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the data product was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the data product was last updated.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. This checksum is computed by the server based on the value of
+other fields, and may be sent on update and delete requests to ensure the
+client has an up-to-date value before proceeding.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataProduct::LabelsEntry>)
+
+Optional. User-defined labels for the data product.
+
+Example:
+ ```
+ {
+   "environment": "production",
+   "billing": "marketing-department"
+ }
+ ```
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the data product.
+
+=item * C<< $msg->icon() >> / C<< $msg->icon($value) >>
+
+Type: C<Bytes>
+
+Optional. Base64 encoded image representing the data product. Max
+Size: 3.0MiB Expected image dimensions are 512x512 pixels, however the API
+only performs validation on size of the encoded data. Note: For byte
+fields, the content of the fields are base64-encoded (which increases the
+size of the data by 33-36%) when using JSON on the wire.
+
+=item * C<< $msg->owner_emails() >> / C<< $msg->owner_emails($value) >>
+
+Type: C<String>
+
+Required. Emails of the data product owners.
+
+=item * C<< $msg->asset_count() >> / C<< $msg->asset_count($value) >>
+
+Type: C<Int32>
+
+Output only. Number of data assets associated with this data product.
+
+=item * C<< $msg->access_groups() >> / C<< $msg->access_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataProduct::AccessGroupsEntry>)
+
+Optional. Data product access groups by access group id as key.
+If data product is used only for packaging data assets, then access groups
+may be empty. However, if a data product is used for sharing data assets,
+then at least one access group must be specified.
+
+Example:
+ ```
+ {
+   "analyst": {
+     "id": "analyst",
+     "displayName": "Analyst",
+     "description": "Access group for analysts",
+     "principal": {
+       "googleGroup": "analysts@example.com"
+     }
+   }
+ }
+ ```
+
+=item * C<< $msg->access_approval_config() >> / C<< $msg->access_approval_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataProduct::AccessApprovalConfig>)
+
+Optional. Configuration for access approval for the data product.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::DataAsset
+
+Represents a data asset resource that can be packaged and shared via a data
+product.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Identifier. Resource name of the data asset.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/dataProducts/{data_product_id}/dataAssets/{data_asset_id}
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the data asset.
+This ID will be different if the data asset is deleted and re-created
+with the same name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the data asset was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time at which the data asset was last updated.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. This checksum is computed by the server based on the value of
+other fields, and may be sent on update and delete requests to ensure the
+client has an up-to-date value before proceeding.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataAsset::LabelsEntry>)
+
+Optional. User-defined labels for the data asset.
+
+Example:
+ ```
+ {
+   "environment": "production",
+   "billing": "marketing-department"
+ }
+ ```
+
+=item * C<< $msg->resource() >> / C<< $msg->resource($value) >>
+
+Type: C<String>
+
+Required. Immutable. Full resource name of the cloud resource represented
+by the data asset. This must follow
+https://cloud.google.com/iam/docs/full-resource-names. Example:
+`//bigquery.googleapis.com/projects/my_project_123/datasets/dataset_456/tables/table_789`
+Only BigQuery tables and datasets are currently supported.
+Data asset creator must have getIamPolicy and setIamPolicy permissions on
+the resource. Data asset creator must also have resource specific get
+permission, for instance, bigquery.tables.get for BigQuery tables.
+
+=item * C<< $msg->access_group_configs() >> / C<< $msg->access_group_configs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataAsset::AccessGroupConfigsEntry>)
+
+Optional. Access groups configurations for this data asset.
+
+The key is `DataProduct.AccessGroup.id` and the value is
+`AccessGroupConfig`.
+
+Example:
+```
+ {
+   "analyst": {
+     "iamRoles": ["roles/bigquery.dataViewer"]
+   }
+ }
+```
+
+Currently, at most one IAM role is allowed per access group. For providing
+multiple predefined IAM roles, wrap them in a custom IAM role as per
+https://cloud.google.com/iam/docs/creating-custom-roles.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::CreateDataProductRequest
+
+Request message for creating a data product.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this data product will be created.
+Format: projects/{project_id_or_number}/locations/{location_id}
+
+=item * C<< $msg->data_product_id() >> / C<< $msg->data_product_id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the data product to create.
+
+The ID must conform to RFC-1034 and contain only lower-case letters (a-z),
+numbers (0-9), or hyphens, with the first character a letter, the last a
+letter or a number, and a 63 character maximum. Characters outside of
+ASCII are not permitted.
+Valid format regex: `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`
+If not provided, a system generated ID will be used.
+
+=item * C<< $msg->data_product() >> / C<< $msg->data_product($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataProduct>)
+
+Required. The data product to create.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Validates the request without actually creating the data product.
+Default: false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::DeleteDataProductRequest
+
+Request message for deleting a data product.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the data product to delete.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/dataProducts/{data_product_id}
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. The etag of the data product.
+
+If an etag is provided and does not match the current etag of the data
+product, then the deletion will be blocked and an ABORTED error will be
+returned.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Validates the request without actually deleting the data product.
+Default: false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::GetDataProductRequest
+
+Request message for getting a data product.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the data product to retrieve.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/dataProducts/{data_product_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::ListDataProductsRequest
+
+Request message for listing data products.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which has this collection of data products.
+
+Format: `projects/{project_id_or_number}/locations/{location_id}`.
+
+Supports listing across all locations with the wildcard `-` (hyphen)
+character. Example: `projects/{project_id_or_number}/locations/-`
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression that filters data products listed in the
+response.
+
+Example of using this filter is: `display_name="my-data-product"`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of data products to return. The service may
+return fewer than this value. If unspecified, at most 50 data products will
+be returned. The maximum value is 1000; values above 1000 will be coerced
+to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListDataProducts` call.
+Provide this to retrieve the subsequent page.
+
+When paginating, all other parameters provided to `ListDataProducts` must
+match the call that provided the page token.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by expression that orders data products listed in the
+response.
+
+Supported Order by fields are: `name` or `create_time`.
+
+If not specified, the ordering is undefined.
+
+Ordering by `create_time` is not supported when listing resources across
+locations (i.e. when request contains `/locations/-`).
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::ListDataProductsResponse
+
+Response message for listing data products.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_products() >> / C<< $msg->data_products($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataProduct>)
+
+The data products for the requested filter criteria.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is empty, then there are no subsequent pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unordered list. Locations that the service couldn't reach.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::UpdateDataProductRequest
+
+Request message for updating a data product.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_product() >> / C<< $msg->data_product($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataProduct>)
+
+Required. The data product to update.
+The data product's `name` field is used to identify the data product to
+update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+If this is empty or not set, then all the fields will be updated.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Validates the request without actually updating the data product.
+Default: false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::RequestDataProductAccessRequest
+
+Message for requesting access to a Data Product.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the data product.
+Format:
+projects/{project_number}/locations/{location_id}/dataProducts/{data_product_id}
+
+=item * C<< $msg->change_request() >> / C<< $msg->change_request($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::ApprovalWorkflow::ChangeRequest>)
+
+Required. The change request for the data product access request.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Validates the request without actually creating the access change
+request. Defaults to false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::RequestDataProductAccessResponse
+
+Response message for requesting access to a Data Product.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->change_request_name() >> / C<< $msg->change_request_name($value) >>
+
+Type: C<String>
+
+The resource name of the created ChangeRequest.
+Format:
+projects/{project_number}/locations/{location_id}/changeRequests/{change_request_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::CreateDataAssetRequest
+
+Request message for creating a data asset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource where this data asset will be created.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/dataProducts/{data_product_id}
+
+=item * C<< $msg->data_asset_id() >> / C<< $msg->data_asset_id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the data asset to create.
+
+The ID must conform to RFC-1034 and contain only lower-case letters (a-z),
+numbers (0-9), or hyphens, with the first character a letter, the last a
+letter or a number, and a 63 character maximum. Characters outside of
+ASCII are not permitted.
+Valid format regex: `^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`
+If not provided, a system generated ID will be used.
+
+=item * C<< $msg->data_asset() >> / C<< $msg->data_asset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataAsset>)
+
+Required. The data asset to create.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Validates the request without actually creating the data asset.
+Defaults to false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::UpdateDataAssetRequest
+
+Request message for updating a data asset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_asset() >> / C<< $msg->data_asset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataAsset>)
+
+Required. The data asset to update.
+The data asset's `name` field is used to identify the data asset to update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. The list of fields to update.
+If this is empty or not set, then all the fields will be updated.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Validates the request without actually updating the data asset.
+Defaults to false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::DeleteDataAssetRequest
+
+Request message for deleting a data asset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the data asset to delete.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/dataProducts/{data_product_id}/dataAssets/{data_asset_id}
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Optional. The etag of the data asset.
+If this is provided, it must match the server's etag.
+If the etag is provided and does not match the server-computed etag,
+the request must fail with a ABORTED error code.
+
+=item * C<< $msg->validate_only() >> / C<< $msg->validate_only($value) >>
+
+Type: C<Bool>
+
+Optional. Validates the request without actually deleting the data asset.
+Defaults to false.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::GetDataAssetRequest
+
+Request message for getting a data asset.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the data asset to retrieve.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/dataProducts/{data_product_id}/dataAssets/{data_asset_id}
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::ListDataAssetsRequest
+
+Request message for listing data assets.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent, which has this collection of data assets.
+Format:
+projects/{project_id_or_number}/locations/{location_id}/dataProducts/{data_product_id}
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filter expression that filters data assets listed in the
+response.
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Order by expression that orders data assets listed in the
+response.
+
+Supported `order_by` fields are: `name` or `create_time`.
+
+If not specified, the ordering is undefined.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of data assets to return. The service may
+return fewer than this value. If unspecified, at most 50 data assets will
+be returned. The maximum value is 1000; values above 1000 will be coerced
+to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListDataAssets` call.
+Provide this to retrieve the subsequent page.
+
+When paginating, all other parameters provided to `ListDataAssets` must
+match the call that provided the page token.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::DataProducts::ListDataAssetsResponse
+
+Response message for listing data assets.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_assets() >> / C<< $msg->data_assets($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::DataProducts::DataAsset>)
+
+The data assets for the requested filter criteria.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is empty, then there are no subsequent pages.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::DataProducts::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

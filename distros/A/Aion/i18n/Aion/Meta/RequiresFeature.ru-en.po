@@ -28,6 +28,9 @@ msgstr "String representation of a feature."
 msgid "Сравнивает с фичей, но только указанные аспекты."
 msgstr "Compares with a feature, but only the specified aspects."
 
+msgid "И выбрасывает исключение, если они не подходят:"
+msgstr "And throws an exception if they don't match:"
+
 msgid "⚖ **GPLv3**"
 msgstr "⚖ **GPLv3**"
 

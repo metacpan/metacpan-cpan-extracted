@@ -3,7 +3,7 @@ package Google::Spanner::V1::Location;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -395,48 +395,6 @@ EOF
     # Field: split_id Type: 4 ()
     # Field: generation Type: 12 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Location::Range - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Location;
-
-    my $msg = Google::Spanner::V1::Location::Range->new(
-        start_key => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start_key>
-
-Type: Bytes
-
-=item * B<limit_key>
-
-Type: Bytes
-
-=item * B<group_uid>
-
-Type: UInt64
-
-=item * B<split_id>
-
-Type: UInt64
-
-=item * B<generation>
-
-Type: Bytes
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Location::Tablet ===
     # Fields for Tablet
     # Field: tablet_uid Type: 4 ()
@@ -447,78 +405,10 @@ Type: Bytes
     # Field: distance Type: 13 ()
     # Field: skip Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Location::Tablet - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Location;
-
-    my $msg = Google::Spanner::V1::Location::Tablet->new(
-        tablet_uid => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tablet_uid>
-
-Type: UInt64
-
-=item * B<server_address>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=item * B<role>
-
-Type: Enum (.google.spanner.v1.Tablet.Role)
-
-=item * B<incarnation>
-
-Type: Bytes
-
-=item * B<distance>
-
-Type: UInt32
-
-=item * B<skip>
-
-Type: Bool
-
-=back
-
-=cut
-
 # Enum: Tablet::Role
 our $Tablet_ROLE_UNSPECIFIED = 0;
 our $Tablet_READ_WRITE = 1;
 our $Tablet_READ_ONLY = 2;
-
-=pod
-
-=head2 Enum: Tablet::Role
-
-Values:
-
-=over 4
-
-=item * C<ROLE_UNSPECIFIED> => 0
-
-=item * C<READ_WRITE> => 1
-
-=item * C<READ_ONLY> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Location::Group ===
     # Fields for Group
@@ -527,44 +417,6 @@ Values:
     # Field: leader_index Type: 5 ()
     # Field: generation Type: 12 ()
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Location::Group - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Location;
-
-    my $msg = Google::Spanner::V1::Location::Group->new(
-        group_uid => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<group_uid>
-
-Type: UInt64
-
-=item * B<tablets>
-
-Type: Message (.google.spanner.v1.Tablet)
-
-=item * B<leader_index>
-
-Type: Int32
-
-=item * B<generation>
-
-Type: Bytes
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Location::KeyRecipe ===
     # Fields for KeyRecipe
     # Field: table_name Type: 9 ()
@@ -572,78 +424,10 @@ Type: Bytes
     # Field: operation_uid Type: 4 ()
     # Field: part Type: 11 (.google.spanner.v1.KeyRecipe.Part)
 
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Location::KeyRecipe - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Location;
-
-    my $msg = Google::Spanner::V1::Location::KeyRecipe->new(
-        table_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<table_name>
-
-Type: String
-
-=item * B<index_name>
-
-Type: String
-
-=item * B<operation_uid>
-
-Type: UInt64
-
-=item * B<part>
-
-Type: Message (.google.spanner.v1.KeyRecipe.Part)
-
-=back
-
-=cut
-
 # === Message: Google::Spanner::V1::Location::RecipeList ===
     # Fields for RecipeList
     # Field: schema_generation Type: 12 ()
     # Field: recipe Type: 11 (.google.spanner.v1.KeyRecipe)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Location::RecipeList - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Location;
-
-    my $msg = Google::Spanner::V1::Location::RecipeList->new(
-        schema_generation => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<schema_generation>
-
-Type: Bytes
-
-=item * B<recipe>
-
-Type: Message (.google.spanner.v1.KeyRecipe)
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Location::CacheUpdate ===
     # Fields for CacheUpdate
@@ -651,44 +435,6 @@ Type: Message (.google.spanner.v1.KeyRecipe)
     # Field: range Type: 11 (.google.spanner.v1.Range)
     # Field: group Type: 11 (.google.spanner.v1.Group)
     # Field: key_recipes Type: 11 (.google.spanner.v1.RecipeList)
-
-=pod
-
-=head1 NAME
-
-Google::Spanner::V1::Location::CacheUpdate - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Spanner::V1::Location;
-
-    my $msg = Google::Spanner::V1::Location::CacheUpdate->new(
-        database_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database_id>
-
-Type: UInt64
-
-=item * B<range>
-
-Type: Message (.google.spanner.v1.Range)
-
-=item * B<group>
-
-Type: Message (.google.spanner.v1.Group)
-
-=item * B<key_recipes>
-
-Type: Message (.google.spanner.v1.RecipeList)
-
-=back
-
-=cut
 
 # === Message: Google::Spanner::V1::Location::RoutingHint ===
     # Fields for RoutingHint
@@ -703,79 +449,498 @@ Type: Message (.google.spanner.v1.RecipeList)
     # Field: skipped_tablet_uid Type: 11 (.google.spanner.v1.RoutingHint.SkippedTablet)
     # Field: client_location Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Spanner::V1::Location::RoutingHint - Compiled Protocol Buffers message class
+Google::Spanner::V1::Location - Compiled Protocol Buffers messages for google/spanner/v1/location.proto
 
 =head1 SYNOPSIS
 
     use Google::Spanner::V1::Location;
 
-    my $msg = Google::Spanner::V1::Location::RoutingHint->new(
-        operation_uid => $value,
-    );
+    my $msg = Google::Spanner::V1::Location::Range->new({
+        start_key => $start_key,
+        limit_key => $limit_key,
+        group_uid => $group_uid,
+        split_id => $split_id,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->start_key();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Spanner::V1::Location::Range->parse($bytes);
 
-=item * B<operation_uid>
-
-Type: UInt64
-
-=item * B<database_id>
-
-Type: UInt64
-
-=item * B<schema_generation>
-
-Type: Bytes
-
-=item * B<key>
-
-Type: Bytes
-
-=item * B<limit_key>
-
-Type: Bytes
-
-=item * B<group_uid>
-
-Type: UInt64
-
-=item * B<split_id>
-
-Type: UInt64
-
-=item * B<tablet_uid>
-
-Type: UInt64
-
-=item * B<skipped_tablet_uid>
-
-Type: Message (.google.spanner.v1.RoutingHint.SkippedTablet)
-
-=item * B<client_location>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Spanner::V1::Location - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/spanner/v1/location.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Spanner::V1::Location::Range
+
+A `Range` represents a range of keys in a database. The keys themselves
+are encoded in "sortable string format", also known as ssformat. Consult
+Spanner's open source client libraries for details on the encoding.
+
+Each range represents a contiguous range of rows, possibly from multiple
+tables/indexes. Each range is associated with a single paxos group (known as
+a "group" throughout this API), a split (which names the exact range within
+the group), and a generation that can be used to determine whether a given
+`Range` represents a newer or older location for the key range.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_key() >> / C<< $msg->start_key($value) >>
+
+Type: C<Bytes>
+
+The start key of the range, inclusive. Encoded in "sortable string format"
+(ssformat).
+
+=item * C<< $msg->limit_key() >> / C<< $msg->limit_key($value) >>
+
+Type: C<Bytes>
+
+The limit key of the range, exclusive. Encoded in "sortable string format"
+(ssformat).
+
+=item * C<< $msg->group_uid() >> / C<< $msg->group_uid($value) >>
+
+Type: C<UInt64>
+
+The UID of the paxos group where this range is stored. UIDs are unique
+within the database. References `Group.group_uid`.
+
+=item * C<< $msg->split_id() >> / C<< $msg->split_id($value) >>
+
+Type: C<UInt64>
+
+A group can store multiple ranges of keys. Each key range is named by an
+ID (the split ID). Within a group, split IDs are unique. The `split_id`
+names the exact split in `group_uid` where this range is stored.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Bytes>
+
+`generation` indicates the freshness of the range information contained
+in this proto. Generations can be compared lexicographically; if generation
+A is greater than generation B, then the `Range` corresponding to A is
+newer than the `Range` corresponding to B, and should be used
+preferentially.
+
+=back
+
+=head2 Google::Spanner::V1::Location::Tablet
+
+A `Tablet` represents a single replica of a `Group`. A tablet is served by a
+single server at a time, and can move between servers due to server death or
+simply load balancing.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tablet_uid() >> / C<< $msg->tablet_uid($value) >>
+
+Type: C<UInt64>
+
+The UID of the tablet, unique within the database. Matches the
+`tablet_uids` and `leader_tablet_uid` fields in `Group`.
+
+=item * C<< $msg->server_address() >> / C<< $msg->server_address($value) >>
+
+Type: C<String>
+
+The address of the server that is serving this tablet -- either an IP
+address or DNS hostname and a port number.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Where this tablet is located. This is the name of a Google Cloud region,
+such as "us-central1".
+
+=item * C<< $msg->role() >> / C<< $msg->role($value) >>
+
+Type: C<Enum> (L<Google::Spanner::V1::Tablet::Role>)
+
+The role of the tablet.
+
+=item * C<< $msg->incarnation() >> / C<< $msg->incarnation($value) >>
+
+Type: C<Bytes>
+
+`incarnation` indicates the freshness of the tablet information contained
+in this proto. Incarnations can be compared lexicographically; if
+incarnation A is greater than incarnation B, then the `Tablet`
+corresponding to A is newer than the `Tablet` corresponding to B, and
+should be used preferentially.
+
+=item * C<< $msg->distance() >> / C<< $msg->distance($value) >>
+
+Type: C<UInt32>
+
+Distances help the client pick the closest tablet out of the list of
+tablets for a given request. Tablets with lower distances should generally
+be preferred. Tablets with the same distance are approximately equally
+close; the client can choose arbitrarily.
+
+Distances do not correspond precisely to expected latency, geographical
+distance, or anything else. Distances should be compared only between
+tablets of the same group; they are not meaningful between different
+groups.
+
+A value of zero indicates that the tablet may be in the same zone as
+the client, and have minimum network latency. A value less than or equal to
+five indicates that the tablet is thought to be in the same region as the
+client, and may have a few milliseconds of network latency. Values greater
+than five are most likely in a different region, with non-trivial network
+latency.
+
+Clients should use the following algorithm:
+  * If the request is using a directed read, eliminate any tablets that
+    do not match the directed read's target zone and/or replica type.
+  * (Read-write transactions only) Choose leader tablet if it has an
+    distance <=5.
+  * Group and sort tablets by distance. Choose a random
+    tablet with the lowest distance. If the request
+    is not a directed read, only consider replicas with distances <=5.
+  * Send the request to the fallback endpoint.
+
+The tablet picked by this algorithm may be skipped, either because it is
+marked as `skip` by the server or because the corresponding server is
+unreachable, flow controlled, etc. Skipped tablets should be added to the
+`skipped_tablet_uid` field in `RoutingHint`; the algorithm above should
+then be re-run without including the skipped tablet(s) to pick the next
+best tablet.
+
+=item * C<< $msg->skip() >> / C<< $msg->skip($value) >>
+
+Type: C<Bool>
+
+If true, the tablet should not be chosen by the client. Typically, this
+signals that the tablet is unhealthy in some way. Tablets with `skip`
+set to true should be reported back to the server in
+`RoutingHint.skipped_tablet_uid`; this cues the server to send updated
+information for this tablet should it become usable again.
+
+=back
+
+=head3 Enum: Tablet::Role
+
+=over 4
+
+=item * C<ROLE_UNSPECIFIED> => C<0>
+
+=item * C<READ_WRITE> => C<1>
+
+=item * C<READ_ONLY> => C<2>
+
+=back
+
+=head2 Google::Spanner::V1::Location::Group
+
+A `Group` represents a paxos group in a database. A group is a set of
+tablets that are replicated across multiple servers. Groups may have a leader
+tablet. Groups store one (or sometimes more) ranges of keys.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->group_uid() >> / C<< $msg->group_uid($value) >>
+
+Type: C<UInt64>
+
+The UID of the paxos group, unique within the database. Matches the
+`group_uid` field in `Range`.
+
+=item * C<< $msg->tablets() >> / C<< $msg->tablets($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::Tablet>)
+
+A list of tablets that are part of the group. Note that this list may not
+be exhaustive; it will only include tablets the server considers useful
+to the client. The returned list is ordered ascending by distance.
+
+Tablet UIDs reference `Tablet.tablet_uid`.
+
+=item * C<< $msg->leader_index() >> / C<< $msg->leader_index($value) >>
+
+Type: C<Int32>
+
+The last known leader tablet of the group as an index into `tablets`. May
+be negative if the group has no known leader.
+
+=item * C<< $msg->generation() >> / C<< $msg->generation($value) >>
+
+Type: C<Bytes>
+
+`generation` indicates the freshness of the group information (including
+leader information) contained in this proto. Generations can be compared
+lexicographically; if generation A is greater than generation B, then the
+`Group` corresponding to A is newer than the `Group` corresponding to B,
+and should be used preferentially.
+
+=back
+
+=head2 Google::Spanner::V1::Location::KeyRecipe
+
+A `KeyRecipe` provides the metadata required to translate reads, mutations,
+and queries into a byte array in "sortable string format" (ssformat)that can
+be used with `Range`s to route requests. Note that the client *must* tolerate
+`KeyRecipe`s that appear to be invalid, since the `KeyRecipe` format may
+change over time. Requests with invalid `KeyRecipe`s should be routed to a
+default server.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->table_name() >> / C<< $msg->table_name($value) >>
+
+Type: C<String>
+
+A table name, matching the name from the database schema.
+
+=item * C<< $msg->index_name() >> / C<< $msg->index_name($value) >>
+
+Type: C<String>
+
+An index name, matching the name from the database schema.
+
+=item * C<< $msg->operation_uid() >> / C<< $msg->operation_uid($value) >>
+
+Type: C<UInt64>
+
+The UID of a query, matching the UID from `RoutingHint`.
+
+=item * C<< $msg->part() >> / C<< $msg->part($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::KeyRecipe::Part>)
+
+Parts are in the order they should appear in the encoded key.
+
+=back
+
+=head2 Google::Spanner::V1::Location::RecipeList
+
+A `RecipeList` contains a list of `KeyRecipe`s, which share the same
+schema generation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->schema_generation() >> / C<< $msg->schema_generation($value) >>
+
+Type: C<Bytes>
+
+The schema generation of the recipes. To be sent to the server in
+`RoutingHint.schema_generation` whenever one of the recipes is used.
+`schema_generation` values are comparable with each other; if generation A
+compares greater than generation B, then A is a more recent schema than B.
+Clients should in general aim to cache only the latest schema generation,
+and discard more stale recipes.
+
+=item * C<< $msg->recipe() >> / C<< $msg->recipe($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::KeyRecipe>)
+
+A list of recipes to be cached.
+
+=back
+
+=head2 Google::Spanner::V1::Location::CacheUpdate
+
+A `CacheUpdate` expresses a set of changes the client should incorporate into
+its location cache. These changes may or may not be newer than what the
+client has in its cache, and should be discarded if necessary. `CacheUpdate`s
+can be obtained in response to requests that included a `RoutingHint`
+field, but may also be obtained by explicit location-fetching RPCs which may
+be added in the future.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database_id() >> / C<< $msg->database_id($value) >>
+
+Type: C<UInt64>
+
+An internal ID for the database. Database names can be reused if a database
+is deleted and re-created. Each time the database is re-created, it will
+get a new database ID, which will never be re-used for any other database.
+
+=item * C<< $msg->range() >> / C<< $msg->range($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::Range>)
+
+A list of ranges to be cached.
+
+=item * C<< $msg->group() >> / C<< $msg->group($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::Group>)
+
+A list of groups to be cached.
+
+=item * C<< $msg->key_recipes() >> / C<< $msg->key_recipes($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::RecipeList>)
+
+A list of recipes to be cached.
+
+=back
+
+=head2 Google::Spanner::V1::Location::RoutingHint
+
+`RoutingHint` can be optionally added to location-aware Spanner
+requests. It gives the server hints that can be used to route the request to
+an appropriate server, potentially significantly decreasing latency and
+improving throughput. To achieve improved performance, most fields must be
+filled in with accurate values.
+
+The presence of a valid `RoutingHint` tells the server that the client
+is location-aware.
+
+`RoutingHint` does not change the semantics of the request; it is
+purely a performance hint; the request will perform the same actions on the
+database's data as if `RoutingHint` were not present. However, if
+the `RoutingHint` is incomplete or incorrect, the response may include
+a `CacheUpdate` the client can use to correct its location cache.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->operation_uid() >> / C<< $msg->operation_uid($value) >>
+
+Type: C<UInt64>
+
+A session-scoped unique ID for the operation, computed client-side.
+Requests with the same `operation_uid` should have a shared 'shape',
+meaning that some fields are expected to be the same, such as the SQL
+query, the target table/columns (for reads) etc. Requests with the same
+`operation_uid` are meant to differ only in fields like keys/key
+ranges/query parameters, transaction IDs, etc.
+
+`operation_uid` must be non-zero for `RoutingHint` to be valid.
+
+=item * C<< $msg->database_id() >> / C<< $msg->database_id($value) >>
+
+Type: C<UInt64>
+
+The database ID of the database being accessed, see
+`CacheUpdate.database_id`. Should match the cache entries that were used
+to generate the rest of the fields in this `RoutingHint`.
+
+=item * C<< $msg->schema_generation() >> / C<< $msg->schema_generation($value) >>
+
+Type: C<Bytes>
+
+The schema generation of the recipe that was used to generate `key` and
+`limit_key`. See also `RecipeList.schema_generation`.
+
+=item * C<< $msg->key() >> / C<< $msg->key($value) >>
+
+Type: C<Bytes>
+
+The key / key range that this request accesses. For operations that
+access a single key, `key` should be set and `limit_key` should be empty.
+For operations that access a key range, `key` and `limit_key` should both
+be set, to the inclusive start and exclusive end of the range respectively.
+
+The keys are encoded in "sortable string format" (ssformat), using a
+`KeyRecipe` that is appropriate for the request. See `KeyRecipe` for more
+details.
+
+=item * C<< $msg->limit_key() >> / C<< $msg->limit_key($value) >>
+
+Type: C<Bytes>
+
+If this request targets a key range, this is the exclusive end of the
+range. See `key` for more details.
+
+=item * C<< $msg->group_uid() >> / C<< $msg->group_uid($value) >>
+
+Type: C<UInt64>
+
+The group UID of the group that the client believes serves the range
+defined by `key` and `limit_key`. See `Range.group_uid` for more details.
+
+=item * C<< $msg->split_id() >> / C<< $msg->split_id($value) >>
+
+Type: C<UInt64>
+
+The split ID of the split that the client believes contains the range
+defined by `key` and `limit_key`. See `Range.split_id` for more details.
+
+=item * C<< $msg->tablet_uid() >> / C<< $msg->tablet_uid($value) >>
+
+Type: C<UInt64>
+
+The tablet UID of the tablet from group `group_uid` that the client
+believes is best to serve this request. See `Group.local_tablet_uids` and
+`Group.leader_tablet_uid`.
+
+=item * C<< $msg->skipped_tablet_uid() >> / C<< $msg->skipped_tablet_uid($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Location::RoutingHint::SkippedTablet>)
+
+If the client had multiple options for tablet selection, and some of its
+first choices were unhealthy (e.g., the server is unreachable, or
+`Tablet.skip` is true), this field will contain the tablet UIDs of those
+tablets, with their incarnations. The server may include a `CacheUpdate`
+with new locations for those tablets.
+
+=item * C<< $msg->client_location() >> / C<< $msg->client_location($value) >>
+
+Type: C<String>
+
+If present, the client's current location. This should be the name of a
+Google Cloud zone or region, such as "us-central1".
+
+If absent, the client's location will be assumed to be the same as the
+location of the server the client ends up connected to.
+
+Locations are primarily valuable for clients that connect from regions
+other than the ones that contain the Spanner database.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Spanner::V1::Location::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

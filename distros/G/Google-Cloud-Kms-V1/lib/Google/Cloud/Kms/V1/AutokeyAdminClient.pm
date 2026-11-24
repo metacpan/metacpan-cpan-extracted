@@ -17,7 +17,7 @@ use Google::Cloud::Kms::V1::HsmManagement;
 use Google::Cloud::Kms::V1::Autokey;
 use Google::Cloud::Kms::V1::Service;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -196,9 +196,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/cloud/kms/v1/autokey_admin.proto>
-
 =item * C<googleapis/google/cloud/kms/v1/autokey.proto>
+
+=item * C<googleapis/google/cloud/kms/v1/autokey_admin.proto>
 
 =item * C<googleapis/google/cloud/kms/v1/ekm_service.proto>
 
@@ -241,15 +241,66 @@ The following RPC methods are available in this client:
 
 =item * B<update_autokey_config>
 
-Calls the RPC method C<UpdateAutokeyConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_autokey_config(
+        autokey_config           => $autokey_config,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<UpdateAutokeyConfig> on C<google.cloud.kms.v1.AutokeyAdmin>.
+
+Request: L<Google::Cloud::Kms::V1::AutokeyAdmin::UpdateAutokeyConfigRequest>
+
+Returns: L<Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig>
+
+Parameters:
+
+=over 4
+
+=item * C<autokey_config> - L<Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<get_autokey_config>
 
-Calls the RPC method C<GetAutokeyConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_autokey_config(
+        name                     => $name,
+    );
+
+Calls the RPC method C<GetAutokeyConfig> on C<google.cloud.kms.v1.AutokeyAdmin>.
+
+Request: L<Google::Cloud::Kms::V1::AutokeyAdmin::GetAutokeyConfigRequest>
+
+Returns: L<Google::Cloud::Kms::V1::AutokeyAdmin::AutokeyConfig>
+
+Parameters:
+
+=over 4
+
+=item * C<name> - C<string>
+
+=back
 
 =item * B<show_effective_autokey_config>
 
-Calls the RPC method C<ShowEffectiveAutokeyConfig> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->show_effective_autokey_config(
+        parent                   => $parent,
+    );
+
+Calls the RPC method C<ShowEffectiveAutokeyConfig> on C<google.cloud.kms.v1.AutokeyAdmin>.
+
+Request: L<Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigRequest>
+
+Returns: L<Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=back
 
 =back
 

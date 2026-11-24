@@ -4,15 +4,47 @@
 
 use strict;
 use warnings;
+use autodie;
 use Cwd qw(realpath);
 use File::Basename;
-use File::HomeDir;
+use File::Path qw(make_path);
 use File::Spec;
-use Geo::Coder::Free;
-use Geo::Coder::Free::Local;
-use Geo::Coder::Free::OpenAddresses;
-use LWP::UserAgent::Cached;
+use Readonly;
 use Weather::Meteo;
+
+# Only this script needs these, so the Weather::Meteo library does not depend on
+# them (the distribution lists them as "recommends").  Geo::Coder::Free in
+# particular pulls in a large dependency tree, including C libraries.  Check for
+# them here so that a missing one gives an instruction instead of a stack trace.
+BEGIN {
+	my @missing = grep {
+		(my $file = "$_.pm") =~ s{::}{/}g;
+		!eval { require $file; 1 };
+	} qw(
+		File::HomeDir
+		Geo::Coder::Free
+		Geo::Coder::Free::Local
+		Geo::Coder::Free::OpenAddresses
+		LWP::UserAgent::Cached
+	);
+
+	if(@missing) {
+		die "$0 needs these modules, which Weather::Meteo itself does not: @missing\n",
+			"Install them with: cpanm Geo::Coder::Free LWP::UserAgent::Cached File::HomeDir\n";
+	}
+}
+
+# What to print, in order: [ label, field in the API's 'daily' section ]
+Readonly my @REPORT => (
+	[ 'Maximum temperature'     => 'temperature_2m_max' ],
+	[ 'Maximum wind speed'      => 'windspeed_10m_max' ],
+	[ 'Maximum wind gust speed' => 'windgusts_10m_max' ],
+);
+
+# Cache directory is created private to the user: cached responses may reveal
+# where somebody has been looking up the weather.
+Readonly my $CACHE_MODE    => oct('700');
+Readonly my $HTTP_TIMEOUT  => 30;
 
 binmode(STDOUT, ':encoding(UTF-8)');
 
@@ -27,13 +59,8 @@ my $coordinates = Geo::Coder::Free::Local->new()->geocode($location) //
 	Geo::Coder::Free->new()->geocode($location);
 
 if(!defined($coordinates) && $ENV{'OPENADDR_HOME'}) {
-	# Untaint and canonicalise the path before handing it to the geocoder
-	my ($safe_oa) = ($ENV{'OPENADDR_HOME'} =~ m{\A([\w/.\-]+)\z})
-		or die "OPENADDR_HOME contains invalid characters\n";
-	my $real_oa = realpath($safe_oa)
-		or die "OPENADDR_HOME '$safe_oa' cannot be resolved: $!\n";
 	$coordinates = Geo::Coder::Free::OpenAddresses->new(
-		openaddr => $real_oa,
+		openaddr => safe_path('OPENADDR_HOME'),
 	)->geocode(location => $location);
 }
 
@@ -41,35 +68,20 @@ if(!defined($coordinates)) {
 	die "$0: unknown location '$location'\n";
 }
 
-# Determine cache directory: $CACHE_DIR env var or ~/.cache/lwp-cache
-my $cache_dir;
-if($ENV{'CACHE_DIR'}) {
-	# Untaint: accept only printable path characters; reject shell metacharacters
-	my ($safe_dir) = ($ENV{'CACHE_DIR'} =~ m{\A([\w/.\-]+)\z})
-		or die "CACHE_DIR contains invalid characters\n";
-	# Canonicalise via realpath to prevent ../.. traversal attacks
-	my $real_dir = realpath($safe_dir)
-		or die "CACHE_DIR '$safe_dir' cannot be resolved: $!\n";
-	$cache_dir = $real_dir;
-	# Atomic mkdir: ignore EEXIST from concurrent creation (avoids TOCTOU race)
-	unless(mkdir($cache_dir, 0700) || $!{EEXIST}) {
-		die "$cache_dir: $!\n";
-	}
-	$cache_dir = File::Spec->catfile($cache_dir, 'lwp-cache');
-} else {
-	$cache_dir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'lwp-cache');
-}
-
-# Atomic mkdir for the final cache leaf directory
-unless(mkdir($cache_dir, 0700) || $!{EEXIST}) {
-	die "$cache_dir: $!\n";
-}
+# $CACHE_DIR if set, else ~/.cache/lwp-cache.  make_path() tolerates a
+# directory that already exists, including one created by a concurrent run,
+# so there is no check-then-create race.
+my $cache_dir = File::Spec->catdir(
+	($ENV{'CACHE_DIR'} ? safe_path('CACHE_DIR') : File::Spec->catdir(File::HomeDir->my_home(), '.cache')),
+	'lwp-cache',
+);
+make_path($cache_dir, { mode => $CACHE_MODE });
 
 my $cached_browser = LWP::UserAgent::Cached->new(
 	cache_dir  => $cache_dir,
 	agent      => basename($0),
 	keep_alive => 1,
-	timeout    => 30,
+	timeout    => $HTTP_TIMEOUT,
 );
 $cached_browser->env_proxy(1);
 $cached_browser->conn_cache->total_capacity(undef);
@@ -80,12 +92,29 @@ if(!defined($weather)) {
 	die "$0: no weather data available for '$location' on $date\n";
 }
 
-print 'Maximum temperature: ',
-	$weather->{'daily'}->{'temperature_2m_max'}[0],
-	($weather->{'daily_units'}->{'temperature_2m_max'} // ''), "\n";
-print 'Maximum wind speed ',
-	$weather->{'daily'}->{'windspeed_10m_max'}[0],
-	($weather->{'daily_units'}->{'windspeed_10m_max'} // ''), "\n";
-print 'Maximum wind gust speed ',
-	$weather->{'daily'}->{'windgusts_10m_max'}[0],
-	($weather->{'daily_units'}->{'windgusts_10m_max'} // ''), "\n";
+foreach my $line (@REPORT) {
+	my ($label, $field) = @{$line};
+	print "$label: ",
+		$weather->{'daily'}->{$field}[0],
+		($weather->{'daily_units'}->{$field} // ''), "\n";
+}
+
+# ---------------------------------------------------------------------------
+# safe_path -- read a directory name from the environment and make it safe
+#
+# Purpose:     Environment variables are attacker-controlled input.  Accept
+#              only plain path characters (which also untaints the value) and
+#              canonicalise with realpath() so ../ tricks cannot escape.
+# Entry:       $name -- name of the environment variable
+# Exit:        canonical absolute path
+# Side effects: dies with a message if the value has odd characters or does
+#              not resolve
+# ---------------------------------------------------------------------------
+sub safe_path {
+	my $name = $_[0];
+
+	my ($safe) = ($ENV{$name} =~ m{\A([\w/.\-]+)\z}) or die "$name contains invalid characters\n";
+	my $real   = realpath($safe) or die "$name '$safe' cannot be resolved: $!\n";
+
+	return $real;
+}

@@ -5,32 +5,32 @@ use warnings;
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
-use Google::Cloud::Networksecurity::V1::Tls;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring;
-use Google::Cloud::Networksecurity::V1::SecurityProfileGroupIntercept;
-use Google::Cloud::Networksecurity::V1::Common;
-use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
-use Google::Cloud::Networksecurity::V1::UrlList;
 use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicyRule;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupMirroring;
 use Google::Cloud::Networksecurity::V1::TlsInspectionPolicy;
-use Google::Cloud::Networksecurity::V1::AuthzPolicy;
+use Google::Cloud::Networksecurity::V1::Common;
+use Google::Cloud::Networksecurity::V1::Tls;
 use Google::Cloud::Networksecurity::V1::BackendAuthenticationConfig;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupIntercept;
+use Google::Cloud::Networksecurity::V1::UrlList;
+use Google::Cloud::Networksecurity::V1::GatewaySecurityPolicy;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupThreatprevention;
 use Google::Cloud::Networksecurity::V1::AuthorizationPolicy;
+use Google::Cloud::Networksecurity::V1::SecurityProfileGroupUrlfiltering;
+use Google::Cloud::Networksecurity::V1::AuthzPolicy;
 use Google::Cloud::Networksecurity::V1::DnsThreatDetector;
+use Google::Cloud::Networksecurity::V1::Intercept;
+use Google::Cloud::Networksecurity::V1::AddressGroup;
+use Google::Cloud::Networksecurity::V1::Mirroring;
+use Google::Cloud::Networksecurity::V1::SseRealm;
+use Google::Cloud::Networksecurity::V1::FirewallActivation;
 use Google::Cloud::Networksecurity::V1::ServerTlsPolicy;
 use Google::Cloud::Networksecurity::V1::ClientTlsPolicy;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroup;
-use Google::Cloud::Networksecurity::V1::SseRealm;
-use Google::Cloud::Networksecurity::V1::Mirroring;
-use Google::Cloud::Networksecurity::V1::Intercept;
-use Google::Cloud::Networksecurity::V1::AddressGroup;
-use Google::Cloud::Networksecurity::V1::FirewallActivation;
 use Google::Cloud::Networksecurity::V1::NetworkSecurity;
 use Google::Cloud::Networksecurity::V1::SecurityProfileGroupService;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 1; # End of Google::Cloud::Networksecurity::V1::OrganizationSecurityProfileGroupServiceClient
 
 __END__
@@ -113,11 +113,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/networksecurity/v1/network_security.proto>
 
+=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group.proto>
+
 =item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_intercept.proto>
 
 =item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_mirroring.proto>
-
-=item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group.proto>
 
 =item * C<googleapis/google/cloud/networksecurity/v1/security_profile_group_service.proto>
 
@@ -129,9 +129,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/networksecurity/v1/sse_realm.proto>
 
-=item * C<googleapis/google/cloud/networksecurity/v1/tls_inspection_policy.proto>
-
 =item * C<googleapis/google/cloud/networksecurity/v1/tls.proto>
+
+=item * C<googleapis/google/cloud/networksecurity/v1/tls_inspection_policy.proto>
 
 =item * C<googleapis/google/cloud/networksecurity/v1/url_list.proto>
 

@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::PartitioningDefinition;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -64,73 +64,97 @@ EOF
     # Fields for PartitioningDefinition
     # Field: partitioned_column Type: 11 (.google.cloud.bigquery.v2.PartitionedColumn)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitioningDefinition - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::PartitioningDefinition;
-
-    my $msg = Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitioningDefinition->new(
-        partitioned_column => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<partitioned_column>
-
-Type: Message (.google.cloud.bigquery.v2.PartitionedColumn)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitionedColumn ===
     # Fields for PartitionedColumn
     # Field: field Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitionedColumn - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::PartitioningDefinition;
-
-    my $msg = Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitionedColumn->new(
-        field => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<field>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::PartitioningDefinition - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::PartitioningDefinition - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/partitioning_definition.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::PartitioningDefinition;
+
+    my $msg = Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitioningDefinition->new({
+        partitioned_column => $partitioned_column,
+    });
+
+    # Read or update a field
+    my $val = $msg->partitioned_column();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitioningDefinition->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/partitioning_definition.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitioningDefinition
+
+The partitioning information, which includes managed table, external table
+and metastore partitioned table partition information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->partitioned_column() >> / C<< $msg->partitioned_column($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitionedColumn>)
+
+Optional. Details about each partitioning column. This field is output only
+for all partitioning types other than metastore partitioned tables.
+BigQuery native tables only support 1 partitioning column. Other table
+types may support 0, 1 or more partitioning columns.
+For metastore partitioned tables, the order must match the definition order
+in the Hive Metastore, where it must match the physical layout of the
+table. For example,
+
+CREATE TABLE a_table(id BIGINT, name STRING)
+PARTITIONED BY (city STRING, state STRING).
+
+In this case the values must be ['city', 'state'] in that order.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::PartitioningDefinition::PartitionedColumn
+
+The partitioning column information.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->field() >> / C<< $msg->field($value) >>
+
+Type: C<String>
+
+Required. The name of the partition column.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::PartitioningDefinition::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -10,56 +10,56 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
-use Google::Cloud::Bigquery::V2::JsonExtension;
-use Google::Cloud::Bigquery::V2::Clustering;
 use Google::Cloud::Bigquery::V2::Error;
-use Google::Cloud::Bigquery::V2::MapTargetType;
-use Google::Cloud::Bigquery::V2::ManagedTableType;
-use Google::Cloud::Bigquery::V2::LocationMetadata;
-use Google::Cloud::Bigquery::V2::GenAiStats;
 use Google::Cloud::Bigquery::V2::Arrow;
+use Google::Cloud::Bigquery::V2::ManagedTableType;
+use Google::Cloud::Bigquery::V2::GenAiStats;
 use Google::Cloud::Bigquery::V2::DecimalTargetTypes;
+use Google::Cloud::Bigquery::V2::FileSetSpecificationType;
+use Google::Cloud::Bigquery::V2::MapTargetType;
+use Google::Cloud::Bigquery::V2::Clustering;
+use Google::Cloud::Bigquery::V2::JsonExtension;
+use Google::Cloud::Bigquery::V2::LocationMetadata;
 use Google::Cloud::Bigquery::V2::UdfResource;
-use Google::Cloud::Bigquery::V2::QueryParameter;
-use Google::Cloud::Bigquery::V2::SessionInfo;
-use Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
-use Google::Cloud::Bigquery::V2::RoutineReference;
-use Google::Cloud::Bigquery::V2::JobCreationReason;
-use Google::Cloud::Bigquery::V2::TableSchema;
-use Google::Cloud::Bigquery::V2::JobReference;
-use Google::Cloud::Bigquery::V2::ExternalDatasetReference;
-use Google::Cloud::Bigquery::V2::RestrictionConfig;
-use Google::Cloud::Bigquery::V2::PrivacyPolicy;
-use Google::Cloud::Bigquery::V2::TimePartitioning;
-use Google::Cloud::Bigquery::V2::PartitioningDefinition;
-use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
-use Google::Cloud::Bigquery::V2::PropertyGraphReference;
-use Google::Cloud::Bigquery::V2::DataFormatOptions;
-use Google::Cloud::Bigquery::V2::StandardSql;
-use Google::Cloud::Bigquery::V2::HivePartitioning;
-use Google::Cloud::Bigquery::V2::EncryptionConfig;
-use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
-use Google::Cloud::Bigquery::V2::ModelReference;
 use Google::Cloud::Bigquery::V2::BiglakeConfig;
+use Google::Cloud::Bigquery::V2::JobReference;
+use Google::Cloud::Bigquery::V2::SessionInfo;
+use Google::Cloud::Bigquery::V2::EncryptionConfig;
 use Google::Cloud::Bigquery::V2::JobStatus;
 use Google::Cloud::Bigquery::V2::TableReference;
 use Google::Cloud::Bigquery::V2::DatasetReference;
+use Google::Cloud::Bigquery::V2::DataFormatOptions;
+use Google::Cloud::Bigquery::V2::RoutineReference;
+use Google::Cloud::Bigquery::V2::StandardSql;
+use Google::Cloud::Bigquery::V2::JobCreationReason;
+use Google::Cloud::Bigquery::V2::PartitioningDefinition;
+use Google::Cloud::Bigquery::V2::RestrictionConfig;
+use Google::Cloud::Bigquery::V2::ExternalCatalogTableOptions;
+use Google::Cloud::Bigquery::V2::ModelReference;
+use Google::Cloud::Bigquery::V2::TableSchema;
+use Google::Cloud::Bigquery::V2::HivePartitioning;
+use Google::Cloud::Bigquery::V2::TimePartitioning;
+use Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
 use Google::Cloud::Bigquery::V2::RangePartitioning;
+use Google::Cloud::Bigquery::V2::ExternalCatalogDatasetOptions;
+use Google::Cloud::Bigquery::V2::PrivacyPolicy;
+use Google::Cloud::Bigquery::V2::PropertyGraphReference;
+use Google::Cloud::Bigquery::V2::QueryParameter;
 use Google::Cloud::Bigquery::V2::Project;
-use Google::Cloud::Bigquery::V2::RowAccessPolicy;
+use Google::Cloud::Bigquery::V2::ExternalDatasetReference;
+use Google::Cloud::Bigquery::V2::TableConstraints;
 use Google::Cloud::Bigquery::V2::Routine;
 use Google::Cloud::Bigquery::V2::SystemVariable;
-use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-use Google::Cloud::Bigquery::V2::TableConstraints;
 use Google::Cloud::Bigquery::V2::Model;
+use Google::Cloud::Bigquery::V2::ExternalDataConfig;
+use Google::Cloud::Bigquery::V2::RowAccessPolicy;
 use Google::Cloud::Bigquery::V2::Dataset;
+use Google::Cloud::Bigquery::V2::JobStats;
 use Google::Cloud::Bigquery::V2::JobConfig;
 use Google::Cloud::Bigquery::V2::Table;
-use Google::Cloud::Bigquery::V2::JobStats;
 use Google::Cloud::Bigquery::V2::Job;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -1392,11 +1392,11 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/hive_partitioning.proto>
 
+=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
+
 =item * C<googleapis/google/cloud/bigquery/v2/job_config.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_creation_reason.proto>
-
-=item * C<googleapis/google/cloud/bigquery/v2/job.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/job_reference.proto>
 
@@ -1444,9 +1444,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/bigquery/v2/system_variable.proto>
 
-=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
-
 =item * C<googleapis/google/cloud/bigquery/v2/table.proto>
+
+=item * C<googleapis/google/cloud/bigquery/v2/table_constraints.proto>
 
 =item * C<googleapis/google/cloud/bigquery/v2/table_reference.proto>
 
@@ -1489,147 +1489,1047 @@ The following RPC methods are available in this client:
 
 =item * B<get_dataset>
 
-Calls the RPC method C<GetDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        dataset_view             => $dataset_view,
+        access_policy_version    => $access_policy_version,
+    );
+
+Calls the RPC method C<GetDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::GetDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<dataset_view> - L<Google::Cloud::Bigquery::V2::Dataset::DatasetView>
+
+=item * C<access_policy_version> - C<int32>
+
+=back
 
 =item * B<insert_dataset>
 
-Calls the RPC method C<InsertDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert_dataset(
+        project_id               => $project_id,
+        dataset                  => $dataset,
+        access_policy_version    => $access_policy_version,
+    );
+
+Calls the RPC method C<InsertDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::InsertDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset> - L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+=item * C<access_policy_version> - C<int32>
+
+=back
 
 =item * B<patch_dataset>
 
-Calls the RPC method C<PatchDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        dataset                  => $dataset,
+        update_mode              => $update_mode,
+        access_policy_version    => $access_policy_version,
+    );
+
+Calls the RPC method C<PatchDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::UpdateOrPatchDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<dataset> - L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+=item * C<update_mode> - L<Google::Cloud::Bigquery::V2::Dataset::UpdateMode>
+
+=item * C<access_policy_version> - C<int32>
+
+=back
 
 =item * B<update_dataset>
 
-Calls the RPC method C<UpdateDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        dataset                  => $dataset,
+        update_mode              => $update_mode,
+        access_policy_version    => $access_policy_version,
+    );
+
+Calls the RPC method C<UpdateDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::UpdateOrPatchDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<dataset> - L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+=item * C<update_mode> - L<Google::Cloud::Bigquery::V2::Dataset::UpdateMode>
+
+=item * C<access_policy_version> - C<int32>
+
+=back
 
 =item * B<delete_dataset>
 
-Calls the RPC method C<DeleteDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        delete_contents          => $delete_contents,
+    );
+
+Calls the RPC method C<DeleteDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::DeleteDatasetRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<delete_contents> - C<bool>
+
+=back
 
 =item * B<list_datasets>
 
-Calls the RPC method C<ListDatasets> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_datasets(
+        project_id               => $project_id,
+        max_results              => $max_results,
+        page_token               => $page_token,
+        all                      => $all,
+        filter                   => $filter,
+    );
+
+Calls the RPC method C<ListDatasets> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::ListDatasetsRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::DatasetList>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<max_results> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<page_token> - C<string>
+
+=item * C<all> - C<bool>
+
+=item * C<filter> - C<string>
+
+=back
 
 =item * B<undelete_dataset>
 
-Calls the RPC method C<UndeleteDataset> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->undelete_dataset(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        deletion_time            => $deletion_time,
+    );
+
+Calls the RPC method C<UndeleteDataset> on C<google.cloud.bigquery.v2.DatasetService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Dataset::UndeleteDatasetRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Dataset::Dataset>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<deletion_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=back
 
 =item * B<cancel_job>
 
-Calls the RPC method C<CancelJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->cancel_job(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<CancelJob> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::CancelJobRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::JobCancelResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<get_job>
 
-Calls the RPC method C<GetJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_job(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<GetJob> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::GetJobRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<insert_job>
 
-Calls the RPC method C<InsertJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert_job(
+        project_id               => $project_id,
+        job                      => $job,
+    );
+
+Calls the RPC method C<InsertJob> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::InsertJobRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job> - L<Google::Cloud::Bigquery::V2::Job::Job>
+
+=back
 
 =item * B<delete_job>
 
-Calls the RPC method C<DeleteJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_job(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        location                 => $location,
+    );
+
+Calls the RPC method C<DeleteJob> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::DeleteJobRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<location> - C<string>
+
+=back
 
 =item * B<list_jobs>
 
-Calls the RPC method C<ListJobs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_jobs(
+        project_id               => $project_id,
+        all_users                => $all_users,
+        max_results              => $max_results,
+        min_creation_time        => $min_creation_time,
+        max_creation_time        => $max_creation_time,
+        page_token               => $page_token,
+        projection               => $projection,
+        state_filter             => [ ... ],
+        parent_job_id            => $parent_job_id,
+    );
+
+Calls the RPC method C<ListJobs> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::ListJobsRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::JobList>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<all_users> - C<bool>
+
+=item * C<max_results> - L<Google::Protobuf::Int32Value::Int32Value>
+
+=item * C<min_creation_time> - C<uint64>
+
+=item * C<max_creation_time> - L<Google::Protobuf::UInt64Value::UInt64Value>
+
+=item * C<page_token> - C<string>
+
+=item * C<projection> - L<Google::Cloud::Bigquery::V2::Job::Projection>
+
+=item * C<state_filter> - ArrayRef of L<Google::Cloud::Bigquery::V2::Job::StateFilter>
+
+=item * C<parent_job_id> - C<string>
+
+=back
 
 =item * B<get_query_results>
 
-Calls the RPC method C<GetQueryResults> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_query_results(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        start_index              => $start_index,
+        page_token               => $page_token,
+        max_results              => $max_results,
+        timeout_ms               => $timeout_ms,
+        location                 => $location,
+        format_options           => $format_options,
+    );
+
+Calls the RPC method C<GetQueryResults> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::GetQueryResultsRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::GetQueryResultsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<start_index> - L<Google::Protobuf::UInt64Value::UInt64Value>
+
+=item * C<page_token> - C<string>
+
+=item * C<max_results> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<timeout_ms> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<location> - C<string>
+
+=item * C<format_options> - L<Google::Cloud::Bigquery::V2::DataFormatOptions::DataFormatOptions>
+
+=back
 
 =item * B<query>
 
-Calls the RPC method C<Query> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->query(
+        project_id               => $project_id,
+        query_request            => $query_request,
+    );
+
+Calls the RPC method C<Query> on C<google.cloud.bigquery.v2.JobService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Job::PostQueryRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Job::QueryResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<query_request> - L<Google::Cloud::Bigquery::V2::Job::QueryRequest>
+
+=back
 
 =item * B<get_model>
 
-Calls the RPC method C<GetModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_model(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        model_id                 => $model_id,
+    );
+
+Calls the RPC method C<GetModel> on C<google.cloud.bigquery.v2.ModelService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Model::GetModelRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Model::Model>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<model_id> - C<string>
+
+=back
 
 =item * B<list_models>
 
-Calls the RPC method C<ListModels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_models(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        max_results              => $max_results,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListModels> on C<google.cloud.bigquery.v2.ModelService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Model::ListModelsRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Model::ListModelsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<max_results> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<patch_model>
 
-Calls the RPC method C<PatchModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_model(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        model_id                 => $model_id,
+        model                    => $model,
+    );
+
+Calls the RPC method C<PatchModel> on C<google.cloud.bigquery.v2.ModelService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Model::PatchModelRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Model::Model>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<model_id> - C<string>
+
+=item * C<model> - L<Google::Cloud::Bigquery::V2::Model::Model>
+
+=back
 
 =item * B<delete_model>
 
-Calls the RPC method C<DeleteModel> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_model(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        model_id                 => $model_id,
+    );
+
+Calls the RPC method C<DeleteModel> on C<google.cloud.bigquery.v2.ModelService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Model::DeleteModelRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<model_id> - C<string>
+
+=back
 
 =item * B<get_service_account>
 
-Calls the RPC method C<GetServiceAccount> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_service_account(
+        project_id               => $project_id,
+    );
+
+Calls the RPC method C<GetServiceAccount> on C<google.cloud.bigquery.v2.ProjectService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Project::GetServiceAccountRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Project::GetServiceAccountResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=back
 
 =item * B<get_routine>
 
-Calls the RPC method C<GetRoutine> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_routine(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        routine_id               => $routine_id,
+    );
+
+Calls the RPC method C<GetRoutine> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::GetRoutineRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<routine_id> - C<string>
+
+=back
 
 =item * B<insert_routine>
 
-Calls the RPC method C<InsertRoutine> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert_routine(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        routine                  => $routine,
+    );
+
+Calls the RPC method C<InsertRoutine> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::InsertRoutineRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<routine> - L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+=back
 
 =item * B<update_routine>
 
-Calls the RPC method C<UpdateRoutine> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_routine(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        routine_id               => $routine_id,
+        routine                  => $routine,
+    );
+
+Calls the RPC method C<UpdateRoutine> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::UpdateRoutineRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<routine_id> - C<string>
+
+=item * C<routine> - L<Google::Cloud::Bigquery::V2::Routine::Routine>
+
+=back
 
 =item * B<delete_routine>
 
-Calls the RPC method C<DeleteRoutine> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_routine(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        routine_id               => $routine_id,
+    );
+
+Calls the RPC method C<DeleteRoutine> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::DeleteRoutineRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<routine_id> - C<string>
+
+=back
 
 =item * B<list_routines>
 
-Calls the RPC method C<ListRoutines> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_routines(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        max_results              => $max_results,
+        page_token               => $page_token,
+        filter                   => $filter,
+    );
+
+Calls the RPC method C<ListRoutines> on C<google.cloud.bigquery.v2.RoutineService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Routine::ListRoutinesRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Routine::ListRoutinesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<max_results> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<page_token> - C<string>
+
+=item * C<filter> - C<string>
+
+=back
 
 =item * B<list_row_access_policies>
 
-Calls the RPC method C<ListRowAccessPolicies> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_row_access_policies(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+        page_token               => $page_token,
+        page_size                => $page_size,
+    );
+
+Calls the RPC method C<ListRowAccessPolicies> on C<google.cloud.bigquery.v2.RowAccessPolicyService>.
+
+Request: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::ListRowAccessPoliciesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=back
 
 =item * B<get_row_access_policy>
 
-Calls the RPC method C<GetRowAccessPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_row_access_policy(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+        policy_id                => $policy_id,
+    );
+
+Calls the RPC method C<GetRowAccessPolicy> on C<google.cloud.bigquery.v2.RowAccessPolicyService>.
+
+Request: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::GetRowAccessPolicyRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=item * C<policy_id> - C<string>
+
+=back
 
 =item * B<create_row_access_policy>
 
-Calls the RPC method C<CreateRowAccessPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_row_access_policy(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+        row_access_policy        => $row_access_policy,
+    );
+
+Calls the RPC method C<CreateRowAccessPolicy> on C<google.cloud.bigquery.v2.RowAccessPolicyService>.
+
+Request: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::CreateRowAccessPolicyRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=item * C<row_access_policy> - L<Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy>
+
+=back
 
 =item * B<update_row_access_policy>
 
-Calls the RPC method C<UpdateRowAccessPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_row_access_policy(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+        policy_id                => $policy_id,
+        row_access_policy        => $row_access_policy,
+    );
+
+Calls the RPC method C<UpdateRowAccessPolicy> on C<google.cloud.bigquery.v2.RowAccessPolicyService>.
+
+Request: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::UpdateRowAccessPolicyRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=item * C<policy_id> - C<string>
+
+=item * C<row_access_policy> - L<Google::Cloud::Bigquery::V2::RowAccessPolicy::RowAccessPolicy>
+
+=back
 
 =item * B<delete_row_access_policy>
 
-Calls the RPC method C<DeleteRowAccessPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_row_access_policy(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+        policy_id                => $policy_id,
+        force                    => $force,
+    );
+
+Calls the RPC method C<DeleteRowAccessPolicy> on C<google.cloud.bigquery.v2.RowAccessPolicyService>.
+
+Request: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::DeleteRowAccessPolicyRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=item * C<policy_id> - C<string>
+
+=item * C<force> - C<bool>
+
+=back
 
 =item * B<batch_delete_row_access_policies>
 
-Calls the RPC method C<BatchDeleteRowAccessPolicies> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->batch_delete_row_access_policies(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+        policy_ids               => [ ... ],
+        force                    => $force,
+    );
+
+Calls the RPC method C<BatchDeleteRowAccessPolicies> on C<google.cloud.bigquery.v2.RowAccessPolicyService>.
+
+Request: L<Google::Cloud::Bigquery::V2::RowAccessPolicy::BatchDeleteRowAccessPoliciesRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=item * C<policy_ids> - ArrayRef of C<string>
+
+=item * C<force> - C<bool>
+
+=back
 
 =item * B<get_table>
 
-Calls the RPC method C<GetTable> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_table(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+        selected_fields          => $selected_fields,
+        view                     => $view,
+    );
+
+Calls the RPC method C<GetTable> on C<google.cloud.bigquery.v2.TableService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Table::GetTableRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Table::Table>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=item * C<selected_fields> - C<string>
+
+=item * C<view> - L<Google::Cloud::Bigquery::V2::Table::TableMetadataView>
+
+=back
 
 =item * B<insert_table>
 
-Calls the RPC method C<InsertTable> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert_table(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table                    => $table,
+    );
+
+Calls the RPC method C<InsertTable> on C<google.cloud.bigquery.v2.TableService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Table::InsertTableRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Table::Table>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table> - L<Google::Cloud::Bigquery::V2::Table::Table>
+
+=back
 
 =item * B<patch_table>
 
-Calls the RPC method C<PatchTable> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->patch_table(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+        table                    => $table,
+        autodetect_schema        => $autodetect_schema,
+    );
+
+Calls the RPC method C<PatchTable> on C<google.cloud.bigquery.v2.TableService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Table::UpdateOrPatchTableRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Table::Table>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=item * C<table> - L<Google::Cloud::Bigquery::V2::Table::Table>
+
+=item * C<autodetect_schema> - C<bool>
+
+=back
 
 =item * B<update_table>
 
-Calls the RPC method C<UpdateTable> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_table(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+        table                    => $table,
+        autodetect_schema        => $autodetect_schema,
+    );
+
+Calls the RPC method C<UpdateTable> on C<google.cloud.bigquery.v2.TableService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Table::UpdateOrPatchTableRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Table::Table>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=item * C<table> - L<Google::Cloud::Bigquery::V2::Table::Table>
+
+=item * C<autodetect_schema> - C<bool>
+
+=back
 
 =item * B<delete_table>
 
-Calls the RPC method C<DeleteTable> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_table(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        table_id                 => $table_id,
+    );
+
+Calls the RPC method C<DeleteTable> on C<google.cloud.bigquery.v2.TableService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Table::DeleteTableRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<table_id> - C<string>
+
+=back
 
 =item * B<list_tables>
 
-Calls the RPC method C<ListTables> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_tables(
+        project_id               => $project_id,
+        dataset_id               => $dataset_id,
+        max_results              => $max_results,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListTables> on C<google.cloud.bigquery.v2.TableService>.
+
+Request: L<Google::Cloud::Bigquery::V2::Table::ListTablesRequest>
+
+Returns: L<Google::Cloud::Bigquery::V2::Table::TableList>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<dataset_id> - C<string>
+
+=item * C<max_results> - L<Google::Protobuf::UInt32Value::UInt32Value>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =back
 

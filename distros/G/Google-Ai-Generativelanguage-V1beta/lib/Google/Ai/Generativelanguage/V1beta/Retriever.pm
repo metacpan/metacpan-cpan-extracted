@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::Retriever;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -245,44 +245,6 @@ EOF
     # Field: create_time Type: 11 (.google.protobuf.Timestamp)
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Retriever::Corpus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Retriever;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Retriever::Corpus->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Retriever::Document ===
     # Fields for Document
     # Field: name Type: 9 ()
@@ -291,77 +253,9 @@ Type: Message (.google.protobuf.Timestamp)
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
     # Field: create_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Retriever::Document - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Retriever;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Retriever::Document->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<custom_metadata>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CustomMetadata)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Retriever::StringList ===
     # Fields for StringList
     # Field: values Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Retriever::StringList - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Retriever;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Retriever::StringList->new(
-        values => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<values>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Retriever::CustomMetadata ===
     # Fields for CustomMetadata
@@ -370,118 +264,16 @@ Type: String
     # Field: numeric_value Type: 2 ()
     # Field: key Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Retriever::CustomMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Retriever;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Retriever::CustomMetadata->new(
-        string_value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<string_value>
-
-Type: String
-
-=item * B<string_list_value>
-
-Type: Message (.google.ai.generativelanguage.v1beta.StringList)
-
-=item * B<numeric_value>
-
-Type: Float
-
-=item * B<key>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Retriever::MetadataFilter ===
     # Fields for MetadataFilter
     # Field: key Type: 9 ()
     # Field: conditions Type: 11 (.google.ai.generativelanguage.v1beta.Condition)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Retriever::MetadataFilter - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Retriever;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Retriever::MetadataFilter->new(
-        key => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<key>
-
-Type: String
-
-=item * B<conditions>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Condition)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::Retriever::Condition ===
     # Fields for Condition
     # Field: string_value Type: 9 ()
     # Field: numeric_value Type: 2 ()
     # Field: operation Type: 14 (.google.ai.generativelanguage.v1beta.Condition.Operator)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Retriever::Condition - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Retriever;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Retriever::Condition->new(
-        string_value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<string_value>
-
-Type: String
-
-=item * B<numeric_value>
-
-Type: Float
-
-=item * B<operation>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.Condition.Operator)
-
-=back
-
-=cut
 
 # Enum: Condition::Operator
 our $Condition_OPERATOR_UNSPECIFIED = 0;
@@ -494,36 +286,6 @@ our $Condition_NOT_EQUAL = 6;
 our $Condition_INCLUDES = 7;
 our $Condition_EXCLUDES = 8;
 
-=pod
-
-=head2 Enum: Condition::Operator
-
-Values:
-
-=over 4
-
-=item * C<OPERATOR_UNSPECIFIED> => 0
-
-=item * C<LESS> => 1
-
-=item * C<LESS_EQUAL> => 2
-
-=item * C<EQUAL> => 3
-
-=item * C<GREATER_EQUAL> => 4
-
-=item * C<GREATER> => 5
-
-=item * C<NOT_EQUAL> => 6
-
-=item * C<INCLUDES> => 7
-
-=item * C<EXCLUDES> => 8
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Retriever::Chunk ===
     # Fields for Chunk
     # Field: name Type: 9 ()
@@ -533,119 +295,383 @@ Values:
     # Field: update_time Type: 11 (.google.protobuf.Timestamp)
     # Field: state Type: 14 (.google.ai.generativelanguage.v1beta.Chunk.State)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Retriever::Chunk - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Retriever;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Retriever::Chunk->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<data>
-
-Type: Message (.google.ai.generativelanguage.v1beta.ChunkData)
-
-=item * B<custom_metadata>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CustomMetadata)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.Chunk.State)
-
-=back
-
-=cut
-
 # Enum: Chunk::State
 our $Chunk_STATE_UNSPECIFIED = 0;
 our $Chunk_STATE_PENDING_PROCESSING = 1;
 our $Chunk_STATE_ACTIVE = 2;
 our $Chunk_STATE_FAILED = 10;
 
-=pod
-
-=head2 Enum: Chunk::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<STATE_PENDING_PROCESSING> => 1
-
-=item * C<STATE_ACTIVE> => 2
-
-=item * C<STATE_FAILED> => 10
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::Retriever::ChunkData ===
     # Fields for ChunkData
     # Field: string_value Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::Retriever::ChunkData - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::Retriever;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::Retriever::ChunkData->new(
-        string_value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<string_value>
-
-Type: String
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::Retriever - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::Retriever - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/retriever.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::Retriever;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::Retriever::Corpus->new({
+        name => $name,
+        display_name => $display_name,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::Retriever::Corpus->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/retriever.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::Retriever::Corpus
+
+A `Corpus` is a collection of `Document`s.
+A project can create up to 5 corpora.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The `Corpus` resource name. The ID (name excluding
+the "corpora/" prefix) can contain up to 40 characters that are lowercase
+alphanumeric or dashes
+(-). The ID cannot start or end with a dash. If the name is empty on
+create, a unique name will be derived from `display_name` along with a 12
+character random suffix.
+Example: `corpora/my-awesome-corpora-123a456b789c`
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. The human-readable display name for the `Corpus`. The display
+name must be no more than 512 characters in length, including spaces.
+Example: "Docs on Semantic Retriever"
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The Timestamp of when the `Corpus` was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The Timestamp of when the `Corpus` was last updated.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Retriever::Document
+
+A `Document` is a collection of `Chunk`s.
+A `Corpus` can have a maximum of 10,000 `Document`s.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The `Document` resource name. The ID (name excluding
+the "corpora/*/documents/" prefix) can contain up to 40 characters that are
+lowercase alphanumeric or dashes (-). The ID cannot start or end with a
+dash. If the name is empty on create, a unique name will be derived from
+`display_name` along with a 12 character random suffix.
+Example: `corpora/{corpus_id}/documents/my-awesome-doc-123a456b789c`
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. The human-readable display name for the `Document`. The display
+name must be no more than 512 characters in length, including spaces.
+Example: "Semantic Retriever Documentation"
+
+=item * C<< $msg->custom_metadata() >> / C<< $msg->custom_metadata($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::CustomMetadata>)
+
+Optional. User provided custom metadata stored as key-value pairs used for
+querying. A `Document` can have a maximum of 20 `CustomMetadata`.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The Timestamp of when the `Document` was last updated.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The Timestamp of when the `Document` was created.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Retriever::StringList
+
+User provided string values assigned to a single metadata key.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->values() >> / C<< $msg->values($value) >>
+
+Type: C<String>
+
+The string values of the metadata to store.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Retriever::CustomMetadata
+
+User provided metadata stored as key-value pairs.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->string_value() >> / C<< $msg->string_value($value) >>
+
+Type: C<String>
+
+The string value of the metadata to store.
+
+=item * C<< $msg->string_list_value() >> / C<< $msg->string_list_value($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::StringList>)
+
+The StringList value of the metadata to store.
+
+=item * C<< $msg->numeric_value() >> / C<< $msg->numeric_value($value) >>
+
+Type: C<Float>
+
+The numeric value of the metadata to store.
+
+=item * C<< $msg->key() >> / C<< $msg->key($value) >>
+
+Type: C<String>
+
+Required. The key of the metadata to store.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Retriever::MetadataFilter
+
+User provided filter to limit retrieval based on `Chunk` or `Document` level
+metadata values.
+Example (genre = drama OR genre = action):
+  key = "document.custom_metadata.genre"
+  conditions = [{string_value = "drama", operation = EQUAL},
+                {string_value = "action", operation = EQUAL}]
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->key() >> / C<< $msg->key($value) >>
+
+Type: C<String>
+
+Required. The key of the metadata to filter on.
+
+=item * C<< $msg->conditions() >> / C<< $msg->conditions($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Condition>)
+
+Required. The `Condition`s for the given key that will trigger this filter.
+Multiple `Condition`s are joined by logical ORs.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Retriever::Condition
+
+Filter condition applicable to a single key.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->string_value() >> / C<< $msg->string_value($value) >>
+
+Type: C<String>
+
+The string value to filter the metadata on.
+
+=item * C<< $msg->numeric_value() >> / C<< $msg->numeric_value($value) >>
+
+Type: C<Float>
+
+The numeric value to filter the metadata on.
+
+=item * C<< $msg->operation() >> / C<< $msg->operation($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::Condition::Operator>)
+
+Required. Operator applied to the given key-value pair to trigger the
+condition.
+
+=back
+
+=head3 Enum: Condition::Operator
+
+=over 4
+
+=item * C<OPERATOR_UNSPECIFIED> => C<0>
+
+=item * C<LESS> => C<1>
+
+=item * C<LESS_EQUAL> => C<2>
+
+=item * C<EQUAL> => C<3>
+
+=item * C<GREATER_EQUAL> => C<4>
+
+=item * C<GREATER> => C<5>
+
+=item * C<NOT_EQUAL> => C<6>
+
+=item * C<INCLUDES> => C<7>
+
+=item * C<EXCLUDES> => C<8>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Retriever::Chunk
+
+A `Chunk` is a subpart of a `Document` that is treated as an independent unit
+for the purposes of vector representation and storage.
+A `Corpus` can have a maximum of 1 million `Chunk`s.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. The `Chunk` resource name. The ID (name excluding
+the "corpora/*/documents/*/chunks/" prefix) can contain up to 40 characters
+that are lowercase alphanumeric or dashes (-). The ID cannot start or end
+with a dash. If the name is empty on create, a random 12-character unique
+ID will be generated.
+Example: `corpora/{corpus_id}/documents/{document_id}/chunks/123a456b789c`
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::ChunkData>)
+
+Required. The content for the `Chunk`, such as the text string.
+The maximum number of tokens per chunk is 2043.
+
+=item * C<< $msg->custom_metadata() >> / C<< $msg->custom_metadata($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::CustomMetadata>)
+
+Optional. User provided custom metadata stored as key-value pairs.
+The maximum number of `CustomMetadata` per chunk is 20.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The Timestamp of when the `Chunk` was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The Timestamp of when the `Chunk` was last updated.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::Chunk::State>)
+
+Output only. Current state of the `Chunk`.
+
+=back
+
+=head3 Enum: Chunk::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<STATE_PENDING_PROCESSING> => C<1>
+
+=item * C<STATE_ACTIVE> => C<2>
+
+=item * C<STATE_FAILED> => C<10>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::Retriever::ChunkData
+
+Extracted data that represents the `Chunk` content.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->string_value() >> / C<< $msg->string_value($value) >>
+
+Type: C<String>
+
+The `Chunk` content as a string.
+The maximum number of tokens per chunk is 2043.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::Retriever::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

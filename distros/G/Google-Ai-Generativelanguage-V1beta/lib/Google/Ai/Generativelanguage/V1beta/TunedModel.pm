@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::TunedModel;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -255,140 +255,16 @@ EOF
     # Field: tuning_task Type: 11 (.google.ai.generativelanguage.v1beta.TuningTask)
     # Field: reader_project_numbers Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TunedModel;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel->new(
-        tuned_model_source => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tuned_model_source>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TunedModelSource)
-
-=item * B<base_model>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<temperature>
-
-Type: Float
-
-=item * B<top_p>
-
-Type: Float
-
-=item * B<top_k>
-
-Type: Int32
-
-=item * B<state>
-
-Type: Enum (.google.ai.generativelanguage.v1beta.TunedModel.State)
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<tuning_task>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TuningTask)
-
-=item * B<reader_project_numbers>
-
-Type: Int64
-
-=back
-
-=cut
-
 # Enum: TunedModel::State
 our $TunedModel_STATE_UNSPECIFIED = 0;
 our $TunedModel_CREATING = 1;
 our $TunedModel_ACTIVE = 2;
 our $TunedModel_FAILED = 3;
 
-=pod
-
-=head2 Enum: TunedModel::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<FAILED> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModelSource ===
     # Fields for TunedModelSource
     # Field: tuned_model Type: 9 ()
     # Field: base_model Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModelSource - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TunedModel;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModelSource->new(
-        tuned_model => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tuned_model>
-
-Type: String
-
-=item * B<base_model>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::TunedModel::TuningTask ===
     # Fields for TuningTask
@@ -398,48 +274,6 @@ Type: String
     # Field: training_data Type: 11 (.google.ai.generativelanguage.v1beta.Dataset)
     # Field: hyperparameters Type: 11 (.google.ai.generativelanguage.v1beta.Hyperparameters)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TunedModel::TuningTask - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TunedModel;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TunedModel::TuningTask->new(
-        start_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<complete_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<snapshots>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TuningSnapshot)
-
-=item * B<training_data>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Dataset)
-
-=item * B<hyperparameters>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Hyperparameters)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TunedModel::Hyperparameters ===
     # Fields for Hyperparameters
     # Field: learning_rate Type: 2 ()
@@ -447,138 +281,18 @@ Type: Message (.google.ai.generativelanguage.v1beta.Hyperparameters)
     # Field: epoch_count Type: 5 ()
     # Field: batch_size Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TunedModel::Hyperparameters - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TunedModel;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TunedModel::Hyperparameters->new(
-        learning_rate => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<learning_rate>
-
-Type: Float
-
-=item * B<learning_rate_multiplier>
-
-Type: Float
-
-=item * B<epoch_count>
-
-Type: Int32
-
-=item * B<batch_size>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TunedModel::Dataset ===
     # Fields for Dataset
     # Field: examples Type: 11 (.google.ai.generativelanguage.v1beta.TuningExamples)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TunedModel::Dataset - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TunedModel;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TunedModel::Dataset->new(
-        examples => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<examples>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TuningExamples)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExamples ===
     # Fields for TuningExamples
     # Field: examples Type: 11 (.google.ai.generativelanguage.v1beta.TuningExample)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExamples - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TunedModel;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExamples->new(
-        examples => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<examples>
-
-Type: Message (.google.ai.generativelanguage.v1beta.TuningExample)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExample ===
     # Fields for TuningExample
     # Field: text_input Type: 9 ()
     # Field: output Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExample - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::TunedModel;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExample->new(
-        text_input => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<text_input>
-
-Type: String
-
-=item * B<output>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::TunedModel::TuningSnapshot ===
     # Fields for TuningSnapshot
@@ -587,55 +301,397 @@ Type: String
     # Field: mean_loss Type: 2 ()
     # Field: compute_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::TunedModel::TuningSnapshot - Compiled Protocol Buffers message class
+Google::Ai::Generativelanguage::V1beta::TunedModel - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/tuned_model.proto
 
 =head1 SYNOPSIS
 
     use Google::Ai::Generativelanguage::V1beta::TunedModel;
 
-    my $msg = Google::Ai::Generativelanguage::V1beta::TunedModel::TuningSnapshot->new(
-        step => $value,
-    );
+    my $msg = Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel->new({
+        tuned_model_source => $tuned_model_source,
+        base_model => $base_model,
+        name => $name,
+        display_name => $display_name,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->tuned_model_source();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel->parse($bytes);
 
-=item * B<step>
-
-Type: Int32
-
-=item * B<epoch>
-
-Type: Int32
-
-=item * B<mean_loss>
-
-Type: Float
-
-=item * B<compute_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::TunedModel - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/tuned_model.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModel
+
+A fine-tuned model created using ModelService.CreateTunedModel.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tuned_model_source() >> / C<< $msg->tuned_model_source($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModelSource>)
+
+Optional. TunedModel to use as the starting point for training the new
+model.
+
+=item * C<< $msg->base_model() >> / C<< $msg->base_model($value) >>
+
+Type: C<String>
+
+Immutable. The name of the `Model` to tune.
+Example: `models/gemini-1.5-flash-001`
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The tuned model name. A unique name will be generated on
+create. Example: `tunedModels/az2mb0bpw6i` If display_name is set on
+create, the id portion of the name will be set by concatenating the words
+of the display_name with hyphens and adding a random portion for
+uniqueness.
+
+Example:
+
+ * display_name = `Sentence Translator`
+ * name = `tunedModels/sentence-translator-u3b7m`
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. The name to display for this model in user interfaces.
+The display name must be up to 40 characters including spaces.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. A short description of this model.
+
+=item * C<< $msg->temperature() >> / C<< $msg->temperature($value) >>
+
+Type: C<Float>
+
+Optional. Controls the randomness of the output.
+
+Values can range over `[0.0,1.0]`, inclusive. A value closer to `1.0` will
+produce responses that are more varied, while a value closer to `0.0` will
+typically result in less surprising responses from the model.
+
+This value specifies default to be the one used by the base model while
+creating the model.
+
+=item * C<< $msg->top_p() >> / C<< $msg->top_p($value) >>
+
+Type: C<Float>
+
+Optional. For Nucleus sampling.
+
+Nucleus sampling considers the smallest set of tokens whose probability
+sum is at least `top_p`.
+
+This value specifies default to be the one used by the base model while
+creating the model.
+
+=item * C<< $msg->top_k() >> / C<< $msg->top_k($value) >>
+
+Type: C<Int32>
+
+Optional. For Top-k sampling.
+
+Top-k sampling considers the set of `top_k` most probable tokens.
+This value specifies default to be used by the backend while making the
+call to the model.
+
+This value specifies default to be the one used by the base model while
+creating the model.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::State>)
+
+Output only. The state of the tuned model.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when this model was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when this model was updated.
+
+=item * C<< $msg->tuning_task() >> / C<< $msg->tuning_task($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::TuningTask>)
+
+Required. The tuning task that creates the tuned model.
+
+=item * C<< $msg->reader_project_numbers() >> / C<< $msg->reader_project_numbers($value) >>
+
+Type: C<Int64>
+
+Optional. List of project numbers that have read access to the tuned model.
+
+=back
+
+=head3 Enum: TunedModel::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<FAILED> => C<3>
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TunedModel::TunedModelSource
+
+Tuned model as a source for training a new model.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tuned_model() >> / C<< $msg->tuned_model($value) >>
+
+Type: C<String>
+
+Immutable. The name of the `TunedModel` to use as the starting point for
+training the new model.
+Example: `tunedModels/my-tuned-model`
+
+=item * C<< $msg->base_model() >> / C<< $msg->base_model($value) >>
+
+Type: C<String>
+
+Output only. The name of the base `Model` this `TunedModel` was tuned from.
+Example: `models/gemini-1.5-flash-001`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TunedModel::TuningTask
+
+Tuning tasks that create tuned models.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when tuning this model started.
+
+=item * C<< $msg->complete_time() >> / C<< $msg->complete_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when tuning this model completed.
+
+=item * C<< $msg->snapshots() >> / C<< $msg->snapshots($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::TuningSnapshot>)
+
+Output only. Metrics collected during tuning.
+
+=item * C<< $msg->training_data() >> / C<< $msg->training_data($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::Dataset>)
+
+Required. Input only. Immutable. The model training data.
+
+=item * C<< $msg->hyperparameters() >> / C<< $msg->hyperparameters($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::Hyperparameters>)
+
+Immutable. Hyperparameters controlling the tuning process. If not provided,
+default values will be used.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TunedModel::Hyperparameters
+
+Hyperparameters controlling the tuning process. Read more at
+https://ai.google.dev/docs/model_tuning_guidance
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->learning_rate() >> / C<< $msg->learning_rate($value) >>
+
+Type: C<Float>
+
+Optional. Immutable. The learning rate hyperparameter for tuning.
+If not set, a default of 0.001 or 0.0002 will be calculated based on the
+number of training examples.
+
+=item * C<< $msg->learning_rate_multiplier() >> / C<< $msg->learning_rate_multiplier($value) >>
+
+Type: C<Float>
+
+Optional. Immutable. The learning rate multiplier is used to calculate a
+final learning_rate based on the default (recommended) value. Actual
+learning rate := learning_rate_multiplier * default learning rate Default
+learning rate is dependent on base model and dataset size. If not set, a
+default of 1.0 will be used.
+
+=item * C<< $msg->epoch_count() >> / C<< $msg->epoch_count($value) >>
+
+Type: C<Int32>
+
+Immutable. The number of training epochs. An epoch is one pass through the
+training data. If not set, a default of 5 will be used.
+
+=item * C<< $msg->batch_size() >> / C<< $msg->batch_size($value) >>
+
+Type: C<Int32>
+
+Immutable. The batch size hyperparameter for tuning.
+If not set, a default of 4 or 16 will be used based on the number of
+training examples.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TunedModel::Dataset
+
+Dataset for training or validation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->examples() >> / C<< $msg->examples($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExamples>)
+
+Optional. Inline examples with simple input/output text.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExamples
+
+A set of tuning examples. Can be training or validation data.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->examples() >> / C<< $msg->examples($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExample>)
+
+The examples. Example input can be for text or discuss, but all examples
+in a set must be of the same type.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TunedModel::TuningExample
+
+A single example for tuning.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->text_input() >> / C<< $msg->text_input($value) >>
+
+Type: C<String>
+
+Optional. Text model input.
+
+=item * C<< $msg->output() >> / C<< $msg->output($value) >>
+
+Type: C<String>
+
+Required. The expected model output.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::TunedModel::TuningSnapshot
+
+Record for a single tuning step.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->step() >> / C<< $msg->step($value) >>
+
+Type: C<Int32>
+
+Output only. The tuning step.
+
+=item * C<< $msg->epoch() >> / C<< $msg->epoch($value) >>
+
+Type: C<Int32>
+
+Output only. The epoch this step was part of.
+
+=item * C<< $msg->mean_loss() >> / C<< $msg->mean_loss($value) >>
+
+Type: C<Float>
+
+Output only. The mean loss of the training examples for this step.
+
+=item * C<< $msg->compute_time() >> / C<< $msg->compute_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when this metric was computed.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::TunedModel::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

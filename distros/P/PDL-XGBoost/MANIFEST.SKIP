@@ -1,0 +1,9 @@
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^blib/
+^pm_to_blib$
+^XGBoost\.c$
+^XGBoost\.bs$
+\.o$
+^PDL-XGBoost-

@@ -1,0 +1,40 @@
+Changes
+lib/Google/Cloud/Gkebackup/V1.pm
+lib/Google/Cloud/Gkebackup/V1/Backup.pm
+lib/Google/Cloud/Gkebackup/V1/Backup/Types.pm
+lib/Google/Cloud/Gkebackup/V1/BackupChannel.pm
+lib/Google/Cloud/Gkebackup/V1/BackupChannel/Types.pm
+lib/Google/Cloud/Gkebackup/V1/BackupForGKEClient.pm
+lib/Google/Cloud/Gkebackup/V1/BackupPlan.pm
+lib/Google/Cloud/Gkebackup/V1/BackupPlan/Types.pm
+lib/Google/Cloud/Gkebackup/V1/BackupPlanBinding.pm
+lib/Google/Cloud/Gkebackup/V1/BackupPlanBinding/Types.pm
+lib/Google/Cloud/Gkebackup/V1/Common.pm
+lib/Google/Cloud/Gkebackup/V1/Common/Types.pm
+lib/Google/Cloud/Gkebackup/V1/Gkebackup.pm
+lib/Google/Cloud/Gkebackup/V1/Gkebackup/Types.pm
+lib/Google/Cloud/Gkebackup/V1/Restore.pm
+lib/Google/Cloud/Gkebackup/V1/Restore/Types.pm
+lib/Google/Cloud/Gkebackup/V1/RestoreChannel.pm
+lib/Google/Cloud/Gkebackup/V1/RestoreChannel/Types.pm
+lib/Google/Cloud/Gkebackup/V1/RestorePlan.pm
+lib/Google/Cloud/Gkebackup/V1/RestorePlan/Types.pm
+lib/Google/Cloud/Gkebackup/V1/RestorePlanBinding.pm
+lib/Google/Cloud/Gkebackup/V1/RestorePlanBinding/Types.pm
+lib/Google/Cloud/Gkebackup/V1/Volume.pm
+lib/Google/Cloud/Gkebackup/V1/Volume/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-BackupForGKE.t
+t/01-service-Default.t
+t/02-rest-transport-BackupForGKE.t
+t/02-rest-transport-Default.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

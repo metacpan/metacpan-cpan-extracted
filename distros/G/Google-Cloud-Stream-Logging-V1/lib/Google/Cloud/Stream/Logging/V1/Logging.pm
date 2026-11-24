@@ -1,0 +1,345 @@
+package Google::Cloud::Stream::Logging::V1::Logging;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+Cixnb29nbGUvY2xvdWQvc3RyZWFtL2xvZ2dpbmcvdjEvbG9nZ2luZy5wcm90bxIeZ29vZ2xl
+LmNsb3VkLnN0cmVhbS5sb2dnaW5nLnYxGh9nb29nbGUvcHJvdG9idWYvdGltZXN0YW1wLnBy
+b3RvIqMCChFPcGVyYXRpb25FdmVudExvZxJRCgpldmVudF90eXBlGAEgASgOMjIuZ29vZ2xl
+LmNsb3VkLnN0cmVhbS5sb2dnaW5nLnYxLk9wZXJhdGlvbkV2ZW50VHlwZVIJZXZlbnRUeXBl
+EjkKCmV2ZW50X3RpbWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wUglldmVu
+dFRpbWUSHAoJb3BlcmF0aW9uGAMgASgJUglvcGVyYXRpb24SYgoTb3BlcmF0aW9uX2FydGlm
+YWN0cxgEIAMoCzIxLmdvb2dsZS5jbG91ZC5zdHJlYW0ubG9nZ2luZy52MS5PcGVyYXRpb25B
+cnRpZmFjdFISb3BlcmF0aW9uQXJ0aWZhY3RzIlsKEU9wZXJhdGlvbkFydGlmYWN0EiMKDWFy
+dGlmYWN0X3R5cGUYASABKAlSDGFydGlmYWN0VHlwZRIhCgxhcnRpZmFjdF91cmkYAiABKAlS
+C2FydGlmYWN0VXJpIrwBCg9TZXNzaW9uRXZlbnRMb2cSTwoKZXZlbnRfdHlwZRgBIAEoDjIw
+Lmdvb2dsZS5jbG91ZC5zdHJlYW0ubG9nZ2luZy52MS5TZXNzaW9uRXZlbnRUeXBlUglldmVu
+dFR5cGUSOQoKZXZlbnRfdGltZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBS
+CWV2ZW50VGltZRIdCgpzZXNzaW9uX2lkGAMgASgJUglzZXNzaW9uSWQqmAUKEk9wZXJhdGlv
+bkV2ZW50VHlwZRIkCiBPUEVSQVRJT05fRVZFTlRfVFlQRV9VTlNQRUNJRklFRBAAEioKJk9Q
+RVJBVElPTl9FVkVOVF9DUkVBVEVfQ09OVEVOVF9TVEFSVEVEEAESKAokT1BFUkFUSU9OX0VW
+RU5UX0NSRUFURV9DT05URU5UX0VOREVEEAISKQolT1BFUkFUSU9OX0VWRU5UX0JVSUxEX0NP
+TlRFTlRfU1RBUlRFRBADEicKI09QRVJBVElPTl9FVkVOVF9CVUlMRF9DT05URU5UX0VOREVE
+EAQSKgomT1BFUkFUSU9OX0VWRU5UX1VQREFURV9DT05URU5UX1NUQVJURUQQBRIoCiRPUEVS
+QVRJT05fRVZFTlRfVVBEQVRFX0NPTlRFTlRfRU5ERUQQBhIqCiZPUEVSQVRJT05fRVZFTlRf
+REVMRVRFX0NPTlRFTlRfU1RBUlRFRBAHEigKJE9QRVJBVElPTl9FVkVOVF9ERUxFVEVfQ09O
+VEVOVF9FTkRFRBAIEisKJ09QRVJBVElPTl9FVkVOVF9DUkVBVEVfSU5TVEFOQ0VfU1RBUlRF
+RBAJEikKJU9QRVJBVElPTl9FVkVOVF9DUkVBVEVfSU5TVEFOQ0VfRU5ERUQQChIrCidPUEVS
+QVRJT05fRVZFTlRfVVBEQVRFX0lOU1RBTkNFX1NUQVJURUQQCxIpCiVPUEVSQVRJT05fRVZF
+TlRfVVBEQVRFX0lOU1RBTkNFX0VOREVEEAwSKwonT1BFUkFUSU9OX0VWRU5UX0RFTEVURV9J
+TlNUQU5DRV9TVEFSVEVEEA0SKQolT1BFUkFUSU9OX0VWRU5UX0RFTEVURV9JTlNUQU5DRV9F
+TkRFRBAOKuUJChBTZXNzaW9uRXZlbnRUeXBlEiIKHlNFU1NJT05fRVZFTlRfVFlQRV9VTlNQ
+RUNJRklFRBAAEi8KK1NFU1NJT05fRVZFTlRfU0VSVkVSX1NUUkVBTUVSX1NIVVRUSU5HX0RP
+V04QARInCiNTRVNTSU9OX0VWRU5UX1NFUlZFUl9TVFJFQU1FUl9SRUFEWRACEjAKLFNFU1NJ
+T05fRVZFTlRfU0VSVkVSX1NUUkVBTUVSX0JJTkFSWV9TVEFSVEVEEAMSNgoyU0VTU0lPTl9F
+VkVOVF9TRVJWRVJfU1RSRUFNRVJfUkVBRF9QT0RfSU1BR0VfTkFNRVMQBBIzCi9TRVNTSU9O
+X0VWRU5UX1NFUlZFUl9TVFJFQU1FUl9DT05ORUNURURfVE9fR0FNRRAFEjUKMVNFU1NJT05f
+RVZFTlRfU0VSVkVSX1NUUkVBTUVSX0NPTk5FQ1RFRF9UT19DTElFTlQQBhI6CjZTRVNTSU9O
+X0VWRU5UX1NFUlZFUl9TVFJFQU1FUl9ESVNDT05ORUNURURfRlJPTV9DTElFTlQQBxJBCj1T
+RVNTSU9OX0VWRU5UX1NFUlZFUl9TVFJFQU1FUl9SRUNFSVZFRF9DUkVBVEVfU0VTU0lPTl9S
+RVFVRVNUEAgSPAo4U0VTU0lPTl9FVkVOVF9TRVJWRVJfU1RSRUFNRVJfR0FNRV9NRVNTQUdF
+X1NUUkVBTV9DTE9TRUQQCRI6CjZTRVNTSU9OX0VWRU5UX1NFUlZFUl9TVFJFQU1FUl9HQU1F
+X0ZSQU1FX1NUUkVBTV9DTE9TRUQQChI7CjdTRVNTSU9OX0VWRU5UX1NFUlZFUl9TVFJFQU1F
+Ul9HQU1FX01FU1NBR0VfU1RSRUFNX0VSUk9SEAsSOQo1U0VTU0lPTl9FVkVOVF9TRVJWRVJf
+U1RSRUFNRVJfR0FNRV9BVURJT19TVFJFQU1fRVJST1IQDBI6CjZTRVNTSU9OX0VWRU5UX1NF
+UlZFUl9TVFJFQU1FUl9HQU1FX0FVRElPX1NUUkVBTV9DTE9TRUQQDRI5CjVTRVNTSU9OX0VW
+RU5UX1NFUlZFUl9TVFJFQU1FUl9HQU1FX0ZSQU1FX1NUUkVBTV9FUlJPUhAOEkEKPVNFU1NJ
+T05fRVZFTlRfU0VSVkVSX0dBTUVfRElTQ09OTkVDVElOR19BRlRFUl9QQVVTRURfVE9PX0xP
+TkcQDxJDCj9TRVNTSU9OX0VWRU5UX1NFUlZFUl9TVFJFQU1FUl9SRUNFSVZFRF9FWFBFUklN
+RU5UX0NPTkZJR1VSQVRJT04QEBI6CjZTRVNTSU9OX0VWRU5UX1NFUlZFUl9HQU1FX0NPTk5F
+Q1RFRF9UT19MT0dHSU5HX1NFUlZJQ0UQERI8CjhTRVNTSU9OX0VWRU5UX1NFUlZFUl9TVFJF
+QU1FUl9ERVRFUk1JTkVEX1NFU1NJT05fT1BUSU9OUxASEj0KOVNFU1NJT05fRVZFTlRfU0VS
+VkVSX1NUUkVBTUVSX0tJTExFRF9JTl9NSURETEVfT0ZfU0VTU0lPThATEjQKMFNFU1NJT05f
+RVZFTlRfU0VSVkVSX0dBTUVfVVBEQVRFRF9GUkFNRV9QSVBFTElORRAUEh4KGlNFU1NJT05f
+RVZFTlRfU0VSVkVSX0VSUk9SEBVCcgoiY29tLmdvb2dsZS5jbG91ZC5zdHJlYW0ubG9nZ2lu
+Zy52MUIMTG9nZ2luZ1Byb3RvUAFaPGNsb3VkLmdvb2dsZS5jb20vZ28vc3RyZWFtL2xvZ2dp
+bmcvYXBpdjEvbG9nZ2luZ3BiO2xvZ2dpbmdwYkqpLQoHEgUOALcBAQq8BAoBDBIDDgASMrEE
+IENvcHlyaWdodCAyMDI1IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hl
+IExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVz
+ZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlv
+dSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3
+LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkg
+YXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0
+cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMi
+IEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQs
+IGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBz
+cGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9u
+cyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAJwoJCgIDABIDEgApCggKAQgSAxQAUwoJ
+CgIICxIDFABTCggKAQgSAxUAIgoJCgIIChIDFQAiCggKAQgSAxYALQoJCgIICBIDFgAtCggK
+AQgSAxcAOwoJCgIIARIDFwA7CvYBCgIEABIEHQApARrpASBPcGVyYXRpb25FdmVudExvZyBj
+b250YWlucyB0aGUgdGltZSBzZXJpZXMgZGF0YSBvZiB0aGUgb3BlcmF0aW9ucyBvbiB0aGUK
+IHN0cmVhbSByZXNvdXJjZXMuIEludGVybmFsbHksIHRoZXNlIGxvZ3MgcmVwcmVzZW50IGV2
+ZW50cyBoYXBwZW5pbmcgaW4KIHRoZSBjb250cm9sIHBsYW5lIGFzIHJlc3VsdCBvZiBBUEkg
+aW52b2NhdGlvbnMgYWdhaW5zdCB0aGUgc3RyZWFtIHJlc291cmNlCiBlbnRpdGllcy4KCgoK
+AwQAARIDHQgZCjMKBAQAAgASAx8CJBomIEVudW0gZm9yIHR5cGUgb2YgZXZlbnQgYmVpbmcg
+bG9nZ2VkLgoKDAoFBAACAAYSAx8CFAoMCgUEAAIAARIDHxUfCgwKBQQAAgADEgMfIiMKMQoE
+BAACARIDIgIrGiQgVGltZXN0YW1wIHdoZW4gdGhlIGV2ZW50IG9jY3VycmVkLgoKDAoFBAAC
+AQYSAyICGwoMCgUEAAIBARIDIhwmCgwKBQQAAgEDEgMiKSoKLQoEBAACAhIDJQIXGiAgT3Bl
+cmF0aW9uIHJlc291cmNlIGlkZW50aWZpZXIuCgoMCgUEAAICBRIDJQIICgwKBQQAAgIBEgMl
+CRIKDAoFBAACAgMSAyUVFgo9CgQEAAIDEgMoAjUaMCBBcnRpZmFjdCBjcmVhdGVkIGFzIGEg
+cmVzdWx0IG9mIHRoZSBvcGVyYXRpb24uCgoMCgUEAAIDBBIDKAIKCgwKBQQAAgMGEgMoCxwK
+DAoFBAACAwESAygdMAoMCgUEAAIDAxIDKDM0CnAKAgQBEgQtADMBGmQgT3BlcmF0aW9uQXJ0
+aWZhY3QgY29udGFpbnMgdGhlIGluZm9ybWF0aW9uIGFib3V0IHRoZSBhcnRpZmFjdCBjcmVh
+dGVkIGFzCiByZXN1bHQgb2YgdGhlIG9wZXJhdGlvbi4KCgoKAwQBARIDLQgZCiQKBAQBAgAS
+Ay8CGxoXIFR5cGUgb2YgdGhlIGFydGlmYWN0LgoKDAoFBAECAAUSAy8CCAoMCgUEAQIAARID
+LwkWCgwKBQQBAgADEgMvGRoKKAoEBAECARIDMgIaGhsgTG9jYXRpb24gb2YgdGhlIGFydGlm
+YWN0LgoKDAoFBAECAQUSAzICCAoMCgUEAQIBARIDMgkVCgwKBQQBAgEDEgMyGBkKiQIKAgQC
+EgQ5AEIBGvwBIFNlc3Npb25FdmVudExvZyBjb250YWlucyB0aGUgdGltZSBzZXJpZXMgZGF0
+YSByZWdhcmRpbmcgdGhlIHN0cmVhbWluZyBzZXNzaW9uCiB0byBzZXJ2ZSB0aGUgZW5kIGNv
+bnN1bWVyLiBJbnRlcm5hbGx5LCB0aGVzZSBsb2dzIHJlcHJlc2VudCBldmVudHMgaW4gdGhl
+CiBkYXRhIHBsYW5lIHN0cmVhbWVyIGluc3RhbmNlIGFzIGEgcmVzdWx0IG9mIGVuZCBjb25z
+dW1lciBpbnRlcmFjdGluZyB3aXRoIHRoZQogc3RyZWFtIHJlc291cmNlcy4KCgoKAwQCARID
+OQgXCjMKBAQCAgASAzsCIhomIEVudW0gZm9yIHR5cGUgb2YgZXZlbnQgYmVpbmcgbG9nZ2Vk
+LgoKDAoFBAICAAYSAzsCEgoMCgUEAgIAARIDOxMdCgwKBQQCAgADEgM7ICEKMQoEBAICARID
+PgIrGiQgVGltZXN0YW1wIHdoZW4gdGhlIGV2ZW50IG9jY3VycmVkLgoKDAoFBAICAQYSAz4C
+GwoMCgUEAgIBARIDPhwmCgwKBQQCAgEDEgM+KSoKPAoEBAICAhIDQQIYGi8gU2Vzc2lvbiBp
+ZGVudGlmaWVyIGdlbmVyYXRlZCBmcm9tIHRoZSBzZXJ2ZXIuCgoMCgUEAgICBRIDQQIICgwK
+BQQCAgIBEgNBCRMKDAoFBAICAgMSA0EWFwpOCgIFABIERQByARpCIE9wZXJhdGlvbkV2ZW50
+VHlwZSBpcyB0aGUgZW51bSB2YWx1ZSBmb3IgdGhlIHN0YXRlIG9mIG9wZXJhdGlvbi4KCgoK
+AwUAARIDRQUXCjAKBAUAAgASA0cCJxojIFVuc3BlY2lmaWVkIG9wZXJhdGlvbiBldmVudCB0
+eXBlLgoKDAoFBQACAAESA0cCIgoMCgUFAAIAAhIDRyUmCjsKBAUAAgESA0oCLRouIE9wZXJh
+dGlvbiBmb3IgY3JlYXRlIHN0cmVhbSBjb250ZW50IHN0YXJ0ZWQuCgoMCgUFAAIBARIDSgIo
+CgwKBQUAAgECEgNKKywKOQoEBQACAhIDTQIrGiwgT3BlcmF0aW9uIGZvciBjcmVhdGUgc3Ry
+ZWFtIGNvbnRlbnQgZW5kZWQuCgoMCgUFAAICARIDTQImCgwKBQUAAgICEgNNKSoKOgoEBQAC
+AxIDUAIsGi0gT3BlcmF0aW9uIGZvciBidWlsZCBzdHJlYW0gY29udGVudCBzdGFydGVkLgoK
+DAoFBQACAwESA1ACJwoMCgUFAAIDAhIDUCorCjgKBAUAAgQSA1MCKhorIE9wZXJhdGlvbiBm
+b3IgYnVpbGQgc3RyZWFtIGNvbnRlbnQgZW5kZWQuCgoMCgUFAAIEARIDUwIlCgwKBQUAAgQC
+EgNTKCkKOwoEBQACBRIDVgItGi4gT3BlcmF0aW9uIGZvciB1cGRhdGUgc3RyZWFtIGNvbnRl
+bnQgc3RhcnRlZC4KCgwKBQUAAgUBEgNWAigKDAoFBQACBQISA1YrLAo5CgQFAAIGEgNZAisa
+LCBPcGVyYXRpb24gZm9yIHVwZGF0ZSBzdHJlYW0gY29udGVudCBlbmRlZC4KCgwKBQUAAgYB
+EgNZAiYKDAoFBQACBgISA1kpKgo7CgQFAAIHEgNcAi0aLiBPcGVyYXRpb24gZm9yIGRlbGV0
+ZSBzdHJlYW0gY29udGVudCBzdGFydGVkLgoKDAoFBQACBwESA1wCKAoMCgUFAAIHAhIDXCss
+CjkKBAUAAggSA18CKxosIE9wZXJhdGlvbiBmb3IgZGVsZXRlIHN0cmVhbSBjb250ZW50IGVu
+ZGVkLgoKDAoFBQACCAESA18CJgoMCgUFAAIIAhIDXykqCjwKBAUAAgkSA2ICLhovIE9wZXJh
+dGlvbiBmb3IgY3JlYXRlIHN0cmVhbSBpbnN0YW5jZSBzdGFydGVkLgoKDAoFBQACCQESA2IC
+KQoMCgUFAAIJAhIDYiwtCjoKBAUAAgoSA2UCLRotIE9wZXJhdGlvbiBmb3IgY3JlYXRlIHN0
+cmVhbSBpbnN0YW5jZSBlbmRlZC4KCgwKBQUAAgoBEgNlAicKDAoFBQACCgISA2UqLAo8CgQF
+AAILEgNoAi8aLyBPcGVyYXRpb24gZm9yIHVwZGF0ZSBzdHJlYW0gaW5zdGFuY2Ugc3RhcnRl
+ZC4KCgwKBQUAAgsBEgNoAikKDAoFBQACCwISA2gsLgo6CgQFAAIMEgNrAi0aLSBPcGVyYXRp
+b24gZm9yIHVwZGF0ZSBzdHJlYW0gaW5zdGFuY2UgZW5kZWQuCgoMCgUFAAIMARIDawInCgwK
+BQUAAgwCEgNrKiwKPAoEBQACDRIDbgIvGi8gT3BlcmF0aW9uIGZvciBkZWxldGUgc3RyZWFt
+IGluc3RhbmNlIHN0YXJ0ZWQuCgoMCgUFAAINARIDbgIpCgwKBQUAAg0CEgNuLC4KOgoEBQAC
+DhIDcQItGi0gT3BlcmF0aW9uIGZvciBkZWxldGUgc3RyZWFtIGluc3RhbmNlIGVuZGVkLgoK
+DAoFBQACDgESA3ECJwoMCgUFAAIOAhIDcSosCksKAgUBEgV1ALcBARo+IFNlc3Npb25FdmVu
+dFR5cGUgaXMgdGhlIGVudW0gdmFsdWUgZm9yIHRoZSBzdGF0ZSBvZiBzZXNzaW9uLgoKCgoD
+BQEBEgN1BRUKLgoEBQECABIDdwIlGiEgVW5zcGVjaWZpZWQgc2Vzc2lvbiBldmVudCB0eXBl
+LgoKDAoFBQECAAESA3cCIAoMCgUFAQIAAhIDdyMkCjcKBAUBAgESA3oCMhoqIFNlc3Npb24g
+aW4gc3RyZWFtZXIgc2h1dHRpbmcgZG93biBzdGF0ZS4KCgwKBQUBAgEBEgN6Ai0KDAoFBQEC
+AQISA3owMQovCgQFAQICEgN9AioaIiBTZXNzaW9uIGluIHN0cmVhbWVyIHJlYWR5IHN0YXRl
+LgoKDAoFBQECAgESA30CJQoMCgUFAQICAhIDfSgpCjkKBAUBAgMSBIABAjMaKyBTZXNzaW9u
+IGluIHN0cmVhbWVyIGJpbmFyeSBzdGFydGVkIHN0YXRlLgoKDQoFBQECAwESBIABAi4KDQoF
+BQECAwISBIABMTIKPwoEBQECBBIEgwECORoxIFNlc3Npb24gaW4gc3RyZWFtZXIgcmVhZCBw
+b2QgaW1hZ2UgbmFtZXMgc3RhdGUuCgoNCgUFAQIEARIEgwECNAoNCgUFAQIEAhIEgwE3OAo8
+CgQFAQIFEgSGAQI2Gi4gU2Vzc2lvbiBpbiBzdHJlYW1lciBjb25uZWN0ZWQgdG8gZ2FtZSBz
+dGF0ZS4KCg0KBQUBAgUBEgSGAQIxCg0KBQUBAgUCEgSGATQ1Cj4KBAUBAgYSBIkBAjgaMCBT
+ZXNzaW9uIGluIHN0cmVhbWVyIGNvbm5lY3RlZCB0byBjbGllbnQgc3RhdGUuCgoNCgUFAQIG
+ARIEiQECMwoNCgUFAQIGAhIEiQE2NwpDCgQFAQIHEgSMAQI9GjUgU2Vzc2lvbiBpbiBzdHJl
+YW1lciBkaXNjb25uZWN0ZWQgZnJvbSBjbGllbnQgc3RhdGUuCgoNCgUFAQIHARIEjAECOAoN
+CgUFAQIHAhIEjAE7PApKCgQFAQIIEgSPAQJEGjwgU2Vzc2lvbiBpbiBzdHJlYW1lciByZWNl
+aXZlZCBjcmVhdGUgc2Vzc2lvbiByZXF1ZXN0IHN0YXRlLgoKDQoFBQECCAESBI8BAj8KDQoF
+BQECCAISBI8BQkMKSAoEBQECCRIEkgECPxo6IFNlc3Npb24gaW4gc3RyZWFtZXIgZ2FtZSBt
+ZXNzYWdlIHRvIHN0cmVhbSBjbG9zZWQgc3RhdGUuCgoNCgUFAQIJARIEkgECOgoNCgUFAQIJ
+AhIEkgE9PgpDCgQFAQIKEgSVAQI+GjUgU2Vzc2lvbiBpbiBzdHJlYW1lciBnYW1lIGZyYW1l
+IHN0cmVhbSBjbG9zZWQgc3RhdGUuCgoNCgUFAQIKARIElQECOAoNCgUFAQIKAhIElQE7PQpE
+CgQFAQILEgSYAQI/GjYgU2Vzc2lvbiBpbiBzdHJlYW1lciBnYW1lIG1lc3NhZ2Ugc3RyZWFt
+IGVycm9yIHN0YXRlLgoKDQoFBQECCwESBJgBAjkKDQoFBQECCwISBJgBPD4KQgoEBQECDBIE
+mwECPRo0IFNlc3Npb24gaW4gc3RyZWFtZXIgZ2FtZSBhdWRpbyBzdHJlYW0gZXJyb3Igc3Rh
+dGUuCgoNCgUFAQIMARIEmwECNwoNCgUFAQIMAhIEmwE6PApDCgQFAQINEgSeAQI+GjUgU2Vz
+c2lvbiBpbiBzdHJlYW1lciBnYW1lIGF1ZGlvIHN0cmVhbSBjbG9zZWQgc3RhdGUuCgoNCgUF
+AQINARIEngECOAoNCgUFAQINAhIEngE7PQpCCgQFAQIOEgShAQI9GjQgU2Vzc2lvbiBpbiBz
+dHJlYW1lciBnYW1lIGZyYW1lIHN0cmVhbSBlcnJvciBzdGF0ZS4KCg0KBQUBAg4BEgShAQI3
+Cg0KBQUBAg4CEgShATo8CkoKBAUBAg8SBKQBAkUaPCBTZXNzaW9uIGluIGdhbWUgZGlzY29u
+bmVjdGluZyBhZnRlciBwYXVzZWQgdG9vIGxvbmcgc3RhdGUuCgoNCgUFAQIPARIEpAECPwoN
+CgUFAQIPAhIEpAFCRApMCgQFAQIQEgSnAQJHGj4gU2Vzc2lvbiBpbiBzdHJlYW1lciByZWNl
+aXZlZCBleHBlcmltZW50IGNvbmZpZ3VyYXRpb24gc3RhdGUuCgoNCgUFAQIQARIEpwECQQoN
+CgUFAQIQAhIEpwFERgpDCgQFAQIREgSqAQI+GjUgU2Vzc2lvbiBpbiBnYW1lIGNvbm5lY3Rl
+ZCB0byBsb2dnaW5nIHNlcnZpY2Ugc3RhdGUuCgoNCgUFAQIRARIEqgECOAoNCgUFAQIRAhIE
+qgE7PQpFCgQFAQISEgStAQJAGjcgU2Vzc2lvbiBpbiBzdHJlYW1lciBkZXRlcm1pbmVkIHNl
+c3Npb24gb3B0aW9ucyBzdGF0ZS4KCg0KBQUBAhIBEgStAQI6Cg0KBQUBAhICEgStAT0/CkYK
+BAUBAhMSBLABAkEaOCBTZXNzaW9uIGluIHN0cmVhbWVyIGtpbGxlZCBpbiBtaWRkbGUgb2Yg
+c2Vzc2lvbiBzdGF0ZS4KCg0KBQUBAhMBEgSwAQI7Cg0KBQUBAhMCEgSwAT5ACj0KBAUBAhQS
+BLMBAjgaLyBTZXNzaW9uIGluIGdhbWUgdXBkYXRlZCBmcmFtZSBwaXBlbGluZSBzdGF0ZS4K
+Cg0KBQUBAhQBEgSzAQIyCg0KBQUBAhQCEgSzATU3Ci4KBAUBAhUSBLYBAiIaICBTZXNzaW9u
+IGluIHNlcnZlciBlcnJvciBzdGF0ZS4KCg0KBQUBAhUBEgS2AQIcCg0KBQUBAhUCEgS2AR8h
+YgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Stream::Logging::V1::Logging::OperationEventLog ===
+    # Fields for OperationEventLog
+    # Field: event_type Type: 14 (.google.cloud.stream.logging.v1.OperationEventType)
+    # Field: event_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: operation Type: 9 ()
+    # Field: operation_artifacts Type: 11 (.google.cloud.stream.logging.v1.OperationArtifact)
+
+# === Message: Google::Cloud::Stream::Logging::V1::Logging::OperationArtifact ===
+    # Fields for OperationArtifact
+    # Field: artifact_type Type: 9 ()
+    # Field: artifact_uri Type: 9 ()
+
+# === Message: Google::Cloud::Stream::Logging::V1::Logging::SessionEventLog ===
+    # Fields for SessionEventLog
+    # Field: event_type Type: 14 (.google.cloud.stream.logging.v1.SessionEventType)
+    # Field: event_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: session_id Type: 9 ()
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Stream::Logging::V1::Logging - Compiled Protocol Buffers messages for google/cloud/stream/logging/v1/logging.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Stream::Logging::V1::Logging;
+
+    my $msg = Google::Cloud::Stream::Logging::V1::Logging::OperationEventLog->new({
+        event_type => $event_type,
+        event_time => $event_time,
+        operation => $operation,
+        operation_artifacts => $operation_artifacts,
+    });
+
+    # Read or update a field
+    my $val = $msg->event_type();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Stream::Logging::V1::Logging::OperationEventLog->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/stream/logging/v1/logging.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Stream::Logging::V1::Logging::OperationEventLog
+
+OperationEventLog contains the time series data of the operations on the
+stream resources. Internally, these logs represent events happening in
+the control plane as result of API invocations against the stream resource
+entities.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->event_type() >> / C<< $msg->event_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Stream::Logging::V1::OperationEventType>)
+
+Enum for type of event being logged.
+
+=item * C<< $msg->event_time() >> / C<< $msg->event_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Timestamp when the event occurred.
+
+=item * C<< $msg->operation() >> / C<< $msg->operation($value) >>
+
+Type: C<String>
+
+Operation resource identifier.
+
+=item * C<< $msg->operation_artifacts() >> / C<< $msg->operation_artifacts($value) >>
+
+Type: C<Message> (L<Google::Cloud::Stream::Logging::V1::Logging::OperationArtifact>)
+
+Artifact created as a result of the operation.
+
+=back
+
+=head2 Google::Cloud::Stream::Logging::V1::Logging::OperationArtifact
+
+OperationArtifact contains the information about the artifact created as
+result of the operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->artifact_type() >> / C<< $msg->artifact_type($value) >>
+
+Type: C<String>
+
+Type of the artifact.
+
+=item * C<< $msg->artifact_uri() >> / C<< $msg->artifact_uri($value) >>
+
+Type: C<String>
+
+Location of the artifact.
+
+=back
+
+=head2 Google::Cloud::Stream::Logging::V1::Logging::SessionEventLog
+
+SessionEventLog contains the time series data regarding the streaming session
+to serve the end consumer. Internally, these logs represent events in the
+data plane streamer instance as a result of end consumer interacting with the
+stream resources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->event_type() >> / C<< $msg->event_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Stream::Logging::V1::SessionEventType>)
+
+Enum for type of event being logged.
+
+=item * C<< $msg->event_time() >> / C<< $msg->event_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Timestamp when the event occurred.
+
+=item * C<< $msg->session_id() >> / C<< $msg->session_id($value) >>
+
+Type: C<String>
+
+Session identifier generated from the server.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Stream::Logging::V1::Logging::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

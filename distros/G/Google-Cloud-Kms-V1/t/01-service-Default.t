@@ -50,6 +50,23 @@ my $client = Google::Cloud::Kms::V1->new();
 ok($client, 'Instantiated generated client');
 isa_ok($client->transport, 'Google::gRPC::Client', 'Client transport');
 
+subtest 'create_key_handle method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.kms.v1.Autokey', 'Correct service path');
+        is($args->{method}, 'CreateKeyHandle', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest', 'Request object');
+        
+        my $response = 'Google::Longrunning::Operations::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->create_key_handle();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Longrunning::Operations::Operation', 'Response object class');
+    done_testing();
+};
+
 subtest 'update_autokey_config method' => sub {
     $client->transport->{mock_call} = sub {
         my ($args) = @_;
@@ -98,23 +115,6 @@ subtest 'show_effective_autokey_config method' => sub {
     my $res = $client->show_effective_autokey_config();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Cloud::Kms::V1::AutokeyAdmin::ShowEffectiveAutokeyConfigResponse', 'Response object class');
-    done_testing();
-};
-
-subtest 'create_key_handle method' => sub {
-    $client->transport->{mock_call} = sub {
-        my ($args) = @_;
-        is($args->{service}, 'google.cloud.kms.v1.Autokey', 'Correct service path');
-        is($args->{method}, 'CreateKeyHandle', 'Correct RPC method');
-        isa_ok($args->{request}, 'Google::Cloud::Kms::V1::Autokey::CreateKeyHandleRequest', 'Request object');
-        
-        my $response = 'Google::Longrunning::Operations::Operation'->new();
-        return $response;
-    };
-    
-    my $res = $client->create_key_handle();
-    ok($res, 'Method returned a response');
-    isa_ok($res, 'Google::Longrunning::Operations::Operation', 'Response object class');
     done_testing();
 };
 

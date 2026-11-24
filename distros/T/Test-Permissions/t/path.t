@@ -457,7 +457,8 @@ Test::Permissions::clear_cache();
 like(Test::Permissions::_cache_key('read', $canon), qr/\0dir:/, 'directory scope');
 path('scope.directory');
 Test::Permissions::set_cache_scope('device');
-like(Test::Permissions::_cache_key('read', $canon), qr/\0dev:\d+$/, 'device scope');
+# st_dev can be negative on FreeBSD with older perls (Perl/perl5#18837)
+like(Test::Permissions::_cache_key('read', $canon), qr/\0dev:-?\d+$/, 'device scope');
 path('scope.device');
 like(Test::Permissions::_cache_key('read', "$canon/none"), qr/\0dir:/, 'device scope, stat fails');
 path('scope.device_stat_fails');

@@ -3,15 +3,15 @@ package Net::WoRMS;
 # (C) 2012 by A. Weidauer
 # Contact: alex.weidauer@huckfinn.de
 # ======================================================================
-# ABSTRACT: Bundles functionalities for the tool query-worms.
-
+# ABSTRACT: Service object to query the "World Register of Marine Species" WoRMS.
+# ======================================================================
 =head1 NAME
 
-Net::WoRMS bundles functionalities for the tool query-worms.
+Net::WoRMS provides functions to query the "World Register of Marine Species".
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ Net::WoRMS bundles WEB access, parsing and formatting capabilities for
 the tool L<query-worms|https://metacpan.org>, to harvest information
 form the "World Register of Marine Species" --
 L<http://www.marinespecies.org>. The module was built around the module
-L<SOAP::Lite> and is implemented by a L<Moo> object.
+L<SOAP::Lite> and is OO implemented using L<Moo>.
 
 =cut
 
@@ -30,7 +30,7 @@ use warnings;
 use utf8;
 use open qw(:std :utf8);
 
-our $VERSION = 1.5;
+our $VERSION = 1.7;
 
 =head1 MODULE DEPENDENCIES
 
@@ -55,7 +55,9 @@ Minimal type system for  L<Moo>
 is used for the WEB access and parsing capabilities to retrieve data
 from L<http://www.marinespecies.org>.
 
-=item L<Syntax::Keyword::Match>, to end the switch-case/while-given madness
+=item L<Syntax::Keyword::Match>
+
+to end the switch-case/while-given madness
 
 =back
 
@@ -82,34 +84,34 @@ no warnings 'experimental::signatures';
 
 The access point to retrieve data via the Simple Object Access Protocol.
 
-=item  $APHIA_NS = 'http://aphia/v1.0'
+=item $APHIA_NS = 'http://aphia/v1.0'
 
 Namespace and corresponding URI. In the development context these
 variables are considered as a constants. There are methods to change
 these values but never tested.
 
-=item C<$FORMAT ='TEXT'>
+=item $FORMAT = 'TEXT'
 
 FORMAT defines the default output format.
 
-=item C<@ORDER_SCORE = qw/APHIA_ID ... />
+=item @ORDER_SCORE = qw/APHIA_ID ... /
 
 The array holds field names for SQL related output.
 
-=item C<@ORDER_DOT = qw/APHIA.ID ... />
+=item @ORDER_DOT = qw/APHIA.ID ... /
 
 The array holds field names for TEXT and CSV related output.
 
-=item C<%FORMATS = ( TEXT => 1, SQL  => 2,  CSV  => 3)>
+=item %FORMATS = ( TEXT => 1, SQL  => 2,  CSV  => 3)
 
 The format hash mostly for validation.
 
-=item C<%ORDER_HASH>
+=item %ORDER_HASH
 
 Dictionary to sort and translate the retrieved field names from the
 WoRMS database and bring them into a consistent form.
 
-=item C<@TYPE>
+=item @TYPE
 
 Type array corresponding to C<@ORDER_SCORE/@ORDER_DOT> and the
 C<%ORDER_HASH> to handle quotes and C<NULL> values.
@@ -285,43 +287,43 @@ sub getFormats($self) { return \%FORMATS; }
 
 =over
 
-=item C<checkSoap()>
+=item checkSoap()
 
 Check if the soap client is running. The function stops the calling
 program C<(die ...)> in case of an error.
 
-=item C<checkError($soapResponse)>
+=item checkError($soapResponse)
 
 Checks the SOAP query result. The function stops the calling program in
 case of an communication error.
 
-=item C<checkDebug($queryResult)>
+=item checkDebug($queryResult)
 
 Prints the query result (dictionary) via L<Data::Dumper> to C<STDERR> if
 the debug flag is set.
 
-=item C<searchSpeciesID($name, $print)>
+=item searchSpeciesID($name, $print)
 
 Function to find a species by a certain name. The if the flag C<$print>
 is set. The result will be written to C<STDOUT> on the given format.
 
-=item C<getRecordByID($aphiaID)>
+=item getRecordByID($aphiaID)
 
 Retrieves a record for a given AphiaID and returns a dictionary or
 'dies' with an error.
 
-=item C<getBlockChildrenByID($AphiaID, $offs)>
+=item getBlockChildrenByID($AphiaID, $offs)
 
 Retrieve a set of taxon records under an given AphiaID for a defined
 offset in the query ensemble. The offset addresses a paging pattern.
 
-=item C<getChildrenByID($aphiaID)>
+=item getChildrenByID($aphiaID)
 
 Retrieves all children under a given AphiaID using the method
 C<getBlockChildrenID(...)> and prints the result to C<STDOUT> using the
 method C<printRecord(...)>.
 
-=item C<printRecord($record, $first, $last, $spc)>
+=item printRecord($record, $first, $last, $spc)
 
 Prints a record to C<STDOUT> and handles indentation by C<$spc> as well
 as header and trailing aspects by using the flags C<$first> and C<$last>.

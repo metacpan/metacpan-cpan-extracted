@@ -25,11 +25,11 @@ my $t = 2;
 my @arr = (
 	['1-2','1-2'], # 2
 	['1--2', '1--2'], # 3
-	['1---2', '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}2'], # 4
-	['1----2', '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}-{\hskip0pt plus .02em}2'], # 5
-	['1-----2', '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}--{\hskip0pt plus .02em}2'], # 6
-	['1------2', '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}---{\hskip0pt plus .02em}2'], # 7
-	['1-------2', '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}---{\hskip0pt plus .02em}-{\hskip0pt plus .02em}2'], # 8
+	['1---2', '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/2'], # 4
+	['1----2', '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/-\\hskip0pt plus.02em\\/2'], # 5
+	['1-----2', '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/--\\hskip0pt plus.02em\\/2'], # 6
+	['1------2', '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/2'], # 7
+	['1-------2', '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/-\\hskip0pt plus.02em\\/2'], # 8
 );
 my $r_mflag = [0,0, (0b0111)x5];
 
@@ -54,199 +54,199 @@ for my $v ( undef, 0, '') { # 9,10,11
 my $v = '~$&,%,$,#,_,{,},^,\2qw\ea-sdf-124-590\\\\\\>>>>---1';
 my $r = [
 	#12: tile = 2
-'{\hskip0pt plus .02em}~$&'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}%,$'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}#,_'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}{,}'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}^,\2'.
-'{\hskip0pt plus .02em}qw\ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}5'.
-'{\hskip0pt plus .02em}90\\\\\\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1',
+'\\hskip0pt plus.02em\\/~$&'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/%,$'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/#,_'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/{,}'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/^,\2'.
+'\\hskip0pt plus.02em\\/qw\ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/5'.
+'\\hskip0pt plus.02em\\/90\\\\\\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1',
 
 	#13: tile = 3
-'{\hskip0pt plus .02em}~$&,'.
-'{\hskip0pt plus .02em}%'.
-'{\hskip0pt plus .02em},$,#'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}_,{'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}},^'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\2'.
-'{\hskip0pt plus .02em}qw\ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}5'.
-'{\hskip0pt plus .02em}9'.
-'{\hskip0pt plus .02em}0\\\\\\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1',
+'\\hskip0pt plus.02em\\/~$&,'.
+'\\hskip0pt plus.02em\\/%'.
+'\\hskip0pt plus.02em\\/,$,#'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/_,{'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/},^'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\2'.
+'\\hskip0pt plus.02em\\/qw\ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/5'.
+'\\hskip0pt plus.02em\\/9'.
+'\\hskip0pt plus.02em\\/0\\\\\\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1',
 
 	#14: tile = 4
-'{\hskip0pt plus .02em}~$&,%'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}$,#,_'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}{,},^'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\2'.
-'{\hskip0pt plus .02em}qw\ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}59'.
-'{\hskip0pt plus .02em}0'.
-'{\hskip0pt plus .02em}\\\\\\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1',
+'\\hskip0pt plus.02em\\/~$&,%'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/$,#,_'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/{,},^'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\2'.
+'\\hskip0pt plus.02em\\/qw\ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/59'.
+'\\hskip0pt plus.02em\\/0'.
+'\\hskip0pt plus.02em\\/\\\\\\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1',
 
 	#15: tile = 5
-'{\hskip0pt plus .02em}~$&,%,'.
-'{\hskip0pt plus .02em}$'.
-'{\hskip0pt plus .02em},#,_,{'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}},^'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\2'.
-'{\hskip0pt plus .02em}qw\ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}59'.
-'{\hskip0pt plus .02em}0'.
-'{\hskip0pt plus .02em}\\\\\\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1',
+'\\hskip0pt plus.02em\\/~$&,%,'.
+'\\hskip0pt plus.02em\\/$'.
+'\\hskip0pt plus.02em\\/,#,_,{'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/},^'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\2'.
+'\\hskip0pt plus.02em\\/qw\ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/59'.
+'\\hskip0pt plus.02em\\/0'.
+'\\hskip0pt plus.02em\\/\\\\\\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1',
 
 	#16: tile = 6
-'{\hskip0pt plus .02em}~$&,%,$'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}#,_,{,}'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}^,\2'.
-'{\hskip0pt plus .02em}qw\ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}59'.
-'{\hskip0pt plus .02em}0'.
-'{\hskip0pt plus .02em}\\\\\\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1',
+'\\hskip0pt plus.02em\\/~$&,%,$'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/#,_,{,}'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/^,\2'.
+'\\hskip0pt plus.02em\\/qw\ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/59'.
+'\\hskip0pt plus.02em\\/0'.
+'\\hskip0pt plus.02em\\/\\\\\\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1',
 
 	#17: tile = 7
-'{\hskip0pt plus .02em}~$&,%,$,'.
-'{\hskip0pt plus .02em}#'.
-'{\hskip0pt plus .02em},_,{,},^'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\2'.
-'{\hskip0pt plus .02em}qw\ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}59'.
-'{\hskip0pt plus .02em}0'.
-'{\hskip0pt plus .02em}\\\\\\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1',
+'\\hskip0pt plus.02em\\/~$&,%,$,'.
+'\\hskip0pt plus.02em\\/#'.
+'\\hskip0pt plus.02em\\/,_,{,},^'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\2'.
+'\\hskip0pt plus.02em\\/qw\ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/59'.
+'\\hskip0pt plus.02em\\/0'.
+'\\hskip0pt plus.02em\\/\\\\\\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1',
 
 	#18: tile = 8
-'{\hskip0pt plus .02em}~$&,%,$,#'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}_,{,},^'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\2'.
-'{\hskip0pt plus .02em}qw\ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}59'.
-'{\hskip0pt plus .02em}0'.
-'{\hskip0pt plus .02em}\\\\\\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1',
+'\\hskip0pt plus.02em\\/~$&,%,$,#'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/_,{,},^'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\2'.
+'\\hskip0pt plus.02em\\/qw\ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/59'.
+'\\hskip0pt plus.02em\\/0'.
+'\\hskip0pt plus.02em\\/\\\\\\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1',
 
 	#19: tile = 9
-'{\hskip0pt plus .02em}~$&,%,$,#'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}_,{,},^'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\2'.
-'{\hskip0pt plus .02em}qw\ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}59'.
-'{\hskip0pt plus .02em}0'.
-'{\hskip0pt plus .02em}\\\\\\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1',
+'\\hskip0pt plus.02em\\/~$&,%,$,#'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/_,{,},^'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\2'.
+'\\hskip0pt plus.02em\\/qw\ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/59'.
+'\\hskip0pt plus.02em\\/0'.
+'\\hskip0pt plus.02em\\/\\\\\\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1',
 
 	#20: tile = 'X' -- INVALID value
-'{\hskip0pt plus .02em}~$&,'.
-'{\hskip0pt plus .02em}%'.
-'{\hskip0pt plus .02em},$,#'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}_,{'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}},^'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\2'.
-'{\hskip0pt plus .02em}qw\ea'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}5'.
-'{\hskip0pt plus .02em}9'.
-'{\hskip0pt plus .02em}0\\\\\\>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1',
+'\\hskip0pt plus.02em\\/~$&,'.
+'\\hskip0pt plus.02em\\/%'.
+'\\hskip0pt plus.02em\\/,$,#'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/_,{'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/},^'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\2'.
+'\\hskip0pt plus.02em\\/qw\ea'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/5'.
+'\\hskip0pt plus.02em\\/9'.
+'\\hskip0pt plus.02em\\/0\\\\\\>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1',
 ];
 
 $i = 0;
@@ -267,29 +267,29 @@ is_deeply( [$v, $mflag], [$r, 0 ], 'Test #'.$t. ": '$v' without changing the val
 
 ###Test #22
 $v = $_ = '\~{}\$\&,\%,\$,\#,\_,\{,\},\^{},\char92{}2qw\char92{}ea"=sdf-124-590\char92{}\char92{}\char92{}>>>>---1';
-$r = '{\hskip0pt plus .02em}\~{}\$\&'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\%,\$'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\#,\_'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\{,\}'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\^{}'.
-'{\hskip0pt plus .02em},'.
-'{\hskip0pt plus .02em}\char92{}'.
-'{\hskip0pt plus .02em}2'.
-'{\hskip0pt plus .02em}qw\char92{}ea"=sdf'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}1'.
-'{\hskip0pt plus .02em}24'.
-'{\hskip0pt plus .02em}-'.
-'{\hskip0pt plus .02em}5'.
-'{\hskip0pt plus .02em}9'.
-'{\hskip0pt plus .02em}0\char92{}\char92{}\char92{}>>'.
-'{\hskip0pt plus .02em}>>'.
-'{\hskip0pt plus .02em}---'.
-'{\hskip0pt plus .02em}1';
+$r = '\\hskip0pt plus.02em\\/\~{}\$\&'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\%,\$'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\#,\_'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\{,\}'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\^{}'.
+'\\hskip0pt plus.02em\\/,'.
+'\\hskip0pt plus.02em\\/\char92{}'.
+'\\hskip0pt plus.02em\\/2'.
+'\\hskip0pt plus.02em\\/qw\char92{}ea"=sdf'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/1'.
+'\\hskip0pt plus.02em\\/24'.
+'\\hskip0pt plus.02em\\/-'.
+'\\hskip0pt plus.02em\\/5'.
+'\\hskip0pt plus.02em\\/9'.
+'\\hskip0pt plus.02em\\/0\char92{}\char92{}\char92{}>>'.
+'\\hskip0pt plus.02em\\/>>'.
+'\\hskip0pt plus.02em\\/---'.
+'\\hskip0pt plus.02em\\/1';
 
 $mflag = REase($_);
 is_deeply( [$_, $mflag], [$r, 0b0111 ], 'Test #'.$t. ": '$v' to '$r' after sub 'tex_escape'");
@@ -298,15 +298,15 @@ is_deeply( [$_, $mflag], [$r, 0b0111 ], 'Test #'.$t. ": '$v' to '$r' after sub '
 
 ###Test #23
 $v = $_= q({{{124244234}}sdsdfdsfsdf 1 22 333 4444 55555 666666 7777777 x cv bvb cfhfhgfcvdg weter{}{});
-$r = '{\hskip0pt plus .02em}{{{1{\hskip0pt plus .02em}2'.
-'{\hskip0pt plus .02em}4244'.
-'{\hskip0pt plus .02em}2'.
-'{\hskip0pt plus .02em}34}}sdsdfdsfsdf 1 22 333 4444 5555'.
-'{\hskip0pt plus .02em}5 6666'.
-'{\hskip0pt plus .02em}6'.
-'{\hskip0pt plus .02em}6 7777'.
-'{\hskip0pt plus .02em}7'.
-'{\hskip0pt plus .02em}77 x cv bvb cfhfhgfcvdg weter{}{}';
+$r = '\\hskip0pt plus.02em\\/{{{1\\hskip0pt plus.02em\\/2'.
+'\\hskip0pt plus.02em\\/4244'.
+'\\hskip0pt plus.02em\\/2'.
+'\\hskip0pt plus.02em\\/34}}sdsdfdsfsdf 1 22 333 4444 5555'.
+'\\hskip0pt plus.02em\\/5 6666'.
+'\\hskip0pt plus.02em\\/6'.
+'\\hskip0pt plus.02em\\/6 7777'.
+'\\hskip0pt plus.02em\\/7'.
+'\\hskip0pt plus.02em\\/77 x cv bvb cfhfhgfcvdg weter{}{}';
 
 $mflag = REase($_);
 is_deeply( [$_, $mflag], [$r, 0b0111 ], 'Test #'.$t. ": '$v' to '$r' nested parentheses");
@@ -314,10 +314,10 @@ is_deeply( [$_, $mflag], [$r, 0b0111 ], 'Test #'.$t. ": '$v' to '$r' nested pare
 
 ###Test #24
 $v = $_= q(   \{\{\{124244234\}\}sdsdfdsfsdf\{\}\{\}\{\}\relax)."\t\t\t";
-$r = '{\hskip0pt plus .02em} \{\{\{1'.
-'{\hskip0pt plus .02em}2424'.
-'{\hskip0pt plus .02em}4'.
-'{\hskip0pt plus .02em}234\}\}sdsdfdsfsdf\{\}\{\}\{\}\relax'."\t\t\t";
+$r = '\\hskip0pt plus.02em\\/ \{\{\{1'.
+'\\hskip0pt plus.02em\\/2424'.
+'\\hskip0pt plus.02em\\/4'.
+'\\hskip0pt plus.02em\\/234\}\}sdsdfdsfsdf\{\}\{\}\{\}\relax'."\t\t\t";
 
 $mflag = REase($_);
 is_deeply( [$_, $mflag], [$r, 0b0111 ], 'Test #'.$t. ": '$v' to '$r with \\relax<tab><tab><tab>");
@@ -356,7 +356,7 @@ is_deeply( [$_, $mflag], [$r, 0], 'Test #'.$t. ": '$v' to '$r' with option '_MFL
 ###Test #30
 $op = [ 0..3 ];
 $v = $_= '1---2';
-$r = '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}2';
+$r = '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/2';
 $mflag = REase( $_, $op );
 is_deeply( [$_, $mflag], [$r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with INVALID option => 'ARRAY'");
 ++$t;
@@ -364,7 +364,7 @@ is_deeply( [$_, $mflag], [$r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with INVALID
 ###Test #31
 $op = '!stag';
 $v = $_= '%%%:1---2';
-$r = '%%%:{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}2';
+$r = '%%%:\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/2';
 $mflag = REase( $_, $op );
 is_deeply( [$_, $mflag], [$r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
 ++$t;
@@ -376,7 +376,7 @@ is( $_, $r, 'Test #'.$t. ": '$v' to '$r' with option '$op', and without check re
 ++$t;
 
 ###Test #33
-$r = $v = $_= '{\hskip0pt plus .02em}1{\hskip0pt plus .02em}---{\hskip0pt plus .02em}2';
+$r = $v = $_= '\\hskip0pt plus.02em\\/1\\hskip0pt plus.02em\\/---\\hskip0pt plus.02em\\/2';
 $mflag = REase( $_ );
 is_deeply( [$_, $mflag], [$r, 0], 'Test #'.$t. ": '$v' to '$r'");
 ++$t;

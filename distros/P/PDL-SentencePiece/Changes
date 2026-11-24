@@ -1,0 +1,4 @@
+Revision history for PDL-SentencePiece
+
+0.01    2026-11-24
+        - Initial release: C++17/XS bindings to libsentencepiece for PDL ndarrays.

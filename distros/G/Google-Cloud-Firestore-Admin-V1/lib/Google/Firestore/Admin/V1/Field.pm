@@ -1,0 +1,277 @@
+package Google::Firestore::Admin::V1::Field;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Firestore::Admin::V1::Index };
+    eval { require Google::Protobuf::Duration };
+    my $descriptor_b64 = <<'EOF';
+CiVnb29nbGUvZmlyZXN0b3JlL2FkbWluL3YxL2ZpZWxkLnByb3RvEhlnb29nbGUuZmlyZXN0
+b3JlLmFkbWluLnYxGh9nb29nbGUvYXBpL2ZpZWxkX2JlaGF2aW9yLnByb3RvGhlnb29nbGUv
+YXBpL3Jlc291cmNlLnByb3RvGiVnb29nbGUvZmlyZXN0b3JlL2FkbWluL3YxL2luZGV4LnBy
+b3RvGh5nb29nbGUvcHJvdG9idWYvZHVyYXRpb24ucHJvdG8i7gUKBUZpZWxkEhcKBG5hbWUY
+ASABKAlCA+BBAlIEbmFtZRJPCgxpbmRleF9jb25maWcYAiABKAsyLC5nb29nbGUuZmlyZXN0
+b3JlLmFkbWluLnYxLkZpZWxkLkluZGV4Q29uZmlnUgtpbmRleENvbmZpZxJJCgp0dGxfY29u
+ZmlnGAMgASgLMiouZ29vZ2xlLmZpcmVzdG9yZS5hZG1pbi52MS5GaWVsZC5UdGxDb25maWdS
+CXR0bENvbmZpZxrAAQoLSW5kZXhDb25maWcSOgoHaW5kZXhlcxgBIAMoCzIgLmdvb2dsZS5m
+aXJlc3RvcmUuYWRtaW4udjEuSW5kZXhSB2luZGV4ZXMSMAoUdXNlc19hbmNlc3Rvcl9jb25m
+aWcYAiABKAhSEnVzZXNBbmNlc3RvckNvbmZpZxIlCg5hbmNlc3Rvcl9maWVsZBgDIAEoCVIN
+YW5jZXN0b3JGaWVsZBIcCglyZXZlcnRpbmcYBCABKAhSCXJldmVydGluZxrxAQoJVHRsQ29u
+ZmlnEksKBXN0YXRlGAEgASgOMjAuZ29vZ2xlLmZpcmVzdG9yZS5hZG1pbi52MS5GaWVsZC5U
+dGxDb25maWcuU3RhdGVCA+BBA1IFc3RhdGUSSwoRZXhwaXJhdGlvbl9vZmZzZXQYAyABKAsy
+GS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CA+BBAVIQZXhwaXJhdGlvbk9mZnNldCJKCgVT
+dGF0ZRIVChFTVEFURV9VTlNQRUNJRklFRBAAEgwKCENSRUFUSU5HEAESCgoGQUNUSVZFEAIS
+EAoMTkVFRFNfUkVQQUlSEAM6eepBdgoeZmlyZXN0b3JlLmdvb2dsZWFwaXMuY29tL0ZpZWxk
+ElRwcm9qZWN0cy97cHJvamVjdH0vZGF0YWJhc2VzL3tkYXRhYmFzZX0vY29sbGVjdGlvbkdy
+b3Vwcy97Y29sbGVjdGlvbn0vZmllbGRzL3tmaWVsZH1C2QEKHWNvbS5nb29nbGUuZmlyZXN0
+b3JlLmFkbWluLnYxQgpGaWVsZFByb3RvUAFaOWNsb3VkLmdvb2dsZS5jb20vZ28vZmlyZXN0
+b3JlL2FwaXYxL2FkbWluL2FkbWlucGI7YWRtaW5wYqICBEdDRlOqAh9Hb29nbGUuQ2xvdWQu
+RmlyZXN0b3JlLkFkbWluLlYxygIfR29vZ2xlXENsb3VkXEZpcmVzdG9yZVxBZG1pblxWMeoC
+I0dvb2dsZTo6Q2xvdWQ6OkZpcmVzdG9yZTo6QWRtaW46OlYxSqIwCgcSBQ4AmQEBCrwECgEM
+EgMOABIysQQgQ29weXJpZ2h0IDIwMjYgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVyIHRo
+ZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91IG1h
+eSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNl
+bnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAgIGh0
+dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyByZXF1
+aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdh
+cmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFu
+ICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBPRiBB
+TlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5zZSBm
+b3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQKIGxp
+bWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAiCgkKAgMAEgMSACkKCQoC
+AwESAxMAIwoJCgIDAhIDFAAvCgkKAgMDEgMVACgKCAoBCBIDFwA8CgkKAgglEgMXADwKCAoB
+CBIDGABQCgkKAggLEgMYAFAKCAoBCBIDGQAiCgkKAggKEgMZACIKCAoBCBIDGgArCgkKAggI
+EgMaACsKCAoBCBIDGwA2CgkKAggBEgMbADYKCAoBCBIDHAAiCgkKAggkEgMcACIKCAoBCBID
+HQA9CgkKAggpEgMdAD0KCAoBCBIDHgA8CgkKAggtEgMeADwKrwEKAgQAEgUkAJkBARqhASBS
+ZXByZXNlbnRzIGEgc2luZ2xlIGZpZWxkIGluIHRoZSBkYXRhYmFzZS4KCiBGaWVsZHMgYXJl
+IGdyb3VwZWQgYnkgdGhlaXIgIkNvbGxlY3Rpb24gR3JvdXAiLCB3aGljaCByZXByZXNlbnQg
+YWxsCiBjb2xsZWN0aW9ucyBpbiB0aGUgZGF0YWJhc2Ugd2l0aCB0aGUgc2FtZSBJRC4KCgoK
+AwQAARIDJAgNCgsKAwQABxIEJQIoBAoNCgUEAAedCBIEJQIoBAo3CgQEAAMAEgQrAkADGikg
+VGhlIGluZGV4IGNvbmZpZ3VyYXRpb24gZm9yIHRoaXMgZmllbGQuCgoMCgUEAAMAARIDKwoV
+CjYKBgQAAwACABIDLQQfGicgVGhlIGluZGV4ZXMgc3VwcG9ydGVkIGZvciB0aGlzIGZpZWxk
+LgoKDgoHBAADAAIABBIDLQQMCg4KBwQAAwACAAYSAy0NEgoOCgcEAAMAAgABEgMtExoKDgoH
+BAADAAIAAxIDLR0eCtMBCgYEAAMAAgESAzIEIhrDASBPdXRwdXQgb25seS4gV2hlbiB0cnVl
+LCB0aGUgYEZpZWxkYCdzIGluZGV4IGNvbmZpZ3VyYXRpb24gaXMgc2V0IGZyb20gdGhlCiBj
+b25maWd1cmF0aW9uIHNwZWNpZmllZCBieSB0aGUgYGFuY2VzdG9yX2ZpZWxkYC4KIFdoZW4g
+ZmFsc2UsIHRoZSBgRmllbGRgJ3MgaW5kZXggY29uZmlndXJhdGlvbiBpcyBkZWZpbmVkIGV4
+cGxpY2l0bHkuCgoOCgcEAAMAAgEFEgMyBAgKDgoHBAADAAIBARIDMgkdCg4KBwQAAwACAQMS
+AzIgIQqXAgoGBAADAAICEgM4BB4ahwIgT3V0cHV0IG9ubHkuIFNwZWNpZmllcyB0aGUgcmVz
+b3VyY2UgbmFtZSBvZiB0aGUgYEZpZWxkYCBmcm9tIHdoaWNoIHRoaXMKIGZpZWxkJ3MgaW5k
+ZXggY29uZmlndXJhdGlvbiBpcyBzZXQgKHdoZW4gYHVzZXNfYW5jZXN0b3JfY29uZmlnYCBp
+cyB0cnVlKSwKIG9yIGZyb20gd2hpY2ggaXQgKndvdWxkKiBiZSBzZXQgaWYgdGhpcyBmaWVs
+ZCBoYWQgbm8gaW5kZXggY29uZmlndXJhdGlvbgogKHdoZW4gYHVzZXNfYW5jZXN0b3JfY29u
+ZmlnYCBpcyBmYWxzZSkuCgoOCgcEAAMAAgIFEgM4BAoKDgoHBAADAAICARIDOAsZCg4KBwQA
+AwACAgMSAzgcHQq3AgoGBAADAAIDEgM/BBcapwIgT3V0cHV0IG9ubHkKIFdoZW4gdHJ1ZSwg
+dGhlIGBGaWVsZGAncyBpbmRleCBjb25maWd1cmF0aW9uIGlzIGluIHRoZSBwcm9jZXNzIG9m
+IGJlaW5nCiByZXZlcnRlZC4gT25jZSBjb21wbGV0ZSwgdGhlIGluZGV4IGNvbmZpZyB3aWxs
+IHRyYW5zaXRpb24gdG8gdGhlIHNhbWUKIHN0YXRlIGFzIHRoZSBmaWVsZCBzcGVjaWZpZWQg
+YnkgYGFuY2VzdG9yX2ZpZWxkYCwgYXQgd2hpY2ggcG9pbnQKIGB1c2VzX2FuY2VzdG9yX2Nv
+bmZpZ2Agd2lsbCBiZSBgdHJ1ZWAgYW5kIGByZXZlcnRpbmdgIHdpbGwgYmUgYGZhbHNlYC4K
+Cg4KBwQAAwACAwUSAz8ECAoOCgcEAAMAAgMBEgM/CRIKDgoHBAADAAIDAxIDPxUWCvEECgQE
+AAMBEgRPAnMDGuIEIFRoZSBUVEwgKHRpbWUtdG8tbGl2ZSkgY29uZmlndXJhdGlvbiBmb3Ig
+ZG9jdW1lbnRzIHRoYXQgaGF2ZSB0aGlzIGBGaWVsZGAKIHNldC4KCiBBIHRpbWVzdGFtcCBz
+dG9yZWQgaW4gYSBUVEwtZW5hYmxlZCBmaWVsZCB3aWxsIGJlIHVzZWQgdG8gZGV0ZXJtaW5l
+IHRoZQogZXhwaXJhdGlvbiB0aW1lIG9mIHRoZSBkb2N1bWVudC4gVGhlIGV4cGlyYXRpb24g
+dGltZSBpcyB0aGUgc3VtCiBvZiB0aGUgdGltZXN0YW1wIHZhbHVlIGFuZCB0aGUgYGV4cGly
+YXRpb25fb2Zmc2V0YC4KCiBGb3IgRW50ZXJwcmlzZSBlZGl0aW9uIGRhdGFiYXNlcywgdGhl
+IHRpbWVzdGFtcCB2YWx1ZSBtYXkgYWx0ZXJuYXRpdmVseSBiZQogc3RvcmVkIGluIGFuIGFy
+cmF5IHZhbHVlIGluIHRoZSBUVEwtZW5hYmxlZCBmaWVsZC4KCiBBbiBleHBpcmF0aW9uIHRp
+bWUgaW4gdGhlIHBhc3QgaW5kaWNhdGVzIHRoYXQgdGhlIGRvY3VtZW50IGlzIGVsaWdpYmxl
+IGZvcgogaW1tZWRpYXRlIGV4cGlyYXRpb24uIFVzaW5nIGFueSBvdGhlciBkYXRhIHR5cGUg
+b3IgbGVhdmluZyB0aGUgZmllbGQgYWJzZW50CiB3aWxsIGRpc2FibGUgZXhwaXJhdGlvbiBm
+b3IgdGhlIGluZGl2aWR1YWwgZG9jdW1lbnQuCgoMCgUEAAMBARIDTwoTCk8KBgQAAwEEABIE
+UQRkBRo/IFRoZSBzdGF0ZSBvZiBhcHBseWluZyB0aGUgVFRMIGNvbmZpZ3VyYXRpb24gdG8g
+YWxsIGRvY3VtZW50cy4KCg4KBwQAAwEEAAESA1EJDgo3CggEAAMBBAACABIDUwYcGiYgVGhl
+IHN0YXRlIGlzIHVuc3BlY2lmaWVkIG9yIHVua25vd24uCgoQCgkEAAMBBAACAAESA1MGFwoQ
+CgkEAAMBBAACAAISA1MaGwrHAgoIBAADAQQAAgESA1oGExq1AiBUaGUgVFRMIGlzIGJlaW5n
+IGFwcGxpZWQuIFRoZXJlIGlzIGFuIGFjdGl2ZSBsb25nLXJ1bm5pbmcgb3BlcmF0aW9uIHRv
+CiB0cmFjayB0aGUgY2hhbmdlLiBOZXdseSB3cml0dGVuIGRvY3VtZW50cyB3aWxsIGhhdmUg
+VFRMcyBhcHBsaWVkIGFzCiByZXF1ZXN0ZWQuIFJlcXVlc3RlZCBUVExzIG9uIGV4aXN0aW5n
+IGRvY3VtZW50cyBhcmUgc3RpbGwgYmVpbmcKIHByb2Nlc3NlZC4gV2hlbiBUVExzIG9uIGFs
+bCBleGlzdGluZyBkb2N1bWVudHMgaGF2ZSBiZWVuIHByb2Nlc3NlZCwgdGhlCiBzdGF0ZSB3
+aWxsIG1vdmUgdG8gJ0FDVElWRScuCgoQCgkEAAMBBAACAQESA1oGDgoQCgkEAAMBBAACAQIS
+A1oREgo3CggEAAMBBAACAhIDXQYRGiYgVGhlIFRUTCBpcyBhY3RpdmUgZm9yIGFsbCBkb2N1
+bWVudHMuCgoQCgkEAAMBBAACAgESA10GDAoQCgkEAAMBBAACAgISA10PEAqKAgoIBAADAQQA
+AgMSA2MGFxr4ASBUaGUgVFRMIGNvbmZpZ3VyYXRpb24gY291bGQgbm90IGJlIGVuYWJsZWQg
+Zm9yIGFsbCBleGlzdGluZyBkb2N1bWVudHMuCiBOZXdseSB3cml0dGVuIGRvY3VtZW50cyB3
+aWxsIGNvbnRpbnVlIHRvIGhhdmUgdGhlaXIgVFRMIGFwcGxpZWQuCiBUaGUgTFJPIHJldHVy
+bmVkIHdoZW4gbGFzdCBhdHRlbXB0aW5nIHRvIGVuYWJsZSBUVEwgZm9yIHRoaXMgYEZpZWxk
+YAogaGFzIGZhaWxlZCwgYW5kIG1heSBoYXZlIG1vcmUgZGV0YWlscy4KChAKCQQAAwEEAAID
+ARIDYwYSChAKCQQAAwEEAAIDAhIDYxUWCkEKBgQAAwECABIDZwRAGjIgT3V0cHV0IG9ubHku
+IFRoZSBzdGF0ZSBvZiB0aGUgVFRMIGNvbmZpZ3VyYXRpb24uCgoOCgcEAAMBAgAGEgNnBAkK
+DgoHBAADAQIAARIDZwoPCg4KBwQAAwECAAMSA2cSEwoOCgcEAAMBAgAIEgNnFD8KEQoKBAAD
+AQIACJwIABIDZxU+CpEDCgYEAAMBAgESBHEEcjEagAMgT3B0aW9uYWwuIFRoZSBvZmZzZXQs
+IHJlbGF0aXZlIHRvIHRoZSB0aW1lc3RhbXAgdmFsdWUgZnJvbSB0aGUKIFRUTC1lbmFibGVk
+IGZpZWxkLCB1c2VkIHRvIGRldGVybWluZSB0aGUgZG9jdW1lbnQncyBleHBpcmF0aW9uIHRp
+bWUuCgogYGV4cGlyYXRpb25fb2Zmc2V0LnNlY29uZHNgIG11c3QgYmUgYmV0d2VlbiAwIGFu
+ZCAyLDE0Nyw0ODMsNjQ3CiBpbmNsdXNpdmUuIFZhbHVlcyBtb3JlIHByZWNpc2UgdGhhbiBz
+ZWNvbmRzIGFyZSByZWplY3RlZC4KCiBJZiB1bnNldCwgZGVmYXVsdHMgdG8gMCwgaW4gd2hp
+Y2ggY2FzZSB0aGUgZXhwaXJhdGlvbiB0aW1lIGlzIHRoZSBzYW1lCiBhcyB0aGUgdGltZXN0
+YW1wIHZhbHVlIGZyb20gdGhlIFRUTC1lbmFibGVkIGZpZWxkLgoKDgoHBAADAQIBBhIDcQQc
+Cg4KBwQAAwECAQESA3EdLgoOCgcEAAMBAgEDEgNxMTIKDgoHBAADAQIBCBIDcggwChEKCgQA
+AwECAQicCAASA3IJLwqoCQoEBAACABIEjQECOxqZCSBSZXF1aXJlZC4gQSBmaWVsZCBuYW1l
+IG9mIHRoZSBmb3JtOgogYHByb2plY3RzL3twcm9qZWN0X2lkfS9kYXRhYmFzZXMve2RhdGFi
+YXNlX2lkfS9jb2xsZWN0aW9uR3JvdXBzL3tjb2xsZWN0aW9uX2lkfS9maWVsZHMve2ZpZWxk
+X3BhdGh9YAoKIEEgZmllbGQgcGF0aCBjYW4gYmUgYSBzaW1wbGUgZmllbGQgbmFtZSwgZS5n
+LiBgYWRkcmVzc2Agb3IgYSBwYXRoIHRvIGZpZWxkcwogd2l0aGluIGBtYXBfdmFsdWVgICwg
+ZS5nLiBgYWRkcmVzcy5jaXR5YCwKIG9yIGEgc3BlY2lhbCBmaWVsZCBwYXRoLiBUaGUgb25s
+eSB2YWxpZCBzcGVjaWFsIGZpZWxkIGlzIGAqYCwgd2hpY2gKIHJlcHJlc2VudHMgYW55IGZp
+ZWxkLgoKIEZpZWxkIHBhdGhzIGNhbiBiZSBxdW90ZWQgdXNpbmcgYGAgYCBgYCAoYmFja3Rp
+Y2spLiBUaGUgb25seSBjaGFyYWN0ZXIgdGhhdAogbXVzdCBiZSBlc2NhcGVkIHdpdGhpbiBh
+IHF1b3RlZCBmaWVsZCBwYXRoIGlzIHRoZSBiYWNrdGljayBjaGFyYWN0ZXIKIGl0c2VsZiwg
+ZXNjYXBlZCB1c2luZyBhIGJhY2tzbGFzaC4gU3BlY2lhbCBjaGFyYWN0ZXJzIGluIGZpZWxk
+IHBhdGhzIHRoYXQKIG11c3QgYmUgcXVvdGVkIGluY2x1ZGU6IGAqYCwgYC5gLAogYGAgYCBg
+YCAoYmFja3RpY2spLCBgW2AsIGBdYCwgYXMgd2VsbCBhcyBhbnkgYXNjaWkgc3ltYm9saWMg
+Y2hhcmFjdGVycy4KCiBFeGFtcGxlczoKIGBgIGBhZGRyZXNzLmNpdHlgIGBgIHJlcHJlc2Vu
+dHMgYSBmaWVsZCBuYW1lZCBgYWRkcmVzcy5jaXR5YCwgbm90IHRoZSBtYXAKIGtleSBgY2l0
+eWAgaW4gdGhlIGZpZWxkIGBhZGRyZXNzYC4gYGAgYCpgIGBgIHJlcHJlc2VudHMgYSBmaWVs
+ZCBuYW1lZCBgKmAsCiBub3QgYW55IGZpZWxkLgoKIEEgc3BlY2lhbCBgRmllbGRgIGNvbnRh
+aW5zIHRoZSBkZWZhdWx0IGluZGV4aW5nIHNldHRpbmdzIGZvciBhbGwgZmllbGRzLgogVGhp
+cyBmaWVsZCdzIHJlc291cmNlIG5hbWUgaXM6CiBgcHJvamVjdHMve3Byb2plY3RfaWR9L2Rh
+dGFiYXNlcy97ZGF0YWJhc2VfaWR9L2NvbGxlY3Rpb25Hcm91cHMvX19kZWZhdWx0X18vZmll
+bGRzLypgCiBJbmRleGVzIGRlZmluZWQgb24gdGhpcyBgRmllbGRgIHdpbGwgYmUgYXBwbGll
+ZCB0byBhbGwgZmllbGRzIHdoaWNoIGRvIG5vdAogaGF2ZSB0aGVpciBvd24gYEZpZWxkYCBp
+bmRleCBjb25maWd1cmF0aW9uLgoKDQoFBAACAAUSBI0BAggKDQoFBAACAAESBI0BCQ0KDQoF
+BAACAAMSBI0BEBEKDQoFBAACAAgSBI0BEjoKEAoIBAACAAicCAASBI0BEzkK/gEKBAQAAgES
+BJMBAh8a7wEgVGhlIGluZGV4IGNvbmZpZ3VyYXRpb24gZm9yIHRoaXMgZmllbGQuIElmIHVu
+c2V0LCBmaWVsZCBpbmRleGluZyB3aWxsCiByZXZlcnQgdG8gdGhlIGNvbmZpZ3VyYXRpb24g
+ZGVmaW5lZCBieSB0aGUgYGFuY2VzdG9yX2ZpZWxkYC4gVG8KIGV4cGxpY2l0bHkgcmVtb3Zl
+IGFsbCBpbmRleGVzIGZvciB0aGlzIGZpZWxkLCBzcGVjaWZ5IGFuIGluZGV4IGNvbmZpZwog
+d2l0aCBhbiBlbXB0eSBsaXN0IG9mIGluZGV4ZXMuCgoNCgUEAAIBBhIEkwECDQoNCgUEAAIB
+ARIEkwEOGgoNCgUEAAIBAxIEkwEdHgqZAQoEBAACAhIEmAECGxqKASBUaGUgVFRMIGNvbmZp
+Z3VyYXRpb24gZm9yIHRoaXMgYEZpZWxkYC4KIFNldHRpbmcgb3IgdW5zZXR0aW5nIHRoaXMg
+d2lsbCBlbmFibGUgb3IgZGlzYWJsZSB0aGUgVFRMIGZvcgogZG9jdW1lbnRzIHRoYXQgaGF2
+ZSB0aGlzIGBGaWVsZGAuCgoNCgUEAAICBhIEmAECCwoNCgUEAAICARIEmAEMFgoNCgUEAAIC
+AxIEmAEZGmIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Firestore::Admin::V1::Field::Field ===
+    # Fields for Field
+    # Field: name Type: 9 ()
+    # Field: index_config Type: 11 (.google.firestore.admin.v1.Field.IndexConfig)
+    # Field: ttl_config Type: 11 (.google.firestore.admin.v1.Field.TtlConfig)
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Firestore::Admin::V1::Field - Compiled Protocol Buffers messages for google/firestore/admin/v1/field.proto
+
+=head1 SYNOPSIS
+
+    use Google::Firestore::Admin::V1::Field;
+
+    my $msg = Google::Firestore::Admin::V1::Field::Field->new({
+        name => $name,
+        index_config => $index_config,
+        ttl_config => $ttl_config,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Firestore::Admin::V1::Field::Field->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/firestore/admin/v1/field.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Firestore::Admin::V1::Field::Field
+
+Represents a single field in the database.
+
+Fields are grouped by their "Collection Group", which represent all
+collections in the database with the same ID.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A field name of the form:
+`projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/fields/{field_path}`
+
+A field path can be a simple field name, e.g. `address` or a path to fields
+within `map_value` , e.g. `address.city`,
+or a special field path. The only valid special field is `*`, which
+represents any field.
+
+Field paths can be quoted using `` ` `` (backtick). The only character that
+must be escaped within a quoted field path is the backtick character
+itself, escaped using a backslash. Special characters in field paths that
+must be quoted include: `*`, `.`,
+`` ` `` (backtick), `[`, `]`, as well as any ascii symbolic characters.
+
+Examples:
+`` `address.city` `` represents a field named `address.city`, not the map
+key `city` in the field `address`. `` `*` `` represents a field named `*`,
+not any field.
+
+A special `Field` contains the default indexing settings for all fields.
+This field's resource name is:
+`projects/{project_id}/databases/{database_id}/collectionGroups/__default__/fields/*`
+Indexes defined on this `Field` will be applied to all fields which do not
+have their own `Field` index configuration.
+
+=item * C<< $msg->index_config() >> / C<< $msg->index_config($value) >>
+
+Type: C<Message> (L<Google::Firestore::Admin::V1::Field::Field::IndexConfig>)
+
+The index configuration for this field. If unset, field indexing will
+revert to the configuration defined by the `ancestor_field`. To
+explicitly remove all indexes for this field, specify an index config
+with an empty list of indexes.
+
+=item * C<< $msg->ttl_config() >> / C<< $msg->ttl_config($value) >>
+
+Type: C<Message> (L<Google::Firestore::Admin::V1::Field::Field::TtlConfig>)
+
+The TTL configuration for this `Field`.
+Setting or unsetting this will enable or disable the TTL for
+documents that have this `Field`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Firestore::Admin::V1::Field::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

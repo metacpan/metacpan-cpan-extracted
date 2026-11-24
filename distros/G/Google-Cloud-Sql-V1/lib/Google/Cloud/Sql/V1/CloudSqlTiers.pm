@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlTiers;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -80,66 +80,10 @@ EOF
     # Fields for SqlTiersListRequest
     # Field: project Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlTiers::SqlTiersListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlTiers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlTiers::SqlTiersListRequest->new(
-        project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlTiers::TiersListResponse ===
     # Fields for TiersListResponse
     # Field: kind Type: 9 ()
     # Field: items Type: 11 (.google.cloud.sql.v1.Tier)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlTiers::TiersListResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlTiers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlTiers::TiersListResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<items>
-
-Type: Message (.google.cloud.sql.v1.Tier)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlTiers::Tier ===
     # Fields for Tier
@@ -149,70 +93,20 @@ Type: Message (.google.cloud.sql.v1.Tier)
     # Field: Disk_Quota Type: 3 ()
     # Field: region Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlTiers::Tier - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlTiers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlTiers::Tier->new(
-        tier => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<tier>
-
-Type: String
-
-=item * B<RAM>
-
-Type: Int64
-
-=item * B<kind>
-
-Type: String
-
-=item * B<Disk_Quota>
-
-Type: Int64
-
-=item * B<region>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlTiers::SqlTiersServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlTiers::SqlTiersServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlTiers::SqlTiersServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlTiers::SqlTiersServiceClient - Client stub representing the remote SqlTiersService service
+Client stub representing the remote C<SqlTiersService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -254,13 +148,126 @@ sub list {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlTiers - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlTiers - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_tiers.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlTiers;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlTiers::SqlTiersListRequest->new({
+        project => $project,
+    });
+
+    # Read or update a field
+    my $val = $msg->project();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlTiers::SqlTiersListRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_tiers.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlTiers::SqlTiersListRequest
+
+Tiers list request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project for which to list tiers.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlTiers::TiersListResponse
+
+Tiers list response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#tiersList`.
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlTiers::Tier>)
+
+List of tiers.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlTiers::Tier
+
+A Google Cloud SQL service tier resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tier() >> / C<< $msg->tier($value) >>
+
+Type: C<String>
+
+An identifier for the machine type, for example, `db-custom-1-3840`. For
+related information, see [Pricing](/sql/pricing).
+
+=item * C<< $msg->RAM() >> / C<< $msg->RAM($value) >>
+
+Type: C<Int64>
+
+The maximum RAM usage of this tier in bytes.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#tier`.
+
+=item * C<< $msg->Disk_Quota() >> / C<< $msg->Disk_Quota($value) >>
+
+Type: C<Int64>
+
+The maximum disk size of this tier in bytes.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+The applicable regions for this tier.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlTiers::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

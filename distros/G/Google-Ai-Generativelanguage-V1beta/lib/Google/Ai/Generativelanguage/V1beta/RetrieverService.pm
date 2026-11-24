@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::RetrieverService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -549,201 +549,29 @@ EOF
     # Fields for CreateCorpusRequest
     # Field: corpus Type: 11 (.google.ai.generativelanguage.v1beta.Corpus)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateCorpusRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateCorpusRequest->new(
-        corpus => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<corpus>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Corpus)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::GetCorpusRequest ===
     # Fields for GetCorpusRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::GetCorpusRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::GetCorpusRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateCorpusRequest ===
     # Fields for UpdateCorpusRequest
     # Field: corpus Type: 11 (.google.ai.generativelanguage.v1beta.Corpus)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateCorpusRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateCorpusRequest->new(
-        corpus => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<corpus>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Corpus)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteCorpusRequest ===
     # Fields for DeleteCorpusRequest
     # Field: name Type: 9 ()
     # Field: force Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteCorpusRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteCorpusRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<force>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::ListCorporaRequest ===
     # Fields for ListCorporaRequest
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::ListCorporaRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::ListCorporaRequest->new(
-        page_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::ListCorporaResponse ===
     # Fields for ListCorporaResponse
     # Field: corpora Type: 11 (.google.ai.generativelanguage.v1beta.Corpus)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::ListCorporaResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::ListCorporaResponse->new(
-        corpora => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<corpora>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Corpus)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryCorpusRequest ===
     # Fields for QueryCorpusRequest
@@ -752,73 +580,9 @@ Type: String
     # Field: metadata_filters Type: 11 (.google.ai.generativelanguage.v1beta.MetadataFilter)
     # Field: results_count Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryCorpusRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryCorpusRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<query>
-
-Type: String
-
-=item * B<metadata_filters>
-
-Type: Message (.google.ai.generativelanguage.v1beta.MetadataFilter)
-
-=item * B<results_count>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryCorpusResponse ===
     # Fields for QueryCorpusResponse
     # Field: relevant_chunks Type: 11 (.google.ai.generativelanguage.v1beta.RelevantChunk)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryCorpusResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryCorpusResponse->new(
-        relevant_chunks => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<relevant_chunks>
-
-Type: Message (.google.ai.generativelanguage.v1beta.RelevantChunk)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::RelevantChunk ===
     # Fields for RelevantChunk
@@ -826,174 +590,24 @@ Type: Message (.google.ai.generativelanguage.v1beta.RelevantChunk)
     # Field: chunk Type: 11 (.google.ai.generativelanguage.v1beta.Chunk)
     # Field: document Type: 11 (.google.ai.generativelanguage.v1beta.Document)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::RelevantChunk - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::RelevantChunk->new(
-        chunk_relevance_score => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<chunk_relevance_score>
-
-Type: Float
-
-=item * B<chunk>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Chunk)
-
-=item * B<document>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Document)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateDocumentRequest ===
     # Fields for CreateDocumentRequest
     # Field: parent Type: 9 ()
     # Field: document Type: 11 (.google.ai.generativelanguage.v1beta.Document)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateDocumentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateDocumentRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<document>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Document)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::GetDocumentRequest ===
     # Fields for GetDocumentRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::GetDocumentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::GetDocumentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateDocumentRequest ===
     # Fields for UpdateDocumentRequest
     # Field: document Type: 11 (.google.ai.generativelanguage.v1beta.Document)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateDocumentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateDocumentRequest->new(
-        document => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<document>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Document)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteDocumentRequest ===
     # Fields for DeleteDocumentRequest
     # Field: name Type: 9 ()
     # Field: force Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteDocumentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteDocumentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<force>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::ListDocumentsRequest ===
     # Fields for ListDocumentsRequest
@@ -1001,74 +615,10 @@ Type: Bool
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::ListDocumentsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::ListDocumentsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::ListDocumentsResponse ===
     # Fields for ListDocumentsResponse
     # Field: documents Type: 11 (.google.ai.generativelanguage.v1beta.Document)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::ListDocumentsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::ListDocumentsResponse->new(
-        documents => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<documents>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Document)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryDocumentRequest ===
     # Fields for QueryDocumentRequest
@@ -1077,368 +627,50 @@ Type: String
     # Field: results_count Type: 5 ()
     # Field: metadata_filters Type: 11 (.google.ai.generativelanguage.v1beta.MetadataFilter)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryDocumentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryDocumentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<query>
-
-Type: String
-
-=item * B<results_count>
-
-Type: Int32
-
-=item * B<metadata_filters>
-
-Type: Message (.google.ai.generativelanguage.v1beta.MetadataFilter)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryDocumentResponse ===
     # Fields for QueryDocumentResponse
     # Field: relevant_chunks Type: 11 (.google.ai.generativelanguage.v1beta.RelevantChunk)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryDocumentResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryDocumentResponse->new(
-        relevant_chunks => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<relevant_chunks>
-
-Type: Message (.google.ai.generativelanguage.v1beta.RelevantChunk)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateChunkRequest ===
     # Fields for CreateChunkRequest
     # Field: parent Type: 9 ()
     # Field: chunk Type: 11 (.google.ai.generativelanguage.v1beta.Chunk)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateChunkRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateChunkRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<chunk>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Chunk)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchCreateChunksRequest ===
     # Fields for BatchCreateChunksRequest
     # Field: parent Type: 9 ()
     # Field: requests Type: 11 (.google.ai.generativelanguage.v1beta.CreateChunkRequest)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchCreateChunksRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchCreateChunksRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<requests>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CreateChunkRequest)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchCreateChunksResponse ===
     # Fields for BatchCreateChunksResponse
     # Field: chunks Type: 11 (.google.ai.generativelanguage.v1beta.Chunk)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchCreateChunksResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchCreateChunksResponse->new(
-        chunks => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<chunks>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Chunk)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::GetChunkRequest ===
     # Fields for GetChunkRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::GetChunkRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::GetChunkRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateChunkRequest ===
     # Fields for UpdateChunkRequest
     # Field: chunk Type: 11 (.google.ai.generativelanguage.v1beta.Chunk)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateChunkRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateChunkRequest->new(
-        chunk => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<chunk>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Chunk)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchUpdateChunksRequest ===
     # Fields for BatchUpdateChunksRequest
     # Field: parent Type: 9 ()
     # Field: requests Type: 11 (.google.ai.generativelanguage.v1beta.UpdateChunkRequest)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchUpdateChunksRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchUpdateChunksRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<requests>
-
-Type: Message (.google.ai.generativelanguage.v1beta.UpdateChunkRequest)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchUpdateChunksResponse ===
     # Fields for BatchUpdateChunksResponse
     # Field: chunks Type: 11 (.google.ai.generativelanguage.v1beta.Chunk)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchUpdateChunksResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchUpdateChunksResponse->new(
-        chunks => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<chunks>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Chunk)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteChunkRequest ===
     # Fields for DeleteChunkRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteChunkRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteChunkRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchDeleteChunksRequest ===
     # Fields for BatchDeleteChunksRequest
     # Field: parent Type: 9 ()
     # Field: requests Type: 11 (.google.ai.generativelanguage.v1beta.DeleteChunkRequest)
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchDeleteChunksRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchDeleteChunksRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<requests>
-
-Type: Message (.google.ai.generativelanguage.v1beta.DeleteChunkRequest)
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::ListChunksRequest ===
     # Fields for ListChunksRequest
@@ -1446,97 +678,25 @@ Type: Message (.google.ai.generativelanguage.v1beta.DeleteChunkRequest)
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::ListChunksRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::ListChunksRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::RetrieverService::ListChunksResponse ===
     # Fields for ListChunksResponse
     # Field: chunks Type: 11 (.google.ai.generativelanguage.v1beta.Chunk)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::RetrieverService::ListChunksResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::ListChunksResponse->new(
-        chunks => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<chunks>
-
-Type: Message (.google.ai.generativelanguage.v1beta.Chunk)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Ai::Generativelanguage::V1beta::RetrieverService::RetrieverServiceClient ===
 package Google::Ai::Generativelanguage::V1beta::RetrieverService::RetrieverServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Ai::Generativelanguage::V1beta::RetrieverService::RetrieverServiceClient
 
-Google::Ai::Generativelanguage::V1beta::RetrieverService::RetrieverServiceClient - Client stub representing the remote RetrieverService service
+Client stub representing the remote C<RetrieverService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<ai.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1825,13 +985,837 @@ sub list_chunks {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::RetrieverService - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::RetrieverService - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/retriever_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::RetrieverService;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateCorpusRequest->new({
+        corpus => $corpus,
+    });
+
+    # Read or update a field
+    my $val = $msg->corpus();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateCorpusRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/retriever_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateCorpusRequest
+
+Request to create a `Corpus`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->corpus() >> / C<< $msg->corpus($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Corpus>)
+
+Required. The `Corpus` to create.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::GetCorpusRequest
+
+Request for getting information about a specific `Corpus`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `Corpus`.
+Example: `corpora/my-corpus-123`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateCorpusRequest
+
+Request to update a `Corpus`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->corpus() >> / C<< $msg->corpus($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Corpus>)
+
+Required. The `Corpus` to update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. The list of fields to update.
+Currently, this only supports updating `display_name`.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteCorpusRequest
+
+Request to delete a `Corpus`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the `Corpus`.
+Example: `corpora/my-corpus-123`
+
+=item * C<< $msg->force() >> / C<< $msg->force($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, any `Document`s and objects related to this
+`Corpus` will also be deleted.
+
+If false (the default), a `FAILED_PRECONDITION` error will be returned if
+`Corpus` contains any `Document`s.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::ListCorporaRequest
+
+Request for listing `Corpora`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of `Corpora` to return (per page).
+The service may return fewer `Corpora`.
+
+If unspecified, at most 10 `Corpora` will be returned.
+The maximum size limit is 20 `Corpora` per page.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListCorpora` call.
+
+Provide the `next_page_token` returned in the response as an argument to
+the next request to retrieve the next page.
+
+When paginating, all other parameters provided to `ListCorpora`
+must match the call that provided the page token.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::ListCorporaResponse
+
+Response from `ListCorpora` containing a paginated list of `Corpora`.
+The results are sorted by ascending `corpus.create_time`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->corpora() >> / C<< $msg->corpora($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Corpus>)
+
+The returned corpora.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no more pages.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryCorpusRequest
+
+Request for querying a `Corpus`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `Corpus` to query.
+Example: `corpora/my-corpus-123`
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Required. Query string to perform semantic search.
+
+=item * C<< $msg->metadata_filters() >> / C<< $msg->metadata_filters($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::MetadataFilter>)
+
+Optional. Filter for `Chunk` and `Document` metadata. Each `MetadataFilter`
+object should correspond to a unique key. Multiple `MetadataFilter` objects
+are joined by logical "AND"s.
+
+Example query at document level:
+(year >= 2020 OR year < 2010) AND (genre = drama OR genre = action)
+
+`MetadataFilter` object list:
+ metadata_filters = [
+ {key = "document.custom_metadata.year"
+  conditions = [{int_value = 2020, operation = GREATER_EQUAL},
+                {int_value = 2010, operation = LESS}]},
+ {key = "document.custom_metadata.year"
+  conditions = [{int_value = 2020, operation = GREATER_EQUAL},
+                {int_value = 2010, operation = LESS}]},
+ {key = "document.custom_metadata.genre"
+  conditions = [{string_value = "drama", operation = EQUAL},
+                {string_value = "action", operation = EQUAL}]}]
+
+Example query at chunk level for a numeric range of values:
+(year > 2015 AND year <= 2020)
+
+`MetadataFilter` object list:
+ metadata_filters = [
+ {key = "chunk.custom_metadata.year"
+  conditions = [{int_value = 2015, operation = GREATER}]},
+ {key = "chunk.custom_metadata.year"
+  conditions = [{int_value = 2020, operation = LESS_EQUAL}]}]
+
+Note: "AND"s for the same key are only supported for numeric values. String
+values only support "OR"s for the same key.
+
+=item * C<< $msg->results_count() >> / C<< $msg->results_count($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of `Chunk`s to return.
+The service may return fewer `Chunk`s.
+
+If unspecified, at most 10 `Chunk`s will be returned.
+The maximum specified result count is 100.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryCorpusResponse
+
+Response from `QueryCorpus` containing a list of relevant chunks.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->relevant_chunks() >> / C<< $msg->relevant_chunks($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::RetrieverService::RelevantChunk>)
+
+The relevant chunks.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::RelevantChunk
+
+The information for a chunk relevant to a query.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->chunk_relevance_score() >> / C<< $msg->chunk_relevance_score($value) >>
+
+Type: C<Float>
+
+`Chunk` relevance to the query.
+
+=item * C<< $msg->chunk() >> / C<< $msg->chunk($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Chunk>)
+
+`Chunk` associated with the query.
+
+=item * C<< $msg->document() >> / C<< $msg->document($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Document>)
+
+`Document` associated with the chunk.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateDocumentRequest
+
+Request to create a `Document`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The name of the `Corpus` where this `Document` will be created.
+Example: `corpora/my-corpus-123`
+
+=item * C<< $msg->document() >> / C<< $msg->document($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Document>)
+
+Required. The `Document` to create.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::GetDocumentRequest
+
+Request for getting information about a specific `Document`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `Document` to retrieve.
+Example: `corpora/my-corpus-123/documents/the-doc-abc`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateDocumentRequest
+
+Request to update a `Document`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->document() >> / C<< $msg->document($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Document>)
+
+Required. The `Document` to update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. The list of fields to update.
+Currently, this only supports updating `display_name` and
+`custom_metadata`.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteDocumentRequest
+
+Request to delete a `Document`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the `Document` to delete.
+Example: `corpora/my-corpus-123/documents/the-doc-abc`
+
+=item * C<< $msg->force() >> / C<< $msg->force($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, any `Chunk`s and objects related to this
+`Document` will also be deleted.
+
+If false (the default), a `FAILED_PRECONDITION` error will be returned if
+`Document` contains any `Chunk`s.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::ListDocumentsRequest
+
+Request for listing `Document`s.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The name of the `Corpus` containing `Document`s.
+Example: `corpora/my-corpus-123`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of `Document`s to return (per page).
+The service may return fewer `Document`s.
+
+If unspecified, at most 10 `Document`s will be returned.
+The maximum size limit is 20 `Document`s per page.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListDocuments` call.
+
+Provide the `next_page_token` returned in the response as an argument to
+the next request to retrieve the next page.
+
+When paginating, all other parameters provided to `ListDocuments`
+must match the call that provided the page token.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::ListDocumentsResponse
+
+Response from `ListDocuments` containing a paginated list of `Document`s.
+The `Document`s are sorted by ascending `document.create_time`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->documents() >> / C<< $msg->documents($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Document>)
+
+The returned `Document`s.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no more pages.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryDocumentRequest
+
+Request for querying a `Document`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `Document` to query.
+Example: `corpora/my-corpus-123/documents/the-doc-abc`
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Required. Query string to perform semantic search.
+
+=item * C<< $msg->results_count() >> / C<< $msg->results_count($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of `Chunk`s to return.
+The service may return fewer `Chunk`s.
+
+If unspecified, at most 10 `Chunk`s will be returned.
+The maximum specified result count is 100.
+
+=item * C<< $msg->metadata_filters() >> / C<< $msg->metadata_filters($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::MetadataFilter>)
+
+Optional. Filter for `Chunk` metadata. Each `MetadataFilter` object should
+correspond to a unique key. Multiple `MetadataFilter` objects are joined by
+logical "AND"s.
+
+Note: `Document`-level filtering is not supported for this request because
+a `Document` name is already specified.
+
+Example query:
+(year >= 2020 OR year < 2010) AND (genre = drama OR genre = action)
+
+`MetadataFilter` object list:
+ metadata_filters = [
+ {key = "chunk.custom_metadata.year"
+  conditions = [{int_value = 2020, operation = GREATER_EQUAL},
+                {int_value = 2010, operation = LESS}},
+ {key = "chunk.custom_metadata.genre"
+  conditions = [{string_value = "drama", operation = EQUAL},
+                {string_value = "action", operation = EQUAL}}]
+
+Example query for a numeric range of values:
+(year > 2015 AND year <= 2020)
+
+`MetadataFilter` object list:
+ metadata_filters = [
+ {key = "chunk.custom_metadata.year"
+  conditions = [{int_value = 2015, operation = GREATER}]},
+ {key = "chunk.custom_metadata.year"
+  conditions = [{int_value = 2020, operation = LESS_EQUAL}]}]
+
+Note: "AND"s for the same key are only supported for numeric values. String
+values only support "OR"s for the same key.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::QueryDocumentResponse
+
+Response from `QueryDocument` containing a list of relevant chunks.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->relevant_chunks() >> / C<< $msg->relevant_chunks($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::RetrieverService::RelevantChunk>)
+
+The returned relevant chunks.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateChunkRequest
+
+Request to create a `Chunk`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The name of the `Document` where this `Chunk` will be created.
+Example: `corpora/my-corpus-123/documents/the-doc-abc`
+
+=item * C<< $msg->chunk() >> / C<< $msg->chunk($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Chunk>)
+
+Required. The `Chunk` to create.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchCreateChunksRequest
+
+Request to batch create `Chunk`s.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Optional. The name of the `Document` where this batch of `Chunk`s will be
+created. The parent field in every `CreateChunkRequest` must match this
+value. Example: `corpora/my-corpus-123/documents/the-doc-abc`
+
+=item * C<< $msg->requests() >> / C<< $msg->requests($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::RetrieverService::CreateChunkRequest>)
+
+Required. The request messages specifying the `Chunk`s to create.
+A maximum of 100 `Chunk`s can be created in a batch.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchCreateChunksResponse
+
+Response from `BatchCreateChunks` containing a list of created `Chunk`s.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->chunks() >> / C<< $msg->chunks($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Chunk>)
+
+`Chunk`s created.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::GetChunkRequest
+
+Request for getting information about a specific `Chunk`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the `Chunk` to retrieve.
+Example: `corpora/my-corpus-123/documents/the-doc-abc/chunks/some-chunk`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateChunkRequest
+
+Request to update a `Chunk`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->chunk() >> / C<< $msg->chunk($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Chunk>)
+
+Required. The `Chunk` to update.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. The list of fields to update.
+Currently, this only supports updating `custom_metadata` and `data`.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchUpdateChunksRequest
+
+Request to batch update `Chunk`s.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Optional. The name of the `Document` containing the `Chunk`s to update.
+The parent field in every `UpdateChunkRequest` must match this value.
+Example: `corpora/my-corpus-123/documents/the-doc-abc`
+
+=item * C<< $msg->requests() >> / C<< $msg->requests($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::RetrieverService::UpdateChunkRequest>)
+
+Required. The request messages specifying the `Chunk`s to update.
+A maximum of 100 `Chunk`s can be updated in a batch.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchUpdateChunksResponse
+
+Response from `BatchUpdateChunks` containing a list of updated `Chunk`s.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->chunks() >> / C<< $msg->chunks($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Chunk>)
+
+`Chunk`s updated.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteChunkRequest
+
+Request to delete a `Chunk`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the `Chunk` to delete.
+Example: `corpora/my-corpus-123/documents/the-doc-abc/chunks/some-chunk`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::BatchDeleteChunksRequest
+
+Request to batch delete `Chunk`s.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Optional. The name of the `Document` containing the `Chunk`s to delete.
+The parent field in every `DeleteChunkRequest` must match this value.
+Example: `corpora/my-corpus-123/documents/the-doc-abc`
+
+=item * C<< $msg->requests() >> / C<< $msg->requests($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::RetrieverService::DeleteChunkRequest>)
+
+Required. The request messages specifying the `Chunk`s to delete.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::ListChunksRequest
+
+Request for listing `Chunk`s.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The name of the `Document` containing `Chunk`s.
+Example: `corpora/my-corpus-123/documents/the-doc-abc`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of `Chunk`s to return (per page).
+The service may return fewer `Chunk`s.
+
+If unspecified, at most 10 `Chunk`s will be returned.
+The maximum size limit is 100 `Chunk`s per page.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListChunks` call.
+
+Provide the `next_page_token` returned in the response as an argument to
+the next request to retrieve the next page.
+
+When paginating, all other parameters provided to `ListChunks`
+must match the call that provided the page token.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::RetrieverService::ListChunksResponse
+
+Response from `ListChunks` containing a paginated list of `Chunk`s.
+The `Chunk`s are sorted by ascending `chunk.create_time`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->chunks() >> / C<< $msg->chunks($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::Retriever::Chunk>)
+
+The returned `Chunk`s.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no more pages.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::RetrieverService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

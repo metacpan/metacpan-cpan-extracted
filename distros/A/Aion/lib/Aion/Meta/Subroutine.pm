@@ -62,7 +62,7 @@ sub wrap_sub {
 sub compare {
 	my ($self, $subroutine) = @_;
 
-	die "Requires subroutine ${\$self->name}" unless $subroutine->isa('Aion::Meta::Subroutine');
+	die "Requires subroutine ${\$self->subname}!" unless UNIVERSAL::isa($subroutine, 'Aion::Meta::Subroutine');
 
 	my $i = 0;
 	my $signature = $subroutine->signature;

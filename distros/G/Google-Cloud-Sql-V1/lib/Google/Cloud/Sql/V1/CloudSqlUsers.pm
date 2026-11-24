@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlUsers;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -332,48 +332,6 @@ EOF
     # Field: project Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersDeleteRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersDeleteRequest->new(
-        host => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<host>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersGetRequest ===
     # Fields for SqlUsersGetRequest
     # Field: instance Type: 9 ()
@@ -382,48 +340,6 @@ Type: String
     # Field: host Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersGetRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersGetRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<host>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersInsertRequest ===
     # Fields for SqlUsersInsertRequest
     # Field: instance Type: 9 ()
@@ -431,83 +347,11 @@ Type: String
     # Field: body Type: 11 (.google.cloud.sql.v1.User)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersInsertRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersInsertRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<body>
-
-Type: Message (.google.cloud.sql.v1.User)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersListRequest ===
     # Fields for SqlUsersListRequest
     # Field: instance Type: 9 ()
     # Field: project Type: 9 ()
     # Field: location Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersListRequest->new(
-        instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersUpdateRequest ===
     # Fields for SqlUsersUpdateRequest
@@ -522,68 +366,6 @@ Type: String
     # Field: body Type: 11 (.google.cloud.sql.v1.User)
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersUpdateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersUpdateRequest->new(
-        host => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<host>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<database_roles>
-
-Type: String
-
-=item * B<revoke_existing_roles>
-
-Type: Bool
-
-=item * B<server_roles>
-
-Type: String
-
-=item * B<revoke_existing_server_roles>
-
-Type: Bool
-
-=item * B<body>
-
-Type: Message (.google.cloud.sql.v1.User)
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlUsers::UserPasswordValidationPolicy ===
     # Fields for UserPasswordValidationPolicy
     # Field: allowed_failed_attempts Type: 5 ()
@@ -592,82 +374,10 @@ Type: String
     # Field: status Type: 11 (.google.cloud.sql.v1.PasswordStatus)
     # Field: enable_password_verification Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::UserPasswordValidationPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::UserPasswordValidationPolicy->new(
-        allowed_failed_attempts => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<allowed_failed_attempts>
-
-Type: Int32
-
-=item * B<password_expiration_duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<enable_failed_attempts_check>
-
-Type: Bool
-
-=item * B<status>
-
-Type: Message (.google.cloud.sql.v1.PasswordStatus)
-
-=item * B<enable_password_verification>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlUsers::PasswordStatus ===
     # Fields for PasswordStatus
     # Field: locked Type: 8 ()
     # Field: password_expiration_time Type: 11 (.google.protobuf.Timestamp)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::PasswordStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::PasswordStatus->new(
-        locked => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<locked>
-
-Type: Bool
-
-=item * B<password_expiration_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlUsers::User ===
     # Fields for User
@@ -687,88 +397,6 @@ Type: Message (.google.protobuf.Timestamp)
     # Field: database_roles Type: 9 ()
     # Field: server_roles Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::User - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::User->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<password>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<host>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.sql.v1.User.SqlUserType)
-
-=item * B<sqlserver_user_details>
-
-Type: Message (.google.cloud.sql.v1.SqlServerUserDetails)
-
-=item * B<iam_email>
-
-Type: String
-
-=item * B<password_policy>
-
-Type: Message (.google.cloud.sql.v1.UserPasswordValidationPolicy)
-
-=item * B<dual_password_type>
-
-Type: Enum (.google.cloud.sql.v1.User.DualPasswordType)
-
-=item * B<iam_status>
-
-Type: Enum (.google.cloud.sql.v1.User.IamStatus)
-
-=item * B<database_roles>
-
-Type: String
-
-=item * B<server_roles>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: User::SqlUserType
 our $User_BUILT_IN = 0;
 our $User_CLOUD_IAM_USER = 1;
@@ -780,119 +408,21 @@ our $User_CLOUD_IAM_WORKFORCE_IDENTITY = 6;
 our $User_ENTRAID_USER = 7;
 our $User_ACTIVE_DIRECTORY_USER = 8;
 
-=pod
-
-=head2 Enum: User::SqlUserType
-
-Values:
-
-=over 4
-
-=item * C<BUILT_IN> => 0
-
-=item * C<CLOUD_IAM_USER> => 1
-
-=item * C<CLOUD_IAM_SERVICE_ACCOUNT> => 2
-
-=item * C<CLOUD_IAM_GROUP> => 3
-
-=item * C<CLOUD_IAM_GROUP_USER> => 4
-
-=item * C<CLOUD_IAM_GROUP_SERVICE_ACCOUNT> => 5
-
-=item * C<CLOUD_IAM_WORKFORCE_IDENTITY> => 6
-
-=item * C<ENTRAID_USER> => 7
-
-=item * C<ACTIVE_DIRECTORY_USER> => 8
-
-=back
-
-=cut
-
 # Enum: User::DualPasswordType
 our $User_DUAL_PASSWORD_TYPE_UNSPECIFIED = 0;
 our $User_NO_MODIFY_DUAL_PASSWORD = 1;
 our $User_NO_DUAL_PASSWORD = 2;
 our $User_DUAL_PASSWORD = 3;
 
-=pod
-
-=head2 Enum: User::DualPasswordType
-
-Values:
-
-=over 4
-
-=item * C<DUAL_PASSWORD_TYPE_UNSPECIFIED> => 0
-
-=item * C<NO_MODIFY_DUAL_PASSWORD> => 1
-
-=item * C<NO_DUAL_PASSWORD> => 2
-
-=item * C<DUAL_PASSWORD> => 3
-
-=back
-
-=cut
-
 # Enum: User::IamStatus
 our $User_IAM_STATUS_UNSPECIFIED = 0;
 our $User_INACTIVE = 1;
 our $User_ACTIVE = 2;
 
-=pod
-
-=head2 Enum: User::IamStatus
-
-Values:
-
-=over 4
-
-=item * C<IAM_STATUS_UNSPECIFIED> => 0
-
-=item * C<INACTIVE> => 1
-
-=item * C<ACTIVE> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlUsers::SqlServerUserDetails ===
     # Fields for SqlServerUserDetails
     # Field: disabled Type: 8 ()
     # Field: server_roles Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::SqlServerUserDetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::SqlServerUserDetails->new(
-        disabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<disabled>
-
-Type: Bool
-
-=item * B<server_roles>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlUsers::UsersListResponse ===
     # Fields for UsersListResponse
@@ -900,62 +430,20 @@ Type: String
     # Field: items Type: 11 (.google.cloud.sql.v1.User)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlUsers::UsersListResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlUsers;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::UsersListResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<items>
-
-Type: Message (.google.cloud.sql.v1.User)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersServiceClient - Client stub representing the remote SqlUsersService service
+Client stub representing the remote C<SqlUsersService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1049,13 +537,544 @@ sub update {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlUsers - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlUsers - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_users.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlUsers;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersDeleteRequest->new({
+        host => $host,
+        instance => $instance,
+        name => $name,
+        project => $project,
+    });
+
+    # Read or update a field
+    my $val = $msg->host();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersDeleteRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_users.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersDeleteRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->host() >> / C<< $msg->host($value) >>
+
+Type: C<String>
+
+Host of the user in the instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Database instance ID. This does not include the project ID.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Name of the user in the instance.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersGetRequest
+
+Request message for Users Get RPC
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Database instance ID. This does not include the project ID.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+User of the instance.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->host() >> / C<< $msg->host($value) >>
+
+Type: C<String>
+
+Host of a user of the instance.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersInsertRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Database instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->body() >> / C<< $msg->body($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlUsers::User>)
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersListRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Database instance ID. This does not include the project ID.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::SqlUsersUpdateRequest
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->host() >> / C<< $msg->host($value) >>
+
+Type: C<String>
+
+Optional. Host of the user in the instance.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Database instance ID. This does not include the project ID.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Name of the user in the instance.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+Project ID of the project that contains the instance.
+
+=item * C<< $msg->database_roles() >> / C<< $msg->database_roles($value) >>
+
+Type: C<String>
+
+Optional. List of database roles to grant to the user. body.database_roles
+will be ignored for update request.
+
+=item * C<< $msg->revoke_existing_roles() >> / C<< $msg->revoke_existing_roles($value) >>
+
+Type: C<Bool>
+
+Optional. Specifies whether to revoke existing roles that are not present
+in the `database_roles` field. If `false` or unset, the database roles
+specified in `database_roles` are added to the user's existing roles.
+
+=item * C<< $msg->server_roles() >> / C<< $msg->server_roles($value) >>
+
+Type: C<String>
+
+Optional. The server roles to grant to the SQL Server login. Existing
+server roles will not be revoked if revoke_existing_roles is false.
+body.server_roles will be ignored for update request.
+
+=item * C<< $msg->revoke_existing_server_roles() >> / C<< $msg->revoke_existing_server_roles($value) >>
+
+Type: C<Bool>
+
+Optional. Specifies whether to revoke existing roles that are not present
+in the `server_roles` field. If `false` or unset, the server roles
+specified in `server_roles` are added to the user's existing server roles.
+
+=item * C<< $msg->body() >> / C<< $msg->body($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlUsers::User>)
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Optional. Region of the Cloud SQL instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::UserPasswordValidationPolicy
+
+User level password validation policy.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->allowed_failed_attempts() >> / C<< $msg->allowed_failed_attempts($value) >>
+
+Type: C<Int32>
+
+Number of failed login attempts allowed before user get locked.
+
+=item * C<< $msg->password_expiration_duration() >> / C<< $msg->password_expiration_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Expiration duration after password is updated.
+
+=item * C<< $msg->enable_failed_attempts_check() >> / C<< $msg->enable_failed_attempts_check($value) >>
+
+Type: C<Bool>
+
+If true, failed login attempts check will be enabled.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlUsers::PasswordStatus>)
+
+Output only. Read-only password status.
+
+=item * C<< $msg->enable_password_verification() >> / C<< $msg->enable_password_verification($value) >>
+
+Type: C<Bool>
+
+If true, the user must specify the current password before changing the
+password. This flag is supported only for MySQL.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::PasswordStatus
+
+Read-only password status.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->locked() >> / C<< $msg->locked($value) >>
+
+Type: C<Bool>
+
+If true, user does not have login privileges.
+
+=item * C<< $msg->password_expiration_time() >> / C<< $msg->password_expiration_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The expiration time of the current password.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::User
+
+A Cloud SQL user resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#user`.
+
+=item * C<< $msg->password() >> / C<< $msg->password($value) >>
+
+Type: C<String>
+
+The password for the user.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+This field is deprecated and will be removed from a future version of the
+API.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The name of the user in the Cloud SQL instance. Can be omitted for
+`update` because it is already specified in the URL.
+
+=item * C<< $msg->host() >> / C<< $msg->host($value) >>
+
+Type: C<String>
+
+Optional. The host from which the user can connect. For `insert`
+operations, host defaults to an empty string. For `update`
+operations, host is specified as part of the request URL. The host name
+cannot be updated after insertion.  For a MySQL instance, it's required;
+for a PostgreSQL or SQL Server instance, it's optional.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+The name of the Cloud SQL instance. This does not include the project ID.
+Can be omitted for `update` because it is already specified on the
+URL.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+The project ID of the project containing the Cloud SQL database. The Google
+apps domain is prefixed if applicable. Can be omitted for `update` because
+it is already specified on the URL.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::User::SqlUserType>)
+
+The user type. It determines the method to authenticate the user during
+login. The default is the database's built-in user type.
+
+=item * C<< $msg->sqlserver_user_details() >> / C<< $msg->sqlserver_user_details($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlUsers::SqlServerUserDetails>)
+
+=item * C<< $msg->iam_email() >> / C<< $msg->iam_email($value) >>
+
+Type: C<String>
+
+Optional. The full email for an IAM user. For normal database users, this
+will not be filled. Only applicable to MySQL database users.
+
+=item * C<< $msg->password_policy() >> / C<< $msg->password_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlUsers::UserPasswordValidationPolicy>)
+
+User level password validation policy.
+
+=item * C<< $msg->dual_password_type() >> / C<< $msg->dual_password_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::User::DualPasswordType>)
+
+Dual password status for the user.
+
+=item * C<< $msg->iam_status() >> / C<< $msg->iam_status($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::User::IamStatus>)
+
+Indicates if a group is active or inactive for IAM database authentication.
+
+=item * C<< $msg->database_roles() >> / C<< $msg->database_roles($value) >>
+
+Type: C<String>
+
+Optional. Role memberships of the user
+
+=item * C<< $msg->server_roles() >> / C<< $msg->server_roles($value) >>
+
+Type: C<String>
+
+Optional. The server roles for the SQL Server login.
+
+=back
+
+=head3 Enum: User::SqlUserType
+
+=over 4
+
+=item * C<BUILT_IN> => C<0>
+
+=item * C<CLOUD_IAM_USER> => C<1>
+
+=item * C<CLOUD_IAM_SERVICE_ACCOUNT> => C<2>
+
+=item * C<CLOUD_IAM_GROUP> => C<3>
+
+=item * C<CLOUD_IAM_GROUP_USER> => C<4>
+
+=item * C<CLOUD_IAM_GROUP_SERVICE_ACCOUNT> => C<5>
+
+=item * C<CLOUD_IAM_WORKFORCE_IDENTITY> => C<6>
+
+=item * C<ENTRAID_USER> => C<7>
+
+=item * C<ACTIVE_DIRECTORY_USER> => C<8>
+
+=back
+
+=head3 Enum: User::DualPasswordType
+
+=over 4
+
+=item * C<DUAL_PASSWORD_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<NO_MODIFY_DUAL_PASSWORD> => C<1>
+
+=item * C<NO_DUAL_PASSWORD> => C<2>
+
+=item * C<DUAL_PASSWORD> => C<3>
+
+=back
+
+=head3 Enum: User::IamStatus
+
+=over 4
+
+=item * C<IAM_STATUS_UNSPECIFIED> => C<0>
+
+=item * C<INACTIVE> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::SqlServerUserDetails
+
+Represents a Sql Server user on the Cloud SQL instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->disabled() >> / C<< $msg->disabled($value) >>
+
+Type: C<Bool>
+
+Indicates if the user has been disabled.
+
+=item * C<< $msg->server_roles() >> / C<< $msg->server_roles($value) >>
+
+Type: C<String>
+
+Indicates the server roles for this user.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlUsers::UsersListResponse
+
+User list response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#usersList`.
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlUsers::User>)
+
+List of user resources in the instance.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Unused.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlUsers::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

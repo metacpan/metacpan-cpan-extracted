@@ -7,7 +7,7 @@ package Excel::Writer::XLSX::Utility;
 #
 # Used in conjunction with Excel::Writer::XLSX
 #
-# Copyright 2000-2025, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2026, John McNamara, jmcnamara@cpan.org
 #
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 #
@@ -25,9 +25,10 @@ use autouse 'Date::Manip' => qw(ParseDate Date_Init);
 use Carp;
 use Digest::MD5 qw(md5_hex);
 use File::Basename 'fileparse';
+use FileHandle;
 
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 # Row and column functions
 my @rowcol = qw(
@@ -55,7 +56,7 @@ my @dates = qw(
 );
 
 our @ISA         = qw(Exporter);
-our @EXPORT_OK   = ();
+our @EXPORT_OK   = qw(_utf16_len _utf16_truncate _has_invalid_name_chars);
 our @EXPORT      = ( @rowcol, @dates, 'quote_sheetname', 'get_image_properties' );
 our %EXPORT_TAGS = (
     rowcol => \@rowcol,
@@ -385,7 +386,7 @@ sub xl_date_list {
       $days + ( $hours * 3600 + $minutes * 60 + $seconds ) / ( 24 * 60 * 60 );
 
     # Add a day for Excel's missing leap day in 1900
-    $date++ if ( $date > 59 );
+    $date++ if ( $date >= 60 );
 
     return $date;
 }
@@ -698,9 +699,13 @@ sub _process_bmp {
     }
 
 
-    # Read the bitmap width and height. Verify the sizes.
-    my ( $width, $height ) = unpack "x18 V2", $data;
+    # Read the bitmap width and height. The height can be stored as negative
+    # for a top-down DIB.
+    my ( $width, $height ) = unpack "x18 l<2", $data;
+    $height = abs( $height );
 
+
+    # Verify the sizes.
     if ( $width > 0xFFFF ) {
         croak "$filename: largest image width $width supported is 65k.";
     }
@@ -813,13 +818,72 @@ sub _process_gif {
 
     my $width  = unpack "v", substr $data, 6, 2;
     my $height = unpack "v", substr $data, 8, 2;
-    print join ", ", ( $type, $width, $height, $x_dpi, $y_dpi, "\n" );
 
     if ( not defined $height ) {
         croak "$filename: no size data found in gif image.\n";
     }
 
     return ( $type, $width, $height, $x_dpi, $y_dpi );
+}
+
+
+###############################################################################
+#
+# _utf16_len()
+#
+# Get the length of a string in UTF-16 units. Excel's string length limits are
+# in UTF-16 units, so characters above U+FFFF, such as emojis, count as 2.
+#
+sub _utf16_len {
+
+    my $string = shift;
+
+    # Count the characters above U+FFFF and add them to the length.
+    return length( $string ) + ( $string =~ tr/\x{10000}-\x{10FFFF}// );
+}
+
+
+###############################################################################
+#
+# _utf16_truncate()
+#
+# Truncate a string to a maximum length in UTF-16 units without splitting a
+# character above U+FFFF.
+#
+sub _utf16_truncate {
+
+    my $string  = shift;
+    my $max_len = shift;
+    my $length  = 0;
+    my $index   = 0;
+
+    for my $char ( split //, $string ) {
+        $length += ord( $char ) > 0xFFFF ? 2 : 1;
+
+        return substr( $string, 0, $index ) if $length > $max_len;
+
+        $index++;
+    }
+
+    return $string;
+}
+
+
+###############################################################################
+#
+# _has_invalid_name_chars()
+#
+# Check for characters that Excel doesn't allow in defined and table names.
+#
+sub _has_invalid_name_chars {
+
+    my $name = shift;
+
+    return 1 if !defined $name || $name eq '';
+    return 1 if $name =~ /[ !"#\$%&'()*+,\-\/:;<=>\@\[\]^`{|}~\x00-\x1f\x7f-\x9f]/;
+    return 1 if $name =~ /^[\d.?]/;
+
+    return 0;
 }
 
 

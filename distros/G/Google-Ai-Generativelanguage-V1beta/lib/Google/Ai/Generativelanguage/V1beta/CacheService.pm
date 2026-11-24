@@ -3,7 +3,7 @@ package Google::Ai::Generativelanguage::V1beta::CacheService;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -148,218 +148,42 @@ EOF
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::CacheService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsRequest->new(
-        page_size => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsResponse ===
     # Fields for ListCachedContentsResponse
     # Field: cached_contents Type: 11 (.google.ai.generativelanguage.v1beta.CachedContent)
     # Field: next_page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::CacheService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsResponse->new(
-        cached_contents => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cached_contents>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CachedContent)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::CacheService::CreateCachedContentRequest ===
     # Fields for CreateCachedContentRequest
     # Field: cached_content Type: 11 (.google.ai.generativelanguage.v1beta.CachedContent)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::CacheService::CreateCachedContentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::CacheService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::CacheService::CreateCachedContentRequest->new(
-        cached_content => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cached_content>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CachedContent)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::CacheService::GetCachedContentRequest ===
     # Fields for GetCachedContentRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::CacheService::GetCachedContentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::CacheService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::CacheService::GetCachedContentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Ai::Generativelanguage::V1beta::CacheService::UpdateCachedContentRequest ===
     # Fields for UpdateCachedContentRequest
     # Field: cached_content Type: 11 (.google.ai.generativelanguage.v1beta.CachedContent)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::CacheService::UpdateCachedContentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::CacheService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::CacheService::UpdateCachedContentRequest->new(
-        cached_content => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cached_content>
-
-Type: Message (.google.ai.generativelanguage.v1beta.CachedContent)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Ai::Generativelanguage::V1beta::CacheService::DeleteCachedContentRequest ===
     # Fields for DeleteCachedContentRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Ai::Generativelanguage::V1beta::CacheService::DeleteCachedContentRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Ai::Generativelanguage::V1beta::CacheService;
-
-    my $msg = Google::Ai::Generativelanguage::V1beta::CacheService::DeleteCachedContentRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Ai::Generativelanguage::V1beta::CacheService::CacheServiceClient ===
 package Google::Ai::Generativelanguage::V1beta::CacheService::CacheServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Ai::Generativelanguage::V1beta::CacheService::CacheServiceClient
 
-Google::Ai::Generativelanguage::V1beta::CacheService::CacheServiceClient - Client stub representing the remote CacheService service
+Client stub representing the remote C<CacheService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<ai.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -453,13 +277,178 @@ sub delete_cached_content {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Ai::Generativelanguage::V1beta::CacheService - Protocol Buffers schema definition
+Google::Ai::Generativelanguage::V1beta::CacheService - Compiled Protocol Buffers messages for google/ai/generativelanguage/v1beta/cache_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Ai::Generativelanguage::V1beta::CacheService;
+
+    my $msg = Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsRequest->new({
+        page_size => $page_size,
+        page_token => $page_token,
+    });
+
+    # Read or update a field
+    my $val = $msg->page_size();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/ai/generativelanguage/v1beta/cache_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsRequest
+
+Request to list CachedContents.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of cached contents to return. The service may
+return fewer than this value. If unspecified, some default (under maximum)
+number of items will be returned. The maximum value is 1000; values above
+1000 will be coerced to 1000.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. A page token, received from a previous `ListCachedContents` call.
+Provide this to retrieve the subsequent page.
+
+When paginating, all other parameters provided to `ListCachedContents` must
+match the call that provided the page token.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::CacheService::ListCachedContentsResponse
+
+Response with CachedContents list.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cached_contents() >> / C<< $msg->cached_contents($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>)
+
+List of cached contents.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::CacheService::CreateCachedContentRequest
+
+Request to create CachedContent.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cached_content() >> / C<< $msg->cached_content($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>)
+
+Required. The cached content to create.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::CacheService::GetCachedContentRequest
+
+Request to read CachedContent.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name referring to the content cache entry.
+Format: `cachedContents/{id}`
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::CacheService::UpdateCachedContentRequest
+
+Request to update CachedContent.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cached_content() >> / C<< $msg->cached_content($value) >>
+
+Type: C<Message> (L<Google::Ai::Generativelanguage::V1beta::CachedContent::CachedContent>)
+
+Required. The content cache entry to update
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+The list of fields to update.
+
+=back
+
+=head2 Google::Ai::Generativelanguage::V1beta::CacheService::DeleteCachedContentRequest
+
+Request to delete CachedContent.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name referring to the content cache entry
+Format: `cachedContents/{id}`
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Ai::Generativelanguage::V1beta::CacheService::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,28 @@
+Changes
+lib/Google/Cloud/Osconfig/V1beta.pm
+lib/Google/Cloud/Osconfig/V1beta/GuestPolicies.pm
+lib/Google/Cloud/Osconfig/V1beta/GuestPolicies/Types.pm
+lib/Google/Cloud/Osconfig/V1beta/OsconfigCommon.pm
+lib/Google/Cloud/Osconfig/V1beta/OsconfigCommon/Types.pm
+lib/Google/Cloud/Osconfig/V1beta/OsconfigService.pm
+lib/Google/Cloud/Osconfig/V1beta/OsconfigService/Types.pm
+lib/Google/Cloud/Osconfig/V1beta/OsConfigServiceClient.pm
+lib/Google/Cloud/Osconfig/V1beta/PatchDeployments.pm
+lib/Google/Cloud/Osconfig/V1beta/PatchDeployments/Types.pm
+lib/Google/Cloud/Osconfig/V1beta/PatchJobs.pm
+lib/Google/Cloud/Osconfig/V1beta/PatchJobs/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-OsConfigService.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-OsConfigService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

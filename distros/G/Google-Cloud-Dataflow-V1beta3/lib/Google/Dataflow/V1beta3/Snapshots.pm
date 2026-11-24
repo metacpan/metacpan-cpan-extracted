@@ -3,7 +3,7 @@ package Google::Dataflow::V1beta3::Snapshots;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -161,40 +161,6 @@ EOF
     # Field: snapshot_name Type: 9 ()
     # Field: expire_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Snapshots::PubsubSnapshotMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Snapshots;
-
-    my $msg = Google::Dataflow::V1beta3::Snapshots::PubsubSnapshotMetadata->new(
-        topic_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<topic_name>
-
-Type: String
-
-=item * B<snapshot_name>
-
-Type: String
-
-=item * B<expire_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Snapshots::Snapshot ===
     # Fields for Snapshot
     # Field: id Type: 9 ()
@@ -208,107 +174,11 @@ Type: Message (.google.protobuf.Timestamp)
     # Field: disk_size_bytes Type: 3 ()
     # Field: region Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Snapshots::Snapshot - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Snapshots;
-
-    my $msg = Google::Dataflow::V1beta3::Snapshots::Snapshot->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: String
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<source_job_id>
-
-Type: String
-
-=item * B<creation_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<ttl>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<state>
-
-Type: Enum (.google.dataflow.v1beta3.SnapshotState)
-
-=item * B<pubsub_metadata>
-
-Type: Message (.google.dataflow.v1beta3.PubsubSnapshotMetadata)
-
-=item * B<description>
-
-Type: String
-
-=item * B<disk_size_bytes>
-
-Type: Int64
-
-=item * B<region>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Snapshots::GetSnapshotRequest ===
     # Fields for GetSnapshotRequest
     # Field: project_id Type: 9 ()
     # Field: snapshot_id Type: 9 ()
     # Field: location Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Snapshots::GetSnapshotRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Snapshots;
-
-    my $msg = Google::Dataflow::V1beta3::Snapshots::GetSnapshotRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<snapshot_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotRequest ===
     # Fields for DeleteSnapshotRequest
@@ -316,63 +186,8 @@ Type: String
     # Field: snapshot_id Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Snapshots;
-
-    my $msg = Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<snapshot_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotResponse ===
     # Fields for DeleteSnapshotResponse
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Snapshots;
-
-    my $msg = Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Dataflow::V1beta3::Snapshots::ListSnapshotsRequest ===
     # Fields for ListSnapshotsRequest
@@ -380,92 +195,24 @@ Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotResponse - Compiled Protocol
     # Field: job_id Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Snapshots::ListSnapshotsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Snapshots;
-
-    my $msg = Google::Dataflow::V1beta3::Snapshots::ListSnapshotsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Dataflow::V1beta3::Snapshots::ListSnapshotsResponse ===
     # Fields for ListSnapshotsResponse
     # Field: snapshots Type: 11 (.google.dataflow.v1beta3.Snapshot)
-
-=pod
-
-=head1 NAME
-
-Google::Dataflow::V1beta3::Snapshots::ListSnapshotsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Dataflow::V1beta3::Snapshots;
-
-    my $msg = Google::Dataflow::V1beta3::Snapshots::ListSnapshotsResponse->new(
-        snapshots => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<snapshots>
-
-Type: Message (.google.dataflow.v1beta3.Snapshot)
-
-=back
-
-=cut
 
 # === Service Client: Google::Dataflow::V1beta3::Snapshots::SnapshotsV1Beta3Client ===
 package Google::Dataflow::V1beta3::Snapshots::SnapshotsV1Beta3Client;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Dataflow::V1beta3::Snapshots::SnapshotsV1Beta3Client
 
-Google::Dataflow::V1beta3::Snapshots::SnapshotsV1Beta3Client - Client stub representing the remote SnapshotsV1Beta3 service
+Client stub representing the remote C<SnapshotsV1Beta3> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataflow.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -533,13 +280,260 @@ sub list_snapshots {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Dataflow::V1beta3::Snapshots - Protocol Buffers schema definition
+Google::Dataflow::V1beta3::Snapshots - Compiled Protocol Buffers messages for google/dataflow/v1beta3/snapshots.proto
+
+=head1 SYNOPSIS
+
+    use Google::Dataflow::V1beta3::Snapshots;
+
+    my $msg = Google::Dataflow::V1beta3::Snapshots::PubsubSnapshotMetadata->new({
+        topic_name => $topic_name,
+        snapshot_name => $snapshot_name,
+        expire_time => $expire_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->topic_name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Dataflow::V1beta3::Snapshots::PubsubSnapshotMetadata->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/dataflow/v1beta3/snapshots.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Dataflow::V1beta3::Snapshots::PubsubSnapshotMetadata
+
+Represents a Pubsub snapshot.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->topic_name() >> / C<< $msg->topic_name($value) >>
+
+Type: C<String>
+
+The name of the Pubsub topic.
+
+=item * C<< $msg->snapshot_name() >> / C<< $msg->snapshot_name($value) >>
+
+Type: C<String>
+
+The name of the Pubsub snapshot.
+
+=item * C<< $msg->expire_time() >> / C<< $msg->expire_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The expire time of the Pubsub snapshot.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Snapshots::Snapshot
+
+Represents a snapshot of a job.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+The unique ID of this snapshot.
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The project this snapshot belongs to.
+
+=item * C<< $msg->source_job_id() >> / C<< $msg->source_job_id($value) >>
+
+Type: C<String>
+
+The job this snapshot was created from.
+
+=item * C<< $msg->creation_time() >> / C<< $msg->creation_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time this snapshot was created.
+
+=item * C<< $msg->ttl() >> / C<< $msg->ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+The time after which this snapshot will be automatically deleted.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Dataflow::V1beta3::SnapshotState>)
+
+State of the snapshot.
+
+=item * C<< $msg->pubsub_metadata() >> / C<< $msg->pubsub_metadata($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Snapshots::PubsubSnapshotMetadata>)
+
+Pub/Sub snapshot metadata.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+User specified description of the snapshot. Maybe empty.
+
+=item * C<< $msg->disk_size_bytes() >> / C<< $msg->disk_size_bytes($value) >>
+
+Type: C<Int64>
+
+The disk byte size of the snapshot. Only available for snapshots in READY
+state.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+Cloud region where this snapshot lives in, e.g., "us-central1".
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Snapshots::GetSnapshotRequest
+
+Request to get information about a snapshot
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The ID of the Cloud Platform project that the snapshot belongs to.
+
+=item * C<< $msg->snapshot_id() >> / C<< $msg->snapshot_id($value) >>
+
+Type: C<String>
+
+The ID of the snapshot.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The location that contains this snapshot.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotRequest
+
+Request to delete a snapshot.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The ID of the Cloud Platform project that the snapshot belongs to.
+
+=item * C<< $msg->snapshot_id() >> / C<< $msg->snapshot_id($value) >>
+
+Type: C<String>
+
+The ID of the snapshot.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The location that contains this snapshot.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Snapshots::DeleteSnapshotResponse
+
+Response from deleting a snapshot.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Dataflow::V1beta3::Snapshots::ListSnapshotsRequest
+
+Request to list snapshots.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+The project ID to list snapshots for.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+If specified, list snapshots created from this job.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The location to list snapshots in.
+
+=back
+
+=head2 Google::Dataflow::V1beta3::Snapshots::ListSnapshotsResponse
+
+List of snapshots.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->snapshots() >> / C<< $msg->snapshots($value) >>
+
+Type: C<Message> (L<Google::Dataflow::V1beta3::Snapshots::Snapshot>)
+
+Returned snapshots.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Dataflow::V1beta3::Snapshots::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

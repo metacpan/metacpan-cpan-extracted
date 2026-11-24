@@ -1,3 +1,44 @@
+Mon Nov 23 10:01:00 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* VERSION: bump
+	* README.md: generated
+	* lib/File/DistDir.pm.in
+	- add `module` parameter to new(); resolves owning distribution via
+	  Module::Metadata and ExtUtils::Installed packlist scanning; dies on
+	  ambiguous or missing ownership; converts :: to - for distribution name
+	- add find(PATTERN) method; matches basenames against simple glob (*, ?)
+	  recursively via list(); slash in pattern switches to full relative-path
+	  matching; excludes symlinks and directories
+	(_distribution_for_module)
+	- new private sub; validates module name syntax, resolves installed path
+	  via Module::Metadata->new_from_module, walks all ExtUtils::Installed
+	  packlists to identify owning distribution
+	- try cheap look for modules by creating distribution name from	module name
+	* lib/File/DistDir/CLI.pm.in
+	(init)
+	- replace mandatory --distribution check with mutual-exclusion guard
+	  between --distribution and --module; pass resolved option to
+	  File::DistDir->new
+	(cmd_find)
+	- new command; delegates to File::DistDir->find with single PATTERN arg;
+	  prints one relative path per line
+	(main)
+	- add --module|-m option spec; register find => \&cmd_find command
+	* t/02-find-module.t: new
+	- tests for module-based constructor and find() behavior
+	* .includes/bash-completion.mk
+	- guard MODULINO, build rule, and bash-completion target under
+	  ifeq ($(MODULINO_ENABLED),1)
+	* Makefile
+	- set MODULINO_ENABLED ?= 1
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.mk: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.yml: new
+	- +Module::Metadata 1.000038
+	* requires
+	- +Module::Metadata 1.000038
+	* cpanfile: generated
+
 Sat Nov 21 17:14:37  Rob Lauer  rclauer@gmail.com
 
 	[1.0.0]:

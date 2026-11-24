@@ -12,16 +12,16 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Dataproc::V1::Shared;
 use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-use Google::Cloud::Dataproc::V1::Operations;
 use Google::Cloud::Dataproc::V1::Jobs;
+use Google::Cloud::Dataproc::V1::Operations;
 use Google::Cloud::Dataproc::V1::Sessions;
 use Google::Cloud::Dataproc::V1::Batches;
 use Google::Cloud::Dataproc::V1::Clusters;
 use Google::Cloud::Dataproc::V1::SessionTemplates;
-use Google::Cloud::Dataproc::V1::NodeGroups;
 use Google::Cloud::Dataproc::V1::WorkflowTemplates;
+use Google::Cloud::Dataproc::V1::NodeGroups;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -669,40 +669,6 @@ sub create_node_group {
     return $response;
 }
 
-sub create_session {
-    my ($self, %params) = @_;
-
-    my $request_class = 'Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest';
-    my $request = eval { $request_class->new(\%params) };
-    my $new_err = $@;
-    if (!$request) {
-        $request = eval { $request_class->new(%params) };
-        $new_err ||= $@;
-    }
-    if (!$request) {
-        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
-    }
-
-    my $response_class = 'Google::Longrunning::Operations::Operation';
-    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
-        return $self->transport->call({
-            http_method    => 'POST',
-            path           => '/google.cloud.dataproc.v1.SessionController/CreateSession',
-            request        => $request,
-            response_class => $response_class,
-        });
-    }
-
-    my $response = $self->transport->call({
-        service        => 'google.cloud.dataproc.v1.SessionController',
-        method         => 'CreateSession',
-        request        => $request,
-        response_class => $response_class,
-    });
-
-    return $response;
-}
-
 sub create_session_template {
     my ($self, %params) = @_;
 
@@ -730,6 +696,40 @@ sub create_session_template {
     my $response = $self->transport->call({
         service        => 'google.cloud.dataproc.v1.SessionTemplateController',
         method         => 'CreateSessionTemplate',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub create_session {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.cloud.dataproc.v1.SessionController/CreateSession',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.cloud.dataproc.v1.SessionController',
+        method         => 'CreateSession',
         request        => $request,
         response_class => $response_class,
     });
@@ -824,9 +824,9 @@ Generated from the following Protocol Buffers schemas:
 
 =item * C<googleapis/google/cloud/dataproc/v1/operations.proto>
 
-=item * C<googleapis/google/cloud/dataproc/v1/sessions.proto>
-
 =item * C<googleapis/google/cloud/dataproc/v1/session_templates.proto>
+
+=item * C<googleapis/google/cloud/dataproc/v1/sessions.proto>
 
 =item * C<googleapis/google/cloud/dataproc/v1/shared.proto>
 
@@ -865,87 +865,630 @@ The following RPC methods are available in this client:
 
 =item * B<create_autoscaling_policy>
 
-Calls the RPC method C<CreateAutoscalingPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_autoscaling_policy(
+        parent                   => $parent,
+        policy                   => $policy,
+    );
+
+Calls the RPC method C<CreateAutoscalingPolicy> on C<google.cloud.dataproc.v1.AutoscalingPolicyService>.
+
+Request: L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::CreateAutoscalingPolicyRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<policy> - L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy>
+
+=back
 
 =item * B<create_batch>
 
-Calls the RPC method C<CreateBatch> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_batch(
+        parent                   => $parent,
+        batch                    => $batch,
+        batch_id                 => $batch_id,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<CreateBatch> on C<google.cloud.dataproc.v1.BatchController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Batches::CreateBatchRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<batch> - L<Google::Cloud::Dataproc::V1::Batches::Batch>
+
+=item * C<batch_id> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<create_cluster>
 
-Calls the RPC method C<CreateCluster> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_cluster(
+        project_id               => $project_id,
+        region                   => $region,
+        cluster                  => $cluster,
+        request_id               => $request_id,
+        action_on_failed_primary_workers => $action_on_failed_primary_workers,
+    );
+
+Calls the RPC method C<CreateCluster> on C<google.cloud.dataproc.v1.ClusterController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Clusters::CreateClusterRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<cluster> - L<Google::Cloud::Dataproc::V1::Clusters::Cluster>
+
+=item * C<request_id> - C<string>
+
+=item * C<action_on_failed_primary_workers> - L<Google::Cloud::Dataproc::V1::Clusters::FailureAction>
+
+=back
 
 =item * B<update_cluster>
 
-Calls the RPC method C<UpdateCluster> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_cluster(
+        project_id               => $project_id,
+        region                   => $region,
+        cluster_name             => $cluster_name,
+        cluster                  => $cluster,
+        graceful_decommission_timeout => $graceful_decommission_timeout,
+        update_mask              => $update_mask,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<UpdateCluster> on C<google.cloud.dataproc.v1.ClusterController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Clusters::UpdateClusterRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<cluster_name> - C<string>
+
+=item * C<cluster> - L<Google::Cloud::Dataproc::V1::Clusters::Cluster>
+
+=item * C<graceful_decommission_timeout> - L<Google::Protobuf::Duration::Duration>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<stop_cluster>
 
-Calls the RPC method C<StopCluster> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stop_cluster(
+        project_id               => $project_id,
+        region                   => $region,
+        cluster_name             => $cluster_name,
+        cluster_uuid             => $cluster_uuid,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<StopCluster> on C<google.cloud.dataproc.v1.ClusterController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Clusters::StopClusterRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<cluster_name> - C<string>
+
+=item * C<cluster_uuid> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<start_cluster>
 
-Calls the RPC method C<StartCluster> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start_cluster(
+        project_id               => $project_id,
+        region                   => $region,
+        cluster_name             => $cluster_name,
+        cluster_uuid             => $cluster_uuid,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<StartCluster> on C<google.cloud.dataproc.v1.ClusterController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Clusters::StartClusterRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<cluster_name> - C<string>
+
+=item * C<cluster_uuid> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<delete_cluster>
 
-Calls the RPC method C<DeleteCluster> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_cluster(
+        project_id               => $project_id,
+        region                   => $region,
+        cluster_name             => $cluster_name,
+        cluster_uuid             => $cluster_uuid,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<DeleteCluster> on C<google.cloud.dataproc.v1.ClusterController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Clusters::DeleteClusterRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<cluster_name> - C<string>
+
+=item * C<cluster_uuid> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get_cluster>
 
-Calls the RPC method C<GetCluster> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_cluster(
+        project_id               => $project_id,
+        region                   => $region,
+        cluster_name             => $cluster_name,
+    );
+
+Calls the RPC method C<GetCluster> on C<google.cloud.dataproc.v1.ClusterController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Clusters::GetClusterRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Clusters::Cluster>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<cluster_name> - C<string>
+
+=back
 
 =item * B<list_clusters>
 
-Calls the RPC method C<ListClusters> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_clusters(
+        project_id               => $project_id,
+        region                   => $region,
+        filter                   => $filter,
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListClusters> on C<google.cloud.dataproc.v1.ClusterController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Clusters::ListClustersRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Clusters::ListClustersResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
 
 =item * B<diagnose_cluster>
 
-Calls the RPC method C<DiagnoseCluster> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->diagnose_cluster(
+        project_id               => $project_id,
+        region                   => $region,
+        cluster_name             => $cluster_name,
+        tarball_gcs_dir          => $tarball_gcs_dir,
+        tarball_access           => $tarball_access,
+        diagnosis_interval       => $diagnosis_interval,
+        jobs                     => [ ... ],
+        yarn_application_ids     => [ ... ],
+    );
+
+Calls the RPC method C<DiagnoseCluster> on C<google.cloud.dataproc.v1.ClusterController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Clusters::DiagnoseClusterRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<cluster_name> - C<string>
+
+=item * C<tarball_gcs_dir> - C<string>
+
+=item * C<tarball_access> - L<Google::Cloud::Dataproc::V1::Clusters::TarballAccess>
+
+=item * C<diagnosis_interval> - L<Google::Type::Interval::Interval>
+
+=item * C<jobs> - ArrayRef of C<string>
+
+=item * C<yarn_application_ids> - ArrayRef of C<string>
+
+=back
 
 =item * B<submit_job>
 
-Calls the RPC method C<SubmitJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->submit_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job                      => $job,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SubmitJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::SubmitJobRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job> - L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<submit_job_as_operation>
 
-Calls the RPC method C<SubmitJobAsOperation> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->submit_job_as_operation(
+        project_id               => $project_id,
+        region                   => $region,
+        job                      => $job,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SubmitJobAsOperation> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::SubmitJobRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job> - L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get_job>
 
-Calls the RPC method C<GetJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job_id                   => $job_id,
+    );
+
+Calls the RPC method C<GetJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::GetJobRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job_id> - C<string>
+
+=back
 
 =item * B<list_jobs>
 
-Calls the RPC method C<ListJobs> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_jobs(
+        project_id               => $project_id,
+        region                   => $region,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        cluster_name             => $cluster_name,
+        job_state_matcher        => $job_state_matcher,
+        filter                   => $filter,
+    );
+
+Calls the RPC method C<ListJobs> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::ListJobsRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::ListJobsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<cluster_name> - C<string>
+
+=item * C<job_state_matcher> - L<Google::Cloud::Dataproc::V1::Jobs::JobStateMatcher>
+
+=item * C<filter> - C<string>
+
+=back
 
 =item * B<update_job>
 
-Calls the RPC method C<UpdateJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job_id                   => $job_id,
+        job                      => $job,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<UpdateJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::UpdateJobRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<job> - L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+=item * C<update_mask> - L<Google::Protobuf::FieldMask::FieldMask>
+
+=back
 
 =item * B<cancel_job>
 
-Calls the RPC method C<CancelJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->cancel_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job_id                   => $job_id,
+    );
+
+Calls the RPC method C<CancelJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::CancelJobRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::Jobs::Job>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job_id> - C<string>
+
+=back
 
 =item * B<delete_job>
 
-Calls the RPC method C<DeleteJob> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete_job(
+        project_id               => $project_id,
+        region                   => $region,
+        job_id                   => $job_id,
+    );
+
+Calls the RPC method C<DeleteJob> on C<google.cloud.dataproc.v1.JobController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Jobs::DeleteJobRequest>
+
+Returns: L<Google::Protobuf::Empty::Empty>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<job_id> - C<string>
+
+=back
 
 =item * B<create_node_group>
 
-Calls the RPC method C<CreateNodeGroup> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_node_group(
+        parent                   => $parent,
+        node_group               => $node_group,
+        node_group_id            => $node_group_id,
+        request_id               => $request_id,
+    );
 
-=item * B<create_session>
+Calls the RPC method C<CreateNodeGroup> on C<google.cloud.dataproc.v1.NodeGroupController>.
 
-Calls the RPC method C<CreateSession> on the service. Takes a hash of parameters representing the request.
+Request: L<Google::Cloud::Dataproc::V1::NodeGroups::CreateNodeGroupRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<node_group> - L<Google::Cloud::Dataproc::V1::Clusters::NodeGroup>
+
+=item * C<node_group_id> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<create_session_template>
 
-Calls the RPC method C<CreateSessionTemplate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_session_template(
+        parent                   => $parent,
+        session_template         => $session_template,
+    );
+
+Calls the RPC method C<CreateSessionTemplate> on C<google.cloud.dataproc.v1.SessionTemplateController>.
+
+Request: L<Google::Cloud::Dataproc::V1::SessionTemplates::CreateSessionTemplateRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<session_template> - L<Google::Cloud::Dataproc::V1::SessionTemplates::SessionTemplate>
+
+=back
+
+=item * B<create_session>
+
+    my $response = $client->create_session(
+        parent                   => $parent,
+        session                  => $session,
+        session_id               => $session_id,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<CreateSession> on C<google.cloud.dataproc.v1.SessionController>.
+
+Request: L<Google::Cloud::Dataproc::V1::Sessions::CreateSessionRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<session> - L<Google::Cloud::Dataproc::V1::Sessions::Session>
+
+=item * C<session_id> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<create_workflow_template>
 
-Calls the RPC method C<CreateWorkflowTemplate> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_workflow_template(
+        parent                   => $parent,
+        template                 => $template,
+    );
+
+Calls the RPC method C<CreateWorkflowTemplate> on C<google.cloud.dataproc.v1.WorkflowTemplateService>.
+
+Request: L<Google::Cloud::Dataproc::V1::WorkflowTemplates::CreateWorkflowTemplateRequest>
+
+Returns: L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<template> - L<Google::Cloud::Dataproc::V1::WorkflowTemplates::WorkflowTemplate>
+
+=back
 
 =back
 

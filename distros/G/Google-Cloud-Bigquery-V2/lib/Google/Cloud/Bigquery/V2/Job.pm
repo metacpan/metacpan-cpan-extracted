@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::Job;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -1058,146 +1058,16 @@ EOF
     # Field: principal_subject Type: 9 ()
     # Field: job_creation_reason Type: 11 (.google.cloud.bigquery.v2.JobCreationReason)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::Job - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::Job->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<id>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<user_email>
-
-Type: String
-
-=item * B<configuration>
-
-Type: Message (.google.cloud.bigquery.v2.JobConfiguration)
-
-=item * B<job_reference>
-
-Type: Message (.google.cloud.bigquery.v2.JobReference)
-
-=item * B<statistics>
-
-Type: Message (.google.cloud.bigquery.v2.JobStatistics)
-
-=item * B<status>
-
-Type: Message (.google.cloud.bigquery.v2.JobStatus)
-
-=item * B<principal_subject>
-
-Type: String
-
-=item * B<job_creation_reason>
-
-Type: Message (.google.cloud.bigquery.v2.JobCreationReason)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Job::CancelJobRequest ===
     # Fields for CancelJobRequest
     # Field: project_id Type: 9 ()
     # Field: job_id Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::CancelJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::CancelJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Job::JobCancelResponse ===
     # Fields for JobCancelResponse
     # Field: kind Type: 9 ()
     # Field: job Type: 11 (.google.cloud.bigquery.v2.Job)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::JobCancelResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::JobCancelResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<job>
-
-Type: Message (.google.cloud.bigquery.v2.Job)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Job::GetJobRequest ===
     # Fields for GetJobRequest
@@ -1205,114 +1075,16 @@ Type: Message (.google.cloud.bigquery.v2.Job)
     # Field: job_id Type: 9 ()
     # Field: location Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::GetJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::GetJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Job::InsertJobRequest ===
     # Fields for InsertJobRequest
     # Field: project_id Type: 9 ()
     # Field: job Type: 11 (.google.cloud.bigquery.v2.Job)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::InsertJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::InsertJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job>
-
-Type: Message (.google.cloud.bigquery.v2.Job)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Job::DeleteJobRequest ===
     # Fields for DeleteJobRequest
     # Field: project_id Type: 9 ()
     # Field: job_id Type: 9 ()
     # Field: location Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::DeleteJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::DeleteJobRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Job::ListJobsRequest ===
     # Fields for ListJobsRequest
@@ -1326,89 +1098,11 @@ Type: String
     # Field: state_filter Type: 14 (.google.cloud.bigquery.v2.ListJobsRequest.StateFilter)
     # Field: parent_job_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::ListJobsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::ListJobsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<all_users>
-
-Type: Bool
-
-=item * B<max_results>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<min_creation_time>
-
-Type: UInt64
-
-=item * B<max_creation_time>
-
-Type: Message (.google.protobuf.UInt64Value)
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<projection>
-
-Type: Enum (.google.cloud.bigquery.v2.ListJobsRequest.Projection)
-
-=item * B<state_filter>
-
-Type: Enum (.google.cloud.bigquery.v2.ListJobsRequest.StateFilter)
-
-=item * B<parent_job_id>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: ListJobsRequest::Projection
 our $ListJobsRequest_minimal = 0;
 our $ListJobsRequest_MINIMAL = 0;
 our $ListJobsRequest_full = 1;
 our $ListJobsRequest_FULL = 1;
-
-=pod
-
-=head2 Enum: ListJobsRequest::Projection
-
-Values:
-
-=over 4
-
-=item * C<minimal> => 0
-
-=item * C<MINIMAL> => 0
-
-=item * C<full> => 1
-
-=item * C<FULL> => 1
-
-=back
-
-=cut
 
 # Enum: ListJobsRequest::StateFilter
 our $ListJobsRequest_done = 0;
@@ -1417,30 +1111,6 @@ our $ListJobsRequest_pending = 1;
 our $ListJobsRequest_PENDING = 1;
 our $ListJobsRequest_running = 2;
 our $ListJobsRequest_RUNNING = 2;
-
-=pod
-
-=head2 Enum: ListJobsRequest::StateFilter
-
-Values:
-
-=over 4
-
-=item * C<done> => 0
-
-=item * C<DONE> => 0
-
-=item * C<pending> => 1
-
-=item * C<PENDING> => 1
-
-=item * C<running> => 2
-
-=item * C<RUNNING> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Job::ListFormatJob ===
     # Fields for ListFormatJob
@@ -1455,68 +1125,6 @@ Values:
     # Field: user_email Type: 9 ()
     # Field: principal_subject Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::ListFormatJob - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::ListFormatJob->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: String
-
-=item * B<kind>
-
-Type: String
-
-=item * B<job_reference>
-
-Type: Message (.google.cloud.bigquery.v2.JobReference)
-
-=item * B<state>
-
-Type: String
-
-=item * B<error_result>
-
-Type: Message (.google.cloud.bigquery.v2.ErrorProto)
-
-=item * B<statistics>
-
-Type: Message (.google.cloud.bigquery.v2.JobStatistics)
-
-=item * B<configuration>
-
-Type: Message (.google.cloud.bigquery.v2.JobConfiguration)
-
-=item * B<status>
-
-Type: Message (.google.cloud.bigquery.v2.JobStatus)
-
-=item * B<user_email>
-
-Type: String
-
-=item * B<principal_subject>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Job::JobList ===
     # Fields for JobList
     # Field: etag Type: 9 ()
@@ -1524,48 +1132,6 @@ Type: String
     # Field: next_page_token Type: 9 ()
     # Field: jobs Type: 11 (.google.cloud.bigquery.v2.ListFormatJob)
     # Field: unreachable Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::JobList - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::JobList->new(
-        etag => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<etag>
-
-Type: String
-
-=item * B<kind>
-
-Type: String
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<jobs>
-
-Type: Message (.google.cloud.bigquery.v2.ListFormatJob)
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Job::GetQueryResultsRequest ===
     # Fields for GetQueryResultsRequest
@@ -1577,60 +1143,6 @@ Type: String
     # Field: timeout_ms Type: 11 (.google.protobuf.UInt32Value)
     # Field: location Type: 9 ()
     # Field: format_options Type: 11 (.google.cloud.bigquery.v2.DataFormatOptions)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::GetQueryResultsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::GetQueryResultsRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<job_id>
-
-Type: String
-
-=item * B<start_index>
-
-Type: Message (.google.protobuf.UInt64Value)
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<max_results>
-
-Type: Message (.google.protobuf.UInt32Value)
-
-=item * B<timeout_ms>
-
-Type: Message (.google.protobuf.UInt32Value)
-
-=item * B<location>
-
-Type: String
-
-=item * B<format_options>
-
-Type: Message (.google.cloud.bigquery.v2.DataFormatOptions)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Job::GetQueryResultsResponse ===
     # Fields for GetQueryResultsResponse
@@ -1647,110 +1159,10 @@ Type: Message (.google.cloud.bigquery.v2.DataFormatOptions)
     # Field: cache_hit Type: 11 (.google.protobuf.BoolValue)
     # Field: num_dml_affected_rows Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::GetQueryResultsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::GetQueryResultsResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<schema>
-
-Type: Message (.google.cloud.bigquery.v2.TableSchema)
-
-=item * B<job_reference>
-
-Type: Message (.google.cloud.bigquery.v2.JobReference)
-
-=item * B<total_rows>
-
-Type: Message (.google.protobuf.UInt64Value)
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<rows>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<total_bytes_processed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<job_complete>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<errors>
-
-Type: Message (.google.cloud.bigquery.v2.ErrorProto)
-
-=item * B<cache_hit>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<num_dml_affected_rows>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::Job::PostQueryRequest ===
     # Fields for PostQueryRequest
     # Field: project_id Type: 9 ()
     # Field: query_request Type: 11 (.google.cloud.bigquery.v2.QueryRequest)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::PostQueryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::PostQueryRequest->new(
-        project_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<project_id>
-
-Type: String
-
-=item * B<query_request>
-
-Type: Message (.google.cloud.bigquery.v2.QueryRequest)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Job::QueryRequest ===
     # Fields for QueryRequest
@@ -1780,173 +1192,15 @@ Type: Message (.google.cloud.bigquery.v2.QueryRequest)
     # Field: query_results_format Type: 14 (.google.cloud.bigquery.v2.QueryRequest.QueryResultsFormat)
     # Field: arrow_serialization_options Type: 11 (.google.cloud.bigquery.v2.ArrowSerializationOptions)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::QueryRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::QueryRequest->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<query>
-
-Type: String
-
-=item * B<max_results>
-
-Type: Message (.google.protobuf.UInt32Value)
-
-=item * B<default_dataset>
-
-Type: Message (.google.cloud.bigquery.v2.DatasetReference)
-
-=item * B<timeout_ms>
-
-Type: Message (.google.protobuf.UInt32Value)
-
-=item * B<job_timeout_ms>
-
-Type: Int64
-
-=item * B<max_slots>
-
-Type: Int32
-
-=item * B<destination_encryption_configuration>
-
-Type: Message (.google.cloud.bigquery.v2.EncryptionConfiguration)
-
-=item * B<dry_run>
-
-Type: Bool
-
-=item * B<use_query_cache>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<use_legacy_sql>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<parameter_mode>
-
-Type: String
-
-=item * B<query_parameters>
-
-Type: Message (.google.cloud.bigquery.v2.QueryParameter)
-
-=item * B<location>
-
-Type: String
-
-=item * B<format_options>
-
-Type: Message (.google.cloud.bigquery.v2.DataFormatOptions)
-
-=item * B<connection_properties>
-
-Type: Message (.google.cloud.bigquery.v2.ConnectionProperty)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.bigquery.v2.QueryRequest.LabelsEntry)
-
-=item * B<maximum_bytes_billed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<request_id>
-
-Type: String
-
-=item * B<create_session>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<job_creation_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.QueryRequest.JobCreationMode)
-
-=item * B<reservation>
-
-Type: String
-
-=item * B<write_incremental_results>
-
-Type: Bool
-
-=item * B<query_results_format>
-
-Type: Enum (.google.cloud.bigquery.v2.QueryRequest.QueryResultsFormat)
-
-=item * B<arrow_serialization_options>
-
-Type: Message (.google.cloud.bigquery.v2.ArrowSerializationOptions)
-
-=back
-
-=cut
-
 # Enum: QueryRequest::JobCreationMode
 our $QueryRequest_JOB_CREATION_MODE_UNSPECIFIED = 0;
 our $QueryRequest_JOB_CREATION_REQUIRED = 1;
 our $QueryRequest_JOB_CREATION_OPTIONAL = 2;
 
-=pod
-
-=head2 Enum: QueryRequest::JobCreationMode
-
-Values:
-
-=over 4
-
-=item * C<JOB_CREATION_MODE_UNSPECIFIED> => 0
-
-=item * C<JOB_CREATION_REQUIRED> => 1
-
-=item * C<JOB_CREATION_OPTIONAL> => 2
-
-=back
-
-=cut
-
 # Enum: QueryRequest::QueryResultsFormat
 our $QueryRequest_QUERY_RESULTS_FORMAT_UNSPECIFIED = 0;
 our $QueryRequest_STRUCT_ENCODING = 1;
 our $QueryRequest_ARROW = 2;
-
-=pod
-
-=head2 Enum: QueryRequest::QueryResultsFormat
-
-Values:
-
-=over 4
-
-=item * C<QUERY_RESULTS_FORMAT_UNSPECIFIED> => 0
-
-=item * C<STRUCT_ENCODING> => 1
-
-=item * C<ARROW> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::Job::QueryResponse ===
     # Fields for QueryResponse
@@ -1976,150 +1230,20 @@ Values:
     # Field: page_row_count Type: 3 ()
     # Field: statement_type Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::Job::QueryResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::Job;
-
-    my $msg = Google::Cloud::Bigquery::V2::Job::QueryResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<schema>
-
-Type: Message (.google.cloud.bigquery.v2.TableSchema)
-
-=item * B<job_reference>
-
-Type: Message (.google.cloud.bigquery.v2.JobReference)
-
-=item * B<job_creation_reason>
-
-Type: Message (.google.cloud.bigquery.v2.JobCreationReason)
-
-=item * B<query_id>
-
-Type: String
-
-=item * B<location>
-
-Type: String
-
-=item * B<total_rows>
-
-Type: Message (.google.protobuf.UInt64Value)
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<rows>
-
-Type: Message (.google.protobuf.Struct)
-
-=item * B<total_bytes_processed>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<total_bytes_billed>
-
-Type: Int64
-
-=item * B<total_slot_ms>
-
-Type: Int64
-
-=item * B<job_complete>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<errors>
-
-Type: Message (.google.cloud.bigquery.v2.ErrorProto)
-
-=item * B<cache_hit>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<num_dml_affected_rows>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<session_info>
-
-Type: Message (.google.cloud.bigquery.v2.SessionInfo)
-
-=item * B<dml_stats>
-
-Type: Message (.google.cloud.bigquery.v2.DmlStats)
-
-=item * B<creation_time>
-
-Type: Int64
-
-=item * B<start_time>
-
-Type: Int64
-
-=item * B<end_time>
-
-Type: Int64
-
-=item * B<arrow_schema>
-
-Type: Message (.google.cloud.bigquery.v2.ArrowSchema)
-
-=item * B<arrow_record_batch>
-
-Type: Message (.google.cloud.bigquery.v2.ArrowRecordBatch)
-
-=item * B<page_row_count>
-
-Type: Int64
-
-=item * B<statement_type>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Bigquery::V2::Job::JobServiceClient ===
 package Google::Cloud::Bigquery::V2::Job::JobServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Bigquery::V2::Job::JobServiceClient
 
-Google::Cloud::Bigquery::V2::Job::JobServiceClient - Client stub representing the remote JobService service
+Client stub representing the remote C<JobService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<bigquery.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -2239,13 +1363,1346 @@ sub query {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::Job - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::Job - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/job.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::Job;
+
+    my $msg = Google::Cloud::Bigquery::V2::Job::Job->new({
+        kind => $kind,
+        etag => $etag,
+        id => $id,
+        self_link => $self_link,
+    });
+
+    # Read or update a field
+    my $val = $msg->kind();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::Job::Job->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/job.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::Job::Job
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+Output only. The type of the resource.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+Output only. A hash of this resource.
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Output only. Opaque ID field of the job.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+Output only. A URL that can be used to access the resource again.
+
+=item * C<< $msg->user_email() >> / C<< $msg->user_email($value) >>
+
+Type: C<String>
+
+Output only. Email address of the user who ran the job.
+
+=item * C<< $msg->configuration() >> / C<< $msg->configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::JobConfiguration>)
+
+Required. Describes the job configuration.
+
+=item * C<< $msg->job_reference() >> / C<< $msg->job_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobReference::JobReference>)
+
+Optional. Reference describing the unique-per-user name of the job.
+
+=item * C<< $msg->statistics() >> / C<< $msg->statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::JobStatistics>)
+
+Output only. Information about the job, including starting time and ending
+time of the job.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStatus::JobStatus>)
+
+Output only. The status of this job. Examine this value when polling an
+asynchronous job to see if the job is complete.
+
+=item * C<< $msg->principal_subject() >> / C<< $msg->principal_subject($value) >>
+
+Type: C<String>
+
+Output only. [Full-projection-only] String representation of identity of
+requesting party. Populated for both first- and third-party identities.
+Only present for APIs that support third-party identities.
+
+=item * C<< $msg->job_creation_reason() >> / C<< $msg->job_creation_reason($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobCreationReason::JobCreationReason>)
+
+Output only. The reason why a Job was created.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::CancelJobRequest
+
+Describes format of a jobs cancellation request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the job to cancel
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Required. Job ID of the job to cancel
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The geographic location of the job. You must
+[specify the
+location](https://cloud.google.com/bigquery/docs/locations#specify_locations)
+to run the job for the following scenarios:
+
+* If the location to run a job is not in the `us` or
+  the `eu` multi-regional location
+* If the job's location is in a single region (for example,
+  `us-central1`)
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::JobCancelResponse
+
+Describes format of a jobs cancellation response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The resource type of the response.
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Job::Job>)
+
+The final state of the job.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::GetJobRequest
+
+Describes format of a jobs get request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the requested job.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Required. Job ID of the requested job.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The geographic location of the job. You must specify the location to run
+the job for the following scenarios:
+
+* If the location to run a job is not in the `us` or
+  the `eu` multi-regional location
+* If the job's location is in a single region (for example,
+  `us-central1`)
+
+For more information, see how to
+[specify
+locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::InsertJobRequest
+
+Describes format of a job insertion request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Project ID of project that will be billed for the job.
+
+=item * C<< $msg->job() >> / C<< $msg->job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Job::Job>)
+
+Jobs resource to insert.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::DeleteJobRequest
+
+Describes the format of a jobs deletion request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the job for which metadata is to be deleted.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Required. Job ID of the job for which metadata is to be deleted. If this is
+a parent job which has child jobs, the metadata from all child jobs will be
+deleted as well. Direct deletion of the metadata of child jobs is not
+allowed.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The geographic location of the job. Required.
+
+For more information, see how to
+[specify
+locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::ListJobsRequest
+
+Describes the format of the list jobs request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Project ID of the jobs to list.
+
+=item * C<< $msg->all_users() >> / C<< $msg->all_users($value) >>
+
+Type: C<Bool>
+
+Whether to display jobs owned by all users in the project. Default False.
+
+=item * C<< $msg->max_results() >> / C<< $msg->max_results($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+The maximum number of results to return in a single response page.
+Leverage the page tokens to iterate through the entire collection.
+
+=item * C<< $msg->min_creation_time() >> / C<< $msg->min_creation_time($value) >>
+
+Type: C<UInt64>
+
+Min value for job creation time, in milliseconds since the POSIX epoch.
+If set, only jobs created after or at this timestamp are returned.
+
+=item * C<< $msg->max_creation_time() >> / C<< $msg->max_creation_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt64Value>)
+
+Max value for job creation time, in milliseconds since the POSIX epoch.
+If set, only jobs created before or at this timestamp are returned.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Page token, returned by a previous call, to request the next page of
+results.
+
+=item * C<< $msg->projection() >> / C<< $msg->projection($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ListJobsRequest::Projection>)
+
+Restrict information returned to a set of selected fields
+
+=item * C<< $msg->state_filter() >> / C<< $msg->state_filter($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ListJobsRequest::StateFilter>)
+
+Filter for job state
+
+=item * C<< $msg->parent_job_id() >> / C<< $msg->parent_job_id($value) >>
+
+Type: C<String>
+
+If set, show only child jobs of the specified parent.  Otherwise, show all
+top-level jobs.
+
+=back
+
+=head3 Enum: ListJobsRequest::Projection
+
+=over 4
+
+=item * C<minimal> => C<0>
+
+=item * C<MINIMAL> => C<0>
+
+=item * C<full> => C<1>
+
+=item * C<FULL> => C<1>
+
+=back
+
+=head3 Enum: ListJobsRequest::StateFilter
+
+=over 4
+
+=item * C<done> => C<0>
+
+=item * C<DONE> => C<0>
+
+=item * C<pending> => C<1>
+
+=item * C<PENDING> => C<1>
+
+=item * C<running> => C<2>
+
+=item * C<RUNNING> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::ListFormatJob
+
+ListFormatJob is a partial projection of job information returned as part
+of a jobs.list response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Unique opaque ID of the job.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The resource type.
+
+=item * C<< $msg->job_reference() >> / C<< $msg->job_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobReference::JobReference>)
+
+Unique opaque ID of the job.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<String>
+
+Running state of the job. When the state is DONE, errorResult can be
+checked to determine whether the job succeeded or failed.
+
+=item * C<< $msg->error_result() >> / C<< $msg->error_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Error::ErrorProto>)
+
+A result object that will be present only if the job has failed.
+
+=item * C<< $msg->statistics() >> / C<< $msg->statistics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::JobStatistics>)
+
+Output only. Information about the job, including starting time and ending
+time of the job.
+
+=item * C<< $msg->configuration() >> / C<< $msg->configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::JobConfiguration>)
+
+Required. Describes the job configuration.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStatus::JobStatus>)
+
+[Full-projection-only] Describes the status of this job.
+
+=item * C<< $msg->user_email() >> / C<< $msg->user_email($value) >>
+
+Type: C<String>
+
+[Full-projection-only] Email address of the user who ran the job.
+
+=item * C<< $msg->principal_subject() >> / C<< $msg->principal_subject($value) >>
+
+Type: C<String>
+
+[Full-projection-only] String representation of identity of requesting
+party. Populated for both first- and third-party identities. Only present
+for APIs that support third-party identities.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::JobList
+
+JobList is the response format for a jobs.list call.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+A hash of this page of results.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The resource type of the response.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to request the next page of results.
+
+=item * C<< $msg->jobs() >> / C<< $msg->jobs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Job::ListFormatJob>)
+
+List of jobs that were requested.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+A list of skipped locations that were unreachable. For more information
+about BigQuery locations, see:
+https://cloud.google.com/bigquery/docs/locations. Example: "europe-west5"
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::GetQueryResultsRequest
+
+Request object of GetQueryResults.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the query job.
+
+=item * C<< $msg->job_id() >> / C<< $msg->job_id($value) >>
+
+Type: C<String>
+
+Required. Job ID of the query job.
+
+=item * C<< $msg->start_index() >> / C<< $msg->start_index($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt64Value>)
+
+Zero-based index of the starting row.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Page token, returned by a previous call, to request the next page of
+results.
+
+=item * C<< $msg->max_results() >> / C<< $msg->max_results($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt32Value>)
+
+Maximum number of results to read.
+
+=item * C<< $msg->timeout_ms() >> / C<< $msg->timeout_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt32Value>)
+
+Optional: Specifies the maximum amount of time, in milliseconds, that the
+client is willing to wait for the query to complete. By default, this limit
+is 10 seconds (10,000 milliseconds). If the query is complete, the
+jobComplete field in the response is true. If the query has not yet
+completed, jobComplete is false.
+
+You can request a longer timeout period in the timeoutMs field.  However,
+the call is not guaranteed to wait for the specified timeout; it typically
+returns after around 200 seconds (200,000 milliseconds), even if the query
+is not complete.
+
+If jobComplete is false, you can continue to wait for the query to complete
+by calling the getQueryResults method until the jobComplete field in the
+getQueryResults response is true.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The geographic location of the job. You must specify the location to run
+the job for the following scenarios:
+
+* If the location to run a job is not in the `us` or
+  the `eu` multi-regional location
+* If the job's location is in a single region (for example,
+`us-central1`)
+
+For more information, see how to
+[specify
+locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
+
+=item * C<< $msg->format_options() >> / C<< $msg->format_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DataFormatOptions::DataFormatOptions>)
+
+Optional. Output format adjustments.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::GetQueryResultsResponse
+
+Response object of GetQueryResults.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The resource type of the response.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+A hash of this response.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableSchema>)
+
+The schema of the results. Present only when the query completes
+successfully.
+
+=item * C<< $msg->job_reference() >> / C<< $msg->job_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobReference::JobReference>)
+
+Reference to the BigQuery Job that was created to run the query. This field
+will be present even if the original request timed out, in which case
+GetQueryResults can be used to read the results once the query has
+completed. Since this API only returns the first page of results,
+subsequent pages can be fetched via the same mechanism (GetQueryResults).
+
+=item * C<< $msg->total_rows() >> / C<< $msg->total_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt64Value>)
+
+The total number of rows in the complete query result set, which can be
+more than the number of rows in this single page of results. Present only
+when the query completes successfully.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A token used for paging results.  When this token is non-empty, it
+indicates additional results are available.
+
+=item * C<< $msg->rows() >> / C<< $msg->rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+An object with as many results as can be contained within the maximum
+permitted reply size. To get any additional rows, you can call
+GetQueryResults and specify the jobReference returned above. Present only
+when the query completes successfully.
+
+The REST-based representation of this data leverages a series of
+JSON f,v objects for indicating fields and values.
+
+=item * C<< $msg->total_bytes_processed() >> / C<< $msg->total_bytes_processed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+The total number of bytes processed for this query.
+
+=item * C<< $msg->job_complete() >> / C<< $msg->job_complete($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether the query has completed or not. If rows or totalRows are present,
+this will always be true. If this is false, totalRows will not be
+available.
+
+=item * C<< $msg->errors() >> / C<< $msg->errors($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Error::ErrorProto>)
+
+Output only. The first errors or warnings encountered during the running
+of the job. The final message includes the number of errors that caused the
+process to stop. Errors here do not necessarily mean that the job has
+completed or was unsuccessful. For more information about error messages,
+see [Error
+messages](https://cloud.google.com/bigquery/docs/error-messages).
+
+=item * C<< $msg->cache_hit() >> / C<< $msg->cache_hit($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether the query result was fetched from the query cache.
+
+=item * C<< $msg->num_dml_affected_rows() >> / C<< $msg->num_dml_affected_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The number of rows affected by a DML statement. Present only
+for DML statements INSERT, UPDATE or DELETE.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::PostQueryRequest
+
+Request format for the query request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. Project ID of the query request.
+
+=item * C<< $msg->query_request() >> / C<< $msg->query_request($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Job::QueryRequest>)
+
+The query request body.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::QueryRequest
+
+Describes the format of the jobs.query request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The resource type of the request.
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Required. A query string to execute, using Google Standard SQL or legacy
+SQL syntax. Example: "SELECT COUNT(f1) FROM
+myProjectId.myDatasetId.myTableId".
+
+=item * C<< $msg->max_results() >> / C<< $msg->max_results($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt32Value>)
+
+Optional. The maximum number of rows of data to return per page of
+results. Setting this flag to a small value such as 1000 and then paging
+through results might improve reliability when the query result set is
+large. In addition to this limit, responses are also limited to 10 MB. By
+default, there is no maximum row count, and only the byte limit applies.
+
+=item * C<< $msg->default_dataset() >> / C<< $msg->default_dataset($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DatasetReference::DatasetReference>)
+
+Optional. Specifies the default datasetId and projectId to assume for any
+unqualified table names in the query. If not set, all table names in the
+query string must be qualified in the format 'datasetId.tableId'.
+
+=item * C<< $msg->timeout_ms() >> / C<< $msg->timeout_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt32Value>)
+
+Optional. Optional: Specifies the maximum amount of time, in milliseconds,
+that the client is willing to wait for the query to complete. By default,
+this limit is 10 seconds (10,000 milliseconds). If the query is complete,
+the jobComplete field in the response is true. If the query has not yet
+completed, jobComplete is false.
+
+You can request a longer timeout period in the timeoutMs field.  However,
+the call is not guaranteed to wait for the specified timeout; it typically
+returns after around 200 seconds (200,000 milliseconds), even if the query
+is not complete.
+
+If jobComplete is false, you can continue to wait for the query to complete
+by calling the getQueryResults method until the jobComplete field in the
+getQueryResults response is true.
+
+=item * C<< $msg->job_timeout_ms() >> / C<< $msg->job_timeout_ms($value) >>
+
+Type: C<Int64>
+
+Optional. Job timeout in milliseconds. If this time limit is exceeded,
+BigQuery will attempt to stop a longer job, but may not always succeed in
+canceling it before the job completes. For example, a job that takes more
+than 60 seconds to complete has a better chance of being stopped than a job
+that takes 10 seconds to complete. This timeout applies to the query even
+if a job does not need to be created.
+
+=item * C<< $msg->max_slots() >> / C<< $msg->max_slots($value) >>
+
+Type: C<Int32>
+
+Optional. A target limit on the rate of slot consumption by this query. If
+set to a value > 0, BigQuery will attempt to limit the rate of slot
+consumption by this query to keep it below the configured limit, even if
+the query is eligible for more slots based on fair scheduling. The unused
+slots will be available for other jobs and queries to use.
+
+Note: This feature is not yet generally available.
+
+=item * C<< $msg->destination_encryption_configuration() >> / C<< $msg->destination_encryption_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::EncryptionConfig::EncryptionConfiguration>)
+
+Optional. Custom encryption configuration (e.g., Cloud KMS keys)
+
+=item * C<< $msg->dry_run() >> / C<< $msg->dry_run($value) >>
+
+Type: C<Bool>
+
+Optional. If set to true, BigQuery doesn't run the job. Instead, if the
+query is valid, BigQuery returns statistics about the job such as how many
+bytes would be processed. If the query is invalid, an error returns. The
+default value is false.
+
+=item * C<< $msg->use_query_cache() >> / C<< $msg->use_query_cache($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Whether to look for the result in the query cache. The query
+cache is a best-effort cache that will be flushed whenever tables in the
+query are modified. The default value is true.
+
+=item * C<< $msg->use_legacy_sql() >> / C<< $msg->use_legacy_sql($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Specifies whether to use BigQuery's legacy SQL dialect for this query. The
+default value is true. If set to false, the query uses BigQuery's
+[GoogleSQL](https://docs.cloud.google.com/bigquery/docs/introduction-sql).
+When useLegacySql is set to false, the value of flattenResults is ignored;
+query will be run as if flattenResults is false.
+
+=item * C<< $msg->parameter_mode() >> / C<< $msg->parameter_mode($value) >>
+
+Type: C<String>
+
+GoogleSQL only. Set to POSITIONAL to use positional (?) query parameters
+or to NAMED to use named (@myparam) query parameters in this query.
+
+=item * C<< $msg->query_parameters() >> / C<< $msg->query_parameters($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::QueryParameter::QueryParameter>)
+
+Query parameters for GoogleSQL queries.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The geographic location where the job should run.
+For more information, see how to
+[specify
+locations](https://cloud.google.com/bigquery/docs/locations#specify_locations).
+
+=item * C<< $msg->format_options() >> / C<< $msg->format_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::DataFormatOptions::DataFormatOptions>)
+
+Optional. Output format adjustments.
+
+=item * C<< $msg->connection_properties() >> / C<< $msg->connection_properties($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobConfig::ConnectionProperty>)
+
+Optional. Connection properties which can modify the query behavior.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Job::QueryRequest::LabelsEntry>)
+
+Optional. The labels associated with this query.
+Labels can be used to organize and group query jobs.
+Label keys and values can be no longer than 63 characters, can only contain
+lowercase letters, numeric characters, underscores and dashes.
+International characters are allowed. Label keys must start with a letter
+and each label in the list must have a different key.
+
+=item * C<< $msg->maximum_bytes_billed() >> / C<< $msg->maximum_bytes_billed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. Limits the bytes billed for this query. Queries with
+bytes billed above this limit will fail (without incurring a charge).
+If unspecified, the project default is used.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. A unique user provided identifier to ensure idempotent behavior
+for queries. Note that this is different from the job_id. It has the
+following properties:
+
+1. It is case-sensitive, limited to up to 36 ASCII characters. A UUID is
+   recommended.
+
+2. Read only queries can ignore this token since they are nullipotent by
+   definition.
+
+3. For the purposes of idempotency ensured by the request_id, a request
+   is considered duplicate of another only if they have the same request_id
+   and are actually duplicates. When determining whether a request is a
+   duplicate of another request, all parameters in the request that
+   may affect the result are considered. For example, query,
+   connection_properties, query_parameters, use_legacy_sql are parameters
+   that affect the result and are considered when determining whether a
+   request is a duplicate, but properties like timeout_ms don't
+   affect the result and are thus not considered. Dry run query
+   requests are never considered duplicate of another request.
+
+4. When a duplicate mutating query request is detected, it returns:
+   a. the results of the mutation if it completes successfully within
+      the timeout.
+   b. the running operation if it is still in progress at the end of the
+       timeout.
+
+5. Its lifetime is limited to 15 minutes. In other words, if two
+   requests are sent with the same request_id, but more than 15 minutes
+   apart, idempotency is not guaranteed.
+
+=item * C<< $msg->create_session() >> / C<< $msg->create_session($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If true, creates a new session using a randomly generated
+session_id. If false, runs query with an existing session_id passed in
+ConnectionProperty, otherwise runs query in non-session mode.
+
+The session location will be set to QueryRequest.location if it is present,
+otherwise it's set to the default location based on existing routing logic.
+
+=item * C<< $msg->job_creation_mode() >> / C<< $msg->job_creation_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::QueryRequest::JobCreationMode>)
+
+Optional. If not set, jobs are always required.
+
+If set, the query request will follow the behavior described
+JobCreationMode.
+
+=item * C<< $msg->reservation() >> / C<< $msg->reservation($value) >>
+
+Type: C<String>
+
+Optional. The reservation that jobs.query request would use. User can
+specify a reservation to execute the job.query. The expected format is
+`projects/{project}/locations/{location}/reservations/{reservation}`.
+Forces the query to use on-demand billing when set to `none`.
+This requires the project or organization to have
+`reservation_override_mode` set to `ALLOW_ANY_OVERRIDE`.
+
+=item * C<< $msg->write_incremental_results() >> / C<< $msg->write_incremental_results($value) >>
+
+Type: C<Bool>
+
+Optional. This is only supported for SELECT query. If set, the query is
+allowed to write results incrementally to the temporary result table. This
+may incur a performance penalty. This option cannot be used with Legacy
+SQL. This feature is not yet available.
+
+=item * C<< $msg->query_results_format() >> / C<< $msg->query_results_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::QueryRequest::QueryResultsFormat>)
+
+Optional. The query results format.
+If the value is anything other than `STRUCT_ENCODING` or unspecified:
+
+ * The schema of the results will be provided in
+   `QueryResponse.results_schema` field.
+ * The results of the first page will be provided in
+   `QueryResponse.results` field.
+ * The `QueryResponse.rows` will not be populated.
+ * The `QueryResponse.schema` for `QueryResponse.rows` will also not be
+   populated since it is the schema of the `QueryResponse.rows`.
+
+This feature is not yet available.
+
+=item * C<< $msg->arrow_serialization_options() >> / C<< $msg->arrow_serialization_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Arrow::ArrowSerializationOptions>)
+
+Optional. Options specific to the Apache Arrow output format.
+
+=back
+
+=head3 Enum: QueryRequest::JobCreationMode
+
+=over 4
+
+=item * C<JOB_CREATION_MODE_UNSPECIFIED> => C<0>
+
+=item * C<JOB_CREATION_REQUIRED> => C<1>
+
+=item * C<JOB_CREATION_OPTIONAL> => C<2>
+
+=back
+
+=head3 Enum: QueryRequest::QueryResultsFormat
+
+=over 4
+
+=item * C<QUERY_RESULTS_FORMAT_UNSPECIFIED> => C<0>
+
+=item * C<STRUCT_ENCODING> => C<1>
+
+=item * C<ARROW> => C<2>
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::Job::QueryResponse
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+The resource type.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableSchema>)
+
+The schema of the results. Present only when the query completes
+successfully.
+
+=item * C<< $msg->job_reference() >> / C<< $msg->job_reference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobReference::JobReference>)
+
+Reference to the Job that was created to run the query. This field will be
+present even if the original request timed out, in which case
+GetQueryResults can be used to read the results once the query has
+completed. Since this API only returns the first page of results,
+subsequent pages can be fetched via the same mechanism (GetQueryResults).
+
+If job_creation_mode was set to `JOB_CREATION_OPTIONAL` and the query
+completes without creating a job, this field will be empty.
+
+=item * C<< $msg->job_creation_reason() >> / C<< $msg->job_creation_reason($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobCreationReason::JobCreationReason>)
+
+Optional. The reason why a Job was created.
+
+Only relevant when a job_reference is present in the response.
+If job_reference is not present it will always be unset.
+
+=item * C<< $msg->query_id() >> / C<< $msg->query_id($value) >>
+
+Type: C<String>
+
+Auto-generated ID for the query.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Output only. The geographic location of the query.
+
+For more information about BigQuery locations, see:
+https://cloud.google.com/bigquery/docs/locations
+
+=item * C<< $msg->total_rows() >> / C<< $msg->total_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::UInt64Value>)
+
+The total number of rows in the complete query result set, which can be
+more than the number of rows in this single page of results.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A token used for paging results. A non-empty token indicates that
+additional results are available. To see additional results,
+query the
+[`jobs.getQueryResults`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/getQueryResults)
+method. For more information, see [Paging through table
+data](https://cloud.google.com/bigquery/docs/paging-results).
+
+=item * C<< $msg->rows() >> / C<< $msg->rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Struct::Struct>)
+
+An object with as many results as can be contained within the maximum
+permitted reply size. To get any additional rows, you can call
+GetQueryResults and specify the jobReference returned above.
+
+=item * C<< $msg->total_bytes_processed() >> / C<< $msg->total_bytes_processed($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+The total number of bytes processed for this query. If this query was a dry
+run, this is the number of bytes that would be processed if the query were
+run.
+
+=item * C<< $msg->total_bytes_billed() >> / C<< $msg->total_bytes_billed($value) >>
+
+Type: C<Int64>
+
+Output only. If the project is configured to use on-demand pricing,
+then this field contains the total bytes billed for the job.
+If the project is configured to use flat-rate pricing, then you are
+not billed for bytes and this field is informational only.
+
+=item * C<< $msg->total_slot_ms() >> / C<< $msg->total_slot_ms($value) >>
+
+Type: C<Int64>
+
+Output only. Number of slot ms the user is actually billed for.
+
+=item * C<< $msg->job_complete() >> / C<< $msg->job_complete($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether the query has completed or not. If rows or totalRows are present,
+this will always be true. If this is false, totalRows will not be
+available.
+
+=item * C<< $msg->errors() >> / C<< $msg->errors($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Error::ErrorProto>)
+
+Output only. The first errors or warnings encountered during the running of
+the job. The final message includes the number of errors that caused the
+process to stop. Errors here do not necessarily mean that the job has
+completed or was unsuccessful. For more information about error messages,
+see [Error
+messages](https://cloud.google.com/bigquery/docs/error-messages).
+
+=item * C<< $msg->cache_hit() >> / C<< $msg->cache_hit($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether the query result was fetched from the query cache.
+
+=item * C<< $msg->num_dml_affected_rows() >> / C<< $msg->num_dml_affected_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Output only. The number of rows affected by a DML statement. Present only
+for DML statements INSERT, UPDATE or DELETE.
+
+=item * C<< $msg->session_info() >> / C<< $msg->session_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::SessionInfo::SessionInfo>)
+
+Output only. Information of the session if this job is part of one.
+
+=item * C<< $msg->dml_stats() >> / C<< $msg->dml_stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::JobStats::DmlStats>)
+
+Output only. Detailed statistics for DML statements INSERT, UPDATE, DELETE,
+MERGE or TRUNCATE.
+
+=item * C<< $msg->creation_time() >> / C<< $msg->creation_time($value) >>
+
+Type: C<Int64>
+
+Output only. Creation time of this query, in milliseconds since the epoch.
+This field will be present on all queries.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Int64>
+
+Output only. Start time of this query, in milliseconds since the epoch.
+This field will be present when the query job transitions from the PENDING
+state to either RUNNING or DONE.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Int64>
+
+Output only. End time of this query, in milliseconds since the epoch. This
+field will be present whenever a query job is in the DONE state.
+
+=item * C<< $msg->arrow_schema() >> / C<< $msg->arrow_schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Arrow::ArrowSchema>)
+
+Output only. Arrow schema
+
+=item * C<< $msg->arrow_record_batch() >> / C<< $msg->arrow_record_batch($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::Arrow::ArrowRecordBatch>)
+
+Output only. Serialized row data in Arrow RecordBatch format.
+
+=item * C<< $msg->page_row_count() >> / C<< $msg->page_row_count($value) >>
+
+Type: C<Int64>
+
+Output only. The number of rows out of `total_rows` returned in this
+response.
+
+This feature is not yet available.
+
+=item * C<< $msg->statement_type() >> / C<< $msg->statement_type($value) >>
+
+Type: C<String>
+
+Output only. The type of query statement, if valid.
+Possible values:
+
+* `SELECT`:
+[`SELECT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#select_list)
+statement.
+* `ASSERT`:
+[`ASSERT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/debugging-statements#assert)
+statement.
+* `INSERT`:
+[`INSERT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#insert_statement)
+statement.
+* `UPDATE`:
+[`UPDATE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#update_statement)
+statement.
+* `DELETE`:
+[`DELETE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language)
+statement.
+* `MERGE`:
+[`MERGE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language)
+statement.
+* `CREATE_TABLE`: [`CREATE
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_statement)
+statement, without `AS SELECT`.
+* `CREATE_TABLE_AS_SELECT`: [`CREATE TABLE AS
+SELECT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_statement)
+statement.
+* `CREATE_VIEW`: [`CREATE
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_view_statement)
+statement.
+* `CREATE_MODEL`: [`CREATE
+MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-create#create_model_statement)
+statement.
+* `CREATE_MATERIALIZED_VIEW`: [`CREATE MATERIALIZED
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_materialized_view_statement)
+statement.
+* `CREATE_FUNCTION`: [`CREATE
+FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_function_statement)
+statement.
+* `CREATE_TABLE_FUNCTION`: [`CREATE TABLE
+FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_table_function_statement)
+statement.
+* `CREATE_PROCEDURE`: [`CREATE
+PROCEDURE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_procedure)
+statement.
+* `CREATE_ROW_ACCESS_POLICY`: [`CREATE ROW ACCESS
+POLICY`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_row_access_policy_statement)
+statement.
+* `CREATE_SCHEMA`: [`CREATE
+SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_schema_statement)
+statement.
+* `CREATE_SNAPSHOT_TABLE`: [`CREATE SNAPSHOT
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_snapshot_table_statement)
+statement.
+* `CREATE_SEARCH_INDEX`: [`CREATE SEARCH
+INDEX`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_search_index_statement)
+statement.
+* `DROP_TABLE`: [`DROP
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_table_statement)
+statement.
+* `DROP_EXTERNAL_TABLE`: [`DROP EXTERNAL
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_external_table_statement)
+statement.
+* `DROP_VIEW`: [`DROP
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_view_statement)
+statement.
+* `DROP_MODEL`: [`DROP
+MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-drop-model)
+statement.
+* `DROP_MATERIALIZED_VIEW`: [`DROP MATERIALIZED
+ VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_materialized_view_statement)
+statement.
+* `DROP_FUNCTION` : [`DROP
+FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_function_statement)
+statement.
+* `DROP_TABLE_FUNCTION` : [`DROP TABLE
+FUNCTION`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_table_function)
+statement.
+* `DROP_PROCEDURE`: [`DROP
+PROCEDURE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_procedure_statement)
+statement.
+* `DROP_SEARCH_INDEX`: [`DROP SEARCH
+INDEX`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_search_index)
+statement.
+* `DROP_SCHEMA`: [`DROP
+SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_schema_statement)
+statement.
+* `DROP_SNAPSHOT_TABLE`: [`DROP SNAPSHOT
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_snapshot_table_statement)
+statement.
+* `DROP_ROW_ACCESS_POLICY`: [`DROP [ALL] ROW ACCESS
+POLICY|POLICIES`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#drop_row_access_policy_statement)
+statement.
+* `ALTER_TABLE`: [`ALTER
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_table_set_options_statement)
+statement.
+* `ALTER_VIEW`: [`ALTER
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_view_set_options_statement)
+statement.
+* `ALTER_MATERIALIZED_VIEW`: [`ALTER MATERIALIZED
+VIEW`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_materialized_view_set_options_statement)
+statement.
+* `ALTER_SCHEMA`: [`ALTER
+SCHEMA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#alter_schema_set_options_statement)
+statement.
+* `SCRIPT`:
+[`SCRIPT`](https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language).
+* `TRUNCATE_TABLE`: [`TRUNCATE
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax#truncate_table_statement)
+statement.
+* `CREATE_EXTERNAL_TABLE`: [`CREATE EXTERNAL
+TABLE`](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#create_external_table_statement)
+statement.
+* `EXPORT_DATA`: [`EXPORT
+DATA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/other-statements#export_data_statement)
+statement.
+* `EXPORT_MODEL`: [`EXPORT
+MODEL`](https://cloud.google.com/bigquery-ml/docs/reference/standard-sql/bigqueryml-syntax-export-model)
+statement.
+* `LOAD_DATA`: [`LOAD
+DATA`](https://cloud.google.com/bigquery/docs/reference/standard-sql/other-statements#load_data_statement)
+statement.
+* `CALL`:
+[`CALL`](https://cloud.google.com/bigquery/docs/reference/standard-sql/procedural-language#call)
+statement.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::Job::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

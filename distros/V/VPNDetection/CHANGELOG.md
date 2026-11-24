@@ -2,6 +2,17 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.19.0 - 2026-11-24
+
+### Features
+
+- Send the user agent of the request you are deciding on with a lookup ([`afb5a8f`](https://github.com/vpndetection-io/sdk-perl/commit/afb5a8fa0a10ea096a7e1ef0ef4427dc2b7df1db))
+
+### Fixes
+
+- Re-pin the spec to 2026.11.23: twelve service and bot members are days ([`b8a0679`](https://github.com/vpndetection-io/sdk-perl/commit/b8a0679fd132f8e3fb0aa9dc241acfe0fe0f27fb))
+- Refuse a bot, SSH, SMTP, web, DNS resolver or BitTorrent day that is not a date ([`5fed1e0`](https://github.com/vpndetection-io/sdk-perl/commit/5fed1e0b4048e7eda9df9f04567506e7e093e5cf))
+
 ## 3.18.1 - 2026-11-23
 
 ### Fixes

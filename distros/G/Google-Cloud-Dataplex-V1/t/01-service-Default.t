@@ -118,23 +118,6 @@ subtest 'create_data_product method' => sub {
     done_testing();
 };
 
-subtest 'create_data_scan method' => sub {
-    $client->transport->{mock_call} = sub {
-        my ($args) = @_;
-        is($args->{service}, 'google.cloud.dataplex.v1.DataScanService', 'Correct service path');
-        is($args->{method}, 'CreateDataScan', 'Correct RPC method');
-        isa_ok($args->{request}, 'Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest', 'Request object');
-        
-        my $response = 'Google::Longrunning::Operations::Operation'->new();
-        return $response;
-    };
-    
-    my $res = $client->create_data_scan();
-    ok($res, 'Method returned a response');
-    isa_ok($res, 'Google::Longrunning::Operations::Operation', 'Response object class');
-    done_testing();
-};
-
 subtest 'create_data_taxonomy method' => sub {
     $client->transport->{mock_call} = sub {
         my ($args) = @_;
@@ -147,6 +130,23 @@ subtest 'create_data_taxonomy method' => sub {
     };
     
     my $res = $client->create_data_taxonomy();
+    ok($res, 'Method returned a response');
+    isa_ok($res, 'Google::Longrunning::Operations::Operation', 'Response object class');
+    done_testing();
+};
+
+subtest 'create_data_scan method' => sub {
+    $client->transport->{mock_call} = sub {
+        my ($args) = @_;
+        is($args->{service}, 'google.cloud.dataplex.v1.DataScanService', 'Correct service path');
+        is($args->{method}, 'CreateDataScan', 'Correct RPC method');
+        isa_ok($args->{request}, 'Google::Cloud::Dataplex::V1::Datascans::CreateDataScanRequest', 'Request object');
+        
+        my $response = 'Google::Longrunning::Operations::Operation'->new();
+        return $response;
+    };
+    
+    my $res = $client->create_data_scan();
     ok($res, 'Method returned a response');
     isa_ok($res, 'Google::Longrunning::Operations::Operation', 'Response object class');
     done_testing();

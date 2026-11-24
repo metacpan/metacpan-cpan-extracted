@@ -3,7 +3,7 @@ package Google::Spanner::V1::Mutation;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -181,67 +181,124 @@ EOF
     # Field: send Type: 11 (.google.spanner.v1.Mutation.Send)
     # Field: ack Type: 11 (.google.spanner.v1.Mutation.Ack)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Spanner::V1::Mutation::Mutation - Compiled Protocol Buffers message class
+Google::Spanner::V1::Mutation - Compiled Protocol Buffers messages for google/spanner/v1/mutation.proto
 
 =head1 SYNOPSIS
 
     use Google::Spanner::V1::Mutation;
 
-    my $msg = Google::Spanner::V1::Mutation::Mutation->new(
-        insert => $value,
-    );
+    my $msg = Google::Spanner::V1::Mutation::Mutation->new({
+        insert => $insert,
+        update => $update,
+        insert_or_update => $insert_or_update,
+        replace => $replace,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->insert();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Spanner::V1::Mutation::Mutation->parse($bytes);
 
-=item * B<insert>
-
-Type: Message (.google.spanner.v1.Mutation.Write)
-
-=item * B<update>
-
-Type: Message (.google.spanner.v1.Mutation.Write)
-
-=item * B<insert_or_update>
-
-Type: Message (.google.spanner.v1.Mutation.Write)
-
-=item * B<replace>
-
-Type: Message (.google.spanner.v1.Mutation.Write)
-
-=item * B<delete>
-
-Type: Message (.google.spanner.v1.Mutation.Delete)
-
-=item * B<send>
-
-Type: Message (.google.spanner.v1.Mutation.Send)
-
-=item * B<ack>
-
-Type: Message (.google.spanner.v1.Mutation.Ack)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Spanner::V1::Mutation - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/spanner/v1/mutation.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Spanner::V1::Mutation::Mutation
+
+A modification to one or more Cloud Spanner rows.  Mutations can be
+applied to a Cloud Spanner database by sending them in a
+[Commit][google.spanner.v1.Spanner.Commit] call.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->insert() >> / C<< $msg->insert($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Mutation::Mutation::Write>)
+
+Insert new rows in a table. If any of the rows already exist,
+the write or transaction fails with error `ALREADY_EXISTS`.
+
+=item * C<< $msg->update() >> / C<< $msg->update($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Mutation::Mutation::Write>)
+
+Update existing rows in a table. If any of the rows does not
+already exist, the transaction fails with error `NOT_FOUND`.
+
+=item * C<< $msg->insert_or_update() >> / C<< $msg->insert_or_update($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Mutation::Mutation::Write>)
+
+Like [insert][google.spanner.v1.Mutation.insert], except that if the row
+already exists, then its column values are overwritten with the ones
+provided. Any column values not explicitly written are preserved.
+
+When using
+[insert_or_update][google.spanner.v1.Mutation.insert_or_update], just as
+when using [insert][google.spanner.v1.Mutation.insert], all `NOT NULL`
+columns in the table must be given a value. This holds true even when the
+row already exists and will therefore actually be updated.
+
+=item * C<< $msg->replace() >> / C<< $msg->replace($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Mutation::Mutation::Write>)
+
+Like [insert][google.spanner.v1.Mutation.insert], except that if the row
+already exists, it is deleted, and the column values provided are
+inserted instead. Unlike
+[insert_or_update][google.spanner.v1.Mutation.insert_or_update], this
+means any values not explicitly written become `NULL`.
+
+In an interleaved table, if you create the child table with the
+`ON DELETE CASCADE` annotation, then replacing a parent row
+also deletes the child rows. Otherwise, you must delete the
+child rows before you replace the parent row.
+
+=item * C<< $msg->delete() >> / C<< $msg->delete($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Mutation::Mutation::Delete>)
+
+Delete rows from a table. Succeeds whether or not the named
+rows were present.
+
+=item * C<< $msg->send() >> / C<< $msg->send($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Mutation::Mutation::Send>)
+
+Send a message to a queue.
+
+=item * C<< $msg->ack() >> / C<< $msg->ack($value) >>
+
+Type: C<Message> (L<Google::Spanner::V1::Mutation::Mutation::Ack>)
+
+Ack a message from a queue.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Spanner::V1::Mutation::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -62,55 +62,86 @@ EOF
     # Field: table_id Type: 9 ()
     # Field: policy_id Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::RowAccessPolicyReference::RowAccessPolicyReference - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::RowAccessPolicyReference - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/row_access_policy_reference.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::RowAccessPolicyReference;
 
-    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicyReference::RowAccessPolicyReference->new(
-        project_id => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::RowAccessPolicyReference::RowAccessPolicyReference->new({
+        project_id => $project_id,
+        dataset_id => $dataset_id,
+        table_id => $table_id,
+        policy_id => $policy_id,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->project_id();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::RowAccessPolicyReference::RowAccessPolicyReference->parse($bytes);
 
-=item * B<project_id>
-
-Type: String
-
-=item * B<dataset_id>
-
-Type: String
-
-=item * B<table_id>
-
-Type: String
-
-=item * B<policy_id>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::RowAccessPolicyReference - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/row_access_policy_reference.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::RowAccessPolicyReference::RowAccessPolicyReference
+
+Id path of a row access policy.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->project_id() >> / C<< $msg->project_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the project containing this row access policy.
+
+=item * C<< $msg->dataset_id() >> / C<< $msg->dataset_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the dataset containing this row access policy.
+
+=item * C<< $msg->table_id() >> / C<< $msg->table_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the table containing this row access policy.
+
+=item * C<< $msg->policy_id() >> / C<< $msg->policy_id($value) >>
+
+Type: C<String>
+
+Required. The ID of the row access policy. The ID must contain only
+letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum
+length is 256 characters.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::RowAccessPolicyReference::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

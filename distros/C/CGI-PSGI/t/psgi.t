@@ -12,6 +12,9 @@ plan tests => 36;
 use CGI::PSGI ();
 use Config;
 
+# the tests call param() in list context on purpose (multi_param needs CGI 4.08)
+{ no warnings "once"; $CGI::LIST_CONTEXT_WARN = 0 }
+
 my $loaded = 1;
 
 $| = 1;

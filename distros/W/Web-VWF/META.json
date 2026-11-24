@@ -142,6 +142,6 @@
          "web" : "https://github.com/nigelhorne/Web-VWF"
       }
    },
-   "version" : "0.003.1",
+   "version" : "0.004.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

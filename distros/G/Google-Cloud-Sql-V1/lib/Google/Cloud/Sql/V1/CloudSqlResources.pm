@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlResources;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -2708,83 +2708,11 @@ EOF
     # Field: name Type: 9 ()
     # Field: kind Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::AclEntry - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::AclEntry->new(
-        value => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<value>
-
-Type: String
-
-=item * B<expiration_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<name>
-
-Type: String
-
-=item * B<kind>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::ApiWarning ===
     # Fields for ApiWarning
     # Field: code Type: 14 (.google.cloud.sql.v1.ApiWarning.SqlApiWarningCode)
     # Field: message Type: 9 ()
     # Field: region Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::ApiWarning - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::ApiWarning->new(
-        code => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<code>
-
-Type: Enum (.google.cloud.sql.v1.ApiWarning.SqlApiWarningCode)
-
-=item * B<message>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=back
-
-=cut
 
 # Enum: ApiWarning::SqlApiWarningCode
 our $ApiWarning_SQL_API_WARNING_CODE_UNSPECIFIED = 0;
@@ -2793,82 +2721,14 @@ our $ApiWarning_MAX_RESULTS_EXCEEDS_LIMIT = 2;
 our $ApiWarning_COMPROMISED_CREDENTIALS = 3;
 our $ApiWarning_INTERNAL_STATE_FAILURE = 4;
 
-=pod
-
-=head2 Enum: ApiWarning::SqlApiWarningCode
-
-Values:
-
-=over 4
-
-=item * C<SQL_API_WARNING_CODE_UNSPECIFIED> => 0
-
-=item * C<REGION_UNREACHABLE> => 1
-
-=item * C<MAX_RESULTS_EXCEEDS_LIMIT> => 2
-
-=item * C<COMPROMISED_CREDENTIALS> => 3
-
-=item * C<INTERNAL_STATE_FAILURE> => 4
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::BackupRetentionSettings ===
     # Fields for BackupRetentionSettings
     # Field: retention_unit Type: 14 (.google.cloud.sql.v1.BackupRetentionSettings.RetentionUnit)
     # Field: retained_backups Type: 11 (.google.protobuf.Int32Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::BackupRetentionSettings - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::BackupRetentionSettings->new(
-        retention_unit => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<retention_unit>
-
-Type: Enum (.google.cloud.sql.v1.BackupRetentionSettings.RetentionUnit)
-
-=item * B<retained_backups>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=back
-
-=cut
-
 # Enum: BackupRetentionSettings::RetentionUnit
 our $BackupRetentionSettings_RETENTION_UNIT_UNSPECIFIED = 0;
 our $BackupRetentionSettings_COUNT = 1;
-
-=pod
-
-=head2 Enum: BackupRetentionSettings::RetentionUnit
-
-Values:
-
-=over 4
-
-=item * C<RETENTION_UNIT_UNSPECIFIED> => 0
-
-=item * C<COUNT> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::BackupConfiguration ===
     # Fields for BackupConfiguration
@@ -2884,72 +2744,6 @@ Values:
     # Field: transactional_log_storage_state Type: 14 (.google.cloud.sql.v1.BackupConfiguration.TransactionalLogStorageState)
     # Field: backup_tier Type: 14 (.google.cloud.sql.v1.BackupConfiguration.BackupTier)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::BackupConfiguration - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::BackupConfiguration->new(
-        start_time => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start_time>
-
-Type: String
-
-=item * B<enabled>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<kind>
-
-Type: String
-
-=item * B<binary_log_enabled>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<replication_log_archiving_enabled>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<location>
-
-Type: String
-
-=item * B<point_in_time_recovery_enabled>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<backup_retention_settings>
-
-Type: Message (.google.cloud.sql.v1.BackupRetentionSettings)
-
-=item * B<transaction_log_retention_days>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<transactional_log_storage_state>
-
-Type: Enum (.google.cloud.sql.v1.BackupConfiguration.TransactionalLogStorageState)
-
-=item * B<backup_tier>
-
-Type: Enum (.google.cloud.sql.v1.BackupConfiguration.BackupTier)
-
-=back
-
-=cut
-
 # Enum: BackupConfiguration::TransactionalLogStorageState
 our $BackupConfiguration_TRANSACTIONAL_LOG_STORAGE_STATE_UNSPECIFIED = 0;
 our $BackupConfiguration_DISK = 1;
@@ -2957,83 +2751,15 @@ our $BackupConfiguration_SWITCHING_TO_CLOUD_STORAGE = 2;
 our $BackupConfiguration_SWITCHED_TO_CLOUD_STORAGE = 3;
 our $BackupConfiguration_CLOUD_STORAGE = 4;
 
-=pod
-
-=head2 Enum: BackupConfiguration::TransactionalLogStorageState
-
-Values:
-
-=over 4
-
-=item * C<TRANSACTIONAL_LOG_STORAGE_STATE_UNSPECIFIED> => 0
-
-=item * C<DISK> => 1
-
-=item * C<SWITCHING_TO_CLOUD_STORAGE> => 2
-
-=item * C<SWITCHED_TO_CLOUD_STORAGE> => 3
-
-=item * C<CLOUD_STORAGE> => 4
-
-=back
-
-=cut
-
 # Enum: BackupConfiguration::BackupTier
 our $BackupConfiguration_BACKUP_TIER_UNSPECIFIED = 0;
 our $BackupConfiguration_STANDARD = 1;
 our $BackupConfiguration_ADVANCED = 2;
 our $BackupConfiguration_ENHANCED = 3;
 
-=pod
-
-=head2 Enum: BackupConfiguration::BackupTier
-
-Values:
-
-=over 4
-
-=item * C<BACKUP_TIER_UNSPECIFIED> => 0
-
-=item * C<STANDARD> => 1
-
-=item * C<ADVANCED> => 2
-
-=item * C<ENHANCED> => 3
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::PerformDiskShrinkContext ===
     # Fields for PerformDiskShrinkContext
     # Field: target_size_gb Type: 3 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::PerformDiskShrinkContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::PerformDiskShrinkContext->new(
-        target_size_gb => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<target_size_gb>
-
-Type: Int64
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::PreCheckResponse ===
     # Fields for PreCheckResponse
@@ -3041,65 +2767,11 @@ Type: Int64
     # Field: message_type Type: 14 (.google.cloud.sql.v1.PreCheckResponse.MessageType)
     # Field: actions_required Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::PreCheckResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::PreCheckResponse->new(
-        message => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<message>
-
-Type: String
-
-=item * B<message_type>
-
-Type: Enum (.google.cloud.sql.v1.PreCheckResponse.MessageType)
-
-=item * B<actions_required>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: PreCheckResponse::MessageType
 our $PreCheckResponse_MESSAGE_TYPE_UNSPECIFIED = 0;
 our $PreCheckResponse_INFO = 1;
 our $PreCheckResponse_WARNING = 2;
 our $PreCheckResponse_ERROR = 3;
-
-=pod
-
-=head2 Enum: PreCheckResponse::MessageType
-
-Values:
-
-=over 4
-
-=item * C<MESSAGE_TYPE_UNSPECIFIED> => 0
-
-=item * C<INFO> => 1
-
-=item * C<WARNING> => 2
-
-=item * C<ERROR> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::PreCheckMajorVersionUpgradeContext ===
     # Fields for PreCheckMajorVersionUpgradeContext
@@ -3108,83 +2780,11 @@ Values:
     # Field: kind Type: 9 ()
     # Field: max_runtime Type: 11 (.google.protobuf.Duration)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::PreCheckMajorVersionUpgradeContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::PreCheckMajorVersionUpgradeContext->new(
-        target_database_version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<target_database_version>
-
-Type: Enum (.google.cloud.sql.v1.SqlDatabaseVersion)
-
-=item * B<pre_check_response>
-
-Type: Message (.google.cloud.sql.v1.PreCheckResponse)
-
-=item * B<kind>
-
-Type: String
-
-=item * B<max_runtime>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::BackupContext ===
     # Fields for BackupContext
     # Field: backup_id Type: 3 ()
     # Field: kind Type: 9 ()
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::BackupContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::BackupContext->new(
-        backup_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<backup_id>
-
-Type: Int64
-
-=item * B<kind>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::Database ===
     # Fields for Database
@@ -3198,198 +2798,24 @@ Type: String
     # Field: project Type: 9 ()
     # Field: sqlserver_database_details Type: 11 (.google.cloud.sql.v1.SqlServerDatabaseDetails)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::Database - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::Database->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<charset>
-
-Type: String
-
-=item * B<collation>
-
-Type: String
-
-=item * B<etag>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=item * B<sqlserver_database_details>
-
-Type: Message (.google.cloud.sql.v1.SqlServerDatabaseDetails)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::SqlServerDatabaseDetails ===
     # Fields for SqlServerDatabaseDetails
     # Field: compatibility_level Type: 5 ()
     # Field: recovery_model Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::SqlServerDatabaseDetails - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::SqlServerDatabaseDetails->new(
-        compatibility_level => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<compatibility_level>
-
-Type: Int32
-
-=item * B<recovery_model>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::DatabaseFlags ===
     # Fields for DatabaseFlags
     # Field: name Type: 9 ()
     # Field: value Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::DatabaseFlags - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::DatabaseFlags->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<value>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::MySqlSyncConfig ===
     # Fields for MySqlSyncConfig
     # Field: initial_sync_flags Type: 11 (.google.cloud.sql.v1.SyncFlags)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::MySqlSyncConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::MySqlSyncConfig->new(
-        initial_sync_flags => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<initial_sync_flags>
-
-Type: Message (.google.cloud.sql.v1.SyncFlags)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::SyncFlags ===
     # Fields for SyncFlags
     # Field: name Type: 9 ()
     # Field: value Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::SyncFlags - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::SyncFlags->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<value>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::InstanceReference ===
     # Fields for InstanceReference
@@ -3397,74 +2823,10 @@ Type: String
     # Field: region Type: 9 ()
     # Field: project Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::InstanceReference - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::InstanceReference->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<region>
-
-Type: String
-
-=item * B<project>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::DemoteMasterConfiguration ===
     # Fields for DemoteMasterConfiguration
     # Field: kind Type: 9 ()
     # Field: mysql_replica_configuration Type: 11 (.google.cloud.sql.v1.DemoteMasterMySqlReplicaConfiguration)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::DemoteMasterConfiguration - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::DemoteMasterConfiguration->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<mysql_replica_configuration>
-
-Type: Message (.google.cloud.sql.v1.DemoteMasterMySqlReplicaConfiguration)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::DemoteMasterMySqlReplicaConfiguration ===
     # Fields for DemoteMasterMySqlReplicaConfiguration
@@ -3474,52 +2836,6 @@ Type: Message (.google.cloud.sql.v1.DemoteMasterMySqlReplicaConfiguration)
     # Field: client_key Type: 9 ()
     # Field: client_certificate Type: 9 ()
     # Field: ca_certificate Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::DemoteMasterMySqlReplicaConfiguration - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::DemoteMasterMySqlReplicaConfiguration->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<username>
-
-Type: String
-
-=item * B<password>
-
-Type: String
-
-=item * B<client_key>
-
-Type: String
-
-=item * B<client_certificate>
-
-Type: String
-
-=item * B<ca_certificate>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::ExportContext ===
     # Fields for ExportContext
@@ -3533,64 +2849,6 @@ Type: String
     # Field: bak_export_options Type: 11 (.google.cloud.sql.v1.ExportContext.SqlBakExportOptions)
     # Field: tde_export_options Type: 11 (.google.cloud.sql.v1.ExportContext.SqlTdeExportOptions)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::ExportContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::ExportContext->new(
-        uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<uri>
-
-Type: String
-
-=item * B<databases>
-
-Type: String
-
-=item * B<kind>
-
-Type: String
-
-=item * B<sql_export_options>
-
-Type: Message (.google.cloud.sql.v1.ExportContext.SqlExportOptions)
-
-=item * B<csv_export_options>
-
-Type: Message (.google.cloud.sql.v1.ExportContext.SqlCsvExportOptions)
-
-=item * B<file_type>
-
-Type: Enum (.google.cloud.sql.v1.SqlFileType)
-
-=item * B<offload>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<bak_export_options>
-
-Type: Message (.google.cloud.sql.v1.ExportContext.SqlBakExportOptions)
-
-=item * B<tde_export_options>
-
-Type: Message (.google.cloud.sql.v1.ExportContext.SqlTdeExportOptions)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::ImportContext ===
     # Fields for ImportContext
     # Field: uri Type: 9 ()
@@ -3602,64 +2860,6 @@ Type: Message (.google.cloud.sql.v1.ExportContext.SqlTdeExportOptions)
     # Field: bak_import_options Type: 11 (.google.cloud.sql.v1.ImportContext.SqlBakImportOptions)
     # Field: sql_import_options Type: 11 (.google.cloud.sql.v1.ImportContext.SqlImportOptions)
     # Field: tde_import_options Type: 11 (.google.cloud.sql.v1.ImportContext.SqlTdeImportOptions)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::ImportContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::ImportContext->new(
-        uri => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<uri>
-
-Type: String
-
-=item * B<database>
-
-Type: String
-
-=item * B<kind>
-
-Type: String
-
-=item * B<file_type>
-
-Type: Enum (.google.cloud.sql.v1.SqlFileType)
-
-=item * B<csv_import_options>
-
-Type: Message (.google.cloud.sql.v1.ImportContext.SqlCsvImportOptions)
-
-=item * B<import_user>
-
-Type: String
-
-=item * B<bak_import_options>
-
-Type: Message (.google.cloud.sql.v1.ImportContext.SqlBakImportOptions)
-
-=item * B<sql_import_options>
-
-Type: Message (.google.cloud.sql.v1.ImportContext.SqlImportOptions)
-
-=item * B<tde_import_options>
-
-Type: Message (.google.cloud.sql.v1.ImportContext.SqlTdeImportOptions)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::IpConfiguration ===
     # Fields for IpConfiguration
@@ -3676,101 +2876,11 @@ Type: Message (.google.cloud.sql.v1.ImportContext.SqlTdeImportOptions)
     # Field: server_ca_pool Type: 9 ()
     # Field: server_certificate_rotation_mode Type: 14 (.google.cloud.sql.v1.IpConfiguration.ServerCertificateRotationMode)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::IpConfiguration - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::IpConfiguration->new(
-        ipv4_enabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<ipv4_enabled>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<private_network>
-
-Type: String
-
-=item * B<require_ssl>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<authorized_networks>
-
-Type: Message (.google.cloud.sql.v1.AclEntry)
-
-=item * B<allocated_ip_range>
-
-Type: String
-
-=item * B<enable_private_path_for_google_cloud_services>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<ssl_mode>
-
-Type: Enum (.google.cloud.sql.v1.IpConfiguration.SslMode)
-
-=item * B<psc_config>
-
-Type: Message (.google.cloud.sql.v1.PscConfig)
-
-=item * B<server_ca_mode>
-
-Type: Enum (.google.cloud.sql.v1.IpConfiguration.CaMode)
-
-=item * B<custom_subject_alternative_names>
-
-Type: String
-
-=item * B<server_ca_pool>
-
-Type: String
-
-=item * B<server_certificate_rotation_mode>
-
-Type: Enum (.google.cloud.sql.v1.IpConfiguration.ServerCertificateRotationMode)
-
-=back
-
-=cut
-
 # Enum: IpConfiguration::SslMode
 our $IpConfiguration_SSL_MODE_UNSPECIFIED = 0;
 our $IpConfiguration_ALLOW_UNENCRYPTED_AND_ENCRYPTED = 1;
 our $IpConfiguration_ENCRYPTED_ONLY = 2;
 our $IpConfiguration_TRUSTED_CLIENT_CERTIFICATE_REQUIRED = 3;
-
-=pod
-
-=head2 Enum: IpConfiguration::SslMode
-
-Values:
-
-=over 4
-
-=item * C<SSL_MODE_UNSPECIFIED> => 0
-
-=item * C<ALLOW_UNENCRYPTED_AND_ENCRYPTED> => 1
-
-=item * C<ENCRYPTED_ONLY> => 2
-
-=item * C<TRUSTED_CLIENT_CERTIFICATE_REQUIRED> => 3
-
-=back
-
-=cut
 
 # Enum: IpConfiguration::CaMode
 our $IpConfiguration_CA_MODE_UNSPECIFIED = 0;
@@ -3778,48 +2888,10 @@ our $IpConfiguration_GOOGLE_MANAGED_INTERNAL_CA = 1;
 our $IpConfiguration_GOOGLE_MANAGED_CAS_CA = 2;
 our $IpConfiguration_CUSTOMER_MANAGED_CAS_CA = 3;
 
-=pod
-
-=head2 Enum: IpConfiguration::CaMode
-
-Values:
-
-=over 4
-
-=item * C<CA_MODE_UNSPECIFIED> => 0
-
-=item * C<GOOGLE_MANAGED_INTERNAL_CA> => 1
-
-=item * C<GOOGLE_MANAGED_CAS_CA> => 2
-
-=item * C<CUSTOMER_MANAGED_CAS_CA> => 3
-
-=back
-
-=cut
-
 # Enum: IpConfiguration::ServerCertificateRotationMode
 our $IpConfiguration_SERVER_CERTIFICATE_ROTATION_MODE_UNSPECIFIED = 0;
 our $IpConfiguration_NO_AUTOMATIC_ROTATION = 1;
 our $IpConfiguration_AUTOMATIC_ROTATION_DURING_MAINTENANCE = 2;
-
-=pod
-
-=head2 Enum: IpConfiguration::ServerCertificateRotationMode
-
-Values:
-
-=over 4
-
-=item * C<SERVER_CERTIFICATE_ROTATION_MODE_UNSPECIFIED> => 0
-
-=item * C<NO_AUTOMATIC_ROTATION> => 1
-
-=item * C<AUTOMATIC_ROTATION_DURING_MAINTENANCE> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::PscConfig ===
     # Fields for PscConfig
@@ -3830,56 +2902,6 @@ Values:
     # Field: psc_auto_dns_enabled Type: 8 ()
     # Field: psc_write_endpoint_dns_enabled Type: 8 ()
     # Field: psc_auto_connection_policy_enabled Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::PscConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::PscConfig->new(
-        psc_enabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<psc_enabled>
-
-Type: Bool
-
-=item * B<allowed_consumer_projects>
-
-Type: String
-
-=item * B<psc_auto_connections>
-
-Type: Message (.google.cloud.sql.v1.PscAutoConnectionConfig)
-
-=item * B<network_attachment_uri>
-
-Type: String
-
-=item * B<psc_auto_dns_enabled>
-
-Type: Bool
-
-=item * B<psc_write_endpoint_dns_enabled>
-
-Type: Bool
-
-=item * B<psc_auto_connection_policy_enabled>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::PscAutoConnectionConfig ===
     # Fields for PscAutoConnectionConfig
@@ -3893,108 +2915,12 @@ Type: Bool
     # Field: instance_auto_dns_status Type: 14 (.google.cloud.sql.v1.AutoDnsStatus)
     # Field: write_endpoint_auto_dns_status Type: 14 (.google.cloud.sql.v1.AutoDnsStatus)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::PscAutoConnectionConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::PscAutoConnectionConfig->new(
-        consumer_project => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<consumer_project>
-
-Type: String
-
-=item * B<consumer_network>
-
-Type: String
-
-=item * B<ip_address>
-
-Type: String
-
-=item * B<status>
-
-Type: String
-
-=item * B<consumer_network_status>
-
-Type: String
-
-=item * B<service_connection_policy>
-
-Type: String
-
-=item * B<service_connection_policy_creation_result>
-
-Type: String
-
-=item * B<instance_auto_dns_status>
-
-Type: Enum (.google.cloud.sql.v1.AutoDnsStatus)
-
-=item * B<write_endpoint_auto_dns_status>
-
-Type: Enum (.google.cloud.sql.v1.AutoDnsStatus)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::LocationPreference ===
     # Fields for LocationPreference
     # Field: follow_gae_application Type: 9 ()
     # Field: zone Type: 9 ()
     # Field: secondary_zone Type: 9 ()
     # Field: kind Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::LocationPreference - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::LocationPreference->new(
-        follow_gae_application => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<follow_gae_application>
-
-Type: String
-
-=item * B<zone>
-
-Type: String
-
-=item * B<secondary_zone>
-
-Type: String
-
-=item * B<kind>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::MaintenanceWindow ===
     # Fields for MaintenanceWindow
@@ -4003,83 +2929,11 @@ Type: String
     # Field: update_track Type: 14 (.google.cloud.sql.v1.SqlUpdateTrack)
     # Field: kind Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::MaintenanceWindow - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::MaintenanceWindow->new(
-        hour => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<hour>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<day>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<update_track>
-
-Type: Enum (.google.cloud.sql.v1.SqlUpdateTrack)
-
-=item * B<kind>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::DenyMaintenancePeriod ===
     # Fields for DenyMaintenancePeriod
     # Field: start_date Type: 9 ()
     # Field: end_date Type: 9 ()
     # Field: time Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::DenyMaintenancePeriod - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::DenyMaintenancePeriod->new(
-        start_date => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<start_date>
-
-Type: String
-
-=item * B<end_date>
-
-Type: String
-
-=item * B<time>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::InsightsConfig ===
     # Fields for InsightsConfig
@@ -4089,52 +2943,6 @@ Type: String
     # Field: query_string_length Type: 11 (.google.protobuf.Int32Value)
     # Field: query_plans_per_minute Type: 11 (.google.protobuf.Int32Value)
     # Field: enhanced_query_insights_enabled Type: 11 (.google.protobuf.BoolValue)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::InsightsConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::InsightsConfig->new(
-        query_insights_enabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<query_insights_enabled>
-
-Type: Bool
-
-=item * B<record_client_address>
-
-Type: Bool
-
-=item * B<record_application_tags>
-
-Type: Bool
-
-=item * B<query_string_length>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<query_plans_per_minute>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<enhanced_query_insights_enabled>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::MySqlReplicaConfiguration ===
     # Fields for MySqlReplicaConfiguration
@@ -4150,72 +2958,6 @@ Type: Message (.google.protobuf.BoolValue)
     # Field: verify_server_certificate Type: 11 (.google.protobuf.BoolValue)
     # Field: kind Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::MySqlReplicaConfiguration - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::MySqlReplicaConfiguration->new(
-        dump_file_path => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dump_file_path>
-
-Type: String
-
-=item * B<username>
-
-Type: String
-
-=item * B<password>
-
-Type: String
-
-=item * B<connect_retry_interval>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<master_heartbeat_period>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<ca_certificate>
-
-Type: String
-
-=item * B<client_certificate>
-
-Type: String
-
-=item * B<client_key>
-
-Type: String
-
-=item * B<ssl_cipher>
-
-Type: String
-
-=item * B<verify_server_certificate>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<kind>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionConfiguration ===
     # Fields for DiskEncryptionConfiguration
     # Field: kms_key_name Type: 9 ()
@@ -4223,78 +2965,10 @@ Type: String
     # Field: confidential_mode Type: 8 ()
     # Field: cmek_source_log_encryption_enforced Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionConfiguration - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionConfiguration->new(
-        kms_key_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kms_key_name>
-
-Type: String
-
-=item * B<kind>
-
-Type: String
-
-=item * B<confidential_mode>
-
-Type: Bool
-
-=item * B<cmek_source_log_encryption_enforced>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionStatus ===
     # Fields for DiskEncryptionStatus
     # Field: kms_key_version_name Type: 9 ()
     # Field: kind Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionStatus - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionStatus->new(
-        kms_key_version_name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kms_key_version_name>
-
-Type: String
-
-=item * B<kind>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::IpMapping ===
     # Fields for IpMapping
@@ -4302,69 +2976,9 @@ Type: String
     # Field: ip_address Type: 9 ()
     # Field: time_to_retire Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::IpMapping - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::IpMapping->new(
-        type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<type>
-
-Type: Enum (.google.cloud.sql.v1.SqlIpAddressType)
-
-=item * B<ip_address>
-
-Type: String
-
-=item * B<time_to_retire>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::SqlSubOperationType ===
     # Fields for SqlSubOperationType
     # Field: maintenance_type Type: 14 (.google.cloud.sql.v1.SqlMaintenanceType)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::SqlSubOperationType - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::SqlSubOperationType->new(
-        maintenance_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<maintenance_type>
-
-Type: Enum (.google.cloud.sql.v1.SqlMaintenanceType)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::Operation ===
     # Fields for Operation
@@ -4392,124 +3006,6 @@ Type: Enum (.google.cloud.sql.v1.SqlMaintenanceType)
     # Field: target_project Type: 9 ()
     # Field: acquire_ssrs_lease_context Type: 11 (.google.cloud.sql.v1.AcquireSsrsLeaseContext)
     # Field: sub_operation_type Type: 11 (.google.cloud.sql.v1.SqlSubOperationType)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::Operation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::Operation->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<target_link>
-
-Type: String
-
-=item * B<status>
-
-Type: Enum (.google.cloud.sql.v1.Operation.SqlOperationStatus)
-
-=item * B<user>
-
-Type: String
-
-=item * B<insert_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<start_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<end_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<error>
-
-Type: Message (.google.cloud.sql.v1.OperationErrors)
-
-=item * B<api_warning>
-
-Type: Message (.google.cloud.sql.v1.ApiWarning)
-
-=item * B<operation_type>
-
-Type: Enum (.google.cloud.sql.v1.Operation.SqlOperationType)
-
-=item * B<import_context>
-
-Type: Message (.google.cloud.sql.v1.ImportContext)
-
-=item * B<export_context>
-
-Type: Message (.google.cloud.sql.v1.ExportContext)
-
-=item * B<backup_context>
-
-Type: Message (.google.cloud.sql.v1.BackupContext)
-
-=item * B<pre_check_major_version_upgrade_context>
-
-Type: Message (.google.cloud.sql.v1.PreCheckMajorVersionUpgradeContext)
-
-=item * B<start_workload_capture_context>
-
-Type: Message (.google.cloud.sql.v1.StartWorkloadCaptureContext)
-
-=item * B<stop_workload_capture_context>
-
-Type: Message (.google.cloud.sql.v1.StopWorkloadCaptureContext)
-
-=item * B<start_workload_replay_context>
-
-Type: Message (.google.cloud.sql.v1.StartWorkloadReplayContext)
-
-=item * B<stop_workload_replay_context>
-
-Type: Message (.google.cloud.sql.v1.StopWorkloadReplayContext)
-
-=item * B<name>
-
-Type: String
-
-=item * B<target_id>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<target_project>
-
-Type: String
-
-=item * B<acquire_ssrs_lease_context>
-
-Type: Message (.google.cloud.sql.v1.AcquireSsrsLeaseContext)
-
-=item * B<sub_operation_type>
-
-Type: Message (.google.cloud.sql.v1.SqlSubOperationType)
-
-=back
-
-=cut
 
 # Enum: Operation::SqlOperationType
 our $Operation_SQL_OPERATION_TYPE_UNSPECIFIED = 0;
@@ -4571,159 +3067,11 @@ our $Operation_SWITCHOVER_BLUE_GREEN_DEPLOYMENT = 57;
 our $Operation_DELETE_BLUE_GREEN_DEPLOYMENT = 58;
 our $Operation_RECONCILE_NETWORKING = 64;
 
-=pod
-
-=head2 Enum: Operation::SqlOperationType
-
-Values:
-
-=over 4
-
-=item * C<SQL_OPERATION_TYPE_UNSPECIFIED> => 0
-
-=item * C<IMPORT> => 1
-
-=item * C<EXPORT> => 2
-
-=item * C<CREATE> => 3
-
-=item * C<UPDATE> => 4
-
-=item * C<DELETE> => 5
-
-=item * C<RESTART> => 6
-
-=item * C<BACKUP> => 7
-
-=item * C<SNAPSHOT> => 8
-
-=item * C<BACKUP_VOLUME> => 9
-
-=item * C<DELETE_VOLUME> => 10
-
-=item * C<RESTORE_VOLUME> => 11
-
-=item * C<INJECT_USER> => 12
-
-=item * C<CLONE> => 14
-
-=item * C<STOP_REPLICA> => 15
-
-=item * C<START_REPLICA> => 16
-
-=item * C<PROMOTE_REPLICA> => 17
-
-=item * C<CREATE_REPLICA> => 18
-
-=item * C<CREATE_USER> => 19
-
-=item * C<DELETE_USER> => 20
-
-=item * C<UPDATE_USER> => 21
-
-=item * C<CREATE_DATABASE> => 22
-
-=item * C<DELETE_DATABASE> => 23
-
-=item * C<UPDATE_DATABASE> => 24
-
-=item * C<FAILOVER> => 25
-
-=item * C<DELETE_BACKUP> => 26
-
-=item * C<RECREATE_REPLICA> => 27
-
-=item * C<TRUNCATE_LOG> => 28
-
-=item * C<DEMOTE_MASTER> => 29
-
-=item * C<MAINTENANCE> => 30
-
-=item * C<ENABLE_PRIVATE_IP> => 31
-
-=item * C<DEFER_MAINTENANCE> => 32
-
-=item * C<CREATE_CLONE> => 33
-
-=item * C<RESCHEDULE_MAINTENANCE> => 34
-
-=item * C<START_EXTERNAL_SYNC> => 35
-
-=item * C<LOG_CLEANUP> => 36
-
-=item * C<AUTO_RESTART> => 37
-
-=item * C<REENCRYPT> => 38
-
-=item * C<SWITCHOVER> => 39
-
-=item * C<UPDATE_BACKUP> => 40
-
-=item * C<ACQUIRE_SSRS_LEASE> => 42
-
-=item * C<RELEASE_SSRS_LEASE> => 43
-
-=item * C<RECONFIGURE_OLD_PRIMARY> => 44
-
-=item * C<CLUSTER_MAINTENANCE> => 45
-
-=item * C<SELF_SERVICE_MAINTENANCE> => 46
-
-=item * C<SWITCHOVER_TO_REPLICA> => 47
-
-=item * C<MAJOR_VERSION_UPGRADE> => 48
-
-=item * C<ADVANCED_BACKUP> => 49
-
-=item * C<MANAGE_BACKUP> => 50
-
-=item * C<ENHANCED_BACKUP> => 51
-
-=item * C<REPAIR_READ_POOL> => 52
-
-=item * C<CREATE_READ_POOL> => 53
-
-=item * C<PRE_CHECK_MAJOR_VERSION_UPGRADE> => 54
-
-=item * C<SETUP_MIGRATION> => 55
-
-=item * C<CREATE_BLUE_GREEN_DEPLOYMENT> => 56
-
-=item * C<SWITCHOVER_BLUE_GREEN_DEPLOYMENT> => 57
-
-=item * C<DELETE_BLUE_GREEN_DEPLOYMENT> => 58
-
-=item * C<RECONCILE_NETWORKING> => 64
-
-=back
-
-=cut
-
 # Enum: Operation::SqlOperationStatus
 our $Operation_SQL_OPERATION_STATUS_UNSPECIFIED = 0;
 our $Operation_PENDING = 1;
 our $Operation_RUNNING = 2;
 our $Operation_DONE = 3;
-
-=pod
-
-=head2 Enum: Operation::SqlOperationStatus
-
-Values:
-
-=over 4
-
-=item * C<SQL_OPERATION_STATUS_UNSPECIFIED> => 0
-
-=item * C<PENDING> => 1
-
-=item * C<RUNNING> => 2
-
-=item * C<DONE> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::OperationError ===
     # Fields for OperationError
@@ -4731,74 +3079,10 @@ Values:
     # Field: code Type: 9 ()
     # Field: message Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::OperationError - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::OperationError->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<code>
-
-Type: String
-
-=item * B<message>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::OperationErrors ===
     # Fields for OperationErrors
     # Field: kind Type: 9 ()
     # Field: errors Type: 11 (.google.cloud.sql.v1.OperationError)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::OperationErrors - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::OperationErrors->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<errors>
-
-Type: Message (.google.cloud.sql.v1.OperationError)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::PasswordValidationPolicy ===
     # Fields for PasswordValidationPolicy
@@ -4810,140 +3094,18 @@ Type: Message (.google.cloud.sql.v1.OperationError)
     # Field: enable_password_policy Type: 11 (.google.protobuf.BoolValue)
     # Field: disallow_compromised_credentials Type: 11 (.google.protobuf.BoolValue)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::PasswordValidationPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::PasswordValidationPolicy->new(
-        min_length => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<min_length>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<complexity>
-
-Type: Enum (.google.cloud.sql.v1.PasswordValidationPolicy.Complexity)
-
-=item * B<reuse_interval>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<disallow_username_substring>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<password_change_interval>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<enable_password_policy>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<disallow_compromised_credentials>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=back
-
-=cut
-
 # Enum: PasswordValidationPolicy::Complexity
 our $PasswordValidationPolicy_COMPLEXITY_UNSPECIFIED = 0;
 our $PasswordValidationPolicy_COMPLEXITY_DEFAULT = 1;
-
-=pod
-
-=head2 Enum: PasswordValidationPolicy::Complexity
-
-Values:
-
-=over 4
-
-=item * C<COMPLEXITY_UNSPECIFIED> => 0
-
-=item * C<COMPLEXITY_DEFAULT> => 1
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::DataCacheConfig ===
     # Fields for DataCacheConfig
     # Field: data_cache_enabled Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::DataCacheConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::DataCacheConfig->new(
-        data_cache_enabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data_cache_enabled>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::FinalBackupConfig ===
     # Fields for FinalBackupConfig
     # Field: enabled Type: 8 ()
     # Field: retention_days Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::FinalBackupConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::FinalBackupConfig->new(
-        enabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enabled>
-
-Type: Bool
-
-=item * B<retention_days>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::Settings ===
     # Fields for Settings
@@ -4997,249 +3159,11 @@ Type: Int32
     # Field: performance_capture_config Type: 11 (.google.cloud.sql.v1.PerformanceCaptureConfig)
     # Field: initial_users_config Type: 11 (.google.cloud.sql.v1.InitialUsersConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::Settings - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::Settings->new(
-        settings_version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<settings_version>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<authorized_gae_applications>
-
-Type: String
-
-=item * B<tier>
-
-Type: String
-
-=item * B<kind>
-
-Type: String
-
-=item * B<user_labels>
-
-Type: Message (.google.cloud.sql.v1.Settings.UserLabelsEntry)
-
-=item * B<availability_type>
-
-Type: Enum (.google.cloud.sql.v1.SqlAvailabilityType)
-
-=item * B<pricing_plan>
-
-Type: Enum (.google.cloud.sql.v1.SqlPricingPlan)
-
-=item * B<replication_type>
-
-Type: Enum (.google.cloud.sql.v1.SqlReplicationType)
-
-=item * B<storage_auto_resize_limit>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<activation_policy>
-
-Type: Enum (.google.cloud.sql.v1.Settings.SqlActivationPolicy)
-
-=item * B<ip_configuration>
-
-Type: Message (.google.cloud.sql.v1.IpConfiguration)
-
-=item * B<storage_auto_resize>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<location_preference>
-
-Type: Message (.google.cloud.sql.v1.LocationPreference)
-
-=item * B<database_flags>
-
-Type: Message (.google.cloud.sql.v1.DatabaseFlags)
-
-=item * B<data_disk_type>
-
-Type: Enum (.google.cloud.sql.v1.SqlDataDiskType)
-
-=item * B<maintenance_window>
-
-Type: Message (.google.cloud.sql.v1.MaintenanceWindow)
-
-=item * B<backup_configuration>
-
-Type: Message (.google.cloud.sql.v1.BackupConfiguration)
-
-=item * B<database_replication_enabled>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<crash_safe_replication_enabled>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<data_disk_size_gb>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<active_directory_config>
-
-Type: Message (.google.cloud.sql.v1.SqlActiveDirectoryConfig)
-
-=item * B<collation>
-
-Type: String
-
-=item * B<deny_maintenance_periods>
-
-Type: Message (.google.cloud.sql.v1.DenyMaintenancePeriod)
-
-=item * B<insights_config>
-
-Type: Message (.google.cloud.sql.v1.InsightsConfig)
-
-=item * B<msdtc_enabled>
-
-Type: Bool
-
-=item * B<msdtc_rpc_auth_mode>
-
-Type: Enum (.google.cloud.sql.v1.Settings.MsdtcRpcAuthMode)
-
-=item * B<password_validation_policy>
-
-Type: Message (.google.cloud.sql.v1.PasswordValidationPolicy)
-
-=item * B<sql_server_audit_config>
-
-Type: Message (.google.cloud.sql.v1.SqlServerAuditConfig)
-
-=item * B<edition>
-
-Type: Enum (.google.cloud.sql.v1.Settings.Edition)
-
-=item * B<connector_enforcement>
-
-Type: Enum (.google.cloud.sql.v1.Settings.ConnectorEnforcement)
-
-=item * B<deletion_protection_enabled>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<time_zone>
-
-Type: String
-
-=item * B<advanced_machine_features>
-
-Type: Message (.google.cloud.sql.v1.AdvancedMachineFeatures)
-
-=item * B<data_cache_config>
-
-Type: Message (.google.cloud.sql.v1.DataCacheConfig)
-
-=item * B<replication_lag_max_seconds>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<enable_google_ml_integration>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<enable_dataplex_integration>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<retain_backups_on_delete>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<data_disk_provisioned_iops>
-
-Type: Int64
-
-=item * B<data_disk_provisioned_throughput>
-
-Type: Int64
-
-=item * B<connection_pool_config>
-
-Type: Message (.google.cloud.sql.v1.ConnectionPoolConfig)
-
-=item * B<final_backup_config>
-
-Type: Message (.google.cloud.sql.v1.FinalBackupConfig)
-
-=item * B<read_pool_auto_scale_config>
-
-Type: Message (.google.cloud.sql.v1.ReadPoolAutoScaleConfig)
-
-=item * B<accelerated_replica_mode>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<auto_upgrade_enabled>
-
-Type: Bool
-
-=item * B<entraid_config>
-
-Type: Message (.google.cloud.sql.v1.SqlServerEntraIdConfig)
-
-=item * B<data_api_access>
-
-Type: Enum (.google.cloud.sql.v1.Settings.DataApiAccess)
-
-=item * B<performance_capture_config>
-
-Type: Message (.google.cloud.sql.v1.PerformanceCaptureConfig)
-
-=item * B<initial_users_config>
-
-Type: Message (.google.cloud.sql.v1.InitialUsersConfig)
-
-=back
-
-=cut
-
 # Enum: Settings::SqlActivationPolicy
 our $Settings_SQL_ACTIVATION_POLICY_UNSPECIFIED = 0;
 our $Settings_ALWAYS = 1;
 our $Settings_NEVER = 2;
 our $Settings_ON_DEMAND = 3;
-
-=pod
-
-=head2 Enum: Settings::SqlActivationPolicy
-
-Values:
-
-=over 4
-
-=item * C<SQL_ACTIVATION_POLICY_UNSPECIFIED> => 0
-
-=item * C<ALWAYS> => 1
-
-=item * C<NEVER> => 2
-
-=item * C<ON_DEMAND> => 3
-
-=back
-
-=cut
 
 # Enum: Settings::MsdtcRpcAuthMode
 our $Settings_MSDTC_RPC_AUTH_MODE_UNSPECIFIED = 0;
@@ -5247,97 +3171,21 @@ our $Settings_ALLOW_ONLY_SECURE_RPC_CALLS = 1;
 our $Settings_FALLBACK_TO_UNSECURE_RPC_IF_NECESSARY = 2;
 our $Settings_TURN_OFF_RPC_SECURITY = 3;
 
-=pod
-
-=head2 Enum: Settings::MsdtcRpcAuthMode
-
-Values:
-
-=over 4
-
-=item * C<MSDTC_RPC_AUTH_MODE_UNSPECIFIED> => 0
-
-=item * C<ALLOW_ONLY_SECURE_RPC_CALLS> => 1
-
-=item * C<FALLBACK_TO_UNSECURE_RPC_IF_NECESSARY> => 2
-
-=item * C<TURN_OFF_RPC_SECURITY> => 3
-
-=back
-
-=cut
-
 # Enum: Settings::Edition
 our $Settings_EDITION_UNSPECIFIED = 0;
 our $Settings_ENTERPRISE = 2;
 our $Settings_ENTERPRISE_PLUS = 3;
 our $Settings_DEVELOPER = 5;
 
-=pod
-
-=head2 Enum: Settings::Edition
-
-Values:
-
-=over 4
-
-=item * C<EDITION_UNSPECIFIED> => 0
-
-=item * C<ENTERPRISE> => 2
-
-=item * C<ENTERPRISE_PLUS> => 3
-
-=item * C<DEVELOPER> => 5
-
-=back
-
-=cut
-
 # Enum: Settings::ConnectorEnforcement
 our $Settings_CONNECTOR_ENFORCEMENT_UNSPECIFIED = 0;
 our $Settings_NOT_REQUIRED = 1;
 our $Settings_REQUIRED = 2;
 
-=pod
-
-=head2 Enum: Settings::ConnectorEnforcement
-
-Values:
-
-=over 4
-
-=item * C<CONNECTOR_ENFORCEMENT_UNSPECIFIED> => 0
-
-=item * C<NOT_REQUIRED> => 1
-
-=item * C<REQUIRED> => 2
-
-=back
-
-=cut
-
 # Enum: Settings::DataApiAccess
 our $Settings_DATA_API_ACCESS_UNSPECIFIED = 0;
 our $Settings_DISALLOW_DATA_API = 1;
 our $Settings_ALLOW_DATA_API = 2;
-
-=pod
-
-=head2 Enum: Settings::DataApiAccess
-
-Values:
-
-=over 4
-
-=item * C<DATA_API_ACCESS_UNSPECIFIED> => 0
-
-=item * C<DISALLOW_DATA_API> => 1
-
-=item * C<ALLOW_DATA_API> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::PerformanceCaptureConfig ===
     # Fields for PerformanceCaptureConfig
@@ -5356,181 +3204,21 @@ Values:
     # Field: transaction_kill_excluded_user_hosts Type: 9 ()
     # Field: transaction_kill_type Type: 14 (.google.cloud.sql.v1.PerformanceCaptureConfig.TransactionKillType)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::PerformanceCaptureConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::PerformanceCaptureConfig->new(
-        enabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enabled>
-
-Type: Bool
-
-=item * B<probing_interval_seconds>
-
-Type: Int32
-
-=item * B<probe_threshold>
-
-Type: Int32
-
-=item * B<running_threads_threshold>
-
-Type: Int32
-
-=item * B<seconds_behind_source_threshold>
-
-Type: Int32
-
-=item * B<transaction_duration_threshold>
-
-Type: Int32
-
-=item * B<cpu_utilization_threshold_percent>
-
-Type: Int32
-
-=item * B<memory_usage_threshold_percent>
-
-Type: Int32
-
-=item * B<transaction_lock_wait_threshold_count>
-
-Type: Int32
-
-=item * B<semaphore_wait_threshold_count>
-
-Type: Int32
-
-=item * B<history_list_length_threshold_count>
-
-Type: Int32
-
-=item * B<transaction_kill_threshold_seconds>
-
-Type: Int32
-
-=item * B<transaction_kill_excluded_user_hosts>
-
-Type: String
-
-=item * B<transaction_kill_type>
-
-Type: Enum (.google.cloud.sql.v1.PerformanceCaptureConfig.TransactionKillType)
-
-=back
-
-=cut
-
 # Enum: PerformanceCaptureConfig::TransactionKillType
 our $PerformanceCaptureConfig_TRANSACTION_KILL_TYPE_UNSPECIFIED = 0;
 our $PerformanceCaptureConfig_READ_ONLY_TRANSACTIONS = 1;
 our $PerformanceCaptureConfig_ALL_TRANSACTIONS = 2;
-
-=pod
-
-=head2 Enum: PerformanceCaptureConfig::TransactionKillType
-
-Values:
-
-=over 4
-
-=item * C<TRANSACTION_KILL_TYPE_UNSPECIFIED> => 0
-
-=item * C<READ_ONLY_TRANSACTIONS> => 1
-
-=item * C<ALL_TRANSACTIONS> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolFlags ===
     # Fields for ConnectionPoolFlags
     # Field: name Type: 9 ()
     # Field: value Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolFlags - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolFlags->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<value>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolConfig ===
     # Fields for ConnectionPoolConfig
     # Field: connection_pooling_enabled Type: 8 ()
     # Field: flags Type: 11 (.google.cloud.sql.v1.ConnectionPoolFlags)
     # Field: pooler_count Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolConfig->new(
-        connection_pooling_enabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<connection_pooling_enabled>
-
-Type: Bool
-
-=item * B<flags>
-
-Type: Message (.google.cloud.sql.v1.ConnectionPoolFlags)
-
-=item * B<pooler_count>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::ReadPoolAutoScaleConfig ===
     # Fields for ReadPoolAutoScaleConfig
@@ -5542,85 +3230,9 @@ Type: Int32
     # Field: scale_in_cooldown_seconds Type: 5 ()
     # Field: scale_out_cooldown_seconds Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::ReadPoolAutoScaleConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::ReadPoolAutoScaleConfig->new(
-        enabled => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enabled>
-
-Type: Bool
-
-=item * B<min_node_count>
-
-Type: Int32
-
-=item * B<max_node_count>
-
-Type: Int32
-
-=item * B<target_metrics>
-
-Type: Message (.google.cloud.sql.v1.ReadPoolAutoScaleConfig.TargetMetric)
-
-=item * B<disable_scale_in>
-
-Type: Bool
-
-=item * B<scale_in_cooldown_seconds>
-
-Type: Int32
-
-=item * B<scale_out_cooldown_seconds>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::AdvancedMachineFeatures ===
     # Fields for AdvancedMachineFeatures
     # Field: threads_per_core Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::AdvancedMachineFeatures - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::AdvancedMachineFeatures->new(
-        threads_per_core => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<threads_per_core>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::SslCert ===
     # Fields for SslCert
@@ -5634,133 +3246,15 @@ Type: Int32
     # Field: instance Type: 9 ()
     # Field: self_link Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::SslCert - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::SslCert->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<cert_serial_number>
-
-Type: String
-
-=item * B<cert>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<common_name>
-
-Type: String
-
-=item * B<expiration_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<sha1_fingerprint>
-
-Type: String
-
-=item * B<instance>
-
-Type: String
-
-=item * B<self_link>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::SslCertDetail ===
     # Fields for SslCertDetail
     # Field: cert_info Type: 11 (.google.cloud.sql.v1.SslCert)
     # Field: cert_private_key Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::SslCertDetail - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::SslCertDetail->new(
-        cert_info => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<cert_info>
-
-Type: Message (.google.cloud.sql.v1.SslCert)
-
-=item * B<cert_private_key>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::DNSEntry ===
     # Fields for DNSEntry
     # Field: dns Type: 9 ()
     # Field: ipv4_address Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::DNSEntry - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::DNSEntry->new(
-        dns => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<dns>
-
-Type: String
-
-=item * B<ipv4_address>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificate ===
     # Fields for CustomerManagedCertificate
@@ -5768,84 +3262,12 @@ Type: String
     # Field: content Type: 12 ()
     # Field: file_path Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificate - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificate->new(
-        certificate_type => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<certificate_type>
-
-Type: Enum (.google.cloud.sql.v1.CertificateType)
-
-=item * B<content>
-
-Type: Bytes
-
-=item * B<file_path>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig ===
     # Fields for CustomerManagedCertificateConfig
     # Field: bundle Type: 9 ()
     # Field: intent Type: 14 (.google.cloud.sql.v1.Intent)
     # Field: primary_dns_record Type: 11 (.google.cloud.sql.v1.DNSEntry)
     # Field: customer_managed_certificates Type: 11 (.google.cloud.sql.v1.CustomerManagedCertificate)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig->new(
-        bundle => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<bundle>
-
-Type: String
-
-=item * B<intent>
-
-Type: Enum (.google.cloud.sql.v1.Intent)
-
-=item * B<primary_dns_record>
-
-Type: Message (.google.cloud.sql.v1.DNSEntry)
-
-=item * B<customer_managed_certificates>
-
-Type: Message (.google.cloud.sql.v1.CustomerManagedCertificate)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::SqlActiveDirectoryConfig ===
     # Fields for SqlActiveDirectoryConfig
@@ -5856,77 +3278,11 @@ Type: Message (.google.cloud.sql.v1.CustomerManagedCertificate)
     # Field: admin_credential_secret_name Type: 9 ()
     # Field: organizational_unit Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::SqlActiveDirectoryConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::SqlActiveDirectoryConfig->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<domain>
-
-Type: String
-
-=item * B<mode>
-
-Type: Enum (.google.cloud.sql.v1.SqlActiveDirectoryConfig.ActiveDirectoryMode)
-
-=item * B<dns_servers>
-
-Type: String
-
-=item * B<admin_credential_secret_name>
-
-Type: String
-
-=item * B<organizational_unit>
-
-Type: String
-
-=back
-
-=cut
-
 # Enum: SqlActiveDirectoryConfig::ActiveDirectoryMode
 our $SqlActiveDirectoryConfig_ACTIVE_DIRECTORY_MODE_UNSPECIFIED = 0;
 our $SqlActiveDirectoryConfig_MANAGED_ACTIVE_DIRECTORY = 1;
 our $SqlActiveDirectoryConfig_SELF_MANAGED_ACTIVE_DIRECTORY = 2;
 our $SqlActiveDirectoryConfig_CUSTOMER_MANAGED_ACTIVE_DIRECTORY = 3;
-
-=pod
-
-=head2 Enum: SqlActiveDirectoryConfig::ActiveDirectoryMode
-
-Values:
-
-=over 4
-
-=item * C<ACTIVE_DIRECTORY_MODE_UNSPECIFIED> => 0
-
-=item * C<MANAGED_ACTIVE_DIRECTORY> => 1
-
-=item * C<SELF_MANAGED_ACTIVE_DIRECTORY> => 2
-
-=item * C<CUSTOMER_MANAGED_ACTIVE_DIRECTORY> => 3
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::SqlServerAuditConfig ===
     # Fields for SqlServerAuditConfig
@@ -5935,113 +3291,15 @@ Values:
     # Field: retention_interval Type: 11 (.google.protobuf.Duration)
     # Field: upload_interval Type: 11 (.google.protobuf.Duration)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::SqlServerAuditConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::SqlServerAuditConfig->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<bucket>
-
-Type: String
-
-=item * B<retention_interval>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<upload_interval>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::SqlServerEntraIdConfig ===
     # Fields for SqlServerEntraIdConfig
     # Field: kind Type: 9 ()
     # Field: tenant_id Type: 9 ()
     # Field: application_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::SqlServerEntraIdConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::SqlServerEntraIdConfig->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<tenant_id>
-
-Type: String
-
-=item * B<application_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig ===
     # Fields for InitialUsersConfig
     # Field: initial_users Type: 11 (.google.cloud.sql.v1.InitialUsersConfig.InitialUser)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig->new(
-        initial_users => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<initial_users>
-
-Type: Message (.google.cloud.sql.v1.InitialUsersConfig.InitialUser)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::AcquireSsrsLeaseContext ===
     # Fields for AcquireSsrsLeaseContext
@@ -6050,44 +3308,6 @@ Type: Message (.google.cloud.sql.v1.InitialUsersConfig.InitialUser)
     # Field: report_database Type: 9 ()
     # Field: duration Type: 11 (.google.protobuf.Duration)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::AcquireSsrsLeaseContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::AcquireSsrsLeaseContext->new(
-        setup_login => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<setup_login>
-
-Type: String
-
-=item * B<service_login>
-
-Type: String
-
-=item * B<report_database>
-
-Type: String
-
-=item * B<duration>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::DnsNameMapping ===
     # Fields for DnsNameMapping
     # Field: name Type: 9 ()
@@ -6095,180 +3315,30 @@ Type: Message (.google.protobuf.Duration)
     # Field: dns_scope Type: 14 (.google.cloud.sql.v1.DnsNameMapping.DnsScope)
     # Field: record_manager Type: 14 (.google.cloud.sql.v1.DnsNameMapping.RecordManager)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::DnsNameMapping - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::DnsNameMapping->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<connection_type>
-
-Type: Enum (.google.cloud.sql.v1.DnsNameMapping.ConnectionType)
-
-=item * B<dns_scope>
-
-Type: Enum (.google.cloud.sql.v1.DnsNameMapping.DnsScope)
-
-=item * B<record_manager>
-
-Type: Enum (.google.cloud.sql.v1.DnsNameMapping.RecordManager)
-
-=back
-
-=cut
-
 # Enum: DnsNameMapping::ConnectionType
 our $DnsNameMapping_CONNECTION_TYPE_UNSPECIFIED = 0;
 our $DnsNameMapping_PUBLIC = 1;
 our $DnsNameMapping_PRIVATE_SERVICES_ACCESS = 2;
 our $DnsNameMapping_PRIVATE_SERVICE_CONNECT = 3;
 
-=pod
-
-=head2 Enum: DnsNameMapping::ConnectionType
-
-Values:
-
-=over 4
-
-=item * C<CONNECTION_TYPE_UNSPECIFIED> => 0
-
-=item * C<PUBLIC> => 1
-
-=item * C<PRIVATE_SERVICES_ACCESS> => 2
-
-=item * C<PRIVATE_SERVICE_CONNECT> => 3
-
-=back
-
-=cut
-
 # Enum: DnsNameMapping::DnsScope
 our $DnsNameMapping_DNS_SCOPE_UNSPECIFIED = 0;
 our $DnsNameMapping_INSTANCE = 1;
 our $DnsNameMapping_CLUSTER = 2;
-
-=pod
-
-=head2 Enum: DnsNameMapping::DnsScope
-
-Values:
-
-=over 4
-
-=item * C<DNS_SCOPE_UNSPECIFIED> => 0
-
-=item * C<INSTANCE> => 1
-
-=item * C<CLUSTER> => 2
-
-=back
-
-=cut
 
 # Enum: DnsNameMapping::RecordManager
 our $DnsNameMapping_RECORD_MANAGER_UNSPECIFIED = 0;
 our $DnsNameMapping_CUSTOMER = 1;
 our $DnsNameMapping_CLOUD_SQL_AUTOMATION = 2;
 
-=pod
-
-=head2 Enum: DnsNameMapping::RecordManager
-
-Values:
-
-=over 4
-
-=item * C<RECORD_MANAGER_UNSPECIFIED> => 0
-
-=item * C<CUSTOMER> => 1
-
-=item * C<CLOUD_SQL_AUTOMATION> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext ===
     # Fields for StartWorkloadCaptureContext
     # Field: enable_live_replay Type: 8 ()
     # Field: replay_instance Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext->new(
-        enable_live_replay => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enable_live_replay>
-
-Type: Bool
-
-=item * B<replay_instance>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext ===
     # Fields for StopWorkloadCaptureContext
     # Field: abort_live_replay Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext->new(
-        abort_live_replay => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<abort_live_replay>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext ===
     # Fields for StartWorkloadReplayContext
@@ -6276,75 +3346,3322 @@ Type: Bool
     # Field: workload_id Type: 9 ()
     # Field: source_instance Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext->new(
-        replay_instance => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<replay_instance>
-
-Type: String
-
-=item * B<workload_id>
-
-Type: String
-
-=item * B<source_instance>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext ===
     # Fields for StopWorkloadReplayContext
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlResources;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlResources - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlResources - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_resources.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlResources;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlResources::AclEntry->new({
+        value => $value,
+        expiration_time => $expiration_time,
+        name => $name,
+        kind => $kind,
+    });
+
+    # Read or update a field
+    my $val = $msg->value();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlResources::AclEntry->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_resources.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::AclEntry
+
+An entry for an Access Control list.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<String>
+
+The allowlisted value for the access control list.
+
+=item * C<< $msg->expiration_time() >> / C<< $msg->expiration_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when this access control entry expires in
+[RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Optional. A label to identify this entry.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#aclEntry`.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::ApiWarning
+
+An Admin API warning message.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::ApiWarning::SqlApiWarningCode>)
+
+Code to uniquely identify the warning type.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+The warning message.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+The region name for REGION_UNREACHABLE warning.
+
+=back
+
+=head3 Enum: ApiWarning::SqlApiWarningCode
+
+=over 4
+
+=item * C<SQL_API_WARNING_CODE_UNSPECIFIED> => C<0>
+
+=item * C<REGION_UNREACHABLE> => C<1>
+
+=item * C<MAX_RESULTS_EXCEEDS_LIMIT> => C<2>
+
+=item * C<COMPROMISED_CREDENTIALS> => C<3>
+
+=item * C<INTERNAL_STATE_FAILURE> => C<4>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::BackupRetentionSettings
+
+We currently only support backup retention by specifying the number
+of backups we will retain.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->retention_unit() >> / C<< $msg->retention_unit($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::BackupRetentionSettings::RetentionUnit>)
+
+The unit that 'retained_backups' represents.
+
+=item * C<< $msg->retained_backups() >> / C<< $msg->retained_backups($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Depending on the value of retention_unit, this is used to determine
+if a backup needs to be deleted.  If retention_unit is 'COUNT', we will
+retain this many backups.
+
+=back
+
+=head3 Enum: BackupRetentionSettings::RetentionUnit
+
+=over 4
+
+=item * C<RETENTION_UNIT_UNSPECIFIED> => C<0>
+
+=item * C<COUNT> => C<1>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::BackupConfiguration
+
+Database instance backup configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<String>
+
+Start time for the daily backup configuration in UTC timezone in the 24
+hour format - `HH:MM`.
+
+=item * C<< $msg->enabled() >> / C<< $msg->enabled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether this configuration is enabled.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#backupConfiguration`.
+
+=item * C<< $msg->binary_log_enabled() >> / C<< $msg->binary_log_enabled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+(MySQL only) Whether binary log is enabled. If backup configuration is
+disabled, binarylog must be disabled as well.
+
+=item * C<< $msg->replication_log_archiving_enabled() >> / C<< $msg->replication_log_archiving_enabled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Deprecated: replication_log_archiving_enabled is deprecated and
+will be removed from a future version of the API. Use
+[point_in_time_recovery_enabled][google.cloud.sql.v1.BackupConfiguration.point_in_time_recovery_enabled]
+instead.
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+Location of the backup
+
+=item * C<< $msg->point_in_time_recovery_enabled() >> / C<< $msg->point_in_time_recovery_enabled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether point in time recovery is enabled.
+
+=item * C<< $msg->backup_retention_settings() >> / C<< $msg->backup_retention_settings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::BackupRetentionSettings>)
+
+Backup retention settings.
+
+=item * C<< $msg->transaction_log_retention_days() >> / C<< $msg->transaction_log_retention_days($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+The number of days of transaction logs we retain for point in time
+restore, from 1-7.
+
+=item * C<< $msg->transactional_log_storage_state() >> / C<< $msg->transactional_log_storage_state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::BackupConfiguration::TransactionalLogStorageState>)
+
+Output only. This value contains the storage location of transactional logs
+used to perform point-in-time recovery (PITR) for the database.
+
+=item * C<< $msg->backup_tier() >> / C<< $msg->backup_tier($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::BackupConfiguration::BackupTier>)
+
+Output only. Backup tier that manages the backups for the instance.
+
+=back
+
+=head3 Enum: BackupConfiguration::TransactionalLogStorageState
+
+=over 4
+
+=item * C<TRANSACTIONAL_LOG_STORAGE_STATE_UNSPECIFIED> => C<0>
+
+=item * C<DISK> => C<1>
+
+=item * C<SWITCHING_TO_CLOUD_STORAGE> => C<2>
+
+=item * C<SWITCHED_TO_CLOUD_STORAGE> => C<3>
+
+=item * C<CLOUD_STORAGE> => C<4>
+
+=back
+
+=head3 Enum: BackupConfiguration::BackupTier
+
+=over 4
+
+=item * C<BACKUP_TIER_UNSPECIFIED> => C<0>
+
+=item * C<STANDARD> => C<1>
+
+=item * C<ADVANCED> => C<2>
+
+=item * C<ENHANCED> => C<3>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::PerformDiskShrinkContext
+
+Perform disk shrink context.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->target_size_gb() >> / C<< $msg->target_size_gb($value) >>
+
+Type: C<Int64>
+
+The target disk shrink size in GigaBytes.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::PreCheckResponse
+
+Structured PreCheckResponse containing message, type, and required
+actions.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+The message to be displayed to the user.
+
+=item * C<< $msg->message_type() >> / C<< $msg->message_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::PreCheckResponse::MessageType>)
+
+The type of message whether it is an info, warning, or error.
+
+=item * C<< $msg->actions_required() >> / C<< $msg->actions_required($value) >>
+
+Type: C<String>
+
+The actions that the user needs to take. Use repeated for multiple
+actions.
+
+=back
+
+=head3 Enum: PreCheckResponse::MessageType
+
+=over 4
+
+=item * C<MESSAGE_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<INFO> => C<1>
+
+=item * C<WARNING> => C<2>
+
+=item * C<ERROR> => C<3>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::PreCheckMajorVersionUpgradeContext
+
+Pre-check major version upgrade context.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->target_database_version() >> / C<< $msg->target_database_version($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlDatabaseVersion>)
+
+Required. The target database version to upgrade to.
+
+=item * C<< $msg->pre_check_response() >> / C<< $msg->pre_check_response($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::PreCheckResponse>)
+
+Output only. The responses from the precheck operation.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+Optional. This is always `sql#preCheckMajorVersionUpgradeContext`.
+
+=item * C<< $msg->max_runtime() >> / C<< $msg->max_runtime($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. The maximum allowed runtime for the precheck operation.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::BackupContext
+
+Backup context.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->backup_id() >> / C<< $msg->backup_id($value) >>
+
+Type: C<Int64>
+
+The identifier of the backup.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#backupContext`.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The name of the backup.
+Format: projects/{project}/backups/{backup}
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::Database
+
+Represents a SQL database on the Cloud SQL instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#database`.
+
+=item * C<< $msg->charset() >> / C<< $msg->charset($value) >>
+
+Type: C<String>
+
+The Cloud SQL charset value.
+
+=item * C<< $msg->collation() >> / C<< $msg->collation($value) >>
+
+Type: C<String>
+
+The Cloud SQL collation value.
+
+=item * C<< $msg->etag() >> / C<< $msg->etag($value) >>
+
+Type: C<String>
+
+This field is deprecated and will be removed from a future version of the
+API.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The name of the database in the Cloud SQL instance. This does not include
+the project ID or instance name.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+The name of the Cloud SQL instance. This does not include the project ID.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+The URI of this resource.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+The project ID of the project containing the Cloud SQL database. The Google
+apps domain is prefixed if applicable.
+
+=item * C<< $msg->sqlserver_database_details() >> / C<< $msg->sqlserver_database_details($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SqlServerDatabaseDetails>)
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::SqlServerDatabaseDetails
+
+Represents a Sql Server database on the Cloud SQL instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->compatibility_level() >> / C<< $msg->compatibility_level($value) >>
+
+Type: C<Int32>
+
+The version of SQL Server with which the database is to be made compatible
+
+=item * C<< $msg->recovery_model() >> / C<< $msg->recovery_model($value) >>
+
+Type: C<String>
+
+The recovery model of a SQL Server database
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::DatabaseFlags
+
+Database flags for Cloud SQL instances.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The name of the flag. These flags are passed at instance startup, so
+include both server options and system variables. Flags are
+specified with underscores, not hyphens. For more information, see
+[Configuring Database Flags](https://cloud.google.com/sql/docs/mysql/flags)
+in the Cloud SQL documentation.
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<String>
+
+The value of the flag. Boolean flags are set to `on` for true
+and `off` for false. This field must be omitted if the flag
+doesn't take a value.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::MySqlSyncConfig
+
+MySQL-specific external server sync settings.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->initial_sync_flags() >> / C<< $msg->initial_sync_flags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SyncFlags>)
+
+Flags to use for the initial dump.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::SyncFlags
+
+Initial sync flags for certain Cloud SQL APIs.
+Currently used for the MySQL external server initial dump.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The name of the flag.
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<String>
+
+The value of the flag. This field must be omitted if the flag
+doesn't take a value.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::InstanceReference
+
+Reference to another Cloud SQL instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The name of the Cloud SQL instance being referenced.
+This does not include the project ID.
+
+=item * C<< $msg->region() >> / C<< $msg->region($value) >>
+
+Type: C<String>
+
+The region of the Cloud SQL instance being referenced.
+
+=item * C<< $msg->project() >> / C<< $msg->project($value) >>
+
+Type: C<String>
+
+The project ID of the Cloud SQL instance being referenced.
+The default is the same project ID as the instance references it.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::DemoteMasterConfiguration
+
+Read-replica configuration for connecting to the on-premises primary
+instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#demoteMasterConfiguration`.
+
+=item * C<< $msg->mysql_replica_configuration() >> / C<< $msg->mysql_replica_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::DemoteMasterMySqlReplicaConfiguration>)
+
+MySQL specific configuration when replicating from a MySQL on-premises
+primary instance. Replication configuration information such as the
+username, password, certificates, and keys are not stored in the instance
+metadata. The configuration information is used only to set up the
+replication connection and is stored by MySQL in a file named
+`master.info` in the data directory.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::DemoteMasterMySqlReplicaConfiguration
+
+Read-replica configuration specific to MySQL databases.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#demoteMasterMysqlReplicaConfiguration`.
+
+=item * C<< $msg->username() >> / C<< $msg->username($value) >>
+
+Type: C<String>
+
+The username for the replication connection.
+
+=item * C<< $msg->password() >> / C<< $msg->password($value) >>
+
+Type: C<String>
+
+The password for the replication connection.
+
+=item * C<< $msg->client_key() >> / C<< $msg->client_key($value) >>
+
+Type: C<String>
+
+PEM representation of the replica's private key. The corresponding public
+key is encoded in the client's certificate. The format of the replica's
+private key can be either PKCS #1 or PKCS #8.
+
+=item * C<< $msg->client_certificate() >> / C<< $msg->client_certificate($value) >>
+
+Type: C<String>
+
+PEM representation of the replica's x509 certificate.
+
+=item * C<< $msg->ca_certificate() >> / C<< $msg->ca_certificate($value) >>
+
+Type: C<String>
+
+PEM representation of the trusted CA's x509 certificate.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::ExportContext
+
+Database instance export context.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->uri() >> / C<< $msg->uri($value) >>
+
+Type: C<String>
+
+The path to the file in Google Cloud Storage where the export will be
+stored. The URI is in the form `gs://bucketName/fileName`. If the file
+already exists, the request succeeds, but the operation fails. If
+`fileType` is `SQL` and the filename ends with .gz,
+the contents are compressed.
+
+=item * C<< $msg->databases() >> / C<< $msg->databases($value) >>
+
+Type: C<String>
+
+Databases to be exported. <br /> `MySQL instances:` If
+`fileType` is `SQL` and no database is specified, all
+databases are exported, except for the `mysql` system database.
+If `fileType` is `CSV`, you can specify one database,
+either by using this property or by using the
+`csvExportOptions.selectQuery` property, which takes precedence
+over this property. <br /> `PostgreSQL instances:` If you don't specify a
+database by name, all user databases in the instance are exported.
+This excludes system databases and Cloud SQL databases used to manage
+internal operations. Exporting all user databases is only available for
+directory-formatted parallel export. If `fileType` is `CSV`,
+this database must match the one specified in the
+`csvExportOptions.selectQuery` property. <br /> `SQL Server
+instances:` You must specify one database to be exported, and the
+`fileType` must be `BAK`.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#exportContext`.
+
+=item * C<< $msg->sql_export_options() >> / C<< $msg->sql_export_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ExportContext::SqlExportOptions>)
+
+Options for exporting data as SQL statements.
+
+=item * C<< $msg->csv_export_options() >> / C<< $msg->csv_export_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ExportContext::SqlCsvExportOptions>)
+
+Options for exporting data as CSV. `MySQL` and `PostgreSQL`
+instances only.
+
+=item * C<< $msg->file_type() >> / C<< $msg->file_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlFileType>)
+
+The file type for the specified uri.
+
+=item * C<< $msg->offload() >> / C<< $msg->offload($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether to perform a serverless export.
+
+=item * C<< $msg->bak_export_options() >> / C<< $msg->bak_export_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ExportContext::SqlBakExportOptions>)
+
+Options for exporting data as BAK files.
+
+=item * C<< $msg->tde_export_options() >> / C<< $msg->tde_export_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ExportContext::SqlTdeExportOptions>)
+
+Optional. Export parameters specific to SQL Server TDE certificates
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::ImportContext
+
+Database instance import context.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->uri() >> / C<< $msg->uri($value) >>
+
+Type: C<String>
+
+Path to the import file in Cloud Storage, in the form
+`gs://bucketName/fileName`. Compressed gzip files (.gz) are supported
+when `fileType` is `SQL`. The instance must have
+write permissions to the bucket and read access to the file.
+
+=item * C<< $msg->database() >> / C<< $msg->database($value) >>
+
+Type: C<String>
+
+The target database for the import. If `fileType` is `SQL`, this field
+is required only if the import file does not specify a database, and is
+overridden by any database specification in the import file. For entire
+instance parallel import operations, the database is overridden by the
+database name stored in subdirectory name. If
+`fileType` is `CSV`, one database must be specified.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#importContext`.
+
+=item * C<< $msg->file_type() >> / C<< $msg->file_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlFileType>)
+
+The file type for the specified uri.\`SQL`: The file
+contains SQL statements. \`CSV`: The file contains CSV data.
+
+=item * C<< $msg->csv_import_options() >> / C<< $msg->csv_import_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ImportContext::SqlCsvImportOptions>)
+
+Options for importing data as CSV.
+
+=item * C<< $msg->import_user() >> / C<< $msg->import_user($value) >>
+
+Type: C<String>
+
+The PostgreSQL user for this import operation. PostgreSQL instances only.
+
+=item * C<< $msg->bak_import_options() >> / C<< $msg->bak_import_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ImportContext::SqlBakImportOptions>)
+
+Import parameters specific to SQL Server .BAK files
+
+=item * C<< $msg->sql_import_options() >> / C<< $msg->sql_import_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ImportContext::SqlImportOptions>)
+
+Optional. Options for importing data from SQL statements.
+
+=item * C<< $msg->tde_import_options() >> / C<< $msg->tde_import_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ImportContext::SqlTdeImportOptions>)
+
+Optional. Import parameters specific to SQL Server TDE certificates
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::IpConfiguration
+
+IP Management configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->ipv4_enabled() >> / C<< $msg->ipv4_enabled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether the instance is assigned a public IP address or not.
+
+=item * C<< $msg->private_network() >> / C<< $msg->private_network($value) >>
+
+Type: C<String>
+
+The resource link for the VPC network from which the Cloud SQL instance is
+accessible for private IP. For example,
+`/projects/myProject/global/networks/default`. This setting can
+be updated, but it cannot be removed after it is set.
+
+=item * C<< $msg->require_ssl() >> / C<< $msg->require_ssl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Use `ssl_mode` instead.
+
+Whether SSL/TLS connections over IP are enforced.
+If set to false, then allow both non-SSL/non-TLS and SSL/TLS connections.
+For SSL/TLS connections, the client certificate won't be verified. If
+set to true, then only allow connections encrypted with SSL/TLS and with
+valid client certificates. If you want to enforce SSL/TLS without enforcing
+the requirement for valid client certificates, then use the `ssl_mode` flag
+instead of the `require_ssl` flag.
+
+=item * C<< $msg->authorized_networks() >> / C<< $msg->authorized_networks($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::AclEntry>)
+
+The list of external networks that are allowed to connect to the instance
+using the IP. In 'CIDR' notation, also known as 'slash' notation (for
+example: `157.197.200.0/24`).
+
+=item * C<< $msg->allocated_ip_range() >> / C<< $msg->allocated_ip_range($value) >>
+
+Type: C<String>
+
+The name of the allocated ip range for the private ip Cloud SQL instance.
+For example: "google-managed-services-default". If set, the instance ip
+will be created in the allocated range. The range name must comply with
+[RFC 1035](https://tools.ietf.org/html/rfc1035). Specifically, the name
+must be 1-63 characters long and match the regular expression
+`[a-z]([-a-z0-9]*[a-z0-9])?.`
+
+=item * C<< $msg->enable_private_path_for_google_cloud_services() >> / C<< $msg->enable_private_path_for_google_cloud_services($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Controls connectivity to private IP instances from Google services,
+such as BigQuery.
+
+=item * C<< $msg->ssl_mode() >> / C<< $msg->ssl_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::IpConfiguration::SslMode>)
+
+Specify how SSL/TLS is enforced in database connections. If you must use
+the `require_ssl` flag for backward compatibility, then only the following
+value pairs are valid:
+
+For PostgreSQL and MySQL:
+
+* `ssl_mode=ALLOW_UNENCRYPTED_AND_ENCRYPTED` and `require_ssl=false`
+* `ssl_mode=ENCRYPTED_ONLY` and `require_ssl=false`
+* `ssl_mode=TRUSTED_CLIENT_CERTIFICATE_REQUIRED` and `require_ssl=true`
+
+For SQL Server:
+
+* `ssl_mode=ALLOW_UNENCRYPTED_AND_ENCRYPTED` and `require_ssl=false`
+* `ssl_mode=ENCRYPTED_ONLY` and `require_ssl=true`
+
+The value of `ssl_mode` has priority over the value of `require_ssl`.
+
+For example, for the pair `ssl_mode=ENCRYPTED_ONLY` and
+`require_ssl=false`, `ssl_mode=ENCRYPTED_ONLY` means accept only SSL
+connections, while `require_ssl=false` means accept both non-SSL
+and SSL connections. In this case, MySQL and PostgreSQL databases respect
+`ssl_mode` and accepts only SSL connections.
+
+=item * C<< $msg->psc_config() >> / C<< $msg->psc_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::PscConfig>)
+
+PSC settings for this instance.
+
+=item * C<< $msg->server_ca_mode() >> / C<< $msg->server_ca_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::IpConfiguration::CaMode>)
+
+Specify what type of CA is used for the server certificate.
+
+=item * C<< $msg->custom_subject_alternative_names() >> / C<< $msg->custom_subject_alternative_names($value) >>
+
+Type: C<String>
+
+Optional. Custom Subject Alternative Name(SAN)s for a Cloud SQL instance.
+
+=item * C<< $msg->server_ca_pool() >> / C<< $msg->server_ca_pool($value) >>
+
+Type: C<String>
+
+Optional. The resource name of the server CA pool for an instance with
+`CUSTOMER_MANAGED_CAS_CA` as the `server_ca_mode`.
+Format: projects/{PROJECT}/locations/{REGION}/caPools/{CA_POOL_ID}
+
+=item * C<< $msg->server_certificate_rotation_mode() >> / C<< $msg->server_certificate_rotation_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::IpConfiguration::ServerCertificateRotationMode>)
+
+Optional. Controls the automatic server certificate rotation feature. This
+feature is disabled by default. When enabled, the server certificate will
+be automatically rotated during Cloud SQL scheduled maintenance or
+self-service maintenance updates up to six months before it expires. This
+setting can only be set if server_ca_mode is either GOOGLE_MANAGED_CAS_CA
+or CUSTOMER_MANAGED_CAS_CA.
+
+=back
+
+=head3 Enum: IpConfiguration::SslMode
+
+=over 4
+
+=item * C<SSL_MODE_UNSPECIFIED> => C<0>
+
+=item * C<ALLOW_UNENCRYPTED_AND_ENCRYPTED> => C<1>
+
+=item * C<ENCRYPTED_ONLY> => C<2>
+
+=item * C<TRUSTED_CLIENT_CERTIFICATE_REQUIRED> => C<3>
+
+=back
+
+=head3 Enum: IpConfiguration::CaMode
+
+=over 4
+
+=item * C<CA_MODE_UNSPECIFIED> => C<0>
+
+=item * C<GOOGLE_MANAGED_INTERNAL_CA> => C<1>
+
+=item * C<GOOGLE_MANAGED_CAS_CA> => C<2>
+
+=item * C<CUSTOMER_MANAGED_CAS_CA> => C<3>
+
+=back
+
+=head3 Enum: IpConfiguration::ServerCertificateRotationMode
+
+=over 4
+
+=item * C<SERVER_CERTIFICATE_ROTATION_MODE_UNSPECIFIED> => C<0>
+
+=item * C<NO_AUTOMATIC_ROTATION> => C<1>
+
+=item * C<AUTOMATIC_ROTATION_DURING_MAINTENANCE> => C<2>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::PscConfig
+
+PSC settings for a Cloud SQL instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->psc_enabled() >> / C<< $msg->psc_enabled($value) >>
+
+Type: C<Bool>
+
+Whether PSC connectivity is enabled for this instance.
+
+=item * C<< $msg->allowed_consumer_projects() >> / C<< $msg->allowed_consumer_projects($value) >>
+
+Type: C<String>
+
+Optional. The list of consumer projects that are allow-listed for PSC
+connections to this instance. This instance can be connected to with PSC
+from any network in these projects.
+
+Each consumer project in this list may be represented by a project number
+(numeric) or by a project id (alphanumeric).
+
+=item * C<< $msg->psc_auto_connections() >> / C<< $msg->psc_auto_connections($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::PscAutoConnectionConfig>)
+
+Optional. The list of settings for requested Private Service Connect
+consumer endpoints that can be used to connect to this Cloud SQL instance.
+
+=item * C<< $msg->network_attachment_uri() >> / C<< $msg->network_attachment_uri($value) >>
+
+Type: C<String>
+
+Optional. The network attachment of the consumer network that the
+Private Service Connect enabled Cloud SQL instance is
+authorized to connect using the PSC interface.
+format: projects/PROJECT/regions/REGION/networkAttachments/ID
+
+=item * C<< $msg->psc_auto_dns_enabled() >> / C<< $msg->psc_auto_dns_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates whether Private Service Connect DNS automation is
+enabled for this instance. When enabled, Cloud SQL provisions a universal
+DNS record across all networks configured with Private Service Connect
+auto-connections. This will default to true for new instances when
+Private Service Connect is enabled.
+
+=item * C<< $msg->psc_write_endpoint_dns_enabled() >> / C<< $msg->psc_write_endpoint_dns_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Indicates whether Private Service Connect write endpoint DNS
+automation is enabled for this instance. When enabled, Cloud SQL provisions
+a universal global DNS record across all networks configured with Private
+Service Connect auto-connections that points to the cluster primary
+instance. This feature is only supported for Enterprise Plus edition. This
+will default to true for new Enterprise Plus instances when
+`psc_auto_dns_enabled` is enabled.
+
+=item * C<< $msg->psc_auto_connection_policy_enabled() >> / C<< $msg->psc_auto_connection_policy_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to set up the PSC service connection policy
+automatically.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::PscAutoConnectionConfig
+
+Settings for an automatically-setup Private Service Connect consumer endpoint
+that is used to connect to a Cloud SQL instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->consumer_project() >> / C<< $msg->consumer_project($value) >>
+
+Type: C<String>
+
+Optional. This is the project ID of consumer service project of this
+consumer endpoint.
+
+This is only applicable if `consumer_network` is a shared VPC
+network.
+
+=item * C<< $msg->consumer_network() >> / C<< $msg->consumer_network($value) >>
+
+Type: C<String>
+
+Optional. The consumer network of this consumer endpoint. This must be a
+resource path that includes both the host project and the network name.
+
+For example, `projects/project1/global/networks/network1`.
+
+The consumer host project of this network might be different from the
+consumer service project.
+
+=item * C<< $msg->ip_address() >> / C<< $msg->ip_address($value) >>
+
+Type: C<String>
+
+The IP address of the consumer endpoint.
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<String>
+
+The connection status of the consumer endpoint.
+
+=item * C<< $msg->consumer_network_status() >> / C<< $msg->consumer_network_status($value) >>
+
+Type: C<String>
+
+The connection policy status of the consumer network.
+
+=item * C<< $msg->service_connection_policy() >> / C<< $msg->service_connection_policy($value) >>
+
+Type: C<String>
+
+Output only. The service connection policy created automatically for the
+consumer network when `psc_auto_connection_policy_enabled` is true. It is
+in the format of:
+`projects/{project}/regions/{region}/serviceConnectionPolicies/{policy_id}`
+The `policy_id` is in format of `$NETWORK-$RANDOM`.
+
+=item * C<< $msg->service_connection_policy_creation_result() >> / C<< $msg->service_connection_policy_creation_result($value) >>
+
+Type: C<String>
+
+Output only. The status of service connection policy creation.
+
+=item * C<< $msg->instance_auto_dns_status() >> / C<< $msg->instance_auto_dns_status($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::AutoDnsStatus>)
+
+Output only. The status of automated DNS provisioning.
+
+=item * C<< $msg->write_endpoint_auto_dns_status() >> / C<< $msg->write_endpoint_auto_dns_status($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::AutoDnsStatus>)
+
+Output only. The status of automated DNS provisioning for the write
+endpoint.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::LocationPreference
+
+Preferred location. This specifies where a Cloud SQL instance is located.
+Note that if the preferred location is not available, the instance will be
+located as close as possible within the region. Only one location may be
+specified.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->follow_gae_application() >> / C<< $msg->follow_gae_application($value) >>
+
+Type: C<String>
+
+The App Engine application to follow, it must be in the same region as the
+Cloud SQL instance. WARNING: Changing this might restart the instance.
+
+=item * C<< $msg->zone() >> / C<< $msg->zone($value) >>
+
+Type: C<String>
+
+The preferred Compute Engine zone (for example: us-central1-a,
+us-central1-b, etc.). WARNING: Changing this might restart the instance.
+
+=item * C<< $msg->secondary_zone() >> / C<< $msg->secondary_zone($value) >>
+
+Type: C<String>
+
+The preferred Compute Engine zone for the secondary/failover
+(for example: us-central1-a, us-central1-b, etc.).
+To disable this field, set it to 'no_secondary_zone'.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#locationPreference`.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::MaintenanceWindow
+
+Maintenance window. This specifies when a Cloud SQL instance is
+restarted for system maintenance purposes.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->hour() >> / C<< $msg->hour($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Hour of day - 0 to 23. Specify in the UTC time zone.
+
+=item * C<< $msg->day() >> / C<< $msg->day($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Day of week - `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`,
+`SATURDAY`, or `SUNDAY`. Specify in the UTC time zone.
+Returned in output as an integer, 1 to 7, where `1` equals Monday.
+
+=item * C<< $msg->update_track() >> / C<< $msg->update_track($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlUpdateTrack>)
+
+Maintenance timing settings: `canary`, `stable`, or `week5`.
+For more information, see [About maintenance on Cloud SQL
+instances](https://cloud.google.com/sql/docs/mysql/maintenance).
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#maintenanceWindow`.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::DenyMaintenancePeriod
+
+Deny maintenance Periods. This specifies a date range during when all CSA
+rollout will be denied.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->start_date() >> / C<< $msg->start_date($value) >>
+
+Type: C<String>
+
+"deny maintenance period" start date. If the year of the start date is
+empty, the year of the end date also must be empty. In this case, it means
+the deny maintenance period recurs every year. The date is in format
+yyyy-mm-dd i.e., 2020-11-01, or mm-dd, i.e., 11-01
+
+=item * C<< $msg->end_date() >> / C<< $msg->end_date($value) >>
+
+Type: C<String>
+
+"deny maintenance period" end date. If the year of the end date is empty,
+the year of the start date also must be empty. In this case, it means the
+no maintenance interval recurs every year. The date is in format yyyy-mm-dd
+i.e., 2020-11-01, or mm-dd, i.e., 11-01
+
+=item * C<< $msg->time() >> / C<< $msg->time($value) >>
+
+Type: C<String>
+
+Time in UTC when the "deny maintenance period" starts on start_date and
+ends on end_date. The time is in format: HH:mm:SS, i.e., 00:00:00
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::InsightsConfig
+
+Insights configuration. This specifies when Cloud SQL Insights feature is
+enabled and optional configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->query_insights_enabled() >> / C<< $msg->query_insights_enabled($value) >>
+
+Type: C<Bool>
+
+Whether Query Insights feature is enabled.
+
+=item * C<< $msg->record_client_address() >> / C<< $msg->record_client_address($value) >>
+
+Type: C<Bool>
+
+Whether Query Insights will record client address when enabled.
+
+=item * C<< $msg->record_application_tags() >> / C<< $msg->record_application_tags($value) >>
+
+Type: C<Bool>
+
+Whether Query Insights will record application tags from query when
+enabled.
+
+=item * C<< $msg->query_string_length() >> / C<< $msg->query_string_length($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Maximum query length stored in bytes. Default value: 1024 bytes.
+Range: 256-4500 bytes. Query lengths greater than this field value will be
+truncated to this value. When unset, query length will be the default
+value. Changing query length will restart the database.
+
+=item * C<< $msg->query_plans_per_minute() >> / C<< $msg->query_plans_per_minute($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Number of query execution plans captured by Insights per minute
+for all queries combined. Default is 5.
+
+=item * C<< $msg->enhanced_query_insights_enabled() >> / C<< $msg->enhanced_query_insights_enabled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Whether enhanced query insights feature is enabled.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::MySqlReplicaConfiguration
+
+Read-replica configuration specific to MySQL databases.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dump_file_path() >> / C<< $msg->dump_file_path($value) >>
+
+Type: C<String>
+
+Path to a SQL dump file in Google Cloud Storage from which the replica
+instance is to be created. The URI is in the form gs://bucketName/fileName.
+Compressed gzip files (.gz) are also supported.
+Dumps have the binlog co-ordinates from which replication
+begins. This can be accomplished by setting --master-data to 1 when using
+mysqldump.
+
+=item * C<< $msg->username() >> / C<< $msg->username($value) >>
+
+Type: C<String>
+
+The username for the replication connection.
+
+=item * C<< $msg->password() >> / C<< $msg->password($value) >>
+
+Type: C<String>
+
+The password for the replication connection.
+
+=item * C<< $msg->connect_retry_interval() >> / C<< $msg->connect_retry_interval($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Seconds to wait between connect retries. MySQL's default is 60 seconds.
+
+=item * C<< $msg->master_heartbeat_period() >> / C<< $msg->master_heartbeat_period($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Interval in milliseconds between replication heartbeats.
+
+=item * C<< $msg->ca_certificate() >> / C<< $msg->ca_certificate($value) >>
+
+Type: C<String>
+
+PEM representation of the trusted CA's x509 certificate.
+
+=item * C<< $msg->client_certificate() >> / C<< $msg->client_certificate($value) >>
+
+Type: C<String>
+
+PEM representation of the replica's x509 certificate.
+
+=item * C<< $msg->client_key() >> / C<< $msg->client_key($value) >>
+
+Type: C<String>
+
+PEM representation of the replica's private key. The corresponding public
+key is encoded in the client's certificate.
+
+=item * C<< $msg->ssl_cipher() >> / C<< $msg->ssl_cipher($value) >>
+
+Type: C<String>
+
+A list of permissible ciphers to use for SSL encryption.
+
+=item * C<< $msg->verify_server_certificate() >> / C<< $msg->verify_server_certificate($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether or not to check the primary instance's Common Name value in the
+certificate that it sends during the SSL handshake.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#mysqlReplicaConfiguration`.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionConfiguration
+
+Disk encryption configuration for an instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kms_key_name() >> / C<< $msg->kms_key_name($value) >>
+
+Type: C<String>
+
+Resource name of KMS key for disk encryption.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#diskEncryptionConfiguration`.
+
+=item * C<< $msg->confidential_mode() >> / C<< $msg->confidential_mode($value) >>
+
+Type: C<Bool>
+
+Optional. If true, enables Confidential Mode for the instance's Hyperdisk
+Balanced volumes. Only supported for zonal C4A instances currently.
+
+=item * C<< $msg->cmek_source_log_encryption_enforced() >> / C<< $msg->cmek_source_log_encryption_enforced($value) >>
+
+Type: C<Bool>
+
+Optional. Whether to enforce CMEK log encryption at source. When enforced,
+transaction logs are encrypted prior to being uploaded to Cloud Storage. If
+not enforced, then CMEK logs are encrypted by the Cloud Storage service.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::DiskEncryptionStatus
+
+Disk encryption status for an instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kms_key_version_name() >> / C<< $msg->kms_key_version_name($value) >>
+
+Type: C<String>
+
+KMS key version used to encrypt the Cloud SQL instance resource
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#diskEncryptionStatus`.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::IpMapping
+
+Database instance IP mapping
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlIpAddressType>)
+
+The type of this IP address. A `PRIMARY` address is a public address that
+can accept incoming connections. A `PRIVATE` address is a private address
+that can accept incoming connections. An `OUTGOING` address is the source
+address of connections originating from the instance, if supported.
+
+=item * C<< $msg->ip_address() >> / C<< $msg->ip_address($value) >>
+
+Type: C<String>
+
+The IP address assigned.
+
+=item * C<< $msg->time_to_retire() >> / C<< $msg->time_to_retire($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The due time for this IP to be retired in
+[RFC 3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`. This field is only available when
+the IP is scheduled to be retired.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::SqlSubOperationType
+
+The sub operation type based on the operation type.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->maintenance_type() >> / C<< $msg->maintenance_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlMaintenanceType>)
+
+The type of maintenance to be performed on the instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::Operation
+
+An Operation resource.&nbsp;For successful operations that return an
+Operation resource, only the fields relevant to the operation are populated
+in the resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#operation`.
+
+=item * C<< $msg->target_link() >> / C<< $msg->target_link($value) >>
+
+Type: C<String>
+
+=item * C<< $msg->status() >> / C<< $msg->status($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::Operation::SqlOperationStatus>)
+
+The status of an operation.
+
+=item * C<< $msg->user() >> / C<< $msg->user($value) >>
+
+Type: C<String>
+
+The email address of the user who initiated this operation.
+
+=item * C<< $msg->insert_time() >> / C<< $msg->insert_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time this operation was enqueued in UTC timezone in [RFC
+3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`.
+
+=item * C<< $msg->start_time() >> / C<< $msg->start_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time this operation actually started in UTC timezone in [RFC
+3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`.
+
+=item * C<< $msg->end_time() >> / C<< $msg->end_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time this operation finished in UTC timezone in [RFC
+3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`.
+
+=item * C<< $msg->error() >> / C<< $msg->error($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::OperationErrors>)
+
+If errors occurred during processing of this operation, this field will be
+populated.
+
+=item * C<< $msg->api_warning() >> / C<< $msg->api_warning($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ApiWarning>)
+
+An Admin API warning message.
+
+=item * C<< $msg->operation_type() >> / C<< $msg->operation_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::Operation::SqlOperationType>)
+
+The type of the operation. Valid values are:
+*  `CREATE`
+*  `DELETE`
+*  `UPDATE`
+*  `RESTART`
+*  `IMPORT`
+*  `EXPORT`
+*  `BACKUP_VOLUME`
+*  `RESTORE_VOLUME`
+*  `CREATE_USER`
+*  `DELETE_USER`
+*  `CREATE_DATABASE`
+*  `DELETE_DATABASE`
+
+=item * C<< $msg->import_context() >> / C<< $msg->import_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ImportContext>)
+
+The context for import operation, if applicable.
+
+=item * C<< $msg->export_context() >> / C<< $msg->export_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ExportContext>)
+
+The context for export operation, if applicable.
+
+=item * C<< $msg->backup_context() >> / C<< $msg->backup_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::BackupContext>)
+
+The context for backup operation, if applicable.
+
+=item * C<< $msg->pre_check_major_version_upgrade_context() >> / C<< $msg->pre_check_major_version_upgrade_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::PreCheckMajorVersionUpgradeContext>)
+
+This field is only populated when the operation_type is
+PRE_CHECK_MAJOR_VERSION_UPGRADE.
+The PreCheckMajorVersionUpgradeContext message itself contains the details
+for that pre-check, such as the target database version for the upgrade
+and the results of the check (including any warnings or errors found).
+
+=item * C<< $msg->start_workload_capture_context() >> / C<< $msg->start_workload_capture_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext>)
+
+The context for the `StartWorkloadCapture` operation, which contains
+details to start recording the workload (SQL queries) on a Cloud SQL
+instance.
+
+=item * C<< $msg->stop_workload_capture_context() >> / C<< $msg->stop_workload_capture_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext>)
+
+The context for the `StopWorkloadCapture` operation, which contains
+details to stop recording the workload (SQL queries) on a Cloud SQL
+instance.
+
+=item * C<< $msg->start_workload_replay_context() >> / C<< $msg->start_workload_replay_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext>)
+
+The context for the `StartWorkloadReplay` operation, which contains details
+about starting the execution of a captured workload (recorded read and
+write SQL queries) on a replay instance (the Cloud SQL
+instance where the recorded SQL queries are executed).
+
+=item * C<< $msg->stop_workload_replay_context() >> / C<< $msg->stop_workload_replay_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext>)
+
+The context for the `StopWorkloadReplay` operation, which contains details
+about stopping the execution of a captured workload (recorded read and
+write SQL queries) on a replay instance.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+An identifier that uniquely identifies the operation. You can use this
+identifier to retrieve the Operations resource that has information about
+the operation.
+
+=item * C<< $msg->target_id() >> / C<< $msg->target_id($value) >>
+
+Type: C<String>
+
+Name of the resource on which this operation runs.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+The URI of this resource.
+
+=item * C<< $msg->target_project() >> / C<< $msg->target_project($value) >>
+
+Type: C<String>
+
+The project ID of the target instance related to this operation.
+
+=item * C<< $msg->acquire_ssrs_lease_context() >> / C<< $msg->acquire_ssrs_lease_context($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::AcquireSsrsLeaseContext>)
+
+The context for acquire SSRS lease operation, if applicable.
+
+=item * C<< $msg->sub_operation_type() >> / C<< $msg->sub_operation_type($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SqlSubOperationType>)
+
+Optional. The sub operation based on the operation type.
+
+=back
+
+=head3 Enum: Operation::SqlOperationType
+
+=over 4
+
+=item * C<SQL_OPERATION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<IMPORT> => C<1>
+
+=item * C<EXPORT> => C<2>
+
+=item * C<CREATE> => C<3>
+
+=item * C<UPDATE> => C<4>
+
+=item * C<DELETE> => C<5>
+
+=item * C<RESTART> => C<6>
+
+=item * C<BACKUP> => C<7>
+
+=item * C<SNAPSHOT> => C<8>
+
+=item * C<BACKUP_VOLUME> => C<9>
+
+=item * C<DELETE_VOLUME> => C<10>
+
+=item * C<RESTORE_VOLUME> => C<11>
+
+=item * C<INJECT_USER> => C<12>
+
+=item * C<CLONE> => C<14>
+
+=item * C<STOP_REPLICA> => C<15>
+
+=item * C<START_REPLICA> => C<16>
+
+=item * C<PROMOTE_REPLICA> => C<17>
+
+=item * C<CREATE_REPLICA> => C<18>
+
+=item * C<CREATE_USER> => C<19>
+
+=item * C<DELETE_USER> => C<20>
+
+=item * C<UPDATE_USER> => C<21>
+
+=item * C<CREATE_DATABASE> => C<22>
+
+=item * C<DELETE_DATABASE> => C<23>
+
+=item * C<UPDATE_DATABASE> => C<24>
+
+=item * C<FAILOVER> => C<25>
+
+=item * C<DELETE_BACKUP> => C<26>
+
+=item * C<RECREATE_REPLICA> => C<27>
+
+=item * C<TRUNCATE_LOG> => C<28>
+
+=item * C<DEMOTE_MASTER> => C<29>
+
+=item * C<MAINTENANCE> => C<30>
+
+=item * C<ENABLE_PRIVATE_IP> => C<31>
+
+=item * C<DEFER_MAINTENANCE> => C<32>
+
+=item * C<CREATE_CLONE> => C<33>
+
+=item * C<RESCHEDULE_MAINTENANCE> => C<34>
+
+=item * C<START_EXTERNAL_SYNC> => C<35>
+
+=item * C<LOG_CLEANUP> => C<36>
+
+=item * C<AUTO_RESTART> => C<37>
+
+=item * C<REENCRYPT> => C<38>
+
+=item * C<SWITCHOVER> => C<39>
+
+=item * C<UPDATE_BACKUP> => C<40>
+
+=item * C<ACQUIRE_SSRS_LEASE> => C<42>
+
+=item * C<RELEASE_SSRS_LEASE> => C<43>
+
+=item * C<RECONFIGURE_OLD_PRIMARY> => C<44>
+
+=item * C<CLUSTER_MAINTENANCE> => C<45>
+
+=item * C<SELF_SERVICE_MAINTENANCE> => C<46>
+
+=item * C<SWITCHOVER_TO_REPLICA> => C<47>
+
+=item * C<MAJOR_VERSION_UPGRADE> => C<48>
+
+=item * C<ADVANCED_BACKUP> => C<49>
+
+=item * C<MANAGE_BACKUP> => C<50>
+
+=item * C<ENHANCED_BACKUP> => C<51>
+
+=item * C<REPAIR_READ_POOL> => C<52>
+
+=item * C<CREATE_READ_POOL> => C<53>
+
+=item * C<PRE_CHECK_MAJOR_VERSION_UPGRADE> => C<54>
+
+=item * C<SETUP_MIGRATION> => C<55>
+
+=item * C<CREATE_BLUE_GREEN_DEPLOYMENT> => C<56>
+
+=item * C<SWITCHOVER_BLUE_GREEN_DEPLOYMENT> => C<57>
+
+=item * C<DELETE_BLUE_GREEN_DEPLOYMENT> => C<58>
+
+=item * C<RECONCILE_NETWORKING> => C<64>
+
+=back
+
+=head3 Enum: Operation::SqlOperationStatus
+
+=over 4
+
+=item * C<SQL_OPERATION_STATUS_UNSPECIFIED> => C<0>
+
+=item * C<PENDING> => C<1>
+
+=item * C<RUNNING> => C<2>
+
+=item * C<DONE> => C<3>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::OperationError
+
+Database instance operation error.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#operationError`.
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<String>
+
+Identifies the specific error that occurred.
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<String>
+
+Additional information about the error encountered.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::OperationErrors
+
+Database instance operation errors list wrapper.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#operationErrors`.
+
+=item * C<< $msg->errors() >> / C<< $msg->errors($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::OperationError>)
+
+The list of errors encountered while processing this operation.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::PasswordValidationPolicy
+
+Database instance local user password validation policy.
+This message defines the password policy for local database users.
+When enabled, it enforces constraints on password complexity, length,
+and reuse. Keep this policy enabled to help prevent unauthorized access.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->min_length() >> / C<< $msg->min_length($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Minimum number of characters allowed.
+
+=item * C<< $msg->complexity() >> / C<< $msg->complexity($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::PasswordValidationPolicy::Complexity>)
+
+The complexity of the password.
+
+=item * C<< $msg->reuse_interval() >> / C<< $msg->reuse_interval($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Number of previous passwords that cannot be reused.
+
+=item * C<< $msg->disallow_username_substring() >> / C<< $msg->disallow_username_substring($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Disallow username as a part of the password.
+
+=item * C<< $msg->password_change_interval() >> / C<< $msg->password_change_interval($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Minimum interval after which the password can be changed. This flag is only
+supported for PostgreSQL.
+
+=item * C<< $msg->enable_password_policy() >> / C<< $msg->enable_password_policy($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether to enable the password policy or not. When enabled, passwords must
+meet complexity requirements. Keep this policy enabled to help prevent
+unauthorized access. Disabling this policy allows weak passwords.
+
+=item * C<< $msg->disallow_compromised_credentials() >> / C<< $msg->disallow_compromised_credentials($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+This field is deprecated and will be removed in a future version of the
+API.
+
+=back
+
+=head3 Enum: PasswordValidationPolicy::Complexity
+
+=over 4
+
+=item * C<COMPLEXITY_UNSPECIFIED> => C<0>
+
+=item * C<COMPLEXITY_DEFAULT> => C<1>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::DataCacheConfig
+
+Data cache configurations.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data_cache_enabled() >> / C<< $msg->data_cache_enabled($value) >>
+
+Type: C<Bool>
+
+Whether data cache is enabled for the instance.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::FinalBackupConfig
+
+Config used to determine the final backup settings for the instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enabled() >> / C<< $msg->enabled($value) >>
+
+Type: C<Bool>
+
+Whether the final backup is enabled for the instance.
+
+=item * C<< $msg->retention_days() >> / C<< $msg->retention_days($value) >>
+
+Type: C<Int32>
+
+The number of days to retain the final backup after the instance deletion.
+The final backup will be purged at (time_of_instance_deletion +
+retention_days).
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::Settings
+
+Database instance settings.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->settings_version() >> / C<< $msg->settings_version($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+The version of instance settings. This is a required field for update
+method to make sure concurrent updates are handled properly. During update,
+use the most recent settingsVersion value for this instance and do not try
+to update this value.
+
+=item * C<< $msg->authorized_gae_applications() >> / C<< $msg->authorized_gae_applications($value) >>
+
+Type: C<String>
+
+The App Engine app IDs that can access this instance.
+(Deprecated) Applied to First Generation instances only.
+
+=item * C<< $msg->tier() >> / C<< $msg->tier($value) >>
+
+Type: C<String>
+
+The tier (or machine type) for this instance, for example
+`db-custom-1-3840`. WARNING: Changing this restarts the instance.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#settings`.
+
+=item * C<< $msg->user_labels() >> / C<< $msg->user_labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::Settings::UserLabelsEntry>)
+
+User-provided labels, represented as a dictionary where each label is a
+single key value pair.
+
+=item * C<< $msg->availability_type() >> / C<< $msg->availability_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlAvailabilityType>)
+
+Availability type. Potential values:
+*  `ZONAL`: The instance serves data from only one zone. Outages in that
+zone affect data accessibility.
+*  `REGIONAL`: The instance can serve data from more than one zone in a
+region (it is highly available)./
+
+For more information, see [Overview of the High Availability
+Configuration](https://cloud.google.com/sql/docs/mysql/high-availability).
+
+=item * C<< $msg->pricing_plan() >> / C<< $msg->pricing_plan($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlPricingPlan>)
+
+The pricing plan for this instance. This can be either `PER_USE` or
+`PACKAGE`. Only `PER_USE` is supported for Second Generation instances.
+
+=item * C<< $msg->replication_type() >> / C<< $msg->replication_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlReplicationType>)
+
+The type of replication this instance uses. This can be either
+`ASYNCHRONOUS` or `SYNCHRONOUS`. (Deprecated) This property was only
+applicable to First Generation instances.
+
+=item * C<< $msg->storage_auto_resize_limit() >> / C<< $msg->storage_auto_resize_limit($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+The maximum size to which storage capacity can be automatically increased.
+The default value is 0, which specifies that there is no limit.
+
+=item * C<< $msg->activation_policy() >> / C<< $msg->activation_policy($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::Settings::SqlActivationPolicy>)
+
+The activation policy specifies when the instance is activated; it is
+applicable only when the instance state is RUNNABLE. Valid values:
+*  `ALWAYS`: The instance is on, and remains so even in the absence of
+connection requests.
+*  `NEVER`: The instance is off; it is not activated, even if a
+connection request arrives.
+
+=item * C<< $msg->ip_configuration() >> / C<< $msg->ip_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::IpConfiguration>)
+
+The settings for IP Management. This allows to enable or disable the
+instance IP and manage which external networks can connect to the instance.
+The IPv4 address cannot be disabled for Second Generation instances.
+
+=item * C<< $msg->storage_auto_resize() >> / C<< $msg->storage_auto_resize($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Configuration to increase storage size automatically. The default value is
+true.
+
+=item * C<< $msg->location_preference() >> / C<< $msg->location_preference($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::LocationPreference>)
+
+The location preference settings. This allows the instance to be located as
+near as possible to either an App Engine app or Compute Engine zone for
+better performance. App Engine co-location was only applicable to First
+Generation instances.
+
+=item * C<< $msg->database_flags() >> / C<< $msg->database_flags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::DatabaseFlags>)
+
+The database flags passed to the instance at startup.
+
+=item * C<< $msg->data_disk_type() >> / C<< $msg->data_disk_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlDataDiskType>)
+
+The type of data disk: `PD_SSD` (default) or `PD_HDD`. Not used for
+First Generation instances.
+
+=item * C<< $msg->maintenance_window() >> / C<< $msg->maintenance_window($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::MaintenanceWindow>)
+
+The maintenance window for this instance. This specifies when the instance
+can be restarted for maintenance purposes.
+
+=item * C<< $msg->backup_configuration() >> / C<< $msg->backup_configuration($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::BackupConfiguration>)
+
+The daily backup configuration for the instance.
+
+=item * C<< $msg->database_replication_enabled() >> / C<< $msg->database_replication_enabled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Configuration specific to read replica instances. Indicates whether
+replication is enabled or not. WARNING: Changing this restarts the
+instance.
+
+=item * C<< $msg->crash_safe_replication_enabled() >> / C<< $msg->crash_safe_replication_enabled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Configuration specific to read replica instances. Indicates whether
+database flags for crash-safe replication are enabled. This property was
+only applicable to First Generation instances.
+
+=item * C<< $msg->data_disk_size_gb() >> / C<< $msg->data_disk_size_gb($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+The size of data disk, in GB. The data disk size minimum is 10GB.
+
+=item * C<< $msg->active_directory_config() >> / C<< $msg->active_directory_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SqlActiveDirectoryConfig>)
+
+Active Directory configuration, relevant only for Cloud SQL for SQL Server.
+
+=item * C<< $msg->collation() >> / C<< $msg->collation($value) >>
+
+Type: C<String>
+
+The name of server Instance collation.
+
+=item * C<< $msg->deny_maintenance_periods() >> / C<< $msg->deny_maintenance_periods($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::DenyMaintenancePeriod>)
+
+Deny maintenance periods
+
+=item * C<< $msg->insights_config() >> / C<< $msg->insights_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::InsightsConfig>)
+
+Insights configuration, for now relevant only for Postgres.
+
+=item * C<< $msg->msdtc_enabled() >> / C<< $msg->msdtc_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Enables Microsoft Distributed Transaction Coordinator (MSDTC) for
+SQL Server.
+
+=item * C<< $msg->msdtc_rpc_auth_mode() >> / C<< $msg->msdtc_rpc_auth_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::Settings::MsdtcRpcAuthMode>)
+
+Optional. RPC authentication mode for Microsoft Distributed Transaction
+Coordinator (MSDTC).
+
+=item * C<< $msg->password_validation_policy() >> / C<< $msg->password_validation_policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::PasswordValidationPolicy>)
+
+The local user password validation policy of the instance for PostgreSQL
+and MySQL.
+
+=item * C<< $msg->sql_server_audit_config() >> / C<< $msg->sql_server_audit_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SqlServerAuditConfig>)
+
+SQL Server specific audit configuration.
+
+=item * C<< $msg->edition() >> / C<< $msg->edition($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::Settings::Edition>)
+
+Optional. The edition type of the Cloud SQL instance.
+
+=item * C<< $msg->connector_enforcement() >> / C<< $msg->connector_enforcement($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::Settings::ConnectorEnforcement>)
+
+Specifies if connections must use Cloud SQL connectors.
+Option values include the following: `NOT_REQUIRED` (Cloud SQL instances
+can be connected without Cloud SQL
+Connectors) and `REQUIRED` (Only allow connections that use Cloud SQL
+Connectors).
+
+Note that using REQUIRED disables all existing authorized networks. If
+this field is not specified when creating a new instance, NOT_REQUIRED is
+used. If this field is not specified when patching or updating an existing
+instance, it is left unchanged in the instance.
+
+=item * C<< $msg->deletion_protection_enabled() >> / C<< $msg->deletion_protection_enabled($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Configuration to protect against accidental instance deletion.
+
+=item * C<< $msg->time_zone() >> / C<< $msg->time_zone($value) >>
+
+Type: C<String>
+
+Server timezone, relevant only for Cloud SQL for SQL Server.
+
+=item * C<< $msg->advanced_machine_features() >> / C<< $msg->advanced_machine_features($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::AdvancedMachineFeatures>)
+
+Specifies advanced machine configuration for the instances relevant only
+for SQL Server.
+
+=item * C<< $msg->data_cache_config() >> / C<< $msg->data_cache_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::DataCacheConfig>)
+
+Configuration for data cache.
+
+=item * C<< $msg->replication_lag_max_seconds() >> / C<< $msg->replication_lag_max_seconds($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Optional. Configuration value for recreation of replica after certain
+replication lag
+
+=item * C<< $msg->enable_google_ml_integration() >> / C<< $msg->enable_google_ml_integration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. When this parameter is set to true, Cloud SQL instances can
+connect to Vertex AI to pass requests for real-time predictions and
+insights to the AI. The default value is false. This applies only to Cloud
+SQL for MySQL and Cloud SQL for PostgreSQL instances.
+
+=item * C<< $msg->enable_dataplex_integration() >> / C<< $msg->enable_dataplex_integration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. By default, Cloud SQL instances have schema extraction disabled
+for Dataplex. When this parameter is set to true, schema extraction for
+Dataplex on Cloud SQL instances is activated.
+
+=item * C<< $msg->retain_backups_on_delete() >> / C<< $msg->retain_backups_on_delete($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. When this parameter is set to true, Cloud SQL retains backups of
+the instance even after the instance is deleted. The ON_DEMAND backup will
+be retained until customer deletes the backup or the project. The AUTOMATED
+backup will be retained based on the backups retention setting.
+
+=item * C<< $msg->data_disk_provisioned_iops() >> / C<< $msg->data_disk_provisioned_iops($value) >>
+
+Type: C<Int64>
+
+Optional. Provisioned number of I/O operations per second for the data
+disk. This field is only used for hyperdisk-balanced disk types.
+
+=item * C<< $msg->data_disk_provisioned_throughput() >> / C<< $msg->data_disk_provisioned_throughput($value) >>
+
+Type: C<Int64>
+
+Optional. Provisioned throughput measured in MiB per second for the data
+disk. This field is only used for hyperdisk-balanced disk types.
+
+=item * C<< $msg->connection_pool_config() >> / C<< $msg->connection_pool_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolConfig>)
+
+Optional. The managed connection pooling configuration for the instance.
+
+=item * C<< $msg->final_backup_config() >> / C<< $msg->final_backup_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::FinalBackupConfig>)
+
+Optional. The final backup configuration for the instance.
+
+=item * C<< $msg->read_pool_auto_scale_config() >> / C<< $msg->read_pool_auto_scale_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ReadPoolAutoScaleConfig>)
+
+Optional. The read pool auto-scale configuration for the instance.
+
+=item * C<< $msg->accelerated_replica_mode() >> / C<< $msg->accelerated_replica_mode($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Whether the replica is in accelerated mode. This feature is in
+private preview and requires allowlisting to take effect.
+
+=item * C<< $msg->auto_upgrade_enabled() >> / C<< $msg->auto_upgrade_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Cloud SQL for MySQL auto-upgrade configuration. When this
+parameter is set to true, auto-upgrade is enabled for MySQL 8.0 minor
+versions. The MySQL version must be 8.0.35 or higher.
+
+=item * C<< $msg->entraid_config() >> / C<< $msg->entraid_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SqlServerEntraIdConfig>)
+
+Optional. The Microsoft Entra ID configuration for the SQL Server instance.
+
+=item * C<< $msg->data_api_access() >> / C<< $msg->data_api_access($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::Settings::DataApiAccess>)
+
+This parameter controls whether to allow using ExecuteSql API to connect to
+the instance. Not allowed by default.
+
+=item * C<< $msg->performance_capture_config() >> / C<< $msg->performance_capture_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::PerformanceCaptureConfig>)
+
+Optional. Configuration for Performance Capture, provides diagnostic
+metrics during high load situations.
+
+=item * C<< $msg->initial_users_config() >> / C<< $msg->initial_users_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig>)
+
+Optional. Input only. Users to be created on the instance during instance
+creation.
+
+=back
+
+=head3 Enum: Settings::SqlActivationPolicy
+
+=over 4
+
+=item * C<SQL_ACTIVATION_POLICY_UNSPECIFIED> => C<0>
+
+=item * C<ALWAYS> => C<1>
+
+=item * C<NEVER> => C<2>
+
+=item * C<ON_DEMAND> => C<3>
+
+=back
+
+=head3 Enum: Settings::MsdtcRpcAuthMode
+
+=over 4
+
+=item * C<MSDTC_RPC_AUTH_MODE_UNSPECIFIED> => C<0>
+
+=item * C<ALLOW_ONLY_SECURE_RPC_CALLS> => C<1>
+
+=item * C<FALLBACK_TO_UNSECURE_RPC_IF_NECESSARY> => C<2>
+
+=item * C<TURN_OFF_RPC_SECURITY> => C<3>
+
+=back
+
+=head3 Enum: Settings::Edition
+
+=over 4
+
+=item * C<EDITION_UNSPECIFIED> => C<0>
+
+=item * C<ENTERPRISE> => C<2>
+
+=item * C<ENTERPRISE_PLUS> => C<3>
+
+=item * C<DEVELOPER> => C<5>
+
+=back
+
+=head3 Enum: Settings::ConnectorEnforcement
+
+=over 4
+
+=item * C<CONNECTOR_ENFORCEMENT_UNSPECIFIED> => C<0>
+
+=item * C<NOT_REQUIRED> => C<1>
+
+=item * C<REQUIRED> => C<2>
+
+=back
+
+=head3 Enum: Settings::DataApiAccess
+
+=over 4
+
+=item * C<DATA_API_ACCESS_UNSPECIFIED> => C<0>
+
+=item * C<DISALLOW_DATA_API> => C<1>
+
+=item * C<ALLOW_DATA_API> => C<2>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::PerformanceCaptureConfig
+
+Performance capture configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enabled() >> / C<< $msg->enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Enables or disables the performance capture feature.
+
+=item * C<< $msg->probing_interval_seconds() >> / C<< $msg->probing_interval_seconds($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the interval in seconds between consecutive probes that
+check if any trigger condition thresholds have been reached.
+
+=item * C<< $msg->probe_threshold() >> / C<< $msg->probe_threshold($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the minimum number of consecutive probe threshold that
+triggers performance capture.
+
+=item * C<< $msg->running_threads_threshold() >> / C<< $msg->running_threads_threshold($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the minimum number of MySQL `Threads_running` to
+trigger the performance capture on the primary instance.
+
+=item * C<< $msg->seconds_behind_source_threshold() >> / C<< $msg->seconds_behind_source_threshold($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the minimum number of seconds replica must be lagging
+behind primary instance to trigger the performance capture on replica.
+
+=item * C<< $msg->transaction_duration_threshold() >> / C<< $msg->transaction_duration_threshold($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the amount of time in seconds that a transaction needs
+to have been open before the watcher starts recording it.
+
+=item * C<< $msg->cpu_utilization_threshold_percent() >> / C<< $msg->cpu_utilization_threshold_percent($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the minimum percentage of CPU utilization to trigger
+the performance capture. Valid integers range from `10` to `99`. Enter `0`
+to disable the check.
+
+=item * C<< $msg->memory_usage_threshold_percent() >> / C<< $msg->memory_usage_threshold_percent($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the minimum percentage of memory usage to trigger the
+performance capture.
+Valid integers range from `10` to `99`. Enter `0` to disable the check.
+
+=item * C<< $msg->transaction_lock_wait_threshold_count() >> / C<< $msg->transaction_lock_wait_threshold_count($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the minimum allowed number of transactions in lock wait
+state to trigger the performance capture. Valid integers range from `10` to
+`10000`. Enter `0` to disable the check.
+
+=item * C<< $msg->semaphore_wait_threshold_count() >> / C<< $msg->semaphore_wait_threshold_count($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the minimum allowed number of semaphore waits to
+trigger the performance capture. Valid integers range from `10` to `10000`.
+Enter `0` to disable the check.
+
+=item * C<< $msg->history_list_length_threshold_count() >> / C<< $msg->history_list_length_threshold_count($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the minimum number of undo log entries in the history
+list length to trigger the performance capture. Valid integers range from
+`10000` to `10000000`. Enter `0` to disable the check.
+
+=item * C<< $msg->transaction_kill_threshold_seconds() >> / C<< $msg->transaction_kill_threshold_seconds($value) >>
+
+Type: C<Int32>
+
+Optional. Specifies the amount of time in seconds that a transaction needs
+to have been open before the watcher starts terminating it. Valid integers
+range from `60` to `604800` (7 days). Enter `0` to disable. If enabled
+(i.e., > 0), this value must be greater than or equal to
+`transaction_duration_threshold`. Configurations where
+`0 < transaction_kill_threshold_seconds < transaction_duration_threshold`
+will be rejected.
+
+=item * C<< $msg->transaction_kill_excluded_user_hosts() >> / C<< $msg->transaction_kill_excluded_user_hosts($value) >>
+
+Type: C<String>
+
+Optional. Specifies a customer-defined list of users to exclude from
+transaction termination. Entries can be in the format 'user@host' or just
+'user'. A standalone 'user' implies 'user@%', excluding the user from any
+host. Wildcard '%' is allowed in the host part of the 'user@host' format.
+Example: `["app_user", "db_admin@10.1.2.3", "report_user@%"]`
+
+=item * C<< $msg->transaction_kill_type() >> / C<< $msg->transaction_kill_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::PerformanceCaptureConfig::TransactionKillType>)
+
+Optional. Determines which transactions are allowed to be terminated when
+they exceed `transaction_kill_threshold_seconds`. This allows protecting
+write-heavy transactions from auto-termination if desired. Defaults to
+`READ_ONLY_TRANSACTIONS` if unspecified.
+
+=back
+
+=head3 Enum: PerformanceCaptureConfig::TransactionKillType
+
+=over 4
+
+=item * C<TRANSACTION_KILL_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<READ_ONLY_TRANSACTIONS> => C<1>
+
+=item * C<ALL_TRANSACTIONS> => C<2>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolFlags
+
+Connection pool flags for Cloud SQL instances managed connection pool
+configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the flag.
+
+=item * C<< $msg->value() >> / C<< $msg->value($value) >>
+
+Type: C<String>
+
+Required. The value of the flag. Boolean flags are set to `on` for true
+and `off` for false. This field must be omitted if the flag
+doesn't take a value.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolConfig
+
+The managed connection pooling configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->connection_pooling_enabled() >> / C<< $msg->connection_pooling_enabled($value) >>
+
+Type: C<Bool>
+
+Whether managed connection pooling is enabled.
+
+=item * C<< $msg->flags() >> / C<< $msg->flags($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ConnectionPoolFlags>)
+
+Optional. List of connection pool configuration flags.
+
+=item * C<< $msg->pooler_count() >> / C<< $msg->pooler_count($value) >>
+
+Type: C<Int32>
+
+Output only. Number of connection poolers.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::ReadPoolAutoScaleConfig
+
+The read pool auto-scale configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enabled() >> / C<< $msg->enabled($value) >>
+
+Type: C<Bool>
+
+Indicates whether read pool auto scaling is enabled.
+
+=item * C<< $msg->min_node_count() >> / C<< $msg->min_node_count($value) >>
+
+Type: C<Int32>
+
+Minimum number of read pool nodes to be maintained.
+
+=item * C<< $msg->max_node_count() >> / C<< $msg->max_node_count($value) >>
+
+Type: C<Int32>
+
+Maximum number of read pool nodes to be maintained.
+
+=item * C<< $msg->target_metrics() >> / C<< $msg->target_metrics($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::ReadPoolAutoScaleConfig::TargetMetric>)
+
+Optional. Target metrics for read pool auto scaling.
+
+=item * C<< $msg->disable_scale_in() >> / C<< $msg->disable_scale_in($value) >>
+
+Type: C<Bool>
+
+Indicates whether read pool auto scaling supports scale in operations
+(removing nodes).
+
+=item * C<< $msg->scale_in_cooldown_seconds() >> / C<< $msg->scale_in_cooldown_seconds($value) >>
+
+Type: C<Int32>
+
+The cooldown period for scale-in operations.
+
+=item * C<< $msg->scale_out_cooldown_seconds() >> / C<< $msg->scale_out_cooldown_seconds($value) >>
+
+Type: C<Int32>
+
+The cooldown period for scale-out operations.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::AdvancedMachineFeatures
+
+Specifies options for controlling advanced machine features.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->threads_per_core() >> / C<< $msg->threads_per_core($value) >>
+
+Type: C<Int32>
+
+The number of threads per physical core.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::SslCert
+
+SslCerts Resource
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#sslCert`.
+
+=item * C<< $msg->cert_serial_number() >> / C<< $msg->cert_serial_number($value) >>
+
+Type: C<String>
+
+Serial number, as extracted from the certificate.
+
+=item * C<< $msg->cert() >> / C<< $msg->cert($value) >>
+
+Type: C<String>
+
+PEM representation.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the certificate was created in [RFC
+3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`
+
+=item * C<< $msg->common_name() >> / C<< $msg->common_name($value) >>
+
+Type: C<String>
+
+User supplied name.  Constrained to [a-zA-Z.-_ ]+.
+
+=item * C<< $msg->expiration_time() >> / C<< $msg->expiration_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+The time when the certificate expires in [RFC
+3339](https://tools.ietf.org/html/rfc3339) format, for example
+`2012-11-15T16:19:00.094Z`.
+
+=item * C<< $msg->sha1_fingerprint() >> / C<< $msg->sha1_fingerprint($value) >>
+
+Type: C<String>
+
+Sha1 Fingerprint.
+
+=item * C<< $msg->instance() >> / C<< $msg->instance($value) >>
+
+Type: C<String>
+
+Name of the database instance.
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+The URI of this resource.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::SslCertDetail
+
+SslCertDetail.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->cert_info() >> / C<< $msg->cert_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::SslCert>)
+
+The public information about the cert.
+
+=item * C<< $msg->cert_private_key() >> / C<< $msg->cert_private_key($value) >>
+
+Type: C<String>
+
+The private key for the client cert, in pem format.  Keep private in order
+to protect your security.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::DNSEntry
+
+DNS Entry for the primary instance in a replication topology.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->dns() >> / C<< $msg->dns($value) >>
+
+Type: C<String>
+
+Required. The DNS name.
+
+=item * C<< $msg->ipv4_address() >> / C<< $msg->ipv4_address($value) >>
+
+Type: C<String>
+
+Required. The IP address.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificate
+
+A single certificate or key in a customer managed certificate bundle.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->certificate_type() >> / C<< $msg->certificate_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::CertificateType>)
+
+Required. The certificate type.
+
+=item * C<< $msg->content() >> / C<< $msg->content($value) >>
+
+Type: C<Bytes>
+
+Required. Input only. The PEM-encoded certificate or key content in base64
+format.
+
+=item * C<< $msg->file_path() >> / C<< $msg->file_path($value) >>
+
+Type: C<String>
+
+Output only. File path of the PEM-encoded certificate or key content on the
+database virtual machine. This path can be used by database extensions or
+plugins (for example, to configure `pglogical` in PostgreSQL) that need to
+reference the certificate or key file directly on the VM's filesystem, ex:
+certs/c1/server-ca.pem
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificateConfig
+
+Customer managed certificate SSL configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->bundle() >> / C<< $msg->bundle($value) >>
+
+Type: C<String>
+
+Output only. The name of the customer managed certificate configuration.
+This name will be used to identify a certificate bundle.
+
+=item * C<< $msg->intent() >> / C<< $msg->intent($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::Intent>)
+
+Required. The intent for this customer managed certificate configuration.
+
+=item * C<< $msg->primary_dns_record() >> / C<< $msg->primary_dns_record($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::DNSEntry>)
+
+DNS name associated with the primary instance in a replication topology.
+This is needed to insert a DNS entry in a replica VM.
+
+=item * C<< $msg->customer_managed_certificates() >> / C<< $msg->customer_managed_certificates($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::CustomerManagedCertificate>)
+
+Required. The server CA certificate, client key and client certificate. You
+can specify up to 3 certificates in a bundle.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::SqlActiveDirectoryConfig
+
+Active Directory configuration, relevant only for Cloud SQL for SQL Server.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always sql#activeDirectoryConfig.
+
+=item * C<< $msg->domain() >> / C<< $msg->domain($value) >>
+
+Type: C<String>
+
+The name of the domain (e.g., mydomain.com).
+
+=item * C<< $msg->mode() >> / C<< $msg->mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlActiveDirectoryConfig::ActiveDirectoryMode>)
+
+Optional. The mode of the Active Directory configuration.
+
+=item * C<< $msg->dns_servers() >> / C<< $msg->dns_servers($value) >>
+
+Type: C<String>
+
+Optional. Domain controller IPv4 addresses used to bootstrap Active
+Directory.
+
+=item * C<< $msg->admin_credential_secret_name() >> / C<< $msg->admin_credential_secret_name($value) >>
+
+Type: C<String>
+
+Optional. The secret manager key storing the administrator credential.
+(e.g., projects/{project}/secrets/{secret}).
+
+=item * C<< $msg->organizational_unit() >> / C<< $msg->organizational_unit($value) >>
+
+Type: C<String>
+
+Optional. The organizational unit distinguished name. This is the full
+hierarchical path to the organizational unit.
+
+=back
+
+=head3 Enum: SqlActiveDirectoryConfig::ActiveDirectoryMode
+
+=over 4
+
+=item * C<ACTIVE_DIRECTORY_MODE_UNSPECIFIED> => C<0>
+
+=item * C<MANAGED_ACTIVE_DIRECTORY> => C<1>
+
+=item * C<SELF_MANAGED_ACTIVE_DIRECTORY> => C<2>
+
+=item * C<CUSTOMER_MANAGED_ACTIVE_DIRECTORY> => C<3>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::SqlServerAuditConfig
+
+SQL Server specific audit configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always sql#sqlServerAuditConfig
+
+=item * C<< $msg->bucket() >> / C<< $msg->bucket($value) >>
+
+Type: C<String>
+
+The name of the destination bucket (e.g., gs://mybucket).
+
+=item * C<< $msg->retention_interval() >> / C<< $msg->retention_interval($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+How long to keep generated audit files.
+
+=item * C<< $msg->upload_interval() >> / C<< $msg->upload_interval($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+How often to upload generated audit files.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::SqlServerEntraIdConfig
+
+SQL Server Entra ID configuration.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+Output only. This is always sql#sqlServerEntraIdConfig
+
+=item * C<< $msg->tenant_id() >> / C<< $msg->tenant_id($value) >>
+
+Type: C<String>
+
+Optional. The tenant ID for the Entra ID configuration.
+
+=item * C<< $msg->application_id() >> / C<< $msg->application_id($value) >>
+
+Type: C<String>
+
+Optional. The application ID for the Entra ID configuration.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig
+
+Configuration for users created during instance creation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->initial_users() >> / C<< $msg->initial_users($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlResources::InitialUsersConfig::InitialUser>)
+
+Optional. List of IAM users to be created during instance creation.
+A maximum of 5 users are allowed.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::AcquireSsrsLeaseContext
+
+Acquire SSRS lease context.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->setup_login() >> / C<< $msg->setup_login($value) >>
+
+Type: C<String>
+
+The username to be used as the setup login to connect to the database
+server for SSRS setup.
+
+=item * C<< $msg->service_login() >> / C<< $msg->service_login($value) >>
+
+Type: C<String>
+
+The username to be used as the service login to connect to the report
+database for SSRS setup.
+
+=item * C<< $msg->report_database() >> / C<< $msg->report_database($value) >>
+
+Type: C<String>
+
+The report database to be used for SSRS setup.
+
+=item * C<< $msg->duration() >> / C<< $msg->duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Lease duration needed for SSRS setup.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::DnsNameMapping
+
+DNS metadata.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The DNS name.
+
+=item * C<< $msg->connection_type() >> / C<< $msg->connection_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::DnsNameMapping::ConnectionType>)
+
+Output only. The connection type of the DNS name.
+
+=item * C<< $msg->dns_scope() >> / C<< $msg->dns_scope($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::DnsNameMapping::DnsScope>)
+
+Output only. The scope that the DNS name applies to.
+
+=item * C<< $msg->record_manager() >> / C<< $msg->record_manager($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::DnsNameMapping::RecordManager>)
+
+Output only. The manager for this DNS record.
+
+=back
+
+=head3 Enum: DnsNameMapping::ConnectionType
+
+=over 4
+
+=item * C<CONNECTION_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<PUBLIC> => C<1>
+
+=item * C<PRIVATE_SERVICES_ACCESS> => C<2>
+
+=item * C<PRIVATE_SERVICE_CONNECT> => C<3>
+
+=back
+
+=head3 Enum: DnsNameMapping::DnsScope
+
+=over 4
+
+=item * C<DNS_SCOPE_UNSPECIFIED> => C<0>
+
+=item * C<INSTANCE> => C<1>
+
+=item * C<CLUSTER> => C<2>
+
+=back
+
+=head3 Enum: DnsNameMapping::RecordManager
+
+=over 4
+
+=item * C<RECORD_MANAGER_UNSPECIFIED> => C<0>
+
+=item * C<CUSTOMER> => C<1>
+
+=item * C<CLOUD_SQL_AUTOMATION> => C<2>
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadCaptureContext
+
+The context for the `StartWorkloadCapture` operation, which contains
+details to start recording the workload (SQL queries) on a Cloud SQL
+instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enable_live_replay() >> / C<< $msg->enable_live_replay($value) >>
+
+Type: C<Bool>
+
+Optional. If true, the captured workload is simultaneously executed on a
+separate, ephemeral Cloud SQL instance. This "live replay" instance
+is automatically provisioned and is cloned from the source instance. If
+false (the default), the workload is only stored and no live replay occurs.
+It can be replayed later using a separate `StartWorkloadReplayRequest`.
+Note: The workload capture runs continuously until an explicit
+`StopWorkloadCaptureRequest` is issued.
+
+=item * C<< $msg->replay_instance() >> / C<< $msg->replay_instance($value) >>
+
+Type: C<String>
+
+Optional. Required if `enable_live_replay` is true.
+The name of the Cloud SQL instance where the captured workload
+(SQL queries) is being executed, excluding the project ID (for example,
+`my-replay-instance`). The instance name must start with a lowercase letter
+and contain only lowercase letters, numbers, and hyphens. The combined
+length of `project-ID:instance-name` must be 98 characters or less.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadCaptureContext
+
+The context for the `StopWorkloadCapture` operation, which contains
+details to stop recording the workload (SQL queries) on a Cloud SQL
+instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->abort_live_replay() >> / C<< $msg->abort_live_replay($value) >>
+
+Type: C<Bool>
+
+Optional. If true, immediately aborts the concurrent live replay and
+discards any un-replayed traffic alongside stopping the capture. If false
+(the default), the capture stops recording new traffic, but the live replay
+will continue executing until the entire backlog of captured traffic has
+been replayed.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::StartWorkloadReplayContext
+
+The context for the `StartWorkloadReplay` operation, which contains details
+about starting the execution of a captured workload (recorded read and
+write SQL queries) on a replay instance (the Cloud SQL
+instance where the recorded SQL queries are executed).
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->replay_instance() >> / C<< $msg->replay_instance($value) >>
+
+Type: C<String>
+
+Required. The name of the Cloud SQL instance where the captured workload
+(SQL queries) is being executed, excluding the project ID (for example,
+`my-replay-instance`). The instance name must start with a lowercase letter
+and contain only lowercase letters, numbers, and hyphens. The combined
+length of `project-ID:instance-name` must be 98 characters or less.
+
+=item * C<< $msg->workload_id() >> / C<< $msg->workload_id($value) >>
+
+Type: C<String>
+
+Output only. The ID of the workload to start executing on the replay
+instance. Each workload capture generates a unique ID in the format
+`workload-<epoch_timestamp>` (for example, `workload-1786046400`). Use this
+ID to start executing the recorded SQL queries.
+
+=item * C<< $msg->source_instance() >> / C<< $msg->source_instance($value) >>
+
+Type: C<String>
+
+Output only. The name of the source Cloud SQL instance where the workload
+was captured, excluding the project ID (for example, `my-source-instance`).
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlResources::StopWorkloadReplayContext
+
+The context for the `StopWorkloadReplay` operation, which represents an
+operation that stops an active workload replay on a target Cloud SQL replay
+instance.
+
+Inherits from L<Protobuf::Message>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlResources::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

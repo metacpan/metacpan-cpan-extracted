@@ -1,0 +1,28 @@
+Changes
+lib/Google/Cloud/Capacityplanner/V1beta.pm
+lib/Google/Cloud/Capacityplanner/V1beta/Allocation.pm
+lib/Google/Cloud/Capacityplanner/V1beta/Allocation/Types.pm
+lib/Google/Cloud/Capacityplanner/V1beta/FutureReservation.pm
+lib/Google/Cloud/Capacityplanner/V1beta/FutureReservation/Types.pm
+lib/Google/Cloud/Capacityplanner/V1beta/Location.pm
+lib/Google/Cloud/Capacityplanner/V1beta/Location/Types.pm
+lib/Google/Cloud/Capacityplanner/V1beta/Resource.pm
+lib/Google/Cloud/Capacityplanner/V1beta/Resource/Types.pm
+lib/Google/Cloud/Capacityplanner/V1beta/UsageService.pm
+lib/Google/Cloud/Capacityplanner/V1beta/UsageService/Types.pm
+lib/Google/Cloud/Capacityplanner/V1beta/UsageServiceClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-UsageService.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-UsageService.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

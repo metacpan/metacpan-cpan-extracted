@@ -21,9 +21,10 @@ BEGIN {
 
 use Database::Abstraction;
 use Web::VWF::Data::index;
-use Web::VWF::Data::states;
+# The states driver is in example/data, its data in example/databases
+require(File::Spec->catfile($Bin, File::Spec->updir(), 'example', 'data', 'states.pm'));
 
-Database::Abstraction::init({ directory => File::Spec->catdir($Bin, File::Spec->updir(), 'example', 'data') });
+Database::Abstraction::init({ directory => File::Spec->catdir($Bin, File::Spec->updir(), 'example', 'databases') });
 
 my $index = Web::VWF::Data::index->new();
 is(($index->email({ entry => 'bob' }))[0], 'bob@example.com', 'index: the address of a person');

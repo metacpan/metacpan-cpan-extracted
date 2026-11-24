@@ -10,26 +10,26 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Ai::Generativelanguage::V1beta::Content;
-use Google::Ai::Generativelanguage::V1beta::Safety;
 use Google::Ai::Generativelanguage::V1beta::Citation;
-use Google::Ai::Generativelanguage::V1beta::TunedModel;
-use Google::Ai::Generativelanguage::V1beta::Retriever;
+use Google::Ai::Generativelanguage::V1beta::Safety;
 use Google::Ai::Generativelanguage::V1beta::Model;
 use Google::Ai::Generativelanguage::V1beta::Permission;
-use Google::Ai::Generativelanguage::V1beta::PredictionService;
+use Google::Ai::Generativelanguage::V1beta::Retriever;
+use Google::Ai::Generativelanguage::V1beta::TunedModel;
 use Google::Ai::Generativelanguage::V1beta::File;
-use Google::Ai::Generativelanguage::V1beta::CachedContent;
+use Google::Ai::Generativelanguage::V1beta::PredictionService;
+use Google::Ai::Generativelanguage::V1beta::Content;
 use Google::Ai::Generativelanguage::V1beta::TextService;
 use Google::Ai::Generativelanguage::V1beta::DiscussService;
-use Google::Ai::Generativelanguage::V1beta::RetrieverService;
-use Google::Ai::Generativelanguage::V1beta::GenerativeService;
-use Google::Ai::Generativelanguage::V1beta::ModelService;
 use Google::Ai::Generativelanguage::V1beta::PermissionService;
+use Google::Ai::Generativelanguage::V1beta::RetrieverService;
+use Google::Ai::Generativelanguage::V1beta::ModelService;
 use Google::Ai::Generativelanguage::V1beta::FileService;
+use Google::Ai::Generativelanguage::V1beta::GenerativeService;
+use Google::Ai::Generativelanguage::V1beta::CachedContent;
 use Google::Ai::Generativelanguage::V1beta::CacheService;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -242,9 +242,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
-
 =item * C<googleapis/google/ai/generativelanguage/v1beta/cache_service.proto>
+
+=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
 
 =item * C<googleapis/google/ai/generativelanguage/v1beta/citation.proto>
 
@@ -311,19 +311,119 @@ The following RPC methods are available in this client:
 
 =item * B<generate_text>
 
-Calls the RPC method C<GenerateText> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->generate_text(
+        model                    => $model,
+        prompt                   => $prompt,
+        temperature              => $temperature,
+        candidate_count          => $candidate_count,
+        max_output_tokens        => $max_output_tokens,
+        top_p                    => $top_p,
+        top_k                    => $top_k,
+        safety_settings          => [ ... ],
+        stop_sequences           => [ ... ],
+    );
+
+Calls the RPC method C<GenerateText> on C<google.ai.generativelanguage.v1beta.TextService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TextService::GenerateTextResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<prompt> - L<Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt>
+
+=item * C<temperature> - C<float>
+
+=item * C<candidate_count> - C<int32>
+
+=item * C<max_output_tokens> - C<int32>
+
+=item * C<top_p> - C<float>
+
+=item * C<top_k> - C<int32>
+
+=item * C<safety_settings> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::Safety::SafetySetting>
+
+=item * C<stop_sequences> - ArrayRef of C<string>
+
+=back
 
 =item * B<embed_text>
 
-Calls the RPC method C<EmbedText> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->embed_text(
+        model                    => $model,
+        text                     => $text,
+    );
+
+Calls the RPC method C<EmbedText> on C<google.ai.generativelanguage.v1beta.TextService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<text> - C<string>
+
+=back
 
 =item * B<batch_embed_text>
 
-Calls the RPC method C<BatchEmbedText> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->batch_embed_text(
+        model                    => $model,
+        texts                    => [ ... ],
+        requests                 => [ ... ],
+    );
+
+Calls the RPC method C<BatchEmbedText> on C<google.ai.generativelanguage.v1beta.TextService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TextService::BatchEmbedTextResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<texts> - ArrayRef of C<string>
+
+=item * C<requests> - ArrayRef of L<Google::Ai::Generativelanguage::V1beta::TextService::EmbedTextRequest>
+
+=back
 
 =item * B<count_text_tokens>
 
-Calls the RPC method C<CountTextTokens> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->count_text_tokens(
+        model                    => $model,
+        prompt                   => $prompt,
+    );
+
+Calls the RPC method C<CountTextTokens> on C<google.ai.generativelanguage.v1beta.TextService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::TextService::CountTextTokensResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<prompt> - L<Google::Ai::Generativelanguage::V1beta::TextService::TextPrompt>
+
+=back
 
 =back
 

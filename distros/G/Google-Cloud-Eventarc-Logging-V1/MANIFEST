@@ -1,0 +1,21 @@
+Changes
+lib/Google/Cloud/Eventarc/Logging/V1.pm
+lib/Google/Cloud/Eventarc/Logging/V1/EnrollmentActivity.pm
+lib/Google/Cloud/Eventarc/Logging/V1/EnrollmentActivity/Types.pm
+lib/Google/Cloud/Eventarc/Logging/V1/GoogleApiSourceActivity.pm
+lib/Google/Cloud/Eventarc/Logging/V1/GoogleApiSourceActivity/Types.pm
+lib/Google/Cloud/Eventarc/Logging/V1/MessageBusActivity.pm
+lib/Google/Cloud/Eventarc/Logging/V1/MessageBusActivity/Types.pm
+lib/Google/Cloud/Eventarc/Logging/V1/PipelineActivity.pm
+lib/Google/Cloud/Eventarc/Logging/V1/PipelineActivity/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

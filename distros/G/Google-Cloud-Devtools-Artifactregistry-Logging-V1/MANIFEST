@@ -1,0 +1,15 @@
+Changes
+lib/Google/Cloud/Devtools/Artifactregistry/Logging/V1.pm
+lib/Google/Devtools/Artifactregistry/Logging/V1/RequestLog.pm
+lib/Google/Devtools/Artifactregistry/Logging/V1/RequestLog/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

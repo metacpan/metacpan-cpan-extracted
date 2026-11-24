@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -226,15 +226,87 @@ The following RPC methods are available in this client:
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        preview_feature          => $preview_feature,
+        project                  => $project,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.PreviewFeatures>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetPreviewFeatureRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::PreviewFeature>
+
+Parameters:
+
+=over 4
+
+=item * C<preview_feature> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.PreviewFeatures>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListPreviewFeaturesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::PreviewFeatureList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=back
 
 =item * B<update>
 
-Calls the RPC method C<Update> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update(
+        preview_feature          => $preview_feature,
+        preview_feature_resource => $preview_feature_resource,
+        project                  => $project,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Update> on C<google.cloud.compute.v1.PreviewFeatures>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdatePreviewFeatureRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<preview_feature> - C<string>
+
+=item * C<preview_feature_resource> - L<Google::Cloud::Compute::V1::Compute::PreviewFeature>
+
+=item * C<project> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =back
 

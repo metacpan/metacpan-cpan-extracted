@@ -1,0 +1,88 @@
+package Google::Cloud::Databasecenter::V1beta::OperationErrorType;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Cj1nb29nbGUvY2xvdWQvZGF0YWJhc2VjZW50ZXIvdjFiZXRhL29wZXJhdGlvbl9lcnJvcl90
+eXBlLnByb3RvEiJnb29nbGUuY2xvdWQuZGF0YWJhc2VjZW50ZXIudjFiZXRhKrYBChJPcGVy
+YXRpb25FcnJvclR5cGUSJAogT1BFUkFUSU9OX0VSUk9SX1RZUEVfVU5TUEVDSUZJRUQQABIR
+Cg1LTVNfS0VZX0VSUk9SEAESEgoOREFUQUJBU0VfRVJST1IQAhISCg5TVE9DS09VVF9FUlJP
+UhADEhYKEkNBTkNFTExBVElPTl9FUlJPUhAEEhMKD1NRTFNFUlZFUl9FUlJPUhAFEhIKDklO
+VEVSTkFMX0VSUk9SEAZChQIKJmNvbS5nb29nbGUuY2xvdWQuZGF0YWJhc2VjZW50ZXIudjFi
+ZXRhQhdPcGVyYXRpb25FcnJvclR5cGVQcm90b1ABWk5jbG91ZC5nb29nbGUuY29tL2dvL2Rh
+dGFiYXNlY2VudGVyL2FwaXYxYmV0YS9kYXRhYmFzZWNlbnRlcnBiO2RhdGFiYXNlY2VudGVy
+cGKqAiJHb29nbGUuQ2xvdWQuRGF0YWJhc2VDZW50ZXIuVjFCZXRhygIiR29vZ2xlXENsb3Vk
+XERhdGFiYXNlQ2VudGVyXFYxYmV0YeoCJUdvb2dsZTo6Q2xvdWQ6OkRhdGFiYXNlQ2VudGVy
+OjpWMWJldGFK0AwKBhIEDgAzAQq8BAoBDBIDDgASMrEEIENvcHlyaWdodCAyMDI2IEdvb2ds
+ZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4w
+ICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGlu
+IGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlvdSBtYXkgb2J0YWluIGEgY29weSBv
+ZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3LmFwYWNoZS5vcmcvbGljZW5zZXMv
+TElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkgYXBwbGljYWJsZSBsYXcgb3IgYWdy
+ZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0cmlidXRlZCB1bmRlciB0aGUgTGlj
+ZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMiIEJBU0lTLAogV0lUSE9VVCBXQVJS
+QU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGlt
+cGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zl
+cm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS4K
+CggKAQISAxAAKwoICgEIEgMSAD8KCQoCCCUSAxIAPwoICgEIEgMTAGUKCQoCCAsSAxMAZQoI
+CgEIEgMUACIKCQoCCAoSAxQAIgoICgEIEgMVADgKCQoCCAgSAxUAOAoICgEIEgMWAD8KCQoC
+CAESAxYAPwoICgEIEgMXAD8KCQoCCCkSAxcAPwoICgEIEgMYAD4KCQoCCC0SAxgAPgrYAQoC
+BQASBB0AMwEaywEgT3BlcmF0aW9uRXJyb3JUeXBlIGlzIHVzZWQgdG8gZXhwb3NlIHNwZWNp
+ZmljIGVycm9yIHR5cGUgd2hpY2ggY2FuIGhhcHBlbiBpbgogZGF0YWJhc2UgcmVzb3VyY2Ug
+d2hpbGUgcGVyZm9ybWluZyBhbiBvcGVyYXRpb24uIEZvciBleGFtcGxlLCBhbiBlcnJvciBj
+YW4KIGhhcHBlbiB3aGlsZSBkYXRhYmFzZSByZXNvdXJjZSBiZWluZyBiYWNrZWQgdXAuCgoK
+CgMFAAESAx0FFwpQCgQFAAIAEgMfAicaQyBVTlNQRUNJRklFRCBtZWFucyBvcGVyYXRpb24g
+ZXJyb3IgdHlwZSBpcyBub3Qga25vd24gb3IgYXZhaWxhYmxlLgoKDAoFBQACAAESAx8CIgoM
+CgUFAAIAAhIDHyUmClMKBAUAAgESAyICFBpGIEtleSBkZXN0cm95ZWQsIGV4cGlyZWQsIG5v
+dCBmb3VuZCwgdW5yZWFjaGFibGUgb3IgcGVybWlzc2lvbiBkZW5pZWQuCgoMCgUFAAIBARID
+IgIPCgwKBQUAAgECEgMiEhMKKgoEBQACAhIDJQIVGh0gRGF0YWJhc2UgaXMgbm90IGFjY2Vz
+c2libGUuCgoMCgUFAAICARIDJQIQCgwKBQUAAgICEgMlExQKagoEBQACAxIDKQIVGl0gVGhl
+IHpvbmUgb3IgcmVnaW9uIGRvZXMgbm90IGhhdmUgc3VmZmljaWVudCByZXNvdXJjZXMgdG8g
+aGFuZGxlIHRoZSByZXF1ZXN0CiBhdCB0aGUgbW9tZW50LgoKDAoFBQACAwESAykCEAoMCgUF
+AAIDAhIDKRMUCisKBAUAAgQSAywCGRoeIFVzZXIgaW5pdGlhdGVkIGNhbmNlbGxhdGlvbi4K
+CgwKBQUAAgQBEgMsAhQKDAoFBQACBAISAywXGAopCgQFAAIFEgMvAhYaHCBTUUwgc2VydmVy
+IHNwZWNpZmljIGVycm9yLgoKDAoFBQACBQESAy8CEQoMCgUFAAIFAhIDLxQVCigKBAUAAgYS
+AzICFRobIEFueSBvdGhlciBpbnRlcm5hbCBlcnJvci4KCgwKBQUAAgYBEgMyAhAKDAoFBQAC
+BgISAzITFGIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Databasecenter::V1beta::OperationErrorType - Compiled Protocol Buffers messages for google/cloud/databasecenter/v1beta/operation_error_type.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/databasecenter/v1beta/operation_error_type.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Databasecenter::V1beta::OperationErrorType::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

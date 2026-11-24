@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::TimePartitioning;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -63,51 +63,82 @@ EOF
     # Field: expiration_ms Type: 11 (.google.protobuf.Int64Value)
     # Field: field Type: 11 (.google.protobuf.StringValue)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::TimePartitioning::TimePartitioning - Compiled Protocol Buffers message class
+Google::Cloud::Bigquery::V2::TimePartitioning - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/time_partitioning.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Bigquery::V2::TimePartitioning;
 
-    my $msg = Google::Cloud::Bigquery::V2::TimePartitioning::TimePartitioning->new(
-        type => $value,
-    );
+    my $msg = Google::Cloud::Bigquery::V2::TimePartitioning::TimePartitioning->new({
+        type => $type,
+        expiration_ms => $expiration_ms,
+        field => $field,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->type();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::TimePartitioning::TimePartitioning->parse($bytes);
 
-=item * B<type>
-
-Type: String
-
-=item * B<expiration_ms>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<field>
-
-Type: Message (.google.protobuf.StringValue)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::TimePartitioning - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/time_partitioning.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::TimePartitioning::TimePartitioning
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+Required. The supported types are DAY, HOUR, MONTH, and YEAR, which will
+generate one partition per day, hour, month, and year, respectively.
+
+=item * C<< $msg->expiration_ms() >> / C<< $msg->expiration_ms($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. Number of milliseconds for which to keep the storage for a
+partition.
+A wrapper is used here because 0 is an invalid value.
+
+=item * C<< $msg->field() >> / C<< $msg->field($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. If not set, the table is partitioned by pseudo
+column '_PARTITIONTIME'; if set, the table is partitioned by this field.
+The field must be a top-level TIMESTAMP or DATE field. Its mode must be
+NULLABLE or REQUIRED.
+A wrapper is used here because an empty string is an invalid value.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::TimePartitioning::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::FirewallActivation;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -630,108 +630,12 @@ EOF
     # Field: billing_project_id Type: 9 ()
     # Field: endpoint_settings Type: 11 (.google.cloud.networksecurity.v1.FirewallEndpoint.EndpointSettings)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpoint.LabelsEntry)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.FirewallEndpoint.State)
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<associated_networks>
-
-Type: String
-
-=item * B<associations>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpoint.AssociationReference)
-
-=item * B<satisfies_pzs>
-
-Type: Bool
-
-=item * B<satisfies_pzi>
-
-Type: Bool
-
-=item * B<billing_project_id>
-
-Type: String
-
-=item * B<endpoint_settings>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpoint.EndpointSettings)
-
-=back
-
-=cut
-
 # Enum: FirewallEndpoint::State
 our $FirewallEndpoint_STATE_UNSPECIFIED = 0;
 our $FirewallEndpoint_CREATING = 1;
 our $FirewallEndpoint_ACTIVE = 2;
 our $FirewallEndpoint_DELETING = 3;
 our $FirewallEndpoint_INACTIVE = 4;
-
-=pod
-
-=head2 Enum: FirewallEndpoint::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<DELETING> => 3
-
-=item * C<INACTIVE> => 4
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsRequest ===
     # Fields for ListFirewallEndpointsRequest
@@ -741,117 +645,15 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsResponse ===
     # Fields for ListFirewallEndpointsResponse
     # Field: firewall_endpoints Type: 11 (.google.cloud.networksecurity.v1.FirewallEndpoint)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsResponse->new(
-        firewall_endpoints => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<firewall_endpoints>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpoint)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::GetFirewallEndpointRequest ===
     # Fields for GetFirewallEndpointRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::GetFirewallEndpointRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::GetFirewallEndpointRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::CreateFirewallEndpointRequest ===
     # Fields for CreateFirewallEndpointRequest
@@ -860,118 +662,16 @@ Type: String
     # Field: firewall_endpoint Type: 11 (.google.cloud.networksecurity.v1.FirewallEndpoint)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::CreateFirewallEndpointRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::CreateFirewallEndpointRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<firewall_endpoint_id>
-
-Type: String
-
-=item * B<firewall_endpoint>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpoint)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::UpdateFirewallEndpointRequest ===
     # Fields for UpdateFirewallEndpointRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: firewall_endpoint Type: 11 (.google.cloud.networksecurity.v1.FirewallEndpoint)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::UpdateFirewallEndpointRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::UpdateFirewallEndpointRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<firewall_endpoint>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpoint)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::DeleteFirewallEndpointRequest ===
     # Fields for DeleteFirewallEndpointRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::DeleteFirewallEndpointRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::DeleteFirewallEndpointRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpointAssociation ===
     # Fields for FirewallEndpointAssociation
@@ -986,68 +686,6 @@ Type: String
     # Field: reconciling Type: 8 ()
     # Field: disabled Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpointAssociation - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpointAssociation->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpointAssociation.LabelsEntry)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.networksecurity.v1.FirewallEndpointAssociation.State)
-
-=item * B<network>
-
-Type: String
-
-=item * B<firewall_endpoint>
-
-Type: String
-
-=item * B<tls_inspection_policy>
-
-Type: String
-
-=item * B<reconciling>
-
-Type: Bool
-
-=item * B<disabled>
-
-Type: Bool
-
-=back
-
-=cut
-
 # Enum: FirewallEndpointAssociation::State
 our $FirewallEndpointAssociation_STATE_UNSPECIFIED = 0;
 our $FirewallEndpointAssociation_CREATING = 1;
@@ -1055,30 +693,6 @@ our $FirewallEndpointAssociation_ACTIVE = 2;
 our $FirewallEndpointAssociation_DELETING = 3;
 our $FirewallEndpointAssociation_INACTIVE = 4;
 our $FirewallEndpointAssociation_ORPHAN = 5;
-
-=pod
-
-=head2 Enum: FirewallEndpointAssociation::State
-
-Values:
-
-=over 4
-
-=item * C<STATE_UNSPECIFIED> => 0
-
-=item * C<CREATING> => 1
-
-=item * C<ACTIVE> => 2
-
-=item * C<DELETING> => 3
-
-=item * C<INACTIVE> => 4
-
-=item * C<ORPHAN> => 5
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointAssociationsRequest ===
     # Fields for ListFirewallEndpointAssociationsRequest
@@ -1088,117 +702,15 @@ Values:
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointAssociationsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointAssociationsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointAssociationsResponse ===
     # Fields for ListFirewallEndpointAssociationsResponse
     # Field: firewall_endpoint_associations Type: 11 (.google.cloud.networksecurity.v1.FirewallEndpointAssociation)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointAssociationsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointAssociationsResponse->new(
-        firewall_endpoint_associations => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<firewall_endpoint_associations>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpointAssociation)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::GetFirewallEndpointAssociationRequest ===
     # Fields for GetFirewallEndpointAssociationRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::GetFirewallEndpointAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::GetFirewallEndpointAssociationRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::CreateFirewallEndpointAssociationRequest ===
     # Fields for CreateFirewallEndpointAssociationRequest
@@ -1207,78 +719,10 @@ Type: String
     # Field: firewall_endpoint_association Type: 11 (.google.cloud.networksecurity.v1.FirewallEndpointAssociation)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::CreateFirewallEndpointAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::CreateFirewallEndpointAssociationRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<firewall_endpoint_association_id>
-
-Type: String
-
-=item * B<firewall_endpoint_association>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpointAssociation)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::DeleteFirewallEndpointAssociationRequest ===
     # Fields for DeleteFirewallEndpointAssociationRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::DeleteFirewallEndpointAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::DeleteFirewallEndpointAssociationRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::FirewallActivation::UpdateFirewallEndpointAssociationRequest ===
     # Fields for UpdateFirewallEndpointAssociationRequest
@@ -1286,62 +730,20 @@ Type: String
     # Field: firewall_endpoint_association Type: 11 (.google.cloud.networksecurity.v1.FirewallEndpointAssociation)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::FirewallActivation::UpdateFirewallEndpointAssociationRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::FirewallActivation;
-
-    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::UpdateFirewallEndpointAssociationRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<firewall_endpoint_association>
-
-Type: Message (.google.cloud.networksecurity.v1.FirewallEndpointAssociation)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallActivationClient ===
 package Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallActivationClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallActivationClient
 
-Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallActivationClient - Client stub representing the remote FirewallActivation service
+Client stub representing the remote C<FirewallActivation> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networksecurity.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1565,13 +967,698 @@ sub update_firewall_endpoint_association {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::FirewallActivation - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::FirewallActivation - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/firewall_activation.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::FirewallActivation;
+
+    my $msg = Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint->new({
+        name => $name,
+        description => $description,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/firewall_activation.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint
+
+Message describing Endpoint object.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. Name of resource.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the firewall endpoint. Max length 2048
+characters.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Create time stamp.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Update time stamp
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint::LabelsEntry>)
+
+Optional. Labels as key value pairs
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::FirewallEndpoint::State>)
+
+Output only. Current state of the endpoint.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. Whether reconciling is in progress, recommended per
+https://google.aip.dev/128.
+
+=item * C<< $msg->associated_networks() >> / C<< $msg->associated_networks($value) >>
+
+Type: C<String>
+
+Output only. Deprecated: List of networks that are associated with this
+endpoint in the local zone. This is a projection of the
+FirewallEndpointAssociations pointing at this endpoint. A network will only
+appear in this list after traffic routing is fully configured. Format:
+projects/{project}/global/networks/{name}.
+
+=item * C<< $msg->associations() >> / C<< $msg->associations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint::AssociationReference>)
+
+Output only. List of FirewallEndpointAssociations that are associated to
+this endpoint. An association will only appear in this list after traffic
+routing is fully configured.
+
+=item * C<< $msg->satisfies_pzs() >> / C<< $msg->satisfies_pzs($value) >>
+
+Type: C<Bool>
+
+Output only. [Output Only] Reserved for future use.
+
+=item * C<< $msg->satisfies_pzi() >> / C<< $msg->satisfies_pzi($value) >>
+
+Type: C<Bool>
+
+Output only. [Output Only] Reserved for future use.
+
+=item * C<< $msg->billing_project_id() >> / C<< $msg->billing_project_id($value) >>
+
+Type: C<String>
+
+Optional. Project to charge for the deployed firewall endpoint.
+This field must be specified when creating the endpoint in the organization
+scope, and should be omitted otherwise.
+
+=item * C<< $msg->endpoint_settings() >> / C<< $msg->endpoint_settings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint::EndpointSettings>)
+
+Optional. Settings for the endpoint.
+
+=back
+
+=head3 Enum: FirewallEndpoint::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<DELETING> => C<3>
+
+=item * C<INACTIVE> => C<4>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsRequest
+
+Message for requesting list of Endpoints
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Parent value for ListEndpointsRequest
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results the server should return.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filtering results
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Hint for how to order the results
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointsResponse
+
+Message for response to listing Endpoints
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->firewall_endpoints() >> / C<< $msg->firewall_endpoints($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint>)
+
+The list of Endpoint
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results the server should return.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::GetFirewallEndpointRequest
+
+Message for getting a Endpoint
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::CreateFirewallEndpointRequest
+
+Message for creating a Endpoint
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Value for parent.
+
+=item * C<< $msg->firewall_endpoint_id() >> / C<< $msg->firewall_endpoint_id($value) >>
+
+Type: C<String>
+
+Required. Id of the requesting object.
+If auto-generating Id server-side, remove this field and
+firewall_endpoint_id from the method_signature of Create RPC.
+
+=item * C<< $msg->firewall_endpoint() >> / C<< $msg->firewall_endpoint($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint>)
+
+Required. The resource being created
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::UpdateFirewallEndpointRequest
+
+Message for updating a Endpoint
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Field mask is used to specify the fields to be overwritten in the
+Endpoint resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->firewall_endpoint() >> / C<< $msg->firewall_endpoint($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpoint>)
+
+Required. The resource being updated
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::DeleteFirewallEndpointRequest
+
+Message for deleting a Endpoint
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes after the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpointAssociation
+
+Message describing Association object
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Immutable. Identifier. name of resource
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Create time stamp
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Update time stamp
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpointAssociation::LabelsEntry>)
+
+Optional. Labels as key value pairs
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::FirewallEndpointAssociation::State>)
+
+Output only. Current state of the association.
+
+=item * C<< $msg->network() >> / C<< $msg->network($value) >>
+
+Type: C<String>
+
+Required. The URL of the network that is being associated.
+
+=item * C<< $msg->firewall_endpoint() >> / C<< $msg->firewall_endpoint($value) >>
+
+Type: C<String>
+
+Required. The URL of the FirewallEndpoint that is being associated.
+
+=item * C<< $msg->tls_inspection_policy() >> / C<< $msg->tls_inspection_policy($value) >>
+
+Type: C<String>
+
+Optional. The URL of the TlsInspectionPolicy that is being associated.
+
+=item * C<< $msg->reconciling() >> / C<< $msg->reconciling($value) >>
+
+Type: C<Bool>
+
+Output only. Whether reconciling is in progress, recommended per
+https://google.aip.dev/128.
+
+=item * C<< $msg->disabled() >> / C<< $msg->disabled($value) >>
+
+Type: C<Bool>
+
+Optional. Whether the association is disabled.
+True indicates that traffic won't be intercepted
+
+=back
+
+=head3 Enum: FirewallEndpointAssociation::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<CREATING> => C<1>
+
+=item * C<ACTIVE> => C<2>
+
+=item * C<DELETING> => C<3>
+
+=item * C<INACTIVE> => C<4>
+
+=item * C<ORPHAN> => C<5>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointAssociationsRequest
+
+Message for requesting list of Associations
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Parent value for ListAssociationsRequest
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Requested page size. Server may return fewer items than
+requested. If unspecified, server will pick an appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results the server should return.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Filtering results
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Hint for how to order the results
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::ListFirewallEndpointAssociationsResponse
+
+Message for response to listing Associations
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->firewall_endpoint_associations() >> / C<< $msg->firewall_endpoint_associations($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpointAssociation>)
+
+The list of Association
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token identifying a page of results the server should return.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::GetFirewallEndpointAssociationRequest
+
+Message for getting a Association
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::CreateFirewallEndpointAssociationRequest
+
+Message for creating a Association
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. Value for parent.
+
+=item * C<< $msg->firewall_endpoint_association_id() >> / C<< $msg->firewall_endpoint_association_id($value) >>
+
+Type: C<String>
+
+Optional. Id of the requesting object.
+If auto-generating Id server-side, remove this field and
+firewall_endpoint_association_id from the method_signature of Create RPC.
+
+=item * C<< $msg->firewall_endpoint_association() >> / C<< $msg->firewall_endpoint_association($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpointAssociation>)
+
+Required. The resource being created
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::DeleteFirewallEndpointAssociationRequest
+
+Message for deleting a Association
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the resource
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes after the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::FirewallActivation::UpdateFirewallEndpointAssociationRequest
+
+Message for updating an Association
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. Field mask is used to specify the fields to be overwritten in the
+Association resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->firewall_endpoint_association() >> / C<< $msg->firewall_endpoint_association($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::FirewallActivation::FirewallEndpointAssociation>)
+
+Required. The resource being updated
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::FirewallActivation::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@ package Google::Cloud::Sql::V1::CloudSqlFlags;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -157,70 +157,10 @@ EOF
     # Field: database_version Type: 9 ()
     # Field: flag_scope Type: 14 (.google.cloud.sql.v1.SqlFlagScope)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsListRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlFlags;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsListRequest->new(
-        database_version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<database_version>
-
-Type: String
-
-=item * B<flag_scope>
-
-Type: Enum (.google.cloud.sql.v1.SqlFlagScope)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Sql::V1::CloudSqlFlags::FlagsListResponse ===
     # Fields for FlagsListResponse
     # Field: kind Type: 9 ()
     # Field: items Type: 11 (.google.cloud.sql.v1.Flag)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlFlags::FlagsListResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlFlags;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlFlags::FlagsListResponse->new(
-        kind => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<kind>
-
-Type: String
-
-=item * B<items>
-
-Type: Message (.google.cloud.sql.v1.Flag)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Sql::V1::CloudSqlFlags::Flag ===
     # Fields for Flag
@@ -238,102 +178,20 @@ Type: Message (.google.cloud.sql.v1.Flag)
     # Field: recommended_string_value Type: 9 ()
     # Field: recommended_int_value Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Sql::V1::CloudSqlFlags::Flag - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Sql::V1::CloudSqlFlags;
-
-    my $msg = Google::Cloud::Sql::V1::CloudSqlFlags::Flag->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.cloud.sql.v1.SqlFlagType)
-
-=item * B<applies_to>
-
-Type: Enum (.google.cloud.sql.v1.SqlDatabaseVersion)
-
-=item * B<allowed_string_values>
-
-Type: String
-
-=item * B<min_value>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<max_value>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<requires_restart>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<kind>
-
-Type: String
-
-=item * B<in_beta>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<allowed_int_values>
-
-Type: Int64
-
-=item * B<flag_scope>
-
-Type: Enum (.google.cloud.sql.v1.SqlFlagScope)
-
-=item * B<recommended_string_value>
-
-Type: String
-
-=item * B<recommended_int_value>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Service Client: Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsServiceClient ===
 package Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsServiceClient
 
-Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsServiceClient - Client stub representing the remote SqlFlagsService service
+Client stub representing the remote C<SqlFlagsService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<sql.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -375,13 +233,196 @@ sub list {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Sql::V1::CloudSqlFlags - Protocol Buffers schema definition
+Google::Cloud::Sql::V1::CloudSqlFlags - Compiled Protocol Buffers messages for google/cloud/sql/v1/cloud_sql_flags.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Sql::V1::CloudSqlFlags;
+
+    my $msg = Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsListRequest->new({
+        database_version => $database_version,
+        flag_scope => $flag_scope,
+    });
+
+    # Read or update a field
+    my $val = $msg->database_version();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsListRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/sql/v1/cloud_sql_flags.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Sql::V1::CloudSqlFlags::SqlFlagsListRequest
+
+Flags list request.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->database_version() >> / C<< $msg->database_version($value) >>
+
+Type: C<String>
+
+Database type and version you want to retrieve flags for. By default, this
+method returns flags for all database types and versions.
+
+=item * C<< $msg->flag_scope() >> / C<< $msg->flag_scope($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlFlagScope>)
+
+Optional. Specify the scope of flags to be returned by SqlFlagsListService.
+Return list of database flags if unspecified.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlFlags::FlagsListResponse
+
+Flags list response.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#flagsList`.
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<Message> (L<Google::Cloud::Sql::V1::CloudSqlFlags::Flag>)
+
+List of flags.
+
+=back
+
+=head2 Google::Cloud::Sql::V1::CloudSqlFlags::Flag
+
+A flag resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+This is the name of the flag. Flag names always use underscores, not
+hyphens, for example: `max_allowed_packet`
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlFlagType>)
+
+The type of the flag. Flags are typed to being `BOOLEAN`, `STRING`,
+`INTEGER` or `NONE`. `NONE` is used for flags that do not take a
+value, such as `skip_grant_tables`.
+
+=item * C<< $msg->applies_to() >> / C<< $msg->applies_to($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlDatabaseVersion>)
+
+The database version this flag applies to. Can be
+MySQL instances: `MYSQL_8_0`, `MYSQL_8_0_18`, `MYSQL_8_0_26`, `MYSQL_5_7`,
+or `MYSQL_5_6`. PostgreSQL instances: `POSTGRES_9_6`, `POSTGRES_10`,
+`POSTGRES_11` or `POSTGRES_12`. SQL Server instances:
+`SQLSERVER_2017_STANDARD`, `SQLSERVER_2017_ENTERPRISE`,
+`SQLSERVER_2017_EXPRESS`, `SQLSERVER_2017_WEB`, `SQLSERVER_2019_STANDARD`,
+`SQLSERVER_2019_ENTERPRISE`, `SQLSERVER_2019_EXPRESS`, or
+`SQLSERVER_2019_WEB`.
+See [the complete
+list](/sql/docs/mysql/admin-api/rest/v1/SqlDatabaseVersion).
+
+=item * C<< $msg->allowed_string_values() >> / C<< $msg->allowed_string_values($value) >>
+
+Type: C<String>
+
+For `STRING` flags, a list of strings that the value can be set to.
+
+=item * C<< $msg->min_value() >> / C<< $msg->min_value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+For `INTEGER` flags, the minimum allowed value.
+
+=item * C<< $msg->max_value() >> / C<< $msg->max_value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+For `INTEGER` flags, the maximum allowed value.
+
+=item * C<< $msg->requires_restart() >> / C<< $msg->requires_restart($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Indicates whether changing this flag will trigger a database restart. Only
+applicable to Second Generation instances.
+
+=item * C<< $msg->kind() >> / C<< $msg->kind($value) >>
+
+Type: C<String>
+
+This is always `sql#flag`.
+
+=item * C<< $msg->in_beta() >> / C<< $msg->in_beta($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Whether or not the flag is considered in beta.
+
+=item * C<< $msg->allowed_int_values() >> / C<< $msg->allowed_int_values($value) >>
+
+Type: C<Int64>
+
+Use this field if only certain integers are accepted. Can be combined
+with min_value and max_value to add additional values.
+
+=item * C<< $msg->flag_scope() >> / C<< $msg->flag_scope($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Sql::V1::SqlFlagScope>)
+
+Scope of flag.
+
+=item * C<< $msg->recommended_string_value() >> / C<< $msg->recommended_string_value($value) >>
+
+Type: C<String>
+
+Recommended string value in string format for UI display.
+
+=item * C<< $msg->recommended_int_value() >> / C<< $msg->recommended_int_value($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Recommended int value in integer format for UI display.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Sql::V1::CloudSqlFlags::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,13 +3,13 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3428';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3430';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw(reftype looks_like_number);
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc avals bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort density df2h dftype bw_nrd0 bw_nrd bw_ucv bw_bcv bw_sj dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm pt qt pchisq qchisq pf qf pbinom qnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table zerotrunc hurdle svyglm ivreg lmer);
+our @EXPORT_OK = qw(h add_data age_standardize agg anova aoh2h aoh2hoa aoh2hoh aov assign auc auroc avals bedroc bfill binom_test cfilter chisq_test chunk col col2col colnames concat cmh_test cor cor_test cov csort density df2h dftype bw_nrd0 bw_nrd bw_ucv bw_bcv bw_sj dnorm cohen_d cramers_v eta_squared drop_cols drop_duplicates dropna epi_2x2 ffill fillna filter fisher_test get_union glm group_by h2aoh hoa2aoh hoa2hoh hoh2hoa hist interpolate intersection is_equivalent kruskal_test ks_test kurtosis Lonly ljoin lm map_cell matrix max mean median melt merge min mode ncol nrow oneway_test p_adjust pivot_table pnorm pt qt pchisq qchisq pf qf pbinom qnorm power_t_test predict prop_test mcnemar_test friedman_test dunn_test prcomp ptukey qcut qtukey quantile rank roc Ronly rbind rbinom read_table rename_cols rnorm rownames runif sample scale sd select_cols seq shapiro_test skew smd sum summary survfit logrank_test coxph table_one t_test transpose TukeyHSD uniq vals value_counts var var_test vif hosmer_lemeshow view wilcox_test write_table zerotrunc hurdle svyglm ivreg lmer glmer);
 our @EXPORT = @EXPORT_OK;
 
 # File operations: failure reporting
@@ -6684,7 +6684,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3428
+version 0.3430
 
 =head1 Synopsis
 
@@ -10682,17 +10682,36 @@ are a double's, as R's are, so these agree with R to about C<1e-14> relative.
 On a long-double or C<__float128> perl they are the NV's from 0.3426 on: the
 incomplete gamma and beta (and so C<pchisq>, C<pt>, C<pf>, C<pbinom> and the
 C<qchisq>, C<qt>, C<qf> that invert them, C<< log =E<gt> 1 >> included) are accurate to a
-few tens of the NV's epsilon rather than to C<1e-14>. Against mpmath at 110
-digits the worst relative error over a grid of 900 chi-square and 4500 beta
-tails, 60 standard deviations either side of the mean and shapes from 1/1024
-to 1e7 (counting the exponent's own rounding: a tail C<exp(-f)> is good to C<f>
-epsilons) is 8 epsilons of a long double and 39 of a C<__float128> for the gamma
-(it was 5e15 and 3e30) and 64 and 86 for the beta (it was 1e5 and 7e19); the
-quantiles, 31 and 31 (they were 1.7e3 and 1e18). A double perl is not changed
-by a single bit. C<t/incomplete.gamma.beta.mpmath.t> holds the expected
+few of the NV's epsilon rather than to C<1e-14>. Against mpmath at 110 digits
+the worst relative error over a grid of 900 chi-square and 4500 beta tails, 60
+standard deviations either side of the mean and shapes from 1/1024 to 1e7
+(counting the exponent's own rounding: a tail C<exp(-f)> is good to C<f>
+epsilons) was, in 0.3426, 8 epsilons of a long double and 39 of a C<__float128>
+for the gamma (it had been 5e15 and 3e30) and 64 and 86 for the beta (1e5 and
+7e19); the quantiles, 31 and 31 (1.7e3 and 1e18). Since 0.3429 the worst over
+the test's 861 cases and 2200 others, which add shapes from 2^-130 to 1e15, is
+3 and 4 epsilons for the gamma and 11 and 10 for the beta. 0.3429 left a double
+perl unchanged to the last bit. Since 0.3430 a double perl also takes R's own
+algorithms wherever one shape of the incomplete beta is at most 1 (C<pt> below
+2000 degrees of freedom, C<pf> with either df at most 2), where it had used a
+continued fraction that was up to C<5e-12> out and whose last digits depended on
+the C library's C<lgamma>. C<t/incomplete.gamma.beta.mpmath.t> holds the expected
 values, frozen, with the script that made them. A long-double perl whose C
 library lacks the long-double math functions, or whose long double is the
 double-double of ppc64, keeps the double's constants and its C<1e-14>.
+
+C<pnorm> and C<qnorm> follow the same rule from 0.3429 on. On a double perl
+C<pnorm> is R's port of Cody's algorithm, which is 0 below C<z = -38.47>, as R's
+is. On a long-double or C<__float128> perl it computes from that NV's C<erfc>,
+with the far tail taken from C<erfcx> so that it reaches C<z = -150>
+(C<pnorm(-40)> is C<3.655893540915e-350> there, not C<0>); C<qnorm> is refined on
+the log scale at the same width, down to C<< qnorm(-1e100, log =E<gt> 1) >>. Against
+mpmath at 110 digits, over 85 C<z> from 0 to C<1e150> (both tails and their logs)
+and 100 quantiles, the worst error is 1.3 epsilons of a long double and 1.1 of
+a C<__float128> for C<pnorm> (in the units above), and 2 epsilons for C<qnorm>
+on both; it was C<1e16> and C<7e30> for C<pnorm>, C<2e4> and C<1e19> for C<qnorm>.
+C<t/pnorm.qnorm.mpmath.t> holds those cases. The p-values the tests in this
+module report keep R's cut-off at C<z = -38.47> on every build.
 
 C<< log =E<gt> 1 >> is carried through in both directions, as in R:
 
@@ -12003,6 +12022,142 @@ errors are right as they stand.
 </tr>
 </tbody>
 </table>
+
+=head2 glmer
+
+Generalized linear mixed models, C<lme4::glmer()> and C<lme4::glmer.nb()>: a
+binomial (logit link), Poisson or negative-binomial (log link) response with
+the random effects of L<C<lmer>|/"lmer">, for counts and binary outcomes measured
+repeatedly on the same units. Where a fixed-effects L<C<glm>|/"glm"> with a dummy
+per unit drops every unit with no events, a random intercept keeps them.
+
+ use Stats::LikeR 'glmer';
+
+ # events per child-month, a random intercept per child, rate ratios
+ my $m = glmer(formula => 'events ~ age + treat + (1 | child)',
+               offset  => 'log(months)', data => \%d, family => 'negbin');
+ printf "treat: RR %.2f (%.2f-%.2f)\n", @{ $m->{exp}{treat} }{qw(estimate conf_low conf_high)};
+ printf "between-child sd %.2f, NB theta %.2f\n", $m->{varcor}[0]{sd}{Intercept}, $m->{nb_theta};
+
+ # a proportion with its number of trials as the weights, as in lme4
+ my $b = glmer(formula => 'incidence ~ period + (1 | herd)', weights => 'size',
+               data => \%cbpp, family => 'binomial');
+
+The formula is L<C<lmer>|/"lmer">'s: C<(1 | g)>, C<(x | g)>, C<(x || g)>, nesting
+C<(1 | a/b)>, several grouping factors, and C<offset()> terms. A binomial
+response is 0/1 or a proportion, with the number of trials as C<weights> (R's
+C<cbind(successes, failures)> is the proportion of C<successes + failures> with
+those as weights). The fit is C<lme4>'s: the Laplace approximation to the
+likelihood, the conditional modes of the random effects by penalized IRLS,
+and two stages, the covariance parameters first with the fixed effects inside
+the IRLS (C<lme4>'s C<nAGQ = 0> fit) and then all of them together. With
+C<nAGQ> from 2 to 100 a model with a single scalar random effect (C<(1 | g)> or
+C<(0 + x | g)>) is fitted by adaptive Gauss-Hermite quadrature instead, as in
+C<lme4>; C<< nAGQ =E<gt> 0 >> stops after the first stage. As in C<lme4>, the
+quadrature's C<deviance> and C<loglik> sum the deviance residuals rather than the
+full log-likelihood, so they differ from the Laplace fit's by the saturated
+model's log-likelihood, which is 0 only for a 0/1 response: C<cbpp>'s
+C<loglik> is -92.03 by Laplace and -50.01 with C<< nAGQ =E<gt> 9 >>.
+
+C<< family =E<gt> 'negbin' >> is C<glmer.nb()>: the negative-binomial C<theta> is started
+from C<MASS::theta.ml()> on a Poisson fit's fitted values, as C<glmer.nb()>
+starts it, and then estimated by maximum likelihood together with the rest;
+C<< theta =E<gt> 1.7 >> holds it fixed instead (C<glmer(family =
+negative.binomial(1.7))>).
+
+Standard errors are C<lme4>'s: from the Hessian of the deviance in the
+covariance parameters and the fixed effects, by finite differences, inverted
+and doubled (C<vcov.merMod(use.hessian = TRUE)>), with the negative-binomial
+C<theta> held fixed. Where that Hessian is not positive definite, and for
+C<< nAGQ =E<gt> 0 >>, they come from the fixed-effects block of the penalized IRLS
+system instead, with a warning in the first case, as C<lme4> does;
+C<vcov_method> says which. The Wald C<z>, p-value and interval follow.
+
+The estimates are those of a tightly converged C<lme4> fit. C<lme4>'s defaults
+stop its penalized IRLS at a relative change of C<1e-7> in the penalized
+deviance (C<tolPwrss>), which is not tight enough for the finite differences
+it takes the Hessian from: on C<cbpp> its log-likelihood is C<2.8e-4> short of
+the optimum and its standard errors are C<0.5%> out, and
+C<glmerControl(tolPwrss = 1e-12)> moves them onto these.
+
+A random-effects structure is fitted as L<C<lmer>|/"lmer"> fits it, one level at
+a time when every term shares one grouping factor, so any number of levels is
+practical. With several grouping factors the random effects are one dense
+matrix, factored at every IRLS step: 71 random effects (C<cbpp> with an
+observation-level term) take a fraction of a second, but 584 (C<grouseticks>'
+three crossed factors) took 13 minutes on a desktop, where C<lme4>'s sparse
+Cholesky takes about a second, and more than 1000 croaks (C<lmer> takes 4000). A
+grouping factor may have a level per row (an observation-level random effect
+for overdispersion), which C<lme4> allows for a model with no scale parameter. Fixed-effect columns that are linear combinations of others
+are left out of the fit and reported as C<NaN>, as C<lme4> drops them.
+
+=for html <table>
+<thead>
+<tr>
+  <th>Option</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>formula</code></td>
+  <td><i>(required)</i></td>
+  <td>As [<code>lmer</code>](#lmer)'s.</td>
+</tr>
+<tr>
+  <td><code>data</code></td>
+  <td><i>(required)</i></td>
+  <td>HoA, AoH or HoH.</td>
+</tr>
+<tr>
+  <td><code>family</code></td>
+  <td><code>'binomial'</code></td>
+  <td><code>'binomial'</code> (logit), <code>'poisson'</code> (log) or <code>'negbin'</code> (negative binomial, log; also <code>'nb'</code>, <code>'negative.binomial'</code>).</td>
+</tr>
+<tr>
+  <td><code>theta</code></td>
+  <td><i>estimated</i></td>
+  <td><code>negbin</code> only: a fixed negative-binomial <code>theta</code>. Also <code>nb_theta</code>.</td>
+</tr>
+<tr>
+  <td><code>nAGQ</code></td>
+  <td><code>1</code></td>
+  <td><code>1</code> for the Laplace approximation; <code>2</code> to <code>100</code> Gauss-Hermite points for a single scalar random effect; <code>0</code> for <code>lme4</code>'s faster first-stage fit.</td>
+</tr>
+<tr>
+  <td><code>offset</code></td>
+  <td><i>none</i></td>
+  <td>As in [<code>glm</code>](#glm): a column, an expression such as <code>'log(t)'</code>, or one value per row.</td>
+</tr>
+<tr>
+  <td><code>weights</code></td>
+  <td><i>none</i></td>
+  <td>Prior weights: the number of trials for a binomial proportion. A row with weight 0 is left out.</td>
+</tr>
+<tr>
+  <td><code>conf_level</code></td>
+  <td><code>0.95</code></td>
+  <td>Level of the Wald intervals.</td>
+</tr>
+</tbody>
+</table>
+
+The result holds C<coefficients>, C<summary> (per term C<Estimate>,
+C<Std. Error>, C<z value>, C<< Pr(E<gt>|z|) >>, C<CI_lower>, C<CI_upper>), C<vcov>,
+C<conf_int>, C<exp> (odds or rate ratios with their intervals, as L<C<glm>|/"glm">
+gives them), C<terms>, C<theta> (C<lme4>'s relative covariance factor),
+C<varcor> (as L<C<lmer>|/"lmer">'s; here the standard deviations are on the
+link scale, with no residual), C<nb_theta> (C<negbin>), C<fitted_values> (the
+fitted means, with the predicted random effects) and C<linear_predictors>,
+C<deviance> (C<-2 loglik>, the summary's "deviance" in C<lme4>), C<loglik>, C<AIC>,
+C<BIC> (the negative-binomial C<theta> counted as a parameter, as C<lme4> counts
+it, even when C<theta> holds it fixed), C<df_residual>, C<nobs>, C<family>, C<nAGQ>, C<conf_level>, C<vcov_method>,
+C<converged> and C<singular>.
+
+Validated against C<lme4> 2.0-6's own examples and tests (C<cbpp>,
+C<grouseticks>, its simulated Bernoulli, binomial and Poisson data, its offset
+test, C<glmer.nb>'s examples, and C<MASS>'s epilepsy data with a random slope).
 
 =head2 group_by
 
@@ -13583,7 +13738,7 @@ that.
 <tr>
   <td><code>formula</code></td>
   <td><i>(required)</i></td>
-  <td>Fixed effects plus one or more <code>( terms | group )</code> random-effects terms.</td>
+  <td>Fixed effects plus one or more <code>( terms | group )</code> random-effects terms, and any <code>offset()</code> terms.</td>
 </tr>
 <tr>
   <td><code>data</code></td>
@@ -13600,8 +13755,27 @@ that.
   <td><code>0.95</code></td>
   <td>Level of <code>conf_int</code>, from the Satterthwaite t.</td>
 </tr>
+<tr>
+  <td><code>offset</code></td>
+  <td><i>none</i></td>
+  <td>A column, an expression such as <code>'log(t)'</code> or <code>'I(0.5*Days)'</code>, or one value per row, with coefficient 1; adds to any <code>offset()</code> terms.</td>
+</tr>
+<tr>
+  <td><code>weights</code></td>
+  <td><i>none</i></td>
+  <td>Prior weights, <code>lmer(weights = )</code>: a column or one value per row. A row's residual variance is <code>sigma^2 / w</code>.</td>
+</tr>
 </tbody>
 </table>
+
+An B<offset> is subtracted from the response before the fit and added back
+into C<fitted_values>, as in C<lme4>. B<Prior weights> make the residual
+variance of a row C<sigma^2 / w> and enter the criterion as C<lme4>'s does,
+which subtracts the sum of C<log(w)>; so multiplying every weight by 10 leaves
+the deviance, the fixed effects and the random-effect standard deviations
+alone, and makes C<sigma> C<sqrt(10)> times larger. A row whose weight is 0 is
+left out of the fit and of C<nobs>, as in L<C<glm>|/"glm">; C<lme4> keeps it, and
+its criterion is then infinite. A negative weight croaks.
 
 The result holds C<coefficients>, C<summary> (per term C<Estimate>,
 C<Std. Error>, C<df>, C<t value>, C<< Pr(E<gt>|t|) >>), C<vcov>, C<conf_int>, C<terms>,

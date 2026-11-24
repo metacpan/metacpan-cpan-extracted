@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.19.0 - 2026-11-24
+
+### Features
+
+- Refuse a first_seen or last_seen that is no YYYY-MM-DD date ([`b909b43`](https://github.com/internetdata/sdk-perl/commit/b909b43a787363fe91dcac054305cd3002f51718))
+
 ## 1.18.2 - 2026-11-23
 
 ### Fixes

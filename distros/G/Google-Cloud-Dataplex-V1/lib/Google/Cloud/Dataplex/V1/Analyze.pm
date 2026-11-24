@@ -3,7 +3,7 @@ package Google::Cloud::Dataplex::V1::Analyze;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -302,76 +302,6 @@ EOF
     # Field: session_status Type: 11 (.google.cloud.dataplex.v1.Environment.SessionStatus)
     # Field: endpoints Type: 11 (.google.cloud.dataplex.v1.Environment.Endpoints)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Analyze::Environment - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Analyze;
-
-    my $msg = Google::Cloud::Dataplex::V1::Analyze::Environment->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<display_name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.Environment.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.State)
-
-=item * B<infrastructure_spec>
-
-Type: Message (.google.cloud.dataplex.v1.Environment.InfrastructureSpec)
-
-=item * B<session_spec>
-
-Type: Message (.google.cloud.dataplex.v1.Environment.SessionSpec)
-
-=item * B<session_status>
-
-Type: Message (.google.cloud.dataplex.v1.Environment.SessionStatus)
-
-=item * B<endpoints>
-
-Type: Message (.google.cloud.dataplex.v1.Environment.Endpoints)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Analyze::Content ===
     # Fields for Content
     # Field: name Type: 9 ()
@@ -385,68 +315,6 @@ Type: Message (.google.cloud.dataplex.v1.Environment.Endpoints)
     # Field: sql_script Type: 11 (.google.cloud.dataplex.v1.Content.SqlScript)
     # Field: notebook Type: 11 (.google.cloud.dataplex.v1.Content.Notebook)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Analyze::Content - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataplex::V1::Analyze;
-
-    my $msg = Google::Cloud::Dataplex::V1::Analyze::Content->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<uid>
-
-Type: String
-
-=item * B<path>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataplex.v1.Content.LabelsEntry)
-
-=item * B<description>
-
-Type: String
-
-=item * B<data_text>
-
-Type: String
-
-=item * B<sql_script>
-
-Type: Message (.google.cloud.dataplex.v1.Content.SqlScript)
-
-=item * B<notebook>
-
-Type: Message (.google.cloud.dataplex.v1.Content.Notebook)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataplex::V1::Analyze::Session ===
     # Fields for Session
     # Field: name Type: 9 ()
@@ -454,55 +322,251 @@ Type: Message (.google.cloud.dataplex.v1.Content.Notebook)
     # Field: create_time Type: 11 (.google.protobuf.Timestamp)
     # Field: state Type: 14 (.google.cloud.dataplex.v1.State)
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Dataplex::V1::Analyze::Session - Compiled Protocol Buffers message class
+Google::Cloud::Dataplex::V1::Analyze - Compiled Protocol Buffers messages for google/cloud/dataplex/v1/analyze.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Dataplex::V1::Analyze;
 
-    my $msg = Google::Cloud::Dataplex::V1::Analyze::Session->new(
-        name => $value,
-    );
+    my $msg = Google::Cloud::Dataplex::V1::Analyze::Environment->new({
+        name => $name,
+        display_name => $display_name,
+        uid => $uid,
+        create_time => $create_time,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataplex::V1::Analyze::Environment->parse($bytes);
 
-=item * B<name>
-
-Type: String
-
-=item * B<user_id>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<state>
-
-Type: Enum (.google.cloud.dataplex.v1.State)
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Dataplex::V1::Analyze - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataplex/v1/analyze.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataplex::V1::Analyze::Environment
+
+Environment represents a user-visible compute infrastructure for analytics
+within a lake.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the environment, of the form:
+projects/{project_id}/locations/{location_id}/lakes/{lake_id}/environment/{environment_id}
+
+=item * C<< $msg->display_name() >> / C<< $msg->display_name($value) >>
+
+Type: C<String>
+
+Optional. User friendly display name.
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the environment. This
+ID will be different if the environment is deleted and re-created with the
+same name.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Environment creation time.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the environment was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Analyze::Environment::LabelsEntry>)
+
+Optional. User defined labels for the environment.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the environment.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::State>)
+
+Output only. Current state of the environment.
+
+=item * C<< $msg->infrastructure_spec() >> / C<< $msg->infrastructure_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Analyze::Environment::InfrastructureSpec>)
+
+Required. Infrastructure specification for the Environment.
+
+=item * C<< $msg->session_spec() >> / C<< $msg->session_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Analyze::Environment::SessionSpec>)
+
+Optional. Configuration for sessions created for this environment.
+
+=item * C<< $msg->session_status() >> / C<< $msg->session_status($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Analyze::Environment::SessionStatus>)
+
+Output only. Status of sessions created for this environment.
+
+=item * C<< $msg->endpoints() >> / C<< $msg->endpoints($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Analyze::Environment::Endpoints>)
+
+Output only. URI Endpoints to access sessions associated with the
+Environment.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Analyze::Content
+
+Content represents a user-visible notebook or a sql script
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the content, of the form:
+projects/{project_id}/locations/{location_id}/lakes/{lake_id}/content/{content_id}
+
+=item * C<< $msg->uid() >> / C<< $msg->uid($value) >>
+
+Type: C<String>
+
+Output only. System generated globally unique ID for the content. This ID
+will be different if the content is deleted and re-created with the same
+name.
+
+=item * C<< $msg->path() >> / C<< $msg->path($value) >>
+
+Type: C<String>
+
+Required. The path for the Content file, represented as directory
+structure. Unique within a lake. Limited to alphanumerics, hyphens,
+underscores, dots and slashes.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Content creation time.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The time when the content was last updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Analyze::Content::LabelsEntry>)
+
+Optional. User defined labels for the content.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Description of the content.
+
+=item * C<< $msg->data_text() >> / C<< $msg->data_text($value) >>
+
+Type: C<String>
+
+Required. Content data in string format.
+
+=item * C<< $msg->sql_script() >> / C<< $msg->sql_script($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Analyze::Content::SqlScript>)
+
+Sql Script related configurations.
+
+=item * C<< $msg->notebook() >> / C<< $msg->notebook($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataplex::V1::Analyze::Content::Notebook>)
+
+Notebook related configurations.
+
+=back
+
+=head2 Google::Cloud::Dataplex::V1::Analyze::Session
+
+Represents an active analyze session running for a user.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The relative resource name of the content, of the form:
+projects/{project_id}/locations/{location_id}/lakes/{lake_id}/environment/{environment_id}/sessions/{session_id}
+
+=item * C<< $msg->user_id() >> / C<< $msg->user_id($value) >>
+
+Type: C<String>
+
+Output only. Email of user running the session.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. Session start time.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataplex::V1::State>)
+
+Output only. State of Session
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataplex::V1::Analyze::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

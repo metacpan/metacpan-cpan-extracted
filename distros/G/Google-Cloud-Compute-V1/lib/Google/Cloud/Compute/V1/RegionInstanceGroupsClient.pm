@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -294,23 +294,166 @@ The following RPC methods are available in this client:
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        instance_group           => $instance_group,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.RegionInstanceGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRegionInstanceGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::InstanceGroup>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.RegionInstanceGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListRegionInstanceGroupsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RegionInstanceGroupList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<list_instances>
 
-Calls the RPC method C<ListInstances> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_instances(
+        filter                   => $filter,
+        instance_group           => $instance_group,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+        region_instance_groups_list_instances_request_resource => $region_instance_groups_list_instances_request_resource,
+    );
+
+Calls the RPC method C<ListInstances> on C<google.cloud.compute.v1.RegionInstanceGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListInstancesRegionInstanceGroupsRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::RegionInstanceGroupsListInstances>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<instance_group> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_instance_groups_list_instances_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionInstanceGroupsListInstancesRequest>
+
+=back
 
 =item * B<set_named_ports>
 
-Calls the RPC method C<SetNamedPorts> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_named_ports(
+        instance_group           => $instance_group,
+        project                  => $project,
+        region                   => $region,
+        region_instance_groups_set_named_ports_request_resource => $region_instance_groups_set_named_ports_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<SetNamedPorts> on C<google.cloud.compute.v1.RegionInstanceGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetNamedPortsRegionInstanceGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<instance_group> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_instance_groups_set_named_ports_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionInstanceGroupsSetNamedPortsRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        region                   => $region,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.RegionInstanceGroups>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsRegionInstanceGroupRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=back
 
 =back
 

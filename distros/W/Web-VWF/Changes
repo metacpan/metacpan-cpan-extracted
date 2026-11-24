@@ -1,5 +1,32 @@
 Revision history for Web-VWF
 
+0.004.1	Mon Nov 23 08:02:40 PM EST 2026
+	[ Bug Fixes ]
+	- A missing default databases directory is no longer an error: it is logged at notice
+	and no data driver is loaded; one the site names is still an error.
+
+0.004.0	Mon Nov 23 01:51:09 PM EST 2026
+	[ Incompatible changes ]
+	- The data files and the drivers that read them are now configured apart:
+	<databases><directory> is where the data files (CSV, XML, SQLite) are
+	(replacing database_dir, which is still read), and <data> declares the drivers,
+	one <driver> each, with a <directory> for all of them or for one.  Without a
+	directory the drivers are looked for in the databases directory, then @INC,
+	rather than only in @INC; only the <directory> of a <driver> is strict, the others
+	fall back to @INC.  <databases><database> is no longer read (a warning is logged);
+	write <data><driver>.  The example site's states driver is in example/data/ and its data
+	files in example/databases/.  The default databases directory is now
+	../databases, not ../data, which is for the drivers.
+
+	[ Enhancements ]
+	- Documented the six functions in Web::VWF that pod-coverage reported:
+	sig_handler, choose, send_error, duration_seconds, blacklisted and filter.
+	- Makefile.PL's META_MERGE excludes example/ and Data::Throttler::Backend::VWF
+	from the PAUSE index.
+
+	[ Bug Fixes ]
+	- Choose the right Perl in the example/cgi-bin/page.fcgi
+
 0.003.1	Thu Nov 19 08:14:20 PM EST 2026
 	[ Enhancements ]
 	- Web::VWF loads CGI::Alert, so an error that stops a page script is emailed

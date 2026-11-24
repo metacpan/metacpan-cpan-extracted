@@ -12,13 +12,13 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Dataflow::V1beta3::Streaming;
 use Google::Dataflow::V1beta3::Environment;
+use Google::Dataflow::V1beta3::Metrics;
 use Google::Dataflow::V1beta3::Snapshots;
 use Google::Dataflow::V1beta3::Messages;
-use Google::Dataflow::V1beta3::Metrics;
 use Google::Dataflow::V1beta3::Jobs;
 use Google::Dataflow::V1beta3::Templates;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -176,7 +176,44 @@ The following RPC methods are available in this client:
 
 =item * B<list_job_messages>
 
-Calls the RPC method C<ListJobMessages> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list_job_messages(
+        project_id               => $project_id,
+        job_id                   => $job_id,
+        minimum_importance       => $minimum_importance,
+        page_size                => $page_size,
+        page_token               => $page_token,
+        start_time               => $start_time,
+        end_time                 => $end_time,
+        location                 => $location,
+    );
+
+Calls the RPC method C<ListJobMessages> on C<google.dataflow.v1beta3.MessagesV1Beta3>.
+
+Request: L<Google::Dataflow::V1beta3::Messages::ListJobMessagesRequest>
+
+Returns: L<Google::Dataflow::V1beta3::Messages::ListJobMessagesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<job_id> - C<string>
+
+=item * C<minimum_importance> - L<Google::Dataflow::V1beta3::Messages::JobMessageImportance>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=item * C<start_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=item * C<end_time> - L<Google::Protobuf::Timestamp::Timestamp>
+
+=item * C<location> - C<string>
+
+=back
 
 =back
 

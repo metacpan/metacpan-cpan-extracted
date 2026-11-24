@@ -3,7 +3,7 @@ package Google::Cloud::Networksecurity::V1::AddressGroup;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -570,113 +570,15 @@ EOF
     # Field: self_link Type: 9 ()
     # Field: purpose Type: 14 (.google.cloud.networksecurity.v1.AddressGroup.Purpose)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroup - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroup->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<description>
-
-Type: String
-
-=item * B<create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<update_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.networksecurity.v1.AddressGroup.LabelsEntry)
-
-=item * B<type>
-
-Type: Enum (.google.cloud.networksecurity.v1.AddressGroup.Type)
-
-=item * B<items>
-
-Type: String
-
-=item * B<capacity>
-
-Type: Int32
-
-=item * B<self_link>
-
-Type: String
-
-=item * B<purpose>
-
-Type: Enum (.google.cloud.networksecurity.v1.AddressGroup.Purpose)
-
-=back
-
-=cut
-
 # Enum: AddressGroup::Type
 our $AddressGroup_TYPE_UNSPECIFIED = 0;
 our $AddressGroup_IPV4 = 1;
 our $AddressGroup_IPV6 = 2;
 
-=pod
-
-=head2 Enum: AddressGroup::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<IPV4> => 1
-
-=item * C<IPV6> => 2
-
-=back
-
-=cut
-
 # Enum: AddressGroup::Purpose
 our $AddressGroup_PURPOSE_UNSPECIFIED = 0;
 our $AddressGroup_DEFAULT = 1;
 our $AddressGroup_CLOUD_ARMOR = 2;
-
-=pod
-
-=head2 Enum: AddressGroup::Purpose
-
-Values:
-
-=over 4
-
-=item * C<PURPOSE_UNSPECIFIED> => 0
-
-=item * C<DEFAULT> => 1
-
-=item * C<CLOUD_ARMOR> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsRequest ===
     # Fields for ListAddressGroupsRequest
@@ -685,113 +587,15 @@ Values:
     # Field: page_token Type: 9 ()
     # Field: return_partial_success Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<return_partial_success>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsResponse ===
     # Fields for ListAddressGroupsResponse
     # Field: address_groups Type: 11 (.google.cloud.networksecurity.v1.AddressGroup)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsResponse->new(
-        address_groups => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<address_groups>
-
-Type: Message (.google.cloud.networksecurity.v1.AddressGroup)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::GetAddressGroupRequest ===
     # Fields for GetAddressGroupRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::GetAddressGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::GetAddressGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::CreateAddressGroupRequest ===
     # Fields for CreateAddressGroupRequest
@@ -800,118 +604,16 @@ Type: String
     # Field: address_group Type: 11 (.google.cloud.networksecurity.v1.AddressGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::CreateAddressGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::CreateAddressGroupRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<address_group_id>
-
-Type: String
-
-=item * B<address_group>
-
-Type: Message (.google.cloud.networksecurity.v1.AddressGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::UpdateAddressGroupRequest ===
     # Fields for UpdateAddressGroupRequest
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
     # Field: address_group Type: 11 (.google.cloud.networksecurity.v1.AddressGroup)
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::UpdateAddressGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::UpdateAddressGroupRequest->new(
-        update_mask => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=item * B<address_group>
-
-Type: Message (.google.cloud.networksecurity.v1.AddressGroup)
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::DeleteAddressGroupRequest ===
     # Fields for DeleteAddressGroupRequest
     # Field: name Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::DeleteAddressGroupRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::DeleteAddressGroupRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::AddAddressGroupItemsRequest ===
     # Fields for AddAddressGroupItemsRequest
@@ -919,79 +621,11 @@ Type: String
     # Field: items Type: 9 ()
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::AddAddressGroupItemsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::AddAddressGroupItemsRequest->new(
-        address_group => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<address_group>
-
-Type: String
-
-=item * B<items>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::RemoveAddressGroupItemsRequest ===
     # Fields for RemoveAddressGroupItemsRequest
     # Field: address_group Type: 9 ()
     # Field: items Type: 9 ()
     # Field: request_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::RemoveAddressGroupItemsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::RemoveAddressGroupItemsRequest->new(
-        address_group => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<address_group>
-
-Type: String
-
-=item * B<items>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::CloneAddressGroupItemsRequest ===
     # Fields for CloneAddressGroupItemsRequest
@@ -999,137 +633,31 @@ Type: String
     # Field: source_address_group Type: 9 ()
     # Field: request_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::CloneAddressGroupItemsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::CloneAddressGroupItemsRequest->new(
-        address_group => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<address_group>
-
-Type: String
-
-=item * B<source_address_group>
-
-Type: String
-
-=item * B<request_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupReferencesRequest ===
     # Fields for ListAddressGroupReferencesRequest
     # Field: address_group Type: 9 ()
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupReferencesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupReferencesRequest->new(
-        address_group => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<address_group>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupReferencesResponse ===
     # Fields for ListAddressGroupReferencesResponse
     # Field: address_group_references Type: 11 (.google.cloud.networksecurity.v1.ListAddressGroupReferencesResponse.AddressGroupReference)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupReferencesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networksecurity::V1::AddressGroup;
-
-    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupReferencesResponse->new(
-        address_group_references => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<address_group_references>
-
-Type: Message (.google.cloud.networksecurity.v1.ListAddressGroupReferencesResponse.AddressGroupReference)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroupServiceClient ===
 package Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroupServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroupServiceClient
 
-Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroupServiceClient - Client stub representing the remote AddressGroupService service
+Client stub representing the remote C<AddressGroupService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networksecurity.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1276,23 +804,15 @@ package Google::Cloud::Networksecurity::V1::AddressGroup::OrganizationAddressGro
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Networksecurity::V1::AddressGroup::OrganizationAddressGroupServiceClient
 
-Google::Cloud::Networksecurity::V1::AddressGroup::OrganizationAddressGroupServiceClient - Client stub representing the remote OrganizationAddressGroupService service
+Client stub representing the remote C<OrganizationAddressGroupService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<networksecurity.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1438,13 +958,562 @@ sub list_address_group_references {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Networksecurity::V1::AddressGroup - Protocol Buffers schema definition
+Google::Cloud::Networksecurity::V1::AddressGroup - Compiled Protocol Buffers messages for google/cloud/networksecurity/v1/address_group.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Networksecurity::V1::AddressGroup;
+
+    my $msg = Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroup->new({
+        name => $name,
+        description => $description,
+        create_time => $create_time,
+        update_time => $update_time,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroup->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networksecurity/v1/address_group.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroup
+
+AddressGroup is a resource that specifies how a collection of IP/DNS used
+in Firewall Policy.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the AddressGroup resource. It matches pattern
+`projects/*/locations/{location}/addressGroups/<address_group>`.
+
+=item * C<< $msg->description() >> / C<< $msg->description($value) >>
+
+Type: C<String>
+
+Optional. Free-text description of the resource.
+
+=item * C<< $msg->create_time() >> / C<< $msg->create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was created.
+
+=item * C<< $msg->update_time() >> / C<< $msg->update_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp when the resource was updated.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroup::LabelsEntry>)
+
+Optional. Set of label tags associated with the AddressGroup resource.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::AddressGroup::Type>)
+
+Required. The type of the Address Group. Possible values are "IPv4" or
+"IPV6".
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<String>
+
+Optional. List of items.
+
+=item * C<< $msg->capacity() >> / C<< $msg->capacity($value) >>
+
+Type: C<Int32>
+
+Required. Capacity of the Address Group
+
+=item * C<< $msg->self_link() >> / C<< $msg->self_link($value) >>
+
+Type: C<String>
+
+Output only. Server-defined fully-qualified URL for this resource.
+
+=item * C<< $msg->purpose() >> / C<< $msg->purpose($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Networksecurity::V1::AddressGroup::Purpose>)
+
+Optional. List of supported purposes of the Address Group.
+
+=back
+
+=head3 Enum: AddressGroup::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<IPV4> => C<1>
+
+=item * C<IPV6> => C<2>
+
+=back
+
+=head3 Enum: AddressGroup::Purpose
+
+=over 4
+
+=item * C<PURPOSE_UNSPECIFIED> => C<0>
+
+=item * C<DEFAULT> => C<1>
+
+=item * C<CLOUD_ARMOR> => C<2>
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsRequest
+
+Request used with the ListAddressGroups method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project and location from which the AddressGroups
+should be listed, specified in the format
+`projects/*/locations/{location}`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of AddressGroups to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last
+`ListAddressGroupsResponse` Indicates that this is a
+continuation of a prior `ListAddressGroups` call, and
+that the system should return the next page of data.
+
+=item * C<< $msg->return_partial_success() >> / C<< $msg->return_partial_success($value) >>
+
+Type: C<Bool>
+
+Optional. If true, allow partial responses for multi-regional Aggregated
+List requests.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupsResponse
+
+Response returned by the ListAddressGroups method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->address_groups() >> / C<< $msg->address_groups($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroup>)
+
+List of AddressGroups resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Locations that could not be reached.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::GetAddressGroupRequest
+
+Request used by the GetAddressGroup method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the AddressGroup to get. Must be in the format
+`projects/*/locations/{location}/addressGroups/*`.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::CreateAddressGroupRequest
+
+Request used by the CreateAddressGroup method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The parent resource of the AddressGroup. Must be in the
+format `projects/*/locations/{location}`.
+
+=item * C<< $msg->address_group_id() >> / C<< $msg->address_group_id($value) >>
+
+Type: C<String>
+
+Required. Short name of the AddressGroup resource to be created.
+This value should be 1-63 characters long, containing only
+letters, numbers, hyphens, and underscores, and should not start
+with a number. E.g. "authz_policy".
+
+=item * C<< $msg->address_group() >> / C<< $msg->address_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroup>)
+
+Required. AddressGroup resource to be created.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::UpdateAddressGroupRequest
+
+Request used by the UpdateAddressGroup method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Optional. Field mask is used to specify the fields to be overwritten in the
+AddressGroup resource by the update.
+The fields specified in the update_mask are relative to the resource, not
+the full request. A field will be overwritten if it is in the mask. If the
+user does not provide a mask then all fields will be overwritten.
+
+=item * C<< $msg->address_group() >> / C<< $msg->address_group($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AddressGroup::AddressGroup>)
+
+Required. Updated AddressGroup resource.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::DeleteAddressGroupRequest
+
+Request used by the DeleteAddressGroup method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. A name of the AddressGroup to delete. Must be in the format
+`projects/*/locations/{location}/addressGroups/*`.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::AddAddressGroupItemsRequest
+
+Request used by the AddAddressGroupItems method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->address_group() >> / C<< $msg->address_group($value) >>
+
+Type: C<String>
+
+Required. A name of the AddressGroup to add items to. Must be in the format
+`projects|organization/*/locations/{location}/addressGroups/*`.
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<String>
+
+Required. List of items to add.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::RemoveAddressGroupItemsRequest
+
+Request used by the RemoveAddressGroupItems method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->address_group() >> / C<< $msg->address_group($value) >>
+
+Type: C<String>
+
+Required. A name of the AddressGroup to remove items from. Must be in the
+format `projects|organization/*/locations/{location}/addressGroups/*`.
+
+=item * C<< $msg->items() >> / C<< $msg->items($value) >>
+
+Type: C<String>
+
+Required. List of items to remove.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::CloneAddressGroupItemsRequest
+
+Request used by the CloneAddressGroupItems method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->address_group() >> / C<< $msg->address_group($value) >>
+
+Type: C<String>
+
+Required. A name of the AddressGroup to clone items to. Must be in the
+format `projects|organization/*/locations/{location}/addressGroups/*`.
+
+=item * C<< $msg->source_address_group() >> / C<< $msg->source_address_group($value) >>
+
+Type: C<String>
+
+Required. Source address group to clone items from.
+
+=item * C<< $msg->request_id() >> / C<< $msg->request_id($value) >>
+
+Type: C<String>
+
+Optional. An optional request ID to identify requests. Specify a unique
+request ID so that if you must retry your request, the server will know to
+ignore the request if it has already been completed. The server will
+guarantee that for at least 60 minutes since the first request.
+
+For example, consider a situation where you make an initial request and
+the request times out. If you make the request again with the same request
+ID, the server can check if original operation with the same request ID
+was received, and if so, will ignore the second request. This prevents
+clients from accidentally creating duplicate commitments.
+
+The request ID must be a valid UUID with the exception that zero UUID is
+not supported (00000000-0000-0000-0000-000000000000).
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupReferencesRequest
+
+Request used by the ListAddressGroupReferences method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->address_group() >> / C<< $msg->address_group($value) >>
+
+Type: C<String>
+
+Required. A name of the AddressGroup to clone items to. Must be in the
+format `projects|organization/*/locations/{location}/addressGroups/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of references to return.  If unspecified, server
+will pick an appropriate default. Server may return fewer items than
+requested. A caller should only rely on response's
+[next_page_token][google.cloud.networksecurity.v1.ListAddressGroupReferencesResponse.next_page_token]
+to determine if there are more AddressGroupUsers left to be queried.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The next_page_token value returned from a previous List request,
+if any.
+
+=back
+
+=head2 Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupReferencesResponse
+
+Response of the ListAddressGroupReferences method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->address_group_references() >> / C<< $msg->address_group_references($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networksecurity::V1::AddressGroup::ListAddressGroupReferencesResponse::AddressGroupReference>)
+
+A list of references that matches the specified filter in the request.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If there might be more results than those appearing in this response, then
+`next_page_token` is included. To get the next set of results, call this
+method again using the value of `next_page_token` as `page_token`.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networksecurity::V1::AddressGroup::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

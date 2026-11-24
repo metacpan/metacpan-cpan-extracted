@@ -41,6 +41,9 @@ t/unit.t
 t/unused.t
 t/vars.t
 t/version.t
+t/i18n.t
+t/minimum-version.t
+t/retry.t
 t/weather.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

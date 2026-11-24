@@ -1,0 +1,32 @@
+Changes
+lib/Google/Cloud/Websecurityscanner/V1alpha.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/CrawledUrl.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/CrawledUrl/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/Finding.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/Finding/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/FindingAddon.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/FindingAddon/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/FindingTypeStats.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/FindingTypeStats/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/ScanConfig.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/ScanConfig/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/ScanRun.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/ScanRun/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/WebSecurityScanner.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/WebSecurityScanner/Types.pm
+lib/Google/Cloud/Websecurityscanner/V1alpha/WebSecurityScannerClient.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-WebSecurityScanner.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-WebSecurityScanner.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,982 @@
+package Google::Cloud::Tasks::V2beta2::Queue;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Tasks::V2beta2::Target };
+    eval { require Google::Protobuf::Duration };
+    eval { require Google::Protobuf::Timestamp };
+    my $descriptor_b64 = <<'EOF';
+CiZnb29nbGUvY2xvdWQvdGFza3MvdjJiZXRhMi9xdWV1ZS5wcm90bxIaZ29vZ2xlLmNsb3Vk
+LnRhc2tzLnYyYmV0YTIaH2dvb2dsZS9hcGkvZmllbGRfYmVoYXZpb3IucHJvdG8aGWdvb2ds
+ZS9hcGkvcmVzb3VyY2UucHJvdG8aJ2dvb2dsZS9jbG91ZC90YXNrcy92MmJldGEyL3Rhcmdl
+dC5wcm90bxoeZ29vZ2xlL3Byb3RvYnVmL2R1cmF0aW9uLnByb3RvGh9nb29nbGUvcHJvdG9i
+dWYvdGltZXN0YW1wLnByb3RvIpUHCgVRdWV1ZRISCgRuYW1lGAEgASgJUgRuYW1lEmYKFmFw
+cF9lbmdpbmVfaHR0cF90YXJnZXQYAyABKAsyLy5nb29nbGUuY2xvdWQudGFza3MudjJiZXRh
+Mi5BcHBFbmdpbmVIdHRwVGFyZ2V0SABSE2FwcEVuZ2luZUh0dHBUYXJnZXQSSQoLcHVsbF90
+YXJnZXQYBCABKAsyJi5nb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5QdWxsVGFyZ2V0SABS
+CnB1bGxUYXJnZXQSSQoLaHR0cF90YXJnZXQYESABKAsyJi5nb29nbGUuY2xvdWQudGFza3Mu
+djJiZXRhMi5IdHRwVGFyZ2V0SABSCmh0dHBUYXJnZXQSRwoLcmF0ZV9saW1pdHMYBSABKAsy
+Ji5nb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5SYXRlTGltaXRzUgpyYXRlTGltaXRzEkoK
+DHJldHJ5X2NvbmZpZxgGIAEoCzInLmdvb2dsZS5jbG91ZC50YXNrcy52MmJldGEyLlJldHJ5
+Q29uZmlnUgtyZXRyeUNvbmZpZxI9CgVzdGF0ZRgHIAEoDjInLmdvb2dsZS5jbG91ZC50YXNr
+cy52MmJldGEyLlF1ZXVlLlN0YXRlUgVzdGF0ZRI5CgpwdXJnZV90aW1lGAggASgLMhouZ29v
+Z2xlLnByb3RvYnVmLlRpbWVzdGFtcFIJcHVyZ2VUaW1lEjQKCHRhc2tfdHRsGAkgASgLMhku
+Z29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uUgd0YXNrVHRsEj4KDXRvbWJzdG9uZV90dGwYCiAB
+KAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25SDHRvbWJzdG9uZVR0bBJBCgVzdGF0cxgQ
+IAEoCzImLmdvb2dsZS5jbG91ZC50YXNrcy52MmJldGEyLlF1ZXVlU3RhdHNCA+BBA1IFc3Rh
+dHMiRQoFU3RhdGUSFQoRU1RBVEVfVU5TUEVDSUZJRUQQABILCgdSVU5OSU5HEAESCgoGUEFV
+U0VEEAISDAoIRElTQUJMRUQQAzpc6kFZCh9jbG91ZHRhc2tzLmdvb2dsZWFwaXMuY29tL1F1
+ZXVlEjZwcm9qZWN0cy97cHJvamVjdH0vbG9jYXRpb25zL3tsb2NhdGlvbn0vcXVldWVzL3tx
+dWV1ZX1CDQoLdGFyZ2V0X3R5cGUiqgEKClJhdGVMaW1pdHMSRAofbWF4X3Rhc2tzX2Rpc3Bh
+dGNoZWRfcGVyX3NlY29uZBgBIAEoAVIbbWF4VGFza3NEaXNwYXRjaGVkUGVyU2Vjb25kEiQK
+Dm1heF9idXJzdF9zaXplGAIgASgFUgxtYXhCdXJzdFNpemUSMAoUbWF4X2NvbmN1cnJlbnRf
+dGFza3MYAyABKAVSEm1heENvbmN1cnJlbnRUYXNrcyLZAgoLUmV0cnlDb25maWcSIwoMbWF4
+X2F0dGVtcHRzGAEgASgFSABSC21heEF0dGVtcHRzEi8KEnVubGltaXRlZF9hdHRlbXB0cxgC
+IAEoCEgAUhF1bmxpbWl0ZWRBdHRlbXB0cxJHChJtYXhfcmV0cnlfZHVyYXRpb24YAyABKAsy
+GS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25SEG1heFJldHJ5RHVyYXRpb24SOgoLbWluX2Jh
+Y2tvZmYYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25SCm1pbkJhY2tvZmYSOgoL
+bWF4X2JhY2tvZmYYBSABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25SCm1heEJhY2tv
+ZmYSIwoNbWF4X2RvdWJsaW5ncxgGIAEoBVIMbWF4RG91YmxpbmdzQg4KDG51bV9hdHRlbXB0
+cyLcAgoKUXVldWVTdGF0cxIkCgt0YXNrc19jb3VudBgBIAEoA0ID4EEDUgp0YXNrc0NvdW50
+EmIKHW9sZGVzdF9lc3RpbWF0ZWRfYXJyaXZhbF90aW1lGAIgASgLMhouZ29vZ2xlLnByb3Rv
+YnVmLlRpbWVzdGFtcEID4EEDUhpvbGRlc3RFc3RpbWF0ZWRBcnJpdmFsVGltZRJAChpleGVj
+dXRlZF9sYXN0X21pbnV0ZV9jb3VudBgDIAEoA0ID4EEDUhdleGVjdXRlZExhc3RNaW51dGVD
+b3VudBJDChtjb25jdXJyZW50X2Rpc3BhdGNoZXNfY291bnQYBCABKANCA+BBA1IZY29uY3Vy
+cmVudERpc3BhdGNoZXNDb3VudBI9ChhlZmZlY3RpdmVfZXhlY3V0aW9uX3JhdGUYBSABKAFC
+A+BBA1IWZWZmZWN0aXZlRXhlY3V0aW9uUmF0ZUJzCh5jb20uZ29vZ2xlLmNsb3VkLnRhc2tz
+LnYyYmV0YTJCClF1ZXVlUHJvdG9QAVpDY2xvdWQuZ29vZ2xlLmNvbS9nby9jbG91ZHRhc2tz
+L2FwaXYyYmV0YTIvY2xvdWR0YXNrc3BiO2Nsb3VkdGFza3NwYkr6jgEKBxIFDgDLAwEKvAQK
+AQwSAw4AEjKxBCBDb3B5cmlnaHQgMjAyNSBHb29nbGUgTExDCgogTGljZW5zZWQgdW5kZXIg
+dGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlICJMaWNlbnNlIik7CiB5b3Ug
+bWF5IG5vdCB1c2UgdGhpcyBmaWxlIGV4Y2VwdCBpbiBjb21wbGlhbmNlIHdpdGggdGhlIExp
+Y2Vuc2UuCiBZb3UgbWF5IG9idGFpbiBhIGNvcHkgb2YgdGhlIExpY2Vuc2UgYXQKCiAgICAg
+aHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wCgogVW5sZXNzIHJl
+cXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0
+d2FyZQogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24g
+YW4gIkFTIElTIiBCQVNJUywKIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9G
+IEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLgogU2VlIHRoZSBMaWNlbnNl
+IGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZAog
+bGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuCgoICgECEgMQACMKCQoCAwASAxIAKQoJ
+CgIDARIDEwAjCgkKAgMCEgMUADEKCQoCAwMSAxUAKAoJCgIDBBIDFgApCggKAQgSAxgAWgoJ
+CgIICxIDGABaCggKAQgSAxkAIgoJCgIIChIDGQAiCggKAQgSAxoAKwoJCgIICBIDGgArCggK
+AQgSAxsANwoJCgIIARIDGwA3CtABCgIEABIFIADUAQEawgEgQSBxdWV1ZSBpcyBhIGNvbnRh
+aW5lciBvZiByZWxhdGVkIHRhc2tzLiBRdWV1ZXMgYXJlIGNvbmZpZ3VyZWQgdG8gbWFuYWdl
+CiBob3cgdGhvc2UgdGFza3MgYXJlIGRpc3BhdGNoZWQuIENvbmZpZ3VyYWJsZSBwcm9wZXJ0
+aWVzIGluY2x1ZGUgcmF0ZSBsaW1pdHMsCiByZXRyeSBvcHRpb25zLCB0YXJnZXQgdHlwZXMs
+IGFuZCBvdGhlcnMuCgoKCgMEAAESAyAIDQoLCgMEAAcSBCECJAQKDQoFBAAHnQgSBCECJAQK
+IwoEBAAEABIEJwJNAxoVIFN0YXRlIG9mIHRoZSBxdWV1ZS4KCgwKBQQABAABEgMnBwwKIwoG
+BAAEAAIAEgMpBBoaFCBVbnNwZWNpZmllZCBzdGF0ZS4KCg4KBwQABAACAAESAykEFQoOCgcE
+AAQAAgACEgMpGBkKkQMKBgQABAACARIDMwQQGoEDIFRoZSBxdWV1ZSBpcyBydW5uaW5nLiBU
+YXNrcyBjYW4gYmUgZGlzcGF0Y2hlZC4KCiBJZiB0aGUgcXVldWUgd2FzIGNyZWF0ZWQgdXNp
+bmcgQ2xvdWQgVGFza3MgYW5kIHRoZSBxdWV1ZSBoYXMKIGhhZCBubyBhY3Rpdml0eSAobWV0
+aG9kIGNhbGxzIG9yIHRhc2sgZGlzcGF0Y2hlcykgZm9yIDMwIGRheXMsCiB0aGUgcXVldWUg
+bWF5IHRha2UgYSBmZXcgbWludXRlcyB0byByZS1hY3RpdmF0ZS4gU29tZSBtZXRob2QKIGNh
+bGxzIG1heSByZXR1cm4gW05PVF9GT1VORF1bZ29vZ2xlLnJwYy5Db2RlLk5PVF9GT1VORF0g
+YW5kCiB0YXNrcyBtYXkgbm90IGJlIGRpc3BhdGNoZWQgZm9yIGEgZmV3IG1pbnV0ZXMgdW50
+aWwgdGhlIHF1ZXVlCiBoYXMgYmVlbiByZS1hY3RpdmF0ZWQuCgoOCgcEAAQAAgEBEgMzBAsK
+DgoHBAAEAAIBAhIDMw4PCuQCCgYEAAQAAgISAzoEDxrUAiBUYXNrcyBhcmUgcGF1c2VkIGJ5
+IHRoZSB1c2VyLiBJZiB0aGUgcXVldWUgaXMgcGF1c2VkIHRoZW4gQ2xvdWQKIFRhc2tzIHdp
+bGwgc3RvcCBkZWxpdmVyaW5nIHRhc2tzIGZyb20gaXQsIGJ1dCBtb3JlIHRhc2tzIGNhbgog
+c3RpbGwgYmUgYWRkZWQgdG8gaXQgYnkgdGhlIHVzZXIuIFdoZW4gYSBwdWxsIHF1ZXVlIGlz
+IHBhdXNlZCwKIGFsbCBbTGVhc2VUYXNrc11bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIu
+Q2xvdWRUYXNrcy5MZWFzZVRhc2tzXSBjYWxscwogd2lsbCByZXR1cm4gYSBbRkFJTEVEX1BS
+RUNPTkRJVElPTl1bZ29vZ2xlLnJwYy5Db2RlLkZBSUxFRF9QUkVDT05ESVRJT05dLgoKDgoH
+BAAEAAICARIDOgQKCg4KBwQABAACAgISAzoNDgqZBQoGBAAEAAIDEgNMBBEaiQUgVGhlIHF1
+ZXVlIGlzIGRpc2FibGVkLgoKIEEgcXVldWUgYmVjb21lcyBgRElTQUJMRURgIHdoZW4KIFtx
+dWV1ZS55YW1sXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYXBwZW5naW5lL2RvY3MvcHl0
+aG9uL2NvbmZpZy9xdWV1ZXJlZikKIG9yCiBbcXVldWUueG1sXShodHRwczovL2Nsb3VkLmdv
+b2dsZS5jb20vYXBwZW5naW5lL2RvY3Mvc3RhbmRhcmQvamF2YS9jb25maWcvcXVldWVyZWYp
+CiBpcyB1cGxvYWRlZCB3aGljaCBkb2VzIG5vdCBjb250YWluIHRoZSBxdWV1ZS4gWW91IGNh
+bm5vdCBkaXJlY3RseSBkaXNhYmxlCiBhIHF1ZXVlLgoKIFdoZW4gYSBxdWV1ZSBpcyBkaXNh
+YmxlZCwgdGFza3MgY2FuIHN0aWxsIGJlIGFkZGVkIHRvIGEgcXVldWUKIGJ1dCB0aGUgdGFz
+a3MgYXJlIG5vdCBkaXNwYXRjaGVkIGFuZAogW0xlYXNlVGFza3NdW2dvb2dsZS5jbG91ZC50
+YXNrcy52MmJldGEyLkNsb3VkVGFza3MuTGVhc2VUYXNrc10gY2FsbHMKIHJldHVybiBhIGBG
+QUlMRURfUFJFQ09ORElUSU9OYCBlcnJvci4KCiBUbyBwZXJtYW5lbnRseSBkZWxldGUgdGhp
+cyBxdWV1ZSBhbmQgYWxsIG9mIGl0cyB0YXNrcywgY2FsbAogW0RlbGV0ZVF1ZXVlXVtnb29n
+bGUuY2xvdWQudGFza3MudjJiZXRhMi5DbG91ZFRhc2tzLkRlbGV0ZVF1ZXVlXS4KCg4KBwQA
+BAACAwESA0wEDAoOCgcEAAQAAgMCEgNMDxAKpwcKBAQAAgASA2MCEhqZByBDYWxsZXItc3Bl
+Y2lmaWVkIGFuZCByZXF1aXJlZCBpbgogW0NyZWF0ZVF1ZXVlXVtnb29nbGUuY2xvdWQudGFz
+a3MudjJiZXRhMi5DbG91ZFRhc2tzLkNyZWF0ZVF1ZXVlXSwgYWZ0ZXIKIHdoaWNoIGl0IGJl
+Y29tZXMgb3V0cHV0IG9ubHkuCgogVGhlIHF1ZXVlIG5hbWUuCgogVGhlIHF1ZXVlIG5hbWUg
+bXVzdCBoYXZlIHRoZSBmb2xsb3dpbmcgZm9ybWF0OgogYHByb2plY3RzL1BST0pFQ1RfSUQv
+bG9jYXRpb25zL0xPQ0FUSU9OX0lEL3F1ZXVlcy9RVUVVRV9JRGAKCiAqIGBQUk9KRUNUX0lE
+YCBjYW4gY29udGFpbiBsZXR0ZXJzIChbQS1aYS16XSksIG51bWJlcnMgKFswLTldKSwKICAg
+IGh5cGhlbnMgKC0pLCBjb2xvbnMgKDopLCBvciBwZXJpb2RzICguKS4KICAgIEZvciBtb3Jl
+IGluZm9ybWF0aW9uLCBzZWUKICAgIFtJZGVudGlmeWluZwogICAgcHJvamVjdHNdKGh0dHBz
+Oi8vY2xvdWQuZ29vZ2xlLmNvbS9yZXNvdXJjZS1tYW5hZ2VyL2RvY3MvY3JlYXRpbmctbWFu
+YWdpbmctcHJvamVjdHMjaWRlbnRpZnlpbmdfcHJvamVjdHMpCiAqIGBMT0NBVElPTl9JRGAg
+aXMgdGhlIGNhbm9uaWNhbCBJRCBmb3IgdGhlIHF1ZXVlJ3MgbG9jYXRpb24uCiAgICBUaGUg
+bGlzdCBvZiBhdmFpbGFibGUgbG9jYXRpb25zIGNhbiBiZSBvYnRhaW5lZCBieSBjYWxsaW5n
+CiAgICBbTGlzdExvY2F0aW9uc11bZ29vZ2xlLmNsb3VkLmxvY2F0aW9uLkxvY2F0aW9ucy5M
+aXN0TG9jYXRpb25zXS4KICAgIEZvciBtb3JlIGluZm9ybWF0aW9uLCBzZWUgaHR0cHM6Ly9j
+bG91ZC5nb29nbGUuY29tL2Fib3V0L2xvY2F0aW9ucy8uCiAqIGBRVUVVRV9JRGAgY2FuIGNv
+bnRhaW4gbGV0dGVycyAoW0EtWmEtel0pLCBudW1iZXJzIChbMC05XSksIG9yCiAgIGh5cGhl
+bnMgKC0pLiBUaGUgbWF4aW11bSBsZW5ndGggaXMgMTAwIGNoYXJhY3RlcnMuCgoMCgUEAAIA
+BRIDYwIICgwKBQQAAgABEgNjCQ0KDAoFBAACAAMSA2MQEQqiAgoEBAAIABIEbQJ8AxqTAiBD
+YWxsZXItc3BlY2lmaWVkIGFuZCByZXF1aXJlZCBpbgogW0NyZWF0ZVF1ZXVlXVtnb29nbGUu
+Y2xvdWQudGFza3MudjJiZXRhMi5DbG91ZFRhc2tzLkNyZWF0ZVF1ZXVlXVtdLCBhZnRlcgog
+d2hpY2ggdGhlIHF1ZXVlIGNvbmZpZyB0eXBlIGJlY29tZXMgb3V0cHV0IG9ubHksIHRob3Vn
+aCBmaWVsZHMgd2l0aGluIHRoZQogY29uZmlnIGFyZSBtdXRhYmxlLgoKIFRoZSBxdWV1ZSdz
+IHRhcmdldC4KCiBUaGUgdGFyZ2V0IGFwcGxpZXMgdG8gYWxsIHRhc2tzIGluIHRoZSBxdWV1
+ZS4KCgwKBQQACAABEgNtCBMKnAEKBAQAAgESA3IEMxqOASBBcHAgRW5naW5lIEhUVFAgdGFy
+Z2V0LgoKIEFuIEFwcCBFbmdpbmUgcXVldWUgaXMgYSBxdWV1ZSB0aGF0IGhhcyBhbgogW0Fw
+cEVuZ2luZUh0dHBUYXJnZXRdW2dvb2dsZS5jbG91ZC50YXNrcy52MmJldGEyLkFwcEVuZ2lu
+ZUh0dHBUYXJnZXRdLgoKDAoFBAACAQYSA3IEFwoMCgUEAAIBARIDchguCgwKBQQAAgEDEgNy
+MTIKdgoEBAACAhIDeAQfGmkgUHVsbCB0YXJnZXQuCgogQSBwdWxsIHF1ZXVlIGlzIGEgcXVl
+dWUgdGhhdCBoYXMgYQogW1B1bGxUYXJnZXRdW2dvb2dsZS5jbG91ZC50YXNrcy52MmJldGEy
+LlB1bGxUYXJnZXRdLgoKDAoFBAACAgYSA3gEDgoMCgUEAAICARIDeA8aCgwKBQQAAgIDEgN4
+HR4KUwoEBAACAxIDewQgGkYgQW4gaHR0cF90YXJnZXQgaXMgdXNlZCB0byBvdmVycmlkZSB0
+aGUgdGFyZ2V0IHZhbHVlcyBmb3IgSFRUUCB0YXNrcy4KCgwKBQQAAgMGEgN7BA4KDAoFBAAC
+AwESA3sPGgoMCgUEAAIDAxIDex0fCrYGCgQEAAIEEgSPAQIdGqcGIFJhdGUgbGltaXRzIGZv
+ciB0YXNrIGRpc3BhdGNoZXMuCgogW3JhdGVfbGltaXRzXVtnb29nbGUuY2xvdWQudGFza3Mu
+djJiZXRhMi5RdWV1ZS5yYXRlX2xpbWl0c10gYW5kCiBbcmV0cnlfY29uZmlnXVtnb29nbGUu
+Y2xvdWQudGFza3MudjJiZXRhMi5RdWV1ZS5yZXRyeV9jb25maWddIGFyZSByZWxhdGVkCiBi
+ZWNhdXNlIHRoZXkgYm90aCBjb250cm9sIHRhc2sgYXR0ZW1wdHMgaG93ZXZlciB0aGV5IGNv
+bnRyb2wgaG93IHRhc2tzIGFyZQogYXR0ZW1wdGVkIGluIGRpZmZlcmVudCB3YXlzOgoKICog
+W3JhdGVfbGltaXRzXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5RdWV1ZS5yYXRlX2xp
+bWl0c10gY29udHJvbHMgdGhlCiB0b3RhbCByYXRlIG9mCiAgIGRpc3BhdGNoZXMgZnJvbSBh
+IHF1ZXVlIChpLmUuIGFsbCB0cmFmZmljIGRpc3BhdGNoZWQgZnJvbSB0aGUKICAgcXVldWUs
+IHJlZ2FyZGxlc3Mgb2Ygd2hldGhlciB0aGUgZGlzcGF0Y2ggaXMgZnJvbSBhIGZpcnN0CiAg
+IGF0dGVtcHQgb3IgYSByZXRyeSkuCiAqIFtyZXRyeV9jb25maWddW2dvb2dsZS5jbG91ZC50
+YXNrcy52MmJldGEyLlF1ZXVlLnJldHJ5X2NvbmZpZ10gY29udHJvbHMKIHdoYXQgaGFwcGVu
+cyB0bwogICBwYXJ0aWN1bGFyIGEgdGFzayBhZnRlciBpdHMgZmlyc3QgYXR0ZW1wdCBmYWls
+cy4gVGhhdCBpcywKICAgW3JldHJ5X2NvbmZpZ11bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0
+YTIuUXVldWUucmV0cnlfY29uZmlnXSBjb250cm9scwogICB0YXNrIHJldHJpZXMgKHRoZSBz
+ZWNvbmQgYXR0ZW1wdCwgdGhpcmQgYXR0ZW1wdCwgZXRjKS4KCg0KBQQAAgQGEgSPAQIMCg0K
+BQQAAgQBEgSPAQ0YCg0KBQQAAgQDEgSPARscCtYECgQEAAIFEgSbAQIfGscEIFNldHRpbmdz
+IHRoYXQgZGV0ZXJtaW5lIHRoZSByZXRyeSBiZWhhdmlvci4KCiAqIEZvciB0YXNrcyBjcmVh
+dGVkIHVzaW5nIENsb3VkIFRhc2tzOiB0aGUgcXVldWUtbGV2ZWwgcmV0cnkgc2V0dGluZ3MK
+ICAgYXBwbHkgdG8gYWxsIHRhc2tzIGluIHRoZSBxdWV1ZSB0aGF0IHdlcmUgY3JlYXRlZCB1
+c2luZyBDbG91ZCBUYXNrcy4KICAgUmV0cnkgc2V0dGluZ3MgY2Fubm90IGJlIHNldCBvbiBp
+bmRpdmlkdWFsIHRhc2tzLgogKiBGb3IgdGFza3MgY3JlYXRlZCB1c2luZyB0aGUgQXBwIEVu
+Z2luZSBTREs6IHRoZSBxdWV1ZS1sZXZlbCByZXRyeQogICBzZXR0aW5ncyBhcHBseSB0byBh
+bGwgdGFza3MgaW4gdGhlIHF1ZXVlIHdoaWNoIGRvIG5vdCBoYXZlIHJldHJ5IHNldHRpbmdz
+CiAgIGV4cGxpY2l0bHkgc2V0IG9uIHRoZSB0YXNrIGFuZCB3ZXJlIGNyZWF0ZWQgYnkgdGhl
+IEFwcCBFbmdpbmUgU0RLLiBTZWUKICAgW0FwcCBFbmdpbmUKICAgZG9jdW1lbnRhdGlvbl0o
+aHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2FwcGVuZ2luZS9kb2NzL3N0YW5kYXJkL3B5dGhv
+bi90YXNrcXVldWUvcHVzaC9yZXRyeWluZy10YXNrcykuCgoNCgUEAAIFBhIEmwECDQoNCgUE
+AAIFARIEmwEOGgoNCgUEAAIFAxIEmwEdHgqnAwoEBAACBhIEpgECEhqYAyBPdXRwdXQgb25s
+eS4gVGhlIHN0YXRlIG9mIHRoZSBxdWV1ZS4KCiBgc3RhdGVgIGNhbiBvbmx5IGJlIGNoYW5n
+ZWQgYnkgY2FsbGVkCiBbUGF1c2VRdWV1ZV1bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIu
+Q2xvdWRUYXNrcy5QYXVzZVF1ZXVlXSwKIFtSZXN1bWVRdWV1ZV1bZ29vZ2xlLmNsb3VkLnRh
+c2tzLnYyYmV0YTIuQ2xvdWRUYXNrcy5SZXN1bWVRdWV1ZV0sIG9yCiB1cGxvYWRpbmcKIFtx
+dWV1ZS55YW1sL3htbF0oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2FwcGVuZ2luZS9kb2Nz
+L3B5dGhvbi9jb25maWcvcXVldWVyZWYpLgogW1VwZGF0ZVF1ZXVlXVtnb29nbGUuY2xvdWQu
+dGFza3MudjJiZXRhMi5DbG91ZFRhc2tzLlVwZGF0ZVF1ZXVlXSBjYW5ub3QgYmUKIHVzZWQg
+dG8gY2hhbmdlIGBzdGF0ZWAuCgoNCgUEAAIGBhIEpgECBwoNCgUEAAIGARIEpgEIDQoNCgUE
+AAIGAxIEpgEQEQrABAoEBAACBxIEtAECKxqxBCBPdXRwdXQgb25seS4gVGhlIGxhc3QgdGlt
+ZSB0aGlzIHF1ZXVlIHdhcyBwdXJnZWQuCgogQWxsIHRhc2tzIHRoYXQgd2VyZSBbY3JlYXRl
+ZF1bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIuVGFzay5jcmVhdGVfdGltZV0KIGJlZm9y
+ZSB0aGlzIHRpbWUgd2VyZSBwdXJnZWQuCgogQSBxdWV1ZSBjYW4gYmUgcHVyZ2VkIHVzaW5n
+CiBbUHVyZ2VRdWV1ZV1bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIuQ2xvdWRUYXNrcy5Q
+dXJnZVF1ZXVlXSwgdGhlIFtBcHAKIEVuZ2luZSBUYXNrIFF1ZXVlIFNESywgb3IgdGhlIENs
+b3VkCiBDb25zb2xlXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYXBwZW5naW5lL2RvY3Mv
+c3RhbmRhcmQvcHl0aG9uL3Rhc2txdWV1ZS9wdXNoL2RlbGV0aW5nLXRhc2tzLWFuZC1xdWV1
+ZXMjcHVyZ2luZ19hbGxfdGFza3NfZnJvbV9hX3F1ZXVlKS4KCiBQdXJnZSB0aW1lIHdpbGwg
+YmUgdHJ1bmNhdGVkIHRvIHRoZSBuZWFyZXN0IG1pY3Jvc2Vjb25kLiBQdXJnZQogdGltZSB3
+aWxsIGJlIHVuc2V0IGlmIHRoZSBxdWV1ZSBoYXMgbmV2ZXIgYmVlbiBwdXJnZWQuCgoNCgUE
+AAIHBhIEtAECGwoNCgUEAAIHARIEtAEcJgoNCgUEAAIHAxIEtAEpKgq7BAoEBAACCBIEwgEC
+KBqsBCBUaGUgbWF4aW11bSBhbW91bnQgb2YgdGltZSB0aGF0IGEgdGFzayB3aWxsIGJlIHJl
+dGFpbmVkIGluCiB0aGlzIHF1ZXVlLgoKIFF1ZXVlcyBjcmVhdGVkIGJ5IENsb3VkIFRhc2tz
+IGhhdmUgYSBkZWZhdWx0IGB0YXNrX3R0bGAgb2YgMzEgZGF5cy4KIEFmdGVyIGEgdGFzayBo
+YXMgbGl2ZWQgZm9yIGB0YXNrX3R0bGAsIHRoZSB0YXNrIHdpbGwgYmUgZGVsZXRlZAogcmVn
+YXJkbGVzcyBvZiB3aGV0aGVyIGl0IHdhcyBkaXNwYXRjaGVkIG9yIG5vdC4KCiBUaGUgYHRh
+c2tfdHRsYCBmb3IgcXVldWVzIGNyZWF0ZWQgdmlhIHF1ZXVlLnlhbWwveG1sIGlzIGVxdWFs
+IHRvIHRoZQogbWF4aW11bSBkdXJhdGlvbiBiZWNhdXNlIHRoZXJlIGlzIGEKIFtzdG9yYWdl
+IHF1b3RhXShodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vYXBwZW5naW5lL3F1b3RhcyNUYXNr
+X1F1ZXVlKSBmb3IKIHRoZXNlIHF1ZXVlcy4gVG8gdmlldyB0aGUgbWF4aW11bSB2YWxpZCBk
+dXJhdGlvbiwgc2VlIHRoZSBkb2N1bWVudGF0aW9uIGZvcgogW0R1cmF0aW9uXVtnb29nbGUu
+cHJvdG9idWYuRHVyYXRpb25dLgoKDQoFBAACCAYSBMIBAhoKDQoFBAACCAESBMIBGyMKDQoF
+BAACCAMSBMIBJicKlgQKBAQAAgkSBM4BAi4ahwQgVGhlIHRhc2sgdG9tYnN0b25lIHRpbWUg
+dG8gbGl2ZSAoVFRMKS4KCiBBZnRlciBhIHRhc2sgaXMgZGVsZXRlZCBvciBjb21wbGV0ZWQs
+IHRoZSB0YXNrJ3MgdG9tYnN0b25lIGlzCiByZXRhaW5lZCBmb3IgdGhlIGxlbmd0aCBvZiB0
+aW1lIHNwZWNpZmllZCBieSBgdG9tYnN0b25lX3R0bGAuCiBUaGUgdG9tYnN0b25lIGlzIHVz
+ZWQgYnkgdGFzayBkZS1kdXBsaWNhdGlvbjsgYW5vdGhlciB0YXNrIHdpdGggdGhlIHNhbWUK
+IG5hbWUgY2FuJ3QgYmUgY3JlYXRlZCB1bnRpbCB0aGUgdG9tYnN0b25lIGhhcyBleHBpcmVk
+LiBGb3IgbW9yZSBpbmZvcm1hdGlvbgogYWJvdXQgdGFzayBkZS1kdXBsaWNhdGlvbiwgc2Vl
+IHRoZSBkb2N1bWVudGF0aW9uIGZvcgogW0NyZWF0ZVRhc2tSZXF1ZXN0XVtnb29nbGUuY2xv
+dWQudGFza3MudjJiZXRhMi5DcmVhdGVUYXNrUmVxdWVzdC50YXNrXS4KCiBRdWV1ZXMgY3Jl
+YXRlZCBieSBDbG91ZCBUYXNrcyBoYXZlIGEgZGVmYXVsdCBgdG9tYnN0b25lX3R0bGAgb2Yg
+MSBob3VyLgoKDQoFBAACCQYSBM4BAhoKDQoFBAACCQESBM4BGygKDQoFBAACCQMSBM4BKy0K
+rQEKBAQAAgoSBNMBAkQangEgT3V0cHV0IG9ubHkuIFRoZSByZWFsdGltZSwgaW5mb3JtYXRp
+b25hbCBzdGF0aXN0aWNzIGZvciBhIHF1ZXVlLiBJbiBvcmRlcgogdG8gcmVjZWl2ZSB0aGUg
+c3RhdGlzdGljcyB0aGUgY2FsbGVyIHNob3VsZCBpbmNsdWRlIHRoaXMgZmllbGQgaW4gdGhl
+CiBGaWVsZE1hc2suCgoNCgUEAAIKBhIE0wECDAoNCgUEAAIKARIE0wENEgoNCgUEAAIKAxIE
+0wEVFwoNCgUEAAIKCBIE0wEYQwoQCggEAAIKCJwIABIE0wEZQgr8AgoCBAESBt8BAKwCARrt
+AiBSYXRlIGxpbWl0cy4KCiBUaGlzIG1lc3NhZ2UgZGV0ZXJtaW5lcyB0aGUgbWF4aW11bSBy
+YXRlIHRoYXQgdGFza3MgY2FuIGJlIGRpc3BhdGNoZWQgYnkgYQogcXVldWUsIHJlZ2FyZGxl
+c3Mgb2Ygd2hldGhlciB0aGUgZGlzcGF0Y2ggaXMgYSBmaXJzdCB0YXNrIGF0dGVtcHQgb3Ig
+YSByZXRyeS4KCiBOb3RlOiBUaGUgZGVidWdnaW5nIGNvbW1hbmQsCiBbUnVuVGFza11bZ29v
+Z2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIuQ2xvdWRUYXNrcy5SdW5UYXNrXSwgd2lsbCBydW4g
+YSB0YXNrCiBldmVuIGlmIHRoZSBxdWV1ZSBoYXMgcmVhY2hlZCBpdHMKIFtSYXRlTGltaXRz
+XVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5SYXRlTGltaXRzXS4KCgsKAwQBARIE3wEI
+Egq9BQoEBAECABIE8gECLRquBSBUaGUgbWF4aW11bSByYXRlIGF0IHdoaWNoIHRhc2tzIGFy
+ZSBkaXNwYXRjaGVkIGZyb20gdGhpcyBxdWV1ZS4KCiBJZiB1bnNwZWNpZmllZCB3aGVuIHRo
+ZSBxdWV1ZSBpcyBjcmVhdGVkLCBDbG91ZCBUYXNrcyB3aWxsIHBpY2sgdGhlCiBkZWZhdWx0
+LgoKICogRm9yIFtBcHAgRW5naW5lIHF1ZXVlc11bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0
+YTIuQXBwRW5naW5lSHR0cFRhcmdldF0sCiB0aGUgbWF4aW11bSBhbGxvd2VkIHZhbHVlCiAg
+IGlzIDUwMC4KICogVGhpcyBmaWVsZCBpcyBvdXRwdXQgb25seSAgIGZvciBbcHVsbAogcXVl
+dWVzXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5QdWxsVGFyZ2V0XS4gSW4gYWRkaXRp
+b24gdG8gdGhlCiAgIGBtYXhfdGFza3NfZGlzcGF0Y2hlZF9wZXJfc2Vjb25kYCBsaW1pdCwg
+YSBtYXhpbXVtIG9mIDEwIFFQUyBvZgogICBbTGVhc2VUYXNrc11bZ29vZ2xlLmNsb3VkLnRh
+c2tzLnYyYmV0YTIuQ2xvdWRUYXNrcy5MZWFzZVRhc2tzXSByZXF1ZXN0cwogICBhcmUgYWxs
+b3dlZCBwZXIgcHVsbCBxdWV1ZS4KCgogVGhpcyBmaWVsZCBoYXMgdGhlIHNhbWUgbWVhbmlu
+ZyBhcwogW3JhdGUgaW4KIHF1ZXVlLnlhbWwveG1sXShodHRwczovL2Nsb3VkLmdvb2dsZS5j
+b20vYXBwZW5naW5lL2RvY3Mvc3RhbmRhcmQvcHl0aG9uL2NvbmZpZy9xdWV1ZXJlZiNyYXRl
+KS4KCg0KBQQBAgAFEgTyAQIICg0KBQQBAgABEgTyAQkoCg0KBQQBAgADEgTyASssCrwMCgQE
+AQIBEgSVAgIbGq0MIFRoZSBtYXggYnVyc3Qgc2l6ZS4KCiBNYXggYnVyc3Qgc2l6ZSBsaW1p
+dHMgaG93IGZhc3QgdGFza3MgaW4gcXVldWUgYXJlIHByb2Nlc3NlZCB3aGVuCiBtYW55IHRh
+c2tzIGFyZSBpbiB0aGUgcXVldWUgYW5kIHRoZSByYXRlIGlzIGhpZ2guIFRoaXMgZmllbGQK
+IGFsbG93cyB0aGUgcXVldWUgdG8gaGF2ZSBhIGhpZ2ggcmF0ZSBzbyBwcm9jZXNzaW5nIHN0
+YXJ0cyBzaG9ydGx5CiBhZnRlciBhIHRhc2sgaXMgZW5xdWV1ZWQsIGJ1dCBzdGlsbCBsaW1p
+dHMgcmVzb3VyY2UgdXNhZ2Ugd2hlbgogbWFueSB0YXNrcyBhcmUgZW5xdWV1ZWQgaW4gYSBz
+aG9ydCBwZXJpb2Qgb2YgdGltZS4KCiBUaGUgW3Rva2VuIGJ1Y2tldF0oaHR0cHM6Ly93aWtp
+cGVkaWEub3JnL3dpa2kvVG9rZW5fQnVja2V0KQogYWxnb3JpdGhtIGlzIHVzZWQgdG8gY29u
+dHJvbCB0aGUgcmF0ZSBvZiB0YXNrIGRpc3BhdGNoZXMuIEVhY2gKIHF1ZXVlIGhhcyBhIHRv
+a2VuIGJ1Y2tldCB0aGF0IGhvbGRzIHRva2VucywgdXAgdG8gdGhlIG1heGltdW0KIHNwZWNp
+ZmllZCBieSBgbWF4X2J1cnN0X3NpemVgLiBFYWNoIHRpbWUgYSB0YXNrIGlzIGRpc3BhdGNo
+ZWQsIGEKIHRva2VuIGlzIHJlbW92ZWQgZnJvbSB0aGUgYnVja2V0LiBUYXNrcyB3aWxsIGJl
+IGRpc3BhdGNoZWQgdW50aWwKIHRoZSBxdWV1ZSdzIGJ1Y2tldCBydW5zIG91dCBvZiB0b2tl
+bnMuIFRoZSBidWNrZXQgd2lsbCBiZQogY29udGludW91c2x5IHJlZmlsbGVkIHdpdGggbmV3
+IHRva2VucyBiYXNlZCBvbgogW21heF9kaXNwYXRjaGVzX3Blcl9zZWNvbmRdW1JhdGVMaW1p
+dHMubWF4X2Rpc3BhdGNoZXNfcGVyX3NlY29uZF0uCgogVGhlIGRlZmF1bHQgdmFsdWUgb2Yg
+YG1heF9idXJzdF9zaXplYCBpcyBwaWNrZWQgYnkgQ2xvdWQgVGFza3MKIGJhc2VkIG9uIHRo
+ZSB2YWx1ZSBvZgogW21heF9kaXNwYXRjaGVzX3Blcl9zZWNvbmRdW1JhdGVMaW1pdHMubWF4
+X2Rpc3BhdGNoZXNfcGVyX3NlY29uZF0uCgogVGhlIG1heGltdW0gdmFsdWUgb2YgYG1heF9i
+dXJzdF9zaXplYCBpcyA1MDAuCgogRm9yIEFwcCBFbmdpbmUgcXVldWVzIHRoYXQgd2VyZSBj
+cmVhdGVkIG9yIHVwZGF0ZWQgdXNpbmcKIGBxdWV1ZS55YW1sL3htbGAsIGBtYXhfYnVyc3Rf
+c2l6ZWAgaXMgZXF1YWwgdG8KIFtidWNrZXRfc2l6ZV0oaHR0cHM6Ly9jbG91ZC5nb29nbGUu
+Y29tL2FwcGVuZ2luZS9kb2NzL3N0YW5kYXJkL3B5dGhvbi9jb25maWcvcXVldWVyZWYjYnVj
+a2V0X3NpemUpLgogSWYKIFtVcGRhdGVRdWV1ZV1bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0
+YTIuQ2xvdWRUYXNrcy5VcGRhdGVRdWV1ZV0gaXMgY2FsbGVkCiBvbiBhIHF1ZXVlIHdpdGhv
+dXQgZXhwbGljaXRseSBzZXR0aW5nIGEgdmFsdWUgZm9yIGBtYXhfYnVyc3Rfc2l6ZWAsCiBg
+bWF4X2J1cnN0X3NpemVgIHZhbHVlIHdpbGwgZ2V0IHVwZGF0ZWQgaWYKIFtVcGRhdGVRdWV1
+ZV1bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIuQ2xvdWRUYXNrcy5VcGRhdGVRdWV1ZV0g
+aXMKIHVwZGF0aW5nIFttYXhfZGlzcGF0Y2hlc19wZXJfc2Vjb25kXVtSYXRlTGltaXRzLm1h
+eF9kaXNwYXRjaGVzX3Blcl9zZWNvbmRdLgoKCg0KBQQBAgEFEgSVAgIHCg0KBQQBAgEBEgSV
+AggWCg0KBQQBAgEDEgSVAhkaCt8FCgQEAQICEgSrAgIhGtAFIFRoZSBtYXhpbXVtIG51bWJl
+ciBvZiBjb25jdXJyZW50IHRhc2tzIHRoYXQgQ2xvdWQgVGFza3MgYWxsb3dzCiB0byBiZSBk
+aXNwYXRjaGVkIGZvciB0aGlzIHF1ZXVlLiBBZnRlciB0aGlzIHRocmVzaG9sZCBoYXMgYmVl
+bgogcmVhY2hlZCwgQ2xvdWQgVGFza3Mgc3RvcHMgZGlzcGF0Y2hpbmcgdGFza3MgdW50aWwg
+dGhlIG51bWJlciBvZgogY29uY3VycmVudCByZXF1ZXN0cyBkZWNyZWFzZXMuCgogSWYgdW5z
+cGVjaWZpZWQgd2hlbiB0aGUgcXVldWUgaXMgY3JlYXRlZCwgQ2xvdWQgVGFza3Mgd2lsbCBw
+aWNrIHRoZQogZGVmYXVsdC4KCgogVGhlIG1heGltdW0gYWxsb3dlZCB2YWx1ZSBpcyA1LDAw
+MC4KCiBUaGlzIGZpZWxkIGlzIG91dHB1dCBvbmx5IGZvcgogW3B1bGwgcXVldWVzXVtnb29n
+bGUuY2xvdWQudGFza3MudjJiZXRhMi5QdWxsVGFyZ2V0XSBhbmQgYWx3YXlzIC0xLCB3aGlj
+aAogaW5kaWNhdGVzIG5vIGxpbWl0LiBObyBvdGhlciBxdWV1ZSB0eXBlcyBjYW4gaGF2ZSBg
+bWF4X2NvbmN1cnJlbnRfdGFza3NgCiBzZXQgdG8gLTEuCgoKIFRoaXMgZmllbGQgaGFzIHRo
+ZSBzYW1lIG1lYW5pbmcgYXMKIFttYXhfY29uY3VycmVudF9yZXF1ZXN0cyBpbgogcXVldWUu
+eWFtbC94bWxdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9hcHBlbmdpbmUvZG9jcy9zdGFu
+ZGFyZC9weXRob24vY29uZmlnL3F1ZXVlcmVmI21heF9jb25jdXJyZW50X3JlcXVlc3RzKS4K
+Cg0KBQQBAgIFEgSrAgIHCg0KBQQBAgIBEgSrAggcCg0KBQQBAgIDEgSrAh8gCl4KAgQCEgax
+AgCrAwEaUCBSZXRyeSBjb25maWcuCgogVGhlc2Ugc2V0dGluZ3MgZGV0ZXJtaW5lIGhvdyBh
+IGZhaWxlZCB0YXNrIGF0dGVtcHQgaXMgcmV0cmllZC4KCgsKAwQCARIEsQIIEwqoAgoEBAII
+ABIGvAICxgIDGpcCIE51bWJlciBvZiBhdHRlbXB0cyBwZXIgdGFzay4KCiBJZiB1bnNwZWNp
+ZmllZCB3aGVuIHRoZSBxdWV1ZSBpcyBjcmVhdGVkLCBDbG91ZCBUYXNrcyB3aWxsIHBpY2sg
+dGhlCiBkZWZhdWx0LgoKCgogVGhpcyBmaWVsZCBoYXMgdGhlIHNhbWUgbWVhbmluZyBhcwog
+W3Rhc2tfcmV0cnlfbGltaXQgaW4KIHF1ZXVlLnlhbWwveG1sXShodHRwczovL2Nsb3VkLmdv
+b2dsZS5jb20vYXBwZW5naW5lL2RvY3Mvc3RhbmRhcmQvcHl0aG9uL2NvbmZpZy9xdWV1ZXJl
+ZiNyZXRyeV9wYXJhbWV0ZXJzKS4KCg0KBQQCCAABEgS8AggUCtoBCgQEAgIAEgTCAgQbGssB
+IFRoZSBtYXhpbXVtIG51bWJlciBvZiBhdHRlbXB0cyBmb3IgYSB0YXNrLgoKIENsb3VkIFRh
+c2tzIHdpbGwgYXR0ZW1wdCB0aGUgdGFzayBgbWF4X2F0dGVtcHRzYCB0aW1lcyAodGhhdAog
+aXMsIGlmIHRoZSBmaXJzdCBhdHRlbXB0IGZhaWxzLCB0aGVuIHRoZXJlIHdpbGwgYmUKIGBt
+YXhfYXR0ZW1wdHMgLSAxYCByZXRyaWVzKS4gIE11c3QgYmUgPiAwLgoKDQoFBAICAAUSBMIC
+BAkKDQoFBAICAAESBMICChYKDQoFBAICAAMSBMICGRoKQgoEBAICARIExQIEIBo0IElmIHRy
+dWUsIHRoZW4gdGhlIG51bWJlciBvZiBhdHRlbXB0cyBpcyB1bmxpbWl0ZWQuCgoNCgUEAgIB
+BRIExQIECAoNCgUEAgIBARIExQIJGwoNCgUEAgIBAxIExQIeHwqrBgoEBAICAhIE3QICMhqc
+BiBJZiBwb3NpdGl2ZSwgYG1heF9yZXRyeV9kdXJhdGlvbmAgc3BlY2lmaWVzIHRoZSB0aW1l
+IGxpbWl0IGZvcgogcmV0cnlpbmcgYSBmYWlsZWQgdGFzaywgbWVhc3VyZWQgZnJvbSB3aGVu
+IHRoZSB0YXNrIHdhcyBmaXJzdAogYXR0ZW1wdGVkLiBPbmNlIGBtYXhfcmV0cnlfZHVyYXRp
+b25gIHRpbWUgaGFzIHBhc3NlZCAqYW5kKiB0aGUKIHRhc2sgaGFzIGJlZW4gYXR0ZW1wdGVk
+CiBbbWF4X2F0dGVtcHRzXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5SZXRyeUNvbmZp
+Zy5tYXhfYXR0ZW1wdHNdIHRpbWVzLAogbm8gZnVydGhlciBhdHRlbXB0cyB3aWxsIGJlIG1h
+ZGUgYW5kIHRoZSB0YXNrIHdpbGwgYmUgZGVsZXRlZC4KCiBJZiB6ZXJvLCB0aGVuIHRoZSB0
+YXNrIGFnZSBpcyB1bmxpbWl0ZWQuCgogSWYgdW5zcGVjaWZpZWQgd2hlbiB0aGUgcXVldWUg
+aXMgY3JlYXRlZCwgQ2xvdWQgVGFza3Mgd2lsbCBwaWNrIHRoZQogZGVmYXVsdC4KCiBUaGlz
+IGZpZWxkIGlzIG91dHB1dCBvbmx5IGZvciBbcHVsbAogcXVldWVzXVtnb29nbGUuY2xvdWQu
+dGFza3MudjJiZXRhMi5QdWxsVGFyZ2V0XS4KCgogYG1heF9yZXRyeV9kdXJhdGlvbmAgd2ls
+bCBiZSB0cnVuY2F0ZWQgdG8gdGhlIG5lYXJlc3Qgc2Vjb25kLgoKIFRoaXMgZmllbGQgaGFz
+IHRoZSBzYW1lIG1lYW5pbmcgYXMKIFt0YXNrX2FnZV9saW1pdCBpbgogcXVldWUueWFtbC94
+bWxdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9hcHBlbmdpbmUvZG9jcy9zdGFuZGFyZC9w
+eXRob24vY29uZmlnL3F1ZXVlcmVmI3JldHJ5X3BhcmFtZXRlcnMpLgoKDQoFBAICAgYSBN0C
+AhoKDQoFBAICAgESBN0CGy0KDQoFBAICAgMSBN0CMDEKjgYKBAQCAgMSBPMCAisa/wUgQSB0
+YXNrIHdpbGwgYmUgW3NjaGVkdWxlZF1bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIuVGFz
+ay5zY2hlZHVsZV90aW1lXQogZm9yIHJldHJ5IGJldHdlZW4KIFttaW5fYmFja29mZl1bZ29v
+Z2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIuUmV0cnlDb25maWcubWluX2JhY2tvZmZdIGFuZAog
+W21heF9iYWNrb2ZmXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5SZXRyeUNvbmZpZy5t
+YXhfYmFja29mZl0gZHVyYXRpb24KIGFmdGVyIGl0IGZhaWxzLCBpZiB0aGUgcXVldWUncwog
+W1JldHJ5Q29uZmlnXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5SZXRyeUNvbmZpZ10g
+c3BlY2lmaWVzIHRoYXQgdGhlCiB0YXNrIHNob3VsZCBiZSByZXRyaWVkLgoKIElmIHVuc3Bl
+Y2lmaWVkIHdoZW4gdGhlIHF1ZXVlIGlzIGNyZWF0ZWQsIENsb3VkIFRhc2tzIHdpbGwgcGlj
+ayB0aGUKIGRlZmF1bHQuCgogVGhpcyBmaWVsZCBpcyBvdXRwdXQgb25seSBmb3IgW3B1bGwK
+IHF1ZXVlc11bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIuUHVsbFRhcmdldF0uCgoKIGBt
+aW5fYmFja29mZmAgd2lsbCBiZSB0cnVuY2F0ZWQgdG8gdGhlIG5lYXJlc3Qgc2Vjb25kLgoK
+IFRoaXMgZmllbGQgaGFzIHRoZSBzYW1lIG1lYW5pbmcgYXMKIFttaW5fYmFja29mZl9zZWNv
+bmRzIGluCiBxdWV1ZS55YW1sL3htbF0oaHR0cHM6Ly9jbG91ZC5nb29nbGUuY29tL2FwcGVu
+Z2luZS9kb2NzL3N0YW5kYXJkL3B5dGhvbi9jb25maWcvcXVldWVyZWYjcmV0cnlfcGFyYW1l
+dGVycykuCgoNCgUEAgIDBhIE8wICGgoNCgUEAgIDARIE8wIbJgoNCgUEAgIDAxIE8wIpKgqO
+BgoEBAICBBIEiQMCKxr/BSBBIHRhc2sgd2lsbCBiZSBbc2NoZWR1bGVkXVtnb29nbGUuY2xv
+dWQudGFza3MudjJiZXRhMi5UYXNrLnNjaGVkdWxlX3RpbWVdCiBmb3IgcmV0cnkgYmV0d2Vl
+bgogW21pbl9iYWNrb2ZmXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5SZXRyeUNvbmZp
+Zy5taW5fYmFja29mZl0gYW5kCiBbbWF4X2JhY2tvZmZdW2dvb2dsZS5jbG91ZC50YXNrcy52
+MmJldGEyLlJldHJ5Q29uZmlnLm1heF9iYWNrb2ZmXSBkdXJhdGlvbgogYWZ0ZXIgaXQgZmFp
+bHMsIGlmIHRoZSBxdWV1ZSdzCiBbUmV0cnlDb25maWddW2dvb2dsZS5jbG91ZC50YXNrcy52
+MmJldGEyLlJldHJ5Q29uZmlnXSBzcGVjaWZpZXMgdGhhdCB0aGUKIHRhc2sgc2hvdWxkIGJl
+IHJldHJpZWQuCgogSWYgdW5zcGVjaWZpZWQgd2hlbiB0aGUgcXVldWUgaXMgY3JlYXRlZCwg
+Q2xvdWQgVGFza3Mgd2lsbCBwaWNrIHRoZQogZGVmYXVsdC4KCiBUaGlzIGZpZWxkIGlzIG91
+dHB1dCBvbmx5IGZvciBbcHVsbAogcXVldWVzXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRh
+Mi5QdWxsVGFyZ2V0XS4KCgogYG1heF9iYWNrb2ZmYCB3aWxsIGJlIHRydW5jYXRlZCB0byB0
+aGUgbmVhcmVzdCBzZWNvbmQuCgogVGhpcyBmaWVsZCBoYXMgdGhlIHNhbWUgbWVhbmluZyBh
+cwogW21heF9iYWNrb2ZmX3NlY29uZHMgaW4KIHF1ZXVlLnlhbWwveG1sXShodHRwczovL2Ns
+b3VkLmdvb2dsZS5jb20vYXBwZW5naW5lL2RvY3Mvc3RhbmRhcmQvcHl0aG9uL2NvbmZpZy9x
+dWV1ZXJlZiNyZXRyeV9wYXJhbWV0ZXJzKS4KCg0KBQQCAgQGEgSJAwIaCg0KBQQCAgQBEgSJ
+AxsmCg0KBQQCAgQDEgSJAykqCvUKCgQEAgIFEgSqAwIaGuYKIFRoZSB0aW1lIGJldHdlZW4g
+cmV0cmllcyB3aWxsIGRvdWJsZSBgbWF4X2RvdWJsaW5nc2AgdGltZXMuCgogQSB0YXNrJ3Mg
+cmV0cnkgaW50ZXJ2YWwgc3RhcnRzIGF0CiBbbWluX2JhY2tvZmZdW2dvb2dsZS5jbG91ZC50
+YXNrcy52MmJldGEyLlJldHJ5Q29uZmlnLm1pbl9iYWNrb2ZmXSwgdGhlbgogZG91YmxlcyBg
+bWF4X2RvdWJsaW5nc2AgdGltZXMsIHRoZW4gaW5jcmVhc2VzIGxpbmVhcmx5LCBhbmQgZmlu
+YWxseSByZXRyaWVzCiBhdCBpbnRlcnZhbHMgb2YKIFttYXhfYmFja29mZl1bZ29vZ2xlLmNs
+b3VkLnRhc2tzLnYyYmV0YTIuUmV0cnlDb25maWcubWF4X2JhY2tvZmZdIHVwIHRvCiBbbWF4
+X2F0dGVtcHRzXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5SZXRyeUNvbmZpZy5tYXhf
+YXR0ZW1wdHNdIHRpbWVzLgoKIEZvciBleGFtcGxlLCBpZgogW21pbl9iYWNrb2ZmXVtnb29n
+bGUuY2xvdWQudGFza3MudjJiZXRhMi5SZXRyeUNvbmZpZy5taW5fYmFja29mZl0gaXMgMTBz
+LAogW21heF9iYWNrb2ZmXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRhMi5SZXRyeUNvbmZp
+Zy5tYXhfYmFja29mZl0gaXMgMzAwcywKIGFuZCBgbWF4X2RvdWJsaW5nc2AgaXMgMywgdGhl
+biB0aGUgYSB0YXNrIHdpbGwgZmlyc3QgYmUgcmV0cmllZCBpbiAxMHMuIFRoZQogcmV0cnkg
+aW50ZXJ2YWwgd2lsbCBkb3VibGUgdGhyZWUgdGltZXMsIGFuZCB0aGVuIGluY3JlYXNlIGxp
+bmVhcmx5IGJ5IDJeMyAqCiAxMHMuICBGaW5hbGx5LCB0aGUgdGFzayB3aWxsIHJldHJ5IGF0
+IGludGVydmFscyBvZgogW21heF9iYWNrb2ZmXVtnb29nbGUuY2xvdWQudGFza3MudjJiZXRh
+Mi5SZXRyeUNvbmZpZy5tYXhfYmFja29mZl0gdW50aWwgdGhlCiB0YXNrIGhhcyBiZWVuIGF0
+dGVtcHRlZAogW21heF9hdHRlbXB0c11bZ29vZ2xlLmNsb3VkLnRhc2tzLnYyYmV0YTIuUmV0
+cnlDb25maWcubWF4X2F0dGVtcHRzXSB0aW1lcy4KIFRodXMsIHRoZSByZXF1ZXN0cyB3aWxs
+IHJldHJ5IGF0IDEwcywgMjBzLCA0MHMsIDgwcywgMTYwcywgMjQwcywgMzAwcywKIDMwMHMs
+IC4uLi4KCiBJZiB1bnNwZWNpZmllZCB3aGVuIHRoZSBxdWV1ZSBpcyBjcmVhdGVkLCBDbG91
+ZCBUYXNrcyB3aWxsIHBpY2sgdGhlCiBkZWZhdWx0LgoKIFRoaXMgZmllbGQgaXMgb3V0cHV0
+IG9ubHkgZm9yIFtwdWxsCiBxdWV1ZXNdW2dvb2dsZS5jbG91ZC50YXNrcy52MmJldGEyLlB1
+bGxUYXJnZXRdLgoKCiBUaGlzIGZpZWxkIGhhcyB0aGUgc2FtZSBtZWFuaW5nIGFzCiBbbWF4
+X2RvdWJsaW5ncyBpbgogcXVldWUueWFtbC94bWxdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNv
+bS9hcHBlbmdpbmUvZG9jcy9zdGFuZGFyZC9weXRob24vY29uZmlnL3F1ZXVlcmVmI3JldHJ5
+X3BhcmFtZXRlcnMpLgoKDQoFBAICBQUSBKoDAgcKDQoFBAICBQESBKoDCBUKDQoFBAICBQMS
+BKoDGBkKJwoCBAMSBq4DAMsDARoZIFN0YXRpc3RpY3MgZm9yIGEgcXVldWUuCgoLCgMEAwES
+BK4DCBIKnAIKBAQDAgASBLMDAkQajQIgT3V0cHV0IG9ubHkuIEFuIGVzdGltYXRpb24gb2Yg
+dGhlIG51bWJlciBvZiB0YXNrcyBpbiB0aGUgcXVldWUsIHRoYXQgaXMsCiB0aGUgdGFza3Mg
+aW4gdGhlIHF1ZXVlIHRoYXQgaGF2ZW4ndCBiZWVuIGV4ZWN1dGVkLCB0aGUgdGFza3MgaW4g
+dGhlIHF1ZXVlCiB3aGljaCB0aGUgcXVldWUgaGFzIGRpc3BhdGNoZWQgYnV0IGhhcyBub3Qg
+eWV0IHJlY2VpdmVkIGEgcmVwbHkgZm9yLCBhbmQKIHRoZSBmYWlsZWQgdGFza3MgdGhhdCB0
+aGUgcXVldWUgaXMgcmV0cnlpbmcuCgoNCgUEAwIABRIEswMCBwoNCgUEAwIAARIEswMIEwoN
+CgUEAwIAAxIEswMWFwoNCgUEAwIACBIEswMYQwoQCggEAwIACJwIABIEswMZQgqGAQoEBAMC
+ARIGtwMCuAMyGnYgT3V0cHV0IG9ubHkuIEFuIGVzdGltYXRpb24gb2YgdGhlIG5lYXJlc3Qg
+dGltZSBpbiB0aGUgZnV0dXJlIHdoZXJlIGEgdGFzawogaW4gdGhlIHF1ZXVlIGlzIHNjaGVk
+dWxlZCB0byBiZSBleGVjdXRlZC4KCg0KBQQDAgEGEgS3AwIbCg0KBQQDAgEBEgS3Axw5Cg0K
+BQQDAgEDEgS3Azw9Cg0KBQQDAgEIEgS4AwYxChAKCAQDAgEInAgAEgS4AwcwCsgBCgQEAwIC
+Ega9AwK+AzIatwEgT3V0cHV0IG9ubHkuIFRoZSBudW1iZXIgb2YgdGFza3MgdGhhdCB0aGUg
+cXVldWUgaGFzIGRpc3BhdGNoZWQgYW5kIHJlY2VpdmVkCiBhIHJlcGx5IGZvciBkdXJpbmcg
+dGhlIGxhc3QgbWludXRlLiBUaGlzIHZhcmlhYmxlIGNvdW50cyBib3RoIHN1Y2Nlc3NmdWwK
+IGFuZCBub24tc3VjY2Vzc2Z1bCBleGVjdXRpb25zLgoKDQoFBAMCAgUSBL0DAgcKDQoFBAMC
+AgESBL0DCCIKDQoFBAMCAgMSBL0DJSYKDQoFBAMCAggSBL4DBjEKEAoIBAMCAgicCAASBL4D
+BzAKegoEBAMCAxIGwgMCwwMyGmogT3V0cHV0IG9ubHkuIFRoZSBudW1iZXIgb2YgcmVxdWVz
+dHMgdGhhdCB0aGUgcXVldWUgaGFzIGRpc3BhdGNoZWQgYnV0IGhhcwogbm90IHJlY2VpdmVk
+IGEgcmVwbHkgZm9yIHlldC4KCg0KBQQDAgMFEgTCAwIHCg0KBQQDAgMBEgTCAwgjCg0KBQQD
+AgMDEgTCAyYnCg0KBQQDAgMIEgTDAwYxChAKCAQDAgMInAgAEgTDAwcwCqACCgQEAwIEEgbJ
+AwLKAzIajwIgT3V0cHV0IG9ubHkuIFRoZSBjdXJyZW50IG1heGltdW0gbnVtYmVyIG9mIHRh
+c2tzIHBlciBzZWNvbmQgZXhlY3V0ZWQgYnkgdGhlCiBxdWV1ZS4gVGhlIG1heGltdW0gdmFs
+dWUgb2YgdGhpcyB2YXJpYWJsZSBpcyBjb250cm9sbGVkIGJ5IHRoZSBSYXRlTGltaXRzCiBv
+ZiB0aGUgUXVldWUuIEhvd2V2ZXIsIHRoaXMgdmFsdWUgY291bGQgYmUgbGVzcyB0byBhdm9p
+ZCBvdmVybG9hZGluZyB0aGUKIGVuZHBvaW50cyB0YXNrcyBpbiB0aGUgcXVldWUgYXJlIHRh
+cmdldGluZy4KCg0KBQQDAgQFEgTJAwIICg0KBQQDAgQBEgTJAwkhCg0KBQQDAgQDEgTJAyQl
+Cg0KBQQDAgQIEgTKAwYxChAKCAQDAgQInAgAEgTKAwcwYgZwcm90bzM=
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Tasks::V2beta2::Queue::Queue ===
+    # Fields for Queue
+    # Field: name Type: 9 ()
+    # Field: app_engine_http_target Type: 11 (.google.cloud.tasks.v2beta2.AppEngineHttpTarget)
+    # Field: pull_target Type: 11 (.google.cloud.tasks.v2beta2.PullTarget)
+    # Field: http_target Type: 11 (.google.cloud.tasks.v2beta2.HttpTarget)
+    # Field: rate_limits Type: 11 (.google.cloud.tasks.v2beta2.RateLimits)
+    # Field: retry_config Type: 11 (.google.cloud.tasks.v2beta2.RetryConfig)
+    # Field: state Type: 14 (.google.cloud.tasks.v2beta2.Queue.State)
+    # Field: purge_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: task_ttl Type: 11 (.google.protobuf.Duration)
+    # Field: tombstone_ttl Type: 11 (.google.protobuf.Duration)
+    # Field: stats Type: 11 (.google.cloud.tasks.v2beta2.QueueStats)
+
+# Enum: Queue::State
+our $Queue_STATE_UNSPECIFIED = 0;
+our $Queue_RUNNING = 1;
+our $Queue_PAUSED = 2;
+our $Queue_DISABLED = 3;
+
+# === Message: Google::Cloud::Tasks::V2beta2::Queue::RateLimits ===
+    # Fields for RateLimits
+    # Field: max_tasks_dispatched_per_second Type: 1 ()
+    # Field: max_burst_size Type: 5 ()
+    # Field: max_concurrent_tasks Type: 5 ()
+
+# === Message: Google::Cloud::Tasks::V2beta2::Queue::RetryConfig ===
+    # Fields for RetryConfig
+    # Field: max_attempts Type: 5 ()
+    # Field: unlimited_attempts Type: 8 ()
+    # Field: max_retry_duration Type: 11 (.google.protobuf.Duration)
+    # Field: min_backoff Type: 11 (.google.protobuf.Duration)
+    # Field: max_backoff Type: 11 (.google.protobuf.Duration)
+    # Field: max_doublings Type: 5 ()
+
+# === Message: Google::Cloud::Tasks::V2beta2::Queue::QueueStats ===
+    # Fields for QueueStats
+    # Field: tasks_count Type: 3 ()
+    # Field: oldest_estimated_arrival_time Type: 11 (.google.protobuf.Timestamp)
+    # Field: executed_last_minute_count Type: 3 ()
+    # Field: concurrent_dispatches_count Type: 3 ()
+    # Field: effective_execution_rate Type: 1 ()
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Tasks::V2beta2::Queue - Compiled Protocol Buffers messages for google/cloud/tasks/v2beta2/queue.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Tasks::V2beta2::Queue;
+
+    my $msg = Google::Cloud::Tasks::V2beta2::Queue::Queue->new({
+        name => $name,
+        app_engine_http_target => $app_engine_http_target,
+        pull_target => $pull_target,
+        http_target => $http_target,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Tasks::V2beta2::Queue::Queue->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/tasks/v2beta2/queue.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Tasks::V2beta2::Queue::Queue
+
+A queue is a container of related tasks. Queues are configured to manage
+how those tasks are dispatched. Configurable properties include rate limits,
+retry options, target types, and others.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Caller-specified and required in
+[CreateQueue][google.cloud.tasks.v2beta2.CloudTasks.CreateQueue], after
+which it becomes output only.
+
+The queue name.
+
+The queue name must have the following format:
+`projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
+
+* `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
+   hyphens (-), colons (:), or periods (.).
+   For more information, see
+   [Identifying
+   projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
+* `LOCATION_ID` is the canonical ID for the queue's location.
+   The list of available locations can be obtained by calling
+   [ListLocations][google.cloud.location.Locations.ListLocations].
+   For more information, see https://cloud.google.com/about/locations/.
+* `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
+  hyphens (-). The maximum length is 100 characters.
+
+=item * C<< $msg->app_engine_http_target() >> / C<< $msg->app_engine_http_target($value) >>
+
+Type: C<Message> (L<Google::Cloud::Tasks::V2beta2::Target::AppEngineHttpTarget>)
+
+App Engine HTTP target.
+
+An App Engine queue is a queue that has an
+[AppEngineHttpTarget][google.cloud.tasks.v2beta2.AppEngineHttpTarget].
+
+=item * C<< $msg->pull_target() >> / C<< $msg->pull_target($value) >>
+
+Type: C<Message> (L<Google::Cloud::Tasks::V2beta2::Target::PullTarget>)
+
+Pull target.
+
+A pull queue is a queue that has a
+[PullTarget][google.cloud.tasks.v2beta2.PullTarget].
+
+=item * C<< $msg->http_target() >> / C<< $msg->http_target($value) >>
+
+Type: C<Message> (L<Google::Cloud::Tasks::V2beta2::Target::HttpTarget>)
+
+An http_target is used to override the target values for HTTP tasks.
+
+=item * C<< $msg->rate_limits() >> / C<< $msg->rate_limits($value) >>
+
+Type: C<Message> (L<Google::Cloud::Tasks::V2beta2::Queue::RateLimits>)
+
+Rate limits for task dispatches.
+
+[rate_limits][google.cloud.tasks.v2beta2.Queue.rate_limits] and
+[retry_config][google.cloud.tasks.v2beta2.Queue.retry_config] are related
+because they both control task attempts however they control how tasks are
+attempted in different ways:
+
+* [rate_limits][google.cloud.tasks.v2beta2.Queue.rate_limits] controls the
+total rate of
+  dispatches from a queue (i.e. all traffic dispatched from the
+  queue, regardless of whether the dispatch is from a first
+  attempt or a retry).
+* [retry_config][google.cloud.tasks.v2beta2.Queue.retry_config] controls
+what happens to
+  particular a task after its first attempt fails. That is,
+  [retry_config][google.cloud.tasks.v2beta2.Queue.retry_config] controls
+  task retries (the second attempt, third attempt, etc).
+
+=item * C<< $msg->retry_config() >> / C<< $msg->retry_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Tasks::V2beta2::Queue::RetryConfig>)
+
+Settings that determine the retry behavior.
+
+* For tasks created using Cloud Tasks: the queue-level retry settings
+  apply to all tasks in the queue that were created using Cloud Tasks.
+  Retry settings cannot be set on individual tasks.
+* For tasks created using the App Engine SDK: the queue-level retry
+  settings apply to all tasks in the queue which do not have retry settings
+  explicitly set on the task and were created by the App Engine SDK. See
+  [App Engine
+  documentation](https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/retrying-tasks).
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Tasks::V2beta2::Queue::State>)
+
+Output only. The state of the queue.
+
+`state` can only be changed by called
+[PauseQueue][google.cloud.tasks.v2beta2.CloudTasks.PauseQueue],
+[ResumeQueue][google.cloud.tasks.v2beta2.CloudTasks.ResumeQueue], or
+uploading
+[queue.yaml/xml](https://cloud.google.com/appengine/docs/python/config/queueref).
+[UpdateQueue][google.cloud.tasks.v2beta2.CloudTasks.UpdateQueue] cannot be
+used to change `state`.
+
+=item * C<< $msg->purge_time() >> / C<< $msg->purge_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The last time this queue was purged.
+
+All tasks that were [created][google.cloud.tasks.v2beta2.Task.create_time]
+before this time were purged.
+
+A queue can be purged using
+[PurgeQueue][google.cloud.tasks.v2beta2.CloudTasks.PurgeQueue], the [App
+Engine Task Queue SDK, or the Cloud
+Console](https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/deleting-tasks-and-queues#purging_all_tasks_from_a_queue).
+
+Purge time will be truncated to the nearest microsecond. Purge
+time will be unset if the queue has never been purged.
+
+=item * C<< $msg->task_ttl() >> / C<< $msg->task_ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+The maximum amount of time that a task will be retained in
+this queue.
+
+Queues created by Cloud Tasks have a default `task_ttl` of 31 days.
+After a task has lived for `task_ttl`, the task will be deleted
+regardless of whether it was dispatched or not.
+
+The `task_ttl` for queues created via queue.yaml/xml is equal to the
+maximum duration because there is a
+[storage quota](https://cloud.google.com/appengine/quotas#Task_Queue) for
+these queues. To view the maximum valid duration, see the documentation for
+[Duration][google.protobuf.Duration].
+
+=item * C<< $msg->tombstone_ttl() >> / C<< $msg->tombstone_ttl($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+The task tombstone time to live (TTL).
+
+After a task is deleted or completed, the task's tombstone is
+retained for the length of time specified by `tombstone_ttl`.
+The tombstone is used by task de-duplication; another task with the same
+name can't be created until the tombstone has expired. For more information
+about task de-duplication, see the documentation for
+[CreateTaskRequest][google.cloud.tasks.v2beta2.CreateTaskRequest.task].
+
+Queues created by Cloud Tasks have a default `tombstone_ttl` of 1 hour.
+
+=item * C<< $msg->stats() >> / C<< $msg->stats($value) >>
+
+Type: C<Message> (L<Google::Cloud::Tasks::V2beta2::Queue::QueueStats>)
+
+Output only. The realtime, informational statistics for a queue. In order
+to receive the statistics the caller should include this field in the
+FieldMask.
+
+=back
+
+=head3 Enum: Queue::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<RUNNING> => C<1>
+
+=item * C<PAUSED> => C<2>
+
+=item * C<DISABLED> => C<3>
+
+=back
+
+=head2 Google::Cloud::Tasks::V2beta2::Queue::RateLimits
+
+Rate limits.
+
+This message determines the maximum rate that tasks can be dispatched by a
+queue, regardless of whether the dispatch is a first task attempt or a retry.
+
+Note: The debugging command,
+[RunTask][google.cloud.tasks.v2beta2.CloudTasks.RunTask], will run a task
+even if the queue has reached its
+[RateLimits][google.cloud.tasks.v2beta2.RateLimits].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->max_tasks_dispatched_per_second() >> / C<< $msg->max_tasks_dispatched_per_second($value) >>
+
+Type: C<Double>
+
+The maximum rate at which tasks are dispatched from this queue.
+
+If unspecified when the queue is created, Cloud Tasks will pick the
+default.
+
+* For [App Engine queues][google.cloud.tasks.v2beta2.AppEngineHttpTarget],
+the maximum allowed value
+  is 500.
+* This field is output only   for [pull
+queues][google.cloud.tasks.v2beta2.PullTarget]. In addition to the
+  `max_tasks_dispatched_per_second` limit, a maximum of 10 QPS of
+  [LeaseTasks][google.cloud.tasks.v2beta2.CloudTasks.LeaseTasks] requests
+  are allowed per pull queue.
+
+
+This field has the same meaning as
+[rate in
+queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#rate).
+
+=item * C<< $msg->max_burst_size() >> / C<< $msg->max_burst_size($value) >>
+
+Type: C<Int32>
+
+The max burst size.
+
+Max burst size limits how fast tasks in queue are processed when
+many tasks are in the queue and the rate is high. This field
+allows the queue to have a high rate so processing starts shortly
+after a task is enqueued, but still limits resource usage when
+many tasks are enqueued in a short period of time.
+
+The [token bucket](https://wikipedia.org/wiki/Token_Bucket)
+algorithm is used to control the rate of task dispatches. Each
+queue has a token bucket that holds tokens, up to the maximum
+specified by `max_burst_size`. Each time a task is dispatched, a
+token is removed from the bucket. Tasks will be dispatched until
+the queue's bucket runs out of tokens. The bucket will be
+continuously refilled with new tokens based on
+[max_dispatches_per_second][RateLimits.max_dispatches_per_second].
+
+The default value of `max_burst_size` is picked by Cloud Tasks
+based on the value of
+[max_dispatches_per_second][RateLimits.max_dispatches_per_second].
+
+The maximum value of `max_burst_size` is 500.
+
+For App Engine queues that were created or updated using
+`queue.yaml/xml`, `max_burst_size` is equal to
+[bucket_size](https://cloud.google.com/appengine/docs/standard/python/config/queueref#bucket_size).
+If
+[UpdateQueue][google.cloud.tasks.v2beta2.CloudTasks.UpdateQueue] is called
+on a queue without explicitly setting a value for `max_burst_size`,
+`max_burst_size` value will get updated if
+[UpdateQueue][google.cloud.tasks.v2beta2.CloudTasks.UpdateQueue] is
+updating [max_dispatches_per_second][RateLimits.max_dispatches_per_second].
+
+
+=item * C<< $msg->max_concurrent_tasks() >> / C<< $msg->max_concurrent_tasks($value) >>
+
+Type: C<Int32>
+
+The maximum number of concurrent tasks that Cloud Tasks allows
+to be dispatched for this queue. After this threshold has been
+reached, Cloud Tasks stops dispatching tasks until the number of
+concurrent requests decreases.
+
+If unspecified when the queue is created, Cloud Tasks will pick the
+default.
+
+
+The maximum allowed value is 5,000.
+
+This field is output only for
+[pull queues][google.cloud.tasks.v2beta2.PullTarget] and always -1, which
+indicates no limit. No other queue types can have `max_concurrent_tasks`
+set to -1.
+
+
+This field has the same meaning as
+[max_concurrent_requests in
+queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#max_concurrent_requests).
+
+=back
+
+=head2 Google::Cloud::Tasks::V2beta2::Queue::RetryConfig
+
+Retry config.
+
+These settings determine how a failed task attempt is retried.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->max_attempts() >> / C<< $msg->max_attempts($value) >>
+
+Type: C<Int32>
+
+The maximum number of attempts for a task.
+
+Cloud Tasks will attempt the task `max_attempts` times (that
+is, if the first attempt fails, then there will be
+`max_attempts - 1` retries).  Must be > 0.
+
+=item * C<< $msg->unlimited_attempts() >> / C<< $msg->unlimited_attempts($value) >>
+
+Type: C<Bool>
+
+If true, then the number of attempts is unlimited.
+
+=item * C<< $msg->max_retry_duration() >> / C<< $msg->max_retry_duration($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+If positive, `max_retry_duration` specifies the time limit for
+retrying a failed task, measured from when the task was first
+attempted. Once `max_retry_duration` time has passed *and* the
+task has been attempted
+[max_attempts][google.cloud.tasks.v2beta2.RetryConfig.max_attempts] times,
+no further attempts will be made and the task will be deleted.
+
+If zero, then the task age is unlimited.
+
+If unspecified when the queue is created, Cloud Tasks will pick the
+default.
+
+This field is output only for [pull
+queues][google.cloud.tasks.v2beta2.PullTarget].
+
+
+`max_retry_duration` will be truncated to the nearest second.
+
+This field has the same meaning as
+[task_age_limit in
+queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
+
+=item * C<< $msg->min_backoff() >> / C<< $msg->min_backoff($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+A task will be [scheduled][google.cloud.tasks.v2beta2.Task.schedule_time]
+for retry between
+[min_backoff][google.cloud.tasks.v2beta2.RetryConfig.min_backoff] and
+[max_backoff][google.cloud.tasks.v2beta2.RetryConfig.max_backoff] duration
+after it fails, if the queue's
+[RetryConfig][google.cloud.tasks.v2beta2.RetryConfig] specifies that the
+task should be retried.
+
+If unspecified when the queue is created, Cloud Tasks will pick the
+default.
+
+This field is output only for [pull
+queues][google.cloud.tasks.v2beta2.PullTarget].
+
+
+`min_backoff` will be truncated to the nearest second.
+
+This field has the same meaning as
+[min_backoff_seconds in
+queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
+
+=item * C<< $msg->max_backoff() >> / C<< $msg->max_backoff($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+A task will be [scheduled][google.cloud.tasks.v2beta2.Task.schedule_time]
+for retry between
+[min_backoff][google.cloud.tasks.v2beta2.RetryConfig.min_backoff] and
+[max_backoff][google.cloud.tasks.v2beta2.RetryConfig.max_backoff] duration
+after it fails, if the queue's
+[RetryConfig][google.cloud.tasks.v2beta2.RetryConfig] specifies that the
+task should be retried.
+
+If unspecified when the queue is created, Cloud Tasks will pick the
+default.
+
+This field is output only for [pull
+queues][google.cloud.tasks.v2beta2.PullTarget].
+
+
+`max_backoff` will be truncated to the nearest second.
+
+This field has the same meaning as
+[max_backoff_seconds in
+queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
+
+=item * C<< $msg->max_doublings() >> / C<< $msg->max_doublings($value) >>
+
+Type: C<Int32>
+
+The time between retries will double `max_doublings` times.
+
+A task's retry interval starts at
+[min_backoff][google.cloud.tasks.v2beta2.RetryConfig.min_backoff], then
+doubles `max_doublings` times, then increases linearly, and finally retries
+at intervals of
+[max_backoff][google.cloud.tasks.v2beta2.RetryConfig.max_backoff] up to
+[max_attempts][google.cloud.tasks.v2beta2.RetryConfig.max_attempts] times.
+
+For example, if
+[min_backoff][google.cloud.tasks.v2beta2.RetryConfig.min_backoff] is 10s,
+[max_backoff][google.cloud.tasks.v2beta2.RetryConfig.max_backoff] is 300s,
+and `max_doublings` is 3, then the a task will first be retried in 10s. The
+retry interval will double three times, and then increase linearly by 2^3 *
+10s.  Finally, the task will retry at intervals of
+[max_backoff][google.cloud.tasks.v2beta2.RetryConfig.max_backoff] until the
+task has been attempted
+[max_attempts][google.cloud.tasks.v2beta2.RetryConfig.max_attempts] times.
+Thus, the requests will retry at 10s, 20s, 40s, 80s, 160s, 240s, 300s,
+300s, ....
+
+If unspecified when the queue is created, Cloud Tasks will pick the
+default.
+
+This field is output only for [pull
+queues][google.cloud.tasks.v2beta2.PullTarget].
+
+
+This field has the same meaning as
+[max_doublings in
+queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
+
+=back
+
+=head2 Google::Cloud::Tasks::V2beta2::Queue::QueueStats
+
+Statistics for a queue.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->tasks_count() >> / C<< $msg->tasks_count($value) >>
+
+Type: C<Int64>
+
+Output only. An estimation of the number of tasks in the queue, that is,
+the tasks in the queue that haven't been executed, the tasks in the queue
+which the queue has dispatched but has not yet received a reply for, and
+the failed tasks that the queue is retrying.
+
+=item * C<< $msg->oldest_estimated_arrival_time() >> / C<< $msg->oldest_estimated_arrival_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. An estimation of the nearest time in the future where a task
+in the queue is scheduled to be executed.
+
+=item * C<< $msg->executed_last_minute_count() >> / C<< $msg->executed_last_minute_count($value) >>
+
+Type: C<Int64>
+
+Output only. The number of tasks that the queue has dispatched and received
+a reply for during the last minute. This variable counts both successful
+and non-successful executions.
+
+=item * C<< $msg->concurrent_dispatches_count() >> / C<< $msg->concurrent_dispatches_count($value) >>
+
+Type: C<Int64>
+
+Output only. The number of requests that the queue has dispatched but has
+not received a reply for yet.
+
+=item * C<< $msg->effective_execution_rate() >> / C<< $msg->effective_execution_rate($value) >>
+
+Type: C<Double>
+
+Output only. The current maximum number of tasks per second executed by the
+queue. The maximum value of this variable is controlled by the RateLimits
+of the Queue. However, this value could be less to avoid overloading the
+endpoints tasks in the queue are targeting.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Tasks::V2beta2::Queue::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

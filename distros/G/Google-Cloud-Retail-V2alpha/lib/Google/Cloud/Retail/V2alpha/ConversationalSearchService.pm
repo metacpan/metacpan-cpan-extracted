@@ -1,0 +1,730 @@
+package Google::Cloud::Retail::V2alpha::ConversationalSearchService;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    eval { require Google::Api::Annotations };
+    eval { require Google::Api::Client };
+    eval { require Google::Api::FieldBehavior };
+    eval { require Google::Api::Resource };
+    eval { require Google::Cloud::Retail::V2alpha::Common };
+    eval { require Google::Cloud::Retail::V2alpha::Safety };
+    eval { require Google::Cloud::Retail::V2alpha::SearchService };
+    my $descriptor_b64 = <<'EOF';
+Cj9nb29nbGUvY2xvdWQvcmV0YWlsL3YyYWxwaGEvY29udmVyc2F0aW9uYWxfc2VhcmNoX3Nl
+cnZpY2UucHJvdG8SG2dvb2dsZS5jbG91ZC5yZXRhaWwudjJhbHBoYRocZ29vZ2xlL2FwaS9h
+bm5vdGF0aW9ucy5wcm90bxoXZ29vZ2xlL2FwaS9jbGllbnQucHJvdG8aH2dvb2dsZS9hcGkv
+ZmllbGRfYmVoYXZpb3IucHJvdG8aGWdvb2dsZS9hcGkvcmVzb3VyY2UucHJvdG8aKGdvb2ds
+ZS9jbG91ZC9yZXRhaWwvdjJhbHBoYS9jb21tb24ucHJvdG8aKGdvb2dsZS9jbG91ZC9yZXRh
+aWwvdjJhbHBoYS9zYWZldHkucHJvdG8aMGdvb2dsZS9jbG91ZC9yZXRhaWwvdjJhbHBoYS9z
+ZWFyY2hfc2VydmljZS5wcm90byLtDgobQ29udmVyc2F0aW9uYWxTZWFyY2hSZXF1ZXN0EiEK
+CXBsYWNlbWVudBgBIAEoCUID4EECUglwbGFjZW1lbnQSPAoGYnJhbmNoGAIgASgJQiTgQQL6
+QR4KHHJldGFpbC5nb29nbGVhcGlzLmNvbS9CcmFuY2hSBmJyYW5jaBIZCgVxdWVyeRgDIAEo
+CUID4EEBUgVxdWVyeRIsCg9wYWdlX2NhdGVnb3JpZXMYBCADKAlCA+BBAVIOcGFnZUNhdGVn
+b3JpZXMSLAoPY29udmVyc2F0aW9uX2lkGAUgASgJQgPgQQFSDmNvbnZlcnNhdGlvbklkEm8K
+DXNlYXJjaF9wYXJhbXMYBiABKAsyRS5nb29nbGUuY2xvdWQucmV0YWlsLnYyYWxwaGEuQ29u
+dmVyc2F0aW9uYWxTZWFyY2hSZXF1ZXN0LlNlYXJjaFBhcmFtc0ID4EEBUgxzZWFyY2hQYXJh
+bXMSIgoKdmlzaXRvcl9pZBgJIAEoCUID4EECUgl2aXNpdG9ySWQSRwoJdXNlcl9pbmZvGAcg
+ASgLMiUuZ29vZ2xlLmNsb3VkLnJldGFpbC52MmFscGhhLlVzZXJJbmZvQgPgQQFSCHVzZXJJ
+bmZvEp0BCh1jb252ZXJzYXRpb25hbF9maWx0ZXJpbmdfc3BlYxgIIAEoCzJULmdvb2dsZS5j
+bG91ZC5yZXRhaWwudjJhbHBoYS5Db252ZXJzYXRpb25hbFNlYXJjaFJlcXVlc3QuQ29udmVy
+c2F0aW9uYWxGaWx0ZXJpbmdTcGVjQgPgQQFSG2NvbnZlcnNhdGlvbmFsRmlsdGVyaW5nU3Bl
+YxJuCgt1c2VyX2xhYmVscxgMIAMoCzJILmdvb2dsZS5jbG91ZC5yZXRhaWwudjJhbHBoYS5D
+b252ZXJzYXRpb25hbFNlYXJjaFJlcXVlc3QuVXNlckxhYmVsc0VudHJ5QgPgQQFSCnVzZXJM
+YWJlbHMSWAoPc2FmZXR5X3NldHRpbmdzGA4gAygLMiouZ29vZ2xlLmNsb3VkLnJldGFpbC52
+MmFscGhhLlNhZmV0eVNldHRpbmdCA+BBAVIOc2FmZXR5U2V0dGluZ3Ma0wEKDFNlYXJjaFBh
+cmFtcxIbCgZmaWx0ZXIYASABKAlCA+BBAVIGZmlsdGVyEi4KEGNhbm9uaWNhbF9maWx0ZXIY
+AiABKAlCA+BBAVIPY2Fub25pY2FsRmlsdGVyEhwKB3NvcnRfYnkYAyABKAlCA+BBAVIGc29y
+dEJ5ElgKCmJvb3N0X3NwZWMYBCABKAsyNC5nb29nbGUuY2xvdWQucmV0YWlsLnYyYWxwaGEu
+U2VhcmNoUmVxdWVzdC5Cb29zdFNwZWNCA+BBAVIJYm9vc3RTcGVjGsACCgpVc2VyQW5zd2Vy
+EiEKC3RleHRfYW5zd2VyGAEgASgJSABSCnRleHRBbnN3ZXISggEKD3NlbGVjdGVkX2Fuc3dl
+chgCIAEoCzJSLmdvb2dsZS5jbG91ZC5yZXRhaWwudjJhbHBoYS5Db252ZXJzYXRpb25hbFNl
+YXJjaFJlcXVlc3QuVXNlckFuc3dlci5TZWxlY3RlZEFuc3dlckID4EEBSABSDnNlbGVjdGVk
+QW5zd2VyGoEBCg5TZWxlY3RlZEFuc3dlchJvChdwcm9kdWN0X2F0dHJpYnV0ZV92YWx1ZRgB
+IAEoCzIyLmdvb2dsZS5jbG91ZC5yZXRhaWwudjJhbHBoYS5Qcm9kdWN0QXR0cmlidXRlVmFs
+dWVCA+BBAVIVcHJvZHVjdEF0dHJpYnV0ZVZhbHVlQgYKBHR5cGUa1QMKG0NvbnZlcnNhdGlv
+bmFsRmlsdGVyaW5nU3BlYxJNCh9lbmFibGVfY29udmVyc2F0aW9uYWxfZmlsdGVyaW5nGAEg
+ASgIQgUYAeBBAVIdZW5hYmxlQ29udmVyc2F0aW9uYWxGaWx0ZXJpbmcSaQoLdXNlcl9hbnN3
+ZXIYAiABKAsyQy5nb29nbGUuY2xvdWQucmV0YWlsLnYyYWxwaGEuQ29udmVyc2F0aW9uYWxT
+ZWFyY2hSZXF1ZXN0LlVzZXJBbnN3ZXJCA+BBAVIKdXNlckFuc3dlchKiAQodY29udmVyc2F0
+aW9uYWxfZmlsdGVyaW5nX21vZGUYBCABKA4yWS5nb29nbGUuY2xvdWQucmV0YWlsLnYyYWxw
+aGEuQ29udmVyc2F0aW9uYWxTZWFyY2hSZXF1ZXN0LkNvbnZlcnNhdGlvbmFsRmlsdGVyaW5n
+U3BlYy5Nb2RlQgPgQQFSG2NvbnZlcnNhdGlvbmFsRmlsdGVyaW5nTW9kZSJXCgRNb2RlEhQK
+EE1PREVfVU5TUEVDSUZJRUQQABIMCghESVNBQkxFRBABEgsKB0VOQUJMRUQQAhIeChpDT05W
+RVJTQVRJT05BTF9GSUxURVJfT05MWRADGj0KD1VzZXJMYWJlbHNFbnRyeRIQCgNrZXkYASAB
+KAlSA2tleRIUCgV2YWx1ZRgCIAEoCVIFdmFsdWU6AjgBIv0LChxDb252ZXJzYXRpb25hbFNl
+YXJjaFJlc3BvbnNlEigKEHVzZXJfcXVlcnlfdHlwZXMYCiADKAlSDnVzZXJRdWVyeVR5cGVz
+EkAKHGNvbnZlcnNhdGlvbmFsX3RleHRfcmVzcG9uc2UYAiABKAlSGmNvbnZlcnNhdGlvbmFs
+VGV4dFJlc3BvbnNlEncKEWZvbGxvd3VwX3F1ZXN0aW9uGAMgASgLMkouZ29vZ2xlLmNsb3Vk
+LnJldGFpbC52MmFscGhhLkNvbnZlcnNhdGlvbmFsU2VhcmNoUmVzcG9uc2UuRm9sbG93dXBR
+dWVzdGlvblIQZm9sbG93dXBRdWVzdGlvbhInCg9jb252ZXJzYXRpb25faWQYBCABKAlSDmNv
+bnZlcnNhdGlvbklkEm4KDnJlZmluZWRfc2VhcmNoGAYgAygLMkcuZ29vZ2xlLmNsb3VkLnJl
+dGFpbC52MmFscGhhLkNvbnZlcnNhdGlvbmFsU2VhcmNoUmVzcG9uc2UuUmVmaW5lZFNlYXJj
+aFINcmVmaW5lZFNlYXJjaBKfAQofY29udmVyc2F0aW9uYWxfZmlsdGVyaW5nX3Jlc3VsdBgH
+IAEoCzJXLmdvb2dsZS5jbG91ZC5yZXRhaWwudjJhbHBoYS5Db252ZXJzYXRpb25hbFNlYXJj
+aFJlc3BvbnNlLkNvbnZlcnNhdGlvbmFsRmlsdGVyaW5nUmVzdWx0Uh1jb252ZXJzYXRpb25h
+bEZpbHRlcmluZ1Jlc3VsdBJaCgVzdGF0ZRgJIAEoDjI/Lmdvb2dsZS5jbG91ZC5yZXRhaWwu
+djJhbHBoYS5Db252ZXJzYXRpb25hbFNlYXJjaFJlc3BvbnNlLlN0YXRlQgPgQQNSBXN0YXRl
+GsgCChBGb2xsb3d1cFF1ZXN0aW9uEisKEWZvbGxvd3VwX3F1ZXN0aW9uGAEgASgJUhBmb2xs
+b3d1cFF1ZXN0aW9uEocBChFzdWdnZXN0ZWRfYW5zd2VycxgCIAMoCzJaLmdvb2dsZS5jbG91
+ZC5yZXRhaWwudjJhbHBoYS5Db252ZXJzYXRpb25hbFNlYXJjaFJlc3BvbnNlLkZvbGxvd3Vw
+UXVlc3Rpb24uU3VnZ2VzdGVkQW5zd2VyUhBzdWdnZXN0ZWRBbnN3ZXJzGn0KD1N1Z2dlc3Rl
+ZEFuc3dlchJqChdwcm9kdWN0X2F0dHJpYnV0ZV92YWx1ZRgBIAEoCzIyLmdvb2dsZS5jbG91
+ZC5yZXRhaWwudjJhbHBoYS5Qcm9kdWN0QXR0cmlidXRlVmFsdWVSFXByb2R1Y3RBdHRyaWJ1
+dGVWYWx1ZRolCg1SZWZpbmVkU2VhcmNoEhQKBXF1ZXJ5GAEgASgJUgVxdWVyeRqwAwodQ29u
+dmVyc2F0aW9uYWxGaWx0ZXJpbmdSZXN1bHQSdwoRZm9sbG93dXBfcXVlc3Rpb24YASABKAsy
+Si5nb29nbGUuY2xvdWQucmV0YWlsLnYyYWxwaGEuQ29udmVyc2F0aW9uYWxTZWFyY2hSZXNw
+b25zZS5Gb2xsb3d1cFF1ZXN0aW9uUhBmb2xsb3d1cFF1ZXN0aW9uEpUBChFhZGRpdGlvbmFs
+X2ZpbHRlchgCIAEoCzJoLmdvb2dsZS5jbG91ZC5yZXRhaWwudjJhbHBoYS5Db252ZXJzYXRp
+b25hbFNlYXJjaFJlc3BvbnNlLkNvbnZlcnNhdGlvbmFsRmlsdGVyaW5nUmVzdWx0LkFkZGl0
+aW9uYWxGaWx0ZXJSEGFkZGl0aW9uYWxGaWx0ZXIafgoQQWRkaXRpb25hbEZpbHRlchJqChdw
+cm9kdWN0X2F0dHJpYnV0ZV92YWx1ZRgBIAEoCzIyLmdvb2dsZS5jbG91ZC5yZXRhaWwudjJh
+bHBoYS5Qcm9kdWN0QXR0cmlidXRlVmFsdWVSFXByb2R1Y3RBdHRyaWJ1dGVWYWx1ZSI8CgVT
+dGF0ZRIVChFTVEFURV9VTlNQRUNJRklFRBAAEg0KCVNUUkVBTUlORxABEg0KCVNVQ0NFRURF
+RBACMsIDChtDb252ZXJzYXRpb25hbFNlYXJjaFNlcnZpY2US1wIKFENvbnZlcnNhdGlvbmFs
+U2VhcmNoEjguZ29vZ2xlLmNsb3VkLnJldGFpbC52MmFscGhhLkNvbnZlcnNhdGlvbmFsU2Vh
+cmNoUmVxdWVzdBo5Lmdvb2dsZS5jbG91ZC5yZXRhaWwudjJhbHBoYS5Db252ZXJzYXRpb25h
+bFNlYXJjaFJlc3BvbnNlIscBgtPkkwLAASJYL3YyYWxwaGEve3BsYWNlbWVudD1wcm9qZWN0
+cy8qL2xvY2F0aW9ucy8qL2NhdGFsb2dzLyovcGxhY2VtZW50cy8qfTpjb252ZXJzYXRpb25h
+bFNlYXJjaDoBKlphIlwvdjJhbHBoYS97cGxhY2VtZW50PXByb2plY3RzLyovbG9jYXRpb25z
+LyovY2F0YWxvZ3MvKi9zZXJ2aW5nQ29uZmlncy8qfTpjb252ZXJzYXRpb25hbFNlYXJjaDoB
+KjABGknKQRVyZXRhaWwuZ29vZ2xlYXBpcy5jb23SQS5odHRwczovL3d3dy5nb29nbGVhcGlz
+LmNvbS9hdXRoL2Nsb3VkLXBsYXRmb3JtQuQBCh9jb20uZ29vZ2xlLmNsb3VkLnJldGFpbC52
+MmFscGhhQiBDb252ZXJzYXRpb25hbFNlYXJjaFNlcnZpY2VQcm90b1ABWjdjbG91ZC5nb29n
+bGUuY29tL2dvL3JldGFpbC9hcGl2MmFscGhhL3JldGFpbHBiO3JldGFpbHBiogIGUkVUQUlM
+qgIbR29vZ2xlLkNsb3VkLlJldGFpbC5WMkFscGhhygIbR29vZ2xlXENsb3VkXFJldGFpbFxW
+MmFscGhh6gIeR29vZ2xlOjpDbG91ZDo6UmV0YWlsOjpWMmFscGhhSuRvCgcSBQ4A6AIBCrwE
+CgEMEgMOABIysQQgQ29weXJpZ2h0IDIwMjUgR29vZ2xlIExMQwoKIExpY2Vuc2VkIHVuZGVy
+IHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSAiTGljZW5zZSIpOwogeW91
+IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBM
+aWNlbnNlLgogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0CgogICAg
+IGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMAoKIFVubGVzcyBy
+ZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29m
+dHdhcmUKIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9u
+IGFuICJBUyBJUyIgQkFTSVMsCiBXSVRIT1VUIFdBUlJBTlRJRVMgT1IgQ09ORElUSU9OUyBP
+RiBBTlkgS0lORCwgZWl0aGVyIGV4cHJlc3Mgb3IgaW1wbGllZC4KIFNlZSB0aGUgTGljZW5z
+ZSBmb3IgdGhlIHNwZWNpZmljIGxhbmd1YWdlIGdvdmVybmluZyBwZXJtaXNzaW9ucyBhbmQK
+IGxpbWl0YXRpb25zIHVuZGVyIHRoZSBMaWNlbnNlLgoKCAoBAhIDEAAkCgkKAgMAEgMSACYK
+CQoCAwESAxMAIQoJCgIDAhIDFAApCgkKAgMDEgMVACMKCQoCAwQSAxYAMgoJCgIDBRIDFwAy
+CgkKAgMGEgMYADoKCAoBCBIDGgA4CgkKAgglEgMaADgKCAoBCBIDGwBOCgkKAggLEgMbAE4K
+CAoBCBIDHAAiCgkKAggKEgMcACIKCAoBCBIDHQBBCgkKAggIEgMdAEEKCAoBCBIDHgA4CgkK
+AggBEgMeADgKCAoBCBIDHwAkCgkKAggkEgMfACQKCAoBCBIDIAA4CgkKAggpEgMgADgKCAoB
+CBIDIQA3CgkKAggtEgMhADcK5AEKAgYAEgQoADwBGtcBIFNlcnZpY2UgZm9yIHJldGFpbCBj
+b252ZXJzYXRpb25hbCBzZWFyY2guCgogVGhpcyBmZWF0dXJlIGlzIG9ubHkgYXZhaWxhYmxl
+IGZvciB1c2VycyB3aG8gaGF2ZSBSZXRhaWwgQ29udmVyc2F0aW9uYWwKIFNlYXJjaCBlbmFi
+bGVkLiBFbmFibGUgUmV0YWlsIENvbnZlcnNhdGlvbmFsIFNlYXJjaCBvbiBDbG91ZCBDb25z
+b2xlCiBiZWZvcmUgdXNpbmcgdGhpcyBmZWF0dXJlLgoKCgoDBgABEgMoCCMKCgoDBgADEgMp
+Aj0KDAoFBgADmQgSAykCPQoLCgMGAAMSBCoCKzcKDQoFBgADmggSBCoCKzcKhQEKBAYAAgAS
+BDECOwMadyBQZXJmb3JtcyBhIGNvbnZlcnNhdGlvbmFsIHNlYXJjaC4KCiBUaGlzIGZlYXR1
+cmUgaXMgb25seSBhdmFpbGFibGUgZm9yIHVzZXJzIHdobyBoYXZlIENvbnZlcnNhdGlvbmFs
+IFNlYXJjaAogZW5hYmxlZC4KCgwKBQYAAgABEgMxBhoKDAoFBgACAAISAzEbNgoMCgUGAAIA
+BhIDMg8VCgwKBQYAAgADEgMyFjIKDQoFBgACAAQSBDMEOgYKEQoJBgACAASwyrwiEgQzBDoG
+Cq4BCgIEABIFQQD8AQEaoAEgUmVxdWVzdCBtZXNzYWdlIGZvcgogW0NvbnZlcnNhdGlvbmFs
+U2VhcmNoU2VydmljZS5Db252ZXJzYXRpb25hbFNlYXJjaF1bZ29vZ2xlLmNsb3VkLnJldGFp
+bC52MmFscGhhLkNvbnZlcnNhdGlvbmFsU2VhcmNoU2VydmljZS5Db252ZXJzYXRpb25hbFNl
+YXJjaF0KIG1ldGhvZC4KCgoKAwQAARIDQQgjCiIKBAQAAwASBEMCXAMaFCBTZWFyY2ggcGFy
+YW1ldGVycy4KCgwKBQQAAwABEgNDChYKxQEKBgQAAwACABIDSAQ/GrUBIE9wdGlvbmFsLiBU
+aGUgZmlsdGVyIHN0cmluZyB0byByZXN0cmljdCBzZWFyY2ggcmVzdWx0cy4KCiBUaGUgc3lu
+dGF4IG9mIHRoZSBmaWx0ZXIgc3RyaW5nIGlzIHRoZSBzYW1lIGFzCiBbU2VhcmNoUmVxdWVz
+dC5maWx0ZXJdW2dvb2dsZS5jbG91ZC5yZXRhaWwudjJhbHBoYS5TZWFyY2hSZXF1ZXN0LmZp
+bHRlcl0uCgoOCgcEAAMAAgAFEgNIBAoKDgoHBAADAAIAARIDSAsRCg4KBwQAAwACAAMSA0gU
+FQoOCgcEAAMAAgAIEgNIFj4KEQoKBAADAAIACJwIABIDSBc9Cu0BCgYEAAMAAgESA04ESRrd
+ASBPcHRpb25hbC4gVGhlIGNhbm9uaWNhbCBmaWx0ZXIgc3RyaW5nIHRvIHJlc3RyaWN0IHNl
+YXJjaCByZXN1bHRzLgoKIFRoZSBzeW50YXggb2YgdGhlIGNhbm9uaWNhbCBmaWx0ZXIgc3Ry
+aW5nIGlzIHRoZSBzYW1lIGFzCiBbU2VhcmNoUmVxdWVzdC5jYW5vbmljYWxfZmlsdGVyXVtn
+b29nbGUuY2xvdWQucmV0YWlsLnYyYWxwaGEuU2VhcmNoUmVxdWVzdC5jYW5vbmljYWxfZmls
+dGVyXS4KCg4KBwQAAwACAQUSA04ECgoOCgcEAAMAAgEBEgNOCxsKDgoHBAADAAIBAxIDTh4f
+Cg4KBwQAAwACAQgSA04gSAoRCgoEAAMAAgEInAgAEgNOIUcKnQEKBgQAAwACAhIDVARAGo0B
+IE9wdGlvbmFsLiBUaGUgc29ydCBzdHJpbmcgdG8gc3BlY2lmeSB0aGUgc29ydGluZyBvZiBz
+ZWFyY2ggcmVzdWx0cy4KCiBUaGUgc3ludGF4IG9mIHRoZSBzb3J0IHN0cmluZyBpcyB0aGUg
+c2FtZSBhcwogW1NlYXJjaFJlcXVlc3Quc29ydF1bXS4KCg4KBwQAAwACAgUSA1QECgoOCgcE
+AAMAAgIBEgNUCxIKDgoHBAADAAICAxIDVBUWCg4KBwQAAwACAggSA1QXPwoRCgoEAAMAAgII
+nAgAEgNUGD4K1wEKBgQAAwACAxIEWgRbMRrGASBPcHRpb25hbC4gVGhlIGJvb3N0IHNwZWMg
+dG8gc3BlY2lmeSB0aGUgYm9vc3Rpbmcgb2Ygc2VhcmNoIHJlc3VsdHMuCgogVGhlIHN5bnRh
+eCBvZiB0aGUgYm9vc3Qgc3BlYyBpcyB0aGUgc2FtZSBhcwogW1NlYXJjaFJlcXVlc3QuYm9v
+c3Rfc3BlY11bZ29vZ2xlLmNsb3VkLnJldGFpbC52MmFscGhhLlNlYXJjaFJlcXVlc3QuYm9v
+c3Rfc3BlY10uCgoOCgcEAAMAAgMGEgNaBBsKDgoHBAADAAIDARIDWhwmCg4KBwQAAwACAwMS
+A1opKgoOCgcEAAMAAgMIEgNbCDAKEQoKBAADAAIDCJwIABIDWwkvCr0BCgQEAAMBEgRhAncD
+Gq4BIFRoaXMgZmllbGQgc3BlY2lmaWVzIHRoZSBjdXJyZW50IHVzZXIgYW5zd2VyIGR1cmlu
+ZyB0aGUgY29udmVyc2F0aW9uYWwKIGZpbHRlcmluZyBzZWFyY2guIFRoaXMgY2FuIGJlIGVp
+dGhlciB1c2VyIHNlbGVjdGVkIGZyb20gc3VnZ2VzdGVkIGFuc3dlcnMKIG9yIHVzZXIgaW5w
+dXQgcGxhaW4gdGV4dC4KCgwKBQQAAwEBEgNhChQKXgoGBAADAQMAEgRkBGkFGk4gVGhpcyBm
+aWVsZCBzcGVjaWZpZXMgdGhlIHNlbGVjdGVkIGFuc3dlcnMgZHVyaW5nIHRoZSBjb252ZXJz
+YXRpb25hbAogc2VhcmNoLgoKDgoHBAADAQMAARIDZAwaCmcKCAQAAwEDAAIAEgRnBmgzGlUg
+T3B0aW9uYWwuIFRoaXMgZmllbGQgc3BlY2lmaWVzIHRoZSBzZWxlY3RlZCBhbnN3ZXIgd2hp
+Y2ggaXMgYSBhdHRyaWJ1dGUKIGtleS12YWx1ZS4KChAKCQQAAwEDAAIABhIDZwYbChAKCQQA
+AwEDAAIAARIDZxwzChAKCQQAAwEDAAIAAxIDZzY3ChAKCQQAAwEDAAIACBIDaAoyChMKDAQA
+AwEDAAIACJwIABIDaAsxCj8KBgQAAwEIABIEbAR2BRovIFRoaXMgZmllbGQgc3BlY2lmaWVz
+IHRoZSB0eXBlIG9mIHVzZXIgYW5zd2VyLgoKDgoHBAADAQgAARIDbAoOCnEKBgQAAwECABID
+bwYdGmIgVGhpcyBmaWVsZCBzcGVjaWZpZXMgdGhlIGluY3JlbWVudGFsIGlucHV0IHRleHQg
+ZnJvbSB0aGUgdXNlciBkdXJpbmcKIHRoZSBjb252ZXJzYXRpb25hbCBzZWFyY2guCgoOCgcE
+AAMBAgAFEgNvBgwKDgoHBAADAQIAARIDbw0YCg4KBwQAAwECAAMSA28bHArKAQoGBAADAQIB
+EgR0BnUzGrkBIE9wdGlvbmFsLiBUaGlzIGZpZWxkIHNwZWNpZmllcyB0aGUgc2VsZWN0ZWQg
+YW5zd2VyIGR1cmluZyB0aGUKIGNvbnZlcnNhdGlvbmFsIHNlYXJjaC4gVGhpcyBzaG91bGQg
+YmUgYSBzdWJzZXQgb2YKIFtDb252ZXJzYXRpb25hbFNlYXJjaFJlc3BvbnNlLmZvbGxvd3Vw
+X3F1ZXN0aW9uLnN1Z2dlc3RlZF9hbnN3ZXJzXVtdLgoKDgoHBAADAQIBBhIDdAYUCg4KBwQA
+AwECAQESA3QVJAoOCgcEAAMBAgEDEgN0JygKDgoHBAADAQIBCBIDdQoyChEKCgQAAwECAQic
+CAASA3ULMQqAAQoEBAADAhIFewKfAQMacSBUaGlzIGZpZWxkIHNwZWNpZmllcyBhbGwgY29u
+dmVyc2F0aW9uYWwgZmlsdGVyaW5nIHJlbGF0ZWQgcGFyYW1ldGVycwogYWRkaXRpb24gdG8g
+Y29udmVyc2F0aW9uYWwgcmV0YWlsIHNlYXJjaC4KCgwKBQQAAwIBEgN7CiUK7wEKBgQAAwIE
+ABIGgAEEjAEFGtwBIEVudW0gdG8gY29udHJvbCBDb252ZXJzYXRpb25hbCBGaWx0ZXJpbmcg
+bW9kZS4KIEEgc2luZ2xlIGNvbnZlcnNhdGlvbiBzZXNzaW9uIGluY2x1ZGluZyBtdWx0aXBs
+ZSB0dXJucyBzdXBwb3J0cyBtb2RlcyBmb3IKIENvbnZlcnNhdGlvbmFsIFNlYXJjaCBPUiBD
+b252ZXJzYXRpb25hbCBGaWx0ZXJpbmcgd2l0aG91dAogQ29udmVyc2F0aW9uYWwgU2VhcmNo
+LCBidXQgbm90IGJvdGguCgoPCgcEAAMCBAABEgSAAQkNCiIKCAQAAwIEAAIAEgSCAQYbGhAg
+RGVmYXVsdCB2YWx1ZS4KChEKCQQAAwIEAAIAARIEggEGFgoRCgkEAAMCBAACAAISBIIBGRoK
+VwoIBAADAgQAAgESBIUBBhMaRSBEaXNhYmxlcyBDb252ZXJzYXRpb25hbCBGaWx0ZXJpbmcg
+d2hlbiB1c2luZyBDb252ZXJzYXRpb25hbCBTZWFyY2guCgoRCgkEAAMCBAACAQESBIUBBg4K
+EQoJBAADAgQAAgECEgSFARESClYKCAQAAwIEAAICEgSIAQYSGkQgRW5hYmxlcyBDb252ZXJz
+YXRpb25hbCBGaWx0ZXJpbmcgd2hlbiB1c2luZyBDb252ZXJzYXRpb25hbCBTZWFyY2guCgoR
+CgkEAAMCBAACAgESBIgBBg0KEQoJBAADAgQAAgICEgSIARARClMKCAQAAwIEAAIDEgSLAQYl
+GkEgRW5hYmxlcyBDb252ZXJzYXRpb25hbCBGaWx0ZXJpbmcgd2l0aG91dCBDb252ZXJzYXRp
+b25hbCBTZWFyY2guCgoRCgkEAAMCBAACAwESBIsBBiAKEQoJBAADAgQAAgMCEgSLASMkCv0B
+CgYEAAMCAgASBpEBBJIBRBrqASBPcHRpb25hbC4gVGhpcyBmaWVsZCBpcyBkZXByZWNhdGVk
+LiBQbGVhc2UgdXNlCiBbQ29udmVyc2F0aW9uYWxGaWx0ZXJpbmdTcGVjLmNvbnZlcnNhdGlv
+bmFsX2ZpbHRlcmluZ19tb2RlXVtnb29nbGUuY2xvdWQucmV0YWlsLnYyYWxwaGEuQ29udmVy
+c2F0aW9uYWxTZWFyY2hSZXF1ZXN0LkNvbnZlcnNhdGlvbmFsRmlsdGVyaW5nU3BlYy5jb252
+ZXJzYXRpb25hbF9maWx0ZXJpbmdfbW9kZV0KIGluc3RlYWQuCgoPCgcEAAMCAgAFEgSRAQQI
+Cg8KBwQAAwICAAESBJEBCSgKDwoHBAADAgIAAxIEkQErLAoPCgcEAAMCAgAIEgSSAQhDChAK
+CAQAAwICAAgDEgSSAQkaChIKCgQAAwICAAicCAASBJIBHEIKxwEKBgQAAwICARIElwEESBq2
+ASBPcHRpb25hbC4gVGhpcyBmaWVsZCBzcGVjaWZpZXMgdGhlIGN1cnJlbnQgdXNlciBhbnN3
+ZXIgZHVyaW5nIHRoZQogY29udmVyc2F0aW9uYWwgZmlsdGVyaW5nIHNlYXJjaC4gSXQgY2Fu
+IGJlIGVpdGhlciB1c2VyIHNlbGVjdGVkIGZyb20KIHN1Z2dlc3RlZCBhbnN3ZXJzIG9yIHVz
+ZXIgaW5wdXQgcGxhaW4gdGV4dC4KCg8KBwQAAwICAQYSBJcBBA4KDwoHBAADAgIBARIElwEP
+GgoPCgcEAAMCAgEDEgSXAR0eCg8KBwQAAwICAQgSBJcBH0cKEgoKBAADAgIBCJwIABIElwEg
+RgrZAQoGBAADAgICEgadAQSeATEaxgEgT3B0aW9uYWwuIE1vZGUgdG8gY29udHJvbCBDb252
+ZXJzYXRpb25hbCBGaWx0ZXJpbmcuCiBEZWZhdWx0cyB0bwogW01vZGUuRElTQUJMRURdW2dv
+b2dsZS5jbG91ZC5yZXRhaWwudjJhbHBoYS5Db252ZXJzYXRpb25hbFNlYXJjaFJlcXVlc3Qu
+Q29udmVyc2F0aW9uYWxGaWx0ZXJpbmdTcGVjLk1vZGUuRElTQUJMRURdCiBpZiBpdCdzIHVu
+c2V0LgoKDwoHBAADAgICBhIEnQEECAoPCgcEAAMCAgIBEgSdAQkmCg8KBwQAAwICAgMSBJ0B
+KSoKDwoHBAADAgICCBIEngEIMAoSCgoEAAMCAgIInAgAEgSeAQkvCv0CCgQEAAIAEgSnAQJA
+Gu4CIFJlcXVpcmVkLiBUaGUgcmVzb3VyY2UgbmFtZSBvZiB0aGUgc2VhcmNoIGVuZ2luZSBw
+bGFjZW1lbnQsIHN1Y2ggYXMKIGBwcm9qZWN0cy8qL2xvY2F0aW9ucy9nbG9iYWwvY2F0YWxv
+Z3MvZGVmYXVsdF9jYXRhbG9nL3BsYWNlbWVudHMvZGVmYXVsdF9zZWFyY2hgCiBvcgogYHBy
+b2plY3RzLyovbG9jYXRpb25zL2dsb2JhbC9jYXRhbG9ncy9kZWZhdWx0X2NhdGFsb2cvc2Vy
+dmluZ0NvbmZpZ3MvZGVmYXVsdF9zZXJ2aW5nX2NvbmZpZ2AKIFRoaXMgZmllbGQgaXMgdXNl
+ZCB0byBpZGVudGlmeSB0aGUgc2VydmluZyBjb25maWcgbmFtZSBhbmQgdGhlIHNldAogb2Yg
+bW9kZWxzIHRoYXQgd2lsbCBiZSB1c2VkIHRvIG1ha2UgdGhlIHNlYXJjaC4KCg0KBQQAAgAF
+EgSnAQIICg0KBQQAAgABEgSnAQkSCg0KBQQAAgADEgSnARUWCg0KBQQAAgAIEgSnARc/ChAK
+CAQAAgAInAgAEgSnARg+CvMBCgQEAAIBEgauAQKxAQQa4gEgUmVxdWlyZWQuIFRoZSBicmFu
+Y2ggcmVzb3VyY2UgbmFtZSwgc3VjaCBhcwogYHByb2plY3RzLyovbG9jYXRpb25zL2dsb2Jh
+bC9jYXRhbG9ncy9kZWZhdWx0X2NhdGFsb2cvYnJhbmNoZXMvMGAuCgogVXNlICJkZWZhdWx0
+X2JyYW5jaCIgYXMgdGhlIGJyYW5jaCBJRCBvciBsZWF2ZSB0aGlzIGZpZWxkIGVtcHR5LCB0
+byBzZWFyY2gKIHByb2R1Y3RzIHVuZGVyIHRoZSBkZWZhdWx0IGJyYW5jaC4KCg0KBQQAAgEF
+EgSuAQIICg0KBQQAAgEBEgSuAQkPCg0KBQQAAgEDEgSuARITCg8KBQQAAgEIEgauARSxAQMK
+EAoIBAACAQicCAASBK8BBCoKDwoHBAACAQifCBIEsAEETgqRAQoEBAACAhIEtwECPBqCASBP
+cHRpb25hbC4gUmF3IHNlYXJjaCBxdWVyeSB0byBiZSBzZWFyY2hlZCBmb3IuCgogSWYgdGhp
+cyBmaWVsZCBpcyBlbXB0eSwgdGhlIHJlcXVlc3QgaXMgY29uc2lkZXJlZCBhIGNhdGVnb3J5
+IGJyb3dzaW5nCiByZXF1ZXN0LgoKDQoFBAACAgUSBLcBAggKDQoFBAACAgESBLcBCQ4KDQoF
+BAACAgMSBLcBERIKDQoFBAACAggSBLcBEzsKEAoIBAACAgicCAASBLcBFDoK8AQKBAQAAgMS
+BMUBAk8a4QQgT3B0aW9uYWwuIFRoZSBjYXRlZ29yaWVzIGFzc29jaWF0ZWQgd2l0aCBhIGNh
+dGVnb3J5IHBhZ2UuIE11c3QgYmUgc2V0IGZvcgogY2F0ZWdvcnkgbmF2aWdhdGlvbiBxdWVy
+aWVzIHRvIGFjaGlldmUgZ29vZCBzZWFyY2ggcXVhbGl0eS4gVGhlIGZvcm1hdAogc2hvdWxk
+IGJlIHRoZSBzYW1lIGFzCiBbVXNlckV2ZW50LnBhZ2VfY2F0ZWdvcmllc11bZ29vZ2xlLmNs
+b3VkLnJldGFpbC52MmFscGhhLlVzZXJFdmVudC5wYWdlX2NhdGVnb3JpZXNdOwoKIFRvIHJl
+cHJlc2VudCBmdWxsIHBhdGggb2YgY2F0ZWdvcnksIHVzZSAnPicgc2lnbiB0byBzZXBhcmF0
+ZSBkaWZmZXJlbnQKIGhpZXJhcmNoaWVzLiBJZiAnPicgaXMgcGFydCBvZiB0aGUgY2F0ZWdv
+cnkgbmFtZSwgcmVwbGFjZSBpdCB3aXRoCiBvdGhlciBjaGFyYWN0ZXIocykuCgogQ2F0ZWdv
+cnkgcGFnZXMgaW5jbHVkZSBzcGVjaWFsIHBhZ2VzIHN1Y2ggYXMgc2FsZXMgb3IgcHJvbW90
+aW9ucy4gRm9yCiBpbnN0YW5jZSwgYSBzcGVjaWFsIHNhbGUgcGFnZSBtYXkgaGF2ZSB0aGUg
+Y2F0ZWdvcnkgaGllcmFyY2h5OgogInBhZ2VDYXRlZ29yaWVzIiA6IFsiU2FsZXMgPiAyMDE3
+IEJsYWNrIEZyaWRheSBEZWFscyJdLgoKDQoFBAACAwQSBMUBAgoKDQoFBAACAwUSBMUBCxEK
+DQoFBAACAwESBMUBEiEKDQoFBAACAwMSBMUBJCUKDQoFBAACAwgSBMUBJk4KEAoIBAACAwic
+CAASBMUBJ00K5AIKBAQAAgQSBMwBAkYa1QIgT3B0aW9uYWwuIFRoaXMgZmllbGQgc3BlY2lm
+aWVzIHRoZSBjb252ZXJzYXRpb24gaWQsIHdoaWNoIG1haW50YWlucyB0aGUKIHN0YXRlIG9m
+IHRoZSBjb252ZXJzYXRpb24gYmV0d2VlbiBjbGllbnQgc2lkZSBhbmQgc2VydmVyIHNpZGUu
+IFVzZSB0aGUKIHZhbHVlIGZyb20gdGhlIHByZXZpb3VzCiBbQ29udmVyc2F0aW9uYWxTZWFy
+Y2hSZXNwb25zZS5jb252ZXJzYXRpb25faWRdW2dvb2dsZS5jbG91ZC5yZXRhaWwudjJhbHBo
+YS5Db252ZXJzYXRpb25hbFNlYXJjaFJlc3BvbnNlLmNvbnZlcnNhdGlvbl9pZF0uCiBGb3Ig
+dGhlIGluaXRpYWwgcmVxdWVzdCwgdGhpcyBzaG91bGQgYmUgZW1wdHkuCgoNCgUEAAIEBRIE
+zAECCAoNCgUEAAIEARIEzAEJGAoNCgUEAAIEAxIEzAEbHAoNCgUEAAIECBIEzAEdRQoQCggE
+AAIECJwIABIEzAEeRAosCgQEAAIFEgTPAQJKGh4gT3B0aW9uYWwuIFNlYXJjaCBwYXJhbWV0
+ZXJzLgoKDQoFBAACBQYSBM8BAg4KDQoFBAACBQESBM8BDxwKDQoFBAACBQMSBM8BHyAKDQoF
+BAACBQgSBM8BIUkKEAoIBAACBQicCAASBM8BIkgKmwQKBAQAAgYSBNsBAkEajAQgUmVxdWly
+ZWQuIEEgdW5pcXVlIGlkZW50aWZpZXIgZm9yIHRyYWNraW5nIHZpc2l0b3JzLiBGb3IgZXhh
+bXBsZSwgdGhpcwogY291bGQgYmUgaW1wbGVtZW50ZWQgd2l0aCBhbiBIVFRQIGNvb2tpZSwg
+d2hpY2ggc2hvdWxkIGJlIGFibGUgdG8gdW5pcXVlbHkKIGlkZW50aWZ5IGEgdmlzaXRvciBv
+biBhIHNpbmdsZSBkZXZpY2UuIFRoaXMgdW5pcXVlIGlkZW50aWZpZXIgc2hvdWxkIG5vdAog
+Y2hhbmdlIGlmIHRoZSB2aXNpdG9yIGxvZ3MgaW4gb3Igb3V0IG9mIHRoZSB3ZWJzaXRlLgoK
+IFRoaXMgc2hvdWxkIGJlIHRoZSBzYW1lIGlkZW50aWZpZXIgYXMKIFtVc2VyRXZlbnQudmlz
+aXRvcl9pZF1bZ29vZ2xlLmNsb3VkLnJldGFpbC52MmFscGhhLlVzZXJFdmVudC52aXNpdG9y
+X2lkXS4KCiBUaGUgZmllbGQgbXVzdCBiZSBhIFVURi04IGVuY29kZWQgc3RyaW5nIHdpdGgg
+YSBsZW5ndGggbGltaXQgb2YgMTI4CiBjaGFyYWN0ZXJzLiBPdGhlcndpc2UsIGFuIElOVkFM
+SURfQVJHVU1FTlQgZXJyb3IgaXMgcmV0dXJuZWQuCgoNCgUEAAIGBRIE2wECCAoNCgUEAAIG
+ARIE2wEJEwoNCgUEAAIGAxIE2wEWFwoNCgUEAAIGCBIE2wEYQAoQCggEAAIGCJwIABIE2wEZ
+PworCgQEAAIHEgTeAQJCGh0gT3B0aW9uYWwuIFVzZXIgaW5mb3JtYXRpb24uCgoNCgUEAAIH
+BhIE3gECCgoNCgUEAAIHARIE3gELFAoNCgUEAAIHAxIE3gEXGAoNCgUEAAIHCBIE3gEZQQoQ
+CggEAAIHCJwIABIE3gEaQApiCgQEAAIIEgbiAQLjAS8aUiBPcHRpb25hbC4gVGhpcyBmaWVs
+ZCBzcGVjaWZpZXMgYWxsIGNvbnZlcnNhdGlvbmFsIGZpbHRlcmluZyByZWxhdGVkCiBwYXJh
+bWV0ZXJzLgoKDQoFBAACCAYSBOIBAh0KDQoFBAACCAESBOIBHjsKDQoFBAACCAMSBOIBPj8K
+DQoFBAACCAgSBOMBBi4KEAoIBAACCAicCAASBOMBBy0K9wYKBAQAAgkSBPcBAlAa6AYgT3B0
+aW9uYWwuIFRoZSB1c2VyIGxhYmVscyBhcHBsaWVkIHRvIGEgcmVzb3VyY2UgbXVzdCBtZWV0
+IHRoZSBmb2xsb3dpbmcKIHJlcXVpcmVtZW50czoKCiAqIEVhY2ggcmVzb3VyY2UgY2FuIGhh
+dmUgbXVsdGlwbGUgbGFiZWxzLCB1cCB0byBhIG1heGltdW0gb2YgNjQuCiAqIEVhY2ggbGFi
+ZWwgbXVzdCBiZSBhIGtleS12YWx1ZSBwYWlyLgogKiBLZXlzIGhhdmUgYSBtaW5pbXVtIGxl
+bmd0aCBvZiAxIGNoYXJhY3RlciBhbmQgYSBtYXhpbXVtIGxlbmd0aCBvZiA2MwogICBjaGFy
+YWN0ZXJzIGFuZCBjYW5ub3QgYmUgZW1wdHkuIFZhbHVlcyBjYW4gYmUgZW1wdHkgYW5kIGhh
+dmUgYSBtYXhpbXVtCiAgIGxlbmd0aCBvZiA2MyBjaGFyYWN0ZXJzLgogKiBLZXlzIGFuZCB2
+YWx1ZXMgY2FuIGNvbnRhaW4gb25seSBsb3dlcmNhc2UgbGV0dGVycywgbnVtZXJpYyBjaGFy
+YWN0ZXJzLAogICB1bmRlcnNjb3JlcywgYW5kIGRhc2hlcy4gQWxsIGNoYXJhY3RlcnMgbXVz
+dCB1c2UgVVRGLTggZW5jb2RpbmcsIGFuZAogICBpbnRlcm5hdGlvbmFsIGNoYXJhY3RlcnMg
+YXJlIGFsbG93ZWQuCiAqIFRoZSBrZXkgcG9ydGlvbiBvZiBhIGxhYmVsIG11c3QgYmUgdW5p
+cXVlLiBIb3dldmVyLCB5b3UgY2FuIHVzZSB0aGUgc2FtZQogICBrZXkgd2l0aCBtdWx0aXBs
+ZSByZXNvdXJjZXMuCiAqIEtleXMgbXVzdCBzdGFydCB3aXRoIGEgbG93ZXJjYXNlIGxldHRl
+ciBvciBpbnRlcm5hdGlvbmFsIGNoYXJhY3Rlci4KCiBTZWUgW0dvb2dsZSBDbG91ZAogRG9j
+dW1lbnRdKGh0dHBzOi8vY2xvdWQuZ29vZ2xlLmNvbS9yZXNvdXJjZS1tYW5hZ2VyL2RvY3Mv
+Y3JlYXRpbmctbWFuYWdpbmctbGFiZWxzI3JlcXVpcmVtZW50cykKIGZvciBtb3JlIGRldGFp
+bHMuCgoNCgUEAAIJBhIE9wECFQoNCgUEAAIJARIE9wEWIQoNCgUEAAIJAxIE9wEkJgoNCgUE
+AAIJCBIE9wEnTwoQCggEAAIJCJwIABIE9wEoTgpXCgQEAAIKEgb6AQL7AS8aRyBPcHRpb25h
+bC4gVGhlIHNhZmV0eSBzZXR0aW5ncyB0byBiZSBhcHBsaWVkIHRvIHRoZSBnZW5lcmF0ZWQg
+Y29udGVudC4KCg0KBQQAAgoEEgT6AQIKCg0KBQQAAgoGEgT6AQsYCg0KBQQAAgoBEgT6ARko
+Cg0KBQQAAgoDEgT6ASstCg0KBQQAAgoIEgT7AQYuChAKCAQAAgoInAgAEgT7AQctCrABCgIE
+ARIGgQIA6AIBGqEBIFJlc3BvbnNlIG1lc3NhZ2UgZm9yCiBbQ29udmVyc2F0aW9uYWxTZWFy
+Y2hTZXJ2aWNlLkNvbnZlcnNhdGlvbmFsU2VhcmNoXVtnb29nbGUuY2xvdWQucmV0YWlsLnYy
+YWxwaGEuQ29udmVyc2F0aW9uYWxTZWFyY2hTZXJ2aWNlLkNvbnZlcnNhdGlvbmFsU2VhcmNo
+XQogbWV0aG9kLgoKCwoDBAEBEgSBAggkClcKBAQBAwASBoMCApICAxpHIFRoZSBjb252ZXJz
+YXRpb25hbCBmb2xsb3d1cCBxdWVzdGlvbiBnZW5lcmF0ZWQgZm9yIEludGVudCByZWZpbmVt
+ZW50LgoKDQoFBAEDAAESBIMCChoKzgEKBgQBAwADABIGhwIEiwIFGrsBIFN1Z2dlc3RlZCBh
+bnN3ZXJzIHRvIHRoZSBmb2xsb3ctdXAgcXVlc3Rpb24uCiBJZiBpdCdzIG51bWVyaWNhbCBh
+dHRyaWJ1dGUsIG9ubHkgUHJvZHVjdEF0dHJpYnV0ZUludGVydmFsIHdpbGwgYmUgc2V0Lgog
+SWYgaXQncyB0ZXh0dWFsIGF0dHJpYnV0ZSwgb25seSBwcm9kdWN0QXR0cmlidXRlVmFsdWUg
+d2lsbCBiZSBzZXQuCgoPCgcEAQMAAwABEgSHAgwbCo0BCggEAQMAAwACABIEigIGOBp7IFBy
+b2R1Y3QgYXR0cmlidXRlIHZhbHVlLCBpbmNsdWRpbmcgYW4gYXR0cmlidXRlIGtleSBhbmQg
+YW4KIGF0dHJpYnV0ZSB2YWx1ZS4gT3RoZXIgdHlwZXMgY2FuIGJlIGFkZGVkIGhlcmUgaW4g
+dGhlIGZ1dHVyZS4KChEKCQQBAwADAAIABhIEigIGGwoRCgkEAQMAAwACAAESBIoCHDMKEQoJ
+BAEDAAMAAgADEgSKAjY3ClcKBgQBAwACABIEjgIEIRpHIFRoZSBjb252ZXJzYXRpb25hbCBm
+b2xsb3d1cCBxdWVzdGlvbiBnZW5lcmF0ZWQgZm9yIEludGVudCByZWZpbmVtZW50LgoKDwoH
+BAEDAAIABRIEjgIECgoPCgcEAQMAAgABEgSOAgscCg8KBwQBAwACAAMSBI4CHyAKUwoGBAED
+AAIBEgSRAgQzGkMgVGhlIGFuc3dlciBvcHRpb25zIHByb3ZpZGVkIHRvIGNsaWVudCBmb3Ig
+dGhlIGZvbGxvdy11cCBxdWVzdGlvbi4KCg8KBwQBAwACAQQSBJECBAwKDwoHBAEDAAIBBhIE
+kQINHAoPCgcEAQMAAgEBEgSRAh0uCg8KBwQBAwACAQMSBJECMTIK0AEKBAQBAwESBpcCApoC
+Axq/ASBUaGUgcHJvcG9zZWQgcmVmaW5lZCBzZWFyY2ggZm9yIGludGVudC1yZWZpbmVtZW50
+L2J1bmRsZWQgc2hvcHBpbmcKIGNvbnZlcnNhdGlvbi4gV2hlbiB1c2luZyBDT05WRVJTQVRJ
+T05BTF9GSUxURVJfT05MWSBtb2RlLCB0aGUKIHJlZmluZWRfcXVlcnkgZnJvbSBzZWFyY2gg
+cmVzcG9uc2Ugd2lsbCBiZSBwb3B1bGF0ZWQgaGVyZS4KCg0KBQQBAwEBEgSXAgoXCjIKBgQB
+AwECABIEmQIEFRoiIFRoZSBxdWVyeSB0byBiZSB1c2VkIGZvciBzZWFyY2guCgoPCgcEAQMB
+AgAFEgSZAgQKCg8KBwQBAwECAAESBJkCCxAKDwoHBAEDAQIAAxIEmQITFAqTAQoEBAEDAhIG
+ngICrwIDGoIBIFRoaXMgZmllbGQgc3BlY2lmaWVzIGFsbCByZWxhdGVkIGluZm9ybWF0aW9u
+IHRoYXQgaXMgbmVlZGVkIG9uIGNsaWVudAogc2lkZSBmb3IgVUkgcmVuZGVyaW5nIG9mIGNv
+bnZlcnNhdGlvbmFsIGZpbHRlcmluZyBzZWFyY2guCgoNCgUEAQMCARIEngIKJwpFCgYEAQMC
+AwASBqACBKQCBRozIEFkZGl0aW9uYWwgZmlsdGVyIHRoYXQgY2xpZW50IHNpZGUgbmVlZCB0
+byBhcHBseS4KCg8KBwQBAwIDAAESBKACDBwKjQEKCAQBAwIDAAIAEgSjAgY4GnsgUHJvZHVj
+dCBhdHRyaWJ1dGUgdmFsdWUsIGluY2x1ZGluZyBhbiBhdHRyaWJ1dGUga2V5IGFuZCBhbgog
+YXR0cmlidXRlIHZhbHVlLiBPdGhlciB0eXBlcyBjYW4gYmUgYWRkZWQgaGVyZSBpbiB0aGUg
+ZnV0dXJlLgoKEQoJBAEDAgMAAgAGEgSjAgYbChEKCQQBAwIDAAIAARIEowIcMwoRCgkEAQMC
+AwACAAMSBKMCNjcKOAoGBAEDAgIAEgSnAgQrGiggVGhlIGNvbnZlcnNhdGlvbmFsIGZpbHRl
+cmluZyBxdWVzdGlvbi4KCg8KBwQBAwICAAYSBKcCBBQKDwoHBAEDAgIAARIEpwIVJgoPCgcE
+AQMCAgADEgSnAikqCt4CCgYEAQMCAgESBK4CBCsazQIgVGhpcyBpcyB0aGUgaW5jcmVtZW50
+YWwgYWRkaXRpb25hbCBmaWx0ZXJzIGltcGxpZWQgZnJvbSB0aGUgY3VycmVudAogdXNlciBh
+bnN3ZXIuIFVzZXIgc2hvdWxkIGFkZCB0aGUgc3VnZ2VzdGVkIGFkZGl0aW9uIGZpbHRlcnMg
+dG8gdGhlCiBwcmV2aW91cyBbQ29udmVyc2F0aW9uYWxTZWFyY2hSZXF1ZXN0LnNlYXJjaF9w
+YXJhbXMuZmlsdGVyXVtdIGFuZAogW1NlYXJjaFJlcXVlc3QuZmlsdGVyXVtnb29nbGUuY2xv
+dWQucmV0YWlsLnYyYWxwaGEuU2VhcmNoUmVxdWVzdC5maWx0ZXJdLAogYW5kIHVzZSB0aGUg
+bWVyZ2VkIGZpbHRlciBpbiB0aGUgZm9sbG93IHVwIHJlcXVlc3RzLgoKDwoHBAEDAgIBBhIE
+rgIEFAoPCgcEAQMCAgEBEgSuAhUmCg8KBwQBAwICAQMSBK4CKSoKNwoEBAEEABIGsgICuwID
+GicgVGhlIHN0YXRlIG9mIHRoZSByZXNwb25zZSBnZW5lcmF0aW9uLgoKDQoFBAEEAAESBLIC
+BwwKGgoGBAEEAAIAEgS0AgQaGgogVW5rbm93bi4KCg8KBwQBBAACAAESBLQCBBUKDwoHBAEE
+AAIAAhIEtAIYGQo4CgYEAQQAAgESBLcCBBIaKCBSZXNwb25zZSBnZW5lcmF0aW9uIGlzIGJl
+aW5nIHN0cmVhbWVkLgoKDwoHBAEEAAIBARIEtwIEDQoPCgcEAQQAAgECEgS3AhARCjQKBgQB
+BAACAhIEugIEEhokIFJlc3BvbnNlIGdlbmVyYXRpb24gaGFzIHN1Y2NlZWRlZC4KCg8KBwQB
+BAACAgESBLoCBA0KDwoHBAEEAAICAhIEugIQEQrfAgoEBAECABIEzgICKBrQAiBUaGUgdHlw
+ZXMgUmV0YWlsIGNsYXNzaWZpZXMgdGhlIHNlYXJjaCBxdWVyeSBhcy4KCiBTdXBwb3J0ZWQg
+dmFsdWVzIGFyZToKCiAtICJPUkRFUl9TVVBQT1JUIgogLSAiU0lNUExFX1BST0RVQ1RfU0VB
+UkNIIgogLSAiSU5URU5UX1JFRklORU1FTlQiCiAtICJQUk9EVUNUX0RFVEFJTFMiCiAtICJQ
+Uk9EVUNUX0NPTVBBUklTT04iCiAtICJERUFMU19BTkRfQ09VUE9OUyIKIC0gIlNUT1JFX1JF
+TEVWQU5UIgogLSAiQkxPQ0tMSVNURUQiCiAtICJCRVNUX1BST0RVQ1QiCiAtICJSRVRBSUxf
+U1VQUE9SVCIKIC0gIkRJU0FCTEVEIgogY2xhbmctZm9ybWF0IG9mZgogY2xhbmctZm9ybWF0
+IG9uCgoNCgUEAQIABBIEzgICCgoNCgUEAQIABRIEzgILEQoNCgUEAQIAARIEzgISIgoNCgUE
+AQIAAxIEzgIlJwpWCgQEAQIBEgTRAgIqGkggVGhlIGNvbnZlcnNhdGlvbmFsIGFuc3dlci1i
+YXNlZCB0ZXh0IHJlc3BvbnNlIGdlbmVyYXRlZCBieSB0aGUgU2VydmVyLgoKDQoFBAECAQUS
+BNECAggKDQoFBAECAQESBNECCSUKDQoFBAECAQMSBNECKCkKVQoEBAECAhIE1AICKRpHIFRo
+ZSBjb252ZXJzYXRpb25hbCBmb2xsb3d1cCBxdWVzdGlvbiBnZW5lcmF0ZWQgZm9yIEludGVu
+dCByZWZpbmVtZW50LgoKDQoFBAECAgYSBNQCAhIKDQoFBAECAgESBNQCEyQKDQoFBAECAgMS
+BNQCJygK1AIKBAQBAgMSBNsCAh0axQIgQ29udmVyc2F0aW9uIFVVSUQuIFRoaXMgZmllbGQg
+d2lsbCBiZSBzdG9yZWQgaW4gY2xpZW50IHNpZGUgc3RvcmFnZSB0bwogbWFpbnRhaW4gdGhl
+IGNvbnZlcnNhdGlvbiBzZXNzaW9uIHdpdGggc2VydmVyIGFuZCB3aWxsIGJlIHVzZWQgZm9y
+IG5leHQKIHNlYXJjaCByZXF1ZXN0J3MKIFtDb252ZXJzYXRpb25hbFNlYXJjaFJlcXVlc3Qu
+Y29udmVyc2F0aW9uX2lkXVtnb29nbGUuY2xvdWQucmV0YWlsLnYyYWxwaGEuQ29udmVyc2F0
+aW9uYWxTZWFyY2hSZXF1ZXN0LmNvbnZlcnNhdGlvbl9pZF0KIHRvIHJlc3RvcmUgY29udmVy
+c2F0aW9uIHN0YXRlIGluIHNlcnZlci4KCg0KBQQBAgMFEgTbAgIICg0KBQQBAgMBEgTbAgkY
+Cg0KBQQBAgMDEgTbAhscCtkBCgQEAQIEEgTgAgIsGsoBIFRoZSBwcm9wb3NlZCByZWZpbmVk
+IHNlYXJjaCBxdWVyaWVzLiBUaGV5IGNhbiBiZSB1c2VkIHRvIGZldGNoIHRoZSByZWxldmFu
+dAogc2VhcmNoIHJlc3VsdHMuIFdoZW4gdXNpbmcgQ09OVkVSU0FUSU9OQUxfRklMVEVSX09O
+TFkgbW9kZSwgdGhlCiByZWZpbmVkX3F1ZXJ5IGZyb20gc2VhcmNoIHJlc3BvbnNlIHdpbGwg
+YmUgcG9wdWxhdGVkIGhlcmUuCgoNCgUEAQIEBBIE4AICCgoNCgUEAQIEBhIE4AILGAoNCgUE
+AQIEARIE4AIZJwoNCgUEAQIEAxIE4AIqKwqRAQoEBAECBRIE5AICRBqCASBUaGlzIGZpZWxk
+IHNwZWNpZmllcyBhbGwgcmVsYXRlZCBpbmZvcm1hdGlvbiB0aGF0IGlzIG5lZWRlZCBvbiBj
+bGllbnQKIHNpZGUgZm9yIFVJIHJlbmRlcmluZyBvZiBjb252ZXJzYXRpb25hbCBmaWx0ZXJp
+bmcgc2VhcmNoLgoKDQoFBAECBQYSBOQCAh8KDQoFBAECBQESBOQCID8KDQoFBAECBQMSBOQC
+QkMKQgoEBAECBhIE5wICPho0IE91dHB1dCBvbmx5LiBUaGUgc3RhdGUgb2YgdGhlIHJlc3Bv
+bnNlIGdlbmVyYXRpb24uCgoNCgUEAQIGBhIE5wICBwoNCgUEAQIGARIE5wIIDQoNCgUEAQIG
+AxIE5wIQEQoNCgUEAQIGCBIE5wISPQoQCggEAQIGCJwIABIE5wITPGIGcHJvdG8z
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+# === Message: Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchRequest ===
+    # Fields for ConversationalSearchRequest
+    # Field: placement Type: 9 ()
+    # Field: branch Type: 9 ()
+    # Field: query Type: 9 ()
+    # Field: page_categories Type: 9 ()
+    # Field: conversation_id Type: 9 ()
+    # Field: search_params Type: 11 (.google.cloud.retail.v2alpha.ConversationalSearchRequest.SearchParams)
+    # Field: visitor_id Type: 9 ()
+    # Field: user_info Type: 11 (.google.cloud.retail.v2alpha.UserInfo)
+    # Field: conversational_filtering_spec Type: 11 (.google.cloud.retail.v2alpha.ConversationalSearchRequest.ConversationalFilteringSpec)
+    # Field: user_labels Type: 11 (.google.cloud.retail.v2alpha.ConversationalSearchRequest.UserLabelsEntry)
+    # Field: safety_settings Type: 11 (.google.cloud.retail.v2alpha.SafetySetting)
+
+# === Message: Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchResponse ===
+    # Fields for ConversationalSearchResponse
+    # Field: user_query_types Type: 9 ()
+    # Field: conversational_text_response Type: 9 ()
+    # Field: followup_question Type: 11 (.google.cloud.retail.v2alpha.ConversationalSearchResponse.FollowupQuestion)
+    # Field: conversation_id Type: 9 ()
+    # Field: refined_search Type: 11 (.google.cloud.retail.v2alpha.ConversationalSearchResponse.RefinedSearch)
+    # Field: conversational_filtering_result Type: 11 (.google.cloud.retail.v2alpha.ConversationalSearchResponse.ConversationalFilteringResult)
+    # Field: state Type: 14 (.google.cloud.retail.v2alpha.ConversationalSearchResponse.State)
+
+# Enum: ConversationalSearchResponse::State
+our $ConversationalSearchResponse_STATE_UNSPECIFIED = 0;
+our $ConversationalSearchResponse_STREAMING = 1;
+our $ConversationalSearchResponse_SUCCEEDED = 2;
+
+# === Service Client: Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchServiceClient ===
+package Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchServiceClient;
+
+=pod
+
+=head2 Service Client: Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchServiceClient
+
+Client stub representing the remote C<ConversationalSearchService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
+
+=head3 target
+
+The endpoint target address. Defaults to C<retail.googleapis.com:443>.
+
+=head3 credentials
+
+The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
+
+=cut
+
+use Moo;
+use Google::Auth;
+use Google::gRPC::Client;
+
+has credentials => ( is => 'ro', default => sub { Google::Auth->default() } );
+has target      => ( is => 'ro', default => 'retail.googleapis.com:443' );
+
+has _grpc_client => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        my $self = shift;
+        return Google::gRPC::Client->new(
+            target     => $self->target,
+            auth_token => $self->credentials->get_token(),
+        );
+    }
+);
+
+sub conversational_search {
+    my ($self, $args) = @_;
+    my $req = ref($args) eq 'HASH'
+        ? Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchRequest->new($args)
+        : $args;
+    return $self->_grpc_client->call({
+        service        => 'google.cloud.retail.v2alpha.ConversationalSearchService',
+        method         => 'ConversationalSearch',
+        request        => $req,
+        response_class => 'Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchResponse',
+    });
+}
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Retail::V2alpha::ConversationalSearchService - Compiled Protocol Buffers messages for google/cloud/retail/v2alpha/conversational_search_service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Retail::V2alpha::ConversationalSearchService;
+
+    my $msg = Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchRequest->new({
+        placement => $placement,
+        branch => $branch,
+        query => $query,
+        page_categories => $page_categories,
+    });
+
+    # Read or update a field
+    my $val = $msg->placement();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/retail/v2alpha/conversational_search_service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchRequest
+
+Request message for
+[ConversationalSearchService.ConversationalSearch][google.cloud.retail.v2alpha.ConversationalSearchService.ConversationalSearch]
+method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->placement() >> / C<< $msg->placement($value) >>
+
+Type: C<String>
+
+Required. The resource name of the search engine placement, such as
+`projects/*/locations/global/catalogs/default_catalog/placements/default_search`
+or
+`projects/*/locations/global/catalogs/default_catalog/servingConfigs/default_serving_config`
+This field is used to identify the serving config name and the set
+of models that will be used to make the search.
+
+=item * C<< $msg->branch() >> / C<< $msg->branch($value) >>
+
+Type: C<String>
+
+Required. The branch resource name, such as
+`projects/*/locations/global/catalogs/default_catalog/branches/0`.
+
+Use "default_branch" as the branch ID or leave this field empty, to search
+products under the default branch.
+
+=item * C<< $msg->query() >> / C<< $msg->query($value) >>
+
+Type: C<String>
+
+Optional. Raw search query to be searched for.
+
+If this field is empty, the request is considered a category browsing
+request.
+
+=item * C<< $msg->page_categories() >> / C<< $msg->page_categories($value) >>
+
+Type: C<String>
+
+Optional. The categories associated with a category page. Must be set for
+category navigation queries to achieve good search quality. The format
+should be the same as
+[UserEvent.page_categories][google.cloud.retail.v2alpha.UserEvent.page_categories];
+
+To represent full path of category, use '>' sign to separate different
+hierarchies. If '>' is part of the category name, replace it with
+other character(s).
+
+Category pages include special pages such as sales or promotions. For
+instance, a special sale page may have the category hierarchy:
+"pageCategories" : ["Sales > 2017 Black Friday Deals"].
+
+=item * C<< $msg->conversation_id() >> / C<< $msg->conversation_id($value) >>
+
+Type: C<String>
+
+Optional. This field specifies the conversation id, which maintains the
+state of the conversation between client side and server side. Use the
+value from the previous
+[ConversationalSearchResponse.conversation_id][google.cloud.retail.v2alpha.ConversationalSearchResponse.conversation_id].
+For the initial request, this should be empty.
+
+=item * C<< $msg->search_params() >> / C<< $msg->search_params($value) >>
+
+Type: C<Message> (L<Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchRequest::SearchParams>)
+
+Optional. Search parameters.
+
+=item * C<< $msg->visitor_id() >> / C<< $msg->visitor_id($value) >>
+
+Type: C<String>
+
+Required. A unique identifier for tracking visitors. For example, this
+could be implemented with an HTTP cookie, which should be able to uniquely
+identify a visitor on a single device. This unique identifier should not
+change if the visitor logs in or out of the website.
+
+This should be the same identifier as
+[UserEvent.visitor_id][google.cloud.retail.v2alpha.UserEvent.visitor_id].
+
+The field must be a UTF-8 encoded string with a length limit of 128
+characters. Otherwise, an INVALID_ARGUMENT error is returned.
+
+=item * C<< $msg->user_info() >> / C<< $msg->user_info($value) >>
+
+Type: C<Message> (L<Google::Cloud::Retail::V2alpha::Common::UserInfo>)
+
+Optional. User information.
+
+=item * C<< $msg->conversational_filtering_spec() >> / C<< $msg->conversational_filtering_spec($value) >>
+
+Type: C<Message> (L<Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchRequest::ConversationalFilteringSpec>)
+
+Optional. This field specifies all conversational filtering related
+parameters.
+
+=item * C<< $msg->user_labels() >> / C<< $msg->user_labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchRequest::UserLabelsEntry>)
+
+Optional. The user labels applied to a resource must meet the following
+requirements:
+
+* Each resource can have multiple labels, up to a maximum of 64.
+* Each label must be a key-value pair.
+* Keys have a minimum length of 1 character and a maximum length of 63
+  characters and cannot be empty. Values can be empty and have a maximum
+  length of 63 characters.
+* Keys and values can contain only lowercase letters, numeric characters,
+  underscores, and dashes. All characters must use UTF-8 encoding, and
+  international characters are allowed.
+* The key portion of a label must be unique. However, you can use the same
+  key with multiple resources.
+* Keys must start with a lowercase letter or international character.
+
+See [Google Cloud
+Document](https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements)
+for more details.
+
+=item * C<< $msg->safety_settings() >> / C<< $msg->safety_settings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Retail::V2alpha::Safety::SafetySetting>)
+
+Optional. The safety settings to be applied to the generated content.
+
+=back
+
+=head2 Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchResponse
+
+Response message for
+[ConversationalSearchService.ConversationalSearch][google.cloud.retail.v2alpha.ConversationalSearchService.ConversationalSearch]
+method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->user_query_types() >> / C<< $msg->user_query_types($value) >>
+
+Type: C<String>
+
+The types Retail classifies the search query as.
+
+Supported values are:
+
+- "ORDER_SUPPORT"
+- "SIMPLE_PRODUCT_SEARCH"
+- "INTENT_REFINEMENT"
+- "PRODUCT_DETAILS"
+- "PRODUCT_COMPARISON"
+- "DEALS_AND_COUPONS"
+- "STORE_RELEVANT"
+- "BLOCKLISTED"
+- "BEST_PRODUCT"
+- "RETAIL_SUPPORT"
+- "DISABLED"
+clang-format off
+clang-format on
+
+=item * C<< $msg->conversational_text_response() >> / C<< $msg->conversational_text_response($value) >>
+
+Type: C<String>
+
+The conversational answer-based text response generated by the Server.
+
+=item * C<< $msg->followup_question() >> / C<< $msg->followup_question($value) >>
+
+Type: C<Message> (L<Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchResponse::FollowupQuestion>)
+
+The conversational followup question generated for Intent refinement.
+
+=item * C<< $msg->conversation_id() >> / C<< $msg->conversation_id($value) >>
+
+Type: C<String>
+
+Conversation UUID. This field will be stored in client side storage to
+maintain the conversation session with server and will be used for next
+search request's
+[ConversationalSearchRequest.conversation_id][google.cloud.retail.v2alpha.ConversationalSearchRequest.conversation_id]
+to restore conversation state in server.
+
+=item * C<< $msg->refined_search() >> / C<< $msg->refined_search($value) >>
+
+Type: C<Message> (L<Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchResponse::RefinedSearch>)
+
+The proposed refined search queries. They can be used to fetch the relevant
+search results. When using CONVERSATIONAL_FILTER_ONLY mode, the
+refined_query from search response will be populated here.
+
+=item * C<< $msg->conversational_filtering_result() >> / C<< $msg->conversational_filtering_result($value) >>
+
+Type: C<Message> (L<Google::Cloud::Retail::V2alpha::ConversationalSearchService::ConversationalSearchResponse::ConversationalFilteringResult>)
+
+This field specifies all related information that is needed on client
+side for UI rendering of conversational filtering search.
+
+=item * C<< $msg->state() >> / C<< $msg->state($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Retail::V2alpha::ConversationalSearchResponse::State>)
+
+Output only. The state of the response generation.
+
+=back
+
+=head3 Enum: ConversationalSearchResponse::State
+
+=over 4
+
+=item * C<STATE_UNSPECIFIED> => C<0>
+
+=item * C<STREAMING> => C<1>
+
+=item * C<SUCCEEDED> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Retail::V2alpha::ConversationalSearchService::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

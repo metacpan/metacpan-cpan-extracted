@@ -12,7 +12,7 @@ use Carp qw(croak);
 use Log::Any qw($log);
 use Time::HiRes qw(sleep);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 has channel_pool => ( is => 'ro', required => 0 );
 has target       => (

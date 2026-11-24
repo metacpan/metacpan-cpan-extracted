@@ -100,6 +100,14 @@ WriteMakefile(
 	clean => { FILES => 'Web-VWF-*' },
 	META_MERGE => {
 		'meta-spec' => { version => 2 },
+		# The example site is not part of the library, and its states driver
+		# is Web::VWF::Data::states.  Data::Throttler::Backend::VWF has to be in
+		# Data::Throttler's namespace for that module to find it, which is not
+		# ours for PAUSE to index.
+		no_index => {
+			directory => ['example'],
+			package => ['Data::Throttler::Backend::VWF'],
+		},
 		prereqs => {
 			test => {
 				recommends => {

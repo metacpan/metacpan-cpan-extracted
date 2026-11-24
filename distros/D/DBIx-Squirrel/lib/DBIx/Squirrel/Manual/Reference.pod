@@ -1256,7 +1256,7 @@ C<column_names> are the statement's columns.
 Four modules of ready-made stages ship with DBIx::Squirrel, each for
 one kind of job: Flow takes or drops values, Rows reshapes rows, Batch
 gathers values together, and Taps looks at them as they go by. Each
-exports the stages it's usually used for, and the rest on request, as
+exports the stages it's usually used for, and the rest upon request, as
 the L<index|/"Index"> says. C<:all> gives them all, and C<()> none. Naming
 a stage in the import list replaces the defaults. To have the defaults
 and one more, name C<:DEFAULT> too:
@@ -3607,7 +3607,7 @@ See L<connect_cached|/"connect_cached">.
 =head2 DBIx::Squirrel::Context
 
 What a stage can ask about the result it's making. Nothing by default;
-each on request, and in Tooling's C<:context>.
+each upon request, and in Tooling's C<:context>.
 
 =head3 iterator
 
@@ -3617,7 +3617,7 @@ Returns the iterator running the stage, in an iterator's or result
 set's own stages; elsewhere, and outside a stage, C<undef>. Through it
 a stage can reach the rest: its C<sth> is the statement handle, the
 statement handle's C<Database> is the database handle, and its
-L<column_names|/"column_names"> are the statement's columns. Exported on
+L<column_names|/"column_names"> are the statement's columns. Exported upon
 request.
 
 See L<Context|/"Context">.
@@ -3630,7 +3630,7 @@ Returns the number of the result being made, from 1. It counts
 results, not rows: while a stage drops rows, the number stays the
 same, and each value a stage returns in place of one row is a result
 of its own. In a flush of a stage made with L<gather|/"gather">, it's
-the number of the first value the flush returns. Exported on request.
+the number of the first value the flush returns. Exported upon request.
 
 See L<Context|/"Context">.
 
@@ -3642,7 +3642,7 @@ Returns the row the result is being made from, as it was fetched,
 before any stage changed it; for a result set, the row object. In a
 flush of a stage made with L<gather|/"gather">, and the stages after it,
 it's C<undef>, as what a flush gives comes from every row, not one.
-Exported on request.
+Exported upon request.
 
 See L<Context|/"Context">.
 
@@ -3852,7 +3852,7 @@ Croaks with a message made by C<sprintf> from a format and its values,
 reported at the line C<croak> would report it at. With C<@CARP_NOT> set
 to C<@DBIx::Squirrel::Errors::INTERNAL>, that's the line that called
 DBIx::Squirrel. It's the one function of DBIx::Squirrel::Errors for
-others: the rest are for the handles. Exported on request.
+others: the rest are for the handles. Exported upon request.
 
 See L<Stages for others|/"Stages for others">.
 
@@ -4187,7 +4187,7 @@ See L<Batching and collecting|/"Batching and collecting">.
 =head2 DBIx::Squirrel::Stages::Flow
 
 Canned stages taking or dropping values. C<take> and C<drop> by default,
-the others on request; all in Tooling's C<:flow>.
+the others upon request; all in Tooling's C<:flow>.
 
 =head3 drop
 
@@ -4208,7 +4208,7 @@ See L<Taking and dropping|/"Taking and dropping">.
 Drops each value the block is true of, and passes on the rest:
 C<take_if>'s opposite. The block gets each value in C<$_> and as its
 argument. It croaks, C<Expected a code reference>, if it isn't given a
-block or code reference. Exported on request.
+block or code reference. Exported upon request.
 
 See L<Taking and dropping|/"Taking and dropping">.
 
@@ -4221,7 +4221,7 @@ Drops values while the block is true of them, then passes on the rest,
 from the first it's false of. After that, the block isn't called again
 on that run. The block gets each value in C<$_> and as its argument. It
 croaks, C<Expected a code reference>, if it isn't given a block or code
-reference. Exported on request.
+reference. Exported upon request.
 
 See L<Taking and dropping|/"Taking and dropping">.
 
@@ -4242,7 +4242,7 @@ See L<Taking and dropping|/"Taking and dropping">.
     take_first
 
 Passes on the first value, then stops the run: C<take(1)>, named as the
-stage of the sink C<keep_first>. Exported on request.
+stage of the sink C<keep_first>. Exported upon request.
 
 See L<Taking and dropping|/"Taking and dropping">.
 
@@ -4256,7 +4256,7 @@ every one, as C<grep> does; it never stops the run. The block gets each
 value in C<$_> and as its argument. A plain stage ending in a test
 passes on what the test returns, true or false; C<take_if> passes on
 the value. It croaks, C<Expected a code reference>, if it isn't given a
-block or code reference. Exported on request.
+block or code reference. Exported upon request.
 
 See L<Taking and dropping|/"Taking and dropping">.
 
@@ -4266,7 +4266,7 @@ See L<Taking and dropping|/"Taking and dropping">.
 
 Passes on the last value, once there are no more, reading every one to
 find it; nothing if there were none. If a stage before it stops the
-run, it passes on the last value to reach it. Exported on request.
+run, it passes on the last value to reach it. Exported upon request.
 
 See L<Taking and dropping|/"Taking and dropping">.
 
@@ -4277,7 +4277,7 @@ See L<Taking and dropping|/"Taking and dropping">.
 Passes on the one value. At a second, it warns, C<Expected only one
 item, but there were more>, and stops the run, so only the first goes
 on: for a statement meant to give one row, whose limit was forgotten.
-Exported on request.
+Exported upon request.
 
 See L<Taking and dropping|/"Taking and dropping">.
 
@@ -4291,7 +4291,7 @@ false of, it stops the run, and doesn't pass that value on. Unlike
 C<take_if>, it reads no further, so it suits rows in an order the test
 follows. The block gets each value in C<$_> and as its argument. It
 croaks, C<Expected a code reference>, if it isn't given a block or code
-reference. Exported on request.
+reference. Exported upon request.
 
 See L<Taking and dropping|/"Taking and dropping">.
 
@@ -4343,7 +4343,7 @@ See L<Reshaping rows|/"Reshaping rows">.
 =head2 DBIx::Squirrel::Stages::Taps
 
 Canned stages run for their side effects. C<peek> and C<count_into> by
-default, C<dump_to> and C<tee> on request; all in Tooling's C<:taps>.
+default, C<dump_to> and C<tee> upon request; all in Tooling's C<:taps>.
 
 =head3 count_into
 
@@ -4363,7 +4363,7 @@ See L<Taps|/"Taps">.
 
 Writes each value to C<$fh>, or to STDERR, with Data::Dumper, keys
 sorted and indented by two, and passes it on. It croaks, C<Expected an
-open filehandle>, if C<$fh> isn't one. Exported on request.
+open filehandle>, if C<$fh> isn't one. Exported upon request.
 
 It's for debugging. Where Text::Redact::Secrets v1.x is installed, it
 writes each secret that module's rules find as C<*REDACTED*>, in the
@@ -4399,7 +4399,7 @@ Runs each value through a branch of C<@stages>, for what they do on the
 side, and passes the value on unchanged. What comes out of the branch
 is dropped. The branch is a run of its own beside the main run, so its
 stages keep their state across the values, and each main run gets a
-fresh branch. Exported on request.
+fresh branch. Exported upon request.
 
 See L<Taps|/"Taps">.
 

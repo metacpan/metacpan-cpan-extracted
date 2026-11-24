@@ -3,7 +3,7 @@ package Google::Cloud::Dataproc::V1::AutoscalingPolicies;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -368,113 +368,15 @@ EOF
     # Field: labels Type: 11 (.google.cloud.dataproc.v1.AutoscalingPolicy.LabelsEntry)
     # Field: cluster_type Type: 14 (.google.cloud.dataproc.v1.AutoscalingPolicy.ClusterType)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy->new(
-        id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<id>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<basic_algorithm>
-
-Type: Message (.google.cloud.dataproc.v1.BasicAutoscalingAlgorithm)
-
-=item * B<worker_config>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceGroupAutoscalingPolicyConfig)
-
-=item * B<secondary_worker_config>
-
-Type: Message (.google.cloud.dataproc.v1.InstanceGroupAutoscalingPolicyConfig)
-
-=item * B<labels>
-
-Type: Message (.google.cloud.dataproc.v1.AutoscalingPolicy.LabelsEntry)
-
-=item * B<cluster_type>
-
-Type: Enum (.google.cloud.dataproc.v1.AutoscalingPolicy.ClusterType)
-
-=back
-
-=cut
-
 # Enum: AutoscalingPolicy::ClusterType
 our $AutoscalingPolicy_CLUSTER_TYPE_UNSPECIFIED = 0;
 our $AutoscalingPolicy_STANDARD = 1;
 our $AutoscalingPolicy_ZERO_SCALE = 2;
 
-=pod
-
-=head2 Enum: AutoscalingPolicy::ClusterType
-
-Values:
-
-=over 4
-
-=item * C<CLUSTER_TYPE_UNSPECIFIED> => 0
-
-=item * C<STANDARD> => 1
-
-=item * C<ZERO_SCALE> => 2
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicAutoscalingAlgorithm ===
     # Fields for BasicAutoscalingAlgorithm
     # Field: yarn_config Type: 11 (.google.cloud.dataproc.v1.BasicYarnAutoscalingConfig)
     # Field: cooldown_period Type: 11 (.google.protobuf.Duration)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicAutoscalingAlgorithm - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicAutoscalingAlgorithm->new(
-        yarn_config => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<yarn_config>
-
-Type: Message (.google.cloud.dataproc.v1.BasicYarnAutoscalingConfig)
-
-=item * B<cooldown_period>
-
-Type: Message (.google.protobuf.Duration)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicYarnAutoscalingConfig ===
     # Fields for BasicYarnAutoscalingConfig
@@ -484,212 +386,28 @@ Type: Message (.google.protobuf.Duration)
     # Field: scale_up_min_worker_fraction Type: 1 ()
     # Field: scale_down_min_worker_fraction Type: 1 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicYarnAutoscalingConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicYarnAutoscalingConfig->new(
-        graceful_decommission_timeout => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<graceful_decommission_timeout>
-
-Type: Message (.google.protobuf.Duration)
-
-=item * B<scale_up_factor>
-
-Type: Double
-
-=item * B<scale_down_factor>
-
-Type: Double
-
-=item * B<scale_up_min_worker_fraction>
-
-Type: Double
-
-=item * B<scale_down_min_worker_fraction>
-
-Type: Double
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::AutoscalingPolicies::InstanceGroupAutoscalingPolicyConfig ===
     # Fields for InstanceGroupAutoscalingPolicyConfig
     # Field: min_instances Type: 5 ()
     # Field: max_instances Type: 5 ()
     # Field: weight Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::InstanceGroupAutoscalingPolicyConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::InstanceGroupAutoscalingPolicyConfig->new(
-        min_instances => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<min_instances>
-
-Type: Int32
-
-=item * B<max_instances>
-
-Type: Int32
-
-=item * B<weight>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::AutoscalingPolicies::CreateAutoscalingPolicyRequest ===
     # Fields for CreateAutoscalingPolicyRequest
     # Field: parent Type: 9 ()
     # Field: policy Type: 11 (.google.cloud.dataproc.v1.AutoscalingPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::CreateAutoscalingPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::CreateAutoscalingPolicyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<policy>
-
-Type: Message (.google.cloud.dataproc.v1.AutoscalingPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::AutoscalingPolicies::GetAutoscalingPolicyRequest ===
     # Fields for GetAutoscalingPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::GetAutoscalingPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::GetAutoscalingPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::AutoscalingPolicies::UpdateAutoscalingPolicyRequest ===
     # Fields for UpdateAutoscalingPolicyRequest
     # Field: policy Type: 11 (.google.cloud.dataproc.v1.AutoscalingPolicy)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::UpdateAutoscalingPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::UpdateAutoscalingPolicyRequest->new(
-        policy => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<policy>
-
-Type: Message (.google.cloud.dataproc.v1.AutoscalingPolicy)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::AutoscalingPolicies::DeleteAutoscalingPolicyRequest ===
     # Fields for DeleteAutoscalingPolicyRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::DeleteAutoscalingPolicyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::DeleteAutoscalingPolicyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Dataproc::V1::AutoscalingPolicies::ListAutoscalingPoliciesRequest ===
     # Fields for ListAutoscalingPoliciesRequest
@@ -697,97 +415,25 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::ListAutoscalingPoliciesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::ListAutoscalingPoliciesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Dataproc::V1::AutoscalingPolicies::ListAutoscalingPoliciesResponse ===
     # Fields for ListAutoscalingPoliciesResponse
     # Field: policies Type: 11 (.google.cloud.dataproc.v1.AutoscalingPolicy)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::ListAutoscalingPoliciesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
-
-    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::ListAutoscalingPoliciesResponse->new(
-        policies => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<policies>
-
-Type: Message (.google.cloud.dataproc.v1.AutoscalingPolicy)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicyServiceClient ===
 package Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicyServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicyServiceClient
 
-Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicyServiceClient - Client stub representing the remote AutoscalingPolicyService service
+Client stub representing the remote C<AutoscalingPolicyService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<dataproc.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -881,13 +527,462 @@ sub delete_autoscaling_policy {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Dataproc::V1::AutoscalingPolicies - Protocol Buffers schema definition
+Google::Cloud::Dataproc::V1::AutoscalingPolicies - Compiled Protocol Buffers messages for google/cloud/dataproc/v1/autoscaling_policies.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Dataproc::V1::AutoscalingPolicies;
+
+    my $msg = Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy->new({
+        id => $id,
+        name => $name,
+        basic_algorithm => $basic_algorithm,
+        worker_config => $worker_config,
+    });
+
+    # Read or update a field
+    my $val = $msg->id();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/dataproc/v1/autoscaling_policies.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy
+
+Describes an autoscaling policy for Dataproc cluster autoscaler.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->id() >> / C<< $msg->id($value) >>
+
+Type: C<String>
+
+Required. The policy id.
+
+The id must contain only letters (a-z, A-Z), numbers (0-9),
+underscores (_), and hyphens (-). Cannot begin or end with underscore
+or hyphen. Must consist of between 3 and 50 characters.
+
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. The "resource name" of the autoscaling policy, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.autoscalingPolicies`, the resource name of the
+  policy has the following format:
+  `projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}`
+
+* For `projects.locations.autoscalingPolicies`, the resource name of the
+  policy has the following format:
+  `projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}`
+
+=item * C<< $msg->basic_algorithm() >> / C<< $msg->basic_algorithm($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicAutoscalingAlgorithm>)
+
+=item * C<< $msg->worker_config() >> / C<< $msg->worker_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::InstanceGroupAutoscalingPolicyConfig>)
+
+Required. Describes how the autoscaler will operate for primary workers.
+
+=item * C<< $msg->secondary_worker_config() >> / C<< $msg->secondary_worker_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::InstanceGroupAutoscalingPolicyConfig>)
+
+Optional. Describes how the autoscaler will operate for secondary workers.
+
+=item * C<< $msg->labels() >> / C<< $msg->labels($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy::LabelsEntry>)
+
+Optional. The labels to associate with this autoscaling policy.
+Label B<keys> must contain 1 to 63 characters, and must conform to
+[RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).
+Label B<values> may be empty, but, if present, must contain 1 to 63
+characters, and must conform to [RFC
+1035](https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be
+associated with an autoscaling policy.
+
+=item * C<< $msg->cluster_type() >> / C<< $msg->cluster_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Dataproc::V1::AutoscalingPolicy::ClusterType>)
+
+Optional. The type of the clusters for which this autoscaling policy is to
+be configured.
+
+=back
+
+=head3 Enum: AutoscalingPolicy::ClusterType
+
+=over 4
+
+=item * C<CLUSTER_TYPE_UNSPECIFIED> => C<0>
+
+=item * C<STANDARD> => C<1>
+
+=item * C<ZERO_SCALE> => C<2>
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicAutoscalingAlgorithm
+
+Basic algorithm for autoscaling.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->yarn_config() >> / C<< $msg->yarn_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicYarnAutoscalingConfig>)
+
+Required. YARN autoscaling configuration.
+
+=item * C<< $msg->cooldown_period() >> / C<< $msg->cooldown_period($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Optional. Duration between scaling events. A scaling period starts after
+the update operation from the previous event has completed.
+
+Bounds: [2m, 1d]. Default: 2m.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::BasicYarnAutoscalingConfig
+
+Basic autoscaling configurations for YARN.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->graceful_decommission_timeout() >> / C<< $msg->graceful_decommission_timeout($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Duration::Duration>)
+
+Required. Timeout for YARN graceful decommissioning of Node Managers.
+Specifies the duration to wait for jobs to complete before forcefully
+removing workers (and potentially interrupting jobs). Only applicable to
+downscaling operations.
+
+Bounds: [0s, 1d].
+
+=item * C<< $msg->scale_up_factor() >> / C<< $msg->scale_up_factor($value) >>
+
+Type: C<Double>
+
+Required. Fraction of average YARN pending memory in the last cooldown
+period for which to add workers. A scale-up factor of 1.0 will result in
+scaling up so that there is no pending memory remaining after the update
+(more aggressive scaling). A scale-up factor closer to 0 will result in a
+smaller magnitude of scaling up (less aggressive scaling). See [How
+autoscaling
+works](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/autoscaling#how_autoscaling_works)
+for more information.
+
+Bounds: [0.0, 1.0].
+
+=item * C<< $msg->scale_down_factor() >> / C<< $msg->scale_down_factor($value) >>
+
+Type: C<Double>
+
+Required. Fraction of average YARN pending memory in the last cooldown
+period for which to remove workers. A scale-down factor of 1 will result in
+scaling down so that there is no available memory remaining after the
+update (more aggressive scaling). A scale-down factor of 0 disables
+removing workers, which can be beneficial for autoscaling a single job.
+See [How autoscaling
+works](https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/autoscaling#how_autoscaling_works)
+for more information.
+
+Bounds: [0.0, 1.0].
+
+=item * C<< $msg->scale_up_min_worker_fraction() >> / C<< $msg->scale_up_min_worker_fraction($value) >>
+
+Type: C<Double>
+
+Optional. Minimum scale-up threshold as a fraction of total cluster size
+before scaling occurs. For example, in a 20-worker cluster, a threshold of
+0.1 means the autoscaler must recommend at least a 2-worker scale-up for
+the cluster to scale. A threshold of 0 means the autoscaler will scale up
+on any recommended change.
+
+Bounds: [0.0, 1.0]. Default: 0.0.
+
+=item * C<< $msg->scale_down_min_worker_fraction() >> / C<< $msg->scale_down_min_worker_fraction($value) >>
+
+Type: C<Double>
+
+Optional. Minimum scale-down threshold as a fraction of total cluster size
+before scaling occurs. For example, in a 20-worker cluster, a threshold of
+0.1 means the autoscaler must recommend at least a 2 worker scale-down for
+the cluster to scale. A threshold of 0 means the autoscaler will scale down
+on any recommended change.
+
+Bounds: [0.0, 1.0]. Default: 0.0.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::InstanceGroupAutoscalingPolicyConfig
+
+Configuration for the size bounds of an instance group, including its
+proportional size to other groups.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->min_instances() >> / C<< $msg->min_instances($value) >>
+
+Type: C<Int32>
+
+Optional. Minimum number of instances for this group.
+
+Primary workers - Bounds: [2, max_instances]. Default: 2.
+Secondary workers - Bounds: [0, max_instances]. Default: 0.
+
+=item * C<< $msg->max_instances() >> / C<< $msg->max_instances($value) >>
+
+Type: C<Int32>
+
+Required. Maximum number of instances for this group. Required for primary
+workers. Note that by default, clusters will not use secondary workers.
+Required for secondary workers if the minimum secondary instances is set.
+
+Primary workers - Bounds: [min_instances, ).
+Secondary workers - Bounds: [min_instances, ). Default: 0.
+
+=item * C<< $msg->weight() >> / C<< $msg->weight($value) >>
+
+Type: C<Int32>
+
+Optional. Weight for the instance group, which is used to determine the
+fraction of total workers in the cluster from this instance group.
+For example, if primary workers have weight 2, and secondary workers have
+weight 1, the cluster will have approximately 2 primary workers for each
+secondary worker.
+
+The cluster may not reach the specified balance if constrained
+by min/max bounds or other autoscaling settings. For example, if
+`max_instances` for secondary workers is 0, then only primary workers will
+be added. The cluster can also be out of balance when created.
+
+If weight is not set on any instance group, the cluster will default to
+equal weight for all groups: the cluster will attempt to maintain an equal
+number of workers in each group within the configured size bounds for each
+group. If weight is set for one group only, the cluster will default to
+zero weight on the unset group. For example if weight is set only on
+primary workers, the cluster will use primary workers only and no
+secondary workers.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::CreateAutoscalingPolicyRequest
+
+A request to create an autoscaling policy.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The "resource name" of the region or location, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.autoscalingPolicies.create`, the resource name
+  of the region has the following format:
+  `projects/{project_id}/regions/{region}`
+
+* For `projects.locations.autoscalingPolicies.create`, the resource name
+  of the location has the following format:
+  `projects/{project_id}/locations/{location}`
+
+=item * C<< $msg->policy() >> / C<< $msg->policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy>)
+
+Required. The autoscaling policy to create.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::GetAutoscalingPolicyRequest
+
+A request to fetch an autoscaling policy.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The "resource name" of the autoscaling policy, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.autoscalingPolicies.get`, the resource name
+  of the policy has the following format:
+  `projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}`
+
+* For `projects.locations.autoscalingPolicies.get`, the resource name
+  of the policy has the following format:
+  `projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}`
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::UpdateAutoscalingPolicyRequest
+
+A request to update an autoscaling policy.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->policy() >> / C<< $msg->policy($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy>)
+
+Required. The updated autoscaling policy.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::DeleteAutoscalingPolicyRequest
+
+A request to delete an autoscaling policy.
+
+Autoscaling policies in use by one or more clusters will not be deleted.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The "resource name" of the autoscaling policy, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.autoscalingPolicies.delete`, the resource name
+  of the policy has the following format:
+  `projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}`
+
+* For `projects.locations.autoscalingPolicies.delete`, the resource name
+  of the policy has the following format:
+  `projects/{project_id}/locations/{location}/autoscalingPolicies/{policy_id}`
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::ListAutoscalingPoliciesRequest
+
+A request to list autoscaling policies in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The "resource name" of the region or location, as described
+in https://cloud.google.com/apis/design/resource_names.
+
+* For `projects.regions.autoscalingPolicies.list`, the resource name
+  of the region has the following format:
+  `projects/{project_id}/regions/{region}`
+
+* For `projects.locations.autoscalingPolicies.list`, the resource name
+  of the location has the following format:
+  `projects/{project_id}/locations/{location}`
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. The maximum number of results to return in each response.
+Must be less than or equal to 1000. Defaults to 100.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. The page token, returned by a previous call, to request the
+next page of results.
+
+=back
+
+=head2 Google::Cloud::Dataproc::V1::AutoscalingPolicies::ListAutoscalingPoliciesResponse
+
+A response to a request to list autoscaling policies in a project.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->policies() >> / C<< $msg->policies($value) >>
+
+Type: C<Message> (L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::AutoscalingPolicy>)
+
+Output only. Autoscaling policies list.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+Output only. This token is included in the response if there are more
+results to fetch.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Dataproc::V1::AutoscalingPolicies::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

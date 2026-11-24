@@ -1,0 +1,501 @@
+package Google::Cloud::Datastore::Admin::V1;
+
+use strict;
+use warnings;
+use Moo;
+use Google::gRPC::Client;
+use Google::Cloud::REST::Client;
+use Google::Auth;
+use Carp qw(croak);
+
+use Protobuf;
+use Google::Api::Common;
+use Google::Datastore::Admin::V1::Migration;
+use Google::Datastore::Admin::V1::Index;
+use Google::Datastore::Admin::V1::DatastoreAdmin;
+
+our $VERSION = '0.06';
+
+has credentials => ( is => 'ro', required => 0 );
+has transport   => ( is => 'rw' );
+
+sub BUILD {
+    my ($self) = @_;
+
+    my $auth = $self->credentials;
+    if (!defined $auth) {
+        $auth = Google::Auth->default();
+    } elsif (!eval { $auth->can('get_token') }) {
+        croak 'Invalid credentials object: must implement get_token()';
+    }
+    my $token = $auth->get_token();
+
+    my $target = 'datastore.googleapis.com:443';
+    my $t = $self->transport || 'grpc';
+
+    if (ref($t) && eval { $t->can('call') }) {
+        # Already a transport object
+    } elsif (lc($t) eq 'rest') {
+        my $client = Google::Cloud::REST::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    } else {
+        my $client = Google::gRPC::Client->new(
+            target     => $target,
+            auth_token => $token,
+        );
+        $self->transport($client);
+    }
+}
+
+sub export_entities {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Datastore::Admin::V1::DatastoreAdmin::ExportEntitiesRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.datastore.admin.v1.DatastoreAdmin/ExportEntities',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.datastore.admin.v1.DatastoreAdmin',
+        method         => 'ExportEntities',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub import_entities {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Datastore::Admin::V1::DatastoreAdmin::ImportEntitiesRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.datastore.admin.v1.DatastoreAdmin/ImportEntities',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.datastore.admin.v1.DatastoreAdmin',
+        method         => 'ImportEntities',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub create_index {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Datastore::Admin::V1::DatastoreAdmin::CreateIndexRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.datastore.admin.v1.DatastoreAdmin/CreateIndex',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.datastore.admin.v1.DatastoreAdmin',
+        method         => 'CreateIndex',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub delete_index {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Datastore::Admin::V1::DatastoreAdmin::DeleteIndexRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Longrunning::Operations::Operation';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.datastore.admin.v1.DatastoreAdmin/DeleteIndex',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.datastore.admin.v1.DatastoreAdmin',
+        method         => 'DeleteIndex',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub get_index {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Datastore::Admin::V1::DatastoreAdmin::GetIndexRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Datastore::Admin::V1::Index::Index';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.datastore.admin.v1.DatastoreAdmin/GetIndex',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.datastore.admin.v1.DatastoreAdmin',
+        method         => 'GetIndex',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+
+sub list_indexes {
+    my ($self, %params) = @_;
+
+    my $request_class = 'Google::Datastore::Admin::V1::DatastoreAdmin::ListIndexesRequest';
+    my $request = eval { $request_class->new(\%params) };
+    my $new_err = $@;
+    if (!$request) {
+        $request = eval { $request_class->new(%params) };
+        $new_err ||= $@;
+    }
+    if (!$request) {
+        croak 'Failed to construct ' . $request_class . ': ' . ($new_err || 'unknown error');
+    }
+
+    my $response_class = 'Google::Datastore::Admin::V1::DatastoreAdmin::ListIndexesResponse';
+    if (eval { $self->transport->isa('Google::Cloud::REST::Client') }) {
+        return $self->transport->call({
+            http_method    => 'POST',
+            path           => '/google.datastore.admin.v1.DatastoreAdmin/ListIndexes',
+            request        => $request,
+            response_class => $response_class,
+        });
+    }
+
+    my $response = $self->transport->call({
+        service        => 'google.datastore.admin.v1.DatastoreAdmin',
+        method         => 'ListIndexes',
+        request        => $request,
+        response_class => $response_class,
+    });
+
+    return $response;
+}
+1; # End of Google::Cloud::Datastore::Admin::V1
+
+__END__
+
+=head1 NAME
+
+Google::Cloud::Datastore::Admin::V1 - Client library for Google Cloud Services
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Datastore::Admin::V1;
+    use Google::Auth;
+
+    my $auth = Google::Auth->default();
+
+    # 1. High-performance gRPC Transport (Default)
+    my $grpc_client = Google::Cloud::Datastore::Admin::V1->new(
+        credentials => $auth,
+        transport   => 'grpc', # Optional: 'grpc' is default
+    );
+
+    # 2. HTTP/REST Transport
+    my $rest_client = Google::Cloud::Datastore::Admin::V1->new(
+        credentials => $auth,
+        transport   => 'rest',
+    );
+
+    # Execute service methods
+    my $res = $grpc_client->some_method( %params );
+
+=head1 DESCRIPTION
+
+C<Google::Cloud::Datastore::Admin::V1> is an auto-generated client library for Google Cloud Services.
+
+It provides a unified client interface supporting both high-performance HTTP/2 gRPC and HTTP/REST transports, with automatic Google Cloud Application Default Credentials (ADC) resolution and typed Protocol Buffers message handling.
+
+=head1 SOURCE
+
+Generated from the following Protocol Buffers schemas:
+
+=over 4
+
+=item * C<googleapis/google/datastore/admin/v1/datastore_admin.proto>
+
+=item * C<googleapis/google/datastore/admin/v1/index.proto>
+
+=item * C<googleapis/google/datastore/admin/v1/migration.proto>
+
+
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $client = Google::Cloud::Datastore::Admin::V1->new(
+        credentials => $auth,   # Optional: Google::Auth object (defaults to ADC)
+        transport   => 'grpc', # Optional: 'grpc' (default) or 'rest'
+    );
+
+=head1 ATTRIBUTES
+
+=head2 credentials
+
+Returns or accepts the L<Google::Auth> credentials object.
+
+=head2 transport
+
+Returns or accepts the active transport object (L<Google::gRPC::Client> or L<Google::Cloud::REST::Client>).
+
+=head1 METHODS
+
+=head2 METHODS
+
+The following RPC methods are available in this client:
+
+=over 4
+
+=item * B<export_entities>
+
+    my $response = $client->export_entities(
+        project_id               => $project_id,
+        labels                   => { ... },
+        entity_filter            => $entity_filter,
+        output_url_prefix        => $output_url_prefix,
+    );
+
+Calls the RPC method C<ExportEntities> on C<google.datastore.admin.v1.DatastoreAdmin>.
+
+Request: L<Google::Datastore::Admin::V1::DatastoreAdmin::ExportEntitiesRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<labels> - C<map<string, string>> (HashRef)
+
+=item * C<entity_filter> - L<Google::Datastore::Admin::V1::DatastoreAdmin::EntityFilter>
+
+=item * C<output_url_prefix> - C<string>
+
+=back
+
+=item * B<import_entities>
+
+    my $response = $client->import_entities(
+        project_id               => $project_id,
+        labels                   => { ... },
+        input_url                => $input_url,
+        entity_filter            => $entity_filter,
+    );
+
+Calls the RPC method C<ImportEntities> on C<google.datastore.admin.v1.DatastoreAdmin>.
+
+Request: L<Google::Datastore::Admin::V1::DatastoreAdmin::ImportEntitiesRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<labels> - C<map<string, string>> (HashRef)
+
+=item * C<input_url> - C<string>
+
+=item * C<entity_filter> - L<Google::Datastore::Admin::V1::DatastoreAdmin::EntityFilter>
+
+=back
+
+=item * B<create_index>
+
+    my $response = $client->create_index(
+        project_id               => $project_id,
+        index                    => $index,
+    );
+
+Calls the RPC method C<CreateIndex> on C<google.datastore.admin.v1.DatastoreAdmin>.
+
+Request: L<Google::Datastore::Admin::V1::DatastoreAdmin::CreateIndexRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<index> - L<Google::Datastore::Admin::V1::Index::Index>
+
+=back
+
+=item * B<delete_index>
+
+    my $response = $client->delete_index(
+        project_id               => $project_id,
+        index_id                 => $index_id,
+    );
+
+Calls the RPC method C<DeleteIndex> on C<google.datastore.admin.v1.DatastoreAdmin>.
+
+Request: L<Google::Datastore::Admin::V1::DatastoreAdmin::DeleteIndexRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<index_id> - C<string>
+
+=back
+
+=item * B<get_index>
+
+    my $response = $client->get_index(
+        project_id               => $project_id,
+        index_id                 => $index_id,
+    );
+
+Calls the RPC method C<GetIndex> on C<google.datastore.admin.v1.DatastoreAdmin>.
+
+Request: L<Google::Datastore::Admin::V1::DatastoreAdmin::GetIndexRequest>
+
+Returns: L<Google::Datastore::Admin::V1::Index::Index>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<index_id> - C<string>
+
+=back
+
+=item * B<list_indexes>
+
+    my $response = $client->list_indexes(
+        project_id               => $project_id,
+        filter                   => $filter,
+        page_size                => $page_size,
+        page_token               => $page_token,
+    );
+
+Calls the RPC method C<ListIndexes> on C<google.datastore.admin.v1.DatastoreAdmin>.
+
+Request: L<Google::Datastore::Admin::V1::DatastoreAdmin::ListIndexesRequest>
+
+Returns: L<Google::Datastore::Admin::V1::DatastoreAdmin::ListIndexesResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project_id> - C<string>
+
+=item * C<filter> - C<string>
+
+=item * C<page_size> - C<int32>
+
+=item * C<page_token> - C<string>
+
+=back
+
+=back
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

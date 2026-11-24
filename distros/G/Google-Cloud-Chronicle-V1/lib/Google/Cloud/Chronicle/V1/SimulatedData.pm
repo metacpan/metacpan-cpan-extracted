@@ -1,0 +1,78 @@
+package Google::Cloud::Chronicle::V1::SimulatedData;
+
+use strict;
+use warnings;
+
+our $VERSION = '0.14';
+
+use Protobuf::Message;
+use Protobuf::DescriptorPool;
+use Protobuf::Internal qw(:all);
+use MIME::Base64;
+
+BEGIN {
+    my $descriptor_b64 = <<'EOF';
+Ci5nb29nbGUvY2xvdWQvY2hyb25pY2xlL3YxL3NpbXVsYXRlZF9kYXRhLnByb3RvEhlnb29n
+bGUuY2xvdWQuY2hyb25pY2xlLnYxKn4KF1NpbXVsYXRlZERhdGFWaXNpYmlsaXR5EikKJVNJ
+TVVMQVRFRF9EQVRBX1ZJU0lCSUxJVFlfVU5TUEVDSUZJRUQQABIbChdTSU1VTEFURURfREFU
+QV9JTkNMVURFRBABEhsKF1NJTVVMQVRFRF9EQVRBX0VYQ0xVREVEEAJCyQEKHWNvbS5nb29n
+bGUuY2xvdWQuY2hyb25pY2xlLnYxQhJTaW11bGF0ZWREYXRhUHJvdG9QAVo7Y2xvdWQuZ29v
+Z2xlLmNvbS9nby9jaHJvbmljbGUvYXBpdjEvY2hyb25pY2xlcGI7Y2hyb25pY2xlcGKqAhlH
+b29nbGUuQ2xvdWQuQ2hyb25pY2xlLlYxygIZR29vZ2xlXENsb3VkXENocm9uaWNsZVxWMeoC
+HEdvb2dsZTo6Q2xvdWQ6OkNocm9uaWNsZTo6VjFK2gkKBhIEDgAmAQq8BAoBDBIDDgASMrEE
+IENvcHlyaWdodCAyMDI2IEdvb2dsZSBMTEMKCiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hl
+IExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgIkxpY2Vuc2UiKTsKIHlvdSBtYXkgbm90IHVz
+ZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS4KIFlv
+dSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdAoKICAgICBodHRwOi8vd3d3
+LmFwYWNoZS5vcmcvbGljZW5zZXMvTElDRU5TRS0yLjAKCiBVbmxlc3MgcmVxdWlyZWQgYnkg
+YXBwbGljYWJsZSBsYXcgb3IgYWdyZWVkIHRvIGluIHdyaXRpbmcsIHNvZnR3YXJlCiBkaXN0
+cmlidXRlZCB1bmRlciB0aGUgTGljZW5zZSBpcyBkaXN0cmlidXRlZCBvbiBhbiAiQVMgSVMi
+IEJBU0lTLAogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQs
+IGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuCiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBz
+cGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kCiBsaW1pdGF0aW9u
+cyB1bmRlciB0aGUgTGljZW5zZS4KCggKAQISAxAAIgoICgEIEgMSADYKCQoCCCUSAxIANgoI
+CgEIEgMTAFIKCQoCCAsSAxMAUgoICgEIEgMUACIKCQoCCAoSAxQAIgoICgEIEgMVADMKCQoC
+CAgSAxUAMwoICgEIEgMWADYKCQoCCAESAxYANgoICgEIEgMXADYKCQoCCCkSAxcANgoICgEI
+EgMYADUKCQoCCC0SAxgANQrUAQoCBQASBB0AJgEaxwEgU3BlY2lmaWVzIHZpc2liaWxpdHkg
+b2Ygc2ltdWxhdGVkIGRhdGEgdG8gaW5jbHVkZS4gVGhpcyBlbnVtIGlzIHVzZWQgaW4KIG11
+bHRpcGxlIHByb3RvcyB0byBmaWx0ZXIgb3V0IHNpbXVsYXRlZCBkYXRhIGZyb20gdGhlIGRh
+dGEgcmV0dXJuZWQgYnkgdGhlCiBBUEkgKGxpa2UgZXZlbnRzLCBkZXRlY3Rpb25zLCBhbmQg
+YWxlcnRzLCBldGMuKS4KCgoKAwUAARIDHQUcCj8KBAUAAgASAx8CLBoyIElmIHVuc3BlY2lm
+aWVkLCBzaW11bGF0ZWQgZGF0YSB3aWxsIGJlIGV4Y2x1ZGVkLgoKDAoFBQACAAESAx8CJwoM
+CgUFAAIAAhIDHyorCj0KBAUAAgESAyICHhowIElmIHNwZWNpZmllZCwgc2ltdWxhdGVkIGRh
+dGEgd2lsbCBiZSBpbmNsdWRlZC4KCgwKBQUAAgEBEgMiAhkKDAoFBQACAQISAyIcHQo9CgQF
+AAICEgMlAh4aMCBJZiBzcGVjaWZpZWQsIHNpbXVsYXRlZCBkYXRhIHdpbGwgYmUgZXhjbHVk
+ZWQuCgoMCgUFAAICARIDJQIZCgwKBQUAAgICEgMlHB1iBnByb3RvMw==
+EOF
+    Protobuf::DescriptorPool->generated_pool->add_serialized_file(MIME::Base64::decode_base64($descriptor_b64));
+}
+
+# Message definitions
+
+1;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+Google::Cloud::Chronicle::V1::SimulatedData - Compiled Protocol Buffers messages for google/cloud/chronicle/v1/simulated_data.proto
+
+=head1 DESCRIPTION
+
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/chronicle/v1/simulated_data.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Chronicle::V1::SimulatedData::Types>, L<https://protobuf.dev/>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Google LLC
+
+This program is released under the Apache 2.0 license.
+
+=cut

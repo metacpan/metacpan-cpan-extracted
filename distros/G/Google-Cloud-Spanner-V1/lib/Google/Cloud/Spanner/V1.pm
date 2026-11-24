@@ -10,18 +10,18 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Spanner::V1::Keys;
 use Google::Spanner::V1::Type;
 use Google::Spanner::V1::QueryPlan;
-use Google::Spanner::V1::Mutation;
-use Google::Spanner::V1::Location;
+use Google::Spanner::V1::Keys;
 use Google::Spanner::V1::ChangeStream;
+use Google::Spanner::V1::Location;
+use Google::Spanner::V1::Mutation;
 use Google::Spanner::V1::Transaction;
-use Google::Spanner::V1::ResultSet;
 use Google::Spanner::V1::CommitResponse;
+use Google::Spanner::V1::ResultSet;
 use Google::Spanner::V1::Spanner;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -185,7 +185,26 @@ The following RPC methods are available in this client:
 
 =item * B<create_session>
 
-Calls the RPC method C<CreateSession> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_session(
+        database                 => $database,
+        session                  => $session,
+    );
+
+Calls the RPC method C<CreateSession> on C<google.spanner.v1.Spanner>.
+
+Request: L<Google::Spanner::V1::Spanner::CreateSessionRequest>
+
+Returns: L<Google::Spanner::V1::Spanner::Session>
+
+Parameters:
+
+=over 4
+
+=item * C<database> - C<string>
+
+=item * C<session> - L<Google::Spanner::V1::Spanner::Session>
+
+=back
 
 =back
 

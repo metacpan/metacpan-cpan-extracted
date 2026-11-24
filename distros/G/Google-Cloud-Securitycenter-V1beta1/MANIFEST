@@ -1,0 +1,32 @@
+Changes
+lib/Google/Cloud/Securitycenter/V1beta1.pm
+lib/Google/Cloud/Securitycenter/V1beta1/Asset.pm
+lib/Google/Cloud/Securitycenter/V1beta1/Asset/Types.pm
+lib/Google/Cloud/Securitycenter/V1beta1/Finding.pm
+lib/Google/Cloud/Securitycenter/V1beta1/Finding/Types.pm
+lib/Google/Cloud/Securitycenter/V1beta1/OrganizationSettings.pm
+lib/Google/Cloud/Securitycenter/V1beta1/OrganizationSettings/Types.pm
+lib/Google/Cloud/Securitycenter/V1beta1/RunAssetDiscoveryResponse.pm
+lib/Google/Cloud/Securitycenter/V1beta1/RunAssetDiscoveryResponse/Types.pm
+lib/Google/Cloud/Securitycenter/V1beta1/SecurityCenterClient.pm
+lib/Google/Cloud/Securitycenter/V1beta1/SecuritycenterService.pm
+lib/Google/Cloud/Securitycenter/V1beta1/SecuritycenterService/Types.pm
+lib/Google/Cloud/Securitycenter/V1beta1/SecurityMarks.pm
+lib/Google/Cloud/Securitycenter/V1beta1/SecurityMarks/Types.pm
+lib/Google/Cloud/Securitycenter/V1beta1/Source.pm
+lib/Google/Cloud/Securitycenter/V1beta1/Source/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-SecurityCenter.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-SecurityCenter.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

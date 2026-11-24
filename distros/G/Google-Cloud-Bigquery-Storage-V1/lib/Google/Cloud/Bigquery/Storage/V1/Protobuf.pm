@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::Storage::V1::Protobuf;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -64,73 +64,94 @@ EOF
     # Fields for ProtoSchema
     # Field: proto_descriptor Type: 11 (.google.protobuf.DescriptorProto)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Protobuf::ProtoSchema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Protobuf;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Protobuf::ProtoSchema->new(
-        proto_descriptor => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<proto_descriptor>
-
-Type: Message (.google.protobuf.DescriptorProto)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::Storage::V1::Protobuf::ProtoRows ===
     # Fields for ProtoRows
     # Field: serialized_rows Type: 12 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::Storage::V1::Protobuf::ProtoRows - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::Storage::V1::Protobuf;
-
-    my $msg = Google::Cloud::Bigquery::Storage::V1::Protobuf::ProtoRows->new(
-        serialized_rows => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<serialized_rows>
-
-Type: Bytes
-
-=back
-
-=cut
 
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::Storage::V1::Protobuf - Protocol Buffers schema definition
+Google::Cloud::Bigquery::Storage::V1::Protobuf - Compiled Protocol Buffers messages for google/cloud/bigquery/storage/v1/protobuf.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::Storage::V1::Protobuf;
+
+    my $msg = Google::Cloud::Bigquery::Storage::V1::Protobuf::ProtoSchema->new({
+        proto_descriptor => $proto_descriptor,
+    });
+
+    # Read or update a field
+    my $val = $msg->proto_descriptor();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::Storage::V1::Protobuf::ProtoSchema->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/storage/v1/protobuf.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Protobuf::ProtoSchema
+
+ProtoSchema describes the schema of the serialized protocol buffer data rows.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->proto_descriptor() >> / C<< $msg->proto_descriptor($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Descriptor::DescriptorProto>)
+
+Descriptor for input message.  The provided descriptor must be self
+contained, such that data rows sent can be fully decoded using only the
+single descriptor.  For data rows that are compositions of multiple
+independent messages, this means the descriptor may need to be transformed
+to only use nested types:
+https://developers.google.com/protocol-buffers/docs/proto#nested
+
+For additional information for how proto types and values map onto BigQuery
+see: https://cloud.google.com/bigquery/docs/write-api#data_type_conversions
+
+=back
+
+=head2 Google::Cloud::Bigquery::Storage::V1::Protobuf::ProtoRows
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->serialized_rows() >> / C<< $msg->serialized_rows($value) >>
+
+Type: C<Bytes>
+
+A sequence of rows serialized as a Protocol Buffer.
+
+See https://developers.google.com/protocol-buffers/docs/overview for more
+information on deserializing this field.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::Storage::V1::Protobuf::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -736,75 +736,561 @@ The following RPC methods are available in this client:
 
 =item * B<add_resource_policies>
 
-Calls the RPC method C<AddResourcePolicies> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->add_resource_policies(
+        disk                     => $disk,
+        project                  => $project,
+        region                   => $region,
+        region_disks_add_resource_policies_request_resource => $region_disks_add_resource_policies_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<AddResourcePolicies> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::AddResourcePoliciesRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_disks_add_resource_policies_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionDisksAddResourcePoliciesRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<bulk_insert>
 
-Calls the RPC method C<BulkInsert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->bulk_insert(
+        bulk_insert_disk_resource_resource => $bulk_insert_disk_resource_resource,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<BulkInsert> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::BulkInsertRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<bulk_insert_disk_resource_resource> - L<Google::Cloud::Compute::V1::Compute::BulkInsertDiskResource>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<create_snapshot>
 
-Calls the RPC method C<CreateSnapshot> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_snapshot(
+        disk                     => $disk,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        snapshot_resource        => $snapshot_resource,
+    );
+
+Calls the RPC method C<CreateSnapshot> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::CreateSnapshotRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<snapshot_resource> - L<Google::Cloud::Compute::V1::Compute::Snapshot>
+
+=back
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        disk                     => $disk,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        disk                     => $disk,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Disk>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<get_iam_policy>
 
-Calls the RPC method C<GetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get_iam_policy(
+        options_requested_policy_version => $options_requested_policy_version,
+        project                  => $project,
+        region                   => $region,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<GetIamPolicy> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetIamPolicyRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<options_requested_policy_version> - C<int32>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        disk_resource            => $disk_resource,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        source_image             => $source_image,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk_resource> - L<Google::Cloud::Compute::V1::Compute::Disk>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<source_image> - C<string>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListRegionDisksRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::DiskList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<remove_resource_policies>
 
-Calls the RPC method C<RemoveResourcePolicies> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->remove_resource_policies(
+        disk                     => $disk,
+        project                  => $project,
+        region                   => $region,
+        region_disks_remove_resource_policies_request_resource => $region_disks_remove_resource_policies_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<RemoveResourcePolicies> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::RemoveResourcePoliciesRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_disks_remove_resource_policies_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionDisksRemoveResourcePoliciesRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<resize>
 
-Calls the RPC method C<Resize> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->resize(
+        disk                     => $disk,
+        project                  => $project,
+        region                   => $region,
+        region_disks_resize_request_resource => $region_disks_resize_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<Resize> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ResizeRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_disks_resize_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionDisksResizeRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<set_iam_policy>
 
-Calls the RPC method C<SetIamPolicy> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_iam_policy(
+        project                  => $project,
+        region                   => $region,
+        region_set_policy_request_resource => $region_set_policy_request_resource,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<SetIamPolicy> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetIamPolicyRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Policy>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_set_policy_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionSetPolicyRequest>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<set_labels>
 
-Calls the RPC method C<SetLabels> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_labels(
+        project                  => $project,
+        region                   => $region,
+        region_set_labels_request_resource => $region_set_labels_request_resource,
+        request_id               => $request_id,
+        resource                 => $resource,
+    );
+
+Calls the RPC method C<SetLabels> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetLabelsRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_set_labels_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionSetLabelsRequest>
+
+=item * C<request_id> - C<string>
+
+=item * C<resource> - C<string>
+
+=back
 
 =item * B<start_async_replication>
 
-Calls the RPC method C<StartAsyncReplication> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->start_async_replication(
+        disk                     => $disk,
+        project                  => $project,
+        region                   => $region,
+        region_disks_start_async_replication_request_resource => $region_disks_start_async_replication_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<StartAsyncReplication> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::StartAsyncReplicationRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_disks_start_async_replication_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionDisksStartAsyncReplicationRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<stop_async_replication>
 
-Calls the RPC method C<StopAsyncReplication> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stop_async_replication(
+        disk                     => $disk,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<StopAsyncReplication> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::StopAsyncReplicationRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<stop_group_async_replication>
 
-Calls the RPC method C<StopGroupAsyncReplication> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->stop_group_async_replication(
+        disks_stop_group_async_replication_resource_resource => $disks_stop_group_async_replication_resource_resource,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<StopGroupAsyncReplication> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::StopGroupAsyncReplicationRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disks_stop_group_async_replication_resource_resource> - L<Google::Cloud::Compute::V1::Compute::DisksStopGroupAsyncReplicationResource>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =item * B<test_iam_permissions>
 
-Calls the RPC method C<TestIamPermissions> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->test_iam_permissions(
+        project                  => $project,
+        region                   => $region,
+        resource                 => $resource,
+        test_permissions_request_resource => $test_permissions_request_resource,
+    );
+
+Calls the RPC method C<TestIamPermissions> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::TestIamPermissionsRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TestPermissionsResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<resource> - C<string>
+
+=item * C<test_permissions_request_resource> - L<Google::Cloud::Compute::V1::Compute::TestPermissionsRequest>
+
+=back
 
 =item * B<update>
 
-Calls the RPC method C<Update> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update(
+        disk                     => $disk,
+        disk_resource            => $disk_resource,
+        paths                    => $paths,
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        update_mask              => $update_mask,
+    );
+
+Calls the RPC method C<Update> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<disk_resource> - L<Google::Cloud::Compute::V1::Compute::Disk>
+
+=item * C<paths> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<update_mask> - C<string>
+
+=back
 
 =item * B<update_kms_key>
 
-Calls the RPC method C<UpdateKmsKey> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->update_kms_key(
+        disk                     => $disk,
+        project                  => $project,
+        region                   => $region,
+        region_disk_update_kms_key_request_resource => $region_disk_update_kms_key_request_resource,
+        request_id               => $request_id,
+    );
+
+Calls the RPC method C<UpdateKmsKey> on C<google.cloud.compute.v1.RegionDisks>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::UpdateKmsKeyRegionDiskRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<disk> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<region_disk_update_kms_key_request_resource> - L<Google::Cloud::Compute::V1::Compute::RegionDiskUpdateKmsKeyRequest>
+
+=item * C<request_id> - C<string>
+
+=back
 
 =back
 

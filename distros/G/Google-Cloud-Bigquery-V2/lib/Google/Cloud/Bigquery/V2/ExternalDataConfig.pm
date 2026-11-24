@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::ExternalDataConfig;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -639,71 +639,11 @@ EOF
     # Fields for AvroOptions
     # Field: use_avro_logical_types Type: 11 (.google.protobuf.BoolValue)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::AvroOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::AvroOptions->new(
-        use_avro_logical_types => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<use_avro_logical_types>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::ExternalDataConfig::ParquetOptions ===
     # Fields for ParquetOptions
     # Field: enum_as_string Type: 11 (.google.protobuf.BoolValue)
     # Field: enable_list_inference Type: 11 (.google.protobuf.BoolValue)
     # Field: map_target_type Type: 14 (.google.cloud.bigquery.v2.MapTargetType)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::ParquetOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::ParquetOptions->new(
-        enum_as_string => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<enum_as_string>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<enable_list_inference>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<map_target_type>
-
-Type: Enum (.google.cloud.bigquery.v2.MapTargetType)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::ExternalDataConfig::CsvOptions ===
     # Fields for CsvOptions
@@ -718,132 +658,14 @@ Type: Enum (.google.cloud.bigquery.v2.MapTargetType)
     # Field: null_markers Type: 9 ()
     # Field: source_column_match Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::CsvOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::CsvOptions->new(
-        field_delimiter => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<field_delimiter>
-
-Type: String
-
-=item * B<skip_leading_rows>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<quote>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<allow_quoted_newlines>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<allow_jagged_rows>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<encoding>
-
-Type: String
-
-=item * B<preserve_ascii_control_characters>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<null_marker>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<null_markers>
-
-Type: String
-
-=item * B<source_column_match>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::ExternalDataConfig::JsonOptions ===
     # Fields for JsonOptions
     # Field: encoding Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::JsonOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::JsonOptions->new(
-        encoding => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<encoding>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableProtoConfig ===
     # Fields for BigtableProtoConfig
     # Field: schema_bundle_id Type: 9 ()
     # Field: proto_message_name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableProtoConfig - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableProtoConfig->new(
-        schema_bundle_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<schema_bundle_id>
-
-Type: String
-
-=item * B<proto_message_name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumn ===
     # Fields for BigtableColumn
@@ -855,56 +677,6 @@ Type: String
     # Field: only_read_latest Type: 11 (.google.protobuf.BoolValue)
     # Field: proto_config Type: 11 (.google.cloud.bigquery.v2.BigtableProtoConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumn - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumn->new(
-        qualifier_encoded => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<qualifier_encoded>
-
-Type: Message (.google.protobuf.BytesValue)
-
-=item * B<qualifier_string>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<field_name>
-
-Type: String
-
-=item * B<type>
-
-Type: String
-
-=item * B<encoding>
-
-Type: String
-
-=item * B<only_read_latest>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<proto_config>
-
-Type: Message (.google.cloud.bigquery.v2.BigtableProtoConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumnFamily ===
     # Fields for BigtableColumnFamily
     # Field: family_id Type: 9 ()
@@ -914,52 +686,6 @@ Type: Message (.google.cloud.bigquery.v2.BigtableProtoConfig)
     # Field: only_read_latest Type: 11 (.google.protobuf.BoolValue)
     # Field: proto_config Type: 11 (.google.cloud.bigquery.v2.BigtableProtoConfig)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumnFamily - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumnFamily->new(
-        family_id => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<family_id>
-
-Type: String
-
-=item * B<type>
-
-Type: String
-
-=item * B<encoding>
-
-Type: String
-
-=item * B<columns>
-
-Type: Message (.google.cloud.bigquery.v2.BigtableColumn)
-
-=item * B<only_read_latest>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<proto_config>
-
-Type: Message (.google.cloud.bigquery.v2.BigtableProtoConfig)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableOptions ===
     # Fields for BigtableOptions
     # Field: column_families Type: 11 (.google.cloud.bigquery.v2.BigtableColumnFamily)
@@ -967,78 +693,10 @@ Type: Message (.google.cloud.bigquery.v2.BigtableProtoConfig)
     # Field: read_rowkey_as_string Type: 11 (.google.protobuf.BoolValue)
     # Field: output_column_families_as_json Type: 11 (.google.protobuf.BoolValue)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableOptions->new(
-        column_families => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<column_families>
-
-Type: Message (.google.cloud.bigquery.v2.BigtableColumnFamily)
-
-=item * B<ignore_unspecified_column_families>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<read_rowkey_as_string>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<output_column_families_as_json>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Bigquery::V2::ExternalDataConfig::GoogleSheetsOptions ===
     # Fields for GoogleSheetsOptions
     # Field: skip_leading_rows Type: 11 (.google.protobuf.Int64Value)
     # Field: range Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::GoogleSheetsOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::GoogleSheetsOptions->new(
-        skip_leading_rows => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<skip_leading_rows>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<range>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Bigquery::V2::ExternalDataConfig::ExternalDataConfiguration ===
     # Fields for ExternalDataConfiguration
@@ -1070,193 +728,866 @@ Type: String
     # Field: timestamp_format Type: 9 ()
     # Field: timestamp_target_precision Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::ExternalDataConfig::ExternalDataConfiguration - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
-
-    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::ExternalDataConfiguration->new(
-        source_uris => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<source_uris>
-
-Type: String
-
-=item * B<file_set_spec_type>
-
-Type: Enum (.google.cloud.bigquery.v2.FileSetSpecType)
-
-=item * B<schema>
-
-Type: Message (.google.cloud.bigquery.v2.TableSchema)
-
-=item * B<source_format>
-
-Type: String
-
-=item * B<max_bad_records>
-
-Type: Message (.google.protobuf.Int32Value)
-
-=item * B<autodetect>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<ignore_unknown_values>
-
-Type: Message (.google.protobuf.BoolValue)
-
-=item * B<compression>
-
-Type: String
-
-=item * B<csv_options>
-
-Type: Message (.google.cloud.bigquery.v2.CsvOptions)
-
-=item * B<json_options>
-
-Type: Message (.google.cloud.bigquery.v2.JsonOptions)
-
-=item * B<bigtable_options>
-
-Type: Message (.google.cloud.bigquery.v2.BigtableOptions)
-
-=item * B<google_sheets_options>
-
-Type: Message (.google.cloud.bigquery.v2.GoogleSheetsOptions)
-
-=item * B<hive_partitioning_options>
-
-Type: Message (.google.cloud.bigquery.v2.HivePartitioningOptions)
-
-=item * B<connection_id>
-
-Type: String
-
-=item * B<decimal_target_types>
-
-Type: Enum (.google.cloud.bigquery.v2.DecimalTargetType)
-
-=item * B<avro_options>
-
-Type: Message (.google.cloud.bigquery.v2.AvroOptions)
-
-=item * B<json_extension>
-
-Type: Enum (.google.cloud.bigquery.v2.JsonExtension)
-
-=item * B<parquet_options>
-
-Type: Message (.google.cloud.bigquery.v2.ParquetOptions)
-
-=item * B<object_metadata>
-
-Type: Enum (.google.cloud.bigquery.v2.ExternalDataConfiguration.ObjectMetadata)
-
-=item * B<reference_file_schema_uri>
-
-Type: Message (.google.protobuf.StringValue)
-
-=item * B<metadata_cache_mode>
-
-Type: Enum (.google.cloud.bigquery.v2.ExternalDataConfiguration.MetadataCacheMode)
-
-=item * B<time_zone>
-
-Type: String
-
-=item * B<date_format>
-
-Type: String
-
-=item * B<datetime_format>
-
-Type: String
-
-=item * B<time_format>
-
-Type: String
-
-=item * B<timestamp_format>
-
-Type: String
-
-=item * B<timestamp_target_precision>
-
-Type: Int32
-
-=back
-
-=cut
-
 # Enum: ExternalDataConfiguration::ObjectMetadata
 our $ExternalDataConfiguration_OBJECT_METADATA_UNSPECIFIED = 0;
 our $ExternalDataConfiguration_DIRECTORY = 1;
 our $ExternalDataConfiguration_SIMPLE = 2;
-
-=pod
-
-=head2 Enum: ExternalDataConfiguration::ObjectMetadata
-
-Values:
-
-=over 4
-
-=item * C<OBJECT_METADATA_UNSPECIFIED> => 0
-
-=item * C<DIRECTORY> => 1
-
-=item * C<SIMPLE> => 2
-
-=back
-
-=cut
 
 # Enum: ExternalDataConfiguration::MetadataCacheMode
 our $ExternalDataConfiguration_METADATA_CACHE_MODE_UNSPECIFIED = 0;
 our $ExternalDataConfiguration_AUTOMATIC = 1;
 our $ExternalDataConfiguration_MANUAL = 2;
 
-=pod
-
-=head2 Enum: ExternalDataConfiguration::MetadataCacheMode
-
-Values:
-
-=over 4
-
-=item * C<METADATA_CACHE_MODE_UNSPECIFIED> => 0
-
-=item * C<AUTOMATIC> => 1
-
-=item * C<MANUAL> => 2
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::ExternalDataConfig - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::ExternalDataConfig - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/external_data_config.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::ExternalDataConfig;
+
+    my $msg = Google::Cloud::Bigquery::V2::ExternalDataConfig::AvroOptions->new({
+        use_avro_logical_types => $use_avro_logical_types,
+    });
+
+    # Read or update a field
+    my $val = $msg->use_avro_logical_types();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::ExternalDataConfig::AvroOptions->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/external_data_config.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::AvroOptions
+
+Options for external data sources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->use_avro_logical_types() >> / C<< $msg->use_avro_logical_types($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If sourceFormat is set to "AVRO", indicates whether to interpret
+logical types as the corresponding BigQuery data type (for example,
+TIMESTAMP), instead of using the raw type (for example, INTEGER).
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::ParquetOptions
+
+Parquet Options for load and make external tables.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->enum_as_string() >> / C<< $msg->enum_as_string($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Indicates whether to infer Parquet ENUM logical type as STRING
+instead of BYTES by default.
+
+=item * C<< $msg->enable_list_inference() >> / C<< $msg->enable_list_inference($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Indicates whether to use schema inference specifically for
+Parquet LIST logical type.
+
+=item * C<< $msg->map_target_type() >> / C<< $msg->map_target_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::MapTargetType>)
+
+Optional. Indicates how to represent a Parquet map if present.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::CsvOptions
+
+Information related to a CSV data source.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->field_delimiter() >> / C<< $msg->field_delimiter($value) >>
+
+Type: C<String>
+
+Optional. The separator character for fields in a CSV file. The separator
+is interpreted as a single byte. For files encoded in ISO-8859-1, any
+single character can be used as a separator. For files encoded in UTF-8,
+characters represented in decimal range 1-127 (U+0001-U+007F) can be used
+without any modification. UTF-8 characters encoded with multiple bytes
+(i.e. U+0080 and above) will have only the first byte used for separating
+fields. The remaining bytes will be treated as a part of the field.
+BigQuery also supports the escape sequence "\t" (U+0009) to specify a tab
+separator. The default value is comma (",", U+002C).
+
+=item * C<< $msg->skip_leading_rows() >> / C<< $msg->skip_leading_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. The number of rows at the top of a CSV file that BigQuery will
+skip when reading the data. The default value is 0. This property is
+useful if you have header rows in the file that should be skipped.
+When autodetect is on, the behavior is the following:
+
+* skipLeadingRows unspecified - Autodetect tries to detect headers in the
+  first row. If they are not detected, the row is read as data. Otherwise
+  data is read starting from the second row.
+* skipLeadingRows is 0 - Instructs autodetect that there are no headers and
+  data should be read starting from the first row.
+* skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect
+  headers in row N. If headers are not detected, row N is just skipped.
+  Otherwise row N is used to extract column names for the detected schema.
+
+=item * C<< $msg->quote() >> / C<< $msg->quote($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. The value that is used to quote data sections in a CSV file.
+BigQuery converts the string to ISO-8859-1 encoding, and then uses the
+first byte of the encoded string to split the data in its raw, binary
+state.
+The default value is a double-quote (").
+If your data does not contain quoted sections,
+set the property value to an empty string.
+If your data contains quoted newline characters, you must also set the
+allowQuotedNewlines property to true.
+To include the specific quote character within a quoted value, precede it
+with an additional matching quote character. For example, if you want to
+escape the default character  ' " ', use ' "" '.
+
+=item * C<< $msg->allow_quoted_newlines() >> / C<< $msg->allow_quoted_newlines($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Indicates if BigQuery should allow quoted data sections that
+contain newline characters in a CSV file. The default value is false.
+
+=item * C<< $msg->allow_jagged_rows() >> / C<< $msg->allow_jagged_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Indicates if BigQuery should accept rows that are missing
+trailing optional columns. If true, BigQuery treats missing trailing
+columns as null values.
+If false, records with missing trailing columns are treated as bad records,
+and if there are too many bad records, an invalid error is returned in the
+job result. The default value is false.
+
+=item * C<< $msg->encoding() >> / C<< $msg->encoding($value) >>
+
+Type: C<String>
+
+Optional. The character encoding of the data.
+The supported values are UTF-8, ISO-8859-1, UTF-16BE, UTF-16LE, UTF-32BE,
+and UTF-32LE.  The default value is UTF-8.
+BigQuery decodes the data after the raw, binary data has been split using
+the values of the quote and fieldDelimiter properties.
+
+=item * C<< $msg->preserve_ascii_control_characters() >> / C<< $msg->preserve_ascii_control_characters($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Indicates if the embedded ASCII control characters (the first 32
+characters in the ASCII-table, from '\x00' to '\x1F') are preserved.
+
+=item * C<< $msg->null_marker() >> / C<< $msg->null_marker($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. Specifies a string that represents a null value in a CSV file.
+For example, if you specify "\N", BigQuery interprets "\N" as a null value
+when querying a CSV file.
+The default value is the empty string. If you set this property to a custom
+value, BigQuery throws an error if an empty string is present for all data
+types except for STRING and BYTE. For STRING and BYTE columns, BigQuery
+interprets the empty string as an empty value.
+
+=item * C<< $msg->null_markers() >> / C<< $msg->null_markers($value) >>
+
+Type: C<String>
+
+Optional. A list of strings represented as SQL NULL value in a CSV file.
+
+null_marker and null_markers can't be set at the same time.
+If null_marker is set, null_markers has to be not set.
+If null_markers is set, null_marker has to be not set.
+If both null_marker and null_markers are set at the same time, a user
+error would be thrown.
+Any strings listed in null_markers, including
+empty string would be interpreted as SQL NULL. This applies to all column
+types.
+
+=item * C<< $msg->source_column_match() >> / C<< $msg->source_column_match($value) >>
+
+Type: C<String>
+
+Optional. Controls the strategy used to match loaded columns to the schema.
+If not set, a sensible default is chosen based on how the schema is
+provided. If autodetect is used, then columns are matched by name.
+Otherwise, columns are matched by position. This is done to keep the
+behavior backward-compatible. Acceptable values are:
+  POSITION - matches by position. This assumes that the columns are ordered
+             the same way as the schema.
+  NAME - matches by name. This reads the header row as column names and
+         reorders columns to match the field names in the schema.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::JsonOptions
+
+Json Options for load and make external tables.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->encoding() >> / C<< $msg->encoding($value) >>
+
+Type: C<String>
+
+Optional. The character encoding of the data.
+The supported values are UTF-8, UTF-16BE, UTF-16LE, UTF-32BE,
+and UTF-32LE.  The default value is UTF-8.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableProtoConfig
+
+Information related to a Bigtable protobuf column.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->schema_bundle_id() >> / C<< $msg->schema_bundle_id($value) >>
+
+Type: C<String>
+
+Optional. The ID of the Bigtable SchemaBundle resource associated with this
+protobuf. The ID should be referred to within the parent table, e.g.,
+`foo` rather than
+`projects/{project}/instances/{instance}/tables/{table}/schemaBundles/foo`.
+See [more details on Bigtable
+SchemaBundles](https://docs.cloud.google.com/bigtable/docs/create-manage-protobuf-schemas).
+
+=item * C<< $msg->proto_message_name() >> / C<< $msg->proto_message_name($value) >>
+
+Type: C<String>
+
+Optional. The fully qualified proto message name of the protobuf. In the
+format of "foo.bar.Message".
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumn
+
+Information related to a Bigtable column.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->qualifier_encoded() >> / C<< $msg->qualifier_encoded($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BytesValue>)
+
+[Required] Qualifier of the column.
+Columns in the parent column family that has this exact qualifier are
+exposed as `<family field name>.<column field name>` field.
+If the qualifier is valid UTF-8 string, it can be specified in the
+qualifier_string field.  Otherwise, a base-64 encoded value must be set to
+qualifier_encoded.
+The column field name is the same as the column qualifier. However, if the
+qualifier is not a valid BigQuery field identifier i.e. does not match
+[a-zA-Z][a-zA-Z0-9_]*, a valid identifier must be provided as field_name.
+
+=item * C<< $msg->qualifier_string() >> / C<< $msg->qualifier_string($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Qualifier string.
+
+=item * C<< $msg->field_name() >> / C<< $msg->field_name($value) >>
+
+Type: C<String>
+
+Optional. If the qualifier is not a valid BigQuery field identifier i.e.
+does not match [a-zA-Z][a-zA-Z0-9_]*,  a valid identifier must be provided
+as the column field name and is used as field name in queries.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+Optional. The type to convert the value in cells of this column.
+The values are expected to be encoded using HBase Bytes.toBytes function
+when using the BINARY encoding value.
+Following BigQuery types are allowed (case-sensitive):
+
+* BYTES
+* STRING
+* INTEGER
+* FLOAT
+* BOOLEAN
+* JSON
+
+Default type is BYTES.
+'type' can also be set at the column family level. However, the setting at
+this level takes precedence if 'type' is set at both levels.
+
+=item * C<< $msg->encoding() >> / C<< $msg->encoding($value) >>
+
+Type: C<String>
+
+Optional. The encoding of the values when the type is not STRING.
+Acceptable encoding values are:
+  TEXT - indicates values are alphanumeric text strings.
+  BINARY - indicates values are encoded using HBase Bytes.toBytes family of
+           functions.
+  PROTO_BINARY - indicates values are encoded using serialized proto
+           messages. This can only be used in combination with JSON
+           type.
+'encoding' can also be set at the column family level. However, the setting
+at this level takes precedence if 'encoding' is set at both levels.
+
+=item * C<< $msg->only_read_latest() >> / C<< $msg->only_read_latest($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If this is set, only the latest version of value in this column
+            are exposed.
+'onlyReadLatest' can also be set at the column family level. However, the
+setting at this level takes precedence if 'onlyReadLatest' is set at both
+levels.
+
+=item * C<< $msg->proto_config() >> / C<< $msg->proto_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableProtoConfig>)
+
+Optional. Protobuf-specific configurations, only takes effect when the
+encoding is PROTO_BINARY.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumnFamily
+
+Information related to a Bigtable column family.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->family_id() >> / C<< $msg->family_id($value) >>
+
+Type: C<String>
+
+Identifier of the column family.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<String>
+
+Optional. The type to convert the value in cells of this column family.
+The values are expected to be encoded using HBase Bytes.toBytes function
+when using the BINARY encoding value.
+Following BigQuery types are allowed (case-sensitive):
+
+* BYTES
+* STRING
+* INTEGER
+* FLOAT
+* BOOLEAN
+* JSON
+
+Default type is BYTES.
+This can be overridden for a specific column by listing that column in
+'columns' and specifying a type for it.
+
+=item * C<< $msg->encoding() >> / C<< $msg->encoding($value) >>
+
+Type: C<String>
+
+Optional. The encoding of the values when the type is not STRING.
+Acceptable encoding values are:
+  TEXT - indicates values are alphanumeric text strings.
+  BINARY - indicates values are encoded using HBase Bytes.toBytes family of
+           functions.
+  PROTO_BINARY - indicates values are encoded using serialized proto
+           messages. This can only be used in combination with JSON
+           type.
+This can be overridden for a specific column by listing that column in
+'columns' and specifying an encoding for it.
+
+=item * C<< $msg->columns() >> / C<< $msg->columns($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumn>)
+
+Optional. Lists of columns that should be exposed as individual fields as
+opposed to a list of (column name, value) pairs.
+All columns whose qualifier matches a qualifier in this list can be
+accessed as `<family field name>.<column field name>`.
+Other columns can be accessed as a list through
+the `<family field name>.Column` field.
+
+=item * C<< $msg->only_read_latest() >> / C<< $msg->only_read_latest($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If this is set only the latest version of value are exposed for
+all columns in this column family.
+This can be overridden for a specific column by listing that column in
+'columns' and specifying a different setting
+for that column.
+
+=item * C<< $msg->proto_config() >> / C<< $msg->proto_config($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableProtoConfig>)
+
+Optional. Protobuf-specific configurations, only takes effect when the
+encoding is PROTO_BINARY.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableOptions
+
+Options specific to Google Cloud Bigtable data sources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->column_families() >> / C<< $msg->column_families($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableColumnFamily>)
+
+Optional. List of column families to expose in the table schema along with
+their types.
+This list restricts the column families that can be referenced in queries
+and specifies their value types.
+You can use this list to do type conversions - see the 'type' field for
+more details.
+If you leave this list empty, all column families are present in the table
+schema and their values are read as BYTES.
+During a query only the column families referenced in that query are read
+from Bigtable.
+
+=item * C<< $msg->ignore_unspecified_column_families() >> / C<< $msg->ignore_unspecified_column_families($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If field is true, then the column families that are not
+specified in columnFamilies list are not exposed in the table schema.
+Otherwise, they are read with BYTES type values.
+The default value is false.
+
+=item * C<< $msg->read_rowkey_as_string() >> / C<< $msg->read_rowkey_as_string($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If field is true, then the rowkey column families will be read
+and converted to string. Otherwise they are read with BYTES type values and
+users need to manually cast them with CAST if necessary.
+The default value is false.
+
+=item * C<< $msg->output_column_families_as_json() >> / C<< $msg->output_column_families_as_json($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. If field is true, then each column family will be read as a
+single JSON column. Otherwise they are read as a repeated cell structure
+containing timestamp/value tuples. The default value is false.
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::GoogleSheetsOptions
+
+Options specific to Google Sheets data sources.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->skip_leading_rows() >> / C<< $msg->skip_leading_rows($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. The number of rows at the top of a sheet that BigQuery will skip
+when reading the data. The default value is 0. This property is useful if
+you have header rows that should be skipped. When autodetect is on,
+the behavior is the following:
+* skipLeadingRows unspecified - Autodetect tries to detect headers in the
+  first row. If they are not detected, the row is read as data. Otherwise
+  data is read starting from the second row.
+* skipLeadingRows is 0 - Instructs autodetect that there are no headers and
+  data should be read starting from the first row.
+* skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect
+  headers in row N. If headers are not detected, row N is just skipped.
+  Otherwise row N is used to extract column names for the detected schema.
+
+=item * C<< $msg->range() >> / C<< $msg->range($value) >>
+
+Type: C<String>
+
+Optional. Range of a sheet to query from. Only used when non-empty.
+Typical format: sheet_name!top_left_cell_id:bottom_right_cell_id
+For example: sheet1!A1:B20
+
+=back
+
+=head2 Google::Cloud::Bigquery::V2::ExternalDataConfig::ExternalDataConfiguration
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->source_uris() >> / C<< $msg->source_uris($value) >>
+
+Type: C<String>
+
+[Required] The fully-qualified URIs that point to your data in Google
+Cloud. For Google Cloud Storage URIs:
+  Each URI can contain one '*' wildcard character and it must come after
+  the 'bucket' name.
+  Size limits related to load jobs apply to external data sources.
+For Google Cloud Bigtable URIs:
+  Exactly one URI can be specified and it has be a fully specified and
+  valid HTTPS URL for a Google Cloud Bigtable table.
+For Google Cloud Datastore backups, exactly one URI can be specified. Also,
+the '*' wildcard character is not allowed.
+
+=item * C<< $msg->file_set_spec_type() >> / C<< $msg->file_set_spec_type($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::FileSetSpecType>)
+
+Optional. Specifies how source URIs are interpreted for constructing the
+file set to load.  By default source URIs are expanded against the
+underlying storage.  Other options include specifying manifest files. Only
+applicable to object storage systems.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::TableSchema::TableSchema>)
+
+Optional. The schema for the data.
+Schema is required for CSV and JSON formats if autodetect is not on.
+Schema is disallowed for Google Cloud Bigtable, Cloud Datastore backups,
+Avro, ORC and Parquet formats.
+
+=item * C<< $msg->source_format() >> / C<< $msg->source_format($value) >>
+
+Type: C<String>
+
+[Required] The data format.
+For CSV files, specify "CSV".
+For Google sheets, specify "GOOGLE_SHEETS".
+For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON".
+For Avro files, specify "AVRO".
+For Google Cloud Datastore backups, specify "DATASTORE_BACKUP".
+For Apache Iceberg tables, specify "ICEBERG".
+For ORC files, specify "ORC".
+For Parquet files, specify "PARQUET".
+[Beta] For Google Cloud Bigtable, specify "BIGTABLE".
+
+=item * C<< $msg->max_bad_records() >> / C<< $msg->max_bad_records($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int32Value>)
+
+Optional. The maximum number of bad records that BigQuery can ignore when
+reading data. If the number of bad records exceeds this value, an invalid
+error is returned in the job result. The default value is 0, which requires
+that all records are valid. This setting is ignored for Google Cloud
+Bigtable, Google Cloud Datastore backups, Avro, ORC and Parquet formats.
+
+=item * C<< $msg->autodetect() >> / C<< $msg->autodetect($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Try to detect schema and format options automatically.
+Any option specified explicitly will be honored.
+
+=item * C<< $msg->ignore_unknown_values() >> / C<< $msg->ignore_unknown_values($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::BoolValue>)
+
+Optional. Indicates if BigQuery should allow extra values that are not
+represented in the table schema.
+If true, the extra values are ignored.
+If false, records with extra columns are treated as bad records, and if
+there are too many bad records, an invalid error is returned in the job
+result.
+The default value is false.
+The sourceFormat property determines what BigQuery treats as an extra
+value:
+  CSV: Trailing columns
+  JSON: Named values that don't match any column names
+  Google Cloud Bigtable: This setting is ignored.
+  Google Cloud Datastore backups: This setting is ignored.
+  Avro: This setting is ignored.
+  ORC: This setting is ignored.
+  Parquet: This setting is ignored.
+
+=item * C<< $msg->compression() >> / C<< $msg->compression($value) >>
+
+Type: C<String>
+
+Optional. The compression type of the data source.
+Possible values include GZIP and NONE. The default value is NONE.
+This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore
+backups, Avro, ORC and Parquet
+formats. An empty string is an invalid value.
+
+=item * C<< $msg->csv_options() >> / C<< $msg->csv_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::CsvOptions>)
+
+Optional. Additional properties to set if sourceFormat is set to CSV.
+
+=item * C<< $msg->json_options() >> / C<< $msg->json_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::JsonOptions>)
+
+Optional. Additional properties to set if sourceFormat is set to JSON.
+
+=item * C<< $msg->bigtable_options() >> / C<< $msg->bigtable_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::BigtableOptions>)
+
+Optional. Additional options if sourceFormat is set to BIGTABLE.
+
+=item * C<< $msg->google_sheets_options() >> / C<< $msg->google_sheets_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::GoogleSheetsOptions>)
+
+Optional. Additional options if sourceFormat is set to GOOGLE_SHEETS.
+
+=item * C<< $msg->hive_partitioning_options() >> / C<< $msg->hive_partitioning_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::HivePartitioning::HivePartitioningOptions>)
+
+Optional. When set, configures hive partitioning support. Not all storage
+formats support hive partitioning -- requesting hive partitioning on an
+unsupported format will lead to an error, as will providing an invalid
+specification.
+
+=item * C<< $msg->connection_id() >> / C<< $msg->connection_id($value) >>
+
+Type: C<String>
+
+Optional. The connection specifying the credentials to be used to read
+external storage, such as Azure Blob, Cloud Storage, or S3. The
+connection_id can have the form
+`{project_id}.{location_id};{connection_id}` or
+`projects/{project_id}/locations/{location_id}/connections/{connection_id}`.
+
+=item * C<< $msg->decimal_target_types() >> / C<< $msg->decimal_target_types($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::DecimalTargetType>)
+
+Defines the list of possible SQL data types to which the source decimal
+values are converted. This list and the precision and the scale parameters
+of the decimal field determine the target type. In the order of NUMERIC,
+BIGNUMERIC, and STRING, a
+type is picked if it is in the specified list and if it supports the
+precision and the scale. STRING supports all precision and scale values.
+If none of the listed types supports the precision and the scale, the type
+supporting the widest range in the specified list is picked, and if a value
+exceeds the supported range when reading the data, an error will be thrown.
+
+Example: Suppose the value of this field is ["NUMERIC", "BIGNUMERIC"].
+If (precision,scale) is:
+
+* (38,9) -> NUMERIC;
+* (39,9) -> BIGNUMERIC (NUMERIC cannot hold 30 integer digits);
+* (38,10) -> BIGNUMERIC (NUMERIC cannot hold 10 fractional digits);
+* (76,38) -> BIGNUMERIC;
+* (77,38) -> BIGNUMERIC (error if value exceeds supported range).
+
+This field cannot contain duplicate types. The order of the types in this
+field is ignored. For example, ["BIGNUMERIC", "NUMERIC"] is the same as
+["NUMERIC", "BIGNUMERIC"] and NUMERIC always takes precedence over
+BIGNUMERIC.
+
+Defaults to ["NUMERIC", "STRING"] for ORC and ["NUMERIC"] for the other
+file formats.
+
+=item * C<< $msg->avro_options() >> / C<< $msg->avro_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::AvroOptions>)
+
+Optional. Additional properties to set if sourceFormat is set to AVRO.
+
+=item * C<< $msg->json_extension() >> / C<< $msg->json_extension($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::JsonExtension>)
+
+Optional. Load option to be used together with source_format
+newline-delimited JSON to indicate that a variant of JSON is being loaded.
+To load newline-delimited GeoJSON, specify GEOJSON (and source_format must
+be set to NEWLINE_DELIMITED_JSON).
+
+=item * C<< $msg->parquet_options() >> / C<< $msg->parquet_options($value) >>
+
+Type: C<Message> (L<Google::Cloud::Bigquery::V2::ExternalDataConfig::ParquetOptions>)
+
+Optional. Additional properties to set if sourceFormat is set to PARQUET.
+
+=item * C<< $msg->object_metadata() >> / C<< $msg->object_metadata($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ExternalDataConfiguration::ObjectMetadata>)
+
+Optional. ObjectMetadata is used to create Object Tables. Object Tables
+contain a listing of objects (with their metadata) found at the
+source_uris. If ObjectMetadata is set, source_format should be omitted.
+
+Currently SIMPLE is the only supported Object Metadata type.
+
+=item * C<< $msg->reference_file_schema_uri() >> / C<< $msg->reference_file_schema_uri($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::StringValue>)
+
+Optional. When creating an external table, the user can provide a reference
+file with the table schema. This is enabled for the following formats:
+AVRO, PARQUET, ORC.
+
+=item * C<< $msg->metadata_cache_mode() >> / C<< $msg->metadata_cache_mode($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::ExternalDataConfiguration::MetadataCacheMode>)
+
+Optional. Metadata Cache Mode for the table. Set this to enable caching of
+metadata from external data source.
+
+=item * C<< $msg->time_zone() >> / C<< $msg->time_zone($value) >>
+
+Type: C<String>
+
+Optional. Time zone used when parsing timestamp values that do not have
+specific time zone information (e.g. 2024-04-20 12:34:56). The expected
+format is a IANA timezone string (e.g. America/Los_Angeles).
+
+=item * C<< $msg->date_format() >> / C<< $msg->date_format($value) >>
+
+Type: C<String>
+
+Optional. Format used to parse DATE values. Supports C-style and SQL-style
+values.
+
+=item * C<< $msg->datetime_format() >> / C<< $msg->datetime_format($value) >>
+
+Type: C<String>
+
+Optional. Format used to parse DATETIME values. Supports C-style and
+SQL-style values.
+
+=item * C<< $msg->time_format() >> / C<< $msg->time_format($value) >>
+
+Type: C<String>
+
+Optional. Format used to parse TIME values. Supports C-style and SQL-style
+values.
+
+=item * C<< $msg->timestamp_format() >> / C<< $msg->timestamp_format($value) >>
+
+Type: C<String>
+
+Optional. Format used to parse TIMESTAMP values. Supports C-style and
+SQL-style values.
+
+=item * C<< $msg->timestamp_target_precision() >> / C<< $msg->timestamp_target_precision($value) >>
+
+Type: C<Int32>
+
+Precisions (maximum number of total digits in base 10) for seconds
+of TIMESTAMP types that are allowed to the destination table for
+autodetection mode.
+
+Available for the formats: CSV, PARQUET, AVRO, and Iceberg External Table.
+
+Possible values include:
+Not Specified, [], or [6]: timestamp(6) for all auto detected TIMESTAMP
+columns
+[6, 12]: timestamp(6) for all auto detected TIMESTAMP columns that have
+less than 6 digits of subseconds.
+         timestamp(12) for all auto detected TIMESTAMP columns that have
+         more than 6 digits of subseconds.
+[12]: timestamp(12) for all auto detected TIMESTAMP columns.
+
+The order of the elements in this array is ignored.
+Inputs that have higher precision than the highest target precision in this
+array will be truncated.
+
+=back
+
+=head3 Enum: ExternalDataConfiguration::ObjectMetadata
+
+=over 4
+
+=item * C<OBJECT_METADATA_UNSPECIFIED> => C<0>
+
+=item * C<DIRECTORY> => C<1>
+
+=item * C<SIMPLE> => C<2>
+
+=back
+
+=head3 Enum: ExternalDataConfiguration::MetadataCacheMode
+
+=over 4
+
+=item * C<METADATA_CACHE_MODE_UNSPECIFIED> => C<0>
+
+=item * C<AUTOMATIC> => C<1>
+
+=item * C<MANUAL> => C<2>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::ExternalDataConfig::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

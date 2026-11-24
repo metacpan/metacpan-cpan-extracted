@@ -91,10 +91,11 @@ Gateway TLS, Identify, READY and large-frame timings, run
 `DISCORD_CLIENT_TEST_TIMING=1 prove -lv t/13-gateway-websocket.t`.
 The diagnostic reports cumulative wall, user and system CPU time from the start
 of certificate generation; CPU times have the platform's `times` resolution.
-It retains the same payloads, assertions and five-second I/O watchdogs.
+It retains the same payloads, assertions and five-second base I/O watchdogs.
 The integration watchdogs measure monotonic time so system clock corrections
-cannot expire relative waits early. `PERL_TEST_TIME_OUT_FACTOR` does not scale
-these five-second budgets.
+cannot expire relative waits early. `PERL_TEST_TIME_OUT_FACTOR` multiplies the
+base watchdog budgets for slower test environments; it does not change protocol
+time or production timeouts.
 
 ## Documentation
 

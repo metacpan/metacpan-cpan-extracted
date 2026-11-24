@@ -3,7 +3,7 @@ package Google::Pubsub::V1::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -348,74 +348,10 @@ EOF
     # Field: revision_id Type: 9 ()
     # Field: revision_create_time Type: 11 (.google.protobuf.Timestamp)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::Schema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::Schema->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<type>
-
-Type: Enum (.google.pubsub.v1.Schema.Type)
-
-=item * B<definition>
-
-Type: String
-
-=item * B<compiled_proto_schema>
-
-Type: Message (.google.pubsub.v1.CompiledProtoSchema)
-
-=item * B<revision_id>
-
-Type: String
-
-=item * B<revision_create_time>
-
-Type: Message (.google.protobuf.Timestamp)
-
-=back
-
-=cut
-
 # Enum: Schema::Type
 our $Schema_TYPE_UNSPECIFIED = 0;
 our $Schema_PROTOCOL_BUFFER = 1;
 our $Schema_AVRO = 2;
-
-=pod
-
-=head2 Enum: Schema::Type
-
-Values:
-
-=over 4
-
-=item * C<TYPE_UNSPECIFIED> => 0
-
-=item * C<PROTOCOL_BUFFER> => 1
-
-=item * C<AVRO> => 2
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Schema::CreateSchemaRequest ===
     # Fields for CreateSchemaRequest
@@ -423,74 +359,10 @@ Values:
     # Field: schema Type: 11 (.google.pubsub.v1.Schema)
     # Field: schema_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::CreateSchemaRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::CreateSchemaRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<schema>
-
-Type: Message (.google.pubsub.v1.Schema)
-
-=item * B<schema_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Schema::GetSchemaRequest ===
     # Fields for GetSchemaRequest
     # Field: name Type: 9 ()
     # Field: view Type: 14 (.google.pubsub.v1.SchemaView)
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::GetSchemaRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::GetSchemaRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.pubsub.v1.SchemaView)
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Schema::ListSchemasRequest ===
     # Fields for ListSchemasRequest
@@ -499,78 +371,10 @@ Type: Enum (.google.pubsub.v1.SchemaView)
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::ListSchemasRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::ListSchemasRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.pubsub.v1.SchemaView)
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Schema::ListSchemasResponse ===
     # Fields for ListSchemasResponse
     # Field: schemas Type: 11 (.google.pubsub.v1.Schema)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::ListSchemasResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::ListSchemasResponse->new(
-        schemas => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<schemas>
-
-Type: Message (.google.pubsub.v1.Schema)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Schema::ListSchemaRevisionsRequest ===
     # Fields for ListSchemaRevisionsRequest
@@ -579,272 +383,37 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::ListSchemaRevisionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::ListSchemaRevisionsRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.pubsub.v1.SchemaView)
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Schema::ListSchemaRevisionsResponse ===
     # Fields for ListSchemaRevisionsResponse
     # Field: schemas Type: 11 (.google.pubsub.v1.Schema)
     # Field: next_page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::ListSchemaRevisionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::ListSchemaRevisionsResponse->new(
-        schemas => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<schemas>
-
-Type: Message (.google.pubsub.v1.Schema)
-
-=item * B<next_page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Schema::CommitSchemaRequest ===
     # Fields for CommitSchemaRequest
     # Field: name Type: 9 ()
     # Field: schema Type: 11 (.google.pubsub.v1.Schema)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::CommitSchemaRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::CommitSchemaRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<schema>
-
-Type: Message (.google.pubsub.v1.Schema)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Schema::RollbackSchemaRequest ===
     # Fields for RollbackSchemaRequest
     # Field: name Type: 9 ()
     # Field: revision_id Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::RollbackSchemaRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::RollbackSchemaRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<revision_id>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Schema::DeleteSchemaRevisionRequest ===
     # Fields for DeleteSchemaRevisionRequest
     # Field: name Type: 9 ()
     # Field: revision_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::DeleteSchemaRevisionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::DeleteSchemaRevisionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<revision_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Schema::DeleteSchemaRequest ===
     # Fields for DeleteSchemaRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::DeleteSchemaRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::DeleteSchemaRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Schema::ValidateSchemaRequest ===
     # Fields for ValidateSchemaRequest
     # Field: parent Type: 9 ()
     # Field: schema Type: 11 (.google.pubsub.v1.Schema)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::ValidateSchemaRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::ValidateSchemaRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<schema>
-
-Type: Message (.google.pubsub.v1.Schema)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Schema::ValidateSchemaResponse ===
     # Fields for ValidateSchemaResponse
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::ValidateSchemaResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::ValidateSchemaResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Schema::ValidateMessageRequest ===
     # Fields for ValidateMessageRequest
@@ -854,129 +423,28 @@ Google::Pubsub::V1::Schema::ValidateSchemaResponse - Compiled Protocol Buffers m
     # Field: message Type: 12 ()
     # Field: encoding Type: 14 (.google.pubsub.v1.Encoding)
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::ValidateMessageRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::ValidateMessageRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<name>
-
-Type: String
-
-=item * B<schema>
-
-Type: Message (.google.pubsub.v1.Schema)
-
-=item * B<message>
-
-Type: Bytes
-
-=item * B<encoding>
-
-Type: Enum (.google.pubsub.v1.Encoding)
-
-=back
-
-=cut
-
 # === Message: Google::Pubsub::V1::Schema::ValidateMessageResponse ===
     # Fields for ValidateMessageResponse
-
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::ValidateMessageResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::ValidateMessageResponse->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Message: Google::Pubsub::V1::Schema::CompiledProtoSchema ===
     # Fields for CompiledProtoSchema
     # Field: root_message Type: 9 ()
     # Field: compiled_bytes Type: 12 ()
 
-=pod
-
-=head1 NAME
-
-Google::Pubsub::V1::Schema::CompiledProtoSchema - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Pubsub::V1::Schema;
-
-    my $msg = Google::Pubsub::V1::Schema::CompiledProtoSchema->new(
-        root_message => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<root_message>
-
-Type: String
-
-=item * B<compiled_bytes>
-
-Type: Bytes
-
-=back
-
-=cut
-
 # === Service Client: Google::Pubsub::V1::Schema::SchemaServiceClient ===
 package Google::Pubsub::V1::Schema::SchemaServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Pubsub::V1::Schema::SchemaServiceClient
 
-Google::Pubsub::V1::Schema::SchemaServiceClient - Client stub representing the remote SchemaService service
+Client stub representing the remote C<SchemaService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<pubsub.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -1135,13 +603,512 @@ sub validate_message {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Pubsub::V1::Schema - Protocol Buffers schema definition
+Google::Pubsub::V1::Schema - Compiled Protocol Buffers messages for google/pubsub/v1/schema.proto
+
+=head1 SYNOPSIS
+
+    use Google::Pubsub::V1::Schema;
+
+    my $msg = Google::Pubsub::V1::Schema::Schema->new({
+        name => $name,
+        type => $type,
+        definition => $definition,
+        compiled_proto_schema => $compiled_proto_schema,
+    });
+
+    # Read or update a field
+    my $val = $msg->name();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Pubsub::V1::Schema::Schema->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/pubsub/v1/schema.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Pubsub::V1::Schema::Schema
+
+A schema resource.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the schema.
+Format is `projects/{project}/schemas/{schema}`.
+
+=item * C<< $msg->type() >> / C<< $msg->type($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::Schema::Type>)
+
+The type of the schema definition.
+
+=item * C<< $msg->definition() >> / C<< $msg->definition($value) >>
+
+Type: C<String>
+
+The definition of the schema. This should contain a string representing
+the full definition of the schema that is a valid schema definition of
+the type specified in `type`.
+
+=item * C<< $msg->compiled_proto_schema() >> / C<< $msg->compiled_proto_schema($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Schema::CompiledProtoSchema>)
+
+Optional. Configuration for a schema provided as a pre-compiled Protocol
+Buffer FileDescriptorSet. The `type` field above must be set to
+PROTOCOL_BUFFER.
+
+=item * C<< $msg->revision_id() >> / C<< $msg->revision_id($value) >>
+
+Type: C<String>
+
+Output only. Immutable. The revision ID of the schema.
+
+=item * C<< $msg->revision_create_time() >> / C<< $msg->revision_create_time($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Timestamp::Timestamp>)
+
+Output only. The timestamp that the revision was created.
+
+=back
+
+=head3 Enum: Schema::Type
+
+=over 4
+
+=item * C<TYPE_UNSPECIFIED> => C<0>
+
+=item * C<PROTOCOL_BUFFER> => C<1>
+
+=item * C<AVRO> => C<2>
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::CreateSchemaRequest
+
+Request for the CreateSchema method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The name of the project in which to create the schema.
+Format is `projects/{project-id}`.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Schema::Schema>)
+
+Required. The schema object to create.
+
+This schema's `name` parameter is ignored. The schema object returned
+by CreateSchema will have a `name` made using the given `parent` and
+`schema_id`.
+
+=item * C<< $msg->schema_id() >> / C<< $msg->schema_id($value) >>
+
+Type: C<String>
+
+The ID to use for the schema, which will become the final component of
+the schema's resource name.
+
+See https://cloud.google.com/pubsub/docs/pubsub-basics#resource_names for
+resource name constraints.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::GetSchemaRequest
+
+Request for the GetSchema method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the schema to get.
+Format is `projects/{project}/schemas/{schema}`.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::SchemaView>)
+
+The set of fields to return in the response. If not set, returns a Schema
+with all fields filled out. Set to `BASIC` to omit the `definition`.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::ListSchemasRequest
+
+Request for the `ListSchemas` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The name of the project in which to list schemas.
+Format is `projects/{project-id}`.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::SchemaView>)
+
+The set of Schema fields to return in the response. If not set, returns
+Schemas with `name` and `type`, but not `definition`. Set to `FULL` to
+retrieve all fields.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of schemas to return.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListSchemasResponse`; indicates that
+this is a continuation of a prior `ListSchemas` call, and that the
+system should return the next page of data.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::ListSchemasResponse
+
+Response for the `ListSchemas` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->schemas() >> / C<< $msg->schemas($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Schema::Schema>)
+
+The resulting schemas.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+If not empty, indicates that there may be more schemas that match the
+request; this value should be passed in a new `ListSchemasRequest`.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::ListSchemaRevisionsRequest
+
+Request for the `ListSchemaRevisions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the schema to list revisions for.
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::SchemaView>)
+
+The set of Schema fields to return in the response. If not set, returns
+Schemas with `name` and `type`, but not `definition`. Set to `FULL` to
+retrieve all fields.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+The maximum number of revisions to return per page.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The page token, received from a previous ListSchemaRevisions call.
+Provide this to retrieve the subsequent page.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::ListSchemaRevisionsResponse
+
+Response for the `ListSchemaRevisions` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->schemas() >> / C<< $msg->schemas($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Schema::Schema>)
+
+The revisions of the schema.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token that can be sent as `page_token` to retrieve the next page.
+If this field is empty, there are no subsequent pages.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::CommitSchemaRequest
+
+Request for CommitSchema method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the schema we are revising.
+Format is `projects/{project}/schemas/{schema}`.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Schema::Schema>)
+
+Required. The schema revision to commit.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::RollbackSchemaRequest
+
+Request for the `RollbackSchema` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The schema being rolled back with revision id.
+
+=item * C<< $msg->revision_id() >> / C<< $msg->revision_id($value) >>
+
+Type: C<String>
+
+Required. The revision ID to roll back to.
+It must be a revision of the same schema.
+
+  Example: c7cfa2a8
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::DeleteSchemaRevisionRequest
+
+Request for the `DeleteSchemaRevision` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The name of the schema revision to be deleted, with a revision ID
+explicitly included.
+
+Example: `projects/123/schemas/my-schema@c7cfa2a8`
+
+=item * C<< $msg->revision_id() >> / C<< $msg->revision_id($value) >>
+
+Type: C<String>
+
+Optional. This field is deprecated and should not be used for specifying
+the revision ID. The revision ID should be specified via the `name`
+parameter.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::DeleteSchemaRequest
+
+Request for the `DeleteSchema` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the schema to delete.
+Format is `projects/{project}/schemas/{schema}`.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::ValidateSchemaRequest
+
+Request for the `ValidateSchema` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The name of the project in which to validate schemas.
+Format is `projects/{project-id}`.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Schema::Schema>)
+
+Required. The schema object to validate.
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::ValidateSchemaResponse
+
+Response for the `ValidateSchema` method.
+Empty for now.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Pubsub::V1::Schema::ValidateMessageRequest
+
+Request for the `ValidateMessage` method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The name of the project in which to validate schemas.
+Format is `projects/{project-id}`.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Name of the schema against which to validate.
+
+Format is `projects/{project}/schemas/{schema}`.
+
+=item * C<< $msg->schema() >> / C<< $msg->schema($value) >>
+
+Type: C<Message> (L<Google::Pubsub::V1::Schema::Schema>)
+
+Ad-hoc schema against which to validate
+
+=item * C<< $msg->message() >> / C<< $msg->message($value) >>
+
+Type: C<Bytes>
+
+Message to validate against the provided `schema_spec`.
+
+=item * C<< $msg->encoding() >> / C<< $msg->encoding($value) >>
+
+Type: C<Enum> (L<Google::Pubsub::V1::Encoding>)
+
+The encoding expected for messages
+
+=back
+
+=head2 Google::Pubsub::V1::Schema::ValidateMessageResponse
+
+Response for the `ValidateMessage` method.
+Empty for now.
+
+Inherits from L<Protobuf::Message>.
+
+=head2 Google::Pubsub::V1::Schema::CompiledProtoSchema
+
+Configuration specific to compiled Protocol Buffer schemas.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->root_message() >> / C<< $msg->root_message($value) >>
+
+Type: C<String>
+
+Required. The name of the root message type in the schema.
+
+=item * C<< $msg->compiled_bytes() >> / C<< $msg->compiled_bytes($value) >>
+
+Type: C<Bytes>
+
+Required. The compiled FileDescriptorSet binary.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Pubsub::V1::Schema::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

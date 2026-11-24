@@ -10,26 +10,26 @@ use Carp qw(croak);
 
 use Protobuf;
 use Google::Api::Common;
-use Google::Ai::Generativelanguage::V1beta::Safety;
 use Google::Ai::Generativelanguage::V1beta::Model;
-use Google::Ai::Generativelanguage::V1beta::Citation;
 use Google::Ai::Generativelanguage::V1beta::Permission;
-use Google::Ai::Generativelanguage::V1beta::Retriever;
+use Google::Ai::Generativelanguage::V1beta::Citation;
+use Google::Ai::Generativelanguage::V1beta::Safety;
 use Google::Ai::Generativelanguage::V1beta::TunedModel;
+use Google::Ai::Generativelanguage::V1beta::Retriever;
+use Google::Ai::Generativelanguage::V1beta::File;
 use Google::Ai::Generativelanguage::V1beta::Content;
 use Google::Ai::Generativelanguage::V1beta::PredictionService;
-use Google::Ai::Generativelanguage::V1beta::File;
-use Google::Ai::Generativelanguage::V1beta::DiscussService;
-use Google::Ai::Generativelanguage::V1beta::TextService;
 use Google::Ai::Generativelanguage::V1beta::PermissionService;
-use Google::Ai::Generativelanguage::V1beta::RetrieverService;
+use Google::Ai::Generativelanguage::V1beta::TextService;
+use Google::Ai::Generativelanguage::V1beta::DiscussService;
 use Google::Ai::Generativelanguage::V1beta::ModelService;
+use Google::Ai::Generativelanguage::V1beta::RetrieverService;
+use Google::Ai::Generativelanguage::V1beta::FileService;
 use Google::Ai::Generativelanguage::V1beta::GenerativeService;
 use Google::Ai::Generativelanguage::V1beta::CachedContent;
-use Google::Ai::Generativelanguage::V1beta::FileService;
 use Google::Ai::Generativelanguage::V1beta::CacheService;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -174,9 +174,9 @@ Generated from the following Protocol Buffers schemas:
 
 =over 4
 
-=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
-
 =item * C<googleapis/google/ai/generativelanguage/v1beta/cache_service.proto>
+
+=item * C<googleapis/google/ai/generativelanguage/v1beta/cached_content.proto>
 
 =item * C<googleapis/google/ai/generativelanguage/v1beta/citation.proto>
 
@@ -243,11 +243,55 @@ The following RPC methods are available in this client:
 
 =item * B<predict>
 
-Calls the RPC method C<Predict> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->predict(
+        model                    => $model,
+        instances                => [ ... ],
+        parameters               => $parameters,
+    );
+
+Calls the RPC method C<Predict> on C<google.ai.generativelanguage.v1beta.PredictionService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::PredictionService::PredictRequest>
+
+Returns: L<Google::Ai::Generativelanguage::V1beta::PredictionService::PredictResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<instances> - ArrayRef of L<Google::Protobuf::Value::Value>
+
+=item * C<parameters> - L<Google::Protobuf::Value::Value>
+
+=back
 
 =item * B<predict_long_running>
 
-Calls the RPC method C<PredictLongRunning> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->predict_long_running(
+        model                    => $model,
+        instances                => [ ... ],
+        parameters               => $parameters,
+    );
+
+Calls the RPC method C<PredictLongRunning> on C<google.ai.generativelanguage.v1beta.PredictionService>.
+
+Request: L<Google::Ai::Generativelanguage::V1beta::PredictionService::PredictLongRunningRequest>
+
+Returns: L<Google::Longrunning::Operations::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<model> - C<string>
+
+=item * C<instances> - ArrayRef of L<Google::Protobuf::Value::Value>
+
+=item * C<parameters> - L<Google::Protobuf::Value::Value>
+
+=back
 
 =back
 

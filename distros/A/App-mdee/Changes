@@ -1,5 +1,15 @@
 Revision history for Perl extension App-mdee
 
+1.27 2026-11-24T07:52:43Z
+
+    - Require Getopt::Long::Bash 2.0.0, which has the fix of the
+      command injection through the regex validation
+      (GHSA-wjqv-m6g4-g5fr): with an older one, the value of --pane
+      (-C) could run a command.  An older getoptlong.sh in PATH stops
+      the script
+    - Require Command::Run 1.06, App::Greple 10.05,
+      App::Greple::tee 1.05 and App::nup 1.24 for their fixes
+
 1.26 2026-11-22T16:02:51Z
 
     - Fix --refill with a table that has a <br> in a cell, or spaces

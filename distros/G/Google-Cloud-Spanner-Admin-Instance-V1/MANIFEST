@@ -1,0 +1,22 @@
+Changes
+lib/Google/Cloud/Spanner/Admin/Instance/V1.pm
+lib/Google/Cloud/Spanner/Admin/Instance/V1/InstanceAdminClient.pm
+lib/Google/Spanner/Admin/Instance/V1/Common.pm
+lib/Google/Spanner/Admin/Instance/V1/Common/Types.pm
+lib/Google/Spanner/Admin/Instance/V1/SpannerInstanceAdmin.pm
+lib/Google/Spanner/Admin/Instance/V1/SpannerInstanceAdmin/Types.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+SECURITY.md
+t/00-load.t
+t/01-service-Default.t
+t/01-service-InstanceAdmin.t
+t/02-rest-transport-Default.t
+t/02-rest-transport-InstanceAdmin.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/00_perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

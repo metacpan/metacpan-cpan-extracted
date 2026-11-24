@@ -54,22 +54,22 @@
    "provides" : {
       "Getopt::Long::Bash" : {
          "file" : "lib/Getopt/Long/Bash.pm",
-         "version" : "v1.5.0"
+         "version" : "v2.0.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/tecolicom/getoptlong/issues"
+         "web" : "https://github.com/tecolicom/getoptlong-bash/issues"
       },
-      "homepage" : "https://github.com/tecolicom/getoptlong",
+      "homepage" : "https://github.com/tecolicom/getoptlong-bash",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/tecolicom/getoptlong.git",
-         "web" : "https://github.com/tecolicom/getoptlong"
+         "url" : "https://github.com/tecolicom/getoptlong-bash.git",
+         "web" : "https://github.com/tecolicom/getoptlong-bash"
       }
    },
-   "version" : "1.5.0",
+   "version" : "2.0.0",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",
       "google-labs-jules[bot] <161369871+google-labs-jules[bot]@users.noreply.github.com>"

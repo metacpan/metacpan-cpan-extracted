@@ -3,7 +3,7 @@ package Google::Cloud::Networkservices::V1::RouteView;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -179,48 +179,6 @@ EOF
     # Field: route_type Type: 9 ()
     # Field: route_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::RouteView::GatewayRouteView - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::RouteView;
-
-    my $msg = Google::Cloud::Networkservices::V1::RouteView::GatewayRouteView->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<route_project_number>
-
-Type: Int64
-
-=item * B<route_location>
-
-Type: String
-
-=item * B<route_type>
-
-Type: String
-
-=item * B<route_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::RouteView::MeshRouteView ===
     # Fields for MeshRouteView
     # Field: name Type: 9 ()
@@ -229,107 +187,13 @@ Type: String
     # Field: route_type Type: 9 ()
     # Field: route_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::RouteView::MeshRouteView - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::RouteView;
-
-    my $msg = Google::Cloud::Networkservices::V1::RouteView::MeshRouteView->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<route_project_number>
-
-Type: Int64
-
-=item * B<route_location>
-
-Type: String
-
-=item * B<route_type>
-
-Type: String
-
-=item * B<route_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::RouteView::GetGatewayRouteViewRequest ===
     # Fields for GetGatewayRouteViewRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::RouteView::GetGatewayRouteViewRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::RouteView;
-
-    my $msg = Google::Cloud::Networkservices::V1::RouteView::GetGatewayRouteViewRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::RouteView::GetMeshRouteViewRequest ===
     # Fields for GetMeshRouteViewRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::RouteView::GetMeshRouteViewRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::RouteView;
-
-    my $msg = Google::Cloud::Networkservices::V1::RouteView::GetMeshRouteViewRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::RouteView::ListGatewayRouteViewsRequest ===
     # Fields for ListGatewayRouteViewsRequest
@@ -337,79 +201,11 @@ Type: String
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::RouteView::ListGatewayRouteViewsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::RouteView;
-
-    my $msg = Google::Cloud::Networkservices::V1::RouteView::ListGatewayRouteViewsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::RouteView::ListMeshRouteViewsRequest ===
     # Fields for ListMeshRouteViewsRequest
     # Field: parent Type: 9 ()
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::RouteView::ListMeshRouteViewsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::RouteView;
-
-    my $msg = Google::Cloud::Networkservices::V1::RouteView::ListMeshRouteViewsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Networkservices::V1::RouteView::ListGatewayRouteViewsResponse ===
     # Fields for ListGatewayRouteViewsResponse
@@ -417,91 +213,316 @@ Type: String
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::RouteView::ListGatewayRouteViewsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Networkservices::V1::RouteView;
-
-    my $msg = Google::Cloud::Networkservices::V1::RouteView::ListGatewayRouteViewsResponse->new(
-        gateway_route_views => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<gateway_route_views>
-
-Type: Message (.google.cloud.networkservices.v1.GatewayRouteView)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Networkservices::V1::RouteView::ListMeshRouteViewsResponse ===
     # Fields for ListMeshRouteViewsResponse
     # Field: mesh_route_views Type: 11 (.google.cloud.networkservices.v1.MeshRouteView)
     # Field: next_page_token Type: 9 ()
     # Field: unreachable Type: 9 ()
 
-=pod
+1;
+
+__END__
+
+=encoding UTF-8
 
 =head1 NAME
 
-Google::Cloud::Networkservices::V1::RouteView::ListMeshRouteViewsResponse - Compiled Protocol Buffers message class
+Google::Cloud::Networkservices::V1::RouteView - Compiled Protocol Buffers messages for google/cloud/networkservices/v1/route_view.proto
 
 =head1 SYNOPSIS
 
     use Google::Cloud::Networkservices::V1::RouteView;
 
-    my $msg = Google::Cloud::Networkservices::V1::RouteView::ListMeshRouteViewsResponse->new(
-        mesh_route_views => $value,
-    );
+    my $msg = Google::Cloud::Networkservices::V1::RouteView::GatewayRouteView->new({
+        name => $name,
+        route_project_number => $route_project_number,
+        route_location => $route_location,
+        route_type => $route_type,
+    });
 
-=head1 FIELDS
+    # Read or update a field
+    my $val = $msg->name();
 
-=over 4
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Networkservices::V1::RouteView::GatewayRouteView->parse($bytes);
 
-=item * B<mesh_route_views>
-
-Type: Message (.google.cloud.networkservices.v1.MeshRouteView)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<unreachable>
-
-Type: String
-
-=back
-
-=cut
-
-1;
-
-__END__
-
-=head1 NAME
-
-Google::Cloud::Networkservices::V1::RouteView - Protocol Buffers schema definition
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/networkservices/v1/route_view.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Networkservices::V1::RouteView::GatewayRouteView
+
+GatewayRouteView defines view-only resource for Routes to a Gateway
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. Full path name of the GatewayRouteView resource.
+Format:
+  projects/{project_number}/locations/{location}/gateways/{gateway}/routeViews/{route_view}
+
+=item * C<< $msg->route_project_number() >> / C<< $msg->route_project_number($value) >>
+
+Type: C<Int64>
+
+Output only. Project number where the route exists.
+
+=item * C<< $msg->route_location() >> / C<< $msg->route_location($value) >>
+
+Type: C<String>
+
+Output only. Location where the route exists.
+
+=item * C<< $msg->route_type() >> / C<< $msg->route_type($value) >>
+
+Type: C<String>
+
+Output only. Type of the route: HttpRoute,GrpcRoute,TcpRoute, or TlsRoute
+
+=item * C<< $msg->route_id() >> / C<< $msg->route_id($value) >>
+
+Type: C<String>
+
+Output only. The resource id for the route.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::RouteView::MeshRouteView
+
+MeshRouteView defines view-only resource for Routes to a Mesh
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Output only. Identifier. Full path name of the MeshRouteView resource.
+Format:
+  projects/{project}/locations/{location}/meshes/{mesh}/routeViews/{route_view}
+
+=item * C<< $msg->route_project_number() >> / C<< $msg->route_project_number($value) >>
+
+Type: C<Int64>
+
+Output only. Project number where the route exists.
+
+=item * C<< $msg->route_location() >> / C<< $msg->route_location($value) >>
+
+Type: C<String>
+
+Output only. Location where the route exists.
+
+=item * C<< $msg->route_type() >> / C<< $msg->route_type($value) >>
+
+Type: C<String>
+
+Output only. Type of the route: HttpRoute,GrpcRoute,TcpRoute, or TlsRoute
+
+=item * C<< $msg->route_id() >> / C<< $msg->route_id($value) >>
+
+Type: C<String>
+
+Output only. The resource id for the route.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::RouteView::GetGatewayRouteViewRequest
+
+Request used with the GetGatewayRouteView method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the GatewayRouteView resource.
+Formats:
+  projects/{project}/locations/{location}/gateways/{gateway}/routeViews/{route_view}
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::RouteView::GetMeshRouteViewRequest
+
+Request used with the GetMeshRouteView method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. Name of the MeshRouteView resource.
+Format:
+  projects/{project}/locations/{location}/meshes/{mesh}/routeViews/{route_view}
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::RouteView::ListGatewayRouteViewsRequest
+
+Request used with the ListGatewayRouteViews method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The Gateway to which a Route is associated.
+Formats:
+  projects/{project}/locations/{location}/gateways/{gateway}
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of GatewayRouteViews to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListGatewayRouteViewsResponse`
+Indicates that this is a continuation of a prior `ListGatewayRouteViews`
+call, and that the system should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::RouteView::ListMeshRouteViewsRequest
+
+Request used with the ListMeshRouteViews method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The Mesh to which a Route is associated.
+Format:
+  projects/{project}/locations/{location}/meshes/{mesh}
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Maximum number of MeshRouteViews to return per call.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+The value returned by the last `ListMeshRouteViewsResponse`
+Indicates that this is a continuation of a prior `ListMeshRouteViews` call,
+and that the system should return the next page of data.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::RouteView::ListGatewayRouteViewsResponse
+
+Response returned by the ListGatewayRouteViews method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->gateway_route_views() >> / C<< $msg->gateway_route_views($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::RouteView::GatewayRouteView>)
+
+List of GatewayRouteView resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request attempts to list all
+resources across all supported locations, while some locations are
+temporarily unavailable.
+
+=back
+
+=head2 Google::Cloud::Networkservices::V1::RouteView::ListMeshRouteViewsResponse
+
+Response returned by the ListMeshRouteViews method.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->mesh_route_views() >> / C<< $msg->mesh_route_views($value) >>
+
+Type: C<Message> (L<Google::Cloud::Networkservices::V1::RouteView::MeshRouteView>)
+
+List of MeshRouteView resources.
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token, which can be sent as `page_token` to retrieve the next page.
+If this field is omitted, there are no subsequent pages.
+
+=item * C<< $msg->unreachable() >> / C<< $msg->unreachable($value) >>
+
+Type: C<String>
+
+Unreachable resources. Populated when the request attempts to list all
+resources across all supported locations, while some locations are
+temporarily unavailable.
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Networkservices::V1::RouteView::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

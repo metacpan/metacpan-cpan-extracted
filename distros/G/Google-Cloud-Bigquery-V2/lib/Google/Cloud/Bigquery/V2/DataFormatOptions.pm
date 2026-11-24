@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::DataFormatOptions;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -66,73 +66,92 @@ EOF
     # Field: use_int64_timestamp Type: 8 ()
     # Field: timestamp_output_format Type: 14 (.google.cloud.bigquery.v2.DataFormatOptions.TimestampOutputFormat)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::DataFormatOptions::DataFormatOptions - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::DataFormatOptions;
-
-    my $msg = Google::Cloud::Bigquery::V2::DataFormatOptions::DataFormatOptions->new(
-        use_int64_timestamp => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<use_int64_timestamp>
-
-Type: Bool
-
-=item * B<timestamp_output_format>
-
-Type: Enum (.google.cloud.bigquery.v2.DataFormatOptions.TimestampOutputFormat)
-
-=back
-
-=cut
-
 # Enum: DataFormatOptions::TimestampOutputFormat
 our $DataFormatOptions_TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED = 0;
 our $DataFormatOptions_FLOAT64 = 1;
 our $DataFormatOptions_INT64 = 2;
 our $DataFormatOptions_ISO8601_STRING = 3;
 
-=pod
-
-=head2 Enum: DataFormatOptions::TimestampOutputFormat
-
-Values:
-
-=over 4
-
-=item * C<TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED> => 0
-
-=item * C<FLOAT64> => 1
-
-=item * C<INT64> => 2
-
-=item * C<ISO8601_STRING> => 3
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::DataFormatOptions - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::DataFormatOptions - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/data_format_options.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::DataFormatOptions;
+
+    my $msg = Google::Cloud::Bigquery::V2::DataFormatOptions::DataFormatOptions->new({
+        use_int64_timestamp => $use_int64_timestamp,
+        timestamp_output_format => $timestamp_output_format,
+    });
+
+    # Read or update a field
+    my $val = $msg->use_int64_timestamp();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::DataFormatOptions::DataFormatOptions->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/data_format_options.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::DataFormatOptions::DataFormatOptions
+
+Options for data format adjustments.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->use_int64_timestamp() >> / C<< $msg->use_int64_timestamp($value) >>
+
+Type: C<Bool>
+
+Optional. Output timestamp as usec int64. Default is false.
+
+=item * C<< $msg->timestamp_output_format() >> / C<< $msg->timestamp_output_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::DataFormatOptions::TimestampOutputFormat>)
+
+Optional. The API output format for a timestamp.
+This offers more explicit control over the timestamp output format
+as compared to the existing `use_int64_timestamp` option.
+
+=back
+
+=head3 Enum: DataFormatOptions::TimestampOutputFormat
+
+=over 4
+
+=item * C<TIMESTAMP_OUTPUT_FORMAT_UNSPECIFIED> => C<0>
+
+=item * C<FLOAT64> => C<1>
+
+=item * C<INT64> => C<2>
+
+=item * C<ISO8601_STRING> => C<3>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::DataFormatOptions::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

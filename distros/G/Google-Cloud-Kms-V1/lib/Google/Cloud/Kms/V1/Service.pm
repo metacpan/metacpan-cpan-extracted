@@ -3,7 +3,7 @@ package Google::Cloud::Kms::V1::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -2525,48 +2525,6 @@ EOF
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListKeyRingsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListKeyRingsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::ListCryptoKeysRequest ===
     # Fields for ListCryptoKeysRequest
     # Field: parent Type: 9 ()
@@ -2575,52 +2533,6 @@ Type: String
     # Field: version_view Type: 14 (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionView)
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListCryptoKeysRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListCryptoKeysRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<version_view>
-
-Type: Enum (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionView)
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::ListCryptoKeyVersionsRequest ===
     # Fields for ListCryptoKeyVersionsRequest
@@ -2631,52 +2543,6 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListCryptoKeyVersionsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListCryptoKeyVersionsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<view>
-
-Type: Enum (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionView)
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::ListImportJobsRequest ===
     # Fields for ListImportJobsRequest
     # Field: parent Type: 9 ()
@@ -2685,87 +2551,11 @@ Type: String
     # Field: filter Type: 9 ()
     # Field: order_by Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListImportJobsRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListImportJobsRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=item * B<filter>
-
-Type: String
-
-=item * B<order_by>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::ListRetiredResourcesRequest ===
     # Fields for ListRetiredResourcesRequest
     # Field: parent Type: 9 ()
     # Field: page_size Type: 5 ()
     # Field: page_token Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListRetiredResourcesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListRetiredResourcesRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<page_size>
-
-Type: Int32
-
-=item * B<page_token>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::ListKeyRingsResponse ===
     # Fields for ListKeyRingsResponse
@@ -2773,79 +2563,11 @@ Type: String
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListKeyRingsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListKeyRingsResponse->new(
-        key_rings => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<key_rings>
-
-Type: Message (.google.cloud.kms.v1.KeyRing)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::ListCryptoKeysResponse ===
     # Fields for ListCryptoKeysResponse
     # Field: crypto_keys Type: 11 (.google.cloud.kms.v1.CryptoKey)
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListCryptoKeysResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListCryptoKeysResponse->new(
-        crypto_keys => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<crypto_keys>
-
-Type: Message (.google.cloud.kms.v1.CryptoKey)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::ListCryptoKeyVersionsResponse ===
     # Fields for ListCryptoKeyVersionsResponse
@@ -2853,79 +2575,11 @@ Type: Int32
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 5 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListCryptoKeyVersionsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListCryptoKeyVersionsResponse->new(
-        crypto_key_versions => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<crypto_key_versions>
-
-Type: Message (.google.cloud.kms.v1.CryptoKeyVersion)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int32
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::ListImportJobsResponse ===
     # Fields for ListImportJobsResponse
     # Field: import_jobs Type: 11 (.google.cloud.kms.v1.ImportJob)
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 5 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListImportJobsResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListImportJobsResponse->new(
-        import_jobs => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<import_jobs>
-
-Type: Message (.google.cloud.kms.v1.ImportJob)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int32
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::ListRetiredResourcesResponse ===
     # Fields for ListRetiredResourcesResponse
@@ -2933,269 +2587,37 @@ Type: Int32
     # Field: next_page_token Type: 9 ()
     # Field: total_size Type: 3 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ListRetiredResourcesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ListRetiredResourcesResponse->new(
-        retired_resources => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<retired_resources>
-
-Type: Message (.google.cloud.kms.v1.RetiredResource)
-
-=item * B<next_page_token>
-
-Type: String
-
-=item * B<total_size>
-
-Type: Int64
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::GetKeyRingRequest ===
     # Fields for GetKeyRingRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::GetKeyRingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::GetKeyRingRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::GetCryptoKeyRequest ===
     # Fields for GetCryptoKeyRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::GetCryptoKeyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::GetCryptoKeyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::GetCryptoKeyVersionRequest ===
     # Fields for GetCryptoKeyVersionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::GetCryptoKeyVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::GetCryptoKeyVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::GetPublicKeyRequest ===
     # Fields for GetPublicKeyRequest
     # Field: name Type: 9 ()
     # Field: public_key_format Type: 14 (.google.cloud.kms.v1.PublicKey.PublicKeyFormat)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::GetPublicKeyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::GetPublicKeyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<public_key_format>
-
-Type: Enum (.google.cloud.kms.v1.PublicKey.PublicKeyFormat)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::GetImportJobRequest ===
     # Fields for GetImportJobRequest
     # Field: name Type: 9 ()
     # Field: public_key_format Type: 14 (.google.cloud.kms.v1.PublicKey.PublicKeyFormat)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::GetImportJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::GetImportJobRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<public_key_format>
-
-Type: Enum (.google.cloud.kms.v1.PublicKey.PublicKeyFormat)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::GetRetiredResourceRequest ===
     # Fields for GetRetiredResourceRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::GetRetiredResourceRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::GetRetiredResourceRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::CreateKeyRingRequest ===
     # Fields for CreateKeyRingRequest
     # Field: parent Type: 9 ()
     # Field: key_ring_id Type: 9 ()
     # Field: key_ring Type: 11 (.google.cloud.kms.v1.KeyRing)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::CreateKeyRingRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::CreateKeyRingRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<key_ring_id>
-
-Type: String
-
-=item * B<key_ring>
-
-Type: Message (.google.cloud.kms.v1.KeyRing)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::CreateCryptoKeyRequest ===
     # Fields for CreateCryptoKeyRequest
@@ -3205,142 +2627,18 @@ Type: Message (.google.cloud.kms.v1.KeyRing)
     # Field: skip_initial_version_creation Type: 8 ()
     # Field: trusted_wrapping_enabled Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::CreateCryptoKeyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::CreateCryptoKeyRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<crypto_key_id>
-
-Type: String
-
-=item * B<crypto_key>
-
-Type: Message (.google.cloud.kms.v1.CryptoKey)
-
-=item * B<skip_initial_version_creation>
-
-Type: Bool
-
-=item * B<trusted_wrapping_enabled>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::CreateCryptoKeyVersionRequest ===
     # Fields for CreateCryptoKeyVersionRequest
     # Field: parent Type: 9 ()
     # Field: crypto_key_version Type: 11 (.google.cloud.kms.v1.CryptoKeyVersion)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::CreateCryptoKeyVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::CreateCryptoKeyVersionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<crypto_key_version>
-
-Type: Message (.google.cloud.kms.v1.CryptoKeyVersion)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::DeleteCryptoKeyRequest ===
     # Fields for DeleteCryptoKeyRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::DeleteCryptoKeyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::DeleteCryptoKeyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::DeleteCryptoKeyVersionRequest ===
     # Fields for DeleteCryptoKeyVersionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::DeleteCryptoKeyVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::DeleteCryptoKeyVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::ImportCryptoKeyVersionRequest ===
     # Fields for ImportCryptoKeyVersionRequest
@@ -3352,56 +2650,6 @@ Type: String
     # Field: rsa_aes_wrapped_key Type: 12 ()
     # Field: trusted_wrapping_enabled Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ImportCryptoKeyVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ImportCryptoKeyVersionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<crypto_key_version>
-
-Type: String
-
-=item * B<algorithm>
-
-Type: Enum (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm)
-
-=item * B<import_job>
-
-Type: String
-
-=item * B<wrapped_key>
-
-Type: Bytes
-
-=item * B<rsa_aes_wrapped_key>
-
-Type: Bytes
-
-=item * B<trusted_wrapping_enabled>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::ImportTrustedKeyWrappedCryptoKeyVersionRequest ===
     # Fields for ImportTrustedKeyWrappedCryptoKeyVersionRequest
     # Field: parent Type: 9 ()
@@ -3410,117 +2658,15 @@ Type: Bool
     # Field: wrapped_key Type: 12 ()
     # Field: algorithm Type: 14 (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ImportTrustedKeyWrappedCryptoKeyVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ImportTrustedKeyWrappedCryptoKeyVersionRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<importing_key>
-
-Type: String
-
-=item * B<crypto_key_version>
-
-Type: String
-
-=item * B<wrapped_key>
-
-Type: Bytes
-
-=item * B<algorithm>
-
-Type: Enum (.google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::ExportTrustedKeyWrappedCryptoKeyVersionRequest ===
     # Fields for ExportTrustedKeyWrappedCryptoKeyVersionRequest
     # Field: name Type: 9 ()
     # Field: wrapping_key Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ExportTrustedKeyWrappedCryptoKeyVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ExportTrustedKeyWrappedCryptoKeyVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<wrapping_key>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::ExportTrustedKeyWrappedCryptoKeyVersionResponse ===
     # Fields for ExportTrustedKeyWrappedCryptoKeyVersionResponse
     # Field: wrapped_key Type: 12 ()
     # Field: wrapped_key_crc32c Type: 11 (.google.protobuf.Int64Value)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::ExportTrustedKeyWrappedCryptoKeyVersionResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::ExportTrustedKeyWrappedCryptoKeyVersionResponse->new(
-        wrapped_key => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<wrapped_key>
-
-Type: Bytes
-
-=item * B<wrapped_key_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::CreateImportJobRequest ===
     # Fields for CreateImportJobRequest
@@ -3528,204 +2674,28 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: import_job_id Type: 9 ()
     # Field: import_job Type: 11 (.google.cloud.kms.v1.ImportJob)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::CreateImportJobRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::CreateImportJobRequest->new(
-        parent => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<parent>
-
-Type: String
-
-=item * B<import_job_id>
-
-Type: String
-
-=item * B<import_job>
-
-Type: Message (.google.cloud.kms.v1.ImportJob)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::UpdateCryptoKeyRequest ===
     # Fields for UpdateCryptoKeyRequest
     # Field: crypto_key Type: 11 (.google.cloud.kms.v1.CryptoKey)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::UpdateCryptoKeyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::UpdateCryptoKeyRequest->new(
-        crypto_key => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<crypto_key>
-
-Type: Message (.google.cloud.kms.v1.CryptoKey)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::UpdateCryptoKeyVersionRequest ===
     # Fields for UpdateCryptoKeyVersionRequest
     # Field: crypto_key_version Type: 11 (.google.cloud.kms.v1.CryptoKeyVersion)
     # Field: update_mask Type: 11 (.google.protobuf.FieldMask)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::UpdateCryptoKeyVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::UpdateCryptoKeyVersionRequest->new(
-        crypto_key_version => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<crypto_key_version>
-
-Type: Message (.google.cloud.kms.v1.CryptoKeyVersion)
-
-=item * B<update_mask>
-
-Type: Message (.google.protobuf.FieldMask)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::UpdateCryptoKeyPrimaryVersionRequest ===
     # Fields for UpdateCryptoKeyPrimaryVersionRequest
     # Field: name Type: 9 ()
     # Field: crypto_key_version_id Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::UpdateCryptoKeyPrimaryVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::UpdateCryptoKeyPrimaryVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<crypto_key_version_id>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::DestroyCryptoKeyVersionRequest ===
     # Fields for DestroyCryptoKeyVersionRequest
     # Field: name Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::DestroyCryptoKeyVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::DestroyCryptoKeyVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::RestoreCryptoKeyVersionRequest ===
     # Fields for RestoreCryptoKeyVersionRequest
     # Field: name Type: 9 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::RestoreCryptoKeyVersionRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::RestoreCryptoKeyVersionRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::EncryptRequest ===
     # Fields for EncryptRequest
@@ -3735,48 +2705,6 @@ Type: String
     # Field: plaintext_crc32c Type: 11 (.google.protobuf.Int64Value)
     # Field: additional_authenticated_data_crc32c Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::EncryptRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::EncryptRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<plaintext>
-
-Type: Bytes
-
-=item * B<additional_authenticated_data>
-
-Type: Bytes
-
-=item * B<plaintext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<additional_authenticated_data_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::DecryptRequest ===
     # Fields for DecryptRequest
     # Field: name Type: 9 ()
@@ -3784,48 +2712,6 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: additional_authenticated_data Type: 12 ()
     # Field: ciphertext_crc32c Type: 11 (.google.protobuf.Int64Value)
     # Field: additional_authenticated_data_crc32c Type: 11 (.google.protobuf.Int64Value)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::DecryptRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::DecryptRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<ciphertext>
-
-Type: Bytes
-
-=item * B<additional_authenticated_data>
-
-Type: Bytes
-
-=item * B<ciphertext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<additional_authenticated_data_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::RawEncryptRequest ===
     # Fields for RawEncryptRequest
@@ -3836,56 +2722,6 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: additional_authenticated_data_crc32c Type: 11 (.google.protobuf.Int64Value)
     # Field: initialization_vector Type: 12 ()
     # Field: initialization_vector_crc32c Type: 11 (.google.protobuf.Int64Value)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::RawEncryptRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::RawEncryptRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<plaintext>
-
-Type: Bytes
-
-=item * B<additional_authenticated_data>
-
-Type: Bytes
-
-=item * B<plaintext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<additional_authenticated_data_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<initialization_vector>
-
-Type: Bytes
-
-=item * B<initialization_vector_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::RawDecryptRequest ===
     # Fields for RawDecryptRequest
@@ -3898,60 +2734,6 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: additional_authenticated_data_crc32c Type: 11 (.google.protobuf.Int64Value)
     # Field: initialization_vector_crc32c Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::RawDecryptRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::RawDecryptRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<ciphertext>
-
-Type: Bytes
-
-=item * B<additional_authenticated_data>
-
-Type: Bytes
-
-=item * B<initialization_vector>
-
-Type: Bytes
-
-=item * B<tag_length>
-
-Type: Int32
-
-=item * B<ciphertext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<additional_authenticated_data_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<initialization_vector_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::AsymmetricSignRequest ===
     # Fields for AsymmetricSignRequest
     # Field: name Type: 9 ()
@@ -3960,127 +2742,17 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: data Type: 12 ()
     # Field: data_crc32c Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::AsymmetricSignRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::AsymmetricSignRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<digest>
-
-Type: Message (.google.cloud.kms.v1.Digest)
-
-=item * B<digest_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<data>
-
-Type: Bytes
-
-=item * B<data_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::AsymmetricDecryptRequest ===
     # Fields for AsymmetricDecryptRequest
     # Field: name Type: 9 ()
     # Field: ciphertext Type: 12 ()
     # Field: ciphertext_crc32c Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::AsymmetricDecryptRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::AsymmetricDecryptRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<ciphertext>
-
-Type: Bytes
-
-=item * B<ciphertext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::MacSignRequest ===
     # Fields for MacSignRequest
     # Field: name Type: 9 ()
     # Field: data Type: 12 ()
     # Field: data_crc32c Type: 11 (.google.protobuf.Int64Value)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::MacSignRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::MacSignRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<data>
-
-Type: Bytes
-
-=item * B<data_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::MacVerifyRequest ===
     # Fields for MacVerifyRequest
@@ -4090,127 +2762,17 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: mac Type: 12 ()
     # Field: mac_crc32c Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::MacVerifyRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::MacVerifyRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<data>
-
-Type: Bytes
-
-=item * B<data_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<mac>
-
-Type: Bytes
-
-=item * B<mac_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::DecapsulateRequest ===
     # Fields for DecapsulateRequest
     # Field: name Type: 9 ()
     # Field: ciphertext Type: 12 ()
     # Field: ciphertext_crc32c Type: 11 (.google.protobuf.Int64Value)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::DecapsulateRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::DecapsulateRequest->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<ciphertext>
-
-Type: Bytes
-
-=item * B<ciphertext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::GenerateRandomBytesRequest ===
     # Fields for GenerateRandomBytesRequest
     # Field: location Type: 9 ()
     # Field: length_bytes Type: 5 ()
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::GenerateRandomBytesRequest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::GenerateRandomBytesRequest->new(
-        location => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<location>
-
-Type: String
-
-=item * B<length_bytes>
-
-Type: Int32
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::EncryptResponse ===
     # Fields for EncryptResponse
@@ -4221,96 +2783,12 @@ Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
     # Field: verified_additional_authenticated_data_crc32c Type: 8 ()
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::EncryptResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::EncryptResponse->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<ciphertext>
-
-Type: Bytes
-
-=item * B<ciphertext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<verified_plaintext_crc32c>
-
-Type: Bool
-
-=item * B<verified_additional_authenticated_data_crc32c>
-
-Type: Bool
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::DecryptResponse ===
     # Fields for DecryptResponse
     # Field: plaintext Type: 12 ()
     # Field: plaintext_crc32c Type: 11 (.google.protobuf.Int64Value)
     # Field: used_primary Type: 8 ()
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::DecryptResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::DecryptResponse->new(
-        plaintext => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<plaintext>
-
-Type: Bytes
-
-=item * B<plaintext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<used_primary>
-
-Type: Bool
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::RawEncryptResponse ===
     # Fields for RawEncryptResponse
@@ -4325,68 +2803,6 @@ Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
     # Field: name Type: 9 ()
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::RawEncryptResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::RawEncryptResponse->new(
-        ciphertext => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<ciphertext>
-
-Type: Bytes
-
-=item * B<initialization_vector>
-
-Type: Bytes
-
-=item * B<tag_length>
-
-Type: Int32
-
-=item * B<ciphertext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<initialization_vector_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<verified_plaintext_crc32c>
-
-Type: Bool
-
-=item * B<verified_additional_authenticated_data_crc32c>
-
-Type: Bool
-
-=item * B<verified_initialization_vector_crc32c>
-
-Type: Bool
-
-=item * B<name>
-
-Type: String
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::RawDecryptResponse ===
     # Fields for RawDecryptResponse
     # Field: plaintext Type: 12 ()
@@ -4395,52 +2811,6 @@ Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
     # Field: verified_ciphertext_crc32c Type: 8 ()
     # Field: verified_additional_authenticated_data_crc32c Type: 8 ()
     # Field: verified_initialization_vector_crc32c Type: 8 ()
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::RawDecryptResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::RawDecryptResponse->new(
-        plaintext => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<plaintext>
-
-Type: Bytes
-
-=item * B<plaintext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=item * B<verified_ciphertext_crc32c>
-
-Type: Bool
-
-=item * B<verified_additional_authenticated_data_crc32c>
-
-Type: Bool
-
-=item * B<verified_initialization_vector_crc32c>
-
-Type: Bool
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::AsymmetricSignResponse ===
     # Fields for AsymmetricSignResponse
@@ -4451,96 +2821,12 @@ Type: Bool
     # Field: verified_data_crc32c Type: 8 ()
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::AsymmetricSignResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::AsymmetricSignResponse->new(
-        signature => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<signature>
-
-Type: Bytes
-
-=item * B<signature_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<verified_digest_crc32c>
-
-Type: Bool
-
-=item * B<name>
-
-Type: String
-
-=item * B<verified_data_crc32c>
-
-Type: Bool
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::AsymmetricDecryptResponse ===
     # Fields for AsymmetricDecryptResponse
     # Field: plaintext Type: 12 ()
     # Field: plaintext_crc32c Type: 11 (.google.protobuf.Int64Value)
     # Field: verified_ciphertext_crc32c Type: 8 ()
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::AsymmetricDecryptResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::AsymmetricDecryptResponse->new(
-        plaintext => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<plaintext>
-
-Type: Bytes
-
-=item * B<plaintext_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<verified_ciphertext_crc32c>
-
-Type: Bool
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::MacSignResponse ===
     # Fields for MacSignResponse
@@ -4549,48 +2835,6 @@ Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
     # Field: mac_crc32c Type: 11 (.google.protobuf.Int64Value)
     # Field: verified_data_crc32c Type: 8 ()
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::MacSignResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::MacSignResponse->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<mac>
-
-Type: Bytes
-
-=item * B<mac_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=item * B<verified_data_crc32c>
-
-Type: Bool
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::MacVerifyResponse ===
     # Fields for MacVerifyResponse
@@ -4601,52 +2845,6 @@ Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
     # Field: verified_success_integrity Type: 8 ()
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::MacVerifyResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::MacVerifyResponse->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<success>
-
-Type: Bool
-
-=item * B<verified_data_crc32c>
-
-Type: Bool
-
-=item * B<verified_mac_crc32c>
-
-Type: Bool
-
-=item * B<verified_success_integrity>
-
-Type: Bool
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::DecapsulateResponse ===
     # Fields for DecapsulateResponse
     # Field: name Type: 9 ()
@@ -4655,82 +2853,10 @@ Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
     # Field: verified_ciphertext_crc32c Type: 8 ()
     # Field: protection_level Type: 14 (.google.cloud.kms.v1.ProtectionLevel)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::DecapsulateResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::DecapsulateResponse->new(
-        name => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<name>
-
-Type: String
-
-=item * B<shared_secret>
-
-Type: Bytes
-
-=item * B<shared_secret_crc32c>
-
-Type: Int64
-
-=item * B<verified_ciphertext_crc32c>
-
-Type: Bool
-
-=item * B<protection_level>
-
-Type: Enum (.google.cloud.kms.v1.ProtectionLevel)
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::GenerateRandomBytesResponse ===
     # Fields for GenerateRandomBytesResponse
     # Field: data Type: 12 ()
     # Field: data_crc32c Type: 11 (.google.protobuf.Int64Value)
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::GenerateRandomBytesResponse - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::GenerateRandomBytesResponse->new(
-        data => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<data>
-
-Type: Bytes
-
-=item * B<data_crc32c>
-
-Type: Message (.google.protobuf.Int64Value)
-
-=back
-
-=cut
 
 # === Message: Google::Cloud::Kms::V1::Service::Digest ===
     # Fields for Digest
@@ -4739,160 +2865,33 @@ Type: Message (.google.protobuf.Int64Value)
     # Field: sha512 Type: 12 ()
     # Field: external_mu Type: 12 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::Digest - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::Digest->new(
-        sha256 => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<sha256>
-
-Type: Bytes
-
-=item * B<sha384>
-
-Type: Bytes
-
-=item * B<sha512>
-
-Type: Bytes
-
-=item * B<external_mu>
-
-Type: Bytes
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::LocationMetadata ===
     # Fields for LocationMetadata
     # Field: hsm_available Type: 8 ()
     # Field: ekm_available Type: 8 ()
     # Field: hsm_single_tenant_available Type: 8 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::LocationMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::LocationMetadata->new(
-        hsm_available => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<hsm_available>
-
-Type: Bool
-
-=item * B<ekm_available>
-
-Type: Bool
-
-=item * B<hsm_single_tenant_available>
-
-Type: Bool
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::DeleteCryptoKeyMetadata ===
     # Fields for DeleteCryptoKeyMetadata
     # Field: retired_resource Type: 9 ()
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::DeleteCryptoKeyMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::DeleteCryptoKeyMetadata->new(
-        retired_resource => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<retired_resource>
-
-Type: String
-
-=back
-
-=cut
-
 # === Message: Google::Cloud::Kms::V1::Service::DeleteCryptoKeyVersionMetadata ===
     # Fields for DeleteCryptoKeyVersionMetadata
-
-=pod
-
-=head1 NAME
-
-Google::Cloud::Kms::V1::Service::DeleteCryptoKeyVersionMetadata - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Kms::V1::Service;
-
-    my $msg = Google::Cloud::Kms::V1::Service::DeleteCryptoKeyVersionMetadata->new(
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=back
-
-=cut
 
 # === Service Client: Google::Cloud::Kms::V1::Service::KeyManagementServiceClient ===
 package Google::Cloud::Kms::V1::Service::KeyManagementServiceClient;
 
 =pod
 
-=head1 NAME
+=head2 Service Client: Google::Cloud::Kms::V1::Service::KeyManagementServiceClient
 
-Google::Cloud::Kms::V1::Service::KeyManagementServiceClient - Client stub representing the remote KeyManagementService service
+Client stub representing the remote C<KeyManagementService> gRPC service. Delegates call dispatching to L<Google::gRPC::Client>.
 
-=head1 DESCRIPTION
-
-This class acts as a local client stub for the remote gRPC service.
-It delegates call dispatching to an underlying L<Google::gRPC::Client>
-instance, ensuring type-safe request parsing and response mapping.
-
-=head1 CONFIGURATION AND ENVIRONMENT
-
-=head2 target
+=head3 target
 
 The endpoint target address. Defaults to C<kms.googleapis.com:443>.
 
-=head2 credentials
+=head3 credentials
 
 The authentication credentials provider. Defaults to application default credentials via L<Google::Auth>.
 
@@ -5376,13 +3375,2964 @@ sub generate_random_bytes {
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Kms::V1::Service - Protocol Buffers schema definition
+Google::Cloud::Kms::V1::Service - Compiled Protocol Buffers messages for google/cloud/kms/v1/service.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Kms::V1::Service;
+
+    my $msg = Google::Cloud::Kms::V1::Service::ListKeyRingsRequest->new({
+        parent => $parent,
+        page_size => $page_size,
+        page_token => $page_token,
+        filter => $filter,
+    });
+
+    # Read or update a field
+    my $val = $msg->parent();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Kms::V1::Service::ListKeyRingsRequest->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/kms/v1/service.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Kms::V1::Service::ListKeyRingsRequest
+
+Request message for
+[KeyManagementService.ListKeyRings][google.cloud.kms.v1.KeyManagementService.ListKeyRings].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the location associated with the
+[KeyRings][google.cloud.kms.v1.KeyRing], in the format
+`projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Optional limit on the number of
+[KeyRings][google.cloud.kms.v1.KeyRing] to include in the response. Further
+[KeyRings][google.cloud.kms.v1.KeyRing] can subsequently be obtained by
+including the
+[ListKeyRingsResponse.next_page_token][google.cloud.kms.v1.ListKeyRingsResponse.next_page_token]
+in a subsequent request.  If unspecified, the server will pick an
+appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Optional pagination token, returned earlier via
+[ListKeyRingsResponse.next_page_token][google.cloud.kms.v1.ListKeyRingsResponse.next_page_token].
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Only include resources that match the filter in the response. For
+more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify how the results should be sorted. If not specified, the
+results will be sorted in the default order.  For more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ListCryptoKeysRequest
+
+Request message for
+[KeyManagementService.ListCryptoKeys][google.cloud.kms.v1.KeyManagementService.ListCryptoKeys].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the [KeyRing][google.cloud.kms.v1.KeyRing]
+to list, in the format `projects/*/locations/*/keyRings/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Optional limit on the number of
+[CryptoKeys][google.cloud.kms.v1.CryptoKey] to include in the response.
+Further [CryptoKeys][google.cloud.kms.v1.CryptoKey] can subsequently be
+obtained by including the
+[ListCryptoKeysResponse.next_page_token][google.cloud.kms.v1.ListCryptoKeysResponse.next_page_token]
+in a subsequent request.  If unspecified, the server will pick an
+appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Optional pagination token, returned earlier via
+[ListCryptoKeysResponse.next_page_token][google.cloud.kms.v1.ListCryptoKeysResponse.next_page_token].
+
+=item * C<< $msg->version_view() >> / C<< $msg->version_view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::CryptoKeyVersion::CryptoKeyVersionView>)
+
+The fields of the primary version to include in the response.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Only include resources that match the filter in the response. For
+more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify how the results should be sorted. If not specified, the
+results will be sorted in the default order. For more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ListCryptoKeyVersionsRequest
+
+Request message for
+[KeyManagementService.ListCryptoKeyVersions][google.cloud.kms.v1.KeyManagementService.ListCryptoKeyVersions].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] to list, in the format
+`projects/*/locations/*/keyRings/*/cryptoKeys/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Optional limit on the number of
+[CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] to include in the
+response. Further [CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion]
+can subsequently be obtained by including the
+[ListCryptoKeyVersionsResponse.next_page_token][google.cloud.kms.v1.ListCryptoKeyVersionsResponse.next_page_token]
+in a subsequent request. If unspecified, the server will pick an
+appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Optional pagination token, returned earlier via
+[ListCryptoKeyVersionsResponse.next_page_token][google.cloud.kms.v1.ListCryptoKeyVersionsResponse.next_page_token].
+
+=item * C<< $msg->view() >> / C<< $msg->view($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::CryptoKeyVersion::CryptoKeyVersionView>)
+
+The fields to include in the response.
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Only include resources that match the filter in the response. For
+more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify how the results should be sorted. If not specified, the
+results will be sorted in the default order. For more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ListImportJobsRequest
+
+Request message for
+[KeyManagementService.ListImportJobs][google.cloud.kms.v1.KeyManagementService.ListImportJobs].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the [KeyRing][google.cloud.kms.v1.KeyRing]
+to list, in the format `projects/*/locations/*/keyRings/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Optional limit on the number of
+[ImportJobs][google.cloud.kms.v1.ImportJob] to include in the response.
+Further [ImportJobs][google.cloud.kms.v1.ImportJob] can subsequently be
+obtained by including the
+[ListImportJobsResponse.next_page_token][google.cloud.kms.v1.ListImportJobsResponse.next_page_token]
+in a subsequent request. If unspecified, the server will pick an
+appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Optional pagination token, returned earlier via
+[ListImportJobsResponse.next_page_token][google.cloud.kms.v1.ListImportJobsResponse.next_page_token].
+
+=item * C<< $msg->filter() >> / C<< $msg->filter($value) >>
+
+Type: C<String>
+
+Optional. Only include resources that match the filter in the response. For
+more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=item * C<< $msg->order_by() >> / C<< $msg->order_by($value) >>
+
+Type: C<String>
+
+Optional. Specify how the results should be sorted. If not specified, the
+results will be sorted in the default order. For more information, see
+[Sorting and filtering list
+results](https://cloud.google.com/kms/docs/sorting-and-filtering).
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ListRetiredResourcesRequest
+
+Request message for
+[KeyManagementService.ListRetiredResources][google.cloud.kms.v1.KeyManagementService.ListRetiredResources].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The project-specific location holding the
+[RetiredResources][google.cloud.kms.v1.RetiredResource], in the format
+`projects/*/locations/*`.
+
+=item * C<< $msg->page_size() >> / C<< $msg->page_size($value) >>
+
+Type: C<Int32>
+
+Optional. Optional limit on the number of
+[RetiredResources][google.cloud.kms.v1.RetiredResource] to be included in
+the response. Further
+[RetiredResources][google.cloud.kms.v1.RetiredResource] can subsequently be
+obtained by including the
+[ListRetiredResourcesResponse.next_page_token][google.cloud.kms.v1.ListRetiredResourcesResponse.next_page_token]
+in a subsequent request. If unspecified, the server will pick an
+appropriate default.
+
+=item * C<< $msg->page_token() >> / C<< $msg->page_token($value) >>
+
+Type: C<String>
+
+Optional. Optional pagination token, returned earlier via
+[ListRetiredResourcesResponse.next_page_token][google.cloud.kms.v1.ListRetiredResourcesResponse.next_page_token].
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ListKeyRingsResponse
+
+Response message for
+[KeyManagementService.ListKeyRings][google.cloud.kms.v1.KeyManagementService.ListKeyRings].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->key_rings() >> / C<< $msg->key_rings($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::KeyRing>)
+
+The list of [KeyRings][google.cloud.kms.v1.KeyRing].
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve next page of results. Pass this value in
+[ListKeyRingsRequest.page_token][google.cloud.kms.v1.ListKeyRingsRequest.page_token]
+to retrieve the next page of results.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The total number of [KeyRings][google.cloud.kms.v1.KeyRing] that matched
+the query.
+
+This field is not populated if
+[ListKeyRingsRequest.filter][google.cloud.kms.v1.ListKeyRingsRequest.filter]
+is applied.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ListCryptoKeysResponse
+
+Response message for
+[KeyManagementService.ListCryptoKeys][google.cloud.kms.v1.KeyManagementService.ListCryptoKeys].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->crypto_keys() >> / C<< $msg->crypto_keys($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::CryptoKey>)
+
+The list of [CryptoKeys][google.cloud.kms.v1.CryptoKey].
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve next page of results. Pass this value in
+[ListCryptoKeysRequest.page_token][google.cloud.kms.v1.ListCryptoKeysRequest.page_token]
+to retrieve the next page of results.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The total number of [CryptoKeys][google.cloud.kms.v1.CryptoKey] that
+matched the query.
+
+This field is not populated if
+[ListCryptoKeysRequest.filter][google.cloud.kms.v1.ListCryptoKeysRequest.filter]
+is applied.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ListCryptoKeyVersionsResponse
+
+Response message for
+[KeyManagementService.ListCryptoKeyVersions][google.cloud.kms.v1.KeyManagementService.ListCryptoKeyVersions].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->crypto_key_versions() >> / C<< $msg->crypto_key_versions($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::CryptoKeyVersion>)
+
+The list of [CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion].
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve next page of results. Pass this value in
+[ListCryptoKeyVersionsRequest.page_token][google.cloud.kms.v1.ListCryptoKeyVersionsRequest.page_token]
+to retrieve the next page of results.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The total number of
+[CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] that matched the
+query.
+
+This field is not populated if
+[ListCryptoKeyVersionsRequest.filter][google.cloud.kms.v1.ListCryptoKeyVersionsRequest.filter]
+is applied.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ListImportJobsResponse
+
+Response message for
+[KeyManagementService.ListImportJobs][google.cloud.kms.v1.KeyManagementService.ListImportJobs].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->import_jobs() >> / C<< $msg->import_jobs($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::ImportJob>)
+
+The list of [ImportJobs][google.cloud.kms.v1.ImportJob].
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve next page of results. Pass this value in
+[ListImportJobsRequest.page_token][google.cloud.kms.v1.ListImportJobsRequest.page_token]
+to retrieve the next page of results.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int32>
+
+The total number of [ImportJobs][google.cloud.kms.v1.ImportJob] that
+matched the query.
+
+This field is not populated if
+[ListImportJobsRequest.filter][google.cloud.kms.v1.ListImportJobsRequest.filter]
+is applied.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ListRetiredResourcesResponse
+
+Response message for
+[KeyManagementService.ListRetiredResources][google.cloud.kms.v1.KeyManagementService.ListRetiredResources].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->retired_resources() >> / C<< $msg->retired_resources($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::RetiredResource>)
+
+The list of [RetiredResources][google.cloud.kms.v1.RetiredResource].
+
+=item * C<< $msg->next_page_token() >> / C<< $msg->next_page_token($value) >>
+
+Type: C<String>
+
+A token to retrieve the next page of results. Pass this value in
+[ListRetiredResourcesRequest.page_token][google.cloud.kms.v1.ListRetiredResourcesRequest.page_token]
+to retrieve the next page of results.
+
+=item * C<< $msg->total_size() >> / C<< $msg->total_size($value) >>
+
+Type: C<Int64>
+
+The total number of [RetiredResources][google.cloud.kms.v1.RetiredResource]
+that matched the query.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::GetKeyRingRequest
+
+Request message for
+[KeyManagementService.GetKeyRing][google.cloud.kms.v1.KeyManagementService.GetKeyRing].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.KeyRing.name] of the
+[KeyRing][google.cloud.kms.v1.KeyRing] to get.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::GetCryptoKeyRequest
+
+Request message for
+[KeyManagementService.GetCryptoKey][google.cloud.kms.v1.KeyManagementService.GetCryptoKey].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKey.name] of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] to get.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::GetCryptoKeyVersionRequest
+
+Request message for
+[KeyManagementService.GetCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.GetCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKeyVersion.name] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to get.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::GetPublicKeyRequest
+
+Request message for
+[KeyManagementService.GetPublicKey][google.cloud.kms.v1.KeyManagementService.GetPublicKey].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKeyVersion.name] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] public key to get.
+
+=item * C<< $msg->public_key_format() >> / C<< $msg->public_key_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::PublicKey::PublicKeyFormat>)
+
+Optional. The [PublicKey][google.cloud.kms.v1.PublicKey] format specified
+by the user. This field is required for PQC algorithms. If specified, the
+public key will be exported through the
+[public_key][google.cloud.kms.v1.PublicKey.public_key] field in the
+requested format. Otherwise, the [pem][google.cloud.kms.v1.PublicKey.pem]
+field will be populated for non-PQC algorithms, and an error will be
+returned for PQC algorithms.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::GetImportJobRequest
+
+Request message for
+[KeyManagementService.GetImportJob][google.cloud.kms.v1.KeyManagementService.GetImportJob].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.ImportJob.name] of the
+[ImportJob][google.cloud.kms.v1.ImportJob] to get.
+
+=item * C<< $msg->public_key_format() >> / C<< $msg->public_key_format($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::PublicKey::PublicKeyFormat>)
+
+Optional. Specifies the [WrappingPublicKey][] format.
+If not specified:
+  * For RSA-based import methods, the wrapping key will be returned in PEM
+  format
+  * For pure ML-KEM-based import methods, the wrapping key will be returned
+  in the raw bytes format specified in FIPS-203
+  * For X-Wing-based import methods, the wrapping key will be returned in
+  the raw bytes format specified in
+  https://datatracker.ietf.org/doc/draft-connolly-cfrg-xwing-kem.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::GetRetiredResourceRequest
+
+Request message for
+[KeyManagementService.GetRetiredResource][google.cloud.kms.v1.KeyManagementService.GetRetiredResource].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.RetiredResource.name] of the
+[RetiredResource][google.cloud.kms.v1.RetiredResource] to get.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::CreateKeyRingRequest
+
+Request message for
+[KeyManagementService.CreateKeyRing][google.cloud.kms.v1.KeyManagementService.CreateKeyRing].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The resource name of the location associated with the
+[KeyRings][google.cloud.kms.v1.KeyRing], in the format
+`projects/*/locations/*`.
+
+=item * C<< $msg->key_ring_id() >> / C<< $msg->key_ring_id($value) >>
+
+Type: C<String>
+
+Required. It must be unique within a location and match the regular
+expression `[a-zA-Z0-9_-]{1,63}`
+
+=item * C<< $msg->key_ring() >> / C<< $msg->key_ring($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::KeyRing>)
+
+Required. A [KeyRing][google.cloud.kms.v1.KeyRing] with initial field
+values.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::CreateCryptoKeyRequest
+
+Request message for
+[KeyManagementService.CreateCryptoKey][google.cloud.kms.v1.KeyManagementService.CreateCryptoKey].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.KeyRing.name] of the KeyRing
+associated with the [CryptoKeys][google.cloud.kms.v1.CryptoKey].
+
+=item * C<< $msg->crypto_key_id() >> / C<< $msg->crypto_key_id($value) >>
+
+Type: C<String>
+
+Required. It must be unique within a KeyRing and match the regular
+expression `[a-zA-Z0-9_-]{1,63}`
+
+=item * C<< $msg->crypto_key() >> / C<< $msg->crypto_key($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::CryptoKey>)
+
+Required. A [CryptoKey][google.cloud.kms.v1.CryptoKey] with initial field
+values.
+
+=item * C<< $msg->skip_initial_version_creation() >> / C<< $msg->skip_initial_version_creation($value) >>
+
+Type: C<Bool>
+
+If set to true, the request will create a
+[CryptoKey][google.cloud.kms.v1.CryptoKey] without any
+[CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion]. You must
+manually call
+[CreateCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.CreateCryptoKeyVersion]
+or
+[ImportCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ImportCryptoKeyVersion]
+before you can use this [CryptoKey][google.cloud.kms.v1.CryptoKey].
+
+=item * C<< $msg->trusted_wrapping_enabled() >> / C<< $msg->trusted_wrapping_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Whether trusted wrapping will be enabled on the first
+[CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion] created for this
+[CryptoKey][google.cloud.kms.v1.CryptoKey]. This field is only supported
+for keys with
+[CryptoKeyVersionTemplate.protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level]
+[HSM_SINGLE_TENANT][google.cloud.kms.v1.ProtectionLevel.HSM_SINGLE_TENANT].
+This field is supported for all
+[CryptoKeyPurposes][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose] except
+[ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT].
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::CreateCryptoKeyVersionRequest
+
+Request message for
+[KeyManagementService.CreateCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.CreateCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKey.name] of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] associated with the
+[CryptoKeyVersions][google.cloud.kms.v1.CryptoKeyVersion].
+
+=item * C<< $msg->crypto_key_version() >> / C<< $msg->crypto_key_version($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::CryptoKeyVersion>)
+
+Required. A [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] with
+initial field values.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::DeleteCryptoKeyRequest
+
+Request message for
+[KeyManagementService.DeleteCryptoKey][google.cloud.kms.v1.KeyManagementService.DeleteCryptoKey].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKey.name] of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] to delete.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::DeleteCryptoKeyVersionRequest
+
+Request message for
+[KeyManagementService.DeleteCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.DeleteCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKeyVersion.name] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to delete.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ImportCryptoKeyVersionRequest
+
+Request message for
+[KeyManagementService.ImportCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ImportCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKey.name] of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] to be imported into.
+
+The create permission is only required on this key when creating a new
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion].
+
+=item * C<< $msg->crypto_key_version() >> / C<< $msg->crypto_key_version($value) >>
+
+Type: C<String>
+
+Optional. The optional [name][google.cloud.kms.v1.CryptoKeyVersion.name] of
+an existing [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to
+target for an import operation. If this field is not present, a new
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] containing the
+supplied key material is created.
+
+If this field is present, the supplied key material is imported into
+the existing [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]. To
+import into an existing
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion], the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] must be a child of
+[ImportCryptoKeyVersionRequest.parent][google.cloud.kms.v1.ImportCryptoKeyVersionRequest.parent],
+have been previously created via
+[ImportCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ImportCryptoKeyVersion],
+and be in
+[DESTROYED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROYED]
+or
+[IMPORT_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.IMPORT_FAILED]
+state. The key material and algorithm must match the previous
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] exactly if the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] has ever contained
+key material.
+
+=item * C<< $msg->algorithm() >> / C<< $msg->algorithm($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::CryptoKeyVersion::CryptoKeyVersionAlgorithm>)
+
+Required. The
+[algorithm][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm]
+of the key being imported. This does not need to match the
+[version_template][google.cloud.kms.v1.CryptoKey.version_template] of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] this version imports into.
+
+=item * C<< $msg->import_job() >> / C<< $msg->import_job($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.ImportJob.name] of the
+[ImportJob][google.cloud.kms.v1.ImportJob] that was used to wrap this key
+material.
+
+=item * C<< $msg->wrapped_key() >> / C<< $msg->wrapped_key($value) >>
+
+Type: C<Bytes>
+
+Optional. The wrapped key material to import.
+
+Before wrapping, key material must be formatted. If importing symmetric key
+material, the expected key material format is plain bytes. If importing
+asymmetric key material, the expected key material format is PKCS#8-encoded
+DER (the PrivateKeyInfo structure from RFC 5208).
+
+When wrapping with import methods
+([RSA_OAEP_3072_SHA1_AES_256][google.cloud.kms.v1.ImportJob.ImportMethod.RSA_OAEP_3072_SHA1_AES_256]
+or
+[RSA_OAEP_4096_SHA1_AES_256][google.cloud.kms.v1.ImportJob.ImportMethod.RSA_OAEP_4096_SHA1_AES_256]
+or
+[RSA_OAEP_3072_SHA256_AES_256][google.cloud.kms.v1.ImportJob.ImportMethod.RSA_OAEP_3072_SHA256_AES_256]
+or
+[RSA_OAEP_4096_SHA256_AES_256][google.cloud.kms.v1.ImportJob.ImportMethod.RSA_OAEP_4096_SHA256_AES_256]),
+
+this field must contain the concatenation of:
+<ol>
+  <li>An ephemeral AES-256 wrapping key wrapped with the
+      [public_key][google.cloud.kms.v1.ImportJob.public_key] using
+      RSAES-OAEP with SHA-1/SHA-256, MGF1 with SHA-1/SHA-256, and an empty
+      label.
+  </li>
+  <li>The formatted key to be imported, wrapped with the ephemeral AES-256
+      key using AES-KWP (RFC 5649).
+  </li>
+</ol>
+
+This format is the same as the format produced by PKCS#11 mechanism
+CKM_RSA_AES_KEY_WRAP.
+
+When wrapping with import methods
+([RSA_OAEP_3072_SHA256][google.cloud.kms.v1.ImportJob.ImportMethod.RSA_OAEP_3072_SHA256]
+or
+[RSA_OAEP_4096_SHA256][google.cloud.kms.v1.ImportJob.ImportMethod.RSA_OAEP_4096_SHA256]),
+
+this field must contain the formatted key to be imported, wrapped with the
+[public_key][google.cloud.kms.v1.ImportJob.public_key] using RSAES-OAEP
+with SHA-256, MGF1 with SHA-256, and an empty label.
+
+=item * C<< $msg->rsa_aes_wrapped_key() >> / C<< $msg->rsa_aes_wrapped_key($value) >>
+
+Type: C<Bytes>
+
+Optional. This field has the same meaning as
+[wrapped_key][google.cloud.kms.v1.ImportCryptoKeyVersionRequest.wrapped_key].
+Prefer to use that field in new work. Either that field or this field
+(but not both) must be specified.
+
+=item * C<< $msg->trusted_wrapping_enabled() >> / C<< $msg->trusted_wrapping_enabled($value) >>
+
+Type: C<Bool>
+
+Optional. Whether trusted wrapping will be enabled on the imported
+[CryptoKeyVersion]. This field is only supported for keys with
+[CryptoKeyVersionTemplate.protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level]
+[HSM_SINGLE_TENANT][google.cloud.kms.v1.ProtectionLevel.HSM_SINGLE_TENANT].
+This field is supported for all
+[CryptoKeyPurposes][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose] besides
+[ENCRYPT_DECRYPT][google.cloud.kms.v1.CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT].
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ImportTrustedKeyWrappedCryptoKeyVersionRequest
+
+Request message for
+[KeyManagementService.ImportTrustedKeyWrappedCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ImportTrustedKeyWrappedCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKey.name] of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] to be imported into.
+
+=item * C<< $msg->importing_key() >> / C<< $msg->importing_key($value) >>
+
+Type: C<String>
+
+Required. Required - the CKV of the trusted key used to import.
+This can be the name of a CryptoKeyVersion or a CryptoKey.
+
+=item * C<< $msg->crypto_key_version() >> / C<< $msg->crypto_key_version($value) >>
+
+Type: C<String>
+
+Optional. The optional [name][google.cloud.kms.v1.CryptoKeyVersion.name] of
+an existing [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to
+target for an import operation. If this field is not present, a new
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] containing the
+supplied key material is created.
+
+If this field is present, the supplied key material is imported into
+the existing [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]. To
+import into an existing
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion], the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] must be a child of
+[ImportTrustedKeyWrappedCryptoKeyVersionRequest.parent][google.cloud.kms.v1.ImportTrustedKeyWrappedCryptoKeyVersionRequest.parent],
+have been previously created via
+[ImportTrustedKeyWrappedCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ImportTrustedKeyWrappedCryptoKeyVersion],
+and be in
+[DESTROYED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.DESTROYED]
+or
+[IMPORT_FAILED][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionState.IMPORT_FAILED]
+state. The key material and algorithm must match the previous
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] exactly if the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] has ever contained
+key material
+
+=item * C<< $msg->wrapped_key() >> / C<< $msg->wrapped_key($value) >>
+
+Type: C<Bytes>
+
+Required. The target key pre-wrapped on premises.
+
+=item * C<< $msg->algorithm() >> / C<< $msg->algorithm($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::CryptoKeyVersion::CryptoKeyVersionAlgorithm>)
+
+Required. Required - The
+[algorithm][google.cloud.kms.v1.CryptoKeyVersion.CryptoKeyVersionAlgorithm]
+of the key being imported. This does not need to match the
+[version_template][google.cloud.kms.v1.CryptoKey.version_template] of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] this version imports into.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ExportTrustedKeyWrappedCryptoKeyVersionRequest
+
+Request message for
+[KeyManagementService.ExportTrustedKeyWrappedCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ExportTrustedKeyWrappedCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKeyVersion.name] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to export. The
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] must have
+[trusted_wrapping_enabled][google.cloud.kms.v1.CryptoKeyVersion.trusted_wrapping_enabled]
+set to true.
+
+=item * C<< $msg->wrapping_key() >> / C<< $msg->wrapping_key($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.CryptoKeyVersion.name] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use as a
+wrapping key. The [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]
+must have [hsm_trusted][google.cloud.kms.v1.CryptoKeyVersion.hsm_trusted]
+set to true.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::ExportTrustedKeyWrappedCryptoKeyVersionResponse
+
+Response message for
+[KeyManagementService.ExportTrustedKeyWrappedCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.ExportTrustedKeyWrappedCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->wrapped_key() >> / C<< $msg->wrapped_key($value) >>
+
+Type: C<Bytes>
+
+The wrapped key material.
+
+=item * C<< $msg->wrapped_key_crc32c() >> / C<< $msg->wrapped_key_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[ExportTrustedKeyWrappedCryptoKeyVersionResponse.wrapped_key][google.cloud.kms.v1.ExportTrustedKeyWrappedCryptoKeyVersionResponse.wrapped_key].
+An integrity check of
+[ExportTrustedKeyWrappedCryptoKeyVersionResponse.wrapped_key][google.cloud.kms.v1.ExportTrustedKeyWrappedCryptoKeyVersionResponse.wrapped_key]
+can be performed by computing the CRC32C checksum of
+[ExportTrustedKeyWrappedCryptoKeyVersionResponse.wrapped_key][google.cloud.kms.v1.ExportTrustedKeyWrappedCryptoKeyVersionResponse.wrapped_key]
+and comparing your results to this field. Discard the response in case of
+non-matching checksum values, and perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum.
+Note: This field is defined as int64 for reasons of compatibility across
+different languages. However, it is a non-negative integer, which will
+never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+that support this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::CreateImportJobRequest
+
+Request message for
+[KeyManagementService.CreateImportJob][google.cloud.kms.v1.KeyManagementService.CreateImportJob].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->parent() >> / C<< $msg->parent($value) >>
+
+Type: C<String>
+
+Required. The [name][google.cloud.kms.v1.KeyRing.name] of the
+[KeyRing][google.cloud.kms.v1.KeyRing] associated with the
+[ImportJobs][google.cloud.kms.v1.ImportJob].
+
+=item * C<< $msg->import_job_id() >> / C<< $msg->import_job_id($value) >>
+
+Type: C<String>
+
+Required. It must be unique within a KeyRing and match the regular
+expression `[a-zA-Z0-9_-]{1,63}`
+
+=item * C<< $msg->import_job() >> / C<< $msg->import_job($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::ImportJob>)
+
+Required. An [ImportJob][google.cloud.kms.v1.ImportJob] with initial field
+values.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::UpdateCryptoKeyRequest
+
+Request message for
+[KeyManagementService.UpdateCryptoKey][google.cloud.kms.v1.KeyManagementService.UpdateCryptoKey].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->crypto_key() >> / C<< $msg->crypto_key($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::CryptoKey>)
+
+Required. [CryptoKey][google.cloud.kms.v1.CryptoKey] with updated values.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. List of fields to be updated in this request.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::UpdateCryptoKeyVersionRequest
+
+Request message for
+[KeyManagementService.UpdateCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.UpdateCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->crypto_key_version() >> / C<< $msg->crypto_key_version($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Resources::CryptoKeyVersion>)
+
+Required. [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] with
+updated values.
+
+=item * C<< $msg->update_mask() >> / C<< $msg->update_mask($value) >>
+
+Type: C<Message> (L<Google::Protobuf::FieldMask::FieldMask>)
+
+Required. List of fields to be updated in this request.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::UpdateCryptoKeyPrimaryVersionRequest
+
+Request message for
+[KeyManagementService.UpdateCryptoKeyPrimaryVersion][google.cloud.kms.v1.KeyManagementService.UpdateCryptoKeyPrimaryVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] to update.
+
+=item * C<< $msg->crypto_key_version_id() >> / C<< $msg->crypto_key_version_id($value) >>
+
+Type: C<String>
+
+Required. The id of the child
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use as primary.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::DestroyCryptoKeyVersionRequest
+
+Request message for
+[KeyManagementService.DestroyCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.DestroyCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to destroy.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::RestoreCryptoKeyVersionRequest
+
+Request message for
+[KeyManagementService.RestoreCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.RestoreCryptoKeyVersion].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to restore.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::EncryptRequest
+
+Request message for
+[KeyManagementService.Encrypt][google.cloud.kms.v1.KeyManagementService.Encrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] or
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+encryption.
+
+If a [CryptoKey][google.cloud.kms.v1.CryptoKey] is specified, the server
+will use its [primary version][google.cloud.kms.v1.CryptoKey.primary].
+
+=item * C<< $msg->plaintext() >> / C<< $msg->plaintext($value) >>
+
+Type: C<Bytes>
+
+Required. The data to encrypt. Must be no larger than 64KiB.
+
+The maximum size depends on the key version's
+[protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
+For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+[EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+[EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys, the
+plaintext must be no larger than 64KiB. For
+[HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
+the plaintext and additional_authenticated_data fields must be no larger
+than 8KiB.
+
+=item * C<< $msg->additional_authenticated_data() >> / C<< $msg->additional_authenticated_data($value) >>
+
+Type: C<Bytes>
+
+Optional. Optional data that, if specified, must also be provided during
+decryption through
+[DecryptRequest.additional_authenticated_data][google.cloud.kms.v1.DecryptRequest.additional_authenticated_data].
+
+The maximum size depends on the key version's
+[protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
+For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE],
+[EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL], and
+[EXTERNAL_VPC][google.cloud.kms.v1.ProtectionLevel.EXTERNAL_VPC] keys the
+AAD must be no larger than 64KiB. For
+[HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
+the plaintext and additional_authenticated_data fields must be no larger
+than 8KiB.
+
+=item * C<< $msg->plaintext_crc32c() >> / C<< $msg->plaintext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[EncryptRequest.plaintext][google.cloud.kms.v1.EncryptRequest.plaintext].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received
+[EncryptRequest.plaintext][google.cloud.kms.v1.EncryptRequest.plaintext]
+using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([EncryptRequest.plaintext][google.cloud.kms.v1.EncryptRequest.plaintext])
+is equal to
+[EncryptRequest.plaintext_crc32c][google.cloud.kms.v1.EncryptRequest.plaintext_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=item * C<< $msg->additional_authenticated_data_crc32c() >> / C<< $msg->additional_authenticated_data_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[EncryptRequest.additional_authenticated_data][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received
+[EncryptRequest.additional_authenticated_data][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data]
+using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([EncryptRequest.additional_authenticated_data][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data])
+is equal to
+[EncryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::DecryptRequest
+
+Request message for
+[KeyManagementService.Decrypt][google.cloud.kms.v1.KeyManagementService.Decrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKey][google.cloud.kms.v1.CryptoKey] to use for decryption. The
+server will choose the appropriate version.
+
+=item * C<< $msg->ciphertext() >> / C<< $msg->ciphertext($value) >>
+
+Type: C<Bytes>
+
+Required. The encrypted data originally returned in
+[EncryptResponse.ciphertext][google.cloud.kms.v1.EncryptResponse.ciphertext].
+
+=item * C<< $msg->additional_authenticated_data() >> / C<< $msg->additional_authenticated_data($value) >>
+
+Type: C<Bytes>
+
+Optional. Optional data that must match the data originally supplied in
+[EncryptRequest.additional_authenticated_data][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data].
+
+=item * C<< $msg->ciphertext_crc32c() >> / C<< $msg->ciphertext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[DecryptRequest.ciphertext][google.cloud.kms.v1.DecryptRequest.ciphertext].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received
+[DecryptRequest.ciphertext][google.cloud.kms.v1.DecryptRequest.ciphertext]
+using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([DecryptRequest.ciphertext][google.cloud.kms.v1.DecryptRequest.ciphertext])
+is equal to
+[DecryptRequest.ciphertext_crc32c][google.cloud.kms.v1.DecryptRequest.ciphertext_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=item * C<< $msg->additional_authenticated_data_crc32c() >> / C<< $msg->additional_authenticated_data_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[DecryptRequest.additional_authenticated_data][google.cloud.kms.v1.DecryptRequest.additional_authenticated_data].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received
+[DecryptRequest.additional_authenticated_data][google.cloud.kms.v1.DecryptRequest.additional_authenticated_data]
+using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([DecryptRequest.additional_authenticated_data][google.cloud.kms.v1.DecryptRequest.additional_authenticated_data])
+is equal to
+[DecryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.DecryptRequest.additional_authenticated_data_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::RawEncryptRequest
+
+Request message for
+[KeyManagementService.RawEncrypt][google.cloud.kms.v1.KeyManagementService.RawEncrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+encryption.
+
+=item * C<< $msg->plaintext() >> / C<< $msg->plaintext($value) >>
+
+Type: C<Bytes>
+
+Required. The data to encrypt. Must be no larger than 64KiB.
+
+The maximum size depends on the key version's
+[protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
+For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the
+plaintext must be no larger than 64KiB. For
+[HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
+the plaintext and additional_authenticated_data fields must be no larger
+than 8KiB.
+
+=item * C<< $msg->additional_authenticated_data() >> / C<< $msg->additional_authenticated_data($value) >>
+
+Type: C<Bytes>
+
+Optional. Optional data that, if specified, must also be provided during
+decryption through
+[RawDecryptRequest.additional_authenticated_data][google.cloud.kms.v1.RawDecryptRequest.additional_authenticated_data].
+
+This field may only be used in conjunction with an
+[algorithm][google.cloud.kms.v1.CryptoKeyVersion.algorithm] that accepts
+additional authenticated data (for example, AES-GCM).
+
+The maximum size depends on the key version's
+[protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level].
+For [SOFTWARE][google.cloud.kms.v1.ProtectionLevel.SOFTWARE] keys, the
+plaintext must be no larger than 64KiB. For
+[HSM][google.cloud.kms.v1.ProtectionLevel.HSM] keys, the combined length of
+the plaintext and additional_authenticated_data fields must be no larger
+than 8KiB.
+
+=item * C<< $msg->plaintext_crc32c() >> / C<< $msg->plaintext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[RawEncryptRequest.plaintext][google.cloud.kms.v1.RawEncryptRequest.plaintext].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received plaintext using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that CRC32C(plaintext) is equal
+to plaintext_crc32c, and if so, perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: This field is defined as int64 for reasons of compatibility
+across different languages. However, it is a non-negative integer, which
+will never exceed 2^32-1, and can be safely downconverted to uint32 in
+languages that support this type.
+
+=item * C<< $msg->additional_authenticated_data_crc32c() >> / C<< $msg->additional_authenticated_data_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[RawEncryptRequest.additional_authenticated_data][google.cloud.kms.v1.RawEncryptRequest.additional_authenticated_data].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received additional_authenticated_data using
+this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C(additional_authenticated_data) is equal to
+additional_authenticated_data_crc32c, and if so, perform
+a limited number of retries. A persistent mismatch may indicate an issue in
+your computation of the CRC32C checksum.
+Note: This field is defined as int64 for reasons of compatibility across
+different languages. However, it is a non-negative integer, which will
+never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+that support this type.
+
+=item * C<< $msg->initialization_vector() >> / C<< $msg->initialization_vector($value) >>
+
+Type: C<Bytes>
+
+Optional. A customer-supplied initialization vector that will be used for
+encryption. If it is not provided for AES-CBC and AES-CTR, one will be
+generated. It will be returned in
+[RawEncryptResponse.initialization_vector][google.cloud.kms.v1.RawEncryptResponse.initialization_vector].
+
+=item * C<< $msg->initialization_vector_crc32c() >> / C<< $msg->initialization_vector_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[RawEncryptRequest.initialization_vector][google.cloud.kms.v1.RawEncryptRequest.initialization_vector].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received initialization_vector using this
+checksum. [KeyManagementService][google.cloud.kms.v1.KeyManagementService]
+will report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C(initialization_vector) is equal to
+initialization_vector_crc32c, and if so, perform
+a limited number of retries. A persistent mismatch may indicate an issue in
+your computation of the CRC32C checksum.
+Note: This field is defined as int64 for reasons of compatibility across
+different languages. However, it is a non-negative integer, which will
+never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+that support this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::RawDecryptRequest
+
+Request message for
+[KeyManagementService.RawDecrypt][google.cloud.kms.v1.KeyManagementService.RawDecrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+decryption.
+
+=item * C<< $msg->ciphertext() >> / C<< $msg->ciphertext($value) >>
+
+Type: C<Bytes>
+
+Required. The encrypted data originally returned in
+[RawEncryptResponse.ciphertext][google.cloud.kms.v1.RawEncryptResponse.ciphertext].
+
+=item * C<< $msg->additional_authenticated_data() >> / C<< $msg->additional_authenticated_data($value) >>
+
+Type: C<Bytes>
+
+Optional. Optional data that must match the data originally supplied in
+[RawEncryptRequest.additional_authenticated_data][google.cloud.kms.v1.RawEncryptRequest.additional_authenticated_data].
+
+=item * C<< $msg->initialization_vector() >> / C<< $msg->initialization_vector($value) >>
+
+Type: C<Bytes>
+
+Required. The initialization vector (IV) used during encryption, which must
+match the data originally provided in
+[RawEncryptResponse.initialization_vector][google.cloud.kms.v1.RawEncryptResponse.initialization_vector].
+
+=item * C<< $msg->tag_length() >> / C<< $msg->tag_length($value) >>
+
+Type: C<Int32>
+
+The length of the authentication tag that is appended to the end of
+the ciphertext. If unspecified (0), the default value for the key's
+algorithm will be used (for AES-GCM, the default value is 16).
+
+=item * C<< $msg->ciphertext_crc32c() >> / C<< $msg->ciphertext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[RawDecryptRequest.ciphertext][google.cloud.kms.v1.RawDecryptRequest.ciphertext].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received ciphertext using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that CRC32C(ciphertext) is equal
+to ciphertext_crc32c, and if so, perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: This field is defined as int64 for reasons of compatibility
+across different languages. However, it is a non-negative integer, which
+will never exceed 2^32-1, and can be safely downconverted to uint32 in
+languages that support this type.
+
+=item * C<< $msg->additional_authenticated_data_crc32c() >> / C<< $msg->additional_authenticated_data_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[RawDecryptRequest.additional_authenticated_data][google.cloud.kms.v1.RawDecryptRequest.additional_authenticated_data].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received additional_authenticated_data using
+this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C(additional_authenticated_data) is equal to
+additional_authenticated_data_crc32c, and if so, perform
+a limited number of retries. A persistent mismatch may indicate an issue in
+your computation of the CRC32C checksum.
+Note: This field is defined as int64 for reasons of compatibility across
+different languages. However, it is a non-negative integer, which will
+never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+that support this type.
+
+=item * C<< $msg->initialization_vector_crc32c() >> / C<< $msg->initialization_vector_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[RawDecryptRequest.initialization_vector][google.cloud.kms.v1.RawDecryptRequest.initialization_vector].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received initialization_vector using this
+checksum. [KeyManagementService][google.cloud.kms.v1.KeyManagementService]
+will report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C(initialization_vector) is equal to initialization_vector_crc32c, and
+if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum.
+Note: This field is defined as int64 for reasons of compatibility across
+different languages. However, it is a non-negative integer, which will
+never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+that support this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::AsymmetricSignRequest
+
+Request message for
+[KeyManagementService.AsymmetricSign][google.cloud.kms.v1.KeyManagementService.AsymmetricSign].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+signing.
+
+=item * C<< $msg->digest() >> / C<< $msg->digest($value) >>
+
+Type: C<Message> (L<Google::Cloud::Kms::V1::Service::Digest>)
+
+Optional. The digest of the data to sign. The digest must be produced with
+the same digest algorithm as specified by the key version's
+[algorithm][google.cloud.kms.v1.CryptoKeyVersion.algorithm].
+
+This field may not be supplied if
+[AsymmetricSignRequest.data][google.cloud.kms.v1.AsymmetricSignRequest.data]
+is supplied.
+
+=item * C<< $msg->digest_crc32c() >> / C<< $msg->digest_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[AsymmetricSignRequest.digest][google.cloud.kms.v1.AsymmetricSignRequest.digest].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received
+[AsymmetricSignRequest.digest][google.cloud.kms.v1.AsymmetricSignRequest.digest]
+using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([AsymmetricSignRequest.digest][google.cloud.kms.v1.AsymmetricSignRequest.digest])
+is equal to
+[AsymmetricSignRequest.digest_crc32c][google.cloud.kms.v1.AsymmetricSignRequest.digest_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+Optional. The data to sign.
+It can't be supplied if
+[AsymmetricSignRequest.digest][google.cloud.kms.v1.AsymmetricSignRequest.digest]
+is supplied.
+
+=item * C<< $msg->data_crc32c() >> / C<< $msg->data_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[AsymmetricSignRequest.data][google.cloud.kms.v1.AsymmetricSignRequest.data].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received
+[AsymmetricSignRequest.data][google.cloud.kms.v1.AsymmetricSignRequest.data]
+using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([AsymmetricSignRequest.data][google.cloud.kms.v1.AsymmetricSignRequest.data])
+is equal to
+[AsymmetricSignRequest.data_crc32c][google.cloud.kms.v1.AsymmetricSignRequest.data_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::AsymmetricDecryptRequest
+
+Request message for
+[KeyManagementService.AsymmetricDecrypt][google.cloud.kms.v1.KeyManagementService.AsymmetricDecrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+decryption.
+
+=item * C<< $msg->ciphertext() >> / C<< $msg->ciphertext($value) >>
+
+Type: C<Bytes>
+
+Required. The data encrypted with the named
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion]'s public key using
+OAEP.
+
+=item * C<< $msg->ciphertext_crc32c() >> / C<< $msg->ciphertext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[AsymmetricDecryptRequest.ciphertext][google.cloud.kms.v1.AsymmetricDecryptRequest.ciphertext].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received
+[AsymmetricDecryptRequest.ciphertext][google.cloud.kms.v1.AsymmetricDecryptRequest.ciphertext]
+using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([AsymmetricDecryptRequest.ciphertext][google.cloud.kms.v1.AsymmetricDecryptRequest.ciphertext])
+is equal to
+[AsymmetricDecryptRequest.ciphertext_crc32c][google.cloud.kms.v1.AsymmetricDecryptRequest.ciphertext_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::MacSignRequest
+
+Request message for
+[KeyManagementService.MacSign][google.cloud.kms.v1.KeyManagementService.MacSign].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+signing.
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+Required. The data to sign. The MAC tag is computed over this data field
+based on the specific algorithm.
+
+=item * C<< $msg->data_crc32c() >> / C<< $msg->data_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[MacSignRequest.data][google.cloud.kms.v1.MacSignRequest.data]. If
+specified, [KeyManagementService][google.cloud.kms.v1.KeyManagementService]
+will verify the integrity of the received
+[MacSignRequest.data][google.cloud.kms.v1.MacSignRequest.data] using this
+checksum. [KeyManagementService][google.cloud.kms.v1.KeyManagementService]
+will report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([MacSignRequest.data][google.cloud.kms.v1.MacSignRequest.data]) is
+equal to
+[MacSignRequest.data_crc32c][google.cloud.kms.v1.MacSignRequest.data_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::MacVerifyRequest
+
+Request message for
+[KeyManagementService.MacVerify][google.cloud.kms.v1.KeyManagementService.MacVerify].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+verification.
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+Required. The data used previously as a
+[MacSignRequest.data][google.cloud.kms.v1.MacSignRequest.data] to generate
+the MAC tag.
+
+=item * C<< $msg->data_crc32c() >> / C<< $msg->data_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[MacVerifyRequest.data][google.cloud.kms.v1.MacVerifyRequest.data]. If
+specified, [KeyManagementService][google.cloud.kms.v1.KeyManagementService]
+will verify the integrity of the received
+[MacVerifyRequest.data][google.cloud.kms.v1.MacVerifyRequest.data] using
+this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([MacVerifyRequest.data][google.cloud.kms.v1.MacVerifyRequest.data])
+is equal to
+[MacVerifyRequest.data_crc32c][google.cloud.kms.v1.MacVerifyRequest.data_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=item * C<< $msg->mac() >> / C<< $msg->mac($value) >>
+
+Type: C<Bytes>
+
+Required. The signature to verify.
+
+=item * C<< $msg->mac_crc32c() >> / C<< $msg->mac_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. An optional CRC32C checksum of the
+[MacVerifyRequest.mac][google.cloud.kms.v1.MacVerifyRequest.mac]. If
+specified, [KeyManagementService][google.cloud.kms.v1.KeyManagementService]
+will verify the integrity of the received
+[MacVerifyRequest.mac][google.cloud.kms.v1.MacVerifyRequest.mac] using this
+checksum. [KeyManagementService][google.cloud.kms.v1.KeyManagementService]
+will report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([MacVerifyRequest.mac][google.cloud.kms.v1.MacVerifyRequest.mac]) is
+equal to
+[MacVerifyRequest.mac_crc32c][google.cloud.kms.v1.MacVerifyRequest.mac_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::DecapsulateRequest
+
+Request message for
+[KeyManagementService.Decapsulate][google.cloud.kms.v1.KeyManagementService.Decapsulate].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+Required. The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] to use for
+decapsulation.
+
+=item * C<< $msg->ciphertext() >> / C<< $msg->ciphertext($value) >>
+
+Type: C<Bytes>
+
+Required. The ciphertext produced from encapsulation with the
+named [CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] public
+key(s).
+
+=item * C<< $msg->ciphertext_crc32c() >> / C<< $msg->ciphertext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Optional. A CRC32C checksum of the
+[DecapsulateRequest.ciphertext][google.cloud.kms.v1.DecapsulateRequest.ciphertext].
+If specified,
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+verify the integrity of the received
+[DecapsulateRequest.ciphertext][google.cloud.kms.v1.DecapsulateRequest.ciphertext]
+using this checksum.
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] will
+report an error if the checksum verification fails. If you receive a
+checksum error, your client should verify that
+CRC32C([DecapsulateRequest.ciphertext][google.cloud.kms.v1.DecapsulateRequest.ciphertext])
+is equal to
+[DecapsulateRequest.ciphertext_crc32c][google.cloud.kms.v1.DecapsulateRequest.ciphertext_crc32c],
+and if so, perform a limited number of retries. A persistent mismatch may
+indicate an issue in your computation of the CRC32C checksum. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::GenerateRandomBytesRequest
+
+Request message for
+[KeyManagementService.GenerateRandomBytes][google.cloud.kms.v1.KeyManagementService.GenerateRandomBytes].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->location() >> / C<< $msg->location($value) >>
+
+Type: C<String>
+
+The project-specific location in which to generate random bytes.
+For example, "projects/my-project/locations/us-central1".
+
+=item * C<< $msg->length_bytes() >> / C<< $msg->length_bytes($value) >>
+
+Type: C<Int32>
+
+The length in bytes of the amount of randomness to retrieve.  Minimum 8
+bytes, maximum 1024 bytes.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] to use when
+generating the random data. Currently, only
+[HSM][google.cloud.kms.v1.ProtectionLevel.HSM] protection level is
+supported.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::EncryptResponse
+
+Response message for
+[KeyManagementService.Encrypt][google.cloud.kms.v1.KeyManagementService.Encrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in
+encryption. Check this field to verify that the intended resource was used
+for encryption.
+
+=item * C<< $msg->ciphertext() >> / C<< $msg->ciphertext($value) >>
+
+Type: C<Bytes>
+
+The encrypted data.
+
+=item * C<< $msg->ciphertext_crc32c() >> / C<< $msg->ciphertext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[EncryptResponse.ciphertext][google.cloud.kms.v1.EncryptResponse.ciphertext].
+An integrity check of
+[EncryptResponse.ciphertext][google.cloud.kms.v1.EncryptResponse.ciphertext]
+can be performed by computing the CRC32C checksum of
+[EncryptResponse.ciphertext][google.cloud.kms.v1.EncryptResponse.ciphertext]
+and comparing your results to this field. Discard the response in case of
+non-matching checksum values, and perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: This field is defined as int64 for reasons of compatibility
+across different languages. However, it is a non-negative integer, which
+will never exceed 2^32-1, and can be safely downconverted to uint32 in
+languages that support this type.
+
+=item * C<< $msg->verified_plaintext_crc32c() >> / C<< $msg->verified_plaintext_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[EncryptRequest.plaintext_crc32c][google.cloud.kms.v1.EncryptRequest.plaintext_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the
+[plaintext][google.cloud.kms.v1.EncryptRequest.plaintext]. A false value of
+this field indicates either that
+[EncryptRequest.plaintext_crc32c][google.cloud.kms.v1.EncryptRequest.plaintext_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[EncryptRequest.plaintext_crc32c][google.cloud.kms.v1.EncryptRequest.plaintext_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->verified_additional_authenticated_data_crc32c() >> / C<< $msg->verified_additional_authenticated_data_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[EncryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the
+[AAD][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data]. A
+false value of this field indicates either that
+[EncryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[EncryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.EncryptRequest.additional_authenticated_data_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in
+encryption.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::DecryptResponse
+
+Response message for
+[KeyManagementService.Decrypt][google.cloud.kms.v1.KeyManagementService.Decrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->plaintext() >> / C<< $msg->plaintext($value) >>
+
+Type: C<Bytes>
+
+The decrypted data originally supplied in
+[EncryptRequest.plaintext][google.cloud.kms.v1.EncryptRequest.plaintext].
+
+=item * C<< $msg->plaintext_crc32c() >> / C<< $msg->plaintext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[DecryptResponse.plaintext][google.cloud.kms.v1.DecryptResponse.plaintext].
+An integrity check of
+[DecryptResponse.plaintext][google.cloud.kms.v1.DecryptResponse.plaintext]
+can be performed by computing the CRC32C checksum of
+[DecryptResponse.plaintext][google.cloud.kms.v1.DecryptResponse.plaintext]
+and comparing your results to this field. Discard the response in case of
+non-matching checksum values, and perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: receiving this response message indicates that
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] is able to
+successfully decrypt the
+[ciphertext][google.cloud.kms.v1.DecryptRequest.ciphertext]. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=item * C<< $msg->used_primary() >> / C<< $msg->used_primary($value) >>
+
+Type: C<Bool>
+
+Whether the Decryption was performed using the primary key version.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in
+decryption.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::RawEncryptResponse
+
+Response message for
+[KeyManagementService.RawEncrypt][google.cloud.kms.v1.KeyManagementService.RawEncrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->ciphertext() >> / C<< $msg->ciphertext($value) >>
+
+Type: C<Bytes>
+
+The encrypted data. In the case of AES-GCM, the authentication tag
+is the [tag_length][google.cloud.kms.v1.RawEncryptResponse.tag_length]
+bytes at the end of this field.
+
+=item * C<< $msg->initialization_vector() >> / C<< $msg->initialization_vector($value) >>
+
+Type: C<Bytes>
+
+The initialization vector (IV) generated by the service during
+encryption. This value must be stored and provided in
+[RawDecryptRequest.initialization_vector][google.cloud.kms.v1.RawDecryptRequest.initialization_vector]
+at decryption time.
+
+=item * C<< $msg->tag_length() >> / C<< $msg->tag_length($value) >>
+
+Type: C<Int32>
+
+The length of the authentication tag that is appended to
+the end of the ciphertext.
+
+=item * C<< $msg->ciphertext_crc32c() >> / C<< $msg->ciphertext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[RawEncryptResponse.ciphertext][google.cloud.kms.v1.RawEncryptResponse.ciphertext].
+An integrity check of ciphertext can be performed by computing the CRC32C
+checksum of ciphertext and comparing your results to this field. Discard
+the response in case of non-matching checksum values, and perform a limited
+number of retries. A persistent mismatch may indicate an issue in your
+computation of the CRC32C checksum. Note: This field is defined as int64
+for reasons of compatibility across different languages. However, it is a
+non-negative integer, which will never exceed 2^32-1, and can be safely
+downconverted to uint32 in languages that support this type.
+
+=item * C<< $msg->initialization_vector_crc32c() >> / C<< $msg->initialization_vector_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[RawEncryptResponse.initialization_vector][google.cloud.kms.v1.RawEncryptResponse.initialization_vector].
+An integrity check of initialization_vector can be performed by computing
+the CRC32C checksum of initialization_vector and comparing your results to
+this field. Discard the response in case of non-matching checksum values,
+and perform a limited number of retries. A persistent mismatch may indicate
+an issue in your computation of the CRC32C checksum. Note: This field is
+defined as int64 for reasons of compatibility across different languages.
+However, it is a non-negative integer, which will never exceed 2^32-1, and
+can be safely downconverted to uint32 in languages that support this type.
+
+=item * C<< $msg->verified_plaintext_crc32c() >> / C<< $msg->verified_plaintext_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[RawEncryptRequest.plaintext_crc32c][google.cloud.kms.v1.RawEncryptRequest.plaintext_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the plaintext. A false value of this
+field indicates either that
+[RawEncryptRequest.plaintext_crc32c][google.cloud.kms.v1.RawEncryptRequest.plaintext_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[RawEncryptRequest.plaintext_crc32c][google.cloud.kms.v1.RawEncryptRequest.plaintext_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->verified_additional_authenticated_data_crc32c() >> / C<< $msg->verified_additional_authenticated_data_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[RawEncryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.RawEncryptRequest.additional_authenticated_data_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of additional_authenticated_data. A false
+value of this field indicates either that //
+[RawEncryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.RawEncryptRequest.additional_authenticated_data_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[RawEncryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.RawEncryptRequest.additional_authenticated_data_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->verified_initialization_vector_crc32c() >> / C<< $msg->verified_initialization_vector_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[RawEncryptRequest.initialization_vector_crc32c][google.cloud.kms.v1.RawEncryptRequest.initialization_vector_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of initialization_vector. A false value of
+this field indicates either that
+[RawEncryptRequest.initialization_vector_crc32c][google.cloud.kms.v1.RawEncryptRequest.initialization_vector_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[RawEncryptRequest.initialization_vector_crc32c][google.cloud.kms.v1.RawEncryptRequest.initialization_vector_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in
+encryption. Check this field to verify that the intended resource was used
+for encryption.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in
+encryption.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::RawDecryptResponse
+
+Response message for
+[KeyManagementService.RawDecrypt][google.cloud.kms.v1.KeyManagementService.RawDecrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->plaintext() >> / C<< $msg->plaintext($value) >>
+
+Type: C<Bytes>
+
+The decrypted data.
+
+=item * C<< $msg->plaintext_crc32c() >> / C<< $msg->plaintext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[RawDecryptResponse.plaintext][google.cloud.kms.v1.RawDecryptResponse.plaintext].
+An integrity check of plaintext can be performed by computing the CRC32C
+checksum of plaintext and comparing your results to this field. Discard the
+response in case of non-matching checksum values, and perform a limited
+number of retries. A persistent mismatch may indicate an issue in your
+computation of the CRC32C checksum. Note: receiving this response message
+indicates that
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] is able to
+successfully decrypt the
+[ciphertext][google.cloud.kms.v1.RawDecryptRequest.ciphertext].
+Note: This field is defined as int64 for reasons of compatibility across
+different languages. However, it is a non-negative integer, which will
+never exceed 2^32-1, and can be safely downconverted to uint32 in languages
+that support this type.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in
+decryption.
+
+=item * C<< $msg->verified_ciphertext_crc32c() >> / C<< $msg->verified_ciphertext_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[RawDecryptRequest.ciphertext_crc32c][google.cloud.kms.v1.RawDecryptRequest.ciphertext_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the ciphertext. A false value of this
+field indicates either that
+[RawDecryptRequest.ciphertext_crc32c][google.cloud.kms.v1.RawDecryptRequest.ciphertext_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[RawDecryptRequest.ciphertext_crc32c][google.cloud.kms.v1.RawDecryptRequest.ciphertext_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->verified_additional_authenticated_data_crc32c() >> / C<< $msg->verified_additional_authenticated_data_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[RawDecryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.RawDecryptRequest.additional_authenticated_data_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of additional_authenticated_data. A false
+value of this field indicates either that //
+[RawDecryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.RawDecryptRequest.additional_authenticated_data_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[RawDecryptRequest.additional_authenticated_data_crc32c][google.cloud.kms.v1.RawDecryptRequest.additional_authenticated_data_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->verified_initialization_vector_crc32c() >> / C<< $msg->verified_initialization_vector_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[RawDecryptRequest.initialization_vector_crc32c][google.cloud.kms.v1.RawDecryptRequest.initialization_vector_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of initialization_vector. A false value of
+this field indicates either that
+[RawDecryptRequest.initialization_vector_crc32c][google.cloud.kms.v1.RawDecryptRequest.initialization_vector_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[RawDecryptRequest.initialization_vector_crc32c][google.cloud.kms.v1.RawDecryptRequest.initialization_vector_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::AsymmetricSignResponse
+
+Response message for
+[KeyManagementService.AsymmetricSign][google.cloud.kms.v1.KeyManagementService.AsymmetricSign].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->signature() >> / C<< $msg->signature($value) >>
+
+Type: C<Bytes>
+
+The created signature.
+
+=item * C<< $msg->signature_crc32c() >> / C<< $msg->signature_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[AsymmetricSignResponse.signature][google.cloud.kms.v1.AsymmetricSignResponse.signature].
+An integrity check of
+[AsymmetricSignResponse.signature][google.cloud.kms.v1.AsymmetricSignResponse.signature]
+can be performed by computing the CRC32C checksum of
+[AsymmetricSignResponse.signature][google.cloud.kms.v1.AsymmetricSignResponse.signature]
+and comparing your results to this field. Discard the response in case of
+non-matching checksum values, and perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: This field is defined as int64 for reasons of compatibility
+across different languages. However, it is a non-negative integer, which
+will never exceed 2^32-1, and can be safely downconverted to uint32 in
+languages that support this type.
+
+=item * C<< $msg->verified_digest_crc32c() >> / C<< $msg->verified_digest_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[AsymmetricSignRequest.digest_crc32c][google.cloud.kms.v1.AsymmetricSignRequest.digest_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the
+[digest][google.cloud.kms.v1.AsymmetricSignRequest.digest]. A false value
+of this field indicates either that
+[AsymmetricSignRequest.digest_crc32c][google.cloud.kms.v1.AsymmetricSignRequest.digest_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[AsymmetricSignRequest.digest_crc32c][google.cloud.kms.v1.AsymmetricSignRequest.digest_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for signing.
+Check this field to verify that the intended resource was used for signing.
+
+=item * C<< $msg->verified_data_crc32c() >> / C<< $msg->verified_data_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[AsymmetricSignRequest.data_crc32c][google.cloud.kms.v1.AsymmetricSignRequest.data_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the
+[data][google.cloud.kms.v1.AsymmetricSignRequest.data]. A false value of
+this field indicates either that
+[AsymmetricSignRequest.data_crc32c][google.cloud.kms.v1.AsymmetricSignRequest.data_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[AsymmetricSignRequest.data_crc32c][google.cloud.kms.v1.AsymmetricSignRequest.data_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for signing.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::AsymmetricDecryptResponse
+
+Response message for
+[KeyManagementService.AsymmetricDecrypt][google.cloud.kms.v1.KeyManagementService.AsymmetricDecrypt].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->plaintext() >> / C<< $msg->plaintext($value) >>
+
+Type: C<Bytes>
+
+The decrypted data originally encrypted with the matching public key.
+
+=item * C<< $msg->plaintext_crc32c() >> / C<< $msg->plaintext_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[AsymmetricDecryptResponse.plaintext][google.cloud.kms.v1.AsymmetricDecryptResponse.plaintext].
+An integrity check of
+[AsymmetricDecryptResponse.plaintext][google.cloud.kms.v1.AsymmetricDecryptResponse.plaintext]
+can be performed by computing the CRC32C checksum of
+[AsymmetricDecryptResponse.plaintext][google.cloud.kms.v1.AsymmetricDecryptResponse.plaintext]
+and comparing your results to this field. Discard the response in case of
+non-matching checksum values, and perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: This field is defined as int64 for reasons of compatibility
+across different languages. However, it is a non-negative integer, which
+will never exceed 2^32-1, and can be safely downconverted to uint32 in
+languages that support this type.
+
+=item * C<< $msg->verified_ciphertext_crc32c() >> / C<< $msg->verified_ciphertext_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[AsymmetricDecryptRequest.ciphertext_crc32c][google.cloud.kms.v1.AsymmetricDecryptRequest.ciphertext_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the
+[ciphertext][google.cloud.kms.v1.AsymmetricDecryptRequest.ciphertext]. A
+false value of this field indicates either that
+[AsymmetricDecryptRequest.ciphertext_crc32c][google.cloud.kms.v1.AsymmetricDecryptRequest.ciphertext_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[AsymmetricDecryptRequest.ciphertext_crc32c][google.cloud.kms.v1.AsymmetricDecryptRequest.ciphertext_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in
+decryption.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::MacSignResponse
+
+Response message for
+[KeyManagementService.MacSign][google.cloud.kms.v1.KeyManagementService.MacSign].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for signing.
+Check this field to verify that the intended resource was used for signing.
+
+=item * C<< $msg->mac() >> / C<< $msg->mac($value) >>
+
+Type: C<Bytes>
+
+The created signature.
+
+=item * C<< $msg->mac_crc32c() >> / C<< $msg->mac_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[MacSignResponse.mac][google.cloud.kms.v1.MacSignResponse.mac]. An
+integrity check of
+[MacSignResponse.mac][google.cloud.kms.v1.MacSignResponse.mac] can be
+performed by computing the CRC32C checksum of
+[MacSignResponse.mac][google.cloud.kms.v1.MacSignResponse.mac] and
+comparing your results to this field. Discard the response in case of
+non-matching checksum values, and perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: This field is defined as int64 for reasons of compatibility
+across different languages. However, it is a non-negative integer, which
+will never exceed 2^32-1, and can be safely downconverted to uint32 in
+languages that support this type.
+
+=item * C<< $msg->verified_data_crc32c() >> / C<< $msg->verified_data_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[MacSignRequest.data_crc32c][google.cloud.kms.v1.MacSignRequest.data_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the
+[data][google.cloud.kms.v1.MacSignRequest.data]. A false value of this
+field indicates either that
+[MacSignRequest.data_crc32c][google.cloud.kms.v1.MacSignRequest.data_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[MacSignRequest.data_crc32c][google.cloud.kms.v1.MacSignRequest.data_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for signing.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::MacVerifyResponse
+
+Response message for
+[KeyManagementService.MacVerify][google.cloud.kms.v1.KeyManagementService.MacVerify].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for
+verification. Check this field to verify that the intended resource was
+used for verification.
+
+=item * C<< $msg->success() >> / C<< $msg->success($value) >>
+
+Type: C<Bool>
+
+This field indicates whether or not the verification operation for
+[MacVerifyRequest.mac][google.cloud.kms.v1.MacVerifyRequest.mac] over
+[MacVerifyRequest.data][google.cloud.kms.v1.MacVerifyRequest.data] was
+successful.
+
+=item * C<< $msg->verified_data_crc32c() >> / C<< $msg->verified_data_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[MacVerifyRequest.data_crc32c][google.cloud.kms.v1.MacVerifyRequest.data_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the
+[data][google.cloud.kms.v1.MacVerifyRequest.data]. A false value of this
+field indicates either that
+[MacVerifyRequest.data_crc32c][google.cloud.kms.v1.MacVerifyRequest.data_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[MacVerifyRequest.data_crc32c][google.cloud.kms.v1.MacVerifyRequest.data_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->verified_mac_crc32c() >> / C<< $msg->verified_mac_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[MacVerifyRequest.mac_crc32c][google.cloud.kms.v1.MacVerifyRequest.mac_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the
+[data][google.cloud.kms.v1.MacVerifyRequest.mac]. A false value of this
+field indicates either that
+[MacVerifyRequest.mac_crc32c][google.cloud.kms.v1.MacVerifyRequest.mac_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[MacVerifyRequest.mac_crc32c][google.cloud.kms.v1.MacVerifyRequest.mac_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->verified_success_integrity() >> / C<< $msg->verified_success_integrity($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. This value is used for the integrity
+verification of [MacVerifyResponse.success]. If the value of this field
+contradicts the value of [MacVerifyResponse.success], discard the response
+and perform a limited number of retries.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for
+verification.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::DecapsulateResponse
+
+Response message for
+[KeyManagementService.Decapsulate][google.cloud.kms.v1.KeyManagementService.Decapsulate].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->name() >> / C<< $msg->name($value) >>
+
+Type: C<String>
+
+The resource name of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used for
+decapsulation. Check this field to verify that the intended resource was
+used for decapsulation.
+
+=item * C<< $msg->shared_secret() >> / C<< $msg->shared_secret($value) >>
+
+Type: C<Bytes>
+
+The decapsulated shared_secret originally encapsulated with the matching
+public key.
+
+=item * C<< $msg->shared_secret_crc32c() >> / C<< $msg->shared_secret_crc32c($value) >>
+
+Type: C<Int64>
+
+Integrity verification field. A CRC32C checksum of the returned
+[DecapsulateResponse.shared_secret][google.cloud.kms.v1.DecapsulateResponse.shared_secret].
+An integrity check of
+[DecapsulateResponse.shared_secret][google.cloud.kms.v1.DecapsulateResponse.shared_secret]
+can be performed by computing the CRC32C checksum of
+[DecapsulateResponse.shared_secret][google.cloud.kms.v1.DecapsulateResponse.shared_secret]
+and comparing your results to this field. Discard the response in case of
+non-matching checksum values, and perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: receiving this response message indicates that
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] is able to
+successfully decrypt the
+[ciphertext][google.cloud.kms.v1.DecapsulateRequest.ciphertext]. Note: This
+field is defined as int64 for reasons of compatibility across different
+languages. However, it is a non-negative integer, which will never exceed
+2^32-1, and can be safely downconverted to uint32 in languages that support
+this type.
+
+=item * C<< $msg->verified_ciphertext_crc32c() >> / C<< $msg->verified_ciphertext_crc32c($value) >>
+
+Type: C<Bool>
+
+Integrity verification field. A flag indicating whether
+[DecapsulateRequest.ciphertext_crc32c][google.cloud.kms.v1.DecapsulateRequest.ciphertext_crc32c]
+was received by
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService] and used
+for the integrity verification of the
+[ciphertext][google.cloud.kms.v1.DecapsulateRequest.ciphertext]. A false
+value of this field indicates either that
+[DecapsulateRequest.ciphertext_crc32c][google.cloud.kms.v1.DecapsulateRequest.ciphertext_crc32c]
+was left unset or that it was not delivered to
+[KeyManagementService][google.cloud.kms.v1.KeyManagementService]. If you've
+set
+[DecapsulateRequest.ciphertext_crc32c][google.cloud.kms.v1.DecapsulateRequest.ciphertext_crc32c]
+but this field is still false, discard the response and perform a limited
+number of retries.
+
+=item * C<< $msg->protection_level() >> / C<< $msg->protection_level($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Kms::V1::ProtectionLevel>)
+
+The [ProtectionLevel][google.cloud.kms.v1.ProtectionLevel] of the
+[CryptoKeyVersion][google.cloud.kms.v1.CryptoKeyVersion] used in
+decapsulation.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::GenerateRandomBytesResponse
+
+Response message for
+[KeyManagementService.GenerateRandomBytes][google.cloud.kms.v1.KeyManagementService.GenerateRandomBytes].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->data() >> / C<< $msg->data($value) >>
+
+Type: C<Bytes>
+
+The generated data.
+
+=item * C<< $msg->data_crc32c() >> / C<< $msg->data_crc32c($value) >>
+
+Type: C<Message> (L<Google::Protobuf::Wrappers::Int64Value>)
+
+Integrity verification field. A CRC32C checksum of the returned
+[GenerateRandomBytesResponse.data][google.cloud.kms.v1.GenerateRandomBytesResponse.data].
+An integrity check of
+[GenerateRandomBytesResponse.data][google.cloud.kms.v1.GenerateRandomBytesResponse.data]
+can be performed by computing the CRC32C checksum of
+[GenerateRandomBytesResponse.data][google.cloud.kms.v1.GenerateRandomBytesResponse.data]
+and comparing your results to this field. Discard the response in case of
+non-matching checksum values, and perform a limited number of retries. A
+persistent mismatch may indicate an issue in your computation of the CRC32C
+checksum. Note: This field is defined as int64 for reasons of compatibility
+across different languages. However, it is a non-negative integer, which
+will never exceed 2^32-1, and can be safely downconverted to uint32 in
+languages that support this type.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::Digest
+
+A [Digest][google.cloud.kms.v1.Digest] holds a cryptographic message digest.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->sha256() >> / C<< $msg->sha256($value) >>
+
+Type: C<Bytes>
+
+A message digest produced with the SHA-256 algorithm.
+
+=item * C<< $msg->sha384() >> / C<< $msg->sha384($value) >>
+
+Type: C<Bytes>
+
+A message digest produced with the SHA-384 algorithm.
+
+=item * C<< $msg->sha512() >> / C<< $msg->sha512($value) >>
+
+Type: C<Bytes>
+
+A message digest produced with the SHA-512 algorithm.
+
+=item * C<< $msg->external_mu() >> / C<< $msg->external_mu($value) >>
+
+Type: C<Bytes>
+
+A message digest produced with SHAKE-256, to be used with ML-DSA
+external-μ algorithms only. See "message representative" note in
+section 6.2, algorithm 7 of the FIPS-204 standard:
+https://doi.org/10.6028/nist.fips.204
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::LocationMetadata
+
+Cloud KMS metadata for the given
+[google.cloud.location.Location][google.cloud.location.Location].
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->hsm_available() >> / C<< $msg->hsm_available($value) >>
+
+Type: C<Bool>
+
+Indicates whether [CryptoKeys][google.cloud.kms.v1.CryptoKey] with
+[protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level]
+[HSM][google.cloud.kms.v1.ProtectionLevel.HSM] can be created in this
+location.
+
+=item * C<< $msg->ekm_available() >> / C<< $msg->ekm_available($value) >>
+
+Type: C<Bool>
+
+Indicates whether [CryptoKeys][google.cloud.kms.v1.CryptoKey] with
+[protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level]
+[EXTERNAL][google.cloud.kms.v1.ProtectionLevel.EXTERNAL] can be created in
+this location.
+
+=item * C<< $msg->hsm_single_tenant_available() >> / C<< $msg->hsm_single_tenant_available($value) >>
+
+Type: C<Bool>
+
+Indicates whether [CryptoKeys][google.cloud.kms.v1.CryptoKey] with
+[protection_level][google.cloud.kms.v1.CryptoKeyVersionTemplate.protection_level]
+[HSM_SINGLE_TENANT][google.cloud.kms.v1.ProtectionLevel.HSM_SINGLE_TENANT]
+can be created in this location.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::DeleteCryptoKeyMetadata
+
+Represents the metadata of the
+[KeyManagementService.DeleteCryptoKey][google.cloud.kms.v1.KeyManagementService.DeleteCryptoKey]
+long-running operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->retired_resource() >> / C<< $msg->retired_resource($value) >>
+
+Type: C<String>
+
+Output only. The resource name of the
+[RetiredResource][google.cloud.kms.v1.RetiredResource] created as a result
+of this operation, in the format
+`projects/*/locations/*/retiredResources/*`.
+
+=back
+
+=head2 Google::Cloud::Kms::V1::Service::DeleteCryptoKeyVersionMetadata
+
+Represents the metadata of the
+[KeyManagementService.DeleteCryptoKeyVersion][google.cloud.kms.v1.KeyManagementService.DeleteCryptoKeyVersion]
+long-running operation.
+
+Inherits from L<Protobuf::Message>.
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Kms::V1::Service::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

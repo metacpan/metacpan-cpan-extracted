@@ -12,7 +12,7 @@ use Protobuf;
 use Google::Api::Common;
 use Google::Cloud::Compute::V1::Compute;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -28,7 +28,7 @@ sub BUILD {
     }
     my $token = $auth->get_token();
 
-    my $target = 'compute.googleapis.com:443';
+    my $target = 'compute/v1.googleapis.com:443';
     my $t = $self->transport || 'grpc';
 
     if (ref($t) && eval { $t->can('call') }) {
@@ -294,23 +294,154 @@ The following RPC methods are available in this client:
 
 =item * B<delete>
 
-Calls the RPC method C<Delete> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->delete(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        target_http_proxy        => $target_http_proxy,
+    );
+
+Calls the RPC method C<Delete> on C<google.cloud.compute.v1.RegionTargetHttpProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::DeleteRegionTargetHttpProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_http_proxy> - C<string>
+
+=back
 
 =item * B<get>
 
-Calls the RPC method C<Get> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->get(
+        project                  => $project,
+        region                   => $region,
+        target_http_proxy        => $target_http_proxy,
+    );
+
+Calls the RPC method C<Get> on C<google.cloud.compute.v1.RegionTargetHttpProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::GetRegionTargetHttpProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TargetHttpProxy>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<target_http_proxy> - C<string>
+
+=back
 
 =item * B<insert>
 
-Calls the RPC method C<Insert> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->insert(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        target_http_proxy_resource => $target_http_proxy_resource,
+    );
+
+Calls the RPC method C<Insert> on C<google.cloud.compute.v1.RegionTargetHttpProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::InsertRegionTargetHttpProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_http_proxy_resource> - L<Google::Cloud::Compute::V1::Compute::TargetHttpProxy>
+
+=back
 
 =item * B<list>
 
-Calls the RPC method C<List> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->list(
+        filter                   => $filter,
+        max_results              => $max_results,
+        order_by                 => $order_by,
+        page_token               => $page_token,
+        project                  => $project,
+        region                   => $region,
+    );
+
+Calls the RPC method C<List> on C<google.cloud.compute.v1.RegionTargetHttpProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::ListRegionTargetHttpProxiesRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::TargetHttpProxyList>
+
+Parameters:
+
+=over 4
+
+=item * C<filter> - C<string>
+
+=item * C<max_results> - C<uint32>
+
+=item * C<order_by> - C<string>
+
+=item * C<page_token> - C<string>
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=back
 
 =item * B<set_url_map>
 
-Calls the RPC method C<SetUrlMap> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->set_url_map(
+        project                  => $project,
+        region                   => $region,
+        request_id               => $request_id,
+        target_http_proxy        => $target_http_proxy,
+        url_map_reference_resource => $url_map_reference_resource,
+    );
+
+Calls the RPC method C<SetUrlMap> on C<google.cloud.compute.v1.RegionTargetHttpProxies>.
+
+Request: L<Google::Cloud::Compute::V1::Compute::SetUrlMapRegionTargetHttpProxyRequest>
+
+Returns: L<Google::Cloud::Compute::V1::Compute::Operation>
+
+Parameters:
+
+=over 4
+
+=item * C<project> - C<string>
+
+=item * C<region> - C<string>
+
+=item * C<request_id> - C<string>
+
+=item * C<target_http_proxy> - C<string>
+
+=item * C<url_map_reference_resource> - L<Google::Cloud::Compute::V1::Compute::UrlMapReference>
+
+=back
 
 =back
 

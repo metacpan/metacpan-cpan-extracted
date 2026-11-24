@@ -3,7 +3,7 @@ package Google::Cloud::Bigquery::V2::JobCreationReason;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Protobuf::Message;
 use Protobuf::DescriptorPool;
@@ -69,32 +69,6 @@ EOF
     # Fields for JobCreationReason
     # Field: code Type: 14 (.google.cloud.bigquery.v2.JobCreationReason.Code)
 
-=pod
-
-=head1 NAME
-
-Google::Cloud::Bigquery::V2::JobCreationReason::JobCreationReason - Compiled Protocol Buffers message class
-
-=head1 SYNOPSIS
-
-    use Google::Cloud::Bigquery::V2::JobCreationReason;
-
-    my $msg = Google::Cloud::Bigquery::V2::JobCreationReason::JobCreationReason->new(
-        code => $value,
-    );
-
-=head1 FIELDS
-
-=over 4
-
-=item * B<code>
-
-Type: Enum (.google.cloud.bigquery.v2.JobCreationReason.Code)
-
-=back
-
-=cut
-
 # Enum: JobCreationReason::Code
 our $JobCreationReason_CODE_UNSPECIFIED = 0;
 our $JobCreationReason_REQUESTED = 1;
@@ -102,39 +76,85 @@ our $JobCreationReason_LONG_RUNNING = 2;
 our $JobCreationReason_LARGE_RESULTS = 3;
 our $JobCreationReason_OTHER = 4;
 
-=pod
-
-=head2 Enum: JobCreationReason::Code
-
-Values:
-
-=over 4
-
-=item * C<CODE_UNSPECIFIED> => 0
-
-=item * C<REQUESTED> => 1
-
-=item * C<LONG_RUNNING> => 2
-
-=item * C<LARGE_RESULTS> => 3
-
-=item * C<OTHER> => 4
-
-=back
-
-=cut
-
 1;
 
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
-Google::Cloud::Bigquery::V2::JobCreationReason - Protocol Buffers schema definition
+Google::Cloud::Bigquery::V2::JobCreationReason - Compiled Protocol Buffers messages for google/cloud/bigquery/v2/job_creation_reason.proto
+
+=head1 SYNOPSIS
+
+    use Google::Cloud::Bigquery::V2::JobCreationReason;
+
+    my $msg = Google::Cloud::Bigquery::V2::JobCreationReason::JobCreationReason->new({
+        code => $code,
+    });
+
+    # Read or update a field
+    my $val = $msg->code();
+
+    # Binary wire-format roundtrip
+    my $bytes   = $msg->serialize();
+    my $decoded = Google::Cloud::Bigquery::V2::JobCreationReason::JobCreationReason->parse($bytes);
+
+    # Canonical ProtoJSON
+    my $json = $msg->to_json();
 
 =head1 DESCRIPTION
 
-Auto-generated Protocol Buffers schema definition class.
+Auto-generated L<Protobuf> message classes compiled from C<google/cloud/bigquery/v2/job_creation_reason.proto>. All message classes inherit from
+L<Protobuf::Message> and support C<new()>, C<serialize()>, C<parse()>,
+C<to_json()>, C<from_json()>, C<to_text()>, and C<to_perl()>.
+
+=head1 MESSAGES
+
+=head2 Google::Cloud::Bigquery::V2::JobCreationReason::JobCreationReason
+
+Reason about why a Job was created from a
+[`jobs.query`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/query)
+method when used with `JOB_CREATION_OPTIONAL` Job creation mode.
+
+For
+[`jobs.insert`](https://cloud.google.com/bigquery/docs/reference/rest/v2/jobs/insert)
+method calls it will always be `REQUESTED`.
+
+Inherits from L<Protobuf::Message>.
+
+=head3 Accessors
+
+=over 4
+
+=item * C<< $msg->code() >> / C<< $msg->code($value) >>
+
+Type: C<Enum> (L<Google::Cloud::Bigquery::V2::JobCreationReason::Code>)
+
+Output only. Specifies the high level reason why a Job was created.
+
+=back
+
+=head3 Enum: JobCreationReason::Code
+
+=over 4
+
+=item * C<CODE_UNSPECIFIED> => C<0>
+
+=item * C<REQUESTED> => C<1>
+
+=item * C<LONG_RUNNING> => C<2>
+
+=item * C<LARGE_RESULTS> => C<3>
+
+=item * C<OTHER> => C<4>
+
+=back
+
+=head1 SEE ALSO
+
+L<Protobuf>, L<Protobuf::Message>, L<Google::Cloud::Bigquery::V2::JobCreationReason::Types>, L<https://protobuf.dev/>
 
 =head1 LICENSE AND COPYRIGHT
 

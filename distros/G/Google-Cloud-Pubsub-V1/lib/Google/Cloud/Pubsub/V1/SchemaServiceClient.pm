@@ -13,7 +13,7 @@ use Google::Api::Common;
 use Google::Pubsub::V1::Schema;
 use Google::Pubsub::V1::Pubsub;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has credentials => ( is => 'ro', required => 0 );
 has transport   => ( is => 'rw' );
@@ -229,15 +229,78 @@ The following RPC methods are available in this client:
 
 =item * B<create_schema>
 
-Calls the RPC method C<CreateSchema> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->create_schema(
+        parent                   => $parent,
+        schema                   => $schema,
+        schema_id                => $schema_id,
+    );
+
+Calls the RPC method C<CreateSchema> on C<google.pubsub.v1.SchemaService>.
+
+Request: L<Google::Pubsub::V1::Schema::CreateSchemaRequest>
+
+Returns: L<Google::Pubsub::V1::Schema::Schema>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<schema> - L<Google::Pubsub::V1::Schema::Schema>
+
+=item * C<schema_id> - C<string>
+
+=back
 
 =item * B<validate_schema>
 
-Calls the RPC method C<ValidateSchema> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->validate_schema(
+        parent                   => $parent,
+        schema                   => $schema,
+    );
+
+Calls the RPC method C<ValidateSchema> on C<google.pubsub.v1.SchemaService>.
+
+Request: L<Google::Pubsub::V1::Schema::ValidateSchemaRequest>
+
+Returns: L<Google::Pubsub::V1::Schema::ValidateSchemaResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<schema> - L<Google::Pubsub::V1::Schema::Schema>
+
+=back
 
 =item * B<validate_message>
 
-Calls the RPC method C<ValidateMessage> on the service. Takes a hash of parameters representing the request.
+    my $response = $client->validate_message(
+        parent                   => $parent,
+        message                  => $message,
+        encoding                 => $encoding,
+    );
+
+Calls the RPC method C<ValidateMessage> on C<google.pubsub.v1.SchemaService>.
+
+Request: L<Google::Pubsub::V1::Schema::ValidateMessageRequest>
+
+Returns: L<Google::Pubsub::V1::Schema::ValidateMessageResponse>
+
+Parameters:
+
+=over 4
+
+=item * C<parent> - C<string>
+
+=item * C<message> - C<bytes>
+
+=item * C<encoding> - L<Google::Pubsub::V1::Schema::Encoding>
+
+=back
 
 =back
 
