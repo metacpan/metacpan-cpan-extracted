@@ -8,22 +8,50 @@ use Test::More;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use File::Spec;
+use Cwd qw(getcwd);
+use Capture::Tiny ();
 
 use lib 'lib';
+use lib 't/lib';
 
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::SkillDispatcher;
 use Developer::Dashboard::CLI::Which;
 use Developer::Dashboard::CLI::TableHelpers;
+use Developer::Dashboard::GoRoutine ();
+use Local::DevelCoverSwitch qw(devel_cover_switches);
 
 # Hermetic runtime: a temp HOME the test also chdirs into, so the
 # DD-OOP-LAYERS runtime root resolves from this directory (the which helper
 # builds its own registry from $ENV{HOME} and the cwd) and nothing leaks in
 # from the developer's real home.
+my $repo = getcwd();
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
 chdir $home or die "Unable to chdir to $home: $!";
+
+{
+    my @include = map { '-I' . File::Spec->catdir( $repo, $_ ) } qw(lib blib/lib blib/arch);
+    my @coverage_switch = devel_cover_switches($ENV{HARNESS_PERL_SWITCHES});
+    my $exec_child = Developer::Dashboard::GoRoutine::spawn(
+        [
+            $^X,
+            @include,
+            @coverage_switch,
+            '-MDeveloper::Dashboard::CLI::Which',
+            '-e',
+            q{Developer::Dashboard::CLI::Which::_command_exec($^X, '-e', 'exit 23')},
+        ],
+        { cwd => $repo },
+    );
+    ok( $exec_child, '_command_exec child starts through GoRoutine' );
+    is(
+        Developer::Dashboard::GoRoutine::wait_process($exec_child),
+        23,
+        '_command_exec preserves literal executable arguments and the child status'
+    );
+}
 
 my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 
@@ -44,19 +72,15 @@ sub make_exec {
     return $path;
 }
 
-# capture_stdout(\&code): run code with STDOUT redirected into a scalar and
-# return ($captured_text, @code_return). Test::Builder keeps its own handle, so
+# capture_stdout(\&code): run code with STDOUT captured at the file-descriptor
+# level and return ($captured_text, @code_return). An in-memory handle has no
+# descriptor, so on Windows the product's icacls child would write to the real
+# stdout and the command's own output would be lost; Capture::Tiny gives a
+# real descriptor on every platform. Test::Builder keeps its own handle, so
 # assertions outside the closure still emit real TAP.
 sub capture_stdout {
     my ($code) = @_;
-    my $buf = '';
-    open my $fh, '>', \$buf or die "Unable to open scalar handle: $!";
-    my @ret;
-    {
-        local *STDOUT = $fh;
-        @ret = $code->();
-    }
-    close $fh;
+    my ( $buf, @ret ) = Capture::Tiny::capture_stdout( sub { return $code->() } );
     return ( $buf, @ret );
 }
 
@@ -113,7 +137,7 @@ my $tool = make_exec( File::Spec->catfile( $cli_root, 'coverage-tool' ) );
         }
     );
     is( $rc, 0, 'run_which_command --edit returns 0 after handing off to open-file' );
-    is( $exec[0], 'dashboard', 'run_which_command --edit re-enters via the default dashboard entrypoint' );
+    is( $exec[0], 'd2', 'run_which_command --edit re-enters via the default d2 entrypoint' );
     is( $exec[1], 'open-file', 'run_which_command --edit re-enters the open-file command' );
     like( $exec[2], qr/coverage-tool/, 'run_which_command --edit hands the resolved command path to open-file' );
     is( $out, '', 'run_which_command --edit prints no inspection output' );
@@ -282,14 +306,39 @@ is( scalar Developer::Dashboard::CLI::Which::_resolve_directory_runner( File::Sp
     delete $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT};
     is_deeply(
         [ Developer::Dashboard::CLI::Which::_dashboard_entry_command() ],
-        ['dashboard'],
-        '_dashboard_entry_command defaults to the public dashboard entrypoint',
+        ['d2'],
+        '_dashboard_entry_command defaults to the public d2 entrypoint',
+    );
+}
+
+# Repository entrypoints can be checked out without executable file mode.
+# Re-enter the public Perl switchboard explicitly in that situation.
+{
+    my $entrypoint = File::Spec->catfile( $home, 'non-executable-dashboard' );
+    open my $fh, '>', $entrypoint or die "Unable to create entrypoint fixture: $!";
+    print {$fh} "#!/usr/bin/env perl\nexit 0;\n";
+    close $fh or die "Unable to close entrypoint fixture: $!";
+    chmod 0644, $entrypoint or die "Unable to set fixture file mode: $!";
+    local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = $entrypoint;
+    is_deeply(
+        [ Developer::Dashboard::CLI::Which::_dashboard_entry_command() ],
+        [ $^X, $entrypoint ],
+        'which --edit re-enters a non-executable Perl switchboard through Perl',
+    );
+
+    chmod 0755, $entrypoint or die "Unable to mark fixture entrypoint executable: $!";
+    # -x never holds on Windows, so the entrypoint correctly re-enters
+    # through Perl there instead of executing directly.
+    is_deeply(
+        [ Developer::Dashboard::CLI::Which::_dashboard_entry_command() ],
+        $^O eq 'MSWin32' ? [ $^X, $entrypoint ] : [$entrypoint],
+        'which --edit executes an existing executable d2 entrypoint directly',
     );
 }
 
 # --- main-gate hook discovery (DD-810) ---------------------------------------
 # The switchboard runs <layer>/hooks/* once per invocation before the command is
-# resolved, so `dashboard which` reports those hooks ahead of the per-command
+# resolved, so `d2 which` reports those hooks ahead of the per-command
 # ones. Drive the registry guard, the no-hooks-root skip, the runnable / `run` /
 # subdirectory filters, the deepest-first layer order, and the printed order.
 {
@@ -327,9 +376,10 @@ is( scalar Developer::Dashboard::CLI::Which::_resolve_directory_runner( File::Sp
     make_path($project_hooks);
     my $hook_deep = make_exec( File::Spec->catfile( $project_hooks, '05-deep' ) );
     my $layered   = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $project );
+    my @actual_layered_hooks = Developer::Dashboard::CLI::Which::_main_gate_hook_files( paths => $layered );
     is_deeply(
-        [ Developer::Dashboard::CLI::Which::_main_gate_hook_files( paths => $layered ) ],
-        [ $hook_deep, $hook_a, $hook_b ],
+        [ map { _without_private_var_prefix($_) } @actual_layered_hooks ],
+        [ map { _without_private_var_prefix($_) } ( $hook_deep, $hook_a, $hook_b ) ],
         '_main_gate_hook_files walks the layers deepest first and the home layer last',
     );
 
@@ -354,21 +404,27 @@ is( scalar Developer::Dashboard::CLI::Which::_resolve_directory_runner( File::Sp
 
 done_testing;
 
+sub _without_private_var_prefix {
+    my ($path) = @_;
+    $path =~ s{\A/private(?=/var/folders/)}{} if defined $path;
+    return $path;
+}
+
 __END__
 
 =pod
 
 =head1 NAME
 
-t/75-cli-which-coverage.t - branch and condition closure for the dashboard which locator
+t/75-cli-which-coverage.t - branch and condition closure for the d2 which locator
 
 =head1 PURPOSE
 
 This test is the executable coverage contract for
-C<Developer::Dashboard::CLI::Which>, the runtime behind C<dashboard which>. It
+C<Developer::Dashboard::CLI::Which>, the runtime behind C<d2 which>. It
 drives every decision the locator makes: printing the resolved C<COMMAND> and
 C<HOOK> lines for a custom command, dying when a target cannot be resolved,
-re-entering C<dashboard open-file> under C<--edit>, and the argument-guard,
+re-entering C<d2 open-file> under C<--edit>, and the argument-guard,
 empty-HOME, skill-target, hook-directory, and directory-runner branches that the
 higher-level CLI smoke tests never reach.
 
@@ -384,7 +440,7 @@ that exercises both sides of each guard, those branches silently rot and the
 
 =head1 WHEN TO USE
 
-Use this file when changing how C<dashboard which> resolves a target, how it
+Use this file when changing how C<d2 which> resolves a target, how it
 prints or suppresses hook lines, how C<--edit> hands off to open-file, how skill
 command and hook discovery is presented, or how the directory-backed C<run.*>
 entrypoint fallback is resolved. Extend it first, watch it fail, then implement,
@@ -401,6 +457,10 @@ C<COMMAND>/C<HOOK> output can be asserted without disturbing TAP. The unreadable
 hook-directory case is skipped when the test runs as root because root bypasses
 POSIX directory permissions. Keep it green under C<prove -lr t> and under the
 Devel::Cover branch and condition run before release.
+The exec-wrapper check uses a GoRoutine-managed child so the production helper
+is exercised while the test process remains alive. When the parent harness
+provides configured C<Devel::Cover> options, the child receives the complete
+module switch so its data reaches the same coverage database.
 
 =head1 WHAT USES IT
 
@@ -424,7 +484,7 @@ Run it through the harness with verbose per-assertion output.
 
 Example 3:
 
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t/75-cli-which-coverage.t
+  HARNESS_PERL_SWITCHES=-MDevel::Cover=-db,cover_db prove -lr t/75-cli-which-coverage.t
 
 Exercise the same test while collecting branch and condition coverage for the
 locator module.

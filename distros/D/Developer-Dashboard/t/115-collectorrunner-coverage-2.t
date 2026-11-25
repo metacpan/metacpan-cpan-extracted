@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
+use Cwd qw(cwd);
 use File::Spec;
 use File::Temp qw(tempdir);
 use POSIX ();
@@ -16,6 +17,37 @@ use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::GoRoutine ();
+
+my $repo_root = cwd();
+
+# _run_perl_child($source, @arguments)
+# Starts an isolated Perl process through the GoRoutine process API, propagates
+# the harness's coverage options and shared database, and returns its exit code.
+# Input: Perl source string followed by its @ARGV values.
+# Output: child exit code integer.
+sub _run_perl_child {
+    my ( $source, @arguments ) = @_;
+    my @include = map { '-I' . File::Spec->catdir( $repo_root, $_ ) } qw(lib blib/lib blib/arch);
+    my %child_env;
+    my $coverage_switches = $ENV{HARNESS_PERL_SWITCHES};
+    my $coverage_child = defined $coverage_switches && length $coverage_switches
+      && $coverage_switches =~ /Devel::Cover/;
+    if ( defined $coverage_switches && length $coverage_switches ) {
+        $child_env{PERL5OPT} = $coverage_switches;
+    }
+    my $spawn_options = { env => \%child_env };
+    # Devel::Cover only instruments repository modules under its selected source
+    # tree. These child fixtures chdir into their throwaway HOME for hermetic
+    # behavior, so coverage mode returns them to the checkout before startup.
+    $spawn_options->{cwd} = $repo_root if $coverage_child;
+    my $pid = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, @include, '-e', $source, @arguments ],
+        $spawn_options,
+    );
+    die "GoRoutine spawn failed: $!" if !defined $pid;
+    return Developer::Dashboard::GoRoutine::wait_process($pid);
+}
 
 # ---------------------------------------------------------------------------
 # Hermetic runtime rooted in a throwaway HOME. The config root resolves from
@@ -179,14 +211,40 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
 # Real delivery: the collector command signals the runner process itself while
 # system() is still waiting for it. The forwarding helper is stubbed so the
 # handlers record the signal instead of exiting the process, and the whole check
-# runs in a forked child so a stray signal cannot reach the test process. Perl
+# runs in an isolated GoRoutine-spawned Perl process so a stray signal cannot
+# reach the test process. Perl
 # ignores SIGINT for the duration of system(), so only TERM and HUP can be
 # delivered here.
-{
+SKIP: {
+    # Real signal delivery is a Unix mechanism: the fixture command shells
+    # out to `kill` to signal the runner, and there is no kill on Windows
+    # (nor any signal delivery to a process at all). The forwarding of a
+    # delivered signal is covered on Windows by the INT-handler block
+    # below, which invokes the handler directly.
+    skip 'real signal delivery needs a Unix kill binary and Unix signal delivery, neither of which exists on Windows', 2
+      if $^O eq 'MSWin32';
     my $report = File::Spec->catfile( $home, 'forwarded-signals.txt' );
-    my $child  = fork();
-    die "Unable to fork: $!" if !defined $child;
-    if ( !$child ) {
+    my $source = q{
+        use POSIX ();
+        use File::Spec;
+        use Developer::Dashboard::Collector;
+        use Developer::Dashboard::CollectorRunner;
+        use Developer::Dashboard::FileRegistry;
+        use Developer::Dashboard::IndicatorStore;
+        use Developer::Dashboard::PathRegistry;
+        my ( $home, $report ) = @ARGV;
+        $ENV{HOME} = $home;
+        chdir $home or die "Unable to chdir to $home: $!";
+        my $paths = Developer::Dashboard::PathRegistry->new(
+            home => $home,
+            workspace_roots => [ File::Spec->catdir( $home, 'workspace' ) ],
+        );
+        my $runner = Developer::Dashboard::CollectorRunner->new(
+            collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+            files => Developer::Dashboard::FileRegistry->new( paths => $paths ),
+            indicators => Developer::Dashboard::IndicatorStore->new( paths => $paths ),
+            paths => $paths,
+        );
         my @forwarded;
         no warnings 'redefine';
         local *Developer::Dashboard::CommandRunner::forward_command_signal = sub {
@@ -195,18 +253,19 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
             return 1;
         };
         my ( undef, undef, $exit_code ) = $runner->_run_command(
-            source     => "kill -TERM $$; kill -HUP $$; sleep 1",
-            cwd        => $home,
+            source => "kill -TERM $$; kill -HUP $$; sleep 1",
+            cwd => $home,
             timeout_ms => 60_000,
         );
         open my $fh, '>', $report or POSIX::_exit(9);
         print {$fh} join( ',', sort @forwarded ) . "|exit=$exit_code";
         close $fh or POSIX::_exit(9);
-        CORE::exit(0);
-    }
-    waitpid( $child, 0 );
-    my $status = $?;
-    is( $status, 0, '_run_command survives a collector command that signals the runner process' );
+    };
+    is(
+        _run_perl_child( $source, $home, $report ),
+        0,
+        '_run_command survives a collector command that signals the runner process',
+    );
     my $forwarded = '';
     if ( open my $fh, '<', $report ) {
         local $/;
@@ -256,10 +315,9 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
 # answers -1 (no such child) and the helper must treat that as "already gone"
 # instead of escalating to a direct KILL.
 {
-    my $gone = fork();
-    die "Unable to fork: $!" if !defined $gone;
-    POSIX::_exit(0) if !$gone;
-    waitpid( $gone, 0 );
+    my $gone = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'exit 0;' ], {} );
+    die "GoRoutine spawn failed: $!" if !defined $gone;
+    Developer::Dashboard::GoRoutine::wait_process($gone);
     ok(
         $runner->_terminate_command_process($gone),
         '_terminate_command_process treats a waitpid of -1 as an already-reaped command child',
@@ -270,9 +328,8 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
 # owns and that exits on TERM, and a stubborn one that has to spend the whole
 # bounded window before the KILL escalation collects it.
 {
-    my $obedient = fork();
-    die "Unable to fork: $!" if !defined $obedient;
-    POSIX::_exit(0) if !$obedient;
+    my $obedient = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'sleep 30;' ], {} );
+    die "GoRoutine spawn failed: $!" if !defined $obedient;
     ok(
         $runner->_terminate_command_process($obedient),
         '_terminate_command_process reaps a command child it still owns',
@@ -280,14 +337,11 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
     ok( !kill( 0, $obedient ), '_terminate_command_process leaves no owned command child behind' );
 }
 {
-    my $stubborn = fork();
-    die "Unable to fork: $!" if !defined $stubborn;
-    if ( !$stubborn ) {
-        POSIX::setsid();
-        $SIG{TERM} = 'IGNORE';
-        select undef, undef, undef, 30;
-        POSIX::_exit(0);
-    }
+    my $stubborn = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', q{$SIG{TERM} = 'IGNORE'; select undef, undef, undef, 30;} ],
+        { process_group => 1 },
+    );
+    die "GoRoutine spawn failed: $!" if !defined $stubborn;
     select undef, undef, undef, 0.1;
     ok(
         $runner->_terminate_command_process($stubborn),
@@ -304,37 +358,54 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
 # before exiting 128+signal. SIGTERM is blocked in the child so the re-raised
 # signal stays pending and the exit status is observable.
 {
-    my $child = fork();
-    die "Unable to fork: $!" if !defined $child;
-    if ( !$child ) {
-        POSIX::sigprocmask( POSIX::SIG_BLOCK(), POSIX::SigSet->new( POSIX::SIGTERM() ) );
+    my $end_marker = File::Spec->catfile( $home, 'forwarded-term-ended.txt' );
+    my $source = q{
+        use POSIX ();
+        use Developer::Dashboard::CommandRunner;
+        END {
+            open my $fh, '>', $ARGV[0] or die "Unable to write END marker: $!";
+            print {$fh} "normal exit\n" or die "Unable to write END marker: $!";
+            close $fh or die "Unable to close END marker: $!";
+        }
+        # POSIX::sigprocmask and its SIG_BLOCK macro do not exist on
+        # Strawberry Perl. The Windows arm of forward_command_signal exits
+        # 128+signal without re-raising, so blocking the signal is not
+        # needed there; the exit code and the END marker are the same.
+        if ( $^O ne 'MSWin32' ) {
+            POSIX::sigprocmask( POSIX::SIG_BLOCK(), POSIX::SigSet->new( POSIX::SIGTERM() ) );
+        }
         no warnings 'redefine';
-        local *Developer::Dashboard::CommandRunner::await_command_pid          = sub { return undef };
+        local *Developer::Dashboard::CommandRunner::await_command_pid = sub { return undef };
         local *Developer::Dashboard::CommandRunner::terminate_command_process = sub { return 1 };
-        $runner->_forward_command_signal( undef, 'TERM', 15 );
-        POSIX::_exit(1);
-    }
-    waitpid( $child, 0 );
-    my $status = $?;
-    is( $status & 127, 0, '_forward_command_signal leaves the re-raised signal pending rather than dying from it' );
-    is( $status >> 8, 143, '_forward_command_signal re-raises the default-disposition signal and exits 128+signal' );
+        Developer::Dashboard::CommandRunner::forward_command_signal( undef, 'TERM', 15 );
+    };
+    is( _run_perl_child( $source, $end_marker ), 143,
+        '_forward_command_signal exits 128+signal while the re-raised signal remains pending' );
+    ok( -f $end_marker,
+        '_forward_command_signal child exits normally instead of dying from the pending signal' );
 }
 
 # Windows arm with an empty recorded pid-file path: the unlink is skipped
 # because the path is present but blank, and no self-signal is re-raised.
 {
-    my $child = fork();
-    die "Unable to fork: $!" if !defined $child;
-    if ( !$child ) {
+    my $end_marker = File::Spec->catfile( $home, 'forwarded-empty-path-ended.txt' );
+    my $source = q{
+        use Developer::Dashboard::CommandRunner;
+        END {
+            open my $fh, '>', $ARGV[0] or die "Unable to write END marker: $!";
+            print {$fh} "normal exit\n" or die "Unable to write END marker: $!";
+            close $fh or die "Unable to close END marker: $!";
+        }
         no warnings 'redefine';
-        local *Developer::Dashboard::CommandRunner::is_windows                 = sub { return 1 };
-        local *Developer::Dashboard::CommandRunner::await_command_pid          = sub { return undef };
+        local *Developer::Dashboard::CommandRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CommandRunner::await_command_pid = sub { return undef };
         local *Developer::Dashboard::CommandRunner::terminate_command_process = sub { return 1 };
-        $runner->_forward_command_signal( '', 'TERM', 15 );
-        POSIX::_exit(1);
-    }
-    waitpid( $child, 0 );
-    is( $? >> 8, 143, '_forward_command_signal skips the unlink for an empty pid-file path and still exits 128+signal' );
+        Developer::Dashboard::CommandRunner::forward_command_signal( '', 'TERM', 15 );
+    };
+    is( _run_perl_child( $source, $end_marker ), 143,
+        '_forward_command_signal skips unlink for an empty path and exits 128+signal' );
+    ok( -f $end_marker,
+        '_forward_command_signal empty-path child exits normally on the Windows branch' );
 }
 
 # A recorded pid-file path is removed before the handler exits, so a stopped
@@ -344,19 +415,160 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
     open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
     print {$fh} "4242\n";
     close $fh or die "Unable to close $pidfile: $!";
-    my $child = fork();
-    die "Unable to fork: $!" if !defined $child;
-    if ( !$child ) {
+    my $end_marker = File::Spec->catfile( $home, 'forwarded-hup-ended.txt' );
+    my $source = q{
+        use Developer::Dashboard::CommandRunner;
+        END {
+            open my $fh, '>', $ARGV[1] or die "Unable to write END marker: $!";
+            print {$fh} "normal exit\n" or die "Unable to write END marker: $!";
+            close $fh or die "Unable to close END marker: $!";
+        }
         no warnings 'redefine';
-        local *Developer::Dashboard::CommandRunner::is_windows                 = sub { return 1 };
-        local *Developer::Dashboard::CommandRunner::await_command_pid          = sub { return undef };
+        local *Developer::Dashboard::CommandRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CommandRunner::await_command_pid = sub { return undef };
         local *Developer::Dashboard::CommandRunner::terminate_command_process = sub { return 1 };
-        $runner->_forward_command_signal( $pidfile, 'HUP', 1 );
-        POSIX::_exit(1);
-    }
-    waitpid( $child, 0 );
-    is( $? >> 8, 129, '_forward_command_signal exits 128+signal for a forwarded HUP' );
+        Developer::Dashboard::CommandRunner::forward_command_signal( $ARGV[0], 'HUP', 1 );
+    };
+    is( _run_perl_child( $source, $pidfile, $end_marker ), 129,
+        '_forward_command_signal exits 128+signal for a forwarded HUP' );
+    ok( -f $end_marker,
+        '_forward_command_signal HUP child exits normally on the Windows branch' );
     ok( !-e $pidfile, '_forward_command_signal removes the recorded launcher pid file' );
+}
+
+# A GoRoutine-spawned Perl child must inherit the harness coverage switch when
+# a coverage run is active. Without explicitly translating the harness switch
+# into PERL5OPT, child-only handlers pass their behavioral assertions but never
+# contribute their module lines to the shared coverage database.
+{
+    my $marker = File::Spec->catfile( $home, 'coverage-child-marker.txt' );
+    my $source = q{
+        use Developer::Dashboard::CommandRunner;
+        use Cwd qw(cwd);
+        Developer::Dashboard::CommandRunner::exit_code_from_status(0);
+        open my $fh, '>', $ARGV[0] or die "Unable to write coverage marker: $!";
+        print {$fh} ( exists $INC{'Devel/Cover.pm'} ? "loaded\n" : "not-loaded\n" );
+        print {$fh} ( defined $ENV{PERL5OPT} ? "$ENV{PERL5OPT}\n" : "(unset)\n" );
+        print {$fh} cwd(), "\n";
+        close $fh or die "Unable to close coverage marker: $!";
+    };
+    is( _run_perl_child( $source, $marker ), 0, 'coverage-switch probe child exits successfully' );
+    open my $fh, '<', $marker or die "Unable to read coverage marker '$marker': $!";
+    my $loaded = <$fh>;
+    my $child_switches = <$fh>;
+    my $child_cwd = <$fh>;
+    close $fh or die "Unable to close coverage marker '$marker': $!";
+    my $expected = ( $ENV{HARNESS_PERL_SWITCHES} // q{} ) =~ /Devel::Cover/ ? "loaded\n" : "not-loaded\n";
+    is( $loaded, $expected, 'GoRoutine subprocess receives the coverage instrumentation selected by the harness' );
+    if ( defined $ENV{HARNESS_PERL_SWITCHES} && $ENV{HARNESS_PERL_SWITCHES} =~ /Devel::Cover/ ) {
+        is( $child_switches, "$ENV{HARNESS_PERL_SWITCHES}\n", 'GoRoutine subprocess writes to the same Devel::Cover database as the test harness' );
+        is(
+            $child_cwd,
+            "$repo_root\n",
+            'coverage-instrumented GoRoutine child starts at the checkout so Devel::Cover includes repository modules',
+        );
+    }
+}
+
+# When procfs supplies a nonempty command line, normalize NUL separators and
+# whitespace without depending on /proc (absent on macOS and Windows).
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub {
+        return "collector\x00worker\x00\n";
+    };
+    is(
+        $runner->_read_process_title(424242),
+        'collector worker',
+        '_read_process_title decodes a procfs command line on every platform',
+    );
+}
+
+# Enumerate real temporary directory entries instead of Linux /proc. The
+# reader and identity lookups are stubbed, but enumeration and filtering run
+# through the real method on every platform.
+{
+    require File::Path;
+    my $root = File::Spec->catdir( $home, 'fake-collector-proc' );
+    my $self_pid = POSIX::getpid();
+    my @pids = map { $self_pid + $_ } ( 10000, 10001, 10002, 10003 );
+    File::Path::make_path( $root, map { File::Spec->catdir( $root, $_ ) } ( $self_pid, @pids ) );
+    no warnings 'redefine';
+    local $Developer::Dashboard::CollectorRunner::PROCFS_ROOT = $root;
+    local *Developer::Dashboard::CollectorRunner::_process_title = sub { 'collector-fixture' };
+    local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub {
+        my ( undef, $path ) = @_;
+        return '' if $path =~ m{/\Q$pids[0]\E/cmdline\z};
+        return 'command line' if $path =~ m{/\Q$pids[1]\E/cmdline\z};
+        return undef;
+    };
+    local *Developer::Dashboard::CollectorRunner::_read_process_title = sub {
+        my ( undef, $pid ) = @_;
+        return 'other-title' if $pid == $pids[1];
+        return 'collector-fixture';
+    };
+    local *Developer::Dashboard::CollectorRunner::_same_pid_namespace = sub {
+        my ( undef, $pid ) = @_;
+        return $pid == $pids[3] ? 1 : 0;
+    };
+    # Fix C scopes every _find_running_loop branch through
+    # _loop_runtime_matches, which fails closed on a candidate with no
+    # runtime identity - and its first guard is liveness (kill 0), so a
+    # synthetic pid can never match through any channel (micro-proven in
+    # t/986). Hold the gate at yes for the positive candidate only: for
+    # every other pid this is exactly the real gate's answer here (a fake
+    # pid fails it on liveness), so the filtering this block pins is
+    # unchanged.
+    local *Developer::Dashboard::CollectorRunner::_loop_runtime_matches = sub {
+        my ( undef, $pid ) = @_;
+        return $pid == $pids[3] ? 1 : 0;
+    };
+    is( $runner->_find_running_loop('fixture'), $pids[3],
+        '_find_running_loop filters empty command lines, titles and namespaces portably' );
+    is( $runner->_find_running_loop(''), undef,
+        '_find_running_loop rejects an empty collector name' );
+    {
+        local *Developer::Dashboard::CollectorRunner::_read_process_title = sub { return undef };
+        is( $runner->_find_running_loop('fixture'), undef,
+            '_find_running_loop rejects candidates whose process title is unavailable' );
+    }
+    {
+        local *Developer::Dashboard::CollectorRunner::_same_pid_namespace = sub { return 0 };
+        is( $runner->_find_running_loop('fixture'), undef,
+            '_find_running_loop returns undef after exhausting foreign-namespace candidates' );
+    }
+
+}
+
+# A missing pidfile and no discoverable supervisor must return cleanly.
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_pidfile = sub {
+        return File::Spec->catfile( $home, 'absent-supervisor.pid' );
+    };
+    local *Developer::Dashboard::CollectorRunner::_find_running_loop = sub { return undef };
+    is( $runner->stop_loop('absent-loop'), undef,
+        'stop_loop returns undef when neither pidfile nor process table finds a loop' );
+}
+
+# Missing pidfile, but a process-table lookup found an already reaped pid:
+# finish persisted state cleanup without signalling a synthetic process.
+{
+    no warnings 'redefine';
+    my $pid = 424242;
+    my $cleaned = 0;
+    local *Developer::Dashboard::CollectorRunner::_pidfile = sub {
+        return File::Spec->catfile( $home, 'absent-supervisor-found.pid' );
+    };
+    local *Developer::Dashboard::CollectorRunner::_find_running_loop = sub { return $pid };
+    local *Developer::Dashboard::CollectorRunner::_state_active_worker_pids = sub { return () };
+    local *Developer::Dashboard::CollectorRunner::_reap_child_process = sub { return 1 };
+    local *Developer::Dashboard::CollectorRunner::_same_pid_namespace = sub { return 1 };
+    local *Developer::Dashboard::CollectorRunner::_cleanup_loop_files = sub { $cleaned++; return 1 };
+    local *Developer::Dashboard::Collector::mark_stopped = sub { return 1 };
+    is( $runner->stop_loop('already-reaped-fixture'), $pid,
+        'stop_loop accepts a discovered pid and handles a reaped supervisor safely' );
+    is( $cleaned, 1, 'discovered, reaped supervisor state is cleaned exactly once' );
 }
 
 done_testing;
@@ -396,35 +608,34 @@ or C<_forward_command_signal>.
 
 =head1 HOW TO USE
 
-Run it directly while iterating:
+Run it inside the dev Docker container while iterating:
 
-  perl -Ilib t/115-collectorrunner-coverage-2.t
+  d2 docker compose exec dev prove -Iblib/lib -Iblib/arch -Ilib -lv t/115-collectorrunner-coverage-2.t
 
 The checks are hermetic: every path lives under a throwaway HOME that the test
-chdirs into first. Two checks fork a child that calls the stop-signal handler
-and then exits through it, so the parent asserts on the child's wait status; the
-POSIX arm blocks SIGTERM in the child first so the handler's self-signal stays
-pending and the C<128+signal> exit code remains observable. The close-failure
-check substitutes a pipe whose read end is gone for the launcher pid file, and
-the rethrow check makes the wait-status decoder die, so neither needs a real
-broken filesystem or a real stuck command.
+chdirs into first. Isolated Perl child programs use the GoRoutine C<spawn> and
+C<wait_process> APIs so the stop-signal handler can exit without ending the
+harness; an C<END> marker and the child's exit status verify that the blocked
+POSIX SIGTERM remains pending and the C<128+signal> exit code is observable.
+The close-failure check substitutes a pipe whose read end is gone for the
+launcher pid file, and the rethrow check makes the wait-status decoder die, so
+neither needs a real broken filesystem or a real stuck command.
 
 =head1 WHAT USES IT
 
 This is a standalone author regression test for
-C<Developer::Dashboard::CollectorRunner>; it is run by C<prove -lr t> and by the
-repository coverage gate, and nothing in the shipped library depends on it.
+C<Developer::Dashboard::CollectorRunner>; it is run by the Docker test suite
+and the repository coverage gate, and nothing in the shipped library depends
+on it.
 
 =head1 EXAMPLES
 
 Drive only this file with verbose output while iterating on a fix:
 
-  prove -lv t/115-collectorrunner-coverage-2.t
+  d2 docker compose exec dev prove -Iblib/lib -Iblib/arch -Ilib -lv t/115-collectorrunner-coverage-2.t
 
 Confirm the collector runner still reads clean on every coverage metric:
 
-  cover -delete
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t
-  cover -report text -select_re '^lib/' -coverage branch -coverage condition
+  d2 docker compose exec dev perl script/coverage-gate
 
 =cut

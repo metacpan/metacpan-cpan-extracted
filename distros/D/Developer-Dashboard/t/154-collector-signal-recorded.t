@@ -9,15 +9,23 @@ use File::Temp qw(tempdir);
 use Time::HiRes ();
 
 use lib 'lib';
+use lib 't/lib';
 
+use Developer::Dashboard::GoRoutine ();
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::PathRegistry;
+use Local::CollectorFixture qw(wait_for_managed_loop);
 
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME}                           = $home;
+# Every collector loop this file starts is detached, and only the matching
+# stop further down ends it. A run that is killed part-way never reaches
+# that stop, and the loops then live on for days. Tie them to this test
+# process: each loop ends itself once this pid is gone.
+local $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID} = $$;
 local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = tempdir( CLEANUP => 1 );
 chdir $home or die "Unable to chdir to $home: $!";
 
@@ -34,9 +42,27 @@ my $name = "signal-probe-$$";
 my $pid  = $runner->start_loop( { name => $name, interval => 3600, mode => 'singleton', command => 'true' } );
 ok( $pid, 'a supervisor started' );
 
-for ( 1 .. 200 ) { last if $runner->_is_managed_loop( $pid, $name ); Time::HiRes::sleep(0.05) }
+# Wait until the loop is not merely recognized but actually up: it is
+# recognizable from the moment it is spawned (its identity marker travels in
+# the spawn environ), but its SIGTERM handler is only installed once it has
+# finished starting. Sending TERM before that kills it with the default
+# disposition and the handler never records the signal - which is exactly
+# what the assertions below check for. The 10s budget matches the poll this
+# replaces (200 x 0.05s).
+wait_for_managed_loop( $runner, $pid, $name, timeout => 10, ready => 1 );
 
-kill 'TERM', $pid;
+# On Windows, Perl kill TERM ends a process without delivering the signal,
+# so the loop's SIGTERM handler never runs and the loop survives the kill,
+# orphaned, holding the harness pipe open. The product's stop path is the
+# only stop that can record the signal there (stop_loop writes the same
+# record the handler writes on Unix), so exercise that path on Windows and
+# keep the raw signal on Unix, where the handler is what is under test.
+if ( $^O eq 'MSWin32' ) {
+    $runner->stop_loop($name);
+}
+else {
+    kill 'TERM', $pid;
+}
 
 my $said = '';
 for ( 1 .. 60 ) {
@@ -60,9 +86,10 @@ like( $said, qr/received by pid \d+/, 'and which process received it, so the rec
 # refuses 'Z'. Asserted here so that stays true, because the obvious
 # simplification is to replace it with kill 0.
 {
-    my $zombie = fork();
-    die "Unable to fork a zombie for the test: $!" if !defined $zombie;
-    exit 0 if !$zombie;
+    my $zombie = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', 'exit 0' ],
+        {},
+    );
 
     # Do NOT reap it: an unreaped exited child IS a zombie, which is the state
     # under test.
@@ -71,12 +98,30 @@ like( $said, qr/received by pid \d+/, 'and which process received it, so the rec
         Time::HiRes::sleep(0.05);
     }
 
-    is( $runner->_read_process_state($zombie), 'Z', 'the fixture really is a zombie, not merely a dead pid' );
-    ok( kill( 0, $zombie ), 'kill 0 reports the zombie as present - which is why it is the wrong question' );
+    SKIP: {
+        skip 'Windows has no zombie process state: an exited child keeps no process-table entry once its handles close', 2
+          if $^O eq 'MSWin32';
+        is( $runner->_read_process_state($zombie), 'Z', 'the fixture really is a zombie, not merely a dead pid' );
+        ok( kill( 0, $zombie ), 'kill 0 reports the zombie as present - which is why it is the wrong question' );
+    }
     is( $runner->_pid_is_running($zombie), 0, 'the runner does NOT report a zombie as running' );
     is( $runner->_is_managed_loop( $zombie, $name ), 0, 'and does not mistake one for a managed collector loop' );
 
     waitpid $zombie, 0;
+}
+
+# Keep a direct process-API parity assertion separate from the zombie fixture:
+# CollectorRunner may reap any exited child while refreshing its loop inventory.
+{
+    my $child = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', 'exit 0' ],
+        {},
+    );
+    is(
+        Developer::Dashboard::GoRoutine::wait_process($child),
+        0,
+        'GoRoutine wait_process returns the child exit status',
+    );
 }
 
 # AC-3: a supervisor that has exited must leave no record claiming it is running.
@@ -132,11 +177,14 @@ Whenever the collector's signal handling or shutdown path changes.
 
 =head1 HOW TO USE
 
-    PERL5LIB="$HOME/perl5/lib/perl5" prove -lv t/154-collector-signal-recorded.t
+    d2 docker compose exec dev prove -blv t/154-collector-signal-recorded.t
 
 =head1 WHAT USES IT
 
 Nothing; it is a regression test for C<Developer::Dashboard::CollectorRunner>.
+Its zombie and exit-status fixtures launch native children with
+C<Developer::Dashboard::GoRoutine::spawn>; the separate exit-status fixture
+also verifies C<wait_process>. The test does not use Perl C<fork>.
 
 =head1 EXAMPLES
 

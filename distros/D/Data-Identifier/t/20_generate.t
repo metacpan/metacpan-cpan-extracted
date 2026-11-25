@@ -1,11 +1,14 @@
 #!/usr/bin/perl -w
 
+use strict;
+use warnings;
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More tests => 1 + 4*2 + 3*2 + 5*2 + 9*2 + 8*2 + 4*2*2 + 7*2;
+use Test::More tests => 2 + 4*2 + 3*2 + 5*2 + 9*2 + 8*2 + 4*2*2 + 7*2 + 7*2 + 2*2 + 2*2*2 + 2*2*7;
 
 use_ok('Data::Identifier::Generate');
+use_ok('Data::Identifier');
 
 my %int_vectors = (
     -1 => 'a7872dea-8912-5c23-b243-567c60e8bd1a',
@@ -75,6 +78,36 @@ my @unit_vectors = (
     [{2 => 1} => '73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7'],
 );
 
+my @digest_vectors = (
+    [[utag      => 'sha-3-512'] => 'ed34c363-6fd3-5b68-9520-986e773e27c0'],
+    [[openpgp   => 14]          => 'ed34c363-6fd3-5b68-9520-986e773e27c0'],
+    [[sni       => 186]         => 'ed34c363-6fd3-5b68-9520-986e773e27c0'],
+    [[utag      => 'sha-1-160'] => 'e54d427b-e18f-5d43-ac38-da26173633a0'],
+    [[openpgp   => 2]           => 'e54d427b-e18f-5d43-ac38-da26173633a0'],
+    [[sni       => 185]         => 'e54d427b-e18f-5d43-ac38-da26173633a0'],
+    [[rfc9530   => 'sha']       => 'e54d427b-e18f-5d43-ac38-da26173633a0'],
+);
+
+my @gte_simple_vectors = (
+    [['ab332382-a6f8-4a24-914d-5f823dd866c1' => 'MF'] => 'c8c718e5-95ba-50f2-bbd1-e688ceb82fac'],
+    [['60764502-18cb-41c9-8531-e4c8b43140b9' => 'MF'] => '0be269cb-588e-5f1c-ac4c-990fcc393645'],
+);
+
+my @raw_tag_based = (
+    [{request => '5e987b9e-7d21-4f3c-bac7-eedefeee4593', namespace => '02513f26-d6ff-4107-98a8-2c9cb492115b'} => 'bc055a32-c8e4-5049-a941-0fe19f1709f9'],
+    [{request => '5e987b9e-7d21-4f3c-bac7-eedefeee4593', namespace => 'bd3136b7-56f2-48a3-b206-fd2bd96551d5'} => 'e1c2b474-38bd-5509-9700-848af1006f6f'],
+);
+
+my @raw_tagcombiner = (
+    [{namespace => '86fa370e-d408-4ff8-a85f-6f01f1fe2512', request => [qw(ae1072ef-0865-5104-b257-0d45441fa5e5 dcf8f4f0-c15e-44bd-ad76-0d483079db16)]} => '358aa5d6-5c21-5f83-baba-4d45a4dc988b'],
+    [{namespace => '86fa370e-d408-4ff8-a85f-6f01f1fe2512', request => [qw(dcf8f4f0-c15e-44bd-ad76-0d483079db16 ae1072ef-0865-5104-b257-0d45441fa5e5)]} => '358aa5d6-5c21-5f83-baba-4d45a4dc988b'],
+    [{namespace => '86fa370e-d408-4ff8-a85f-6f01f1fe2512', request => [qw(571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1 ae1072ef-0865-5104-b257-0d45441fa5e5 c55c1769-02cc-4042-a33b-5a04da186ad0)]} => 'efa73f2b-1eed-5acb-b977-c800fc3d7b12'],
+    [{namespace => '86fa370e-d408-4ff8-a85f-6f01f1fe2512', request => [qw(c55c1769-02cc-4042-a33b-5a04da186ad0 571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1 ae1072ef-0865-5104-b257-0d45441fa5e5)]} => 'efa73f2b-1eed-5acb-b977-c800fc3d7b12'],
+    [{namespace => '86fa370e-d408-4ff8-a85f-6f01f1fe2512', request => [qw(c55c1769-02cc-4042-a33b-5a04da186ad0 ae1072ef-0865-5104-b257-0d45441fa5e5 571fe2aa-95f6-4b16-a8d2-1ff4f78bdad1)]} => 'efa73f2b-1eed-5acb-b977-c800fc3d7b12'],
+    [{namespace => '86fa370e-d408-4ff8-a85f-6f01f1fe2512', request => [qw(c55c1769-02cc-4042-a33b-5a04da186ad0)]} => 'die'],
+    [{namespace => '86fa370e-d408-4ff8-a85f-6f01f1fe2512', request => []} => 'die'],
+);
+
 foreach my $int (sort keys %int_vectors) {
     my $identifier = Data::Identifier::Generate->integer($int);
     isa_ok($identifier, 'Data::Identifier');
@@ -115,6 +148,46 @@ foreach my $vector (@unit_vectors) {
     my $identifier = Data::Identifier::Generate->unit($vector->[0]);
     isa_ok($identifier, 'Data::Identifier');
     is($identifier->uuid, $vector->[-1], 'Matching UUID for '.$vector->[-1]);
+}
+
+foreach my $vector (@digest_vectors) {
+    my $identifier = Data::Identifier::Generate->digest(@{$vector->[0]});
+    isa_ok($identifier, 'Data::Identifier');
+    is($identifier->uuid, $vector->[-1], 'Matching UUID for '.$vector->[-1]);
+}
+
+foreach my $vector (@gte_simple_vectors) {
+    my $identifier = Data::Identifier::Generate->gte_simple(@{$vector->[0]});
+    isa_ok($identifier, 'Data::Identifier');
+    is($identifier->uuid, $vector->[-1], 'Matching UUID for '.$vector->[-1]);
+}
+
+foreach my $vector (@raw_tag_based) {
+    my %req = %{$vector->[0]};
+    my $proto_request = delete $req{request};
+    foreach my $request ($proto_request, Data::Identifier->new(uuid => $proto_request)) {
+        my $identifier = Data::Identifier::Generate->generic(%req, request => $request, style => 'tag-based');
+        isa_ok($identifier, 'Data::Identifier');
+        is($identifier->uuid, $vector->[-1], 'Matching UUID for '.$vector->[-1]);
+    }
+}
+
+foreach my $vector (@raw_tagcombiner) {
+    my %req = %{$vector->[0]};
+    my $proto_request = delete $req{request};
+    foreach my $request ($proto_request, [map {Data::Identifier->new(uuid => $_)} @{$proto_request}]) {
+        if ($vector->[-1] eq 'die') {
+            local $@;
+            my $identifier = eval { Data::Identifier::Generate->generic(%req, request => $request, style => 'tagcombiner') };
+            my $err = $@;
+            ok(!defined($identifier), 'No identifier for invalid request');
+            ok(defined($err) && length($err), 'Died for invalid request');
+        } else {
+            my $identifier = Data::Identifier::Generate->generic(%req, request => $request, style => 'tagcombiner');
+            isa_ok($identifier, 'Data::Identifier');
+            is($identifier->uuid, $vector->[-1], 'Matching UUID for '.$vector->[-1]);
+        }
+    }
 }
 
 exit 0;

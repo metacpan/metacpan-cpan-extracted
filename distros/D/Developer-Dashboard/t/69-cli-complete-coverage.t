@@ -87,7 +87,8 @@ sub write_fixture {
     );
     write_fixture(
         File::Spec->catfile( $skill_root, 'config', 'config.json' ),
-        '{"path_aliases":{"project":"' . $alias_target . '"}}',
+        # Backslashes are doubled so a Windows path stays valid JSON.
+        '{"path_aliases":{"project":"' . ( $alias_target =~ s{\\}{\\\\}gr ) . '"}}',
     );
     write_fixture(
         File::Spec->catfile( $skill_root, 'lib', 'Folder.pm' ),

@@ -24,7 +24,7 @@ package Matplotlib::Simple::Gnuplot;
 # 4.8 inch figure (rcParams figure.figsize) and 100 dots per inch for a PNG
 # (rcParams figure.dpi).
 require 5.010;
-our $VERSION = 0.3345;
+our $VERSION = 0.3346;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max min sum);
 use POSIX ();
@@ -350,7 +350,18 @@ sub color_scale {
 	# "cb_max", which cb_limits has turned into them) and from the values,
 	# checked as matplotlib's norm_args checks them: a log scale must start
 	# above 0.
-	my ( $plot, $values, $log ) = @_;
+	#
+	# Ends that are equal -- every value the same, or "vmin" == "vmax" -- are
+	# moved apart, since gnuplot will not draw on an empty cbrange ("Can't plot
+	# with an empty cb range!"). matplotlib draws such a figure in one color:
+	# its Normalize puts the value at the bottom of the colormap, but a
+	# colorbar widens the scale in place before the figure is drawn, by
+	# _nonsingular(vmin, vmax, expander=0.1) in Colorbar._process_values
+	# (matplotlib 3.11.2), and that puts it in the middle. $centered is true
+	# where matplotlib colors by the norm after its colorbar has widened it,
+	# and the scale is widened as it widens it; otherwise it runs from the
+	# value up by as much, so the value is at the bottom.
+	my ( $plot, $values, $log, $centered ) = @_;
 	cb_limits( $plot, $current_sub );
 	foreach my $v ( grep { defined $plot->{$_} } ( 'vmin', 'vmax' ) ) {
 		check_numbers( [ $plot->{$v} ], "\"$v\"", $current_sub );
@@ -365,6 +376,10 @@ sub color_scale {
 		$lo = $lo // min(@finite);
 	}
 	$hi = $hi // max(@finite);
+	if ( ( defined $lo ) && ( defined $hi ) && ( $lo == $hi ) ) {
+		my $spread = ( $lo == 0 ) ? 0.1 : 0.1 * abs($lo);    # 0.1: the expander above
+		( $lo, $hi ) = $centered ? ( $lo - $spread, $hi + $spread ) : ( $lo, $lo + 2 * $spread );
+	}
 	return ( $lo, $hi );
 }
 sub box_rows {
@@ -822,10 +837,18 @@ sub draw_boxplot_native {
 	push @{ $g{set} }, "set logscale $_" foreach logscale_axes( $plot->{logscale}, $current_sub );
 	push @{ $g{set} }, 'set style boxplot nooutliers' unless $show{showfliers};
 	push @{ $g{set} }, 'set errorbars 0' unless $show{showcaps};    # the caps of the whiskers are gnuplot's error bars ("help boxplot")
+	# gnuplot 6.0 draws a set of fewer than 4 values as its points alone, with
+	# no box, and under "nooutliers" not at all; with no box anywhere it has
+	# no x range to autoscale and dies ("x range is invalid"). The range is
+	# therefore given, half a place either side of the boxes.
+	push @{ $g{set} }, sprintf( 'set xrange [0.5:%s]', gp_num( scalar(@keys) + 0.5 ) );
 	my @labels;
 	foreach my $i ( 0 .. $#keys ) {
 		my $at = $i + 1;
 		my ( $block, $n ) = column_of( $sets->{ $keys[$i] }, $keys[$i] );
+		if ( ( $n > 0 ) && ( $n < 4 ) && ( not $show{showfliers} ) ) {
+			die "\"$keys[$i]\" has $n value(s), and gnuplot's boxplot draws a set of fewer than 4 as its points alone, which \"showfliers\" => 0 hides, so $current_sub would leave it out; style => 'matplotlib' draws it";
+		}
 		push @labels, "$keys[$i] (" . format_commas($n) . ')';
 		next unless defined $block;
 		my $color = $face[$i] // next_color( $axes, 'patches' );
@@ -1152,7 +1175,7 @@ sub draw_hist2d {
 			push @rows, [ ( $x0 + $x1 ) / 2, ( $y0 + $y1 ) / 2, $x0, $x1, $y0, $y1, $v ];
 		}
 	}
-	my ( $lo, $hi ) = color_scale( $plot, \@values, $log_cb );
+	my ( $lo, $hi ) = color_scale( $plot, \@values, $log_cb, $show );
 	push @{ $g{set} }, palette({ cmap => default_cmap( $plot, 'gist_rainbow' ), lo => $lo, hi => $hi, log => $log_cb, colorbar => $show, label => $plot->{cblabel} // 'Density' });
 	my $block = datablock( \@rows );
 	$g{plot} = [ defined $block ? "$block using 1:2:3:4:5:6:7 with boxxyerror fs solid 1.0 noborder lc palette notitle" : () ];
@@ -1176,11 +1199,21 @@ sub bin_index {
 sub image_clause {
 	# A matrix of values drawn as an image, row 0 at the top, as matplotlib's
 	# imshow draws it.
+	#
+	# gnuplot's "with image" draws nothing for a matrix of one row or one
+	# column ("Image grid must be at least 4 points (2 x 2)", gnuplot 6.0), so
+	# such a matrix is drawn a cell at a time, as boxes colored by the palette,
+	# which is the same figure. A larger one stays an image, which is one
+	# element of the SVG however many cells it has.
 	my ( $matrix, $g ) = @_;
 	my ( $nr, $nc ) = ( scalar @{$matrix}, scalar @{ $matrix->[0] } );
-	my $block = datablock($matrix);
 	push @{ $g->{set} }, sprintf( 'set xrange [-0.5:%s]', gp_num( $nc - 0.5 ) ), sprintf( 'set yrange [%s:-0.5]', gp_num( $nr - 0.5 ) );
 	$g->{no_margin} = [ 'left', 'right', 'top', 'bottom' ];
+	if ( ( $nr < 2 ) || ( $nc < 2 ) ) {
+		my $cells = datablock( [ map { my $r = $_; map { [ @{ box_rows( $_, 0.5, $r - 0.5, $r + 0.5, 0 ) }, $matrix->[$r][$_] ] } 0 .. $nc - 1 } 0 .. $nr - 1 ] );
+		return "$cells using 1:2:3:4:5:6:7 with boxxyerror fs solid 1.0 noborder lc palette notitle";
+	}
+	my $block = datablock($matrix);
 	return "$block matrix using 1:2:3 with image notitle";
 }
 sub draw_imshow {
@@ -1232,7 +1265,7 @@ sub draw_imshow {
 		push @{ $g{set} }, 'set rmargin ' . ( max( map { length $plot->{stringmap}{$_} } @strings ) + 8 + ( defined $plot->{cblabel} ? 3 : 0 ) ) if $colorbar;
 		$g{plot} = [ image_clause( [ map { [ map { $int{$_} } @{$_} ] } @{$data} ], \%g ) ];
 	} else {
-		my ( $lo, $hi ) = color_scale( $plot, [ map { @{$_} } @{$data} ], $log );
+		my ( $lo, $hi ) = color_scale( $plot, [ map { @{$_} } @{$data} ], $log, $colorbar );
 		push @{ $g{set} }, palette({ cmap => default_cmap( $plot, 'viridis' ), lo => $lo, hi => $hi, log => $log, colorbar => $colorbar, label => $plot->{cblabel} });
 		$g{plot} = [ image_clause( $data, \%g ) ];
 	}
@@ -1269,7 +1302,7 @@ sub draw_colored_table {
 	}
 	my $log = bool_option( $plot->{cb_logscale}, 'cb_logscale', $current_sub );
 	my $colorbar = bool_option( $plot->{colorbar_on} // 1, 'colorbar_on', $current_sub );
-	my ( $lo, $hi ) = color_scale( $plot, \@values, $log );
+	my ( $lo, $hi ) = color_scale( $plot, \@values, $log, 0 );    # 0: matplotlib colors the cells by its norm before the colorbar widens it
 	my $undef_color = hex_of( $plot->{undef_color} // 'gray', '"undef_color"' );
 	my ( $nr, $nc ) = ( scalar @rows, scalar @{$cols} );
 	my %g = ( set => [], palette => 1, solo => 'colored_table' );
@@ -1451,7 +1484,7 @@ sub draw_scatter {
 	my @z = map { finite_values( @{ $_->[1]{ $_->[3] } } ) } grep { defined $_->[3] } @drawn;
 	my $colored = grep { defined $_->[3] } @drawn;
 	if ($colored) {
-		my ( $lo, $hi ) = color_scale( $plot, \@z, $log_cb );
+		my ( $lo, $hi ) = color_scale( $plot, \@z, $log_cb, $colorbar );
 		my ($cb_key) = map { $_->[3] } grep { defined $_->[3] } @drawn;
 		push @{ $g{set} }, palette({ cmap => default_cmap( $plot, 'gist_rainbow' ), lo => $lo, hi => $hi, log => $log_cb, colorbar => $colorbar, label => $plot->{cblabel} // $cb_key });
 		$g{palette} = 1;
@@ -1832,7 +1865,14 @@ sub render {
 		print {$run} $copy or die "$current_sub: can't write \"" . $run->filename . "\": $!";
 		close $run or die "$current_sub: can't close \"" . $run->filename . "\": $!";
 		my $stderr = run_script( [ program_from_env('MATPLOTLIB_SIMPLE_GNUPLOT') // 'gnuplot', $run->filename ] );
-		my ($version) = $stderr =~ m/^Matplotlib::Simple gnuplot (\S+)$/m;
+		my ($version) = $stderr =~ m/^Matplotlib::Simple gnuplot (\S+)\r?$/m;
+		# The rest of what the script wrote to STDERR as it ran and succeeded,
+		# as the matplotlib engine prints it: gnuplot's warnings, the only word
+		# that a figure was written but is not what was asked for, such as
+		# "empty y range [0:0], adjusting to [-1:1]". The version line above is
+		# the module's own, and was the only part read until 0.3346.
+		$stderr =~ s/^Matplotlib::Simple gnuplot \S+\r?(?:\n|\z)//mg;
+		print STDERR $stderr if length $stderr;
 		foreach my $svg (@svgs) {
 			creator_svg( $drawn{ $svg->[0] }->filename, @{$svg}, $version // 'of unknown version' );
 		}

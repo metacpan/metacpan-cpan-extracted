@@ -1,12 +1,10 @@
 package Skilletor::Error::Unsupported;
-# ABSTRACT: An item a lookup cannot serve: a Nunjucks template
+# ABSTRACT: Retired stub, see Skilletor
 
-use Moo;
-use namespace::clean;
+use strict;
+use warnings;
 
-extends 'Skilletor::Error';
-
-our $VERSION = '0.008000';
+our $VERSION = '0.009000';
 
 1;
 
@@ -18,15 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Error::Unsupported - An item a lookup cannot serve: a Nunjucks template
+Skilletor::Error::Unsupported - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
+version 0.009000
 
 =head1 DESCRIPTION
 
-Thrown by L<Skilletor/resolve_skill> and its siblings for an item with a C<.njk> file: a lookup serves files of the source tree, and an unrendered template is never served as if it were the item; a sync renders it. See L<Skilletor::Error> for the interface.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
+
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Skilletor>
+
+=item * L<https://github.com/Getty/skilletor#install>
+
+=back
 
 =head1 SUPPORT
 

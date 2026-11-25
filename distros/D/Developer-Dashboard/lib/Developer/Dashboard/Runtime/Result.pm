@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Encode qw(encode);
 use File::Basename qw(basename dirname);
@@ -12,10 +12,19 @@ use File::Temp qw(tempfile);
 use Fcntl qw(F_GETFD F_SETFD FD_CLOEXEC SEEK_SET);
 use JSON::XS qw(decode_json encode_json);
 
+use Developer::Dashboard::Platform qw(is_windows);
+
 # Directory whose numeric entries name this process's open descriptors; a
 # package variable so a test can point it somewhere absent and exercise the
 # /proc/self/fd fallback.
 our $DEV_FD_DIR = '/dev/fd';
+# Darwin's /dev/fd proxy may share an inherited offset between Perl execs.
+# Keep a mode-0600 named tempfile readable to each child independently there.
+# Windows has no /dev/fd or /proc/self/fd at all, so the named tempfile path
+# is the only channel a child can open there (build #111: tests 824-828
+# saw the probe hook and final command die reading RESULT_FILE
+# "/proc/self/fd/N", which does not exist on Windows).
+our $CHANNEL_USE_NAMED_PATH = $^O eq 'darwin' || $^O eq 'MSWin32';
 
 my %CHANNEL_FILE_HANDLE;
 my %CHANNEL_FILE_PATH;
@@ -246,7 +255,7 @@ sub _max_inline_bytes {
 # Opens one inherited file descriptor that child hook/command exec() calls can
 # read through RESULT_FILE without inflating the process environment.
 # Input: none.
-# Output: filehandle and portable fd-backed path string.
+# Output: filehandle and portable readable channel path string.
 sub _open_channel_file {
     my ( $fh, $path ) = tempfile( 'dashboard-result-XXXXXX', TMPDIR => 1, UNLINK => 1 );
     binmode $fh, ':raw';
@@ -257,15 +266,32 @@ sub _open_channel_file {
     # wrong when a platform or File::Temp version behaves differently than
     # assumed. The RESULT channel can carry hook stdout/stderr, so an
     # unexpectedly permissive mode would be a real exposure.
-    chmod 0600, $fh or die "Unable to chmod RESULT tempfile $path to 0600: $!";
+    # Strawberry Perl has no fchmod: chmod on a filehandle dies with
+    # "The fchmod function is unimplemented". On Windows chmod by path
+    # (which only toggles the read-only attribute) and keep the handle
+    # form on Unix, where the explicit mode is the DD-621 TOCTOU guard.
+    if ( is_windows() ) {
+        chmod 0600, $path or die "Unable to chmod RESULT tempfile $path to 0600: $!";
+    }
+    else {
+        chmod 0600, $fh or die "Unable to chmod RESULT tempfile $path to 0600: $!";
+    }
 
-    my $flags = fcntl( $fh, F_GETFD, 0 );
-    die "Unable to inspect RESULT file descriptor flags: $!" if !defined $flags;
-    fcntl( $fh, F_SETFD, $flags & ~FD_CLOEXEC )
-      or die "Unable to clear close-on-exec for RESULT file descriptor: $!";
+    if ( !is_windows() ) {
+        # Close-on-exec is a Unix descriptor flag: F_GETFD and F_SETFD
+        # do not exist on Strawberry Perl, so even evaluating them dies.
+        # On Windows the spawn layer controls handle inheritance
+        # explicitly, so there is nothing to clear here.
+        my $flags = fcntl( $fh, F_GETFD, 0 );
+        die "Unable to inspect RESULT file descriptor flags: $!" if !defined $flags;
+        fcntl( $fh, F_SETFD, $flags & ~FD_CLOEXEC )
+          or die "Unable to clear close-on-exec for RESULT file descriptor: $!";
+    }
 
     my $fd = fileno($fh);
-    my $fd_path = -e "$DEV_FD_DIR/$fd" ? "$DEV_FD_DIR/$fd" : "/proc/self/fd/$fd";
+    my $fd_path = $CHANNEL_USE_NAMED_PATH
+      ? $path
+      : ( -e "$DEV_FD_DIR/$fd" ? "$DEV_FD_DIR/$fd" : "/proc/self/fd/$fd" );
     return ( $fh, $fd_path );
 }
 
@@ -302,7 +328,7 @@ sub _set_channel {
     }
 
     my ( $fh, $path ) = _open_channel_file();
-    print {$fh} $json;
+    print {$fh} $json or die "Unable to write $env_name file $path: $!";
     truncate( $fh, tell($fh) ) or die "Unable to truncate $env_name file $path: $!";
     seek( $fh, 0, SEEK_SET ) or die "Unable to rewind $env_name file $path: $!";
 
@@ -340,7 +366,7 @@ sub _clear_channel_file {
 }
 
 # _command_name()
-# Resolves the current dashboard command name for RESULT reports.
+# Resolves the current d2 command name for RESULT reports.
 # Derives the command name from $0 first, then falls back to
 # DEVELOPER_DASHBOARD_COMMAND env var if $0 is not valid.
 # Handles special case where $0 basename is 'run' (directory-backed custom command).
@@ -351,12 +377,12 @@ sub _command_name {
     if ( $script eq '' ) {
         my $name = $ENV{DEVELOPER_DASHBOARD_COMMAND} || '';
         return $name if $name ne '';
-        return 'dashboard';
+        return 'd2';
     }
 
     my $normalized = $script;
     $normalized =~ s{[\\/]+\z}{} if $normalized !~ m{\A(?:[\\/]|[A-Za-z]:[\\/]?)\z};
-    return 'dashboard' if $normalized eq '' || $normalized eq '/' || $normalized eq '\\' || $normalized =~ m{\A[A-Za-z]:[\\/]?\z};
+    return 'd2' if $normalized eq '' || $normalized eq '/' || $normalized eq '\\' || $normalized =~ m{\A[A-Za-z]:[\\/]?\z};
 
     # $normalized is a non-root path here (line above returns for empty/root/drive
     # forms), so basename always yields a non-empty, non-separator component; the
@@ -371,7 +397,7 @@ sub _command_name {
 
     my $name = $ENV{DEVELOPER_DASHBOARD_COMMAND} || '';
     return $name if $name ne '';
-    return 'dashboard';
+    return 'd2';
 }
 
 1;
@@ -397,7 +423,7 @@ Developer::Dashboard::Runtime::Result - helper accessors for dashboard hook RESU
 
 =head1 DESCRIPTION
 
-This module decodes the hook-result payload populated by C<dashboard> command
+This module decodes the hook-result payload populated by C<d2> command
 hook execution. Small payloads stay inline in C<RESULT>. Oversized payloads
 spill into C<RESULT_FILE> before later C<exec()> calls would hit the kernel
 arg/env limit. The helper accessors hide that transport detail and provide one
@@ -451,7 +477,7 @@ the explicit stop marker.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard> command-hook priming, custom CLI hook scripts,
+It is used by C<bin/d2> command-hook priming, custom CLI hook scripts,
 update hooks, skill hook dispatch, and tests that cover result overflow,
 previous-hook chaining, and explicit stop-marker behavior.
 

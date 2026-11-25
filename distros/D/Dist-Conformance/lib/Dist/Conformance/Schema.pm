@@ -1,4 +1,4 @@
-package Dist::Conformance::Schema 0.007;
+package Dist::Conformance::Schema 0.008;
 
 # ABSTRACT: Parse YAML, JSON and INI, and validate the result against a schema
 
@@ -12,8 +12,12 @@ use JSON::Validator::Schema::Troglodyne();
 use YAML::XS();
 
 
-our $NAME   = { type => 'string', pattern => '\A[A-Za-z0-9][A-Za-z0-9._-]*\z' };
-our $PATH   = { type => 'string', pattern => '\A(?!/)(?!(?:.*/)?[.][.](?:/|\z)).+\z' };
+# Each pattern is a qr// in a string, so that it keeps the modifiers of this file.
+my $NAME_RX = qr/\A[[:alnum:]][[:alnum:]._-]*\z/;
+my $PATH_RX = qr{\A(?!/)(?!(?:[^\n]*/)?[.][.](?:/|\z))[^\n]+\z};
+
+our $NAME   = { type => 'string', pattern => "$NAME_RX" };
+our $PATH   = { type => 'string', pattern => "$PATH_RX" };
 our $STATUS = { type => 'string', enum    => [qw{pass info fail}] };
 
 
@@ -35,6 +39,36 @@ sub parse_json ( $bytes, $where ) {
 
 sub encode_json ($data) {
     return Cpanel::JSON::XS->new->utf8->pretty->space_before(0)->canonical->indent_length(2)->encode($data);
+}
+
+
+sub insert_yaml ( $text, $path, $data ) {
+    my $indent_of = sub ($line) { return length( $line =~ s/\S.*//sr ) };
+    my $fragment  = sub ( $value, $indent ) {
+        return map { ( q{ } x $indent ) . $_ } split /\n/, YAML::XS::Dump($value) =~ s/\A---\n//r;
+    };
+    my @lines = split /\n/, $text, -1;
+    pop @lines if @lines && $lines[-1] eq q{};
+    my ( $indent, $from, $to, @keys ) = ( 0, 0, scalar @lines, @$path );
+    while ( defined( my $key = shift @keys ) ) {
+        my ($at) = grep { $lines[$_] =~ m/\A[ ]{$indent}\Q$key\E:/ } $from .. $to - 1;
+        if ( !defined $at ) {
+            my $nested = $data;
+            for my $inner ( reverse @keys ) { $nested = { $inner => $nested } }
+            splice @lines, $to, 0, $fragment->( { $key => $nested }, $indent );
+            return join( "\n", @lines ) . "\n";
+        }
+        die "$key has something after it on its line\n" if $lines[$at] !~ m/:\s*(?:\#.*)?\z/;
+        my @block;
+        for my $index ( grep { $lines[$_] =~ m/\A\s*[^\s\#]/ } $at + 1 .. $to - 1 ) {
+            last if $indent_of->( $lines[$index] ) <= $indent;
+            push @block, $index;
+        }
+        ( $from, $to ) = ( $at + 1, @block ? $block[-1] + 1 : $at + 1 );
+        $indent = @block ? $indent_of->( $lines[ $block[0] ] ) : $indent + 2;
+    }
+    splice @lines, $to, 0, $fragment->( $data, $indent );
+    return join( "\n", @lines ) . "\n";
 }
 
 
@@ -88,7 +122,7 @@ sub first_line ($text) {
 }
 
 # Config::INI::Reader keeps the last value of a repeated key, so it collects each repeat into a list.
-package Dist::Conformance::Schema::INIReader 0.007 {
+package Dist::Conformance::Schema::INIReader 0.008 {
     use parent 'Config::INI::Reader';
 
     sub set_value ( $self, $name, $value ) {
@@ -110,7 +144,7 @@ Dist::Conformance::Schema - Parse YAML, JSON and INI, and validate the result ag
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -154,6 +188,22 @@ C<($bytes, $where)>.  The same as L</parse_yaml>, for UTF-8 JSON text.
 C<($data)>.  Returns C<$data> as UTF-8 JSON, indented by two spaces, with the
 keys sorted, and with a final newline, so that a file that this distribution
 writes gives a small diff the next time it changes.
+
+=head2 insert_yaml
+
+C<($text, $path, $data)>.  The YAML text C<$text>, with C<$data> added to the
+collection at the keys of C<@$path> from the top, such as
+C<['x_system_sources', 'deb']>.  C<$data> is a mapping, whose entries are
+added, or a list, whose items are added.  They go at the end of the block of
+the last key, at the indentation of the block, and every other line stays as
+it is.  A key that is not there is added at the end of the block of the key
+above it, or of the text, with C<$data> under it.  The text ends in a newline.
+
+It edits text, and does not parse it.  So it can give text that does not say
+what it should, such as for a key in quotes, or a list at the indentation of
+its key.  The caller parses the result, and compares it with what it expects.
+Dies when a key on the path has something after it on its line, such as a
+collection in flow style or an anchor.
 
 =head2 validate
 

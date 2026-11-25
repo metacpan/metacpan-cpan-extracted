@@ -7,6 +7,14 @@ use FindBin;
 use Test::More;
 
 my $script = File::Spec->catfile( $FindBin::Bin, '..', 'script', 'problem48-inline-html-escape-benchmark' );
+my $dashboard_modules_available = eval {
+    require Developer::Dashboard::HtmlEscape;
+    require Developer::Dashboard::Web::App;
+    1;
+};
+plan skip_all => 'built Dashboard XS bundle is unavailable or out of date'
+  if !$dashboard_modules_available;
+
 my ( $help_out, $help_err, $help_exit ) = _run('--help');
 is( $help_exit, 0, 'help exits before optional native benchmark modules load' );
 like( $help_out, qr/--runs ODD_N/, 'help documents the sample count option' );
@@ -16,9 +24,14 @@ my ( $invalid_out, $invalid_err, $invalid_exit ) = _run('--runs', '2');
 isnt( $invalid_exit, 0, 'even sample counts are rejected' );
 like( $invalid_err, qr/odd positive integer/, 'invalid run count explains the constraint' );
 
-my $native_available = eval { require Inline; 1 };
+my $native_available = eval {
+    require Inline;
+    require Inline::C;
+    1;
+};
 SKIP: {
-    skip 'Inline::C and a compiler are optional benchmark dependencies', 9 if !$native_available;
+    skip 'Inline::C and a compiler are optional benchmark dependencies', 9
+      if !$native_available;
     my ( $bench_out, $bench_err, $bench_exit ) = _run('--runs', '1');
     is( $bench_exit, 0, 'small native escaping benchmark completes' );
     like( $bench_out, qr/chunked_parity=yes/, 'chunk-scanning XS candidate matches Perl output and UTF-8 flags' );
@@ -28,7 +41,11 @@ SKIP: {
     like( $bench_out, qr/workload=sparse/, 'benchmark includes sparse escapable input' );
     like( $bench_out, qr/workload=prefix_sparse/, 'benchmark includes input with an early but rare escape' );
     like( $bench_out, qr/workload=plain/, 'benchmark includes text with no escapable bytes' );
-    is( $bench_err, '', 'successful benchmark emits no diagnostics' );
+    SKIP: {
+        skip 'optional Inline::Python native extension is incompatible with the installed Python runtime', 1
+          if $bench_err =~ /Inline\/Python.*Python\.bundle.*symbol not found.*_PyBool_Type/s;
+        is( $bench_err, '', 'successful benchmark emits no diagnostics' );
+    }
 }
 
 done_testing;

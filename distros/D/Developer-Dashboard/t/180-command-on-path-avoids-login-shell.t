@@ -45,7 +45,8 @@ my $home = _home_with_dash_incompatible_profile();
 # Confirm the fixture actually reproduces the login-shell hazard directly,
 # independent of _command_on_path, so a failure below can never be blamed on
 # a fixture that quietly stopped breaking dash.
-{
+SKIP: {
+    skip 'requires a Linux dash login shell', 1 if $^O ne 'linux';
     local $ENV{HOME} = $home;
     my $login_shell_exit = system( 'sh', '-lc', 'true' );
     isnt( $login_shell_exit, 0, 'fixture HOME genuinely breaks a dash login shell (sh -lc), matching the real ~/.bashrc lesspipe hazard' );

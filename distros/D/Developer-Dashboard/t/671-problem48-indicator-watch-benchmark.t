@@ -50,7 +50,7 @@ optional FFI backend.
 
 The Problem 48 benchmark is the repeatable evidence gate for the optional
 indicator sync watcher. Its command-line validation must stay usable even in
-the standard test image where FFI::Platypus is not installed.
+the standard test image where the Dashboard XS extension is not built.
 
 =head1 WHEN TO USE
 

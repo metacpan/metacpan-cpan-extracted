@@ -592,7 +592,7 @@ NBI::Launcher - Base class for nbilaunch tool wrappers
 
 =head1 VERSION
 
-version 0.22.0
+version 0.24.0
 
 =head1 SYNOPSIS
 

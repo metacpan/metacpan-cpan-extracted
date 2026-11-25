@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::API;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Digest::SHA qw(sha256_hex);
 use Getopt::Long qw(GetOptionsFromArray);
@@ -14,7 +14,7 @@ use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PathRegistry;
 
 # run_api_command(%args)
-# Dispatches dashboard api management commands for layered config/api.json
+# Dispatches d2 api management commands for layered config/api.json
 # files.
 # Input: raw argv array reference under args.
 # Output: numeric process exit code after printing table or JSON output.
@@ -30,7 +30,7 @@ sub run_api_command {
     return _run_add_command(@argv)  if $action eq 'add';
     return _run_remove_command(@argv) if $action eq 'rm';
 
-    die "Unknown api action: $action\nUsage: dashboard api [ls|add|rm]\n";
+    die "Unknown api action: $action\nUsage: d2 api [ls|add|rm]\n";
 }
 
 # _run_list_command(@argv)
@@ -46,7 +46,7 @@ sub _run_list_command {
         'o|output=s' => \$output,
         'key=s'      => \$key,
     );
-    die "Usage: dashboard api [ls] [--key <name>] [-o json|table]\n"
+    die "Usage: d2 api [ls] [--key <name>] [-o json|table]\n"
       if @argv || ( $output ne 'json' && $output ne 'table' );
 
     my $config = _build_config();
@@ -83,7 +83,7 @@ sub _run_add_command {
         'route=s@'       => \@routes,
         'o|output=s'     => \$output,
     );
-    die "Usage: dashboard api add --key <name> [--secret <raw>|--maybe-secret <raw>] [--route /ajax/... ]... [-o json|table]\n"
+    die "Usage: d2 api add --key <name> [--secret <raw>|--maybe-secret <raw>] [--route /ajax/... ]... [-o json|table]\n"
       if @argv || $key eq '' || ( $secret eq '' && $maybe_secret eq '' && !@routes ) || ( $output ne 'json' && $output ne 'table' );
     die "Use either --secret or --maybe-secret, not both\n"
       if $secret ne '' && $maybe_secret ne '';
@@ -153,7 +153,7 @@ sub _run_remove_command {
         'route=s'    => \$route,
         'o|output=s' => \$output,
     );
-    die "Usage: dashboard api rm --key <name> [--route /ajax/... ] [-o json|table]\n"
+    die "Usage: d2 api rm --key <name> [--route /ajax/... ] [-o json|table]\n"
       if @argv || $key eq '' || ( $output ne 'json' && $output ne 'table' );
     die "Route must begin with /ajax/\n" if $route ne '' && $route !~ m{\A/ajax(?:/|\z)};
 
@@ -266,7 +266,7 @@ sub _api_table {
 }
 
 # _build_config()
-# Builds the lightweight config loader used by the dashboard api helper.
+# Builds the lightweight config loader used by the d2 api helper.
 # Input: none.
 # Output: Developer::Dashboard::Config object.
 sub _build_config {
@@ -286,7 +286,7 @@ __END__
 
 =head1 NAME
 
-Developer::Dashboard::CLI::API - layered API-key manager for dashboard api
+Developer::Dashboard::CLI::API - layered API-key manager for d2 api
 
 =head1 SYNOPSIS
 
@@ -295,7 +295,7 @@ Developer::Dashboard::CLI::API - layered API-key manager for dashboard api
 
 =head1 DESCRIPTION
 
-This module powers the built-in C<dashboard api> command. It manages the
+This module powers the built-in C<d2 api> command. It manages the
 deepest writable F<config/api.json> layer while listing the effective merged
 registry through C<DD-OOP-LAYERS>.
 
@@ -303,7 +303,7 @@ registry through C<DD-OOP-LAYERS>.
 
 =head2 run_api_command
 
-Dispatch the public C<dashboard api> command.
+Dispatch the public C<d2 api> command.
 
 =for comment FULL-POD-DOC START
 
@@ -321,14 +321,14 @@ layer without hand-editing JSON and without breaking OOP inheritance rules.
 
 =head1 WHEN TO USE
 
-Use this file when changing C<dashboard api> syntax, writable-layer update
+Use this file when changing C<d2 api> syntax, writable-layer update
 rules, API-key hashing behavior, or table and JSON output for API
 administration.
 
 =head1 HOW TO USE
 
 Call C<run_api_command(args =E<gt> \@ARGV)> from the staged helper. The module
-defaults C<dashboard api> to C<ls>, supports C<add> and C<rm>, hashes raw
+defaults C<d2 api> to C<ls>, supports C<add> and C<rm>, hashes raw
 secrets from either C<--secret> or C<--maybe-secret> with SHA-256 before
 persistence, accepts repeated C<--route> flags on C<add>, and writes only to the deepest
 participating runtime layer under F<config/api.json>.
@@ -343,20 +343,20 @@ allowlists from the shell.
 
 Example 1:
 
-  dashboard api
+  d2 api
 
 List the effective merged API registry as a table.
 
 Example 2:
 
-  dashboard api add --key ci-bot --secret bot-secret --route /ajax/health
+  d2 api add --key ci-bot --secret bot-secret --route /ajax/health
 
 Create or update one writable-layer API key and allow it to call one saved
 Ajax route.
 
 Example 3:
 
-  dashboard api rm --key ci-bot --route /ajax/health
+  d2 api rm --key ci-bot --route /ajax/health
 
 Remove one route from the effective API group while preserving the current
 secret digest.

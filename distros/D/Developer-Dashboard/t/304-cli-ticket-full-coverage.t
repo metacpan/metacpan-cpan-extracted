@@ -79,6 +79,22 @@ subtest 'chdir failures are reported for both the -c and alias forms' => sub {
 
 is_deeply( \@warnings, [], 'no warnings escaped' );
 
+# Even when a fallback socket directory exists, tmux must reject it if it
+# cannot be written. A callback controls both checks independently of uid.
+{
+    local %ENV = %ENV;
+    delete $ENV{TMUX_TMPDIR};
+    my $error = error_from( sub {
+        Developer::Dashboard::CLI::Ticket::_tmux_socket_directory(
+            tmpdir => File::Spec->catdir( $home, 'not-writable-primary' ),
+            fallback => $home,
+            is_writable => sub { return 0 },
+        );
+    } );
+    like( $error, qr/no writable socket directory is available/,
+        '_tmux_socket_directory rejects a present but unwritable fallback' );
+}
+
 done_testing;
 
 __END__

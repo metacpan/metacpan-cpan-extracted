@@ -43,40 +43,49 @@ require_ok('Developer::Dashboard::StreamDrain');
 
 my $PAYLOAD = 'PAYLOAD-DELIVERED-AFTER-EINTR';
 
-# Feature: an EINTR-interrupted read is retried, not mistaken for end of file.
-#
-# Scenario: a signal arrives while sysread is blocked on a handle that IO::Select
-# reported ready. Given the signal handler writes the payload before returning,
-# when the drain step runs, then it returns those bytes - because EINTR means
-# "try again", not "the child is finished".
-{
-    pipe( my $reader, my $writer ) or BAIL_OUT("cannot pipe: $!");
+# Perl on Windows emulates signals safely: a handler runs between
+# opcodes and never interrupts a blocking sysread, so EINTR never
+# occurs there - the drain waits forever instead (the solo run hung
+# with 0.1s of CPU in 283s). The scenario is skipped on Windows;
+# the real-EOF and EBADF scenarios below still run.
+SKIP: {
+    skip 'EINTR cannot interrupt a blocking read on Windows', 3 if $^O eq 'MSWin32';
 
-    # The handler supplies the data, so the retry has something to find. This is
-    # what makes the test deterministic rather than a race with a child process.
-    local $SIG{ALRM} = sub { syswrite( $writer, $PAYLOAD ) };
-    alarm 1;
-
-    my $selector = IO::Select->new($reader);
-    my $chunk_ref =
-      Developer::Dashboard::StreamDrain::_drain_ready_handle( undef, $selector, $reader );
-    alarm 0;
-
-    ok( defined $chunk_ref,
-        'an EINTR-interrupted read does not report end of file' )
-      or diag(
-        'the drain returned undef, which its callers read as "child finished" - '
-      . 'so the payload written during the interrupt is silently discarded' );
-
-    is( ( defined $chunk_ref ? ${$chunk_ref} : '' ), $PAYLOAD,
-        'the bytes that arrived during the interrupt are returned intact' );
-
-    ok( $selector->exists($reader),
-        'the handle is still in the select set after an interrupted read' )
-      or diag('an EINTR retry must not remove the handle - the child is not finished');
-
-    close $reader if defined fileno $reader;
-    close $writer;
+    # Feature: an EINTR-interrupted read is retried, not mistaken for end of file.
+    #
+    # Scenario: a signal arrives while sysread is blocked on a handle that IO::Select
+    # reported ready. Given the signal handler writes the payload before returning,
+    # when the drain step runs, then it returns those bytes - because EINTR means
+    # "try again", not "the child is finished".
+    {
+        pipe( my $reader, my $writer ) or BAIL_OUT("cannot pipe: $!");
+    
+        # The handler supplies the data, so the retry has something to find. This is
+        # what makes the test deterministic rather than a race with a child process.
+        local $SIG{ALRM} = sub { syswrite( $writer, $PAYLOAD ) };
+        alarm 1;
+    
+        my $selector = IO::Select->new($reader);
+        my $chunk_ref =
+          Developer::Dashboard::StreamDrain::_drain_ready_handle( undef, $selector, $reader );
+        alarm 0;
+    
+        ok( defined $chunk_ref,
+            'an EINTR-interrupted read does not report end of file' )
+          or diag(
+            'the drain returned undef, which its callers read as "child finished" - '
+          . 'so the payload written during the interrupt is silently discarded' );
+    
+        is( ( defined $chunk_ref ? ${$chunk_ref} : '' ), $PAYLOAD,
+            'the bytes that arrived during the interrupt are returned intact' );
+    
+        ok( $selector->exists($reader),
+            'the handle is still in the select set after an interrupted read' )
+          or diag('an EINTR retry must not remove the handle - the child is not finished');
+    
+        close $reader if defined fileno $reader;
+        close $writer;
+    }
 }
 
 # Scenario: a real end of file still closes silently.

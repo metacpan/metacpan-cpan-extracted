@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use utf8;
 use v5.14;
@@ -7,28 +7,46 @@ use warnings;
 no warnings 'redefine';
 no warnings 'once';
 
-binmode(\*STDOUT, ':encoding(UTF-8)');
-binmode(\*STDERR, ':encoding(UTF-8)');
+binmode(\*STDERR, ':encoding(utf8)');
+binmode(\*STDOUT, ':encoding(utf8)');
 
 use autodie;
 use Test::Roo;
+use List::Util qw(all);
+use FindBin qw($Bin);
+use Attean;
+use AtteanX::Store::DBI;
 use File::Slurp;
 use File::Temp qw(tempfile);
-use List::MoreUtils qw(all);
 use DBIx::MultiStatementDo;
 use Types::Standard qw(Str ArrayRef);
 use Class::Method::Modifiers;
+use Module::Load::Conditional qw(can_load);
+use namespace::clean;
 
-use AtteanX::Store::DBI;
+unless (can_load( modules => { 'DBD::sqlite' => 0 })) {
+	plan skip_all => "DBD::sqlite not available.";
+}
+
 with 'Test::Attean::SPARQLSuite';
 
 has 'test_files'	=> (is => 'rw', isa => ArrayRef, default => sub { [] });
 has 'file'			=> (is => 'rw', isa => Str);
 
-my %args;
+sub BUILD {
+	my $self		= shift;
+	my $env_path	= $ENV{'W3C_RDF_TESTS_PATH'};
+	my $base		= (defined($env_path) and -d $env_path) ? $env_path : File::Spec->catfile( $Bin, 'data', 'rdf-tests' );
+	my $path		= File::Spec->catfile( $base, 'sparql', 'sparql11' );
+	$self->tests_dir($path);
+	$self->enable_earl(filename => 'attean-sparql11-dbi-sqlite-planner.ttl', conf => { store => 'DBI/sqlite', 'eval' => 'QueryPlanner' });
+}
+
+my %args	= (use_idp_planner => 1);
 while (defined(my $opt = shift)) {
 	if ($opt eq '-v') {
 		$args{debug}++;
+		$args{results}++;
 	} else {
 		$args{pattern}	= $opt;
 	}
@@ -64,6 +82,10 @@ after 'teardown' => sub {
 	unlink($self->file);
 };
 
+run_me(\%args);
+
+done_testing;
+
 sub test_model {
 	my $self	= shift;
 	my @connect	= AtteanX::Store::DBI->dbi_connect_args('sqlite', database => $self->file);
@@ -75,8 +97,3 @@ sub test_model {
 	my $model	= Attean::MutableQuadModel->new( store => $store );
 	return $model;
 }
-
-run_me(\%args);
-
-done_testing;
-

@@ -210,4 +210,27 @@ subtest 'Sugar connects again after the server drops the connection' => sub {
     is twice(4, keep_single), 8, 'for its statements too';
 };
 
+subtest 'execute_array, in every style (roadmap 2026-0037)' => sub {
+    my $rows = 'SELECT id, name, again FROM ea_t ORDER BY id';
+    $dbh->do(
+        'CREATE TEMPORARY TABLE ea_t (id INTEGER, name VARCHAR(10), again INTEGER)');
+    for my $values ('$1, $2, $1', ':id, :name, :id') {
+        $dbh->do('DELETE FROM ea_t');
+        my $sth
+            = $dbh->prepare("INSERT INTO ea_t (id, name, again) VALUES ($values)");
+        is [$sth->execute_array({}, [1, 2], ['a', 'b'])], [2, 2],
+            "$values: the tuples and rows changed";
+        is $dbh->selectall_arrayref($rows), [[1, 'a', 1], [2, 'b', 2]],
+            "$values: the rows";
+    }
+    $dbh->do('DELETE FROM ea_t');
+    my $sth = $dbh->prepare(
+        'INSERT INTO ea_t (id, name, again) VALUES (:id, :name, :id)');
+    my @rows = ({id => 3, name => 'c'}, {name => 'd', id => 4});
+    is scalar $sth->execute_for_fetch(sub { shift @rows }), 2,
+        'execute_for_fetch, from hashes';
+    is $dbh->selectall_arrayref($rows), [[3, 'c', 3], [4, 'd', 4]], 'the rows';
+    $dbh->do('DROP TABLE ea_t');
+};
+
 done_testing;

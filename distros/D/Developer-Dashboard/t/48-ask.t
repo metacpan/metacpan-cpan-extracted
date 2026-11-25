@@ -319,13 +319,20 @@ subtest '_execute_grep_repo: real search, no matches, bad pattern, subdirectory 
 
 subtest '_scoped_tool_path: normalization and refusal edge cases' => sub {
     my $root = '/tmp/dd-fake-root';
+    # On Windows the product resolves the root against the current drive
+    # and returns forward-slash, drive-letter paths (C:/tmp/dd-fake-root).
+    my $root_abs = $root;
+    if ( $^O eq 'MSWin32' ) {
+        ( $root_abs = File::Spec->rel2abs($root) ) =~ tr{\\}{/};
+        $root_abs =~ s{\A([a-z]):}{\U$1:};
+    }
     my ( $abs1, $err1 ) = $M->can('_scoped_tool_path')->( $root, 'a/./b/../c' );
     is( $err1, undef,        'a mixed ./.. path that stays inside the root resolves cleanly' );
-    is( $abs1, "$root/a/c",  'normalized to the collapsed absolute path' );
+    is( $abs1, "$root_abs/a/c",  'normalized to the collapsed absolute path' );
 
     my ( $abs2, $err2 ) = $M->can('_scoped_tool_path')->( $root, undef );
     is( $err2, undef, 'an undef relative path means "the root itself"' );
-    is( $abs2, $root, 'resolves to the root' );
+    is( $abs2, $root_abs, 'resolves to the root' );
 
     my ( undef, $err3 ) = $M->can('_scoped_tool_path')->( $root, '../escape' );
     like( $err3, qr/Refused/, 'a leading .. that climbs above the root is refused' );
@@ -1002,7 +1009,10 @@ subtest 'transcript load resilience' => sub {
 };
 
 subtest 'unit seams: _run_cli, _default_ua, slurp_file, _emit' => sub {
-    my ( $so, $se, $ex ) = $M->can('_run_cli')->( [ $^X, '-e', 'print "hi"; warn "werr\n"; exit 0' ] );
+    # The child scripts use q{}/qq{} rather than double quotes: Windows
+    # list-form system() does not carry embedded double quotes through to
+    # the child's command line intact.
+    my ( $so, $se, $ex ) = $M->can('_run_cli')->( [ $^X, '-e', 'print q{hi}; warn qq{werr\n}; exit 0' ] );
     is( $so, 'hi',    '_run_cli captures stdout' );
     like( $se, qr/werr/, '_run_cli captures stderr' );
     is( $ex, 0, '_run_cli exit 0' );
@@ -1014,7 +1024,7 @@ subtest 'unit seams: _run_cli, _default_ua, slurp_file, _emit' => sub {
 
     # DD-948: _run_cli must TEE the child's stdout to our own STDOUT live, not
     # only return it after the child exits - that live echo is what makes
-    # "dashboard ask" show progress instead of sitting silent until done.
+    # "d2 ask" show progress instead of sitting silent until done.
     # Redirect our own STDOUT to a temp file, feed the child a real 0.3s
     # delay before it prints so a buffer-then-return implementation would
     # still pass "eventually contains the text" but this asserts something
@@ -1029,7 +1039,7 @@ subtest 'unit seams: _run_cli, _default_ua, slurp_file, _emit' => sub {
 
         my $during_run_content;
         my ( $stdout, undef, $exit ) = $M->can('_run_cli')->(
-            [ $^X, '-e', '$| = 1; print "DD948-LIVE\n"; select( undef, undef, undef, 0.3 );' ] );
+            [ $^X, '-e', '$| = 1; print qq{DD948-LIVE\n}; select( undef, undef, undef, 0.3 );' ] );
 
         # _run_cli has already returned above; re-open our own STDOUT back to
         # normal BEFORE reading the tee file, so the read itself is honest.
@@ -1084,7 +1094,7 @@ subtest 'transcript is written owner-only under state root' => sub {
 };
 
 # --------------------------------------------------------------------------
-# DD-938: `dashboard ask --docs` prints curated onboarding context and never
+# DD-938: `d2 ask --docs` prints curated onboarding context and never
 # touches an AI backend or writes any file - a pure, cheap, static stdout
 # path, distinct from every other test above which exercises a real (faked)
 # backend round-trip.
@@ -1113,7 +1123,7 @@ subtest 'DD-938: ask --docs prints curated context, touches no backend, writes n
 
 # --------------------------------------------------------------------------
 # DD-938 (auto-inject, owner-corrected scope): a workspace's FIRST-EVER
-# plain `dashboard ask` call (no --docs flag) silently gets the curated
+# plain `d2 ask` call (no --docs flag) silently gets the curated
 # docs context prepended to that turn's prompt - zero flag, zero injected
 # instruction line. The SECOND call in the same workspace must NOT repeat
 # it, since it is already in that conversation's own history from turn 1.
@@ -1373,11 +1383,11 @@ __END__
 
 =head1 NAME
 
-t/48-ask.t - regression contract for the dashboard ask AI-backend command
+t/48-ask.t - regression contract for the d2 ask AI-backend command
 
 =head1 PURPOSE
 
-This test is the executable regression contract for C<dashboard ask>. It pins
+This test is the executable regression contract for C<d2 ask>. It pins
 backend selection and stickiness, per-workspace conversation memory, attachment
 handling, the Anthropic API request shape, the claude CLI fallback, and every
 error path, driving the ask CLI module to full statement and subroutine
@@ -1394,7 +1404,7 @@ and detector seams so the behavior is deterministic and offline.
 
 =head1 WHEN TO USE
 
-Use this file when changing C<dashboard ask> syntax, adding or adjusting an
+Use this file when changing C<d2 ask> syntax, adding or adjusting an
 assistant backend, changing the Anthropic API request, changing attachment
 inlining or encoding, or changing where and how the per-workspace transcript is
 stored.

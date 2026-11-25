@@ -22,18 +22,18 @@ auth - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard auth ...
+  d2 auth ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes helper-user administration commands such as C<dashboard auth add-user>, C<list-users>, and C<remove-user>. It gives the CLI a focused auth-management entrypoint without putting user-management code in C<bin/dashboard>.
+This staged helper exposes helper-user administration commands such as C<d2 auth add-user>, C<list-users>, and C<remove-user>. It gives the CLI a focused auth-management entrypoint without putting user-management code in C<bin/d2>.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing the CLI auth command surface or when fixing how help
 
 =head1 HOW TO USE
 
-Users run C<dashboard auth ...>. The staged helper forwards the subcommand and arguments into the private built-in runtime, which loads the auth module and updates the runtime user store.
+Users run C<d2 auth ...>. The staged helper forwards the subcommand and arguments into the private built-in runtime, which loads the auth module and updates the runtime user store.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by administrators creating or removing helper users, by integration s
 
 Example 1:
 
-  dashboard auth helper login
+  d2 auth helper login
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/auth --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

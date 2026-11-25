@@ -11,7 +11,7 @@ package Matplotlib::Simple;
 # alone, so the keywords are matplotlib's names throughout, and an engine that
 # has no counterpart for one refuses it by name rather than leaving it out (check_engine).
 require 5.010;
-our $VERSION = 0.3345;
+our $VERSION = 0.3346;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use POSIX ();
@@ -3289,7 +3289,9 @@ saying so:
 
 namely a horizontal C<boxplot> or C<hist> in gnuplot, a horizontal C<violin> with
 C<whiskers> in gnuplot, a hist whose C<bins> are edges of different widths in
-gnuplot, and, in ggplot2, a C<bar>, C<boxplot> or C<violin> overlaid with a type
+gnuplot, a C<boxplot> set of fewer than 4 values with C<< showfliers =E<gt> 0 >> in
+gnuplot (whose boxplot draws such a set as its points alone, with no box),
+and, in ggplot2, a C<bar>, C<boxplot> or C<violin> overlaid with a type
 whose positions are numbers, since native ggplot2 puts their keys on a category
 axis.  C<style> too belongs to the whole figure, and is refused inside a
 subplot.

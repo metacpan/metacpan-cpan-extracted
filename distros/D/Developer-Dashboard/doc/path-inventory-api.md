@@ -6,7 +6,7 @@ path hashes printed by the CLI.
 The file side of the same contract lives behind `Developer::Dashboard::File`
 and `Developer::Dashboard::FileRegistry`.
 
-Full `dashboard paths` payload:
+Full `d2 paths` payload:
 
 ```perl
 use Developer::Dashboard::PathRegistry;
@@ -84,7 +84,7 @@ my $one = Developer::Dashboard::EnvAudit->key('FOO');
 my $all = Developer::Dashboard::EnvAudit->keys;
 ```
 
-Shorter alias-style inventory matching `dashboard path list`:
+Shorter alias-style inventory matching `d2 path list`:
 
 ```perl
 my $aliases = $paths->all_path_aliases;

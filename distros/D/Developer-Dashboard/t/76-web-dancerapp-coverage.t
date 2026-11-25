@@ -22,6 +22,16 @@ use Developer::Dashboard::PageRuntime ();
 use Developer::Dashboard::Web::DancerApp;
 use Local::PSGITest;
 
+sub _without_private_var_prefix {
+    my ($path) = @_;
+    $path =~ s{/private(?=/var/folders/)}{}g if defined $path;
+    # The loader reports abs_path spellings, which use forward slashes on
+    # Windows, while the fixture paths are built with File::Spec and carry
+    # backslashes there. Both name the same file, so compare one spelling.
+    $path =~ tr{\\}{/} if defined $path && $^O eq 'MSWin32';
+    return $path;
+}
+
 # ---------------------------------------------------------------------------
 # Hermetic runtime: the Dancer2 route layer and Config discovery both resolve
 # from the process HOME and the deepest .developer-dashboard layer under the
@@ -298,7 +308,11 @@ sub _dashboard_module_fixture {
         no warnings 'redefine';
         local *Dancer2::runner = sub { return $runner; };
         my $loaded = Developer::Dashboard::Web::DancerApp::_load_skill_dashboard_modules($route_entries);
-        is_deeply( $loaded, [ $route_fixture->{module} ], 'loader reports the one valid skill module it loaded' );
+        is_deeply(
+            [ map { _without_private_var_prefix($_) } @{$loaded} ],
+            [ _without_private_var_prefix( $route_fixture->{module} ) ],
+            'loader reports the one valid skill module it loaded',
+        );
     }
     is( scalar @{ $fake_app->{hooks} }, 1, 'loader installs one authorization hook for added routes' );
     is( $fake_app->{routes}{get}[-1], $original_get, 'new GET skill routes stay ahead of the built-in fallback route' );

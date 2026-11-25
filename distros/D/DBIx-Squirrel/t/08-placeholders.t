@@ -269,6 +269,17 @@ subtest 'values_for and values_taken' => sub {
     like dies { values_for($named, a => 1) },
         qr( \A \QExpected a value for each placeholder (none for b)\E )x,
         'a name missing';
+
+    # Two spellings of a name took a value as the hash's order chose.
+    my $twice
+        = qr( \A \QExpected one value for each placeholder (two for a)\E )x;
+    like dies { values_for($named, ':a' => 1, a => 7, b => 2) }, $twice,
+        'a name given twice, with and without its sigil';
+    like dies { values_for($named, {':a' => 1, a => 7, b => 2}) }, $twice,
+        'and in a hash reference';
+    like dies { values_for($named, a => 1, b => 2, ':b' => 3, ':a' => 4) },
+        qr( \A \QExpected one value for each placeholder (two for a, b)\E )x,
+        'each named once in the message';
 };
 
 subtest 'expand_lists and place_values' => sub {

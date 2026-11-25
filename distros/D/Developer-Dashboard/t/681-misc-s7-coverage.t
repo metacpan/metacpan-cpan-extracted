@@ -69,7 +69,16 @@ my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 
 # --- PageStore: platforms without O_NOFOLLOW still resolve a flag ------------
 {
-    ok( Developer::Dashboard::PageStore::_nofollow_flag() > 0, 'the no-follow flag is the platform value when the macro exists' );
+    # O_NOFOLLOW does not exist in Strawberry Perl's Fcntl, so the flag
+    # is 0 there by design (the product falls back to zero so path-based
+    # opens still work); on a host where the macro exists it is the
+    # platform value.
+    if ( $^O eq 'MSWin32' ) {
+        is( Developer::Dashboard::PageStore::_nofollow_flag(), 0, 'the no-follow flag is zero where the macro does not exist' );
+    }
+    else {
+        ok( Developer::Dashboard::PageStore::_nofollow_flag() > 0, 'the no-follow flag is the platform value when the macro exists' );
+    }
     no warnings qw(redefine once);
     local *Fcntl::O_NOFOLLOW = sub { die "O_NOFOLLOW is not available\n" };
     is( Developer::Dashboard::PageStore::_nofollow_flag(), 0, 'the no-follow flag falls back to zero when the macro is unavailable' );

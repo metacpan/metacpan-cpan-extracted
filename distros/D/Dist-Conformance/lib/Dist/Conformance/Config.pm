@@ -1,4 +1,4 @@
-package Dist::Conformance::Config 0.007;
+package Dist::Conformance::Config 0.008;
 
 # ABSTRACT: .conformance.yml, which picks the flavor of a repository and its source
 
@@ -11,7 +11,8 @@ use Dist::Conformance::Schema();
 
 our $FILE = '.conformance.yml';
 
-my $NOT_AN_OPTION = { type => 'string', minLength => 1, pattern => '\A[^-]' };
+my $NOT_AN_OPTION_RX = qr/\A[^-]/;
+my $NOT_AN_OPTION    = { type => 'string', minLength => 1, pattern => "$NOT_AN_OPTION_RX" };
 
 our %SCHEMA = (
     type                 => 'object',
@@ -64,7 +65,7 @@ Dist::Conformance::Config - .conformance.yml, which picks the flavor of a reposi
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

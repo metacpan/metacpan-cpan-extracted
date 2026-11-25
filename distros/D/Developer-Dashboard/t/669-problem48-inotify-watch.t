@@ -6,9 +6,10 @@ use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Time::HiRes qw(sleep);
-use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 use Errno ();
 use IO::Handle;
+use IO::Select;
+use IO::Socket::INET;
 use Test::More;
 
 my $repo_root = File::Spec->catdir( $FindBin::Bin, '..' );
@@ -18,6 +19,7 @@ lib->import( File::Spec->catdir( $repo_root, 'lib' ) );
 my $module = 'Developer::Dashboard::IndicatorStore::Watch';
 my $loaded = eval "require $module; 1";
 ok( $loaded, 'the indicator watcher module loads' ) or BAIL_OUT($@);
+require Developer::Dashboard::HtmlEscape;
 
 my ( @writers, @added, $initializations, $closed_handles );
 my $backend = {
@@ -332,20 +334,9 @@ like( $callback_missing_state->last_error, qr/returned no state/,
 }
 
 {
-    local $INC{'FFI/Platypus.pm'};
-    delete $INC{'FFI/Platypus.pm'};
-    local @INC = ( sub { die "Can't locate FFI/Platypus.pm in \@INC\n" } );
-    is( $module->_windows_backend, undef, 'missing optional Windows FFI module selects portable validation' );
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 0;
+    is( $module->_windows_backend, undef, 'Windows backend is unavailable when the shared XS extension is not loaded' );
 }
-my $unexpected_windows_ffi_error;
-{
-    local $INC{'FFI/Platypus.pm'};
-    delete $INC{'FFI/Platypus.pm'};
-    local @INC = ( sub { die "synthetic Windows FFI loader failure\n" } );
-    eval { $module->_windows_backend; 1 } or $unexpected_windows_ffi_error = $@;
-}
-like( $unexpected_windows_ffi_error, qr/synthetic Windows FFI loader failure/,
-    'unexpected Windows FFI loader errors remain visible' );
 
 {
     my ( $read_fh, $write_fh );
@@ -442,10 +433,25 @@ like( $unexpected_fsevents_error, qr/synthetic FSEvents loader failure/,
     'unexpected FSEvents loader errors remain visible' );
 
 {
-    local $INC{'FFI/Platypus.pm'} = __FILE__;
-    local $INC{'FFI/Platypus/Type/WideString.pm'} = __FILE__;
     no warnings qw(redefine once);
-    local *FFI::Platypus::new = sub { return bless {}, 'Local::Problem48WindowsFFI' };
+    local *Developer::Dashboard::IndicatorStore::Watch::_xs_win32_find_first_change = sub {
+        push @{ $main::P48_WINDOWS_FIRST_PATHS ||= [] }, $_[0];
+        return shift @main::P48_WINDOWS_CHANGE_HANDLES;
+    };
+    local *Developer::Dashboard::IndicatorStore::Watch::_xs_win32_wait = sub {
+        return shift @main::P48_WINDOWS_WAIT_STATES;
+    };
+    local *Developer::Dashboard::IndicatorStore::Watch::_xs_win32_next_change = sub {
+        $main::P48_WINDOWS_NEXT_COUNT++;
+        return $main::P48_WINDOWS_NEXT_RESULT;
+    };
+    local *Developer::Dashboard::IndicatorStore::Watch::_xs_win32_close_change = sub {
+        $main::P48_WINDOWS_CLOSE_COUNT++;
+        return $main::P48_WINDOWS_CLOSE_RESULT;
+    };
+    local *Developer::Dashboard::IndicatorStore::Watch::_xs_win32_last_error = sub {
+        return $main::P48_WINDOWS_LAST_ERROR;
+    };
     our @P48_WINDOWS_WAIT_STATES = ( 258, 258, 0, 258 );
     our @P48_WINDOWS_CHANGE_HANDLES = ( 101, 102 );
     our $P48_WINDOWS_NEXT_COUNT = 0;
@@ -455,7 +461,7 @@ like( $unexpected_fsevents_error, qr/synthetic FSEvents loader failure/,
     our $P48_WINDOWS_LAST_ERROR = 5;
     our $P48_WINDOWS_FIRST_PATHS;
     my $windows_backend = $module->_windows_backend;
-    ok( ref($windows_backend) eq 'HASH', 'Windows FFI backend loads when FFI is available' );
+    ok( ref($windows_backend) eq 'HASH', 'Windows XS backend loads when the shared extension is available' );
     {
         local $^O = 'MSWin32';
         ok( ref( $module->_native_backend ) eq 'HASH',
@@ -515,7 +521,7 @@ like( $unexpected_fsevents_error, qr/synthetic FSEvents loader failure/,
         like( $invalid_handle_error, qr/FindFirstChangeNotificationW failed.*GetLastError=5/,
             'invalid Windows notification handle exposes GetLastError' );
 
-        @P48_WINDOWS_CHANGE_HANDLES = ( 301, -1 );
+        @P48_WINDOWS_CHANGE_HANDLES = ( 301, undef );
         $P48_WINDOWS_CLOSE_RESULT = 0;
         my ( $partial_handle, $partial_error ) = $windows_backend->{configure_paths}->( [ 'C:\\one', 'C:\\two' ] );
         ok( !defined $partial_handle, 'Windows setup closes a partial watch set after a later handle fails' );
@@ -523,20 +529,11 @@ like( $unexpected_fsevents_error, qr/synthetic FSEvents loader failure/,
             'Windows partial-watch cleanup failure is explicit' );
         $P48_WINDOWS_CLOSE_RESULT = 1;
 
-        @P48_WINDOWS_CHANGE_HANDLES = ( 311, -1 );
+        @P48_WINDOWS_CHANGE_HANDLES = ( 311, undef );
         $P48_WINDOWS_CLOSE_RESULT = 1;
         my ( $partial_success, $partial_success_error ) = $windows_backend->{configure_paths}->( [ 'C:\\one', 'C:\\two' ] );
         ok( !defined $partial_success, 'Windows setup still rejects a later invalid handle when cleanup succeeds' );
         unlike( $partial_success_error, qr/cleanup failed/, 'successful Windows partial cleanup adds no cleanup error' );
-
-        for my $invalid ( 0, -1, '4294967295', '18446744073709551615', '0xffffffff', '0xffffffffffffffff' ) {
-            ok( Developer::Dashboard::IndicatorStore::Watch::_windows_invalid_handle($invalid),
-                "Windows rejects invalid handle sentinel $invalid" );
-        }
-        ok( Developer::Dashboard::IndicatorStore::Watch::_windows_invalid_handle(undef),
-            'Windows rejects an undefined native handle' );
-        ok( !Developer::Dashboard::IndicatorStore::Watch::_windows_invalid_handle(101),
-            'Windows accepts a normal native handle' );
 
         my $wait_failure = $module->new( backend => $windows_backend );
         @P48_WINDOWS_CHANGE_HANDLES = ( 401 );
@@ -564,6 +561,44 @@ like( $unexpected_fsevents_error, qr/synthetic FSEvents loader failure/,
             'Windows rearm failure includes GetLastError' );
         $P48_WINDOWS_NEXT_RESULT = 1;
         $wait_failure->close;
+
+        # A notification handle whose watched directory was deleted reports
+        # GetLastError=6 (ERROR_INVALID_HANDLE). The watch is dead, which is
+        # a change, not a watcher failure: the snapshot must invalidate
+        # without an error, and closing the dead handle must succeed. This
+        # is the GetLastError=6 warning the Windows prove run printed when
+        # a tempdir was cleaned up before its watcher closed.
+        my $dead_handle = $module->new( backend => $windows_backend );
+        @P48_WINDOWS_CHANGE_HANDLES = (501);
+        ok( $dead_handle->configure( 'windows-dead-handle', ['C:\\gone'] ),
+            'Windows dead-handle fixture configures' );
+        @P48_WINDOWS_WAIT_STATES = (0xffffffff);
+        $P48_WINDOWS_LAST_ERROR = 6;
+        my ( $dead_state, $dead_error ) = $windows_backend->{unchanged}->( $dead_handle->{handle} );
+        is( $dead_state, 0, 'a dead Windows notification handle invalidates the snapshot as a change' );
+        ok( !defined $dead_error, 'a dead Windows notification handle reports no watcher error' );
+
+        @P48_WINDOWS_WAIT_STATES = (0);
+        $P48_WINDOWS_NEXT_RESULT = 0;
+        my ( $dead_rearm_state, $dead_rearm_error ) = $windows_backend->{unchanged}->( $dead_handle->{handle} );
+        is( $dead_rearm_state, 0, 'a dead Windows notification handle invalidates the snapshot when rearming fails' );
+        ok( !defined $dead_rearm_error, 'a dead Windows rearm reports no watcher error' );
+        $P48_WINDOWS_NEXT_RESULT = 1;
+
+        $P48_WINDOWS_CLOSE_RESULT = 0;
+        ok( $dead_handle->close, 'closing a dead Windows notification handle succeeds' );
+        ok( !defined $dead_handle->last_error, 'closing a dead Windows notification handle leaves no error' );
+        $P48_WINDOWS_CLOSE_RESULT = 1;
+        $P48_WINDOWS_LAST_ERROR = 5;
+
+        @P48_WINDOWS_CHANGE_HANDLES = ( 601, undef );
+        $P48_WINDOWS_CLOSE_RESULT = 0;
+        $P48_WINDOWS_LAST_ERROR = 6;
+        my ( $dead_partial, $dead_partial_error ) = $windows_backend->{configure_paths}->( [ 'C:\\one', 'C:\\two' ] );
+        ok( !defined $dead_partial, 'Windows setup still rejects a later invalid handle when cleanup meets a dead handle' );
+        unlike( $dead_partial_error, qr/cleanup failed/, 'a dead handle during partial cleanup adds no cleanup error' );
+        $P48_WINDOWS_CLOSE_RESULT = 1;
+        $P48_WINDOWS_LAST_ERROR = 5;
     }
 }
 
@@ -696,13 +731,53 @@ ok( !$blank_disable_close_failure->configure( 'partial-blank-close', ['/root'] )
 like( $blank_disable_close_failure->last_error, qr/descriptor close failed: unknown close failure/,
     'partial cleanup with a blank native diagnostic remains explicitly visible' );
 
+# _loopback_socketpair()
+# Creates a connected loopback socket pair for the read-error/eof fixture.
+# The read end can be made nonblocking on every platform with
+# IO::Handle->blocking(0): on Windows that is FIONBIO on a socket, where
+# an anonymous pipe cannot be made nonblocking at all (fcntl has no
+# F_SETFL on Strawberry Perl, and SetNamedPipeHandleState rejects
+# anonymous pipes with $^E = 87, probe solo #374). The peer stays open
+# for the error case and is closed for the end-of-file case.
+# Input: none.
+# Output: ($reader, $peer) connected socket handles, or dies on failure.
+sub _loopback_socketpair {
+    my $listener = IO::Socket::INET->new(
+        LocalAddr => '127.0.0.1',
+        LocalPort => 0,
+        Proto     => 'tcp',
+        Listen    => 1,
+        ReuseAddr => 1,
+    ) or die "Unable to create loopback listener: $!";
+    my $peer = IO::Socket::INET->new(
+        PeerAddr => '127.0.0.1',
+        PeerPort => $listener->sockport,
+        Proto    => 'tcp',
+    ) or die "Unable to connect loopback peer: $!";
+    my $reader = $listener->accept
+      or die "Unable to accept loopback connection: $!";
+    close $listener;
+    return ( $reader, $peer );
+}
+
 for my $read_case ( [ error => 1 ], [ eof => 0 ] ) {
-    my ( $kind, $send_writer ) = @{$read_case};
-    my ( $reader, $writer );
-    pipe( $reader, $writer ) or die "Unable to create $kind test pipe: $!";
-    fcntl( $reader, F_SETFL, fcntl( $reader, F_GETFL, 0 ) | O_NONBLOCK )
-      or die "Unable to make $kind test pipe nonblocking: $!";
-    close $writer if !$send_writer;
+    my ( $kind, $keep_peer ) = @{$read_case};
+    my ( $reader, $peer ) = _loopback_socketpair();
+    $reader->blocking(0)
+      or die "Unable to make $kind test socket nonblocking: $!";
+    if ( !$keep_peer ) {
+        close $peer;
+        # The peer's close sends FIN, but it reaches the read end
+        # asynchronously; wait until the socket reports readable so the
+        # forced read below sees end-of-file, not a transient EAGAIN.
+        my $selector = IO::Select->new($reader);
+        my $eof_ready = 0;
+        for ( 1 .. 100 ) {
+            if ( $selector->can_read(0) ) { $eof_ready = 1; last; }
+            sleep 0.01;
+        }
+        $eof_ready or die "Unable to observe EOF on $kind test socket: $!";
+    }
     my $read_failure = $module->new(
         backend => {
             initialize => sub { return $reader },
@@ -713,9 +788,12 @@ for my $read_case ( [ error => 1 ], [ eof => 0 ] ) {
     ok( $read_failure->configure( "read-$kind", ['/root'] ), "$kind-read watcher configures" );
     $read_failure->{select} = bless {}, 'Local::Problem48AlwaysReadable';
     ok( !$read_failure->unchanged("read-$kind"), "$kind read invalidates the watcher" );
-    like( $read_failure->last_error, qr/Unable to read filesystem watch events|closed unexpectedly/,
+    my $expected_diagnostic = $kind eq 'error'
+      ? qr/Unable to read filesystem watch events/
+      : qr/closed unexpectedly/;
+    like( $read_failure->last_error, $expected_diagnostic,
         "$kind read failure has an explicit diagnostic" );
-    close $writer if $send_writer;
+    close $peer if $keep_peer;
 }
 
 my $unsupported;
@@ -726,32 +804,34 @@ my $unsupported;
 is( $unsupported, undef, 'unsupported platforms do not construct a native backend' );
 my $explicitly_missing_backend = $module->new( backend => undef );
 is( $explicitly_missing_backend, undef, 'constructor rejects an explicitly unavailable backend' );
-my $missing_ffi;
+my $missing_xs;
 {
     local $^O = 'linux';
-    local @INC = ();
-    local $INC{'FFI/Platypus.pm'};
-    delete $INC{'FFI/Platypus.pm'};
-    $missing_ffi = $module->_native_backend;
+    local $Developer::Dashboard::HtmlEscape::XS_LOADED = 0;
+    $missing_xs = $module->_native_backend;
 }
-is( $missing_ffi, undef, 'a missing optional FFI module selects the portable path' );
-my $unexpected_ffi_error;
+is( $missing_xs, undef, 'an unavailable shared XS extension selects the portable path' );
+my $unexpected_xs_error;
 {
     local $^O = 'linux';
-    local @INC = ( sub { die "synthetic FFI loader failure\n" } );
-    local $INC{'FFI/Platypus.pm'};
-    delete $INC{'FFI/Platypus.pm'};
-    eval { $module->_native_backend; 1 } or $unexpected_ffi_error = $@;
+    local $INC{'Developer/Dashboard/HtmlEscape.pm'};
+    delete $INC{'Developer/Dashboard/HtmlEscape.pm'};
+    local @INC = ( sub { die "synthetic XS loader failure\n" } );
+    eval { $module->_native_backend; 1 } or $unexpected_xs_error = $@;
 }
-like( $unexpected_ffi_error, qr/synthetic FFI loader failure/,
-    'unexpected optional FFI loader errors remain visible' );
+like( $unexpected_xs_error, qr/synthetic XS loader failure/,
+    'unexpected shared XS loader errors remain visible' );
 
 our $P48_FAKE_FD_RESULT;
 {
     local $^O = 'linux';
-    local $INC{'FFI/Platypus.pm'} = __FILE__;
     no warnings qw(redefine once);
-    local *FFI::Platypus::new = sub { return bless {}, 'Local::Problem48FFI' };
+    local *Developer::Dashboard::IndicatorStore::Watch::_xs_inotify_init = sub {
+        return $main::P48_FAKE_FD_RESULT;
+    };
+    local *Developer::Dashboard::IndicatorStore::Watch::_xs_inotify_add_watch = sub {
+        return $_[0];
+    };
     my $fake_backend = $module->_native_backend;
     $P48_FAKE_FD_RESULT = undef;
     ok( !defined $fake_backend->{initialize}->(), 'native adapter rejects an undefined descriptor' );
@@ -769,7 +849,13 @@ our $P48_FAKE_FD_RESULT;
     is( $fake_backend->{add_watch}->( $reader, $unicode_path, $module->event_mask ), -1,
         'Linux inotify refuses a path that cannot be represented as filesystem bytes' );
     is( 0 + $!, Errno::EILSEQ(), 'unrepresentable Linux watcher path sets EILSEQ' );
-    close $reader or die "Unable to close Unicode path fixture reader: $!";
+    $P48_FAKE_FD_RESULT = fileno($reader);
+    my $native_handle = $fake_backend->{initialize}->();
+    ok( defined $native_handle, 'Linux inotify wraps a valid descriptor' );
+    is( $fake_backend->{add_watch}->( $native_handle, '/path/with/ascii', $module->event_mask ),
+        fileno($reader), 'Linux inotify registers a byte-safe path' );
+    ok( $fake_backend->{close}->($native_handle),
+        'Linux inotify backend closes its descriptor through the native close callback' );
     close $writer or die "Unable to close Unicode path fixture writer: $!";
 }
 
@@ -811,20 +897,6 @@ package Local::Problem48AlwaysReadable;
 # Input: selector object and optional timeout.
 # Output: true, causing the watcher to attempt one descriptor read.
 sub can_read { return 1 }
-
-package Local::Problem48FFI;
-# function($self, $symbol, @signature)
-# Returns a fake callable for the requested libc symbol.
-# Input: fake FFI instance, symbol name, and ignored type metadata.
-# Output: fake function object used by native-backend failure tests.
-sub function { return bless { symbol => $_[1] }, 'Local::Problem48Function' }
-
-package Local::Problem48Function;
-# call($self, @arguments)
-# Returns the configured fake native descriptor result.
-# Input: fake function object and native call arguments.
-# Output: descriptor value supplied by the surrounding test.
-sub call { return $main::P48_FAKE_FD_RESULT }
 
 package Local::Problem48FSEvents;
 # watch()
@@ -905,42 +977,6 @@ package Local::Problem48NoStopFSEvents;
 # Output: undef, forcing setup to report a missing readable stream.
 sub watch { return }
 
-package Local::Problem48WindowsFFI;
-# function($self, $name, $arguments, $return)
-# Creates a fake native function object for Win32 API backend tests.
-# Input: fake FFI object, exported function name, and ignored type signatures.
-# Output: callable object retaining the requested Win32 symbol.
-sub function { return bless { symbol => $_[1] }, 'Local::Problem48WindowsFunction' }
-sub load_custom_type { return 1 }
-sub type { return 1 }
-
-package Local::Problem48WindowsFunction;
-# call($self, @arguments)
-# Simulates Windows filesystem notification API calls and records watched paths.
-# Input: fake function object and the native call arguments.
-# Output: configured handle, wait status, API success flag, or last-error code.
-sub call {
-    my ( $self, @arguments ) = @_;
-    my $symbol = $self->{symbol};
-    if ( $symbol eq 'FindFirstChangeNotificationW' ) {
-        push @{ $main::P48_WINDOWS_FIRST_PATHS ||= [] }, $arguments[0];
-        return shift @main::P48_WINDOWS_CHANGE_HANDLES;
-    }
-    if ( $symbol eq 'WaitForSingleObject' ) {
-        return shift @main::P48_WINDOWS_WAIT_STATES;
-    }
-    if ( $symbol eq 'FindNextChangeNotification' ) {
-        $main::P48_WINDOWS_NEXT_COUNT++;
-        return $main::P48_WINDOWS_NEXT_RESULT;
-    }
-    if ( $symbol eq 'FindCloseChangeNotification' ) {
-        $main::P48_WINDOWS_CLOSE_COUNT++;
-        return $main::P48_WINDOWS_CLOSE_RESULT;
-    }
-    return $main::P48_WINDOWS_LAST_ERROR if $symbol eq 'GetLastError';
-    die "Unexpected fake Windows API call '$symbol'";
-}
-
 __END__
 
 =pod
@@ -980,12 +1016,14 @@ runs whenever the runner has its platform adapter and optional dependencies.
 
 =head1 EXAMPLES
 
-The test injects a pipe-backed fake descriptor, configures directory watches,
-checks an event-free poll, writes an event, then verifies invalidation and
-watch-set replacement. It also exercises descriptor and watch registration
-failures without requiring a native library, plus mocked FSEvents and Win32
-API contracts. When a platform adapter is available, an integration case
-writes a real status file, observes cache invalidation, and closes native
-resources.
+The test injects a pipe-backed descriptor and mocked XS entry points, configures
+directory watches, checks an event-free poll, writes an event, then verifies
+invalidation and watch-set replacement. It also exercises descriptor and watch
+registration failures without requiring native operating-system calls, plus
+mocked FSEvents and Windows notification contracts. The fake Linux adapter also
+invokes its native close callback, so wrapper coverage remains deterministic
+when live native integration is skipped. When a platform adapter is available,
+an integration case writes a real status file, observes cache invalidation, and
+closes native resources.
 
 =cut

@@ -3,7 +3,7 @@ package Developer::Dashboard::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(readfile);
@@ -336,7 +336,11 @@ sub append_log_entry {
     return $self->_with_log_lock(
         $paths,
         sub {
-            open my $fh, '>>', $paths->{log} or die "Unable to append $paths->{log}: $!";
+            # The entry text is formatted with "\n" line endings and is
+            # read back byte-exact (read_log slurps raw), so the append
+            # must be raw too: a text-mode append turns every "\n" into
+            # "\r\n" on Windows and the rendered log would carry them.
+            open my $fh, '>>:raw', $paths->{log} or die "Unable to append $paths->{log}: $!";
             print {$fh} $text;
             close $fh;
             $self->{paths}->secure_file_permissions( $paths->{log} );

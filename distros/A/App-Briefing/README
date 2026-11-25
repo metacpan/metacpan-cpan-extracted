@@ -1,7 +1,7 @@
 This archive contains the distribution App-Briefing,
-version 0.006000:
+version 0.007000:
 
-  Preload declared skills into Claude Code and Codex subagents at spawn time
+  Retired: Claude Code preloads agent skills natively
 
 This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 

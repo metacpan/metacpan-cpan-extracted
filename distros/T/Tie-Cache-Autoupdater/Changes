@@ -25,3 +25,26 @@ Revision history for Tie::Cache::Autoupdater
         has always said "the same terms as Perl itself" (Artistic 1.0 or GPL).
 
         Removed the empty TODO file from the distribution.
+0.23
+        Bugfix. On perl older than 5.18, reading a key registered without a
+        source emitted an extra "Use of uninitialized value in subroutine
+        entry" warning before the module's own "Check source subroutine"
+        warning. Only the module's warning is emitted now, on every perl.
+
+        Bugfix. A failing source could be taken for one returning nothing,
+        and its "result" cached as undef for the whole timeout, with no
+        warning: on perl older than 5.14 when a destructor running eval
+        cleared $@ as the source died (DBI handles, guard objects), and on
+        any perl when the source died with a false exception object. Failure
+        is now detected from eval's return value; an empty error is reported
+        as "unknown error".
+
+        Timeouts are now measured on the monotonic clock where the system
+        has one (via Time::HiRes), so setting the system clock back - by hand
+        or by NTP - no longer keeps a stale value cached until the clock
+        catches up, and setting it forward no longer expires values early.
+        Without a monotonic clock Time::HiRes::time or the built-in time is
+        used, as before.
+
+        Declared the minimum perl version, 5.8, in Makefile.PL and in the
+        documentation. The GitHub CI matrix now covers perl 5.8.9 through 5.42.

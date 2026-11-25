@@ -16,6 +16,12 @@ use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::Prompt;
 
+sub _portable_text {
+    my ($text) = @_;
+    $text =~ s{/private(?=/var/folders/)}{}g if defined $text;
+    return $text;
+}
+
 # Hermetic runtime rooted in a throwaway HOME, with the current working
 # directory moved inside it so the runtime-layer stack resolves from a clean
 # temporary tree rather than the developer checkout.
@@ -84,7 +90,8 @@ sub write_file {
     like( $explicit, qr/🎫:T-1/, 'TICKET_REF becomes the ticket (line 58 defined-true, line 60 push)' );
 
     my $bare = render_with( $prompt, no_indicators => 1, env => {} );
-    like( $bare, qr/Home: \Q$home\E/, 'falls back to cwd() when no cwd given (line 37 right-true)' );
+    my $portable_home = _portable_text($home);
+    like( _portable_text($bare), qr/Home: \Q$portable_home\E/, 'falls back to cwd() when no cwd given (line 37 right-true)' );
     unlike( $bare, qr/🎫/, 'no ticket rendered when both refs unset (line 58 defined-false, line 60 no-push)' );
 
     my $empty_ws = render_with(
@@ -512,7 +519,9 @@ sub write_file {
     mkdir $relative_wt or die "mkdir $relative_wt: $!";
     my $relative_gitdir = File::Spec->abs2rel( $realgit, $relative_wt );
     write_file( File::Spec->catfile( $relative_wt, '.git' ), "gitdir: $relative_gitdir\n" );
-    is( $prompt->_git_metadata_dir($relative_wt), abs_path($realgit), 'a relative worktree gitdir pointer resolves from its worktree root' );
+    # The product returns the canonical native spelling; abs_path alone spells
+    # with forward slashes on Windows, so canonicalise the expected value too.
+    is( $prompt->_git_metadata_dir($relative_wt), File::Spec->canonpath( abs_path($realgit) ), 'a relative worktree gitdir pointer resolves from its worktree root' );
     {
         no warnings 'redefine';
         local *Developer::Dashboard::Prompt::abs_path = sub { return undef };
@@ -559,7 +568,7 @@ and worktree pointer files. Branch-label tests cover nested local names,
 detached HEAD resolution through loose and packed origin refs, malformed refs,
 symlink and non-file entries, and injected Git metadata I/O failures. These
 expectations apply to every supported shell because Bash, Zsh, sh, and
-PowerShell adapters all invoke the same C<dashboard ps1> renderer.
+PowerShell adapters all invoke the same C<d2 ps1> renderer.
 
 =head1 WHY IT EXISTS
 
@@ -588,7 +597,7 @@ green under C<prove -lr t>. Under the coverage gate it closes the renderer's
 statement, branch, condition, and subroutine columns using deterministic Git
 fixtures and injected I/O failures. No behavior is excused by an uncoverable
 annotation. Branch-label behavior is shell-independent: Bash, Zsh, sh, and
-PowerShell adapters all invoke the same C<dashboard ps1> renderer.
+PowerShell adapters all invoke the same C<d2 ps1> renderer.
 
 =head1 WHAT USES IT
 

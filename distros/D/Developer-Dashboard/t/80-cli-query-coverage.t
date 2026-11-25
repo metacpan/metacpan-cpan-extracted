@@ -4,19 +4,24 @@ use strict;
 use warnings;
 use utf8;
 
+use Cwd qw(getcwd);
 use Test::More;
 use File::Temp qw(tempdir);
 use File::Spec;
 use Capture::Tiny qw(capture);
 
 use lib 'lib';
+use lib 't/lib';
 
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::CLI::Query qw(run_query_command);
+use Developer::Dashboard::GoRoutine ();
+use Local::DevelCoverSwitch qw(devel_cover_switches);
 
 # Hermetic runtime: the query commands resolve their runtime layer from the
 # deepest .developer-dashboard directory at or above the CWD, so we chdir into a
 # throwaway HOME before touching anything.
+my $repo = getcwd();
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
 chdir $home or die "chdir $home: $!";
@@ -28,6 +33,28 @@ my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 isa_ok( $paths, 'Developer::Dashboard::PathRegistry', 'path registry built' );
 
 my $Q = 'Developer::Dashboard::CLI::Query';
+
+{
+    my @coverage_switch = devel_cover_switches($ENV{HARNESS_PERL_SWITCHES});
+    my @include = map { '-I' . File::Spec->catdir( $repo, $_ ) } qw(lib blib/lib blib/arch);
+    my $exit_child = Developer::Dashboard::GoRoutine::spawn(
+        [
+            $^X,
+            @include,
+            @coverage_switch,
+            '-MDeveloper::Dashboard::CLI::Query',
+            '-e',
+            'Developer::Dashboard::CLI::Query::_command_exit(23)',
+        ],
+        { cwd => $repo },
+    );
+    ok( $exit_child, '_command_exit subprocess starts through GoRoutine' );
+    is(
+        Developer::Dashboard::GoRoutine::wait_process($exit_child),
+        23,
+        '_command_exit preserves the requested child exit status'
+    );
+}
 
 # run_query_command exits through _command_exit; override it so the whole flow
 # runs in-process without tearing down the test.
@@ -285,16 +312,20 @@ repository's all-metrics coverage gate stays satisfied for this file.
 
 Use this file when changing argument splitting, input sourcing, dotted-path or
 C<$d> expression semantics, scalar-versus-JSON output rules, any format
-parser, or the XML conversion. Extend it first when adding a new query format
-or selector behavior.
+parser, or the XML conversion. The production exit helper is also invoked in
+a GoRoutine-managed child so its actual process exit code remains covered.
+Extend it first when adding a new query format or selector behavior.
 
 =head1 HOW TO USE
 
 Run C<prove -lv t/80-cli-query-coverage.t> while iterating. It builds a
 hermetic HOME, overrides the process-exit wrapper so the full command flow runs
 in-process, and calls both the exported entry point and the internal helpers
-directly to reach guard branches that the public path cannot produce. Keep it
-green under C<prove -lr t> and inside the coverage run before release.
+directly to reach guard branches that the public path cannot produce. Its
+subprocess check executes the unmocked exit helper and waits through GoRoutine;
+when coverage is active, the exact configured Devel::Cover switch is forwarded
+so the child contributes to the same database. Keep it green under
+C<prove -lr t> and inside the coverage run before release.
 
 =head1 WHAT USES IT
 

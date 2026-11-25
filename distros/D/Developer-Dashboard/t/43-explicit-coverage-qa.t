@@ -21,7 +21,35 @@ use Developer::Dashboard::CLI::Progress ();
 use Developer::Dashboard::CLI::Skills ();
 use Developer::Dashboard::File ();
 use Developer::Dashboard::FileRegistry ();
+use Developer::Dashboard::PerlEnv;
 use Developer::Dashboard::SkillManager ();
+
+# The platform PATH separator: a ':' join mangles drive-letter entries on
+# Windows, so a fake bin directory prepended with ':' is never reached.
+my $path_sep = Developer::Dashboard::PerlEnv::path_separator();
+
+# _write_stub($path, $shell_body, $cmd_body): writes a fake executable stub
+# runnable on this platform at $path. On Windows the stub is the .cmd form
+# (a #!/bin/sh script cannot run where there is no sh), found by the product
+# through PATHEXT; on Unix it is the shell script itself, made executable.
+# The .cmd body is given alongside the shell body so the two stay visibly
+# in step.
+sub _write_stub {
+    my ( $path, $shell_body, $cmd_body ) = @_;
+    if ( $^O eq 'MSWin32' ) {
+        my ( $vol, $dir, $file ) = File::Spec->splitpath($path);
+        $path = File::Spec->catpath( $vol, $dir, "$file.cmd" );
+        open my $fh, '>', $path or die "Unable to write $path: $!";
+        print {$fh} $cmd_body;
+        close $fh or die "Unable to close $path: $!";
+        return $path;
+    }
+    open my $fh, '>', $path or die "Unable to write $path: $!";
+    print {$fh} $shell_body;
+    close $fh or die "Unable to close $path: $!";
+    chmod 0755, $path or die "Unable to chmod $path: $!";
+    return $path;
+}
 
 {
     package TestCoveragePaths;
@@ -663,6 +691,8 @@ subtest 'CLI::Paths covers current-directory delete normalization branches' => s
     make_path($cwd);
     my $previous = File::Spec->catdir( $tmp, 'previous-dir' );
     make_path($previous);
+    my $cwd_alias = $cwd;
+    $cwd_alias =~ s{\A(?:/private|)/var/folders/}{/private/var/folders/};
     my $old = Cwd::getcwd();
     chdir $cwd or die "Unable to chdir to $cwd: $!";
 
@@ -671,7 +701,7 @@ subtest 'CLI::Paths covers current-directory delete normalization branches' => s
     local *TestCLIPathsConfig::path_aliases = sub {
         return {
             alpha => $previous,
-            beta  => $cwd,
+            beta  => $cwd_alias,
         };
     };
 
@@ -786,7 +816,7 @@ subtest 'CLI::Files covers files inventory and locate branches' => sub {
     };
     is_deeply(
         decode_json($stdout_locate_alias),
-        [ '/tmp/root-dir/needle.txt' ],
+        [ File::Spec->canonpath('/tmp/root-dir/needle.txt') ],
         'file locate can scope the search to a resolved file alias path',
     );
 
@@ -803,7 +833,7 @@ subtest 'CLI::Files covers files inventory and locate branches' => sub {
         Developer::Dashboard::CLI::Files::run_files_command( command => 'file', args => [ 'locate', 'plain.txt' ] );
     };
     like( $stdout_locate_table, qr/^Path\s*$/m, 'file locate defaults to a one-column summary table' );
-    like( $stdout_locate_table, qr/\Q$tmp\/plain.txt\E/, 'file locate default table searches beneath the current working directory' );
+    like( $stdout_locate_table, qr/\Q@{[ File::Spec->catfile( $tmp, 'plain.txt' ) ]}\E/, 'file locate default table searches beneath the current working directory' );
 
     my ( $stdout_add ) = capture {
         Developer::Dashboard::CLI::Files::run_files_command( command => 'file', args => [ 'add', 'report', '/tmp/report.txt' ] );
@@ -838,27 +868,27 @@ subtest 'CLI::Files covers files inventory and locate branches' => sub {
 
     like(
         _dies( sub { Developer::Dashboard::CLI::Files::run_files_command( command => 'files', args => [ '-o', 'yaml' ] ) } ),
-        qr/Usage: dashboard files \[-o json\|table\]/,
+        qr/Usage: d2 files \[-o json\|table\]/,
         'files rejects unsupported output formats explicitly',
     );
     like(
         _dies( sub { Developer::Dashboard::CLI::Files::run_files_command( command => 'file', args => [ 'locate', '-o', 'yaml', 'plain.txt' ] ) } ),
-        qr/Usage: dashboard file locate \[-o json\|table\]/,
+        qr/Usage: d2 file locate \[-o json\|table\]/,
         'file locate rejects unsupported output formats explicitly',
     );
     like(
         _dies( sub { Developer::Dashboard::CLI::Files::run_files_command( command => 'file', args => [ 'add', '-o', 'yaml', 'bad', '/tmp/bad.txt' ] ) } ),
-        qr/Usage: dashboard file add <name> <path> \[-c\|--create\[=MODE\]\] \[-o json\|table\]/,
+        qr/Usage: d2 file add <name> <path> \[-c\|--create\[=MODE\]\] \[-o json\|table\]/,
         'file add rejects unsupported output formats explicitly',
     );
     like(
         _dies( sub { Developer::Dashboard::CLI::Files::run_files_command( command => 'file', args => [ 'del', '-o', 'yaml', 'bad' ] ) } ),
-        qr/Usage: dashboard file del <name> \[-o json\|table\]/,
+        qr/Usage: d2 file del <name> \[-o json\|table\]/,
         'file del rejects unsupported output formats explicitly',
     );
     like(
         _dies( sub { Developer::Dashboard::CLI::Files::run_files_command( command => 'file', args => [ 'list', '-o', 'yaml' ] ) } ),
-        qr/Usage: dashboard file list \[-o json\|table\]/,
+        qr/Usage: d2 file list \[-o json\|table\]/,
         'file list rejects unsupported output formats explicitly',
     );
 
@@ -971,7 +1001,7 @@ subtest 'CLI::Paths covers table defaults and output guards' => sub {
         Developer::Dashboard::CLI::Paths::run_paths_command( command => 'path', args => [ 'locate', 'match-dir' ] );
     };
     like( $stdout_locate, qr/^Path\s*$/m, 'path locate defaults to a one-column summary table' );
-    like( $stdout_locate, qr/\Q$workspace_hit\/match-dir\E/, 'path locate table includes the matched project path' );
+    like( $stdout_locate, qr/\Q@{[ File::Spec->catdir( $workspace_hit, 'match-dir' ) ]}\E/, 'path locate table includes the matched project path' );
 
     my ( $stdout_add ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command( command => 'path', args => [ 'add', 'demo', $named_root ] );
@@ -1011,27 +1041,27 @@ subtest 'CLI::Paths covers table defaults and output guards' => sub {
 
     like(
         _dies( sub { Developer::Dashboard::CLI::Paths::run_paths_command( command => 'paths', args => [ '-o', 'yaml' ] ) } ),
-        qr/Usage: dashboard paths \[-o json\|table\]/,
+        qr/Usage: d2 paths \[-o json\|table\]/,
         'paths rejects unsupported output formats explicitly',
     );
     like(
         _dies( sub { Developer::Dashboard::CLI::Paths::run_paths_command( command => 'path', args => [ 'locate', '-o', 'yaml', 'match-dir' ] ) } ),
-        qr/Usage: dashboard path locate \[-o json\|table\]/,
+        qr/Usage: d2 path locate \[-o json\|table\]/,
         'path locate rejects unsupported output formats explicitly',
     );
     like(
         _dies( sub { Developer::Dashboard::CLI::Paths::run_paths_command( command => 'path', args => [ 'add', '-o', 'yaml', 'demo', $named_root ] ) } ),
-        qr/Usage: dashboard path add <name> <path> \[-c\|--create\[=MODE\]\] \[-o json\|table\]/,
+        qr/Usage: d2 path add <name> <path> \[-c\|--create\[=MODE\]\] \[-o json\|table\]/,
         'path add rejects unsupported output formats explicitly',
     );
     like(
         _dies( sub { Developer::Dashboard::CLI::Paths::run_paths_command( command => 'path', args => [ 'del', '-o', 'yaml', 'demo' ] ) } ),
-        qr/Usage: dashboard path del <name> \[-o json\|table\]/,
+        qr/Usage: d2 path del <name> \[-o json\|table\]/,
         'path del rejects unsupported output formats explicitly',
     );
     like(
         _dies( sub { Developer::Dashboard::CLI::Paths::run_paths_command( command => 'path', args => [ 'list', '-o', 'yaml' ] ) } ),
-        qr/Usage: dashboard path list \[-o json\|table\]/,
+        qr/Usage: d2 path list \[-o json\|table\]/,
         'path list rejects unsupported output formats explicitly',
     );
 
@@ -1156,7 +1186,7 @@ subtest 'CLI::Skills covers helper branches and table rendering' => sub {
         );
         is( $exit, 2, 'invalid install output returns the usage exit code' );
     };
-    like( $stderr_usage, qr/Usage: dashboard skills install/, 'invalid install output prints the usage message' );
+    like( $stderr_usage, qr/Usage: d2 skills install/, 'invalid install output prints the usage message' );
 
     my ( $stdout_uninstall ) = capture {
         my $exit = Developer::Dashboard::CLI::Skills::run_skills_command(
@@ -1240,7 +1270,7 @@ subtest 'CLI::Skills covers helper branches and table rendering' => sub {
         1;
     };
     ok( !$list_usage_ok, 'list with invalid output dies with a usage message' );
-    like( $@, qr/Usage: dashboard skills list/, 'list with invalid output prints the list usage message' );
+    like( $@, qr/Usage: d2 skills list/, 'list with invalid output prints the list usage message' );
 
     my ( $stdout_usage_json ) = capture {
         my $exit = Developer::Dashboard::CLI::Skills::run_skills_command(
@@ -1271,7 +1301,7 @@ subtest 'CLI::Skills covers helper branches and table rendering' => sub {
         1;
     };
     ok( !$usage_usage_ok, 'usage with invalid output dies with a usage message' );
-    like( $@, qr/Usage: dashboard skills usage/, 'usage with invalid output prints the usage message' );
+    like( $@, qr/Usage: d2 skills usage/, 'usage with invalid output prints the usage message' );
 
     my $install_table = '';
     my $install_exit = eval {
@@ -1414,13 +1444,24 @@ subtest 'SkillManager closes the remaining direct error-path coverage branches' 
     open my $copy_source_fh, '>', $copy_source or die $!;
     print {$copy_source_fh} "copied\n";
     close $copy_source_fh;
-    chmod 0600, $copy_source or die $!;
+    # Windows has no Unix mode bits: the only mode chmod can express there
+    # is the read-only attribute, which stat reports as 0444 against the
+    # 0666 default (probe on win-ts: chmod 0600 stays 0666, chmod 0400
+    # reads back 0444). So the same check runs there with a read-only
+    # source instead of being skipped: the copied target must come out
+    # read-only too, not at the 0666 default.
+    my $copy_source_mode   = $^O eq 'MSWin32' ? 0400   : 0600;
+    my $copy_expected_mode = $^O eq 'MSWin32' ? '0444' : '0600';
+    chmod $copy_source_mode, $copy_source or die $!;
     my $copy_target_root = tempdir( CLEANUP => 1 );
     $manager->_copy_tree_contents( $copy_source_root, $copy_target_root );
     my $copy_target = File::Spec->catfile( $copy_target_root, 'nested', 'source.txt' );
     ok( -f $copy_target, '_copy_tree_contents creates the target parent directory and copies the source file' );
     my $copied_mode = ( stat $copy_target )[2] & 07777;
-    is( sprintf( '%04o', $copied_mode ), '0600', '_copy_tree_contents applies the requested file mode to copied targets' );
+    is( sprintf( '%04o', $copied_mode ), $copy_expected_mode, '_copy_tree_contents applies the requested file mode to copied targets' );
+    # Make both files writable again so the temp-dir cleanup can remove
+    # them on Windows, where a read-only file cannot be unlinked.
+    chmod 0600, $copy_source, $copy_target;
 
     my @events;
     my $progress_manager = bless {
@@ -1455,14 +1496,13 @@ subtest 'SkillManager closes the remaining direct error-path coverage branches' 
     open my $make_fh, '>', $makefile or die $!;
     print {$make_fh} "install:\n\t\@true\n";
     close $make_fh;
-    my $make_bin = File::Spec->catfile( $make_root, 'make' );
-    open my $bin_fh, '>', $make_bin or die $!;
-    print {$bin_fh} "#!/bin/sh\n";
-    print {$bin_fh} "exit 1\n";
-    close $bin_fh;
-    chmod 0755, $make_bin or die $!;
+    _write_stub(
+        File::Spec->catfile( $make_root, 'make' ),
+        "#!/bin/sh\nexit 1\n",
+        "\@echo off\nexit /b 1\n",
+    );
     local *Developer::Dashboard::SkillManager::_makefile_targets = sub { return ('install'); };
-    local $ENV{PATH} = join ':', $make_root, ( $ENV{PATH} || '' );
+    local $ENV{PATH} = join $path_sep, $make_root, ( $ENV{PATH} || '' );
     my $make_failure = $manager->_install_skill_makefile($make_root);
     like(
         $make_failure->{error},
@@ -1475,17 +1515,12 @@ subtest 'SkillManager closes the remaining direct error-path coverage branches' 
     open my $named_make_fh, '>', $named_makefile or die $!;
     print {$named_make_fh} "install:\n\t\@true\n";
     close $named_make_fh;
-    my $named_make_bin = File::Spec->catfile( $named_make_root, 'make' );
-    open my $named_bin_fh, '>', $named_make_bin or die $!;
-    print {$named_bin_fh} "#!/bin/sh\n";
-    print {$named_bin_fh} "if [ \"\${1:-default}\" = \"install\" ]; then\n";
-    print {$named_bin_fh} "  echo install failed >&2\n";
-    print {$named_bin_fh} "  exit 1\n";
-    print {$named_bin_fh} "fi\n";
-    print {$named_bin_fh} "exit 0\n";
-    close $named_bin_fh;
-    chmod 0755, $named_make_bin or die $!;
-    local $ENV{PATH} = join ':', $named_make_root, ( $ENV{PATH} || '' );
+    _write_stub(
+        File::Spec->catfile( $named_make_root, 'make' ),
+        "#!/bin/sh\nif [ \"\${1:-default}\" = \"install\" ]; then\n  echo install failed >&2\n  exit 1\nfi\nexit 0\n",
+        "\@echo off\nif \"%1\"==\"install\" echo install failed 1>&2\nif \"%1\"==\"install\" exit /b 1\nexit /b 0\n",
+    );
+    local $ENV{PATH} = join $path_sep, $named_make_root, ( $ENV{PATH} || '' );
     my $named_make_failure = $manager->_install_skill_makefile($named_make_root);
     like(
         $named_make_failure->{error},
@@ -1498,27 +1533,31 @@ subtest 'SkillManager closes the remaining direct error-path coverage branches' 
     open my $winget_fh, '>', $wingetfile or die $!;
     print {$winget_fh} "Git.Git\n";
     close $winget_fh;
-    my $winget_bin = File::Spec->catfile( $winget_root, 'winget' );
-    open my $winget_bin_fh, '>', $winget_bin or die $!;
-    print {$winget_bin_fh} "#!/bin/sh\n";
-    print {$winget_bin_fh} "echo winget-ok\n";
-    print {$winget_bin_fh} "echo winget-warn >&2\n";
-    print {$winget_bin_fh} "exit 0\n";
-    close $winget_bin_fh;
-    chmod 0755, $winget_bin or die $!;
-    local $ENV{PATH} = join ':', $winget_root, ( $ENV{PATH} || '' );
+    my $winget_base = File::Spec->catfile( $winget_root, 'winget' );
+    _write_stub(
+        $winget_base,
+        "#!/bin/sh\necho winget-ok\necho winget-warn >&2\nexit 0\n",
+        "\@echo off\necho winget-ok\necho winget-warn 1>&2\nexit /b 0\n",
+    );
+    # A plain prepend is not enough on Windows: a direct spawn finds the
+    # real winget.exe in a later PATH directory before the winget.cmd stub
+    # in an earlier one, so the real installer would run (it did, by hand
+    # on win-ts, 22 Nov 2026). Drop every directory that holds a winget.
+    local $ENV{PATH} = _path_without_winget($winget_root);
     local *Developer::Dashboard::SkillManager::_is_windows = sub { 1 };
     my $winget_ok = $manager->_install_skill_wingetfile($winget_root);
     ok( $winget_ok->{success}, '_install_skill_wingetfile succeeds on Windows when winget exits cleanly' );
-    is( $winget_ok->{stdout}, "winget-ok\n", '_install_skill_wingetfile returns streamed winget stdout without folding the progress banner into the result payload' );
+    # cmd.exe echo writes CRLF where sh writes LF; the assertion is about the
+    # streamed content, not the line ending, so normalise before comparing.
+    ( my $winget_stdout = $winget_ok->{stdout} ) =~ s/\r\n/\n/g;
+    is( $winget_stdout, "winget-ok\n", '_install_skill_wingetfile returns streamed winget stdout without folding the progress banner into the result payload' );
     like( $winget_ok->{stderr}, qr/winget-warn/, '_install_skill_wingetfile returns combined stderr from winget' );
 
-    open my $winget_fail_fh, '>', $winget_bin or die $!;
-    print {$winget_fail_fh} "#!/bin/sh\n";
-    print {$winget_fail_fh} "echo broken-winget >&2\n";
-    print {$winget_fail_fh} "exit 1\n";
-    close $winget_fail_fh;
-    chmod 0755, $winget_bin or die $!;
+    _write_stub(
+        $winget_base,
+        "#!/bin/sh\necho broken-winget >&2\nexit 1\n",
+        "\@echo off\necho broken-winget 1>&2\nexit /b 1\n",
+    );
     my $winget_fail = $manager->_install_skill_wingetfile($winget_root);
     like(
         $winget_fail->{error},
@@ -1597,6 +1636,28 @@ subtest 'SkillManager closes the remaining direct error-path coverage branches' 
     like( $cpan_local_failure->{error}, qr/cpan local boom/, '_install_skill_cpanfile_local surfaces the streamed cpanm failure text in the structured error result' );
     is( Cwd::getcwd(), $original_cwd, '_install_skill_cpanfile_local restores the original cwd after an in-flight failure' );
 };
+
+# _path_without_winget($fake_bin): a PATH with $fake_bin first and, on
+# Windows, every directory holding a real winget.exe/winget.com removed.
+# On Windows a direct spawn finds a same-named .exe in a later PATH
+# directory before a .cmd stub in an earlier one, so the stub only shadows
+# the real winget when no winget executable remains in PATH. The real one
+# is the App Installer execution alias, a reparse point that -f/-e/-l
+# cannot see, so the directory is detected by listing it. Same helper as
+# t/102. On Unix the fake directory is simply put first.
+sub _path_without_winget {
+    my ($fake_bin) = @_;
+    return join( $path_sep, $fake_bin, ( $ENV{PATH} || '' ) ) if $^O ne 'MSWin32';
+    my @kept;
+    for my $dir ( split /\Q$path_sep\E/, ( $ENV{PATH} || '' ) ) {
+        next if $dir eq '';
+        opendir my $dh, $dir or do { push @kept, $dir; next };
+        my $has_winget = grep { lc($_) eq 'winget.exe' || lc($_) eq 'winget.com' } readdir $dh;
+        closedir $dh;
+        push @kept, $dir if !$has_winget;
+    }
+    return join( $path_sep, $fake_bin, @kept );
+}
 
 sub _dies {
     my ($code) = @_;

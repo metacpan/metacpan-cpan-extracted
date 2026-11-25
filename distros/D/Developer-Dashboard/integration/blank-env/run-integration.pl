@@ -178,12 +178,12 @@ BOOKMARK
     _assert( $bare->{exit_code} != 0, 'bare dashboard returns non-zero usage exit' );
     _assert_match( $bare->{stdout}, qr/Usage:/, 'bare dashboard prints usage output' );
 
-    my $help = _run_shell( 'dashboard help', 'dashboard help' );
-    _assert_match( $help->{stdout}, qr/Available built-in commands:/, 'dashboard help renders the concise built-in command index' );
-    _assert_match( $help->{stdout}, qr/^  dashboard api \[ls\|add\|rm\]/m, 'dashboard help includes command-specific catalog entries' );
+    my $help = _run_shell( 'd2 help', 'd2 help' );
+    _assert_match( $help->{stdout}, qr/Available built-in commands:/, 'd2 help renders the concise built-in command index' );
+    _assert_match( $help->{stdout}, qr/^  d2 api \[ls\|add\|rm\]/m, 'd2 help includes command-specific catalog entries' );
 
-    my $version = _run_shell( 'dashboard version', 'dashboard version' );
-    _assert_match( $version->{stdout}, qr/^\Q$expected_version\E$/m, 'dashboard version reports the installed runtime version' );
+    my $version = _run_shell( 'd2 version', 'd2 version' );
+    _assert_match( $version->{stdout}, qr/^\Q$expected_version\E$/m, 'd2 version reports the installed runtime version' );
 
     my $d2_version = _run_shell( 'd2 version after tarball install', 'd2 version' );
     _assert_match( $d2_version->{stdout}, qr/^\Q$expected_version\E$/m, 'd2 reports the installed tarball version through the short entrypoint' );
@@ -208,15 +208,15 @@ BOOKMARK
     );
     _assert_match( $d2_compose_help->{stdout}, qr/\bhelp\s*\z/, 'd2 forwards Docker Compose literal help unchanged after tarball install' );
 
-    my $init = _run_shell( 'dashboard init', 'cd ' . _shell_quote($project) . ' && dashboard init' );
+    my $init = _run_shell( 'd2 init', 'cd ' . _shell_quote($project) . ' && d2 init' );
     my $init_data = decode_json( $init->{stdout} );
-    _assert_match( $init_data->{runtime_root} || '', qr/\.developer-dashboard/, 'dashboard init returns runtime root' );
-    _assert( !grep { $_ eq 'welcome' } @{ $init_data->{pages} || [] }, 'dashboard init no longer seeds welcome page' );
+    _assert_match( $init_data->{runtime_root} || '', qr/\.developer-dashboard/, 'd2 init returns runtime root' );
+    _assert( !grep { $_ eq 'welcome' } @{ $init_data->{pages} || [] }, 'd2 init no longer seeds welcome page' );
     my $reported_pages = encode_json( [ sort @{ $init_data->{pages} || [] } ] );
     my $expected_pages = encode_json( [ 'legacy-ajax', 'legacy-ajax-stream', 'nav/alpha.tt', 'nav/beta.tt', 'project-home' ] );
     _assert(
         $reported_pages eq $expected_pages,
-        'dashboard init reports only the fake-project bookmark files that the integration fixture created instead of seeding extracted core starter dashboards',
+        'd2 init reports only the fake-project bookmark files that the integration fixture created instead of seeding extracted core starter dashboards',
     );
 
     my $legacy_flat_core  = File::Spec->catfile( $home, '.developer-dashboard', 'cli', '_dashboard-core' );
@@ -240,12 +240,12 @@ PERL
     );
     chmod 0700, $legacy_flat_shell or die "Unable to chmod $legacy_flat_shell: $!";
 
-    my $shell_bootstrap = _run_shell( 'dashboard shell bash', 'dashboard shell bash' );
-    _assert_match( $shell_bootstrap->{stdout}, qr/_dd_tmux_status_active/, 'dashboard shell bash emits the tmux ticket-session detection helper after install' );
-    _assert_match( $shell_bootstrap->{stdout}, qr/status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell bash emits the tmux status bootstrap after install' );
-    _assert_match( $shell_bootstrap->{stdout}, qr/ps1 --jobs \\j --mode compact --no-indicators/, 'dashboard shell bash suppresses prompt indicators when tmux owns the status line after install' );
-    _assert( !-e $legacy_flat_core, 'dashboard shell bash helper staging removes managed legacy flat _dashboard-core files after install' );
-    _assert( !-e $legacy_flat_shell, 'dashboard shell bash helper staging removes managed legacy flat shell wrappers after install' );
+    my $shell_bootstrap = _run_shell( 'd2 shell bash', 'd2 shell bash' );
+    _assert_match( $shell_bootstrap->{stdout}, qr/_dd_tmux_status_active/, 'd2 shell bash emits the tmux ticket-session detection helper after install' );
+    _assert_match( $shell_bootstrap->{stdout}, qr/status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'd2 shell bash emits the tmux status bootstrap after install' );
+    _assert_match( $shell_bootstrap->{stdout}, qr/ps1 --jobs \\j --mode compact --no-indicators/, 'd2 shell bash suppresses prompt indicators when tmux owns the status line after install' );
+    _assert( !-e $legacy_flat_core, 'd2 shell bash helper staging removes managed legacy flat _dashboard-core files after install' );
+    _assert( !-e $legacy_flat_shell, 'd2 shell bash helper staging removes managed legacy flat shell wrappers after install' );
 
     make_path($update_root);
     _write_text(
@@ -287,57 +287,57 @@ PL
     chmod 0600, File::Spec->catfile( $update_root, '03-data.file' )
       or die "Unable to chmod runtime update data file: $!";
 
-    my $update = _run_shell( 'dashboard update', 'cd ' . _shell_quote($project) . ' && dashboard update' );
+    my $update = _run_shell( 'd2 update', 'cd ' . _shell_quote($project) . ' && d2 update' );
     my $update_data = _decode_json_tail( $update->{stdout} );
-    _assert( ref($update_data) eq 'HASH', 'dashboard update custom command returns structured trailing json summary from the common command hook path' );
-    _assert( scalar(keys %{$update_data}) == 2, 'dashboard update custom command ran the seeded executable runtime update scripts only' );
-    _assert( exists $update_data->{'01-runtime-update'}, 'dashboard update custom command reports the runtime update script filename' );
-    _assert( exists $update_data->{'02-runtime-result.pl'}, 'dashboard update custom command reports the result-aware runtime update script filename' );
-    _assert_match( $update_data->{'01-runtime-update'}{stdout} || '', qr/runtime update ok/, 'dashboard update custom command captures runtime update script stdout' );
-    _assert_match( $update_data->{'02-runtime-result.pl'}{stdout} || '', qr/runtime update ok/, 'dashboard update custom command exposes the prior hook result to later hook scripts' );
+    _assert( ref($update_data) eq 'HASH', 'd2 update custom command returns structured trailing json summary from the common command hook path' );
+    _assert( scalar(keys %{$update_data}) == 2, 'd2 update custom command ran the seeded executable runtime update scripts only' );
+    _assert( exists $update_data->{'01-runtime-update'}, 'd2 update custom command reports the runtime update script filename' );
+    _assert( exists $update_data->{'02-runtime-result.pl'}, 'd2 update custom command reports the result-aware runtime update script filename' );
+    _assert_match( $update_data->{'01-runtime-update'}{stdout} || '', qr/runtime update ok/, 'd2 update custom command captures runtime update script stdout' );
+    _assert_match( $update_data->{'02-runtime-result.pl'}{stdout} || '', qr/runtime update ok/, 'd2 update custom command exposes the prior hook result to later hook scripts' );
 
-    my $paths = _run_shell( 'dashboard paths', 'cd ' . _shell_quote($project) . ' && dashboard paths -o json' );
-    _assert_match( $paths->{stdout}, qr/"runtime_root"/, 'dashboard paths returns runtime json' );
-    _assert_match( $paths->{stdout}, qr/\Q$bookmarks\E/, 'dashboard paths reflects fake bookmark override' );
-    _assert_match( $paths->{stdout}, qr/\Q$configs\E/, 'dashboard paths reflects fake config override' );
-    _assert_match( $paths->{stdout}, qr/\Q$cli_root\E/, 'dashboard paths reflects the runtime cli root' );
+    my $paths = _run_shell( 'd2 paths', 'cd ' . _shell_quote($project) . ' && d2 paths -o json' );
+    _assert_match( $paths->{stdout}, qr/"runtime_root"/, 'd2 paths returns runtime json' );
+    _assert_match( $paths->{stdout}, qr/\Q$bookmarks\E/, 'd2 paths reflects fake bookmark override' );
+    _assert_match( $paths->{stdout}, qr/\Q$configs\E/, 'd2 paths reflects fake config override' );
+    _assert_match( $paths->{stdout}, qr/\Q$cli_root\E/, 'd2 paths reflects the runtime cli root' );
 
-    my $path_list = _run_shell( 'dashboard path list', 'cd ' . _shell_quote($project) . ' && dashboard path list -o json' );
-    _assert_match( $path_list->{stdout}, qr/"runtime"/, 'dashboard path list returns named paths' );
+    my $path_list = _run_shell( 'd2 path list', 'cd ' . _shell_quote($project) . ' && d2 path list -o json' );
+    _assert_match( $path_list->{stdout}, qr/"runtime"/, 'd2 path list returns named paths' );
 
-    my $path_resolve = _run_shell( 'dashboard path resolve home', 'cd ' . _shell_quote($project) . ' && dashboard path resolve home' );
-    _assert_match( $path_resolve->{stdout}, qr/^\Q$home\E/m, 'dashboard path resolve home returns integration home' );
+    my $path_resolve = _run_shell( 'd2 path resolve home', 'cd ' . _shell_quote($project) . ' && d2 path resolve home' );
+    _assert_match( $path_resolve->{stdout}, qr/^\Q$home\E/m, 'd2 path resolve home returns integration home' );
 
-    my $bookmark_resolve = _run_shell( 'dashboard path resolve bookmarks', 'cd ' . _shell_quote($project) . ' && dashboard path resolve bookmarks' );
-    _assert_match( $bookmark_resolve->{stdout}, qr/^\Q$bookmarks\E/m, 'dashboard path resolve bookmarks returns fake project bookmark root' );
+    my $bookmark_resolve = _run_shell( 'd2 path resolve bookmarks', 'cd ' . _shell_quote($project) . ' && d2 path resolve bookmarks' );
+    _assert_match( $bookmark_resolve->{stdout}, qr/^\Q$bookmarks\E/m, 'd2 path resolve bookmarks returns fake project bookmark root' );
 
-    my $path_project = _run_shell( 'dashboard path project-root', 'cd ' . _shell_quote($project) . ' && dashboard path project-root' );
-    _assert_match( $path_project->{stdout}, qr/^\Q$project\E/m, 'dashboard path project-root detects fake project root' );
+    my $path_project = _run_shell( 'd2 path project-root', 'cd ' . _shell_quote($project) . ' && d2 path project-root' );
+    _assert_match( $path_project->{stdout}, qr/^\Q$project\E/m, 'd2 path project-root detects fake project root' );
 
-    my $codec = _run_shell( 'dashboard encode/decode', q{printf 'integration-codec' | dashboard encode | dashboard decode} );
-    _assert_match( $codec->{stdout}, qr/integration-codec/, 'dashboard encode and decode round-trip text' );
+    my $codec = _run_shell( 'd2 encode/decode', q{printf 'integration-codec' | d2 encode | d2 decode} );
+    _assert_match( $codec->{stdout}, qr/integration-codec/, 'd2 encode and decode round-trip text' );
 
-    my $set_indicator = _run_shell( 'dashboard indicator set', q{dashboard indicator set integration "Integration" "I" ok} );
-    _assert_match( $set_indicator->{stdout}, qr/"name"\s*:\s*"integration"/, 'dashboard indicator set persists state' );
+    my $set_indicator = _run_shell( 'd2 indicator set', q{d2 indicator set integration "Integration" "I" ok} );
+    _assert_match( $set_indicator->{stdout}, qr/"name"\s*:\s*"integration"/, 'd2 indicator set persists state' );
 
-    my $list_indicator = _run_shell( 'dashboard indicator list', 'dashboard indicator list' );
-    _assert_match( $list_indicator->{stdout}, qr/"integration"/, 'dashboard indicator list includes integration indicator' );
+    my $list_indicator = _run_shell( 'd2 indicator list', 'd2 indicator list' );
+    _assert_match( $list_indicator->{stdout}, qr/"integration"/, 'd2 indicator list includes integration indicator' );
 
-    my $refresh_indicator = _run_shell( 'dashboard indicator refresh-core', 'cd ' . _shell_quote($project) . ' && dashboard indicator refresh-core ' . _shell_quote($project) );
-    _assert_match( $refresh_indicator->{stdout}, qr/"docker"|"project"|"git"/, 'dashboard indicator refresh-core updates built-ins' );
+    my $refresh_indicator = _run_shell( 'd2 indicator refresh-core', 'cd ' . _shell_quote($project) . ' && d2 indicator refresh-core ' . _shell_quote($project) );
+    _assert_match( $refresh_indicator->{stdout}, qr/"docker"|"project"|"git"/, 'd2 indicator refresh-core updates built-ins' );
 
-    my $ps1 = _run_shell( 'dashboard ps1', 'cd ' . _shell_quote($project) . ' && dashboard ps1 --jobs 1 --cwd ' . _shell_quote($project) );
-    _assert_match( $ps1->{stdout}, qr/fake-project|jobs/, 'dashboard ps1 renders prompt text for fake project' );
+    my $ps1 = _run_shell( 'd2 ps1', 'cd ' . _shell_quote($project) . ' && d2 ps1 --jobs 1 --cwd ' . _shell_quote($project) );
+    _assert_match( $ps1->{stdout}, qr/fake-project|jobs/, 'd2 ps1 renders prompt text for fake project' );
 
-    my $shell = _run_shell( 'dashboard shell bash', 'dashboard shell bash' );
-    _assert_match( $shell->{stdout}, qr/path resolve "\$1"|ps1 --jobs/, 'dashboard shell bash emits shell integration' );
+    my $shell = _run_shell( 'd2 shell bash', 'd2 shell bash' );
+    _assert_match( $shell->{stdout}, qr/path resolve "\$1"|ps1 --jobs/, 'd2 shell bash emits shell integration' );
 
-    my $config_init = _run_shell( 'dashboard config init', 'dashboard config init' );
-    _assert_match( $config_init->{stdout}, qr/config\.json/, 'dashboard config init writes config file' );
+    my $config_init = _run_shell( 'd2 config init', 'd2 config init' );
+    _assert_match( $config_init->{stdout}, qr/config\.json/, 'd2 config init writes config file' );
     _assert_match(
         _read_text( File::Spec->catfile( $configs, 'config.json' ) ),
         qr/fake\.config\.collector/,
-        'dashboard config init leaves an existing config.json untouched',
+        'd2 config init leaves an existing config.json untouched',
     );
     _write_text(
         File::Spec->catfile( $configs, 'config.json' ),
@@ -377,97 +377,97 @@ PL
 JSON
     );
 
-    my $config_show = _run_shell( 'dashboard config show', $project_cd . 'dashboard config show' );
-    _assert_match( $config_show->{stdout}, qr/"collectors"/, 'dashboard config show includes collectors' );
+    my $config_show = _run_shell( 'd2 config show', $project_cd . 'd2 config show' );
+    _assert_match( $config_show->{stdout}, qr/"collectors"/, 'd2 config show includes collectors' );
 
-    my $page_new = _run_shell( 'dashboard page new', $project_cd . q{dashboard page new sample "Sample Page"} );
-    _assert_match( $page_new->{stdout}, qr/^TITLE:\s+Sample Page/m, 'dashboard page new emits bookmark instruction text' );
+    my $page_new = _run_shell( 'd2 page new', $project_cd . q{d2 page new sample "Sample Page"} );
+    _assert_match( $page_new->{stdout}, qr/^TITLE:\s+Sample Page/m, 'd2 page new emits bookmark instruction text' );
 
     _write_text( '/tmp/sample.bookmark', $page_new->{stdout} );
-    my $page_save = _run_shell( 'dashboard page save', $project_cd . q{dashboard page save sample < /tmp/sample.bookmark} );
-    _assert_match( $page_save->{stdout}, qr/sample$/, 'dashboard page save writes bookmark file' );
-    _assert( -f File::Spec->catfile( $bookmarks, 'sample' ), 'dashboard page save wrote into fake project bookmark root' );
+    my $page_save = _run_shell( 'd2 page save', $project_cd . q{d2 page save sample < /tmp/sample.bookmark} );
+    _assert_match( $page_save->{stdout}, qr/sample$/, 'd2 page save writes bookmark file' );
+    _assert( -f File::Spec->catfile( $bookmarks, 'sample' ), 'd2 page save wrote into fake project bookmark root' );
 
-    my $page_list = _run_shell( 'dashboard page list', $project_cd . 'dashboard page list' );
-    _assert_match( $page_list->{stdout}, qr/"sample"/, 'dashboard page list includes saved sample page' );
-    _assert_match( $page_list->{stdout}, qr/"project-home"/, 'dashboard page list includes fake project bookmark page' );
+    my $page_list = _run_shell( 'd2 page list', $project_cd . 'd2 page list' );
+    _assert_match( $page_list->{stdout}, qr/"sample"/, 'd2 page list includes saved sample page' );
+    _assert_match( $page_list->{stdout}, qr/"project-home"/, 'd2 page list includes fake project bookmark page' );
 
-    my $page_show = _run_shell( 'dashboard page show', $project_cd . 'dashboard page show sample' );
-    _assert_match( $page_show->{stdout}, qr/^BOOKMARK:\s+sample/m, 'dashboard page show returns canonical bookmark source' );
+    my $page_show = _run_shell( 'd2 page show', $project_cd . 'd2 page show sample' );
+    _assert_match( $page_show->{stdout}, qr/^BOOKMARK:\s+sample/m, 'd2 page show returns canonical bookmark source' );
 
-    my $page_encode = _run_shell( 'dashboard page encode', $project_cd . 'dashboard page encode sample' );
+    my $page_encode = _run_shell( 'd2 page encode', $project_cd . 'd2 page encode sample' );
     my $token = _trim( $page_encode->{stdout} );
-    _assert( $token ne '', 'dashboard page encode returns a token' );
+    _assert( $token ne '', 'd2 page encode returns a token' );
 
-    my $page_decode = _run_shell( 'dashboard page decode', $project_cd . 'dashboard page decode ' . _shell_quote($token) );
-    _assert_match( $page_decode->{stdout}, qr/^BOOKMARK:\s+sample/m, 'dashboard page decode restores bookmark source' );
+    my $page_decode = _run_shell( 'd2 page decode', $project_cd . 'd2 page decode ' . _shell_quote($token) );
+    _assert_match( $page_decode->{stdout}, qr/^BOOKMARK:\s+sample/m, 'd2 page decode restores bookmark source' );
 
-    my $page_urls = _run_shell( 'dashboard page urls', $project_cd . 'dashboard page urls sample' );
-    _assert_match( $page_urls->{stdout}, qr/"render"/, 'dashboard page urls returns edit and render links' );
+    my $page_urls = _run_shell( 'd2 page urls', $project_cd . 'd2 page urls sample' );
+    _assert_match( $page_urls->{stdout}, qr/"render"/, 'd2 page urls returns edit and render links' );
 
-    my $page_render = _run_shell( 'dashboard page render', $project_cd . 'dashboard page render sample' );
-    _assert_match( $page_render->{stdout}, qr/Replace this body with your own page content/, 'dashboard page render produces html output' );
+    my $page_render = _run_shell( 'd2 page render', $project_cd . 'd2 page render sample' );
+    _assert_match( $page_render->{stdout}, qr/Replace this body with your own page content/, 'd2 page render produces html output' );
 
-    my $page_source = _run_shell( 'dashboard page source', $project_cd . 'dashboard page source sample' );
-    _assert_match( $page_source->{stdout}, qr/^BOOKMARK:\s+sample/m, 'dashboard page source returns instruction text' );
+    my $page_source = _run_shell( 'd2 page source', $project_cd . 'd2 page source sample' );
+    _assert_match( $page_source->{stdout}, qr/^BOOKMARK:\s+sample/m, 'd2 page source returns instruction text' );
 
-    my $action = _run_shell( 'dashboard action run system-status paths', $project_cd . 'dashboard action run system-status paths' );
-    _assert_match( $action->{stdout}, qr/runtime/, 'dashboard action run executes builtin action' );
+    my $action = _run_shell( 'd2 action run system-status paths', $project_cd . 'd2 action run system-status paths' );
+    _assert_match( $action->{stdout}, qr/runtime/, 'd2 action run executes builtin action' );
 
-    my $collector_write = _run_shell( 'dashboard collector write-result', $project_cd . q{printf 'manual-output' | dashboard collector write-result manual.collector 0} );
-    _assert( $collector_write->{exit_code} == 0, 'dashboard collector write-result accepts manual output' );
+    my $collector_write = _run_shell( 'd2 collector write-result', $project_cd . q{printf 'manual-output' | d2 collector write-result manual.collector 0} );
+    _assert( $collector_write->{exit_code} == 0, 'd2 collector write-result accepts manual output' );
 
-    my $fake_collector_run = _run_shell( 'dashboard collector run fake.config.collector', $project_cd . 'dashboard collector run fake.config.collector' );
-    _assert_match( $fake_collector_run->{stdout}, qr/"exit_code"\s*:\s*0/, 'dashboard collector run succeeds for fake project config collector' );
+    my $fake_collector_run = _run_shell( 'd2 collector run fake.config.collector', $project_cd . 'd2 collector run fake.config.collector' );
+    _assert_match( $fake_collector_run->{stdout}, qr/"exit_code"\s*:\s*0/, 'd2 collector run succeeds for fake project config collector' );
 
-    my $collector_list = _run_shell( 'dashboard collector list', $project_cd . 'dashboard collector list' );
-    _assert_match( $collector_list->{stdout}, qr/manual\.collector/, 'dashboard collector list shows stored collectors' );
-    _assert_match( $collector_list->{stdout}, qr/fake\.config\.collector/, 'dashboard collector list shows fake project config collector' );
+    my $collector_list = _run_shell( 'd2 collector list', $project_cd . 'd2 collector list' );
+    _assert_match( $collector_list->{stdout}, qr/manual\.collector/, 'd2 collector list shows stored collectors' );
+    _assert_match( $collector_list->{stdout}, qr/fake\.config\.collector/, 'd2 collector list shows fake project config collector' );
 
-    my $collector_job = _run_shell( 'dashboard collector job', $project_cd . 'dashboard collector job fake.config.collector' );
-    _assert_match( $collector_job->{stdout}, qr/"command"/, 'dashboard collector job returns job metadata' );
+    my $collector_job = _run_shell( 'd2 collector job', $project_cd . 'd2 collector job fake.config.collector' );
+    _assert_match( $collector_job->{stdout}, qr/"command"/, 'd2 collector job returns job metadata' );
 
-    my $collector_status = _run_shell( 'dashboard collector status', $project_cd . 'dashboard collector status fake.config.collector' );
-    _assert_match( $collector_status->{stdout}, qr/"enabled"/, 'dashboard collector status returns status data' );
+    my $collector_status = _run_shell( 'd2 collector status', $project_cd . 'd2 collector status fake.config.collector' );
+    _assert_match( $collector_status->{stdout}, qr/"enabled"/, 'd2 collector status returns status data' );
 
-    my $collector_output = _run_shell( 'dashboard collector output', $project_cd . 'dashboard collector output fake.config.collector' );
-    _assert_match( $collector_output->{stdout}, qr/fake config collector output/, 'dashboard collector output returns prepared output' );
+    my $collector_output = _run_shell( 'd2 collector output', $project_cd . 'd2 collector output fake.config.collector' );
+    _assert_match( $collector_output->{stdout}, qr/fake config collector output/, 'd2 collector output returns prepared output' );
 
-    my $collector_inspect = _run_shell( 'dashboard collector inspect', $project_cd . 'dashboard collector inspect fake.config.collector' );
-    _assert_match( $collector_inspect->{stdout}, qr/"job"|"status"|"output"/, 'dashboard collector inspect returns combined view' );
+    my $collector_inspect = _run_shell( 'd2 collector inspect', $project_cd . 'd2 collector inspect fake.config.collector' );
+    _assert_match( $collector_inspect->{stdout}, qr/"job"|"status"|"output"/, 'd2 collector inspect returns combined view' );
 
-    my $collector_start = _run_shell( 'dashboard collector start', $project_cd . 'dashboard collector start fake.config.collector' );
-    _assert_match( $collector_start->{stdout}, qr/\d+/, 'dashboard collector start returns a pid' );
+    my $collector_start = _run_shell( 'd2 collector start', $project_cd . 'd2 collector start fake.config.collector' );
+    _assert_match( $collector_start->{stdout}, qr/\d+/, 'd2 collector start returns a pid' );
 
     sleep 2;
 
-    my $collector_restart = _run_shell( 'dashboard collector restart', $project_cd . 'dashboard collector restart fake.config.collector' );
-    _assert_match( $collector_restart->{stdout}, qr/\d+/, 'dashboard collector restart returns a pid' );
+    my $collector_restart = _run_shell( 'd2 collector restart', $project_cd . 'd2 collector restart fake.config.collector' );
+    _assert_match( $collector_restart->{stdout}, qr/\d+/, 'd2 collector restart returns a pid' );
 
-    my $collector_stop = _run_shell( 'dashboard collector stop', $project_cd . 'dashboard collector stop fake.config.collector' );
-    _assert_match( $collector_stop->{stdout}, qr/\d+/, 'dashboard collector stop returns the stopped pid' );
+    my $collector_stop = _run_shell( 'd2 collector stop', $project_cd . 'd2 collector stop fake.config.collector' );
+    _assert_match( $collector_stop->{stdout}, qr/\d+/, 'd2 collector stop returns the stopped pid' );
 
-    my $collector_log = _run_shell( 'dashboard collector log', $project_cd . 'dashboard collector log' );
-    _assert( defined $collector_log->{stdout}, 'dashboard collector log returns log text' );
+    my $collector_log = _run_shell( 'd2 collector log', $project_cd . 'd2 collector log' );
+    _assert( defined $collector_log->{stdout}, 'd2 collector log returns log text' );
 
-    my $auth_add = _run_shell( 'dashboard auth add-user', $project_cd . q{dashboard auth add-user explicit_helper explicit-pass-123} );
-    _assert_match( $auth_add->{stdout}, qr/"username"\s*:\s*"explicit_helper"/, 'dashboard auth add-user creates helper user' );
+    my $auth_add = _run_shell( 'd2 auth add-user', $project_cd . q{d2 auth add-user explicit_helper explicit-pass-123} );
+    _assert_match( $auth_add->{stdout}, qr/"username"\s*:\s*"explicit_helper"/, 'd2 auth add-user creates helper user' );
 
-    my $auth_list = _run_shell( 'dashboard auth list-users', $project_cd . 'dashboard auth list-users' );
-    _assert_match( $auth_list->{stdout}, qr/"explicit_helper"/, 'dashboard auth list-users includes explicit helper' );
+    my $auth_list = _run_shell( 'd2 auth list-users', $project_cd . 'd2 auth list-users' );
+    _assert_match( $auth_list->{stdout}, qr/"explicit_helper"/, 'd2 auth list-users includes explicit helper' );
 
-    my $auth_remove = _run_shell( 'dashboard auth remove-user', $project_cd . 'dashboard auth remove-user explicit_helper' );
-    _assert_match( $auth_remove->{stdout}, qr/"removed"\s*:\s*"explicit_helper"/, 'dashboard auth remove-user removes explicit helper' );
+    my $auth_remove = _run_shell( 'd2 auth remove-user', $project_cd . 'd2 auth remove-user explicit_helper' );
+    _assert_match( $auth_remove->{stdout}, qr/"removed"\s*:\s*"explicit_helper"/, 'd2 auth remove-user removes explicit helper' );
 
     my $docker_dry = _run_shell(
-        'dashboard docker compose --dry-run',
-        'dashboard docker compose --project ' . _shell_quote($compose) . ' --dry-run config'
+        'd2 docker compose --dry-run',
+        'd2 docker compose --project ' . _shell_quote($compose) . ' --dry-run config'
     );
-    _assert_match( $docker_dry->{stdout}, qr/"command"\s*:/, 'dashboard docker compose dry-run returns resolved command' );
-    _assert_match( $docker_dry->{stdout}, qr/compose\.yaml/, 'dashboard docker compose dry-run includes compose file' );
+    _assert_match( $docker_dry->{stdout}, qr/"command"\s*:/, 'd2 docker compose dry-run returns resolved command' );
+    _assert_match( $docker_dry->{stdout}, qr/compose\.yaml/, 'd2 docker compose dry-run includes compose file' );
 
-    my $serve = _run_shell( 'dashboard serve', $project_cd . 'dashboard serve' );
-    _assert_match( $serve->{stdout}, qr/"pid"\s*:/, 'dashboard serve starts background web service' );
+    my $serve = _run_shell( 'd2 serve', $project_cd . 'd2 serve' );
+    _assert_match( $serve->{stdout}, qr/"pid"\s*:/, 'd2 serve starts background web service' );
     _wait_for_http( 'http://127.0.0.1:7890/', 200 );
 
     my $blocked_transient = _run_shell(
@@ -537,7 +537,7 @@ JSON
     _assert( $helper_disabled_dom !~ /Helper access is disabled until a helper user is added\./, 'browser outsider bootstrap response does not leak helper bootstrap guidance before any helper user exists' );
     _assert( $helper_disabled_dom !~ /action="\/login"/, 'browser outsider bootstrap response omits the login form before any helper user exists' );
 
-    _run_shell( 'dashboard auth add helper-login user', $project_cd . q{dashboard auth add-user helper_login helper-login-pass-123} );
+    _run_shell( 'd2 auth add helper-login user', $project_cd . q{d2 auth add-user helper_login helper-login-pass-123} );
     my $helper_root = _run_shell(
         'curl helper root after helper user exists',
         'curl -sS -o /tmp/helper-root-after-enable.html -w \'%{http_code}\' http://' . $container_ip . ':7890/'
@@ -570,16 +570,16 @@ JSON
     _assert( $helper_logout->{exit_code} == 0, 'helper logout request completed' );
     _assert_match( _read_text('/tmp/helper-logout.headers'), qr/^HTTP\/1\.1 302/m, 'helper logout redirects to login' );
 
-    my $post_logout_users = _run_shell( 'dashboard auth list-users after logout', $project_cd . 'dashboard auth list-users' );
+    my $post_logout_users = _run_shell( 'd2 auth list-users after logout', $project_cd . 'd2 auth list-users' );
     _assert( $post_logout_users->{stdout} !~ /helper_login/, 'helper logout removes helper account from auth store' );
 
-    my $restart = _run_shell( 'dashboard restart', $project_cd . 'dashboard restart -o json' );
-    _assert_match( $restart->{stdout}, qr/"web_pid"\s*:/, 'dashboard restart returns structured lifecycle data' );
+    my $restart = _run_shell( 'd2 restart', $project_cd . 'd2 restart -o json' );
+    _assert_match( $restart->{stdout}, qr/"web_pid"\s*:/, 'd2 restart returns structured lifecycle data' );
     _wait_for_http( 'http://127.0.0.1:7890/', 200 );
 
     sleep 2;
 
-    my $restart_collectors = _run_shell( 'dashboard collector list after restart', $project_cd . 'dashboard collector list' );
+    my $restart_collectors = _run_shell( 'd2 collector list after restart', $project_cd . 'd2 collector list' );
     my $restart_collectors_data = decode_json( $restart_collectors->{stdout} );
     my %restart_collectors_by_name = map { ( $_->{name} || '' ) => $_ } @{$restart_collectors_data};
     _assert( exists $restart_collectors_by_name{'broken.collector'}, 'restart keeps the broken config collector visible in collector state' );
@@ -593,11 +593,11 @@ JSON
     _assert( $broken_exit_code != 0, 'broken config collector keeps a non-zero exit code after restart' );
     _assert( $healthy_exit_code == 0, 'healthy config collector stays green after restart' );
 
-    my $restart_indicators = _run_shell( 'dashboard indicator list after restart', $project_cd . 'dashboard indicator list' );
+    my $restart_indicators = _run_shell( 'd2 indicator list after restart', $project_cd . 'd2 indicator list' );
     _assert_match( $restart_indicators->{stdout}, qr/"name"\s*:\s*"broken\.indicator"(?s:.*?)"status"\s*:\s*"error"/, 'broken config collector indicator stays red after restart' );
     _assert_match( $restart_indicators->{stdout}, qr/"name"\s*:\s*"healthy\.indicator"(?s:.*?)"status"\s*:\s*"ok"/, 'healthy config collector indicator stays green after restart' );
 
-    my $restart_ps1 = _run_shell( 'dashboard ps1 after restart', 'cd ' . _shell_quote($project) . ' && dashboard ps1 --jobs 0 --cwd ' . _shell_quote($project) );
+    my $restart_ps1 = _run_shell( 'd2 ps1 after restart', 'cd ' . _shell_quote($project) . ' && d2 ps1 --jobs 0 --cwd ' . _shell_quote($project) );
     _assert_match( $restart_ps1->{stdout}, qr/🚨B/, 'prompt keeps the broken config collector visible after restart' );
     _assert_match( $restart_ps1->{stdout}, qr/✅H/, 'prompt keeps the healthy config collector visible after restart' );
 
@@ -605,14 +605,14 @@ JSON
     _assert_match( $restart_status->{stdout}, qr/"prog"\s*:\s*"broken\.indicator"/, 'system status payload includes the broken config collector indicator' );
     _assert_match( $restart_status->{stdout}, qr/"prog"\s*:\s*"healthy\.indicator"/, 'system status payload includes the healthy config collector indicator' );
 
-    my $stop = _run_shell( 'dashboard stop', $project_cd . 'dashboard stop -o json' );
-    _assert_match( $stop->{stdout}, qr/"web_pid"\s*:/, 'dashboard stop returns structured lifecycle data' );
+    my $stop = _run_shell( 'd2 stop', $project_cd . 'd2 stop -o json' );
+    _assert_match( $stop->{stdout}, qr/"web_pid"\s*:/, 'd2 stop returns structured lifecycle data' );
     my $stopped = _run_shell(
         'curl after stop',
         q{curl -sS -o /tmp/after-stop.body -w '%{http_code}' http://127.0.0.1:7890/},
         allow_fail => 1,
     );
-    _assert( $stopped->{exit_code} != 0, 'web service is no longer reachable after dashboard stop' );
+    _assert( $stopped->{exit_code} != 0, 'web service is no longer reachable after d2 stop' );
 
     print "Blank-environment integration run passed\n";
     return 0;
@@ -993,7 +993,7 @@ This script expects a host-built C<Developer-Dashboard> tarball to be mounted
 into the container. It extracts that tarball to a temporary source tree,
 stages a versioned local tarball copy for C<cpanm> so the install and its test
 phase stay on the host-built artifact rather than drifting to a CPAN lookup, and
-then exercises the installed C<dashboard> CLI and web runtime against a fake
+then exercises the installed C<d2> CLI and web runtime against a fake
 project after the source-tree test and coverage gates have already run. The
 expected version comes from the extracted distribution C<META.yml> when
 available, with a literal main-module version retained as a fallback for older

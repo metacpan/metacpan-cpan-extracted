@@ -1,0 +1,13 @@
+^bioconda-recipes/
+^blib/
+^Bioconda-Packages-
+\bMakefile$
+\bMYMETA\.(json|yml)$
+\bpm_to_blib$
+~$
+\.bak$
+\.tmp
+^\.git/
+^\.gitignore$
+\.DS_Store$
+^pod2htm

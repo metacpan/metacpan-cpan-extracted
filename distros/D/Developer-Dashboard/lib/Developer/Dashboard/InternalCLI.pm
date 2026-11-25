@@ -3,7 +3,7 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
@@ -178,13 +178,17 @@ sub ensure_helper {
 
     my $target = helper_path( paths => $paths, name => $name );
     require Developer::Dashboard::Platform;
+    # On Windows an already-managed helper is left as it is on this hot path,
+    # but the retired and legacy flat helper cleanup below must still run, as
+    # it does on every other platform.
+    my $keep_existing = 0;
     if ( Developer::Dashboard::Platform::is_windows() && _helper_uses_dashboard_core($name) && -f $target ) {
         open my $existing_fh, '<:raw', $target or die "Unable to read $target: $!";
         my $existing = do { local $/; <$existing_fh> };
         close $existing_fh or die "Unable to close $target: $!";
-        return \@written if _is_dashboard_managed_helper( $existing, $name );
+        $keep_existing = 1 if _is_dashboard_managed_helper( $existing, $name );
     }
-    if ( !_managed_helper_file_current( $target, $name ) ) {
+    if ( !$keep_existing && !_managed_helper_file_current( $target, $name ) ) {
         if ( _stage_managed_helper( paths => $paths, name => $name, target => $target ) ) {
             $paths->secure_file_permissions( $target, executable => 1 );
             push @written, $target;
@@ -232,18 +236,41 @@ sub _stage_managed_helper {
 }
 
 # _should_defer_windows_helper_refresh($name, $target)
-# Skips replacing Windows helper files that can still be locked by the active
-# helper chain during command startup. The shared staged _dashboard-core helper
-# is always deferred on Windows, and the currently running wrapper helper is
-# also preserved until the next refresh pass.
+# Skips replacing a Windows helper file that is actually locked by a live
+# process. The shared staged _dashboard-core helper is probed with a
+# rename aside and back: a rename that fails means the file cannot be
+# replaced right now, so the refresh is deferred; a rename that succeeds
+# proves the file is not locked and the restage proceeds. The currently
+# running wrapper helper is also preserved until the next refresh pass.
 # Input: helper name string and final helper target path.
 # Output: boolean true when the Windows helper refresh should be deferred.
 sub _should_defer_windows_helper_refresh {
     my ( $name, $target ) = @_;
     require Developer::Dashboard::Platform;
     return 0 if !Developer::Dashboard::Platform::is_windows();
-    return 1 if defined $name && $name eq '_dashboard-core';
+    return _helper_file_is_locked($target) if defined $name && $name eq '_dashboard-core';
     return _running_helper_matches_target($target);
+}
+
+# _helper_file_is_locked($target)
+# Probes whether a helper file is currently locked by a live process by
+# attempting the exact operation a restage needs: renaming it aside and
+# back. On Windows a file held by a running process cannot be renamed, so
+# a failed rename means the file must not be replaced; a successful rename
+# aside and back proves it can. The probe restores the file immediately,
+# and dies loudly if the restore itself fails rather than leaving the
+# helper missing.
+# Input: helper target path.
+# Output: boolean true when the file is locked and must not be replaced.
+sub _helper_file_is_locked {
+    my ($target) = @_;
+    return 0 if !defined $target || $target eq '' || !-e $target;
+    my $probe = $target . '.lockprobe.' . $$ . '.' . int( rand(1_000_000) );
+    return 1 if !_rename_path( $target, $probe );
+    if ( !_rename_path( $probe, $target ) ) {
+        die "Unable to restore $target after Windows helper lock probe: $!";
+    }
+    return 0;
 }
 
 # _running_helper_matches_target($target)
@@ -300,7 +327,10 @@ sub _replace_helper_file {
 
     my $error = $!;
     require Developer::Dashboard::Platform;
-    if ( Developer::Dashboard::Platform::is_windows() && -e $target ) {
+    if ( Developer::Dashboard::Platform::is_windows() && -e $target && !-d $target ) {
+        # A directory target cannot be unlinked for the retry: report the
+        # rename failure (and clean up the temp file below) instead of dying
+        # on the unlink with a misleading "Unable to remove ... Is a directory".
         _unlink_path($target)
           or die "Unable to remove $target before Windows helper replace retry: $!";
         sleep 0.05;
@@ -470,10 +500,15 @@ sub _managed_helper_version_marker {
 # built-in command name to the shared _dashboard-core runtime.
 # Input: helper name string.
 # Output: boolean true when the helper delegates into _dashboard-core.
+# The complete helper belongs here: it is only a thin exec wrapper around
+# the core, so on Windows bin/d2 must bypass it (a staged wrapper's exec
+# hand-off silently ends the process there) and the core must be staged for
+# it (on a fresh home no earlier command has staged the core yet, so the
+# wrapper's exec failed to open it).
 sub _helper_uses_dashboard_core {
     my ($name) = @_;
     return 0 if !defined $name || $name eq '';
-    return $name =~ /\A(?:encode|decode|indicator|collector|config|auth|api|ask|init|cpan|page|action|docker|serve|stop|restart|log|shell|doctor|housekeeper|skills|which)\z/ ? 1 : 0;
+    return $name =~ /\A(?:encode|decode|indicator|collector|complete|config|auth|api|ask|init|cpan|page|action|docker|serve|stop|restart|log|shell|doctor|housekeeper|skills|which)\z/ ? 1 : 0;
 }
 
 # _is_dashboard_managed_helper($content, $name)
@@ -484,10 +519,13 @@ sub _helper_uses_dashboard_core {
 sub _is_dashboard_managed_helper {
     my ( $content, $name ) = @_;
     return 0 if !defined $content;
-    return 1 if $content =~ /^\Q@{[ _managed_helper_marker($name) ]}\E$/m;
+    # The ownership marker is matched against content read :raw, and a helper
+    # file written in text mode carries "\r\n" line endings on Windows; the
+    # "\r" before the newline would break a bare "$" anchor, so allow it.
+    return 1 if $content =~ /^\Q@{[ _managed_helper_marker($name) ]}\E\r?$/m;
     if ( $name eq '_dashboard-core' ) {
         return 1
-          if $content =~ /Missing built-in dashboard command/
+          if $content =~ /Missing built-in d2 command/
           && $content =~ /Developer::Dashboard::CLI::SeededPages/;
     }
     return 1
@@ -524,10 +562,15 @@ sub _helper_install_root {
 sub _is_managed_helper_target {
     my ( $paths, $target ) = @_;
     return 0 if !$paths || !defined $target || $target eq '';
-    my $root = File::Spec->rel2abs( _helper_install_root($paths) );
-    my $path = File::Spec->rel2abs($target);
+    # Canonicalise both spellings: rel2abs can return forward slashes on
+    # Windows while the managed root is a File::Spec backslash spelling, so
+    # a forward-slash prefix check would never match a Windows path. The
+    # match requires a separator after the root, so a sibling such as
+    # "dd-evil" is never mistaken for a child of "dd".
+    my $root = File::Spec->canonpath( File::Spec->rel2abs( _helper_install_root($paths) ) );
+    my $path = File::Spec->canonpath( File::Spec->rel2abs($target) );
     return 1 if $path eq $root;
-    return index( $path, $root . '/' ) == 0;
+    return $path =~ /^\Q$root\E[\/\\]/ ? 1 : 0;
 }
 
 # _managed_helper_file_current($path, $name)
@@ -544,7 +587,9 @@ sub _managed_helper_file_current {
     my $content = do { local $/; <$fh> };
     close $fh or die "Unable to close $path: $!";
     return 0 if !_is_dashboard_managed_helper( $content, $name );
-    return $content =~ /^\Q@{[ _managed_helper_version_marker() ]}\E$/m ? 1 : 0;
+    # As in _is_dashboard_managed_helper: content read :raw from a
+    # text-mode-written helper carries "\r\n" on Windows, so allow the "\r".
+    return $content =~ /^\Q@{[ _managed_helper_version_marker() ]}\E\r?$/m ? 1 : 0;
 }
 
 # _helper_asset_path($name)
@@ -637,7 +682,10 @@ sub _module_source_looks_like_blib_build {
 
 # _abs_existing_path($path)
 # Canonicalizes one existing filesystem path when possible without warning on
-# missing candidates.
+# missing candidates. The resolved path goes through File::Spec->canonpath
+# so it uses the platform's separator spelling: abs_path returns forward
+# slashes on Windows while the rest of the codebase spells paths with
+# File::Spec, and the two spellings must not meet unnormalized.
 # Input: absolute or relative path string.
 # Output: canonical absolute path string when the path exists, otherwise the
 # original path string.
@@ -646,7 +694,7 @@ sub _abs_existing_path {
     return '' if !defined $path || $path eq '';
     return $path if !-e $path;
     my $resolved = abs_path($path);
-    return $resolved if $resolved;
+    return File::Spec->canonpath($resolved) if $resolved;
     return $path;
 }
 
@@ -795,7 +843,7 @@ Build and seed the built-in private helper command files.
 
 =head1 PURPOSE
 
-This module owns the dashboard-managed private helper assets. It decides which built-in command names exist, stages the corresponding helper files under F<~/.developer-dashboard/cli/dd/>, and resolves the helper paths that the public C<dashboard> entrypoint should C<exec> into.
+This module owns the dashboard-managed private helper assets. It decides which built-in command names exist, stages the corresponding helper files under F<~/.developer-dashboard/cli/dd/>, and resolves the helper paths that the public C<d2> entrypoint should C<exec> into.
 
 =head1 WHY IT EXISTS
 
@@ -811,7 +859,7 @@ Call C<ensure_helpers> with the active paths object to stage or refresh managed 
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard>, by init/update flows that stage built-ins, by shell bootstrap generation, and by tests that verify helper extraction and private-helper packaging.
+It is used by C<bin/d2>, by init/update flows that stage built-ins, by shell bootstrap generation, and by tests that verify helper extraction and private-helper packaging.
 
 =head1 EXAMPLES
 

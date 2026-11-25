@@ -1,0 +1,25 @@
+Revision history for Bioconda-Packages
+
+2026.11.4  2026-11-24
+      - Database update: rebuilt from bioconda-recipes 732e36fd.
+
+0.1.0 2026-11-25
+      - Upgraded pipelines
+      - Semantic version
+
+0.01  2026-11-24
+      - Initial release.
+      - Offline, read-only query API (Bioconda::Packages) over a bundled,
+        gzipped JSON snapshot of Bioconda package metadata.
+      - Jinja-aware, core-only meta.yaml parser (Bioconda::Packages::RecipeParser).
+      - Maintainer tooling to rebuild the database from a bioconda-recipes clone,
+        with optional anaconda.org enrichment (Bioconda::Packages::Updater,
+        maintainer/update-db.pl).
+      - Removed packages are retained and flagged (is_removed / removed_at).
+      - Command-line client: bin/bioconda-packages, incl. a 'version' command
+        (also --version/-V) reporting the tool and database versions.
+      - Progressive database version string (CalVer YEAR.MONTH.N, SemVer-sortable)
+        stamped into the db meta and exposed via db_version()/stats(). The
+        version bumps - and the db file is rewritten - only when the semantic
+        content changes (tracked by a content hash that ignores timestamps and
+        download counts); update-db.pl --force overrides this.

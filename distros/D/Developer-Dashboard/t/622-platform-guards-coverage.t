@@ -27,6 +27,11 @@ is( Developer::Dashboard::Platform::normalize_shell_name('/usr/local/bin/ZSH'), 
 {
     my $empty = tempdir( CLEANUP => 1 );
     local $ENV{PATH} = $empty;
+    # _git_for_windows_roots also probes %ProgramFiles%\Git, which is
+    # outside PATH, so neutralise that too or the Git fallback resolves
+    # bash/sh even with an empty PATH.
+    local $ENV{ProgramFiles}         = '';
+    local $ENV{'ProgramFiles(x86)'}  = '';
     is( Developer::Dashboard::Platform::_posix_shell_binary('bash'), 'bash', 'the preferred name is returned when neither it nor sh is on PATH' );
     is( Developer::Dashboard::Platform::_posix_shell_binary(''), '', 'an empty preferred name is returned unchanged when nothing resolves' );
 }

@@ -2,10 +2,12 @@ package Developer::Dashboard::IndicatorStore::Watch;
 
 use strict;
 use warnings;
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Errno qw(EILSEQ);
 use IO::Select;
+use POSIX ();
+use Socket qw(SO_TYPE SOL_SOCKET);
 
 use constant EVENT_MASK => 0x00000fce;
 
@@ -123,8 +125,7 @@ sub unchanged {
         return $unchanged ? 1 : 0;
     }
     return 0 if !$self->{select};
-    my @readable = $self->{select}->can_read(0);
-    return 1 if !@readable;
+    return 1 if !_handle_readable( $self->{select}, $self->{handle} );
 
     my $events = '';
     my $read = sysread( $self->{handle}, $events, 65_536 );
@@ -136,6 +137,98 @@ sub unchanged {
     }
     $self->{last_error} = undef;
     return 0;
+}
+
+# _handle_readable($select, $handle)
+# Reports whether a watched handle has input waiting, without blocking.
+# On Windows, select() only works on real sockets, so IO::Select->can_read
+# never fires for a pipe handle even with data queued (the t/88 client
+# hang, same class); pipe readiness comes from PeekNamedPipe on the
+# handle's real Win32 HANDLE instead. A select-like object that is not
+# a genuine IO::Select keeps its own can_read: its readiness does not
+# go through the operating-system select, so there is nothing to work
+# around, and test doubles that force readability keep working. When
+# the Windows primitive is unavailable the caller falls back to
+# can_read, the pre-existing behaviour, never a new failure.
+# Input: IO::Select (or select-like) object and the watched handle.
+# Output: true when input is waiting, false when the handle is quiet.
+sub _handle_readable {
+    my ( $select, $handle ) = @_;
+    return 0 if !defined $select || !defined $handle;
+    if ( $^O eq 'MSWin32' && ref($select) eq 'IO::Select' ) {
+        my $readable = _windows_handle_readable( $select, $handle );
+        return $readable if defined $readable;
+    }
+    my @readable = $select->can_read(0);
+    return @readable ? 1 : 0;
+}
+
+# _windows_handle_readable($select, $handle)
+# Windows readiness for one watched handle. A getsockopt probe (Server.pm,
+# t/17 devnull case) tells a socket from a pipe: a socket answers SO_TYPE
+# and keeps the select path, a pipe does not and is polled with
+# PeekNamedPipe. A PeekNamedPipe failure means the pipe is broken, so the
+# handle counts as readable and the caller's read reports the real
+# end-of-file or error diagnostic instead of silently missing the event.
+# Input: IO::Select object and the watched handle.
+# Output: 1 when input is waiting, 0 when quiet, undef when the Windows
+#         primitive is unavailable.
+sub _windows_handle_readable {
+    my ( $select, $handle ) = @_;
+    if ( defined getsockopt( $handle, SOL_SOCKET, SO_TYPE ) ) {
+        my @readable = $select->can_read(0);
+        return @readable ? 1 : 0;
+    }
+    my $peek = _windows_peek_named_pipe();
+    return undef if !defined $peek;
+    my $os_handle = eval { Win32API::File::GetOsFHandle($handle) };
+    return undef if $@ || !defined $os_handle;
+    my $avail = _windows_pipe_available( $peek, $os_handle );
+    return 1 if !defined $avail;
+    return $avail > 0 ? 1 : 0;
+}
+
+# Cached PeekNamedPipe import, attempted once; a failed import is never
+# retried, so a missing Win32 primitive degrades to can_read exactly once.
+my $_WINDOWS_PEEK;
+my $_WINDOWS_PEEK_FAILED;
+
+# _windows_peek_named_pipe()
+# Imports PeekNamedPipe from kernel32 once and caches the function object.
+# Input: none.
+# Output: imported function object, or undef when the import fails.
+sub _windows_peek_named_pipe {
+    return $_WINDOWS_PEEK if defined $_WINDOWS_PEEK;
+    return undef if $_WINDOWS_PEEK_FAILED;
+    my $peek = eval {
+        require Win32API::File;
+        require Win32::API;
+        my $imported = Win32::API->new( 'kernel32', 'PeekNamedPipe', 'QPIPPP', 'I' );
+        die "Could not import PeekNamedPipe from kernel32\n" if !defined $imported;
+        $imported;
+    };
+    if ( !$peek ) {
+        $_WINDOWS_PEEK_FAILED = 1;
+        return undef;
+    }
+    $_WINDOWS_PEEK = $peek;
+    return $peek;
+}
+
+# _windows_pipe_available($peek, $handle)
+# Reports how many bytes are waiting on one Windows pipe, without blocking.
+# Input: imported PeekNamedPipe function object and one real Win32 HANDLE.
+# Output: byte count, or undef when the pipe is broken or the call fails.
+sub _windows_pipe_available {
+    my ( $peek, $handle ) = @_;
+    return undef if !defined $handle;
+    $^E = 0;
+    my $bytes_read  = pack 'L', 0;
+    my $total_avail = pack 'L', 0;
+    my $bytes_left  = pack 'L', 0;
+    my $ok = $peek->Call( $handle, '', 0, $bytes_read, $total_avail, $bytes_left );
+    return undef if !$ok;
+    return unpack 'L', $total_avail;
 }
 
 # last_error()
@@ -212,8 +305,8 @@ sub _disable {
 }
 
 # _native_backend()
-# Selects the operating-system watcher adapter, loading optional bindings only
-# for the current platform. Other module-load failures remain visible.
+# Selects the operating-system watcher adapter, requiring the built XS
+# extension only on supported native platforms.
 # Input: none.
 # Output: native backend callbacks, or undef when unsupported or optional
 #         platform modules are unavailable.
@@ -225,25 +318,29 @@ sub _native_backend {
 }
 
 # _linux_backend()
-# Builds a typed libc inotify backend for Linux kernels.
+# Builds an XS inotify backend for Linux kernels.
 # Input: none.
-# Output: descriptor backend callbacks, or undef when optional FFI is absent.
+# Output: descriptor backend callbacks, or undef when XS is unavailable.
 sub _linux_backend {
-    my $loaded = eval { require FFI::Platypus; 1 };
-    if ( !$loaded ) {
-        my $error = $@;
-        return if $error =~ /Can't locate FFI\/Platypus\.pm in \@INC/;
-        die $error;
-    }
-    my $ffi = FFI::Platypus->new( api => 2, lib => undef );
-    my $initialize = $ffi->function( inotify_init1 => ['sint32'] => 'sint32' );
-    my $add_watch = $ffi->function(
-        inotify_add_watch => [ 'sint32', 'string', 'uint32' ] => 'sint32'
-    );
+    return if !_native_xs_available();
     return {
         initialize => sub {
-            my $fd = $initialize->call( 0x00000800 | 0x00080000 );
+            my $fd = _xs_inotify_init();
             return if !defined $fd || $fd < 0;
+
+            # Validate the descriptor before wrapping it: perlio grows its
+            # fd refcount table to cover the descriptor number before the
+            # open can fail with EBADF, so wrapping a bogus fd such as
+            # 999,999,999 asks for a ~4 GB table and dies out of memory
+            # on a small box (t/669 on ARM64). dup() is a raw syscall
+            # that never touches perlio, so it tests validity safely;
+            # the duplicate is closed at once. A failed dup dies with
+            # the same diagnostic the wrap itself would have produced.
+            my $probe = POSIX::dup($fd);
+            if ( !defined $probe ) {
+                die "Unable to wrap inotify descriptor $fd: $!";
+            }
+            POSIX::close($probe);
             open my $handle, '<&=', $fd
               or die "Unable to wrap inotify descriptor $fd: $!";
             return $handle;
@@ -255,7 +352,7 @@ sub _linux_backend {
                 $! = EILSEQ;
                 return -1;
             }
-            return $add_watch->call( fileno($handle), $native_path, $mask );
+            return _xs_inotify_add_watch( fileno($handle), $native_path, $mask );
         },
         close => sub {
             my ($handle) = @_;
@@ -309,7 +406,7 @@ sub _macos_backend {
             my ($watch) = @_;
             return ( undef, 'FSEvents watch handle is malformed' )
               if ref($watch) ne 'HASH' || !$watch->{stream} || !$watch->{select};
-            return ( 1, undef ) if !$watch->{select}->can_read(0);
+            return ( 1, undef ) if !_handle_readable( $watch->{select}, $watch->{handle} );
             my $read = eval { $watch->{stream}->read_events; 1 };
             return ( undef, "Unable to read macOS FSEvents: $@" ) if !$read;
             return ( 0, undef );
@@ -327,41 +424,30 @@ sub _macos_backend {
 }
 
 # _windows_backend()
-# Builds Unicode-aware Win32 directory-change notifications using typed FFI
-# calls. Each watched directory owns a native notification handle.
+# Builds Unicode-aware Win32 directory-change notifications using XS calls.
+# Each watched directory owns a native notification handle.
 # Input: none.
-# Output: path-configuring event backend, or undef when optional FFI is absent.
+# Output: path-configuring event backend, or undef when XS is unavailable.
 sub _windows_backend {
-    my $loaded = eval { require FFI::Platypus; 1 };
-    if ( !$loaded ) {
-        my $error = $@;
-        return if $error =~ /Can't locate FFI\/Platypus\.pm in \@INC/;
-        die $error;
-    }
-    require FFI::Platypus::Type::WideString;
-    my $ffi = FFI::Platypus->new( api => 2, lib => 'kernel32' );
-    $ffi->load_custom_type( '::WideString' => 'LPCWSTR', access => 'read' );
-    $ffi->type( 'uintptr' => 'HANDLE' );
-    my $first_change = $ffi->function(
-        FindFirstChangeNotificationW => [ 'LPCWSTR', 'uint32', 'uint32' ] => 'HANDLE'
-    );
-    my $wait = $ffi->function( WaitForSingleObject => [ 'HANDLE', 'uint32' ] => 'uint32' );
-    my $next_change = $ffi->function( FindNextChangeNotification => ['HANDLE'] => 'uint32' );
-    my $close_change = $ffi->function( FindCloseChangeNotification => ['HANDLE'] => 'uint32' );
-    my $last_error = $ffi->function( GetLastError => [] => 'uint32' );
+    return if !_native_xs_available();
     return {
         configure_paths => sub {
             my ($paths) = @_;
             return ( undef, 'No existing directories were provided to Windows notifications' ) if !@{$paths};
             my @handles;
             for my $path ( @{$paths} ) {
-                my $handle = $first_change->call( $path, 0, 0x0000001f );
-                if ( !defined $handle || _windows_invalid_handle($handle) ) {
-                    my $code = $last_error->call;
+                my $handle = _xs_win32_find_first_change($path);
+                if ( !defined $handle ) {
+                    my $code = _xs_win32_last_error();
                     my $error = "FindFirstChangeNotificationW failed for '$path' (GetLastError=$code)";
                     for my $active_handle (@handles) {
-                        if ( !$close_change->call($active_handle) ) {
-                            my $close_code = $last_error->call;
+                        if ( !_xs_win32_close_change($active_handle) ) {
+                            my $close_code = _xs_win32_last_error();
+                            # ERROR_INVALID_HANDLE (6): the handle is already
+                            # gone (its directory was deleted), so there is
+                            # nothing left to clean up; a dead handle is not
+                            # a cleanup failure.
+                            next if $close_code == 6;
                             $error .= "; cleanup failed (GetLastError=$close_code)";
                         }
                     }
@@ -369,7 +455,7 @@ sub _windows_backend {
                 }
                 push @handles, $handle;
             }
-            return ( { handles => \@handles, wait => $wait, rearm => $next_change, close => $close_change, last_error => $last_error }, undef );
+            return ( { handles => \@handles }, undef );
         },
         unchanged => sub {
             my ($watch) = @_;
@@ -377,15 +463,23 @@ sub _windows_backend {
               if ref($watch) ne 'HASH' || ref( $watch->{handles} ) ne 'ARRAY';
             my $changed = 0;
             for my $handle ( @{ $watch->{handles} } ) {
-                my $state = $watch->{wait}->call( $handle, 0 );
+                my $state = _xs_win32_wait($handle);
                 next if defined $state && $state == 258;
                 if ( !defined $state || $state == 0xffffffff ) {
-                    my $code = $watch->{last_error}->call;
+                    my $code = _xs_win32_last_error();
+                    # ERROR_INVALID_HANDLE (6): the watched directory was
+                    # deleted (tempdir cleanup) and the notification handle
+                    # died with it. That is a change, not a watcher failure:
+                    # report the snapshot invalid and let the caller's
+                    # portable validation see the directory is gone, instead
+                    # of disabling the watcher with a native error.
+                    return ( 0, undef ) if $code == 6;
                     return ( undef, "WaitForSingleObject failed (GetLastError=$code)" );
                 }
                 if ( $state == 0 ) {
-                    if ( !$watch->{rearm}->call($handle) ) {
-                        my $code = $watch->{last_error}->call;
+                    if ( !_xs_win32_next_change($handle) ) {
+                        my $code = _xs_win32_last_error();
+                        return ( 0, undef ) if $code == 6;
                         return ( undef, "FindNextChangeNotification failed (GetLastError=$code)" );
                     }
                     $changed = 1;
@@ -402,8 +496,12 @@ sub _windows_backend {
             my $closed = 1;
             my @errors;
             for my $handle ( @{ $watch->{handles} } ) {
-                if ( !$watch->{close}->call($handle) ) {
-                    my $code = $watch->{last_error}->call;
+                if ( !_xs_win32_close_change($handle) ) {
+                    my $code = _xs_win32_last_error();
+                    # ERROR_INVALID_HANDLE (6): the handle is already gone
+                    # (its directory was deleted), so there is nothing left
+                    # to close; a dead handle is not a close failure.
+                    next if $code == 6;
                     $! = $code;
                     push @errors, "FindCloseChangeNotification failed (GetLastError=$code)";
                     $closed = 0;
@@ -414,20 +512,18 @@ sub _windows_backend {
     };
 }
 
-# _windows_invalid_handle($handle)
-# Identifies the Win32 INVALID_HANDLE_VALUE sentinel returned by FFI.
-# Input: native HANDLE value represented as an integer scalar.
-# Output: boolean true for null or invalid handle sentinels.
-sub _windows_invalid_handle {
-    my ($handle) = @_;
-    return 1 if !defined $handle;
-    my $value = "$handle";
-    return 1 if $value eq '0' || $value eq '-1'
-      || $value eq '4294967295'
-      || $value eq '18446744073709551615'
-      || $value =~ /\A0x(?:f{8}|f{16})\z/i;
-    return 0;
+# _native_xs_available()
+# Loads the shared XS extension through the existing native-extension bootstrap.
+# Input: none.
+# Output: true when the extension exposes the watcher native entry points.
+sub _native_xs_available {
+    require Developer::Dashboard::HtmlEscape;
+    return 0 if !$Developer::Dashboard::HtmlEscape::XS_LOADED;
+    return __PACKAGE__->can('_xs_inotify_init')
+      && __PACKAGE__->can('_xs_win32_find_first_change') ? 1 : 0;
 }
+
+1;
 
 __END__
 
@@ -441,8 +537,8 @@ Developer::Dashboard::IndicatorStore::Watch - optional filesystem event adapter
 
 Provides a small, nonblocking event watcher used to validate stable indicator
 and configuration filesystem snapshots when a native backend is available. The
-native Linux adapter uses libc inotify through the optional FFI::Platypus
-distribution. Tests and other platform adapters can inject a path-configuring
+native Linux adapter uses inotify through the distribution's XS extension.
+Tests and other platform adapters can inject a path-configuring
 backend with nonblocking poll and close callbacks. Unsupported systems use the
 caller's portable metadata/content validator instead of disabling snapshot
 reuse.
@@ -475,17 +571,17 @@ removals, and in-place edits without requiring Linux-specific APIs.
       my $unchanged = $watch->unchanged($signature);
   }
 
-Unsupported systems do not load native modules. Linux uses FFI::Platypus for
-inotify, macOS optionally uses Mac::FSEvents, and Windows uses FFI::Platypus
-with wide-character directory notification APIs. Missing optional modules
-return undef from the default constructor; failures in installed bindings
-remain visible.
+Unsupported systems do not load native APIs. Linux uses XS for inotify, macOS
+optionally uses Mac::FSEvents, and Windows uses XS with wide-character
+directory notification APIs. If the extension is unavailable, the constructor
+returns undef; failures in available native calls remain visible.
 
 =head1 WHAT USES IT
 
 Developer::Dashboard::IndicatorStore may use the adapter for its stable
 collector synchronization. The repository tests use an injected backend to
-exercise event and error handling without relying on Linux or FFI installation.
+exercise event and error handling without relying on a particular operating
+system.
 
 =head1 EXAMPLES
 
@@ -503,9 +599,9 @@ Example 3: invalidate and use the ordinary validator after any event.
       validate_directory_inventory_and_file_signatures();
   }
 
-Example 4: run its deterministic contract test.
+Example 4: run its deterministic contract test in the Docker dev container.
 
-  prove -lv t/669-problem48-inotify-watch.t
+  d2 docker compose exec dev prove -Iblib/arch -Iblib/lib -Ilib -lv t/669-problem48-inotify-watch.t
 
 =head1 SAFETY
 
@@ -513,7 +609,7 @@ The adapter executes no shell commands and reads no status-file content. It
 does not treat a failed or event-bearing watch as unchanged. Linux paths are
 passed to libc only when they can be represented without lossy byte
 conversion. macOS uses FSEvents when Mac::FSEvents is installed; Windows uses
-wide-character directory notifications through FFI::Platypus. Each optional
-backend falls back to the caller's portable validator when unavailable.
+wide-character directory notifications through XS. Each optional backend falls
+back to the caller's portable validator when unavailable.
 
 =cut

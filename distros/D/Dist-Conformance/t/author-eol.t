@@ -80,6 +80,7 @@ my @files = (
     't/data/standards/conformance/troglodyne.yml',
     't/data/standards/templates/CLAUDE.md',
     't/data/standards/templates/Changes',
+    't/data/standards/templates/metamerge.yml',
     't/data/standards/templates/perlcriticrc',
     't/data/standards/templates/perlcriticrc.compat',
     't/data/standards/templates/perltidyrc',

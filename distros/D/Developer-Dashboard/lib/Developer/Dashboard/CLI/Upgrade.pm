@@ -3,9 +3,10 @@ package Developer::Dashboard::CLI::Upgrade;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Developer::Dashboard::Platform ();
+use Errno qw(ENOENT);
 use File::Temp qw(tempfile);
 use LWP::UserAgent;
 
@@ -141,10 +142,30 @@ sub _run_command {
     # after this sub returns, regardless of the exit code already captured
     # in this sub's own return value.
     local $?;
+    if ( !_program_is_startable( $argv->[0] ) ) {
+        $! = ENOENT;
+        die "Unable to start Developer Dashboard installer: $!\n";
+    }
     system @{$argv};
     die "Unable to start Developer Dashboard installer: $!\n" if $? == -1;
     return 128 + ( $? & 127 ) if $? & 127;
     return $? >> 8;
+}
+
+# _program_is_startable($program)
+# Pre-flight check for process creation: on Windows system() routes a
+# missing program through cmd.exe, which exits 1 instead of failing the
+# spawn, so the $? == -1 check below never fires and the failure surfaces
+# only as cmd.exe's own message (round 62, t/136 test 27, proven live on
+# win-ts). Resolve the program the way the native spawn can execute it
+# first, and report a missing program clearly instead.
+# Input: program name or path from the command argv.
+# Output: boolean true when the program can be started.
+sub _program_is_startable {
+    my ($program) = @_;
+    return 0 if !defined $program || $program eq '';
+    return ( -f $program && -x $program ) ? 1 : 0 if $program =~ m{[\\/]};
+    return defined Developer::Dashboard::Platform::command_in_path_direct($program) ? 1 : 0;
 }
 
 # _usage()
@@ -152,7 +173,7 @@ sub _run_command {
 # Input: none.
 # Output: usage message string ending in a newline.
 sub _usage {
-    return "Usage: dashboard upgrade [--dry-run]\n";
+    return "Usage: d2 upgrade [--dry-run]\n";
 }
 
 1;
@@ -172,7 +193,7 @@ Developer::Dashboard::CLI::Upgrade - safe cross-platform dashboard self-upgrade
 
 =head1 DESCRIPTION
 
-This module implements the first-class C<dashboard upgrade> and C<d2 upgrade>
+This module implements the first-class C<d2 upgrade> and C<d2 upgrade>
 behavior outside the thin public switchboard. It downloads the canonical HTTPS
 bootstrap installer for the active platform, validates that the response has
 the expected Developer Dashboard installer shape, writes it to a private
@@ -191,7 +212,7 @@ process status visible.
 Requiring users to remember and retype a remote installer pipeline makes
 upgrades harder to discover and easier to perform inconsistently. A built-in
 command gives both public entrypoints one tested, auditable route without
-embedding installer logic in C<bin/dashboard>.
+embedding installer logic in C<bin/d2>.
 
 =head1 WHEN TO USE
 
@@ -202,7 +223,7 @@ for dashboard self-upgrades.
 =head1 HOW TO USE
 
 Call C<run_upgrade(args =E<gt> \@ARGV)> from the staged built-in helper. Users
-run C<dashboard upgrade> or C<d2 upgrade>; C<--dry-run> prints the platform and
+run C<d2 upgrade> or C<d2 upgrade>; C<--dry-run> prints the platform and
 installer URL without downloading or executing anything.
 
 =head1 WHAT USES IT
@@ -212,8 +233,8 @@ tests, and the cross-platform install E2E matrix use this module.
 
 =head1 EXAMPLES
 
-  dashboard upgrade --dry-run
-  dashboard upgrade
+  d2 upgrade --dry-run
+  d2 upgrade
   d2 upgrade
 
 =for comment FULL-POD-DOC END

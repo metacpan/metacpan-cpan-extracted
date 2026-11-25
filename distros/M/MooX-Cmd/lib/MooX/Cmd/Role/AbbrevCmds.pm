@@ -1,12 +1,12 @@
 package MooX::Cmd::Role::AbbrevCmds;
 # ABSTRACT: Text::Abbrev support role for MooX::Cmd
-our $VERSION = '1.000';
 use strict;
 use warnings;
-
-use Text::Abbrev;
+our $VERSION = '1.001';
 
 use Moo::Role;
+
+use Carp qw(croak);
 
 
 requires "command_commands";
@@ -17,7 +17,10 @@ around _build_command_commands => sub {
     my $params   = shift;
     my $cmd_cmds = $class->$next($params, @_);
 
-    my %abbrevs  = abbrev keys %$cmd_cmds;
+    eval { require Text::Abbrev; 1 }
+      or croak "MooX::Cmd::Role::AbbrevCmds requires Text::Abbrev, please install it: $@";
+
+    my %abbrevs  = Text::Abbrev::abbrev(keys %$cmd_cmds);
     my %cmd_cmds = map { $_ => $cmd_cmds->{$abbrevs{$_}} } keys %abbrevs;
 
     return \%cmd_cmds;
@@ -37,7 +40,7 @@ MooX::Cmd::Role::AbbrevCmds - Text::Abbrev support role for MooX::Cmd
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 DESCRIPTION
 
@@ -62,7 +65,7 @@ Or apply the role explicitly:
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-moox-cmd/issues>.
 
 =head2 IRC
@@ -75,11 +78,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

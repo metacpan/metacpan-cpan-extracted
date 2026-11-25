@@ -3,7 +3,7 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
@@ -44,6 +44,56 @@ sub _default_project_root {
     return current_working_directory();
 }
 
+# _rewrite_exec_dashboard_command(\@args)
+# A compose exec that re-enters the dashboard CLI by its retired name must run
+# the current entrypoint instead: the container only ships d2 now. Rewrites a
+# leading 'dashboard' command token (the token after the exec service name) to
+# 'd2', leaving every other command untouched.
+# Input: passthrough compose argument array reference (modified in place).
+# Output: none.
+sub _rewrite_exec_dashboard_command {
+    my ($args) = @_;
+    return if !defined $args || @{$args} < 3;
+    # Compose global flags (with their values) precede the operation.
+    my %global_takes_value = map { $_ => 1 } qw(-f --file -p --project-name --project-directory --env-file --profile --ansi --progress --parallel);
+    my $index = 0;
+    while ( $index < @{$args} ) {
+        my $token = $args->[$index];
+        last if !defined $token || $token eq '' || $token !~ /^-/;
+        if ( $global_takes_value{$token} ) {
+            $index += 2;
+        }
+        elsif ( $token =~ /^--(?:project-name|env-file|profile|ansi|progress|parallel|file|project-directory)=/ || $token =~ /^-p./ ) {
+            $index += 1;
+        }
+        else {
+            $index += 1;
+        }
+    }
+    return if $index >= @{$args} || $args->[$index] ne 'exec';
+    # Skip exec flags (and their values) to reach the service name.
+    my %exec_takes_value = map { $_ => 1 } qw(-e --env -u --user -w --workdir --index);
+    $index++;
+    while ( $index < @{$args} ) {
+        my $token = $args->[$index];
+        last if !defined $token || $token eq '' || $token !~ /^-/;
+        if ( $exec_takes_value{$token} ) {
+            $index += 2;
+        }
+        elsif ( $token =~ /^--(?:env|user|workdir|index)=/ ) {
+            $index += 1;
+        }
+        else {
+            $index += 1;
+        }
+    }
+    # $index is the service name; the command is the next token.
+    if ( $index + 1 < @{$args} && defined $args->[ $index + 1 ] && $args->[ $index + 1 ] eq 'dashboard' ) {
+        $args->[ $index + 1 ] = 'd2';
+    }
+    return;
+}
+
 # resolve(%args)
 # Resolves the effective docker compose context and overlay stack.
 # Input: optional project_root, addons, modes, services, compose args, and an
@@ -57,6 +107,7 @@ sub resolve {
     my $docker_cfg  = $self->{config}->docker_config;
     my $docker_root = $self->_docker_config_root;
     my @passthrough = @{ $args{args} || [] };
+    _rewrite_exec_dashboard_command( \@passthrough );
     my @compose_files = ();
     my @layers;
 
@@ -356,7 +407,7 @@ sub _expand_env_path {
 }
 
 # _docker_config_root()
-# Returns the dashboard docker configuration root used for isolated service folders.
+# Returns the d2 docker configuration root used for isolated service folders.
 # Input: none.
 # Output: absolute directory path string.
 sub _docker_config_root {
@@ -730,7 +781,7 @@ sub _infer_services_from_args {
 # Output: hash reference describing the toggled service and marker path.
 sub disable_service {
     my ( $self, %args ) = @_;
-    my $service = $args{service} || die "Usage: dashboard docker disable <service>\n";
+    my $service = $args{service} || die "Usage: d2 docker disable <service>\n";
     my $marker = $self->_service_disabled_marker_path(
         project_root => $args{project_root},
         service      => $service,
@@ -756,7 +807,7 @@ sub disable_service {
 # Output: hash reference describing the toggled service and marker path.
 sub enable_service {
     my ( $self, %args ) = @_;
-    my $service = $args{service} || die "Usage: dashboard docker enable <service>\n";
+    my $service = $args{service} || die "Usage: d2 docker enable <service>\n";
     my $marker = $self->_service_disabled_marker_path(
         project_root => $args{project_root},
         service      => $service,
@@ -783,7 +834,7 @@ sub enable_service {
 # Output: hash reference describing the enabled development state and marker path.
 sub enable_service_development {
     my ( $self, %args ) = @_;
-    my $service = $args{service} || die "Usage: dashboard docker development enable <service>\n";
+    my $service = $args{service} || die "Usage: d2 docker development enable <service>\n";
     my $marker = $self->_service_development_marker_path(
         project_root => $args{project_root},
         service      => $service,
@@ -809,7 +860,7 @@ sub enable_service_development {
 # Output: hash reference describing the disabled development state and marker path.
 sub disable_service_development {
     my ( $self, %args ) = @_;
-    my $service = $args{service} || die "Usage: dashboard docker development disable <service>\n";
+    my $service = $args{service} || die "Usage: d2 docker development disable <service>\n";
     my $marker = $self->_service_development_marker_path(
         project_root => $args{project_root},
         service      => $service,
@@ -838,7 +889,7 @@ sub list_services {
     my ( $self, %args ) = @_;
     my $project_root = $self->_default_project_root( $args{project_root} );
     my $filter = defined $args{filter} && $args{filter} ne '' ? $args{filter} : 'all';
-    die "Usage: dashboard docker list [--enabled|--disabled]\n"
+    die "Usage: d2 docker list [--enabled|--disabled]\n"
       if $filter !~ /\A(?:all|enabled|disabled)\z/;
 
     my @services = $self->_discover_service_names(
@@ -1111,9 +1162,17 @@ sub _materialized_command {
         $merged = _compose_yaml_utf8_bytes($effective_output);
     }
 
-    my $tmp_dir  = File::Temp::tempdir( CLEANUP => 1 );
-    my $tmp_file = File::Spec->catfile( $tmp_dir, 'merged-compose.yml' );
-    open my $fh, '>:raw', $tmp_file or die "Unable to write $tmp_file: $!";
+    my ( $fh, $tmp_file );
+    eval {
+        ( $fh, $tmp_file ) = File::Temp::tempfile(
+            'merged-compose-XXXXXX',
+            SUFFIX => '.yml',
+            TMPDIR => 1,
+            UNLINK => 1,
+        );
+        1;
+    } or die "Unable to create temporary merged Compose file: $@";
+    binmode $fh, ':raw' or die "Unable to set raw mode for $tmp_file: $!";
     print {$fh} $merged;
     _close_materialized_compose_file($fh) or die "Unable to close $tmp_file: $!";
 
@@ -1169,7 +1228,13 @@ sub _compose_argument_parts {
     my @global_args;
     my @files;
     my @operation_args;
-    my @project_directory = ( '--project-directory', $args{compose_root} );
+    # A missing Compose root must not seed a valueless --project-directory:
+    # it becomes an undef element in the materialized command and warns
+    # under system(). Compose derives the project directory from the
+    # working directory when the flag is absent, which is what a caller
+    # that gave no root gets.
+    my @project_directory
+        = defined $args{compose_root} ? ( '--project-directory', $args{compose_root} ) : ();
     my %takes_value = map { $_ => 1 } qw(-f --file -p --project-name --project-directory --env-file --profile --ansi --progress --parallel);
     my $operation_started = 0;
     my $argument_index = 0;
@@ -1341,7 +1406,7 @@ sub _local_compose_services {
 # _contained_service_path($root, $service)
 # Resolves an untrusted service name below the docker toggle root and refuses any
 # result that escapes it. The service name arrives straight from the command line
-# (dashboard docker disable|enable), and File::Spec->catfile neither canonicalises
+# (d2 docker disable|enable), and File::Spec->catfile neither canonicalises
 # a path nor rejects a parent-directory run, so without this a name containing
 # '../' steered a write to any location the user could reach and an unlink to any
 # file named disabled.yml. Resolution is lexical and never consults the
@@ -1578,7 +1643,7 @@ Feed the parsed wrapper arguments into this module and let it return or execute 
 
 =head1 WHAT USES IT
 
-It is used by the C<dashboard docker compose> helper, by docker-focused tests, and by developers who keep Compose stacks under F<.developer-dashboard/config/docker/> instead of shell aliases.
+It is used by the C<d2 docker compose> helper, by docker-focused tests, and by developers who keep Compose stacks under F<.developer-dashboard/config/docker/> instead of shell aliases.
 
 =head1 EXAMPLES
 
@@ -1596,7 +1661,7 @@ Run the focused regression tests that most directly exercise this module's behav
 
 Example 3:
 
-  dashboard docker list --disabled
+  d2 docker list --disabled
 
 Inspect the effective disabled-service view through the same resolver rules as
 compose discovery.

@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Files;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Getopt::Long qw(GetOptionsFromArray);
@@ -38,7 +38,7 @@ sub _parse_create_option {
 }
 
 # run_files_command(%args)
-# Dispatches the lightweight dashboard file/files CLI behaviour without loading
+# Dispatches the lightweight d2 file/files CLI behaviour without loading
 # the main dashboard runtime.
 # Input: command name under "command" plus the remaining argv array reference
 # under "args".
@@ -62,7 +62,7 @@ sub run_files_command {
         my @argv = @{$argv};
         my $output = 'table';
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        die "Usage: dashboard files [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
+        die "Usage: d2 files [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
         $load_configured_file_aliases->();
         if ( $output eq 'json' ) {
             print json_encode( $files->all_files );
@@ -76,14 +76,14 @@ sub run_files_command {
     my $action = shift @argv || '';
     if ( $action eq 'resolve' ) {
         $load_configured_file_aliases->();
-        my $name = shift @argv || die "Usage: dashboard file resolve <name>\n";
+        my $name = shift @argv || die "Usage: d2 file resolve <name>\n";
         print $files->resolve_file($name), "\n";
         return 1;
     }
     if ( $action eq 'locate' ) {
         my $output = 'table';
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        die "Usage: dashboard file locate [-o json|table] [<root-or-alias>] <term...>\n" if $output ne 'json' && $output ne 'table';
+        die "Usage: d2 file locate [-o json|table] [<root-or-alias>] <term...>\n" if $output ne 'json' && $output ne 'table';
         my $root = current_working_directory();
         if ( @argv >= 2 ) {
             $load_configured_file_aliases->();
@@ -110,10 +110,10 @@ sub run_files_command {
         my $output = 'table';
         my $create_raw;
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output, 'c|create:s' => \$create_raw );
-        die "Usage: dashboard file add <name> <path> [-c|--create[=MODE]] [-o json|table]\n" if $output ne 'json' && $output ne 'table';
+        die "Usage: d2 file add <name> <path> [-c|--create[=MODE]] [-o json|table]\n" if $output ne 'json' && $output ne 'table';
         my ( $create, $mode ) = _parse_create_option($create_raw);
-        my $name = shift @argv || die "Usage: dashboard file add <name> <path>\n";
-        my $path = shift @argv || die "Usage: dashboard file add <name> <path>\n";
+        my $name = shift @argv || die "Usage: d2 file add <name> <path>\n";
+        my $path = shift @argv || die "Usage: d2 file add <name> <path>\n";
         my $saved = $config->save_file_alias( $name, $path, ( $create ? ( create => 1, ( defined $mode ? ( mode => $mode ) : () ) ) : () ) );
         $files->register_named_files( { $saved->{name} => ( $saved->{create} ? { path => $saved->{path}, create => 1, ( defined $saved->{mode} ? ( mode => $saved->{mode} ) : () ) } : $saved->{path} ) } );
         $saved->{resolved} = $files->resolve_file( $saved->{name} );
@@ -132,8 +132,8 @@ sub run_files_command {
     if ( $action eq 'del' ) {
         my $output = 'table';
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        die "Usage: dashboard file del <name> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
-        my $name = shift @argv || die "Usage: dashboard file del <name>\n";
+        die "Usage: d2 file del <name> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
+        my $name = shift @argv || die "Usage: d2 file del <name>\n";
         my $deleted = $config->remove_file_alias($name);
         $files->unregister_named_file($name);
         if ( $output eq 'json' ) {
@@ -149,7 +149,7 @@ sub run_files_command {
     if ( $action eq 'list' ) {
         my $output = 'table';
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-        die "Usage: dashboard file list [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
+        die "Usage: d2 file list [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
         $load_configured_file_aliases->();
         if ( $output eq 'json' ) {
             print json_encode( $files->named_files );
@@ -159,7 +159,7 @@ sub run_files_command {
         return 1;
     }
 
-    die "Usage: dashboard file <resolve|locate|add|del|list> ...\n";
+    die "Usage: d2 file <resolve|locate|add|del|list> ...\n";
 }
 
 # _files_table($files_hash)
@@ -187,7 +187,7 @@ Developer::Dashboard::CLI::Files - lightweight file and files helper dispatch
 
 =head1 DESCRIPTION
 
-Implements the lightweight C<dashboard file> and C<dashboard files> commands so
+Implements the lightweight C<d2 file> and C<d2 files> commands so
 the public entrypoint can hand off file-related work to an extracted helper
 without loading the heavier dashboard runtime.
 
@@ -195,10 +195,10 @@ without loading the heavier dashboard runtime.
 
 =head1 PURPOSE
 
-This module is the command runtime behind C<dashboard file ...> and
-C<dashboard files>. It prints the active runtime file inventory, resolves named
+This module is the command runtime behind C<d2 file ...> and
+C<d2 files>. It prints the active runtime file inventory, resolves named
 file aliases, persists alias add/delete operations, and locates files beneath a
-search root without forcing the main C<dashboard> entrypoint to load unrelated
+search root without forcing the main C<d2> entrypoint to load unrelated
 subsystems.
 
 =head1 WHY IT EXISTS
@@ -209,14 +209,14 @@ callers get one consistent behavior.
 
 =head1 WHEN TO USE
 
-Use this file when changing the behavior of C<dashboard file
+Use this file when changing the behavior of C<d2 file
 resolve/add/del/list/locate>, the human-readable summary tables or JSON
-payloads returned by C<dashboard files>, or the file alias persistence
+payloads returned by C<d2 files>, or the file alias persistence
 contract stored in config.
 
 =head1 HOW TO USE
 
-Users run C<dashboard file E<lt>verbE<gt> ...> or C<dashboard files>. Named
+Users run C<d2 file E<lt>verbE<gt> ...> or C<d2 files>. Named
 aliases are loaded from config, the direct C<resolve> verb keeps its
 line-oriented contract for shell use, and the operator-facing inventory and
 mutation commands default to human-readable tables while C<-o json> returns
@@ -230,13 +230,13 @@ to file alias behavior without loading the full web/runtime stack.
 
 =head1 EXAMPLES
 
-  dashboard files
-  dashboard file resolve global_config
-  dashboard file add notes ~/notes.txt
-  dashboard file add scratch /tmp/scratch/notes.txt --create
-  dashboard file locate notes txt
-  dashboard file list
-  dashboard file del notes
+  d2 files
+  d2 file resolve global_config
+  d2 file add notes ~/notes.txt
+  d2 file add scratch /tmp/scratch/notes.txt --create
+  d2 file locate notes txt
+  d2 file list
+  d2 file del notes
 
 =for comment FULL-POD-DOC END
 

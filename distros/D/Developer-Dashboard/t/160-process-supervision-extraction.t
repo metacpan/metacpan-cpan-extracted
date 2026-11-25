@@ -30,7 +30,6 @@ use lib "$FindBin::Bin/../lib";
 my @EXTRACTED = qw(
     _current_perl_command
     _descriptor_is_inherited_pipe
-    _fork_process
     _open_file_descriptors
     _overwrite_state_file_in_place
     _pid_is_running

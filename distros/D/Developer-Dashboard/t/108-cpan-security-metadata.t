@@ -59,7 +59,7 @@ my %secure_minimum = (
     'Storable'               => '3.41',
     'Template'               => '3.103',
     'XML::Parser'            => '2.48',
-    'YAML'                   => '1.28',
+    'YAML'                   => '1.30',
     'YAML::XS'               => '0.903.0',
 );
 

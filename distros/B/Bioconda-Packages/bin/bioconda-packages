@@ -1,0 +1,154 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib";
+use Getopt::Long qw(GetOptions);
+use Bioconda::Packages;
+
+=head1 NAME
+
+bioconda-packages - Query the bundled Bioconda package database from the command line.
+
+=head1 SYNOPSIS
+
+    bioconda-packages info samtools
+    bioconda-packages deps multiqc            # run deps (--kind host|build|all)
+    bioconda-packages versions samtools
+    bioconda-packages search aligner
+    bioconda-packages rdeps zlib              # reverse deps (--kind run|host|build|all)
+    bioconda-packages removed
+    bioconda-packages stats
+    bioconda-packages version                 # tool + database version
+
+=head1 OPTIONS
+
+    --db PATH         Use a specific database file
+    --kind KIND       Dependency kind for 'deps'/'rdeps' (run|host|build|all)
+    --all             Include removed packages (search/list/rdeps)
+    --version, -V     Print the tool and database version
+    --help            This message
+
+=cut
+
+my %opt = (kind => undef, all => 0);
+GetOptions(
+    'db=s'       => \$opt{db},
+    'kind=s'     => \$opt{kind},
+    'all'        => \$opt{all},
+    'version|V'  => \$opt{version},
+    'help'       => \$opt{help},
+) or die "Bad arguments. Try --help.\n";
+
+exec('perldoc', $0) if $opt{help};
+
+my $cmd = $opt{version} ? 'version' : (shift @ARGV or die usage());
+
+# 'version' must work even if the database cannot be located.
+if ($cmd eq 'version') { cmd_version(); exit 0 }
+
+my $bp = Bioconda::Packages->new($opt{db} ? (db => $opt{db}) : ());
+
+my %dispatch = (
+    info     => \&cmd_info,
+    deps     => \&cmd_deps,
+    versions => \&cmd_versions,
+    search   => \&cmd_search,
+    rdeps    => \&cmd_rdeps,
+    removed  => \&cmd_removed,
+    stats    => \&cmd_stats,
+    list     => \&cmd_list,
+);
+
+my $handler = $dispatch{$cmd} or die "Unknown command '$cmd'.\n", usage();
+$handler->();
+
+sub usage {
+    return "Usage: bioconda-packages <info|deps|versions|search|rdeps|removed|list|stats|version> [args]\n";
+}
+
+sub cmd_version {
+    printf "bioconda-packages (Bioconda::Packages) %s\n",
+        Bioconda::Packages->VERSION // 'dev';
+    my $bp = eval { Bioconda::Packages->new($opt{db} ? (db => $opt{db}) : ()) };
+    if ($bp) {
+        my $m = $bp->meta;
+        printf "database version: %s\n", $m->{db_version} // '(unversioned)';
+        printf "database:         %s\n", $bp->db_path;
+        printf "  built from:     bioconda-recipes %s\n",
+            $m->{recipes_commit} // 'unknown';
+        printf "  generated at:   %s\n", $m->{generated_at}  // '-';
+        printf "  packages:       %s\n", $m->{package_count} // '-';
+        printf "  generator:      %s\n", $m->{generator}     // '-';
+    }
+    else {
+        print "database:         (not found)\n";
+    }
+}
+
+sub need_pkg {
+    my $name = shift @ARGV or die "This command needs a package name.\n";
+    my $pkg = $bp->get($name);
+    die "Package '$name' not found.\n" unless $pkg;
+    return $pkg;
+}
+
+sub cmd_info {
+    my $p = need_pkg();
+    printf "%-16s %s%s\n", 'Package:', $p->name,
+        ($p->is_removed ? "  [REMOVED ".($p->removed_at//'')."]" : '');
+    printf "%-16s %s\n", 'Version:', $p->current_version // '-';
+    printf "%-16s %s\n", 'Summary:', $p->summary // '-';
+    printf "%-16s %s\n", 'License:', $p->license // '-';
+    printf "%-16s %s\n", 'Home:',    $p->home // '-';
+    printf "%-16s %s\n", 'Doc URL:', $p->doc_url // '-' if $p->doc_url;
+    printf "%-16s %s\n", 'noarch:',  $p->noarch if $p->noarch;
+    printf "%-16s %s\n", 'Downloads:', $p->downloads if defined $p->downloads;
+    my @ids = $p->identifiers;
+    printf "%-16s %s\n", 'Identifiers:', join(', ', @ids) if @ids;
+    printf "%-16s %s\n", 'Run deps:', scalar($p->dependencies('run'));
+}
+
+sub cmd_deps {
+    my $p = need_pkg();
+    my $kind = $opt{kind} || 'run';
+    for my $d ($p->dependencies($kind)) {
+        printf "%s%s\n", $d->{name},
+            (defined $d->{constraint} ? " $d->{constraint}" : '');
+    }
+}
+
+sub cmd_versions {
+    my $p = need_pkg();
+    print "$_\n" for $p->versions;
+}
+
+sub cmd_search {
+    my $term = shift @ARGV or die "search needs a term.\n";
+    print "$_\n" for $bp->search($term, include_removed => $opt{all});
+}
+
+sub cmd_rdeps {
+    my $name = shift @ARGV or die "rdeps needs a package name.\n";
+    print "$_\n" for $bp->reverse_dependencies(
+        $name, kind => ($opt{kind} || 'run'), include_removed => $opt{all});
+}
+
+sub cmd_removed {
+    print "$_\n" for $bp->removed;
+}
+
+sub cmd_list {
+    print "$_\n" for $bp->list(include_removed => $opt{all});
+}
+
+sub cmd_stats {
+    my %s = $bp->stats;
+    printf "Database version: %s\n", $s{db_version} // '(unversioned)';
+    printf "Total packages:   %d\n", $s{total};
+    printf "Current:          %d\n", $s{current};
+    printf "Removed:          %d\n", $s{removed};
+    printf "noarch:           %d\n", $s{noarch};
+    printf "Generated at:     %s\n", $s{generated_at}   // '-';
+    printf "Recipes commit:   %s\n", $s{recipes_commit} // '-';
+}

@@ -1,9 +1,9 @@
 # Workspace Change-Directory Flag
 
-`dashboard workspace -c <name>` and `dashboard workspace <name> -c` change
+`d2 workspace -c <name>` and `d2 workspace <name> -c` change
 directory before starting the workspace.
 
-When the workspace name is registered in the dashboard paths inventory, the
+When the workspace name is registered in the d2 paths inventory, the
 same registered names the shell `cdr` helper resolves (configured
 `path_aliases` plus the path registry), the command:
 
@@ -11,18 +11,18 @@ same registered names the shell `cdr` helper resolves (configured
 2. changes into that directory first
 3. plans and starts the tmux workspace session from there
 
-So `dashboard workspace -c foobar` behaves like:
+So `d2 workspace -c foobar` behaves like:
 
 ```sh
 cdr foobar
-dashboard workspace foobar
+d2 workspace foobar
 ```
 
 The flag position is flexible; both of these are equivalent:
 
 ```sh
-dashboard workspace -c foobar
-dashboard workspace foobar -c
+d2 workspace -c foobar
+d2 workspace foobar -c
 ```
 
 Because the directory change happens before session planning, the tmux
@@ -32,11 +32,11 @@ typed.
 
 Failure behavior is explicit, never silent:
 
-- a name that is not a registered dashboard path fails with
-  `Workspace '<name>' is not a registered dashboard path, so -c has no directory to change into`
+- a name that is not a registered d2 path fails with
+  `Workspace '<name>' is not a registered d2 path, so -c has no directory to change into`
 - a registered target that is not a directory fails with an error naming the
   resolved path
 - a directory the user cannot enter fails with the underlying `chdir` error
 
-Without `-c`, `dashboard workspace` behavior is unchanged: the session starts
+Without `-c`, `d2 workspace` behavior is unchanged: the session starts
 from the current working directory.

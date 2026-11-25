@@ -1,4 +1,4 @@
-package Dist::Conformance::Check 0.007;
+package Dist::Conformance::Check 0.008;
 
 # ABSTRACT: The interface of a check, and what the checks share
 
@@ -18,7 +18,9 @@ has config => sub { {} };
 has 'source';
 has variables => sub { {} };
 
-our $MODULE = { type => 'string', pattern => "\\A$Module::Runtime::module_name_rx\\z" };
+my $MODULE_NAME_RX = $Module::Runtime::module_name_rx;
+my $MODULE_RX      = qr/\A$MODULE_NAME_RX\z/;
+our $MODULE = { type => 'string', pattern => "$MODULE_RX" };
 
 
 sub config_schema ($) { return { properties => {} } }
@@ -79,7 +81,7 @@ sub write_template ( $self, $update, $path, $template, $mode = oct 644 ) {
 
 
 sub missing ( $, $snapshot, @paths ) {
-    my @missing = grep { !$snapshot->contains($_) } @paths;
+    my @missing = grep { local ($_) = $_; !$snapshot->contains($_) } @paths;
     return @missing;
 }
 
@@ -95,7 +97,7 @@ Dist::Conformance::Check - The interface of a check, and what the checks share
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -313,7 +315,8 @@ The CI workflows exist.
 
 =item L<Dist::Conformance::Check::SystemPackages>
 
-The system packages and archives that F<metamerge.yml> declares are valid.
+The system packages and archives that F<metamerge.yml> declares are valid, and
+include those of a template.
 
 =back
 

@@ -14,12 +14,13 @@ use lib 'lib';
 use lib 't/lib';
 
 use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::GoRoutine ();
 use Local::BoundedCommand qw(run_bounded);
 use Local::BrowserProbe qw(browser_can_fetch_loopback);
 
 my $repo_root     = abs_path('.');
 my $repo_lib      = File::Spec->catdir( $repo_root, 'lib' );
-my $dashboard_bin = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
+my $dashboard_bin = File::Spec->catfile( $repo_root, 'bin', 'd2' );
 my $chromium_bin  = _find_command( qw(google-chrome-stable google-chrome chromium-browser chromium) );
 
 plan skip_all => 'SSL browser smoke requires Chromium on PATH'
@@ -65,7 +66,7 @@ eval {
         command => [ $^X, "-I$repo_lib", $dashboard_bin, 'init' ],
         cwd     => $project_root,
         env     => { HOME => $home_root },
-        label   => 'dashboard init for SSL browser smoke',
+        label   => 'd2 init for SSL browser smoke',
     );
     _write_global_config(
         home_root => $home_root,
@@ -305,35 +306,49 @@ sub _run_command {
 }
 
 # _start_dashboard_server(%args)
-# Purpose: fork one foreground dashboard SSL server for the browser smoke fixture.
+# Purpose: spawn one foreground dashboard SSL server for the browser smoke fixture.
 # Input: hash with cwd, home, repo_lib, dashboard_bin, port, and log_file keys.
 # Output: child PID integer.
 sub _start_dashboard_server {
     my (%args) = @_;
-    my $pid = fork();
-    die "Unable to fork dashboard SSL browser smoke server: $!" if !defined $pid;
-    if ( !$pid ) {
-        open STDOUT, '>>', $args{log_file} or die "Unable to redirect STDOUT to $args{log_file}: $!";
-        open STDERR, '>>', $args{log_file} or die "Unable to redirect STDERR to $args{log_file}: $!";
-        chdir $args{cwd} or die "Unable to chdir to $args{cwd}: $!";
-        local %ENV = ( %ENV, HOME => $args{home} );
-        delete @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)} if _coverage_requested();
-        exec $^X, "-I$args{repo_lib}", $args{dashboard_bin}, 'serve', '--ssl', '--host', '127.0.0.1', '--port', $args{port}, '--foreground'
-          or die "Unable to exec dashboard serve --ssl: $!";
-    }
-    return $pid;
+    my $drop_harness = _coverage_requested() ? 1 : 0;
+    my $running_helper = File::Spec->catfile(
+        $args{home}, '.developer-dashboard', 'cli', 'dd', '_dashboard-core',
+    );
+    die "d2 init did not stage the SSL server helper '$running_helper': $!\n"
+      if !-f $running_helper;
+    my $launcher = q{
+        my ($repo_lib, $dashboard_bin, $drop_harness, @arguments) = @ARGV;
+        delete @ENV{qw(PERL5OPT HARNESS_PERL_SWITCHES)} if $drop_harness;
+        exec $^X, "-I$repo_lib", $dashboard_bin, @arguments
+          or die "Unable to exec dashboard SSL browser smoke server: $!\n";
+    };
+    return Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', $launcher, '--', $args{repo_lib}, $args{dashboard_bin}, $drop_harness,
+            'serve', '--ssl', '--host', '127.0.0.1', '--port', $args{port}, '--foreground' ],
+        {
+            cwd          => $args{cwd},
+            env          => {
+                HOME => $args{home},
+                DEVELOPER_DASHBOARD_RUNNING_HELPER => $running_helper,
+            },
+            stdout       => $args{log_file},
+            stderr       => $args{log_file},
+            process_group => 1,
+        },
+    );
 }
 
 # _stop_dashboard_server(%args)
-# Purpose: stop the forked dashboard server and wait for it to exit cleanly.
+# Purpose: stop the GoRoutine-spawned dashboard server and wait for it to exit cleanly.
 # Input: hash with child pid plus optional cwd/home/repo_lib/dashboard_bin keys for fallback stop command execution.
 # Output: true when the child has exited.
 sub _stop_dashboard_server {
     my (%args) = @_;
     my $pid = $args{pid};
     return 1 if !$pid;
-    kill 'TERM', $pid;
-    waitpid( $pid, 0 );
+    Developer::Dashboard::GoRoutine::terminate_process( $pid, 'TERM' );
+    Developer::Dashboard::GoRoutine::wait_process($pid);
     return 1;
 }
 
@@ -418,17 +433,19 @@ __END__
 
 =head1 NAME
 
-t/33-web-server-ssl-browser.t - real Chromium browser smoke for dashboard serve --ssl
+t/33-web-server-ssl-browser.t - real Chromium browser smoke for d2 serve --ssl
 
 =head1 DESCRIPTION
 
-This test exercises the public HTTPS browser path for C<dashboard serve --ssl>.
+This test exercises the public HTTPS browser path for C<d2 serve --ssl>.
 It verifies that an untrusted browser reaches Chromium's privacy interstitial
 or reports its certificate-authority failure in headless diagnostics, instead
-of a broken reset, and that the real dashboard page loads once certificate
+of a broken reset, and that the real d2 page loads once certificate
 trust is bypassed locally for the test browser process. Chromium versions differ
 in whether C<--dump-dom> emits the interstitial markup or only reports
 C<ERR_CERT_AUTHORITY_INVALID> / C<net_error -202> on stderr.
+The server fixture also pins C<DEVELOPER_DASHBOARD_RUNNING_HELPER> to the helper
+staged in its temporary home, isolating the test from a caller's stale helper.
 
 =for comment FULL-POD-DOC START
 

@@ -5,6 +5,7 @@ use warnings;
 use autodie;
 use File::Slurp;
 use Attean;
+use Attean::RDF qw(iri);
 use AtteanX::Store::DBI;
 use DBI;
 use DBIx::MultiStatementDo;
@@ -17,11 +18,11 @@ if (scalar(@types) == 0) {
 	exit(0);
 }
 
-my $COMMANDS_STRING	= join("\n", map { "  $_" } qw(init drop));
+my $COMMANDS_STRING	= join("\n", map { "  $_" } qw(init drop load dump));
 my $TYPES_STRING	= join("\n", map { "  $_" } @types);
 if (scalar(@ARGV) < 1) {
 	print STDERR <<"END";
-Usage: $0 COMMAND DATATYPE-TYPE [-h HOST] [-P PORT] [-u USER] [-p PASSWORD] DATABASE-NAME
+Usage: $0 COMMAND DATATYPE-TYPE [-h HOST] [-P PORT] [-u USER] [-p PASSWORD] DATABASE-NAME [LOAD-FILENAME]
 
 COMMAND must be one of:
 
@@ -42,6 +43,7 @@ my $host;
 my $port;
 my $user;
 my $password;
+my $format	= 'NQuads';
 my %args;
 my $result			= GetOptions(
 	"verbose"		=> \$verbose,
@@ -50,16 +52,17 @@ my $result			= GetOptions(
 	"port|P=s"		=> \$args{port},
 	"user=s"		=> \$args{user},
 	"password|p=s"	=> \$args{password},
+	'format|f=s'	=> \$format,
 );
+
 my $command	= shift;
-die "Unrecoognized command '$command'. Must be one of:$COMMANDS_STRING\n\n" unless ($command =~ /^(init|drop)$/);
+die "Unrecoognized command '$command'. Must be one of:$COMMANDS_STRING\n\n" unless ($command =~ /^(init|drop|load|dump)$/);
 
 my $type	= shift;
 die "No database type given. Must be one of:\n\n$TYPES_STRING\n\n" unless (defined($type) and length($type));
 die "Unrecoognized database type '$type'. Must be one of:\n\n$TYPES_STRING\n\n" unless (exists $types{$type});
 
 $args{database}	= shift || die "No database name given.\n";
-
 
 my @connect	= AtteanX::Store::DBI->dbi_connect_args($type, %args);
 my $dbh		= DBI->connect(@connect);
@@ -91,4 +94,25 @@ if ($command eq 'init') {
 		warn "No schema file available for this database.\n";
 		exit(1);
 	}
+} elsif ($command eq 'load') {
+	while (my $filename = shift) {
+		my %args;
+		my $parser		= Attean->get_parser($format ? ($format) : (filename => $filename))->new();
+		my $graph		= iri('file://' . File::Spec->rel2abs($filename));
+		open(my $fh, "<:encoding(UTF-8)", $filename) or die $!;
+		my $iter		= $parser->parse_iter_from_io($fh);
+		my $quads		= $iter->as_quads($graph);
+		$store->add_iter($quads);
+	}
+} elsif ($command eq 'dump') {
+	my %args;
+	my $sclass		= Attean->get_serializer($format);
+	die "No suitable serializer found for '$format'" if ($format and not $sclass);
+	die "No suitable serializer found" if (not $sclass);
+	my $ser			= $sclass->new();
+	my $quads		= $store->get_quads();
+	binmode(STDOUT, ":utf8");
+	$ser->serialize_iter_to_io(\*STDOUT, $quads);
+} else {
+	die "Unexpected command: [$command]";
 }

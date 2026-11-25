@@ -24,7 +24,7 @@ xmlq - XML query command for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard xmlq [path] [file]
+  d2 xmlq [path] [file]
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ This command provides XML query extraction for Developer Dashboard.
 
 =head1 PURPOSE
 
-This staged helper owns the public C<dashboard xmlq> command. It accepts a
+This staged helper owns the public C<d2 xmlq> command. It accepts a
 path or C<$d>-based Perl expression plus an optional input file, then hands the
 request to the shared query runtime so parsing, file-vs-STDIN handling, and
 output formatting stay consistent with the rest of the dashboard toolchain.
@@ -48,12 +48,12 @@ callers dig raw XML back out of a wrapper field.
 
 =head1 WHEN TO USE
 
-Use this file when changing the public C<dashboard xmlq> argv contract, the XML
+Use this file when changing the public C<d2 xmlq> argv contract, the XML
 helper examples, or the staged handoff into the shared query runtime.
 
 =head1 HOW TO USE
 
-Users run C<dashboard xmlq [path] [file]>. The staged helper selects the XML
+Users run C<d2 xmlq [path] [file]>. The staged helper selects the XML
 backend in the shared query runtime, which accepts the file and path in either
 order, reads STDIN when no file is given, decodes XML into nested Perl hashes
 and arrays, stores XML attributes under C<_attributes>, stores mixed text under
@@ -62,16 +62,16 @@ decoded tree. Use C<$d> or C<.> when you need the whole decoded document.
 
 =head1 WHAT USES IT
 
-It is used by the public C<dashboard xmlq> command, by shell snippets that want
+It is used by the public C<d2 xmlq> command, by shell snippets that want
 a runtime-local XML inspection tool, and by query-helper coverage under C<t/>
 that locks in the decoded-tree contract.
 
 =head1 EXAMPLES
 
-  printf '<root><value>demo</value></root>' | dashboard xmlq root.value
-  dashboard xmlq feed.xml '$d'
-  dashboard xmlq '$d' feed.xml
-  printf '<root><item id="1">x</item><item id="2">y</item></root>' | dashboard xmlq 'join q(,), map { $_->{_attributes}{id} } @{ $d->{root}{item} }'
+  printf '<root><value>demo</value></root>' | d2 xmlq root.value
+  d2 xmlq feed.xml '$d'
+  d2 xmlq '$d' feed.xml
+  printf '<root><item id="1">x</item><item id="2">y</item></root>' | d2 xmlq 'join q(,), map { $_->{_attributes}{id} } @{ $d->{root}{item} }'
 
 =for comment FULL-POD-DOC END
 

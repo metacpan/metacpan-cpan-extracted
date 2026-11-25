@@ -28,19 +28,19 @@ The integration run covers these command families:
 - host packaging: `dzil build`
 - installation: `cpanm <tarball>` (runs the distribution test suite)
 - short entrypoint: `d2 version` must match the installed tarball version, `d2 of grep --help` must reach GNU grep, and `d2 docker compose config --help` / `d2 docker compose help` must preserve native Compose help arguments
-- bootstrap: `dashboard init`, user-provided `dashboard update`
-- help and prompt: `dashboard`, `dashboard help`, `dashboard ps1`, `dashboard shell bash`, `dashboard shell ps`
+- bootstrap: `d2 init`, user-provided `d2 update`
+- help and prompt: `dashboard`, `d2 help`, `d2 ps1`, `d2 shell bash`, `d2 shell ps`
 - shell completion: root `d2` TAB candidates contain commands rather than path aliases, `workspace` completion offers configured/Folder.pm aliases and existing sessions, and `cdr` completion descends one directory level per entered term without recursive scans
 - helper staging: rerun a built-in helper command after install and verify the managed helper runtime converges on `~/.developer-dashboard/cli/dd/`; dashboard-managed flat helper files left directly under `~/.developer-dashboard/cli/` by older releases should be removed automatically on that staging pass
-- paths: `dashboard paths`, `dashboard path list`, `dashboard path resolve`, `dashboard path project-root`
-- encoding: `dashboard encode`, `dashboard decode`
-- indicators: `dashboard indicator set`, `dashboard indicator list`, `dashboard indicator refresh-core`; verify core refresh does not add a Docker indicator, while an explicitly configured Docker collector retains its own indicator
-- collectors: `dashboard collector write-result`, `run`, `list`, `job`, `status`, `output`, `inspect`, `log`, `start`, `restart`, `stop`
-- config: `dashboard config init`, `dashboard config show`
-- auth: `dashboard auth add-user`, `list-users`, `remove-user`
-- pages: `dashboard page new`, `save`, `list`, `show`, `encode`, `decode`, `urls`, `render`, `source`
-- actions: `dashboard action run system-status paths`
-- docker resolver: `dashboard docker compose --dry-run`
+- paths: `d2 paths`, `d2 path list`, `d2 path resolve`, `d2 path project-root`
+- encoding: `d2 encode`, `d2 decode`
+- indicators: `d2 indicator set`, `d2 indicator list`, `d2 indicator refresh-core`; verify core refresh does not add a Docker indicator, while an explicitly configured Docker collector retains its own indicator
+- collectors: `d2 collector write-result`, `run`, `list`, `job`, `status`, `output`, `inspect`, `log`, `start`, `restart`, `stop`
+- config: `d2 config init`, `d2 config show`
+- auth: `d2 auth add-user`, `list-users`, `remove-user`
+- pages: `d2 page new`, `save`, `list`, `show`, `encode`, `decode`, `urls`, `render`, `source`
+- actions: `d2 action run system-status paths`
+- docker resolver: `d2 docker compose --dry-run`
 - Docker workspace mode: `d2 workspace -c <registered-alias> --docker` (or
   `-d`) starts or reuses the Compose `workspace` service from the alias
   directory, whose configuration bind-mounts that target at `/workspace`. A
@@ -67,7 +67,7 @@ The integration run covers these command families:
   preserves them. This confirms the missing locale belongs at the client
   handoff, not in the Compose YAML or the indicator source.
   A failed state query or startup must stop before either in-container command
-- web lifecycle: `dashboard serve`, `dashboard restart`, `dashboard stop`
+- web lifecycle: `d2 serve`, `d2 restart`, `d2 stop`
 - browser checks: headless Chromium editor, saved fake-project bookmark page, outsider bootstrap DOM verification, and helper-login DOM verification after helper-user enablement
 - ajax streaming: installed long-running `/ajax/<file>` route timing, early-chunk verification, refresh-safe singleton replacement, `fetch_value()` / `stream_value()` DOM helper coverage, and browser pagehide cleanup coverage in unit tests
 - skill Dancer2 extensions: load each installed `lib/Dashboard.pm` once while the PSGI app starts; verify `hook before` variables are visible to `/app/<skill>/...` and `/ajax/<skill>/...` CODE, and that hook-set headers override dashboard defaults unless the backend explicitly returns that header
@@ -85,8 +85,8 @@ Those focused skill checks currently verify the installed-skill command and
 page dispatch rules, the merged skill config behavior, repo-qualified skill
 collectors joining the managed fleet used by `serve` / `restart` / `stop`,
 shared nav rendering from every installed skill on both skill routes and
-normal `/app/<page>` routes such as `/app/index`, the `dashboard skills list`
-and `dashboard skills usage <repo>` inventory payloads, and the enable/disable
+normal `/app/<page>` routes such as `/app/index`, the `d2 skills list`
+and `d2 skills usage <repo>` inventory payloads, and the enable/disable
 runtime boundary where disabled skills stay installed but stop contributing
 commands, routes, collectors, and docker roots until they are re-enabled.
 They also verify same-repo `DD-OOP-LAYERS` fallback inside one skill checkout,
@@ -138,7 +138,9 @@ The integration run creates:
 
 1. Build the distribution tarball on the host with `dzil build`.
 2. Run `prove -lv t/44-smart-router-two-stage.t` against that freshly built tarball so the extracted-dashboard smart-router contract is verified at the post-build stage. That guard retries one transient `cpanm` fetch or unpack failure inside its Docker container before treating the post-build install as a real repository regression.
+   Its disposable install container uses Perl 5.44 with ithreads enabled and verifies that configuration before compiling the GoRoutine XS extension.
 3. Start the blank container with only that host-built tarball mounted into it.
+   The image is pinned to a threaded Perl 5.44 build because the GoRoutine XS extension requires ithreads; it installs the GTK/Ayatana headers needed by the Linux native helper.
 4. Copy the mounted tarball to a versioned local path inside the container and
    install and test that staged tarball with `cpanm`. The staged filename must keep the
    concrete `Developer-Dashboard-X.XX.tar.gz` version so `cpanm` cannot drift
@@ -149,19 +151,19 @@ The integration run creates:
    distribution-level source of truth when the public module delegates
    `$VERSION` to `Developer::Dashboard::Version`; it falls back to a literal
    main-module version for older archives without metadata.
-7. Verify the installed CLI responds to `dashboard help`.
+7. Verify the installed CLI responds to `d2 help`.
 8. Verify bare `dashboard` returns usage output.
-9. Verify `dashboard version` reports the installed runtime version.
+9. Verify `d2 version` reports the installed runtime version.
 10. Create a fake project root with a local `./.developer-dashboard` runtime tree.
-11. Exercise `dashboard cpan DBD::Driver` inside the fake project and confirm the requested driver plus `DBI` are installed into `./.developer-dashboard/local` and recorded in `./.developer-dashboard/cpanfile`.
-12. Seed a user-provided fake-project `./.developer-dashboard/cli/update` command plus `update.d` hooks in the clean container, run `dashboard update`, and confirm the normal top-level command-hook pipeline completes, including later-hook reads through `Runtime::Result`.
+11. Exercise `d2 cpan DBD::Driver` inside the fake project and confirm the requested driver plus `DBI` are installed into `./.developer-dashboard/local` and recorded in `./.developer-dashboard/cpanfile`.
+12. Seed a user-provided fake-project `./.developer-dashboard/cli/update` command plus `update.d` hooks in the clean container, run `d2 update`, and confirm the normal top-level command-hook pipeline completes, including later-hook reads through `Runtime::Result`.
 13. Exercise path, prompt, shell, encode/decode, and indicator commands.
-14. Exercise collector write/run/read/start/restart/stop flows, including fake-project config collector definitions, TT-backed collector indicator icons rendered from collector stdout JSON, `dashboard collector log`, `dashboard collector log <name>`, and housekeeper-driven collector log rotation from configured `rotation` or `rotations` rules. Run the housekeeper at least twice against a collector that combines a line budget with an age window, and confirm the rotated transcript still starts at a complete entry header and the second pass still completes: a line cut that lands inside an entry once left a headerless transcript that killed every later cleanup pass.
+14. Exercise collector write/run/read/start/restart/stop flows, including fake-project config collector definitions, TT-backed collector indicator icons rendered from collector stdout JSON, `d2 collector log`, `d2 collector log <name>`, and housekeeper-driven collector log rotation from configured `rotation` or `rotations` rules. Run the housekeeper at least twice against a collector that combines a line budget with an age window, and confirm the rotated transcript still starts at a complete entry header and the second pass still completes: a line cut that lands inside an entry once left a headerless transcript that killed every later cleanup pass.
 15. Restart the installed runtime with one intentionally broken Perl config collector and one healthy config collector, then verify the broken collector reports an error without stopping the healthy collector or its green indicator state, even when prompt/browser status refreshes run during the restart window.
-16. Kill one managed collector loop after startup, confirm the watchdog restarts it automatically, and verify `dashboard collector status <name>` records watchdog restart counters/timestamps. Kill it repeatedly until the watchdog limit is exceeded, then confirm the collector is marked `attention_required` instead of disappearing silently.
+16. Kill one managed collector loop after startup, confirm the watchdog restarts it automatically, and verify `d2 collector status <name>` records watchdog restart counters/timestamps. Kill it repeatedly until the watchdog limit is exceeded, then confirm the collector is marked `attention_required` instead of disappearing silently.
 17. Exercise page create/save/show/encode/decode/render/source flows inside the fake bookmark directory.
 18. Exercise builtin action execution.
-19. For Windows-targeted changes, run `integration/windows/run-strawberry-smoke.ps1 -UseInstallBootstrap -BootstrapScript <checkout install.ps1>` so the guest validates the same streamed `Invoke-Expression` bootstrap shape that operators use with `irm .../install.ps1 | iex`, including successful `cpanm --notest .` checkout installation and a fresh PowerShell session that can load the generated profile without a `running scripts is disabled` failure, resolve `dashboard`, print `dashboard version`, and run `dashboard logs`.
+19. For Windows-targeted changes, run `integration/windows/run-strawberry-smoke.ps1 -UseInstallBootstrap -BootstrapScript <checkout install.ps1>` so the guest validates the same streamed `Invoke-Expression` bootstrap shape that operators use with `irm .../install.ps1 | iex`, including successful `cpanm --notest .` checkout installation and a fresh PowerShell session that can load the generated profile without a `running scripts is disabled` failure, resolve `dashboard`, print `d2 version`, and run `d2 logs`.
 20. Exercise docker compose dry-run resolution against a temporary project.
     For Docker workspace mode, use an isolated project with a named
     `workspace` service that bind-mounts the project at `/workspace` and a
@@ -193,71 +195,71 @@ The integration run creates:
 
 - every covered command exits successfully except bare `dashboard`, which should
   return usage with a non-zero status
-- `dashboard version` reports the installed release version
-- `dashboard init` creates starter state without requiring manual setup
-- `dashboard update` succeeds in the container from a user-provided fake-project `./.developer-dashboard/cli/update` command through the normal command-hook path
+- `d2 version` reports the installed release version
+- `d2 init` creates starter state without requiring manual setup
+- `d2 update` succeeds in the container from a user-provided fake-project `./.developer-dashboard/cli/update` command through the normal command-hook path
 - the installed `dashboard` binary works without `perl -Ilib`
 - the fake project's `./.developer-dashboard` tree becomes the active local runtime root with the home tree as fallback
-- layered root-to-leaf `.env` and `.env.pl` files override in order; for skill commands, home runtime files are defaults, skill-root and skill-CLI files override matching home keys, and deeper project runtime layers retain final precedence among file values. Variables explicitly inherited from the invoking process stay above every file layer. Nested skill commands expand `foo -> foo.bar -> foo.bar.zzz` env files in order while preserving overwritten parent keys under aliases such as `foo_VERSION` and `foo_bar_VERSION`, and `dashboard docker compose` loads the same nested skill env chain plus both the leaf and cumulative `<skill>_DDDC` aliases for installed skills whose `config/docker/<service>/compose.yml` or `development.compose.yml` files actually participate in the resolved stack
+- layered root-to-leaf `.env` and `.env.pl` files override in order; for skill commands, home runtime files are defaults, skill-root and skill-CLI files override matching home keys, and deeper project runtime layers retain final precedence among file values. Variables explicitly inherited from the invoking process stay above every file layer. Nested skill commands expand `foo -> foo.bar -> foo.bar.zzz` env files in order while preserving overwritten parent keys under aliases such as `foo_VERSION` and `foo_bar_VERSION`, and `d2 docker compose` loads the same nested skill env chain plus both the leaf and cumulative `<skill>_DDDC` aliases for installed skills whose `config/docker/<service>/compose.yml` or `development.compose.yml` files actually participate in the resolved stack
 - two installed skills may define the same Compose interpolation key in their root `.env`; sequential `d2 docker compose up foo` and `... up bar` runs must materialize and execute with the selected service's own skill value rather than allowing a different, later-enumerated skill's value to leak across services. Operations selecting no service continue to resolve environment from all effective base services
-- skill dependency installs follow `aptfile -> apkfile -> dnfile -> wingetfile -> brewfile -> package.json -> requirements.txt -> cpanfile -> cpanfile.local -> Makefile -> ddfile -> ddfile.local`, with `aptfile`, `apkfile`, and `dnfile` probing each listed package first and only escalating to `sudo apt-get install -y`, `sudo apk add --no-cache`, or `sudo dnf install -y` for packages that are still missing, `wingetfile` installing each listed package id only on Windows through `winget install --id ... --exact --accept-package-agreements --accept-source-agreements --disable-interactivity`, Node dependencies being staged through `npx --yes npm install` in a private dashboard workspace before landing in `$HOME/node_modules`, Python dependencies being installed through `python -m pip install --user --requirement requirements.txt` from the skill root, shared skill Perl dependencies landing in `~/perl5`, skill-local Perl dependencies landing in each skill's `./perl5`, optional skill `Makefile` flows running `make`, `make test` when a `test` or `tests` target exists unless `dashboard skills install --notest` is used, `make install`, and `make clean` when a `clean` target exists, and `ddfile.local` dependencies staying at the current skill install level
+- skill dependency installs follow `aptfile -> apkfile -> dnfile -> wingetfile -> brewfile -> package.json -> requirements.txt -> cpanfile -> cpanfile.local -> Makefile -> ddfile -> ddfile.local`, with `aptfile`, `apkfile`, and `dnfile` probing each listed package first and only escalating to `sudo apt-get install -y`, `sudo apk add --no-cache`, or `sudo dnf install -y` for packages that are still missing, `wingetfile` installing each listed package id only on Windows through `winget install --id ... --exact --accept-package-agreements --accept-source-agreements --disable-interactivity`, Node dependencies being staged through `npx --yes npm install` in a private d2 workspace before landing in `$HOME/node_modules`, Python dependencies being installed through `python -m pip install --user --requirement requirements.txt` from the skill root, shared skill Perl dependencies landing in `~/perl5`, skill-local Perl dependencies landing in each skill's `./perl5`, optional skill `Makefile` flows running `make`, `make test` when a `test` or `tests` target exists unless `d2 skills install --notest` is used, `make install`, and `make clean` when a `clean` target exists, and `ddfile.local` dependencies staying at the current skill install level
 - long-running skill dependency steps keep the main epic checklist visible while streaming a Docker-style rolling ten-line detail window under the active task, collapse those detail lines when the task succeeds, and leave the captured detail visible when the task fails
-- explicit `dashboard skills install --ddfile` runs process `ddfile` first into the active layered skills root and then `ddfile.local` into the current directory's nested `./skills/` tree
-- explicit `dashboard skills install <source> ...` runs can install one or more sources in command-line order, append each exact source to the home root `~/.developer-dashboard/ddfile` without duplicating existing non-comment entries, `dashboard skills uninstall <repo-name>` removes matching source lines from that same root `ddfile` while preserving comments and unrelated entries, and bare `dashboard skills install` uses that root `ddfile` to reinstall every registered skill as an update-all pass with a visible source-level progress rundown and a default before/after `.env` `VERSION` table summary
+- explicit `d2 skills install --ddfile` runs process `ddfile` first into the active layered skills root and then `ddfile.local` into the current directory's nested `./skills/` tree
+- explicit `d2 skills install <source> ...` runs can install one or more sources in command-line order, append each exact source to the home root `~/.developer-dashboard/ddfile` without duplicating existing non-comment entries, `d2 skills uninstall <repo-name>` removes matching source lines from that same root `ddfile` while preserving comments and unrelated entries, and bare `d2 skills install` uses that root `ddfile` to reinstall every registered skill as an update-all pass with a visible source-level progress rundown and a default before/after `.env` `VERSION` table summary
 - remote skill installs accept `-b <branch>`/`--branch`; a fresh install without it tries `master` and then `main`, while reinstall without it retains the named branch checked out in the installed skill directory, and an explicit branch overrides that retained branch
 - skill install progress reports an existing `ddfile` or `ddfile.local` as requiring no dependency installs when appropriate, and says a manifest is missing only when the corresponding file is absent
 - separator-based and modern bookmark `HEAD` sections survive parse/serialize and render as raw content inside the page document's `<head>`, while the editor highlights their content as HTML
 - when the home runtime already has `.gitignore` or compatibility `.gitiignore`, explicit skill installs append `skills/<repo-name>/` without duplicates so cloned skill trees stay ignored by runtime Git checkouts
-- `dashboard skill` is covered as the singular alias for `dashboard skills` management commands while installed command execution remains on the dotted `dashboard <skill>.<command>` path
-- streamed `install.sh` runs such as `curl ... | sh` succeed without a local checkout by falling back to embedded `aptfile`, `apkfile`, `dnfile`, and `brewfile` manifests, shipping `tmux` in those bootstrap package sets because `dashboard workspace` is a first-party tmux workflow, cloning the current GitHub `master` checkout into a temporary local tree when no explicit `DD_INSTALL_CPAN_TARGET` override is set, and Debian-family or Alpine hosts bootstrap `App::perlbrew` automatically when the package manager path did not already provide `perlbrew`
+- `d2 skill` is covered as the singular alias for `d2 skills` management commands while installed command execution remains on the dotted `d2 <skill>.<command>` path
+- streamed `install.sh` runs such as `curl ... | sh` succeed without a local checkout by falling back to embedded `aptfile`, `apkfile`, `dnfile`, and `brewfile` manifests, shipping `tmux` in those bootstrap package sets because `d2 workspace` is a first-party tmux workflow, cloning the current GitHub `master` checkout into a temporary local tree when no explicit `DD_INSTALL_CPAN_TARGET` override is set, and Debian-family or Alpine hosts bootstrap `App::perlbrew` automatically when the package manager path did not already provide `perlbrew`
 - the old-system-Perl Alpine rescue path keeps the locally bootstrapped `perlbrew` and `patchperl` tools on the private `~/perl5/lib/perl5` include path so `curl ... | sh` can still build `perl-5.44.0` instead of dying with missing `App::perlbrew` or `Devel::PatchPerl` modules
 - Debian-family streamed bootstrap also copes with third-party `nodejs` repositories that conflict with the distro `npm` package by installing `nodejs` first, checking whether `npm` and `npx` are already present, and only then attempting the distro `npm` package
 - Alpine streamed bootstrap installs the repo-root `apkfile` package set through `apk add --no-cache` and then proves the same post-install shell finish line as Debian-family hosts
 - Debian-family streamed bootstrap uses `perlbrew --notest install perl-5.44.0` for the old-system-Perl rescue path so blank-machine bootstrap does not fail on upstream Perl core test noise before Developer Dashboard itself is installed
-- `install.sh` prints a full progress board before it changes the system, then emits only per-step transitions instead of redrawing the whole board, explains any upcoming `sudo` prompt as an operating-system package-manager password request before the prompt appears, suppresses perlbrew's generic `~/.profile` advice, updates the chosen rc file itself with the required `PERLBREW_HOME` and rescue-Perl `PATH` lines without sourcing perlbrew's bash-only startup file under generic `sh`, appends the matching `dashboard shell bash|zsh|sh` eval line so `d2`, prompt integration, and completion come up automatically, bridges bash login shells through `~/.profile` to `~/.bashrc`, seeds `File::ShareDir::Install` into the private `~/perl5` bootstrap before the checkout install, installs the local checkout directly with `cpanm --no-wget --notest .` when the installer is running from a checkout or extracted tarball, re-enters an activated shell automatically on a real terminal-backed `curl ... | sh` run, and for automated acceptance uses `DD_INSTALL_SHELL_COMMANDS` to prove `dashboard version`, `d2 version`, and `dashboard skills install browser` through that activated shell path
+- `install.sh` prints a full progress board before it changes the system, then emits only per-step transitions instead of redrawing the whole board, explains any upcoming `sudo` prompt as an operating-system package-manager password request before the prompt appears, suppresses perlbrew's generic `~/.profile` advice, updates the chosen rc file itself with the required `PERLBREW_HOME` and rescue-Perl `PATH` lines without sourcing perlbrew's bash-only startup file under generic `sh`, appends the matching `d2 shell bash|zsh|sh` eval line so `d2`, prompt integration, and completion come up automatically, bridges bash login shells through `~/.profile` to `~/.bashrc`, seeds `File::ShareDir::Install` into the private `~/perl5` bootstrap before the checkout install, installs the local checkout directly with `cpanm --no-wget --notest .` when the installer is running from a checkout or extracted tarball, re-enters an activated shell automatically on a real terminal-backed `curl ... | sh` run, and for automated acceptance uses `DD_INSTALL_SHELL_COMMANDS` to prove `d2 version`, `d2 version`, and `d2 skills install browser` through that activated shell path
 - blank macOS streamed bootstrap now also covers the no-Homebrew starting state, proving `install.sh` bootstraps Homebrew first, updates `PATH` from the discovered Homebrew prefix in the same run, and only then installs the repo `brewfile` package set
-- `dashboard workspace` tmux sessions move prompt indicators into the first row of a session-local two-line bottom tmux status block, keep the normal indexed session/window row underneath it, keep the inline prompt free of duplicated indicators even for older sessions that only expose `TICKET_REF`, refresh the live indicator strip automatically through tmux status refresh at a 15-second cadence instead of a hot 2-second loop, and do not change ordinary tmux sessions or any user tmux config file
+- `d2 workspace` tmux sessions move prompt indicators into the first row of a session-local two-line bottom tmux status block, keep the normal indexed session/window row underneath it, keep the inline prompt free of duplicated indicators even for older sessions that only expose `TICKET_REF`, refresh the live indicator strip automatically through tmux status refresh at a 15-second cadence instead of a hot 2-second loop, and do not change ordinary tmux sessions or any user tmux config file
 - nested installed skill nav trees such as `skills/ho/skills/coverage/dashboards/nav/index.tt` render on the nested skill route itself and also join the shared nav strip above normal saved `/app/<page>` routes
-- the staged home-runtime `shell` helper itself must emit that tmux-aware bootstrap after install, not just the repo checkout `bin/dashboard shell ...` path
+- the staged home-runtime `shell` helper itself must emit that tmux-aware bootstrap after install, not just the repo checkout `bin/d2 shell ...` path
 - a broken config Perl collector reports an error without stopping other configured collectors
-- a healthy config collector still reports `ok` and stays green in `dashboard indicator list`, `dashboard ps1`, and `/system/status`, without being clobbered back to `missing` by concurrent config-sync refreshes
-- a killed managed collector loop is restarted automatically by the watchdog, and repeated crash loops eventually surface `watchdog_attention_required` in `dashboard collector status <name>` instead of going silent
-- a live managed collector loop that stops updating its status or completion timestamps is treated as stalled, recycled automatically by the watchdog, and reported explicitly in `dashboard collector status <name>` instead of sitting silent forever
-- `dashboard collector log` prints aggregated collector transcripts, `dashboard collector log <name>` prints the named collector transcript, and configured collectors that have not run yet report an explicit no-log message instead of blank output
+- a healthy config collector still reports `ok` and stays green in `d2 indicator list`, `d2 ps1`, and `/system/status`, without being clobbered back to `missing` by concurrent config-sync refreshes
+- a killed managed collector loop is restarted automatically by the watchdog, and repeated crash loops eventually surface `watchdog_attention_required` in `d2 collector status <name>` instead of going silent
+- a live managed collector loop that stops updating its status or completion timestamps is treated as stalled, recycled automatically by the watchdog, and reported explicitly in `d2 collector status <name>` instead of sitting silent forever
+- `d2 collector log` prints aggregated collector transcripts, `d2 collector log <name>` prints the named collector transcript, and configured collectors that have not run yet report an explicit no-log message instead of blank output
 - TT-backed collector icons render from stdout JSON and stay rendered through later config-sync reads instead of reverting to raw `[% ... %]` text
 - the web service serves the root editor on `127.0.0.1:7890`
 - the browser can load both the editor and a saved fake-project bookmark page from the fake project bookmark directory
 - the browser sees sorted shared `nav/*.tt` fragments above the main page body on that fake-project bookmark page
 - the browser top-right status strip shows configured collector icons and does not leave stale renamed collector indicators behind
 - nested `DD-OOP-LAYERS` collector prompts do not let a child-layer placeholder `missing` state override a healthy inherited parent-layer collector indicator when the child config adds no collector override
-- under `DD-OOP-LAYERS`, `dashboard path add` writes only the new child-layer alias delta into the deepest child `config/config.json` instead of copying inherited parent config domains into that file
+- under `DD-OOP-LAYERS`, `d2 path add` writes only the new child-layer alias delta into the deepest child `config/config.json` instead of copying inherited parent config domains into that file
 - bookmark pages can use `fetch_value()`, `stream_value()`, and `stream_data()` helpers against saved `/ajax/...` endpoints on first render
 - the installed `/ajax/<file>` route streams early output chunks promptly enough to prove browser-visible progress instead of silent buffering
 - skill pages that ship `config/routes.json` emit their declared canonical custom ajax paths, while the smart `/ajax/<repo-name>/...` route still works as the parent compatibility resolver and custom paths stay fallback-only before a normal `404`
 - layered `config/api.json` files under both runtime roots and installed skills can authorize selected saved `/ajax/...` routes for machine callers, those callers must present matching `X-DD-API-Key` and `X-DD-API-Secret` headers, helper-session auth still works on the same registered routes, and missing or wrong API credentials fail closed with `403 {"status":"forbidden"}`
-- the built-in `dashboard api` command can list that effective merged registry, hash raw secrets from `--secret` or `--maybe-secret` before saving them, add and remove exact saved ajax routes, and write only to the deepest writable `config/api.json` layer while masking inherited keys through child-layer tombstones
+- the built-in `d2 api` command can list that effective merged registry, hash raw secrets from `--secret` or `--maybe-secret` before saving them, add and remove exact saved ajax routes, and write only to the deepest writable `config/api.json` layer while masking inherited keys through child-layer tombstones
 - non-loopback access produces `401` with an empty body and without a login page until a helper user exists in the active runtime
-- under `dashboard serve --ssl`, plain `http://HOST:PORT/...` requests on the public listener return a same-port `307` redirect to `https://HOST:PORT/...`, the generated cert advertises SAN coverage for `localhost`, `127.0.0.1`, and `::1`, and a browser then reaches the expected self-signed certificate warning instead of a reset connection
+- under `d2 serve --ssl`, plain `http://HOST:PORT/...` requests on the public listener return a same-port `307` redirect to `https://HOST:PORT/...`, the generated cert advertises SAN coverage for `localhost`, `127.0.0.1`, and `::1`, and a browser then reaches the expected self-signed certificate warning instead of a reset connection
 - after a helper user exists, non-loopback access produces the helper login page
 - helper logout removes both the helper session and the helper account
-- `dashboard stop` leaves no active listener on port `7890`
-- `dashboard stop` and `dashboard restart` still control the real serving pid
+- `d2 stop` leaves no active listener on port `7890`
+- `d2 stop` and `d2 restart` still control the real serving pid
   when the web process has renamed itself into a `starman master` listener
   shape, so container lifecycle checks stay attached to the active listener
-- interactive `dashboard stop` and `dashboard restart` runs print the full lifecycle task board on `stderr` before work begins, so managed shutdown and startup waits stay visible instead of looking hung
-- `dashboard stop` and `dashboard restart` default to a final terminal table summary, while `-o json` keeps the machine-readable payload
-- `dashboard stop web`, `dashboard stop collector`, `dashboard stop collector <name>`, `dashboard restart web`, `dashboard restart collector`, `dashboard restart collector <name>`, `dashboard log`, `dashboard logs`, `dashboard log web`, `dashboard log collector`, and `dashboard log collector <name>` all behave as documented, with collector-name completion feeding the scoped collector commands
-- `dashboard logs -t`, `-f`, `--tail N`, and `--tail=N` work together across mixed web/collector output, web-only output, all collectors, and one named collector; tail limits the initial snapshot, follow streams only newly appended content from each selected source, and `-n N` remains a compatible tail alias
+- interactive `d2 stop` and `d2 restart` runs print the full lifecycle task board on `stderr` before work begins, so managed shutdown and startup waits stay visible instead of looking hung
+- `d2 stop` and `d2 restart` default to a final terminal table summary, while `-o json` keeps the machine-readable payload
+- `d2 stop web`, `d2 stop collector`, `d2 stop collector <name>`, `d2 restart web`, `d2 restart collector`, `d2 restart collector <name>`, `d2 log`, `d2 logs`, `d2 log web`, `d2 log collector`, and `d2 log collector <name>` all behave as documented, with collector-name completion feeding the scoped collector commands
+- `d2 logs -t`, `-f`, `--tail N`, and `--tail=N` work together across mixed web/collector output, web-only output, all collectors, and one named collector; tail limits the initial snapshot, follow streams only newly appended content from each selected source, and `-n N` remains a compatible tail alias
 - collector `-t` prefixes use each persisted run timestamp; raw web log lines have no stored per-line time, so their timestamp marks the time the log is read
-- `dashboard serve logs` accepts the same timestamp, follow, and tail flags for web-only output
+- `d2 serve logs` accepts the same timestamp, follow, and tail flags for web-only output
 - runtime stop/restart behavior still works when listener ownership must be
   discovered through `/proc` instead of `ss`
 - Linux host lifecycle runs ignore web and collector pids that belong to a
   different pid namespace, so a host-side runtime does not kill or adopt a
-  sibling Docker runtime during `dashboard stop` or `dashboard restart`
-- `dashboard restart` also succeeds when a listener pid survives the first stop
+  sibling Docker runtime during `d2 stop` or `d2 restart`
+- `d2 restart` also succeeds when a listener pid survives the first stop
   sweep and must be discovered by a late port re-probe
-- `dashboard restart` only reports success after the replacement runtime still
+- `d2 restart` only reports success after the replacement runtime still
   has a live managed pid and an accepting listener on the requested port, and
   after that ready state survives a short confirmation window instead of
   trusting an acknowledged pid that dies immediately afterwards
@@ -278,9 +280,9 @@ The upstream README documents a compose flow using `dockurr/macos`,
 `/dev/kvm`, `/dev/net/tun`, `NET_ADMIN`, and the web installer on port `8006`.
 Once the guest is installed and reachable, copy the built tarball in, install
 Developer Dashboard with `cpanm`, create a skill that ships a `brewfile`, and
-confirm `dashboard skills install <skill>` prints the requested Homebrew
+confirm `d2 skills install <skill>` prints the requested Homebrew
 packages before running `brew install ...`. When the fixture directory also
-contains `ddfile` and `ddfile.local`, run `dashboard skills install --ddfile`
+contains `ddfile` and `ddfile.local`, run `d2 skills install --ddfile`
 from that directory and confirm the global entries land under the active
 layered skills root while the local entries land under `./skills/`.
 
@@ -357,8 +359,9 @@ and `latest` tags for Linux amd64 and arm64. Full test and coverage gates must
 pass before publication; rerunning the full suite under QEMU for each target
 architecture duplicated that work and caused the 120-minute workflow timeout.
 The exact tarball still receives a tested `cpanm` install in the blank Docker
-environment above. The workflow contract is covered by
-`t/228-dockerhub-image-workflow.t`; Docker Hub publication itself requires
+environment above. The workflow contract was covered by
+the test 228-dockerhub-image-workflow, removed on 2026-11-23 together with the
+GitHub workflow files it checked; Docker Hub publication itself requires
 GitHub-managed credentials and is verified in the Actions run.
 
 The run passes when:

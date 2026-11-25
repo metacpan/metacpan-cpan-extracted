@@ -2,6 +2,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use Capture::Tiny qw(capture);
+use Config;
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Copy qw(copy);
@@ -180,14 +181,24 @@ is_deeply( \@offenders, [],
 
 done_testing;
 
-# Purpose: locate an executable by name on PATH.
+# Purpose: locate an executable by name on PATH, on every platform. PATH is
+#          split on the platform's own separator, and on Windows the name is
+#          tried with each PATHEXT extension, because a command there is a
+#          file such as git.exe and Perl's -x goes by that extension.
 # Input:   the command name.
 # Output:  the full path to the executable, or undef when it is not on PATH.
 sub _find_command {
     my ($name) = @_;
-    for my $dir ( split /:/, ( $ENV{PATH} || q{} ) ) {
-        my $candidate = File::Spec->catfile( $dir, $name );
-        return $candidate if -x $candidate;
+    my $is_windows = $^O eq 'MSWin32';
+    my @extensions = $is_windows
+      ? grep { length } split /;/, ( $ENV{PATHEXT} || '.COM;.EXE;.BAT;.CMD' )
+      : (q{});
+    for my $dir ( grep { length } split /\Q$Config{path_sep}\E/, ( $ENV{PATH} || q{} ) ) {
+        for my $extension (@extensions) {
+            my $candidate = File::Spec->catfile( $dir, $name . $extension );
+            next if !-f $candidate;
+            return $candidate if $is_windows || -x $candidate;
+        }
     }
     return;
 }

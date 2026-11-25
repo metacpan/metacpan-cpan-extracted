@@ -16,7 +16,7 @@ use Net::Async::HTTP ();
 use Future ();
 use Future::Utils qw( repeat fmap_void );
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 
 # Keys forwarded straight to the underlying WWW::Crawl4AI orchestrator.
@@ -106,7 +106,12 @@ sub _do_request_with_retry {
   my ( $self, $request, $backend, $attempt ) = @_;
   my $client = $self->client;
   my $max    = $client->max_attempts;
-  return $self->http->do_request( request => $request, fail_on_error => 0 )->then(
+  return $self->http->do_request(
+    request       => $request,
+    fail_on_error => 0,
+    max_redirects => 0,
+    timeout       => $client->timeout,
+  )->then(
     sub {
       my ( $response ) = @_;
       return Future->done($response) if $response->is_success;
@@ -214,9 +219,33 @@ sub health {
   my ( $self ) = @_;
   my $client = $self->client;
   return $self->do_request( $client->health_request )->then(
-    sub { Future->done( $client->parse_health_response( $_[0] ) ? 1 : 0 ) },
-    sub { Future->done(0) },
+    sub {
+      my ( $res ) = @_;
+      # The parser dies on a non-2xx (a 3xx included), as in the sync client.
+      my $healthy = eval { $client->parse_health_response($res) ? 1 : 0 };
+      if ( my $err = $@ ) {
+        $self->_warn_health_failure($err);
+        return Future->done(0);
+      }
+      return Future->done($healthy);
+    },
+    sub {
+      my ( $err ) = @_;
+      $self->_warn_health_failure($err);
+      return Future->done(0);
+    },
   );
+}
+
+# Same warning as WWW::Crawl4AI::Client::health: the reason on one line.
+sub _warn_health_failure {
+  my ( $self, $err ) = @_;
+  my $message = blessed($err) && $err->isa('WWW::Crawl4AI::Error') ? $err->message : $err;
+  $message = '' unless defined $message;
+  $message =~ s/\s*\n.*\z//s;
+  $message =~ s/\s+\z//;
+  warn 'crawl4ai health check failed: ' . $message . "\n" if length $message;
+  return;
 }
 
 
@@ -472,7 +501,7 @@ Net::Async::Crawl4AI - IO::Async Crawl4AI client with an async strategy chain
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -530,6 +559,10 @@ as C<< crawl4ai => $www >>.
 Async-only keys: C<poll_interval>, C<http> (pre-built L<Net::Async::HTTP>),
 C<delay_sub> (CodeRef → Future, for retry/poll delays; mainly a test hook).
 
+C<timeout> (seconds, default 120) is applied to every request as the
+L<Net::Async::HTTP> C<timeout>; a stalled request fails as a C<transport> error
+and is retried like any other transport failure.
+
 The retry policy (C<max_attempts>, C<retry_backoff>, C<retry_statuses>,
 C<on_retry>) lives on the underlying L<WWW::Crawl4AI::Client>.
 
@@ -568,6 +601,11 @@ Low-level: dispatch an L<HTTP::Request> (typically built via
 C<< $self->client->foo_request >>) through L<Net::Async::HTTP> with the retry
 policy applied. Returns a Future of L<HTTP::Response>.
 
+Redirects are never followed (C<< max_redirects => 0 >>), matching the sync
+client: a 3xx response is handed back like any other non-2xx, so the
+endpoint's parser reports it as a C<type=api> error carrying the 3xx
+C<status_code>.
+
 =head2 crawl_once
 
   $crawler->crawl_once($request, $backend?) → Future[\@pages]
@@ -598,7 +636,10 @@ with a C<type=job> L<WWW::Crawl4AI::Error> when the job reports C<FAILED>.
 =head2 health
 
 Resolves to 1 if the Crawl4AI server answers C<GET /health>, else 0. Never
-fails.
+fails. Like the sync L<WWW::Crawl4AI::Client/health>, a failed check (a
+transport error, or a non-2xx answer including a 3xx) warns once,
+C<crawl4ai health check failed: E<lt>reasonE<gt>>, with the reason on a single
+line, before resolving 0.
 
 =head2 screenshot
 
@@ -695,7 +736,7 @@ L<https://github.com/unclecode/crawl4ai>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-net-async-crawl4ai/issues>.
 
 =head1 CONTRIBUTING
@@ -704,11 +745,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

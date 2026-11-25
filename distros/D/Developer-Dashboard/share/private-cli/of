@@ -24,19 +24,19 @@ of - private open-file helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard of [--print] [--line N] [--editor CMD] [--online] <file|scope> [pattern...]
+  d2 of [--print] [--line N] [--editor CMD] [--online] <file|scope> [pattern...]
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
-C<dashboard> command can keep file-opening behaviour available without
+C<d2> command can keep file-opening behaviour available without
 installing a generic executable into the user's global PATH.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard of>, the short name for the dashboard
+This staged helper exposes C<d2 of>, the short name for the dashboard
 open-file command. It is the shell-facing entrypoint for direct file opens,
 scoped regex search, Perl module lookup, Java dotted class lookup, and the
 print-vs-editor decision that happens after resolution.
@@ -45,18 +45,18 @@ print-vs-editor decision that happens after resolution.
 
 It exists because file lookup is a frequent interactive task and should stay
 fast to type, but the public switchboard still needs to stay thin. The helper
-lets users type C<dashboard of ...> while the heavy search and ranking rules
+lets users type C<d2 of ...> while the heavy search and ranking rules
 stay in C<Developer::Dashboard::CLI::OpenFile>.
 
 =head1 WHEN TO USE
 
 Use this file when changing the short-form CLI contract for open-file behavior,
 the staged-helper handoff, or the exact examples contributors see when they
-look up how C<dashboard of> behaves.
+look up how C<d2 of> behaves.
 
 =head1 HOW TO USE
 
-Users run C<dashboard of [--print] [--line N] [--editor CMD] [--online]
+Users run C<d2 of [--print] [--line N] [--editor CMD] [--online]
 E<lt>file|scopeE<gt> [pattern ...]>. Direct paths and C<file:line> arguments
 resolve immediately. In scoped mode the first positional argument is the
 search root or saved alias, and every extra positional argument is a
@@ -75,12 +75,12 @@ resolution, Java source lookup, and print-vs-editor behavior.
 
 =head1 EXAMPLES
 
-  dashboard of lib 'OpenFile\.pm$'
-  dashboard of . "Ok\.js$"
-  dashboard of Developer::Dashboard::CLI::Paths
-  dashboard of javax.jws.WebService
-  dashboard of --online javax.jws.WebService
-  dashboard of --print bookmarks index
+  d2 of lib 'OpenFile\.pm$'
+  d2 of . "Ok\.js$"
+  d2 of Developer::Dashboard::CLI::Paths
+  d2 of javax.jws.WebService
+  d2 of --online javax.jws.WebService
+  d2 of --print bookmarks index
 
 =for comment FULL-POD-DOC END
 

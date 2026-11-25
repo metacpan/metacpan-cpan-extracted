@@ -96,7 +96,7 @@ Build the release tarball and verify the exact artifact reaches 100 percent kwal
 
 Example 2:
 
-  dashboard pause-release --dry-run
+  d2 pause-release --dry-run
 
 Preview the release path, then run this focused kwalitee gate before the real upload if you changed packaging metadata.
 

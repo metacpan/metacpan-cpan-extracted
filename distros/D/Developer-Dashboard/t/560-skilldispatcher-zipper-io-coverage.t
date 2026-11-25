@@ -11,7 +11,18 @@ use warnings;
 our ( %FAIL, $EXEC_FAKE );
 
 BEGIN {
+    require Symbol;
     *CORE::GLOBAL::open = sub (*;$@) {
+        # A bareword handle such as STDOUT reaches a "*" prototype as a plain
+        # string, which CORE::open refuses under strict refs. Resolve it to
+        # the caller's glob first. Windows is where this is exercised: the
+        # product secures runtime paths there by running icacls with STDOUT
+        # and STDERR redirected and restored.
+        if ( defined $_[0] && !ref $_[0] ) {
+            my $glob = Symbol::qualify_to_ref( $_[0], scalar caller );
+            return CORE::open( $glob, $_[1] ) if @_ == 2;
+            return CORE::open( $glob, $_[1], @_[ 2 .. $#_ ] );
+        }
         if ( @_ >= 3 && defined $_[2] && !ref $_[2] && $FAIL{ $_[2] } ) {
             $! = 13;
             return 0;
@@ -30,6 +41,15 @@ BEGIN {
         return 1 if $EXEC_FAKE;
         no warnings;
         return CORE::exec(@_);
+    };
+    # On Windows _exec_replacement runs the command with system() and then
+    # calls exit(), so the faked exec above is never reached there. Fake
+    # exit too while $EXEC_FAKE is set so the Windows branch falls through
+    # instead of ending the process before done_testing; otherwise delegate
+    # to the real exit so the harness can still end the run.
+    *CORE::GLOBAL::exit = sub {
+        return 0 if $EXEC_FAKE;
+        return CORE::exit( $_[0] // 0 );
     };
 }
 
@@ -162,10 +182,13 @@ is_deeply( [ $dispatcher->_relative_files($nav_root) ], ['a.tt'], 'relative file
 
 # A faked successful exec falls through. Only one exec is exercised per process
 # because Devel::Cover stops recording after the first exec; the failing exec
-# is covered by the other skill tests.
+# is covered by the other skill tests. On Windows the handoff is system+exit,
+# so the faked exit above is what makes this fall through there.
 {
     local $EXEC_FAKE = 1;
-    ok( !$dispatcher->_exec_replacement( ['true'], [] ), 'an exec that hands off falls through without an error string' );
+    # A Perl child, not the Unix-only "true": the Windows handoff really
+    # runs the command with system() before the faked exit.
+    ok( !$dispatcher->_exec_replacement( [ $^X, '-e', 'exit 0' ], [] ), 'an exec that hands off falls through without an error string' );
 }
 
 done_testing;

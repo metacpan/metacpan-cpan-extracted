@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 
-use 5.040;
+use 5.020;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Install and sync skills, agents and rules for Claude Code, Codex and Hermes Agent",
+  "ABSTRACT" => "Retired: skilletor's Perl port; use the skilletor plugin or its install.sh",
   "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,46 +17,17 @@ my %WriteMakefileArgs = (
     "script/skilletor"
   ],
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.040",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "Skilletor",
-  "PREREQ_PM" => {
-    "B" => 0,
-    "Carp" => 0,
-    "Compress::Raw::Zlib" => 0,
-    "Cwd" => 0,
-    "Digest::SHA" => 0,
-    "Encode" => 0,
-    "Errno" => 0,
-    "Exporter" => 0,
-    "Fcntl" => 0,
-    "File::Spec" => 0,
-    "HTTP::Tiny" => "0.083",
-    "Hash::Ordered" => 0,
-    "IO::Handle" => 0,
-    "IO::Select" => 0,
-    "IO::Socket::SSL" => "1.968",
-    "JSON::MaybeXS" => "1.004000",
-    "Moo" => "2.000000",
-    "Moo::Role" => 0,
-    "Net::SSLeay" => "1.49",
-    "POSIX" => 0,
-    "Path::Tiny" => "0.119",
-    "Scalar::Util" => 0,
-    "Sys::Hostname" => 0,
-    "Text::Nunjucks" => "0.001",
-    "Time::HiRes" => 0,
-    "Unicode::Normalize" => 0,
-    "namespace::clean" => 0
-  },
+  "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
+    "File::Find" => 0,
     "FindBin" => 0,
-    "IO::Compress::Gzip" => 0,
-    "IO::Socket::INET" => 0,
-    "IPC::Open2" => 0,
-    "Test::More" => "0.96",
-    "version" => "0.77"
+    "IPC::Open3" => 0,
+    "Symbol" => 0,
+    "Test::More" => 0
   },
-  "VERSION" => "0.008000",
+  "VERSION" => "0.009000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,39 +35,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "B" => 0,
-  "Carp" => 0,
-  "Compress::Raw::Zlib" => 0,
-  "Cwd" => 0,
-  "Digest::SHA" => 0,
-  "Encode" => 0,
-  "Errno" => 0,
-  "Exporter" => 0,
-  "Fcntl" => 0,
-  "File::Spec" => 0,
+  "File::Find" => 0,
   "FindBin" => 0,
-  "HTTP::Tiny" => "0.083",
-  "Hash::Ordered" => 0,
-  "IO::Compress::Gzip" => 0,
-  "IO::Handle" => 0,
-  "IO::Select" => 0,
-  "IO::Socket::INET" => 0,
-  "IO::Socket::SSL" => "1.968",
-  "IPC::Open2" => 0,
-  "JSON::MaybeXS" => "1.004000",
-  "Moo" => "2.000000",
-  "Moo::Role" => 0,
-  "Net::SSLeay" => "1.49",
-  "POSIX" => 0,
-  "Path::Tiny" => "0.119",
-  "Scalar::Util" => 0,
-  "Sys::Hostname" => 0,
-  "Test::More" => "0.96",
-  "Text::Nunjucks" => "0.001",
-  "Time::HiRes" => 0,
-  "Unicode::Normalize" => 0,
-  "namespace::clean" => 0,
-  "version" => "0.77"
+  "IPC::Open3" => 0,
+  "Symbol" => 0,
+  "Test::More" => 0
 );
 
 

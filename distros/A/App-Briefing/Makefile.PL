@@ -7,39 +7,21 @@ use 5.020;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Preload declared skills into Claude Code and Codex subagents at spawn time",
+  "ABSTRACT" => "Retired: Claude Code preloads agent skills natively",
   "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "Module::CPANfile" => "1.1004"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "App-Briefing",
-  "EXE_FILES" => [
-    "script/briefing"
-  ],
   "LICENSE" => "artistic_2",
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "App::Briefing",
-  "PREREQ_PM" => {
-    "B" => 0,
-    "Carp" => 0,
-    "Encode" => 0,
-    "JSON::MaybeXS" => 0,
-    "Moo" => 0,
-    "Path::Tiny" => 0,
-    "TOML::Tiny::Parser" => "0.22",
-    "namespace::clean" => 0
-  },
+  "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
-    "Cwd" => 0,
-    "Exporter" => 0,
-    "File::Temp" => 0,
     "FindBin" => 0,
-    "IPC::Open3" => 0,
-    "Symbol" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006000",
+  "VERSION" => "0.007000",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,32 +29,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "B" => 0,
-  "Carp" => 0,
-  "Cwd" => 0,
-  "Encode" => 0,
-  "Exporter" => 0,
-  "File::Temp" => 0,
   "FindBin" => 0,
-  "IPC::Open3" => 0,
-  "JSON::MaybeXS" => 0,
-  "Moo" => 0,
-  "Path::Tiny" => 0,
-  "Symbol" => 0,
-  "TOML::Tiny::Parser" => "0.22",
-  "Test::More" => 0,
-  "namespace::clean" => 0
+  "Test::More" => 0
 );
-
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
-require Module::CPANfile;
-my $dynamic_prereqs = Module::CPANfile->load('cpanfile')->prereq_specs;
-my $runtime_requires = $dynamic_prereqs->{runtime}{requires} || {};
-$WriteMakefileArgs{PREREQ_PM} ||= {};
-for my $module (keys %{$runtime_requires}) {
-  $WriteMakefileArgs{PREREQ_PM}{$module} = $runtime_requires->{$module};
-  $FallbackPrereqs{$module} = $runtime_requires->{$module};
-}
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

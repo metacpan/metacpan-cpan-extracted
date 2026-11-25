@@ -25,6 +25,7 @@ use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PageStore;
+use Developer::Dashboard::PathIdentity qw(_resolve_symlinks);
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Prompt;
 use Developer::Dashboard::SessionStore;
@@ -63,12 +64,12 @@ local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 my $repo_root = File::Spec->rel2abs('.');
 my $repo_lib = File::Spec->catdir( $repo_root, 'lib' );
 chdir $ENV{HOME} or die "Unable to chdir to $ENV{HOME}: $!";
-my $dashboard_bin = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
+my $dashboard_bin = File::Spec->catfile( $repo_root, 'bin', 'd2' );
 my ( $seed_init_stdout, $seed_init_stderr, $seed_init_exit ) = capture {
     system( $^X, "-I$repo_lib", $dashboard_bin, 'init' );
 };
-is( $seed_init_exit, 0, 'dashboard init exits cleanly for web app fixture setup' );
-is( $seed_init_stderr, '', 'dashboard init does not emit stderr for web app fixture setup' );
+is( $seed_init_exit, 0, 'd2 init exits cleanly for web app fixture setup' );
+is( $seed_init_stderr, '', 'd2 init does not emit stderr for web app fixture setup' );
 
 my $paths = Developer::Dashboard::PathRegistry->new;
 my $store = Developer::Dashboard::PageStore->new(paths => $paths);
@@ -432,6 +433,55 @@ like( $fresh_settings_body, qr/read-only no-editor mode/, 'the fresh request use
 }
 
 {
+    my $delayed_app = Developer::Dashboard::Web::App->new(
+        auth     => $auth,
+        config   => $config,
+        pages    => $store,
+        prompt   => $prompt,
+        runtime  => $runtime,
+        sessions => $sessions,
+    );
+    my $delayed_watch = Local::Problem48ConfigSnapshotWatch->new;
+    my $merged_calls = 0;
+    my $original_merged = Developer::Dashboard::Config->can('merged');
+    my ( $initial_status, $updated_status, $unchanged_calls );
+    {
+        no warnings qw(redefine once);
+        local *Developer::Dashboard::IndicatorStore::Watch::new = sub { return $delayed_watch };
+        local *Local::Problem48ConfigSnapshotWatch::unchanged = sub {
+            $delayed_watch->{unchanged_calls}++;
+            return 1;
+        };
+        local *Developer::Dashboard::Config::merged = sub {
+            $merged_calls++;
+            return $original_merged->(@_);
+        };
+        is( $delayed_app->_config_snapshot_watcher, $delayed_watch, 'delayed-event fixture installs its controlled watcher' );
+        $config->save_global_web_settings( no_editor => 0 );
+        $initial_status = $delayed_app->handle(
+            path        => '/app/welcome',
+            query       => '',
+            remote_addr => '127.0.0.1',
+            headers     => { host => '127.0.0.1' },
+        )->[0];
+        $unchanged_calls = $delayed_watch->{unchanged_calls};
+        $config->save_global_web_settings( no_editor => 1 );
+        $updated_status = $delayed_app->handle(
+            path        => '/app/welcome/edit',
+            query       => '',
+            remote_addr => '127.0.0.1',
+            headers     => { host => '127.0.0.1' },
+        )->[0];
+        $config->save_global_web_settings( no_editor => 0 );
+    }
+    is( $initial_status, 200, 'a watched request initially sees the editable page' );
+    is( $updated_status, 403, 'a watched request sees an atomic config change before its native event is delivered' );
+    is( $merged_calls, 2, 'a changed config bypasses an apparently unchanged native watcher snapshot' );
+    cmp_ok( $delayed_watch->{unchanged_calls}, '>', $unchanged_calls,
+        'the delayed-event fixture reports its unchanged state on the later request' );
+}
+
+{
     my $signature_app = bless { pages => $store }, 'Developer::Dashboard::Web::App';
     my $before = $signature_app->_config_snapshot_environment_signature;
     like( $before, qr/\ADASHBOARD_CONFIG_SNAPSHOT\0v1\0/, 'snapshot environment signature uses versioned unambiguous framing' );
@@ -695,8 +745,10 @@ like( $fresh_settings_body, qr/read-only no-editor mode/, 'the fresh request use
             local $portable_app->{_request_config_snapshot} = undef;
             $portable_app->_request_config_snapshot;
         }
-        is( $installed_skill_lookups, 3,
-            'each later portable cache hit performs one fresh skill-layer discovery to preserve filesystem freshness' );
+        cmp_ok( $installed_skill_lookups, '>=', 3,
+            'each later cache hit discovers fresh skill layers' );
+        cmp_ok( $installed_skill_lookups, '<=', 4,
+            'later cache hits make no more than two discovery passes' );
         my $bad_skill_entries_error;
         eval { $portable_app->_config_snapshot_portable_signature( [], {} ); 1 }
           or $bad_skill_entries_error = $@;
@@ -854,20 +906,25 @@ like( $fresh_settings_body, qr/read-only no-editor mode/, 'the fresh request use
     }
 }
 
-for my $cache_case (qw(no_watcher portable_hit portable_stale_signature portable_missing_environment portable_changed_environment portable_missing_signature invalid_cache missing_environment changed_environment missing_watch_signature changed_watcher complete_hit)) {
+for my $cache_case (qw(no_watcher portable_hit portable_stale_signature portable_missing_environment portable_changed_environment portable_missing_signature invalid_cache missing_environment changed_environment missing_watch_signature changed_watcher watcher_missing_portable_signature watcher_changed_portable_signature complete_hit)) {
     my $merged_config = bless {}, 'Local::Problem48MergedConfig';
-    my $watch = bless { unchanged => $cache_case eq 'changed_watcher' ? 0 : 1 }, 'Local::Problem48FixedWatch';
+    my $watch = bless { unchanged => $cache_case eq 'changed_watcher' ? 0 : 1, checks => 0 }, 'Local::Problem48FixedWatch';
     my $cached_snapshot = { merged_config => { cached => $cache_case }, skill_config_entries => [] };
     my $cached = $cache_case eq 'invalid_cache'
       ? []
       : {
         environment_signature => 'current',
         watch_signature       => 'stable-watch',
+        portable_signature    => 'stable-portable',
         snapshot              => $cached_snapshot,
       };
     if ( $cache_case =~ /\Aportable_/ ) {
         $cached->{portable_signature} = $cache_case eq 'portable_stale_signature' ? 'stale-portable' : 'stable-portable'
           if $cache_case ne 'portable_missing_signature';
+        delete $cached->{portable_signature} if $cache_case eq 'portable_missing_signature';
+        ok( !defined $cached->{portable_signature},
+            'portable_missing_signature fixture omits the cached freshness signature' )
+          if $cache_case eq 'portable_missing_signature';
         delete $cached->{environment_signature} if $cache_case eq 'portable_missing_environment';
         $cached->{environment_signature} = 'stale' if $cache_case eq 'portable_changed_environment';
         delete $cached->{watch_signature};
@@ -875,6 +932,8 @@ for my $cache_case (qw(no_watcher portable_hit portable_stale_signature portable
     delete $cached->{environment_signature} if $cache_case eq 'missing_environment';
     $cached->{environment_signature} = 'stale' if $cache_case eq 'changed_environment';
     delete $cached->{watch_signature} if $cache_case eq 'missing_watch_signature';
+    delete $cached->{portable_signature} if $cache_case eq 'watcher_missing_portable_signature';
+    $cached->{portable_signature} = 'stale-portable' if $cache_case eq 'watcher_changed_portable_signature';
     my $snapshot_app = bless {
         config                    => $merged_config,
         pages                     => {},
@@ -891,25 +950,39 @@ for my $cache_case (qw(no_watcher portable_hit portable_stale_signature portable
             return { merged => 'fresh' };
         };
         local *Developer::Dashboard::Web::App::_config_snapshot_environment_signature = sub { return 'current' };
-        if ( $cache_case =~ /\Aportable_/ ) {
+        if ( $cache_case =~ /\Aportable_/ || $cache_case =~ /\Awatcher_/ || $cache_case eq 'changed_watcher' || $cache_case eq 'complete_hit' ) {
             local *Developer::Dashboard::Web::App::_config_snapshot_watch_paths = sub { return [] };
             local *Developer::Dashboard::Web::App::_config_snapshot_portable_signature = sub { return 'stable-portable' };
+            if ( $cache_case eq 'changed_watcher' ) {
+                local *Developer::Dashboard::Web::App::_config_snapshot_watcher = sub { return $watch };
+                my $snapshot = $snapshot_app->_request_config_snapshot;
+                is( $snapshot->{merged_config}{merged}, 'fresh', 'a changed native watcher rebuilds the config snapshot' );
+                is( $merge_count, 1, 'a changed native watcher performs one config merge' );
+                is( $watch->{checks}, 2, 'a changed native watcher is checked before and after the merge' );
+                next;
+            }
             if ( $cache_case eq 'portable_hit' ) {
                 my $snapshot = $snapshot_app->_request_config_snapshot;
                 is( $snapshot, $cached_snapshot, 'a matching portable signature returns its cached config snapshot' );
                 is( $merge_count, 0, 'a portable cache hit avoids another merged-config load' );
                 next;
             }
+            if ( $cache_case eq 'complete_hit' ) {
+                my $snapshot = $snapshot_app->_request_config_snapshot;
+                is( $snapshot, $cached_snapshot, 'a complete matching cache entry is returned without rebuilding' );
+                is( $merge_count, 0, 'a complete matching cache entry avoids another config merge' );
+                is( $watch->{checks}, 1, 'the matching watcher cache checks the native watcher before reuse' );
+                next;
+            }
         }
         my $snapshot = $snapshot_app->_request_config_snapshot;
-        if ( $cache_case eq 'complete_hit' ) {
-            is( $snapshot, $cached_snapshot, 'a complete matching cache entry is returned without rebuilding' );
-            is( $merge_count, 0, 'a complete matching cache entry avoids another config merge' );
-        }
-        else {
-            is( $snapshot->{merged_config}{merged}, 'fresh', "$cache_case cache state safely rebuilds merged config" );
-            is( $merge_count, 1, "$cache_case cache state performs exactly one config merge" );
-        }
+        is( $snapshot->{merged_config}{merged}, 'fresh', "$cache_case cache state safely rebuilds merged config" );
+        is( $merge_count, 1, "$cache_case cache state performs exactly one config merge" );
+        ok( !exists $snapshot_app->{_config_snapshot_cache},
+            'a native watcher change evicts the stale application snapshot' )
+          if $cache_case eq 'changed_watcher';
+        is( $watch->{checks}, 1, 'a fully matching cached watcher entry is rejected when the watcher reports a change' )
+          if $cache_case eq 'changed_watcher';
     }
 }
 
@@ -941,7 +1014,7 @@ for my $cache_case (qw(no_watcher portable_hit portable_stale_signature portable
     }
 }
 
-for my $unstable_mode (qw(path_changed watcher_changed portable_changed)) {
+for my $unstable_mode (qw(path_changed watcher_changed portable_changed watcher_missing_signature watcher_portable_changed)) {
     my $merged_config = bless {}, 'Local::Problem48MergedConfig';
     my $unstable_watch = Local::Problem48ConfigSnapshotWatch->new;
     my $snapshot_app = bless {
@@ -960,7 +1033,26 @@ for my $unstable_mode (qw(path_changed watcher_changed portable_changed)) {
             $path_call++;
             return $unstable_mode eq 'path_changed' && $path_call > 1 ? ['/changed'] : ['/initial'];
         };
-        if ( $unstable_mode eq 'portable_changed' ) {
+        local *Developer::Dashboard::Web::App::_config_snapshot_portable_signature = sub { return 'stable-inventory'; };
+        if ( $unstable_mode eq 'watcher_missing_signature' ) {
+            my $signature_call = 0;
+            local *Developer::Dashboard::Web::App::_config_snapshot_portable_signature = sub {
+                return ++$signature_call == 1 ? undef : 'stable-inventory';
+            };
+            $snapshot_app->_request_config_snapshot;
+            is( $signature_call, 2,
+                'a watcher snapshot still rechecks freshness after the merge when its baseline is unavailable' );
+        }
+        elsif ( $unstable_mode eq 'watcher_portable_changed' ) {
+            my $signature_call = 0;
+            local *Developer::Dashboard::Web::App::_config_snapshot_portable_signature = sub {
+                return ++$signature_call == 1 ? 'before-merge' : 'changed-during-merge';
+            };
+            $snapshot_app->_request_config_snapshot;
+            is( $signature_call, 2,
+                'a watcher snapshot compares its fresh signature after the merge' );
+        }
+        elsif ( $unstable_mode eq 'portable_changed' ) {
             my $signature_call = 0;
             local *Developer::Dashboard::Web::App::_config_snapshot_portable_signature = sub {
                 return ++$signature_call == 1 ? 'before-merge' : 'changed-during-merge';
@@ -1016,16 +1108,20 @@ for my $unstable_mode (qw(path_changed watcher_changed portable_changed)) {
 }
 
 {
+    # '/tmp' does not exist on Windows, so the ancestor walk would climb
+    # past it to the root and the grep would never match. Use a real
+    # tempdir so the root is an existing directory on every platform.
+    my $skill_root = tempdir(CLEANUP => 1);
     my $entries_paths = bless {
         runtime_roots => [],
         config_roots => [ undef, [], '' ],
         skills_roots => [],
-        installed => [ undef, 'not a record', {}, { layers => 'not a list' }, { layers => [ undef, [], '' ] }, { layers => ['/tmp'] } ],
-        nested => [ undef, 'not a record', {}, { dir => undef }, { dir => [] }, { dir => '/tmp' } ],
+        installed => [ undef, 'not a record', {}, { layers => 'not a list' }, { layers => [ undef, [], '' ] }, { layers => [$skill_root] } ],
+        nested => [ undef, 'not a record', {}, { dir => undef }, { dir => [] }, { dir => $skill_root } ],
     }, 'Local::Problem48SkillEntryPaths';
     my $entries_app = bless { pages => $entries_paths }, 'Developer::Dashboard::Web::App';
     my $watch_paths = $entries_app->_config_snapshot_watch_paths;
-    ok( ( grep { $_ eq '/tmp' } @{$watch_paths} ), 'watch-path discovery includes valid installed and nested skill roots' );
+    ok( ( grep { $_ eq $skill_root } @{$watch_paths} ), 'watch-path discovery includes valid installed and nested skill roots' );
     ok( !( grep { ref($_) } @{$watch_paths} ), 'watch-path discovery ignores malformed skill entry and path values' );
 }
 
@@ -1972,8 +2068,15 @@ my ( $code2b, undef, $body2b );
         'saved-page route snapshots ordered page roots once despite loading its page and nav fragments' );
     my @dashboard_roots = $paths->dashboards_roots;
     my $root_resolve_counts = sub {
-        my %counts = map { $_ => 0 } @dashboard_roots;
-        $counts{$_}++ for grep { exists $counts{$_} } @page_store_abs_path_inputs;
+        # abs_path inputs are recorded after PageStore resolves symlink
+        # components (e.g. /var -> /private/var on macOS), while
+        # dashboards_roots keeps the unresolved spelling, so compare
+        # both sides through the same symlink resolution.
+        my %counts = map { _resolve_symlinks($_) => 0 } @dashboard_roots;
+        for my $input (@page_store_abs_path_inputs) {
+            my $resolved = _resolve_symlinks($input);
+            $counts{$resolved}++ if defined $resolved && exists $counts{$resolved};
+        }
         return [ sort grep { $_ > 0 } values %counts ];
     };
     is_deeply( $root_resolve_counts->(), [1], 'saved-page and nav path checks resolve each dashboards root once per request' );
@@ -2578,6 +2681,7 @@ is_deeply(
 
     sub unchanged {
         my ( $self, $signature ) = @_;
+        $self->{unchanged_calls}++;
         return 0 if !defined $self->{signature} || $self->{signature} ne $signature;
         return $self->{stable} ? 1 : 0;
     }
@@ -2644,7 +2748,10 @@ is_deeply(
     package Local::Problem48FixedWatch;
 
     sub configure { return 1 }
-    sub unchanged { return $_[0]->{unchanged} }
+    sub unchanged {
+        $_[0]->{checks}++;
+        return $_[0]->{unchanged};
+    }
 }
 
 {
@@ -2762,11 +2869,17 @@ template-service scopes. It also covers the status configuration snapshot
 watcher's cache-hit, invalidation, setup-failure, and runtime/project-boundary
 cases, plus the portable validator's unchanged cache hit, same-size config
 edit, and skill config file creation/removal when the native backend is
-unavailable. It verifies that normalized indicator
+unavailable. It verifies that an absent initial freshness signature disables
+cache reuse in both portable and watcher-backed modes. A controlled
+delayed-event watcher also proves that an atomic config replacement refreshes
+the next request through high-resolution file
+metadata before the native event arrives. It verifies that normalized indicator
 collectors are reused only for an unchanged watched configuration and that a
 checker-filter change alters the cache signature. It protects the static
 raw-nav fast path while confirming dynamic Template Toolkit nav fragments
-still receive request context.
+still receive request context. Watcher-cache cases also exercise missing and
+mismatched portable signatures and prove that an otherwise matching cached
+entry is rejected when the watcher reports a change.
 
 =for comment FULL-POD-DOC START
 

@@ -1,3 +1,18 @@
+v0.39.02  2026-11-25Z
+    - Corrected copyright header
+    - Added more tests
+    - Improved tests
+
+v0.39  2026-11-24Z
+    - Updated list of reserved methods in Data::Identifier::Interface::Simple
+    - Updated tag list in Data::Identifier::Wellknown
+    - Added backup for language tags (work around I18N::LangTags::List)
+    - Added ::Util->match_origin(), and ::Util->normalise_uri()
+    - Added ::Util->register_package()
+    - Added more tests
+    - Marked subobject related options in Data::Identifier::new() as deprecated
+    - Added experimental support to pass so as a hashref in as()
+
 v0.38  2026-11-10Z
     - Preform correct isa()-recheck as part of as()
     - Corrected validation for simple tags

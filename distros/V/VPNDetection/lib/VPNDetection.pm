@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.19.0';
+our $VERSION = '3.19.1';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -152,6 +152,12 @@ sub new {
     my $cache_size = defined $args{cache_size} ? $args{cache_size} : 10_000;
     Carp::croak('VPNDetection->new: concurrency must be a whole number, 1 or more') unless _is_count($concurrency, 1);
     Carp::croak('VPNDetection->new: retries must be a whole number, 0 or more') unless _is_count($retries, 0);
+    Carp::croak('VPNDetection->new: cache_size must be a whole number, 0 or more') unless _is_count($cache_size, 0);
+    # NaN compares false with any time, so a NaN lifetime never went stale and
+    # held every answer for good; a negative or non-numeric one cached nothing.
+    my $cache_ttl = defined $args{cache_ttl} ? $args{cache_ttl} : 3600;
+    Carp::croak('VPNDetection->new: cache_ttl must be a number of seconds, 0 or more')
+        unless !ref $cache_ttl && Scalar::Util::looks_like_number($cache_ttl) && $cache_ttl >= 0;
     # Mojo arms a negative or non-numeric bound as a timer that fires at once, so
     # every call would fail as a network error.
     my $timeout = defined $args{timeout} ? $args{timeout} : 30;
@@ -182,10 +188,7 @@ sub new {
         # Numified: Mojo arms a bound only when it is true, and '0.0', '00', '0e0'
         # and '0 but true' are true strings, each a timer that fires at once.
         timeout => 0 + $timeout,
-        cache => $cache_size > 0 ? VPNDetection::Cache->new(
-            max => $cache_size,
-            ttl => defined $args{cache_ttl} ? $args{cache_ttl} : 3600,
-        ) : undef,
+        cache => $cache_size > 0 ? VPNDetection::Cache->new(max => 0 + $cache_size, ttl => 0 + $cache_ttl) : undef,
         # The addresses with a request in flight, each a promise its waiters
         # take the answer from (see _board).
         flights => {},
@@ -900,7 +903,7 @@ before writing an C<if>.
 Your API key. Without one a lookup is on Unlimited, the free plan: C<ip>,
 C<is_vpn>, the Tor and relay members, C<location> and C<asn>, with no daily or
 monthly cap.
-Every paid plan answers every field, and a batch needs one. An empty or blank key is the same as none, and
+The Data plan answers every field, and a batch needs a paid plan. An empty or blank key is the same as none, and
 sends no C<Authorization> header. The key is trimmed, so one read from
 a file with its newline works; a key still holding a control character, or a
 character past U+00FF, croaks here.
@@ -911,11 +914,13 @@ Defaults to C<https://api.vpndetection.io>.
 
 =item cache_size
 
-Addresses held in this client's cache. Defaults to 10000; B<0 disables caching>.
+Addresses held in this client's cache, a whole number from 0. Defaults to 10000;
+B<0 disables caching>.
 
 =item cache_ttl
 
-How long an answer stays fresh, in seconds. Defaults to 3600.
+How long an answer stays fresh, in seconds, a number from 0. Defaults to 3600; at
+0 nothing stays.
 
 =item concurrency
 

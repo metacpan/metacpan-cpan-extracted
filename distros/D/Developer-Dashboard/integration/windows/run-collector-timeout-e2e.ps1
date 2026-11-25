@@ -66,7 +66,7 @@ function Get-PerlBin {
     throw "Unable to find a Perl interpreter for the blocking collector command"
 }
 
-# Purpose: resolve the installed dashboard command path.
+# Purpose: resolve the installed d2 command path.
 # Input: optional explicit dashboard executable path.
 # Output: returns the dashboard executable path or throws if it is missing from PATH.
 function Get-DashboardBin {
@@ -82,7 +82,7 @@ function Get-DashboardBin {
         return $commandPath
     }
 
-    throw "Unable to find installed dashboard command in PATH"
+    throw "Unable to find installed d2 command in PATH"
 }
 
 # Purpose: throw with a labelled message when a condition does not hold.
@@ -124,7 +124,7 @@ function Get-ProcessesMatching {
 # Input: none.
 # Output: returns nothing; logs and stops each stray process best-effort.
 function Stop-StrayDashboardProcesses {
-    foreach ($fragment in @('dd-timeout-e2e-', '.developer-dashboard', 'dashboard collector')) {
+    foreach ($fragment in @('dd-timeout-e2e-', '.developer-dashboard', 'd2 collector')) {
         foreach ($stray in @( Get-ProcessesMatching -Fragment $fragment )) {
             Write-Host ("clean-slate: stopping stray pid {0}: {1}" -f $stray.ProcessId, $stray.CommandLine)
             Stop-Process -Id $stray.ProcessId -Force -ErrorAction SilentlyContinue
@@ -159,7 +159,7 @@ function Assert-MarkerProcessesGone {
     throw "ASSERT FAILED: $($survivors.Count) marker process(es) survived $GraceSeconds seconds after the timeout"
 }
 
-# Purpose: run one dashboard CLI invocation and return its stdout text.
+# Purpose: run one d2 CLI invocation and return its stdout text.
 # Input: dashboard executable path plus argument array and a label.
 # Output: returns captured stdout and throws on a non-zero exit code.
 function Invoke-Dashboard {
@@ -257,7 +257,7 @@ Push-Location $projectRoot
 try {
     Write-Host "==> trigger the blocking collector (timeout ${TimeoutSeconds}s, block 3600s)"
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-    $runOutput = Invoke-Dashboard -Dashboard $Dashboard -Arguments @("collector", "run", "timeout.e2e") -Label "dashboard collector run timeout.e2e"
+    $runOutput = Invoke-Dashboard -Dashboard $Dashboard -Arguments @("collector", "run", "timeout.e2e") -Label "d2 collector run timeout.e2e"
     $stopwatch.Stop()
     $elapsed = [int]$stopwatch.Elapsed.TotalSeconds
     Write-Host "collector run returned after ${elapsed}s"
@@ -289,7 +289,7 @@ try {
     }
 
     Write-Host "==> verify the cached collector status reflects the timeout"
-    $statusOutput = Invoke-Dashboard -Dashboard $Dashboard -Arguments @("collector", "status", "timeout.e2e") -Label "dashboard collector status timeout.e2e"
+    $statusOutput = Invoke-Dashboard -Dashboard $Dashboard -Arguments @("collector", "status", "timeout.e2e") -Label "d2 collector status timeout.e2e"
     Write-Host $statusOutput
     $status = $statusOutput | ConvertFrom-Json
     Assert-True -Condition ($status.timed_out -eq 1) -Label "cached collector status reports timed_out=1"
@@ -297,7 +297,7 @@ try {
     Assert-True -Condition ($status.running -eq 0) -Label "cached collector status reports running=0 after the timeout"
 
     Write-Host "==> verify the collector agent survived: run a healthy collector after the timeout"
-    $aliveOutput = Invoke-Dashboard -Dashboard $Dashboard -Arguments @("collector", "run", "alive.e2e") -Label "dashboard collector run alive.e2e"
+    $aliveOutput = Invoke-Dashboard -Dashboard $Dashboard -Arguments @("collector", "run", "alive.e2e") -Label "d2 collector run alive.e2e"
     Write-Host $aliveOutput
     $aliveResult = $aliveOutput | ConvertFrom-Json
     Assert-True -Condition ($aliveResult.exit_code -eq 0) -Label "post-timeout healthy collector run exits 0"
@@ -348,7 +348,7 @@ descendant process, records both pids, prints one line of output, and sleeps.
 Every process in that command subtree carries a unique per-run marker on its
 command line.
 
-The script then triggers C<dashboard collector run> and asserts the full
+The script then triggers C<d2 collector run> and asserts the full
 timeout contract with real process-state evidence, not just exit codes: the
 run returns near the configured timeout instead of the one-hour block, the
 structured result reports C<timed_out> with exit code 124 and preserves the
@@ -359,7 +359,7 @@ collector agent itself survived without crashing.
 
 Run it over SSH on a prepared QEMU guest, through the C<windev> guest, or
 through the Dockur Windows guest's shared-folder job channel. The installed
-C<dashboard> and a Perl interpreter are resolved from PATH unless
+C<d2> and a Perl interpreter are resolved from PATH unless
 C<-DashboardBin> or C<-PerlBin> point at explicit executables. The companion
 host-side driver F<run-dockur-collector-timeout-e2e.sh> installs a freshly built
 tarball into the Dockur guest and runs this script there in one repeatable step.

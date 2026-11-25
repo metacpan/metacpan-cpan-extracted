@@ -40,6 +40,14 @@ $SIG{__WARN__} = sub { die "WARNING: $_[0]" };
         my ( $self, @rest ) = @_;
         return Developer::Dashboard::PathRegistry::_chmod_pending( $self, @rest );
     }
+    # _chmod_pending dispatches to _apply_file_mode as a method on its
+    # invocant, so this double needs it too. Like the two above, it never
+    # touches the invocant's internals - it only tightens the given path
+    # to the given mode - so forwarding straight through is safe.
+    sub _apply_file_mode {
+        my ( $self, @rest ) = @_;
+        return Developer::Dashboard::PathRegistry::_apply_file_mode( $self, @rest );
+    }
 }
 
 # write_file($path, $content)

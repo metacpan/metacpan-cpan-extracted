@@ -1,10 +1,11 @@
-package Dist::Conformance::Check::ToolConfiguration 0.007;
+package Dist::Conformance::Check::ToolConfiguration 0.008;
 
 # ABSTRACT: The configuration files of the tools exist
 
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
+no autovivification;
 use Mojo::Base 'Dist::Conformance::Check', -signatures;
 
 use Dist::Conformance::Schema();
@@ -50,7 +51,7 @@ Dist::Conformance::Check::ToolConfiguration - The configuration files of the too
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

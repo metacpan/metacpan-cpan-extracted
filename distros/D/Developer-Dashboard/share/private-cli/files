@@ -24,19 +24,19 @@ files - private runtime file helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard files
+  d2 files
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
-C<dashboard> command can expose the active runtime file set without loading the
+C<d2> command can expose the active runtime file set without loading the
 full runtime first.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard files>, the command that prints the
+This staged helper exposes C<d2 files>, the command that prints the
 active runtime file set as JSON. It is the shell-visible entrypoint for named
 runtime files such as logs, pid/state files, config files, and configured file
 aliases.
@@ -49,13 +49,13 @@ the lookup and serialization rules.
 
 =head1 WHEN TO USE
 
-Use this file when changing the C<dashboard files> CLI contract, the staged
+Use this file when changing the C<d2 files> CLI contract, the staged
 helper handoff, or the exact examples contributors use to inspect active
 runtime files from the shell.
 
 =head1 HOW TO USE
 
-Users run C<dashboard files>. The staged helper forwards the request to the
+Users run C<d2 files>. The staged helper forwards the request to the
 lightweight file runtime, which collects named runtime files and configured
 aliases for the current working directory and prints that payload as JSON.
 
@@ -66,7 +66,7 @@ active runtime file payload.
 
 =head1 EXAMPLES
 
-  dashboard files
+  d2 files
 
 =for comment FULL-POD-DOC END
 

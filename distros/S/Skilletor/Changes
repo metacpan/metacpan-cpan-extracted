@@ -1,5 +1,24 @@
 Revision history for skilletor and Skilletor, its Perl distribution
 
+0.009000  2026-11-25 04:39:00Z
+  - CPAN: skilletor's Perl port is retired. Skilletor ships the 62 modules of
+    0.008000 as empty stubs whose documentation names the replacement (the
+    skilletor plugin for Claude Code, Codex or Hermes Agent, or install.sh),
+    so an upgrade replaces the earlier library code; Skilletor::Briefing is
+    back as one of them, Skilletor::AgentSkills is not released. The
+    `skilletor` program and Skilletor::CLI::run print that notice and exit 1,
+    the `hook` command 0. The distribution needs core Perl 5.20 alone and
+    builds no binaries.
+  - Plugin: The briefing plugin is gone from skilletor. The check for an
+    installed agent's skills reads the agent's top-level `skills:` list (the
+    one Claude Code preloads) and warns "agent <name> (claude): skills not
+    installed: …"; the JSON field `briefingMissing` is now `skillsMissing` in
+    sync and status reports. A Codex role file carries no skills, so Codex
+    agents are not checked, and the `# briefing: skills = [...]` comment line
+    is no longer written. A `briefing:` key left in a source's frontmatter is
+    an ordinary unknown key. The project's `settings.json` requirement names
+    only the skilletor plugin.
+
 0.008000  2026-11-21 03:31:10Z
   - One version line in two spellings: the CPAN dist Skilletor 0.008000 is the
     plugin's 0.8.0 (package.json, the Codex and Hermes manifests). The dist

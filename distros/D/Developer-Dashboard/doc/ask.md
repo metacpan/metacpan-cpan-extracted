@@ -1,8 +1,8 @@
-# Asking an AI backend: `dashboard ask`
+# Asking an AI backend: `d2 ask`
 
-`dashboard ask <question>` puts a question to an AI coding assistant straight
+`d2 ask <question>` puts a question to an AI coding assistant straight
 from the shell and prints a plain-text answer. The running conversation is
-remembered **per workspace**, so a later `dashboard ask` in the same workspace
+remembered **per workspace**, so a later `d2 ask` in the same workspace
 continues the same thread instead of starting over.
 
 ## Backends
@@ -24,7 +24,7 @@ the workspace until you pick another:
 Each CLI backend is invoked non-interactively. If the selected CLI is not
 installed, `ask` reports which package to install rather than failing silently.
 
-Run `dashboard ask --help` at any time to see the full, current usage text -
+Run `d2 ask --help` at any time to see the full, current usage text -
 every backend flag and every option, generated from the same source the CLI
 itself uses so it can never drift out of sync with what `ask` actually
 supports.
@@ -32,7 +32,7 @@ supports.
 ## Key resolution (claude backend)
 
 1. `ANTHROPIC_API_KEY` in the environment.
-2. `claude.api_key` in the merged dashboard config.
+2. `claude.api_key` in the merged d2 config.
 3. If no key is found, the local `claude` CLI is used instead.
 4. If there is neither a key nor a `claude` CLI, `ask` reports the problem.
 
@@ -62,14 +62,14 @@ backend instead of dropping the attachment silently.
 
 ```sh
 # Ask the default claude backend; the turn is remembered for this workspace.
-dashboard ask "How do I list collectors?"
+d2 ask "How do I list collectors?"
 
 # Switch to codex (sticky) and inline a text file.
-dashboard ask --codex "Explain this stack trace" --file trace.txt
+d2 ask --codex "Explain this stack trace" --file trace.txt
 
 # Start over and override the model for one turn.
-dashboard ask --new --model claude-sonnet-5 "Summarize the repo"
+d2 ask --new --model claude-sonnet-5 "Summarize the repo"
 
 # Pipe context in on stdin.
-git diff | dashboard ask "Review this change"
+git diff | d2 ask "Review this change"
 ```

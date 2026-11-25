@@ -3,7 +3,7 @@ package Developer::Dashboard::Folder;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use File::Basename qw(dirname);
@@ -70,7 +70,7 @@ sub bookmarks {
 }
 
 # configs()
-# Returns the dashboard config directory.
+# Returns the d2 config directory.
 # Input: none.
 # Output: directory path string.
 sub configs {
@@ -79,7 +79,7 @@ sub configs {
 }
 
 # all()
-# Returns the full runtime path inventory exposed by C<dashboard paths>.
+# Returns the full runtime path inventory exposed by C<d2 paths>.
 # Input: none.
 # Output: hash reference describing the active runtime path set plus named aliases.
 sub all {
@@ -109,8 +109,11 @@ sub _paths_obj {
     return if $home eq '';
     $PATHS = Developer::Dashboard::PathRegistry->new(
         home            => $home,
-        workspace_roots => [ grep { -d } map { "$home/$_" } qw(projects src work) ],
-        project_roots   => [ grep { -d } map { "$home/$_" } qw(projects src work) ],
+        # catdir, not "$home/$_": string interpolation spells the separator
+        # with a forward slash on every platform, while the registry is
+        # compared against File::Spec spellings.
+        workspace_roots => [ grep { -d } map { File::Spec->catdir( $home, $_ ) } qw(projects src work) ],
+        project_roots   => [ grep { -d } map { File::Spec->catdir( $home, $_ ) } qw(projects src work) ],
     );
     _load_configured_aliases();
     return $PATHS;
@@ -219,7 +222,7 @@ sub locate {
                 no_chdir => 1,
                 wanted   => sub {
                     return if !-d $_;
-                    my $path = $File::Find::name;
+                    my $path = File::Spec->canonpath($File::Find::name);
                     for my $part (@parts) {
                         return if $path !~ /\Q$part\E/i;
                     }
@@ -278,7 +281,10 @@ sub AUTOLOAD {
     return if $name eq 'DESTROY';
     my $path = $class->_resolve_path($name);
     die "Unknown folder '$name'" if !defined $path;
-    make_path($path) if $path ne '' && $path =~ m{^/} && !-e $path;
+    # file_name_is_absolute, not m{^/}: a Windows drive-letter path never
+    # starts with a forward slash, so the old guard never created the
+    # directory there (solo #423, t/112 test 60).
+    make_path($path) if $path ne '' && File::Spec->file_name_is_absolute($path) && !-e $path;
     return $path;
 }
 
@@ -310,7 +316,7 @@ Configure and resolve compatibility folders.
 
 =head1 PURPOSE
 
-This module provides named folder resolution for runtime roots and configured aliases. It gives callers the same conceptual folder names exposed by C<dashboard paths> without forcing them to know the exact on-disk layout under the current runtime.
+This module provides named folder resolution for runtime roots and configured aliases. It gives callers the same conceptual folder names exposed by C<d2 paths> without forcing them to know the exact on-disk layout under the current runtime.
 
 =head1 WHY IT EXISTS
 
@@ -324,7 +330,7 @@ Use this file when a module, bookmark, or helper needs a named runtime directory
 
 Load C<Developer::Dashboard::Folder> and ask it for the named folder you need. Use it as the semantic folder layer above the lower-level path registry instead of hard-coding F<~/.developer-dashboard> descendants.
 
-When you need the complete resolved path payload that C<dashboard paths>
+When you need the complete resolved path payload that C<d2 paths>
 prints, call C<Developer::Dashboard::Folder-E<gt>all>. It returns the same
 hash shape as the CLI command.
 

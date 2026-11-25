@@ -1,0 +1,31 @@
+name: CI
+
+# Runs the test suite and the author tests. It never releases: no dzil release,
+# no CPAN upload, no push, and the token is read-only.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: perl ${{ matrix.perl }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl: ['5.30', '5.38', '5.40']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+      - name: Install dependencies
+        run: cpanm --quiet --notest --installdeps --with-recommends --with-develop .
+      - name: Test suite
+        run: prove -lr t/
+      - name: Author tests
+        run: prove -lr xt/

@@ -151,8 +151,8 @@ sub reset ($self, @args) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms
     # DBI takes its slower way given one, so it's given none.
     my $slice = $self->_slice;
     $slice = undef if is_plain_arrayref($slice) && !@$slice;
-    @$self{qw(executed done ended produced column_names slice)}
-        = (1, 0, undef, 0, [], $slice);
+    @$self{qw(executed done ended column_names slice)}
+        = (1, 0, undef, [], $slice);
     # The source's set-up executes the statement, as the run starts.
     $self->{pipeline} //= _pipeline($self);
     $self->{run}        = $self->{pipeline}->iterator(_statement($self));
@@ -163,21 +163,11 @@ sub reset ($self, @args) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms
     return $self;
 }
 
-# Return the pipeline of the iterator's stages, if any, followed by one
-# counting the results, for DBIx::Squirrel::Context: before the last, if
-# it's a sink, whose result is the run's, so its results are counted too.
-# It holds the iterator weakly, so the iterator can keep it.
+# Return the pipeline of the iterator's stages. Ekorn's run counts their
+# results, for DBIx::Squirrel::Context's result_number, so there's no
+# stage of ours to count them (roadmap 2026-0032).
 sub _pipeline ($self) {
-    my @counted = @{ $self->{stages} };
-    if (@counted) {
-        my $counter = $self;
-        weaken $counter;
-        my $at = Ekorn::Pipeline::is_sink($counted[-1]) ? $#counted : @counted;
-
-        # Without a signature, as it's called for each result.
-        splice @counted, $at, 0, sub { $counter->{produced}++; $_[0] };
-    }
-    return Ekorn::Pipeline->new(@counted);
+    return Ekorn::Pipeline->new(@{ $self->{stages} });
 }
 
 # Return how the last run ended, as Ekorn's iterator says: done, stopped
@@ -333,7 +323,15 @@ sub _statement ($self) {
             $sth->finish if $sth->{Active};
             return;
         };
-        return {step => $step, end => $end, context => $context};
+        # The original of the value given last, the row, for Ekorn's
+        # result_original, which passes it through chains (roadmap
+        # 2026-0046).
+        return {
+            step     => $step,
+            end      => $end,
+            context  => $context,
+            original => sub { $context->{row} },
+        };
     };
 }
 

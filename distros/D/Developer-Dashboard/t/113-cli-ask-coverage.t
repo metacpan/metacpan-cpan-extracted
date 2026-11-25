@@ -391,8 +391,15 @@ subtest 'transcript load and save edge cases' => sub {
         $save->( $rename_target, { backend => 'claude', messages => [] }, $paths );
         umask($old_umask);
         ok( defined $DD602_OBSERVED_RENAME_MODE, 'DD-602: _save_transcript renamed a source file into the predictable final path (rename observed)' );
-        is( sprintf( '%04o', $DD602_OBSERVED_RENAME_MODE // -1 ), '0600',
-            'DD-602: the source file was already 0600 BEFORE the rename that made it visible at its final, predictable path - even under umask(0)' );
+        # skip() ends with 'last SKIP', so it must run inside a SKIP: block:
+        # called outside one it dies with 'Label not found for last SKIP'
+        # (round 57, t/113 on Windows - on Unix the $^O guard never fires,
+        # so the bare call was never exercised there).
+      SKIP: {
+            skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
+            is( sprintf( '%04o', $DD602_OBSERVED_RENAME_MODE // -1 ), '0600',
+                'DD-602: the source file was already 0600 BEFORE the rename that made it visible at its final, predictable path - even under umask(0)' );
+        }
     }
 
     # DD-602: force the close-stage die. The temp path is fully predictable
@@ -457,7 +464,29 @@ subtest '_run_cli reports an unexecutable command distinctly' => sub {
     like( $missing_err, qr/Can't exec "dd-ask-no-such-command-42"/, 'the exec failure is reported in the captured standard error' );
     like( $teed, qr/Can't exec "dd-ask-no-such-command-42"/, 'the live tee echoes the exec failure instead of leaking it into the test output' );
 
-    my ( $stdout, $stderr, $exit ) = $run->( [ $^X, '-e', 'print "ran\n"' ] );
+    # Same missing-command shape through the Windows branch: on Windows
+    # system() hands the command to cmd.exe, which exits 1 with "not
+    # recognized" text instead of -1 with "Can't exec", so _run_cli checks
+    # resolvability first and reports the same -1 with the same words.
+    # Proved on Linux with $^O localized; on Windows the branch is live.
+    {
+        local $^O = 'MSWin32';
+        my @win_missing;
+        my $win_teed = capture_stderr { @win_missing = $run->( ['dd-ask-no-such-command-42'] ) };
+        is( $win_missing[2], -1, 'on Windows a command that cannot be executed reports -1' );
+        like( $win_missing[1], qr/Can't exec "dd-ask-no-such-command-42"/, 'on Windows the exec failure is reported in the captured standard error' );
+        like( $win_teed, qr/Can't exec "dd-ask-no-such-command-42"/, 'on Windows the live tee echoes the exec failure' );
+    }
+
+    # A quoted -e script does not survive Win32 command-line construction
+    # (win32 system() re-splits an argument holding spaces and double
+    # quotes), so the probe runs from a temp file instead.
+    my $probe_dir = tempdir( CLEANUP => 1 );
+    my $probe     = File::Spec->catfile( $probe_dir, 'ran.pl' );
+    open my $probe_fh, '>', $probe or die "Unable to write $probe: $!";
+    print {$probe_fh} "print \"ran\\n\";\n" or die "Unable to write $probe: $!";
+    close $probe_fh or die "Unable to close $probe: $!";
+    my ( $stdout, $stderr, $exit ) = $run->( [ $^X, $probe ] );
     is( $exit,   0,       'a real command reports its shifted exit status' );
     is( $stdout, "ran\n", 'a real command has its stdout captured' );
 };
@@ -562,7 +591,7 @@ t/113-cli-ask-coverage.t - branch and condition coverage for the ask CLI module
 
 =head1 PURPOSE
 
-This test drives the decision paths of the C<dashboard ask> implementation that
+This test drives the decision paths of the C<d2 ask> implementation that
 the behavioural ask tests never reach: the fallback seams of C<run_ask> (process
 environment, self-built layered config and path registry), blank-value handling
 in backend and API-key resolution, malformed Anthropic response payloads,

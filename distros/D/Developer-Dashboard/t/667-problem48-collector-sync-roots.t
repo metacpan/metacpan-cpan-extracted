@@ -10,6 +10,15 @@ use Test::More;
 
 our %P48_SYNC_DIR_ROOT_BY_FD;
 our ( $P48_SYNC_FAIL_OPENDIR, $P48_SYNC_FAIL_READDIR, $P48_SYNC_FAIL_CLOSEDIR );
+# _p48_dir_key($handle): identity of one open directory handle. fileno() on a
+# directory handle needs dirfd(), which Windows does not have (it returns
+# undef there), so the handle itself is the key: it is the same glob for the
+# opendir, readdir and closedir of one directory on every platform.
+sub _p48_dir_key {
+    my ($handle) = @_;
+    return defined $handle ? "$handle" : undef;
+}
+
 BEGIN {
     no warnings 'redefine';
     *CORE::GLOBAL::opendir = sub (*$) {
@@ -19,12 +28,12 @@ BEGIN {
             return 0;
         }
         my $opened = CORE::opendir( $_[0], $root );
-        $main::P48_SYNC_DIR_ROOT_BY_FD{ fileno( $_[0] ) } = $root if $opened;
+        $main::P48_SYNC_DIR_ROOT_BY_FD{ _p48_dir_key( $_[0] ) } = $root if $opened;
         return $opened;
     };
     *CORE::GLOBAL::readdir = sub (*) {
         my ($handle) = @_;
-        my $root = $main::P48_SYNC_DIR_ROOT_BY_FD{ fileno($handle) };
+        my $root = $main::P48_SYNC_DIR_ROOT_BY_FD{ _p48_dir_key($handle) };
         if ( defined $main::P48_SYNC_FAIL_READDIR && defined $root && $root eq $main::P48_SYNC_FAIL_READDIR ) {
             $! = Errno::EIO();
             return;
@@ -33,7 +42,7 @@ BEGIN {
     };
     *CORE::GLOBAL::closedir = sub (*) {
         my ($handle) = @_;
-        my $fd = fileno($handle);
+        my $fd = _p48_dir_key($handle);
         my $root = defined $fd ? delete $main::P48_SYNC_DIR_ROOT_BY_FD{$fd} : undef;
         if ( defined $main::P48_SYNC_FAIL_CLOSEDIR && defined $root && $root eq $main::P48_SYNC_FAIL_CLOSEDIR ) {
             CORE::closedir($handle) or return 0;
@@ -57,7 +66,7 @@ my $paths = Developer::Dashboard::PathRegistry->new;
 my $store = Developer::Dashboard::IndicatorStore->new( paths => $paths );
 # This file verifies the portable metadata/stat validator and its path-cache
 # counters. Keep the optional native watcher disabled so these assertions stay
-# deterministic on systems where FFI::Platypus is installed.
+# deterministic on systems where the native XS watcher is available.
 $store->{_indicator_sync_watcher_unavailable} = 1;
 my @jobs = map {
     {

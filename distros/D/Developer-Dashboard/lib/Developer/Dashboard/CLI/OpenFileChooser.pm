@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::OpenFileChooser;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Exporter 'import';
 
@@ -41,7 +41,7 @@ sub _editor_supports_tabs {
 #
 # Deliberately NOT a bare "is STDIN a tty" check: this command's chooser is
 # designed to be answered non-interactively by piping an answer ahead of
-# time (e.g. `printf '2\n' | dashboard of ...`), which is real, documented,
+# time (e.g. `printf '2\n' | d2 of ...`), which is real, documented,
 # already-tested behavior (t/05-cli-smoke.t) - a tty-only check would wrongly
 # treat that legitimate piped answer as "nobody is coming" and skip reading
 # it. The actual hang this guards against is narrower: a STDIN connection
@@ -70,6 +70,20 @@ sub _stdin_has_pending_input {
     my $fileno = fileno(STDIN);
     return 1 if !defined $fileno || $fileno < 0;
 
+    if ( $^O eq 'MSWin32' ) {
+        # On Windows IO::Select only works for real sockets, so the call
+        # below returns 0 immediately for a regular file (which never
+        # blocks) and never waits out the timeout for a pipe, which is
+        # exactly backwards. Answer the two cases Windows can answer
+        # natively and leave anything else (a socket) to IO::Select.
+        return 1 if -f STDIN;
+        if ( -p STDIN ) {
+            my $ready = _windows_stdin_pipe_ready($timeout_seconds);
+            return $ready if defined $ready;
+            return 1;    # the native check is unavailable: fall back to the ordinary blocking read
+        }
+    }
+
     # select(2) - and therefore IO::Select - is only reliably usable on
     # non-socket handles (a console, a pipe, STDIN itself) on Unix-family
     # platforms; on Windows it is documented to work only for real sockets,
@@ -88,6 +102,47 @@ sub _stdin_has_pending_input {
     };
     return 1 if !defined $ready;    # IO::Select misbehaving on this platform: fall back to the ordinary blocking read
     return $ready;
+}
+
+# _windows_stdin_pipe_ready($timeout_seconds)
+# Polls a Windows pipe STDIN for waiting data with PeekNamedPipe, which is
+# the Windows-native readiness check for a pipe: select() cannot wait on
+# one. A closed writer (broken pipe) counts as ready, because a read then
+# returns end-of-file at once instead of blocking.
+#
+# PeekNamedPipe lives in kernel32 and is reached through Win32::API;
+# Win32API::File does not export it. The real Win32 HANDLE comes from
+# Win32API::File::GetOsFHandle with the filehandle glob: passing the fileno
+# number instead returns nothing (proved live on Strawberry Perl 5.38.2),
+# which made the earlier version of this check report every silent pipe as
+# ready at once. This is the same route StreamDrain already takes for its
+# Windows pipes, and the byte count is read by its helper.
+# Input: how many seconds to wait for data before giving up.
+# Output: true when data is waiting or the pipe is at end-of-file, false
+# when the timeout expires with nothing waiting, or undef when the native
+# check cannot run at all.
+sub _windows_stdin_pipe_ready {
+    my ($timeout_seconds) = @_;
+    my ( $peek, $handle ) = eval {
+        require Win32API::File;
+        require Win32::API;
+        require Developer::Dashboard::StreamDrain;
+        my $imported = Win32::API->new( 'kernel32', 'PeekNamedPipe', 'QPIPPP', 'I' );
+        die "Could not import PeekNamedPipe from kernel32\n" if !defined $imported;
+        my $os_handle = Win32API::File::GetOsFHandle( \*STDIN );
+        die "unable to resolve the STDIN operating-system handle\n" if !$os_handle;
+        ( $imported, $os_handle );
+    };
+    return if !$peek || !$handle;
+    require Time::HiRes;
+    my $deadline = Time::HiRes::time() + $timeout_seconds;
+    while (1) {
+        my $available = Developer::Dashboard::StreamDrain::_windows_pipe_available( $peek, $handle );
+        return 1 if !defined $available;    # writer closed: a read returns end-of-file at once
+        return 1 if $available > 0;
+        return 0 if Time::HiRes::time() >= $deadline;
+        Time::HiRes::sleep(0.01);
+    }
 }
 
 # _stdin_is_tty()
@@ -179,7 +234,7 @@ __END__
 
 =head1 NAME
 
-Developer::Dashboard::CLI::OpenFileChooser - interactive match chooser and editor selection for dashboard of
+Developer::Dashboard::CLI::OpenFileChooser - interactive match chooser and editor selection for d2 of
 
 =head1 SYNOPSIS
 
@@ -197,7 +252,7 @@ multi-match chooser prompt itself.
 
 =head1 PURPOSE
 
-When C<dashboard of> resolves more than one matching file and C<--print> was
+When C<d2 of> resolves more than one matching file and C<--print> was
 not given, this module decides how to present the choice (a numbered list),
 how to read an answer safely without hanging on a STDIN that will never send
 one, how to parse that answer into a selection (single index, comma list, or

@@ -8,7 +8,6 @@ use Cwd qw(getcwd);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
-use POSIX ();
 use Test::More;
 
 use lib 'lib';
@@ -18,6 +17,7 @@ use Developer::Dashboard::Collector;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::RuntimeManager;
+use Developer::Dashboard::GoRoutine ();
 
 BEGIN {
     # DD-993: both 'redefine' AND 'prototype' must be silenced here, not just
@@ -150,10 +150,10 @@ for my $case (@env_int_cases) {
     $state_root = '/root';
     $procfs     = 1;
     @procs      = (
-        { pid => 101, args => 'dashboard ajax: a' },
-        { pid => 102, args => 'dashboard ajax: b' },
-        { pid => 103, args => 'dashboard ajax: c' },
-        { pid => 104, args => 'dashboard ajax: d' },
+        { pid => 101, args => 'd2 ajax: a' },
+        { pid => 102, args => 'd2 ajax: b' },
+        { pid => 103, args => 'd2 ajax: c' },
+        { pid => 104, args => 'd2 ajax: d' },
     );
     %markers = ( 101 => '', 103 => '/root', 104 => 'other' );
     is_deeply(
@@ -167,8 +167,8 @@ for my $case (@env_int_cases) {
     $state_root = '';
     $procfs     = 1;
     @procs      = (
-        { pid => 101, args => 'dashboard ajax: a' },
-        { pid => 102, args => 'dashboard ajax: b' },
+        { pid => 101, args => 'd2 ajax: a' },
+        { pid => 102, args => 'd2 ajax: b' },
     );
     %markers = ( 101 => '' );
     is_deeply(
@@ -181,7 +181,7 @@ for my $case (@env_int_cases) {
     # false, so the process is kept regardless of runtime root.
     $state_root = '/root';
     $procfs     = 0;
-    @procs      = ( { pid => 102, args => 'dashboard ajax: b' } );
+    @procs      = ( { pid => 102, args => 'd2 ajax: b' } );
     %markers    = ();
     is_deeply(
         [ map { $_->{pid} } $manager->_managed_ajax_processes ],
@@ -337,16 +337,24 @@ for my $case (@env_int_cases) {
     # assert a well-formed pair was parsed rather than the value of a variable
     # mutated after startup.
     my $home_value = $manager->_read_process_env_marker( $$, 'HOME' );
-    ok( defined $home_value && $home_value ne '', '_read_process_env_marker reads a well-formed KEY=VALUE pair from the current process' );
+    SKIP: {
+        skip 'current process environment requires procfs', 1 if !-r "/proc/$$/environ";
+        ok( defined $home_value && $home_value ne '',
+            '_read_process_env_marker reads a well-formed KEY=VALUE pair from the current process' );
+    }
     is( $manager->_read_process_env_marker( $$, 'DD_ABSENT_KEY_XYZ' ), undef, '_read_process_env_marker returns undef for an absent key' );
 
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        $0 = 'dashboard collector coverage worker ' . ( 'z' x 512 );
+    my $worker_title = 'd2 collector coverage worker ' . ( 'z' x 512 );
+    my $worker_script = q{
+        my ($title) = @ARGV;
+        $0 = $title;
         select undef, undef, undef, 5;
-        POSIX::_exit(0);
-    }
+        exit 0;
+    };
+    my $child = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', $worker_script, $worker_title ],
+        {},
+    );
 
     my $environ = "/proc/$child/environ";
     my $ready   = 0;
@@ -359,8 +367,8 @@ for my $case (@env_int_cases) {
         my $marker = $manager->_read_process_env_marker( $child, 'DD_ABSENT_KEY_XYZ' );
         is( $marker, undef, '_read_process_env_marker skips malformed environ entries and returns undef' );
     }
-    kill 'KILL', $child;
-    waitpid $child, 0;
+    Developer::Dashboard::GoRoutine::terminate_process( $child, 'KILL' );
+    Developer::Dashboard::GoRoutine::wait_process($child);
 }
 
 chdir $original_cwd or die "Unable to restore cwd: $!";
@@ -405,8 +413,8 @@ inspection helpers, or the Windows web-service background launch path.
 
 =head1 HOW TO USE
 
-Run C<prove -lv t/106-runtimemanager-coverage-2.t> while iterating on the
-runtime manager. Keep it green under C<prove -lr t>, and confirm the runtime
+Run C<d2 docker compose exec dev prove -blv t/106-runtimemanager-coverage-2.t> while iterating on the
+runtime manager. Keep it green under C<d2 docker compose exec dev prove -blr t>, and confirm the runtime
 manager still reports 100.0 on every Devel::Cover metric before release.
 
 =head1 WHAT USES IT
@@ -418,13 +426,13 @@ this file to keep the runtime manager's process-lifecycle edge cases exercised.
 
 Example 1:
 
-  prove -lv t/106-runtimemanager-coverage-2.t
+  d2 docker compose exec dev prove -blv t/106-runtimemanager-coverage-2.t
 
 Run the dedicated runtime-manager branch/condition closure check by itself.
 
 Example 2:
 
-  prove -lr t
+  d2 docker compose exec dev prove -blr t
 
 Run it inside the full repository suite before release.
 

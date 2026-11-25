@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Capture::Tiny qw(capture);
 use Digest::SHA qw(sha256_hex);
@@ -302,8 +302,9 @@ sub _web_settings {
 
 # _request_config_snapshot()
 # Lazily reads merged runtime configuration once within handle(), reusing an
-# application snapshot only while its watched configuration roots and relevant
-# environment selectors remain unchanged. The request-local copy retains skill
+# application snapshot only while its watched configuration roots, high-resolution
+# config-file metadata, native watcher state, and relevant environment selectors
+# remain unchanged. The request-local copy retains skill
 # entries and the lazily normalized indicator collector projection; direct calls
 # outside a request do not use the request cache.
 # Input: none.
@@ -322,9 +323,9 @@ sub _request_config_snapshot {
     my $portable_signature;
     my @skill_entries;
     my $watch_paths;
+    $watch_paths = $self->_config_snapshot_watch_paths( \@skill_entries );
+    $portable_signature = $self->_config_snapshot_portable_signature( $watch_paths, \@skill_entries, $watcher ? 1 : 0 );
     if ( !$watcher ) {
-        $watch_paths = $self->_config_snapshot_watch_paths( \@skill_entries );
-        $portable_signature = $self->_config_snapshot_portable_signature( $watch_paths, \@skill_entries );
         if ( ref($cached) eq 'HASH' ) {
             if ( defined $cached->{environment_signature} ) {
                 if ( $cached->{environment_signature} eq $environment_signature ) {
@@ -343,16 +344,27 @@ sub _request_config_snapshot {
         && defined $cached->{environment_signature}
         && $cached->{environment_signature} eq $environment_signature
         && defined $cached->{watch_signature}
-        && $watcher->unchanged( $cached->{watch_signature} ) )
+        && defined $cached->{portable_signature}
+        && $cached->{portable_signature} eq $portable_signature )
     {
-        $self->{_request_config_snapshot} = $cached->{snapshot};
-        return $cached->{snapshot};
+        # Keep the watcher result as a separate decision after the cache
+        # signatures have matched; this makes the event-backed reuse check
+        # explicit and independently testable for both outcomes.
+        my $watcher_unchanged = $watcher->unchanged( $cached->{watch_signature} );
+        if ($watcher_unchanged) {
+            $self->{_request_config_snapshot} = $cached->{snapshot};
+            return $cached->{snapshot};
+        }
+        else {
+            # A native change makes this application snapshot stale. Drop it
+            # before rebuilding so a failed refresh cannot leave stale data.
+            delete $self->{_config_snapshot_cache};
+        }
     }
 
     my $watch_signature;
     my $watch_ready = 0;
     if ($watcher) {
-        $watch_paths = $self->_config_snapshot_watch_paths( \@skill_entries );
         $watch_signature = json_encode(
             {
                 environment => $environment_signature,
@@ -384,12 +396,16 @@ sub _request_config_snapshot {
     if ($watch_ready) {
         my @fresh_skill_entries;
         my $fresh_paths = $self->_config_snapshot_watch_paths( \@fresh_skill_entries );
+        my $fresh_portable_signature = $self->_config_snapshot_portable_signature( $fresh_paths, \@fresh_skill_entries, 1 );
         if ( join( "\0", @{$fresh_paths} ) eq join( "\0", @{$watch_paths} )
+            && defined $portable_signature
+            && $fresh_portable_signature eq $portable_signature
             && $watcher->unchanged($watch_signature) )
         {
             $self->{_config_snapshot_cache} = {
                 environment_signature => $environment_signature,
                 watch_signature       => $watch_signature,
+                portable_signature    => $portable_signature,
                 snapshot              => $snapshot,
             };
         }
@@ -417,17 +433,20 @@ sub _request_config_snapshot {
 }
 
 # _config_snapshot_portable_signature($watch_paths, $skill_entries)
-# Builds a cross-platform freshness signature for configuration snapshots when
-# native filesystem notifications are unavailable. Directory metadata catches
-# layer and skill additions/removals; SHA-256 of each exact config input catches
-# same-size in-place edits regardless of filesystem timestamp resolution.
+# Builds a cross-platform freshness signature for configuration snapshots.
+# Directory metadata catches layer and skill additions/removals. When native
+# filesystem notifications are unavailable, SHA-256 of every exact config
+# input catches same-size in-place edits regardless of timestamp resolution.
+# With a native watcher, high-resolution metadata provides a cheap guard against
+# delayed event delivery while the watcher remains the primary invalidator.
 # Input: array reference of existing directories returned by
 # _config_snapshot_watch_paths(), and optional array reference of installed
-# skill entries captured during that same discovery pass.
+# skill entries captured during that same discovery pass, plus an optional true
+# value to omit content reads when a native watcher is active.
 # Output: deterministic SHA-256 signature string; filesystem read failures die
 #         visibly rather than allowing stale configuration to be reused.
 sub _config_snapshot_portable_signature {
-    my ( $self, $watch_paths, $skill_entries ) = @_;
+    my ( $self, $watch_paths, $skill_entries, $metadata_only ) = @_;
     die "Config snapshot watch paths must be an array reference\n"
       if ref($watch_paths) ne 'ARRAY';
     die "Config snapshot skill entries must be an array reference\n"
@@ -479,7 +498,7 @@ sub _config_snapshot_portable_signature {
         my @stat = $self->_config_snapshot_stat($file);
         die "Unable to inspect config snapshot file '$file': $!\n" if !@stat;
         my $digest;
-        if ( -f $file ) {
+        if ( -f $file && !$metadata_only ) {
             my $fh = $self->_config_snapshot_open($file);
             die "Unable to read config snapshot file '$file': $!\n" if !$fh;
             my $sha = Digest::SHA->new(256);
@@ -500,7 +519,7 @@ sub _config_snapshot_portable_signature {
 # Output: list of lstat fields, or an empty list when the path is unavailable.
 sub _config_snapshot_lstat {
     my ( $self, $path ) = @_;
-    return CORE::lstat($path);
+    return Time::HiRes::lstat($path);
 }
 
 # _config_snapshot_stat($path)
@@ -510,7 +529,7 @@ sub _config_snapshot_lstat {
 # Output: list of stat fields, or an empty list when the target is unavailable.
 sub _config_snapshot_stat {
     my ( $self, $path ) = @_;
-    return CORE::stat($path);
+    return Time::HiRes::stat($path);
 }
 
 # _config_snapshot_open($path)
@@ -536,10 +555,11 @@ sub _config_snapshot_close {
 
 # _config_snapshot_watcher()
 # Constructs the optional native watcher once for cross-request configuration
-# reuse. Missing FFI or an unsupported platform selects the portable metadata
+# reuse. Missing XS support or an unsupported platform selects the portable metadata
 # and SHA-256 validator; setup errors are reported by _request_config_snapshot().
-# Its module is loaded from this file's absolute source path so request-time
-# working-directory changes cannot invalidate a relative @INC entry.
+# Its module is loaded by its canonical package name with this file's library
+# root temporarily first in @INC, so request-time working-directory changes do
+# not affect resolution or cause duplicate absolute and canonical %INC entries.
 # Input: none.
 # Output: watcher object or undef when no native watcher is available.
 sub _config_snapshot_watcher {
@@ -547,11 +567,12 @@ sub _config_snapshot_watcher {
     return $self->{_config_snapshot_watcher}
       if ref( $self->{_config_snapshot_watcher} );
     return if $self->{_config_snapshot_watcher_unavailable};
-    if ( !$INC{'Developer/Dashboard/IndicatorStore/Watch.pm'} ) {
-        my $watcher_module = File::Spec->catfile(
-            dirname( dirname($MODULE_SOURCE_PATH) ), 'IndicatorStore', 'Watch.pm'
-        );
-        require $watcher_module;
+    if ( !$INC{'Developer/Dashboard/IndicatorStore/Watch.pm'}
+        && !Developer::Dashboard::IndicatorStore::Watch->can('new') )
+    {
+        my $library_root = dirname( dirname( dirname($MODULE_SOURCE_PATH) ) );
+        local @INC = ( $library_root, @INC );
+        require Developer::Dashboard::IndicatorStore::Watch;
     }
     my $watcher = Developer::Dashboard::IndicatorStore::Watch->new;
     if ( !$watcher ) {
@@ -629,7 +650,11 @@ sub _config_snapshot_watch_paths {
             return if $parent eq $directory;
             $directory = $parent;
         }
-        $watch{$directory} = 1;
+        # Canonicalise so the root is in native form: File::Basename::dirname
+        # yields '/' for a forward-slash path even on Windows, but
+        # File::Spec->rootdir is '\' there, and watch paths must match the
+        # native form the rest of the code (and the tests) expect.
+        $watch{ File::Spec->canonpath($directory) } = 1;
     };
 
     my @runtime_roots = $paths->runtime_roots;
@@ -2997,8 +3022,9 @@ sub _saved_nav_items_snapshot_state {
 
 # _saved_nav_items_watcher()
 # Lazily constructs the optional native watcher used to validate cached saved-nav HTML.
-# Loads the module from the absolute application source path because a request
-# may change the current directory before this first watcher access.
+# Loads the module by its canonical package name with the application library
+# root temporarily first in @INC because a request may change the current
+# directory before this first watcher access.
 # Input: none.
 # Output: watcher object, or undef when no native backend is available.
 sub _saved_nav_items_watcher {
@@ -3006,11 +3032,12 @@ sub _saved_nav_items_watcher {
     return $self->{_saved_nav_items_watcher}
       if ref( $self->{_saved_nav_items_watcher} );
     return if $self->{_saved_nav_items_watcher_unavailable};
-    if ( !$INC{'Developer/Dashboard/IndicatorStore/Watch.pm'} ) {
-        my $watcher_module = File::Spec->catfile(
-            dirname( dirname($MODULE_SOURCE_PATH) ), 'IndicatorStore', 'Watch.pm'
-        );
-        require $watcher_module;
+    if ( !$INC{'Developer/Dashboard/IndicatorStore/Watch.pm'}
+        && !Developer::Dashboard::IndicatorStore::Watch->can('new') )
+    {
+        my $library_root = dirname( dirname( dirname($MODULE_SOURCE_PATH) ) );
+        local @INC = ( $library_root, @INC );
+        require Developer::Dashboard::IndicatorStore::Watch;
     }
     my $watcher = Developer::Dashboard::IndicatorStore::Watch->new;
     if ( !$watcher ) {
@@ -3115,7 +3142,7 @@ sub _saved_nav_items_handle_watch_error {
 # _nav_ids_for_roots($dashboards_roots)
 # Returns the ordered, de-duplicated saved navigation ids for dashboard layers.
 # It reuses only the filename inventory while each nav directory's high-resolution
-# identity and timestamps are unchanged; page contents are still loaded fresh.
+# identity, timestamps and child entry names are unchanged; page contents are still loaded fresh.
 # Input: array reference of dashboard roots in lookup order.
 # Output: array reference of sorted nav/*.tt ids.
 sub _nav_ids_for_roots {
@@ -3133,6 +3160,26 @@ sub _nav_ids_for_roots {
         my @stat = Time::HiRes::stat($nav_root);
         die "Unable to inspect saved navigation directory '$nav_root': $!\n" if !@stat;
         push @signature, $nav_root, @stat[ 0, 1, 2, 4, 5, 7, 9, 10 ];
+        # Directory timestamps move coarsely on Windows: a file added in the
+        # same tick leaves the stat identity unchanged, so the cached ids
+        # went stale. Fold the sorted child entry names into the signature
+        # so an add, removal or rename invalidates it even when the
+        # directory timestamp does not move. This reads the directory
+        # directly rather than through the scan helpers below: the helpers
+        # are the scan's own path and their test doubles count attempts, so
+        # going through them here would double-count an unopenable
+        # directory. A read or close failure is reported here with the
+        # same message the scan uses, rather than silently producing an
+        # empty child list. An unreadable directory keeps its stat-only
+        # signature; the scan below handles it as before. As in the scan:
+        # readdir does not clear $! on success, so $! is zeroed first.
+        if ( opendir my $dh, $nav_root ) {
+            $! = 0;
+            my @children = sort grep { $_ ne '.' && $_ ne '..' } readdir $dh;
+            die "Unable to read saved navigation directory '$nav_root': $!\n" if $!;
+            closedir $dh or die "Unable to close saved navigation directory '$nav_root': $!\n";
+            push @signature, @children;
+        }
     }
     my $signature = join "\0", @signature;
     my $cached = $self->{_nav_ids_cache};
@@ -4109,11 +4156,28 @@ sub _ip_pairs_from_ip {
     # after this sub returns - a query function must not decide its
     # caller's exit status.
     local $?;
-    return () if !command_in_path('ip');
-    my ( $stdout, undef, $exit_code ) = capture {
-        system 'ip', '-o', '-4', 'addr', 'show', 'up', 'scope', 'global';
-        return $? >> 8;
+    # Resolve first, then execute the resolved absolute path: a bare name
+    # handed to system() is resolved by CreateProcess on Windows, which
+    # only appends .exe, so a .cmd on PATH is invisible to it - the t/08
+    # fake ipconfig.cmd never ran and the real System32 ipconfig.exe
+    # answered instead (micro t/997 proved it). Resolving through
+    # command_in_path, which expands PATHEXT, finds the .cmd, and the
+    # absolute path runs it through cmd (the t/09 _taskkill_command
+    # pattern). No fallback: when the command is absent the helper
+    # returns no addresses, as the t/101/t/105 absence tests pin.
+    my $command = command_in_path('ip');
+    return () if !defined $command || $command eq '';
+    # IP discovery is best effort: a capture failure (for example a bad
+    # file descriptor being duplicated while the caller renders a page)
+    # must not kill the render, so fall back to no addresses and let the
+    # caller use the host or loopback address instead.
+    my ( $stdout, undef, $exit_code ) = eval {
+        capture {
+            system $command, '-o', '-4', 'addr', 'show', 'up', 'scope', 'global';
+            return $? >> 8;
+        };
     };
+    return () if $@;
     return () if $exit_code != 0 || !defined $stdout || $stdout eq '';
     my @pairs;
     for my $line ( split /\n/, $stdout ) {
@@ -4135,11 +4199,21 @@ sub _ip_pairs_from_ipconfig {
     # after this sub returns - a query function must not decide its
     # caller's exit status.
     local $?;
-    return () if !command_in_path('ipconfig');
-    my ( $stdout, undef, $exit_code ) = capture {
-        system 'ipconfig';
-        return $? >> 8;
+    # Resolve first, then execute the resolved absolute path - same
+    # CreateProcess/PATHEXT split as _ip_pairs_from_ip (t/08, micro
+    # t/997); no fallback when the command is absent.
+    my $command = command_in_path('ipconfig');
+    return () if !defined $command || $command eq '';
+    # Same best-effort guard as _ip_pairs_from_ip: a capture failure
+    # must not kill the caller (this is the call that killed t/105
+    # after 387 passing subtests when the descriptor was unusable).
+    my ( $stdout, undef, $exit_code ) = eval {
+        capture {
+            system $command;
+            return $? >> 8;
+        };
     };
+    return () if $@;
     return () if $exit_code != 0 || !defined $stdout || $stdout eq '';
     my @pairs;
     my $iface = '';
@@ -4169,11 +4243,20 @@ sub _ip_pairs_from_ifconfig {
     # after this sub returns - a query function must not decide its
     # caller's exit status.
     local $?;
-    return () if !command_in_path('ifconfig');
-    my ( $stdout, undef, $exit_code ) = capture {
-        system 'ifconfig';
-        return $? >> 8;
+    # Resolve first, then execute the resolved absolute path - same
+    # CreateProcess/PATHEXT split as _ip_pairs_from_ip (t/08, micro
+    # t/997); no fallback when the command is absent.
+    my $command = command_in_path('ifconfig');
+    return () if !defined $command || $command eq '';
+    # Same best-effort guard as _ip_pairs_from_ip: a capture failure
+    # must not kill the caller.
+    my ( $stdout, undef, $exit_code ) = eval {
+        capture {
+            system $command;
+            return $? >> 8;
+        };
     };
+    return () if $@;
     return () if $exit_code != 0 || !defined $stdout || $stdout eq '';
     my @pairs;
     my $iface = '';
@@ -4333,8 +4416,21 @@ sub _serve_static_file_from_roots {
     for my $public_dir (@public_roots) {
         my $candidate = File::Spec->catfile( $public_dir, $filename );
         my $real_path = File::Spec->rel2abs($candidate);
-        my $quoted_public = quotemeta($public_dir);
-        next if $real_path !~ /^$quoted_public(?:\/|\z)/;
+        if (is_windows()) {
+            # rel2abs uses native backslashes on Windows; a forward-slash-only
+            # suffix check rejects every legitimate child file as a 404.
+            # The later realpath containment guard still checks symlinks.
+            my $root_path = File::Spec->rel2abs($public_dir);
+            my ( $file_cmp, $root_cmp ) = ( lc $real_path, lc $root_path );
+            $file_cmp =~ s{\\}{/}g;
+            $root_cmp =~ s{\\}{/}g;
+            $root_cmp =~ s{/$}{} if $root_cmp ne '/';
+            next if index( $file_cmp, $root_cmp . '/' ) != 0;
+        }
+        else {
+            my $quoted_public = quotemeta($public_dir);
+            next if $real_path !~ /^$quoted_public(?:\/|\z)/;
+        }
         next if !-f $candidate || !_file_is_readable($candidate);
         $file_path = $candidate;
         last;

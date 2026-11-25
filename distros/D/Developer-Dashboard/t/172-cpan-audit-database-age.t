@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Capture::Tiny qw(capture_merged);
 use Developer::Dashboard::PerlEnv;
 use File::Path qw(make_path);
 use File::Spec;
@@ -112,17 +113,28 @@ FAKEVER
 # Input:   $stamp, %env - extra environment (CPAN_AUDIT_FRESH_DAYS).
 # Output:  ($exit, $combined_output)
 #
-# The status is read from CHILD_ERROR_NATIVE, never through a pipe: a pipe reports
-# the LAST stage's status, which has already laundered a gate result on this project
-# and did so again while this card was being researched.
+# The status is read from $? inside the capture block, never through a pipe:
+# a pipe reports the LAST stage's status, which has already laundered a gate
+# result on this project and did so again while this card was being
+# researched. List form, no shell: the old backtick invocation
+#   `$^X \Q$PERL_GATE\E \Q$root\E 2>&1`
+# never ran the gate on Windows - /bin/sh interprets the \Q escapes, but
+# cmd.exe passes the backslashes literally to perl.exe, so perl received
+# the script path as C\:\\Users\\... and died with "Invalid argument"
+# (exit 22, round 74). Capture::Tiny merges both streams; the refusal is
+# printed on stderr.
 sub _run_perl_gate {
     my ( $stamp, %env ) = @_;
     my $lib  = _fake_db_lib($stamp);
     my $root = tempdir( CLEANUP => 1 );
     local $ENV{PERL5LIB} = join Developer::Dashboard::PerlEnv::path_separator(), $lib, ( $ENV{PERL5LIB} // () );
     local @ENV{ keys %env } = values %env;
-    my $out = `$^X \Q$PERL_GATE\E \Q$root\E 2>&1`;
-    return ( ${^CHILD_ERROR_NATIVE} >> 8, $out );
+    my $status;
+    my $out = capture_merged {
+        system( $^X, $PERL_GATE, $root );
+        $status = $?;
+    };
+    return ( $status < 0 ? 255 : ( $status >> 8 ), $out );
 }
 
 # Purpose: a cpan-audit shim whose --version names a chosen database stamp.
@@ -154,19 +166,103 @@ SHIM
     return $dir;
 }
 
+# _posix_shell_binary($preferred)
+# Purpose: resolve the POSIX shell that runs the bash gate and the recipe
+#          check. On Windows the Git for Windows usr/bin directory is not on
+#          PATH (only Git\cmd is), so a bare 'bash' or 'sh' is never found
+#          and the invocation fails before the gate runs at all - every
+#          assertion about the gate then passes or fails on the strength of
+#          a missing interpreter instead of the gate's behaviour. Resolve
+#          the shell from the Git for Windows install, mirroring the
+#          product's own lookup in
+#          Developer::Dashboard::Platform::_git_for_windows_shell (derive
+#          the Git root from the git on PATH, then try the conventional
+#          %ProgramFiles% installs) - the same helper t/110 already uses
+#          for this gate, and it passed there in a full round on Windows.
+# Input:   $preferred - shell command name such as bash or sh.
+# Output:  absolute shell path string on Windows when Git bash is found,
+#          otherwise the bare name.
+sub _posix_shell_binary {
+    my ($preferred) = @_;
+    return $preferred if $^O ne 'MSWin32';
+
+    my @roots;
+    my %seen;
+
+    # git.exe lives in <root>\cmd, <root>\bin or <root>\mingw64\bin: strip
+    # those trailing components to recover the Git install root.
+    for my $dir ( split /;/, $ENV{PATH} // '' ) {
+        my $git = File::Spec->catfile( $dir, 'git.exe' );
+        next if !-f $git;
+        my ( $volume, $dirs ) = File::Spec->splitpath($git);
+        my @parts = grep { $_ ne '' } File::Spec->splitdir($dirs);
+        pop @parts while @parts && $parts[-1] =~ /\A(?:cmd|bin|mingw64|mingw32)\z/i;
+        my $root = File::Spec->catdir( $volume . File::Spec->rootdir(), @parts );
+        push @roots, $root if !$seen{$root}++;
+        last;
+    }
+
+    for my $program_files ( grep { defined && $_ ne '' } $ENV{ProgramFiles}, $ENV{'ProgramFiles(x86)'} ) {
+        my $root = File::Spec->catdir( $program_files, 'Git' );
+        push @roots, $root if !$seen{$root}++;
+    }
+
+    for my $root (@roots) {
+        my $shell = File::Spec->catfile( $root, 'usr', 'bin', "$preferred.exe" );
+        return $shell if -f $shell;
+    }
+    return $preferred;
+}
+
+# _msys_path($path)
+# Purpose: spell a Windows native path the way MSYS bash spells it, so the
+#          gate's own repo_root and the audited root agree. A native
+#          C:\... spelling handed to bash comes back from its pwd as
+#          /c/... in one place and stays C:/... in another, and the gate's
+#          in-tree comparison then refuses a root inside the checkout.
+# Input:   $path - a native path string.
+# Output:  the same path in /c/... form on Windows, unchanged elsewhere.
+sub _msys_path {
+    my ($path) = @_;
+    return $path if $^O ne 'MSWin32';
+    $path =~ s{\\}{/}g;
+    $path =~ s{\A([A-Za-z]):}{'/' . lc($1)}e;
+    return $path;
+}
+
 # Purpose: run the bash gate with a shimmed cpan-audit.
 # Input:   $stamp, %env
 # Output:  ($exit, $combined_output)
+#
+# List form, no shell, through the resolved bash: the old backtick
+# invocation `bash \Q$BASH_GATE\E \Q$root\E 2>&1` failed twice on Windows -
+# a bare 'bash' is not on PATH (see _posix_shell_binary), and the \Q
+# escapes would have reached the gate literally anyway. The gate is a bash
+# script that also calls dirname, grep and awk, so the interpreter alone is
+# not enough: those helpers must resolve to the Git for Windows tools as
+# well, so the tool directory the interpreter came from is prepended to
+# PATH (t/110). The shim directory stays first so the shimmed cpan-audit
+# shadows any real one.
 sub _run_bash_gate {
     my ( $stamp, %env ) = @_;
     my $tmp  = tempdir( CLEANUP => 1 );
     my $root = File::Spec->catdir( $tmp, 'local', 'lib', 'perl5' );
     make_path($root);
-    local $ENV{PATH} = join ':', _version_shim($stamp), $ENV{PATH};
+    my $bash = _posix_shell_binary('bash');
+    my $path = join Developer::Dashboard::PerlEnv::path_separator(), _version_shim($stamp), ( $ENV{PATH} // () );
+    if ( $bash ne 'bash' ) {
+        my ( $volume, $bash_dir ) = File::Spec->splitpath($bash);
+        $path = join Developer::Dashboard::PerlEnv::path_separator(), $volume . $bash_dir, $path;
+    }
+    local $ENV{PATH} = $path;
     local $ENV{DD_CPAN_AUDIT_ALLOW_EXTERNAL_ROOT} = 1;
     local @ENV{ keys %env } = values %env;
-    my $out = `bash \Q$BASH_GATE\E \Q$root\E 2>&1`;
-    return ( ${^CHILD_ERROR_NATIVE} >> 8, $out );
+    my $status;
+    my $out = capture_merged {
+        system( $bash, _msys_path($BASH_GATE), _msys_path($root) );
+        $status = $?;
+    };
+    return ( $status < 0 ? 255 : ( $status >> 8 ), $out );
 }
 
 my $FRESH = _stamp(0);
@@ -373,7 +469,7 @@ my $REFUSAL = qr/advisory database is \d+ days? old .* and the limit is \d+/i;
     is $perl_exit, 2, 'declared-chain still exits 2';
     is $bash_exit, 4, 'cpan-audit-project still exits 4 - its own code, not the Perl gate 2';
 
-    # AC-3: what is printed must actually RUN. A refusal that prints a recipe with a
+        # AC-3: what is printed must actually RUN. A refusal that prints a recipe with a
     # syntax error is worse than one printing nothing: the user believes it, pastes
     # it, and then debugs our message. Nothing else in this suite checks that.
     for my $case ( [ 'declared-chain', $perl_out ], [ 'cpan-audit-project', $bash_out ] ) {
@@ -385,7 +481,10 @@ my $REFUSAL = qr/advisory database is \d+ days? old .* and the limit is \d+/i;
         open my $rfh, '>', $script or die "cannot write recipe: $!";
         print {$rfh} join( "\n", map { s/^\s{4}//r } @recipe ), "\n";
         close $rfh;
-        system 'sh', '-n', $script;
+        # A bare 'sh' is not on PATH on Windows (see _posix_shell_binary);
+        # resolve it the same way, and hand it the recipe in MSYS spelling.
+        my $sh = _posix_shell_binary('sh');
+        system $sh, '-n', _msys_path($script);
         is ${^CHILD_ERROR_NATIVE} >> 8, 0,
           "$name printed recipe parses as shell - sh -n accepts it";
     }

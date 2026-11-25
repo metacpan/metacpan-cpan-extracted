@@ -170,6 +170,44 @@ C<Retry-After> is also captured.
 
 =head1 METHODS
 
+=head2 new
+
+    my $quota = HTTP::API::Core::RateLimit->new(
+        remaining => 0,
+        reset     => 10,
+    );
+
+Constructs normalized metadata directly. Numeric fields accept
+non-negative decimal numbers or C<undef>. C<resource> and C<source> are
+scalar values or C<undef>.
+
+=head2 from_headers
+
+    my $quota = HTTP::API::Core::RateLimit->from_headers($headers);
+
+Parses a header hash reference using case-insensitive names. Missing or
+undefined headers yield unknown metadata. Repeated values are accepted
+when identical; conflicting values are treated as unknown. For limit,
+remaining, used and resource, a present C<RateLimit-*> field takes
+precedence over its legacy C<X-RateLimit-*> counterpart even if the
+standard value cannot be parsed.
+
+=head2 retry_after
+
+Numeric C<Retry-After> delay when available. HTTP-date parsing belongs
+to the client's retry policy rather than this accessor.
+
+=head2 source
+
+Returns C<ratelimit> or C<x-ratelimit> when the corresponding limit,
+remaining or reset header family is present; otherwise C<undef>.
+The standard family takes precedence.
+
+=head2 as_hash
+
+Returns a new hash reference containing the eight normalized fields,
+including undefined values.
+
 =head2 limit, remaining, used, resource
 
 Normalized quota metadata when present.
@@ -186,6 +224,9 @@ UTC epoch reset timestamp from C<X-RateLimit-Reset>.
 
 Returns the preferred delay before retrying. C<Retry-After> takes precedence,
 then C<RateLimit-Reset>, then C<X-RateLimit-Reset> converted from epoch time.
+An elapsed reset timestamp yields zero; unavailable delay information yields
+C<undef>. Pass C<now =E<gt> $epoch> to use a specified non-negative epoch
+rather than the current time.
 
 =head2 exhausted
 

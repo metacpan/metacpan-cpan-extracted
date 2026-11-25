@@ -71,8 +71,16 @@ _run_or_die(
     'docker', 'run', '-d',
     '--name', $container,
     '-p', "127.0.0.1:$host_port:7890",
-    'perl:latest',
+    'perl:5.44-threaded-bookworm@sha256:4bc64abbc2d74e0354b6b8af8229456183a516eff033dc986ff3d3bf78326c79',
     'sleep', 'infinity',
+);
+_run_or_die(
+    'docker', 'exec', $container, 'perl', '-MConfig', '-e',
+    'die "Perl interpreter must be built with ithreads\\n" if !$Config{useithreads};',
+);
+_run_or_die(
+    'docker', 'exec', $container, 'sh', '-lc',
+    'apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential libayatana-appindicator3-dev libgtk-3-dev pkg-config && rm -rf /var/lib/apt/lists/*',
 );
 _run_or_die( 'docker', 'cp', $tarball, "$container:$container_tarball" );
 _run_or_die( 'docker', 'cp', $skill_repo, "$container:$skill_mount_path" );
@@ -81,8 +89,8 @@ _run_or_die_with_retry(
     2,
     [ 'docker', 'exec', $container, 'sh', '-lc', "cpanm --notest $container_tarball" ],
 );
-_run_or_die( 'docker', 'exec', $container, 'sh', '-lc', 'dashboard init' );
-_run_or_die( 'docker', 'exec', $container, 'sh', '-lc', 'cd /root && dashboard restart web' );
+_run_or_die( 'docker', 'exec', $container, 'sh', '-lc', 'd2 init' );
+_run_or_die( 'docker', 'exec', $container, 'sh', '-lc', 'cd /root && d2 restart web' );
 
 my ( $stage1_code, $stage1_body ) = _container_http_get(
     $container,
@@ -91,7 +99,7 @@ my ( $stage1_code, $stage1_body ) = _container_http_get(
 is( $stage1_code, 404, 'stage 1 root extracted-dashboard ajax route is absent before skill installation' );
 is( $stage1_body, "Ajax handler not found\n", 'stage 1 root extracted-dashboard ajax route reports the handler is absent before skill installation' );
 
-_run_or_die( 'docker', 'exec', $container, 'sh', '-lc', "cd /root && dashboard skills install file://$skill_mount_path" );
+_run_or_die( 'docker', 'exec', $container, 'sh', '-lc', "cd /root && d2 skills install file://$skill_mount_path" );
 ok(
     _docker_file_exists(
         $container,
@@ -127,6 +135,44 @@ sub _command_on_path {
     # needs no profile at all. $name is also passed positionally rather than
     # interpolated into the command string, so it can never be read as shell
     # syntax regardless of what a future caller passes.
+    if ( $^O eq 'MSWin32' ) {
+        # Windows has no sh on PATH: Git for Windows ships sh.exe in
+        # <root>\usr\bin, which is not on PATH (only <root>\cmd is), so a
+        # bare 'sh' fails with "The system cannot find the path specified"
+        # before the check runs at all (round 77). Derive the Git root from
+        # the git on PATH, then try the conventional %ProgramFiles% installs
+        # - the same lookup t/110's _bash_binary and the product's
+        # _git_for_windows_shell use - and prepend usr\bin for the child,
+        # so both the shell itself and the `command -v` lookup inside it
+        # resolve. This sub is extracted verbatim by t/180, so the lookup
+        # stays inline here rather than calling another sub.
+        my $usr_bin;
+        for my $dir ( split /;/, $ENV{PATH} // '' ) {
+            next if !-f "$dir\\git.exe";
+            my @parts = grep { $_ ne '' } split /\\/, $dir;
+            pop @parts while @parts && $parts[-1] =~ /\A(?:cmd|bin|mingw64|mingw32)\z/i;
+            my $cand = join( '\\', @parts ) . '\\usr\\bin';
+            if ( -f "$cand\\sh.exe" ) { $usr_bin = $cand; last; }
+        }
+        if ( !defined $usr_bin ) {
+            for my $pf ( grep { defined && $_ ne '' } $ENV{ProgramFiles}, $ENV{'ProgramFiles(x86)'} ) {
+                my $cand = "$pf\\Git\\usr\\bin";
+                if ( -f "$cand\\sh.exe" ) { $usr_bin = $cand; last; }
+            }
+        }
+
+        # The -c string must NOT quote $1 on Windows: Perl's system() routes
+        # through cmd.exe, which strips the double quotes, so
+        # 'command -v "$1"' reaches sh as bare `command` and reports every
+        # name as present (proved live on win-ts: a missing name returned 0,
+        # and echo "A=[$1]" printed an empty line). $1 stays positional, so
+        # it is never re-parsed as shell syntax; it can only word-split,
+        # which cannot occur for a real command name.
+        my $path = $ENV{PATH} // '';
+        $path = "$usr_bin;$path" if defined $usr_bin;
+        local $ENV{PATH} = $path;
+        return system( 'sh', '-c', 'command -v $1 >/dev/null 2>&1', 'sh', $name ) == 0 ? 1 : 0;
+    }
     return system( 'sh', '-c', 'command -v "$1" >/dev/null 2>&1', 'sh', $name ) == 0 ? 1 : 0;
 }
 
@@ -168,7 +214,7 @@ sub _create_dashboard_skill_repo {
         0700,
     );
     _run_or_die(qw(git add .));
-    _run_or_die( 'git', 'commit', '-m', 'Initial extracted dashboard skill fixture' );
+    _run_or_die( 'git', 'commit', '-m', 'Initial extracted d2 skill fixture' );
     chdir $cwd or die "Unable to chdir back to $cwd: $!";
     return $repo;
 }
@@ -260,9 +306,12 @@ __END__
 =head1 DESCRIPTION
 
 This test is a post-build guardrail. It runs only after a fresh distribution
-tarball exists, installs that tarball into a blank C<perl:latest> Docker
-container, and then exercises the two-stage smart-router contract for one
-extracted dashboard skill fixture.
+tarball exists, installs that tarball into a pinned threaded Perl 5.44
+Docker container, verifies that its interpreter supports ithreads, installs
+the Linux GTK/Ayatana build headers required by the distribution's native XS
+helpers, and then exercises the two-stage smart-router contract for one
+extracted d2 skill fixture. The threaded Perl build is required by the
+Dashboard native GoRoutine XS extension.
 
 =for comment FULL-POD-DOC START
 

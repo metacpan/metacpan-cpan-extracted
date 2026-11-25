@@ -71,7 +71,12 @@ for my $strategy (@strategies) {
     my $first = _evaluate( $strategy, [$link] )->[0];
     _replace_link( $link, $target_b );
     my $next = _evaluate( $strategy, [$link] )->[0];
-    $refresh_ok = 0 if $first eq $next || $next ne ( Cwd::abs_path($target_b) // '' );
+    # The product reports identities in the native spelling (backslashes on
+    # Windows) where Cwd::abs_path gives forward slashes there, so compare
+    # the canonical spelling of the same directory. No change on Unix.
+    my $wanted = Cwd::abs_path($target_b);
+    $wanted = File::Spec->canonpath($wanted) if defined $wanted;
+    $refresh_ok = 0 if $first eq $next || $next ne ( $wanted // '' );
     _replace_link( $link, $target_a );
 }
 die "A strategy returned stale symlink identity after operation boundary\n" if !$refresh_ok;

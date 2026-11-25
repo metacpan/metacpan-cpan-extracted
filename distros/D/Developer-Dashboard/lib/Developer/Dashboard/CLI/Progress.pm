@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Progress;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 # new(%args)
 # Constructs a terminal progress renderer for restart/stop lifecycle commands.
@@ -233,7 +233,7 @@ Developer::Dashboard::CLI::Progress - terminal task-board renderer for lifecycle
 =head1 SYNOPSIS
 
   my $progress = Developer::Dashboard::CLI::Progress->new(
-      title => 'dashboard restart progress',
+      title => 'd2 restart progress',
       tasks => [
           { id => 'stop_web',  label => 'Stop dashboard web service' },
           { id => 'start_web', label => 'Start dashboard web service' },
@@ -250,7 +250,7 @@ Developer::Dashboard::CLI::Progress - terminal task-board renderer for lifecycle
 =head1 DESCRIPTION
 
 This module renders a simple terminal task board for long-running lifecycle
-commands such as C<dashboard restart> and C<dashboard stop>.
+commands such as C<d2 restart> and C<d2 stop>.
 
 =head1 METHODS
 
@@ -298,13 +298,13 @@ Render a non-interactive progress board and drive one task through running and d
 
 Example 2:
 
-  DEVELOPER_DASHBOARD_PROGRESS=1 dashboard restart
+  DEVELOPER_DASHBOARD_PROGRESS=1 d2 restart
 
 Force the restart helper to emit the task board even when stdout and stderr are being captured instead of attached to an interactive terminal.
 
 Example 3:
 
-  dashboard restart
+  d2 restart
 
 Render the interactive lifecycle board with blue running markers and detail
 lines, green C<[OK]> completion markers, and red C<[X]> failure markers plus

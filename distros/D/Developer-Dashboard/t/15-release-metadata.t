@@ -8,6 +8,7 @@ use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use FindBin qw($RealBin);
+use Config;
 use Capture::Tiny qw(capture);
 use JSON::XS ();
 use Test::More;
@@ -26,6 +27,7 @@ my $readme = _slurp_optional( _repo_path('README.md') );
 my $plain_readme = _slurp_optional( _repo_path('README') );
 my $skill_guide = _slurp_optional( _repo_path('SKILL.md') );
 my $release_doc = _slurp_optional( _repo_path( 'doc', 'update-and-release.md' ) );
+my $collector_cron_doc = _slurp_optional( _repo_path( 'doc', 'collector-cron-scheduling.txt' ) );
 my $security_checks_doc = _slurp_optional( _repo_path('SECURITY_CHECKS.md') );
 my $security_doc = _slurp_optional( _repo_path( 'doc', 'security.md' ) );
 my $owasp_sow_doc = _slurp_optional( _repo_path( 'doc', 'owasp-compliance-sow.md' ) );
@@ -41,11 +43,14 @@ my $dist = _slurp_optional( _repo_path('dist.ini') );
 my $meta = _slurp_optional( _repo_path('META.json') );
 my $cpanfile = _slurp( _repo_path('cpanfile') );
 my $makefile = _slurp( _repo_path('Makefile.PL') );
+
+my $pbkdf2_module = _slurp( _repo_path( 'lib', 'Developer', 'Dashboard', 'Crypto', 'PBKDF2.pm' ) );
+my $watch_module = _slurp( _repo_path( 'lib', 'Developer', 'Dashboard', 'IndicatorStore', 'Watch.pm' ) );
 my $agents_override = _slurp_optional( _repo_path('AGENTS.override.md') );
 my $security_pod = _slurp_optional( _repo_path('SECURITY.pod') );
 my $contributing_pod = _slurp_optional( _repo_path('CONTRIBUTING.pod') );
 my @doc_paths = grep {
-    -e $_ && $tracked_repo_paths{ File::Spec->abs2rel( $_, $ROOT ) }
+    -e $_ && $tracked_repo_paths{ _tracked_key($_) }
 } (
     _repo_path('README.md'),
     _repo_path('SKILL.md'),
@@ -143,7 +148,49 @@ like(
     qr/\A<!-- Generated from lib\/Developer\/Dashboard\.pm POD by script\/sync-readme-from-pod\. Do not edit manually\. -->\n\n#/,
     'README.md is generated from the canonical POD source',
 ) if $readme ne '';
+like( $pm, qr/once at the start of every hour.*0 \*\/1 \* \* \*/is,
+    'main POD gives the correct minute-zero expression for one run each hour' );
+like( $pm, qr/\* \*\/1 \* \* \*.*every minute/is,
+    'main POD explains that a wildcard minute field runs every minute' );
+like( $readme, qr/once at the start of every hour.*0 \*\/1 \* \* \*/is,
+    'generated README gives the correct minute-zero expression for one run each hour' );
+like( $readme, qr/\* \*\/1 \* \* \*.*every minute/is,
+    'generated README explains that a wildcard minute field runs every minute' );
+like( $collector_cron_doc, qr/once at the start of every hour.*0 \*\/1 \* \* \*/is,
+    'collector cron reference gives the correct minute-zero expression for one run each hour' );
+like( $collector_cron_doc, qr/\* \*\/1 \* \* \*.*every minute/is,
+    'collector cron reference explains that a wildcard minute field runs every minute' );
 like( $dist, qr/^\[Prereqs \/ ConfigureRequires\]$/m, 'dist.ini declares explicit configure prerequisites for packaged installs' );
+like(
+    $dist,
+    qr/^\[Prereqs \/ TestRequires\]\n.*?^Test::Harness = 3\.48$/ms,
+    'dist.ini declares the TAP harness version required by nested Windows test runs',
+);
+like(
+    $dist,
+    qr/^\[Prereqs \/ TestRequires\]\n.*?^Devel::Cover = 0$/ms,
+    'dist.ini declares Devel::Cover for release-tarball coverage gate tests',
+);
+like(
+    $cpanfile,
+    qr/^on 'test' => sub \{\n.*?requires 'Test::Harness', '3\.48';/ms,
+    'cpanfile declares the TAP harness version required by nested Windows test runs',
+);
+like(
+    $cpanfile,
+    qr/^on 'test' => sub \{\n.*?requires 'Devel::Cover' if \$\^O ne 'MSWin32';.*?^\};/ms,
+    'cpanfile declares Devel::Cover for coverage-gate tests except on unsupported Windows runners',
+);
+like(
+    $makefile,
+    qr/my\s+%test_requires\s*=\s*\(\s*'Test::Harness'\s*=>\s*'3\.48'/s,
+    'Makefile.PL exports the TAP harness test prerequisite for checkout-based CI installs',
+);
+like(
+    $makefile,
+    qr/\$test_requires\{'Devel::Cover'\}\s*=\s*0\s+if\s+\$\^O\s+ne\s+'MSWin32'.*?TEST_REQUIRES\s*=>\s*\\%test_requires/s,
+    'Makefile.PL omits Devel::Cover on Windows while preserving it for supported checkout CI installs',
+);
 like(
     $dist,
     qr/^exclude_match = \^cover_db\(\?:\[-_\]\[\^\/\]\+\)\?\(\?:\/\|\$\)/m,
@@ -194,11 +241,28 @@ if ( $dist ne '' ) {
         copy( _repo_path('HtmlEscape.xs'), File::Spec->catfile( $fixture, 'HtmlEscape.xs' ) )
           or die "Unable to copy HtmlEscape.xs into $fixture: $!";
         make_path( File::Spec->catdir( $fixture, 'share' ) );
+        my $fake_bin = File::Spec->catdir( $fixture, 'fake-bin' );
+        make_path($fake_bin);
+        my $fake_pkg_config = File::Spec->catfile( $fake_bin, 'pkg-config' );
+        open my $pkg_config_handle, '>', $fake_pkg_config
+          or die "Unable to write pkg-config fixture '$fake_pkg_config': $!";
+        print {$pkg_config_handle} <<'PKG_CONFIG_FIXTURE';
+#!/usr/bin/env perl
+use strict;
+use warnings;
+exit ( ( $ENV{DD_TEST_PKG_CONFIG_STATUS} // 1 ) == 0 ? 0 : 1 );
+PKG_CONFIG_FIXTURE
+        close $pkg_config_handle
+          or die "Unable to close pkg-config fixture '$fake_pkg_config': $!";
+        chmod 0755, $fake_pkg_config
+          or die "Unable to make pkg-config fixture executable '$fake_pkg_config': $!";
 
         my ( $configure_stdout, $configure_stderr, $configure_exit ) = capture {
             my $original = Cwd::cwd();
             chdir $fixture or die "Unable to chdir to $fixture: $!";
             local $ENV{HOME} = $fixture;
+            local $ENV{PATH} = join $Config{path_sep}, $fake_bin, ( $ENV{PATH} // q{} );
+            local $ENV{DD_TEST_PKG_CONFIG_STATUS} = 1;
             system( $^X, 'Makefile.PL' );
             my $exit = $? >> 8;
             chdir $original or die "Unable to return to $original: $!";
@@ -213,6 +277,56 @@ if ( $dist ne '' ) {
         ok( -f $mymeta_path, 'Makefile.PL writes MYMETA.json' );
         my $generated_meta = JSON::XS->new->decode( _slurp($mymeta_path) );
         is_deeply( $generated_meta->{license}, ['mit'], 'generated MakeMaker metadata declares only the canonical MIT license' );
+        my $generated_makefile = _slurp( File::Spec->catfile( $fixture, 'Makefile' ) );
+        if ( $^O eq 'linux' ) {
+            unlike( $generated_makefile, qr/^build-system-menu-helper:/m,
+                'Linux Makefile omits the native helper build when pkg-config reports missing GTK/Ayatana modules' );
+            like( $configure_stdout, qr/System Menu helper.*not built.*pkg-config/is,
+                'Linux Makefile.PL visibly explains why the optional helper was not built' );
+        }
+        else {
+            pass('Linux-only optional GTK helper assertions are not applicable on this platform');
+            pass('Linux-only optional GTK helper notice is not applicable on this platform');
+        }
+
+        if ( $^O eq 'linux' ) {
+            my ( $available_stdout, $available_stderr, $available_exit ) = capture {
+                my $original = Cwd::cwd();
+                chdir $fixture or die "Unable to chdir to $fixture: $!";
+                local $ENV{HOME} = $fixture;
+                local $ENV{PATH} = join $Config{path_sep}, $fake_bin, ( $ENV{PATH} // q{} );
+                local $ENV{DD_TEST_PKG_CONFIG_STATUS} = 0;
+                local $ENV{DD_REQUIRE_SYSTEM_MENU_HELPER} = 1;
+                system( $^X, 'Makefile.PL' );
+                my $exit = $? >> 8;
+                chdir $original or die "Unable to return to $original: $!";
+                return $exit;
+            };
+            is( $available_exit, 0,
+                'Linux configure succeeds when GTK/Ayatana modules are available and the helper is required' )
+              or diag("stdout:\n$available_stdout\nstderr:\n$available_stderr");
+            $generated_makefile = _slurp( File::Spec->catfile( $fixture, 'Makefile' ) );
+            like( $generated_makefile, qr/^build-system-menu-helper:/m,
+                'Linux Makefile retains the native helper target when both pkg-config modules exist' );
+
+            my ( $required_stdout, $required_stderr, $required_exit ) = capture {
+                my $original = Cwd::cwd();
+                chdir $fixture or die "Unable to chdir to $fixture: $!";
+                local $ENV{HOME} = $fixture;
+                local $ENV{PATH} = join $Config{path_sep}, $fake_bin, ( $ENV{PATH} // q{} );
+                local $ENV{DD_TEST_PKG_CONFIG_STATUS} = 1;
+                local $ENV{DD_REQUIRE_SYSTEM_MENU_HELPER} = 1;
+                system( $^X, 'Makefile.PL' );
+                my $exit = $? >> 8;
+                chdir $original or die "Unable to return to $original: $!";
+                return $exit;
+            };
+            isnt( $required_exit, 0,
+                'Linux configure fails when the required native helper dependencies are missing' );
+            like( "$required_stdout\n$required_stderr",
+                qr/Required Linux System Menu helper cannot be built.*gtk/i,
+                'required-helper failure names the missing native dependency setup' );
+        }
     }
     like( $makefile, qr/VERSION_FROM\s*=>\s*'lib\/Developer\/Dashboard\/Version\.pm'/,
         'Makefile.PL reads version metadata from the lightweight version module' );
@@ -270,8 +384,14 @@ for my $path (
     ok( !-e _repo_path($path), "$path is no longer shipped as a public executable" );
 }
 
-ok( -f _repo_path( 'bin', 'd2' ), 'bin/d2 is shipped as the real short dashboard entrypoint' );
-ok( -x _repo_path( 'bin', 'd2' ), 'bin/d2 is shipped as an executable' );
+ok( -f _repo_path( 'bin', 'd2' ), 'bin/d2 is shipped as the real short d2 entrypoint' );
+# Perl's -x on Windows goes by the file extension, so it is false for the
+# extensionless bin/d2 whatever the file is. There the same property is
+# read where it really lives: the executable bit recorded in the git index.
+ok(
+    $^O eq 'MSWin32' ? _git_index_mode( 'bin/d2' ) eq '100755' : -x _repo_path( 'bin', 'd2' ),
+    'bin/d2 is shipped as an executable',
+);
 
 for my $module (
     qw(
@@ -292,19 +412,18 @@ unlike( $makefile, qr/["']HTTP::Daemon["']\s*=>\s*0/, 'Makefile.PL no longer dec
 unlike( $makefile, qr/["']HTTP::Status["']\s*=>\s*0/, 'Makefile.PL no longer declares unused HTTP::Status metadata' );
 like( $makefile, qr/["']HTTP::Tiny["']\s*=>\s*["']0\.096["']/, 'Makefile.PL pins Plack\x27s transitive HTTP::Tiny dependency at the fixed security release' );
 my ($makefile_runtime_prereqs) = $makefile =~ /PREREQ_PM\s*=>\s*\{(.*?)\n\s*\},/s;
-unlike( $makefile_runtime_prereqs // q{}, qr/["']FFI::(?:Platypus|CheckLib)["']\s*=>/, 'Makefile.PL does not put optional FFI acceleration into PREREQ_PM' );
-like( $makefile, qr/prereqs\s*=>\s*\{\s*runtime\s*=>\s*\{\s*recommends\s*=>\s*\{\s*'FFI::Platypus'\s*=>\s*'2\.12'.*?'FFI::CheckLib'\s*=>\s*'0\.31'/s, 'Makefile.PL publishes FFI acceleration as optional runtime recommendations' );
+unlike( $makefile_runtime_prereqs // q{}, qr/["']FFI::(?:Platypus|CheckLib)["']\s*=>/, 'Makefile.PL has no FFI runtime prerequisite' );
+unlike( $makefile, qr/FFI::(?:Platypus|CheckLib)/, 'Makefile.PL has no FFI recommendation or dependency' );
 unlike( $cpanfile, qr/requires ['"]Test::Pod['"];/, 'cpanfile does not ship Test::Pod as an install-time prerequisite' );
 like( $cpanfile, qr/requires ['"]HTTP::Tiny['"]\s*,\s*['"]0\.096['"];/, 'cpanfile pins Plack\x27s transitive HTTP::Tiny dependency at the fixed security release' );
 like( $dist, qr/^HTTP::Tiny = 0\.096$/m, 'dist.ini pins Plack\x27s transitive HTTP::Tiny dependency at the fixed security release' );
 my ($dist_runtime_prereqs) = $dist =~ /^\[Prereqs\]\s*\n(.*?)(?=^\[|\z)/ms;
-unlike( $dist_runtime_prereqs // q{}, qr/^FFI::(?:Platypus|CheckLib)\s*=/m, 'dist.ini does not make optional FFI acceleration a hard runtime prerequisite' );
-my ($runtime_recommends) = $dist =~ /^\[Prereqs \/ RuntimeRecommends\]\s*\n(.*?)(?=^\[|\z)/ms;
-like( $runtime_recommends // q{}, qr/^FFI::Platypus = 2\.12$/m, 'dist.ini recommends the tested FFI::Platypus version' );
-like( $runtime_recommends // q{}, qr/^FFI::CheckLib = 0\.31$/m, 'dist.ini recommends the tested FFI::CheckLib version' );
-unlike( $cpanfile, qr/^requires ['"]FFI::(?:Platypus|CheckLib)['"]/m, 'cpanfile does not require optional FFI acceleration modules' );
-like( $cpanfile, qr/^recommends ['"]FFI::Platypus['"]\s*,\s*['"]2\.12['"];/m, 'cpanfile recommends the tested FFI::Platypus version' );
-like( $cpanfile, qr/^recommends ['"]FFI::CheckLib['"]\s*,\s*['"]0\.31['"];/m, 'cpanfile recommends the tested FFI::CheckLib version' );
+unlike( $dist_runtime_prereqs // q{}, qr/^FFI::(?:Platypus|CheckLib)\s*=/m, 'dist.ini has no FFI runtime prerequisite' );
+unlike( $dist // q{}, qr/FFI::(?:Platypus|CheckLib)/, 'dist.ini has no FFI recommendation or dependency' );
+unlike( $cpanfile, qr/FFI::(?:Platypus|CheckLib)/, 'cpanfile has no FFI dependency or recommendation' );
+unlike( $pbkdf2_module, qr/FFI::(?:Platypus|CheckLib)/, 'PBKDF2 runtime module does not load an FFI package' );
+unlike( $watch_module, qr/FFI::(?:Platypus|CheckLib)/, 'watch runtime module does not load an FFI package' );
+
 my %runtime_prereq_minimum = (
     'JSON::XS'               => '4.04',
     'YAML::XS'               => '0.903.0',
@@ -319,15 +438,16 @@ my %runtime_prereq_minimum = (
     'Compress::Raw::Zlib'    => '2.220',
     'IO::Compress::Gzip'     => '2.220',
     'IO::Uncompress::Gunzip' => '2.220',
-    'Cpanel::JSON::XS'       => '4.41',
+    'Cpanel::JSON::XS'       => '4.80',
     'Dancer2'                => '2.2.0',
-    'YAML'                   => '1.28',
-    'Plack'                  => '1.0054',
+    'YAML'                   => '1.30',
+    'Plack'                  => '1.0056',
     'Socket'                 => '2.041',
-    'Starman'                => '0.4018',
+    'Starman'                => '0.4019',
     'Storable'               => '3.41',
     'HTML::Parser'           => '3.84',
     'HTTP::Date'             => '6.08',
+    'HTTP::Parser::XS'       => '0.18',
     'HTTP::Request'          => '0',
     'LWP::Protocol::https'   => '6.07',
     'LWP::UserAgent'         => '6.83',
@@ -491,7 +611,7 @@ my @operator_local_files = qw(
 
     my @must_be_shipped = qw(
         lib/Developer/Dashboard.pm
-        bin/dashboard
+        bin/d2
         t/15-release-metadata.t
         share/public/js/jquery-4.0.0.min.js
         integration/blank-env/run-integration.pl
@@ -579,7 +699,7 @@ SKIP: {
     }
 
     my @tracked = grep { m{^\.worktrees/} || m{^dogfood-output/} }
-      split /\n/, `git -C @{[ _repo_path() ]} ls-files 2>/dev/null`;
+      sort keys %tracked_repo_paths;
     is_deeply( \@tracked, [], 'no sandbox file is tracked in this repository' );
 }
 
@@ -600,7 +720,7 @@ SKIP: {
     );
 
     my @tracked = grep { m{^\.claude/} }
-      split /\n/, `git -C @{[ _repo_path() ]} ls-files 2>/dev/null`;
+      sort keys %tracked_repo_paths;
     is_deeply( \@tracked, [], 'no .claude/ file is tracked in this repository' );
 }
 
@@ -649,11 +769,11 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/~\/\.developer-dashboard\/cli/, 'docs describe private helper extraction under the runtime cli root' );
     like( $doc, qr/\bof\b.*~\/\.developer-dashboard\/cli|~\/\.developer-dashboard\/cli.*\bof\b/s, 'docs describe private of/open-file helper staging' );
     like( $doc, qr/\bworkspace\b.*~\/\.developer-dashboard\/cli|~\/\.developer-dashboard\/cli.*\bworkspace\b/s, 'docs describe private workspace helper staging' );
-    like( $doc, qr/dashboard jq/, 'docs describe the renamed jq subcommand' );
-    like( $doc, qr/dashboard yq/, 'docs describe the renamed yq subcommand' );
-    like( $doc, qr/dashboard tomq/, 'docs describe the renamed tomq subcommand' );
-    like( $doc, qr/dashboard propq/, 'docs describe the renamed propq subcommand' );
-    like( $doc, qr/dashboard of \. jq|jq\.js.*jquery\.js|jquery\.js.*jq\.js/s, 'docs describe the scoped open-file ranking behaviour' );
+    like( $doc, qr/d2 jq/, 'docs describe the renamed jq subcommand' );
+    like( $doc, qr/d2 yq/, 'docs describe the renamed yq subcommand' );
+    like( $doc, qr/d2 tomq/, 'docs describe the renamed tomq subcommand' );
+    like( $doc, qr/d2 propq/, 'docs describe the renamed propq subcommand' );
+    like( $doc, qr/d2 of \. jq|jq\.js.*jquery\.js|jquery\.js.*jq\.js/s, 'docs describe the scoped open-file ranking behaviour' );
     like( $doc, qr/Ok\\\.js\$|ok\.json|case-insensitive regex/i, 'docs describe regex-based scoped open-file matching explicitly' );
     like( $doc, qr/javax\.jws\.WebService|Maven source jar|~\/\.developer-dashboard\/cache\/open-file/i, 'docs describe Java source lookup through archives and cached Maven downloads' );
     like( $doc, qr/vim -p|C<vim -p>/, 'docs describe vim tab mode for blank-enter open-all' );
@@ -661,14 +781,14 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/XMLHttpRequest/, 'docs describe incremental browser streaming through XMLHttpRequest' );
     like( $doc, qr/request-specific\s+token\s+form|carry(?:ing)?\s+those\s+token\s+values\s+across\s+matching\s+placeholders|(?:`\{\{token\}\}`|C<\{\{token\}\}>|\{\{token\}\})\s+placeholders/s, 'docs describe the request-token carry-over workflow' );
     like( $doc, qr/below\s+the\s+response\s+`pre`|below\s+the\s+response\s+C<pre>/s, 'docs describe the response tabs below the response pre box' );
-    like( $doc, qr/dashboard cpan(?: <Module\.\.\.>| E<lt>Module\.\.\.E<gt>)?|C<dashboard cpan E<lt>Module\.\.\.E<gt>>/, 'docs describe the runtime-local dashboard cpan command' );
+    like( $doc, qr/d2 cpan(?: <Module\.\.\.>| E<lt>Module\.\.\.E<gt>)?|C<d2 cpan E<lt>Module\.\.\.E<gt>>/, 'docs describe the runtime-local d2 cpan command' );
     like( $doc, qr/ssl_subject_alt_names/, 'docs describe configured extra SSL SAN aliases and IPs' );
     like( $doc, qr/config\/api\.json|F<config\/api\.json>/, 'docs describe layered config/api.json machine auth for saved ajax routes' );
-    like( $doc, qr/dashboard api(?: add| rm| ls)?/, 'docs describe the dashboard api management command for layered machine auth' );
+    like( $doc, qr/d2 api(?: add| rm| ls)?/, 'docs describe the d2 api management command for layered machine auth' );
     like( $doc, qr/X-DD-API-Key|x-dd-api-key/i, 'docs describe the API key header for saved ajax machine auth' );
     like( $doc, qr/X-DD-API-Secret|x-dd-api-secret/i, 'docs describe the API secret header for saved ajax machine auth' );
-    like( $doc, qr/bin\/dashboard|dashboard entrypoint|C<dashboard> entrypoint/, 'docs describe the dashboard cpan implementation as entrypoint-local' );
-    like( $doc, qr/config\/config\.json.*intact|preserves an existing .*config\/config\.json/s, 'docs describe non-destructive dashboard init reruns' );
+    like( $doc, qr/bin\/dashboard|d2 entrypoint|C<d2> entrypoint/, 'docs describe the d2 cpan implementation as entrypoint-local' );
+    like( $doc, qr/config\/config\.json.*intact|preserves an existing .*config\/config\.json/s, 'docs describe non-destructive d2 init reruns' );
     like( $doc, qr/cli\/dd/, 'docs describe the dedicated dd helper namespace under the home runtime CLI root' );
     like( $doc, qr/config\.json.*\{\}|creates it as `\{\}`|creates it as C<\{\}>/s, 'docs describe empty-object config bootstrapping instead of example collector seeding' );
     like( $doc, qr/preserve(?:s|d)?\s+.*user-owned.*~\/\.developer-dashboard\/cli|~\/\.developer-dashboard\/cli.*user-owned.*preserve|non-destructive.*~\/\.developer-dashboard\/cli/s, 'docs describe non-destructive preservation of user-owned files under the home runtime CLI root' );
@@ -693,7 +813,7 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/\.js.*node|node.*\.js/s, 'docs describe direct executable JavaScript command and hook dispatch through node' );
     like( $doc, qr/\.py.*python|python.*\.py/s, 'docs describe direct executable Python command and hook dispatch through python' );
     like( $doc, qr/\.java.*javac.*java|javac.*\.java.*java/s, 'docs describe direct executable Java command and hook dispatch through javac and java' );
-    like( $doc, qr/dashboard hi|dashboard foo/, 'docs include concrete custom-command examples for source-backed CLI dispatch' );
+    like( $doc, qr/d2 hi|d2 foo/, 'docs include concrete custom-command examples for source-backed CLI dispatch' );
     unlike( $doc, qr/CPANManager/, 'docs do not describe a dedicated CPAN manager module for a removed browser workspace runtime driver flow' );
     like( $doc, qr/Developer::Dashboard::SKILLS/, 'docs point readers at the shipped skill POD module' );
     unlike( $doc, qr/standalone `of` and `open-file`|standalone of and open-file/, 'docs no longer advertise public standalone of/open-file executables' );
@@ -701,9 +821,9 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/Developer::Dashboard::Runtime::Result/, 'docs use the namespaced Runtime::Result module name' );
     like( $doc, qr/Developer::Dashboard::Folder/, 'docs use the namespaced Folder module name' );
     like( $doc, qr/Folder->all|all_paths|new_from_all_folders|Collector->new_from_all_folders/, 'docs mention the public Perl path inventory API' );
-    like( $doc, qr/dashboard which/, 'docs mention the command inspection helper explicitly' );
-    like( $doc, qr/COMMAND \/full\/path|HOOK \/full\/path/, 'docs describe the COMMAND and HOOK output shape for dashboard which' );
-    like( $doc, qr/--edit.*dashboard open-file|dashboard open-file.*--edit/s, 'docs describe dashboard which --edit re-entering dashboard open-file' );
+    like( $doc, qr/d2 which/, 'docs mention the command inspection helper explicitly' );
+    like( $doc, qr/COMMAND \/full\/path|HOOK \/full\/path/, 'docs describe the COMMAND and HOOK output shape for d2 which' );
+    like( $doc, qr/--edit.*d2 open-file|d2 open-file.*--edit/s, 'docs describe d2 which --edit re-entering d2 open-file' );
     like( $doc, qr/Developer::Dashboard::EnvAudit/, 'docs mention the env provenance audit API' );
     like( $doc, qr/\.env\.pl|\.env/, 'docs describe layered env files explicitly' );
     like( $doc, qr/skill-local env files (?:load|are loaded) only when a skill command|skill env files only load when a skill command/i, 'docs describe skill-local env loading isolation' );
@@ -733,14 +853,14 @@ for my $doc (
 }
 
 for my $doc ( grep { defined && $_ ne '' } ( $skill_guide, $skills_pod ) ) {
-    like( $doc, qr/dashboard skills install/, 'skill authoring docs explain installation' );
-    like( $doc, qr/dashboard skills install browser foo\/bar git\@github\.com:user\/example-skill\.git/, 'skill authoring docs explain multi-source skill installs' );
-    like( $doc, qr/dashboard skill list|C<dashboard skill>/, 'skill authoring docs explain the singular skill management alias' );
+    like( $doc, qr/d2 skills install/, 'skill authoring docs explain installation' );
+    like( $doc, qr/d2 skills install browser foo\/bar git\@github\.com:user\/example-skill\.git/, 'skill authoring docs explain multi-source skill installs' );
+    like( $doc, qr/d2 skill list|C<d2 skill>/, 'skill authoring docs explain the singular skill management alias' );
     like( $doc, qr/\.gitignore.*skills\/<repo-name>\/|\.gitignore.*skills\/E<lt>repo-nameE<gt>\//s, 'skill authoring docs explain home gitignore skill tree registration' );
     like( $doc, qr/\/absolute\/path\/to\/example-skill/, 'skill authoring docs explain direct local skill installs' );
     like( $doc, qr/\.git\/.*\.env.*VERSION|\.env.*VERSION.*\.git\//is, 'skill authoring docs explain local skill qualification' );
-    like( $doc, qr/dashboard example-skill\.hello/, 'skill authoring docs explain dotted command dispatch' );
-    unlike( $doc, qr/dashboard skill example-skill/, 'skill authoring docs no longer describe the removed singular dispatcher' );
+    like( $doc, qr/d2 example-skill\.hello/, 'skill authoring docs explain dotted command dispatch' );
+    unlike( $doc, qr/d2 skill example-skill/, 'skill authoring docs no longer describe the removed singular dispatcher' );
     like( $doc, qr{~/.developer-dashboard/skills/<repo-name>/|F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>}, 'skill authoring docs describe the isolated skill root' );
     like( $doc, qr/DD-OOP-LAYERS.*skill|skill.*DD-OOP-LAYERS/is, 'skill authoring docs describe layered skill lookup through DD-OOP-LAYERS' );
     like( $doc, qr/deepest.*shadow|shadow.*deepest|deepest matching repo name/is, 'skill authoring docs describe deepest-layer skill shadowing' );
@@ -805,23 +925,23 @@ for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/checkout-only.*install\.sh|install\.sh.*checkout-only/is, 'README documents install.sh as a checkout-only bootstrap script instead of an installed CPAN command' );
     like( $doc, qr/checkout-only.*install\.ps|install\.ps.*checkout-only/is, 'README and POD document install.ps1 as a checkout-only bootstrap script instead of an installed CPAN command' );
     like( $doc, qr/PowerShell.*install\.ps|install\.ps.*PowerShell/is, 'README and POD document install.ps1 as the Windows bootstrap entrypoint' );
-    like( $doc, qr/dashboard skills install/, 'README documents skill installation' );
-    like( $doc, qr/dashboard skills install browser foo\/bar git\@github\.com:user\/example-skill\.git/, 'README documents multi-source skill installation' );
-    like( $doc, qr/dashboard skill list|`dashboard skill`/, 'README documents the singular skill management alias' );
+    like( $doc, qr/d2 skills install/, 'README documents skill installation' );
+    like( $doc, qr/d2 skills install browser foo\/bar git\@github\.com:user\/example-skill\.git/, 'README documents multi-source skill installation' );
+    like( $doc, qr/d2 skill list|`d2 skill`/, 'README documents the singular skill management alias' );
     like( $doc, qr/\.gitignore.*skills\/<repo-name>\//s, 'README documents home gitignore skill tree registration' );
-    like( $doc, qr/dashboard skills install \/absolute\/path\/to\/example-skill/, 'README documents direct local skill installation' );
-    like( $doc, qr/dashboard skills uninstall/, 'README documents skill uninstallation' );
-    like( $doc, qr/Update registered skills.*dashboard skills install/s, 'README documents bare install as the registered-skill update command' );
+    like( $doc, qr/d2 skills install \/absolute\/path\/to\/example-skill/, 'README documents direct local skill installation' );
+    like( $doc, qr/d2 skills uninstall/, 'README documents skill uninstallation' );
+    like( $doc, qr/Update registered skills.*d2 skills install/s, 'README documents bare install as the registered-skill update command' );
     like( $doc, qr/-o json.*raw result payload|raw result payload.*-o json/s, 'README documents JSON output as an explicit skill install option' );
-    like( $doc, qr/dashboard skills enable/, 'README documents skill enablement' );
-    like( $doc, qr/dashboard skills disable/, 'README documents skill disablement' );
-    like( $doc, qr/dashboard skills usage/, 'README documents skill usage inspection' );
-    like( $doc, qr/dashboard skills list -o json|dashboard skills usage example-skill -o json|default output is a readable multi-section summary|default output is a padded table/is, 'README documents the human-summary plus explicit JSON contract for skill inspection' );
-    like( $doc, qr/dashboard skills list -o json/, 'README documents explicit JSON output for the skills list' );
+    like( $doc, qr/d2 skills enable/, 'README documents skill enablement' );
+    like( $doc, qr/d2 skills disable/, 'README documents skill disablement' );
+    like( $doc, qr/d2 skills usage/, 'README documents skill usage inspection' );
+    like( $doc, qr/d2 skills list -o json|d2 skills usage example-skill -o json|default output is a readable multi-section summary|default output is a padded table/is, 'README documents the human-summary plus explicit JSON contract for skill inspection' );
+    like( $doc, qr/d2 skills list -o json/, 'README documents explicit JSON output for the skills list' );
     like( $doc, qr/default output is a padded table|default output is a .*table/i, 'README documents table as the default skills list output' );
-    like( $doc, qr/dashboard example-skill\.somecmd/, 'README documents dotted isolated skill command dispatch' );
-    like( $doc, qr/dashboard example-skill\.foo\.bar\.baz|skills\/foo\/skills\/bar\/cli\/baz/, 'README documents dotted dispatch for multi-level nested skills/<repo>/cli commands' );
-    unlike( $doc, qr/dashboard skill example-skill/, 'README no longer documents the removed singular dispatcher' );
+    like( $doc, qr/d2 example-skill\.somecmd/, 'README documents dotted isolated skill command dispatch' );
+    like( $doc, qr/d2 example-skill\.foo\.bar\.baz|skills\/foo\/skills\/bar\/cli\/baz/, 'README documents dotted dispatch for multi-level nested skills/<repo>/cli commands' );
+    unlike( $doc, qr/d2 skill example-skill/, 'README no longer documents the removed singular dispatcher' );
     like( $doc, qr/aptfile/, 'README documents skill apt dependency bootstrap' );
     like( $doc, qr/_example-skill|_<repo-name>/, 'README documents underscored skill config merge keys' );
     like( $doc, qr{/app/<repo-name>|/app/<repo-name>/<page>}, 'README documents app-style skill routes' );
@@ -878,8 +998,8 @@ unlike( $readme, qr/real\s+inputs.*outputs|outputs.*real\s+inputs/is, 'README no
 unlike( $pm, qr/real\s+inputs.*outputs|outputs.*real\s+inputs/is, 'main module POD no longer carries file-level FULL-POD-DOC contributor guidance' );
 unlike( $readme, qr/common\s+path.*edge|edge.*common\s+path/is, 'README no longer carries the contributor example-bank wording' ) if $readme ne '';
 unlike( $pm, qr/common\s+path.*edge|edge.*common\s+path/is, 'main module POD no longer carries the contributor example-bank wording' );
-like( $readme, qr/How is the browser UI served\?|browser UI runs as the dashboard web service.*dashboard serve/is, 'README explains the browser service entrypoint instead of framing it as a framework requirement' ) if $readme ne '';
-like( $pm, qr/How is the browser UI served\?|browser UI runs as the dashboard web service.*dashboard serve/is, 'main module explains the browser service entrypoint instead of framing it as a framework requirement' );
+like( $readme, qr/How is the browser UI served\?|browser UI runs as the dashboard web service.*d2 serve/is, 'README explains the browser service entrypoint instead of framing it as a framework requirement' ) if $readme ne '';
+like( $pm, qr/How is the browser UI served\?|browser UI runs as the dashboard web service.*d2 serve/is, 'main module explains the browser service entrypoint instead of framing it as a framework requirement' );
 unlike( $pm, qr/=head2 Does it require a web framework\?/m, 'main module no longer carries the misleading web framework FAQ heading' );
 unlike( $readme, qr/minimal HTTP layer implemented with core Perl-oriented modules/i, 'README no longer claims the web stack avoids a framework' ) if $readme ne '';
 unlike( $pm, qr/minimal HTTP layer implemented with core Perl-oriented modules/i, 'main module no longer claims the web stack avoids a framework' );
@@ -909,7 +1029,7 @@ for my $path ( _perl_doc_paths() ) {
     like( $content, qr/^__END__$/m, "$path keeps Perl POD after __END__" );
     like( $content, qr/^=head1 NAME$/m, "$path documents NAME" );
     unlike( _extract_pod($content), qr/\b[A-Za-z0-9_\/.-]+\.md\b/, "$path POD does not point readers at repo-internal markdown filenames" );
-    next if $path eq _repo_path( 'lib', 'Developer', 'Dashboard.pm' );
+    next if _same_path( $path, _repo_path( 'lib', 'Developer', 'Dashboard.pm' ) );
     like( $content, qr/^=head1 PURPOSE$/m, "$path documents PURPOSE" );
     like( $content, qr/^=head1 WHY IT EXISTS$/m, "$path documents WHY IT EXISTS" );
     like( $content, qr/^=head1 WHEN TO USE$/m, "$path documents WHEN TO USE" );
@@ -922,7 +1042,7 @@ my @forbidden_full_pod_boilerplate = (
     qr/Perl module in the Developer Dashboard codebase\./,
     qr/Private helper script in the Developer Dashboard codebase\./,
     qr/Open this file when you need the implementation, regression coverage, or runtime entrypoint for that responsibility rather than guessing which part of the tree owns it\./,
-    qr/It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<dashboard> switchboard, bookmark text, or duplicated helper scripts\./,
+    qr/It exists to keep this responsibility in reusable Perl code instead of hiding it in the thin C<d2> switchboard, bookmark text, or duplicated helper scripts\./,
     qr/Use this file when you are changing the underlying runtime behaviour it owns, when you need to call its routines from another part of the project, or when a failing test points at this module as the real owner of the bug\./,
     qr/Load C<Developer::Dashboard::[A-Za-z:]+> from Perl code under C<lib\/> or from a focused test, then use the public routines documented in the inline function comments and existing SYNOPSIS\/METHODS sections\./,
     qr/This file is used by whichever runtime path owns this responsibility:/,
@@ -935,7 +1055,7 @@ for my $path ( _shipped_perl_doc_paths() ) {
         unlike( $content, $pattern, "$path no longer uses the generic FULL-POD-DOC boilerplate" );
     }
 
-    next if $path eq _repo_path( 'lib', 'Developer', 'Dashboard.pm' );
+    next if _same_path( $path, _repo_path( 'lib', 'Developer', 'Dashboard.pm' ) );
 
     my $how_to_use = _section_body( $content, 'HOW TO USE' );
     my $normalized_how_to_use = $how_to_use;
@@ -1002,7 +1122,7 @@ done_testing();
 
 sub _slurp {
     my ($path) = @_;
-    open my $fh, '<', $path or die $!;
+    open my $fh, '<', $path or die "Unable to read $path: $!";
     my $content = do { local $/; <$fh> };
     close $fh;
     return $content;
@@ -1016,6 +1136,41 @@ sub _slurp_optional {
 
 sub _repo_path {
     return File::Spec->catfile( $ROOT, @_ );
+}
+
+# Purpose: say whether two paths name the same file, whatever separator each
+# was spelt with. File::Find joins with a forward slash and File::Spec with
+# the platform separator, so on Windows the same file arrives in two
+# spellings and a plain string comparison never matches.
+# Input: two path strings. Output: true when both canonicalise to one path.
+sub _same_path {
+    my ( $left, $right ) = @_;
+    return File::Spec->canonpath($left) eq File::Spec->canonpath($right);
+}
+
+# Purpose: turn an absolute path into the key git ls-files uses for it.
+# git always answers with forward slashes; File::Spec->abs2rel answers with
+# backslashes on Windows, so the raw value never matched a tracked path there
+# and the tracked-only walks came back almost empty.
+# Input: absolute path. Output: repository-relative path, forward slashes.
+sub _tracked_key {
+    my ($path) = @_;
+    my $relative = File::Spec->abs2rel( $path, $ROOT );
+    $relative =~ s{\\}{/}g if $^O eq 'MSWin32';
+    return $relative;
+}
+
+# Purpose: read the file mode git records in its index for one tracked path.
+# Input: repository-relative path with forward slashes. Output: the mode
+# string such as 100755, or an empty string when the path is not tracked.
+sub _git_index_mode {
+    my ($relative) = @_;
+    my ( $stdout, $stderr, $exit ) = capture {
+        system( 'git', '-C', $ROOT, 'ls-files', '-s', '--', $relative );
+    };
+    die "git ls-files -s failed while reading the index mode of $relative: $stderr"
+      if $exit != 0 || $stderr ne '';
+    return $stdout =~ /\A([0-7]{6}) / ? $1 : '';
 }
 
 sub _tracked_repo_paths {
@@ -1060,7 +1215,7 @@ sub _perl_doc_paths {
     );
     push @paths, grep { -f $_ } (
         _repo_path('app.psgi'),
-        _repo_path('bin', 'dashboard'),
+        _repo_path('bin', 'd2'),
     );
 
     for my $root (@roots) {
@@ -1070,6 +1225,9 @@ sub _perl_doc_paths {
                 no_chdir => 1,
                 wanted   => sub {
                     return if !-f $_;
+                    # Concurrent tests create and remove transient Perl fixtures.
+                    # A release metadata sweep must read tracked sources only.
+                    return if !$tracked_repo_paths{ _tracked_key($File::Find::name) };
                     return if $_ =~ m{/OLD_CODE/};
                     return if $_ !~ /\.(?:pm|pl|t)\z/ && $_ !~ m{/share/private-cli/[^/]+\z};
                     push @paths, $File::Find::name;
@@ -1095,12 +1253,13 @@ sub _test_citation_population {
                 no_chdir => 1,
                 wanted   => sub {
                     return if !-f $_;
+                    return if !$tracked_repo_paths{ _tracked_key($File::Find::name) };
                     return if $_ !~ /\.md\z/;
                     # This locally ignored coverage work log is intentionally
                     # outside the shipped/repository documentation set while
                     # Problem 20 is paused; its historical PAX test references
                     # describe tests removed with the retired subsystem.
-                    return if $File::Find::name eq _repo_path( 'doc', 'problem-20-report.md' );
+                    return if _same_path( $File::Find::name, _repo_path( 'doc', 'problem-20-report.md' ) );
                     push @paths, $File::Find::name;
                 },
             },
@@ -1144,7 +1303,7 @@ sub _shipped_perl_doc_paths {
     my @paths;
     push @paths, grep { -f $_ } (
         _repo_path('app.psgi'),
-        _repo_path('bin', 'dashboard'),
+        _repo_path('bin', 'd2'),
     );
 
     for my $root ( _repo_path('lib'), _repo_path( 'share', 'private-cli' ) ) {
@@ -1214,8 +1373,8 @@ sub _repo_search_without_self {
     my %seen;
     my @matches;
     FILE:
-    for my $path ( sort grep { !$seen{$_}++ } @files ) {
-        next if $path eq $self;
+    for my $path ( sort grep { !$seen{$_}++ && $tracked_repo_paths{ _tracked_key($_) } } @files ) {
+        next if _same_path( $path, $self );
         next if $path =~ m{/t/fixtures/};
         my $content = _slurp($path);
         my @lines   = split /\n/, $content, -1;
@@ -1233,10 +1392,23 @@ sub _command_on_path {
     my ($name) = @_;
     return 0 if !defined $name || $name eq '';
 
-    for my $dir ( split /:/, $ENV{PATH} || q{} ) {
+    # File::Spec->path splits PATH on the platform's own separator. Splitting
+    # on a colon can never find a command on Windows, where PATH is joined
+    # with semicolons, so the README sync checks skipped there even with
+    # pod2markdown installed. On Windows the name is also tried with each
+    # PATHEXT extension, because a command there is a file such as
+    # pod2markdown.bat and Perl's -x goes by that extension.
+    my $is_windows = $^O eq 'MSWin32';
+    my @extensions = $is_windows
+      ? grep { length } split /;/, ( $ENV{PATHEXT} || '.COM;.EXE;.BAT;.CMD' )
+      : (q{});
+    for my $dir ( File::Spec->path ) {
         next if !defined $dir || $dir eq '';
-        my $candidate = File::Spec->catfile( $dir, $name );
-        return 1 if -x $candidate;
+        for my $extension (@extensions) {
+            my $candidate = File::Spec->catfile( $dir, $name . $extension );
+            next if !-f $candidate;
+            return 1 if $is_windows || -x $candidate;
+        }
     }
 
     return 0;
@@ -1255,9 +1427,15 @@ documentation, and numbered problem-report index aligned for the private-helper
 and isolated-skill packaging model. It also pins the declared runtime dependency floors, so a
 distribution carrying a published advisory cannot be permitted by the manifests
 even where no current advisory database is installed to notice.
+It configures isolated MakeMaker fixtures with mocked pkg-config results to
+verify optional Linux System Menu helper handling, including the strict mode
+used by CI.
 It also resolves every C<t/NN-name.t> path cited in the README, the markdown under
 C<doc/> and C<docs/>, and the POD of every Perl file, so a renamed test file
-cannot leave a stale citation behind in the documentation.
+cannot leave a stale citation behind in the documentation. The collector cron
+assertions distinguish a once-hourly expression from a wildcard-minute,
+per-minute expression in the plain reference, canonical POD, and generated
+README.
 
 =for comment FULL-POD-DOC START
 
@@ -1288,17 +1466,25 @@ Example 1:
 
   prove -lv t/15-release-metadata.t
 
-Run the release metadata and documentation contract checks by themselves while editing docs or version metadata.
+Run the release metadata, documentation, and optional native-helper configure
+contract checks by themselves while editing docs, version metadata, or build
+prerequisites.
 
 Example 2:
 
   HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/15-release-metadata.t
 
-Confirm the metadata guardrails still behave under the covered test path.
+Confirm the metadata and mocked native-helper configuration guardrails still
+behave under the covered test path.
 
 Example 3:
 
   dzil build
+
+The cron documentation assertions fail until the canonical POD and plain
+collector scheduling reference explain C<0 */1 * * *> as hourly and
+C<* */1 * * *> as per-minute. The generated README is checked both for those
+examples and against the canonical POD renderer.
 
 Follow the metadata assertions with a real distribution build, because this test protects the release contract.
 

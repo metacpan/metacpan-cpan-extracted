@@ -24,7 +24,7 @@ SKIP: {
     my ( $bench_out, $bench_err, $bench_exit ) = _run(
         $script, '--skills', '3', '--runs', '1', '--workers', '2',
     );
-    is( $bench_exit, 0, 'small dashboard config benchmark succeeds with MCE' );
+    is( $bench_exit, 0, 'small d2 config benchmark succeeds with MCE' );
     like( $bench_out, qr/exact_alias_parity=yes/, 'serial and MCE path_aliases payloads match' );
     is( $bench_err, '', 'successful benchmark produces no warnings' );
 }
@@ -78,7 +78,7 @@ covered without the optional dependency.
 =head1 WHAT USES IT
 
 The repository test suite runs the CLI contract; Problem 48 research uses the
-benchmark's timings to evaluate whether dashboard config alias reads benefit
+benchmark's timings to evaluate whether d2 config alias reads benefit
 from parallel processing.
 
 =head1 EXAMPLES

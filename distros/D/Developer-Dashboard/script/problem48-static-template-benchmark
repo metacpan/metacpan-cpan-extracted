@@ -123,7 +123,7 @@ early return. It requires exact output parity, including a non-ASCII character.
 
 =head1 WHY IT EXISTS
 
-NYTProf found that dashboard page preparation called Template Toolkit for
+NYTProf found that d2 page preparation called Template Toolkit for
 static navigation fragments as well as templates. Static bodies with no
 default C<[%> opener have no template work to perform, so they can skip context
 assembly and processing without changing their output.

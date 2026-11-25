@@ -1,7 +1,0 @@
-# Line endings stay LF in every checkout, whatever core.autocrlf says: the
-# launcher is a shell script with a shebang, dist/ is checked byte for byte.
-* text=auto eol=lf
-*.exe binary
-
-# Conformance fixtures are byte-exact: this case holds CRLF and BOM files.
-conformance/cases/16-frontmatter-crlf-bom/sources/** -text

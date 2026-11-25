@@ -203,4 +203,67 @@ for my $case (
     is $called, 0, "invalid hook-mutated $name is rejected before transport";
 }
 
+
+# A failing terminal hook must stop the request, even when the response or
+# original error would otherwise allow continuation. Later hooks never run.
+for my $stage (qw(after_response on_error)) {
+    my ($calls, $later, $other) = (0, 0, 0);
+    my $client = HTTP::API::Core->new(
+        base_url => 'https://api.example.test',
+        retry => { attempts => 3, base_delay => 0, jitter => 0 },
+        hooks => {
+            $stage => [
+                sub { die "terminal hook failed\n" },
+                sub { $later++ },
+            ],
+            ($stage eq 'after_response' ? 'on_error' : 'after_response') => sub { $other++ },
+        },
+        transport => sub {
+            $calls++;
+            return { status => $stage eq 'after_response' ? 200 : 503 };
+        },
+    );
+    my $error;
+    eval { $client->get('/terminal'); 1 } or $error = $@;
+    isa_ok $error, 'HTTP::API::Core::Error';
+    is $error->category, 'hook', "$stage failure has hook category";
+    ok !$error->retryable, "$stage failure is not retryable";
+    like $error->message, qr/terminal hook failed/, "$stage preserves the diagnostic";
+    is $calls, 1, "$stage failure never resends the request";
+    is $later, 0, "$stage failure stops the remaining callbacks";
+    is $other, 0, "$stage failure does not invoke the opposite callback";
+}
+
+for my $case (
+    [ 'undefined method', sub { $_[0]{method} = undef }, qr/method must be a non-empty scalar/ ],
+    [ 'empty method', sub { $_[0]{method} = '' }, qr/method must be a non-empty scalar/ ],
+    [ 'undefined URL', sub { $_[0]{url} = undef }, qr/url must be a non-empty scalar/ ],
+    [ 'invalid header map', sub { $_[0]{headers} = [] }, qr/headers must be a hash reference/ ],
+) {
+    my ($label, $mutate, $pattern) = @$case;
+    my $calls = 0;
+    my $client = HTTP::API::Core->new(
+        base_url => 'https://api.example.test',
+        hooks => { before_request => $mutate },
+        transport => sub { $calls++; return ok_response() },
+    );
+    my ($error, @warnings);
+    {
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
+        eval { $client->get('/invalid'); 1 } or $error = $@;
+    }
+    like $error, $pattern, "$label is rejected";
+    is_deeply \@warnings, [], "$label is rejected without coercion warnings";
+    is $calls, 0, "$label never reaches transport";
+}
+
+{
+    my $client = HTTP::API::Core->new(
+        base_url => 'https://api.example.test', hooks => undef,
+        transport => sub { ok_response() },
+    );
+    is $client->get('/no-hooks', hooks => undef)->status, 200,
+        'explicit undefined hooks are equivalent to no hooks';
+}
+
 done_testing;

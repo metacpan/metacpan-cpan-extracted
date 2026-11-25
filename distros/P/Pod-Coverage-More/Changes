@@ -1,0 +1,42 @@
+Revision history for Pod-Coverage-More
+
+0.003 2026-11-25 TEODESIAN
+    - Leave the files for development, such as dist.ini and CLAUDE.md, out of the tarball
+    - Declare aspell and its English dictionary as system packages in META.json, so that a host that installs them checks the spelling of the POD
+    - Stop dying with "Can't call method name on an undefined value" on a ternary with an empty list as a branch, such as $x ? lc $x : ()
+    - Stop the warnings "Missing argument in sprintf" and "Invalid conversion in sprintf" for POD whose prose has a % in it
+    - [Blurbs] writes the POD of an override whose parent class is installed and has only a comment above the sub, rather than taking that comment for a blurb
+    - The termination check counts log_fatal, as Dist::Zilla plugins call it, and the logdie, logcroak and logconfess of Log::Log4perl, as ways to die
+    - [Blurbs] puts "Dies" before a @throws that names an exception class, such as "with a Some::Exception when ...", so the sentence has a verb
+    - Weave the blurbs of a script whose package has no module file of its own
+    - Accept any name in the POD for a placeholder parameter of a signature, at its position
+    - Document the elements of a slurpy array or hash in a blurb as @param @paths Str, and in POD as =item @paths - Str
+    - Accept a documented return type that parameterizes the type that the code returns, as ArrayRef[HashRef] for an ArrayRef
+    - Do not report a sub whose POD says it returns nothing for returning the value of a call
+    - On perl 5.36 to 5.42, report the empty list of a ternary, such as $x ? lc $x : (), as an empty return and not an unknown value
+
+0.002 2026-11-24 TEODESIAN
+    - Count a sub that =for Pod::Coverage names as documented, as Pod::Coverage::TrustPod does
+    - Add [Test::Pod::Coverage::More], a Dist::Zilla plugin that adds xt/author/pod-coverage-more.t in place of [PodCoverageTests]
+
+0.001 2026-11-24 TEODESIAN
+    - Infer parameters, return values and terminations of subs from their compiled op trees, on perl 5.36 and later
+    - License the distribution under MIT instead of the terms of Perl 5
+    - Read the keys of named arguments from exists and delete when perl compiles them without the multideref op
+    - Count POSIX::_exit as a termination, and Carp::cluck, which only warns, as none
+    - Report the implicit $self of core class methods as parameter 0 on every perl, and mark subs that another file installed as generated
+    - Report inferred types as Type::Tiny constraints: the constraint of each returned value, and of each parameter from its uses
+    - Read declared parameter and return types from Moose, Moo, Mouse, Class::Tiny, Object::Pad, Function::Parameters, Kavorka and Type::Params, and analyze the code that their wrappers call
+    - Read declared types from Type::Tiny guards, Type::Params checkers and Method::Signatures, and read $_[N] with a default as an optional parameter
+    - Check documented return types, terminations and examples against the code, and compare argument types as Type::Tiny constraints
+    - Read POD with Pod::Simple, including the =method, =func and =attr commands of Pod::Weaver
+    - Add Test::Pod::Coverage::More, which runs the checks of Pod::Coverage::More as tests
+    - Read constants that hold objects, such as the literals of use bigint, and the scopes of the bignum pragmas, and fail a documented return type against an operator result only when they are of different kinds
+    - Count subs that a parent class documents as documented, and take the POD of stubs and XS subs on the author's word in the argument checks
+    - Compare literal return values by value, argument lists with sigils in any case, and no longer read object fields as named arguments
+    - Generate the POD of a sub from the blurb above it, a description and @param, @returns, @throws and @example tags, filled in from what its code declares
+    - Add Pod::Weaver::Section::Blurbs, which weaves the generated POD of each sub with a blurb into the built module
+    - Load the package before reading its POD, so that a module the caller did not load is rated
+    - Write no section for an override of a sub that a parent class has a blurb for
+    - Document the arguments, types, return values and examples of every sub, so that the POD of the dist passes its own checks
+    - An object blessed into the invocant, as by bless {}, $class, is an instance of the package

@@ -12,11 +12,11 @@ like, iterators over results, and a pipeline of stages written beside
 the query. It never hides the SQL, and it isn't an ORM.
 
 ```perl
-my @names = $dbh->iterate(
+my @to_copy = $dbh->iterate(
     'SELECT name FROM track WHERE plays > :plays ORDER BY plays DESC',
-    plays => 6000,
-    pluck,              # each row's name
-    sub { uc },         # in capitals
+    plays => 5000,
+    pluck,                           # each row's name
+    drop_if { $on_my_phone{$_} },    # a hash: what the database can't know
 )->all;
 ```
 
@@ -46,8 +46,29 @@ DBIx::Squirrel does them for you.
     read what a result holds next to the SQL that makes it. Rows are
     fetched in batches, so you can work through a large result a row at a
     time without holding all of it in memory. Ready-made stages do the
-    common jobs, such as taking the first few rows, picking out a column,
-    or handing rows out in batches.
+    common jobs, such as picking out a column, handing rows out in
+    batches, or watching them go by.
+
+    The SQL still does what SQL does best. A condition or a limit belongs
+    in the query, where the database can use its indexes and send fewer
+    rows. Stages are for the work SQL can't do, and for steps you add
+    without changing a query: one shared, or with a name, or one you're
+    debugging.
+
+- **Files in and out, without the plumbing.**
+
+    A query goes out to a CSV file in one call, with its column names as
+    the header, and fields quoted where they need to be:
+
+    ```perl
+    $dbh->iterate('SELECT name, plays FROM track', to_csv(file => 'tracks.csv', header => 1));
+    ```
+
+    A CSV file comes in the same way: each row a hash keyed by the header,
+    straight into a statement's named placeholders, a batch to a
+    transaction, with no arrays to build and no columns to count. JSON
+    Lines go in and out much the same way, with `as_hash` to write each
+    row as an object.
 
 - **Queries with names.**
 
@@ -118,15 +139,17 @@ if there's another.
 
 ```perl
 my @hits = $dbh->iterate(
-    'SELECT name, plays FROM track ORDER BY plays DESC',
-    sub { $_->[1] >= 5000 ? $_ : () },    # leave out the rest
-    sub { "$_->[0] ($_->[1])" },          # make each a string
+    'SELECT name, plays FROM track WHERE plays >= 5000 ORDER BY plays DESC',
+    sub { "$_->[0] ($_->[1])" },    # make each a string
 )->all;
 ```
 
 Each row goes through the stages, given as `$_`. A stage returns
 nothing to drop the row, one value in its place, or several. It can
-also stop the iteration early. A stage made with `gather` can hold
+also stop the iteration early. To leave rows out, though, or stop
+after so many, write it in the SQL if you can: dropping rows or
+stopping early in a stage is for what the SQL can't say, or for a
+query you'd rather not change. A stage made with `gather` can hold
 rows, and give them out at the end, in batches or as one value.
 `pipe` runs anything else through stages the same way.
 
@@ -147,16 +170,18 @@ module, by tags, as `:stages` and `:sinks`, or `:all`:
 ```perl
 use DBIx::Squirrel::Tooling qw(:all);
 
-my @top_ten = $dbh->iterate(
-    'SELECT name, plays FROM track ORDER BY plays DESC',
-    take_if { $_->[1] >= 5000 },    # leave out the rest
+my @next_ten = $dbh->iterate(
+    'SELECT name FROM track ORDER BY plays DESC',
     pluck('name'),
-    take(10),
+    drop_if { $on_my_phone{$_} },    # already copied
+    take(10),                        # the first ten of what's left
     keep_all,
 );
-
-my $hits = $dbh->iterate('SELECT * FROM track WHERE plays > ?', 6000, count_items);
 ```
+
+`take(10)` comes after a test in Perl, so a `LIMIT` in the SQL
+couldn't do its job. While debugging, `peek { warn ... }` anywhere in
+the stages shows the rows going by, without a change to the query.
 
 Where [Ekorn::Pipeline::Operators](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AOperators) is in scope, `|` chains them too,
 as in `$it | count_items`. The reference says how to write your own
@@ -183,7 +208,7 @@ objects.
 ### 6. Give your databases and statements names.
 
 ```perl
-use DBIx::Squirrel::Tooling qw(pluck keep_all);
+use DBIx::Squirrel::Tooling qw(pluck take keep_all);
 use DBIx::Squirrel::Sugar
     database  => {music => ['dbi:SQLite:dbname=music.db', '', '']},
     statement => {
@@ -191,11 +216,15 @@ use DBIx::Squirrel::Sugar
     };
 
 my @titles = titles_by 2, keep_all;
+my @first  = titles_by 2, take(1), keep_all;
 ```
 
 [DBIx::Squirrel::Sugar](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3ASugar) makes each a function with its own name. A
 statement's stages are declared beside its SQL. Called, it gives an
 iterator over the results, or, with a sink last, the sink's result.
+Stages given in the call run after the statement's own, so code that
+uses a statement can add a step, such as `take`, without changing the
+SQL other code shares.
 Given `pipeline`, it names pipelines too, which a statement can name
 among its stages.
 
@@ -205,7 +234,9 @@ among its stages.
 feature in detail, with examples.
 [The user guide](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3AManual%3A%3AHowTo) is a tour of the
 package, a layer at a time, from the DBI underneath to the shortcuts
-on top, with recipes that work. Each module's POD, starting with
+on top, with recipes that work; its "When should I use it, and when
+not?" says where the package helps, and where plain DBI or SQL is the
+better choice. Each module's POD, starting with
 [DBIx::Squirrel](https://metacpan.org/pod/DBIx%3A%3ASquirrel), says the same more briefly.
 
 ## Installing

@@ -22,19 +22,19 @@ ask - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard ask ...
+  d2 ask ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard ask> so an operator can put a question to
-an AI backend straight from the dashboard shell and get a plain-text answer,
+This staged helper exposes C<d2 ask> so an operator can put a question to
+an AI backend straight from the d2 shell and get a plain-text answer,
 with the running conversation remembered per workspace.
 
 =head1 WHY IT EXISTS
@@ -43,16 +43,16 @@ It exists because the ask command needs a uniform surface over several assistant
 backends -- the Anthropic API, the local C<claude> CLI, and the C<codex>,
 C<copilot>, and C<gemini> command-line tools -- but the public switchboard should
 only dispatch to a staged helper instead of embedding backend-invocation logic
-directly in C<bin/dashboard>.
+directly in C<bin/d2>.
 
 =head1 WHEN TO USE
 
-Use this file when changing how the C<dashboard ask> command is routed into the
+Use this file when changing how the C<d2 ask> command is routed into the
 private runtime, or when the staged wrapper for the ask surface needs adjusting.
 
 =head1 HOW TO USE
 
-Users run C<dashboard ask "question">, optionally selecting a backend with
+Users run C<d2 ask "question">, optionally selecting a backend with
 C<--codex>, C<--copilot>, or C<--gemini> (default C<--claude>), attaching files
 with C<--file>, or starting a fresh conversation with C<--new>. The staged helper
 forwards the raw argv list into the private built-in runtime, which loads the ask
@@ -67,14 +67,14 @@ tests, and by staged-helper coverage tests.
 
 Example 1:
 
-  dashboard ask "How do I list collectors?"
+  d2 ask "How do I list collectors?"
 
 Ask the default claude backend and print a plain-text answer through the public
 built-in command path.
 
 Example 2:
 
-  dashboard ask --codex "Explain this stack trace" --file trace.txt
+  d2 ask --codex "Explain this stack trace" --file trace.txt
 
 Switch the workspace to the codex backend and inline a text attachment.
 

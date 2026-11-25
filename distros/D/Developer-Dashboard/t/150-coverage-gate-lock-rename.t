@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Test::More;
+use Capture::Tiny qw(capture_merged);
 use Cwd qw(getcwd);
 use Fcntl qw(:flock);
 use File::Spec;
@@ -24,6 +25,18 @@ use File::Temp qw(tempdir);
 my $source = File::Spec->catfile( getcwd(), 'script', 'coverage-gate' );
 
 plan skip_all => "the coverage gate is not present at $source" if !-f $source;
+
+# Devel::Cover is an optional development tool, not a declared runtime dependency.
+# Without it the gate takes a different and correct path - it reports that
+# Devel::Cover::DB::IO could not be loaded - so this file's subject cannot be
+# measured at all, and its assertions would report an environmental gap as a
+# defect. The guard sits BEFORE any plan is declared: t/151 previously died after
+# 3 of a planned 9, and "Bad plan. You planned 9 tests but ran 3" cannot tell a
+# reader which assertions were unmet and which were never attempted. Gated by
+# t/170-optional-tooling-skips.t, because CI carries Devel::Cover and would never
+# notice this guard being removed.
+plan skip_all => 'Devel::Cover is not installed, so the coverage gate cannot be exercised'
+  if !eval { require Devel::Cover::DB::IO; 1 };
 
 # The behaviour under test is about the DEFAULT database - the only one that ever
 # had a legacy lock name - so the test cannot simply pass --database and step out
@@ -72,9 +85,13 @@ $held->flush if $held->can('flush');
 sub run_gate {
     my @arguments = @_;
 
-    my $output = qx{$^X \Q$gate\E @{[ join ' ', map { quotemeta } @arguments ]} 2>&1};
+    # List-form system through capture_merged: no shell is involved, so no
+    # quoting of the gate path is needed. The old qx{} form built the command
+    # with quotemeta, which cmd.exe on Windows does not unescape - perl then
+    # received the literal doubled-backslash path and refused it with EINVAL.
+    my ( $output, $status ) = capture_merged { system $^X, $gate, @arguments };
 
-    return ( defined $output ? $output : '', $? >> 8 );
+    return ( defined $output ? $output : '', $status >> 8 );
 }
 
 # Feature: a rename does not open a window in which the lock stops working.

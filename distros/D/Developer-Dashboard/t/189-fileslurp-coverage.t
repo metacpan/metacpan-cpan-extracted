@@ -5,6 +5,16 @@ use warnings;
 use utf8;
 
 use Test::More;
+
+# Emulate a successfully opened handle whose read returns undef on every OS.
+# A real null device reports either undef or '' depending on the Perl port.
+our $FORCE_UNDEF_READ = 0;
+BEGIN {
+    *CORE::GLOBAL::readline = sub (*) {
+        return undef if $FORCE_UNDEF_READ;
+        return CORE::readline( $_[0] );
+    };
+}
 use File::Temp qw(tempdir);
 use File::Spec;
 
@@ -50,8 +60,35 @@ is( slurp_file( $missing_path, raw => 1, on_missing => 'empty' ), '', 'Collector
 eval { slurp_file($missing_path) };
 like( $@, qr/\Q$missing_path\E/, 'CollectorRunner.pm-shaped call: text mode, dies naming the path' );
 
-# CLI/Ask.pm contract: raw + custom message + never returns undef
-is( slurp_file( $text_path, raw => 1 ), "hello\n", 'CLI/Ask.pm-shaped call: raw mode on an existing file' );
+# CLI/Ask.pm contract: raw + custom message + never returns undef. The
+# fixture is written in :raw mode so its bytes are "hello\n" on every
+# platform: a text-mode write stores "hello\r\n" on Windows, and a byte-exact
+# raw read would rightly return that instead.
+my $raw_text_path = File::Spec->catfile( $dir, 'raw-text.txt' );
+open my $rtfh, '>:raw', $raw_text_path or die $!;
+print {$rtfh} "hello\n";
+close $rtfh;
+is( slurp_file( $raw_text_path, raw => 1 ), "hello\n", 'CLI/Ask.pm-shaped call: raw mode on an existing file' );
+
+# The platform's null device always opens but yields EOF immediately. This
+# exercises the undef-read normalization on macOS and Windows as well as Linux,
+# without depending on Linux-only /proc/self/mem.
+my $devnull = File::Spec->devnull;
+my $null_data = slurp_file( $devnull, raw => 1 );
+ok( !defined $null_data || $null_data eq '',
+    'a successfully opened null device produces no payload on this Perl port' );
+is( slurp_file( $devnull, raw => 1, normalize_undef => 1 ), '',
+    'normalize_undef converts an undef read to an empty string on every platform' );
+
+# The portable failure injection reaches both arms even when /proc/self/mem
+# does not exist (macOS/Windows) or the null device returns a defined ''.
+{
+    local $FORCE_UNDEF_READ = 1;
+    is( slurp_file( $text_path, raw => 1 ), undef,
+        'an injected undef read is preserved when normalization is disabled' );
+    is( slurp_file( $text_path, raw => 1, normalize_undef => 1 ), '',
+        'an injected undef read is normalized on all platforms' );
+}
 
 # normalize_undef: an I/O error on an already-open handle (not a missing file)
 # yields undef from <$fh>. Reproduced hermetically the same way as

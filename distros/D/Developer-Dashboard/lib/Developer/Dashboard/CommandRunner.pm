@@ -1,12 +1,14 @@
 package Developer::Dashboard::CommandRunner;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use strict;
 use warnings;
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
+use Encode qw(encode);
 use File::Temp qw(tempfile);
+use MIME::Base64 qw(encode_base64);
 use Time::HiRes qw(sleep time);
 use Developer::Dashboard::PerlEnv ();
 use Developer::Dashboard::Platform qw(is_windows shell_command_argv);
@@ -36,7 +38,21 @@ sub run_command {
     # sub returns, regardless of the exit code already captured in this sub's
     # own return value.
     local $?;
-    my $cmd        = $args{source};
+    my $cmd              = $args{source};
+    my $inline_perl_file;
+
+    # On Windows, PowerShell -Command quoting does not survive a double-quoted
+    # -e script: the Win32 command-line construction mangles the nested
+    # quotes before PowerShell ever sees them, so the child perl receives an
+    # empty program ("syntax error at -e line 1, at EOF"). Run the script from
+    # a temp file instead; the file is removed below once the child has run.
+    if ( is_windows() ) {
+        my $rewritten = _windows_perl_inline_command($cmd);
+        if ( defined $rewritten ) {
+            $cmd              = $rewritten->{command};
+            $inline_perl_file = $rewritten->{file};
+        }
+    }
     my $cwd        = $args{cwd};
     my $env        = ref( $args{env} ) eq 'HASH' ? $args{env} : {};
     my $timeout_ms = $args{timeout_ms} || 30_000;
@@ -50,7 +66,11 @@ sub run_command {
     my ( $pid_fh, $pidfile ) = tempfile( 'dashboard-collector-command-XXXXXX', TMPDIR => 1, UNLINK => 0 );
     CORE::close $pid_fh or die "Unable to close collector command pid file $pidfile: $!";
     my ( $stdout, $stderr, $exit_code ) = capture {
-        my @argv = shell_command_argv( $cmd, login => 0 );
+        # On Windows the command goes through _windows_powershell_argv, not
+        # shell_command_argv: see that sub for why -Command loses quotes.
+        my @argv = is_windows()
+            ? _windows_powershell_argv($cmd)
+            : shell_command_argv( $cmd, login => 0 );
 
         local $SIG{TERM} = sub { forward_command_signal( $pidfile, 'TERM', 15 ) };
         local $SIG{INT}  = sub { forward_command_signal( $pidfile, 'INT',  2 ) };
@@ -84,8 +104,125 @@ sub run_command {
     };
     alarm(0);
     unlink $pidfile;
+    unlink $inline_perl_file if defined $inline_perl_file && $inline_perl_file ne '';
     chdir $old or die "Unable to restore cwd to $old: $!";
     return ( $stdout, $stderr, $exit_code, $timed_out );
+}
+
+# _windows_perl_inline_command($command)
+# Rewrites a Windows perl -e invocation into a temp .pl file invocation, so
+# the script survives the PowerShell -Command quoting that mangles nested
+# double quotes. Only the exact <perl> [-flags] -e "<code>" shape is
+# rewritten; anything else passes through untouched (undef).
+# Input: shell command string.
+# Output: { command => ..., file => ... } hash ref, or undef.
+sub _windows_perl_inline_command {
+    my ($command) = @_;
+    return if !defined $command;
+    return if $command !~ /\A\s*(\S*perl(?:\.exe)?)\s+((?:-\S+\s+)*)-e\s+"(.*)"\s*\z/s;
+    my ( $perl, $flags, $code ) = ( $1, $2, $3 );
+    $flags =~ s/\s+\z//;
+    my ( $fh, $file ) = tempfile( 'dashboard-perl-inline-XXXXXX', SUFFIX => '.pl', TMPDIR => 1, UNLINK => 0 );
+    print {$fh} $code or die "Unable to write $file: $!";
+    close $fh or die "Unable to close $file: $!";
+    my $rewritten = join ' ', grep { $_ ne '' } ( $perl, $flags, $file );
+    return { command => $rewritten, file => $file };
+}
+
+# _windows_powershell_argv($command)
+# Builds the Windows PowerShell argv for one collector command so double
+# quotes survive BOTH Windows quoting layers, each proven by a micro-repro
+# (t/05 1079, Jenkins builds #59/#61):
+#   (1) The -Command handoff: Perl list-form system() does not escape
+#       embedded quotes when it joins argv into powershell.exe's command
+#       line, so the child's argv parser strips them before PowerShell
+#       parses the script - a cmdlet (Write-Output) lost them too, which
+#       rules out the native boundary as the only layer. Base64
+#       -EncodedCommand defeats this: the argument carries no quotes or
+#       spaces, so nothing can be mangled in transit.
+#   (2) PowerShell 5.1 native forwarding: even with the script delivered
+#       intact (base64, or read from a .ps1 file), PowerShell strips
+#       embedded quotes when it builds a native executable's command line.
+#       Escaping " as \" inside single-quoted strings defeats this: the
+#       backslash survives PowerShell's literal single-quote parsing and
+#       the child's argv parser turns \" back into ". Proven end to end
+#       by micro v5 probe 2 (build #61): printf '{"a":123}' comes back
+#       intact. pwsh is NOT installed on the Windows node, so the
+#       PowerShell 7 native-argument fix is not an option here.
+#   (3) Exit-code propagation: powershell.exe does NOT return a native
+#       command's exit code as its own process exit code - a native command
+#       exiting 2 leaves powershell.exe exiting 1 (probe526 cases A/B on
+#       win-ts, Jenkins build #161: run_once reported 1 for a command
+#       exiting 2). $LASTEXITCODE inside the script IS the real code
+#       (probe526 case C), so the script exits with it explicitly. A
+#       script ending in its own `exit N` never reaches the appended
+#       statement, and a cmdlet-only script sees $LASTEXITCODE 0, so
+#       neither case changes (probe526b G1/G2). A script ending in a cmdlet
+#       after a failed native command now reports the failure instead of 0
+#       (probe526b G6) - the correct outcome for a collector.
+# The escaping is deliberately limited to single-quoted strings: a " there
+# is data, never PowerShell syntax, so \" cannot change what the script
+# means - while a " in a double-quoted region IS syntax and is left alone.
+# Input: shell command string.
+# Output: PowerShell argv list.
+sub _windows_powershell_argv {
+    my ($command) = @_;
+    my $escaped = _escape_windows_powershell_single_quotes($command);
+    $escaped .= '; exit $LASTEXITCODE';
+    my $encoded = encode_base64( encode( 'UTF-16LE', $escaped ), '' );
+    return ( 'powershell', '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass',
+        '-EncodedCommand', $encoded );
+}
+
+# _escape_windows_powershell_single_quotes($command)
+# Escapes double quotes inside single-quoted PowerShell strings as \",
+# so they survive PowerShell 5.1's native-argument forwarding (see
+# _windows_powershell_argv). Single-quoted strings are literal in
+# PowerShell - no interpolation - so the backslash reaches the native
+# command line unchanged, where the child's argv parser restores the
+# quote. Double-quoted regions are left alone, and '' (PowerShell's
+# escaped quote inside a single-quoted string) passes through unchanged.
+# An unbalanced single quote (an apostrophe in a bareword) treats the
+# rest of the command as single-quoted; such a command is already broken
+# in PowerShell, and escaping its later quotes changes nothing it could
+# have done.
+# Input: shell command string (undef or empty passes through unchanged).
+# Output: command string with " escaped as \" inside single quotes only.
+sub _escape_windows_powershell_single_quotes {
+    my ($command) = @_;
+    return $command if !defined $command || $command eq '';
+    my $out       = '';
+    my $in_single = 0;
+    my $i         = 0;
+    my $len       = length $command;
+    while ( $i < $len ) {
+        my $ch = substr( $command, $i, 1 );
+        if ($in_single) {
+            if ( $ch eq q{'} ) {
+                if ( substr( $command, $i + 1, 1 ) eq q{'} ) {
+                    $out .= q{''};
+                    $i += 2;
+                    next;
+                }
+                $in_single = 0;
+                $out .= $ch;
+                $i++;
+                next;
+            }
+            if ( $ch eq q{"} ) {
+                $out .= q{\\"};
+                $i++;
+                next;
+            }
+            $out .= $ch;
+            $i++;
+            next;
+        }
+        $in_single = 1 if $ch eq q{'};
+        $out .= $ch;
+        $i++;
+    }
+    return $out;
 }
 
 # await_windows_command($pidfile, $timeout_ms, @command_argv)
@@ -231,6 +368,29 @@ sub terminate_command_process {
 
     if ( is_windows() ) {
         capture { system 'taskkill', '/PID', $pid, '/T', '/F' };
+        # taskkill reports SUCCESS once termination is issued, and
+        # Perl's waitpid cannot reap a CreateProcess child on
+        # Windows (a later WNOHANG waitpid still returns the dead
+        # pid), so neither of those leaves the child gone. The
+        # spawn registry keeps one process handle open per child
+        # until it is collected, and that handle is what makes kill 0
+        # report a dead child alive - so poll the registry until the
+        # child is collected, or the caller still sees it afterwards.
+        # The poll exists only to collect that kept handle: a pid the
+        # registry never saw has no handle to collect, so the poll
+        # can never succeed for it and would only burn its whole
+        # bound (t/122: 5s timeout + 5s poll = 10.067s against < 10,
+        # for a command spawn_windows_command starts with system()
+        # and therefore never registers, and for every POSIX
+        # simulation where the registry stays empty by design).
+        # Only poll when the child is registry-tracked.
+        require Developer::Dashboard::GoRoutine;
+        if ( Developer::Dashboard::GoRoutine::is_spawn_child($pid) ) {
+            for ( 1 .. 500 ) {
+                last if Developer::Dashboard::GoRoutine::reap_child($pid);
+                sleep 0.01;
+            }
+        }
         waitpid( $pid, 0 );
         return 1;
     }

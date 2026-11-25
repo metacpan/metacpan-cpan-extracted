@@ -13,6 +13,8 @@ use Ekorn::Pipeline::Stop   qw();
 
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v0.4.0';
+
 our @EXPORT = qw(take drop);    ## no critic (Modules::ProhibitAutomaticExportation)
 
 our @EXPORT_OK = (
@@ -61,7 +63,6 @@ sub take_first : prototype() () {
     return take(1);
 }
 
-
 # Return a stage holding each value, and passing on the last once they
 # run out; nothing if there were none.
 sub take_last : prototype() () {
@@ -74,7 +75,6 @@ sub take_last : prototype() () {
         };
     };
 }
-
 
 # Return a stage passing on the one value, asserting it's the only one:
 # at a second, it warns and stops the pipeline.
@@ -91,7 +91,6 @@ sub take_single : prototype() () {
     };
 }
 
-
 # Return a stage passing on each value the test given is true of, and
 # dropping the rest.
 sub take_if : prototype(&) ($test) {
@@ -100,7 +99,6 @@ sub take_if : prototype(&) ($test) {
         sub ($value) { $test->($value) ? $value : () });
 }
 
-
 # Return a stage dropping each value the test given is true of, and
 # passing on the rest.
 sub drop_if : prototype(&) ($test) {
@@ -108,7 +106,6 @@ sub drop_if : prototype(&) ($test) {
     return Ekorn::Pipeline::Stage->new(
         sub ($value) { $test->($value) ? () : $value });
 }
-
 
 # Return a stage passing on values while the test given is true of them,
 # and stopping the pipeline at the first it's false of.
@@ -255,7 +252,7 @@ goes on: for when one value was meant, and its limit forgotten.
 
 Passes on each value the block returns true for, and drops the rest:
 a filter, as C<grep> is, testing every value. The block gets each
-value in C<$_> and as its argument. It's new in v0.3.0.
+value in C<$_> and as its argument.
 
     take_if { $_->{plays} >= 6000 }    # every hit
 
@@ -269,7 +266,7 @@ passes on the value.
 
 Drops each value the block returns true for, and passes on the rest:
 C<take_if>'s opposite. The block gets each value in C<$_> and as its
-argument. It's new in v0.3.0.
+argument.
 
 =head2 take_while
 

@@ -37,7 +37,7 @@ is( run_cli( 'install', '-b', '-o', 'json' )->{exit}, 2, '-b followed by another
 
 my $unknown = run_cli( 'install', '--definitely-not-an-option' );
 is( $unknown->{exit}, 2, 'an unknown install option reports usage' );
-like( $unknown->{stdout} . $unknown->{stderr}, qr/Usage: dashboard skills install/, 'the usage text is printed' );
+like( $unknown->{stdout} . $unknown->{stderr}, qr/Usage: d2 skills install/, 'the usage text is printed' );
 
 is( scalar(@warnings), 1, 'only the Getopt::Long unknown-option warning was emitted' );
 like( $warnings[0], qr/Unknown option: definitely-not-an-option/, 'the warning names the unknown option' );
@@ -55,7 +55,7 @@ t/302-cli-skills-full-coverage.t - install option-parsing condition coverage for
 =head1 DESCRIPTION
 
 Covers the C<--branch> long form, a branch flag followed by another option, and
-GetOptions failures in C<dashboard skills install> option validation.
+GetOptions failures in C<d2 skills install> option validation.
 
 =head1 PURPOSE
 

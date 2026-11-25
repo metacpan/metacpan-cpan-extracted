@@ -75,7 +75,7 @@ old-versus-new result comparison.
 =head1 WHAT USES IT
 
 The repository test suite exercises the benchmark contract. Problem 48
-research uses its CLI to measure the live dashboard indicator-list path.
+research uses its CLI to measure the live d2 indicator-list path.
 
 =head1 EXAMPLES
 

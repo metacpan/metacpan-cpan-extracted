@@ -3,14 +3,28 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-use Exporter 'import';
+use Exporter ();
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
+use Developer::Dashboard::GoRoutine;
 use Developer::Dashboard::Handle;
 use Developer::Dashboard::Version ();
 
 our $VERSION = $Developer::Dashboard::Version::VERSION;
+our @ISA = qw(Exporter);
 
-our @EXPORT = ('d2');
+our @EXPORT = ( 'd2', @Developer::Dashboard::GoRoutine::EXPORT );
+our @EXPORT_OK = @EXPORT;
+
+# import()
+# Exports d2 and GoRoutine's public API into the requesting package, while
+# installing GoRoutine's syntax filter in the importing source file.
+# Input: optional list of exported symbol names.
+# Output: none; symbols and the GoRoutine source filter are installed.
+sub import {
+    my ( $class, @symbols ) = @_;
+    Developer::Dashboard::GoRoutine->import();
+    return $class->export_to_level( 1, $class, @symbols );
+}
 
 my %HANDLE_BY_CWD;
 
@@ -19,7 +33,7 @@ my %HANDLE_BY_CWD;
 # directory - the same runtime, project-root discovery, and configured path
 # aliases the dashboard/d2 command line resolves, callable in-process. See
 # Developer::Dashboard::Handle for what the returned object can do
-# (->paths, ->run, and any dashboard subcommand as a bareword method).
+# (->paths, ->run, and any d2 subcommand as a bareword method).
 # Memoized per working directory: repeated calls from the same directory
 # reuse the same handle instead of rebuilding its registry each time.
 # Input: none.
@@ -68,7 +82,7 @@ Developer Dashboard - a home for day-to-day development
 
 =head1 VERSION
 
-6.06
+6.31
 
 =head1 INTRODUCTION
 
@@ -172,7 +186,7 @@ snapshot as the installer rather than relying on an older published release.
 On Unix-like systems, the installer uses the package manifest for the host
 (Debian-family, Alpine, Fedora, or macOS) to install system prerequisites. It
 then prepares a user-local Perl environment, installs Developer Dashboard,
-configures shell integration, and runs C<dashboard init>.
+configures shell integration, and runs C<d2 init>.
 
 The installer displays progress and may ask for the operating-system password
 when a system package manager requires elevated access. It prepares the
@@ -184,7 +198,9 @@ Unix bootstrap accepts an existing host Perl from C<5.38>; when it must build
 an isolated fallback, it installs C<perlbrew --notest install perl-5.44.0>.
 The dependency set also pins C<HTTP::Tiny> to C<0.096> so the transitive
 minimum inherited through Plack cannot resolve to versions with known TLS,
-request-validation, or cross-origin redirect credential vulnerabilities.
+request-validation, or cross-origin redirect credential vulnerabilities. It
+requires C<YAML> C<1.30> or newer because lower releases are affected by
+CPANSA-YAML-2017-20285.
 
 The Unix-like installer prepares its user-local Perl dependencies before
 installing the checkout and initialising the runtime.
@@ -192,20 +208,20 @@ installing the checkout and initialising the runtime.
 On Windows, F<install.ps1> installs Git, Strawberry Perl, and Node.js when
 needed, then installs the dashboard and initialises its runtime. It configures
 the current user's PowerShell profile to load the generated environment and
-shell bootstrap files. Use C<dashboard shell ps> to refresh those generated
+shell bootstrap files. Use C<d2 shell ps> to refresh those generated
 PowerShell files later.
 
 Future PowerShell sessions do not rely on installer-only helper functions
 while loading the generated profile block.
 
 The generated bash, zsh, POSIX sh, and PowerShell bootstraps share the same
-tmux prompt behaviour. In a C<dashboard workspace> session with
+tmux prompt behaviour. In a C<d2 workspace> session with
 C<DEVELOPER_DASHBOARD_TMUX_STATUS=1>, indicators appear on the first row of the
 two-line bottom status block. The second row keeps tmux's session and window
 list.
 
 The inline
-prompt suppresses indicator fragments with C<dashboard ps1 --no-indicators>.
+prompt suppresses indicator fragments with C<d2 ps1 --no-indicators>.
 
 Ordinary tmux sessions keep the normal inline prompt. Developer Dashboard
 does not edit the user's tmux config file to provide that behaviour, and it
@@ -239,13 +255,13 @@ local tree and installs that local checkout so the bootstrap installs the same
 snapshot that shipped the installer instead of an older CPAN release.
 
 The Windows smoke gate also checks that a new profile-loaded PowerShell
-session can resolve C<dashboard>, print C<dashboard version>, run
-C<dashboard logs>, run C<dashboard restart>, and install at least one real
+session can resolve C<d2>, print C<d2 version>, run
+C<d2 logs>, run C<d2 restart>, and install at least one real
 skill after that streamed bootstrap completes.
 
 The generated PowerShell shell
 bootstrap now forces UTF-8 console input and output encoding before it returns
-the multi-line prompt from C<dashboard ps1>, so the prompt keeps the trailing
+the multi-line prompt from C<d2 ps1>, so the prompt keeps the trailing
 command marker on the next line and preserves indicator plus branch glyphs
 such as heartbeat status and the trailing C<🌿branch> fragment in normal
 Windows terminals.
@@ -270,6 +286,19 @@ formatting deeply nested POD (CVE-2026-82560). The minimum is declared in
 C<cpanfile>, C<Makefile.PL>, and C<dist.ini>, and regression tests keep the
 three dependency sources aligned.
 
+The cross-platform test workflow also declares C<Test::Harness> 3.48 as a
+test-only prerequisite. Its C<TAP::Harness::Env> module is needed by nested
+Windows test runs and is not guaranteed to be present in Strawberry Perl, so
+the Windows job installs and verifies it in the local test environment. This
+does not add C<Test::Harness> to end-user runtime installation. The workflow
+uses separate full-suite steps: Unix-like runners retain C<prove> in Bash,
+while Windows uses PowerShell and invokes C<App::Prove> through the
+workflow-selected Perl. This avoids Git Bash selecting or rewriting paths for
+a different Perl installation. C<Makefile.PL> always declares
+C<Test::Harness> for test runs and declares C<Devel::Cover> only outside
+Windows, where its supported test toolchain can install it; Windows runs the
+suite without coverage instrumentation.
+
 Or install from a checkout with:
 
   perl Makefile.PL
@@ -277,37 +306,43 @@ Or install from a checkout with:
   make test
   make install
 
+C<Makefile.PL> uses a project-local C<.perl5> library when it contains
+installed modules. Otherwise it checks the user's C<perl5> library under
+C<HOME> on Unix or C<USERPROFILE> on Windows. If neither home variable is set,
+it safely uses only the project-local candidate and emits no
+undefined-variable warning.
+
 =head2 First Run
 
 Initialise the runtime:
 
-  dashboard init
+  d2 init
 
 Inspect resolved paths:
 
-  dashboard paths
-  dashboard paths -o json
-  dashboard path resolve bookmarks_root
-  dashboard path add foobar /tmp/foobar
-  dashboard path add foobar /tmp/foobar -o json
-  dashboard path add .
-  dashboard path add scratch /tmp/scratch --create
-  dashboard path add scratch /tmp/scratch --create 0777
-  dashboard path del foobar
-  dashboard path rm foobar
-  dashboard files
-  dashboard files -o json
-  dashboard file add notes ~/notes.txt
-  dashboard file add notes ~/notes.txt -o json
-  dashboard file add scratch /tmp/scratch/notes.txt --create
-  dashboard file resolve notes
-  dashboard file del notes
-  dashboard which jq
-  dashboard which layered-tool
-  dashboard which nest.level1.level2.here
-  dashboard which --edit jq
+  d2 paths
+  d2 paths -o json
+  d2 path resolve bookmarks_root
+  d2 path add foobar /tmp/foobar
+  d2 path add foobar /tmp/foobar -o json
+  d2 path add .
+  d2 path add scratch /tmp/scratch --create
+  d2 path add scratch /tmp/scratch --create 0777
+  d2 path del foobar
+  d2 path rm foobar
+  d2 files
+  d2 files -o json
+  d2 file add notes ~/notes.txt
+  d2 file add notes ~/notes.txt -o json
+  d2 file add scratch /tmp/scratch/notes.txt --create
+  d2 file resolve notes
+  d2 file del notes
+  d2 which jq
+  d2 which layered-tool
+  d2 which nest.level1.level2.here
+  d2 which --edit jq
 
-Custom path aliases are stored in the effective dashboard config root so shell
+Custom path aliases are stored in the effective d2 config root so shell
 helpers such as C<cdr foobar> and C<which_dir foobar> keep working across
 sessions. Installed skills can also provide C<lib/Folder.pm> with path methods:
 C<cdr ch.workspace> checks the effective skill C<config/config.json> alias
@@ -315,13 +350,13 @@ first, then loads C<Folder.pm> and calls C<Folder-E<gt>workspace> only when no
 configured alias exists.
 
 If the module implements C<Folder-E<gt>__list__>, its
-list-context alias names are merged into C<dashboard paths>, C<dashboard path
+list-context alias names are merged into C<d2 paths>, C<d2 path
 list>, C<cdr> completion, and C<d2 ch.> shell completion.
 
 Typing a skill name
 followed by a dot offers that skill's config aliases and listed module aliases;
 only the named skill's module is loaded for this completion. That runtime merge
-is read-only; C<dashboard path add> continues to write to config, and a config alias overrides a collision
+is read-only; C<d2 path add> continues to write to config, and a config alias overrides a collision
 with a module method. When a project-local F<./.developer-dashboard> tree exists, alias
 writes go there first; otherwise they go to the home runtime.
 
@@ -338,14 +373,14 @@ runtime remains portable across different developer accounts. Re-adding an
 existing alias updates it without error, and deleting a missing alias is also
 safe.
 
-For C<dashboard paths>, the global alias view and skill-qualified aliases
+For C<d2 paths>, the global alias view and skill-qualified aliases
 share one installed-skill configuration inventory. Each participating skill's
 layered C<config/config.json> data is read once for that operation, preserving
 home-to-project precedence while avoiding a second filesystem scan.
 
-The machine-readable C<dashboard paths -o json> route does not load terminal
+The machine-readable C<d2 paths -o json> route does not load terminal
 table-rendering helpers. Human-readable output still loads those helpers on
-demand, so C<dashboard paths> and C<dashboard path list> retain their table
+demand, so C<d2 paths> and C<d2 path list> retain their table
 format without paying that import cost when only JSON is requested.
 
 Runtime-layer ownership checks also canonicalise a candidate only once when
@@ -353,7 +388,7 @@ testing it against multiple layers. Each root remains freshly canonicalised
 and compared at a path-component boundary, preserving symlink-aware security
 checks while avoiding repeated candidate resolution.
 
-The aggregate C<dashboard paths> inventory shares its runtime-layer candidate
+The aggregate C<d2 paths> inventory shares its runtime-layer candidate
 list only for the duration of that one inventory call. This avoids repeating
 the same ancestor scan across its permission checks without retaining a stale
 layer list for later operations; a subsequent lookup discovers newly created
@@ -374,7 +409,7 @@ Developer Dashboard now uses one CLI output contract for operator-facing
 built-ins. By default, inventory and mutation commands print a human-readable
 summary table. When a script or LLM needs the full raw payload, pass
 C<-o json>. Shell-plumbing commands that need one stable direct value such as
-C<dashboard path resolve>, C<dashboard path project-root>, C<cdr>, and
+C<d2 path resolve>, C<d2 path project-root>, C<cdr>, and
 C<which_dir> keep their direct output contracts instead of forcing a summary
 table.
 
@@ -419,17 +454,17 @@ Examples:
 
 Use C<Developer::Dashboard::Folder> for runtime path helpers. It resolves the
 same runtime, bookmark, config, and configured alias names exposed by
-C<dashboard paths>, and therefore backs the same folder-oriented flow that
+C<d2 paths>, and therefore backs the same folder-oriented flow that
 C<cdr> and C<which_dir> use, including names such as C<docker>, without relying on
 unscoped CPAN-global module names.
 
-C<dashboard path add .> saves the current working directory under its basename.
-C<dashboard path add E<lt>nameE<gt> .> uses the current working directory as the
-target for an explicit alias. C<dashboard path del .> and C<dashboard path rm .>
+C<d2 path add .> saves the current working directory under its basename.
+C<d2 path add E<lt>nameE<gt> .> uses the current working directory as the
+target for an explicit alias. C<d2 path del .> and C<d2 path rm .>
 remove the alias that points at the current working directory instead of
 treating C<.> as a literal error token.
 
-C<dashboard path add E<lt>nameE<gt> E<lt>pathE<gt> -c|--create[=MODE]> (DD-1005)
+C<d2 path add E<lt>nameE<gt> E<lt>pathE<gt> -c|--create[=MODE]> (DD-1005)
 marks the alias as lazily creatable: the first time C<cdr>, a workspace
 route, or any direct Perl caller resolves it and the target directory does
 not yet exist, it is created (with parents) before being returned - chmod'd
@@ -440,22 +475,22 @@ umask-governed default otherwise.
 An alias saved without C<-c>/C<--create>
 behaves exactly as before this feature existed.
 
-C<dashboard file add>
+C<d2 file add>
 accepts the identical flag, but since a file alias points at a file rather
 than a directory, "lazy create" there means only the file's PARENT
 directory chain is created - the file itself is left absent for the
 caller to write.
 
 Use C<Developer::Dashboard::File> for runtime file helpers. It resolves the
-same built-in and config-backed file aliases exposed by C<dashboard files> and
-C<dashboard file list>, supports direct reads and writes through one public
+same built-in and config-backed file aliases exposed by C<d2 files> and
+C<d2 file list>, supports direct reads and writes through one public
 wrapper, and keeps file alias behaviour parallel with the folder/path contract.
 
 It is the file-side twin of the existing Folder contract in the same way that
-C<dashboard of> and C<dashboard open-file> are the file-side twins of
+C<d2 of> and C<d2 open-file> are the file-side twins of
 C<cdr> and C<which_dir>.
 
-If you need the whole C<dashboard paths> payload in Perl, call
+If you need the whole C<d2 paths> payload in Perl, call
 C<Developer::Dashboard::Folder-E<gt>all> or
 C<Developer::Dashboard::PathRegistry-E<gt>all_paths> instead of rebuilding the
 hash by hand. If you need a fresh path registry object from that public Folder
@@ -471,16 +506,16 @@ the result is discarded at the operation boundary so later operations see
 runtime-layer creation and removal. If you need a collector store from the same Folder-derived runtime roots, call
 C<Developer::Dashboard::Collector-E<gt>new_from_all_folders>.
 
-If you need the whole C<dashboard files> payload in Perl, call
+If you need the whole C<d2 files> payload in Perl, call
 C<Developer::Dashboard::File-E<gt>all> or
 C<Developer::Dashboard::FileRegistry-E<gt>all_files> instead of rebuilding the
 hash by hand.
 
-File aliases follow the same effective-config write rules as path aliases. C<dashboard file add E<lt>nameE<gt> E<lt>pathE<gt>> writes to the deepest
+File aliases follow the same effective-config write rules as path aliases. C<d2 file add E<lt>nameE<gt> E<lt>pathE<gt>> writes to the deepest
 participating config layer, keeps C<$HOME/...> storage portable when the
 target lives under the current home directory, updates existing aliases
-idempotently, and lets C<dashboard file resolve E<lt>nameE<gt>>,
-C<dashboard of E<lt>nameE<gt>>, or
+idempotently, and lets C<d2 file resolve E<lt>nameE<gt>>,
+C<d2 of E<lt>nameE<gt>>, or
 C<Developer::Dashboard::File-E<gt>resolve($name)> read that alias back later.
 
 When the alias name is a valid Perl method token,
@@ -489,24 +524,24 @@ C<Developer::Dashboard::File-E<gt>$name()> also works directly.
 When the alias
 is numeric such as C<123>, use a scalar method name like
 C<my $name = 123; Developer::Dashboard::File-E<gt>$name()> because bare
-C<-E<gt>123> is not valid Perl syntax. C<dashboard files> prints the full
+C<-E<gt>123> is not valid Perl syntax. C<d2 files> prints the full
 built-in plus configured file inventory as a table by default, while
-C<dashboard file list> prints only the named configured file aliases.
+C<d2 file list> prints only the named configured file aliases.
 
 Use
 C<-o json> with either command when you need the full raw payload.
 
-C<dashboard of> and C<dashboard open-file> now treat configured file aliases
+C<d2 of> and C<d2 open-file> now treat configured file aliases
 as direct file targets before they fall back to Perl-module, Java-class, or
 regex search behaviour. If the first token resolves as a saved path alias and
 the remaining tokens join into one existing relative file path inside that
-aliased directory, C<dashboard of E<lt>path-aliasE<gt> E<lt>relative-fileE<gt>>
+aliased directory, C<d2 of E<lt>path-aliasE<gt> E<lt>relative-fileE<gt>>
 opens that exact file instead of treating the remaining tokens as regex
 patterns.
 
 That means flows such as
-C<dashboard file add 123 /tmp/123.txt> followed by C<dashboard of 123>, or
-C<dashboard path add foobar .> followed by C<dashboard of foobar 456.txt>, now
+C<d2 file add 123 /tmp/123.txt> followed by C<d2 of 123>, or
+C<d2 path add foobar .> followed by C<d2 of foobar 456.txt>, now
 resolve the exact configured or scoped file target directly.
 
 The hashed C<state_root>, C<collectors_root>, C<indicators_root>, and
@@ -523,7 +558,7 @@ For each path-registry instance, the account name used in the state-root path
 is reused while the relevant environment values stay unchanged; changes to
 those values are detected and resolved again.
 
-Use C<dashboard which E<lt>targetE<gt>> to inspect what C<dashboard> would
+Use C<d2 which E<lt>targetE<gt>> to inspect what C<d2> would
 execute before you run it. The command prints one
 C<COMMAND /full/path> line for the resolved file and then one
 C<HOOK /full/path> line for each participating hook in runtime execution
@@ -534,16 +569,16 @@ such as C<layered-tool>, single-level skill commands such as
 C<example-skill.somecmd>, and multi-level nested skill commands such as
 C<nest.level1.level2.here>.
 
-If you add C<--edit>, C<dashboard which> skips the
-inspection output and re-enters C<dashboard open-file> with the resolved
+If you add C<--edit>, C<d2 which> skips the
+inspection output and re-enters C<d2 open-file> with the resolved
 command file path so the normal editor-selection behaviour is reused.
 
 Render shell bootstrap for bash, zsh, POSIX sh, or PowerShell:
 
-  dashboard shell bash
-  dashboard shell zsh
-  dashboard shell sh
-  dashboard shell ps
+  d2 shell bash
+  d2 shell zsh
+  d2 shell sh
+  d2 shell ps
 
 The generated zsh bootstrap now loads C<compinit> before any C<compdef>
 registration, so a fresh macOS zsh shell can evaluate it without raising
@@ -551,8 +586,8 @@ C<command not found: compdef>.
 
 Audit runtime permissions:
 
-  dashboard doctor
-  dashboard doctor --fix
+  d2 doctor
+  d2 doctor --fix
 
 The doctor command also checks staged helper drift under
 F<~/.developer-dashboard/cli/dd/> and repairs dashboard-managed helper content
@@ -563,36 +598,36 @@ F<~/.bashrc>.
 
 Resolve or open files from the CLI:
 
-  dashboard of --print My::Module
-  dashboard open-file --print com.example.App
-  dashboard open-file --print javax.jws.WebService
-  dashboard of --print notes
-  dashboard of --print . 'Ok\.js$'
-  dashboard of --print foobar 456.txt
-  dashboard open-file --print path/to/file.txt
-  dashboard open-file --print bookmarks index
+  d2 of --print My::Module
+  d2 open-file --print com.example.App
+  d2 open-file --print javax.jws.WebService
+  d2 of --print notes
+  d2 of --print . 'Ok\.js$'
+  d2 of --print foobar 456.txt
+  d2 open-file --print path/to/file.txt
+  d2 open-file --print bookmarks index
 
 Query structured files from the CLI:
 
-  printf '{"alpha":{"beta":2}}' | dashboard jq alpha.beta
-  printf 'alpha:\n  beta: 3\n' | dashboard yq alpha.beta
-  printf '[alpha]\nbeta = 4\n' | dashboard tomq alpha.beta
-  printf 'alpha.beta=5\n' | dashboard propq alpha.beta
-  dashboard jq file.json '$d'
+  printf '{"alpha":{"beta":2}}' | d2 jq alpha.beta
+  printf 'alpha:\n  beta: 3\n' | d2 yq alpha.beta
+  printf '[alpha]\nbeta = 4\n' | d2 tomq alpha.beta
+  printf 'alpha.beta=5\n' | d2 propq alpha.beta
+  d2 jq file.json '$d'
 
 Start the local app:
 
-  dashboard serve
+  d2 serve
 
 Open the root path with no bookmark path to get the free-form bookmark editor directly. The browser now splits bookmark sections into separate editor blocks instead of making you manage one long source textarea by hand, but it still saves the same on-disk bookmark file format behind the scenes.
 
-If you start the web service with C<dashboard serve --no-editor> or C<dashboard serve --no-endit>, the browser stays read-only instead and direct editor/source routes are blocked.
+If you start the web service with C<d2 serve --no-editor> or C<d2 serve --no-endit>, the browser stays read-only instead and direct editor/source routes are blocked.
 
-If you start it with C<dashboard serve --no-indicators> or C<dashboard serve --no-indicator>, the right-top browser chrome is cleared while normal page rendering still works.
+If you start it with C<d2 serve --no-indicators> or C<d2 serve --no-indicator>, the right-top browser chrome is cleared while normal page rendering still works.
 
 Stop the local app and collector loops:
 
-  dashboard stop
+  d2 stop
 
 Interactive terminal runs now print a task board on C<stderr> first, then
 mark each stop step as it finishes so the command does not appear hung while
@@ -600,7 +635,7 @@ the runtime waits for managed shutdown.
 
 Restart the local app and configured collector loops:
 
-  dashboard restart
+  d2 restart
 
 Interactive restarts print a task board on C<stderr>. The active step is
 highlighted, and completed or failed steps receive a status marker. The final
@@ -611,11 +646,11 @@ iSH Perl builds that do not accept signal names such as C<TERM>.
 
 Create a helper login user:
 
-  dashboard auth add-user <username> <password>
+  d2 auth add-user <username> <password>
 
 Remove a helper login user:
 
-  dashboard auth remove-user helper
+  d2 auth remove-user helper
 
 Helper sessions show a Logout link in the page chrome. Logging out removes both
 the helper session and that helper account. Helper page views also show the
@@ -626,29 +661,29 @@ Exact-loopback admin requests do not show a Logout link.
 
 List the effective machine-auth API registry:
 
-  dashboard api
-  dashboard api ls
-  dashboard api ls --key helper-bot
-  dashboard api ls --key helper-bot -o json
+  d2 api
+  d2 api ls
+  d2 api ls --key helper-bot
+  d2 api ls --key helper-bot -o json
 
 Create or update one API group from a raw secret:
 
-  dashboard api add --key helper-bot --secret raw-secret
-  dashboard api add --key helper-bot --secret rotated-secret
-  dashboard api add --key helper-bot --secret raw-secret --route /ajax/health --route /ajax/healthz
-  dashboard api add --key helper-bot --maybe-secret raw-secret --route /ajax/health --route /ajax/healthz
+  d2 api add --key helper-bot --secret raw-secret
+  d2 api add --key helper-bot --secret rotated-secret
+  d2 api add --key helper-bot --secret raw-secret --route /ajax/health --route /ajax/healthz
+  d2 api add --key helper-bot --maybe-secret raw-secret --route /ajax/health --route /ajax/healthz
 
 Add one exact saved Ajax route to an existing API group:
 
-  dashboard api add --key helper-bot --route /ajax/health
-  dashboard api add --key helper-bot --route /ajax/healthz
+  d2 api add --key helper-bot --route /ajax/health
+  d2 api add --key helper-bot --route /ajax/healthz
 
 Remove one route or remove the whole API group:
 
-  dashboard api rm --key helper-bot --route /ajax/healthz
-  dashboard api rm --key helper-bot
+  d2 api rm --key helper-bot --route /ajax/healthz
+  d2 api rm --key helper-bot
 
-The C<dashboard api> command manages the deepest writable runtime
+The C<d2 api> command manages the deepest writable runtime
 C<config/api.json> layer under C<DD-OOP-LAYERS>. Listing shows the effective
 merged registry from home through the active child layer together with any
 installed-skill API fragments that contribute saved Ajax machine auth.
@@ -668,7 +703,7 @@ the requested routes.
 The saved JSON keeps the digest under C<secret> plus the
 exact allowed saved Ajax routes under C<ajax>.
 
-C<dashboard api add> accepts
+C<d2 api add> accepts
 one or more repeated C<--route> flags, so one command can create the key,
 hash the secret, and register multiple exact routes at once. Adding the same
 route twice is a no-op. Removing an inherited API group from a deeper child
@@ -679,33 +714,33 @@ without editing the parent file.
 
 Create a starter page document:
 
-  dashboard page new sample "Sample Page"
+  d2 page new sample "Sample Page"
 
 Save a page:
 
-  dashboard page new sample "Sample Page" | dashboard page save sample
+  d2 page new sample "Sample Page" | d2 page save sample
 
 List saved pages:
 
-  dashboard page list
+  d2 page list
 
 Render a saved page:
 
-  dashboard page render sample
+  d2 page render sample
 
-C<dashboard page render> now uses the same page-runtime preparation path as
+C<d2 page render> now uses the same page-runtime preparation path as
 the browser route, so saved bookmark TT such as C<[% title %]> and
 C<[% stash.foo %]> is rendered there too instead of only working under
 C</app/E<lt>idE<gt>>.
 
 Encode and decode transient pages:
 
-  dashboard page show sample | dashboard page encode
-  dashboard page show sample | dashboard page encode | dashboard page decode
+  d2 page show sample | d2 page encode
+  d2 page show sample | d2 page encode | d2 page decode
 
 Run a page action:
 
-  dashboard action run system-status paths
+  d2 action run system-status paths
 
 Bookmark documents use the original separator-line format with directive
 headers such as C<TITLE:>, C<STASH:>, C<HEAD:>, C<HTML:>, and C<CODE1:>.
@@ -781,7 +816,7 @@ encodes or stores C<print 123;> for the Ajax worker to execute.
 
 Ensure the home config file exists without seeding collectors:
 
-  dashboard config init
+  d2 config init
 
 If F<config/config.json> is missing, that command creates it as:
 
@@ -792,20 +827,20 @@ left untouched.
 
 List collector status:
 
-  dashboard collector list
-  dashboard collector status shell.example
+  d2 collector list
+  d2 collector status shell.example
 
 Inspect collector logs:
 
-  dashboard collector log
-  dashboard collector log shell.example
+  d2 collector log
+  d2 collector log shell.example
 
-C<dashboard collector log> prints the known collector log streams.
-C<dashboard collector log E<lt>nameE<gt>> prints one collector transcript.
+C<d2 collector log> prints the known collector log streams.
+C<d2 collector log E<lt>nameE<gt>> prints one collector transcript.
 
 If a configured collector has not run yet, the command prints an explicit
 no-log message instead of blank output.
-C<dashboard collector status E<lt>nameE<gt>> now also exposes watchdog
+C<d2 collector status E<lt>nameE<gt>> now also exposes watchdog
 metadata for managed loops, including C<watchdog_restart_count>,
 C<watchdog_last_unexpected_stop_at>, C<watchdog_last_restart_at>, and
 C<watchdog_attention_required>, so repeated collector crashes are visible
@@ -840,6 +875,12 @@ ranges, range steps, C<*/step>, and case-insensitive month and weekday names
 are supported. When both day-of-month and day-of-week are restricted, either
 matching field makes the date due, following crontab semantics.
 
+To run once at the start of every hour, use C<0 */1 * * *>: the first field
+is the minute, so C<0> selects minute zero, and C<*/1> in the second field
+selects every hour. Do not use C<* */1 * * *> for an hourly run. Its first
+field is C<*>, which matches every minute, so it runs once per minute
+throughout each hour.
+
 An explicit
 C<schedule> value takes precedence over inferred scheduling; use
 C<"schedule": "cron"> with C<cron> when you want to state the mode explicitly.
@@ -868,7 +909,7 @@ directory accessor such as C<home>, a configured C<path_aliases> name, or a
 skill-qualified C<Folder.pm> alias such as C<collectorpaths.workspace>. Config
 aliases take precedence over skill-provided aliases. The latter are resolved
 read-only from the installed skill's C<lib/Folder.pm> using the same method
-rules as C<dashboard path resolve>.
+rules as C<d2 path resolve>.
 
 The built-in C<housekeeper> collector is always present even when
 F<config/config.json> is otherwise empty. It runs every C<900> seconds with
@@ -893,8 +934,8 @@ fragment behind.
 
 Run it on demand with:
 
-  dashboard housekeeper
-  dashboard collector run housekeeper
+  d2 housekeeper
+  d2 collector run housekeeper
 
 If you need different cadence or behaviour, define your own collector named
 C<housekeeper> in config. That override now inherits the built-in C<code> and
@@ -977,7 +1018,7 @@ C<2>.
 
 =item *
 
-Collectors whose C<command> re-enters C<dashboard> or C<d2> through a shell
+Collectors whose C<command> re-enters C<d2> through a shell
 path now have a safety floor of C<30> seconds even if config asks for a
 smaller interval, because those recursive dashboard collectors are materially
 heavier than direct shell probes. Set C<allow_fast_poll> or
@@ -1001,7 +1042,7 @@ collector.
 =item *
 
 Stopping a singleton collector loop also terminates the long-running command
-currently owned by that loop, so C<dashboard stop collector foo> does not leave
+currently owned by that loop, so C<d2 stop collector foo> does not leave
 the old worker command alive behind the stopped dispatcher.
 
 =back
@@ -1041,11 +1082,11 @@ renders C<[% a %]> into the live icon C<123>.
 
 Later config-sync passes keep
 the configured C<icon_template> metadata and the already-rendered live
-C<icon>, so commands such as C<dashboard indicator list> and C<dashboard ps1>
+C<icon>, so commands such as C<d2 indicator list> and C<d2 ps1>
 do not revert the persisted icon back to raw C<[% ... %]> text between runs. The blank-environment integration flow also keeps a regression for mixed
 collector health: one intentionally broken Perl collector must stay red
 without stopping a second healthy collector from staying green in
-C<dashboard indicator list>, C<dashboard ps1>, and C</system/status>.
+C<d2 indicator list>, C<d2 ps1>, and C</system/status>.
 
 =head2 Docker Compose
 
@@ -1053,33 +1094,33 @@ Show the Docker command reference without starting or inspecting containers:
 
   d2 docker --help
 
-Both C<dashboard docker --help> and C<d2 docker --help> print the available
+Both C<d2 docker --help> and C<d2 docker --help> print the available
 Compose and service-management commands. The shell completion list includes
 C<compose>, C<list>, C<enable>, C<disable>, and C<development>; after
 C<docker development>, completion offers C<enable> and C<disable>.
 
 Inspect the resolved compose stack without running Docker:
 
-  dashboard docker compose --dry-run config
+  d2 docker compose --dry-run config
 
 Include addons or modes:
 
-  dashboard docker compose --addon mailhog --mode dev up -d
-  dashboard docker compose config green
-  dashboard docker compose config
-  dashboard docker list
-  dashboard docker list --disabled
-  dashboard docker list --enabled
-  dashboard docker disable green
-  dashboard docker enable green
-  dashboard docker development enable green
-  dashboard docker development disable green
+  d2 docker compose --addon mailhog --mode dev up -d
+  d2 docker compose config green
+  d2 docker compose config
+  d2 docker list
+  d2 docker list --disabled
+  d2 docker list --enabled
+  d2 docker disable green
+  d2 docker enable green
+  d2 docker development enable green
+  d2 docker development disable green
 
 The resolver also supports isolated service folders without adding entries to
 dashboard JSON config. If
 C<./.developer-dashboard/config/docker/green/compose.yml> exists in the current
 project it wins; otherwise the resolver falls back to
-C<~/.developer-dashboard/config/docker/green/compose.yml>. C<dashboard docker compose config> and operational commands first resolve the
+C<~/.developer-dashboard/config/docker/green/compose.yml>. C<d2 docker compose config> and operational commands first resolve the
 base Compose config, including configured non-service project/addon/mode
 files, and read its resulting C<services:> map.
 
@@ -1105,8 +1146,8 @@ the development file is ignored even when present.
 If the marker exists but the development
 file does not, only the base is loaded and no error is raised. Toggle
 development mode without creating or deleting the file manually with
-C<dashboard docker development enable E<lt>serviceE<gt>> or
-C<dashboard docker development disable E<lt>serviceE<gt>>.
+C<d2 docker development enable E<lt>serviceE<gt>> or
+C<d2 docker development disable E<lt>serviceE<gt>>.
 
 A newly enabled
 marker is written under the selected home runtime: C<~/.developer-dashboard>
@@ -1115,13 +1156,13 @@ across active layers.
 
 To toggle the disabled marker without
 creating or deleting the file manually, use
-C<dashboard docker disable E<lt>serviceE<gt>> or
-C<dashboard docker enable E<lt>serviceE<gt>>. The disable toggle uses the same
+C<d2 docker disable E<lt>serviceE<gt>> or
+C<d2 docker enable E<lt>serviceE<gt>>. The disable toggle uses the same
 selected home runtime root.
 
-C<dashboard docker enable E<lt>serviceE<gt>> removes
+C<d2 docker enable E<lt>serviceE<gt>> removes
 every C<disabled.yml> marker for that service across active layers. To inspect the effective marker state without walking the folders manually,
-use C<dashboard docker list>.
+use C<d2 docker list>.
 
 Add C<--disabled> to show only disabled
 services or C<--enabled> to show only enabled services.
@@ -1266,9 +1307,9 @@ a known image build; C<latest> follows successful master builds.
 
 Render prompt text directly:
 
-  dashboard ps1 --jobs 2
+  d2 ps1 --jobs 2
 
-C<dashboard ps1> now follows the original F<~/bin/ps1> shape more closely: a
+C<d2 ps1> now follows the original F<~/bin/ps1> shape more closely: a
 C<(YYYY-MM-DD HH:MM:SS)> timestamp prefix, dashboard status and workspace info, a
 bracketed working directory, an optional jobs suffix, and a trailing
 C<🌿branch> marker when git metadata is available. The prompt helper reads the
@@ -1282,7 +1323,7 @@ paths identify the same directory.
 
 If the workspace workflow seeded
 C<WORKSPACE_REF> or the older
-C<TICKET_REF> into the current tmux session, C<dashboard ps1> also reads that
+C<TICKET_REF> into the current tmux session, C<d2 ps1> also reads that
 context from tmux when the shell environment does not already export it, but it
 skips that tmux probe entirely when the shell is not inside tmux. The branch marker preserves every component of a local branch such as
 C<team/feature>.
@@ -1295,15 +1336,15 @@ redundant C<origin/> prefix omitted.
 Packed and loose refs are both recognised,
 while symlinked refs are not followed. When no matching remote ref exists, it
 keeps the short commit id. All generated shell adapters
-call this same C<dashboard ps1> renderer, so the branch label is consistent in
+call this same C<d2 ps1> renderer, so the branch label is consistent in
 Bash, Zsh, sh, and PowerShell.
 
 Generate shell bootstrap:
 
-  dashboard shell bash
-  dashboard shell zsh
-  dashboard shell sh
-  dashboard shell ps
+  d2 shell bash
+  d2 shell zsh
+  d2 shell sh
+  d2 shell ps
 
 The generated shell helper keeps the same bookmark-aware C<cdr>, C<dd_cdr>,
 C<d2>,
@@ -1341,16 +1382,15 @@ PowerShell uses a C<prompt> function.
 The shell checks compare canonical paths, so equivalent macOS paths such as
 C</var/...> and C</private/var/...> are treated as the same location.
 
-C<d2> is a real, installed short command for C<dashboard>, shipped in the same
-C<bin> directory and re-execing the C<dashboard> entrypoint, so you can run
-C<d2 version>, C<d2 doctor>, or C<d2 docker compose ps> without typing the full
-command name -- in scripts and fresh shells as well as interactively, without
-depending on the shell bootstrap.
+C<d2> is the command. It is a real, installed command shipped in C<bin>, so
+you can run C<d2 version>, C<d2 doctor>, or C<d2 docker compose ps> -- in
+scripts and fresh shells as well as interactively, without depending on the
+shell bootstrap.
 
-The same generated bootstrap also wires live tab completion for C<dashboard>
-and C<d2>. Bash registers C<_dashboard_complete>, zsh registers
+The same generated bootstrap also wires live tab completion for C<d2>.
+Bash registers C<_dashboard_complete>, zsh registers
 C<_dashboard_complete_zsh>, and PowerShell registers
-C<Register-ArgumentCompleter> for both command names. Completion candidates
+C<Register-ArgumentCompleter> for the command name. Completion candidates
 come from the live runtime instead of a hardcoded shell list, so built-in
 commands, layered custom CLI commands, and installed dotted skill commands
 all show up in suggestions.
@@ -1372,11 +1412,11 @@ C<which_dir> stable on macOS installs where C</usr/bin/perl> and a user-local
 C<~/perl5> XS stack do not belong to the same Perl build.
 
 The generated
-C<d2> shortcut re-enters the C<dashboard> script directly instead of
+C<d2> shortcut re-enters the C<d2> script directly instead of
 hardcoding the current Perl binary path, so the shortcut still works when the
 bootstrap is loaded by a shell whose preferred Perl lives somewhere else.
 
-On Windows, C<dashboard shell> auto-selects PowerShell by default, and
+On Windows, C<d2 shell> auto-selects PowerShell by default, and
 interpreter-backed runtime entrypoints such as collector C<command> strings,
 trusted command actions, saved Ajax files, custom CLI commands, hook files,
 and update scripts now resolve C<.ps1>, C<.cmd>, C<.bat>, and C<.pl>
@@ -1394,7 +1434,7 @@ host smoke in the source checkout, and a host-side rerun helper that delegates
 to the QEMU launcher for release-grade Windows compatibility claims. The
 supported baseline on Windows is PowerShell plus Strawberry Perl. Git Bash is
 optional. Scoop is optional. They are setup helpers, not runtime requirements
-for the installed C<dashboard> command.
+for the installed C<d2> command.
 
 In the Dockur-backed path, the launcher
 stages the Strawberry Perl MSI from the Linux host into the OEM bundle and can
@@ -1481,7 +1521,7 @@ link, and the current date/time in the same spirit as the old local dashboard ch
 
 The displayed address is discovered from the machine interfaces, preferring a VPN-style address when one is active, and the date/time is refreshed in the browser with JavaScript.
 
-C<dashboard serve --no-indicators> and C<dashboard serve --no-indicator> clear that whole top-right browser-only area without changing the terminal prompt or C</system/status>. The bookmark editor also follows the old auto-submit flow, but now it waits
+C<d2 serve --no-indicators> and C<d2 serve --no-indicator> clear that whole top-right browser-only area without changing the terminal prompt or C</system/status>. The bookmark editor also follows the old auto-submit flow, but now it waits
 until focus leaves the whole editor form instead of firing every time you move
 between section blocks.
 
@@ -1514,7 +1554,7 @@ C<DD-OOP-LAYERS> comparisons normalise canonical path identities, so symlinked
 aliases such as macOS C</var/...> versus C</private/var/...> do not break
 layer discovery, deepest-layer writes, or layered bookmark/nav lookup.
 The CLI path helpers follow the same portability rule: commands such as
-C<dashboard path project-root> may surface the canonical filesystem path, and
+C<d2 path project-root> may surface the canonical filesystem path, and
 the supported contract treats macOS aliases such as C</var/...> and
 C</private/var/...> as the same project root instead of different repos.
 
@@ -1530,65 +1570,91 @@ The runtime manager follows the older local-service pattern:
 
 =item *
 
-C<dashboard serve> starts the web service in the background by default
+C<d2 serve> starts the web service in the background by default
 
 =item *
 
-C<dashboard serve> starts the configured collector loops alongside the web
+On POSIX, background web startup launches the private C<web-foreground>
+helper through GoRoutine's shell-free process API. The runtime records the
+listener only after the configured port accepts connections; if readiness
+times out, it terminates and reaps the child and reports its exit status and
+log paths.
+
+=item *
+
+C<d2 serve> starts the configured collector loops alongside the web
 service, so a plain serve keeps collectors and the web runtime under the same
 lifecycle action
 
 =item *
 
-C<dashboard serve --foreground> keeps the web service attached to the terminal
+C<d2 serve --foreground> keeps the web service attached to the terminal
 
 =item *
 
-C<dashboard serve --ssl> enables HTTPS in Starman with the generated local
+C<d2 serve --ssl> enables HTTPS in Starman with the generated local
 certificate and key, keeps that certificate on a browser-correct SAN profile
 covering localhost, loopback IPs, the concrete non-wildcard bind host, and any
 configured C<web.ssl_subject_alt_names>, regenerates older dashboard certs when
 they are stale, redirects non-HTTPS requests to the matching C<https://...>
-URL, and reuses the saved SSL setting on later C<dashboard restart> runs unless
+URL, and reuses the saved SSL setting on later C<d2 restart> runs unless
 you override it
 
 =item *
 
-C<dashboard serve --no-editor> and C<dashboard serve --no-endit> keep the
+In SSL mode, the public frontend starts C<web-ssl-backend-foreground> with
+GoRoutine's shell-free OS-process API. Accepted client sockets are handled by
+GoRoutine routines using the 0.12 shared filehandle support; shutdown stops
+and waits for the backend process and drains client routine errors explicitly.
+If a client or listener socket close fails, the frontend retains the first
+close error, joins its workers, stops the managed backend, and then reports the
+saved error so cleanup is not abandoned at the first failed close.
+
+=item *
+
+On Windows, saved-Ajax C<stdout> and C<stderr> pipes are drained by one Perl
+reader thread per pipe because C<IO::Select> cannot reliably report anonymous
+pipe readiness there. Chunks and read errors pass through a bounded event
+queue; interrupted reads are retried, and a disconnected writer or fatal stream
+error terminates the child and joins both readers before returning.
+
+=item *
+
+C<d2 serve --no-editor> and C<d2 serve --no-endit> keep the
 browser in read-only mode by hiding Share, Play, and View Source chrome,
 denying C</app/E<lt>idE<gt>/edit>, C</app/E<lt>idE<gt>/source>, and
 bookmark-save POST routes with C<403>, and persisting that read-only flag for
-later C<dashboard restart> runs until C<dashboard serve --editor> turns it back
+later C<d2 restart> runs until C<d2 serve --editor> turns it back
 off
 
 =item *
 
-C<dashboard serve --no-indicators> and C<dashboard serve --no-indicator> keep
+C<d2 serve --no-indicators> and C<d2 serve --no-indicator> keep
 normal page rendering and left-side page chrome intact while clearing the
 whole top-right browser-only chrome area, including the status strip,
 username, host or IP link, and live date-time line, and persisting that flag
-for later C<dashboard restart> runs until C<dashboard serve --indicators>
+for later C<d2 restart> runs until C<d2 serve --indicators>
 turns it back off
 
 =item *
 
-C<dashboard serve logs> prints the web-service runtime log captured in the
-dashboard log file. C<-t> prefixes lines with UTC timestamps, C<--tail N>,
+C<d2 serve logs> prints the web-service runtime log captured in the
+d2 log file. C<-t> prefixes lines with UTC timestamps, C<--tail N>,
 C<--tail=N>, and C<-n N> limit the initial output, and C<-f> follows appended
-lines. For example, C<dashboard serve logs -t --tail 100 -f> starts with the
+lines. For example, C<d2 serve logs -t --tail 100 -f> starts with the
 final 100 lines and then follows new output.
 
 =item *
 
-C<dashboard serve workers N> saves the default Starman worker count and starts
+C<d2 serve workers N> saves the default Starman worker count and starts
 the web service immediately when it is currently stopped; C<--host HOST> and
 C<--port PORT> can steer that auto-start path, and both
-C<dashboard serve --workers N> and C<dashboard restart --workers N> can still
+C<d2 serve --workers N> and C<d2 restart --workers N> can still
 override the worker count for one run
 
 =item *
 
-C<dashboard stop> stops both the web service and managed collector loops and,
+C<d2 stop> stops both the web service and managed collector loops and,
 prints the final lifecycle summary as a terminal table by default or JSON with
 C<-o json>; on an interactive terminal it also prints the full stop task board
 on C<stderr> before work starts so each shutdown step becomes visible instead
@@ -1606,21 +1672,21 @@ the new pid.
 
 =item *
 
-C<dashboard stop web> only stops the managed web service
+C<d2 stop web> only stops the managed web service
 
 =item *
 
-C<dashboard stop collector> only stops managed collector loops
+C<d2 stop collector> only stops managed collector loops
 
 =item *
 
-C<dashboard stop collector E<lt>nameE<gt>> only stops the requested managed
+C<d2 stop collector E<lt>nameE<gt>> only stops the requested managed
 collector loop, and collector-name shell completion suggests registered
 collector names
 
 =item *
 
-C<dashboard restart> stops both, starts configured collector loops again, then
+C<d2 restart> stops both, starts configured collector loops again, then
 starts the web service, prints the final lifecycle summary as a terminal table
 by default or JSON with C<-o json>, and only reports success after the
 replacement collector loops and web runtime become visible and survive a short
@@ -1639,15 +1705,15 @@ loop
 
 =item *
 
-C<dashboard restart web> only restarts the managed web service
+C<d2 restart web> only restarts the managed web service
 
 =item *
 
-C<dashboard restart collector> only restarts managed collector loops
+C<d2 restart collector> only restarts managed collector loops
 
 =item *
 
-C<dashboard restart collector E<lt>nameE<gt>> only restarts the requested
+C<d2 restart collector E<lt>nameE<gt>> only restarts the requested
 collector loop, including an on-demand manual collector by converting it into
 a managed interval loop, and collector-name shell completion suggests
 registered collector names
@@ -1662,14 +1728,14 @@ operator sees an explicit problem instead of infinite silent restart churn
 
 =item *
 
-C<dashboard log> and C<dashboard logs> print the combined dashboard web log
+C<d2 log> and C<d2 logs> print the combined dashboard web log
 plus collector logs
 
 =item *
 
-C<dashboard logs --tail 100> or C<dashboard logs --tail=100> prints only the
+C<d2 logs --tail 100> or C<d2 logs --tail=100> prints only the
 last 100 lines of the combined output. The same C<--tail> option accepts both
-spellings for C<dashboard log web>, C<dashboard log collector>, and a named
+spellings for C<d2 log web>, C<d2 log collector>, and a named
 collector log. C<-n N> remains a compatible short form. C<--tail=0> prints no
 lines; negative or non-integer counts are rejected with usage information.
 
@@ -1677,22 +1743,22 @@ C<-t> prefixes each displayed line with a UTC timestamp. Collector output uses
 the recorded run timestamp; raw web output, which has no stored per-line event
 time, uses the time it is read. C<-f> follows new lines from web logs, one
 collector, all collectors, or the combined view. Flags may be combined, so
-C<dashboard logs -f -t --tail 50> starts with the last 50 combined lines and
+C<d2 logs -f -t --tail 50> starts with the last 50 combined lines and
 continues following both sources.
 
 =item *
 
-C<dashboard log web> prints only the dashboard web log and supports C<-t>,
+C<d2 log web> prints only the dashboard web log and supports C<-t>,
 C<--tail N>, C<--tail=N>, C<-n N>, and C<-f>
 
 =item *
 
-C<dashboard log collector> prints only collector logs and accepts C<-t>,
+C<d2 log collector> prints only collector logs and accepts C<-t>,
 C<-f>, and the same trailing-line limit
 
 =item *
 
-C<dashboard log collector E<lt>nameE<gt>> prints only the requested collector
+C<d2 log collector E<lt>nameE<gt>> prints only the requested collector
 log, accepts C<-t>, C<-f>, C<--tail N>, and C<--tail=N>, and collector-name
 shell completion suggests registered collector names
 
@@ -1753,19 +1819,19 @@ and Docker compose overlays.
 
 Run your user-provided update command:
 
-  dashboard update
+  d2 update
 
 If F<./.developer-dashboard/cli/update> or
 F<./.developer-dashboard/cli/update/run> exists in the current project it is
-used first; otherwise the home runtime fallback is used. C<dashboard update>
+used first; otherwise the home runtime fallback is used. C<d2 update>
 runs that command after any sorted hook files from F<update/> or F<update.d>.
 
-Re-running C<dashboard init> keeps an existing
+Re-running C<d2 init> keeps an existing
 F<~/.developer-dashboard/config/config.json> intact. If the file is missing,
 init creates it as C<{}>. The command refreshes dashboard-managed helpers in
 F<~/.developer-dashboard/cli/dd/> and preserves user-owned saved pages.
 
-When C<dashboard init> refreshes a dashboard-managed helper or shipped
+When C<d2 init> refreshes a dashboard-managed helper or shipped
 starter file, it compares the existing content against the shipped content by
 MD5 inside Perl first. If the content already matches, init skips the copy
 instead of rewriting the file unnecessarily.
@@ -1773,20 +1839,20 @@ instead of rewriting the file unnecessarily.
 When bookmark C<HTML:> or shared C<nav/*.tt> fragments hit a Template Toolkit
 syntax error, render mode now shows a visible C<runtime-error> block instead
 of leaking the raw C<[% ... %]> source into the browser or
-C<dashboard page render> output.
+C<d2 page render> output.
 
-Home helper staging is non-destructive too. C<dashboard init> may add or
+Home helper staging is non-destructive too. C<d2 init> may add or
 update dashboard-managed built-in helpers only under
 F<~/.developer-dashboard/cli/dd/>. User commands and hook directories stay in
 F<~/.developer-dashboard/cli/> and in child-layer
 F<./.developer-dashboard/cli/> roots, and init must not overwrite or delete
 those user-space files while refreshing the home-only dd namespace.
 
-The public C<dashboard> entrypoint also stays thin for all built-in commands. It only stages and execs helper assets from F<share/private-cli/>: dedicated
-helper bodies for C<dashboard jq>, C<dashboard yq>, C<dashboard of>,
-C<dashboard open-file>, C<dashboard workspace>, C<dashboard path>,
-C<dashboard paths>, C<dashboard file>, C<dashboard files>, and
-C<dashboard ps1>, plus thin wrappers for the
+The public C<d2> entrypoint also stays thin for all built-in commands. It only stages and execs helper assets from F<share/private-cli/>: dedicated
+helper bodies for C<d2 jq>, C<d2 yq>, C<d2 of>,
+C<d2 open-file>, C<d2 workspace>, C<d2 path>,
+C<d2 paths>, C<d2 file>, C<d2 files>, and
+C<d2 ps1>, plus thin wrappers for the
 remaining built-ins that hand off to the shared private
 C<_dashboard-core> runtime.
 
@@ -1794,7 +1860,7 @@ The shipped starter bookmark source lives under
 F<share/seeded-pages/>, and the shipped helper scripts live under
 F<share/private-cli/>, so neither bookmark bodies nor helper script bodies
 are embedded directly in the command script. Installed copies resolve the same seeded pages and helper assets from the
-distribution share directory, so C<dashboard init> works after a C<cpanm>
+distribution share directory, so C<d2 init> works after a C<cpanm>
 install and not just from a source checkout.
 
 Those helper-backed built-ins
@@ -1802,18 +1868,18 @@ also rewrite their live process title to C<developer-dashboard ...>, so
 process listings stay aligned with the public command names instead of
 exposing the staged helper path.
 
-When C<dashboard> re-execs a Perl-backed helper or hook, it also forces the
+When C<d2> re-execs a Perl-backed helper or hook, it also forces the
 same active dashboard F<lib/> root into that child Perl process. That keeps
 thin switchboard handoff on the current checkout code instead of drifting onto
 an older installed C<Developer::Dashboard> copy that may also be visible in
 C<PERL5LIB>.
 
-C<dashboard cpan E<lt>Module...E<gt>> installs optional Perl modules into the
+C<d2 cpan E<lt>Module...E<gt>> installs optional Perl modules into the
 active runtime-local F<./.developer-dashboard/local> tree and appends matching
 C<requires 'Module';> lines to F<./.developer-dashboard/cpanfile>.
 
 The command
-stays implemented in the C<dashboard> entrypoint rather than introducing a
+stays implemented in the d2 entrypoint rather than introducing a
 separate CPAN manager product module, and saved Ajax workers infer the
 same runtime-local C<local/lib/perl5> path directly from the active runtime
 root. When the requested modules include C<DBD::*>, the command also installs
@@ -1828,23 +1894,23 @@ Extend dashboard with isolated skill packages:
 Install a skill from either a Git repository URL or a local checked-out skill
 repository:
 
-  dashboard skills install browser
-  dashboard skills install foo/bar
-  dashboard skills install git@github.com:user/example-skill.git
-  dashboard skills install https://github.com/user/example-skill.git
-  dashboard skills install /absolute/path/to/example-skill
-  dashboard skills install --notest browser
-  dashboard skills install -b main git@github.com:user/example-skill.git
-  dashboard skills install browser foo/bar git@github.com:user/example-skill.git
-  dashboard skills install --ddfile
-  dashboard skill list
+  d2 skills install browser
+  d2 skills install foo/bar
+  d2 skills install git@github.com:user/example-skill.git
+  d2 skills install https://github.com/user/example-skill.git
+  d2 skills install /absolute/path/to/example-skill
+  d2 skills install --notest browser
+  d2 skills install -b main git@github.com:user/example-skill.git
+  d2 skills install browser foo/bar git@github.com:user/example-skill.git
+  d2 skills install --ddfile
+  d2 skill list
 
 Bare one-word skill names are expanded against the official
 C<https://github.com/manif3station/> GitHub base, so
-C<dashboard skills install browser> clones
+C<d2 skills install browser> clones
 C<https://github.com/manif3station/browser>. Two-part C<owner/repo>
 shorthand is expanded against GitHub too, so
-C<dashboard skills install foo/bar> clones C<https://github.com/foo/bar>.
+C<d2 skills install foo/bar> clones C<https://github.com/foo/bar>.
 
 Full URLs such as C<https://github.com/user/example-skill.git> and
 C<git@github.com:user/example-skill.git> are used exactly as supplied. Use C<-b E<lt>branchE<gt>> or C<--branch E<lt>branchE<gt>> to select a remote
@@ -1872,11 +1938,11 @@ C<VERSION> before and after the install.
 Use C<-o json> when a script needs the
 raw result payload.
 
-C<dashboard skill> is
-accepted as a singular alias for the C<dashboard skills> management command
-family, so C<dashboard skill list> and C<dashboard skill install browser> are
+C<d2 skill> is
+accepted as a singular alias for the C<d2 skills> management command
+family, so C<d2 skill list> and C<d2 skill install browser> are
 equivalent to the plural form. It does not replace dotted skill execution;
-installed skill commands still run as C<dashboard E<lt>skillE<gt>.E<lt>commandE<gt>>.
+installed skill commands still run as C<d2 E<lt>skillE<gt>.E<lt>commandE<gt>>.
 
 For Perl commands, the C<lib/> directory of the skill layer providing the
 command is the first module search path in the child process C<@INC>. Other
@@ -1891,7 +1957,7 @@ C<DB.pm> with C<use DB;> without adding a manual library path.
 Git sources are cloned. Direct local checked-out directories are synced in
 place instead of recloned, using C<rsync> when it is available and the
 built-in Perl tree-copy fallback when it is not. That means
-C<dashboard skills install> also acts as reinstall and update for an already
+C<d2 skills install> also acts as reinstall and update for an already
 installed skill.
 
 A direct local directory is only accepted when it is a
@@ -1904,7 +1970,7 @@ In a home-only session that is
 F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>. In a deeper project
 layer that already has its own F<.developer-dashboard/>, the install target
 becomes
-F<E<lt>that-layerE<gt>/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>. Each explicit C<dashboard skills install E<lt>sourceE<gt>>, including every
+F<E<lt>that-layerE<gt>/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>. Each explicit C<d2 skills install E<lt>sourceE<gt>>, including every
 source in a multi-source command, also registers that exact source in
 F<~/.developer-dashboard/ddfile> unless it is already listed there.
 
@@ -1915,7 +1981,7 @@ existing entries, so users who keep the dashboard runtime in Git do not
 accidentally track cloned skill trees. The installer also honors an existing
 F<~/.developer-dashboard/.gitiignore> spelling as a compatibility safety net.
 
-Calling bare C<dashboard skills install> with no source reads that root
+Calling bare C<d2 skills install> with no source reads that root
 F<ddfile> and reinstalls every listed skill as an update batch, showing the
 same progress rundown and before/after version table.
 
@@ -1927,7 +1993,7 @@ installable entries, the command returns an explicit error telling the user to
 install a skill first or pass a skill source.
 
 When an operator later runs
-C<dashboard skills uninstall E<lt>repo-nameE<gt>>, the home root
+C<d2 skills uninstall E<lt>repo-nameE<gt>>, the home root
 F<ddfile> now drops any exact source lines that resolve back to that repo name
 while leaving comments and unrelated entries untouched.
 
@@ -1943,7 +2009,7 @@ C<wingetfile>, C<brewfile>, C<Makefile>, C<dockerfile>, C<package.json>, C<cpanf
 C<cpanfile.local>, or Docker files into the
 normal runtime folders.
 
-C<dashboard skills install --ddfile> reads dependency manifests from the
+C<d2 skills install --ddfile> reads dependency manifests from the
 current directory instead of taking one explicit skill source. If F<ddfile>
 exists there, each listed source installs into the base home-layer skills root
 at F<~/.developer-dashboard/skills/E<lt>repo-nameE<gt>/> even when the command
@@ -1955,9 +2021,9 @@ F<skills/E<lt>repo-nameE<gt>/> tree instead. When both manifests are present,
 the command processes F<ddfile> first and F<ddfile.local> second.
 
 Repeated
-C<dashboard skills install --ddfile> runs also act as reinstall and refresh
+C<d2 skills install --ddfile> runs also act as reinstall and refresh
 for already-installed targets, just like repeated explicit
-C<dashboard skills install E<lt>sourceE<gt>> runs. Interactive C<dashboard skills install> runs also print a task board on
+C<d2 skills install E<lt>sourceE<gt>> runs. Interactive C<d2 skills install> runs also print a task board on
 C<stderr>; multi-source and bare update-all installs show one task for every
 source before any clone or dependency step starts.
 
@@ -1978,7 +2044,7 @@ detail window that keeps the newest progress lines under the active task in
 blue and leaves failure detail lines visible in red when a manifest step stops
 with an error.
 
-Installed dotted skill commands such as C<dashboard demo-skill.foo> now hand
+Installed dotted skill commands such as C<d2 demo-skill.foo> now hand
 control to the real skill command after hook processing instead of wrapping
 the main command in an extra capture layer. That keeps interactive prompting
 behaviour intact for commands that print a prompt and then read from standard
@@ -2003,8 +2069,8 @@ override.
 
 List installed skills:
 
-  dashboard skills list
-  dashboard skills list -o json
+  d2 skills list
+  d2 skills list -o json
 
 The default output is a padded table with the columns C<Repo>, C<Enabled>,
 C<CLI>, C<Pages>, C<Docker>, C<Collectors>, and C<Indicators>. The
@@ -2042,8 +2108,8 @@ C<has_cpanfile_local>, C<has_makefile>, and C<has_dockerfile>
 
 Inspect one installed skill:
 
-  dashboard skills usage example-skill
-  dashboard skills usage example-skill -o json
+  d2 skills usage example-skill
+  d2 skills usage example-skill -o json
 
 The default output is a readable multi-section summary. It still returns the
 installed skill state even when the skill is disabled, including:
@@ -2077,11 +2143,11 @@ usage data.
 
 Update registered skills to their latest versions:
 
-  dashboard skills install
+  d2 skills install
 
 Disable a skill without uninstalling it:
 
-  dashboard skills disable example-skill
+  d2 skills disable example-skill
 
 Disabling keeps the checkout in its current layered skills root but removes it
 from normal runtime lookup. That means:
@@ -2090,7 +2156,7 @@ from normal runtime lookup. That means:
 
 =item *
 
-C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> stop dispatching into that
+C<d2 E<lt>repo-nameE<gt>.E<lt>commandE<gt>> stop dispatching into that
 skill
 
 =item *
@@ -2105,15 +2171,15 @@ active runtime
 
 =item *
 
-C<dashboard skills list> and
-C<dashboard skills usage E<lt>repo-nameE<gt>> still report the installed skill
+C<d2 skills list> and
+C<d2 skills usage E<lt>repo-nameE<gt>> still report the installed skill
 so it can be inspected and re-enabled later
 
 =back
 
 Enable a previously disabled skill:
 
-  dashboard skills enable example-skill
+  d2 skills enable example-skill
 
 Enabling removes the local disabled marker and restores the skill to command
 dispatch, browser routes, collector loading, docker lookup, config merge, and
@@ -2121,17 +2187,17 @@ shared nav rendering.
 
 Execute a skill command:
 
-  dashboard example-skill.somecmd arg1 arg2
+  d2 example-skill.somecmd arg1 arg2
 
 The dotted form is the public route. If C<example-skill> is installed and
-ships C<cli/somecmd>, C<dashboard example-skill.somecmd> resolves the correct
+ships C<cli/somecmd>, C<d2 example-skill.somecmd> resolves the correct
 layered skill command. If the active child layer for that same repo omits
 C<cli/somecmd>, the command falls back to the nearest inherited skill layer
 that still provides it.
 
 That same dotted dispatch also applies to runtime-backed command files such as
 C<cli/report.py> and C<cli/webhook.js>. In those cases the resolved skill
-command still runs through the same public C<dashboard E<lt>skillE<gt>.E<lt>commandE<gt>>
+command still runs through the same public C<d2 E<lt>skillE<gt>.E<lt>commandE<gt>>
 route, with Python-backed files launched through C<python> and JavaScript-backed
 files launched through C<node>.
 
@@ -2140,8 +2206,8 @@ C<skills/E<lt>repoE<gt>/.../skills/E<lt>repoE<gt>> trees, the same dotted
 public form keeps walking those nested skill roots until it resolves the final
 C<cli/E<lt>cmdE<gt>> file. For example:
 
-  dashboard nest.level1.level2.here
-  dashboard which nest.level1.level2.here
+  d2 nest.level1.level2.here
+  d2 which nest.level1.level2.here
 
 The first command executes the nested skill command. The second prints the
 resolved nested C<cli/here> file plus any matching hook files that would run
@@ -2150,15 +2216,15 @@ before it.
 Nested skill trees under C<skills/E<lt>repoE<gt>/cli/> stay reachable through
 that same public dotted route, including multiple nested levels. For example,
 if C<example-skill> ships C<skills/foo/skills/bar/cli/baz>, then
-C<dashboard example-skill.foo.bar.baz> resolves the nested command through the
+C<d2 example-skill.foo.bar.baz> resolves the nested command through the
 installed skill tree.
 
 A nested skill can also expose its default command as C<cli/__init__> (with any
 supported executable extension). Naming that nested skill directly invokes
 its initializer, including at multiple nested levels:
 
-  dashboard example-skill.foo
-  dashboard example-skill.foo.bar
+  d2 example-skill.foo
+  d2 example-skill.foo.bar
 
 When a deeper nested skill has its own initializer, it takes precedence over
 an ancestor skill's generic initializer. Explicit command files are resolved
@@ -2170,7 +2236,7 @@ main command.
 
 Uninstall a skill:
 
-  dashboard skills uninstall example-skill
+  d2 skills uninstall example-skill
 
 Each installed skill lives under
 F<E<lt>participating-layerE<gt>/.developer-dashboard/skills/E<lt>repo-nameE<gt>/>
@@ -2251,7 +2317,7 @@ Optional Windows packages installed through C<winget install --id ... --exact
 
 Optional skill install workflow run before C<ddfile>, using C<make>,
 C<make test> when a C<test> or C<tests> target exists unless
-C<dashboard skills install --notest> is used, C<make install>, and
+C<d2 skills install --notest> is used, C<make install>, and
 C<make clean> when a C<clean> target exists
 
 =item B<dnfile>
@@ -2284,7 +2350,7 @@ C<E<lt>skill-rootE<gt>/perl5>
 =back
 
 Skills are completely isolated from the main dashboard runtime and from other
-skills. Removing a skill is simple: C<dashboard skills uninstall E<lt>repo-nameE<gt>>
+skills. Removing a skill is simple: C<d2 skills uninstall E<lt>repo-nameE<gt>>
 cleanly removes only that skill's directory and unregisters matching install
 sources from the home root F<ddfile>.
 
@@ -2361,7 +2427,7 @@ fleet used by the system config
 
 =item *
 
-C<dashboard serve>, C<dashboard restart>, and C<dashboard stop> manage those
+C<d2 serve>, C<d2 restart>, and C<d2 stop> manage those
 skill collectors together with the system-owned collectors
 
 =item *
@@ -2470,7 +2536,7 @@ Skill dependency and docker layering:
 
 if a C<ddfile> exists, each listed dependency is installed after package and
 language dependency manifests through
-C<dashboard skills install E<lt>dependencyE<gt>> while already-installed or
+C<d2 skills install E<lt>dependencyE<gt>> while already-installed or
 in-flight skills are skipped to avoid loops
 
 =item *
@@ -2482,7 +2548,7 @@ inventory
 
 =item *
 
-if an operator runs C<dashboard skills install --ddfile> inside a directory
+if an operator runs C<d2 skills install --ddfile> inside a directory
 that contains F<ddfile>, every listed source is reinstalled or refreshed into
 the base F<~/.developer-dashboard/skills/> root
 
@@ -2532,7 +2598,7 @@ row when both the manifest exists and the host is macOS
 if a C<Makefile> exists, Dashboard runs it after the Perl dependency
 manifests and before any deferred C<ddfile> processing, using C<make>,
 C<make test> when a C<test> or C<tests> target exists unless
-C<dashboard skills install --notest> was requested, C<make install>, and
+C<d2 skills install --notest> was requested, C<make install>, and
 C<make clean> when a C<clean> target exists; interactive progress output only
 shows this row when the file exists
 
@@ -2587,7 +2653,7 @@ root.
 
 Skill commands are file-based
 commands run through the dotted
-C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> form.
+C<d2 E<lt>repo-nameE<gt>.E<lt>commandE<gt>> form.
 
 Skill hook files live
 under C<cli/E<lt>commandE<gt>.d/>, skill app pages render from
@@ -2596,7 +2662,7 @@ the older C</skill/E<lt>repo-nameE<gt>/bookmarks/E<lt>idE<gt>> route still
 resolves direct bookmark renders. If C<config/config.json> declares
 collectors, those collectors join the normal managed fleet under
 repo-qualified names such as C<example-skill.status>, which means
-C<dashboard serve>, C<dashboard restart>, and C<dashboard stop> treat them the
+C<d2 serve>, C<d2 restart>, and C<d2 stop> treat them the
 same way they treat system-owned collectors.
 
 If C<config/api.json> declares API
@@ -2614,7 +2680,7 @@ configuration merge keys such as C<_example-skill>.
 
 The guide describes automatic dependency installation order:
 C<aptfile -> apkfile -> dnfile -> wingetfile -> brewfile -> package.json -> requirements.txt -> cpanfile -> cpanfile.local -> Makefile -> ddfile -> ddfile.local>.
-The explicit C<dashboard skills install --ddfile> option handles the deferred
+The explicit C<d2 skills install --ddfile> option handles the deferred
 C<ddfile -> ddfile.local> pass separately.
 
 It also explains shared and skill-local dependency directories, the install
@@ -2629,10 +2695,10 @@ C<.env>. Page values are request-local and saved Ajax values are passed only to
 the child process; neither leaks into the long-lived web worker or other
 requests.
 
-For operators rather than authors, C<dashboard skills list>,
-C<dashboard skills usage E<lt>repo-nameE<gt>>,
-C<dashboard skills disable E<lt>repo-nameE<gt>>, and
-C<dashboard skills enable E<lt>repo-nameE<gt>> are the supported controls for
+For operators rather than authors, C<d2 skills list>,
+C<d2 skills usage E<lt>repo-nameE<gt>>,
+C<d2 skills disable E<lt>repo-nameE<gt>>, and
+C<d2 skills enable E<lt>repo-nameE<gt>> are the supported controls for
 inventorying and toggling installed skills without deleting their isolated
 runtime trees.
 
@@ -2710,6 +2776,16 @@ removing a fragment changes that signature and refreshes the next request.
 Only the filename inventory is reused: every fragment's contents are loaded
 and rendered for each request, so edits remain visible without an ID rescan.
 
+Merged runtime configuration is also cached between web requests when the
+native filesystem watcher is active. Before reusing a cached configuration,
+the worker checks high-resolution metadata for watched roots and exact config
+files as well as the watcher and environment signatures. This catches atomic
+config-file replacement immediately, even if a macOS filesystem event has not
+yet been delivered. If native watching is unavailable, the portable validator
+also hashes config contents so same-size edits remain visible. A fresh merge
+is cached only when the before-and-after signatures still match; filesystem
+inspection and read failures remain explicit.
+
 Missing nav directories continue to contribute no items; an incomplete
 directory scan is not cached, and filesystem stat, read, or close failures
 remain explicit.
@@ -2769,13 +2845,13 @@ workflow for every repo
 
 Run the web interface with:
 
-  dashboard serve
+  d2 serve
 
 By default it listens on C<0.0.0.0:7890>, so you can open it in a browser at:
 
   http://127.0.0.1:7890/
 
-Run C<dashboard serve --ssl> to enable HTTPS with a generated self-signed
+Run C<d2 serve --ssl> to enable HTTPS with a generated self-signed
 certificate under F<~/.developer-dashboard/certs/>, then open:
 
   https://127.0.0.1:7890/
@@ -2794,18 +2870,18 @@ rotated forward automatically when they no longer match that expected profile.
 Browsers still show the normal self-signed certificate warning until you trust
 the generated certificate locally.
 
-Run C<dashboard serve --no-editor> or C<dashboard serve --no-endit> to keep
+Run C<d2 serve --no-editor> or C<d2 serve --no-endit> to keep
 the browser in read-only mode. That hides the Share, Play, and View Source
 links, blocks bookmark editor and source routes with C<403>, blocks
 bookmark-save POST requests even if someone tries to hit them directly, and
-persists the mode so later C<dashboard restart> runs stay read-only until you
-switch it back with C<dashboard serve --editor>.
+persists the mode so later C<d2 restart> runs stay read-only until you
+switch it back with C<d2 serve --editor>.
 
-Run C<dashboard serve --no-indicators> or C<dashboard serve --no-indicator> to
+Run C<d2 serve --no-indicators> or C<d2 serve --no-indicator> to
 clear the whole top-right browser chrome area. That hides the browser-only
 indicator strip, username, host or IP link, and live date-time line without
-changing C</system/status> or terminal prompt output such as C<dashboard ps1>,
-and persists the mode until C<dashboard serve --indicators> turns it back on.
+changing C</system/status> or terminal prompt output such as C<d2 ps1>,
+and persists the mode until C<d2 serve --indicators> turns it back on.
 
 For example, if you want the same dashboard cert to work for one local
 C</etc/hosts> alias and one LAN IP, keep the runtime config like this:
@@ -2842,7 +2918,7 @@ machines on the network
 =item *
 
 the loopback-admin shortcut applies only to direct (plain HTTP) connections;
-under C<dashboard serve --ssl> the public front-proxy relays TLS to an internal
+under C<d2 serve --ssl> the public front-proxy relays TLS to an internal
 loopback backend, so every backend connection looks like loopback and cannot
 prove the real client is local -- in that mode the shortcut is disabled and
 even loopback HTTPS requests require a helper login
@@ -2858,12 +2934,12 @@ In practice that means the developer at the machine gets friction-free local
 admin access, while shared or forwarded access is forced through explicit
 helper accounts. Helper passwords use PBKDF2-HMAC-SHA256 with 210,000 iterations.
 
-When
-FFI::Platypus and a compatible system OpenSSL C<libcrypto> are available, the
-same derivation runs through OpenSSL's native PBKDF2 function; this preserves
-the existing salts, stored hashes, and verification format. If the native
-library is unavailable or the password cannot safely use the byte-oriented
-FFI path, authentication uses the existing C<Digest::SHA> implementation.
+When the compiled Dashboard XS extension and a compatible system OpenSSL
+C<libcrypto> are available, the same derivation runs through OpenSSL's native
+PBKDF2 function; this preserves the existing salts, stored hashes, and
+verification format. If the native library is unavailable or the password
+cannot safely use the byte-oriented XS path, authentication uses the existing
+C<Digest::SHA> implementation.
 
 
 
@@ -2964,7 +3040,7 @@ used by:
 
 =item *
 
-the shell prompt rendered by C<dashboard ps1>
+the shell prompt rendered by C<d2 ps1>
 
 =item *
 
@@ -2972,7 +3048,7 @@ the top-right status strip in the web interface
 
 =item *
 
-CLI inspection commands such as C<dashboard indicator list>
+CLI inspection commands such as C<d2 indicator list>
 
 =back
 
@@ -3032,7 +3108,7 @@ visibility of an external state change, and correct inventory after retirement.
 
 
 Workspace sessions use a
-two-line bottom status block: the first row is the dashboard indicator strip
+two-line bottom status block: the first row is the d2 indicator strip
 with the trailing date-time segment, and the second row keeps tmux's normal
 session and indexed window list. Ordinary tmux sessions keep the normal
 inline prompt.
@@ -3063,6 +3139,37 @@ persists the rendered icon as the live indicator value. Invalid JSON or TT
 render failures are explicit collector errors: the collector C<stderr> records
 the template problem and the indicator stays red instead of silently falling
 back.
+
+=head3 System menu indicator configuration
+
+C<Developer::Dashboard::SystemMenu-E<gt>items_for_platform> projects
+configured indicator names and their current icons for the C<macos>,
+C<windows>, or C<ubuntu> selector. Each platform selector is opt-in; a missing
+or false value disables that item. Invalid values for any supported selector
+are rejected even when the current host is another platform. The projection
+preserves configuration order and does not start a native menu by itself. The
+private C<web-foreground> runtime supplies merged configuration and the shared
+indicator store to C<Developer::Dashboard::SystemMenu::Runner>. The runner
+starts the menu only when an indicator is enabled for the current host and
+keeps the helper active for the foreground web-service lifetime. It stops and
+joins the GoRoutine worker when the service returns or fails; disabled or
+unsupported platform settings do not load the native adapter. The existing
+C<d2 ps1> output remains unchanged.
+
+The native System::Menu adapter starts the platform helper in a controlled
+GoRoutine worker. On Ubuntu, the helper uses Ayatana AppIndicator3 and a GTK
+menu; rendered status icons are kept in a private temporary icon-theme
+directory and removed when the helper shuts down. Building from source
+requires the Ayatana AppIndicator3 and GTK3 development packages; runtime
+requires a desktop session with AppIndicator support. The helper reports a
+clear error when no desktop session is available. Source and compile tests do
+not prove that a desktop shell visibly displayed the menu; hosted platform
+verification is required for each supported operating system. Linux CI and
+the published Docker image install those native development packages before
+building the helper. The macOS helper uses ARC and treats deprecated AppKit APIs
+as errors. The Windows full-suite job installs Test::Harness without
+Devel::Cover, which does not configure on its supported Windows runner; the
+four-metric coverage gate remains on Linux.
 
 
 
@@ -3117,7 +3224,7 @@ I know what I need to I am at the file or value now
 =item *
 
 Docker Compose helpers keep recurring container workflows behind the same
-C<dashboard> entrypoint
+C<d2> entrypoint
 
 =back
 
@@ -3221,7 +3328,7 @@ status to the browser and shell prompt.
 
 =item * Web and command interfaces
 
-Provide the local browser UI and the C<dashboard> command line entry point over
+Provide the local browser UI and the C<d2> command line entry point over
 the same runtime data.
 
 =item * Skills and extensions
@@ -3264,8 +3371,8 @@ C<1>, C<true>, C<yes>, or C<on>.
 
 =head2 Transient Web Token Policy
 
-Transient page tokens still exist for CLI workflows such as C<dashboard page encode>
-and C<dashboard page decode>, but browser routes that execute a transient payload
+Transient page tokens still exist for CLI workflows such as C<d2 page encode>
+and C<d2 page decode>, but browser routes that execute a transient payload
 from C<token=> or C<atoken=> are disabled by default.
 
 That means links such as:
@@ -3383,7 +3490,7 @@ deepest active child layer, and installed skills contribute their own layered
 C<config/api.json> fragments for skill-local saved Ajax routes.
 
 The built-in
-C<dashboard api> command is the supported way to inspect or update the writable
+C<d2 api> command is the supported way to inspect or update the writable
 runtime layer for that registry.
 
 An entry carrying C<"disabled": true> (or the same flag under C<_disabled>)
@@ -3400,10 +3507,10 @@ If a saved handler also needs refresh-safe process reuse, pass
 C<singleton =E<gt> 'NAME'> in the C<Ajax> helper.
 
 The generated URL carries the singleton name, and the worker runs as
-C<dashboard ajax: NAME>. A refreshed request replaces the older matching
+C<d2 ajax: NAME>. A refreshed request replaces the older matching
 worker.
 
-C<dashboard stop> and C<dashboard restart> also stop singleton Ajax workers.
+C<d2 stop> and C<d2 restart> also stop singleton Ajax workers.
 Closing a browser tab sends a C<pagehide> cleanup request to
 C</ajax/singleton/stop?singleton=NAME>.
 
@@ -3482,7 +3589,7 @@ Unknown top-level subcommands can be provided by executable files under
 the current working directory's F<./.developer-dashboard/cli> first, then the
 nearest git-backed project runtime F<./.developer-dashboard/cli> when it is a
 different directory, and then F<~/.developer-dashboard/cli>. For example,
-C<dashboard foobar a b> will exec the first matching
+C<d2 foobar a b> will exec the first matching
 F<cli/foobar> with C<a b> as argv, while preserving stdin, stdout, and
 stderr.
 
@@ -3491,19 +3598,19 @@ F<cli/E<lt>commandE<gt>.pl>, F<cli/E<lt>commandE<gt>.py>, F<cli/E<lt>commandE<gt
 F<cli/E<lt>commandE<gt>.java>, F<cli/E<lt>commandE<gt>.sh>,
 F<cli/E<lt>commandE<gt>.bash>, F<cli/E<lt>commandE<gt>.ps1>,
 F<cli/E<lt>commandE<gt>.cmd>, or F<cli/E<lt>commandE<gt>.bat>, and
-C<dashboard E<lt>commandE<gt>> resolves the same logical command name to
+C<d2 E<lt>commandE<gt>> resolves the same logical command name to
 those files.
 
 Concrete source-backed examples:
 
-  dashboard hi
-  dashboard foo
+  d2 hi
+  d2 foo
 
-If F<cli/hi.go> is executable, C<dashboard hi> runs it through C<go run>.
-If F<cli/report.py> is executable, C<dashboard report> runs it through C<python>.
+If F<cli/hi.go> is executable, C<d2 hi> runs it through C<go run>.
+If F<cli/report.py> is executable, C<d2 report> runs it through C<python>.
 
-If F<cli/webhook.js> is executable, C<dashboard webhook> runs it through C<node>.
-If F<cli/foo.java> is executable, C<dashboard foo> compiles it with C<javac>
+If F<cli/webhook.js> is executable, C<d2 webhook> runs it through C<node>.
+If F<cli/foo.java> is executable, C<d2 foo> compiles it with C<javac>
 into an isolated temp directory and then runs the declared main class with
 C<java>.
 
@@ -3515,7 +3622,7 @@ runtime CLI layer and then invoke the switchboard:
   chmod +x ~/.developer-dashboard/cli/update
   printf '#!/bin/sh\nprintf "before update\\n"\n' > ~/.developer-dashboard/cli/update.d/01-log
   chmod +x ~/.developer-dashboard/cli/update.d/01-log
-  perl -Ilib bin/dashboard update
+  perl -Ilib bin/d2 update
 
 The command file is user-provided, not a built-in. The hook runs before it;
 project-local runtime layers take precedence over the home layer.
@@ -3523,7 +3630,7 @@ project-local runtime layers take precedence over the home layer.
 If a user mistypes a command, dashboard now prints an explicit unknown-command
 error together with the closest matching public command before the usual usage
 summary. The same guidance also applies to dotted skill commands, so
-C<dashboard alpha-skill.run-tset> suggests the nearest installed dotted skill
+C<d2 alpha-skill.run-tset> suggests the nearest installed dotted skill
 command instead of only dumping generic help.
 
 =head2 Built-in command help and completion
@@ -3546,7 +3653,7 @@ preserved. The global help form and command help include actionable usage and
 the available action/options where applicable.
 
 The same catalogue supplies TAB candidates for public commands, nested actions,
-and supported option flags. Bash and zsh call the live C<dashboard complete>
+and supported option flags. Bash and zsh call the live C<d2 complete>
 helper, so their candidates stay aligned with the command catalogue rather than
 maintaining separate shell-side action lists. Existing dynamic completions for
 skills, workspace sessions, collectors, and workspace path aliases remain
@@ -3589,10 +3696,10 @@ Hook output streams to the terminal and is also accumulated as JSON in
 C<RESULT>.
 
 If that JSON grows too large for a safe
-C<exec()> environment, C<dashboard> spills it into C<RESULT_FILE> and
+C<exec()> environment, C<d2> spills it into C<RESULT_FILE> and
 C<Developer::Dashboard::Runtime::Result> reads the same logical payload from
 there so later hooks and the final command still see the same result set
-without tripping C<Argument list too long>. Built-in commands such as C<dashboard jq>
+without tripping C<Argument list too long>. Built-in commands such as C<d2 jq>
 use the same hook directory.
 
 A
@@ -3632,10 +3739,18 @@ success/error report for each sorted hook file.
 
 Environment files are part of the same C<DD-OOP-LAYERS> contract.
 When C<dashboard ...> runs, it loads every participating plain-directory env
-file and runtime-layer env file from root to leaf before command hooks,
-custom commands, or built-in helpers execute.
+file and runtime-layer env file from parent to child before command hooks,
+custom commands, or built-in helpers execute. This is one interleaved pass,
+not a pass over all plain directories followed by a pass over all runtime
+directories.
 
-That ordered runtime pass loads, when present:
+For each directory from the selected root toward the current directory, the
+pass loads its plain C<.env> and C<.env.pl> files, then the C<.env> and
+C<.env.pl> files in runtime roots located under that directory. Sibling
+C<.d2> and C<.developer-dashboard> roots retain their discovered order, with
+deeper directories loaded later. Explicit runtime roots outside the plain
+directory chain are loaded before that chain so child C<.env.pl> files can
+read their inherited values. The participating files are:
 
 =over 4
 
@@ -3667,7 +3782,8 @@ each participating F<.developer-dashboard/.env.pl> and F<.d2/.env.pl>
 
 Deeper files win because later layers overwrite earlier keys. Plain F<.env>
 files must contain explicit C<KEY=VALUE> lines, and the load order at one
-directory is always F<.env> first and then F<.env.pl>. Plain F<.env> parsing
+directory is always F<.env> first and then F<.env.pl>, followed by its
+runtime-root files. Plain F<.env> parsing
 ignores blank lines, whole-line C<#> comments, whole-line C<//> comments, and
 C</* ... */> block comments that can span multiple lines. Plain F<.env>
 values also support:
@@ -3737,7 +3853,7 @@ chain and deeper runtime layers after it. Therefore a nested command such as
 C<d2 foo.bar.bob> receives home defaults, then the C<foo> and C<bar> skill
 overrides, then any nearer project runtime values.
 
-For nested skill commands such as C<dashboard foo.bar.zzz.show>, the skill env
+For nested skill commands such as C<d2 foo.bar.zzz.show>, the skill env
 chain expands from the root nested skill to the leaf skill before the command
 runs:
 
@@ -3825,7 +3941,7 @@ counterpart.
 
 =head2 Open File Commands
 
-C<dashboard of> is the shorthand name for C<dashboard open-file>.
+C<d2 of> is the shorthand name for C<d2 open-file>.
 
 These commands support:
 
@@ -3854,12 +3970,12 @@ recursive regex searches inside a resolved directory alias or path
 
 =item *
 
-recursive content searches with C<dashboard of grep -nr E<lt>patternE<gt>
+recursive content searches with C<d2 of grep -nr E<lt>patternE<gt>
 E<lt>directoryE<gt>>
 
 =back
 
-Without C<--print>, C<dashboard of> and C<dashboard open-file> now behave like
+Without C<--print>, C<d2 of> and C<d2 open-file> now behave like
 the older picker workflow again: one unique match opens directly in
 C<--editor>, C<VISUAL>, C<EDITOR>, or C<vim> as the final fallback, and
 multiple matches render a numbered prompt. At that prompt you can press Enter
@@ -3868,11 +3984,11 @@ numbers such as C<1,3>, or use a range such as C<2-5>.
 
 Scoped searches also
 rank exact helper/script names before broader regex hits, so
-C<dashboard of . jq> lists C<jq> and C<jq.js> ahead of C<jquery.js>.
+C<d2 of . jq> lists C<jq> and C<jq.js> ahead of C<jquery.js>.
 
 Every
 scoped search token is treated as a case-insensitive regex, so
-C<dashboard of . 'Ok\.js$'> matches C<ok.js> but not C<ok.json>. Content grep passes arguments directly to the system C<grep> executable (no
+C<d2 of . 'Ok\.js$'> matches C<ok.js> but not C<ok.json>. Content grep passes arguments directly to the system C<grep> executable (no
 shell expansion), adds filename and line-number output for reliable file
 selection, then opens the unique matching files using the same chooser. Add
 C<--print> before C<grep> to print the unique paths without opening an editor.
@@ -3899,31 +4015,31 @@ C<$d>:
 
 =item *
 
-C<dashboard jq [path] [file]> for JSON
+C<d2 jq [path] [file]> for JSON
 
 =item *
 
-C<dashboard yq [path] [file]> for YAML
+C<d2 yq [path] [file]> for YAML
 
 =item *
 
-C<dashboard tomq [path] [file]> for TOML
+C<d2 tomq [path] [file]> for TOML
 
 =item *
 
-C<dashboard propq [path] [file]> for Java properties
+C<d2 propq [path] [file]> for Java properties
 
 =item *
 
-C<dashboard iniq [path] [file]> for INI
+C<d2 iniq [path] [file]> for INI
 
 =item *
 
-C<dashboard csvq [path] [file]> for CSV
+C<d2 csvq [path] [file]> for CSV
 
 =item *
 
-C<dashboard xmlq [path] [file]> for XML
+C<d2 xmlq [path] [file]> for XML
 
 =back
 
@@ -3932,8 +4048,8 @@ If the selected value is a scalar, it prints the scalar plus a trailing
 newline.
 
 The file path and query text are order-independent, and C<$d> selects the
-whole parsed document. For example, C<cat file.json | dashboard jq '$d'> and
-C<dashboard jq file.json '$d'> return the same result.
+whole parsed document. For example, C<cat file.json | d2 jq '$d'> and
+C<d2 jq file.json '$d'> return the same result.
 
 If the query text uses
 C<$d> inside a Perl expression, the command evaluates that expression against
@@ -3947,7 +4063,7 @@ C<xmlq> follows the same decoded-data model as the other query commands. XML
 elements decode into nested hashes and arrays, repeated sibling tags become
 arrays, attributes live under C<_attributes>, and mixed text lives under
 C<_text>. That means C<printf '<root><value>demo</value></root>' | dashboard
-xmlq root.value> prints C<demo>, while C<dashboard xmlq feed.xml '$d'> prints
+xmlq root.value> prints C<demo>, while C<d2 xmlq feed.xml '$d'> prints
 the full decoded XML tree as canonical JSON.
 
 =head1 FAQ
@@ -3972,7 +4088,7 @@ What remains intentionally lightweight is breadth, not architecture:
 =head2 How is the browser UI served?
 
 The browser UI runs as the dashboard web service you start with
-C<dashboard serve>. Internally that service is a PSGI application served
+C<d2 serve>. Internally that service is a PSGI application served
 through the shipped web runtime, while CLI-only commands continue to work
 without keeping the browser service running.
 
@@ -4004,12 +4120,12 @@ The project uses C<JSON::XS> for JSON encoding and decoding, including shell hel
 The project uses C<Capture::Tiny> for command-output capture via C<capture>,
 with exit codes returned from the capture block rather than read separately.
 It uses C<LWP::UserAgent> for real outbound HTTP in active runtime paths such
-as the Java source lookup or mirror path behind C<dashboard of> and
-C<dashboard open-file>.
+as the Java source lookup or mirror path behind C<d2 of> and
+C<d2 open-file>.
 
 =head1 EMBEDDING IN PERL CODE
 
-Perl code that wants the same runtime the C<dashboard>/C<d2> command line
+Perl code that wants the same runtime the C<d2>/C<d2> command line
 resolves - a configured path alias, or the output of any other subcommand -
 does not need to build a path registry, file registry, and config loader by
 hand. C<use Developer::Dashboard> exports C<d2()>, a memoised runtime handle
@@ -4018,15 +4134,15 @@ scoped to the current working directory:
     use Developer::Dashboard;
 
     my $foo = d2->paths->{foo};                    # in-process, no subprocess
-    my $out = d2->doctor->();                       # shells to `dashboard doctor`
-    my $lst = d2->collector->list->();               # `dashboard collector.list`
+    my $out = d2->doctor->();                       # shells to `d2 doctor`
+    my $lst = d2->collector->list->();               # `d2 collector.list`
     my $res = d2->run( 'tira.ticket.show', '--ref', 'DD-726' );
                                                       # run() takes words separately
 
-C<< d2->paths >> resolves in-process, the same table C<dashboard paths>
+C<< d2->paths >> resolves in-process, the same table C<d2 paths>
 prints. Any other bareword method name starts a B<lazy chain> that mirrors
 the CLI's own dotted dispatch at arbitrary depth - C<< d2->foo->bar->() >>
-runs C<dashboard foo.bar> - and B<nothing executes until the chain is
+runs C<d2 foo.bar> - and B<nothing executes until the chain is
 terminated with a call>, the trailing C<< ->() >>.
 
 An un-terminated chain is
@@ -4064,6 +4180,71 @@ See L</Layered
 Env Files> for the C<.env>-file-native C<# include E<lt>skill.pathE<gt>>
 directive this method mirrors.
 
+=head2 Native concurrent work and shared Perl data
+
+C<Developer::Dashboard::GoRoutine> provides a distribution-owned XS API for
+native worker callbacks, shared Perl data, and explicit child-process
+supervision. It is part of the Developer Dashboard Perl namespace; callers do
+not need to install or load a separate GoRoutine distribution.
+
+For a single-import interface, C<use Developer::Dashboard> exports C<d2> and
+the GoRoutine functions C<go>, C<wait_all>, C<share>, C<channel>, C<spawn>,
+C<process_running>, C<process_exited>, C<wait_process>, and
+C<terminate_process>. The GoRoutine source syntax for C<go sub { ... }> and
+C<share my $value = ...> is installed by that import as well. The original
+C<use Developer::Dashboard::GoRoutine> import remains available.
+
+Use C<go> to run a Perl callback on a native worker and C<wait_all> when the
+parent needs a completion barrier. Workers execute in cloned Perl interpreters.
+On Windows, cloning also requests the host-clone flag when the active Perl
+headers provide it, while retaining the pointer table needed to map callbacks.
+The process-wide worker count is drained during normal interpreter shutdown,
+and callback exceptions are reported as Perl warnings rather than silently
+discarded.
+
+The GoRoutine 0.04 contract adds graph-based sharing through C<share>; it is
+distinct from the GoRoutine 0.05 routine-control API. GoRoutine 0.05 makes
+C<go> return a C<Developer::Dashboard::GoRoutine::Routine> handle with
+C<is_running>, C<age>, C<status>, C<kill>, C<timeout>, and C<is_killed>
+methods. Timeouts can be replaced or disabled with zero, and Perl C<exit>
+inside a worker ends that worker rather than the parent process. Cancellation
+is cooperative at Perl opcode boundaries. POSIX workers can also be woken from
+blocking waits, but an opaque native or system call is not forcibly terminated;
+use C<spawn> when an independently terminable process is required.
+
+C<share> makes an object graph visible across the parent and worker
+interpreters. Supported values are scalars, hashes, arrays, nested combinations,
+scalar references, and ordinary blessed objects whose data is held by those
+Perl reference types. The API preserves aliases, cycles, blessing, normal
+dereferencing, and methods that operate on shared Perl data. Perl Unicode string
+semantics are preserved across the XS boundary. Compiled regular expressions
+are shared as pattern text and reconstructed as native C<REGEXP> references,
+including inline modifiers. Named format references are shared as fully
+qualified symbol names and resolved as native C<FORMAT> references in each
+interpreter. Scalar updates and hash/array structural operations are protected
+by a native lock. References to
+opaque interpreter or library resources, including code references, file or
+socket handles, and objects backed by native pointers, are not supported as
+shared data.
+
+For example:
+
+    use Developer::Dashboard;
+
+    share my $state = { completed => 0, results => [] };
+    go sub {
+        $state->{completed}++;
+        push $state->{results}->@*, { ok => 1 };
+    } for 1 .. 4;
+    wait_all();
+
+C<spawn>, C<process_running>, C<process_exited>, C<wait_process>, and
+C<terminate_process> are a separate API for OS child processes. C<spawn> takes
+an executable argument vector and optional working-directory and standard-
+stream paths; it does not invoke a shell. Use it where a distinct process ID,
+process isolation, or child-process lifecycle is required. Worker threads are
+not substitutes for those process semantics.
+
 =head1 MAINTAINER GUIDE
 
 Build, change, and verify the project using these contributor notes.
@@ -4079,8 +4260,8 @@ Build a distribution archive:
 
 Run the checkout's command line interface:
 
-  perl -Ilib bin/dashboard help
-  perl -Ilib bin/dashboard version
+  perl -Ilib bin/d2 help
+  perl -Ilib bin/d2 version
 
 When documentation changes, regenerate this README from the main POD:
 
@@ -4098,6 +4279,76 @@ The maintained end-to-end scenario plan defines expected routes, inputs, and
 outputs. Hosted workflows provide additional platform checks and packaging
 verification.
 
+Tests that observe managed collector child output must wait for the asynchronous
+log event with a bounded wall-clock timeout, then keep an explicit assertion
+that the expected message arrived. In C<t/07-core-units.t>, the wait belongs in
+the C<broken-loop> test before its child is stopped and the log is asserted; do
+not put it in a neighboring collector test. This avoids assuming one fixed
+sleep is enough on every hosted runner.
+
+For local GitHub Actions runs executed through C<act>, use:
+
+  d2 github-workflow --container-options "--init"
+
+The init process reaps orphaned child processes so process-group cleanup tests
+observe the expected exit behavior. This option does not skip tests or change
+their assertions.
+
+Pull requests are checked by the shared Jenkins job C<D2/testing-v1>, which
+runs the full suite on macOS arm64, Linux amd64, Linux arm64, and Windows
+amd64. Linux and macOS install C<Devel::Cover> into the local
+dependency tree and export that tree through C<PERL5LIB> before running the
+complete suite. Coverage-gate regression tests launch child Perl processes, so
+those processes must resolve the same coverage serializer and project
+dependencies as the parent test process.
+
+When a MakeMaker build has created C<blib/arch>, dashboard-managed Perl
+environments put that directory ahead of installed Perl libraries. This keeps
+source modules paired with the checkout's freshly built XS extension instead
+of loading an older installed binary that may not provide the current XSUB
+API. The coverage gate also includes C<blib/arch> in its child-process
+C<PERL5LIB>, while the test suite continues loading its Perl modules from
+C<lib/>.
+
+C<Devel::Cover> is declared as a test prerequisite in the distribution
+metadata. This lets a clean release-tarball test environment run its coverage
+gate tests without an undeclared manual install. It is not an end-user runtime
+dependency.
+
+On macOS ARM64, the same workflow installs Homebrew C<openssl@3>, verifies that
+its headers and C<libssl.dylib> are present for ARM64, and exports the formula
+prefix as C<OPENSSL_PREFIX> before building C<Net::SSLeay>. This makes the
+OpenSSL selection explicit for the native TLS dependency used by
+C<IO::Socket::SSL> and C<LWP::Protocol::https>. The runner log now includes
+verbose diagnostics from this focused C<Net::SSLeay> build if it fails.
+
+Each platform stage builds the Dashboard XS extension before running the
+coverage suite. Unix build and coverage steps use Bash; Windows amd64 uses
+PowerShell, and Windows arm64 uses the native CLANGARM64 Perl and toolchain. The
+Windows jobs check their runner architectures and fail if the native target is
+not available; they do not report skipped native tests as a pass.
+
+Checkout dependencies are installed into C<local/lib/perl5>. The Linux
+workflow adds that directory to C<PERL5LIB> before invoking C<perl Makefile.PL>,
+because the configure-time C<File::ShareDir::Install> dependency is needed
+before MakeMaker can create C<blib>. Linux also installs
+C<libayatana-appindicator3-dev> and C<libgtk-3-dev> before building the native
+System Menu helper; these provide the pkg-config libraries and headers required
+by C<native/system_menu_helper_linux.c>. On Linux, C<Makefile.PL> checks for
+both pkg-config modules. If either is unavailable, it prints a notice and omits
+the optional helper target so CPAN testers without desktop headers can still
+build and test the distribution; invoking the System Menu without its helper
+still fails clearly. Set C<DD_REQUIRE_SYSTEM_MENU_HELPER=1> to require the
+native helper, as the Linux coverage workflow does. The Windows builds use
+Perl's configured path separator when assembling the same local library path.
+Workflow regression tests check these setup requirements.
+
+The Linux coverage gate passes C<blib/arch> and the local dependency library
+through C<PERL5LIB> after compiling the extension. It instruments C<lib/> rather
+than copied C<blib/lib> sources. This ensures child Perl processes load the
+native extension built by the current checkout and keeps coverage from counting
+duplicate source copies.
+
 =head3 Library coverage
 
 Install Devel::Cover into the local development library and run the repository
@@ -4109,8 +4360,18 @@ gate:
   perl script/coverage-gate
 
 The gate requires 100.0% statement, subroutine, branch, and condition coverage
-for C<lib/>. A passing run exits with status C<0>. Run one coverage job at a
-time on a host.
+for C<lib/>. Its report disables optional C<gcov> output from compiled XS
+artefacts: this gate measures Perl modules, while native XS behavior is checked
+by functional tests, and extra C-file tables or diagnostics would invalidate
+the single-table report parser. The instrumented run also excludes the
+repository C<t/> tree: test files are not coverage targets, and their dynamic
+fixtures can cause Devel::Cover source-map warnings. This does not reduce
+coverage because the report is explicitly scoped to C<lib/>. The three
+GoRoutine ithread tests (C<t/231>, C<t/237> and C<t/238>) run in a separate,
+uninstrumented C<prove> process because Devel::Cover cannot safely instrument
+ithreads. They remain mandatory tests, and a failure in either suite prevents a
+coverage verdict. A passing run exits with status C<0>. Run one coverage job at
+a time on a host.
 
 =head3 Integration and release checks
 
@@ -4130,6 +4391,18 @@ Push a C<vX.XX> tag so the tag-triggered GitHub release workflow runs. It
 publishes tarball, checksum, and detached signature assets. The release also
 publishes a C<.intoto.jsonl> provenance asset; build provenance, not merely a
 signature, is required for the Signed-Releases Scorecard check.
+
+Changing C<dist.ini> alone does not create a GitHub Release. The pushed tag must
+match the distribution version and point at the commit containing that version.
+The release workflow runs tests and all-metric coverage before building or
+publishing; if either gate fails, the previous successful GitHub Release remains
+the latest. Check the tag's workflow run and its first failed step before
+retrying.
+
+Some optional native integrations are unavailable on release runners. Their
+success and failure paths therefore need deterministic fake-backend tests so
+the coverage gate verifies the actual adapter logic without relying on a host
+library being installed.
 
 Do not treat Scorecard as a pre-commit local gate. Finish local tests,
 documentation, security, coverage, and packaging checks, then commit and push

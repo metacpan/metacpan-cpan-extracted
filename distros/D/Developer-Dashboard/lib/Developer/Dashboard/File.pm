@@ -3,7 +3,7 @@ package Developer::Dashboard::File;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use File::Spec;
 use Scalar::Util qw(blessed);
@@ -35,7 +35,7 @@ sub configure {
 }
 
 # all()
-# Returns the full runtime file inventory exposed by C<dashboard files>.
+# Returns the full runtime file inventory exposed by C<d2 files>.
 # Input: none.
 # Output: hash reference describing the active runtime file set plus named aliases.
 sub all {
@@ -257,7 +257,7 @@ Configure and resolve compatibility files.
 
 This module provides named file resolution for runtime files and configured
 aliases. It gives callers the same conceptual file names exposed by
-C<dashboard files> and C<dashboard file list> without forcing them to know the
+C<d2 files> and C<d2 file list> without forcing them to know the
 exact on-disk layout under the current runtime.
 
 =head1 WHY IT EXISTS
@@ -279,7 +279,7 @@ Load C<Developer::Dashboard::File> and ask it for the named file you need. Use
 it as the semantic file layer above the lower-level file registry instead of
 hard-coding F<~/.developer-dashboard> descendants.
 
-When you need the complete resolved file payload that C<dashboard files>
+When you need the complete resolved file payload that C<d2 files>
 prints, call C<Developer::Dashboard::File-E<gt>all>. It returns the same hash
 shape as the CLI command.
 

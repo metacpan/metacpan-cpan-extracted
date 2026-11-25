@@ -10,10 +10,12 @@ use FindBin qw($RealBin);
 
 my $repo_root = File::Spec->catdir( $RealBin, File::Spec->updir );
 my $source    = File::Spec->catfile( $repo_root, 'lib', 'Developer', 'Dashboard.pm' );
+my $header    = File::Spec->catfile( $repo_root, 'docs', 'readme-header.md' );
 my $target    = File::Spec->catfile( $repo_root, 'README.md' );
 my $to_stdout = ( scalar grep { defined $_ && $_ eq '--stdout' } @ARGV ) ? 1 : 0;
 
 die "Missing POD source: $source\n" if !-f $source;
+die "Missing README header: $header\n" if !-f $header;
 die "pod2markdown is required on PATH to sync the checkout manual\n" if !_command_on_path('pod2markdown');
 
 my ( $stdout, $stderr, $exit ) = capture {
@@ -23,10 +25,25 @@ my ( $stdout, $stderr, $exit ) = capture {
 
 die "pod2markdown failed while generating the checkout manual: $stderr\n" if $exit != 0;
 
+# The header carries the title, banner, badges and reader routing, so the
+# generated NAME and VERSION sections would only repeat it. Keep the manual
+# from INTRODUCTION onward.
+my $manual = $stdout;
+$manual =~ s/\A.*?(?=^# INTRODUCTION\n)//ms;
+die "Generated manual has no INTRODUCTION section to keep after the header\n"
+  if $manual eq $stdout;
+
+my $header_text = do {
+    open my $fh, '<', $header or die "Unable to read $header: $!\n";
+    local $/;
+    <$fh>;
+};
+$header_text =~ s/\s+\z/\n/;
+
 my $generated = join "\n",
   '<!-- Generated from lib/Developer/Dashboard.pm POD by script/sync-readme-from-pod. Do not edit manually. -->',
   '',
-  $stdout;
+  $header_text . "\n" . $manual;
 
 if ($to_stdout) {
     print $generated;
@@ -43,10 +60,23 @@ sub _command_on_path {
     my ($name) = @_;
     return 0 if !defined $name || $name eq '';
 
-    for my $dir ( split /:/, $ENV{PATH} || q{} ) {
+    # File::Spec->path splits PATH on the platform's own separator. Splitting
+    # on a colon can never find a command on Windows, where PATH is joined
+    # with semicolons, so the README sync checks skipped there even with
+    # pod2markdown installed. On Windows the name is also tried with each
+    # PATHEXT extension, because a command there is a file such as
+    # pod2markdown.bat and Perl's -x goes by that extension.
+    my $is_windows = $^O eq 'MSWin32';
+    my @extensions = $is_windows
+      ? grep { length } split /;/, ( $ENV{PATHEXT} || '.COM;.EXE;.BAT;.CMD' )
+      : (q{});
+    for my $dir ( File::Spec->path ) {
         next if !defined $dir || $dir eq '';
-        my $candidate = File::Spec->catfile( $dir, $name );
-        return 1 if -x $candidate;
+        for my $extension (@extensions) {
+            my $candidate = File::Spec->catfile( $dir, $name . $extension );
+            next if !-f $candidate;
+            return 1 if $is_windows || -x $candidate;
+        }
     }
 
     return 0;
@@ -71,6 +101,12 @@ This checkout-only helper regenerates the project manual used by Markdown
 consumers from the canonical POD in C<Developer::Dashboard>. It exists to keep
 the top-level manual and the main module documentation in exact sync and to
 avoid hand-edited drift between the two copies.
+
+It prepends the reader-facing header from F<docs/readme-header.md> (title,
+banner, badges, routing table, quick start and repository map) to the
+generated manual, and drops the generated NAME and VERSION sections, which
+the header already covers. The manual itself is kept from INTRODUCTION
+onward, unchanged.
 
 =head1 PURPOSE
 

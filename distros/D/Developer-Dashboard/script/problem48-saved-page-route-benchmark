@@ -198,6 +198,7 @@ my $home = File::Spec->catdir( $fixture_root, 'home' );
 make_path($home);
 local $ENV{HOME} = $home;
 local $ENV{USER} = 'problem48-benchmark';
+local $ENV{DD_STATE_ROOT_USER} = sprintf 'problem48-benchmark-%d', $$;
 local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
 local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
 local $ENV{DEVELOPER_DASHBOARD_CHECKERS};

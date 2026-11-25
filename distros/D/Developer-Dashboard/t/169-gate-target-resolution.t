@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Capture::Tiny qw(capture);
 use File::Spec;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
@@ -16,6 +17,19 @@ my $GATE = File::Spec->catfile( $FindBin::Bin, File::Spec->updir, 'script', 'cov
 
 plan skip_all => "coverage-gate not found at $GATE" if !-f $GATE;
 
+# Devel::Cover is an optional development tool, not a declared runtime
+# dependency. Without it the gate takes a different and correct path - it
+# reports that Devel::Cover::DB::IO could not be loaded and exits 2 before
+# it ever announces a database - so the two blocks below, which need the
+# gate to reach its announcement, cannot be measured at all, and their
+# assertions would report an environmental gap as a defect. The divergence
+# block needs no Devel::Cover (the refusal fires first) and still runs
+# everywhere, including Windows. Same guard as t/148, t/151, t/149 and
+# t/150. This file is NOT in t/170's @SPECS list: t/170's contract is for
+# file-level skip_all specs, and this file runs 3 tests and skips 4, so
+# adding it would fail t/170's first assertion.
+my $HAS_COVER = eval { require Devel::Cover::DB::IO; 1 } ? 1 : 0;
+
 # Purpose: build a throwaway directory that IS a real git checkout.
 # Input:   nothing.
 # Output:  the absolute path of the new checkout.
@@ -27,7 +41,13 @@ plan skip_all => "coverage-gate not found at $GATE" if !-f $GATE;
 sub temp_checkout {
     my $dir = tempdir( CLEANUP => 1 );
     make_path( File::Spec->catdir( $dir, 'script' ) );
-    system("git init -q '$dir' >/dev/null 2>&1");
+    # List form, no shell: the old
+    #   system("git init -q '$dir' >/dev/null 2>&1")
+    # never ran git on Windows - cmd.exe has no /dev/null, so the redirect
+    # itself failed with "The system cannot find the path specified" and no
+    # .git was created (round 73, twice - once per checkout). -q keeps a
+    # successful init silent, so no output suppression is needed.
+    system( 'git', 'init', '-q', $dir ) == 0 or die "git init failed for $dir: $?";
     return abs_path($dir);
 }
 
@@ -68,16 +88,19 @@ sub _copy {
 # the delete command and returns before running it.
 sub run_from {
     my ( $gate, $dir, @args ) = @_;
-    my $out = File::Spec->catfile( tempdir( CLEANUP => 1 ), 'gate.out' );
     my $prev = getcwd();
     chdir $dir or die "cannot enter $dir: $!";
-    my $status = system( "perl '$gate' --dry-run " . join( ' ', @args ) . " > '$out' 2>&1" );
+    # Capture::Tiny + list form, no shell: the old
+    #   system("perl '$gate' --dry-run ... > '$out' 2>&1")
+    # never wrote $out on Windows - cmd.exe does not interpret Unix single
+    # quotes, so the redirect target was invalid ("The filename, directory
+    # name, or volume label syntax is incorrect") and the read below died
+    # at line 76 (round 73). The refusal is printed on stderr, so both
+    # streams are captured and concatenated. $^X is the selected Perl on
+    # every platform, as the gate itself does for its child probe.
+    my ( $stdout, $stderr, $status ) = capture { system( $^X, $gate, '--dry-run', @args ) };
     chdir $prev or die "cannot return to $prev: $!";
-    open my $fh, '<', $out or die "cannot read gate output: $!";
-    local $/ = undef;
-    my $text = <$fh>;
-    close $fh;
-    return { status => $status, output => ( $text // '' ) };
+    return { status => $status, output => ( $stdout // '' ) . ( $stderr // '' ) };
 }
 
 # AC-2: BOTH sides are real checkouts and they DIFFER -> refuse, naming both.
@@ -97,7 +120,10 @@ sub run_from {
 }
 
 # AC-3: only ONE side is a checkout -> proceed, exactly as t/151 depends on.
-{
+SKIP: {
+    skip 'Devel::Cover is not installed, so the coverage gate cannot be exercised', 2
+        if !$HAS_COVER;
+
     my $gate_root = tempdir( CLEANUP => 1 );      # NOT a git checkout
     make_path( File::Spec->catdir( $gate_root, 'script' ) );
     my $gate = install_gate($gate_root);
@@ -111,14 +137,23 @@ sub run_from {
 }
 
 # AC-5: the resolved target is reported as an ABSOLUTE path.
-{
+SKIP: {
+    skip 'Devel::Cover is not installed, so the coverage gate cannot be exercised', 2
+        if !$HAS_COVER;
+
     my $gate_root = temp_checkout();
     my $gate      = install_gate($gate_root);
 
     my $r = run_from( $gate, $gate_root );        # same tree: no divergence
 
     is( $r->{status}, 0, 'AC-5: running inside its own checkout is not a divergence' );
-    like( $r->{output}, qr{\Q$gate_root\E/cover_db|database\s*:\s*/},
+    # The gate prints the resolved database with native separators while
+    # abs_path spells the root with forward slashes on Windows, so compare
+    # separator-normalised copies (t/146). Only the first alternative can
+    # match there - the second needs a leading slash the drive letter
+    # replaces - and that is enough: root + /cover_db IS the absolute path.
+    ( my $db_out = $r->{output} ) =~ s{\\}{/}g;
+    like( $db_out, qr{\Q$gate_root\E/cover_db|database\s*:\s*/},
         'AC-5: the database is reported as a RESOLVED ABSOLUTE path, not the relative name "cover_db" which is identical from every tree' );
 }
 

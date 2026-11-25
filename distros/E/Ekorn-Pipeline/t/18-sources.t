@@ -19,7 +19,6 @@ sub read_all ($source, @stages) {
     return $class->new(@stages)->iterator($source)->all;
 }
 
-
 # Write $content to a new file in the test's directory, returning its path.
 sub file_of ($name, $content) {
     my $path = "$dir/$name";

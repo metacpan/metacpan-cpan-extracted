@@ -153,13 +153,23 @@ sub _code_only_repo_sources {
 
     my @chunks;
     for my $path (@paths) {
-        next if $path eq File::Spec->catfile( $ROOT, 'lib', 'Developer', 'Dashboard.pm' );
+        next if _same_path( $path, File::Spec->catfile( $ROOT, 'lib', 'Developer', 'Dashboard.pm' ) );
         my $text = _slurp_absolute($path);
         $text =~ s/\n__END__\n.*\z//s;
         push @chunks, $text;
     }
 
     return join "\n", @chunks;
+}
+
+# Purpose: say whether two paths name the same file, whatever separator each
+# was spelt with. File::Find joins with a forward slash and File::Spec with
+# the platform separator, so on Windows the same file arrives in two
+# spellings and a plain string comparison never matches.
+# Input: two path strings. Output: true when both canonicalise to one path.
+sub _same_path {
+    my ( $left, $right ) = @_;
+    return File::Spec->canonpath($left) eq File::Spec->canonpath($right);
 }
 
 sub _slurp_absolute {

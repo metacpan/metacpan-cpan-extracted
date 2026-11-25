@@ -1,12 +1,10 @@
 package Skilletor::Error::Convert;
-# ABSTRACT: An item cannot be converted for a harness (the reference's ConvertError)
+# ABSTRACT: Retired stub, see Skilletor
 
-use Moo;
-use namespace::clean;
+use strict;
+use warnings;
 
-extends 'Skilletor::Error';
-
-our $VERSION = '0.008000';
+our $VERSION = '0.009000';
 
 1;
 
@@ -18,20 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Error::Convert - An item cannot be converted for a harness (the reference's ConvertError)
+Skilletor::Error::Convert - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
+version 0.009000
 
 =head1 DESCRIPTION
 
-Thrown by L<Skilletor::Convert> where the reference throws its C<ConvertError>:
-an agent Codex would reject (no description, an empty name, a
-C<codex.briefing> key, a C<briefing.skills> name the comment line cannot
-carry), a rule that holds a skilletor marker line, unreadable frontmatter (the
-L<Skilletor::Error::Frontmatter> message), a file missing from the build. See
-L<Skilletor::Error> for the interface.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
+
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Skilletor>
+
+=item * L<https://github.com/Getty/skilletor#install>
+
+=back
 
 =head1 SUPPORT
 

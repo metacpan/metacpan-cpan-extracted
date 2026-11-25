@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::OpenFileJavaSource;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Digest::MD5 qw(md5_hex);
@@ -33,7 +33,7 @@ our @EXPORT_OK = qw(
 # _java_archive_source_matches(%args)
 # Resolves Java source files from local or downloaded source archives when no live .java file exists.
 # The network fallback (Maven Central) only runs when the caller explicitly
-# opts in via online => 1 (DD-914) - dashboard of otherwise looks like a
+# opts in via online => 1 (DD-914) - d2 of otherwise looks like a
 # local file-search command, and reaching the internet as an automatic side
 # effect of a miss is a surprising thing for it to do silently. When offline
 # and no local archive satisfies the lookup, a notice naming --online is
@@ -327,7 +327,7 @@ __END__
 
 =head1 NAME
 
-Developer::Dashboard::CLI::OpenFileJavaSource - Java source-lookup support for dashboard of
+Developer::Dashboard::CLI::OpenFileJavaSource - Java source-lookup support for d2 of
 
 =head1 SYNOPSIS
 

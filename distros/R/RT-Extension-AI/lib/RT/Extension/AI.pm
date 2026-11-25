@@ -3,7 +3,7 @@ use warnings;
 
 package RT::Extension::AI;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require RT::Extension::AI::Provider;
 require RT::Extension::AI::Provider::OpenAI;
@@ -186,6 +186,21 @@ you set it explicitly, because the frontier models (Opus 4.7 and later) reject
 it. To pin a specific API version, add an C<anthropic_version> key to the
 provider configuration; it defaults to C<2023-06-01>.
 
+Newer models, such as Claude Haiku 5.5, can think before they answer, and the
+thinking counts against C<max_tokens>. With a small limit like the 20 tokens
+autocomplete uses, the model can run out of tokens before it writes any text,
+and no suggestion appears. Turn thinking off for autocomplete with a
+C<thinking> key, which is passed to the API as is:
+
+    autocomplete_model => {
+        name       => 'claude-haiku-5-5',
+        max_tokens => 20,
+        thinking   => { type => 'disabled' },
+    },
+
+Check the Anthropic documentation for the C<thinking> values each model
+accepts; some newer models reject C<disabled>.
+
 =head2 Global and Queue-specific Configuration
 
 The block of configuration defined for the "Default" key, as shown above, is used
@@ -225,6 +240,10 @@ Gemini, URL: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-
 Claude (Anthropic), URL: https://api.anthropic.com/v1/messages
 
 =back
+
+To add another provider, subclass L<RT::Extension::AI::Provider> and implement
+C<_process_request>, and optionally C<_usage> to report token counts. See that
+module's documentation for details.
 
 =head2 Models
 
@@ -274,6 +293,39 @@ Before enabling these features in full production, test them with your provider
 and watch your token usage for both input and output. Confirm that your account's
 limits and budget can absorb the volume you expect. Refer to your AI provider's
 documentation for the details of their token limits, pricing, and policies.
+The log entry for each request, described in L</Logging>, includes the token
+counts reported by the provider.
+
+=head2 Logging
+
+Each request to the AI provider is logged with the provider, the model, the RT
+feature that made the request, the time it took, and the input and output
+token counts when the provider reports them. For example:
+
+    AI request succeeded: provider=Claude model=claude-sonnet-4-5
+      feature=summarize_ticket elapsed_ms=1843 input_tokens=2210 output_tokens=187
+
+The entry is a single line in the log; it is wrapped here for readability.
+
+Successful requests are logged at the C<info> level and failed requests at the
+C<warning> level, with the error returned by the provider. Use RT's normal
+logging settings, such as C<$LogToFile> and C<$LogToSyslog>, to choose which
+levels are recorded.
+
+The feature is one of C<summarize_ticket>, C<assess_sentiment>,
+C<generate_ticketsql>, C<queue_creation_assistant>, or the name of the editor
+feature, such as C<adjust_tone> or C<suggest_response>. The Queue Creation
+Assistant retries failed requests, and each attempt is logged separately.
+
+Autocomplete sends a request each time the user pauses while typing, so when
+C<autocomplete_text> is enabled, logging at the C<info> level records many
+C<feature=autocomplete_text> entries. Logging at C<warning> skips them, along
+with the entries for all other successful requests. To reduce them while still
+logging at C<info>, limit autocomplete to selected queues as described in
+L</Global and Queue-specific Configuration>.
+
+Prompts, ticket content, responses from the provider, and request headers,
+which contain the API key, are not included in this entry.
 
 =head2 Prompts
 
@@ -353,12 +405,14 @@ any conditions to create scrips that make sense for your system.
 
 Content from the ticket is sent to the AI provider and analyzed to assess
 the sentiment of the end user. Responses are Satisfied, Dissatisfied, or Neutral
-and the value is saved in the "Ticket Summary" custom field on the ticket.
+and the value is saved in the "Ticket Sentiment" custom field on the ticket.
 
 =item Generate Ticket Summary
 
 Content from the ticket is sent to the AI provider and a concise summary is
-requested. The result is saved in the "Ticket Sentiment" custom field on the ticket.
+requested. The result is saved in the "Ticket Summary" custom field on the ticket.
+The log records the length of the summary at the C<info> level; the summary
+text itself is logged only at the C<debug> level.
 
 =back
 

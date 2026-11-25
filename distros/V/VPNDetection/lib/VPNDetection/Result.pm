@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.19.0';
+our $VERSION = '3.19.1';
 
 our @FLAGS = qw(
     is_vpn is_hosting is_relay is_tor is_cdn is_bot is_resproxy is_dcproxy is_mobproxy
@@ -159,7 +159,7 @@ a served answer carries the API's own C<is_bogon>, which this reads.
 
 The tier-gated flags: C<1>, C<0>, or C<undef> when your plan omits the field.
 On Unlimited, the free plan, with a key or without one, C<is_tor> and C<is_relay> come
-back beside C<is_vpn>; every paid plan answers every flag. C<is_pubproxy> is whether a
+back beside C<is_vpn>; the Data plan answers every flag. C<is_pubproxy> is whether a
 public proxy, one anyone can connect through, listens on the address or sends
 its traffic out from it.
 

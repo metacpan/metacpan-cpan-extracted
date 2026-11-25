@@ -1,10 +1,11 @@
-package Dist::Conformance::Check::SystemPackages 0.007;
+package Dist::Conformance::Check::SystemPackages 0.008;
 
 # ABSTRACT: The system packages that a repository declares in metamerge.yml, validated, and resolved for a host
 
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
+no autovivification;
 use Mojo::Base 'Dist::Conformance::Check', -signatures;
 
 use Lingua::EN::Inflect();
@@ -57,7 +58,14 @@ my sub entry_of ($pattern) {
     };
 }
 
-our $URL = { type => 'string', pattern => '\Ahttps?://[^/\s]+\S*\z' };
+my $URL_RX         = qr{\Ahttps?://[^/\s]+\S*\z};
+my $SUITE_RX       = qr/\A(?:[^\s{}]|\{codename\})+\z/;
+my $NONBLANK_RX    = qr/\A\S+\z/;
+my $ARCH_RX        = qr/\A[[:lower:][:digit:]]+\z/;
+my $FINGERPRINT_RX = qr/\A[[:xdigit:]]{40}\z/;
+my $TEST_RX        = qr/\A[^\n]*\S[^\n]*\z/;
+
+our $URL = { type => 'string', pattern => "$URL_RX" };
 
 our %SOURCE = (
     deb => {
@@ -68,16 +76,16 @@ our %SOURCE = (
             name          => { type => 'string', pattern => $SOURCE_NAME },
             uri           => $URL,
             key           => $URL,
-            suites        => list_of( { type => 'string', pattern => '\A(?:[^\s{}]|\{codename\})+\z' } ),
-            components    => { type => 'array',  items   => { type => 'string', pattern => '\A\S+\z' } },
-            architectures => { type => 'array',  items   => { type => 'string', pattern => '\A[a-z0-9]+\z' } },
-            fingerprint   => { type => 'string', pattern => '\A[0-9A-Fa-f]{40}\z' },
+            suites        => list_of( { type => 'string', pattern => "$SUITE_RX" } ),
+            components    => { type => 'array',  items   => { type => 'string', pattern => "$NONBLANK_RX" } },
+            architectures => { type => 'array',  items   => { type => 'string', pattern => "$ARCH_RX" } },
+            fingerprint   => { type => 'string', pattern => "$FINGERPRINT_RX" },
             distros       => list_of( { type => 'string', pattern => $HOST } ),
             pin           => {
                 type                 => 'object',
                 required             => ['priority'],
                 additionalProperties => 0,
-                properties           => { priority => { type => 'integer' }, packages => { type => 'string', pattern => '\A\S+\z' } },
+                properties           => { priority => { type => 'integer' }, packages => { type => 'string', pattern => "$NONBLANK_RX" } },
             },
         },
     },
@@ -95,7 +103,7 @@ our $SCHEMA = {
                     more_than( test => 'names no packager' ),
                     additionalProperties => 0,
                     properties           => {
-                        test => { type => 'string', pattern => '\A[^\n]*\S[^\n]*\z' },
+                        test => { type => 'string', pattern => "$TEST_RX" },
                         map { $_ => entry_of( $PACKAGE_NAME{$_} ) } keys %PACKAGE_NAME,
                     },
                     patternProperties => { '(?!(?:' . join( q{|}, sort keys %PACKAGE_NAME ) . ')\z)' . $PACKAGER => entry_of($ANY_PACKAGE_NAME) },
@@ -145,6 +153,28 @@ my sub errors_of ($document) {
         }
     }
     return @errors;
+}
+
+
+sub config_schema ($) { return { properties => { template => $Dist::Conformance::Schema::PATH } } }
+
+
+sub required ($self) {
+    my $path = $self->config->{template} // return;
+    my ( $text, @unfilled ) = $self->template($path);
+    die "$path needs the variables " . join( ', ', @unfilled ) . ", which nothing sets\n" if @unfilled;
+    my $document = Dist::Conformance::Schema::parse_yaml( $text, $path );
+    my @errors   = errors_of($document);
+    Dist::Conformance::Schema::refuse( $path, @errors ) if @errors;
+    return $document;
+}
+
+# The sorted names of the dependencies of the template $required that the valid $document does not declare.
+my sub missing_from ( $document, $required ) {
+    return if !$required;
+    my $declared = $document->{$PACKAGES} // {};
+    my @missing  = grep { !exists $declared->{$_} } sort keys %{ $required->{$PACKAGES} // {} };
+    return @missing;
 }
 
 
@@ -218,18 +248,67 @@ sub os_release ($text) {
 }
 
 
-sub check ( $, $snapshot ) {
-    return ( 'pass', "there is no $FILE, so it needs no system packages" ) if !$snapshot->contains($FILE);
+sub check ( $self, $snapshot ) {
+    if ( !$snapshot->contains($FILE) ) {
+        my @missing = missing_from( {}, scalar $self->required );
+        return ( 'fail', "there is no $FILE, to declare " . join ', ', @missing ) if @missing;
+        return ( 'pass', "there is no $FILE, so it needs no system packages" );
+    }
     my $document = eval { document_of($snapshot) } // return ( 'fail', Dist::Conformance::Schema::first_line($@) );
     my @errors   = errors_of($document);
     return ( 'fail', "$FILE is not valid: " . join '; ', @errors ) if @errors;
+    my @missing = missing_from( $document, scalar $self->required );
+    return ( 'fail', "$FILE does not declare " . join ', ', @missing ) if @missing;
     my $declaration = declaration_of($document);
     my $sources     = $declaration->{sources};
-    my @said        = ( map { Lingua::EN::Inflect::NO( "$_ source", scalar @{ $sources->{$_} } ) } sort keys %$sources );
+    my @said        = ( map { local ($_) = $_; Lingua::EN::Inflect::NO( "$_ source", scalar @{ $sources->{$_} } ) } sort keys %$sources );
     unshift @said, Lingua::EN::Inflect::NO( 'dependency', scalar keys %{ $declaration->{packages} } ) if %{ $declaration->{packages} };
     return ( 'pass', "$FILE declares no system packages" ) if !@said;
     my $last = pop @said;
     return ( 'pass', "$FILE declares " . ( @said ? join( ', ', @said ) . " and $last" : $last ) );
+}
+
+
+sub update ( $self, $update ) {
+    my $template = $self->config->{template} // return $self->SUPER::update($update);
+    my $snapshot = $update->snapshot;
+    return $self->write_template( $update, $FILE, $template ) if !$snapshot->contains($FILE);
+    my $document = eval { document_of($snapshot) };
+    if ( !$document ) {
+        $update->by_hand( Dist::Conformance::Schema::first_line($@) . ': fix it by hand' );
+        return;
+    }
+    if ( my @errors = errors_of($document) ) {
+        $update->by_hand( "$FILE is not valid: " . join( '; ', @errors ) . ': fix it by hand' );
+        return;
+    }
+    my $required = $self->required;
+    my @missing  = missing_from( $document, $required ) or return;
+    my @additions;
+    for my $name (@missing) {
+        my $dependency = $required->{$PACKAGES}{$name};
+        $document->{$PACKAGES}{$name} = $dependency;
+        push @additions, [ [$PACKAGES], { $name => $dependency } ];
+        for my $packager ( grep { ref $dependency->{$_} && defined $dependency->{$_}{source} } sort keys %$dependency ) {
+            my $source_name = $dependency->{$packager}{source};
+            my $sources     = $document->{$SOURCES}{$packager} //= [];
+            next if List::Util::any { $_->{name} eq $source_name } @$sources;
+            my $source = List::Util::first { $_->{name} eq $source_name } @{ $required->{$SOURCES}{$packager} };
+            push @$sources,  $source;
+            push @additions, [ [ $SOURCES, $packager ], [$source] ];
+        }
+    }
+    my $text = $snapshot->content($FILE);
+    my $same = eval {
+        for my $addition (@additions) { $text = Dist::Conformance::Schema::insert_yaml( $text, @$addition ) }
+        Dist::Conformance::Schema::encode_json( Dist::Conformance::Schema::parse_yaml( $text, $FILE ) ) eq Dist::Conformance::Schema::encode_json($document);
+    };
+    if ( !$same ) {
+        $update->by_hand( "Add " . join( ', ', @missing ) . " to $FILE by hand: its layout is not one that the update can edit" );
+        return;
+    }
+    $update->write( $FILE, $text );
+    return;
 }
 
 __END__
@@ -244,7 +323,7 @@ Dist::Conformance::Check::SystemPackages - The system packages that a repository
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -418,6 +497,14 @@ no entry names is not valid, because nothing would install from it.
 
 =head1 METHODS
 
+=head2 config_schema
+
+=head2 required
+
+The mapping of the template of C<template>, with its variables filled in, or
+nothing without C<template>.  Dies when the template has a placeholder that
+nothing fills, does not parse, or is not a valid declaration.
+
 =head2 declared
 
 C<($from)>, a class method.  The validated declaration of a repository, as it
@@ -511,6 +598,11 @@ codename that C<%host> does not give.
 
 =head2 check
 
+=head2 update
+
+Without C<template>, changes nothing, and says what is wrong when the check
+fails.  With it, writes the file or adds to it, as L</CONFIGURATION> says.
+
 =head1 FUNCTIONS
 
 =head2 os_release
@@ -524,19 +616,50 @@ escapes, as the shell reads it.  Blank lines and comments are skipped.
 =head1 IN A FLAVOR
 
     checks:
-      SystemPackages: {}
+      SystemPackages:
+        template: templates/metamerge.yml
 
 =head1 STATUSES
 
-The check passes when there is no F<metamerge.yml>, when it declares nothing,
-and when the declaration is valid, because most repositories need no system
-packages.  It fails when F<metamerge.yml> does not parse, or when the
-declaration is not valid.  The update changes nothing: what a repository needs
-is its own choice.
+Without C<template>, the check passes when there is no F<metamerge.yml>, when
+it declares nothing, and when the declaration is valid, because most
+repositories need no system packages.  It fails when F<metamerge.yml> does not
+parse, or when the declaration is not valid.  The update changes nothing: what
+a repository needs is its own choice.
+
+With C<template>, the check also fails when the repository does not declare
+each dependency that the template declares, and so when it has no
+F<metamerge.yml>.
 
 =head1 CONFIGURATION
 
-None, other than L<Dist::Conformance::Check/THE KEYS THAT EVERY CHECK TAKES>.
+=over
+
+=item template
+
+Optional.  The path of a F<metamerge.yml> in the standards, for the
+dependencies that every repository of the flavor needs, such as a program that
+a test of the harness runs.  The repository must declare each dependency of
+its C<x_system_packages>, under the same name.  An entry that the repository
+already has for that name is the repository's own, and the check does not
+compare it with the template.
+
+The update writes the template when the repository has no F<metamerge.yml>.
+When it has one, the update adds each dependency that is missing, and each
+source of the template that such a dependency names and the repository lacks.
+It edits the text of the file: each entry goes at the end of the block of
+its key, at the indentation of the entries that are there, or in a new block
+at the end of the file when the key is absent.  So the comments, the order of
+the keys and the layout of the rest of the file stay as they are.
+
+Then it parses what it would write.  Unless that is the old declaration with
+exactly the added entries, it writes nothing, and says to add them by hand.
+That is the case for a key whose value is in flow style, such as
+C<x_system_packages: {}>, and for a layout that it cannot edit in this way.
+A file that does not parse is left for a person too, and so is a declaration
+that is not valid.
+
+=back
 
 =head1 SEE ALSO
 

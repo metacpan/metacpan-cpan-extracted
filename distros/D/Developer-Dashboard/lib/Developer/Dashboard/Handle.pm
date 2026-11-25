@@ -10,7 +10,7 @@ use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::Config;
 use Developer::Dashboard::JSON qw(json_decode);
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 our $AUTOLOAD;
 
@@ -27,8 +27,8 @@ sub new {
 
 # paths()
 # Returns the resolved path-alias table for this handle's directory - the
-# same aliases `dashboard paths` prints: built-in runtime roots plus any
-# custom alias added with `dashboard path add`. In-process, no subprocess.
+# same aliases `d2 paths` prints: built-in runtime roots plus any
+# custom alias added with `d2 path add`. In-process, no subprocess.
 # Input: none.
 # Output: hash reference of alias name => resolved directory path.
 sub paths {
@@ -37,7 +37,7 @@ sub paths {
 }
 
 # run($subcommand, @args)
-# Runs `dashboard <subcommand> @args` exactly as it would run on the command
+# Runs `d2 <subcommand> @args` exactly as it would run on the command
 # line, for anything not covered by an in-process method such as paths().
 # The explicit escape hatch for a subcommand genuinely spelled with an
 # underscore (unreachable through the AUTOLOAD proxy chain per Q-107 in
@@ -58,10 +58,10 @@ sub run {
 
     my ( $stdout, $stderr, $exit ) = capture {
         local $ENV{PATH} = $ENV{PATH};
-        system( 'dashboard', $subcommand, @args );
+        system( 'd2', $subcommand, @args );
     };
     $exit >>= 8;
-    die "dashboard $subcommand @args failed (exit $exit): $stderr"
+    die "d2 $subcommand @args failed (exit $exit): $stderr"
       if $exit != 0;
 
     $stdout =~ s/\A\s+|\s+\z//g;
@@ -264,7 +264,7 @@ Developer::Dashboard::Handle - in-process proxy for the dashboard/d2 CLI
 =head1 PURPOSE
 
 Gives Perl code a single-line way to reach the same runtime the
-C<dashboard>/C<d2> command line resolves, instead of hand-building a
+C<d2>/C<d2> command line resolves, instead of hand-building a
 L<Developer::Dashboard::PathRegistry>, L<Developer::Dashboard::FileRegistry>,
 and L<Developer::Dashboard::Config> to answer one question such as a
 configured path alias.
@@ -272,8 +272,8 @@ configured path alias.
 =head1 WHY IT EXISTS
 
 Filed after the project's owner asked directly (over the project's Telegram
-bridge) for a shorter Perl equivalent of C<dashboard path resolve NAME>, then
-widened the request to cover any dashboard subcommand: "Anything I can run
+bridge) for a shorter Perl equivalent of C<d2 path resolve NAME>, then
+widened the request to cover any d2 subcommand: "Anything I can run
 with d2 on bash [...] I am expecting the d2() subroutine can do the same."
 C<paths()> answers the original, narrower ask in-process (no subprocess,
 since path aliases are cheap to resolve directly against the registry);
@@ -285,7 +285,7 @@ surface without reimplementing it.
 
 From any Perl script or module in this project (or one with this
 distribution installed) that needs a configured path alias, or the output of
-any other C<dashboard> subcommand, without forking a subprocess by hand and
+any other C<d2> subcommand, without forking a subprocess by hand and
 parsing its output itself.
 
 =head1 HOW TO USE
@@ -296,8 +296,8 @@ parsing its output itself.
 
     # A bareword method starts a LAZY chain. Nothing runs until the chain is
     # terminated with a call - the trailing ->().
-    my $out = d2->doctor->();                # shells to `dashboard doctor`
-    my $lst = d2->collector->list->();       # shells to `dashboard collector.list`
+    my $out = d2->doctor->();                # shells to `d2 doctor`
+    my $lst = d2->collector->list->();       # shells to `d2 collector.list`
 
     # Un-terminated, a chain is inert and says so if you print it:
     print d2->collector->list;               # "d2 proxy: collector.list"
@@ -313,7 +313,7 @@ parsing its output itself.
     # complete pairs, so it passes through unchanged as a positional
     # argument instead - Perl cannot itself tell ('a' => 'b') apart from
     # ('a', 'b') at runtime, so arity is the only question this can answer.
-    my $del = d2->path->del('myalias')->(); # shells to `dashboard path.del myalias`
+    my $del = d2->path->del('myalias')->(); # shells to `d2 path.del myalias`
 
 C<d2()> (exported by L<Developer::Dashboard>) memoizes one handle per working
 directory, so repeated calls from the same directory reuse the same
@@ -330,7 +330,7 @@ build their own registries directly, unchanged by this module.
 
     use Developer::Dashboard;
 
-    # A custom alias added with `dashboard path add reports /var/reports`:
+    # A custom alias added with `d2 path add reports /var/reports`:
     my $dir = d2->paths->{reports};   # '/var/reports'
 
     # UNDERSCORES BECOME HYPHENS in every segment, because a Perl method name

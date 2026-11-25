@@ -54,6 +54,17 @@ close $fh or die "Unable to close $manifest: $!";
     like( $err, qr/Unable to close \Q$manifest\E/, 'the close failure names the manifest' );
 }
 
+# The manifest writer must also surface a failed close rather than claiming
+# a durable update. The same scoped CORE::GLOBAL::close hook applies.
+{
+    local $FAIL_CLOSE = 1;
+    my $ok = eval { $SP->can('_write_manifest')->( paths => $paths, manifest => {} ); 1 };
+    my $err = $@;
+    local $FAIL_CLOSE = 0;
+    ok( !$ok, 'a manifest writer whose handle cannot be closed dies' );
+    like( $err, qr/Unable to close \Q$manifest\E/, 'the manifest write close failure names its path' );
+}
+
 # A whitespace-only manifest reads back as an empty hash.
 open $fh, '>', $manifest or die "Unable to write $manifest: $!";
 print {$fh} "  \n";

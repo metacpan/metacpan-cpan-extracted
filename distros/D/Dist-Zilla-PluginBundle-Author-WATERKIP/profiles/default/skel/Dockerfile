@@ -1,14 +1,19 @@
+# This is a default dockerfile for perl project based on the latest perl
+# version
+# You can pick from the following list:
 #
-# This is a skeleton Dockerfile.
-# It is not intended to be small or super nifty, it tries to cache some,
-# but it is intended to be easy to go into an environment and poke
-# around and edit and less things
+# * development
+# * objectpad, moo, moosy, mojo, fat, waya
 #
-FROM registry.gitlab.com/opndev/perl5/docker-p5/moosy-development:latest
+# Most versions have -development tag
+#
+# For a private darkpan, use
+# minicpan, orepan2
+#
+FROM registry.gitlab.com/opndev/perl5/docker-p5:latest
 
 COPY cpanfile .
-RUN docker-cpanm --installdeps --test-only . \
-    && docker-cpanm -n --installdeps .
+RUN docker-cpanm -n --installdeps .
 
 COPY . .
 RUN prove -l && docker-cpanm -n .

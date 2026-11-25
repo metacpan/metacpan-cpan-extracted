@@ -156,6 +156,87 @@ sub write_file {
 }
 
 {
+    my $layer_home    = tempdir( CLEANUP => 1 );
+    my $layer_project = File::Spec->catdir( $layer_home, 'projects', 'env-order' );
+    make_path( File::Spec->catdir( $layer_project, '.git' ) );
+    write_file(
+        File::Spec->catfile( $layer_home, '.developer-dashboard', '.env' ),
+        "DD_T87_LAYERED_SOURCE=$layer_home/parent-value\n",
+    );
+    write_file(
+        File::Spec->catfile( $layer_project, '.env' ),
+        "DD_T87_LAYERED_OVERRIDE=project-value\n",
+    );
+    write_file(
+        File::Spec->catfile( $layer_project, '.env.pl' ),
+        '$ENV{DD_T87_LAYERED_DERIVED} = "$ENV{DD_T87_LAYERED_SOURCE}/child";' . "\n1;\n",
+    );
+
+    my $layer_paths = Developer::Dashboard::PathRegistry->new(
+        home => $layer_home,
+        cwd  => $layer_project,
+    );
+    local %ENV                                   = %ENV;
+    local $ENV{_DEVELOPER_DASHBOARD_INHERITED_ENV_KEYS} = undef;
+    local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT}    = undef;
+    local %Developer::Dashboard::EnvAudit::AUDIT = ();
+    my $loaded = $EL->load_runtime_layers( paths => $layer_paths );
+
+    is(
+        $ENV{DD_T87_LAYERED_DERIVED},
+        "$layer_home/parent-value/child",
+        'a project .env.pl sees a value from the parent home runtime layer',
+    );
+    is( $ENV{DD_T87_LAYERED_OVERRIDE}, 'project-value', 'the project plain .env still overrides its home parent' );
+    is_deeply(
+        $loaded,
+        [
+            File::Spec->catfile( $layer_home, '.developer-dashboard', '.env' ),
+            File::Spec->catfile( $layer_project, '.env' ),
+            File::Spec->catfile( $layer_project, '.env.pl' ),
+        ],
+        'runtime env files load from parent layers before the current project layer',
+    );
+}
+
+{
+    my $external_base    = tempdir( CLEANUP => 1 );
+    my $external_runtime = File::Spec->catdir( $external_base, 'inherited-runtime' );
+    my $external_project = File::Spec->catdir( $external_base, 'working-project' );
+    make_path(
+        File::Spec->catdir( $external_runtime ),
+        File::Spec->catdir( $external_project, '.git' ),
+    );
+    write_file( File::Spec->catfile( $external_runtime, '.env' ), "DD_T87_EXTERNAL_PARENT=from-runtime\n" );
+    write_file(
+        File::Spec->catfile( $external_project, '.env.pl' ),
+        '$ENV{DD_T87_EXTERNAL_DERIVED} = "$ENV{DD_T87_EXTERNAL_PARENT}/project";' . "\n1;\n",
+    );
+
+    local %ENV                                   = %ENV;
+    local $ENV{HOME}                             = File::Spec->catdir( $external_base, 'home' );
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_LAYERS} = $external_runtime;
+    local $ENV{_DEVELOPER_DASHBOARD_INHERITED_ENV_KEYS} = undef;
+    local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT}    = undef;
+    local %Developer::Dashboard::EnvAudit::AUDIT = ();
+    my $external_paths = Developer::Dashboard::PathRegistry->new(
+        home => $ENV{HOME},
+        cwd  => $external_project,
+    );
+    my $loaded = $EL->load_runtime_layers( paths => $external_paths );
+
+    is( $ENV{DD_T87_EXTERNAL_DERIVED}, 'from-runtime/project', 'an inherited out-of-tree runtime env loads before project .env.pl' );
+    is_deeply(
+        $loaded,
+        [
+            File::Spec->catfile( $external_runtime, '.env' ),
+            File::Spec->catfile( $external_project, '.env.pl' ),
+        ],
+        'an explicit runtime root outside the plain directory chain is loaded first',
+    );
+}
+
+{
     local %ENV                                   = %ENV;
     local $ENV{_DEVELOPER_DASHBOARD_INHERITED_ENV_KEYS} = undef;
     local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT}    = undef;
@@ -680,6 +761,22 @@ write_file( File::Spec->catfile( $ab,  '.env' ),    "AK=abval\n" );
         [ $EL->_plain_directory_layers( Local::MockPaths->new( cwd => '/p/q/r', home => '/other', project_root => '/p/q' ) ) ],
         [ '/p/q', '/p/q/r' ],
         '_plain_directory_layers walks from the project root down to the cwd',
+    );
+}
+
+{
+    my $inherited = $EL->inherited_key_names({
+        '=C:'                                         => 'C:\\workspace',
+        'HOME'                                        => '/home/fixture',
+        'USERPROFILE'                                 => 'C:\\Users\\fixture',
+        '_VALID123'                                   => 'ok',
+        'invalid-name'                                => 'not a variable name',
+        '_DEVELOPER_DASHBOARD_INHERITED_ENV_KEYS'      => '[]',
+    });
+    is_deeply(
+        $inherited,
+        [ 'HOME', 'USERPROFILE', '_VALID123' ],
+        'Windows drive-directory pseudo keys are never inherited as env variables',
     );
 }
 

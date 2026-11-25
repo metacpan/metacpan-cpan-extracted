@@ -1,46 +1,10 @@
 package Skilletor::Cache;
-# ABSTRACT: Where a git or url source is cached – the reference's cache naming
+# ABSTRACT: Retired stub, see Skilletor
 
 use strict;
 use warnings;
 
-use Digest::SHA qw( sha256_hex );
-use Exporter qw( import );
-use Skilletor::FSUtil qw( encode_text path_join );
-use Skilletor::JSON qw( js_stringify );
-
-our $VERSION = '0.008000';
-
-our @EXPORT_OK = qw( cache_root cache_name git_identity git_cache_dir url_cache_dir CACHE_NAME_RE );
-
-# The name a cache dir has: 16 hex digits of a sha256 (git and url caches share the scheme).
-use constant CACHE_NAME_RE => qr/\A[0-9a-f]{16}\z/;
-
-sub cache_root {
-  my ( $home ) = @_;
-  return path_join( $home, '.claude', 'skilletor', 'cache' );
-}
-
-sub cache_name {
-  my ( $identity ) = @_;
-  return substr( sha256_hex( encode_text($identity) ), 0, 16 );
-}
-
-# An unpinned source keeps the legacy URL-only identity; an explicit ref never shares it.
-sub git_identity {
-  my ( $url, $ref ) = @_;
-  return ( defined $ref && length $ref ) ? js_stringify( [ $url, $ref ] ) : $url;
-}
-
-sub git_cache_dir {
-  my ( $root, $url, $ref ) = @_;
-  return path_join( $root, cache_name( git_identity( $url, $ref ) ) );
-}
-
-sub url_cache_dir {
-  my ( $root, $url ) = @_;
-  return path_join( $root, cache_name($url) );
-}
+our $VERSION = '0.009000';
 
 1;
 
@@ -52,54 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Cache - Where a git or url source is cached – the reference's cache naming
+Skilletor::Cache - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
-
-=head1 SYNOPSIS
-
-  use Skilletor::Cache qw( cache_root git_cache_dir url_cache_dir );
-
-  my $root = cache_root( $ENV{HOME} );     # ~/.claude/skilletor/cache
-  my $dir  = git_cache_dir( $root, 'https://github.com/Getty/skills', 'main' );
-  my $tgz  = url_cache_dir( $root, 'https://skills.example.com/skills.tar.gz' );
+version 0.009000
 
 =head1 DESCRIPTION
 
-Both implementations fetch into one cache, so they must name every cache
-directory alike. A git source's identity is its URL alone when it has no
-C<ref> (the cache layout before skilletor 0.3.1, kept for unpinned sources),
-else C<JSON.stringify([url, ref])>; a url source's identity is its URL. The
-directory is the first 16 hex digits of the sha256 of the identity's UTF-8
-bytes, beneath the cache root.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
 
-=head2 cache_root
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
 
-  cache_root($home);
+=head1 SEE ALSO
 
-C<< <home>/.claude/skilletor/cache >>, the cache root of a CLI run.
+=over
 
-=head2 cache_name
+=item * L<Skilletor>
 
-The 16-hex-digit directory name of an identity.
+=item * L<https://github.com/Getty/skilletor#install>
 
-=head2 git_identity
-
-  git_identity( $url, $ref );
-
-=head2 git_cache_dir
-
-  git_cache_dir( $root, $url, $ref );
-
-=head2 url_cache_dir
-
-  url_cache_dir( $root, $url );
-
-=head2 CACHE_NAME_RE
-
-The pattern a cache directory's name matches; the sweeps touch nothing else.
+=back
 
 =head1 SUPPORT
 

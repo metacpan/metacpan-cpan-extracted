@@ -7,6 +7,8 @@ use Exporter qw(import);
 
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v0.4.0';
+
 our @EXPORT_OK = qw(croakf);
 
 # The packages Carp looks past, to croak at the line that called
@@ -26,6 +28,7 @@ our @INTERNAL = qw(
     Ekorn::Pipeline::Operators::Stages
     Ekorn::Pipeline::Source Ekorn::Pipeline::Sources
     Ekorn::Pipeline::Stage  Ekorn::Pipeline::JSON
+    Ekorn::Pipeline::CSV
     Ekorn::Pipeline::Sugar
 );
 our @CARP_NOT = @INTERNAL;

@@ -22,18 +22,18 @@ action - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard action ...
+  d2 action ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes the page-action command surface, especially C<dashboard action run>. It keeps the public command available after helper staging while leaving page-action execution policy inside the action runtime.
+This staged helper exposes the page-action command surface, especially C<d2 action run>. It keeps the public command available after helper staging while leaving page-action execution policy inside the action runtime.
 
 =head1 WHY IT EXISTS
 
@@ -45,17 +45,17 @@ Use this file when changing CLI argument handling for page actions or when fixin
 
 =head1 HOW TO USE
 
-Users run C<dashboard action run E<lt>page_idE<gt> E<lt>action_idE<gt>>. The staged helper forwards that request into the private command runtime, which loads the action runner and executes the requested saved page action.
+Users run C<d2 action run E<lt>page_idE<gt> E<lt>action_idE<gt>>. The staged helper forwards that request into the private command runtime, which loads the action runner and executes the requested saved page action.
 
 =head1 WHAT USES IT
 
-It is used by the public C<dashboard action ...> command family, by saved action debugging from the CLI, and by tests that verify staged helper dispatch for action commands.
+It is used by the public C<d2 action ...> command family, by saved action debugging from the CLI, and by tests that verify staged helper dispatch for action commands.
 
 =head1 EXAMPLES
 
 Example 1:
 
-  dashboard action run sample refresh-data
+  d2 action run sample refresh-data
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/action --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

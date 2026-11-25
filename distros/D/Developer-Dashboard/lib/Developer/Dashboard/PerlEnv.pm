@@ -3,12 +3,14 @@ package Developer::Dashboard::PerlEnv;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Config ();
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Spec;
+
+use Developer::Dashboard::Platform qw(command_in_path is_windows native_shell_name);
 
 # path_separator()
 # Returns the platform-specific Perl library path separator.
@@ -31,23 +33,39 @@ sub current_perl_bin_dir {
     my $resolved = abs_path($perl);
     $resolved = $perl if !$resolved;
     my $dir = dirname($resolved);
-    return -d $dir ? $dir : '';
+    # abs_path spells with forward slashes on Windows; callers compare this
+    # against File::Spec spellings, so canonicalise at the boundary.
+    return -d $dir ? File::Spec->canonpath($dir) : '';
 }
 
 # current_shell_bin_dir()
 # Returns the directory that contains the shell used for dashboard-managed
 # shell command execution so PATH repair can keep shell-based collector
-# commands runnable even when the inherited PATH is broken.
+# commands runnable even when the inherited PATH is broken. On Windows
+# $Config{sh} names a Unix shell that never exists there, so the platform
+# shell (powershell/pwsh) is the configured shell instead.
 # Input: none.
 # Output: absolute or original shell directory path string, or empty string
 # when unavailable.
 sub current_shell_bin_dir {
     my $shell = $Config::Config{sh} || '';
-    return '' if $shell eq '';
-    my $resolved = abs_path($shell);
-    $resolved = $shell if !$resolved;
-    my $dir = dirname($resolved);
-    return -d $dir ? $dir : '';
+    if ( $shell ne '' ) {
+        my $resolved = abs_path($shell);
+        $resolved = $shell if !$resolved;
+        my $dir = dirname($resolved);
+        return File::Spec->canonpath($dir) if -d $dir;
+    }
+    return '' if !is_windows();
+    my $native = native_shell_name();
+    my $bin = command_in_path($native) || command_in_path('powershell');
+    if ( !$bin ) {
+        my $root = $ENV{SystemRoot} || 'C:\Windows';
+        my $candidate = File::Spec->catfile( $root, 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe' );
+        $bin = $candidate if -f $candidate;
+    }
+    return '' if !$bin;
+    my $dir = dirname($bin);
+    return -d $dir ? File::Spec->canonpath($dir) : '';
 }
 
 # core_inc_paths()
@@ -119,6 +137,17 @@ sub perl5lib_list {
       ? @{ $args{existing} }
       : grep { $_ ne '' } split /\Q$path_sep\E/, ( $env->{PERL5LIB} || '' );
 
+    # A source checkout's native build must win over an installed copy of the
+    # same XS extension. Installed distributions have no sibling blib tree, so
+    # this only changes source-tree execution after the extension was built.
+    my @build_arch;
+    if ( defined $args{dashboard_lib} && $args{dashboard_lib} ne ''
+        && -f File::Spec->catfile( $args{dashboard_lib}, 'Developer', 'Dashboard.pm' ) ) {
+        my $checkout_root = dirname( $args{dashboard_lib} );
+        my $build_arch = File::Spec->catdir( $checkout_root, 'blib', 'arch' );
+        push @build_arch, $build_arch if -d $build_arch;
+    }
+
     my @ordered;
     my %seen;
     my @prefixes = (
@@ -127,6 +156,7 @@ sub perl5lib_list {
               ? $class->dashboard_lib_roots( $args{dashboard_lib} )
               : ()
         ),
+        @build_arch,
         @{ $args{extra} || [] },
         $class->core_inc_paths,
         @existing,
@@ -236,7 +266,7 @@ Developer::Dashboard::PerlEnv - normalize safe Perl library ordering for dashboa
 =head1 DESCRIPTION
 
 This module centralizes the C<PERL5LIB> ordering used by the public
-C<dashboard> switchboard, staged private helpers, and dashboard-managed child
+C<d2> switchboard, staged private helpers, and dashboard-managed child
 process environments. It keeps dashboard libraries and the active Perl core
 directories ahead of inherited user-local paths so stale dual-life XS modules
 such as C<Encode> do not shadow the interpreter's matching core copy.
@@ -259,7 +289,7 @@ slightly different ways.
 
 =head1 WHEN TO USE
 
-Use this module when bootstrapping C<dashboard> itself, when staging or
+Use this module when bootstrapping C<d2> itself, when staging or
 running private helper commands, and whenever dashboard-managed subprocesses
 need a Perl-aware child environment. It is also the right place to debug XS
 handshake mismatches, interpreter drift, or any bug where a child process
@@ -288,8 +318,10 @@ active interpreter.
 =head2 perl5lib_list
 
 Builds the ordered list of C<PERL5LIB> paths using the dashboard lib path,
+the checkout's C<blib/arch> directory when its native extension has been built,
 runtime-specific extra paths, the active interpreter's core directories, and
-the inherited environment.
+the inherited environment. The built checkout extension precedes installed
+Perl libraries so its XS symbols remain paired with the source modules.
 
 =head2 perl5lib_env
 
@@ -328,7 +360,7 @@ defaulting to C<%ENV>.
 
 =head1 WHAT USES IT
 
-The public C<bin/dashboard> entrypoint uses it during early bootstrap, the
+The public C<bin/d2> entrypoint uses it during early bootstrap, the
 staged private helper runtime uses it before loading command implementations,
 and runtime child-process builders use it to prepare safe Perl environments
 for saved Ajax handlers, skills, and collector-related subprocesses.

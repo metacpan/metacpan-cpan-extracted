@@ -1,16 +1,10 @@
 package Skilletor::Error::Render;
-# ABSTRACT: A template cannot be rendered (the reference's RenderError)
+# ABSTRACT: Retired stub, see Skilletor
 
-use Moo;
-use namespace::clean;
+use strict;
+use warnings;
 
-extends 'Skilletor::Error';
-
-our $VERSION = '0.008000';
-
-# The reference's class name: Nunjucks words an error thrown inside a template's include as
-# `NAME: MESSAGE`, and Text::Nunjucks asks the error for both.
-sub name { 'RenderError' }
+our $VERSION = '0.009000';
 
 1;
 
@@ -22,23 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Error::Render - A template cannot be rendered (the reference's RenderError)
+Skilletor::Error::Render - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
+version 0.009000
 
 =head1 DESCRIPTION
 
-Thrown by L<Skilletor::Render/build> where the reference throws its
-C<RenderError>: a template that fails to render (C<< <file>: <message> >>, the
-message Nunjucks gives) and an include or import that leaves the source root
-(C<< template escapes source root: <name> >>). See L<Skilletor::Error> for the
-interface.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
 
-=head2 name
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
 
-C<RenderError>, the reference's class name.
+=head1 SEE ALSO
+
+=over
+
+=item * L<Skilletor>
+
+=item * L<https://github.com/Getty/skilletor#install>
+
+=back
 
 =head1 SUPPORT
 

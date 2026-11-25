@@ -20,12 +20,18 @@ package My::Stage {
     sub new ($class, %parts) {
         bless {call => sub { $_ }, parts => {%parts}}, $class;
     }
+
+
     sub EKORN_STAGE ($self) { return {%{ $self->{parts} }} }
 }
 
 package My::Source {
-    sub new          ($class, %parts) { bless {parts => {%parts}}, $class }
-    sub EKORN_SOURCE ($self)          { return {%{ $self->{parts} }} }
+
+
+    sub new ($class, %parts) { bless {parts => {%parts}}, $class }
+
+
+    sub EKORN_SOURCE ($self) { return {%{ $self->{parts} }} }
 }
 
 subtest 'A source: step, end and context' => sub {

@@ -2,6 +2,124 @@ Revision history for DBIx-Squirrel
 
 Unreleased
 
+v3.6.1 2026-11-24
+
+    result_original is Ekorn::Pipeline's own, and a stage reading it
+    is 11 to 13% quicker; a value given twice for a placeholder croaks,
+    rather than one being chosen at random.
+
+    It ships roadmap 2026-0046: the statement's source gives
+    Ekorn::Pipeline the row as its original, which Ekorn carries
+    through chains, so DBIx::Squirrel::Context's result_original is
+    Ekorn::Pipeline::Context's own, as result_number is; and fixes
+    from a review of what changed since v3.3.2. Requires
+    Ekorn::Pipeline >= v0.3.14, < v0.4.0.
+
+    - result_original is Ekorn::Pipeline::Context's own sub, and gives
+      what it gave: the fetched row wherever a statement is read,
+      chains included, undef in a flush, and the value given in a run
+      reading no statement. A stage reading it each row is 238 to 259
+      ns a row quicker, 11 to 13%, on Perl 5.36 and 5.44, reading
+      297,848 rows (roadmap 2026-0046).
+    - Requires Ekorn::Pipeline v0.3.14 or later, below v0.4.0: v0.3.13
+      added a source's original part, and v0.3.14 hands a sink of
+      many's result straight to all, so iterate(..., keep_all) is 15
+      to 17% quicker, costing what a stage and all do.
+    - A value given for a named placeholder twice, written with and
+      without its sigil, as :id and id, croaks: "Expected one value for
+      each placeholder (two for id)". It took one of the two as a hash
+      happened to order them, wherever values are given by name: in
+      pairs, in a hash given to execute, or in a hash row for
+      execute_for_fetch.
+    - A row for execute_for_fetch, or from ArrayTupleFetch, that's
+      neither an array nor, for named placeholders, a hash croaks:
+      "Expected a row of values: an array, or a hash for named
+      placeholders". A hash for numbered placeholders said "Expected 2
+      bind values, not 1", and an object, Perl's own "Not an ARRAY
+      reference". The reference says the rows before such a row have
+      been executed, so a load wants a transaction.
+    - The user guide's timings are measured again: a stage now costs
+      about a microsecond a row, where it said under two, and
+      iterate(..., keep_all) 0.429 seconds over 297,848 rows, not 0.533.
+    - DBIx::Squirrel::db's POD lists the ekorn_slice error.
+
+v3.6.0 2026-11-24
+
+    Iterators with stages are 10 to 17% quicker, and result_number
+    works in any run.
+
+    It ships roadmap 2026-0032: Ekorn::Pipeline now counts every run's
+    results, so DBIx::Squirrel::Context builds on its count, and the
+    stage each iterator added to count its own is gone. Requires
+    Ekorn::Pipeline >= v0.3.12, < v0.4.0.
+
+    - An iterator with stages no longer adds one of its own to count
+      its results, which cost 200 to 260 ns a row: reading 297,848
+      rows through one stage, next and all are 197 to 274 ns a row
+      quicker, 10 to 17%, on Perl 5.36 and 5.44 (roadmap 2026-0032).
+    - result_number works in any run, each counting its own: in a chain
+      made with |, and in a pipeline of your own, where it was undef. A
+      sink's step sees the number of the value it's given, not the
+      next, and an end sees undef.
+    - result_original, in a run reading no statement, where it was
+      undef, gives the value the run's source gave, or that was pushed,
+      as Ekorn::Pipeline::Context's does.
+    - Requires Ekorn::Pipeline v0.3.12 or later, below v0.4.0: v0.3.11
+      added Ekorn::Pipeline::Context, and v0.3.12 gave its functions
+      the empty prototype ours have, so result_number is Ekorn's own.
+
+v3.5.0 2026-11-24
+
+    execute_array and execute_for_fetch work for every placeholder
+    style, CSV files go in and out, the examples show stages doing what
+    SQL can't, and the user guide says when to use them.
+
+    It ships roadmap 2026-0037: loading many rows at once, which worked
+    only for ? placeholders, works for numbered and named ones, used
+    once or more, with rows as hashes by name; 2026-0044, Tooling's
+    :csv, with a recipe loading a CSV file into a table and an export
+    to one; 2026-0045, a stop after a tee no longer losing what its
+    branch holds; and 2026-0036, an appraisal of Ekorn's feed and tee.
+    Requires Ekorn::Pipeline >= v0.3.10, < v0.4.0, and recommends
+    Text::CSV.
+
+    - execute_array, execute_for_fetch and bind_param_array work for
+      numbered and named placeholders, used once or more, as plain DBI's
+      work for ?, on any driver (roadmap 2026-0037). A row's values come
+      in placeholder order: by number, or as each name first appears,
+      so :id, :name, :id takes two values a row. A row for named
+      placeholders can be a hash, keyed by name. bind_param_array takes
+      a placeholder's name. A statement with a list placeholder croaks:
+      "Expected no list placeholder in a statement for rows of values".
+    - The user guide's loader writes hashes with execute_for_fetch and
+      named placeholders.
+    - DBIx::Squirrel::Tooling exports from_csv and to_csv, from
+      Ekorn::Pipeline::CSV, in a new tag, :csv, and in :all, as
+      Ekorn::Pipeline::Tooling does (roadmap 2026-0044).
+    - Recommends Text::CSV, which from_csv and to_csv need, and load
+      only when one is called.
+    - The user guide has a recipe, "Load a CSV file into a table", and
+      writes a query to a CSV file with a header in "Write the results
+      to a file"; the README's pitch says so; and the reference says
+      what header to give to_csv after as_hash with column names.
+    - Requires Ekorn::Pipeline v0.3.10 or later, below v0.4.0, the first
+      with Ekorn::Pipeline::CSV, and with a tee whose branch is closed
+      when a stage after it stops the run, so what the branch holds,
+      such as a part-filled batch, is flushed rather than dropped. The
+      user guide and the reference say so, and no longer say to put a
+      stage that stops the run before the tee (roadmap 2026-0045,
+      2026-0036).
+    - The README, the user guide and the reference no longer filter,
+      limit or count in stages what a WHERE, LIMIT or COUNT would.
+      Their examples test data the database doesn't have, keep running
+      totals, resume where a run stopped, and make slugs and words,
+      and say that a test the SQL could do belongs there, but in a
+      stage while debugging a query you'd rather not touch.
+    - The user guide answers "When should I use it, and when not?": the
+      DBI's methods for a simple query used once, SQL for what the
+      database can do, stages for a query whose callers vary, and a
+      list or a hash where rows don't flow. The README points to it.
+
 v3.4.2 2026-11-23
 
     The reference's wording matches Ekorn::Pipeline's.

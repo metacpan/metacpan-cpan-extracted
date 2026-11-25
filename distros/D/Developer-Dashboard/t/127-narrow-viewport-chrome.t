@@ -278,7 +278,7 @@ scrollbar.
 
 Run C<prove -lv t/127-narrow-viewport-chrome.t> while iterating on the chrome
 markup, then keep it green under C<prove -lr t>. For a visual re-check, serve a
-page with C<dashboard serve> and measure
+page with C<d2 serve> and measure
 C<document.documentElement.scrollWidth> against C<window.innerWidth> in a
 browser device-emulation viewport of 320x640, 375x667, and 800x600; all three
 must report equal widths and the status-strip icons must still be visible.

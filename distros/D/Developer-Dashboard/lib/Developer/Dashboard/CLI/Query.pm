@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Query;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Exporter 'import';
 
@@ -415,7 +415,7 @@ Developer::Dashboard::CLI::Query - standalone structured-data query command supp
 Provides the lightweight shared implementation behind the private runtime
 helper scripts for C<jq>, C<yq>, C<tomq>, C<propq>, C<iniq>, C<csvq>, and
 C<xmlq> plus the proxied C<dashboard ...> command paths. Earlier names such as
-C<pjq>, C<pyq>, C<ptomq>, and C<pjp> still normalize through C<dashboard> for
+C<pjq>, C<pyq>, C<ptomq>, and C<pjp> still normalize through C<d2> for
 compatibility.
 
 =for comment FULL-POD-DOC START
@@ -465,14 +465,14 @@ root-document queries, and format-specific edge cases.
 
 =head1 EXAMPLES
 
-  printf '{"alpha":{"beta":2}}' | dashboard jq alpha.beta
-  dashboard jq response.json '$d'
-  dashboard jq response.json 'sort keys %$d'
-  printf 'alpha:\n  beta: 3\n' | dashboard yq alpha.beta
-  printf 'alpha.beta=5\nname=demo\n' | dashboard propq '$d'
-  printf 'alpha,beta\n7,8\n' | dashboard csvq 1.1
-  printf '<root><value>demo</value></root>' | dashboard xmlq root.value
-  printf '<root><item id="1">x</item><item id="2">y</item></root>' | dashboard xmlq 'join q(,), map { $_->{_attributes}{id} } @{ $d->{root}{item} }'
+  printf '{"alpha":{"beta":2}}' | d2 jq alpha.beta
+  d2 jq response.json '$d'
+  d2 jq response.json 'sort keys %$d'
+  printf 'alpha:\n  beta: 3\n' | d2 yq alpha.beta
+  printf 'alpha.beta=5\nname=demo\n' | d2 propq '$d'
+  printf 'alpha,beta\n7,8\n' | d2 csvq 1.1
+  printf '<root><value>demo</value></root>' | d2 xmlq root.value
+  printf '<root><item id="1">x</item><item id="2">y</item></root>' | d2 xmlq 'join q(,), map { $_->{_attributes}{id} } @{ $d->{root}{item} }'
 
 =for comment FULL-POD-DOC END
 

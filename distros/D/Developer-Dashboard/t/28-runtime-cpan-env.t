@@ -134,7 +134,7 @@ make_path($parent_lib_dir);
 }
 
 {
-    my $dashboard = File::Spec->catfile( File::Spec->curdir, 'bin', 'dashboard' );
+    my $dashboard = File::Spec->catfile( File::Spec->curdir, 'bin', 'd2' );
     open my $fh, '<', $dashboard or die "Unable to read $dashboard: $!";
     my $source = do { local $/; <$fh> };
     close $fh or die "Unable to close $dashboard: $!";

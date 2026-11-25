@@ -84,7 +84,8 @@ my $dispatcher = Developer::Dashboard::SkillDispatcher->new( manager => $manager
         command      => 'go',
     );
     ok( exists $env{DEVELOPER_DASHBOARD_SKILL_ROOT}, '_skill_env skips undefined and empty layers and dedupes the shared lib' );
-    my $count = () = ( $env{PERL5LIB} // '' ) =~ m{\Q$tmp\E/perl5/lib/perl5(?::|\z)}g;
+    my $shared_lib = File::Spec->canonpath( File::Spec->catdir( $tmp, 'perl5', 'lib', 'perl5' ) );
+    my $count = () = ( $env{PERL5LIB} // '' ) =~ m{\Q$shared_lib\E(?:;|:|\z)}g;
     is( $count, 1, 'the shared perl5 lib appears once' );
 }
 

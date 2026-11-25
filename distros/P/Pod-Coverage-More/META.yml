@@ -1,0 +1,155 @@
+---
+abstract: 'Make sure your POD covers more ground than just subroutines'
+author:
+  - 'George S. Baugh <teodesian@cpan.org>'
+build_requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::pushd: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  POSIX: '0'
+  PPI: '0'
+  Pod::Weaver: '4'
+  Sub::Util: '0'
+  Test2::API: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V1: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Type::Params: '0'
+  autovivification: '0'
+  bigint: '0'
+  constant: '0'
+  experimental: '0'
+  lib: '0'
+  perl: '5.038'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150013'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Coverage-More
+no_index:
+  directory:
+    - docs
+    - t
+    - templates
+provides:
+  Dist::Zilla::Plugin::Test::Pod::Coverage::More:
+    file: lib/Dist/Zilla/Plugin/Test/Pod/Coverage/More.pm
+    version: '0.003'
+  Pod::Coverage::More:
+    file: lib/Pod/Coverage/More.pm
+    version: '0.003'
+  Pod::Coverage::More::Analyzer:
+    file: lib/Pod/Coverage/More/Analyzer.pm
+    version: '0.003'
+  Pod::Coverage::More::Analyzer::Perl5_36:
+    file: lib/Pod/Coverage/More/Analyzer/Perl5_36.pm
+    version: '0.003'
+  Pod::Coverage::More::Analyzer::Perl5_38:
+    file: lib/Pod/Coverage/More/Analyzer/Perl5_38.pm
+    version: '0.003'
+  Pod::Coverage::More::Analyzer::Perl5_44:
+    file: lib/Pod/Coverage/More/Analyzer/Perl5_44.pm
+    version: '0.003'
+  Pod::Coverage::More::Blurb:
+    file: lib/Pod/Coverage/More/Blurb.pm
+    version: '0.003'
+  Pod::Coverage::More::Declared:
+    file: lib/Pod/Coverage/More/Declared.pm
+    version: '0.003'
+  Pod::Coverage::More::Declared::ClassTiny:
+    file: lib/Pod/Coverage/More/Declared/ClassTiny.pm
+    version: '0.003'
+  Pod::Coverage::More::Declared::FunctionParameters:
+    file: lib/Pod/Coverage/More/Declared/FunctionParameters.pm
+    version: '0.003'
+  Pod::Coverage::More::Declared::Kavorka:
+    file: lib/Pod/Coverage/More/Declared/Kavorka.pm
+    version: '0.003'
+  Pod::Coverage::More::Declared::MOP:
+    file: lib/Pod/Coverage/More/Declared/MOP.pm
+    version: '0.003'
+  Pod::Coverage::More::Declared::ObjectPad:
+    file: lib/Pod/Coverage/More/Declared/ObjectPad.pm
+    version: '0.003'
+  Pod::Coverage::More::Declared::TypeParams:
+    file: lib/Pod/Coverage/More/Declared/TypeParams.pm
+    version: '0.003'
+  Pod::Coverage::More::Documentation:
+    file: lib/Pod/Coverage/More/Documentation.pm
+    version: '0.003'
+  Pod::Coverage::More::Generator:
+    file: lib/Pod/Coverage/More/Generator.pm
+    version: '0.003'
+  Pod::Coverage::More::Types:
+    file: lib/Pod/Coverage/More/Types.pm
+    version: '0.003'
+  Pod::Weaver::Section::Blurbs:
+    file: lib/Pod/Weaver/Section/Blurbs.pm
+    version: '0.003'
+  Test::Pod::Coverage::More:
+    file: lib/Test/Pod/Coverage/More.pm
+    version: '0.003'
+requires:
+  B: '0'
+  Capture::Tiny: '0'
+  Data::Dumper: '0'
+  Dist::Zilla::Plugin::InlineFiles: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Exporter: '0'
+  List::Util: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  Package::Stash: '0'
+  Pod::Coverage::TrustPod: '0'
+  Pod::Elemental: '0'
+  Pod::Elemental::Element::Nested: '0'
+  Pod::Elemental::Transformer::Pod5: '0'
+  Pod::Find: '0'
+  Pod::Simple::SimpleTree: '0'
+  Pod::Weaver: '4'
+  Pod::Weaver::Role::Section: '0'
+  Scalar::Util: '0'
+  Test::Builder: '0'
+  Test::Pod::Coverage: '0'
+  Type::Registry: '0'
+  Type::Tiny::Intersection: '0'
+  Type::Tiny::Union: '0'
+  Types::Standard: '0'
+  Types::TypeTiny: '0'
+  mro: '0'
+  parent: '0'
+  perl: '5.038'
+  re: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/teodesian/Pod-Coverage-More/issues
+  homepage: https://github.com/teodesian/Pod-Coverage-More
+  repository: https://github.com/teodesian/Pod-Coverage-More.git
+version: '0.003'
+x_contributors:
+  - 'troglodyne-robot <trogbot@troglodyne.net>'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: MIT
+x_system_packages:
+  aspell:
+    deb: aspell
+    rpm: aspell
+    test: 'aspell --version'
+  aspell-en:
+    deb: aspell-en
+    rpm: aspell-en
+    test: 'aspell --lang=en_US -a'

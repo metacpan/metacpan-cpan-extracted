@@ -20,7 +20,7 @@ sub default_headers {
     };
 }
 
-sub process_request {
+sub _process_request {
     my ( $self, %args ) = @_;
     my $ua = $self->{ua};
 
@@ -56,6 +56,11 @@ sub process_request {
     $request_payload->{temperature} = $model_config->{temperature}
         if defined $model_config->{temperature};
 
+    # Which thinking settings a model accepts varies by model and effort, so
+    # send one only when configured rather than choosing a default here.
+    $request_payload->{thinking} = $model_config->{thinking}
+        if ref $model_config->{thinking} eq 'HASH';
+
     my $response = $ua->post(
         $self->{api_url},
         Content      => encode_json($request_payload),
@@ -74,13 +79,18 @@ sub process_request {
             };
         }
 
-        my $result = $content->{content}[0]{text};
+        # Models that think return thinking blocks before the text, so the
+        # first block is not necessarily the answer.
+        my $result = join '',
+            map { $_->{text} // '' }
+            grep { ref $_ eq 'HASH' && ( $_->{type} // '' ) eq 'text' }
+            @{ ref $content->{content} eq 'ARRAY' ? $content->{content} : [] };
         return {
             success => 0,
             error   => "No content in response",
             raw     => $content,
             }
-            unless defined $result;
+            unless length $result;
 
         return {
             success => 1,
@@ -99,6 +109,17 @@ sub process_request {
             raw     => $response->decoded_content,
         };
     }
+}
+
+sub _usage {
+    my ( $self, $raw ) = @_;
+    return {} unless ref $raw eq 'HASH' && ref $raw->{usage} eq 'HASH';
+
+    my $usage = $raw->{usage};
+    return {
+        input_tokens  => $usage->{input_tokens},
+        output_tokens => $usage->{output_tokens},
+    };
 }
 
 1;

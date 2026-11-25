@@ -3,8 +3,11 @@ use v5.36;
 package Ekorn::Pipeline::Feed;
 
 use Ekorn::Pipeline::Errors qw(croakf);
+use namespace::clean;
 
 # Croak at the line that called Ekorn::Pipeline.
+our $VERSION = 'v0.4.0';
+
 our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 
 # Return a feed of a run, from its parts, each a code reference: push,
@@ -15,7 +18,6 @@ our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 sub new ($class, %parts) {
     return bless {%parts, why => undef, busy => 0}, $class;
 }
-
 
 # Return what came out of the values pushed: a list, or, asked for one
 # value, an array reference of them.
@@ -30,7 +32,6 @@ sub push ($self, @values) {    ## no critic (Subroutines::ProhibitBuiltinHomonym
     return wantarray ? @results : \@results;
 }
 
-
 # End the input, and return what the flushes give, as push returns its
 # results.
 sub close ($self) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms, NamingConventions::ProhibitAmbiguousNames)
@@ -40,7 +41,6 @@ sub close ($self) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms, Namin
     @$self{qw(busy why)} = (0, 'it was closed');
     return wantarray ? @results : \@results;
 }
-
 
 # End the run, if it hasn't ended, as from outside.
 sub finish ($self) {
@@ -52,13 +52,11 @@ sub finish ($self) {
     return;
 }
 
-
 # Return how the run ended: "done", "stopped" or "died"; nothing while
 # it's open.
 sub ended ($self) {
     return $self->{ended}->();
 }
-
 
 # Croak unless the run is open, and the call isn't from inside it: once
 # the run has ended, busy may be left set by a push that died.

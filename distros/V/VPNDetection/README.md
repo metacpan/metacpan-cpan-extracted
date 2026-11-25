@@ -32,7 +32,7 @@ print $result->asn->{name};          # who runs the announcing network
 
 ### With an API key
 
-Every paid plan answers every field: `is_hosting`, `is_cdn` and the four proxy flags as well, the carrier and satellite flags, the five service flags (SSH, SMTP, web, DNS resolver and BitTorrent), the `bot` detail (whose bot uses the address, the agents it serves, what they do and whether its operator vouches for it), city-level `location`, the `company` and the `abuse` contact, the provider (its ID and its name), confidence and last-seen detail behind each flag, and `user_agent`, the verdict on a user agent you send with a lookup. The plans differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.vpndetection.io), then pass it in:
+A paid plan answers every field: `is_hosting`, `is_cdn` and the four proxy flags as well, the carrier and satellite flags, the five service flags (SSH, SMTP, web, DNS resolver and BitTorrent), the `bot` detail (whose bot uses the address, the agents it serves, what they do and whether its operator vouches for it), city-level `location`, the `company` and the `abuse` contact, the provider (its ID and its name), confidence and last-seen detail behind each flag, and `user_agent`, the verdict on a user agent you send with a lookup. Its quotas differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.vpndetection.io), then pass it in:
 
 ```perl
 my $client = VPNDetection->new(api_key => $ENV{VPNDETECTION_API_KEY});
@@ -70,8 +70,8 @@ Same answer `lookup` would give for that address, and the same cost against your
 
 ```perl
 my $acct = $client->my_entitlement;
-print $acct->{plan}{name};         # Max, what to show
-print $acct->{plan}{key};          # max, what to compare against
+print $acct->{plan}{name};         # Data, what to show
+print $acct->{plan}{key};          # data_4, what to compare against
 print $acct->{usage}{requests};    # 580
 print $acct->{usage}{window_end};  # when the allowance resets
 ```
@@ -317,7 +317,7 @@ There are official VPNDetection client libraries available for many languages in
 
 VPN Detection API: Accurate anonymity detection identifying VPNs, residential proxies, hosting servers, Tor nodes, CDNs, relays and more.
 
-[<img src="https://s3.vpndetection.io/vpndetection-public/brand/mark.svg" alt="VPNDetection" height="64"/>](https://vpndetection.io/)
+[<picture><source media="(prefers-color-scheme: dark)" srcset="https://s3.vpndetection.io/vpndetection-public/brand/logo-dark.svg"><img src="https://s3.vpndetection.io/vpndetection-public/brand/logo.svg" alt="VPNDetection" height="40"/></picture>](https://vpndetection.io/)
 
 ## License
 

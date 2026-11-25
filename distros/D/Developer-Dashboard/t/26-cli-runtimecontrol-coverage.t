@@ -168,7 +168,7 @@ sub base_args {
         $run_lifecycle->( command => 'restart', args => [], %a );
     };
     is( $rc, 0, 'lifecycle default scope all, table output, restart' );
-    like( $out, qr/web.*dashboard.*restarted/s, 'table renders the restart result' );
+    like( $out, qr/web.*d2.*restarted/s, 'table renders the restart result' );
 }
 
 {
@@ -193,7 +193,7 @@ sub base_args {
     eval {
         capture { $run_lifecycle->( command => 'restart', args => [ '-o', 'xml' ], %a ); };
     };
-    like( $@, qr/^Usage: dashboard restart/, 'bad output value dies with usage' );
+    like( $@, qr/^Usage: d2 restart/, 'bad output value dies with usage' );
 }
 
 {
@@ -201,7 +201,7 @@ sub base_args {
     eval {
         capture { $run_lifecycle->( command => 'restart', args => [ 'extra', 'stuff' ], %a ); };
     };
-    like( $@, qr/^Usage: dashboard restart/, 'leftover argv dies with usage' );
+    like( $@, qr/^Usage: d2 restart/, 'leftover argv dies with usage' );
 }
 
 {
@@ -290,7 +290,7 @@ sub base_args {
         web        => { status => 'up', pid => 1, details => '' },
         collectors => [ { name => 'a', status => 'up', pid => 2, details => '' } ],
     } );
-    like( $table, qr/web.*dashboard.*up.*1.*-/s,     'falsy web details render as -' );
+    like( $table, qr/web.*d2.*up.*1.*-/s,     'falsy web details render as -' );
     like( $table, qr/collector.*a.*up.*2.*-/s,       'falsy collector details render as -' );
 }
 
@@ -299,7 +299,7 @@ sub base_args {
         web        => { status => '', pid => 1, details => 'ok' },
         collectors => [ { name => '', status => '', pid => 2, details => 'ok' } ],
     } );
-    like( $table, qr/web.*dashboard.*-.*1.*ok/s, 'falsy web status renders as -' );
+    like( $table, qr/web.*d2.*-.*1.*ok/s, 'falsy web status renders as -' );
     like( $table, qr/collector.*-.*-.*2.*ok/s,   'falsy collector name and status render as -' );
 }
 
@@ -308,7 +308,7 @@ sub base_args {
         web        => { status => 'up', details => 'ok' },
         collectors => [ { name => 'a', status => 'up', details => 'ok' } ],
     } );
-    like( $table, qr/web.*dashboard.*up.*-.*ok/s,      'an undef web pid renders as -' );
+    like( $table, qr/web.*d2.*up.*-.*ok/s,      'an undef web pid renders as -' );
     like( $table, qr/collector.*a.*up.*-.*ok/s,        'an undef collector pid renders as -' );
 }
 
@@ -419,7 +419,7 @@ is_deeply(
         { web => "web entry\n", 'collector:alpha' => '', 'collector:beta' => undef },
         'all',
     );
-    like( $combined_output, qr/=== dashboard web ===\nweb entry/, 'combined rendering preserves the web header and body' );
+    like( $combined_output, qr/=== d2 web ===\nweb entry/, 'combined rendering preserves the web header and body' );
     like( $combined_output, qr/No log entries are available yet for collector 'alpha'/, 'combined rendering includes empty collector placeholders' );
     like( $combined_output, qr/No log entries are available yet for collector 'beta'/, 'combined rendering normalizes an undefined source' );
 }
@@ -494,7 +494,7 @@ like( $timestamp_log_text->('unterminated'), qr/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d
         eval { capture { $run_log->( args => ['--tail'], %a ); }; };
         $error = $@;
     }
-    like( $error, qr/^Usage: dashboard log/, 'tail without its required value is rejected with usage' );
+    like( $error, qr/^Usage: d2 log/, 'tail without its required value is rejected with usage' );
     like( join( '', @parse_warnings ), qr/Option tail requires an argument/, 'Getopt reports the missing tail value explicitly' );
 }
 
@@ -507,14 +507,14 @@ like( $timestamp_log_text->('unterminated'), qr/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d
         eval { capture { $run_log->( args => ['--tail=not-a-number'], %a ); }; };
         $error = $@;
     }
-    like( $error, qr/^Usage: dashboard log/, 'a non-integer tail value is rejected with usage' );
+    like( $error, qr/^Usage: d2 log/, 'a non-integer tail value is rejected with usage' );
     like( join( '', @parse_warnings ), qr/Value .* invalid for option tail/, 'Getopt reports the malformed tail value explicitly' );
 }
 
 {
     my %a = base_args();
     eval { capture { $run_log->( args => ['--tail=-1'], %a ); }; };
-    like( $@, qr/^Usage: dashboard log/, 'negative tail count is rejected with usage' );
+    like( $@, qr/^Usage: d2 log/, 'negative tail count is rejected with usage' );
 }
 
 is( $tail_log_text->( undef, 1 ), '', 'tailing an undefined log returns empty output' );
@@ -719,7 +719,7 @@ is( $tail_log_text->( "\n", 1 ), "\n", 'tailing a blank newline preserves the ne
     my %a = base_args( runtime => Test::RC::Runtime->new( web_log_result => "web body\n" ) );
     my ( $out, $err, $rc ) = capture { $run_log->( args => [], %a ); };
     is( $rc, 0, 'log all scope returns 0' );
-    like( $out, qr/=== dashboard web ===/, 'all scope prints the web header' );
+    like( $out, qr/=== d2 web ===/, 'all scope prints the web header' );
 }
 
 {
@@ -736,7 +736,7 @@ is( $tail_log_text->( "\n", 1 ), "\n", 'tailing a blank newline preserves the ne
     );
     my ( $out, $err, $rc ) = capture { $run_log->( args => [], %a ); };
     is( $rc, 0, 'all scope with an undef web log still returns 0' );
-    unlike( $out, qr/=== dashboard web ===/, 'an undef web log omits the web header' );
+    unlike( $out, qr/=== d2 web ===/, 'an undef web log omits the web header' );
     like( $out, qr/collector line/,          'the collector log still prints' );
 }
 
@@ -744,31 +744,31 @@ is( $tail_log_text->( "\n", 1 ), "\n", 'tailing a blank newline preserves the ne
     my %a = base_args( runtime => Test::RC::Runtime->new( web_log_result => '' ) );
     my ( $out, $err, $rc ) = capture { $run_log->( args => [], %a ); };
     is( $rc, 0, 'all scope with an empty-string web log still returns 0' );
-    unlike( $out, qr/=== dashboard web ===/, 'an empty-string web log omits the web header' );
+    unlike( $out, qr/=== d2 web ===/, 'an empty-string web log omits the web header' );
 }
 
 {
     my %a = base_args();
     eval { capture { $run_log->( args => ['bogus'], %a ); } };
-    like( $@, qr/^Usage: dashboard log/, 'unknown scope dies with usage' );
+    like( $@, qr/^Usage: d2 log/, 'unknown scope dies with usage' );
 }
 
 {
     my %a = base_args();
     eval { capture { $run_log->( args => ['-'], %a ); } };
-    like( $@, qr/^Usage: dashboard log/, 'a lone dash is not consumed as the log scope' );
+    like( $@, qr/^Usage: d2 log/, 'a lone dash is not consumed as the log scope' );
 }
 
 {
     my %a = base_args();
     eval { capture { $run_log->( args => [ 'collector', '-' ], %a ); } };
-    like( $@, qr/^Usage: dashboard log/, 'a lone dash is not consumed as a collector name' );
+    like( $@, qr/^Usage: d2 log/, 'a lone dash is not consumed as a collector name' );
 }
 
 {
     my %a = base_args();
     eval { capture { $run_log->( args => [ 'web', 'extra' ], %a ); } };
-    like( $@, qr/^Usage: dashboard log/, 'leftover log argv dies with usage' );
+    like( $@, qr/^Usage: d2 log/, 'leftover log argv dies with usage' );
 }
 
 # ---------------------------------------------------------- _collector_logs_text
@@ -878,7 +878,7 @@ is( $tail_log_text->( "\n", 1 ), "\n", 'tailing a blank newline preserves the ne
 
 {
     my $table = $summary_table->( { web => { status => 'up', pid => 1, details => 'ok' } } );
-    like( $table, qr/web.*dashboard.*up.*1.*ok/s, 'summary table renders a web row' );
+    like( $table, qr/web.*d2.*up.*1.*ok/s, 'summary table renders a web row' );
 }
 
 {
@@ -909,8 +909,8 @@ is( $tail_log_text->( "\n", 1 ), "\n", 'tailing a blank newline preserves the ne
 # ---------------------------------------------------------- usage strings
 
 {
-    like( $lifecycle_usage->('restart'), qr/^Usage: dashboard restart/, 'lifecycle usage names the command' );
-    like( $log_usage->(),                qr/^Usage: dashboard log/,     'log usage text' );
+    like( $lifecycle_usage->('restart'), qr/^Usage: d2 restart/, 'lifecycle usage names the command' );
+    like( $log_usage->(),                qr/^Usage: d2 log/,     'log usage text' );
 }
 
 is( scalar(@warnings), 0, 'no warnings escaped the run' ) or diag( join "\n", @warnings );
@@ -926,8 +926,8 @@ t/26-cli-runtimecontrol-coverage.t - Devel::Cover gate for the runtime control C
 =head1 PURPOSE
 
 Exercises every function in C<Developer::Dashboard::CLI::RuntimeControl> - the
-shared parser and default output renderer behind C<dashboard restart>,
-C<dashboard stop>, and C<dashboard log[s]> (including Docker-style timestamps,
+shared parser and default output renderer behind C<d2 restart>,
+C<d2 stop>, and C<d2 log[s]> (including Docker-style timestamps,
 follow mode, and tail options) - against injected stand-in objects
 for the runtime manager, config, and collector store it is handed, so the
 module can reach 100.0 on all four Devel::Cover metrics without a real
@@ -965,8 +965,8 @@ check the branch and condition columns for the runtime control module.
 =head1 WHAT USES IT
 
 The repository test suite, the Devel::Cover gate, and developers changing the
-runtime-control CLI use this file to keep C<dashboard restart>,
-C<dashboard stop>, and C<dashboard log[s]> behaving as documented.
+runtime-control CLI use this file to keep C<d2 restart>,
+C<d2 stop>, and C<d2 log[s]> behaving as documented.
 
 =head1 EXAMPLES
 

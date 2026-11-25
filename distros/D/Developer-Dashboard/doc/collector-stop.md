@@ -1,7 +1,7 @@
 # Stopping Collectors
 
-`dashboard collector start <name>` starts two things: the collector **loop**
-(the process titled `dashboard collector: <name>` that schedules and runs the
+`d2 collector start <name>` starts two things: the collector **loop**
+(the process titled `d2 collector: <name>` that schedules and runs the
 collector command) and a background **supervisor** (watchdog) that keeps the
 collector alive by restarting the loop if it dies.
 
@@ -11,20 +11,20 @@ supervisor immediately restarts it.
 
 ## The two stop commands (both supervisor-aware)
 
-- `dashboard collector stop <name>` — the collector-subcommand form.
-- `dashboard stop collector <name>` — the top-level runtime-control form.
+- `d2 collector stop <name>` — the collector-subcommand form.
+- `d2 stop collector <name>` — the top-level runtime-control form.
 
 Both now route through the same supervisor-aware stop:
 
 1. deregister the collector from the supervisor (and stop the supervisor when no
    collectors remain under it), so the loop cannot be respawned;
 2. terminate the loop, its workers, and each worker's command subtree;
-3. reset the consumer-facing `status.json` so `dashboard collector status
-   <name>`, the prompt strip (`dashboard ps1`), and the web status board all
+3. reset the consumer-facing `status.json` so `d2 collector status
+   <name>`, the prompt strip (`d2 ps1`), and the web status board all
    report the collector as stopped.
 
 After a stop, the collector stays stopped: no new loop pid appears and
-`dashboard collector status <name>` reports `running: 0`.
+`d2 collector status <name>` reports `running: 0`.
 
 ## What "stop everything" covers
 
@@ -41,7 +41,7 @@ After a stop, the collector stays stopped: no new loop pid appears and
 
 ## Duplicate loops are prevented
 
-`dashboard collector start` records the loop's identity in its state file
+`d2 collector start` records the loop's identity in its state file
 immediately. The supervisor recognizes an already-running loop from that
 recorded state as well as from process identity, so it never creates a second
 loop by racing a freshly started one before it has set its process title.

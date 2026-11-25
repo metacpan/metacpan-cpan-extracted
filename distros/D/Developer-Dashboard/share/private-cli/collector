@@ -22,12 +22,12 @@ collector - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard collector ...
+  d2 collector ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
@@ -45,7 +45,7 @@ Use this file when changing collector CLI verbs, argument parsing, or how collec
 
 =head1 HOW TO USE
 
-Users run C<dashboard collector E<lt>verbE<gt> ...>. The staged helper passes the request into the private runtime, which loads the collector store and runner and prints the resulting state or output.
+Users run C<d2 collector E<lt>verbE<gt> ...>. The staged helper passes the request into the private runtime, which loads the collector store and runner and prints the resulting state or output.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by developers inspecting collector health, by restart/stop flows that
 
 Example 1:
 
-  dashboard collector run sample-collector
+  d2 collector run sample-collector
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/collector --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

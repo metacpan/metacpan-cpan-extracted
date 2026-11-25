@@ -1,55 +1,10 @@
 package Skilletor::Source::Local;
-# ABSTRACT: A source read straight from a local directory (author mode)
+# ABSTRACT: Retired stub, see Skilletor
 
-use Moo;
-use Skilletor::Error::Source;
-use Skilletor::FSUtil qw( path_join );
-use namespace::clean;
+use strict;
+use warnings;
 
-with 'Skilletor::Role::Source';
-
-our $VERSION = '0.008000';
-
-has local_path => (
-  is       => 'ro',
-  required => 1,
-);
-
-has home => (
-  is => 'ro',
-);
-
-has dir => (
-  is       => 'lazy',
-  init_arg => undef,
-);
-
-sub _build_dir {
-  my ( $self ) = @_;
-  return defined $self->home ? $self->expand_home( $self->local_path, $self->home ) : $self->local_path;
-}
-
-# A leading ~ or ~/ against the home; other paths pass through.
-sub expand_home {
-  my ( $self, $path, $home ) = @_;
-  return $home if $path eq '~';
-  return path_join( $home, substr( $path, 2 ) ) if $path =~ m{\A~/} || ( $^O eq 'MSWin32' && $path =~ m{\A~\\} );
-  return $path;
-}
-
-sub exists { -d $_[0]->dir ? 1 : 0 }
-
-sub resolve {
-  my ( $self ) = @_;
-  Skilletor::Error::Source->throw( 'local source directory does not exist: '.$self->dir ) unless -e $self->dir;
-  return { dir => $self->dir, version => 'local' };
-}
-
-# No network to avoid: the directory itself.
-sub cached { $_[0]->resolve }
-
-# Local sources are always re-rendered.
-sub check { 1 }
+our $VERSION = '0.009000';
 
 1;
 
@@ -61,59 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Source::Local - A source read straight from a local directory (author mode)
+Skilletor::Source::Local - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
-
-=head1 SYNOPSIS
-
-  use Skilletor::Source::Local;
-
-  my $src = Skilletor::Source::Local->new( local_path => '~/dev/skills', home => $ENV{HOME} );
-  my $loc = $src->resolve;    # { dir => '/home/me/dev/skills', version => 'local' }
+version 0.009000
 
 =head1 DESCRIPTION
 
-The reference's C<sources/local.ts> (spec §4.4): a directory read directly, no
-fetch and no cache. The version is always C<local> and L</check> always says
-changed, so every run re-renders it. A missing directory is no error until
-L</resolve>: L</exists> lets the caller fall back to the source's git or url.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
 
-=head2 local_path
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
 
-The path as configured; a leading C<~> is expanded when L</home> is given.
-Without C<home> the path is taken as is.
+=head1 SEE ALSO
 
-=head2 home
+=over
 
-Stands in for C<~> in L</local_path>.
+=item * L<Skilletor>
 
-=head2 dir
+=item * L<https://github.com/Getty/skilletor#install>
 
-The directory read.
-
-=head2 expand_home
-
-  $src->expand_home( '~/dev', '/home/me' );   # /home/me/dev
-
-=head2 exists
-
-True when L</dir> is a directory.
-
-=head2 resolve
-
-C<< { dir, version => 'local' } >>; throws L<Skilletor::Error::Source> for a missing directory.
-
-=head2 cached
-
-L</resolve>: a local source needs no network (the offline call the git and url
-backends have too).
-
-=head2 check
-
-Always true: a local source is re-rendered every run.
+=back
 
 =head1 SUPPORT
 

@@ -24,23 +24,23 @@ workspace - private tmux workspace helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard workspace <workspace-ref>
-  dashboard workspace -c <workspace-ref>
-  dashboard workspace <workspace-ref> -c
-  dashboard workspace -c <path-alias> --docker
-  dashboard workspace <path-alias> -c -d
+  d2 workspace <workspace-ref>
+  d2 workspace -c <workspace-ref>
+  d2 workspace <workspace-ref> -c
+  d2 workspace -c <path-alias> --docker
+  d2 workspace <path-alias> -c -d
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
-C<dashboard> command can keep workspace-session behaviour available without
+C<d2> command can keep workspace-session behaviour available without
 installing a generic executable into the user's global PATH.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard workspace>, the command that creates or
+This staged helper exposes C<d2 workspace>, the command that creates or
 reuses a tmux session for one workspace and then attaches the terminal to it.
 It is the shell-facing entrypoint for the workspace-session workflow.
 
@@ -52,14 +52,14 @@ session naming, layered env seeding, and create-vs-attach logic.
 
 =head1 WHEN TO USE
 
-Use this file when changing the C<dashboard workspace> CLI contract, the staged
+Use this file when changing the C<d2 workspace> CLI contract, the staged
 helper handoff, or the examples contributors use to understand explicit workspace
 selection and session environment refresh behavior.
 
 =head1 HOW TO USE
 
-Users run C<dashboard workspace E<lt>workspace-refE<gt>> or set C<WORKSPACE_REF>
-and run C<dashboard workspace>. The staged helper forwards the request into the
+Users run C<d2 workspace E<lt>workspace-refE<gt>> or set C<WORKSPACE_REF>
+and run C<d2 workspace>. The staged helper forwards the request into the
 private runtime, which loads C<Developer::Dashboard::CLI::Ticket>, resolves the
 workspace name, seeds C<WORKSPACE_REF>, C<TICKET_REF>, C<B>, and C<OB> in the
 tmux session environment, refreshes layered plain-directory C<.env> values from
@@ -67,7 +67,7 @@ the highest ancestor down to the current directory, creates a detached C<Code1>
 window when the session does not exist yet, and then attaches to that session.
 
 Adding C<-c> before or after the workspace name changes directory first: when
-the workspace name is registered in the dashboard paths inventory (the same
+the workspace name is registered in the d2 paths inventory (the same
 registered names the shell C<cdr> helper resolves), including configured path
 aliases and skill-qualified methods from a skill's C<lib/Folder.pm>, the helper
 changes into that registered directory before planning the session. Dotted
@@ -75,7 +75,7 @@ skill names remain qualified at every nesting depth, such as
 C<parent.child.work>. Configured aliases take precedence when a configured
 name collides with a Folder.pm method. The tmux session and its layered C<.env>
 refresh both start from the resolved directory.
-When the name is not a registered dashboard path, C<-c> fails with an explicit
+When the name is not a registered d2 path, C<-c> fails with an explicit
 error instead of silently starting the workspace from the wrong directory.
 
 Use C<-d> or C<--docker> together with C<-c> and a registered path alias to
@@ -100,14 +100,14 @@ that verify explicit workspace selection, env refresh, and environment fallback.
 
 =head1 EXAMPLES
 
-  dashboard workspace
-  dashboard workspace DD-123
-  WORKSPACE_REF=DD-123 dashboard workspace
-  dashboard workspace feature-branch-42
-  dashboard workspace -c foobar
-  dashboard workspace foobar -c
-  dashboard workspace -c foobar --docker
-  dashboard workspace foobar -c -d
+  d2 workspace
+  d2 workspace DD-123
+  WORKSPACE_REF=DD-123 d2 workspace
+  d2 workspace feature-branch-42
+  d2 workspace -c foobar
+  d2 workspace foobar -c
+  d2 workspace -c foobar --docker
+  d2 workspace foobar -c -d
 
 =for comment FULL-POD-DOC END
 

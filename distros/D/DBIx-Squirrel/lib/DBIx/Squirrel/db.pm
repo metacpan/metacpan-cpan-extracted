@@ -844,6 +844,11 @@ another, as in C<SELECT :a WHERE x IN (...:a)>.
 With DBD::Pg's C<pg_placeholder_dollaronly>, the statement goes to
 DBD::Pg as written, so a C<$1> placeholder can't take a list.
 
+=item Expected ekorn_slice to be a reference to an ARRAY or HASH
+
+C<ekorn_slice>, given to L</prepare> or with the handle, was something
+else.
+
 =item Expected a reference to a HASH or ARRAY
 
 The first argument after the statement in L</do>, L</iterate>,

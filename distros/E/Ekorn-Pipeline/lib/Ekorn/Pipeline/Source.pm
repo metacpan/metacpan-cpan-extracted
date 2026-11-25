@@ -9,12 +9,14 @@ use Ekorn::Pipeline::Errors qw(croakf);
 use namespace::clean;
 
 # Croak at the line that called Ekorn::Pipeline.
+our $VERSION = 'v0.4.0';
+
 our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 
 # Return a source made afresh for each run by the set-up given, which
-# returns the source's step and, optionally, its end and a context for
-# the run. Called directly, it croaks: a run of its own would never be
-# ended, so what it opened would stay open.
+# returns the source's step and, optionally, its end, a context for the
+# run, and an original. Called directly, it croaks: a run of its own
+# would never be ended, so what it opened would stay open.
 sub new ($class, $setup) {
     croakf 'Expected a code reference' unless is_coderef($setup);
     return bless {
@@ -23,9 +25,8 @@ sub new ($class, $setup) {
     }, $class;
 }
 
-
 # Return what the set-up returns for a new run: the step, and
-# optionally the end and a context.
+# optionally the end, a context and an original.
 sub EKORN_SOURCE ($self) {
     return $self->{setup}->();
 }
@@ -83,7 +84,13 @@ and C<died> if the run died. What it returns is dropped;
 
 =item * optionally, a I<context>: anything the run's stages may ask
 for with L<Ekorn::Pipeline/run_context>, such as a statement's
-columns.
+columns;
+
+=item * optionally, an I<original>: called with nothing, returning the
+original of the value the source gave last, such as the row a value
+was made from, which L<Ekorn::Pipeline::Context/result_original> gives
+in its place. It's called only when that's asked, and a run reading an
+iterator of this run gets it too. New in v0.3.13.
 
 =back
 
@@ -112,7 +119,8 @@ of these from a block.
 
 A class of your own needn't be one of these to be a source. Any
 object with an C<EKORN_SOURCE> method, returning the step and
-optionally the end and the context, as a list or by name, is one.
+optionally the end, the context and the original, as a list or by
+name, is one.
 
 =head1 METHODS
 
@@ -147,6 +155,11 @@ L<Ekorn::Pipeline/iterator> instead.
 
 The set-up returned something else: no step, or a step or end that
 isn't a code reference. It's reported as the run starts.
+
+=item Expected the source's original to be a code reference
+
+The set-up returned an original that isn't a code reference. It's
+reported as the run starts.
 
 =back
 

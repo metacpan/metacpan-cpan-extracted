@@ -26,7 +26,6 @@ sub hold_all () {
     };
 }
 
-
 # Return the shortest of three timings of $run, given $n values.
 sub fastest ($run, $n) {
     my $best;

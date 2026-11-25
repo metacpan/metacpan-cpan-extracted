@@ -1,4 +1,0 @@
----
-description: Style
----
-Write clearly.

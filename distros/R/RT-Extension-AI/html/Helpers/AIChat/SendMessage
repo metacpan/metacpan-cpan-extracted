@@ -55,15 +55,14 @@ unless ( $provider_instance ) {
     $m->abort();
 }
 
-my $model_config = $config->{default_model} || { name => $config->{name}, max_tokens => 4096, temperature => 0.5 };
-
 my $max_retries = 2;
 my $response;
 for my $attempt ( 0 .. $max_retries ) {
     $response = $provider_instance->process_request(
         prompt       => $system_prompt,
         raw_text     => $raw_text,
-        model_config => $model_config,
+        model_config => $config->{default_model},
+        feature      => 'queue_creation_assistant',
     );
     last if $response->{success};
     RT->Logger->warning("AI chat attempt " . ($attempt + 1) . " failed: " . ($response->{error} || 'unknown'));

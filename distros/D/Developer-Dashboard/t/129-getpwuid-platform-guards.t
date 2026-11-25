@@ -30,9 +30,15 @@ chdir $home or die "Unable to chdir to $home: $!";
 
 my $windows = 'MSWin32';
 
-# A uid that cannot own a passwd record on the test host, used to exercise the
-# "no record" outcome with the real getpwuid instead of a stub.
-my $absent_uid = 4294967294;
+# Windows perl leaves getpwuid unimplemented, so there is no passwd
+# database to pick an absent uid from. The "real passwd database"
+# scenario below is skipped there, and the rest of this file exercises
+# the guards with the platform name forced to Windows instead.
+my ($absent_uid) = $^O eq 'MSWin32'
+  ? ()
+  : grep { !defined scalar getpwuid($_) }
+      (4294967293, 4294967292, 2147483647, 999999999);
+die 'Unable to select an absent uid' if !defined $absent_uid && $^O ne 'MSWin32';
 
 # ---------------------------------------------------------------------------
 # Feature: the guarded passwd accessors never die.
@@ -56,13 +62,15 @@ my $absent_uid = 4294967294;
 # Scenario: on a runtime with a real passwd database the accessors still return
 # the account name and home directory.
 # ---------------------------------------------------------------------------
-{
-    my @entry = getpwuid($<);
-    is( passwd_user_name($<),      $entry[0], 'passwd_user_name returns the real account name' );
-    is( passwd_home_directory($<), $entry[7], 'passwd_home_directory returns the real home directory' );
+SKIP: {
+    skip 'there is no passwd database on Windows', 4 if $^O eq 'MSWin32';
 
-    is( passwd_user_name($absent_uid),      undef, 'passwd_user_name reports no name for an absent uid' );
-    is( passwd_home_directory($absent_uid), undef, 'passwd_home_directory reports no home for an absent uid' );
+        my @entry = getpwuid($<);
+        is( passwd_user_name($<),      $entry[0], 'passwd_user_name returns the real account name' );
+        is( passwd_home_directory($<), $entry[7], 'passwd_home_directory returns the real home directory' );
+
+        is( passwd_user_name($absent_uid),      undef, 'passwd_user_name reports no name for an absent uid' );
+        is( passwd_home_directory($absent_uid), undef, 'passwd_home_directory reports no home for an absent uid' );
 }
 
 # ---------------------------------------------------------------------------
@@ -148,6 +156,12 @@ my $absent_uid = 4294967294;
 # resolves both fallback chains, proving the eval guard and not only the
 # is_windows() short-circuit protects them. This mirrors the technique the
 # install-bootstrap gate uses for the make staging recipe.
+#
+# The child program runs from a file, not from a multi-line -e argument:
+# win32 system() splits a multi-line -e program at its newlines, so only
+# the first line ever runs (the child then exits 0 having printed
+# nothing). The same program in a file runs whole, as t/654 already
+# proved for its smoke program.
 # ---------------------------------------------------------------------------
 {
     my $profile_home = tempdir( CLEANUP => 1 );
@@ -161,7 +175,13 @@ print "HOME=", $manager->{paths}->home, "\n";
 print "STATE_USER=", $manager->{paths}->_state_root_user, "\n";
 PERL
 
-    my ( $stdout, $stderr, $exit ) = capture {
+    my $child_file = File::Spec->catfile( $profile_home, 'child.pl' );
+    open my $child_fh, '>:raw', $child_file or die "Unable to write $child_file: $!";
+    print {$child_fh} $prelude, $child;
+    close $child_fh or die "Unable to close $child_file: $!";
+
+    my $child_exit;
+    my ( $stdout, $stderr ) = capture {
         local %ENV = %ENV;
         delete $ENV{HOME};
         delete $ENV{DD_STATE_ROOT_USER};
@@ -169,17 +189,28 @@ PERL
         delete $ENV{LOGNAME};
         delete $ENV{USERNAME};
         $ENV{USERPROFILE} = $profile_home;
-        system( $^X, '-I' . $repo_lib, '-e', $prelude . $child );
-        $?;
+        system( $^X, '-I' . $repo_lib, $child_file );
+        $child_exit = $?;
     };
 
-    is( $exit >> 8, 0, 'both fallback chains run to completion under a getpwuid that dies' )
+    # Capture::Tiny returns only stdout and stderr, so the list assignment
+    # above cannot carry the exit code; read it from the lexical the block
+    # filled in instead of trusting an undef $exit.
+    is( $child_exit >> 8, 0, 'both fallback chains run to completion under a getpwuid that dies' )
       or diag $stderr;
     is( $stderr, '', 'the dying passwd lookup leaks no warnings or errors' );
+
+    # On Windows the child writes through a :crlf STDOUT, so each printed
+    # line ends in \r\n. The contract here is about which home and user the
+    # fallbacks resolve, not about the child platform's line ending, so
+    # normalise before matching.
+    $stdout =~ s/\r\n/\n/g;
     like( $stdout, qr/^HOME=\Q$profile_home\E$/m,
-        'the skill manager home falls back to USERPROFILE when getpwuid dies' );
+        'the skill manager home falls back to USERPROFILE when getpwuid dies' )
+      or diag $stdout;
     like( $stdout, qr/^STATE_USER=user$/m,
-        'the state-root user falls back to the literal when getpwuid dies' );
+        'the state-root user falls back to the literal when getpwuid dies' )
+      or diag $stdout;
 }
 
 done_testing();

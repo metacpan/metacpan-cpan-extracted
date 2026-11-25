@@ -9,7 +9,6 @@ use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir tempfile);
-use POSIX qw(:sys_wait_h);
 use Capture::Tiny qw(capture);
 
 use lib 'lib';
@@ -18,6 +17,7 @@ use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::RuntimeManager ();
+use Developer::Dashboard qw(spawn process_exited wait_process);
 
 # A tiny class exposed to the Template Toolkit method() helper so the helper's
 # class/method/can validation can be driven through all of its branches.
@@ -657,18 +657,18 @@ is( $runtime->_system_context( runtime_context => {}, source => '' )->{cwd}, '.'
 }
 
 # DD-593: same $? leak class as DD-585/589/590/591/592 - _saved_ajax_child_exited
-# reaps a real child via waitpid(WNOHANG) and reads the global $? into its own
-# return value without localizing it, so the reaped child's exit status leaks
-# into the caller's $? after this sub returns. A mocked pid never touches the
-# real $? this bug is about, so this forks a genuine child and reaps it for real.
+# reaps a real GoRoutine-spawned child via waitpid(WNOHANG) and reads the global
+# $? into its own return value without localizing it, so the reaped child's exit
+# status leaks into the caller's $? after this sub returns. A mocked pid never
+# touches the real $? this bug is about, so the child must exit independently.
 {
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        POSIX::_exit(5);
-    }
+    my $child = spawn( [ $^X, '-e', 'exit 5;' ], {} );
+    die "Unable to spawn child: $!" if !defined $child;
     my $deadline = time + 5;
-    1 while kill( 0, $child ) && time < $deadline;
+    while ( !process_exited($child) && time < $deadline ) {
+        select undef, undef, undef, 0.01;
+    }
+    die "GoRoutine child did not exit before deadline" if !process_exited($child);
 
     $? = 7 << 8;    ## no critic (Variables::RequireLocalizedPunctuationVars)
     my @reaped = $runtime->_saved_ajax_child_exited($child);
@@ -676,6 +676,32 @@ is( $runtime->_system_context( runtime_context => {}, source => '' )->{cwd}, '.'
     is( $reaped[1] >> 8, 5, '_saved_ajax_child_exited reports the reaped child exit code' );
     is( $? >> 8, 7,
         '_saved_ajax_child_exited does not leak the reaped child status into the caller global $?' );
+}
+
+# Same check through the Windows branch: waitpid cannot reap a GoRoutine
+# (CreateProcess) child on Windows, so the branch asks the native process
+# API instead. Proved on Linux with $^O and Platform::OS_NAME localized;
+# on Windows the branch is the live one.
+{
+    my $child = spawn( [ $^X, '-e', 'exit 5;' ], {} );
+    die "Unable to spawn child: $!" if !defined $child;
+    my $deadline = time + 5;
+    while ( !process_exited($child) && time < $deadline ) {
+        select undef, undef, undef, 0.01;
+    }
+    die "GoRoutine child did not exit before deadline" if !process_exited($child);
+
+    $? = 7 << 8;    ## no critic (Variables::RequireLocalizedPunctuationVars)
+    my @reaped;
+    {
+        local $^O = 'MSWin32';
+        local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+        @reaped = $runtime->_saved_ajax_child_exited($child);
+    }
+    is( $reaped[0], 1, 'on Windows _saved_ajax_child_exited reports a real exited child' );
+    is( $reaped[1] >> 8, 5, 'on Windows _saved_ajax_child_exited reports the exited child code' );
+    is( $? >> 8, 7,
+        'on Windows _saved_ajax_child_exited does not leak the reaped child status into the caller global $?' );
 }
 
 # ---- _close_saved_ajax_streams (L583 / L591) ---------------------------------
@@ -695,30 +721,66 @@ is( $runtime->_system_context( runtime_context => {}, source => '' )->{cwd}, '.'
 {
     is( $runtime->_terminate_saved_ajax_process(0), 1, '_terminate_saved_ajax_process returns for a falsy pid' );
 
-    my $dead = fork();
-    die "fork failed: $!" if !defined $dead;
-    if ( !$dead ) { POSIX::_exit(0); }
-    waitpid( $dead, 0 );
+    my $dead = spawn( [ $^X, '-e', 'exit 0;' ], {} );
+    die "Unable to spawn exited child: $!" if !defined $dead;
+    wait_process($dead);
     is( $runtime->_terminate_saved_ajax_process($dead), 1, '_terminate_saved_ajax_process returns for an already-reaped pid' );
 
-    my ( $ready_r, $ready_w );
-    pipe $ready_r, $ready_w or die "pipe: $!";
-    my $live = fork();
-    die "fork failed: $!" if !defined $live;
-    if ( !$live ) {
-        close $ready_r;
-        $SIG{TERM} = 'IGNORE';
-        syswrite $ready_w, "up";    # signal readiness only after ignoring TERM
-        select undef, undef, undef, 30;
-        POSIX::_exit(0);
+    my $ready_path = File::Spec->catfile( tempdir( CLEANUP => 1 ), 'term-ignored' );
+    my $live = spawn(
+        [
+            $^X, '-e',
+            q{$SIG{TERM} = 'IGNORE'; open my $fh, '>', $ARGV[0] or die $!; close $fh or die $!; sleep 30;},
+            $ready_path,
+        ],
+        {},
+    );
+    die "Unable to spawn TERM-ignoring child: $!" if !defined $live;
+    my $ready_deadline = time + 5;
+    while ( !-f $ready_path && time < $ready_deadline ) {
+        select undef, undef, undef, 0.01;
     }
-    close $ready_w;
-    my $ready = '';
-    sysread $ready_r, $ready, 2;    # block until the child has installed the TERM guard
-    close $ready_r;
+    die "TERM-ignoring child did not become ready" if !-f $ready_path;
     is( $runtime->_terminate_saved_ajax_process($live), 1, '_terminate_saved_ajax_process escalates to SIGKILL for a TERM-ignoring child' );
-    waitpid( $live, 0 );
-    ok( !kill( 0, $live ), '_terminate_saved_ajax_process leaves the TERM-ignoring child dead' );
+    my $exit_deadline = time + 5;
+    while ( !process_exited($live) && time < $exit_deadline ) {
+        select undef, undef, undef, 0.01;
+    }
+    ok( process_exited($live), '_terminate_saved_ajax_process leaves the TERM-ignoring child dead' );
+}
+
+# Same termination through the Windows branch: Perl kill TERM/KILL never
+# reaches a CreateProcess child, so the branch terminates through the
+# native process API instead. Proved on Linux with $^O and
+# Platform::OS_NAME localized; on Windows the branch is the live one.
+{
+    my $ready_path = File::Spec->catfile( tempdir( CLEANUP => 1 ), 'term-ignored-win' );
+    my $live = spawn(
+        [
+            $^X, '-e',
+            q{$SIG{TERM} = 'IGNORE'; open my $fh, '>', $ARGV[0] or die $!; close $fh or die $!; sleep 30;},
+            $ready_path,
+        ],
+        {},
+    );
+    die "Unable to spawn TERM-ignoring child: $!" if !defined $live;
+    my $ready_deadline = time + 5;
+    while ( !-f $ready_path && time < $ready_deadline ) {
+        select undef, undef, undef, 0.01;
+    }
+    die "TERM-ignoring child did not become ready" if !-f $ready_path;
+    my $terminated;
+    {
+        local $^O = 'MSWin32';
+        local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+        $terminated = $runtime->_terminate_saved_ajax_process($live);
+    }
+    is( $terminated, 1, 'on Windows _terminate_saved_ajax_process escalates to KILL for a TERM-ignoring child' );
+    my $exit_deadline = time + 5;
+    while ( !process_exited($live) && time < $exit_deadline ) {
+        select undef, undef, undef, 0.01;
+    }
+    ok( process_exited($live), 'on Windows _terminate_saved_ajax_process leaves the TERM-ignoring child dead' );
 }
 
 # ---- _looks_like_stream_disconnect_error (L621 / L622) -----------------------
@@ -756,7 +818,20 @@ is( $runtime->_system_context( runtime_context => {}, source => '' )->{cwd}, '.'
 
     my $shebang = write_file( File::Spec->catfile( $home, 'sheb.dat' ), "#!/bin/sh\necho hi\n" );
     chmod 0700, $shebang or die $!;
-    is_deeply( [ $runtime->_saved_ajax_command( path => $shebang ) ], [$shebang], '_saved_ajax_command executes a shebang file directly' );
+    if ( $^O eq 'MSWin32' ) {
+        # CreateProcess cannot execute a shebang file directly on Windows;
+        # the command routes through the resolved POSIX shell instead, and
+        # the script still runs.
+        my @shebang_cmd = $runtime->_saved_ajax_command( path => $shebang );
+        is( scalar @shebang_cmd, 2, '_saved_ajax_command routes a shebang file through a shell on Windows' );
+        like( $shebang_cmd[1], qr/sheb\.dat\z/, '_saved_ajax_command passes the shebang file to the shell on Windows' );
+        my ( $shebang_out, undef, $shebang_exit ) = capture { system @shebang_cmd; return $? >> 8; };
+        is( $shebang_exit, 0, '_saved_ajax_command runs a shebang file through the shell on Windows' );
+        is( $shebang_out, "hi\n", '_saved_ajax_command streams the shebang file output on Windows' );
+    }
+    else {
+        is_deeply( [ $runtime->_saved_ajax_command( path => $shebang ) ], [$shebang], '_saved_ajax_command executes a shebang file directly' );
+    }
 
     my $plain = write_file( File::Spec->catfile( $home, 'plain.dat' ), "just text\n" );
     is( ( $runtime->_saved_ajax_command( path => $plain ) )[0], $^X, '_saved_ajax_command bootstraps a non-shebang extensionless file through Perl' );
@@ -825,7 +900,7 @@ is( $runtime->_system_context( runtime_context => {}, source => '' )->{cwd}, '.'
         local *Developer::Dashboard::RuntimeManager::_pkill_perl = sub { push @patterns, $_[1]; return 1 };
         is( $runtime->_kill_saved_ajax_singleton('mysingle'), 1, '_kill_saved_ajax_singleton terminates matching workers for a real singleton' );
     }
-    is_deeply( \@patterns, ['^dashboard ajax: mysingle$'], '_kill_saved_ajax_singleton builds an anchored process pattern' );
+    is_deeply( \@patterns, ['^d2 ajax: mysingle$'], '_kill_saved_ajax_singleton builds an anchored process pattern' );
 }
 
 # ---- _query_string_from_params (L785 / L789) ---------------------------------
@@ -913,8 +988,16 @@ is( $runtime->_system_context( runtime_context => {}, source => '' )->{cwd}, '.'
         'stream_saved_ajax_file direct-wait fallback does not leak the reaped worker status into the caller global $?' );
 
     # path only: params, writers, page, and type all defaulted (L400/401/402/409 right).
+    # The whole result is pinned, not only the exit code: a defaulted writer
+    # that answered "stop streaming" got the worker terminated at its first
+    # chunk, which Unix hid (a TERM death is wait status 15, whose exit-code
+    # half is 0) and Windows showed as exit code 255.
     my $bare_res = $runtime->stream_saved_ajax_file( path => $ok_file );
-    is( $bare_res->{exit_code}, 0, 'stream_saved_ajax_file runs with defaulted params, writers, page, and type' );
+    is_deeply(
+        $bare_res,
+        { disconnected => 0, exit_code => 0, status => 0 },
+        'stream_saved_ajax_file runs with defaulted params, writers, page, and type',
+    );
 
     # writer failure that is not disconnect-like surfaces a fatal error (L483 true).
     my $we_file = write_file(

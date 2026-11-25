@@ -177,7 +177,7 @@ method. No ineffective code was retained.
 Saved URLs redirect while preserving saved query keys, allowing request keys to override matching values and append new ones. Regression coverage: `t/03-web-app.t`, `t/104-skilldispatcher-coverage.t`, `t/131-bookmark-url-encoding.t`.
 
 ### Problem 2: Resolve skill-aware Template Toolkit includes (2a09c53b) — done
-Skill pages can include local dashboard fragments and explicit skill dashboard paths. The include allow-list now covers the owning skill dashboard root. Regression coverage: `t/08-web-update-coverage.t`, `t/20-skill-web-routes.t`.
+Skill pages can include local dashboard fragments and explicit skill d2 paths. The include allow-list now covers the owning skill dashboard root. Regression coverage: `t/08-web-update-coverage.t`, `t/20-skill-web-routes.t`.
 
 ### Problem 3: Render supplied data in saved Ajax code templates (2a09c53b) — done
 Ajax handler source is rendered with its supplied Template Toolkit data before it is stored and executed. Regression coverage: `t/12-legacy-helper-coverage.t`, `t/85-zipper-coverage.t`.
@@ -383,7 +383,7 @@ stale uncoverable annotations). The required focused
 web-security trio passed 459 tests. The 5.65 tarball passed CPANTS kwalitee
 at 100% (7/7 assertions) and the source POD gate (348 files, 355 assertions).
 `dzil build` produced `Developer-Dashboard-5.65.tar.gz`; the image build
-succeeded and a one-off Compose run reported `dashboard version` as `5.65`.
+succeeded and a one-off Compose run reported `d2 version` as `5.65`.
 The blank-environment container installed the tarball using `cpanm` without
 `--notest`, then its complete installed-runtime integration script passed.
 `perlsec` was reviewed from the container's `perlsec.pod` with `pod2text`
@@ -615,7 +615,7 @@ reported `d2 version` 5.70. The image-build guard had already recorded 5.69
 as used, so the finalized report and repeat artifact checks were assigned this
 distinct version. No release upload was performed.
 
-### Problem 45: Add Docker-style timestamps, follow, and tail to dashboard logs (done in 5.77)
+### Problem 45: Add Docker-style timestamps, follow, and tail to d2 logs (done in 5.77)
 
 Expected: `d2 logs` supports Docker-style `-t`, `-f`, `--tail N`, and
 `--tail=N` across the default mixed web/collector view, web-only output, all
@@ -645,7 +645,7 @@ from persisted run records and uses UTC read time for raw web records, whose
 file format has no historical per-line timestamp. Tail is applied to the
 selected output after source composition and timestamp formatting. Follow
 polls each source independently, emits only appended bytes, and restarts from
-the beginning when a log is truncated. `dashboard serve logs` delegates to
+the beginning when a log is truncated. `d2 serve logs` delegates to
 the same parser, so its options and validation stay aligned. The shared help
 catalog, option completion metadata, README, POD, and integration plan are
 updated.
@@ -831,7 +831,8 @@ CPAN distribution, while unreleased fixes exist only in the Git checkout. The
 image flow had no job that rebuilt the checked-out code into a tarball and
 installed that exact artifact after bootstrap.
 
-Red test: `t/228-dockerhub-image-workflow.t` asserts the GitHub workflow,
+Red test: the test 228-dockerhub-image-workflow (removed on 2026-11-23 with
+the GitHub workflow files) asserted the GitHub workflow,
 credential wiring, version/latest tags, target platforms, and that the image
 build runs `install.sh`, `dzil build`, and installs the generated tarball with
 `cpanm`. It also guards that GitHub automation files, excluded from the CPAN
@@ -872,7 +873,8 @@ packaged. README/POD parity and all 76 library module versions were verified.
 
 Post-push Scorecard identified one repository-fixable item: the Ubuntu base
 image tag was not pinned by digest (Pinned-Dependencies 9/10). A new assertion
-in `t/228-dockerhub-image-workflow.t` reproduced that finding before the
+in the test 228-dockerhub-image-workflow (removed on 2026-11-23 with the
+GitHub workflow files) reproduced that finding before the
 Dockerfile was changed to the Scorecard-reported multi-platform manifest
 digest. This follow-up is version 5.82. The remaining Scorecard findings
 require repository administration or community history; rerun Scorecard after
@@ -913,7 +915,8 @@ Dockerfile's final `cpanm` installation had no `--notest`, so it reran the
 23,000+ test suite for each emulated target architecture despite the separate
 full repository and coverage gates.
 
-Red test: updated `t/228-dockerhub-image-workflow.t` first to require
+Red test: updated the test 228-dockerhub-image-workflow (removed on
+2026-11-23 with the GitHub workflow files) first to require
 `cpanm --notest --reinstall` for installing the generated archive. Running it
 inside the Docker `dev` service failed at that assertion against the old
 Dockerfile (31 passed, 1 failed), reproducing the unwanted duplicate suite.
@@ -1142,7 +1145,7 @@ regression tests. Do not claim the whole goal from one optimized routine.
 
 Latest command-floor evidence (2026-10-14): an alternating 31-run Docker
 measurement found a 2.286 ms median for a bare `perl -e 1` child and 32.528 ms
-for the current `perl bin/dashboard version` child. The documented v5.88
+for the current `perl bin/d2 version` child. The documented v5.88
 version baseline is 56.7 ms, so 50x end-to-end would require 1.134 ms—below
 the measured Perl child-process floor. This is not a reason to reduce the
 requested subroutine scope; it shows that the command-level 50x interpretation
@@ -1183,7 +1186,7 @@ run --rm bench perl script/problem48-collector-config-benchmark`.
 This scoped improvement does not meet the 50x-per-subroutine objective; the
 full Problem 48 and SDLC delivery gates remain open.
 
-Reproduction and baseline: run the checked-out `bin/dashboard` inside the
+Reproduction and baseline: run the checked-out `bin/d2` inside the
 isolated `dd-problem48-profile` Compose project five times each for `version`,
 `paths`, and `ps1`. Median elapsed times were 56.7 ms, 93.3 ms, and 109.5 ms.
 Profile `t/03-web-app.t` in a one-off container; all 328 assertions passed.
@@ -1232,7 +1235,7 @@ Measured startup follow-up: NYTProf first attributed 18.6 ms inclusive to eager
 `Pod::Usage` loading on the version path. A red CLI smoke contract failed before
 the eager import was removed and the usage-error branches changed to load the
 module lazily. Later NYTProf tracing showed the apparent lazy import was
-insufficient: `bin/dashboard` loaded `InternalCLI` before dispatch, and that
+insufficient: `bin/d2` loaded `InternalCLI` before dispatch, and that
 module loaded `Platform`; `PathRegistry` also imported `Platform` eagerly. Red
 runtime tests confirmed both paths. The fix defers those imports until their
 behavior is needed and adds `Developer::Dashboard::Version` so the version
@@ -1292,7 +1295,7 @@ Literal-target audit: the v5.88 `HEAD` tree has 1,624 named `sub` declaration
 lines under `lib/Developer/Dashboard`; the current worktree has 1,648 by the
 same source-line count. Anonymous closures are excluded; none of these has a
 50x before/after proof set. The measured
-bare Perl process floor is 1.032–1.268 ms; 50x for the 5.88 `dashboard version`
+bare Perl process floor is 1.032–1.268 ms; 50x for the 5.88 `d2 version`
 median would require about 1.134 ms total, leaving roughly 0.1 ms beyond the
 interpreter floor for application startup, environment discovery, hooks, and
 output. The current evidence contradicts a 50x result for that invocation and
@@ -1312,8 +1315,8 @@ coverage shortfall only; Problem 48's 50× performance requirement and remaining
 delivery gates are still open.
 
 Fresh-process timing recheck (2026-10-12): after two warm-ups, 15 successful
-Docker executions measured medians of 36.379 ms for `dashboard version`,
-82.020 ms for `dashboard paths -o json`, and 90.429 ms for `dashboard ps1`.
+Docker executions measured medians of 36.379 ms for `d2 version`,
+82.020 ms for `d2 paths -o json`, and 90.429 ms for `d2 ps1`.
 Exit statuses were checked and stdout was discarded to exclude terminal output
 from the timing. The refreshed results do not establish a 50x result; the
 resident-runtime and socket results below remain separate prototype figures.
@@ -1572,7 +1575,7 @@ was made; this evidence does not establish or satisfy the required 50x for
 every subroutine.
 
 Prompt-path refinement (2026-10-13): a red-first test made an injected
-`Capture::Tiny` stub die when loaded during ordinary `dashboard ps1
+`Capture::Tiny` stub die when loaded during ordinary `d2 ps1
 --no-indicators`; the existing helper and `IndicatorStore` imports triggered
 it. The helper now loads Capture::Tiny only for a tmux ticket lookup, while the
 full project/Git core-indicator refresh loads it only after returning from the
@@ -1586,10 +1589,10 @@ Path-only Config view refinement (2026-10-13): the prompt and path CLI created
 a `FileRegistry` only to construct `Config`; these collector and path-alias
 operations resolve through `PathRegistry`, and `Config` does not access its
 `files` member. A red-first Docker test blocked `FileRegistry` and failed on
-`dashboard paths -o json`. `Config->for_path_config` now creates a path-bound
+`d2 paths -o json`. `Config->for_path_config` now creates a path-bound
 view without importing or constructing `FileRegistry`, and both paths use it.
 The prompt-loader, Config, and path CLI suites passed 361 assertions. An
-alternating 25-cycle fresh-process comparison measured `dashboard paths -o
+alternating 25-cycle fresh-process comparison measured `d2 paths -o
 json` at 64.636 ms with FileRegistry unloaded versus 72.077 ms with its module
 force-loaded (about 1.12x). This control isolates import overhead and does not
 reproduce the full old path. The first full gate found a stale
@@ -1786,7 +1789,7 @@ recorded as import hygiene rather than a material speed claim. Problem 48's
 
 The full gate reported the Problem 48 PBKDF2 adapter at 63.4% total coverage
 because the Docker image lacks optional FFI packages, leaving native-success
-and error branches unexercised. `t/651-crypto-pbkdf2-ffi.t` now provides a
+and error branches unexercised. `t/651-crypto-pbkdf2-xs.t` now provides a
 deterministic fake FFI boundary independent of installed modules or system
 `libcrypto`. It verifies cached and lazy initialization, digest parity,
 UTF-8 byte-boundary decline, signed-int input limits, short-output rejection,
@@ -1799,6 +1802,43 @@ across `lib/` (47,329 detail rows; no stale uncoverable annotations).
 `perldoc perlsec` also completed successfully in the benchmark container.
 Coverage is now verified for this worktree; Problem 48's 50x-per-subroutine
 objective is still open.
+
+### DKT-015 FFI-to-XS replacement (2026-10-30)
+
+The runtime use of `FFI::Platypus` and `FFI::CheckLib` was removed. PBKDF2,
+Linux inotify, and Windows directory notifications now call native functions
+from the shared distribution XS extension while keeping their existing Perl
+module APIs. macOS continues to use `Mac::FSEvents`. The platform workflow now
+builds the XS extension before native tests and includes a Windows ARM64
+watcher smoke test. Focused XS parity, workflow, watcher, and API tests pass in
+the Docker development container. A fresh-interpreter regression test first
+reproduced the duplicate module cache-key problem: absolute-path `require`
+left the canonical `%INC` key empty, so a later canonical import re-evaluated
+`Watch.pm`. The lazy loaders now prepend their own library root to `@INC` and
+require the canonical package name. The focused `t/08`, `t/10`, and `t/104`
+rerun passed with zero watcher redefinition warnings. The final full Docker run
+passed 290 files and 25,955 tests; statement, branch, condition, and subroutine
+coverage each measured 100.0 percent across 51,606 detail rows, with no stale
+uncoverable annotations. The release kwalitee test also passed all seven
+checks at 100 percent after refreshing the project dev image. No hosted-platform
+result or release is claimed here.
+
+#### Post-push Windows workflow correction (2026-10-31)
+
+The first hosted run of the XS change, 41156746869, passed Linux x64 and Linux
+ARM64. Windows x64 failed before tests because the XS build step explicitly
+used Git Bash, which selected its bundled MSYS Perl and could not load
+ExtUtils::MakeMaker, even though the workflow-installed Windows Perl was
+available to PowerShell steps. The build and coverage-tool setup now use
+separate Windows PowerShell and Unix Bash steps. A Docker workflow regression
+test failed first against the old workflow, then passed with checks for both
+shells and Windows path separators.
+
+That run also confirmed windows-11-arm is an ARM64 runner but supplies
+MSWin32-x64-multi-thread Perl. The ARM64 job now emits a visible warning and
+skips Perl-dependent install, build and watcher-test steps unless Perl itself
+is ARM64. It does not claim native ARM64 XS coverage when the runtime is
+unavailable. Hosted verification of the follow-up is pending.
 
 ### Problem 48 request-scoped installed-skill directory inventory (2026-10-14)
 
@@ -1912,7 +1952,7 @@ goal remains open.
 
 ### Problem 48 cold-process performance floor evidence (2026-10-14)
 
-An alternating Docker control launched 25 fresh `bin/dashboard version`
+An alternating Docker control launched 25 fresh `bin/d2 version`
 processes and 25 fresh bare Perl processes with the same interpreter. The
 medians were 32.424 ms and 1.263 ms respectively. Against the recorded v5.88
 dashboard median of 56.7 ms, a 50x result requires 1.134 ms total, less than
@@ -2852,6 +2892,21 @@ Problem 48's 50x all-routine objective. The latest profile still highlights
 indicator directory enumeration and response assembly; Problem 48 remains in
 progress.
 
+### DKT-012 coverage-gate source-map verification note (2026-10-31)
+
+The first Docker coverage report showed Devel::Cover source-map warnings for
+test files, even though only `lib/` is included in the enforced report. The
+cause was that the gate instrumented `t/` as well as the modules under test;
+dynamic test fixtures made those non-target source maps noisy. A red-first
+assertion was added to `t/107-all-metric-coverage-gate.t`, then the gate was
+changed to exclude `t/` from instrumentation while retaining all `lib/` files
+and treating any remaining Devel::Cover warning as a failure. Focused coverage
+gate tests pass. The first full rerun produced 100.0% for all four library
+metrics but correctly refused to accept the report because the source identity
+changed during the run; the main POD lives under `lib/` and was updated during
+that run. A stable-tree full coverage rerun is pending; no full coverage pass is
+claimed.
+
 #### Navigation item array removal (2026-10-18)
 
 Expected outcome: retain byte-for-byte saved-before-skill navigation markup
@@ -3027,6 +3082,73 @@ web-update, static-file, and TLS tests passed. `perldoc perlsec` could not load
 a formatter in the test image; the complete core `perlsec.pod` source was
 reviewed directly. The all-routine 50x goal remains open, so Problem 48 remains
 in progress.
+
+### DKT-012 / TSK-026: delayed macOS configuration watcher events (2026-10-31)
+
+Expected outcome: a web request observes an atomically replaced runtime
+configuration even when the native macOS FSEvents callback has not been
+delivered yet; stable requests still reuse their merged snapshot.
+
+Reproduction: in Docker, create a web app with a native watcher, issue a request
+that seeds the merged-config cache, atomically replace the config with a
+setting that disables the editor, and issue a second request before the fake
+watcher reports a change. Before the fix, the second response remained HTTP
+200 and did not merge configuration again instead of returning HTTP 403.
+
+Root cause: the watcher was the only cache invalidator on native platforms.
+Some watcher backends deliver filesystem events asynchronously, so a request
+could arrive after the file rename but before the callback marked the cached
+snapshot stale.
+
+Fix: watcher-backed cache checks now compare a high-resolution metadata
+signature for watched roots and config inputs in addition to watcher and
+environment signatures. The signature includes file identity, size, mtime,
+and ctime, so atomic replacement is detected without reading config contents
+on every watched request. The no-watcher portable validator continues to
+hash file contents, preserving same-size edit detection when no native event
+source is available. Both paths verify the inventory again after a fresh
+merge before retaining the snapshot.
+
+Verification: a test-first delayed-event regression failed on the old path
+(HTTP 200 and one merge) and passes after the change (HTTP 403 and two merges).
+The focused `t/03-web-app.t` run passes 548 assertions. A Docker route benchmark
+with five nav fragments measured 0.542 ms/request with native watching and
+0.809 ms/request with the portable no-watcher path, retaining identical
+response status, byte count, and SHA-256. A synthetic 100 skill-nav-fragment
+run retained exact response parity at 8.470 ms/request; this higher workload
+has no before-fix comparison and is not used as a speedup claim. Full-suite,
+coverage, documentation, packaging, blank-container installation, and hosted
+macOS rerun evidence remain pending for this release candidate.
+
+### DKT-012 / TSK-027: Linux Test workflow omits the XS build path (2026-10-31)
+
+Expected outcome: the primary Linux Test workflow compiles the distribution's
+XS extension before running tests, and test and coverage child processes load
+the compiled `blib` modules from this checkout.
+
+Reproduction: inspect failing Test workflow run 41179585840. Its suite fails
+`t/669-problem48-inotify-watch.t` and `t/677-native-xs-api.t` because the native
+XS entry points are unavailable. The Platform workflow has a separate job
+that builds XS, which made the discrepancy visible only in the primary Linux
+Test workflow.
+
+Root cause: `.github/workflows/test.yml` ran `prove -lr t` without first
+running `perl Makefile.PL` and `make`. Its `PERL5LIB` contained the local
+dependency tree but not `blib/arch` or `blib/lib`, so native tests and child
+Perl processes could not load the extension compiled from the current source.
+
+Fix: add an explicit XS build step, pass both `blib` paths to `prove`, and
+export them before the coverage step so its child processes inherit the same
+extension and local dependencies. Expand the test
+230-native-xs-workflow (removed on 2026-11-23 with the GitHub workflow files) to
+protect build ordering and both library paths. Correct the Web::App cache
+fixture that claimed to omit a signature while retaining its default value,
+and add a watcher-mode test for an unavailable initial freshness signature.
+
+Verification: the workflow regression passes 44 assertions; the full Docker
+source suite passes 290 files and 26,079 tests with XS built. The focused
+`t/03-web-app.t` regression passes 551 assertions. The full four-metric
+coverage rerun and hosted Test workflow result are pending.
 
 ### Problem 48 stable status-path join reuse (2026-10-15)
 

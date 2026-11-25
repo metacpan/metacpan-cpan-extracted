@@ -57,6 +57,8 @@ subtest 'pipeline looks names up in the package that calls it' => sub {
     package My::Words {
         use Ekorn::Pipeline::Factories qw(pipeline);
         Ekorn::Pipeline->named(shout => sub { uc });
+
+
         sub make (@stages) { pipeline(@stages) }
     }
     is [My::Words::make('shout')->('a')], ['A'];

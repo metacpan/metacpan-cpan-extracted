@@ -23,7 +23,10 @@ our $DEFAULT_STALE_AFTER = 3600;
 # Purpose: report whether a pid still has a process behind it, distinguishing a
 #          process that is gone from one this uid merely may not signal. The
 #          leaked containers this module reclaims run as root, so treating
-#          "permission denied" as "gone" would be exactly backwards.
+#          "permission denied" as "gone" would be exactly backwards. On Windows
+#          a bare kill(0) is not that check: it cannot open the System process
+#          (pid 4) at all, so _pid_alive_windows answers from OpenProcess
+#          instead (see below).
 # Input:   $pid - a pid parsed out of a container name; may be undef or <= 0.
 # Output:  1 when a process with that pid exists, 0 when it does not.
 sub pid_alive {
@@ -31,8 +34,89 @@ sub pid_alive {
     return 0 if !defined $pid;
     return 0 if $pid !~ /\A[0-9]+\z/;
     return 0 if $pid <= 0;
+    return _pid_alive_windows($pid) if $^O eq 'MSWin32';
     return 1 if kill 0, $pid;
     return $! == EPERM ? 1 : 0;
+}
+
+# Cached Win32 process-query imports, attempted once; a failed import is
+# never retried, so a missing Win32 primitive degrades to kill(0) exactly
+# once (the Watch.pm _windows_peek_named_pipe shape).
+my $_WINDOWS_PROCESS_API;
+my $_WINDOWS_PROCESS_API_FAILED;
+
+# STILL_ACTIVE is the exit code GetExitCodeProcess reports for a process
+# that has not exited; PROCESS_QUERY_LIMITED_INFORMATION is the access
+# right OpenProcess needs to query it (micro t/997, solo #385).
+my $_WINDOWS_STILL_ACTIVE              = 259;
+my $_WINDOWS_QUERY_LIMITED_INFORMATION = 0x1000;
+
+# _windows_process_api()
+# Imports the four kernel32 functions the Windows liveness check needs,
+# once, and caches them. Win32::API is loaded lazily so Unix legs never
+# pay for it and a leg without it keeps working.
+# Input: none.
+# Output: hash reference of imported function objects, or undef when the
+#          import fails (callers fall back to kill(0)).
+sub _windows_process_api {
+    return $_WINDOWS_PROCESS_API if defined $_WINDOWS_PROCESS_API;
+    return undef if $_WINDOWS_PROCESS_API_FAILED;
+    my $api = eval {
+        require Win32::API;
+        my $open_process = Win32::API->new( 'kernel32', 'OpenProcess', 'NIN', 'Q' );
+        die "OpenProcess import failed\n" if !defined $open_process;
+        my $get_exit_code = Win32::API->new( 'kernel32', 'GetExitCodeProcess', 'QP', 'I' );
+        die "GetExitCodeProcess import failed\n" if !defined $get_exit_code;
+        my $get_process_id = Win32::API->new( 'kernel32', 'GetProcessId', 'Q', 'N' );
+        die "GetProcessId import failed\n" if !defined $get_process_id;
+        my $close_handle = Win32::API->new( 'kernel32', 'CloseHandle', 'Q', 'I' );
+        die "CloseHandle import failed\n" if !defined $close_handle;
+        {
+            open_process   => $open_process,
+            get_exit_code  => $get_exit_code,
+            get_process_id => $get_process_id,
+            close_handle   => $close_handle,
+        };
+    };
+    if ( !$api ) {
+        $_WINDOWS_PROCESS_API_FAILED = 1;
+        return undef;
+    }
+    $_WINDOWS_PROCESS_API = $api;
+    return $api;
+}
+
+# _pid_alive_windows($pid)
+# Windows-only liveness check. A bare kill(0) cannot be trusted here:
+# Perl's kill(0) on Windows cannot open the System process (pid 4) at all
+# — kill 0, 4 fails with EINVAL — so a live but unsignallable process
+# would be reported dead, exactly backwards for this probe. Open the
+# process for QUERY_LIMITED_INFORMATION instead, require GetProcessId to
+# return exactly the pid asked for (a SYNCHRONIZE pseudo-handle reports
+# 0), and require the exit code to be STILL_ACTIVE — the same discipline
+# as ProcessSupervision::_process_exists_windows (round 42, t/09 test 209;
+# micro t/997 proved both traps in solo #385). The handle is closed on
+# every path once opened: the values are read into Perl scalars first and
+# CloseHandle runs before any of the verdict returns below, so there is
+# no early return that can leak it. When the Win32 imports are unavailable
+# the check falls back to kill(0), so behaviour degrades to today's
+# rather than dying.
+# Input: process id integer.
+# Output: boolean true when the process is really running.
+sub _pid_alive_windows {
+    my ($pid) = @_;
+    my $api = _windows_process_api();
+    return kill( 0, $pid ) ? 1 : 0 if !$api;
+    my $handle = $api->{open_process}->Call( $_WINDOWS_QUERY_LIMITED_INFORMATION, 0, $pid );
+    return 0 if !$handle;
+    my $real_pid = $api->{get_process_id}->Call($handle);
+    my $code_buf = pack 'L', 0;
+    my $ok = $api->{get_exit_code}->Call( $handle, $code_buf );
+    my $code = $ok ? unpack( 'L', $code_buf ) : undef;
+    $api->{close_handle}->Call($handle);
+    return 0 if !defined $real_pid || $real_pid != $pid;
+    return 0 if !defined $code;
+    return $code == $_WINDOWS_STILL_ACTIVE ? 1 : 0;
 }
 
 # Purpose: decide which of the containers currently on the host are guard

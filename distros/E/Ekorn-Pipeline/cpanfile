@@ -13,6 +13,10 @@ requires 'namespace::clean';
 # A v2.0.0 changes what redact takes or returns, so dump_to takes v1.x.
 recommends 'Text::Redact::Secrets', '>= v1.0.0, < v2.0.0';
 
+# from_csv and to_csv read and write with it, and load it only when
+# they're called (roadmap 2026-0049).
+recommends 'Text::CSV';
+
 on test => sub {
     requires 'Test2::V0';
     requires 'Test2::Plugin::NoWarnings';

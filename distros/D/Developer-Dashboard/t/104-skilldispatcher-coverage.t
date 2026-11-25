@@ -255,8 +255,8 @@ is( $run_libcheck->{stdout}, "local-lib-ok\n", 'dispatch exposes skill lib direc
 my $run_inc_check = $disp->dispatch( 'runner', 'inc' );
 my ($first_cli_inc) = split /,/, $run_inc_check->{stdout}, 2;
 is(
-    $first_cli_inc,
-    File::Spec->catdir( $proj_runner, 'lib' ),
+    _without_private_var_prefix($first_cli_inc),
+    _without_private_var_prefix( File::Spec->catdir( $proj_runner, 'lib' ) ),
     'the exact skill path providing a CLI script is the first entry in that child Perl process @INC',
 );
 
@@ -282,6 +282,27 @@ ok( $hook_entry, 'execute_hooks records the failing hook' );
 is( $hook_fail->{hooks}{$hook_entry}{exit_code}, 1,
     'execute_hooks reports the real exit code for a failing hook, not the raw wait-status' );
 
+# _run_with_exec_failure($fail_re, $code)
+# Runs $code with the final exec handoff faked to fail, so the error path of
+# exec_command / _exec_resolved_command can be asserted without replacing
+# the test process. On Unix the exec shim above does it: $fail_re selects
+# the argv to fail. On Windows _exec_replacement never calls exec() at all
+# - it runs system() and exits - so the shim can never fire there (round
+# 53, t/104 test 26: the real 'solo' ran and exit killed the test process
+# mid-test). Mock the replacement itself on Windows instead; it is the seam
+# the product actually uses there, and _exec_resolved_command still
+# assembles the same 'Unable to exec ...' error from its return.
+sub _run_with_exec_failure {
+    my ( $fail_re, $code ) = @_;
+    local $Local::ExecShim::FAIL_RE = $fail_re;
+    if ( $^O eq 'MSWin32' ) {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillDispatcher::_exec_replacement = sub { 'No such file or directory' };
+        return $code->();
+    }
+    return $code->();
+}
+
 # ---------------------------------------------------------------------------
 # exec_command(): guards plus the exec handoff (faked via the shim).
 # ---------------------------------------------------------------------------
@@ -293,27 +314,24 @@ ok( $disp->exec_command( 'disabledskill', 'greet' )->{error}, 'exec_command refu
 
 {
     local %ENV = %ENV;
-    local $Local::ExecShim::FAIL_RE = qr{/solo\z};
-    my $exec_solo = $disp->exec_command( 'runner', 'solo' );
+    my $exec_solo = _run_with_exec_failure( qr{/solo\z}, sub { $disp->exec_command( 'runner', 'solo' ) } );
     like( $exec_solo->{error}, qr/\AUnable to exec /, 'exec_command surfaces the exec failure for a hookless command' );
 }
 {
     local %ENV = %ENV;
-    local $Local::ExecShim::FAIL_RE = qr{/exectest\z};
-    my $exec_hooked = quietly( sub { $disp->exec_command( 'runner', 'exectest' ) } );
+    my $exec_hooked = _run_with_exec_failure( qr{/exectest\z}, sub { quietly( sub { $disp->exec_command( 'runner', 'exectest' ) } ) } );
     like( $exec_hooked->{error}, qr/\AUnable to exec /, 'exec_command runs streaming hooks then reports the exec failure' );
 }
 
 # DD-1043: exec_command's native .version fallback - no cli/version script
 # exists for 'runner', so it reads VERSION=9.99 from the .env staged above
-# and hands it to _exec_replacement, going through the same shimmed exec()
-# every other exec_command path already uses.
+# and hands it to _exec_replacement, going through the same faked exec
+# failure every other exec_command path already uses.
 {
     is( $disp->dispatch( 'runner', 'version' )->{stdout}, "9.99\n", 'dispatch native .version fallback prints the .env VERSION=' );
 
-    local $Local::ExecShim::FAIL_RE = qr/./s;
-    my $exec_version = $disp->exec_command( 'runner', 'version' );
-    like( $exec_version->{error}, qr/\AUnable to exec /, 'exec_command native .version fallback routes through the shimmed exec()' );
+    my $exec_version = _run_with_exec_failure( qr/./s, sub { $disp->exec_command( 'runner', 'version' ) } );
+    like( $exec_version->{error}, qr/\AUnable to exec /, 'exec_command native .version fallback reports the exec failure' );
 }
 
 # ---------------------------------------------------------------------------
@@ -336,7 +354,10 @@ is_deeply( $disp->_execute_hooks_streaming( 'runner', 'greet', [] ), { hooks => 
 
 my $child = quietly( sub {
     $disp->_run_child_command_streaming(
-        command    => [ '/bin/sh', '-c', 'echo direct-out; echo direct-err >&2' ],
+        # No /bin/sh on Windows, so the child never runs there (solo #416,
+        # test 40). Use the running perl instead, the same portable shape
+        # t/102 already uses for streaming children.
+        command    => [ $^X, '-e', 'print q{direct-out}; print STDERR q{direct-err}' ],
         stdin_mode => 'null',
     );
 } );
@@ -349,7 +370,11 @@ like( $child->{stdout}, qr/direct-out/, 'direct child runner captures stdout and
     $? = 12 << 8;    ## no critic (Variables::RequireLocalizedPunctuationVars)
     quietly( sub {
         $disp->_run_child_command_streaming(
-            command    => [ '/bin/sh', '-c', 'exit 0' ],
+            # As above: /bin/sh does not exist on Windows, so this passed
+            # vacuously there with no child ever spawned or reaped. The
+            # perl exit runs a real child on every platform, so the $?
+            # guard is genuinely exercised.
+            command    => [ $^X, '-e', 'exit 0' ],
             stdin_mode => 'null',
         );
     } );
@@ -368,8 +393,7 @@ is_deeply( $disp->execute_hooks( 'runner', 'nosuchcmd' ), { hooks => {}, result_
 # _exec_resolved_command / _exec_replacement error handoff.
 # ---------------------------------------------------------------------------
 {
-    local $Local::ExecShim::FAIL_RE = qr{/bin/false\z};
-    my $res = $disp->_exec_resolved_command( '/bin/false', [ '/bin/false' ], [] );
+    my $res = _run_with_exec_failure( qr{/bin/false\z}, sub { $disp->_exec_resolved_command( '/bin/false', [ '/bin/false' ], [] ) } );
     like( $res->{error}, qr{\AUnable to exec /bin/false:}, '_exec_resolved_command returns the exec failure' );
 }
 
@@ -535,7 +559,7 @@ is( scalar @hook_paths, 2, 'command_hook_paths lists only the runnable hook file
 is( $disp->_page_location( '', 'index' ),    undef, '_page_location guards a missing skill name' );
 is( $disp->_page_location( 'runner', '' ),   undef, '_page_location guards a missing route id' );
 my ( $idx_file, $idx_owner ) = $disp->_page_location( 'runner', 'index' );
-ok( -f $idx_file, '_page_location resolves an existing dashboard file' );
+ok( -f $idx_file, '_page_location resolves an existing d2 file' );
 
 {
     my $died = !eval { $disp->_load_skill_page( route_id => 'index' ); 1 };
@@ -922,6 +946,12 @@ is_deeply( [ $disp->_descendant_skill_names( 'x', '' ) ], [], '_descendant_skill
 chdir $orig_cwd or die $!;
 done_testing;
 
+sub _without_private_var_prefix {
+    my ($path) = @_;
+    $path =~ s{/private(?=/var/folders/)}{}g if defined $path;
+    return $path;
+}
+
 __END__
 
 =pod
@@ -968,7 +998,7 @@ focused test with:
 
 The repository test harness and the Devel::Cover release gate use this file to
 lock down skill dispatcher behaviour that sits behind dotted
-C<dashboard E<lt>repoE<gt>.E<lt>commandE<gt>> dispatch and the skill browser
+C<d2 E<lt>repoE<gt>.E<lt>commandE<gt>> dispatch and the skill browser
 routes.
 
 =head1 EXAMPLES

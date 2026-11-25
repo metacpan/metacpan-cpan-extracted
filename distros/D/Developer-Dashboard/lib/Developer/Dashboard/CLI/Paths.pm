@@ -3,14 +3,14 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Cwd qw(abs_path);
 use File::Basename qw(basename);
 use File::Spec;
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PathRegistry;
-use Developer::Dashboard::PathIdentity qw(current_working_directory);
+use Developer::Dashboard::PathIdentity qw(current_working_directory _resolve_symlinks);
 
 # _build_paths()
 # Builds the shared path registry without loading table-rendering code, which
@@ -40,7 +40,7 @@ sub _load_table_helpers {
 }
 
 # run_paths_command(%args)
-# Dispatches the lightweight dashboard path/paths CLI behavior without loading
+# Dispatches the lightweight d2 path/paths CLI behavior without loading
 # the main dashboard runtime. Configuration and file-registry modules are
 # required only for verbs that read configured aliases or mutate path config;
 # Getopt::Long is loaded only when the selected verb parses CLI options.
@@ -116,7 +116,7 @@ sub run_paths_command {
     if ( $action eq 'project-root' ) { return _paths_action_project_root( %ctx, argv => \@argv ) }
     if ( $action eq 'list' )         { return _paths_action_list( %ctx, argv => \@argv ) }
 
-    die "Usage: dashboard path <resolve|locate|cdr|complete-cdr|add|del|rm|project-root|list> ...\n";
+    die "Usage: d2 path <resolve|locate|cdr|complete-cdr|add|del|rm|project-root|list> ...\n";
 }
 
 # _get_options_from_array($argv, @option_specs)
@@ -173,7 +173,7 @@ sub _parse_output_options_fast {
 }
 
 # _paths_action_paths(%args)
-# Implements the top-level "dashboard paths" inventory listing.
+# Implements the top-level "d2 paths" inventory listing.
 # Input: paths registry, config, alias-loader closure, and argv under "paths",
 # "config", "load_paths", and "argv".
 # Output: prints the full path inventory as JSON or a summary table; returns 1.
@@ -183,7 +183,7 @@ sub _paths_action_paths {
     my @argv = @{$argv};
     my $output = 'table';
     _get_options_from_array( \@argv, 'o|output=s' => \$output );
-    die "Usage: dashboard paths [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
+    die "Usage: d2 paths [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
     $load_folder_paths->();
     if ( $output eq 'json' ) {
         print json_encode( $paths->all_paths );
@@ -194,7 +194,7 @@ sub _paths_action_paths {
 }
 
 # _paths_action_resolve(%args)
-# Implements "dashboard path resolve <name>".
+# Implements "d2 path resolve <name>".
 # Input: paths registry, alias-loader closure, and argv under "paths",
 # "load_paths", and "argv".
 # Output: prints the resolved directory for the named alias; returns 1.
@@ -202,14 +202,14 @@ sub _paths_action_resolve {
     my (%args) = @_;
     my ( $paths, $load_paths, $argv ) = @args{qw(paths load_paths argv)};
     $load_paths->();
-    my $name = shift( @{$argv} ) || die "Usage: dashboard path resolve <name>\n";
+    my $name = shift( @{$argv} ) || die "Usage: d2 path resolve <name>\n";
     my $target = _resolve_path_alias( paths => $paths, name => $name );
     print $target, "\n";
     return 1;
 }
 
 # _paths_action_locate(%args)
-# Implements "dashboard path locate [-o json|table] <term...>".
+# Implements "d2 path locate [-o json|table] <term...>".
 # Input: paths registry and argv under "paths" and "argv".
 # Output: prints the matched project paths as JSON or a summary table;
 # returns 1.
@@ -219,7 +219,7 @@ sub _paths_action_locate {
     my @argv = @{$argv};
     my $output = 'table';
     _get_options_from_array( \@argv, 'o|output=s' => \$output );
-    die "Usage: dashboard path locate [-o json|table] <term...>\n" if $output ne 'json' && $output ne 'table';
+    die "Usage: d2 path locate [-o json|table] <term...>\n" if $output ne 'json' && $output ne 'table';
     my $matches = [ $paths->locate_projects(@argv) ];
     if ( $output eq 'json' ) {
         print json_encode($matches);
@@ -231,7 +231,7 @@ sub _paths_action_locate {
 }
 
 # _paths_action_cdr(%args)
-# Implements "dashboard path cdr <term...>".
+# Implements "d2 path cdr <term...>".
 # Input: paths registry, alias-loader closure, and argv under "paths",
 # "load_paths", and "argv".
 # Output: prints the cdr resolution payload as JSON; returns 1.
@@ -250,7 +250,7 @@ sub _paths_action_cdr {
 }
 
 # _paths_action_complete_cdr(%args)
-# Implements "dashboard path complete-cdr <index> <word...>".
+# Implements "d2 path complete-cdr <index> <word...>".
 # Input: paths registry, alias-loader closure, and argv under "paths",
 # "load_paths", and "argv".
 # Output: prints newline-separated shell-completion candidates; returns 1.
@@ -288,7 +288,7 @@ sub _parse_create_option {
 }
 
 # _paths_action_add(%args)
-# Implements "dashboard path add <name> <path> [-c|--create[=MODE]] [-o json|table]".
+# Implements "d2 path add <name> <path> [-c|--create[=MODE]] [-o json|table]".
 # Input: paths registry, config, and argv under "paths", "config", and "argv".
 # Output: prints the saved alias as JSON or a mutation summary table;
 # returns 1.
@@ -299,7 +299,7 @@ sub _paths_action_add {
     my $output = 'table';
     my $create_raw;
     _get_options_from_array( \@argv, 'o|output=s' => \$output, 'c|create:s' => \$create_raw );
-    die "Usage: dashboard path add <name> <path> [-c|--create[=MODE]] [-o json|table]\n" if $output ne 'json' && $output ne 'table';
+    die "Usage: d2 path add <name> <path> [-c|--create[=MODE]] [-o json|table]\n" if $output ne 'json' && $output ne 'table';
     my ( $create, $mode ) = _parse_create_option($create_raw);
     my ( $name, $path ) = _normalize_add_arguments(@argv);
     my $saved = $config->save_path_alias( $name, $path, ( $create ? ( create => 1, ( defined $mode ? ( mode => $mode ) : () ) ) : () ) );
@@ -320,7 +320,7 @@ sub _paths_action_add {
 }
 
 # _paths_action_del(%args)
-# Implements "dashboard path del|rm <name> [-o json|table]".
+# Implements "d2 path del|rm <name> [-o json|table]".
 # Input: paths registry, config, and argv under "paths", "config", and "argv".
 # Output: prints the removed alias as JSON or a removal summary table;
 # returns 1.
@@ -330,7 +330,7 @@ sub _paths_action_del {
     my @argv = @{$argv};
     my $output = 'table';
     _get_options_from_array( \@argv, 'o|output=s' => \$output );
-    die "Usage: dashboard path del <name> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
+    die "Usage: d2 path del <name> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
     my $name = _normalize_delete_argument(
         paths  => $paths,
         config => $config,
@@ -351,7 +351,7 @@ sub _paths_action_del {
 }
 
 # _paths_action_project_root(%args)
-# Implements "dashboard path project-root".
+# Implements "d2 path project-root".
 # Input: paths registry under "paths".
 # Output: prints the current project root, or nothing when there is none;
 # returns 1.
@@ -364,7 +364,7 @@ sub _paths_action_project_root {
 }
 
 # _paths_action_list(%args)
-# Implements "dashboard path list [-o json|table]".
+# Implements "d2 path list [-o json|table]".
 # Input: paths registry, alias-loader closure, and argv under "paths",
 # "load_paths", and "argv".
 # Output: prints the configured path aliases as JSON or a summary table;
@@ -375,7 +375,7 @@ sub _paths_action_list {
     my @argv = @{$argv};
     my $output = 'table';
     _get_options_from_array( \@argv, 'o|output=s' => \$output );
-    die "Usage: dashboard path list [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
+    die "Usage: d2 path list [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
     $load_folder_paths->();
     if ( $output eq 'json' ) {
         print json_encode( $paths->all_path_aliases );
@@ -387,27 +387,27 @@ sub _paths_action_list {
 }
 
 # _normalize_add_arguments(@argv)
-# Expands dashboard path add shorthand so "." points at the current working
+# Expands d2 path add shorthand so "." points at the current working
 # directory and a lone "." also derives the alias name from that directory.
-# Input: raw argv entries that follow "dashboard path add".
+# Input: raw argv entries that follow "d2 path add".
 # Output: alias name string plus target path string.
 sub _normalize_add_arguments {
     my (@argv) = @_;
-    die "Usage: dashboard path add <name> <path>\n" if !@argv;
+    die "Usage: d2 path add <name> <path>\n" if !@argv;
 
     if ( @argv == 1 && $argv[0] eq '.' ) {
         my $cwd = current_working_directory();
         return ( basename($cwd), $cwd );
     }
 
-    my $name = shift @argv || die "Usage: dashboard path add <name> <path>\n";
-    my $path = shift @argv || die "Usage: dashboard path add <name> <path>\n";
+    my $name = shift @argv || die "Usage: d2 path add <name> <path>\n";
+    my $path = shift @argv || die "Usage: d2 path add <name> <path>\n";
     $path = current_working_directory() if $path eq '.';
     return ( $name, $path );
 }
 
 # _normalize_delete_argument(%args)
-# Expands dashboard path del/rm shorthand so "." removes the alias that points
+# Expands d2 path del/rm shorthand so "." removes the alias that points
 # at the current working directory.
 # Input: hash containing the path registry under "paths", the config under
 # "config", and the raw alias token under "name".
@@ -417,7 +417,7 @@ sub _normalize_delete_argument {
     my $paths  = $args{paths}  || die "Missing paths registry\n";
     my $config = $args{config} || die "Missing config\n";
     my $name   = $args{name};
-    die "Usage: dashboard path del <name>\n" if !defined $name || $name eq '';
+    die "Usage: d2 path del <name>\n" if !defined $name || $name eq '';
     return $name if $name ne '.';
 
     my $cwd = current_working_directory();
@@ -538,7 +538,16 @@ sub _skill_folder_entries {
             file => File::Spec->catfile( $lib, 'Folder.pm' ),
             lib  => $lib,
         }
-    } grep { !$_->{disabled} } @nested_entries;
+    } grep {
+        !$_->{disabled}
+          # An entry whose segments carry an undef or empty name cannot form
+          # a real alias: the join warned and produced a phantom alias such
+          # as '.work'. Skip it here so a malformed inventory from any source
+          # can never resurface it. An entry with no segments key at all
+          # keeps its established empty name.
+          && ( !defined $_->{segments}
+            || !grep { !defined $_ || $_ eq '' } @{ $_->{segments} } )
+    } @nested_entries;
 }
 
 # _load_skill_folder_module($entry)
@@ -553,9 +562,16 @@ sub _load_skill_folder_module {
     my $file = $entry->{file} || die "Missing skill Folder.pm path\n";
     return 0 if !-f $file;
 
-    my $real_skill = abs_path( $entry->{dir} );
-    my $real_lib   = abs_path( $entry->{lib} );
-    my $real_file  = abs_path($file);
+    # Resolve symlink components before abs_path: abs_path does not resolve
+    # symlinks on Windows, so a symlinked lib would otherwise look as if it
+    # were still inside the skill root. _resolve_symlinks returns undef for a
+    # link loop, which keeps the unresolvable-path die below firing.
+    my $skill_source = _resolve_symlinks( $entry->{dir} );
+    my $lib_source   = _resolve_symlinks( $entry->{lib} );
+    my $file_source  = _resolve_symlinks($file);
+    my $real_skill = defined $skill_source ? abs_path($skill_source) : undef;
+    my $real_lib   = defined $lib_source ? abs_path($lib_source) : undef;
+    my $real_file  = defined $file_source ? abs_path($file_source) : undef;
     die "Unable to resolve skill Folder.pm '$file'\n"
       if !defined $real_skill || !defined $real_lib || !defined $real_file;
     my @lib_parts = File::Spec->splitdir( File::Spec->abs2rel( $real_lib, $real_skill ) );
@@ -804,7 +820,7 @@ Developer::Dashboard::CLI::Paths - lightweight path and paths helper dispatch
 
 =head1 DESCRIPTION
 
-Implements the lightweight C<dashboard path> and C<dashboard paths> commands so
+Implements the lightweight C<d2 path> and C<d2 paths> commands so
 the public entrypoint can hand off path-related work to an extracted helper
 script under F<~/.developer-dashboard/cli/>. That includes the shared
 target-selection logic used by shell helpers such as C<cdr> and
@@ -823,7 +839,7 @@ Dispatch the path helper command.
 
 =head1 PURPOSE
 
-This module is the command runtime behind C<dashboard paths> and C<dashboard path ...>. It prints the active runtime roots, resolves named aliases, persists alias add/delete operations, computes the JSON payload used by shell helpers such as C<cdr> and C<which_dir>, and returns the live completion candidates used by the C<cdr> shell functions.
+This module is the command runtime behind C<d2 paths> and C<d2 path ...>. It prints the active runtime roots, resolves named aliases, persists alias add/delete operations, computes the JSON payload used by shell helpers such as C<cdr> and C<which_dir>, and returns the live completion candidates used by the C<cdr> shell functions.
 
 =head1 WHY IT EXISTS
 
@@ -831,7 +847,7 @@ It exists because path reporting and shell-navigation semantics should live in P
 
 =head1 WHEN TO USE
 
-Use this file when changing the output of C<dashboard paths>, the behavior of C<dashboard path resolve/add/del/rm/list/project-root>, the C<cdr> payload contract consumed by shell helpers, or the completion candidates exposed to C<cdr>, C<dd_cdr>, and C<which_dir>.
+Use this file when changing the output of C<d2 paths>, the behavior of C<d2 path resolve/add/del/rm/list/project-root>, the C<cdr> payload contract consumed by shell helpers, or the completion candidates exposed to C<cdr>, C<dd_cdr>, and C<which_dir>.
 
 =head1 HOW TO USE
 
@@ -844,23 +860,23 @@ default with C<-o json> available for the full machine payload. The
 C<project-root> and C<locate> verbs do not load config or file-registry modules;
 verbs that read or change configured aliases load them when needed. The option
 parser is also loaded on demand only for verbs that accept command-line flags. For
-C<dashboard path cdr>, the first argument is
+C<d2 path cdr>, the first argument is
 treated as a saved alias when one exists; otherwise it becomes the first search
 regex under the current directory. Any remaining narrowing terms are
 case-insensitive regexes and all of them must match a candidate path. A single
 match becomes the target directory; multiple matches are returned as a list
 while the target stays at the alias root or current directory. For
-C<dashboard path complete-cdr>, pass the shell completion index followed by the
+C<d2 path complete-cdr>, pass the shell completion index followed by the
 raw shell words, for example C<cdr foobar alp>; the helper returns newline
 delimited completion candidates for aliases or matching directory basenames.
 
 An installed skill can define C<lib/Folder.pm> with C<package Folder;> and
 methods that return path strings. C<cdr E<lt>skillE<gt>.E<lt>aliasE<gt>> and
-C<dashboard path resolve> consult the effective C<config/config.json> path
+C<d2 path resolve> consult the effective C<config/config.json> path
 alias first, then call the matching method from C<Folder.pm>. If the module
 implements C<__list__>, its list-context alias names are called and merged
-into C<dashboard paths>, C<dashboard path list>, and completion output. This
-is a read-only merge: C<dashboard path add> continues to write aliases only
+into C<d2 paths>, C<d2 path list>, and completion output. This
+is a read-only merge: C<d2 path add> continues to write aliases only
 to config, where a configured value overrides a same-named module method. C<cdr>
 completion includes aliases and only direct child directories; each entered
 term narrows one level before the next candidates are listed. It avoids
@@ -875,18 +891,18 @@ output.
 
 =head1 EXAMPLES
 
-  dashboard paths
-  dashboard path resolve bookmarks
-  dashboard path cdr project alpha ".*service"
+  d2 paths
+  d2 path resolve bookmarks
+  d2 path cdr project alpha ".*service"
   cdr ch.workspace
   d2 paths -o json
-  dashboard path complete-cdr 2 cdr project alp
-  dashboard path add work ~/projects/work
-  dashboard path add .
-  dashboard path add scratch /tmp/scratch --create
-  dashboard path add scratch /tmp/scratch --create 0777
-  dashboard path rm work
-  dashboard path list
+  d2 path complete-cdr 2 cdr project alp
+  d2 path add work ~/projects/work
+  d2 path add .
+  d2 path add scratch /tmp/scratch --create
+  d2 path add scratch /tmp/scratch --create 0777
+  d2 path rm work
+  d2 path list
 
 =for comment FULL-POD-DOC END
 

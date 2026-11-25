@@ -24,19 +24,19 @@ open-file - private open-file helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard open-file [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
+  d2 open-file [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
-C<dashboard> command can keep file-opening behaviour available without
+C<d2> command can keep file-opening behaviour available without
 installing a generic executable into the user's global PATH.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard open-file>, the long-form file lookup
+This staged helper exposes C<d2 open-file>, the long-form file lookup
 command. It is the user-facing wrapper for direct file opens, scoped regex
 search, Perl module lookup, Java dotted class lookup, and the final
 print-vs-editor action chosen by the shared open-file runtime.
@@ -49,13 +49,13 @@ archive lookup, and editor-exec behavior in one tested Perl module.
 
 =head1 WHEN TO USE
 
-Use this file when changing the public C<dashboard open-file> argv contract,
+Use this file when changing the public C<d2 open-file> argv contract,
 the staged-helper handoff, or the examples contributors use to understand the
 full-featured open-file behavior.
 
 =head1 HOW TO USE
 
-Users run C<dashboard open-file [--print] [--line N] [--editor CMD]
+Users run C<d2 open-file [--print] [--line N] [--editor CMD]
 E<lt>file|scopeE<gt> [pattern ...]>. Direct paths and C<file:line> values are
 opened immediately. Scoped mode treats the first positional argument as the
 root and every remaining positional argument as a case-insensitive regex that
@@ -72,12 +72,12 @@ Perl modules, Java classes, and print-vs-editor behavior.
 
 =head1 EXAMPLES
 
-  dashboard open-file lib 'OpenFile\.pm$'
-  dashboard open-file path/to/file.txt
-  dashboard open-file . "Ok\.js$"
-  dashboard open-file Developer::Dashboard::CLI::Paths
-  dashboard open-file javax.jws.WebService
-  dashboard open-file --print bookmarks index
+  d2 open-file lib 'OpenFile\.pm$'
+  d2 open-file path/to/file.txt
+  d2 open-file . "Ok\.js$"
+  d2 open-file Developer::Dashboard::CLI::Paths
+  d2 open-file javax.jws.WebService
+  d2 open-file --print bookmarks index
 
 =for comment FULL-POD-DOC END
 

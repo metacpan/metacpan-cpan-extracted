@@ -177,7 +177,7 @@ isa_ok( Developer::Dashboard::CLI::Skills::_build_paths(), 'Developer::Dashboard
 
 like(
     run_cli('uninstall')->{error},
-    qr/\AUsage: dashboard skills uninstall <repo-name>\n\z/,
+    qr/\AUsage: d2 skills uninstall <repo-name>\n\z/,
     'uninstall without a repo name prints the short usage and dies',
 );
 
@@ -187,7 +187,7 @@ like( json_decode( $uninstall_missing_json->{stdout} )->{error}, qr/not found/, 
 
 like(
     run_cli( 'uninstall', 'ghost-skill', '-o', 'yaml' )->{error},
-    qr/\AUsage: dashboard skills uninstall <repo-name> \[-o json\|table\]\n\z/,
+    qr/\AUsage: d2 skills uninstall <repo-name> \[-o json\|table\]\n\z/,
     'uninstall rejects an unsupported table output format',
 );
 
@@ -215,7 +215,7 @@ make_path( File::Spec->catdir( $skills_root, 'demo-skill', 'cli' ) );
 
 like(
     run_cli('enable')->{error},
-    qr/\AUsage: dashboard skills enable <repo-name>\n\z/,
+    qr/\AUsage: d2 skills enable <repo-name>\n\z/,
     'enable without a repo name prints the short usage and dies',
 );
 
@@ -223,7 +223,7 @@ is( run_cli( 'enable', 'ghost-skill', '-o', 'json' )->{exit}, 1, 'enable of a mi
 
 like(
     run_cli( 'enable', 'ghost-skill', '-o', 'yaml' )->{error},
-    qr/\AUsage: dashboard skills enable <repo-name> \[-o json\|table\]\n\z/,
+    qr/\AUsage: d2 skills enable <repo-name> \[-o json\|table\]\n\z/,
     'enable rejects an unsupported table output format',
 );
 
@@ -239,7 +239,7 @@ is( run_cli( 'enable', 'demo-skill', '-o', 'json' )->{exit}, 0, 'enable json out
 
 like(
     run_cli('disable')->{error},
-    qr/\AUsage: dashboard skills disable <repo-name>\n\z/,
+    qr/\AUsage: d2 skills disable <repo-name>\n\z/,
     'disable without a repo name prints the short usage and dies',
 );
 
@@ -247,7 +247,7 @@ is( run_cli( 'disable', 'ghost-skill', '-o', 'json' )->{exit}, 1, 'disable of a 
 
 like(
     run_cli( 'disable', 'ghost-skill', '-o', 'yaml' )->{error},
-    qr/\AUsage: dashboard skills disable <repo-name> \[-o json\|table\]\n\z/,
+    qr/\AUsage: d2 skills disable <repo-name> \[-o json\|table\]\n\z/,
     'disable rejects an unsupported table output format',
 );
 
@@ -290,7 +290,7 @@ like( $list_table->{stdout}, qr/^Repo\s+Enabled\s+CLI/m, 'list table renders the
 
 like(
     run_cli( 'list', '-o', 'yaml' )->{error},
-    qr/\AUsage: dashboard skills list \[-o json\|table\]\n\z/,
+    qr/\AUsage: d2 skills list \[-o json\|table\]\n\z/,
     'list rejects an unsupported output format',
 );
 
@@ -300,7 +300,7 @@ like(
 
 like(
     run_cli('usage')->{error},
-    qr/\AUsage: dashboard skills usage <repo-name> \[-o json\|table\]\n\z/,
+    qr/\AUsage: d2 skills usage <repo-name> \[-o json\|table\]\n\z/,
     'usage without a repo name prints the usage and dies',
 );
 
@@ -322,7 +322,7 @@ like( $usage_table->{stdout}, qr/^Skill: demo-skill$/m, 'usage table renders the
 
 like(
     run_cli( 'usage', 'demo-skill', '-o', 'yaml' )->{error},
-    qr/\AUsage: dashboard skills usage <repo-name> \[-o json\|table\]\n\z/,
+    qr/\AUsage: d2 skills usage <repo-name> \[-o json\|table\]\n\z/,
     'usage rejects an unsupported output format',
 );
 
@@ -332,13 +332,13 @@ like(
 
 like(
     run_cli('_exec')->{error},
-    qr/\AUsage: dashboard <skill-name>\.<command> \[args\.\.\.\]\n\z/,
+    qr/\AUsage: d2 <skill-name>\.<command> \[args\.\.\.\]\n\z/,
     '_exec without a skill name prints the dotted usage and dies',
 );
 
 like(
     run_cli( '_exec', 'demo-skill' )->{error},
-    qr/\AUsage: dashboard <skill-name>\.<command> \[args\.\.\.\]\n\z/,
+    qr/\AUsage: d2 <skill-name>\.<command> \[args\.\.\.\]\n\z/,
     '_exec without a command name prints the dotted usage and dies',
 );
 
@@ -402,11 +402,11 @@ my @manager_branches;
 
     my $bad_output = run_cli( 'install', '-o', 'yaml' );
     is( $bad_output->{exit}, 2, 'install rejects an unsupported output format with the usage exit code' );
-    like( $bad_output->{stderr}, qr/\AUsage: dashboard skills install \[--notest\]/, 'install prints the single-line usage for a bad output format' );
+    like( $bad_output->{stderr}, qr/\AUsage: d2 skills install \[--notest\]/, 'install prints the single-line usage for a bad output format' );
 
     my $ddfile_with_paths = run_cli( 'install', '--ddfile', 'some-skill' );
     is( $ddfile_with_paths->{exit}, 2, 'install refuses to mix --ddfile with explicit sources' );
-    like( $ddfile_with_paths->{stderr}, qr/dashboard skills install --ddfile/, 'the --ddfile conflict prints the full three-line usage' );
+    like( $ddfile_with_paths->{stderr}, qr/d2 skills install --ddfile/, 'the --ddfile conflict prints the full three-line usage' );
 
     @manager_calls = ();
     my $ddfile_run = run_cli( 'install', '--ddfile' );
@@ -479,7 +479,7 @@ my @manager_branches;
     $next_die = Local::FalseSkillError->new;
     like(
         run_cli( 'install', 'alpha-skill' )->{error},
-        qr/\Adashboard skills install failed\n\z/,
+        qr/\Ad2 skills install failed\n\z/,
         'a false exception object falls back to the default install failure message',
     );
     $next_die = undef;
@@ -492,12 +492,12 @@ my @manager_branches;
         $next_result = { operations => [ { repo_name => 'alpha-skill', status => 'installed' } ] };
         my $progress_ok = run_cli( 'install', 'alpha-skill' );
         is( $progress_ok->{exit}, 0, 'a successful install with progress enabled exits zero' );
-        like( $progress_ok->{stderr}, qr/dashboard skills install progress/, 'the progress board is rendered to stderr on the success path' );
+        like( $progress_ok->{stderr}, qr/d2 skills install progress/, 'the progress board is rendered to stderr on the success path' );
 
         $next_die = "git clone failed\n";
         my $progress_failed = run_cli( 'install', 'alpha-skill' );
         like( $progress_failed->{error}, qr/\Agit clone failed\n\z/, 'a dying install with progress enabled still re-throws the manager error' );
-        like( $progress_failed->{stderr}, qr/dashboard skills install progress/, 'the progress board is rendered to stderr on the failure path' );
+        like( $progress_failed->{stderr}, qr/d2 skills install progress/, 'the progress board is rendered to stderr on the failure path' );
         $next_die = undef;
 
         $next_result = { operations => [] };
@@ -758,7 +758,7 @@ t/92-cli-skills-coverage.t - branch and condition coverage closure for the skill
 
 This test is the executable coverage contract for
 C<Developer::Dashboard::CLI::Skills>. It drives every decision point in the
-staged C<dashboard skills> helper: the argv contract, the install source
+staged C<d2 skills> helper: the argv contract, the install source
 selection between an explicit path, several paths, the registered sources, and
 C<--ddfile>, the progress-board terminal detection, the install error and
 false-exception fallbacks, the lifecycle verbs against both a real installed
@@ -781,7 +781,7 @@ on a headless test host.
 
 =head1 WHEN TO USE
 
-Use this file when changing the public C<dashboard skills ...> verbs, the
+Use this file when changing the public C<d2 skills ...> verbs, the
 install source-selection order, the progress-board construction rules, the JSON
 payloads, or any of the table renderers, and whenever the coverage gate reports
 an uncovered branch or condition in the skills helper.

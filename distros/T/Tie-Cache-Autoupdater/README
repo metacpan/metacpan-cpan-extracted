@@ -27,10 +27,10 @@ See the module documentation for the full description:
 
 REQUIREMENTS
 ------------
-Perl and the core modules Storable and, optionally, Time::HiRes - the latter is
-used for fractional timeouts when it is available.
+Perl 5.8 or newer, and the core modules Storable and, optionally, Time::HiRes -
+the latter is used for fractional timeouts when it is available.
 
-Tested on perl 5.26 through 5.42.
+Tested on perl 5.8.9 through 5.42.
 
 HOW TO BUILD
 ------------

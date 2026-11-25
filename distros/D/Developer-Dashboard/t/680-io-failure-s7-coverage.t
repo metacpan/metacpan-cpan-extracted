@@ -11,7 +11,18 @@ use Errno qw(EACCES EIO);
 our ( %FAIL_OPEN, %FAIL_OPENDIR, %FAIL_UNLINK, $FAIL_READDIR, $FAIL_CLOSEDIR, $FAIL_CLOSE, $FAIL_FLOCK, $FAKE_GETPWUID );
 
 BEGIN {
+    require Symbol;
     *CORE::GLOBAL::open = sub (*;$@) {
+        # A bareword handle such as STDOUT reaches a "*" prototype as a plain
+        # string, which CORE::open refuses under strict refs. Resolve it to
+        # the caller's glob first. Windows is where this is exercised: the
+        # product secures runtime paths there by running icacls with STDOUT
+        # and STDERR redirected and restored.
+        if ( defined $_[0] && !ref $_[0] ) {
+            my $glob = Symbol::qualify_to_ref( $_[0], scalar caller );
+            return CORE::open( $glob, $_[1] ) if @_ == 2;
+            return CORE::open( $glob, $_[1], @_[ 2 .. $#_ ] );
+        }
         if ( @_ >= 3 && defined $_[2] && !ref $_[2] && $FAIL_OPEN{ $_[2] } ) {
             $! = $FAIL_OPEN{ $_[2] } == 1 ? EACCES : $FAIL_OPEN{ $_[2] };
             return 0;
@@ -81,6 +92,12 @@ use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
+
+sub _without_private_var_prefix {
+    my ($path) = @_;
+    $path =~ s{/private(?=/var/folders/)}{}g if defined $path;
+    return $path;
+}
 
 use lib 'lib';
 
@@ -300,9 +317,12 @@ sub write_file {
     delete $FAIL_UNLINK{$legacy};
 
     # A directory opens fine but reading it fails, so closing it reports the read error.
+    # On Windows the open itself fails (a directory cannot be opened for
+    # reading there), so the same unreadable bookmark is reported at the
+    # read step instead of the close step; either wording names the failure.
     my $ok2 = eval { $store->_read_saved_instruction($root); 1 };
     ok( !$ok2, 'a bookmark that cannot be read to the end is fatal at close' );
-    like( $@, qr/Unable to close/, 'bookmark close failure is named' );
+    like( $@, qr/Unable to (?:read|close)/, 'bookmark close failure is named' );
 }
 
 # --- IndicatorStore: flock failure -------------------------------------------
@@ -334,7 +354,8 @@ sub write_file {
     my $wt = File::Spec->catdir( $home, 'worktree' );
     make_path($wt);
     my $git_file = write_file( File::Spec->catfile( $wt, '.git' ), "gitdir: $repo/.git\n" );
-    is( $prompt->_git_metadata_dir($wt), "$repo/.git", 'a readable .git file resolves its gitdir' );
+    is( _without_private_var_prefix( $prompt->_git_metadata_dir($wt) ),
+        _without_private_var_prefix( File::Spec->catfile( $repo, '.git' ) ), 'a readable .git file resolves its gitdir' );
     local $FAIL_OPEN{$git_file} = 1;
     is( $prompt->_git_metadata_dir($wt), undef, 'a .git file that cannot be opened resolves no metadata dir' );
 }

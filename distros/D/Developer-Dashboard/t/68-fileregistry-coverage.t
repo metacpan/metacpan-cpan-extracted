@@ -13,6 +13,12 @@ use lib 'lib';
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::FileRegistry;
 
+sub _portable_path {
+    my ($path) = @_;
+    $path =~ s{/private(?=/var/folders/)}{}g if defined $path;
+    return $path;
+}
+
 # Hermetic runtime: an isolated HOME whose deepest .developer-dashboard layer is
 # the config root, entered via chdir so layer discovery resolves against it.
 my $home = tempdir( CLEANUP => 1 );
@@ -106,7 +112,7 @@ my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
 
     # The cwd-rooted entry point delegates to locate_files_under (line 113).
     my @cwd_hits = $files->locate_files('ddfrneedle');
-    ok( ( grep { $_ eq $match_path } @cwd_hits ), 'locate_files searches the current directory and finds the matching file' );
+    ok( ( grep { _portable_path($_) eq _portable_path($match_path) } @cwd_hits ), 'locate_files searches the current directory and finds the matching file' );
 }
 
 # --- resolve_file behaviours --------------------------------------------------

@@ -21,6 +21,11 @@ use Developer::Dashboard::PathRegistry;
 # this collides with any other collector test's shared /tmp state tree.
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
+# Every collector loop this file starts is detached, and only the matching
+# stop further down ends it. A run that is killed part-way never reaches
+# that stop, and the loops then live on for days. Tie them to this test
+# process: each loop ends itself once this pid is gone.
+local $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID} = $$;
 local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = tempdir( CLEANUP => 1 );
 chdir $home or die "Unable to chdir to $home: $!";
 
@@ -39,9 +44,9 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
 # developer-dashboard:latest: a real config shaped exactly like this one
 # ({interval:60, name:"docker"}, no command) left the collector retrying
 # every 60 seconds indefinitely, and each time its loop-worker process died
-# (from this error, or from a `dashboard restart` cycle) it became an
+# (from this error, or from a `d2 restart` cycle) it became an
 # unreaped zombie under a PID 1 that does not auto-reap orphans - observed
-# as hundreds of accumulated defunct "dashboard collector: docker" entries
+# as hundreds of accumulated defunct "d2 collector: docker" entries
 # on a real machine.
 #
 # The fix moves the validation _collector_source already performs on every
@@ -108,7 +113,7 @@ dies on every tick forever.
 =head1 WHY IT EXISTS
 
 DD-737: the owner reported hundreds of unreaped zombie
-"dashboard collector: docker" processes on a real machine, traced to a
+"d2 collector: docker" processes on a real machine, traced to a
 collector config with no command that was silently forked into a loop
 anyway, retrying and failing every interval without ever disabling itself.
 
@@ -123,7 +128,7 @@ Whenever C<CollectorRunner::start_loop> or C<_collector_source> changes.
 =head1 WHAT USES IT
 
 Nothing outside this spec directly; it protects C<CollectorRunner::start_loop>,
-which C<dashboard collector start> and C<dashboard restart> both call.
+which C<d2 collector start> and C<d2 restart> both call.
 
 =head1 EXAMPLES
 

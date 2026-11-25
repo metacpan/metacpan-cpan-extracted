@@ -1,0 +1,20 @@
+#!perl
+package Scripted::Program;
+
+# A script whose package maps to no module file, for t/Pod-Weaver-Section-Blurbs.t to weave.
+
+use 5.036;
+use warnings FATAL => q{all};
+
+# Greet somebody.
+# @param   name  Str  who to greet
+# @returns Str  the greeting
+# @example my $greeting = Scripted::Program::greet('world');
+sub greet {
+    my ($name) = @_;
+    return "Hello, $name";
+}
+
+exit 0 if !caller;
+
+1;

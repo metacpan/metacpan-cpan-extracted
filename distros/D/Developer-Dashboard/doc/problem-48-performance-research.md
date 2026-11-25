@@ -798,7 +798,7 @@ does not prove 50x against v5.88 for all subroutines.
 This review covers the performance work in the current Problem 48 change set,
 not the repository's blanket compliance status. The relevant higher-trust work
 is the OpenSSL PBKDF2 adapter and the native HTML escaper. Evidence includes
-the full Docker suite and coverage gate, `t/651-crypto-pbkdf2-ffi.t`,
+the full Docker suite and coverage gate, `t/651-crypto-pbkdf2-xs.t`,
 `t/665-problem48-xs-html-escape.t`, `t/667-problem48-collector-sync-roots.t`,
 `t/668-problem48-status-response-cache.t`, and the web-security trio (466
 assertions). ASVS Level 3 scrutiny was applied to authentication/cryptography
@@ -976,7 +976,7 @@ declarations do not turn existing Perl routines into native code.
 ## Reproduction and baseline
 
 The source checkout was exercised in an isolated Docker Compose test project.
-The original five-run medians for `bin/dashboard version`, `paths`, and `ps1`
+The original five-run medians for `bin/d2 version`, `paths`, and `ps1`
 were 56.7 ms, 93.3 ms, and 109.5 ms. Profiles showed startup/module loading and
 filesystem/environment discovery, not long CPU-bound batches suitable for
 generic worker execution. A profiled web test passed 328 assertions, but its
@@ -992,7 +992,7 @@ earlier 56.7 ms median, this is about 1.14x, not 50x. This is a command-specific
 measurement, not an application-wide claim.
 
 A follow-up profile showed that this was not the whole startup cost:
-`bin/dashboard` eagerly loaded `InternalCLI` before dispatch, which imported
+`bin/d2` eagerly loaded `InternalCLI` before dispatch, which imported
 `Platform`, and `PathRegistry` also imported `Platform`. The dashboard module
 was then loaded only to read its version scalar, pulling in Handle and
 FileRegistry. New red-first tests verified the import contracts and runtime
@@ -1000,7 +1000,7 @@ FileRegistry. New red-first tests verified the import contracts and runtime
 until platform-specific operations run; a dependency-light
 `Developer::Dashboard::Version` supplies the CLI and public module version.
 The regression and release-metadata suites passed 12 and 5,502 assertions in
-Docker. After these changes, 15 Docker runs of `dashboard version` measured
+Docker. After these changes, 15 Docker runs of `d2 version` measured
 33.889–41.006 ms (35.114 ms median), about 1.62x versus the original 56.7 ms
 median. NYTProf contains no Platform, InternalCLI, Handle, or FileRegistry
 entries for that command. This is a cumulative CLI improvement only and still
@@ -1019,7 +1019,7 @@ web, environment, and handle code use the shared function where they previously
 called `Cwd::cwd` or `Cwd::getcwd`. A red-first six-assertion test covers a
 valid PWD without invoking fallback, a valid logical symlink, and absent,
 relative, nonexistent, or different-directory PWD values. After this change,
-15 Docker runs of `dashboard version` measured 31.560–37.133 ms (32.287 ms
+15 Docker runs of `d2 version` measured 31.560–37.133 ms (32.287 ms
 median), versus 35.114 ms immediately before it and 56.7 ms for the recorded
 5.88 baseline. This is approximately 1.76x cumulative, not 50x.
 
@@ -1117,7 +1117,7 @@ the change.
 The user asked for another route to the 50x target. A Docker experiment tested
 whether reusing a warm Perl runtime and its validated path/configuration context
 can remove enough repeated startup and discovery work. Ten fresh executions
-of the current `dashboard paths -o json` command averaged 84.412 ms each. The
+of the current `d2 paths -o json` command averaged 84.412 ms each. The
 same real handler, run in a resident process while reconstructing its aliases
 on every request, averaged 5.636 ms with byte-for-byte output parity. Reusing
 the already-built path/config context, while still recomputing `all_paths` and
@@ -1130,7 +1130,7 @@ a production claim yet. A second disposable Docker prototype added a compiled
 C client and a resident Perl Unix-domain-socket server. Each measured request
 included a separate C client process launch, socket connect/write/read/close,
 and consuming the server response; 100 requests averaged 0.514 ms each. The
-returned bytes matched `dashboard paths -o json` exactly. Compared with the
+returned bytes matched `d2 paths -o json` exactly. Compared with the
 84.412 ms fresh CLI measurement, this prototype delivered an experiment-level
 164x response reduction. Server startup and context construction are one-time
 costs and were not included in the per-request figure.
@@ -1243,7 +1243,7 @@ The existing CLI remains unchanged while this architecture is evaluated.
 ### Cold-process launch floor recheck (2026-10-14)
 
 To check whether further in-process tuning can satisfy a 50x public-command
-target, an alternating Docker control launched 25 fresh `bin/dashboard
+target, an alternating Docker control launched 25 fresh `bin/d2
 version` processes and 25 fresh bare Perl processes using the same interpreter.
 The medians were 32.424 ms and 1.263 ms respectively (dashboard range
 30.815–39.976 ms; Perl range 1.034–1.427 ms). The recorded v5.88 dashboard
@@ -1380,7 +1380,7 @@ There is a measured startup floor too: a bare `perl -e 1` process took
 1.032–1.268 ms in the same Docker image. Fifty times faster than the original
 56.7 ms version-command median would require about 1.134 ms total, leaving only
 about 0.1 ms above the fastest bare interpreter launch for the whole command.
-Current `dashboard version` measures 35.114 ms, so the requested 50x result is
+Current `d2 version` measures 35.114 ms, so the requested 50x result is
 not achieved. This does not disprove 50x for a selected CPU-heavy routine, but
 PBKDF2 currently shows 9.5x and the objective requires every routine.
 
@@ -1390,8 +1390,8 @@ PBKDF2 currently shows 9.5x and the objective requires every routine.
 
 After two warm-up runs per command, 15 measured executions in the isolated
 Docker benchmark service completed successfully. Fresh-process medians were
-36.379 ms for `dashboard version`, 82.020 ms for `dashboard paths -o json`,
-and 90.429 ms for `dashboard ps1`. Every measured command exit status was
+36.379 ms for `d2 version`, 82.020 ms for `d2 paths -o json`,
+and 90.429 ms for `d2 ps1`. Every measured command exit status was
 checked; stdout was discarded only to keep terminal rendering out of the
 timing. This confirms that the current CLI remains far from a 50x improvement
 against the recorded 5.88 baselines. The earlier resident/socket figures are
@@ -1436,7 +1436,7 @@ same `do`-based command harness for both cases; the control preloaded all five
 modules and the candidate left them unloaded for `version`. Medians were
 33.104 ms and 31.520 ms respectively (about 1.05x). This isolates a small
 startup cost; it is not a substitute for the requested 50x result or the cold
-`bin/dashboard` process benchmark.
+`bin/d2` process benchmark.
 
 ### Path CLI deferred imports (2026-10-13)
 
@@ -1525,7 +1525,7 @@ objective.
 ### Current path-helper NYTProf map (2026-10-12)
 
 The public switchboard intentionally `exec`s the staged helper, so profiling
-`bin/dashboard` as one NYTProf process leaves an incomplete profile at that
+`bin/d2` as one NYTProf process leaves an incomplete profile at that
 handoff. Profiling the source helper entrypoint `share/private-cli/paths`
 directly produced a complete trace. In the current runtime, path discovery
 iterated 303 runtime-root entries, checked 97 skill disable markers, queued 32
@@ -1571,7 +1571,7 @@ Focused command:
 ```sh
 d2 docker compose --service bench -f /tmp/d2-problem48-bench.yml \
   --project-name dd-problem48-bench run --rm bench sh -c \
-  'export PERL5LIB=/bench-perl/lib/perl5/x86_64-linux-gnu-thread-multi:/bench-perl/lib/perl5; cd /checkout; prove -lv t/651-crypto-pbkdf2-ffi.t t/82-auth-coverage.t t/09-runtime-manager.t t/15-release-metadata.t'
+  'export PERL5LIB=/bench-perl/lib/perl5/x86_64-linux-gnu-thread-multi:/bench-perl/lib/perl5; cd /checkout; prove -lv t/651-crypto-pbkdf2-xs.t t/82-auth-coverage.t t/09-runtime-manager.t t/15-release-metadata.t'
 ```
 
 The focused functional/auth/runtime/release-metadata run passed 6,010 tests
@@ -1681,7 +1681,7 @@ The prompt dependency path showed `Capture::Tiny` was loaded on ordinary
 prompt startup even though prompt-only indicator refresh returns before
 running the Git capture code, and tmux capture is guarded by `TMUX`. A red-first
 Docker regression put a stub `Capture::Tiny` earlier in `@INC` that dies when
-loaded; ordinary `dashboard ps1 --no-indicators` failed on that import. The
+loaded; ordinary `d2 ps1 --no-indicators` failed on that import. The
 prompt helper now requires it only for tmux ticket lookup, and
 `IndicatorStore` requires it only after the prompt-only return, before a full
 project/Git refresh. The prompt loader, CLI smoke, and IndicatorStore suites
@@ -1697,12 +1697,12 @@ The prompt helper and path CLI created a `FileRegistry` solely to construct
 `Config`. Inspection showed these configuration reads and path-alias
 operations resolve via `PathRegistry`; `Config` does not access its `files`
 member. A red-first Docker regression blocked `FileRegistry` and failed on
-`dashboard paths -o json`. `Config->for_path_config` now returns a path-bound
+`d2 paths -o json`. `Config->for_path_config` now returns a path-bound
 view without importing or constructing `FileRegistry`; both the prompt and
 path CLI use it. Focused prompt-loader, Config, and path CLI Docker tests passed
 361 assertions, including collector/alias parity and missing-path validation.
 An alternating 25-cycle fresh-process comparison measured
-`dashboard paths -o json` at 64.636 ms with `FileRegistry` unloaded and
+`d2 paths -o json` at 64.636 ms with `FileRegistry` unloaded and
 72.077 ms with its module force-loaded (about 1.12x). That control isolates
 module-load cost rather than reproducing the complete old implementation. The
 result is command-specific and far short of the all-subroutine 50x target.
@@ -1768,7 +1768,7 @@ module initialization avoided by the canonical path, not a 50x command or
 routine speedup.
 
 An end-to-end public-command check then ran
-`bin/dashboard ps1 --no-indicators --cwd /` in 30 alternating pairs with a
+`bin/d2 ps1 --no-indicators --cwd /` in 30 alternating pairs with a
 disposable home. Median wall times were
 65.535 ms on the canonical path and 72.307 ms with Getopt::Long preloaded via
 `PERL5OPT` (about 1.10x), with successful exit status each time. This public
@@ -2524,7 +2524,7 @@ improvement and does not establish 50x for every subroutine.
 ### CLI process-floor measurement (2026-10-14)
 
 In the isolated Docker bench, 31 alternating child-process runs measured a
-bare `perl -e 1` median of 2.286 ms and `perl bin/dashboard version` at
+bare `perl -e 1` median of 2.286 ms and `perl bin/d2 version` at
 32.528 ms. Against the recorded v5.88 `version` median of 56.7 ms, a 50x
 end-to-end target would require 1.134 ms total, below this measured child
 process floor. The current command therefore cannot reach 50x through
@@ -5150,3 +5150,17 @@ Statement, branch, condition, and subroutine coverage are each 100.0% across
 Windows QEMU, CPANTS, POD, and audit-tool checks were explicitly skipped when
 their external dependencies were unavailable. This gate verifies code coverage;
 it does not establish the universal 50x objective or hosted platform results.
+
+### Native FFI replacement with the shared XS extension (2026-10-30)
+
+For ticket DKT-015, the PBKDF2, Linux inotify, and Windows directory-notification
+adapters were moved from runtime FFI bindings to the existing distribution XS
+extension. The Perl-facing module names and call sites remain unchanged, and
+macOS retains its existing Mac::FSEvents backend. MakeMaker builds one shared
+extension; platform CI now builds it before exercising native paths and no
+longer installs FFI::Platypus or FFI::CheckLib. Focused XS tests passed in the
+Docker development container. The first full suite passed but exposed an
+uncovered pair of XS availability branches and repeated module redefinition
+warnings. Regression tests now cover those branches and prevent duplicate
+watcher loading. The clean full coverage rerun is in progress; this note will
+be updated with its evidence before the ticket is considered complete.

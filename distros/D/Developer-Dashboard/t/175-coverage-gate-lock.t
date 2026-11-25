@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Test::More;
+use Capture::Tiny qw(capture_merged);
 use Cwd qw(getcwd);
 use Fcntl qw(:flock);
 use File::Spec;
@@ -26,6 +27,21 @@ my $repository = getcwd();
 my $gate       = File::Spec->catfile( $repository, 'script', 'coverage-gate' );
 
 plan skip_all => "the coverage gate is not present at $gate" if !-f $gate;
+
+# Devel::Cover is an optional development tool, not a declared runtime
+# dependency. Without it the gate takes a different and correct path - it
+# reports that Devel::Cover::DB::IO could not be loaded and exits 2 before
+# it ever announces a database, returns from a dry run, or reaches the
+# lock logic this file exists to test - so the assertions below that need
+# the gate to reach its lock logic cannot be measured at all, and would
+# report an environmental gap as a defect. The assertions that hold for
+# ANY refusal (nothing deleted, suite never started, dry run not refused
+# in words, harness case not refused by the host lock) still run
+# everywhere, including Windows. Same guard as t/148, t/151, t/149, t/150
+# and t/169. This file is NOT in t/170's @SPECS list: t/170's contract is
+# for file-level skip_all specs, and this file runs 5 tests and skips 10
+# on Windows, so adding it would fail t/170's first assertion.
+my $HAS_COVER = eval { require Devel::Cover::DB::IO; 1 } ? 1 : 0;
 
 # The staged conflict is over a database of this test's own, never the real
 # cover_db. That is not merely tidiness. The gate names its lock after the
@@ -66,22 +82,27 @@ $held->flush if $held->can('flush');
 
 my ( $refused_output, $refused_status ) = _run_gate( '--database', $scratch, 't/00-load.t' );
 
-is( $refused_status, 4, 'a gate that cannot own the database exits 4 rather than running' );
-like(
-    $refused_output,
-    qr/refusing to run/,
-    'the refusal says it is refusing, instead of failing silently or looking like a crash'
-);
-like(
-    $refused_output,
-    qr/means nothing/,
-    'the refusal explains the consequence it is avoiding, so the reader knows why waiting is better'
-);
-like(
-    $refused_output,
-    qr/pid $$\b/,
-    'the refusal names the exact process holding the gate, so the operator can find it'
-);
+SKIP: {
+    skip 'Devel::Cover is not installed, so the coverage gate cannot be exercised', 4
+        if !$HAS_COVER;
+
+    is( $refused_status, 4, 'a gate that cannot own the database exits 4 rather than running' );
+    like(
+        $refused_output,
+        qr/refusing to run/,
+        'the refusal says it is refusing, instead of failing silently or looking like a crash'
+    );
+    like(
+        $refused_output,
+        qr/means nothing/,
+        'the refusal explains the consequence it is avoiding, so the reader knows why waiting is better'
+    );
+    like(
+        $refused_output,
+        qr/pid $$\b/,
+        'the refusal names the exact process holding the gate, so the operator can find it'
+    );
+}
 ok(
     !-d $scratch,
     'a refused gate deletes nothing: it stops before it can destroy the data the other run is accumulating'
@@ -98,7 +119,12 @@ unlike(
 # most useful.
 my ( $dry_output, $dry_status ) = _run_gate( '--database', $scratch, '--dry-run' );
 
-is( $dry_status, 0, 'a dry run succeeds while another gate holds the lock' );
+SKIP: {
+    skip 'Devel::Cover is not installed, so the coverage gate cannot be exercised', 1
+        if !$HAS_COVER;
+
+    is( $dry_status, 0, 'a dry run succeeds while another gate holds the lock' );
+}
 unlike( $dry_output, qr/refusing to run/, 'a dry run is not refused, because it competes for nothing' );
 
 # Releasing must actually release. A lock that is never given back turns the
@@ -159,12 +185,17 @@ my ( $host_output, $host_status ) = _run_gate_with_env(
     '--database', $other_scratch, 't/00-load.t'
 );
 
-is( $host_status, 4,
-    'a gate exits 4 when the HOST lock is held, even though its own database is free' );
-like( $host_output, qr/refusing to run/,
-    'the host-lock refusal says it is refusing, in the same words as the database refusal' );
-like( $host_output, qr/pid $$\b/,
-    'the host-lock refusal names the holder, so an operator can find the suite that owns the host' );
+SKIP: {
+    skip 'Devel::Cover is not installed, so the coverage gate cannot be exercised', 3
+        if !$HAS_COVER;
+
+    is( $host_status, 4,
+        'a gate exits 4 when the HOST lock is held, even though its own database is free' );
+    like( $host_output, qr/refusing to run/,
+        'the host-lock refusal says it is refusing, in the same words as the database refusal' );
+    like( $host_output, qr/pid $$\b/,
+        'the host-lock refusal names the holder, so an operator can find the suite that owns the host' );
+}
 
 # The other direction, and it is the regression this change most plausibly
 # causes. A gate whose host lock is FREE must run even while a foreign database
@@ -175,8 +206,13 @@ my ( $free_output, $free_status ) = _run_gate_with_env(
     '--database', $other_scratch, '--dry-run'
 );
 
-is( $free_status, 0,
-    'a gate with a free host lock is not refused, so two gates on different databases still coexist' );
+SKIP: {
+    skip 'Devel::Cover is not installed, so the coverage gate cannot be exercised', 1
+        if !$HAS_COVER;
+
+    is( $free_status, 0,
+        'a gate with a free host lock is not refused, so two gates on different databases still coexist' );
+}
 
 # DD-734, AC-5. THE GATE MUST NOT REFUSE ITSELF.
 #
@@ -198,8 +234,13 @@ my ( $harness_output, $harness_status ) = _run_gate_with_env(
     '--database', $other_scratch, '--dry-run'
 );
 
-is( $harness_status, 0,
-    'a gate under a harness proceeds even though the host lock is held, so the suite can still run the gate (DD-526)' );
+SKIP: {
+    skip 'Devel::Cover is not installed, so the coverage gate cannot be exercised', 1
+        if !$HAS_COVER;
+
+    is( $harness_status, 0,
+        'a gate under a harness proceeds even though the host lock is held, so the suite can still run the gate (DD-526)' );
+}
 unlike( $harness_output, qr/another gate holds/,
     'the harness case is not refused by the host lock, which nine existing test files depend on' );
 
@@ -212,9 +253,13 @@ close $host_held;
 sub _run_gate {
     my @arguments = @_;
 
-    my $output = qx{$^X \Q$gate\E @{[ join ' ', map { quotemeta } @arguments ]} 2>&1};
+    # List-form system through capture_merged: no shell is involved, so no
+    # quoting of the gate path is needed. The old qx{} form built the command
+    # with quotemeta, which cmd.exe on Windows does not unescape - perl then
+    # received the literal doubled-backslash path and refused it with EINVAL.
+    my ( $output, $status ) = capture_merged { system $^X, $gate, @arguments };
 
-    return ( defined $output ? $output : '', $? >> 8 );
+    return ( defined $output ? $output : '', $status >> 8 );
 }
 
 # Purpose: run the gate as a separate process with extra environment set, so a

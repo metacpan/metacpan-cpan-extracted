@@ -12,6 +12,8 @@ use Ekorn::Pipeline::Errors qw(croakf);
 use namespace::clean;
 
 # Croak at the line that called Ekorn::Pipeline.
+our $VERSION = 'v0.4.0';
+
 our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 
 # Return a stage of the code given, which is kept as it is, never
@@ -28,12 +30,10 @@ sub new ($class, $code) {
         $class;
 }
 
-
 # Return the code the stage was made of.
 sub code ($self) {
     return $self->{code};
 }
-
 
 # Return the stage's step for a new run: its code, as a code reference.
 sub EKORN_STAGE ($self) {

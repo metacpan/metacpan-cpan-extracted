@@ -3,7 +3,7 @@ package Developer::Dashboard::Auth;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Crypt::URandom qw(urandom);
 use Fcntl qw(:mode);
@@ -483,7 +483,7 @@ sub _password_hash {
 # _pbkdf2_hmac_sha256_hex($password, $salt, $iterations)
 # Stretches a password with PBKDF2-HMAC-SHA256 (RFC 2898). The 32-byte SHA-256
 # output equals the derived-key length, so exactly one output block is needed.
-# Uses the optional OpenSSL FFI adapter when compatible; otherwise preserves
+# Uses the optional OpenSSL-backed XS adapter when compatible; otherwise preserves
 # the established Digest::SHA implementation.
 # Input: password string, salt string, positive iteration count.
 # Output: 64-character lowercase hex string of the derived key.
@@ -554,12 +554,12 @@ are still accepted, so tightening the scheme never locks out an established
 helper user.
 
 New and existing PBKDF2 helper-password hashes use 210,000 HMAC-SHA256 rounds.
-When FFI::Platypus and a compatible system C<libcrypto> are available, the
-derivation is performed by OpenSSL's one-shot PBKDF2 routine. This does not
-change stored hashes, salts, iteration counts, or comparisons. Unsupported
-wide-character inputs and unavailable native crypto use the existing
-Digest::SHA loop, so authentication behavior remains compatible across
-platforms.
+When the compiled Dashboard XS extension and a compatible system
+C<libcrypto> are available, the derivation is performed by OpenSSL's one-shot
+PBKDF2 routine. This does not change stored hashes, salts, iteration counts,
+or comparisons. Unsupported wide-character inputs and unavailable native
+crypto use the existing Digest::SHA loop, so authentication behaviour remains
+compatible across platforms.
 
 =head1 METHODS
 

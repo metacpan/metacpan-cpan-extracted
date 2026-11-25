@@ -22,15 +22,15 @@ log - private built-in log helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard log
-  dashboard log web
-  dashboard log collector
-  dashboard log collector alpha.collector
+  d2 log
+  d2 log web
+  d2 log collector
+  d2 log collector alpha.collector
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
@@ -48,14 +48,14 @@ rendering live in reusable Perl modules.
 
 =head1 WHEN TO USE
 
-Use this file when changing the public C<dashboard log> or C<dashboard logs>
+Use this file when changing the public C<d2 log> or C<d2 logs>
 CLI contract, the staged helper dispatch path, or the examples operators use
 for web versus collector log inspection.
 
 =head1 HOW TO USE
 
-Users run C<dashboard log>, C<dashboard logs>, C<dashboard log web>, or
-C<dashboard log collector [name]>. The helper re-enters the private runtime,
+Users run C<d2 log>, C<d2 logs>, C<d2 log web>, or
+C<d2 log collector [name]>. The helper re-enters the private runtime,
 which loads the shared runtime-control module and prints the requested log
 stream.
 
@@ -67,10 +67,10 @@ staged built-in helper instead of bloating the public entrypoint.
 
 =head1 EXAMPLES
 
-  dashboard log
-  dashboard logs
-  dashboard log web -n 50
-  dashboard log collector housekeeper
+  d2 log
+  d2 logs
+  d2 log web -n 50
+  d2 log collector housekeeper
 
 =for comment FULL-POD-DOC END
 

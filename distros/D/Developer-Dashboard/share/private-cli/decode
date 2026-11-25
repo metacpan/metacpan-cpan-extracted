@@ -22,18 +22,18 @@ decode - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard decode
+  d2 decode
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard decode>, the token-to-text half of the dashboard codec pair. It lets users inspect the payload behind a transient bookmark or action token from the CLI.
+This staged helper exposes C<d2 decode>, the token-to-text half of the dashboard codec pair. It lets users inspect the payload behind a transient bookmark or action token from the CLI.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing the CLI contract for token decoding or when fixing h
 
 =head1 HOW TO USE
 
-Users pipe or pass a token into C<dashboard decode>. The staged helper forwards the request to the private runtime, which decodes the base64+gzip payload and prints the recovered text.
+Users pipe or pass a token into C<d2 decode>. The staged helper forwards the request to the private runtime, which decodes the base64+gzip payload and prints the recovered text.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by developers debugging transient bookmark URLs, by docs that demonst
 
 Example 1:
 
-  dashboard decode eyJwYWdlIjoiL2FwcC90ZXN0In0
+  d2 decode eyJwYWdlIjoiL2FwcC90ZXN0In0
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/decode --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

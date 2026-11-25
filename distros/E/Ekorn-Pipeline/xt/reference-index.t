@@ -37,7 +37,6 @@ my %INTERNAL = (
 my %CLASSES = ('Ekorn::Pipeline::Sink' =>
     [qw(Ekorn::Pipeline::Sink::One Ekorn::Pipeline::Sink::Many)]);
 
-
 # Return the key a name sorts by: in any case, with one starting with a
 # symbol last.
 sub sort_key ($name) {
@@ -46,7 +45,6 @@ sub sort_key ($name) {
     return $key;
 }
 
-
 # Return a heading's anchor, as GitHub makes it.
 sub anchor ($heading) {
     my $anchor = lc $heading;
@@ -54,7 +52,6 @@ sub anchor ($heading) {
     $anchor =~ s( \  )(-)xg;
     return $anchor;
 }
-
 
 # Return the anchors of the reference's headings before the index, each
 # true if its section opens with a block of code, and the index's
@@ -88,7 +85,6 @@ sub index_entries () {
     return \%anchors, @entries;
 }
 
-
 # Return the module each file under lib is: .pm and .pod alike.
 sub modules () {
     my @files;
@@ -98,7 +94,6 @@ sub modules () {
     );
     return sort map { s( \A lib/ | \. \w+ \z )()xgr =~ s( / )(::)xgr } @files;
 }
-
 
 # Return a module's public names: what it exports, and the subs it
 # defines, but for import, those starting with _, and an overload's.

@@ -3,7 +3,7 @@ requires 'Carp';
 requires 'DBI';
 requires 'Data::Dumper';
 requires 'Digest::SHA';
-requires 'Ekorn::Pipeline', '>= v0.3.7, < v0.4.0';
+requires 'Ekorn::Pipeline', '>= v0.3.14, < v0.4.0';
 requires 'Exporter';
 requires 'List::Util';
 requires 'Ref::Util';
@@ -15,6 +15,11 @@ requires 'namespace::clean';
 # installed (Ekorn 2026-0038); installers don't follow a dependency's
 # recommendations, so ours names it too.
 recommends 'Text::Redact::Secrets', '>= v1.0.0, < v2.0.0';
+
+# Ekorn::Pipeline::CSV's from_csv and to_csv, which Tooling exports in
+# :csv, read and write with it, and load it only when they're called
+# (roadmap 2026-0044).
+recommends 'Text::CSV';
 
 on test => sub {
     requires 'DBD::SQLite';
@@ -34,5 +39,6 @@ on develop => sub {
     requires 'Test2::Harness';
     requires 'Test2::Plugin::Cover';
     requires 'Test::Spellunker';
+    requires 'Text::CSV';
     requires 'UUID';
 };

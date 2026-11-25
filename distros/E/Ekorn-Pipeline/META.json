@@ -57,6 +57,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "Text::CSV" : "0",
             "Text::Redact::Secrets" : ">= v1.0.0, < v2.0.0"
          },
          "requires" : {
@@ -82,31 +83,50 @@
    "provides" : {
       "Ekorn::Pipeline" : {
          "file" : "lib/Ekorn/Pipeline.pm",
-         "version" : "v0.3.9"
+         "version" : "v0.4.0"
+      },
+      "Ekorn::Pipeline::CSV" : {
+         "file" : "lib/Ekorn/Pipeline/CSV.pm",
+         "version" : "v0.4.0"
+      },
+      "Ekorn::Pipeline::CSV::Text" : {
+         "file" : "lib/Ekorn/Pipeline/CSV.pm"
+      },
+      "Ekorn::Pipeline::Context" : {
+         "file" : "lib/Ekorn/Pipeline/Context.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Element" : {
-         "file" : "lib/Ekorn/Pipeline/Element.pm"
+         "file" : "lib/Ekorn/Pipeline/Element.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Errors" : {
-         "file" : "lib/Ekorn/Pipeline/Errors.pm"
+         "file" : "lib/Ekorn/Pipeline/Errors.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Factories" : {
-         "file" : "lib/Ekorn/Pipeline/Factories.pm"
+         "file" : "lib/Ekorn/Pipeline/Factories.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Feed" : {
-         "file" : "lib/Ekorn/Pipeline/Feed.pm"
+         "file" : "lib/Ekorn/Pipeline/Feed.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Gather" : {
-         "file" : "lib/Ekorn/Pipeline/Gather.pm"
+         "file" : "lib/Ekorn/Pipeline/Gather.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Iterator" : {
-         "file" : "lib/Ekorn/Pipeline/Iterator.pm"
+         "file" : "lib/Ekorn/Pipeline/Iterator.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::JSON" : {
-         "file" : "lib/Ekorn/Pipeline/JSON.pm"
+         "file" : "lib/Ekorn/Pipeline/JSON.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Operators" : {
-         "file" : "lib/Ekorn/Pipeline/Operators.pm"
+         "file" : "lib/Ekorn/Pipeline/Operators.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Operators::Chain" : {
          "file" : "lib/Ekorn/Pipeline/Operators.pm"
@@ -115,10 +135,12 @@
          "file" : "lib/Ekorn/Pipeline/Operators.pm"
       },
       "Ekorn::Pipeline::Pipes" : {
-         "file" : "lib/Ekorn/Pipeline/Pipes.pm"
+         "file" : "lib/Ekorn/Pipeline/Pipes.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Sink" : {
-         "file" : "lib/Ekorn/Pipeline/Sink.pm"
+         "file" : "lib/Ekorn/Pipeline/Sink.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Sink::Many" : {
          "file" : "lib/Ekorn/Pipeline/Sink.pm"
@@ -127,34 +149,44 @@
          "file" : "lib/Ekorn/Pipeline/Sink.pm"
       },
       "Ekorn::Pipeline::Sinks" : {
-         "file" : "lib/Ekorn/Pipeline/Sinks.pm"
+         "file" : "lib/Ekorn/Pipeline/Sinks.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Source" : {
-         "file" : "lib/Ekorn/Pipeline/Source.pm"
+         "file" : "lib/Ekorn/Pipeline/Source.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Sources" : {
-         "file" : "lib/Ekorn/Pipeline/Sources.pm"
+         "file" : "lib/Ekorn/Pipeline/Sources.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Stage" : {
-         "file" : "lib/Ekorn/Pipeline/Stage.pm"
+         "file" : "lib/Ekorn/Pipeline/Stage.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Stages::Batch" : {
-         "file" : "lib/Ekorn/Pipeline/Stages/Batch.pm"
+         "file" : "lib/Ekorn/Pipeline/Stages/Batch.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Stages::Flow" : {
-         "file" : "lib/Ekorn/Pipeline/Stages/Flow.pm"
+         "file" : "lib/Ekorn/Pipeline/Stages/Flow.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Stages::Taps" : {
-         "file" : "lib/Ekorn/Pipeline/Stages/Taps.pm"
+         "file" : "lib/Ekorn/Pipeline/Stages/Taps.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Stop" : {
-         "file" : "lib/Ekorn/Pipeline/Stop.pm"
+         "file" : "lib/Ekorn/Pipeline/Stop.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Sugar" : {
-         "file" : "lib/Ekorn/Pipeline/Sugar.pm"
+         "file" : "lib/Ekorn/Pipeline/Sugar.pm",
+         "version" : "v0.4.0"
       },
       "Ekorn::Pipeline::Tooling" : {
-         "file" : "lib/Ekorn/Pipeline/Tooling.pm"
+         "file" : "lib/Ekorn/Pipeline/Tooling.pm",
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -169,7 +201,7 @@
          "web" : "https://github.com/nukopian/Ekorn-Pipeline"
       }
    },
-   "version" : "v0.3.9",
+   "version" : "v0.4.0",
    "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 1
 }

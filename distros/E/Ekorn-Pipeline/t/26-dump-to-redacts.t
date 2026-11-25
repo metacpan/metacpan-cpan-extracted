@@ -113,6 +113,8 @@ subtest 'with $DumpSecrets true' => sub {
 
 my $works = q{
     our $VERSION = 'v1.0.2';
+
+
     sub redact ($text) { $text =~ s( Zq8v\w+ | AKIA\w+ )(*REDACTED*)xgr }
 };
 

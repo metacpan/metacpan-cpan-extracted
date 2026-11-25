@@ -156,7 +156,7 @@ verifies the same ordered layer results.
 
 =head1 WHY IT EXISTS
 
-NYTProf found repeated skill-root work during dashboard page rendering. The
+NYTProf found repeated skill-root work during d2 page rendering. The
 candidate reuses directory names already read by the request, but it is kept
 out of production unless a realistic scoped benchmark shows a gain.
 

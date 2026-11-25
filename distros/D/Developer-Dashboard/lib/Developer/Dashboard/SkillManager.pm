@@ -3,13 +3,13 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
 use File::Path qw(make_path remove_tree);
 use File::Spec;
-use File::Basename qw(basename);
+use File::Basename qw(basename dirname);
 use File::Find qw(find);
 use File::Temp qw(tempdir);
 use Capture::Tiny qw(capture);
@@ -17,10 +17,11 @@ use IO::Select;
 use IPC::Open3;
 use JSON::XS qw(decode_json encode_json);
 use Symbol qw(gensym);
+use Time::HiRes ();
 use Developer::Dashboard::Platform qw(command_in_path passwd_home_directory);
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
-use Developer::Dashboard::StreamDrain qw(_drain_ready_handle);
+use Developer::Dashboard::StreamDrain qw(_drain_ready_handle _drain_child_streams_windows);
 
 # new()
 # Creates a SkillManager instance to handle skill installation, updates, uninstalls.
@@ -53,7 +54,7 @@ sub new {
 }
 
 # install_progress_tasks()
-# Returns the ordered task list shown for one dashboard skills install run.
+# Returns the ordered task list shown for one d2 skills install run.
 # Input: none.
 # Output: array reference of progress task hashes.
 sub install_progress_tasks {
@@ -273,6 +274,7 @@ sub uninstall {
     my $inside_layer = 0;
     for my $skills_root ( $self->{paths}->skills_roots ) {
         my $real_root = realpath($skills_root);
+        next if !defined $real_root;
         if ( index( $real_path, $real_root . '/' ) == 0 ) {
             $inside_layer = 1;
             last;
@@ -439,20 +441,33 @@ sub usage {
 # a validator: sources such as owner/.., file:///x/.. or git@github.com:owner/..
 # legitimately yield a '..' segment, so every caller that joins the result onto
 # a directory must first clear it through _is_safe_skill_name.
+# A file:// URL carrying a Windows path (file://C:\.. or file:///C:/..) splits
+# on backslashes as well as forward slashes, so the last path segment is the name
+# and not the whole drive path.
 # Input: Git URL string or local directory path.
 # Output: repo name or undef.
 sub _extract_repo_name {
     my ($url) = @_;
-    
+
     return if !$url;
     return basename($url) if -d $url;
-    
+
+    if ( $url =~ m{\Afile://(.*)\z} ) {
+        my $path = $1;
+        $path =~ s{\Alocalhost}{}i;
+        $path =~ s{[\\/]+\z}{};
+        my ($name) = $path =~ m{([^\\/]+)\z};
+        return if !defined $name || $name eq '';
+        $name =~ s{\.git\z}{};
+        return $name;
+    }
+
     # Extract from: git@github.com:user/repo-name.git
     if ( $url =~ m{/([^/]+?)(\.git)?$} ) {
         my $name = $1;
         return $name;
     }
-    
+
     return;
 }
 
@@ -469,36 +484,139 @@ sub _is_safe_skill_name {
     return @segments == 1 ? 1 : 0;
 }
 
+# _resolve_path_symlinks($path)
+# Resolves every symlink component of one path, component by component,
+# returning the fully resolved path, or undef when a link cannot be read
+# or the resolution would recurse too deep. Cwd::realpath does not resolve
+# symlinks on Windows (it canonicalises dots and case only), so a plain
+# realpath cannot tell that a planted link escapes the skills root. On
+# Unix realpath already resolves links, so this walk is a no-op there: no
+# component is ever a symlink the walk needs to replace.
+# Input: absolute or relative path string.
+# Output: resolved path string, or undef.
+sub _resolve_path_symlinks {
+    my ( $path, $depth ) = @_;
+    $depth //= 0;
+    return undef if $depth > 40;
+    return $path if !defined $path || $path eq '';
+    my ( $vol, $dirs, $file ) = File::Spec->splitpath($path);
+    my @parts = File::Spec->splitdir($dirs);
+    push @parts, $file if defined $file && $file ne '';
+    my $current = File::Spec->file_name_is_absolute($path)
+        ? File::Spec->catpath( $vol, File::Spec->rootdir(), '' )
+        : current_working_directory();
+    for my $i ( 0 .. $#parts ) {
+        my $part = $parts[$i];
+        next if !defined $part || $part eq '' || $part eq '.';
+        if ( $part eq '..' ) {
+            $current = dirname($current);
+            next;
+        }
+        $current = File::Spec->catdir( $current, $part );
+        next if !-l $current;
+        my $target = readlink($current);
+        return undef if !defined $target;
+        my $resolved = File::Spec->file_name_is_absolute($target)
+            ? $target
+            : File::Spec->catdir( dirname($current), $target );
+        my @rest = @parts[ $i + 1 .. $#parts ];
+        my $rejoined
+            = @rest ? File::Spec->catdir( $resolved, @rest ) : $resolved;
+        return _resolve_path_symlinks( $rejoined, $depth + 1 );
+    }
+    return $current;
+}
+
+# _strict_directory($path)
+# Whether one path names an existing directory, checking each component
+# in turn. Win32 stat() forgives a '..' after a component that does not
+# exist, so '-d "owner/.."' is true on Windows even when there is no
+# 'owner'; walking the components and requiring each one to exist as a
+# directory matches Unix '-d' on every platform.
+# Input: path string.
+# Output: boolean true when the path is an existing directory.
+sub _strict_directory {
+    my ($path) = @_;
+    return 0 if !defined $path || $path eq '';
+    my ( $vol, $dirs, $file ) = File::Spec->splitpath($path);
+    my @parts = File::Spec->splitdir($dirs);
+    push @parts, $file if defined $file && $file ne '';
+    my $current = File::Spec->file_name_is_absolute($path)
+        ? File::Spec->catpath( $vol, File::Spec->rootdir(), '' )
+        : current_working_directory();
+    for my $part (@parts) {
+        next if !defined $part || $part eq '' || $part eq '.';
+        if ( $part eq '..' ) {
+            $current = dirname($current);
+            next;
+        }
+        $current = File::Spec->catdir( $current, $part );
+        return 0 if !-d $current;
+    }
+    return 1;
+}
+
 # _install_path_contained($skill_path, $skills_root)
 # Reports whether one install destination resolves to somewhere strictly
-# beneath its skills root, following symlinks so a planted link cannot redirect
-# the pre-install removal or the checkout that follows it out of the tree. A
-# destination that does not exist yet is contained by construction, because the
-# name it was built from is already one validated segment; a destination whose
-# resolved target cannot be established is refused rather than assumed safe.
+# beneath its skills root, following symlinks so a planted link cannot
+# redirect the pre-install removal or the checkout that follows it out of
+# the tree. Symlink components are resolved by a readlink walk first,
+# because realpath does not resolve them on Windows; a destination that
+# does not exist yet is then checked lexically against the root, which is
+# sound once its links are resolved. A destination whose resolved target
+# cannot be established is refused rather than assumed safe.
 # Input: candidate installed skill path and its skills root directory path.
 # Output: boolean true when the destination is safe to remove and write.
 sub _install_path_contained {
     my ( $self, $skill_path, $skills_root ) = @_;
     my $root_real = realpath($skills_root);
     return 0 if !defined $root_real;
-    return 1 if !-e $skill_path && !-l $skill_path;
-    my $path_real = realpath($skill_path);
-    return 0 if !defined $path_real;
+    my $resolved = _resolve_path_symlinks($skill_path);
+    return 0 if !defined $resolved;
+    my $path_real = realpath($resolved);
+    if ( !defined $path_real ) {
+        # Not yet created: realpath cannot resolve it, so compare the
+        # symlink-resolved lexical path against the root instead.
+        $path_real = $resolved;
+    }
     $root_real =~ s{\\}{/}g;
     $path_real =~ s{\\}{/}g;
+    if ( $^O eq 'MSWin32' ) {
+        $root_real = lc $root_real;
+        $path_real = lc $path_real;
+    }
     return index( $path_real, $root_real . '/' ) == 0 ? 1 : 0;
 }
 
 # _normalize_install_source($source)
 # Expands shorthand remote skill names into full GitHub clone URLs while
-# leaving local paths and explicit remote URLs unchanged.
+# leaving local paths and explicit remote URLs unchanged. A file:// URL
+# carrying a Windows path is rewritten into the canonical file:///C:/...
+# forward-slash form git accepts: backslashes are not valid in a URL, and
+# file://C:\... is missing the third slash. Unix file:/// paths and
+# network-host file:// URLs pass through unchanged.
 # Input: install source string.
 # Output: normalized install source string.
 sub _normalize_install_source {
     my ( $self, $source ) = @_;
     return $source if !defined $source || $source eq '';
     return $source if -d $source;
+    if ( $source =~ m{\Afile://(.*)\z} ) {
+        my $path = $1;
+        # Only a Windows drive path earns the rewrite: a trailing drive
+        # letter after an optional localhost, or a backslash anywhere. A
+        # plain file://localhost/... (a Unix local path) passes through
+        # unchanged — the drive-letter branch already covers
+        # file://localhost/C:/..., so a bare localhost branch would only
+        # rewrite paths it has no business touching.
+        if ( $path =~ m{\A(?:localhost)?[\\/]?[A-Za-z]:} || $path =~ m{\\} ) {
+            $path =~ s{\Alocalhost}{}i;
+            $path =~ s{\\}{/}g;
+            $path =~ s{\A/+}{};
+            return "file:///$path";
+        }
+        return $source;
+    }
     return $source if $source =~ m{\A[A-Za-z][A-Za-z0-9+.-]*://};
     return $source if $source =~ /\Agit@/;
     return "https://github.com/$source"
@@ -520,7 +638,7 @@ sub _root_ddfile_has_sources {
 # _register_root_ddfile_source($source)
 # Appends one explicit skill install source to the home root ddfile unless the
 # same non-comment source is already present.
-# Input: source string exactly as supplied to dashboard skills install.
+# Input: source string exactly as supplied to d2 skills install.
 # Output: hash ref with ddfile path and boolean registered status, or an error hash.
 sub _register_root_ddfile_source {
     my ( $self, $source ) = @_;
@@ -841,7 +959,7 @@ sub _local_checked_out_source {
     my ( $self, $source ) = @_;
     return if !$source;
     return if $source =~ m{\A[A-Za-z][A-Za-z0-9+.-]*://};
-    return if !-d $source;
+    return if !_strict_directory($source);
 
     my $local_source = realpath($source);
     return { error => "Local skill source '$source' is missing a .git directory" }
@@ -1380,13 +1498,40 @@ sub _run_streaming_command {
 
     my $timed_out = 0;
     my $read_loop = sub {
-        while ( my @ready = $selector->can_read ) {
-            for my $handle (@ready) {
-                my $chunk_ref = $self->_drain_ready_handle( $selector, $handle ) or next;
-                my $chunk = ${$chunk_ref};
-                ${ $target_for{ fileno($handle) } } .= $chunk;
-                for my $line ( split /\n/, $chunk ) {
-                    $self->_progress_detail_line($line);
+        # On Windows IO::Select only works for real sockets, so can_read over
+        # the open3 pipes returns at once with nothing ready and the child's
+        # output is silently lost. Drain both pipes with PeekNamedPipe there
+        # instead; the select loop below stays for every other platform.
+        my $drained = 0;
+        if ( $^O eq 'MSWin32' ) {
+            # The Windows drain polls, so it can enforce the timeout itself:
+            # alarm delivery is deferred while this process is blocked in
+            # select on Strawberry Perl, so the deadline is the mechanism
+            # that actually ends a hung child on time there.
+            my $deadline = $timeout_ms ? Time::HiRes::time() + $timeout_ms / 1000 : undef;
+            $drained = $self->_drain_child_streams_windows(
+                $stdout_handle,
+                $stderr_handle,
+                sub {
+                    my ( $is_stdout, $chunk ) = @_;
+                    my $slot = $is_stdout ? \$stdout : \$stderr;
+                    ${$slot} .= $chunk;
+                    for my $line ( split /\n/, $chunk ) {
+                        $self->_progress_detail_line($line);
+                    }
+                },
+                $deadline,
+            );
+        }
+        if ( !$drained ) {
+            while ( my @ready = $selector->can_read ) {
+                for my $handle (@ready) {
+                    my $chunk_ref = $self->_drain_ready_handle( $selector, $handle ) or next;
+                    my $chunk = ${$chunk_ref};
+                    ${ $target_for{ fileno($handle) } } .= $chunk;
+                    for my $line ( split /\n/, $chunk ) {
+                        $self->_progress_detail_line($line);
+                    }
                 }
             }
         }
@@ -1449,9 +1594,9 @@ sub _terminate_streaming_command {
 # Output: absolute parent skills root directory path.
 sub _skill_install_root {
     my ( $self, $skill_path ) = @_;
-    my ( undef, $dir ) = File::Spec->splitpath($skill_path);
+    my ( $vol, $dir ) = File::Spec->splitpath($skill_path);
     $dir =~ s{[\\/]\z}{};
-    return $dir;
+    return $vol . $dir;
 }
 
 # _skill_apt_packages($skill_path)
@@ -1691,7 +1836,7 @@ sub _install_skill_dependency_manifest {
             eval {
                 chdir $skills_root or die "Unable to chdir to $skills_root for $manifest_name dependency install: $!";
                 ( $stdout, $stderr, $status ) = capture {
-                    system( 'dashboard', 'skills', 'install', $dependency );
+                    system( 'd2', 'skills', 'install', $dependency );
                 };
                 chdir $cwd or die "Unable to chdir back to $cwd after $manifest_name dependency install: $!";
                 1;
@@ -1772,6 +1917,24 @@ sub _install_skill_nested_dependency_manifest {
     };
 }
 
+# _cmd_protected_argument($argument)
+# Protects one argv element from cmd.exe on Windows. npx is a .cmd shim
+# there, so Perl hands the command line to cmd.exe, which strips "^" and
+# treats "<", ">", "&" and "|" as operators: an npm range such as "^1.2.3"
+# would lose its caret and ">=1.0" would become a redirection. Wrapping the
+# element in double quotes keeps it literal. Every other platform passes
+# the element through untouched.
+# Input: one argv element string.
+# Output: the element, double-quoted on Windows when it carries a cmd.exe
+# metacharacter and is not already quoted.
+sub _cmd_protected_argument {
+    my ($argument) = @_;
+    return $argument if $^O ne 'MSWin32';
+    return $argument if !defined $argument || $argument =~ /"/;
+    return $argument if $argument !~ /[\^&|<>%()]/;
+    return qq{"$argument"};
+}
+
 # _install_skill_package_json($skill_path)
 # Installs Node dependencies declared by package.json into the dashboard home
 # node_modules directory by running npx-wrapped npm inside a private staging
@@ -1804,7 +1967,7 @@ sub _install_skill_package_json {
     close $workspace_fh;
 
     my $run = $self->_run_streaming_command(
-        command    => [ 'npx', '--yes', 'npm', 'install', @specs ],
+        command    => [ 'npx', '--yes', 'npm', 'install', map { _cmd_protected_argument($_) } @specs ],
         cwd        => $workspace,
         banner     => "Installing Node dependencies for " . basename($skill_path) . " from $package_json: " . join( ' ', @specs ),
         timeout_ms => $self->_skill_install_timeout_ms,
@@ -2723,7 +2886,7 @@ __END__
 
 =head1 NAME
 
-Developer::Dashboard::SkillManager - manage installed dashboard skills
+Developer::Dashboard::SkillManager - manage installed d2 skills
 
 =head1 SYNOPSIS
 
@@ -2738,7 +2901,7 @@ Developer::Dashboard::SkillManager - manage installed dashboard skills
 
 =head1 DESCRIPTION
 
-Manages the lifecycle of installed dashboard skills:
+Manages the lifecycle of installed d2 skills:
 - Install: Clone Git repositories as skills
 - Uninstall: Remove skills completely
 - Update: Pull latest changes from skill repositories
@@ -2765,7 +2928,7 @@ refusal instead of removing or writing outside the skills tree.
 
 =head1 PURPOSE
 
-This module installs, updates, removes, and lists dashboard skills. It manages the on-disk skill roots under the active C<DD-OOP-LAYERS> chain, clones or updates Git-backed skill repos, prepares the expected directory layout, and helps the rest of the runtime locate the effective skill for one repo name from deepest layer back to home. Remote clones accept an optional branch; fresh installs try C<master> then C<main>, while reinstall keeps the currently checked-out named branch unless explicitly overridden.
+This module installs, updates, removes, and lists d2 skills. It manages the on-disk skill roots under the active C<DD-OOP-LAYERS> chain, clones or updates Git-backed skill repos, prepares the expected directory layout, and helps the rest of the runtime locate the effective skill for one repo name from deepest layer back to home. Remote clones accept an optional branch; fresh installs try C<master> then C<main>, while reinstall keeps the currently checked-out named branch unless explicitly overridden.
 
 =head1 WHY IT EXISTS
 
@@ -2777,11 +2940,11 @@ Use this file when changing skill install/update/uninstall behavior, the expecte
 
 =head1 HOW TO USE
 
-Construct it with the active paths and, optionally, C<clone_branch =E<gt> $branch>. Call the install/update/uninstall/list methods from the C<dashboard skills> helper or from tests. Leave command execution and hook handling to C<Developer::Dashboard::SkillDispatcher>.
+Construct it with the active paths and, optionally, C<clone_branch =E<gt> $branch>. Call the install/update/uninstall/list methods from the C<d2 skills> helper or from tests. Leave command execution and hook handling to C<Developer::Dashboard::SkillDispatcher>.
 
 =head1 WHAT USES IT
 
-It is used by the C<dashboard skills> command family, by the skill dispatcher, by release metadata that documents the isolated skill layout, and by skill lifecycle tests.
+It is used by the C<d2 skills> command family, by the skill dispatcher, by release metadata that documents the isolated skill layout, and by skill lifecycle tests.
 
 =head1 EXAMPLES
 
@@ -2811,7 +2974,7 @@ Put any module-level change back through the entire repository suite before rele
 
 Example 5:
 
-  dashboard skills install --ddfile
+  d2 skills install --ddfile
 
 Drive an explicit manifest install from the current directory, where F<ddfile>
 targets the base home-layer F<~/.developer-dashboard/skills/> root and
@@ -2819,7 +2982,7 @@ F<ddfile.local> targets the current directory's nested C<skills/> tree.
 
 Example 6:
 
-  dashboard skills install -b main git@github.com:user/example-skill.git
+  d2 skills install -b main git@github.com:user/example-skill.git
 
 Install one remote skill from the named branch. Without C<-b>, a fresh
 checkout tries C<master> then C<main>; reinstall preserves the installed

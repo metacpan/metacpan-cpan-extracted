@@ -325,6 +325,12 @@ B<What it gives you:> C<from_json>, C<from_jsonl>, C<to_json> and C<to_jsonl>
 
 B<Made in:> Ekorn::Pipeline::JSON
 
+=item C<:csv>
+
+B<What it gives you:> C<from_csv> and C<to_csv>
+
+B<Made in:> Ekorn::Pipeline::CSV
+
 =item C<:words>
 
 B<What it gives you:> C<pipeline>, C<stage>, C<source>, C<generator>, C<sink_one> and the rest
@@ -341,9 +347,10 @@ Ask for what you need, by tag or by name. Nothing comes by default:
 
     package My::Report {
         use DBIx::Squirrel::Tooling qw(:stages :sinks);
+        my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
         say $dbh->iterate(
-            'SELECT name, plays FROM track',
-            take_if { $_->[1] > 6000 },
+            'SELECT name FROM track',
+            drop_if { $on_my_phone{ $_->[0] } },    # what the database can't know
             count_items,
         );
         # 3
@@ -716,12 +723,12 @@ one comes back. Stages come into their own in L<chapter
 C<selectall_array> gives the rows, so each row goes through the stages
 in turn:
 
-    my @names = $dbh->selectall_array(
-        'SELECT name FROM artist ORDER BY name',
-        sub ($row) { $row->[0] },    # each row, into its name
-        sub { uc },                  # each name, in capitals
+    my @slugs = $dbh->selectall_array(
+        'SELECT title FROM album ORDER BY year',
+        sub ($row) { $row->[0] },      # each row, into its title
+        sub { lc s( \W+ )(-)xgr },     # each title, as a slug for a URL
     );
-    say "@names";    # ABBA BLUR CREAM
+    say "@slugs";    # disraeli-gears arrival parklife the-great-escape
 
 The others give one value, a reference, so their first stage gets
 that: C<selectall_arrayref>'s array of rows, say, which a stage can
@@ -983,17 +990,23 @@ as its argument, and in C<$_>, so write whichever reads best:
 
 Return an empty list, and the row is dropped:
 
-    my @hits = $dbh->iterate(
-        'SELECT name, plays FROM track ORDER BY id',
-        sub { $_->[1] >= 6000 ? $_ : () },    # keep the popular ones
-        sub { $_->[0] },                      # then just the name
-    )->all;
-    say join ', ', @hits;    # Dancing Queen, Girls & Boys, Sunshine of Your Love
+Say the tracks already on your phone are in a hash, read from its
+playlist. The database has never heard of your phone, so no C<WHERE>
+can ask it which tracks are still to copy. A stage can:
 
-That's a filter in Perl, and C<take_if>, from
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
+
+    my @to_copy = $dbh->iterate(
+        'SELECT name FROM track ORDER BY id',
+        sub { $on_my_phone{ $_->[0] } ? () : $_ },    # leave out what's there
+        sub { $_->[0] },                               # then just the name
+    )->all;
+    say join ', ', @to_copy;    # Knowing Me, Knowing You, Girls & Boys, Country House
+
+That's a filter in Perl, and C<drop_if>, from
 DBIx::Squirrel::Stages::Flow, says the same in a word:
-C<< take_if { $_->[1] >= 6000 } >> passes on each row its block is true of,
-and C<drop_if> each it's false of (L<chapter
+C<< drop_if { $on_my_phone{ $_->[0] } } >> drops each row its block is true
+of, and C<take_if> keeps each (L<chapter
 6|/"Keep or drop rows by a test">). When the database can do it, in a
 C<WHERE>, let it: it's quicker, and fewer rows cross the wire. A stage
 is for what SQL can't say, or can't say well: a regular expression, a
@@ -1074,7 +1087,8 @@ was fetched, whatever the stages before have done to it:
     # 2. Sunshine of Your Love (7700 plays)
 
 C<result_number> counts results, not rows, so a dropped row doesn't use
-up a number.
+up a number. It works in any run, each counting its own: an
+iterator's stages, a chain made with C<|>, or a pipeline of your own.
 
 =head2 Watch rows go by, or count them
 
@@ -1117,6 +1131,11 @@ as the pipeline's can:
 A stop in C<tee>'s stages, such as C<take(2)>'s, ends only them: the
 pipeline reads on. It costs a good deal more than C<peek>, so keep it
 for side jobs and debugging.
+
+A stop after the tee, such as C<take>'s, or an iterator's C<first>,
+ends the branch too, and the branch's stages hand over what they
+hold, as they do when the rows run out. So a branch writing rows in
+batches writes the last, part-filled one, however the run ends.
 
 =head2 Compared with C<map> over every row
 
@@ -1182,16 +1201,23 @@ C<take> and C<drop>, from DBIx::Squirrel::Stages::Flow, pass on, or pass
 over, a number of values. C<take> stops the run once it has its values,
 so no more rows are fetched:
 
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
+
     my @page = $dbh->iterate(
         'SELECT name FROM track ORDER BY id',
         pluck,
-        sub { m( \s )x ? $_ : () },    # names of more than one word
-        drop(1),                       # the second and third of them
+        drop_if { $on_my_phone{$_} },    # the tracks still to copy
+        drop(1),                         # the second and third of them
         take(2),
     )->all;
     say for @page;
-    # Knowing Me, Knowing You
     # Girls & Boys
+    # Country House
+
+The page is of what's left after a test in Perl, which SQL's C<LIMIT>
+and C<OFFSET> can't see. With nothing in Perl before them, put C<LIMIT>
+and C<OFFSET> in the SQL instead, and the database sends only the
+page.
 
 =head2 Keep or drop rows by a test
 
@@ -1200,23 +1226,25 @@ each it's false of. They test every value, as Perl's C<grep> does, and
 never stop the run, unlike C<take_while>, which stops at the first
 value its test fails:
 
-    my @popular = $dbh->iterate(
-        'SELECT name, plays FROM track ORDER BY id',
-        take_if { $_->[1] > 6000 },
-        sub { $_->[0] },
-    )->all;
-    say join ', ', @popular;    # Dancing Queen, Girls & Boys, Sunshine of Your Love
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
 
-    my @quiet = $dbh->iterate(
-        'SELECT name, plays FROM track ORDER BY id',
-        drop_if { $_->[1] > 6000 },
+    my @copied = $dbh->iterate(
+        'SELECT name FROM track ORDER BY id',
+        take_if { $on_my_phone{ $_->[0] } },
         sub { $_->[0] },
     )->all;
-    say join ', ', @quiet;    # Knowing Me, Knowing You, Parklife, Country House
+    say join ', ', @copied;    # Dancing Queen, Parklife, Sunshine of Your Love
+
+    my @to_copy = $dbh->iterate(
+        'SELECT name FROM track ORDER BY id',
+        drop_if { $on_my_phone{ $_->[0] } },
+        sub { $_->[0] },
+    )->all;
+    say join ', ', @to_copy;    # Knowing Me, Knowing You, Girls & Boys, Country House
 
     my @until = $dbh->iterate(
-        'SELECT name, plays FROM track ORDER BY id',
-        take_while { $_->[1] > 6000 },
+        'SELECT name FROM track ORDER BY id',
+        take_while { $on_my_phone{ $_->[0] } },
         sub { $_->[0] },
     )->all;
     say join ', ', @until;    # Dancing Queen
@@ -1224,45 +1252,69 @@ value its test fails:
 The last stops at Knowing Me, Knowing You, the first track that fails
 its test, so the tracks after it are never fetched.
 
+A test the database could do belongs in the C<WHERE>. The one time it
+earns a place in a stage is while you're debugging: to try a condition
+on a query's rows without touching the query, say one shared with
+other code, and move it into the SQL once it's right:
+
+    my $shared = 'SELECT name, plays FROM track ORDER BY id';    # not yours to change
+
+    my @would_keep = $dbh->iterate(
+        $shared,
+        take_if { $_->[1] > 6000 },    # trying it out, before it goes in a WHERE
+        sub { $_->[0] },
+    )->all;
+    say join ', ', @would_keep;    # Dancing Queen, Girls & Boys, Sunshine of Your Love
+
 =head2 Take while a test holds, or skip until it fails
 
 C<take_while> passes values on while its block is true of them, and
 stops at the first it isn't. C<drop_while> passes over values while its
 block is true, then passes on the rest:
 
+Both suit a test that depends on what came before, which a C<WHERE>,
+looking at one row at a time, can't see. Here are the few hits that
+make up half of all the plays, by a running total, and the albums a
+job has still to do, after the one it stopped at last time:
+
+    my $half   = $dbh->selectrow_array('SELECT SUM(plays) FROM track') / 2;
+    my $so_far = 0;
+
     my @hits = $dbh->iterate(
         'SELECT name, plays FROM track ORDER BY plays DESC',
-        take_while { $_->[1] > 6000 },
-        sub { $_->[0] },
+        take_while { $so_far < $half },          # until these make half
+        sub { $so_far += $_->[1]; $_->[0] },
     )->all;
     say join ', ', @hits;    # Dancing Queen, Sunshine of Your Love, Girls & Boys
 
-    my @later = $dbh->iterate(
-        'SELECT title, year FROM album ORDER BY year',
-        drop_while { $_->[1] < 1990 },
-        sub { $_->[0] },
+    my $stopped_at = 'Arrival';    # saved by the last run
+
+    my @still_to_do = $dbh->iterate(
+        'SELECT title FROM album ORDER BY year',
+        pluck,
+        drop_while { $_ ne $stopped_at },    # what's done already
+        drop(1),                             # and the one it stopped at
     )->all;
-    say join ', ', @later;    # Parklife, The Great Escape
+    say join ', ', @still_to_do;    # Parklife, The Great Escape
+
+C<take_while> stops the run at Parklife, so no row after it is
+fetched.
 
 =head2 Take the first, the last, or the only one, and go on
 
 C<take_first>, C<take_last> and C<take_single> pass on one value, and let
 the stages after them go on working with it. C<take_single> warns at a
-second value, as C<single> does:
+second value, as C<single> does. On a query of your own, C<LIMIT 1>
+fetches less; these are for a statement or pipeline that others
+share, or that has a name:
 
-    my @oldest = $dbh->iterate(
-        'SELECT title FROM album ORDER BY year',
-        take_first,
-        sub { uc $_->[0] },
-    )->all;
-    say "@oldest";    # DISRAELI GEARS
+    my $by_year = 'SELECT title FROM album ORDER BY year';
 
-    my @newest = $dbh->iterate(
-        'SELECT title FROM album ORDER BY year',
-        take_last,
-        sub { lc $_->[0] },
-    )->all;
-    say "@newest";    # the great escape
+    my @oldest = $dbh->iterate($by_year, take_first, sub { lc $_->[0] =~ s( \W+ )(-)xgr })->all;
+    say "@oldest";    # disraeli-gears
+
+    my @newest = $dbh->iterate($by_year, take_last, sub { lc $_->[0] =~ s( \W+ )(-)xgr })->all;
+    say "@newest";    # the-great-escape
 
 =head2 Catch errors in a stage, but let a stop through
 
@@ -1459,8 +1511,12 @@ for, an array reference. C<count_items> gives how many there were:
     );
     say ref $names;    # ARRAY
 
-    my $popular = $dbh->iterate('SELECT name FROM track WHERE plays > ?', 5000, count_items);
-    say $popular;    # 4
+    my $words = $dbh->iterate('SELECT name FROM track', sub { split ' ', $_->[0] }, count_items);
+    say $words;    # 16
+
+C<count_items> counts what comes out of the stages, which SQL's C<COUNT>
+can't: here, the words in the tracks' names. For a count of rows, ask
+the database, with C<SELECT COUNT(*)>.
 
 So C<my $rows = ...> is the rows, never a count by accident: if you
 want a count, say so with C<count_items>. An empty result is an empty
@@ -1541,6 +1597,36 @@ C<to_fh> does the same to a filehandle you've opened, and leaves it
 open. So an export of a large table is one call, a few rows in memory
 at a time.
 
+For a spreadsheet, C<to_csv>, from Tooling's C<:csv>, writes each row as
+a line of CSV. With C<< header => 1 >>, the first line is the statement's
+column names, so the file says what's in it, and fields holding a
+comma or a quote are quoted, so it reads back as it was:
+
+    my $exported = $dbh->iterate(
+        'SELECT name, plays FROM track WHERE plays > 6000 ORDER BY plays DESC',
+        to_csv(file => 'hits.csv', header => 1),
+    );
+    say $exported;    # 3
+
+    open my $in, '<', 'hits.csv' or die "Can't read hits.csv: $!";
+    my @lines = <$in>;
+    close $in;
+    print @lines;
+    # name,plays
+    # "Dancing Queen",9100
+    # "Sunshine of Your Love",7700
+    # "Girls & Boys",6100
+
+C<to_csv> gives how many rows it wrote, not counting the header. It
+needs L<Text::CSV|https://metacpan.org/pod/Text::CSV>, which
+DBIx::Squirrel recommends, rather than requires; it's loaded only when
+C<to_csv> or C<from_csv> is called. Rows may be arrays, as here, or
+hashes, written in the header's order. After C<as_hash> with columns,
+as in C<as_hash(qw(name plays))>, name them in the header too,
+C<< header => [qw(name plays)] >>: C<< header => 1 >> names every column the
+statement has. C<< csv => {sep_char => "\t"} >> writes TSV. L<Load a CSV
+file into a table|/"Load a CSV file into a table"> goes the other way.
+
 =head2 Methods or sinks?
 
 The iterator's methods and the sinks overlap, on purpose:
@@ -1580,6 +1666,10 @@ B<A sink, given last:> C<keep_last>
 =item them in a file
 
 B<A sink, given last:> C<to_file($path)>
+
+=item them in a CSV file
+
+B<A sink, given last:> C<< to_csv(file => $path, header => 1) >>
 
 =back
 
@@ -1652,13 +1742,15 @@ C<get_column> still reaches it.
 Stages see the objects, and the sinks work as before. C<pluck> takes a
 column of an object too:
 
-    my @recent = $dbh->results(
+    my %owned = map { $_ => 1 } 'Arrival', 'Parklife';
+
+    my @wanted = $dbh->results(
         'SELECT title, year FROM album ORDER BY year',
-        sub { $_->year >= 1990 ? $_ : () },
+        drop_if { $owned{ $_->title } },    # the albums you have already
         pluck('title'),
         keep_all,
     );
-    say "@recent";    # Parklife The Great Escape
+    say join ', ', @wanted;    # Disraeli Gears, The Great Escape
 
 =head1 10. Building pipelines from pipelines
 
@@ -1671,19 +1763,22 @@ you use often can be made once, named, and used everywhere.
 
     use Ekorn::Pipeline;
 
-    my $hits = Ekorn::Pipeline->new(
-        sub { $_->[1] >= 5000 ? $_ : () },    # 5,000 plays or more
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
+
+    my $to_copy = Ekorn::Pipeline->new(
+        drop_if { $on_my_phone{ $_->[0] } },    # what the phone has already
         pluck('name'),
     );
 
     my $by_plays = 'SELECT name, plays FROM track ORDER BY plays DESC';
-    say join ', ', $dbh->iterate($by_plays, $hits)->all;             # Dancing Queen, Sunshine of Your Love, Girls & Boys, Parklife
+    say join ', ', $dbh->iterate($by_plays, $to_copy)->all;
+    # Girls & Boys, Knowing Me, Knowing You, Country House
     say join ', ', $dbh->iterate(
         $by_plays,
-        $hits,
+        $to_copy,
         take(2),
     )->all;
-    # Dancing Queen, Sunshine of Your Love
+    # Girls & Boys, Knowing Me, Knowing You
 
 Its stages run in its place, as if written out there, with more stages
 before or after it.
@@ -1714,29 +1809,29 @@ to push values into as they arrive: lines read from a socket, records
 a callback hands you, or rows from somewhere other than a statement.
 Each C<push> gives back what came out of the values pushed. C<close>
 ends the input, and gives what the stages still held, such as a last,
-part-filled batch. C<ended> says how the run ended.
+part-filled batch. C<ended> says how the run ended. For a file, there's
+a source instead: see L<Load a CSV file into a
+table|/"Load a CSV file into a table">.
 
-So a feed is a loader. Here rows go into a table two at a time, each
-batch in a transaction of its own, with C<execute_array> writing it:
+So a feed is a loader. Here records go into a table two at a time,
+each batch in a transaction of its own. The records are hashes, and
+the statement's placeholders are named, so C<execute_for_fetch> writes
+each as it came, with no arrays to build:
 
     use Ekorn::Pipeline;
 
     $dbh->do('CREATE TEMP TABLE heard (track_id INTEGER, plays INTEGER)');
-    my $insert = $dbh->prepare('INSERT INTO heard (track_id, plays) VALUES (?, ?)');
+    my $insert = $dbh->prepare('INSERT INTO heard (track_id, plays) VALUES (:track_id, :plays)');
 
     my $load = Ekorn::Pipeline->new(
         drop_if { $_->{plays} == 0 },
         batch(2),
         sub {
-            my $rows = $_;
+            my @records = @$_;
             $dbh->begin_work;
-            $insert->execute_array(
-                {},
-                [map { $_->{track_id} } @$rows],
-                [map { $_->{plays} } @$rows],
-            );
+            my $written = $insert->execute_for_fetch(sub { shift @records });
             $dbh->commit;
-            scalar @$rows;    # how many were written
+            $written;    # how many were written
         },
     )->feed;
 
@@ -1756,6 +1851,65 @@ push when a stop may come. Ekorn::Pipeline's L<how-to on
 feeds|Ekorn::Pipeline::Manual::HowTo/"Feed values in as they arrive">
 has the rest.
 
+C<execute_for_fetch> takes arrays too, a value for each placeholder,
+in the order each name first appears. So does C<execute_array>, an
+array for each placeholder, and C<bind_param_array> binds one by name,
+as the reference's L<execute_array|DBIx::Squirrel::Manual::Reference/"execute_array"> says.
+Plain DBI's take only C<?>, and other styles as far as the driver reads
+them.
+
+=head2 Load a CSV file into a table
+
+A file needs no feed: C<from_csv>, from Tooling's C<:csv>, is a source,
+reading a row at a time as the pipeline asks. With C<< header => 1 >>, each
+row is a hash keyed by the header's names, and C<< munge => 'db' >> makes
+those names into ones a database takes, so "Track Name" is
+C<track_name>. Name the statement's placeholders the same, and each
+row goes in as it was read, with no arrays to build and no columns to
+count:
+
+    use Ekorn::Pipeline;
+
+    # A file as a spreadsheet saves it, its header in a person's words
+    open my $out, '>', 'this-week.csv' or die "Can't write this-week.csv: $!";
+    print $out <<~'CSV';
+        Track Name,Plays This Week
+        Parklife,12
+        "Knowing Me, Knowing You",3
+        Country House,0
+        Girls & Boys,7
+        CSV
+    close $out;
+
+    $dbh->do('CREATE TEMP TABLE this_week (track_name TEXT, plays_this_week INTEGER)');
+    my $insert = $dbh->prepare(
+        'INSERT INTO this_week (track_name, plays_this_week) VALUES (:track_name, :plays_this_week)',
+    );
+
+    my @written = Ekorn::Pipeline->new(
+        drop_if { $_->{plays_this_week} == 0 },    # the file's rows, before the database has them
+        batch(500),
+        sub {
+            my @rows = @$_;
+            $dbh->begin_work;
+            my $written = $insert->execute_for_fetch(sub { shift @rows });
+            $dbh->commit;
+            $written;
+        },
+    )->iterator(from_csv(file => 'this-week.csv', header => 1, munge => 'db'))->all;
+    say "@written";    # 3
+
+    say $dbh->selectrow_array('SELECT SUM(plays_this_week) FROM this_week');    # 22
+
+It reads the file a row at a time, and writes it 500 rows at a time,
+each batch in a transaction, so a file of a million rows needs no more
+memory than a batch of them. A row that won't parse croaks, naming its
+record and field, rather than ending the load early as if the file had
+ended. C<from_csv> needs Text::CSV, as C<to_csv> does (see L<Write the
+results to a file|/"Write the results to a file">). C<< header => 'skip' >>
+reads the rows as arrays, for C<?> placeholders, and C<< csv => {sep_char
+Z<>=> "\t"} >> reads TSV. Ekorn::Pipeline::CSV's documentation has the rest.
+
 =head2 Name a pipeline, and use it by name
 
 C<< Ekorn::Pipeline->named >> names a pipeline, for the rest of the
@@ -1765,10 +1919,11 @@ pipeline, then these":
 
     use Ekorn::Pipeline;
 
-    Ekorn::Pipeline->named(shouted => sub { uc $_->[0] });
+    Ekorn::Pipeline->named(slug => sub { lc $_->[0] =~ s( \W+ )(-)xgr });
 
-    say join ', ', $dbh->iterate('SELECT name FROM artist ORDER BY id', pipeline('shouted'))->all;             # ABBA, BLUR, CREAM
-    say join ', ', $dbh->iterate('SELECT name FROM artist ORDER BY id', pipeline('shouted', take(1)))->all;    # ABBA
+    say join ', ', $dbh->iterate('SELECT title FROM album ORDER BY year', pipeline('slug'))->all;
+    # disraeli-gears, arrival, parklife, the-great-escape
+    say join ', ', $dbh->iterate('SELECT title FROM album ORDER BY year', pipeline('slug', take(1)))->all;    # disraeli-gears
 
 A name belongs to the package that named it, so two modules can each
 have a C<clean> of their own. A name is looked up when the pipeline is
@@ -1781,11 +1936,13 @@ C<pipe> runs a database or statement handle itself through stages, and
 gives back what comes out. C<tap> does the same for the stages' side
 effects, and gives back the handle, so a chain of calls can carry on:
 
+    my %from = (Abba => 'Sweden', Blur => 'England', Cream => 'England');    # from a config file
+
     my @names = $dbh->pipe(
         sub ($dbh) { @{ $dbh->selectcol_arrayref('SELECT name FROM artist ORDER BY id') } },
-        sub { uc },
+        sub { "$_ ($from{$_})" },
     );
-    say "@names";    # ABBA BLUR CREAM
+    say join ', ', @names;    # Abba (Sweden), Blur (England), Cream (England)
 
     my $albums = $dbh->tap(sub ($dbh) { say 'albums: ', $dbh->selectrow_array('SELECT COUNT(*) FROM album') })
         ->selectrow_array('SELECT COUNT(*) FROM album WHERE year > 1990');
@@ -1805,14 +1962,17 @@ does what it makes:
 
     use Ekorn::Pipeline::Operators;
 
-    my $top = $dbh->iterate('SELECT name FROM track ORDER BY plays DESC')
-        | pluck('name')
-        | take(3)
-        | keep_all;
-    say join ', ', @$top;    # Dancing Queen, Sunshine of Your Love, Girls & Boys
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
 
-    my $n = $dbh->iterate('SELECT * FROM album') | count_items;
-    say $n;    # 4
+    my $next = $dbh->iterate('SELECT name FROM track ORDER BY plays DESC')
+        | pluck('name')
+        | drop_if { $on_my_phone{$_} }
+        | take(2)
+        | keep_all;
+    say join ', ', @$next;    # Girls & Boys, Knowing Me, Knowing You
+
+    my $n = $dbh->iterate('SELECT name FROM track') | sub { split ' ', $_->[0] } | count_items;
+    say $n;    # 16
 
 The operators are in force only in the scope that says
 C<use Ekorn::Pipeline::Operators>. Elsewhere, C<|> on an iterator
@@ -1949,8 +2109,8 @@ only:
     my @titles = titles_by artist => 2, keep_all;
     say "@titles";    # Parklife The Great Escape
 
-    my @shouted = titles_by artist => 2, sub { uc }, keep_all;
-    say "@shouted";    # PARKLIFE THE GREAT ESCAPE
+    my @slugs = titles_by artist => 2, sub { lc s( \W+ )(-)xgr }, keep_all;
+    say "@slugs";    # parklife the-great-escape
 
     say titles_by(artist => 2, count_items);    # 2
 
@@ -1990,12 +2150,12 @@ called, a string is always a value, never a name:
 
     use DBIx::Squirrel::Sugar
         statement => {
-            loud_titles => [music => 'SELECT title FROM album WHERE year < ? ORDER BY year', 'loud'],
+            title_slugs => [music => 'SELECT title FROM album WHERE year < ? ORDER BY year', 'slugged'],
         },
-        pipeline => {loud => [sub { uc $_->[0] }]};
+        pipeline => {slugged => [sub { lc $_->[0] =~ s( \W+ )(-)xgr }]};
 
-    say join ', ', loud_titles(1990, keep_all);    # DISRAELI GEARS, ARRIVAL
-    say loud(['Parklife']);                        # PARKLIFE
+    say join ', ', title_slugs(1990, keep_all);    # disraeli-gears, arrival
+    say slugged(['The Great Escape']);             # the-great-escape
 
 C<pipeline> takes what Ekorn::Pipeline::Sugar takes: a hash, or an
 array of names and stages in turn. A name is looked up as the
@@ -2203,15 +2363,18 @@ do:
 
     use Ekorn::Pipeline;
 
-    sub loud_names () {
+    sub with_origin () {
+        my %from = (Abba => 'Sweden', Blur => 'England', Cream => 'England');
         return Ekorn::Pipeline->new(
             pluck('name'),
-            sub { uc },
+            sub { "$_ ($from{$_})" },
         );
     }
 
-    say join ' ', $dbh->iterate('SELECT id, name FROM artist ORDER BY id', loud_names)->all;    # ABBA BLUR CREAM
-    say join ' ', $dbh->results('SELECT id, name FROM artist ORDER BY id', loud_names)->all;    # ABBA BLUR CREAM
+    say join ', ', $dbh->iterate('SELECT id, name FROM artist ORDER BY id', with_origin)->all;
+    # Abba (Sweden), Blur (England), Cream (England)
+    say join ', ', $dbh->results('SELECT id, name FROM artist ORDER BY id', with_origin)->all;
+    # Abba (Sweden), Blur (England), Cream (England)
 
 =head2 Test a stage
 
@@ -2331,6 +2494,83 @@ the same thing, they give the same result. You can add it to a program
 one query at a time, and take a handle you already have (L<chapter
 1|/"1. Still the DBI">). The tests run on SQLite, MySQL and PostgreSQL.
 
+=head2 When should I use it, and when not?
+
+The rest of this guide says what DBIx::Squirrel can do; this says when
+it's worth it. The stages are more to learn, and they pay that back in
+some code, not all of it.
+
+B<One query, used once, its rows used at once: the DBI's methods.> A
+C<selectall_arrayref>, or a C<fetchrow_hashref> loop, says all there is
+to say, and stages would only add words. That isn't leaving
+DBIx::Squirrel: the handle is a DBI handle, so the DBI's methods are
+there beside the rest, with placeholders in any style.
+
+B<Work the database can do: SQL.> For the first ten rows, write
+C<LIMIT 10>, not C<take(10)>; for the rows that match, write C<WHERE>,
+not C<take_if>. Sorting, grouping, joining and filtering a large table
+belong in the query, where the database can use its indexes and send
+fewer rows. Stages aren't a way to tune a query. As a rule: shaping
+that belongs to the query goes in SQL, and shaping that belongs to the
+caller goes in stages.
+
+B<One query, many callers: stages.> When a query stays the same but
+what's done with its rows varies, write it once, in a function that
+takes stages, and let each caller say what it wants: a count, the
+first few, a column, a file (L<Let callers of your functions add
+stages|/"Let callers of your functions add stages">). The function
+needn't change for a caller it didn't foresee. That's where the extra
+words pay for themselves, and why the package suits reports, exports
+and loads, command-line tools over a database, admin scripts, and
+modules whose functions others call.
+
+B<Every caller wants a list: give them one.> A function whose callers
+all end with C<keep_all> holds every row each time, so its rows don't
+stream anyway. C<keep_all> isn't wrong; often it's what's wanted. But
+then offer both, a function that takes stages and one that gives the
+list, and let the caller choose:
+
+    sub artist_names (@stages) {
+        return $dbh->iterate('SELECT name FROM artist ORDER BY name', pluck, @stages);
+    }
+    sub all_artist_names () { return artist_names(keep_all) }
+
+    say join ', ', all_artist_names();                # Abba, Blur, Cream
+    say artist_names(take(1), keep_all);              # Abba
+
+B<Not everything is a stream.> Rows that flow, read once in order,
+suit an iterator and stages. A table you look things up in wants a
+hash, built once with a select method, and an answer you'll read
+several times wants an array:
+
+    my %artist = map {@$_} @{ $dbh->selectall_arrayref('SELECT id, name FROM artist') };
+    say $artist{2};    # Blur
+
+Making every query a stream would make code like that worse, not
+better.
+
+As a rough rule, choosing quickly:
+
+=over 4
+
+=item a simple query, and one simple use of its rows
+
+the DBI's methods, on the same handle
+
+=item a domain model, as objects and their relationships
+
+an ORM, such as DBIx::Class
+
+=item a query that stays the same, and callers that vary
+
+DBIx::Squirrel's stages
+
+=back
+
+It's a simplification, but close to how the choice goes in practice.
+The biggest gain isn't the loops the stages replace: it's that whoever
+writes a query needn't guess how its callers will want the rows.
+
 =head2 Do I need to learn Ekorn::Pipeline?
 
 Not to use DBIx::Squirrel: this guide shows its parts as they apply to
@@ -2344,57 +2584,57 @@ starts from the beginning.
 
 Close to the DBI where it does the DBI's work, and a little slower per
 row where it does more. Timed on a real table of 297,848 narrow rows,
-in SQLite, the best of three runs, in seconds:
+in SQLite, on Perl 5.36, each way in a process of its own, the best of
+three runs, in seconds:
 
 =over 4
 
 =item the DBI's C<fetchrow_arrayref>, in a loop
 
-0.079
+0.073
 
 =item the DBI's C<selectall_arrayref>
 
-0.107
+0.092
 
 =item DBIx::Squirrel's C<selectall_arrayref>
 
-0.107
+0.092
 
 =item C<< iterate(...)->all >>
 
-0.156
+0.122
 
 =item C<map> over C<< iterate(...)->all >>
 
-0.169
+0.144
 
 =item C<next>, in a loop
 
-0.276
+0.259
 
 =item C<iterate(..., keep_all)>
 
-0.533
+0.429
 
 =item C<< iterate(..., $stage)->all >>
 
-0.637
+0.437
 
 =back
 
 On wide rows, 21,826 of them averaging 24 KB, fetching the data costs
 far more than anything around it, and every one of those ways takes
-between 0.13 and 0.23 seconds.
+between 0.13 and 0.20 seconds.
 
-So: the select methods cost nothing over the DBI's. C<all> with no
-stages takes about one and a half times as long as
-C<selectall_arrayref>. A stage costs under two microseconds a row; over
-a hundred thousand rows, that's a sixth of a second, and on most
-queries it's lost in the time the database takes. When every row of a
-big result is wanted, and only needs changing, C<map> over C<all> is
-quickest. Use stages when you might not need every row, when the
-result is too big to hold, or when the steps should travel with the
-query.
+So: the select methods cost nothing over the DBI's. C<all> with no stages
+takes about a third longer than C<selectall_arrayref>. A stage costs
+about a microsecond a row; over a hundred thousand rows, that's a tenth
+of a second, and on most queries it's lost in the time the database
+takes. When every row of a big result is wanted, and only needs
+changing, C<map> over C<all> is quickest. Use stages when you might not
+need every row, when the result is too big to hold, or when the steps
+should travel with the query.
 
 =head2 Will a large result fill my memory?
 

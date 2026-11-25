@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::GitHooks 0.007;
+package Dist::Conformance::Check::GitHooks 0.008;
 
 # ABSTRACT: The git hooks are tracked, match their templates, and are installed
 
@@ -31,10 +31,10 @@ sub hook_path ( $self, $name ) { return $self->config->{directory} . "/$name" }
 sub check ( $self, $snapshot ) {
     my $hooks   = $self->config->{hooks};
     my @names   = sort keys %$hooks;
-    my @missing = $self->missing( $snapshot, map { $self->hook_path($_) } @names );
+    my @missing = $self->missing( $snapshot, map { local ($_) = $_; $self->hook_path($_) } @names );
     return ( 'fail', 'missing: ' . join ', ', @missing ) if @missing;
-    my @differ = grep { $snapshot->sha( $self->hook_path($_) ) ne Dist::Conformance::Snapshot::blob_sha( ( $self->template( $hooks->{$_} ) )[0] ) } @names;
-    return ( $self->config->{differ}, 'customized or outdated: ' . join ', ', map { $self->hook_path($_) } @differ ) if @differ;
+    my @differ = grep { local ($_) = $_; $snapshot->sha( $self->hook_path($_) ) ne Dist::Conformance::Snapshot::blob_sha( ( $self->template( $hooks->{$_} ) )[0] ) } @names;
+    return ( $self->config->{differ}, 'customized or outdated: ' . join ', ', map { local ($_) = $_; $self->hook_path($_) } @differ ) if @differ;
     return ( 'pass', 'match the templates' );
 }
 
@@ -66,7 +66,7 @@ Dist::Conformance::Check::GitHooks - The git hooks are tracked, match their temp
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

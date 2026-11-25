@@ -40,7 +40,6 @@ sub both ($stages, @values) {
     return @got;
 }
 
-
 # Check both ways give the same, and what's expected.
 sub same ($name, $stages, $values, $expected) {
     my($plain, $full) = both($stages, @$values);
@@ -177,6 +176,37 @@ subtest 'A pushed run has no context, and gives nothing from a flush' => sub {
     $outer->iterator($outer_source)->all;
     is \@seen, [['not', undef], ['not', undef]],
         'in a run called from a stage, or a flush, of a run with a context';
+};
+
+subtest "all takes what the last part gives at once straight, in order" => sub {
+    # all collects the values after the first that the last part returns
+    # at once without queueing them; next queues them. Each gives the same.
+    my $many = sub ($value) {
+        map { "$value$_" } qw(a b c);
+    };
+    my $flush = gather {
+        my @held;
+        return (sub ($value) { push @held, $value; () }, sub () { splice @held });
+    };
+    my %stages = (
+        'a last step returning several'         => [$many],
+        'a last stage, full, returning several' => [$same, $many],
+        "a last gather's flush"                 => [$flush],
+        "a list sink's result"                  => [keep_all],
+        'several, then a flush of several'      => [$many, $flush],
+        'a stop carrying several, at the end'   =>
+            [sub { Stop->throw('x', 'y') if $_[0] == 2; $_[0] }, $many],
+    );
+    for my $name (sort keys %stages) {
+        my $p    = $class->new(@{ $stages{$name} });
+        my $next = $p->iterator(from_array(1 .. 3));
+        my @one;
+        while (my($value) = $next->()) { push @one, $value }
+        is [$p->iterator(from_array(1 .. 3))->all], \@one, "$name: all as next";
+        is [$p->(1 .. 3)],                          \@one, "$name: pushed as next";
+    }
+    is [$class->new($many)->iterator(from_array(1, 2))->all],
+        [qw(1a 1b 1c 2a 2b 2c)], 'in order';
 };
 
 subtest 'In scalar context, how many' => sub {

@@ -197,15 +197,21 @@ sub _values_for ($binds, $args) {
     return \%values
         if keys %values == keys %$binds
         && !grep { !exists $binds->{$_} } keys %values;
-    my(%given, @unknown);
+    my(%given, @unknown, %twice);
     for my $name (keys %values) {
         # A name as the statement keys it, as most are, is its own key.
         my $key = exists $binds->{$name} ? $name : key_of($name);
+        # Two spellings of one name, as :id and id, would leave the value
+        # to the hash's order.
+        $twice{$key} = 1 if exists $given{$key};
         $given{$key} = $values{$name};
         push @unknown, $name unless $binds->{$key};
     }
     croakf 'Expected a placeholder of the statement (%s)', join ', ', sort @unknown
         if @unknown;
+    croakf 'Expected one value for each placeholder (two for %s)',
+        join ', ', sort keys %twice
+        if %twice;
     # Each key given is the statement's, so as many as it has are all of
     # them.
     return \%given if keys %given == keys %$binds;

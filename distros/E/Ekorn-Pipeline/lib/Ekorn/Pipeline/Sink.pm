@@ -10,6 +10,8 @@ use Ekorn::Pipeline::Errors qw(croakf);
 use namespace::clean;
 
 # Croak at the line that called Ekorn::Pipeline.
+our $VERSION = 'v0.4.0';
+
 our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 
 # Return a sink made afresh for each run by the set-up given, which
@@ -26,7 +28,6 @@ sub new_sink_many ($class, $setup) {
         $setup,
     );
 }
-
 
 # Return a sink, as new_sink_many does, whose result is one value.
 sub new_sink_one ($class, $setup) {

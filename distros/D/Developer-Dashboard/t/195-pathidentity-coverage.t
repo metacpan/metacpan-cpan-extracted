@@ -30,7 +30,14 @@ my $tmp = tempdir( CLEANUP => 1 );
             $identity_checks++;
             return 0;
         };
-        is( current_working_directory(), $physical,
+        # getcwd() spells the path with forward slashes on Windows while
+        # current_working_directory() returns the File::Spec canonpath
+        # spelling, so compare separator-normalised copies: the check
+        # asserts the same directory, not one spelling of it.
+        my $got = current_working_directory();
+        ( my $got_unix = $got ) =~ s{\\}{/}g;
+        ( my $physical_unix = $physical ) =~ s{\\}{/}g;
+        is( $got_unix, $physical_unix,
             'current_working_directory returns the matching physical path' );
     }
     is( $getcwd_calls, 1, 'current_working_directory uses one native getcwd call on the common path' );
@@ -49,7 +56,12 @@ for my $invalid_pwd ( 'relative/path', File::Spec->catdir( $tmp, 'missing-pwd' )
             $getcwd_calls++;
             return $original_getcwd->();
         };
-        is( current_working_directory(), $physical,
+        # Same separator normalisation as the matching-PWD block above:
+        # the fallback returns the canonpath spelling on Windows.
+        my $got = current_working_directory();
+        ( my $got_unix = $got ) =~ s{\\}{/}g;
+        ( my $physical_unix = $physical ) =~ s{\\}{/}g;
+        is( $got_unix, $physical_unix,
             'an invalid PWD falls back to the process working directory' );
     }
     is( $getcwd_calls, 1, 'an invalid PWD performs one live getcwd lookup' );
@@ -90,16 +102,27 @@ for my $invalid_pwd ( 'relative/path', File::Spec->catdir( $tmp, 'missing-pwd' )
 # --- a real, existing path resolves to its abs_path() form under both modes -----
 {
     my $resolved = abs_path($tmp);
-    is( _path_identity( $tmp, empty_fallback => 1 ), $resolved, '_path_identity resolves a real existing path (empty_fallback=>1)' );
-    is( _path_identity( $tmp, empty_fallback => 0 ), $resolved, '_path_identity resolves a real existing path (empty_fallback=>0)' );
+    # abs_path() spells the path with forward slashes on Windows while
+    # _path_identity() returns the File::Spec canonpath spelling, so
+    # compare separator-normalised copies (t/146 precedent).
+    ( my $resolved_unix = $resolved ) =~ s{\\}{/}g;
+    ( my $got_one_unix = _path_identity( $tmp, empty_fallback => 1 ) ) =~ s{\\}{/}g;
+    ( my $got_zero_unix = _path_identity( $tmp, empty_fallback => 0 ) ) =~ s{\\}{/}g;
+    is( $got_one_unix, $resolved_unix, '_path_identity resolves a real existing path (empty_fallback=>1)' );
+    is( $got_zero_unix, $resolved_unix, '_path_identity resolves a real existing path (empty_fallback=>0)' );
 }
 
 # --- a nonexistent path falls back to File::Spec->canonpath under both modes ----
 {
     my $nonexistent = File::Spec->catdir( $tmp, 'does-not-exist-at-all' );
     my $canon       = File::Spec->canonpath($nonexistent);
-    is( _path_identity( $nonexistent, empty_fallback => 1 ), $canon, '_path_identity falls back to canonpath for a nonexistent path (empty_fallback=>1, undef abs_path)' );
-    is( _path_identity( $nonexistent, empty_fallback => 0 ), $canon, '_path_identity falls back to canonpath for a nonexistent path (empty_fallback=>0, undef abs_path)' );
+    my $got_fallback = _path_identity( $nonexistent, empty_fallback => 1 );
+    my $got_empty    = _path_identity( $nonexistent, empty_fallback => 0 );
+    for ( $canon, $got_fallback, $got_empty ) {
+        s{/private(?=/var/folders/)}{}g;
+    }
+    is( $got_fallback, $canon, '_path_identity falls back to canonpath for a nonexistent path (empty_fallback=>1, undef abs_path)' );
+    is( $got_empty, $canon, '_path_identity falls back to canonpath for a nonexistent path (empty_fallback=>0, undef abs_path)' );
 }
 
 # --- the abs_path()-returns-empty-string edge case: THIS is where the two ------
@@ -217,6 +240,28 @@ for my $invalid_pwd ( 'relative/path', File::Spec->catdir( $tmp, 'missing-pwd' )
             separator => $win_separator, case_tolerant => 1,
         ),
         'identity comparison handles a drive-root separator without duplicating it'
+    );
+    ok(
+        Developer::Dashboard::PathIdentity::_same_or_descendant_identity(
+            'C:/Users/Alice/project', 'C:\\Users\\Alice',
+            separator => $win_separator, case_tolerant => 1,
+        ),
+        'Windows canonical forward slashes match a backslash-spelled ancestor'
+    );
+    ok(
+        Developer::Dashboard::PathIdentity::_same_or_descendant_identity(
+            'C:\\Users\\Alice\\project', 'C:/Users/Alice',
+            separator => $win_separator, case_tolerant => 1,
+        ),
+        'Windows backslash descendants match a forward-slash ancestor'
+    );
+    is(
+        Developer::Dashboard::PathIdentity::_same_or_descendant_identity(
+            'C:/Users/Alice-other/project', 'C:\\Users\\Alice',
+            separator => $win_separator, case_tolerant => 1,
+        ),
+        0,
+        'mixed Windows separators still require an exact directory boundary'
     );
     is(
         Developer::Dashboard::PathIdentity::_same_or_descendant_identity(

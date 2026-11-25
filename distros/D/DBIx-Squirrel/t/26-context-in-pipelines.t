@@ -6,6 +6,7 @@ use DBIx::Squirrel;
 use DBIx::Squirrel::Context      qw(iterator result_number result_original);
 use DBIx::Squirrel::Stages::Rows qw(as_hash  pluck);
 use Ekorn::Pipeline              qw();
+use Ekorn::Pipeline::Factories   qw(sink_one);
 use Ekorn::Pipeline::Operators;
 use Ekorn::Pipeline::Sinks   qw(keep_all keep_first keep_last count_items);
 use Ekorn::Pipeline::Sources qw(from_array);
@@ -57,13 +58,57 @@ subtest 'result_original, through |' => sub {
     is $ending, [[3, undef]], 'undef, for a value a flush gives';
 };
 
-subtest "result_number and iterator are only the iterator's" => sub {
+# From roadmap 2026-0032, result_number is Ekorn's, counting in every
+# run (D1), and result_original falls back to Ekorn's outside a run
+# reading a statement (D2); iterator is still only the iterator's (D3).
+subtest "result_number in every run; iterator only the iterator's" => sub {
     my $asked = sub { [result_number, iterator] };
-    is $dbh->iterate($sql) | $asked | keep_all, [([undef, undef]) x 3],
-        "undef in a pipeline of the user's own";
+    is $dbh->iterate($sql) | $asked | keep_all,
+        [map { [$_, undef] } 1 .. 3],
+        "a chain counts its own results, with no iterator";
     my $it = $dbh->iterate($sql, $asked);
     is [$it->all], [map { [$_, exact_ref($it)] } 1 .. 3],
         "as before, in the iterator's own stages";
+    is [Ekorn::Pipeline->new(sub { result_number })->(qw(a b c))], [1 .. 3],
+        "and a pushed run of the user's own";
+    is [result_number, result_original], [undef, undef], 'undef outside a run';
+    is [Ekorn::Pipeline->new(sub { result_number + 1 })->('a')], [2],
+        'an empty prototype: + 1 adds one';
+};
+
+# From roadmap 2026-0046, result_original is Ekorn's own sub, and the
+# statement's source gives Ekorn the row as its original, which Ekorn
+# passes through chains.
+subtest "result_original is Ekorn's, carrying the row through chains" => sub {
+    ref_is \&result_original, \&Ekorn::Pipeline::Context::result_original,
+        "Ekorn's own sub";
+    is prototype(\&result_original), '', 'with an empty prototype';
+    my $inner = $dbh->iterate($sql, sub { uc $_->[1] });
+    my $outer = Ekorn::Pipeline->new(sub { $_ })->iterator($inner);
+    is [Ekorn::Pipeline->new(sub { result_original })->iterator($outer)->all],
+        [map { [$_ + 1, $names[$_]] } 0 .. 2],
+        'the fetched row, two pipelines from the statement';
+};
+
+subtest 'result_original, outside a run reading a statement' => sub {
+    is [Ekorn::Pipeline->new(sub { result_original })->(qw(a b))],
+        [qw(a b)], "Ekorn's: the value pushed";
+    is [Ekorn::Pipeline->new(collect { scalar @_ }, sub { result_original })
+            ->(qw(a b))
+        ],
+        [undef], 'undef in a flush, as in a statement run';
+};
+
+subtest "a sink's step sees its value's number" => sub {
+    my @seen;
+    my $sink = sink_one {
+        return (
+            sub ($row) { push @seen, result_number . " $row->[1]" },
+            sub () { scalar @seen },
+        );
+    };
+    is $dbh->iterate($sql, sub { $_[0] }, $sink), 3, "the sink's result";
+    is \@seen, ['1 Abba', '2 Blur', '3 Cream'],      'each its own number';
 };
 
 subtest 'result_number and iterator, with a sink given last' => sub {

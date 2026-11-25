@@ -3,7 +3,7 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
@@ -23,11 +23,14 @@ use Developer::Dashboard::TimeUtils qw(_now_iso8601);
 use Developer::Dashboard::Platform qw(command_in_path is_windows shell_command_argv);
 use Developer::Dashboard::ProcessSupervision qw(
     _current_perl_command
+    _perl_library_args
     _descriptor_is_inherited_pipe
-    _fork_process
     _open_file_descriptors
     _overwrite_state_file_in_place
     _pid_is_running
+    _lifetime_owner_pid
+    _lifetime_owner_is_gone
+    _lifetime_owner_poll_seconds
     _pid_namespace_id
     _powershell_single_quote
     _process_exists
@@ -36,11 +39,13 @@ use Developer::Dashboard::ProcessSupervision qw(
     _powershell_command
     _rename_path
     _replace_state_file
+    _source_is_movable
     _unlink_path
     _helper_file_supports_internal_command
     _same_pid_namespace
     _close_inherited_fds
     _dashboard_core_helper_path
+    _taskkill_command
 );
 
 our $SIGNAL_RUNNER;
@@ -355,7 +360,7 @@ sub _run_job {
 # start_loop($job)
 # Starts a managed collector loop for interval or cron schedules.
 # Input: collector job hash reference.
-# Output: existing or newly forked collector pid integer.
+# Output: existing or newly spawned collector child-process PID integer.
 sub start_loop {
     my ( $self, $job ) = @_;
     my $interval = $self->_effective_interval_seconds($job);
@@ -368,13 +373,13 @@ sub start_loop {
         die "Collector '$name' has invalid cron expression: $cron_error\n" if $cron_error;
     }
 
-    # DD-737: a collector with neither 'command' nor 'code' used to be forked
+    # DD-737: a collector with neither 'command' nor 'code' used to be launched
     # into a loop anyway, which then died on its very first tick inside
     # _collector_source and every tick after that, forever, without ever
     # disabling itself - observed on a real machine as hundreds of unreaped
     # zombie loop-worker processes from one permanently misconfigured
     # collector. _collector_source already performs exactly the check this
-    # needs; running it here, before any pidfile or fork, turns a doomed
+    # needs; running it here, before any pidfile or child-process launch, turns a doomed
     # loop into an immediate, visible failure instead.
     $self->_collector_source($job);
 
@@ -390,84 +395,25 @@ sub start_loop {
     );
     return $adopted_pid if defined $adopted_pid;
 
-    if ( is_windows() ) {
-        return $self->_start_windows_loop_process(
-            configured_interval => $configured_interval,
-            interval            => $interval,
-            job                 => $job,
-            name                => $name,
-            schedule_mode       => $schedule_mode,
-            title               => $title,
-        );
-    }
-
-    my $pid = $self->_fork_process();
-    die "Unable to fork collector '$name': $!" if !defined $pid;
-
-    if ($pid) {
-        # The loop STATE is written before the pidfile, and the order is
-        # load-bearing rather than stylistic.
-        #
-        # running_loops keys on the pidfile: it lists pidfiles, and for each one
-        # decides whether that pid is a loop it manages. It recognises the pid
-        # either by its process title or by this recorded state. Written the other
-        # way round there is a window - pidfile present, state not yet written -
-        # in which a freshly forked child that has not yet adopted its title is
-        # unrecognisable by either route. A concurrent running_loops in any other
-        # process then treats a perfectly healthy loop as an orphan and unlinks
-        # its pidfile.
-        #
-        # The consequence is the exact failure the surrounding code exists to
-        # prevent: stop_loop returns early on a missing pidfile so the loop can no
-        # longer be stopped by name, and start_loop consults the loop-state
-        # fallback only inside its `-f $pidfile` branch, so the next supervisor
-        # start forks a DUPLICATE. The fallback that would have caught it cannot
-        # fire, because the sweep deleted the evidence it reads.
-        #
-        # Writing the state first closes the window instead of widening a wait:
-        # the pidfile - the thing the sweep keys on - never exists without the
-        # state that identifies it.
-        $self->_write_loop_state(
-            $name,
-            {
-                pid          => $pid,
-                name         => $name,
-                process_name => $title,
-                command      => $job->{command},
-                cwd          => $job->{cwd},
-                interval     => $interval,
-                ( $interval != $configured_interval ? ( configured_interval => $configured_interval ) : () ),
-                schedule     => $schedule_mode,
-                status       => 'starting',
-                started_at   => _now_iso8601( tz => "local" ),
-                heartbeat_at => _now_iso8601( tz => "local" ),
-            }
-        );
-        open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
-        print {$fh} $pid;
-        close $fh;
-        $self->{paths}->secure_file_permissions($pidfile);
-        return $pid;
-    }
-
-    return $self->_run_loop_child(
-        interval      => $interval,
-        job           => $job,
-        name          => $name,
-        schedule_mode => $schedule_mode,
-        title         => $title,
+    return $self->_start_windows_loop_process(
+        configured_interval => $configured_interval,
+        interval            => $interval,
+        job                 => $job,
+        name                => $name,
+        schedule_mode       => $schedule_mode,
+        title               => $title,
     );
 }
 
 # _adopt_existing_loop_if_running(%args)
 # Checks whether a collector loop is already running for this name and, if
 # so, adopts it - rewriting its recorded state (and repairing a missing
-# pidfile) rather than letting start_loop fork a duplicate. Runs entirely
-# before any fork, so it carries none of start_loop's fork-timing risk.
+# pidfile) rather than letting start_loop spawn a duplicate process. Runs before
+# any child-process launch, so it carries none of start_loop's process-start timing risk.
 # Input: pidfile path, collector name, process title, effective interval,
 # and schedule mode.
-# Output: the adopted pid if a genuinely running loop was found and adopted;
-# undef if start_loop should proceed to fork a fresh loop.
+# Output: the adopted PID if a genuinely running loop was found and adopted;
+# undef if start_loop should proceed to spawn a fresh loop process.
 sub _adopt_existing_loop_if_running {
     my ( $self, %args ) = @_;
     my ( $pidfile, $name, $title, $interval, $schedule_mode )
@@ -476,24 +422,28 @@ sub _adopt_existing_loop_if_running {
     # The pidfile is a RECORD of what is running, not the authority on it. Asking
     # only the file is what let 27 supervisor loops accumulate for a collector
     # declared singleton: once the file was gone - a crash before the write, a
-    # cleanup, a /tmp sweep - every start forked another loop that nothing could
+    # cleanup, a /tmp sweep - every start launched another loop that nothing could
     # see, stop or count, and each one went on spawning work every interval.
     #
-    # So if the record is missing, ask the process table before forking, then
+    # So if the record is missing, ask the process table before spawning, then
     # consult the parent's state record if process-title matching has not caught
-    # a newly forked child yet. An existing loop is adopted and its record
+    # a newly started child process yet. An existing loop is adopted and its record
     # rewritten, which is both the correct outcome and the repair of the missing
     # file.
     my $existing = -f $pidfile ? do { my $recorded = slurp_file($pidfile); chomp $recorded; $recorded } : undef;
     if (!$existing) {
         $existing = $self->_find_running_loop($name);
         if (!$existing) {
-            # The parent records the forked pid and its intended title before
+            # The launcher records the spawned process PID and its intended title before
             # returning from start_loop. A concurrent start can therefore see a
             # valid state record while the child is still adopting that title,
             # which makes process-table matching temporarily miss it. Consult
-            # that parent-written state before deciding to fork another loop.
-            my $state = $self->loop_state($name);
+            # that launcher-written state before deciding to spawn another loop.
+            # loop_state dies on a state file that stays empty or torn (a
+            # write caught half way, a crash mid-write). That is no record
+            # of a running loop, so it must mean "nothing to adopt" and let
+            # start_loop spawn, not make the start itself die.
+            my $state = eval { $self->loop_state($name) };
             my $state_pid = ref($state) eq 'HASH' ? $state->{pid} : undef;
             $existing = $state_pid
               if defined $state_pid
@@ -541,13 +491,17 @@ sub _adopt_existing_loop_if_running {
             # collector invisible to stop and to status, which both key off that
             # file - one missing record causing two more symptoms.
             #
-            # close is unchecked, like the original write further down: checking it
-            # raised "Bad file descriptor" and killed start_loop outright, which is
-            # a far worse outcome than an unclosed handle.
+            # CORE::close, not the plain close: this file imports POSIX::close,
+            # which shadows the built-in with the raw close(2) - it closes the
+            # descriptor WITHOUT flushing the stdio buffer, so the pid written
+            # above stayed buffered and the pidfile on disk was empty until
+            # this handle went out of scope (the same hazard left loop.json
+            # empty and killed t/07 test 577). The close stays unchecked, as
+            # before: a failed close must not kill start_loop outright.
             if ( !-f $pidfile ) {
                 open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
                 print {$fh} $pid;
-                close $fh;
+                CORE::close $fh;
                 $self->{paths}->secure_file_permissions($pidfile);
             }
             return $pid;
@@ -560,8 +514,8 @@ sub _adopt_existing_loop_if_running {
 
 
 # _start_windows_loop_process(%args)
-# Launches one detached collector loop helper on Windows instead of relying on
-# Perl pseudo-fork semantics for long-lived background processes.
+# Launches one detached collector loop helper through the native GoRoutine
+# process API on every supported operating system.
 # Input: collector job hash, collector name, title, effective interval,
 # configured interval, and schedule mode.
 # Output: detached loop pid integer.
@@ -586,13 +540,37 @@ sub _start_windows_loop_process {
     );
 
     my @command = $self->_windows_background_loop_command($name);
-    my $pid = $self->_spawn_windows_background_command(@command);
+    # The loop's identity marker travels in the INITIAL environ, not in a
+    # post-exec $ENV assignment: the kernel environ block is fixed at exec,
+    # so a variable assigned after startup is invisible to /proc readers on
+    # every platform. The marker is what identifies the loop where its $0
+    # title cannot be observed (Windows, and qemu user-mode emulation, where
+    # the guest's $0 write never reaches the host's /proc). Workers are NOT
+    # given it: _run_loop_child deletes it from %ENV before spawning any,
+    # so a worker can never be mistaken for its supervisor by this test.
+    # The runtime marker travels the same way: it is the environ-visible
+    # runtime identity, and the finder scopes its title and marker branches
+    # through it, so a loop from another runtime is never adopted.
+    #
+    # The markers are localized into this process's %ENV for the spawn call
+    # itself, not only passed in the env option: the GoRoutine wrapper
+    # honours that option on Windows (it merges the overrides into the
+    # parent environ for the spawn), but on POSIX the native spawn passes
+    # the parent environ verbatim and never reads the option, so the
+    # markers would never reach the child's initial environ there. The
+    # localization ends when this block exits, so the markers never leak
+    # into this process's own environment - and the loop child deletes
+    # them from its %ENV before spawning workers, while its /proc environ
+    # block (the initial one) still shows them.
+    my $runtime_key = $self->_runtime_state_key;
+    my $pid;
+    {
+        local $ENV{DEVELOPER_DASHBOARD_LOOP_NAME}    = $name;
+        local $ENV{DEVELOPER_DASHBOARD_LOOP_RUNTIME} = $runtime_key;
+        $pid = $self->_spawn_windows_background_command( @command, { env => { DEVELOPER_DASHBOARD_LOOP_NAME => $name, DEVELOPER_DASHBOARD_LOOP_RUNTIME => $runtime_key } } );
+    }
     die "Unable to launch collector '$name' on Windows\n" if !$pid;
 
-    open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
-    print {$fh} $pid;
-    close $fh;
-    $self->{paths}->secure_file_permissions($pidfile);
     $self->_write_loop_state(
         $name,
         {
@@ -609,6 +587,11 @@ sub _start_windows_loop_process {
             heartbeat_at => _now_iso8601( tz => "local" ),
         }
     );
+    open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
+    print {$fh} $pid;
+    # CORE::close: plain close is POSIX::close in this file (raw, no flush).
+    CORE::close $fh;
+    $self->{paths}->secure_file_permissions($pidfile);
     return $pid;
 }
 
@@ -637,7 +620,18 @@ sub _run_loop_child {
         $self->_close_inherited_fds( close_ipc => 1 );
     }
 
-    $ENV{DEVELOPER_DASHBOARD_LOOP_NAME}   = $name;
+    # The identity marker is NOT assigned here any more. It arrives in the
+    # child's INITIAL environ (see _start_windows_loop_process): the kernel
+    # environ block is fixed at exec, so a post-exec $ENV assignment is
+    # invisible to /proc readers and the marker was a dead recognition path.
+    # It is deleted from %ENV instead, before any worker is spawned, so a
+    # worker forked from this loop cannot inherit it and be mistaken for a
+    # second supervisor by the marker test. The loop's own /proc environ
+    # block still shows it - that block is the initial one, unaffected by
+    # this delete. The runtime marker is deleted the same way, so a worker
+    # never carries this runtime's identity either.
+    delete $ENV{DEVELOPER_DASHBOARD_LOOP_NAME};
+    delete $ENV{DEVELOPER_DASHBOARD_LOOP_RUNTIME};
     $ENV{DEVELOPER_DASHBOARD_LOOP_STATUS} = 'running';
     $0 = $title;
     local $SIGNAL_RUNNER    = $self;
@@ -653,6 +647,13 @@ sub _run_loop_child {
     local $SIG{INT}  = \&_signal_stop;
     local $SIG{HUP}  = \&_signal_stop;
     my ( $execution_mode, $max_parallel ) = $self->_collector_execution_policy($job);
+
+    # The process this loop's lifetime is tied to, when the starter opted
+    # in through DEVELOPER_DASHBOARD_LIFETIME_PID, how many polls in a
+    # row it has been seen dead, and how long the loop has slept since
+    # the last poll. Undef pid when the starter did not opt in, which is
+    # every ordinary user: the sleep below then never polls anything.
+    my $lifetime_owner = { pid => $self->_lifetime_owner_pid, dead_polls => 0, slept => 0 };
 
     while (1) {
         $self->_reap_finished_loop_workers( \%active_workers );
@@ -723,6 +724,8 @@ sub _run_loop_child {
         $self->_sleep_until_next_tick(
             interval       => $schedule_mode eq 'cron' ? 1 : $interval,
             active_workers => \%active_workers,
+            name           => $name,
+            lifetime_owner => $lifetime_owner,
         );
         if ($single_tick) {
             $self->_settle_single_tick_workers( \%active_workers );
@@ -793,7 +796,7 @@ sub _is_dashboard_subcommand_collector {
     my $command = $job->{command};
     return 0 if !defined $command || $command eq '';
     return 1 if $command =~ /\A\s*(?:dashboard|d2)(?:\s|$)/;
-    return 1 if $command =~ /\A\s*(?:"[^"]*\/dashboard"|'[^']*\/dashboard'|[^\s]+\/dashboard)(?:\s|$)/;
+    return 1 if $command =~ /\A\s*(?:"[^"]*\/(?:dashboard|d2)"|'[^']*\/(?:dashboard|d2)'|[^\s]+\/(?:dashboard|d2))(?:\s|$)/;
     return 0;
 }
 
@@ -804,14 +807,8 @@ sub _is_dashboard_subcommand_collector {
 # Output: worker pid integer in the parent or never returns in the child.
 sub _start_loop_worker {
     my ( $self, $job, $name, $title ) = @_;
-    if ( is_windows() ) {
-        my @command = $self->_windows_background_worker_command( $name, $$ );
-        return $self->_spawn_windows_background_command(@command);
-    }
-    my $pid = $self->_fork_process();
-    die "Unable to fork collector worker '$name': $!" if !defined $pid;
-    return $pid if $pid;
-    return $self->_run_loop_worker( $job, $name, $title, $$ );
+    my @command = $self->_windows_background_worker_command( $name, $$ );
+    return $self->_spawn_windows_background_command(@command);
 }
 
 # _run_loop_worker($job, $name, $title, $loop_pid)
@@ -821,8 +818,26 @@ sub _start_loop_worker {
 # Output: never returns in normal operation.
 sub _run_loop_worker {
     my ( $self, $job, $name, $title, $loop_pid ) = @_;
-    $0 = "dashboard collector worker: $name";
+    $0 = "d2 collector worker: $name";
     setsid() if !is_windows();
+    # The worker inherits its standard handles from the native spawn layer, and
+    # on Windows those handles have no Perl file descriptor behind them, so
+    # Capture::Tiny's >&STDOUT duplication inside a job fails with
+    # 'Inappropriate I/O control operation' and its <&STDIN duplication fails
+    # with 'Bad file descriptor', and the job dies before its command runs.
+    # Re-open the handles to the same log files the spawn layer already
+    # targets (STDIN from devnull, matching the stdin the spawn layer already
+    # passes; collector commands never read stdin), so the worker has real
+    # descriptors before it runs. Windows only: on POSIX the worker is forked
+    # from the daemonized loop child, which already has both handles on the
+    # collector log, so there is nothing to repair — and re-opening STDERR
+    # here would send worker stderr to '<log>.stderr', a different file
+    # from the loop's own stderr.
+    if ( is_windows() ) {
+        open STDIN,  '<', File::Spec->devnull() or die $!;
+        open STDOUT, '>>', $self->{files}->collector_log or die $!;
+        open STDERR, '>>', $self->{files}->collector_log . '.stderr' or die $!;
+    }
     local $SIG{TERM} = 'DEFAULT';
     local $SIG{INT}  = 'DEFAULT';
     local $SIG{HUP}  = 'DEFAULT';
@@ -869,6 +884,20 @@ sub _run_loop_worker {
 # Output: count of reaped worker processes.
 sub _reap_finished_loop_workers {
     my ( $self, $active_workers ) = @_;
+
+    # A REAP MUST LEAVE THE EXIT STATUS AND ERRNO AS IT FOUND THEM. The loop
+    # runs this from its CHLD handler, and a handler can be delivered
+    # straight after a system() the loop made itself, between the system()
+    # and the statement that reads its exit status. Each wait below writes
+    # the exit status: -1 while a worker is still running or is not a child
+    # (with errno ECHILD), the worker's own status when it is reaped. A
+    # "system ...; return $? >> 8" in the loop would then read a status the
+    # command never set. Both values are restored when this sub returns,
+    # whichever caller it has. The guard is here and not in
+    # _waitpid_nonblocking because this sub is that wrapper's only caller
+    # and no caller of this sub reads a worker's exit status.
+    local $?;
+    local $!;
     $active_workers ||= {};
     my $reaped = 0;
     for my $pid ( keys %{$active_workers} ) {
@@ -887,6 +916,14 @@ sub _reap_finished_loop_workers {
 # Output: waitpid return value.
 sub _waitpid_nonblocking {
     my ( $self, $pid ) = @_;
+    if ( is_windows() ) {
+        # A GoRoutine child is reaped through the native process API, which
+        # the spawn registry keeps alive until it is collected. Any other
+        # pid falls through to waitpid, which keeps its existing behaviour
+        # for it.
+        require Developer::Dashboard::GoRoutine;
+        return $pid if Developer::Dashboard::GoRoutine::reap_child($pid);
+    }
     return waitpid( $pid, 1 );
 }
 
@@ -900,7 +937,33 @@ sub _terminate_loop_workers {
     for my $pid ( keys %{$active_workers} ) {
         next if !$self->_pid_is_running($pid);
         kill 15, -$pid if !is_windows();
-        kill 15, $pid;
+        if ( is_windows() ) {
+            # Tree-kill FIRST, while the worker is still alive. taskkill /T
+            # roots the kill at the worker pid, and a worker already dead
+            # from TERM answers "process not found", so its
+            # powershell/command descendants survive orphaned: probe643
+            # proved stop_loop left the singleton worker's powershell and
+            # long-running perl command running (t/07 643), because the
+            # TERM below killed the worker at once and the tree kill in
+            # the escalation loop below was then skipped as "not running".
+            # A tree kill on the live worker takes the whole subtree down
+            # (probe643 part C). Perl kill TERM never reaches a
+            # CreateProcess child (it has no console to deliver the event
+            # to); terminate through the native process API instead, for
+            # any worker the tree kill leaves behind. taskkill is resolved
+            # through _taskkill_command, the same helper RuntimeManager's
+            # _send_signal uses, so both kill paths find the same program
+            # (a bare name handed to system() only ever finds a .exe).
+            my @taskkill = ( _taskkill_command(), '/PID', $pid, '/T', '/F' );
+            capture { system @taskkill };
+            if ( $self->_pid_is_running($pid) ) {
+                require Developer::Dashboard::GoRoutine;
+                Developer::Dashboard::GoRoutine::terminate_process( $pid, 'TERM' );
+            }
+        }
+        else {
+            kill 15, $pid;
+        }
     }
     for my $pid ( keys %{$active_workers} ) {
         for ( 1 .. 20 ) {
@@ -913,7 +976,38 @@ sub _terminate_loop_workers {
         # signalled directly when it is still alive. kill on an empty group is a
         # harmless no-op.
         kill 9, -$pid if !is_windows();
-        kill 9, $pid if $self->_pid_is_running($pid);
+        if ( is_windows() ) {
+            if ( $self->_pid_is_running($pid) ) {
+                # The POSIX group SIGKILL has no Windows equivalent, because
+                # the native spawn layer creates no process groups. taskkill
+                # in tree mode is the equivalent: it kills the worker and
+                # every descendant it spawned, so a TERM-ignoring command
+                # child left in a dead worker's subtree does not survive.
+                # Terminate the worker itself directly if the tree kill
+                # leaves it behind.
+                my @taskkill = ( _taskkill_command(), '/PID', $pid, '/T', '/F' );
+                capture { system @taskkill };
+                if ( $self->_pid_is_running($pid) ) {
+                    require Developer::Dashboard::GoRoutine;
+                    Developer::Dashboard::GoRoutine::terminate_process( $pid, 'KILL' );
+                }
+            }
+        }
+        elsif ( $self->_pid_is_running($pid) ) {
+            kill 9, $pid;
+        }
+        # Wait, bounded, for the kill to take effect and the child to be
+        # reapable before the single reap below: signal delivery and
+        # process death lag under slow scheduling (qemu user-mode
+        # emulation), so a lone non-blocking reap here can miss a child
+        # that dies a moment later and leave it an unreaped zombie even
+        # though this function promises to stop AND reap every worker.
+        # _pid_is_running attempts a reap on each check, so this loop both
+        # waits and reaps; it exits at once when the child is gone.
+        for ( 1 .. 20 ) {
+            last if !$self->_pid_is_running($pid);
+            sleep 0.1;
+        }
         $self->_reap_child_process($pid);
         delete $active_workers->{$pid};
     }
@@ -957,22 +1051,60 @@ sub _settle_single_tick_workers {
 # _sleep_until_next_tick(%args)
 # Sleeps until the next collector loop tick while periodically reaping any
 # finished worker children so zombies do not sit around for an entire interval
-# when a CHLD wakeup is missed.
-# Input: interval seconds and active_workers hash reference.
+# when a CHLD wakeup is missed. When the starter opted in to a lifetime
+# owner, the same slices also poll that owner, so a loop with an hour-long
+# interval still notices its owner dying within seconds.
+# Input: interval seconds and active_workers hash reference, plus the
+# optional collector name and lifetime-owner state hash reference.
 # Output: true value after the bounded sleep window completes.
 sub _sleep_until_next_tick {
     my ( $self, %args ) = @_;
     my $remaining = defined $args{interval} ? $args{interval} : 0;
     $remaining = 0 if $remaining < 0;
     my $active_workers = $args{active_workers} || {};
+    my $owner = $args{lifetime_owner};
+    $owner = undef if ref($owner) ne 'HASH' || !defined $owner->{pid};
     my $slice = $remaining > 0.1 ? 0.1 : $remaining;
     while ( $remaining > 0 ) {
         $slice = $remaining if $remaining < $slice;
         sleep $slice;
         $remaining -= $slice;
         $self->_reap_finished_loop_workers($active_workers);
+        next if !$owner;
+        $owner->{slept} += $slice;
+        next if $owner->{slept} < $self->_lifetime_owner_poll_seconds;
+        $owner->{slept} = 0;
+        $self->_check_loop_lifetime_owner( $args{name}, $owner, $active_workers );
     }
     return 1;
+}
+
+# _check_loop_lifetime_owner($name, $owner, $active_workers)
+# Ends this collector loop once the opted-in lifetime owner is confirmed
+# dead: records why in the collector log, then shuts down through the
+# same path a stop signal takes, which ends the loop's workers, writes
+# the final state and removes the loop's pid and state files. A loop
+# started with no supervisor has nothing else that would ever end it
+# when its starter is killed without running a stop. The log entry is
+# not allowed to keep the loop alive when it fails.
+# Input: collector name string, the owner-state hash reference the loop
+# keeps across polls (pid, dead_polls), and the active worker hash
+# reference.
+# Output: never returns once the owner has been confirmed dead;
+# otherwise undef.
+sub _check_loop_lifetime_owner {
+    my ( $self, $name, $owner, $active_workers ) = @_;
+    return if !$self->_lifetime_owner_is_gone($owner);
+    eval {
+        $self->{collectors}->append_log_entry(
+            $name,
+            happened_at => _now_iso8601( tz => "local" ),
+            source      => 'loop stopped: lifetime owner gone',
+            error       => "lifetime owner pid $owner->{pid} is gone; loop pid $$ is stopping",
+        );
+        1;
+    };
+    $self->_shutdown_loop( $name, 'lifetime-owner-gone', $active_workers );
 }
 
 # stop_loop($name)
@@ -993,6 +1125,28 @@ sub stop_loop {
     }
     else {
         $pid = $self->_find_running_loop($name);
+        if ( !defined $pid ) {
+            # The process-table scan is procfs-only: on Windows opendir
+            # '/proc' fails, so it always returns undef and a loop whose
+            # pidfile is gone could never be stopped there - it survived
+            # stop_loop, held its log open, and (through the inherited
+            # handles GoRoutine spawn passes) held prove's stdout pipe
+            # open until the failsafe taskkilled the tree. Two live
+            # survivors on win-ts proved it: stop-finds-probe-7896 (pid
+            # 1396) and stop-finds-probe-10528 (pid 9276), both left by
+            # direct runs of t/153 whose stop_loop returned without
+            # signalling. Fall back to the launcher-written state, the
+            # same channel _adopt_existing_loop_if_running already
+            # trusts, validated the same way. The eval keeps a torn
+            # state file from turning a "nothing found" into a die,
+            # which is stop_loop's contract for an absent collector.
+            my $state = eval { $self->loop_state($name) };
+            my $state_pid = ref($state) eq 'HASH' ? $state->{pid} : undef;
+            $pid = $state_pid
+              if defined $state_pid
+              && "$state_pid" =~ /\A[1-9][0-9]*\z/
+              && $self->_state_confirms_managed_loop( $name, $state_pid );
+        }
         return if !defined $pid;
     }
     my @state_worker_pids = $self->_state_active_worker_pids($name);
@@ -1009,14 +1163,46 @@ sub stop_loop {
         # SIGTERM handler can terminate its accurate in-memory worker set. Scale
         # the grace to the recorded worker count so the loop is not KILL-9'd
         # mid-cleanup (its handler may spend up to ~2s per stubborn worker).
-        kill 15, $pid;
+        if ( is_windows() ) {
+            # Perl kill TERM never reaches a CreateProcess child (it has no
+            # console to deliver the event to); terminate through the native
+            # process API instead, which maps TERM onto native termination.
+            require Developer::Dashboard::GoRoutine;
+            Developer::Dashboard::GoRoutine::terminate_process( $pid, 'TERM' );
+        }
+        else {
+            kill 15, $pid;
+        }
         my $grace = 20 + 20 * scalar(@state_worker_pids);
         for ( 1 .. $grace ) {
             last if !$self->_pid_is_running($pid);
             sleep 0.1;
         }
+        # On Windows the loop's SIGTERM handler can never run (Perl kill TERM
+        # terminates the process without delivering the signal), so the record
+        # that distinguishes 'told to stop' from 'crashed' would never be
+        # written. The stopper records it here, in the same words the handler
+        # uses on Unix, so the collector log keeps the same meaning.
+        if ( is_windows() ) {
+            eval {
+                $self->{collectors}->append_log_entry(
+                    $name,
+                    happened_at => _now_iso8601( tz => "local" ),
+                    source      => 'loop stopped by signal',
+                    error       => "SIGTERM received by pid $pid",
+                );
+            };
+        }
         kill 9, -$pid if !is_windows();
-        kill 9, $pid  if $self->_pid_is_running($pid);
+        if ( is_windows() ) {
+            if ( $self->_pid_is_running($pid) ) {
+                require Developer::Dashboard::GoRoutine;
+                Developer::Dashboard::GoRoutine::terminate_process( $pid, 'KILL' );
+            }
+        }
+        elsif ( $self->_pid_is_running($pid) ) {
+            kill 9, $pid;
+        }
         for ( 1 .. 20 ) {
             last if !$self->_pid_is_running($pid);
             sleep 0.1;
@@ -1149,13 +1335,52 @@ sub _statefile {
     return File::Spec->catfile( $self->{paths}->collector_dir($name), 'loop.json' );
 }
 
+# _runtime_state_key()
+# Returns this runner's runtime identity key (the 32-hex state-root key).
+# Input: none.
+# Output: 32-hex-character string.
+sub _runtime_state_key {
+    my ($self) = @_;
+    return $self->{paths}->state_root_key;
+}
+
+# _loop_runtime_matches($pid, $name)
+# Checks whether a process belongs to this runner's runtime, through any
+# of three channels. The initial-environ marker is the channel where the
+# title cannot be observed, and the --runtime command-line token is the
+# channel where the environ cannot be read (Windows CIM, and qemu
+# user-mode emulation, where the spawn argv is still visible). Neither
+# survives on Linux for a RUNNING loop: the loop's $0 assignment
+# overwrites its own /proc environ with spaces and its cmdline with the
+# title, so both are unreadable there once the loop has started (verified
+# with a local fork probe, and by solo #247's diag, which showed a
+# one-entry environ of spaces). The third channel covers exactly that:
+# the loop's own persisted state still names it, so our loop.json (pid,
+# name, title, status) confirms a pid is our loop even when neither
+# process-table channel can. A loop with none of the three - started by
+# hand, or by an older version - never matches: adoption fails closed,
+# so a foreign runtime's loop is never adopted in place of a fresh one.
+# Input: process id integer and collector name string.
+# Output: boolean match flag.
+sub _loop_runtime_matches {
+    my ( $self, $pid, $name ) = @_;
+    return 0 if !$pid || !kill 0, $pid;
+    my $key = $self->_runtime_state_key;
+    my $marker = $self->_read_process_env_marker( $pid, 'DEVELOPER_DASHBOARD_LOOP_RUNTIME' );
+    return 1 if defined $marker && $marker eq $key;
+    my $title = $self->_read_process_title($pid);
+    return 1 if defined $title && $title =~ /--runtime\s+\Q$key\E\b/;
+    return 1 if $self->_state_confirms_managed_loop( $name, $pid );
+    return 0;
+}
+
 # _process_title($name)
 # Builds the managed process title string for a collector loop.
 # Input: collector name string.
 # Output: process title string.
 sub _process_title {
     my ( $self, $name ) = @_;
-    return "dashboard collector: $name";
+    return "d2 collector: $name";
 }
 
 # _is_managed_loop($pid, $name)
@@ -1169,9 +1394,71 @@ sub _is_managed_loop {
     my $marker = $self->_read_process_env_marker( $pid, 'DEVELOPER_DASHBOARD_LOOP_NAME' );
     return 1 if defined $marker && $marker eq $name;
     my $title = $self->_read_process_title($pid);
-    return 0 if !defined $title || $title eq '';
-    return $title eq $self->_process_title($name) ? 1 : 0;
+    return 1 if defined $title && $title ne '' && $title eq $self->_process_title($name);
+    # A non-matching title NO LONGER ends the check. On Windows /proc and ps
+    # are both unavailable, so a loop's title is never observable - and under
+    # qemu user-mode emulation the title IS observable but wrong, because the
+    # guest's $0 write never reaches the host's /proc and the cmdline still
+    # shows the emulator-prefixed spawn argv. Both are the same situation:
+    # the title cannot confirm the loop, so fall through to the persisted
+    # loop state, which requires pid+name+process_name to match and still
+    # answers 0 for a foreign pid.
+    return 1 if $self->_state_confirms_managed_loop( $name, $pid );
+    # Windows-only fallback: the env marker and the process title are both
+    # unobservable there (no /proc, no ps), and loop.json lands slowly
+    # through the atomic replace, so a live loop can have a pidfile but no
+    # confirming state yet - or a torn read mid-replace. A live pid that
+    # matches the pidfile we wrote for this name is a loop we started;
+    # refusing to recognise it makes running_loops delete the pidfile and
+    # the state, orphaning the live loop permanently (no /proc scan on
+    # Windows can ever recover it), and stop_loop then never signals it.
+    # The pid-reuse risk (a stale pidfile pid reassigned to a foreign
+    # process) is negligible next to that certain orphaning, and the stop
+    # fallback already targets from the pidfile alone.
+    #
+    # A title or marker that POSITIVELY disagrees vetoes this fallback
+    # (t/07 645): a live foreign process whose command line says something
+    # else is not our loop, even when a pidfile names its pid - without
+    # the veto, stop_loop('foreign') signalled the test process itself.
+    # Only an unavailable title/marker (undef or empty - the process
+    # table has no entry for the pid), a title showing our own
+    # loop-helper argv (collector-loop-foreground --name <name> --runtime
+    # <key>, the shape a real Windows loop child's CIM command line
+    # always has, since $0 never rewrites it), or a title carrying our
+    # own loop title as a token (a manual child spawned with $0 set to
+    # 'd2 collector: <name>', t/07 635, whose -e code carries the title
+    # inside the launch command line) leaves the fallback in place for
+    # the slow / torn loop.json replace it was added for. The shape
+    # alone is not enough: a loop from another runtime has the same
+    # helper shape with a different --runtime token, and confirming it
+    # here would let stop_loop signal another runtime's loop.
+    if ( $^O eq 'MSWin32' ) {
+        my $runtime_key = $self->_runtime_state_key;
+        # The loop title is hoisted out of the match: a method call inside
+        # a regex never runs (Perl interpolates only the $self variable,
+        # stringified, and treats ->_process_title(...) as literal text),
+        # so matching against it inline can never agree with any title.
+        my $loop_title = $self->_process_title($name);
+        my $title_disagrees = defined $title && $title ne ''
+          && !( $title =~ /\bcollector-loop-foreground\b/
+            && $title =~ /--name\s+\Q$name\E(?:\s|\z)/
+            && $title =~ /--runtime\s+\Q$runtime_key\E\b/ )
+          && !( $title =~ /\b\Q$loop_title\E\b/ );
+        my $marker_disagrees = defined $marker && $marker ne $name;
+        if ( !$title_disagrees && !$marker_disagrees ) {
+            my $recorded = eval { slurp_file( $self->_pidfile($name) ) };
+            if ( !$@ && defined $recorded ) {
+                chomp $recorded;
+                return 1 if $recorded =~ /^\d+$/ && $recorded == $pid;
+            }
+        }
+    }
+    return 0;
 }
+
+# Default Linux procfs root. A test may use a private directory to exercise
+# process enumeration on macOS and Windows without touching real processes.
+our $PROCFS_ROOT = '/proc';
 
 # _find_running_loop($name)
 # Finds a supervisor loop already running for one collector by asking the
@@ -1181,7 +1468,7 @@ sub _is_managed_loop {
 #
 # This exists because the pidfile is a record and not the authority. A record can
 # be lost while the thing it describes keeps running, and when that happened here
-# every subsequent start forked another supervisor: 27 were alive at once for a
+# every subsequent start launched another supervisor process: 27 were alive at once for a
 # singleton collector, each firing every 900 seconds, while stop knew about one
 # and status reported none.
 #
@@ -1193,17 +1480,29 @@ sub _find_running_loop {
     my ( $self, $name ) = @_;
     return if !defined $name || $name eq '';
 
-    opendir my $dh, '/proc' or return;
+    opendir my $dh, $PROCFS_ROOT or return;
     my @candidates = sort { $a <=> $b } grep { /\A[0-9]+\z/ } readdir $dh;
     closedir $dh;
 
     # Identity by TITLE, not by the environment marker. _is_managed_loop accepts
     # either, which is right when confirming a pid you already have - but the
-    # marker is set into %ENV and every forked child INHERITS it, so a collector's
+    # marker is set into %ENV and every spawned child process INHERITS it, so a collector's
     # own worker is indistinguishable from its supervisor by that test. Searching
     # on it found two "supervisors" four pids apart: the loop and the command it
     # had just spawned. A supervisor sets its own title; a worker does not carry
     # its parent's.
+    #
+    # That inheritance hazard is gone now: the loop carries the marker in its
+    # INITIAL environ (see _start_windows_loop_process) and _run_loop_child
+    # deletes it from %ENV before spawning any worker, so no worker ever
+    # carries it. The marker is therefore a safe second identity below, and
+    # it is the one that works where the title cannot be observed at all -
+    # under qemu user-mode emulation the guest's $0 write never reaches the
+    # host's /proc, so the title check can never match there. A third
+    # identity covers a loop started without the marker (by hand, or by an
+    # older version): its helper command shape, collector-loop-foreground
+    # --name <name>, is still visible in the spawn argv under qemu, and a
+    # worker's command (collector-worker-foreground) never matches it.
     my $title = $self->_process_title($name);
     for my $pid (@candidates) {
         next if $pid == $$;
@@ -1215,22 +1514,45 @@ sub _find_running_loop {
         # per pid when cmdline is empty. On a host with hundreds of kernel
         # threads that made every collector start/check scan cost one subprocess
         # spawn per thread - reproduced live: 943 empty-cmdline /proc entries on
-        # one host made `dashboard serve --foreground` hang 90+ seconds with zero
+        # one host made `d2 serve --foreground` hang 90+ seconds with zero
         # output whenever any skill declared a collector. An empty cmdline can
         # never equal $title (a non-empty string), so skipping it here costs
         # nothing correct and removes the pathological cost entirely. Only a
         # genuinely UNREADABLE cmdline (undef - the process vanished between
         # readdir and this read) still falls through to the ps fallback below,
         # which is the race _read_process_title's own fallback exists for.
-        my $cmdline = $self->_read_proc_file("/proc/$pid/cmdline");
+        my $cmdline = $self->_read_proc_file("$PROCFS_ROOT/$pid/cmdline");
         next if defined $cmdline && $cmdline eq '';
 
         my $running = $self->_read_process_title($pid);
-        next if !defined $running || $running ne $title;
+        next if !defined $running || $running eq '';
         # A process carrying this collector's exact title while living in a
         # DIFFERENT pid namespace cannot be constructed from a test without a
         # container runtime.
-        return $pid if $self->_same_pid_namespace($pid);
+        #
+        # Every branch below is also scoped to this runtime
+        # (_loop_runtime_matches): the process table is global, and a loop
+        # from a dead run carries the same title, the same helper shape and
+        # the same name marker as one from this run. Without the scope, a
+        # fresh runtime adopted the dead run's loop and rewrote its pidfile
+        # and state into the fresh root, so the orphan was never replaced
+        # and never died across runs. A loop with no runtime identity at
+        # all never matches: adoption fails closed. The scope's state
+        # channel is what makes this work on Linux, where the loop's $0
+        # assignment has already overwritten its own /proc environ with
+        # spaces and its cmdline with the title, so neither the marker nor
+        # the token is readable for a running loop there.
+        return $pid if $running eq $title && $self->_same_pid_namespace($pid) && $self->_loop_runtime_matches( $pid, $name );
+        # The loop's helper command shape, visible in the spawn argv even
+        # where the $0 title is not (qemu user-mode emulation).
+        return $pid
+          if $running =~ /collector-loop-foreground\s+--name\s+\Q$name\E(?:\s|\z)/
+          && $self->_same_pid_namespace($pid)
+          && $self->_loop_runtime_matches( $pid, $name );
+        # The pre-exec identity marker, safe here because the loop deletes
+        # it from %ENV before spawning workers, so no worker carries it.
+        my $marker = $self->_read_process_env_marker( $pid, 'DEVELOPER_DASHBOARD_LOOP_NAME' );
+        return $pid if defined $marker && $marker eq $name && $self->_same_pid_namespace($pid) && $self->_loop_runtime_matches( $pid, $name );
     }
     return;
 }
@@ -1274,12 +1596,54 @@ sub _read_process_title {
     # CI run 32011417394 died exactly that way. Containing $? here fixes it for
     # every caller rather than for the one test that noticed.
     local $?;
+    return if !defined $pid;
     my $proc = "/proc/$pid/cmdline";
     my $cmdline = $self->_read_proc_file($proc);
     if ( defined $cmdline && $cmdline ne '' ) {
         $cmdline =~ s/\0/ /g;
         $cmdline =~ s/\s+$//;
         return $cmdline;
+    }
+
+    if ( is_windows() ) {
+        # ps does not exist on Windows, so read the command line from
+        # the Windows process table via CIM, the same source
+        # RuntimeManager::_ps_processes uses: a $0 assignment never
+        # rewrites the Windows launch command line, but a child spawned
+        # with the assignment in its arguments still carries it there.
+        # The command line is the FULL launch command, not just the
+        # title: the title rides inside it as a quoted argument, so a
+        # token at its end is followed by a closing quote. Token
+        # matches must therefore accept any non-word terminator (a word
+        # boundary), not just whitespace or end of string.
+        # The Where-Object filter keeps this to the one
+        # pid instead of scanning the whole table, and the command line
+        # is flattened to one line first, mirroring _ps_processes, so a
+        # child spawned with a multi-line -e script cannot split the
+        # output. A pid the table no longer lists is simply unknown.
+        # Callers already treat undef as unknown; spawning cmd.exe for
+        # a ps that can never exist would only waste a process and
+        # surface its "not recognized" text through the capture.
+        return if !defined $pid || $pid !~ /^\d+$/;
+        my $powershell = _powershell_command;
+        return if !length $powershell;
+        # The pid is interpolated with %d, never as a bare string: the
+        # q{} literal below holds balanced braces throughout, so a
+        # concatenation inside it would silently become part of the
+        # script text instead of Perl code.
+        my $script = sprintf(
+            q{$ErrorActionPreference = 'Stop'; Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -eq %d } | ForEach-Object { $cmd = $_.CommandLine; if ($null -eq $cmd) { $cmd = '' }; $cmd = $cmd -replace '\s+', ' '; [Console]::Out.WriteLine($cmd) }},
+            $pid,
+        );
+        my ( $title, undef, $exit_code ) = capture {
+            system( $powershell, '-NoLogo', '-NoProfile', '-Command', $script );
+            return $? >> 8;
+        };
+        return if defined $exit_code && $exit_code != 0;
+        return if !defined $title;
+        $title =~ s/\s+$//;
+        return if $title eq '';
+        return $title;
     }
 
     my ( $title, undef, $exit_code ) = capture {
@@ -1313,6 +1677,13 @@ sub _read_process_state {
     my $stat = $self->_read_proc_file($proc);
     if ( defined $stat && $stat ne '' && $stat =~ /^\d+\s+\(.*\)\s+(\S)/s ) {
         return $1;
+    }
+
+    if ( is_windows() ) {
+        # As _read_process_title above: ps does not exist on Windows, so
+        # a state that procfs did not supply is simply unavailable and
+        # the callers treat undef as unknown.
+        return;
     }
 
     my ( $state, undef, $exit_code ) = capture {
@@ -1373,7 +1744,12 @@ sub _write_loop_state {
     my $tmp = $self->_pending_loop_state_file($file);
     open my $fh, '>', $tmp or die "Unable to write $tmp: $!";
     print {$fh} json_encode( \%state );
-    close $fh;
+    # CORE::close, not the plain close: this file imports POSIX::close, which
+    # shadows the built-in with the raw close(2) - it closes the descriptor
+    # WITHOUT flushing the stdio buffer, so the state JSON stayed buffered and
+    # the staging file on disk was empty (and held open) when _replace_state_file
+    # read it, leaving loop.json empty and killing t/07 test 577.
+    CORE::close $fh;
     if ( is_windows() ) {
         sleep 0.05;
     }
@@ -1390,8 +1766,8 @@ sub _write_loop_state {
 
 # _replace_path_via_powershell($source, $target)
 # Uses the native Windows Move-Item path as a last-resort file replacement
-# fallback when Perl's in-process rename fails inside pseudo-forked collector
-# flows.
+# fallback when Perl's in-process rename fails inside a collector child-process
+# flow.
 # Input: source file path and destination file path.
 # Output: boolean success flag and optional failure text string.
 sub _replace_path_via_powershell {
@@ -1431,12 +1807,20 @@ sub _windows_background_loop_command {
     my ( $self, $name ) = @_;
     my $core = $self->_dashboard_core_helper_path('collector-loop-foreground');
     my $perl = $self->_current_perl_command;
+    # The --runtime token is the argv-visible runtime identity: it is the
+    # one channel readable on every platform (CIM CommandLine on Windows,
+    # host /proc cmdline under qemu), and the finder scopes its helper-shape
+    # branch through it. The token is identity for observers, not an input
+    # the loop acts on - the helper accepts and ignores it.
     return (
         $perl,
+        $self->_perl_library_args,
         $core,
         'collector-loop-foreground',
         '--name',
         $name,
+        '--runtime',
+        $self->_runtime_state_key,
     );
 }
 
@@ -1451,6 +1835,7 @@ sub _windows_background_worker_command {
     my $perl = $self->_current_perl_command;
     return (
         $perl,
+        $self->_perl_library_args,
         $core,
         'collector-worker-foreground',
         '--name',
@@ -1461,42 +1846,38 @@ sub _windows_background_worker_command {
 }
 
 
-# _spawn_windows_background_command(@command)
+# _spawn_windows_background_command(@command[, \%options])
 # Launches one detached background Windows helper command and returns the
 # spawned pid.
-# Input: command list.
+# Input: command list, plus an optional trailing options hashref. The only
+# option read today is `env`, extra environment variables for the child.
+# On Windows the GoRoutine wrapper merges them into the parent environ for
+# the duration of the spawn, so the child inherits them in its initial
+# environ at creation; on POSIX the native spawn passes the parent environ
+# verbatim and never reads the option, so a caller that needs a marker in
+# the child's initial environ localizes it into its own %ENV for the spawn
+# call instead (see _start_windows_loop_process). A post-exec $ENV
+# assignment is never a substitute: the kernel environ block is fixed at
+# exec, so it is invisible to /proc readers on every platform.
 # Output: spawned pid integer.
 sub _spawn_windows_background_command {
     my ( $self, @command ) = @_;
-
-    # DD-597: system() below mutates the caller's global $? as a side effect;
-    # without this guard that stays set in the caller's process after this
-    # sub returns.
-    local $?;
-    my $powershell = _powershell_command;
-    die "Unable to launch detached Windows collector process: powershell is unavailable\n"
-      if !defined $powershell || $powershell eq '';
-
+    require Developer::Dashboard::GoRoutine;
     my $stdout_log = $self->{files}->collector_log;
-    my $stderr_log = $stdout_log . '.stderr';
-    my @script = (
-        q{$ErrorActionPreference = 'Stop'},
-        '$job = Start-Process'
-          . ' -FilePath ' . _powershell_single_quote( $command[0] )
-          . ' -ArgumentList ' . join( ', ', map { _powershell_single_quote($_) } @command[ 1 .. $#command ] )
-          . ' -WindowStyle Hidden'
-          . ' -RedirectStandardOutput ' . _powershell_single_quote($stdout_log)
-          . ' -RedirectStandardError ' . _powershell_single_quote($stderr_log)
-          . ' -PassThru',
-        q{[Console]::Out.WriteLine($job.Id)},
+    my $options = {};
+    if ( @command && ref( $command[-1] ) eq 'HASH' ) {
+        $options = pop @command;
+    }
+    my $pid = Developer::Dashboard::GoRoutine::spawn(
+        \@command,
+        {
+            stdin  => File::Spec->devnull(),
+            stdout => $stdout_log,
+            stderr => $stdout_log . '.stderr',
+            ( defined $options->{env} ? ( env => $options->{env} ) : () ),
+        },
     );
-    my ( $stdout, $stderr, $exit_code ) = capture {
-        system $powershell, '-NoLogo', '-NoProfile', '-Command', join '; ', @script;
-        return $? >> 8;
-    };
-    die "Unable to launch detached Windows collector process: $stderr$stdout"
-      if $exit_code != 0;
-    my ($pid) = grep { /^\d+$/ && $_ > 0 } split /\r?\n/, ( $stdout || '' );
+    die "Unable to launch detached collector process\n" if !$pid;
     return $pid;
 }
 
@@ -1894,14 +2275,14 @@ Use this file when changing collector process spawning, pid validation, restart 
 Construct it with the path registry and collector store, then call the lifecycle methods for one collector name. Keep process-management behavior and TT-backed collector icon rendering here; the CLI wrappers should only parse arguments and print the returned state.
 
 For C<run_once>, a relative C<cwd> first checks built-in directory accessors,
-then configured aliases from merged dashboard config, then a qualified skill
+then configured aliases from merged d2 config, then a qualified skill
 C<Folder.pm> method (for example C<collectorpaths.workspace>). If no alias
 applies, an existing relative directory remains valid. Config aliases win over
 skill methods with the same name; skill aliases are read-only.
 
 =head1 WHAT USES IT
 
-It is used by the C<dashboard collector ...> command family, by runtime restart/stop flows that manage collectors together with the web process, and by collector/runtimemanager regression tests.
+It is used by the C<d2 collector ...> command family, by runtime restart/stop flows that manage collectors together with the web process, and by collector/runtimemanager regression tests.
 
 =head1 EXAMPLES
 

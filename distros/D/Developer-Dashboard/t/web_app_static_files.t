@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use File::Temp qw(tempdir);
+use File::Basename qw(dirname);
 use File::Spec;
 use File::Path qw(make_path);
 use Cwd qw(cwd);
@@ -128,7 +129,10 @@ sub create_mock_app {
     local $ENV{USERPROFILE};
     my $app = create_mock_app();
     my @roots = $app->_static_file_roots('js');
-    is( $roots[-1], '/root/.developer-dashboard/dashboard/public/js', '_static_file_roots falls back to the default root dashboard public path when no home env exists' );
+    # The product builds this root with File::Spec->catdir, so the expected
+    # value is spelled with the platform's own separator (backslashes on
+    # Windows) and not a fixed forward-slash string.
+    is( $roots[-1], File::Spec->catdir( '/root', '.developer-dashboard', 'dashboard', 'public', 'js' ), '_static_file_roots falls back to the default root dashboard public path when no home env exists' );
 }
 
 # Test: _static_file_roots uses USERPROFILE when HOME is absent
@@ -137,7 +141,7 @@ sub create_mock_app {
     local $ENV{USERPROFILE} = '/tmp/dashboard-userprofile';
     my $app = create_mock_app();
     my @roots = $app->_static_file_roots('css');
-    is( $roots[-1], '/tmp/dashboard-userprofile/.developer-dashboard/dashboard/public/css', '_static_file_roots falls back to USERPROFILE before the default root path' );
+    is( $roots[-1], File::Spec->catdir( '/tmp/dashboard-userprofile', '.developer-dashboard', 'dashboard', 'public', 'css' ), '_static_file_roots falls back to USERPROFILE before the default root path' );
 }
 
 # Test: built-in jquery shim route exists for bookmark compatibility
@@ -266,8 +270,10 @@ done_testing();
 
 sub _write_file {
     my ( $path, $content ) = @_;
-    my $dir = $path;
-    $dir =~ s{/[^/]+\z}{};
+    # dirname understands the platform's separator. Stripping the last
+    # "/segment" by hand left a backslash-only Windows path unchanged, so the
+    # file's own path was created as a directory and the open below failed.
+    my $dir = dirname($path);
     make_path($dir) if $dir ne '' && !-d $dir;
     open my $fh, '>', $path or die "Cannot create $path: $!";
     print {$fh} $content;

@@ -47,6 +47,7 @@ sub Commit {
         prompt       => $config->{prompts}{assess_sentiment},
         raw_text     => $conversation,
         model_config => $config->{default_model},
+        feature      => 'assess_sentiment',
     );
 
     unless ( $response->{success} ) {

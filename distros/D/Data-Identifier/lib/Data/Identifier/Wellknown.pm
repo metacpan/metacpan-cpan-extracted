@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.38;
+our $VERSION = v0.39.02;
 
 use constant {
     WK_UUID         => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -257,7 +257,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.38
+version v0.39.02
 
 =head1 SYNOPSIS
 
@@ -466,6 +466,8 @@ $type uuid
 
 .   1c0dad03-519f-4bce-af41-19191af655c7    day-of-week
 
+.   f92f5ec5-86d7-4278-b57d-9e4a27a0b160    taglist
+
 $extra_classes identifier
 .   8be115d2-dc2f-4a98-91e1-a6e3075cbc31    uuid                        sid=2,sni=119
 .   bfae7574-3dae-425d-89b1-9c087c140c23    tagname                     sid=3
@@ -528,6 +530,8 @@ $extra_classes identifier
 .   a6f7d17a-ced2-4cf7-8ce7-fcb4a98f7aa0    wikitree-person-identifier
 .   241348a8-c5d0-4473-9ec1-de7c2ba00fbb    iconclass-identifier
 .   c1166bf7-c4ab-40ad-9a92-a55103bec509    media-subtype-identifier
+.   cf3be2a5-3a95-41a0-99d7-cea6caf7d455    wikifunctions-identifier
+.   96dee3b8-f287-433b-9d25-0f205f062c50    md-tag-identifier
 
 
 $class any-taxon

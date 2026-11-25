@@ -22,18 +22,18 @@ stop - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard stop
+  d2 stop
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard stop>, which stops the managed web listener and coordinated collectors for the current runtime while showing a visible terminal task board during interactive runs.
+This staged helper exposes C<d2 stop>, which stops the managed web listener and coordinated collectors for the current runtime while showing a visible terminal task board during interactive runs.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing stop CLI behavior or the handoff into the runtime li
 
 =head1 HOW TO USE
 
-Users run C<dashboard stop>. The staged helper forwards the request into the private runtime, which prints the full stop task list on C<stderr> for interactive terminals, stops the web process and the collectors associated with the active runtime, and leaves the final JSON payload on C<stdout>.
+Users run C<d2 stop>. The staged helper forwards the request into the private runtime, which prints the full stop task list on C<stderr> for interactive terminals, stops the web process and the collectors associated with the active runtime, and leaves the final JSON payload on C<stdout>.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by operators shutting down the local dashboard, by integration smoke 
 
 Example 1:
 
-  dashboard stop
+  d2 stop
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/stop --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

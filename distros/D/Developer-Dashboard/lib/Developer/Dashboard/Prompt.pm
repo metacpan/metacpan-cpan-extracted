@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Cwd qw(abs_path);
 use File::Basename qw(basename);
@@ -45,8 +45,23 @@ sub render {
     $no_indicators = 1 if !$no_indicators && $self->_tmux_status_active;
     my $project = $self->{paths}->project_root_for($cwd);
     my $home = $self->{paths}->home;
-    $cwd =~ s/^\Q$home\E/~/;
-    $cwd = "Home: $home" if $cwd eq '~';
+    my $cwd_for_home = $cwd // '';
+    my $home_for_match = $home // '';
+    # Home and cwd can arrive spelled with different separators on Windows:
+    # abs_path spells with forward slashes while catdir spells with
+    # backslashes, so a literal prefix match never shortens the home
+    # directory there. Normalise both to forward slashes first; the
+    # captured suffix is then already in the ~/... form the prompt shows.
+    $cwd_for_home =~ s{\\}{/}g;
+    $home_for_match =~ s{\\}{/}g;
+    $cwd_for_home =~ s{\A/private(?=/var/folders/)}{};
+    $home_for_match =~ s{\A/private(?=/var/folders/)}{};
+    if ( defined $home_for_match && $home_for_match ne ''
+        && $cwd_for_home =~ /^\Q$home_for_match\E(.*)\z/ )
+    {
+        my $suffix = $1;
+        $cwd = length $suffix ? "~$suffix" : "Home: $home";
+    }
 
     my @indicator_parts = $no_indicators
       ? ()
@@ -364,9 +379,11 @@ sub _git_metadata_dir {
     $git_dir = File::Spec->catdir( $project_root, $git_dir )
       if !File::Spec->file_name_is_absolute($git_dir);
     my $resolved = abs_path($git_dir);
-    return $resolved if defined $resolved && -d $resolved;
+    # abs_path spells with forward slashes on Windows; canonicalise so the
+    # returned metadata directory spells like every other registry path.
+    return File::Spec->canonpath($resolved) if defined $resolved && -d $resolved;
     return if !-d $git_dir;
-    return $git_dir;
+    return File::Spec->canonpath($git_dir);
 }
 
 1;
@@ -420,7 +437,7 @@ It exists because prompt rendering is a product feature with its own ordering an
 
 =head1 WHEN TO USE
 
-Use this file when changing prompt shape, indicator ordering, icon/status rendering, compact versus extended prompt output, or the prompt command arguments exposed through C<dashboard ps1>.
+Use this file when changing prompt shape, indicator ordering, icon/status rendering, compact versus extended prompt output, or the prompt command arguments exposed through C<d2 ps1>.
 
 =head1 HOW TO USE
 
@@ -428,7 +445,7 @@ Construct it with the active paths and state stores, then call the prompt-render
 
 =head1 WHAT USES IT
 
-It is used by the C<dashboard ps1> helper, by generated shell bootstrap functions, by integration smoke runs that verify prompt text, and by prompt-focused regression tests.
+It is used by the C<d2 ps1> helper, by generated shell bootstrap functions, by integration smoke runs that verify prompt text, and by prompt-focused regression tests.
 
 =head1 EXAMPLES
 

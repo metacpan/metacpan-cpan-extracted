@@ -46,7 +46,6 @@ sub use_error ($code) {
 
 my $n = 0;
 
-
 # Return the name of a package of its own, for a use to define in.
 sub fresh () {
     return 'My::Fresh' . ++$n;

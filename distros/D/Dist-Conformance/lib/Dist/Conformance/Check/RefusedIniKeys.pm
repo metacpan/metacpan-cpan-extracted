@@ -1,10 +1,11 @@
-package Dist::Conformance::Check::RefusedIniKeys 0.007;
+package Dist::Conformance::Check::RefusedIniKeys 0.008;
 
 # ABSTRACT: An INI file, such as dist.ini, sets no key that the flavor refuses, and the update removes each one
 
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
+no autovivification;
 use Mojo::Base 'Dist::Conformance::Check', -signatures;
 
 use Config::INI::Reader();
@@ -93,7 +94,7 @@ Dist::Conformance::Check::RefusedIniKeys - An INI file, such as dist.ini, sets n
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

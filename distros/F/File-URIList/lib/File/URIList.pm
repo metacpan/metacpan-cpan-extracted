@@ -20,7 +20,7 @@ use constant {
     CRLF => "\015\012",
 };
 
-our $VERSION = v0.05;
+our $VERSION = v0.06;
 
 my %_check_defaults = (
     blank_lines => 'die',
@@ -273,7 +273,7 @@ File::URIList - module for reading and writing RFC 2483 URI lists
 
 =head1 VERSION
 
-version v0.05
+version v0.06
 
 =head1 SYNOPSIS
 

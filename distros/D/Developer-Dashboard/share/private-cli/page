@@ -22,12 +22,12 @@ page - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard page ...
+  d2 page ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
@@ -45,7 +45,7 @@ Use this file when changing page CLI verbs, bookmark save/show/render behavior f
 
 =head1 HOW TO USE
 
-Users run C<dashboard page ...>. The staged helper forwards the request into the private runtime, which loads the page store, page document parser, and page runtime needed for the selected page operation.
+Users run C<d2 page ...>. The staged helper forwards the request into the private runtime, which loads the page store, page document parser, and page runtime needed for the selected page operation.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by developers managing bookmark pages outside the browser, by integra
 
 Example 1:
 
-  dashboard page source index
+  d2 page source index
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/page --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

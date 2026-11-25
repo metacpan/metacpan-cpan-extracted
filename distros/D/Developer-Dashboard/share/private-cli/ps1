@@ -236,18 +236,18 @@ ps1 - private prompt helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard ps1 [--jobs N] [--cwd DIR] [--mode compact|extended] [--color] [--max-age N]
+  d2 ps1 [--jobs N] [--cwd DIR] [--mode compact|extended] [--color] [--max-age N]
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
-C<dashboard> command can keep prompt rendering on a lightweight handoff path.
+C<d2> command can keep prompt rendering on a lightweight handoff path.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard ps1>, the prompt-rendering command used by generated shell bootstraps. It is the CLI face of the prompt subsystem.
+This staged helper exposes C<d2 ps1>, the prompt-rendering command used by generated shell bootstraps. It is the CLI face of the prompt subsystem.
 
 =head1 WHY IT EXISTS
 
@@ -259,7 +259,7 @@ Use this file when changing prompt CLI flags, compact versus extended mode handl
 
 =head1 HOW TO USE
 
-Users or shell bootstrap functions run C<dashboard ps1 ...>. The staged helper
+Users or shell bootstrap functions run C<d2 ps1 ...>. The staged helper
 uses C<DEVELOPER_DASHBOARD_REPO_LIB> from the public switchboard when that
 directory is available, avoiding a C<FindBin> startup import. Direct standalone
 invocation retains a C<FindBin> fallback to the helper-relative library
@@ -277,7 +277,7 @@ It is used by generated bash/zsh/sh/PowerShell prompts, by prompt smoke tests, a
 
 Example 1:
 
-  dashboard shell ps1
+  d2 shell ps1
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -285,7 +285,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/ps1 --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

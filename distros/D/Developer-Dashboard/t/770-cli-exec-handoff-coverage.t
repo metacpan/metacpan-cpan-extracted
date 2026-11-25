@@ -35,6 +35,24 @@ my $dir = tempdir( CLEANUP => 1 );
 }
 
 {
+    # On Windows /tmp is not writable (or present) and /dev/shm never
+    # exists, so the socket-directory check died before the mocked tmux
+    # exec was even reached. Localizing $^O models that branch on Linux:
+    # it proves the branch is taken and the handoff reaches the exec, not
+    # the Windows temp directory value itself, which still needs a box
+    # solo run to prove.
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::Ticket::_exec_tmux = sub { $! = 2; return 0 };
+    local $^O = 'MSWin32';
+    local $ENV{TMUX_TMPDIR};
+    is( Developer::Dashboard::CLI::Ticket::_tmux_socket_directory(), undef,
+        'tmux socket directory keeps the tmux default on Windows when the platform temp directory is writable' );
+    eval { Developer::Dashboard::CLI::Ticket::exec_workspace_attach( args => ['attach-session'] ) };
+    like( $@, qr/Unable to exec tmux to attach the workspace session/,
+        'exec_workspace_attach reaches the tmux exec on Windows instead of dying on the socket directory' );
+}
+
+{
     my $got = Developer::Dashboard::CLI::OpenFile::_exec_raw( File::Spec->catfile( $dir, 'no-such-editor' ), 'x' );
     ok( !$got, '_exec_raw returns false when the editor cannot be executed' );
 }

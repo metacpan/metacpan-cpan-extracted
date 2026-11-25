@@ -24,7 +24,7 @@ propq - Java properties query command for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard propq [path] [file]
+  d2 propq [path] [file]
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ This command provides Java properties query extraction for Developer Dashboard.
 
 =head1 PURPOSE
 
-This staged helper owns the public C<dashboard propq> command. It accepts an
+This staged helper owns the public C<d2 propq> command. It accepts an
 optional Java-properties key path or C<$d>-based Perl expression plus an
 optional input file, then hands the request to the shared query runtime so
 parsing, file-vs-STDIN handling, and output formatting stay consistent with the
@@ -42,15 +42,15 @@ rest of the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
-It exists because the dashboard ships a private, repo-local Java properties inspection tool instead of depending on a globally installed parser binary. Keeping C<propq> as a staged helper also preserves the thin-switchboard contract in C<bin/dashboard>.
+It exists because the dashboard ships a private, repo-local Java properties inspection tool instead of depending on a globally installed parser binary. Keeping C<propq> as a staged helper also preserves the thin-switchboard contract in C<bin/d2>.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing how C<dashboard propq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
+Use this file when you are changing how C<d2 propq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
 
 =head1 HOW TO USE
 
-Users run C<dashboard propq [path] [file]>. The staged helper selects the
+Users run C<d2 propq [path] [file]>. The staged helper selects the
 Java-properties backend in the shared query runtime, which accepts the file and
 path in either order, reads STDIN when no file is given, preserves dotted keys
 such as C<alpha.beta>, and prints the whole parsed document when the path is
@@ -60,15 +60,15 @@ before formatting the result.
 
 =head1 WHAT USES IT
 
-It is used by the public C<dashboard propq> command, by shell snippets that want a runtime-local Java properties query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
+It is used by the public C<d2 propq> command, by shell snippets that want a runtime-local Java properties query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
 
 =head1 EXAMPLES
 
-  printf 'alpha.beta=5\nname=demo\n' | dashboard propq alpha.beta
-  dashboard propq app.properties '$d'
-  dashboard propq '$d' app.properties
-  printf 'foo=1\nbar=2\n' | dashboard propq 'sort keys %$d'
-  printf 'name = demo\n' | dashboard propq name
+  printf 'alpha.beta=5\nname=demo\n' | d2 propq alpha.beta
+  d2 propq app.properties '$d'
+  d2 propq '$d' app.properties
+  printf 'foo=1\nbar=2\n' | d2 propq 'sort keys %$d'
+  printf 'name = demo\n' | d2 propq name
 
 =for comment FULL-POD-DOC END
 

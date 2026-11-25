@@ -10,6 +10,8 @@ use Ekorn::Pipeline::Sink   qw();
 use Ekorn::Pipeline::Stop   qw();
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v0.4.0';
+
 our @EXPORT_OK = qw(
     keep  keep_all count_items keep_first keep_last keep_single
     to_fh to_file);
@@ -32,11 +34,6 @@ sub count_items : prototype() () {
     });
 }
 
-
-# The sinks named for what they give: keep_all, keep(N), keep_first,
-# keep_last, keep_single and count_items. The container sinks, named for
-# where the items go, are to_fh and to_file, below.
-
 # Return a sink giving every item, as a list.
 sub keep_all : prototype() () {
     return Ekorn::Pipeline::Sink->new_sink_many(sub {
@@ -45,7 +42,6 @@ sub keep_all : prototype() () {
         return {step => sub { push @all, $_[0] }, flush => sub () { @all }};
     });
 }
-
 
 # Return a sink giving the one item, asserting it's the only one: at a
 # second, it warns and stops the run, giving the first; undef if there
@@ -68,7 +64,6 @@ sub keep_single : prototype() () {
     });
 }
 
-
 # Return a sink giving the first item, stopping the run there; undef if
 # there was none.
 sub keep_first : prototype() () {
@@ -81,7 +76,6 @@ sub keep_first : prototype() () {
         };
     });
 }
-
 
 # Return a sink giving the first $count items, as a list, stopping the
 # run once it has them.
@@ -103,7 +97,6 @@ sub keep ($count) {
     });
 }
 
-
 # Return a sink giving the last item, reading every one to find it;
 # undef if there was none.
 sub keep_last : prototype() () {
@@ -117,7 +110,6 @@ sub keep_last : prototype() () {
     });
 }
 
-
 # Return a sink printing each value to the filehandle given, followed by
 # $/, giving how many, and leaving it open, for its opener to close.
 sub to_fh ($fh) {
@@ -126,7 +118,6 @@ sub to_fh ($fh) {
         return _writer($fh, 'the filehandle');
     });
 }
-
 
 # Return a sink writing each value to the file, followed by $/, giving
 # how many; the file is opened as the run starts, with the I/O layers
@@ -142,7 +133,6 @@ sub to_file ($path, $layers = '') {
         };
     });
 }
-
 
 # Return, by name, the step and the flush of a sink printing each value to $fh,
 # named $what in its message, followed by $/ as it is now, as from_fh and

@@ -15,14 +15,99 @@ use HTTP::Response;
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 
 use lib 'lib';
+use lib 't/lib';
 
 use Developer::Dashboard::CLI::OpenFile qw(build_path_registry run_open_file_command);
 use Developer::Dashboard::CLI::OpenFileGrep qw(grep_matching_files);
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::GoRoutine ();
 use Developer::Dashboard::PathRegistry;
+use Local::DevelCoverSwitch qw(devel_cover_switches);
+
+# The Windows branch of _stdin_has_pending_input reads pipe readiness
+# through two Windows-only modules: Win32API::File resolves the real Win32
+# HANDLE from the filehandle glob, and Win32::API imports PeekNamedPipe from
+# kernel32. These stubs let the Windows-branch blocks below run on Linux,
+# where $^O is localized to 'MSWin32' for the call: on a real Windows box
+# the real modules load instead and this block is inert, so the same blocks
+# drive real pipes there. The two package variables are the stub's script
+# for the next PeekNamedPipe call: how many bytes it reports available, and
+# whether the call succeeds at all.
+# The stubs are installed at run time inside the condition, never as named
+# subs: a named sub is compiled on every platform, so on Windows it would
+# sit in the real module's namespace and be redefined when that loads.
+BEGIN {
+    if ( $^O ne 'MSWin32' ) {
+        $INC{'Win32API/File.pm'} = 1;
+        $INC{'Win32/API.pm'}     = 1;
+        $Win32API::File::PEEK_BYTES = 0;
+        $Win32API::File::PEEK_OK    = 1;
+        no strict 'refs';
+        *{'Win32API::File::GetOsFHandle'} = sub {
+            my ($fh) = @_;
+            my $fd = eval { fileno($fh) };
+            return $fd + 1000 if defined $fd && $fd >= 0;
+            return;
+        };
+        *{'Win32::API::new'} = sub {
+            my ( $class, $library, $function ) = @_;
+            return bless { library => $library, function => $function }, $class;
+        };
+        *{'Win32::API::Call'} = sub {
+            my ( $self, $handle, $buffer, $length, $bytes_read, $bytes_available, $bytes_left ) = @_;
+            $_[5] = pack 'L', $Win32API::File::PEEK_BYTES;
+            return $Win32API::File::PEEK_OK;
+        };
+    }
+}
 
 my $PKG = 'Developer::Dashboard::CLI::OpenFile';
+
+is_deeply(
+    [ devel_cover_switches(
+        '-MDevel::Cover=-db,/work/cover_db,-blib,0,+ignore,^/tmp/,\\.developer-dashboard/,/t/'
+    ) ],
+    ['-MDevel::Cover=-db,/work/cover_db,-blib,0,+ignore,^/tmp/,\\.developer-dashboard/,/t/'],
+    'coverage child switch preserves the parent database and ignore options',
+);
+
+is_deeply(
+    [ devel_cover_switches('-Mstrict -MDevel::Cover -w') ],
+    ['-MDevel::Cover'],
+    'coverage child switch accepts the bare module form among other Perl switches',
+);
+
+is_deeply(
+    [ devel_cover_switches('-Mstrict -w') ],
+    [],
+    'no coverage switch is forwarded when the parent harness does not enable coverage',
+);
+
+{
+    my @coverage_switch = devel_cover_switches($ENV{HARNESS_PERL_SWITCHES});
+    my $exit_child = Developer::Dashboard::GoRoutine::spawn(
+        [
+            $^X,
+            # Load the source modules once: using blib/lib ahead of lib
+            # creates duplicate Devel::Cover structures and an unreadable
+            # merge warning in the strict 100% report.
+            '-Ilib',
+            '-Iblib/arch',
+            @coverage_switch,
+            '-MDeveloper::Dashboard::CLI::OpenFile',
+            '-e',
+            'Developer::Dashboard::CLI::OpenFile::_command_exit(23)',
+        ],
+        { cwd => getcwd() },
+    );
+    ok( $exit_child, '_command_exit subprocess starts through GoRoutine' );
+    is(
+        Developer::Dashboard::GoRoutine::wait_process($exit_child),
+        23,
+        '_command_exit preserves the requested child exit status'
+    );
+}
 
 # oc($function_name, @args)
 # Calls one private OpenFile helper by name, preserving list/scalar context.
@@ -145,7 +230,7 @@ is_deeply( [ oc('_select_open_file_matches') ],                     [],         
 is_deeply( [ oc( '_select_open_file_matches', matches => ['solo'] ) ], ['solo'], 'single match returns immediately' );
 {
     # A pipe with data already written and then closed behaves exactly like
-    # the historical "piped answer" usage (printf '2\n' | dashboard of ...,
+    # the historical "piped answer" usage (printf '2\n' | d2 of ...,
     # t/05-cli-smoke.t) - IO::Select reports it ready immediately (EOF is a
     # readable event), so this exercises the real, unmocked
     # _stdin_has_pending_input() as well as the read/EOF path below it.
@@ -252,6 +337,67 @@ is_deeply( [ oc( '_select_open_file_matches', matches => ['solo'] ) ], ['solo'],
     is( $ready, 0, 'an open pipe with nothing written is reported not ready after the timeout' );
     ok( $elapsed >= 1, 'the check genuinely waited out the timeout rather than giving up early' );
     close $write_end;
+}
+{
+    # Windows branch, regular file: the Windows branch answers -f STDIN
+    # directly (a regular file never blocks), instead of select() - which
+    # on Windows returns immediately with 0 for a plain file descriptor.
+    # Proved on Linux with $^O localized and the stubs above; the real
+    # modules are used on Windows.
+    my $dir = tempdir( CLEANUP => 1 );
+    my $real_file = catfile( $dir, 'real-stdin-fixture-win.txt' );
+    spew( $real_file, "3\n" );
+    open my $in, '<', $real_file or die $!;
+    local *STDIN = $in;
+    local $^O = 'MSWin32';
+    my $ready = oc( '_stdin_has_pending_input', 5 );
+    is( $ready, 1, 'on Windows a regular file reports ready immediately (a file never blocks)' );
+}
+{
+    # Windows branch, open pipe with nothing waiting: PeekNamedPipe
+    # (stubbed on Unix, real on Windows) reports 0 bytes, so the poll loop
+    # waits out the timeout and reports not-ready - the same outcome as the
+    # Unix select() path, reached through the Windows-native readiness call.
+    $Win32API::File::PEEK_BYTES = 0;
+    $Win32API::File::PEEK_OK    = 1;
+    pipe( my $read_end, my $write_end ) or die "pipe failed: $!";
+    local *STDIN = $read_end;
+    local $^O = 'MSWin32';
+    my $before  = time;
+    my $ready   = oc( '_stdin_has_pending_input', 1 );
+    my $elapsed = time - $before;
+    is( $ready, 0, 'on Windows an open pipe with nothing waiting is reported not ready after the timeout' );
+    ok( $elapsed >= 1, 'the Windows pipe check genuinely waited out the timeout' );
+    close $write_end;
+}
+{
+    # Windows branch, pipe with data waiting: PeekNamedPipe reports bytes
+    # available, so the check returns ready at once. The bytes are really
+    # written, so a real Windows pipe answers the same way the stub does.
+    $Win32API::File::PEEK_BYTES = 3;
+    $Win32API::File::PEEK_OK    = 1;
+    pipe( my $read_end, my $write_end ) or die "pipe failed: $!";
+    syswrite( $write_end, "3\n" ) or die "pipe write failed: $!";
+    local *STDIN = $read_end;
+    local $^O = 'MSWin32';
+    my $ready = oc( '_stdin_has_pending_input', 5 );
+    is( $ready, 1, 'on Windows a pipe with data waiting reports ready immediately' );
+    close $write_end;
+}
+{
+    # Windows branch, broken pipe: PeekNamedPipe fails (its return is
+    # false once the writer has closed), which counts as ready - a read
+    # then returns end-of-file at once instead of blocking.
+    # The writer really is closed before the check, so a real Windows pipe
+    # is broken exactly as the stub scripts it.
+    $Win32API::File::PEEK_BYTES = 0;
+    $Win32API::File::PEEK_OK    = 0;
+    pipe( my $read_end, my $write_end ) or die "pipe failed: $!";
+    close $write_end or die "pipe close failed: $!";
+    local *STDIN = $read_end;
+    local $^O = 'MSWin32';
+    my $ready = oc( '_stdin_has_pending_input', 5 );
+    is( $ready, 1, 'on Windows a closed pipe reports ready (a read returns end-of-file at once)' );
 }
 {
     # Explicit "nothing pending" override, since a real open-but-silent pipe
@@ -456,7 +602,7 @@ is_deeply( [ oc( '_named_source_matches', paths => $reg ) ], [], 'missing name y
 {
     like( eval { grep_matching_files(args => {}); 1 } ? '' : $@, qr/grep args must be an array reference/,
         'grep adapter rejects a non-array argument value' );
-    like( eval { grep_matching_files(); 1 } ? '' : $@, qr/^Usage: dashboard of grep/,
+    like( eval { grep_matching_files(); 1 } ? '' : $@, qr/^Usage: d2 of grep/,
         'grep adapter rejects an empty argument list' );
 
     my $grep_root = catdir( $home, 'grep-root' );
@@ -465,11 +611,16 @@ is_deeply( [ oc( '_named_source_matches', paths => $reg ) ], [], 'missing name y
     my $match_b = catfile( $grep_root, 'b.txt' );
     spew( $match_a, "needle in nested file\nneedle repeated in one file\n" );
     spew( $match_b, "needle in second file\n" );
-    spew( catfile( $grep_root, 'named:123:file.txt' ), "needle in a colon-named file\n" );
+    # A colon is a separator in file names on Unix but is illegal in a
+    # Windows file name, so the colon-named fixture only exists where the
+    # operating system allows it; everywhere else the same shape is
+    # exercised with dashes.
+    my $colon_file = $^O eq 'MSWin32' ? 'named-123-file.txt' : 'named:123:file.txt';
+    spew( catfile( $grep_root, $colon_file ), "needle in a colon-named file\n" );
     spew( catfile( $grep_root, 'miss.txt' ), "other text\n" );
     is_deeply(
         [ sort( grep_matching_files( args => [ '-nr', 'needle', $grep_root ] ) ) ],
-        [ sort ( $match_a, $match_b, catfile( $grep_root, 'named:123:file.txt' ) ) ],
+        [ sort ( $match_a, $match_b, catfile( $grep_root, $colon_file ) ) ],
         'grep mode recursively searches contents and returns unique paths, including colon-named files',
     );
     my $print_error;
@@ -478,9 +629,9 @@ is_deeply( [ oc( '_named_source_matches', paths => $reg ) ], [], 'missing name y
         eval { run_open_file_command( paths => $reg, args => [ '--print', 'grep', '-nr', 'needle', $grep_root ] ) };
         $print_error = $@;
     };
-    like( $print_error, qr/^EXIT:0/, 'dashboard of --print grep exits successfully after printing matches' );
-    is_deeply( [ sort split /\n/, $grep_print ], [ sort ( $match_a, $match_b, catfile( $grep_root, 'named:123:file.txt' ) ) ],
-        'dashboard of --print grep uses the content-search adapter' );
+    like( $print_error, qr/^EXIT:0/, 'd2 of --print grep exits successfully after printing matches' );
+    is_deeply( [ sort split /\n/, $grep_print ], [ sort ( $match_a, $match_b, catfile( $grep_root, $colon_file ) ) ],
+        'd2 of --print grep uses the content-search adapter' );
 
     my $bare_print_error;
     eval { run_open_file_command( paths => $reg, args => ['--print'] ); 1 };
@@ -503,9 +654,9 @@ is_deeply( [ oc( '_named_source_matches', paths => $reg ) ], [], 'missing name y
         eval { run_open_file_command( paths => $reg, args => [ 'grep', '-nr', 'needle', $grep_root ] ) };
         $editor_error = $@;
     };
-    like( $editor_error, qr/^EDITOR EXECUTED/, 'dashboard of grep reaches the editor launch after matching content' );
+    like( $editor_error, qr/^EDITOR EXECUTED/, 'd2 of grep reaches the editor launch after matching content' );
     is_deeply( \@editor_command, [ 'vim', '-p', $match_a, $match_b ],
-        'dashboard of grep opens the unique matching files in vim tabs' );
+        'd2 of grep opens the unique matching files in vim tabs' );
 
     my @single_editor_command;
     my $single_editor_error;
@@ -523,9 +674,9 @@ is_deeply( [ oc( '_named_source_matches', paths => $reg ) ], [], 'missing name y
         eval { run_open_file_command( paths => $reg, args => [ 'grep', '-nr', 'needle', $grep_root ] ) };
         $single_editor_error = $@;
     }
-    like( $single_editor_error, qr/^SINGLE EDITOR EXECUTED/, 'dashboard of grep launches editors without tab support' );
+    like( $single_editor_error, qr/^SINGLE EDITOR EXECUTED/, 'd2 of grep launches editors without tab support' );
     is_deeply( \@single_editor_command, [ 'editor', $match_a, $match_b ],
-        'dashboard of grep omits the tab flag for an editor without tab support' );
+        'd2 of grep omits the tab flag for an editor without tab support' );
 
     my $no_match_error;
     eval {
@@ -533,7 +684,7 @@ is_deeply( [ oc( '_named_source_matches', paths => $reg ) ], [], 'missing name y
         1;
     };
     $no_match_error = $@;
-    like( $no_match_error, qr/^No files found\n/, 'dashboard of grep reports an explicit error when no file matches' );
+    like( $no_match_error, qr/^No files found\n/, 'd2 of grep reports an explicit error when no file matches' );
 
     my $grep_error;
     capture {
@@ -552,9 +703,17 @@ is_deeply( [ oc( '_named_source_matches', paths => $reg ) ], [], 'missing name y
     is( scalar(@no_match), 0, q{grep's normal no-match exit status returns an empty result list} );
 
     {
+        # With no grep to run, Unix reports the failed spawn. Real Windows
+        # never sees a failed spawn: cmd.exe answers for the missing binary
+        # with grep's own "no match" exit code, so the product settles it
+        # with its built-in search, which then gives grep's own answer for
+        # this argument list - a directory named without -r is an error.
         local $ENV{PATH} = '';
         eval { grep_matching_files( args => [ 'needle', $grep_root ] ) };
-        like( $@, qr/^Unable to execute grep:/, 'grep adapter reports an unavailable grep executable' );
+        my $unavailable = $^O eq 'MSWin32'
+          ? qr/^grep failed: \Q$grep_root\E: Is a directory$/m
+          : qr/^Unable to execute grep:/;
+        like( $@, $unavailable, 'grep adapter reports an unavailable grep executable' );
     }
     {
         no warnings 'redefine';
@@ -701,7 +860,14 @@ like( $@, qr/Missing path registry/, '_candidate_java_source_archives requires p
     my $arcjar = catfile( $arctest, 'lib-sources.jar' );
     write_jar( $arcjar, { 'a/B.java' => "class B {}\n" } );
     my @arch = oc( '_candidate_java_source_archives', paths => $reg, roots => [ $arctest, $arcparent ] );
-    is_deeply( \@arch, [$arcjar], 'overlapping roots dedupe the repeated archive path' );
+    # File::Find reports names with forward slashes on Windows whatever the
+    # root was spelled with; compare one spelling of the same path. A
+    # second entry for the same archive would still fail the comparison.
+    my @expected_arch = ($arcjar);
+    if ( $^O eq 'MSWin32' ) {
+        s{\\}{/}g for @arch, @expected_arch;
+    }
+    is_deeply( \@arch, \@expected_arch, 'overlapping roots dedupe the repeated archive path' );
 }
 
 # ---------------------------------------------------------------------------
@@ -1005,7 +1171,14 @@ like( $@, qr/Missing path registry/, 'resolve requires a path registry' );
     is( $nl, 0, 'no-argument resolve returns a zero line' );
     is_deeply( \@nm, [], 'no-argument resolve over an empty scope finds nothing' );
 
-    my ( $ml, @mm ) = oc( '_resolve_open_file_matches', paths => $sreg, args => ["$scandir/missing:5"] );
+    # A token that names no file is searched for as a regex. A Windows path
+    # spelled with backslashes is not a usable regex (\U, \T, or a
+    # backreference when a folder name starts with a digit, which the random
+    # temporary directory name sometimes does), so the missing file is
+    # named with forward slashes there - the same path, and Windows accepts
+    # either spelling.
+    ( my $missing_scope = $scandir ) =~ s{\\}{/}g;
+    my ( $ml, @mm ) = oc( '_resolve_open_file_matches', paths => $sreg, args => ["$missing_scope/missing:5"] );
     is_deeply( \@mm, [], 'file:line with a missing file falls through to search' );
 
     my ( $pl, @pm ) = oc( '_resolve_open_file_matches', paths => $sreg, args => ['alpha'] );
@@ -1043,17 +1216,30 @@ like( $@, qr/^Usage: open-file/, 'run rejects missing arguments' );
 # directly because the public switchboard normally delegates before reaching
 # this helper, and include an undefined argv slot to cover the grep predicate's
 # defined-value guard.
+# Where no system grep resolves (plain Windows), the product prints the
+# usage of its built-in search and exits 0 instead of handing off to a
+# binary that is not there, so that side is pinned on such a box.
 {
     my @exec_argv;
-    eval {
+    my $help_error;
+    my ($help_out) = capture {
+        no warnings 'redefine';
         local *Developer::Dashboard::CLI::OpenFile::_command_exec = sub {
             @exec_argv = @_;
             die "EXEC\n";
         };
-        run_open_file_command( paths => $reg, args => [ 'grep', undef, '--help' ] );
+        local *Developer::Dashboard::CLI::OpenFile::_command_exit = sub { die "EXIT:$_[0]\n" };
+        eval { run_open_file_command( paths => $reg, args => [ 'grep', undef, '--help' ] ) };
+        $help_error = $@;
     };
-    like( $@, qr/^EXEC/, 'native grep help reaches the command exec handoff' );
-    is_deeply( \@exec_argv, [ 'grep', undef, '--help' ], 'grep help arguments are passed through unchanged' );
+    if ( Developer::Dashboard::Platform::command_in_path('grep') ) {
+        like( $help_error, qr/^EXEC/, 'native grep help reaches the command exec handoff' );
+        is_deeply( \@exec_argv, [ 'grep', undef, '--help' ], 'grep help arguments are passed through unchanged' );
+    }
+    else {
+        like( $help_error, qr/^EXIT:0/, 'native grep help reaches the command exec handoff' );
+        like( $help_out, qr/^Usage: grep \[OPTION\]/, 'grep help arguments are passed through unchanged' );
+    }
 }
 # An unrecognized flag must fail loudly, not silently proceed with defaults.
 {
@@ -1158,8 +1344,8 @@ t/98-cli-openfile-coverage.t - branch and condition coverage for the open-file C
 =head1 PURPOSE
 
 This test drives every decision point in
-C<Developer::Dashboard::CLI::OpenFile>, the library behind C<dashboard of> and
-C<dashboard open-file>. It exercises direct path, C<file:line>, file-alias,
+C<Developer::Dashboard::CLI::OpenFile>, the library behind C<d2 of> and
+C<d2 open-file>. It exercises direct path, C<file:line>, file-alias,
 scoped-relative, complete C<@INC>-based Perl-module and Java-class resolution,
 recursive content-grep dispatch, the numbered chooser flow, editor-command
 selection, and Java source-archive/Maven download lookups, including guard,
@@ -1180,8 +1366,9 @@ Devel::Cover coverage and cannot silently regress a defensive path.
 
 Use this file when changing how open-file resolves targets, ranks matches,
 selects an editor, reads Java source jars, queries Maven Central, or decides
-between printing and launching an editor. Re-run it whenever any of those
-branches move.
+between printing and launching an editor. It also invokes the real exit helper
+in a GoRoutine-managed child so the production exit boundary is covered without
+terminating the test process. Re-run it whenever any of those branches move.
 
 =head1 HOW TO USE
 
@@ -1196,7 +1383,11 @@ helpers.
 
 The repository test suite and the coverage gate run this file to keep the
 open-file helper at full statement, subroutine, branch, and condition coverage.
-Developers use it during test-driven changes to the open-file resolution logic.
+Developers use it during test-driven changes to the open-file resolution logic
+and its subprocess exit behavior. When the parent harness explicitly enables
+C<Devel::Cover>, the GoRoutine-managed child receives the complete configured
+module switch, including the shared database path, so coverage of the
+production exit boundary is included in the same report.
 
 =head1 EXAMPLES
 

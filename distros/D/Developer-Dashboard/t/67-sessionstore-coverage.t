@@ -230,8 +230,11 @@ for my $case ( [ 'cover-empty-expiry', '' ], [ 'cover-zero-expiry', '0' ] ) {
     my $expected_file = $store->_session_file( $record->{session_id} );
     is( $DD600_OBSERVED_RENAME_TO, $expected_file,
         'DD-600: create renamed a source file into the predictable final session path (rename observed)' );
-    is( sprintf( '%04o', $DD600_OBSERVED_RENAME_MODE // -1 ), '0600',
-        'DD-600: the source file was already 0600 BEFORE the rename that made it visible at its final, predictable path - even under umask(0)' );
+  SKIP: {
+        skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
+        is( sprintf( '%04o', $DD600_OBSERVED_RENAME_MODE // -1 ), '0600',
+            'DD-600: the source file was already 0600 BEFORE the rename that made it visible at its final, predictable path - even under umask(0)' );
+    }
     $store->delete( $record->{session_id} );    # avoid polluting later state
 }
 

@@ -3,13 +3,13 @@ package Developer::Dashboard::PathIdentity;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Exporter 'import';
 use Cwd qw(abs_path cwd getcwd);
 use File::Spec;
 
-our @EXPORT_OK = qw(_path_identity _same_or_descendant_path current_working_directory);
+our @EXPORT_OK = qw(_path_identity _same_or_descendant_path current_working_directory _resolve_symlinks);
 
 # current_working_directory()
 # Uses native getcwd for the common physical-PWD case, verifies distinct
@@ -18,21 +18,37 @@ our @EXPORT_OK = qw(_path_identity _same_or_descendant_path current_working_dire
 # Input: none; reads PWD only as an untrusted candidate.
 # Output: verified logical absolute path, physical cwd, or Cwd::cwd fallback.
 sub current_working_directory {
+    # Cwd::getcwd (and Cwd::cwd) overwrite $ENV{PWD} with the physical
+    # directory on Windows, so read the logical candidate before any
+    # getcwd call: otherwise the symlink spelling is destroyed before it
+    # can be verified and the identity check below can never fire.
+    my $logical  = $ENV{PWD};
     my $physical = eval { getcwd() };
     if ( defined $physical && $physical ne '' ) {
-        my $logical = $ENV{PWD};
-        return $physical if defined $logical && $logical eq $physical;
+        return File::Spec->canonpath($physical) if defined $logical && $logical eq $physical;
 
         if ( defined $logical && $logical ne '' && File::Spec->file_name_is_absolute($logical) ) {
             my @logical_stat  = stat $logical;
             my @current_stat = stat q{.};
-            return $logical if _same_directory_identity( \@logical_stat, \@current_stat );
+            return File::Spec->canonpath($logical) if _same_directory_identity( \@logical_stat, \@current_stat );
+
+            # Device/inode fields are not a reliable same-directory test on
+            # every platform, so when they disagree, compare canonical
+            # identities instead: two spellings of one directory resolve to
+            # the same identity, while genuinely different directories do
+            # not. This is what makes a logical PWD keep its symlink
+            # spelling on Windows, where the stat comparison above fails.
+            my $logical_id = _path_identity( $logical, empty_fallback => 1 );
+            my $current_id = _path_identity( q{.},     empty_fallback => 1 );
+            return File::Spec->canonpath($logical)
+              if $logical_id ne '' && $logical_id eq $current_id;
         }
 
-        return $physical;
+        return File::Spec->canonpath($physical);
     }
 
-    return cwd();
+    my $fallback = cwd();
+    return defined $fallback ? File::Spec->canonpath($fallback) : $fallback;
 }
 
 # _same_directory_identity($candidate_stat, $current_stat)
@@ -49,6 +65,51 @@ sub _same_directory_identity {
     return 1;
 }
 
+# _resolve_symlinks($path)
+# Resolves every symlink component of $path, root down, following each link
+# to its target (relative targets against the link's own parent directory).
+# Cwd::abs_path does not resolve symlinks on Windows, so a path through a
+# symlinked directory would otherwise canonicalise to a different identity
+# than the same directory spelled physically - which is what makes a
+# symlinked skill lib escape its root unnoticed and a symlinked home stop
+# being an ancestor. On Unix abs_path already resolves links, so the walk
+# is idempotent there. Returns the resolved path, or undef when a link loop
+# is detected (more than forty hops through one component).
+# Input: path string.
+# Output: resolved path string or undef.
+sub _resolve_symlinks {
+    my ($path) = @_;
+    return $path if !defined $path || $path eq '';
+    $path = File::Spec->rel2abs($path) if !File::Spec->file_name_is_absolute($path);
+
+    my ( $volume, $directories, $file ) = File::Spec->splitpath($path);
+    my @parts = grep { $_ ne '' } File::Spec->splitdir($directories);
+    push @parts, $file if defined $file && $file ne '';
+    my $current = $volume ne '' ? $volume . File::Spec->rootdir() : File::Spec->rootdir();
+
+    for my $part (@parts) {
+        $current = File::Spec->catdir( $current, $part );
+        next if !-l $current;
+        my %seen;
+        my $hops = 0;
+        while ( -l $current ) {
+            return if ++$hops > 40;
+            my $target = readlink $current;
+            return if !defined $target;
+            if ( File::Spec->file_name_is_absolute($target) ) {
+                $current = $target;
+            }
+            else {
+                my ( $parent_volume, $parent_dirs ) = File::Spec->splitpath($current);
+                $current = File::Spec->catdir(
+                    File::Spec->catpath( $parent_volume, $parent_dirs, '' ), $target );
+            }
+            return if $seen{$current}++;
+        }
+    }
+    return $current;
+}
+
 # _path_identity($path, empty_fallback => 1|0)
 # Normalizes a path for identity and ancestry comparisons without requiring
 # the caller to care about symlink aliases such as /var versus /private/var
@@ -63,12 +124,17 @@ sub _path_identity {
     die "_path_identity requires an explicit empty_fallback => 1|0 parameter\n"
         if !defined $empty_fallback;
 
-    my $resolved = eval { abs_path($path) };
+    my $resolved = eval { abs_path( _resolve_symlinks($path) ) };
     if ($empty_fallback) {
-        return $resolved if defined $resolved && $resolved ne '';
+        # abs_path returns forward slashes on Windows while File::Spec spells
+        # paths with backslashes, so hand the resolved path through canonpath:
+        # identities compared or returned to callers then spell the same
+        # directory the same way on every platform. On Unix canonpath is a
+        # no-op for the clean absolute paths abs_path returns.
+        return File::Spec->canonpath($resolved) if defined $resolved && $resolved ne '';
         return File::Spec->canonpath($path);
     }
-    return defined $resolved ? $resolved : File::Spec->canonpath($path);
+    return defined $resolved ? File::Spec->canonpath($resolved) : File::Spec->canonpath($path);
 }
 
 # _same_or_descendant_path($path, $root, empty_fallback => 1|0)
@@ -118,6 +184,14 @@ sub _same_or_descendant_identity {
         $case_tolerant = $volume ne '' ? File::Spec->case_tolerant($volume) : 0;
     }
     my ( $candidate, $root ) = $case_tolerant ? ( lc($path_id), lc($root_id) ) : ( $path_id, $root_id );
+    # Cwd::abs_path may return forward slashes on Windows while File::Spec
+    # supplies a backslash root separator. Compare one separator style so
+    # real descendants do not disappear from runtime-layer discovery.
+    if ( $separator eq '\\' ) {
+        $candidate =~ tr{\\}{/};
+        $root      =~ tr{\\}{/};
+        $separator = '/';
+    }
     return 1 if $candidate eq $root;
     my $prefix = $root;
     $prefix .= $separator if substr( $prefix, -length($separator) ) ne $separator;

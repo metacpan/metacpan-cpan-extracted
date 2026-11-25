@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-use File::Temp qw(tempdir);
 use FindBin qw($Bin);
 use Getopt::Long qw(GetOptions);
 use Time::HiRes qw(time);
@@ -28,62 +27,42 @@ die "--runs must be an odd positive integer\n" if $runs < 1 || $runs % 2 == 0;
 require Digest::SHA;
 require Developer::Dashboard::Crypto::PBKDF2;
 
-my $inline_dir = tempdir( 'problem48-inline-xs-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
-local $ENV{PERL_INLINE_DIRECTORY} = $inline_dir;
-require Inline;
-my $compile_started = time;
-Inline->bind(
-    C => _inline_source(),
-    LIBS => '-lcrypto',
-);
-my $compile_seconds = time - $compile_started;
-
-die "OpenSSL FFI PBKDF2 backend is unavailable\n"
+die "OpenSSL XS PBKDF2 backend is unavailable\n"
   if !Developer::Dashboard::Crypto::PBKDF2->native_available;
 
 my $password = 'problem48-password';
 my $salt     = 'problem48-salt';
 my $known    = unpack 'H*', _pbkdf2_perl( $password, $salt, 1 );
-my $ffi_one  = Developer::Dashboard::Crypto::PBKDF2->derive_sha256(
+my $xs_one = Developer::Dashboard::Crypto::PBKDF2->derive_sha256(
     password   => $password,
     salt       => $salt,
     iterations => 1,
 );
-my $inline_one = unpack 'H*', main::dd_problem48_inline_pbkdf2( $password, $salt, 1 );
-die "OpenSSL FFI PBKDF2 digest mismatch\n" if !defined $ffi_one || $ffi_one ne $known;
-die "Inline::C/XS PBKDF2 digest mismatch\n" if !defined $inline_one || $inline_one ne $known;
+die "OpenSSL XS PBKDF2 digest mismatch\n" if !defined $xs_one || $xs_one ne $known;
 
-my ( @perl_seconds, @ffi_seconds, @inline_seconds );
+my ( @perl_seconds, @xs_seconds );
 for ( 1 .. $runs ) {
     my $started = time;
     my $perl = unpack 'H*', _pbkdf2_perl( $password, $salt, $iterations );
     push @perl_seconds, time - $started;
 
     $started = time;
-    my $ffi = Developer::Dashboard::Crypto::PBKDF2->derive_sha256(
+    my $xs = Developer::Dashboard::Crypto::PBKDF2->derive_sha256(
         password   => $password,
         salt       => $salt,
         iterations => $iterations,
     );
-    push @ffi_seconds, time - $started;
+    push @xs_seconds, time - $started;
 
-    $started = time;
-    my $inline = unpack 'H*', main::dd_problem48_inline_pbkdf2( $password, $salt, $iterations );
-    push @inline_seconds, time - $started;
-
-    die "PBKDF2 output mismatch during benchmark run $_\n"
-      if !defined $ffi || !defined $inline || $ffi ne $perl || $inline ne $perl;
+    die "PBKDF2 output mismatch during benchmark run $_\n" if !defined $xs || $xs ne $perl;
 }
 
-my $perl_median   = _median(@perl_seconds);
-my $ffi_median    = _median(@ffi_seconds);
-my $inline_median = _median(@inline_seconds);
+my $perl_median = _median(@perl_seconds);
+my $xs_median   = _median(@xs_seconds);
 printf "PBKDF2-HMAC-SHA256: %d iterations, %d alternating runs; all_digests_match=yes\n",
   $iterations, $runs;
-printf "Inline::C/XS compile_ms=%.3f (excluded from routine medians)\n", 1000 * $compile_seconds;
-printf "Perl median_ms=%.3f FFI median_ms=%.3f (%.2fx) Inline::C/XS median_ms=%.3f (%.2fx)\n",
-  1000 * $perl_median, 1000 * $ffi_median, $perl_median / $ffi_median,
-  1000 * $inline_median, $perl_median / $inline_median;
+printf "Perl median_ms=%.3f XS median_ms=%.3f (%.2fx)\n",
+  1000 * $perl_median, 1000 * $xs_median, $perl_median / $xs_median;
 exit 0;
 
 # _usage()
@@ -92,27 +71,6 @@ exit 0;
 # Output: usage text string.
 sub _usage {
     return "Usage: $0 [--iterations N] [--runs ODD_N] [--help]\n";
-}
-
-# _inline_source()
-# Returns C source that delegates PBKDF2-HMAC-SHA256 to OpenSSL from one XS call.
-# Input: none.
-# Output: C source string for Inline::C.
-sub _inline_source {
-    return <<'C_SOURCE';
-#include <openssl/evp.h>
-#include <string.h>
-
-SV* dd_problem48_inline_pbkdf2(const char *password, const char *salt, int rounds) {
-    unsigned char output[32];
-    if (PKCS5_PBKDF2_HMAC(password, (int)strlen(password),
-                          (const unsigned char*)salt, (int)strlen(salt),
-                          rounds, EVP_sha256(), (int)sizeof(output), output) != 1) {
-        croak("OpenSSL PKCS5_PBKDF2_HMAC failed");
-    }
-    return newSVpvn((const char*)output, sizeof(output));
-}
-C_SOURCE
 }
 
 # _pbkdf2_perl($password, $salt, $rounds)
@@ -146,26 +104,24 @@ __END__
 
 =head1 NAME
 
-problem48-inline-xs-benchmark - compare PBKDF2 Perl, FFI, and Inline::C/XS
+problem48-inline-xs-benchmark - compare PBKDF2 Perl and XS
 
 =head1 PURPOSE
 
 Measures the same PBKDF2-HMAC-SHA256 input through the existing Perl
-Digest::SHA reference loop, the Dashboard OpenSSL FFI::Platypus adapter, and
-an Inline::C generated XS wrapper around the same OpenSSL function.
+Digest::SHA reference loop and the Dashboard XS adapter around OpenSSL's
+PBKDF2 function.
 
 =head1 WHY IT EXISTS
 
-Problem 48 evaluates whether Inline::C/XS adds meaningful speed beyond the
-FFI boundary already used for the authentication hot loop. Every timed digest
-must match exactly, and the one-time Inline compilation cost is reported
-separately from routine medians.
+Problem 48 uses this benchmark to compare the production XS path with the
+established Perl reference loop. Every timed digest must match exactly before
+the medians are reported.
 
 =head1 WHEN TO USE
 
-Use only in the isolated Problem 48 benchmark container, which provides
-Inline::C, a C compiler, OpenSSL development headers, and FFI::Platypus. This
-script is research tooling and is not loaded by the application.
+Use in the development container after building the Dashboard XS extension.
+This script is research tooling and is not loaded by the application.
 
 =head1 HOW TO USE
 
@@ -178,9 +134,8 @@ produce byte-identical output or the script fails.
 
 =head1 WHAT USES IT
 
-Problem 48 performance research uses this benchmark to compare the FFI and
-Inline::C/XS call boundaries. The dashboard and release process do not invoke
-it.
+Problem 48 performance research uses this benchmark to compare Perl and XS
+PBKDF2 execution. The dashboard and release process do not invoke it.
 
 =head1 EXAMPLES
 

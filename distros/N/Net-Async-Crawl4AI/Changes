@@ -1,3 +1,21 @@
+0.002     2026-11-24 19:20:44Z
+
+ - Async requests no longer follow redirects (max_redirects => 0), matching
+   WWW::Crawl4AI: a 3xx fails as an api error carrying the 3xx status_code
+ - health resolves 0 and never fails a Future; on a failed check (transport
+   error, or any non-2xx answer, a 3xx included) it warns once, on one line,
+   "crawl4ai health check failed: <reason>", like WWW::Crawl4AI::Client
+ - The timeout attribute is now applied to every async request (passed to
+   Net::Async::HTTP do_request); a stalled request fails as a transport error and
+   is retried, so a hung Crawl4AI no longer leaves the Future pending forever
+ - cpanfile: declare URI (runtime) and Moo (test)
+ - crawl / markdown Result now surfaces response_headers from the async path,
+   mirroring the sync WWW::Crawl4AI facade (regression test t/55-response-headers.t)
+ - Require WWW::Crawl4AI 0.007 (up from 0.002) for response_headers support
+   and the dying health parser behind the health warning
+ - t/10-chain.t expects http_403 for a bare 403 answer, the reason
+   WWW::Crawl4AI 0.005 and later report for it (RT#179729)
+
 0.001     2026-05-30 01:01:52Z
 
  - Initial release

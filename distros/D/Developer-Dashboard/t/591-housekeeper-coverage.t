@@ -10,7 +10,18 @@ our ( %FAIL_OPENDIR, %FAIL_CLOSE, %FAIL_UNLINK, %VANISH_UNLINK );
 my %close_handles;
 
 BEGIN {
+    require Symbol;
     *CORE::GLOBAL::open = sub (*;$@) {
+        # A bareword handle such as STDOUT reaches a "*" prototype as a plain
+        # string, which CORE::open refuses under strict refs. Resolve it to
+        # the caller's glob first. Windows is where this is exercised: the
+        # product secures runtime paths there by running icacls with STDOUT
+        # and STDERR redirected and restored.
+        if ( defined $_[0] && !ref $_[0] ) {
+            my $glob = Symbol::qualify_to_ref( $_[0], scalar caller );
+            return CORE::open( $glob, $_[1] ) if @_ == 2;
+            return CORE::open( $glob, $_[1], @_[ 2 .. $#_ ] );
+        }
         my $rc = @_ == 2 ? CORE::open( $_[0], $_[1] ) : CORE::open( $_[0], $_[1], @_[ 2 .. $#_ ] );
         if ( $rc && @_ >= 3 && defined $_[2] && !ref $_[2] && $FAIL_CLOSE{"$_[1]|$_[2]"} ) {
             $close_handles{ Scalar::Util::refaddr( $_[0] ) } = 1;
@@ -19,7 +30,8 @@ BEGIN {
     };
     *CORE::GLOBAL::close = sub (;*) {
         my $fail = @_ && ref $_[0] && delete $close_handles{ Scalar::Util::refaddr( $_[0] ) };
-        my $rc = @_ ? CORE::close( $_[0] ) : CORE::close();
+        # Same bareword rule as the open override above.
+        my $rc = !@_ ? CORE::close() : CORE::close( ref $_[0] ? $_[0] : Symbol::qualify_to_ref( $_[0], scalar caller ) );
         if ($fail) {
             $! = 5;
             return 0;

@@ -153,7 +153,14 @@ is( _should_defer_windows_helper_refresh( 'jq', cf( $home, 'x' ) ), 0, '_should_
     no warnings 'redefine';
     local *Developer::Dashboard::Platform::is_windows = sub { 1 };
     my $t = cf( $home, 'defer-target' );
-    is( _should_defer_windows_helper_refresh( '_dashboard-core', $t ), 1, '_should_defer_windows_helper_refresh always defers core' );
+    open my $defer_fh, '>', $t or die "Unable to write $t: $!";
+    print {$defer_fh} "core\n";
+    close $defer_fh or die "Unable to close $t: $!";
+    is( _should_defer_windows_helper_refresh( '_dashboard-core', $t ), 0, '_should_defer_windows_helper_refresh restages core when the lock probe shows it is not locked' );
+    {
+        local *Developer::Dashboard::InternalCLI::_rename_path = sub { return 0 };
+        is( _should_defer_windows_helper_refresh( '_dashboard-core', $t ), 1, '_should_defer_windows_helper_refresh defers core when the lock probe fails' );
+    }
     {
         delete local $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER};
         is( _should_defer_windows_helper_refresh( 'jq', $t ), 0, '_should_defer_windows_helper_refresh checks the running helper for non-core' );
@@ -178,8 +185,8 @@ ok( _abs_existing_path($home) ne '', '_abs_existing_path canonicalizes an existi
 # _is_dashboard_managed_helper: core detection (line 488) + POD heuristic (492).
 # ---------------------------------------------------------------------------
 is( _is_dashboard_managed_helper( "random text\n", '_dashboard-core' ), 0, '_is_dashboard_managed_helper core: no legacy marker' );
-is( _is_dashboard_managed_helper( "Missing built-in dashboard command\nfoo\n", '_dashboard-core' ), 0, '_is_dashboard_managed_helper core: missing SeededPages marker' );
-ok( _is_dashboard_managed_helper( "Missing built-in dashboard command\nDeveloper::Dashboard::CLI::SeededPages\n", '_dashboard-core' ), '_is_dashboard_managed_helper core: both legacy markers present' );
+is( _is_dashboard_managed_helper( "Missing built-in d2 command\nfoo\n", '_dashboard-core' ), 0, '_is_dashboard_managed_helper core: missing SeededPages marker' );
+ok( _is_dashboard_managed_helper( "Missing built-in d2 command\nDeveloper::Dashboard::CLI::SeededPages\n", '_dashboard-core' ), '_is_dashboard_managed_helper core: both legacy markers present' );
 is( _is_dashboard_managed_helper( "LAZY-THIN-CMD only body\n", 'jq' ), 0, '_is_dashboard_managed_helper: LAZY marker without product name' );
 ok( _is_dashboard_managed_helper( "LAZY-THIN-CMD\nDeveloper Dashboard\n", 'jq' ), '_is_dashboard_managed_helper: both POD heuristics present' );
 is( _is_dashboard_managed_helper( "plain body\n", 'jq' ), 0, '_is_dashboard_managed_helper: unrelated content is unmanaged' );

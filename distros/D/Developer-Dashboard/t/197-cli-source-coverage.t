@@ -33,12 +33,12 @@ close $fh2;
 
 subtest 'command name validation' => sub {
     eval { $M->can('run_source_command')->( command => 'not-source', args => [] ) };
-    like( $@, qr/Usage: dashboard source/, 'wrong command name dies with usage' );
+    like( $@, qr/Usage: d2 source/, 'wrong command name dies with usage' );
 };
 
 subtest 'missing --files flag dies with usage' => sub {
     eval { $M->can('run_source_command')->( command => 'source', args => [], home => $home ) };
-    like( $@, qr/Usage: dashboard source/, '--files is required' );
+    like( $@, qr/Usage: d2 source/, '--files is required' );
 };
 
 subtest 'missing command key dies with a clear message' => sub {
@@ -58,7 +58,7 @@ subtest 'args must be an array reference' => sub {
 
 subtest 'an unrecognized option dies with usage' => sub {
     eval { $M->can('run_source_command')->( command => 'source', args => ['--bogus'], home => $home ) };
-    like( $@, qr/Usage: dashboard source/, 'GetOptionsFromArray failure dies with usage, not a raw Getopt error' );
+    like( $@, qr/Usage: d2 source/, 'GetOptionsFromArray failure dies with usage, not a raw Getopt error' );
 };
 
 subtest 'HOME truly unset (no override, no $ENV{HOME}) dies clearly' => sub {
@@ -74,8 +74,15 @@ subtest '--files lists real installed files, sorted' => sub {
     );
     is( $rc, 0, 'exits 0' );
     my @lines = split /\n/, $out;
-    ok( ( grep { $_ eq $lib_file } @lines ), 'lists the fake lib file' );
-    ok( ( grep { $_ eq $bin_file } @lines ), 'lists the fake bin file' );
+    # File::Find reports every name with forward slashes on Windows, while
+    # File::Spec builds the fixture paths with backslashes there. Both spell
+    # the same file, so compare the two in one spelling on Windows.
+    my ( $want_lib, $want_bin ) = ( $lib_file, $bin_file );
+    if ( $^O eq 'MSWin32' ) {
+        tr{\\}{/} for $want_lib, $want_bin;
+    }
+    ok( ( grep { $_ eq $want_lib } @lines ), 'lists the fake lib file' );
+    ok( ( grep { $_ eq $want_bin } @lines ), 'lists the fake bin file' );
     is_deeply( \@lines, [ sort @lines ], 'output is sorted' );
 };
 
@@ -126,13 +133,13 @@ t/197-cli-source-coverage.t - coverage for Developer::Dashboard::CLI::Source (DD
 
 =head1 PURPOSE
 
-Exercises C<dashboard source --files>: usage validation, real file listing
+Exercises C<d2 source --files>: usage validation, real file listing
 against a fake installed tree, and the empty-tree edge case.
 
 =head1 WHY IT EXISTS
 
-DD-938 added C<dashboard source --files> as the fallback deep-dive reference
-for C<dashboard ask --docs>'s curated onboarding summary - this file is its
+DD-938 added C<d2 source --files> as the fallback deep-dive reference
+for C<d2 ask --docs>'s curated onboarding summary - this file is its
 own coverage gate.
 
 =head1 WHEN TO USE

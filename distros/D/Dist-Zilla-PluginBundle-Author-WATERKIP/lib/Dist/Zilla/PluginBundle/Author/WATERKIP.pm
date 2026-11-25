@@ -7,9 +7,10 @@ use Moose;
 use Data::Dumper;
 use List::Util qw(uniq any first);
 use Moose::Util::TypeConstraints qw(enum subtype where);
+use URI;
 use namespace::autoclean;
 
-our $VERSION = '3.3';
+our $VERSION = '3.4';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -108,6 +109,32 @@ has upload_to => (
     default  => sub { $_[0]->payload->{upload_to} // 'cpan' },
 );
 
+has cpan_host => (
+    is       => 'ro',
+    isa      => 'Str',
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub {
+        my $host = $ENV{DZIL_CPAN_HOST} // $_[0]->payload->{cpan_host} // '';
+        return $host if $host eq '';
+        $host = "https://$host" unless $host =~ m{\Ahttps?://};
+
+        my $uri = URI->new($host);
+        $uri->path('/authenquery') if $uri->path eq '' || $uri->path eq '/';
+        return $uri->as_string;
+    },
+);
+
+has cpan_host_insecure => (
+    is       => 'ro',
+    isa      => 'Bool',
+    init_arg => undef,
+    lazy     => 1,
+    default  => sub {
+        $ENV{DZIL_CPAN_HOST_INSECURE} // $_[0]->payload->{cpan_host_insecure} // 0;
+    },
+);
+
 has authority => (
     is       => 'ro',
     isa      => 'Str',
@@ -117,6 +144,15 @@ has authority => (
         my $self = shift;
         $self->payload->{authority} // 'cpan:WATERKIP';
     },
+);
+
+has release_branch => (
+    is       => 'ro',
+    isa      => 'Str',
+    init_arg => undef,
+    lazy     => 1,
+    default =>
+        sub { $ENV{RELEASE_BRANCH} // $_[0]->payload->{release_branch} // 'master' },
 );
 
 has fake_release => (
@@ -156,6 +192,7 @@ sub build_network_plugins {
         CheckPrereqsIndexed
         CheckIssues
         UploadToCPAN
+        UploadToDarkPAN
         UploadToStratopan
         Git::Push
     )];
@@ -168,6 +205,18 @@ sub release_option {
     if ($self->fake_release) {
         _warn_me("Fake release has been set");
         return 'FakeRelease';
+    }
+    if ($self->cpan_host) {
+        _warn_me("Uploading to alternate CPAN host: " . $self->cpan_host);
+        if ($self->cpan_host_insecure) {
+            _warn_me("Ignoring TLS certificate errors for this host");
+            $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+        }
+        return [
+            'UploadToDarkPAN' => {
+                upload_uri => $self->cpan_host,
+            }
+        ];
     }
     if ($self->upload_to eq 'stratopan') {
         _warn_me("Stratopan release has been set");
@@ -298,7 +347,7 @@ sub configure {
         qw(Git::CheckFor::MergeConflicts),
         ['Git::Remote::Check' => { branch => 'master', remote_branch => 'master' } ],
         ['Git::CheckFor::CorrectBranch' =>
-                { release_branch => 'master' }
+                { release_branch => $self->release_branch }
         ],
 
         qw(CheckPrereqsIndexed),
@@ -381,7 +430,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 3.3
+version 3.4
 
 =head1 SYNOPSIS
 
@@ -513,7 +562,13 @@ Commit files after a release
 
 Define the release options. Choose between:
 
-C<cpan> or C<stratopan>. When fake release is used, this overrides these two options
+C<cpan> or C<stratopan>. When fake release is used, this overrides these two options.
+
+If C<DZIL_CPAN_HOST> is set in the environment (or C<cpan_host> is set in
+F<dist.ini>), uploads go to that host instead of PAUSE/CPAN, e.g. to
+release to a darkpan:
+
+    DZIL_CPAN_HOST=https://orepan.local.opndev.io/authenquery dzil release
 
 =head2 build_network_plugins
 

@@ -27,10 +27,18 @@ die "Unexpected PSGI status: " . $response->code . "\n" if !$response->is_succes
 print "PSGI /system/status returned " . $response->code . "\n";
 };
 
+# The smoke program is written to a file instead of passed with -e: on
+# Windows, passing a multi-line program containing double quotes through the
+# native command line mangles it (the child died with 'syntax error at -e
+# line 2, at EOF'), while a file reaches the child exactly as written.
+my ( $smoke_fh, $smoke_file ) = File::Temp::tempfile( 'dd-app-psgi-smoke-XXXXXX', SUFFIX => '.pl', TMPDIR => 1, UNLINK => 0 );
+print {$smoke_fh} $smoke or die "Unable to write $smoke_file: $!";
+close $smoke_fh or die "Unable to close $smoke_file: $!";
 my ( $stdout, $stderr, $exit ) = capture {
-    system $^X, '-I' . File::Spec->catdir( $repo, 't', 'lib' ), '-e', $smoke, $app_psgi;
+    system $^X, '-I' . File::Spec->catdir( $repo, 't', 'lib' ), $smoke_file, $app_psgi;
     return $? >> 8;
 };
+unlink $smoke_file or die "Unable to remove $smoke_file: $!";
 
 is( $exit, 0, 'the standalone PSGI bootstrap serves a successful status request' );
 is( $stdout, "PSGI /system/status returned 200\n", 'the PSGI status route returns the expected result' );

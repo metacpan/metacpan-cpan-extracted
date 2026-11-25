@@ -183,6 +183,13 @@ CPU/memory exhaustion while formatting sufficiently deep `=over` nesting
 the fixed distribution instead of classifying this installed package as
 environmental.
 
+The declared dependency chain also requires YAML 1.30 or newer. The live
+declared-chain audit reported that a floor of 1.28 permits
+CPANSA-YAML-2017-20285, whose affected range is below 1.30. Keep the cpanfile,
+Makefile.PL, and Dist::Zilla runtime metadata aligned at 1.30; the real-chain
+assertion in `t/109-declared-chain-advisory-closure.t` verifies that no
+vulnerable YAML resolution remains permitted.
+
 When raising a floor, audit the newly resolved chain rather than assuming it is
 safe: a higher floor can pull in additional distributions, and a floor set above
 a module's newest release would make the distribution uninstallable.
@@ -376,8 +383,8 @@ makes mandatory.
 Run these checks:
 
 ```bash
-dashboard doctor
-dashboard doctor --fix
+d2 doctor
+d2 doctor --fix
 prove -lr t
 ```
 

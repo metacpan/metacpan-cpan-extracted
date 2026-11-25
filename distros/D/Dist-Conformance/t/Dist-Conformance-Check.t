@@ -1,7 +1,8 @@
-#!/usr/bin/env perl
+#!perl
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
+no autovivification;
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
 use FindBin::libs;
@@ -33,8 +34,8 @@ subtest schema => sub {
 
 subtest '$MODULE' => sub {
     my $is_module = sub ($name) { return Dist::Conformance::Schema::matches( $Dist::Conformance::Check::MODULE, $name ) };
-    ok( $is_module->($_), "$_ is a module name" ) for qw{Foo Foo::Bar _Foo::Bar1};
-    ok( !$is_module->($_), "'$_' is not a module name" ) for q{}, qw{1Foo Foo:: Foo::::Bar}, "Foo::B\N{LATIN SMALL LETTER A WITH DIAERESIS}r", "F\N{LATIN SMALL LETTER O WITH DIAERESIS}o";
+    for my $name (qw{Foo Foo::Bar _Foo::Bar1})                                                                                                     { ok( $is_module->($name),  "$name is a module name" ) }
+    for my $name ( q{}, qw{1Foo Foo:: Foo::::Bar}, "Foo::B\N{LATIN SMALL LETTER A WITH DIAERESIS}r", "F\N{LATIN SMALL LETTER O WITH DIAERESIS}o" ) { ok( !$is_module->($name), "'$name' is not a module name" ) }
 };
 
 subtest from_config => sub {
@@ -93,7 +94,7 @@ subtest missing => sub {
 # Every check module that ships: it loads, it is a check, and its POD documents each key that it takes.
 subtest 'the shipped checks' => sub {
     my $dir     = Mojo::File->new("$FindBin::Bin/../lib/Dist/Conformance/Check");
-    my @modules = map { $_->basename('.pm') } $dir->list->grep(qr/[.]pm\z/)->each;
+    my @modules = map { local ($_) = $_; $_->basename('.pm') } $dir->list->grep(qr/[.]pm\z/)->each;
     ok( scalar @modules >= 8, 'there are the checks of the harness' );
     for my $module (@modules) {
         my $class = Module::Runtime::use_module("Dist::Conformance::Check::$module");

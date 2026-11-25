@@ -78,7 +78,10 @@ subtest 'async chain escalates plain -> browser -> stealth, stops at first good'
   is $r->cost_class, 'stealth', 'cost class reported';
   is $r->attempt_count, 3, 'three attempts';
   is $r->attempts->[0]->why_failed, 'thin_content', 'plain failed thin';
-  is $r->attempts->[1]->why_failed, 'bot_wall_detected', 'browser failed blocked';
+  # WWW::Crawl4AI 0.005+ decides bot_wall_detected only from a WAF challenge
+  # final_url, not from HTTP status or body text; a bare 403 falls to the
+  # http_error axis and reads http_403 (shared Detect::why_failed, mirrored here).
+  is $r->attempts->[1]->why_failed, 'http_403', 'browser failed 403';
   ok $r->attempts->[2]->ok, 'stealth ok';
   like $r->markdown, qr/real useful content/, 'winning markdown carried';
 
@@ -95,7 +98,7 @@ subtest 'all strategies fail -> ok=0 with history' => sub {
   my $r = $c->crawl( url => 'https://example.com' )->get;
   ok !$r->ok, 'not ok';
   is $r->attempt_count, 3, 'all three tried';
-  is $r->why_failed, 'bot_wall_detected', 'last reason surfaced';
+  is $r->why_failed, 'http_403', 'last reason surfaced (0.005+ classifies a bare 403 as http_403)';
   isa_ok $r->error, 'WWW::Crawl4AI::Error';
 };
 

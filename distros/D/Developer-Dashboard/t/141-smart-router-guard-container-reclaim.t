@@ -298,7 +298,14 @@ subtest 'an unreadable container inventory stops the guard instead of pretending
 
 subtest 'the default pid probe distinguishes a missing process from an unkillable one' => sub {
     ok( Local::DockerGuard::pid_alive($$), 'this test process is reported alive' );
-    ok( Local::DockerGuard::pid_alive(1),  'pid 1 is reported alive even though this uid may not signal it' );
+    # pid 1 is init on Unix and always exists; Windows has no pid 1 (pids
+    # start at 4), so the always-existing-but-unsignallable process there
+    # is pid 4, the System process.
+    my $unsignallable = $^O eq 'MSWin32' ? 4 : 1;
+    ok(
+        Local::DockerGuard::pid_alive($unsignallable),
+        "pid $unsignallable is reported alive even though this uid may not signal it",
+    );
     ok( !Local::DockerGuard::pid_alive(0), 'pid 0 is never treated as an owner' );
     ok( !Local::DockerGuard::pid_alive(-1), 'a negative pid is never treated as an owner' );
     ok( !Local::DockerGuard::pid_alive(undef), 'an undefined pid is never treated as an owner' );
@@ -361,7 +368,9 @@ sub _slurp {
 sub _unused_pid {
     for my $candidate ( 4_000_000 .. 4_000_200 ) {
         next if kill 0, $candidate;
-        next if $! != Errno::ESRCH();
+        # A missing pid fails kill(0) with ESRCH on Unix but with EINVAL
+        # on Windows, so accept either errno as "no process behind it".
+        next if $! != Errno::ESRCH() && !( $^O eq 'MSWin32' && $! == Errno::EINVAL() );
         return $candidate;
     }
     return undef;

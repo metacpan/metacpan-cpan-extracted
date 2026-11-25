@@ -167,4 +167,87 @@ sub error_from {
         'cross-origin target is never requested and invalid items stay hidden';
 }
 
+
+# Empty continuation strings are terminal, not a new request or a loop.
+for my $mode (qw(next_url cursor)) {
+    my $field = $mode eq 'cursor' ? 'next_cursor' : 'next';
+    my $client = T::AtomicPageClient->new({
+        '/empty' => [ { items => [1], $field => '' } ],
+    });
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $client, path => '/empty', mode => $mode,
+    );
+    is_deeply scalar($pager->all), [1], "$mode retains final items with empty continuation";
+    is_deeply $client->{calls}, ['/empty'], "$mode does not request an empty continuation";
+}
+
+# An absolute continuation without an authority is invalid; failure must
+# leave the iterator at the same page and must not expose unaccepted items.
+{
+    my $client = T::AtomicPageClient->new({
+        '/malformed' => [
+            { items => [99], next => 'https:///private' },
+            { items => [1], next => '' },
+        ],
+    });
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $client, path => '/malformed', max_pages => 1,
+    );
+    like error_from(sub { $pager->next }), qr/invalid pagination continuation URL/,
+        'absolute URL without authority is rejected';
+    is_deeply scalar($pager->all), [1], 'corrected page fits the original page allowance';
+    is_deeply $client->{calls}, ['/malformed', '/malformed'],
+        'malformed continuation is never fetched';
+}
+
+# Total is required to be a defined non-negative integer when configured.
+# Both missing and non-numeric totals must leave offset and allowance intact.
+for my $case ([undef, 'missing'], ['1.5', 'fractional'], [-1, 'negative']) {
+    my ($total, $label) = @$case;
+    my $client = T::AtomicPageClient->new({
+        '/offset?offset=0' => [
+            { items => [99], total => $total },
+            { items => [1], total => 1 },
+        ],
+    });
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $client, path => '/offset', mode => 'offset',
+        total => 'total', max_pages => 1,
+    );
+    like error_from(sub { $pager->next }),
+        qr/pagination total extractor must return a non-negative integer/,
+        "$label total is rejected";
+    is_deeply scalar($pager->all), [1], "$label total leaves items and allowance uncommitted";
+    is_deeply $client->{calls}, ['/offset?offset=0', '/offset?offset=0'],
+        "$label total leaves offset unchanged";
+}
+
+# Page-number fallback without a size or has_more stops at the first empty
+# page, including when the items extractor selects the entire JSON body.
+{
+    my $client = T::AtomicPageClient->new({
+        '/root?page=1' => [ [1, 2] ],
+        '/root?page=2' => [ [] ],
+    });
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $client, path => '/root', mode => 'page', items => '',
+    );
+    is_deeply scalar($pager->all), [1, 2], 'root array and implicit page completion work';
+    is_deeply $client->{calls}, ['/root?page=1', '/root?page=2'],
+        'empty page ends iteration without another request';
+}
+
+# A missing intermediate member of a dotted continuation path is a normal
+# absent continuation, not an exception or a request to a bogus URL.
+{
+    my $client = T::AtomicPageClient->new({
+        '/missing' => [ { items => [1], links => undef } ],
+    });
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $client, path => '/missing', next => 'links.next',
+    );
+    is_deeply scalar($pager->all), [1], 'missing intermediate continuation ends pagination';
+    is_deeply $client->{calls}, ['/missing'], 'no request for a missing continuation';
+}
+
 done_testing;

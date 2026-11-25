@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use sort 'stable';
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
 use Exporter 'import';
 use File::Find ();
 use File::Spec;
 use Getopt::Long qw(GetOptionsFromArray);
-use Developer::Dashboard::CLI::OpenFileGrep qw(grep_matching_files);
+use Developer::Dashboard::CLI::OpenFileGrep qw(grep_matching_files native_grep_usage);
 
 use Developer::Dashboard::CLI::OpenFileChooser qw(_default_editor _editor_supports_tabs _select_open_file_matches _stdin_has_pending_input _selection_matches);
 use Developer::Dashboard::CLI::OpenFileJavaSource qw(
@@ -28,6 +28,7 @@ use Developer::Dashboard::CLI::OpenFileJavaSource qw(
 );
 use Developer::Dashboard::CLI::OpenFileUtil qw(_unique_matches _unique_existing_dirs);
 use Developer::Dashboard::Config;
+use Developer::Dashboard::Platform qw(command_argv_for_path command_in_path command_in_path_direct is_windows);
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 
@@ -47,7 +48,8 @@ sub build_path_registry {
 # run_open_file_command(%args)
 # Resolves and opens or prints matching files from a direct path, file:line reference, or search scope.
 # Input: optional path registry object and mutable argv array reference.
-# Output: prints matches, execs grep for native --help, or execs the configured editor.
+# Output: prints matches, execs grep for native --help, prints the built-in
+# grep usage when grep does not resolve, or execs the configured editor.
 sub run_open_file_command {
     my (%args) = @_;
     my $paths = $args{paths};
@@ -65,6 +67,15 @@ sub run_open_file_command {
     if ( @argv && $argv[0] eq 'grep' ) {
         shift @argv;
         if ( grep { defined $_ && $_ eq '--help' } @argv ) {
+            # No system grep on this box (plain Windows): show the usage
+            # of the built-in search instead of dying on the missing
+            # binary, so `of grep --help` works the same way the search
+            # itself does through the Perl-native fallback. With a system
+            # grep present the exec below runs untouched.
+            if ( !command_in_path('grep') ) {
+                print native_grep_usage();
+                _command_exit(0);
+            }
             _command_exec( 'grep', @argv );
         }
         my @matches = grep_matching_files( args => \@argv );
@@ -299,7 +310,13 @@ sub _resolve_open_file_matches {
             no_chdir => 1,
             wanted   => sub {
                 return if !-f $_;
+                # File::Find joins with forward slashes even on Windows, so
+                # canonicalise absolute hits: matches are compared and
+                # displayed against File::Spec spellings. A leading ./ is
+                # kept verbatim - the chooser displays it and passes it to
+                # the editor, and canonpath would strip it.
                 my $path = $File::Find::name;
+                $path = File::Spec->canonpath($path) if $path !~ m{\A\./};
                 my $relative = File::Spec->abs2rel( $path, $scope );
                 $relative =~ s{\A\.[/\\]}{};
                 for my $regex (@regexes) {
@@ -475,6 +492,19 @@ sub _command_exit {
 # Output: never returns during normal command execution.
 sub _command_exec {
     my (@command) = @_;
+    if ( is_windows() && @command && -f $command[0] ) {
+        # On Windows, CreateProcess cannot execute a POSIX shell script
+        # directly; route it through the resolved POSIX shell instead, keeping
+        # any extra arguments as the script's own argv.
+        my $lower = lc $command[0];
+        my $is_shell = $lower =~ /\.(?:sh|bash)\z/;
+        if ( !$is_shell && open my $shebang_fh, '<', $command[0] ) {
+            my $first = <$shebang_fh> // '';
+            close $shebang_fh;
+            $is_shell = $first =~ m{\A\#!\s*(?:/usr/bin/env\s+|/bin/)(?:sh|bash)(?:\s|\z)} ? 1 : 0;
+        }
+        @command = ( command_argv_for_path( $command[0] ), @command[ 1 .. $#command ] ) if $is_shell;
+    }
     _exec_raw(@command);
 
     # Reached only when exec() fails to replace the process image. The raw
@@ -490,6 +520,51 @@ sub _command_exec {
 # Output: false when exec fails, never returns on success.
 sub _exec_raw {
     my (@command) = @_;
+    if ( is_windows() ) {
+        # Perl's exec() cannot run a program whose path contains a space
+        # (e.g. C:\Program Files\Git\usr\bin\sh.exe): the path is split
+        # and the fallback shell reports "/c/Program: ... No such file or
+        # directory" while exiting 0, so the editor silently never runs
+        # (t/05 line 2403). system() quotes the program correctly; exit
+        # with the child's status so the caller still never returns, as
+        # with exec(). A failed start returns false and warns exactly as
+        # a failed exec does, so _command_exec dies (DD-910) and t/770's
+        # failure-path expectations still hold: system's own "Can't spawn"
+        # fallback warning is replaced by the "Can't exec" warning.
+        # A BARE editor name is resolved to a full path first: the block
+        # form performs no PATH search and no extension probing, so
+        # 'vim' is never found even when a vim.bat sits on PATH (t/05
+        # tests 694/696 - the block form returns rc 65280 for a bare
+        # name with and without the twin, while the list form finds the
+        # twin). command_in_path_direct returns the first directly
+        # runnable file on PATH (.exe/.com/.bat/.cmd); an extensionless
+        # POSIX script is never returned, since neither CreateProcess
+        # nor cmd can run it. A resolved full path keeps the block form:
+        # it runs .bat files by full path and paths with spaces, as the
+        # 2403 probes verified. When nothing resolves, fail exactly as
+        # a failed exec does, with ENOENT so the die names the cause.
+        my @spawn = @command;
+        if ( $command[0] !~ m{[\\/]} ) {
+            my $resolved = command_in_path_direct( $command[0] );
+            if ( !defined $resolved ) {
+                $! = 2;    # ENOENT
+                warn "Can't exec \"$command[0]\": $!";
+                return 0;
+            }
+            @spawn = ( $resolved, @command[ 1 .. $#command ] );
+        }
+        my $rc;
+        {
+            local $SIG{__WARN__} = sub { return };
+            $! = 0;
+            $rc = system { $spawn[0] } @spawn;
+        }
+        if ( $rc == -1 || $! ) {
+            warn "Can't exec \"$command[0]\": $!";
+            return 0;
+        }
+        exit( $rc >> 8 );
+    }
     return exec { $command[0] } @command;
 }
 
@@ -501,7 +576,7 @@ __END__
 
 =head1 NAME
 
-Developer::Dashboard::CLI::OpenFile - dashboard open-file command support
+Developer::Dashboard::CLI::OpenFile - d2 open-file command support
 
 =head1 SYNOPSIS
 
@@ -510,14 +585,14 @@ Developer::Dashboard::CLI::OpenFile - dashboard open-file command support
 
 =head1 DESCRIPTION
 
-Provides the shared implementation behind the built-in C<dashboard of> and
-C<dashboard open-file> command paths.
+Provides the shared implementation behind the built-in C<d2 of> and
+C<d2 open-file> command paths.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This module implements the search and resolution logic behind C<dashboard of> and C<dashboard open-file>. It can open direct paths, search within scopes, resolve Perl module names, resolve Java dotted class names through source trees and source archives, and rank file matches before opening or printing them.
+This module implements the search and resolution logic behind C<d2 of> and C<d2 open-file>. It can open direct paths, search within scopes, resolve Perl module names, resolve Java dotted class names through source trees and source archives, and rank file matches before opening or printing them.
 
 =head1 WHY IT EXISTS
 
@@ -538,13 +613,16 @@ match the candidate path, except when those remaining arguments join into one
 existing relative file path inside the resolved scope. In that exact-file case,
 the helper opens the scoped file directly instead of falling back to regex
 search. A single hit opens or prints that file, while multiple hits are ranked
-and shown as a chooser or plain list. C<dashboard of grep -nr PATTERN DIR>
+and shown as a chooser or plain list. C<d2 of grep -nr PATTERN DIR>
 instead searches file contents and opens each unique matching file; adding
 C<--print> before C<grep> prints those paths without launching an editor. The
 grep arguments are passed directly to the executable, not through a shell.
 When C<--help> is supplied after C<grep>, the helper execs grep unchanged so
 its native usage text and exit status reach the caller rather than being
-parsed as search results.
+parsed as search results. When no system grep is installed, the helper
+prints the built-in search's usage instead rather than dying on the missing
+binary (see C<native_grep_usage> in
+C<Developer::Dashboard::CLI::OpenFileGrep>).
 Perl module lookup maps C<Foo::Bar> to C<Foo/Bar.pm> under every existing
 directory in the running process's C<@INC>; Java lookup maps dotted class
 names to C<.java> source files or
@@ -563,15 +641,15 @@ print-vs-editor flows.
 
 =head1 EXAMPLES
 
-  dashboard open-file path/to/file.txt
-  dashboard open-file lib 'OpenFile\.pm$'
-  dashboard of notes
-  dashboard of foobar 456.txt
-  dashboard of . "Ok\.js$"
-  dashboard open-file javax.jws.WebService
-  dashboard open-file --online javax.jws.WebService
-  dashboard of Developer::Dashboard::CLI::Paths
-  dashboard open-file --print bookmarks index
+  d2 open-file path/to/file.txt
+  d2 open-file lib 'OpenFile\.pm$'
+  d2 of notes
+  d2 of foobar 456.txt
+  d2 of . "Ok\.js$"
+  d2 open-file javax.jws.WebService
+  d2 open-file --online javax.jws.WebService
+  d2 of Developer::Dashboard::CLI::Paths
+  d2 open-file --print bookmarks index
 
 =for comment FULL-POD-DOC END
 

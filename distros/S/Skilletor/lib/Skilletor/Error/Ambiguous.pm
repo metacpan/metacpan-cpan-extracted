@@ -1,12 +1,10 @@
 package Skilletor::Error::Ambiguous;
-# ABSTRACT: A lookup that would have to hide one of two items: a rule both scopes declare
+# ABSTRACT: Retired stub, see Skilletor
 
-use Moo;
-use namespace::clean;
+use strict;
+use warnings;
 
-extends 'Skilletor::Error';
-
-our $VERSION = '0.008000';
+our $VERSION = '0.009000';
 
 1;
 
@@ -18,19 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Error::Ambiguous - A lookup that would have to hide one of two items: a rule both scopes declare
+Skilletor::Error::Ambiguous - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
+version 0.009000
 
 =head1 DESCRIPTION
 
-Thrown by L<Skilletor/resolve_rule> and L<Skilletor/resolve_item> when the user
-and the project scope both declare a rule of the name and no C<scope> narrows
-the lookup: Claude Code loads both, neither overrides the other, so a single
-answer would hide one. L<Skilletor/resolve_rules> and L<Skilletor/resolve_items>
-give both. See L<Skilletor::Error> for the interface.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
+
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Skilletor>
+
+=item * L<https://github.com/Getty/skilletor#install>
+
+=back
 
 =head1 SUPPORT
 

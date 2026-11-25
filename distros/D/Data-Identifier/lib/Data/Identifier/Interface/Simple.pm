@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -15,7 +15,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.38;
+our $VERSION = v0.39.02;
 
 
 sub as {
@@ -50,7 +50,7 @@ Data::Identifier::Interface::Simple - format independent identifier object
 
 =head1 VERSION
 
-version v0.38
+version v0.39.02
 
 =head1 SYNOPSIS
 
@@ -107,9 +107,16 @@ The default implementation is equivalent to:
 
 To be future-safe this interface reserves the following methods:
 C<displaycolour> (since v0.36),
-C<icontext> (since v0.36).
+C<icontext> (since v0.36),
+C<eq> (since v0.39),
+C<cmp> (since v0.39),
+C<register> (since v0.39).
 
 Those methods may be used in the same or similar way as the corresponding methods in L<Data::Identifier>.
+
+Implementations of this interface may implement those reserved methods if they provide the same interface
+and perform as defined by L<Data::Identifier> (since v0.39).
+Implementations doing so must actively monitor potential future changes both to this interface and L<Data::Identifier>.
 
 Future versions of this module may provide default implementations.
 

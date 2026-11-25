@@ -21,6 +21,23 @@ use Developer::Dashboard::CLI::TableHelpers ();
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::JSON qw(json_decode json_encode);
+use Developer::Dashboard qw(spawn wait_process);
+
+my $repo_root = cwd();
+
+# _run_perl_child($source, @arguments)
+# Runs a short Perl program in an independently spawned process for assertions
+# that exercise exec() or exit() without directly forking the test interpreter.
+# Input: Perl source text followed by literal @ARGV values for that source.
+# Output: the child's shell-style exit status after it has been reaped.
+sub _run_perl_child {
+    my ( $source, @arguments ) = @_;
+    my @include = map { "-I$_" } map { File::Spec->catdir( $repo_root, $_ ) }
+      qw(lib blib/lib blib/arch);
+    my $pid = spawn( [ $^X, @include, '-e', $source, @arguments ], { cwd => cwd() } );
+    die "Unable to spawn Perl test child: $!" if !defined $pid;
+    return wait_process($pid);
+}
 
 local $ENV{HOME} = tempdir(CLEANUP => 1);
 for my $dir (qw(projects src work)) {
@@ -129,7 +146,7 @@ _write_zip_entries(
         name  => 'com.example.Archived',
     );
     ok( @archive_named, 'Java class lookup returns a match extracted from a local source archive when no .java file exists in the project tree' );
-    like( $archive_named[0], qr{/\Qopen-file/java-sources/\E}, 'Java archive lookup extracts matching source files into the dashboard cache tree' );
+    like( $archive_named[0], qr{[\\/]open-file[\\/]java-sources[\\/]}, 'Java archive lookup extracts matching source files into the dashboard cache tree' );
     open my $archive_source_fh, '<', $archive_named[0] or die "Unable to read $archive_named[0]: $!";
     my $archive_source = do { local $/; <$archive_source_fh> };
     close $archive_source_fh;
@@ -287,12 +304,12 @@ like( $@, qr/^EXEC/, 'which --edit reaches the exec hook' );
 is(
     $which_exec,
     join( "\n", '/tmp/dashboard-entrypoint', 'open-file', $notes_file ),
-    'which --edit re-enters dashboard open-file with the resolved command path',
+    'which --edit re-enters d2 open-file with the resolved command path',
 );
 
 is(
     Developer::Dashboard::CLI::Which::_usage(),
-    'Usage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>' . "\n",
+    'Usage: d2 which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>' . "\n",
     'which usage text documents the --edit switch and dotted skill targets',
 );
 
@@ -633,7 +650,7 @@ ok(
         paths  => $which_paths,
         target => 'jq',
     );
-    like( $builtin->{command}, qr{/\.developer-dashboard/cli/dd/jq\z}, 'which builtin lookup resolves the staged helper path' );
+    like( $builtin->{command}, qr{[\\/]\.developer-dashboard[\\/]cli[\\/]dd[\\/]jq\z}, 'which builtin lookup resolves the staged helper path' );
     is_deeply( $builtin->{hooks}, [], 'which builtin lookup reports no hooks when no jq hooks are present' );
 }
 
@@ -679,12 +696,12 @@ ok(
             args    => [ '--edit', 'demo-tool' ],
         ),
         0,
-        'which edit mode returns success after the dashboard open-file handoff returns in tests',
+        'which edit mode returns success after the d2 open-file handoff returns in tests',
     );
     is_deeply(
         \@exec,
-        [ ( $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || 'dashboard' ), 'open-file', '/tmp/demo-command' ],
-        'which edit mode hands the resolved command path to dashboard open-file before returning success',
+        [ ( $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || 'd2' ), 'open-file', '/tmp/demo-command' ],
+        'which edit mode hands the resolved command path to d2 open-file before returning success',
     );
 }
 
@@ -697,7 +714,7 @@ like(
             );
         }
     ),
-    qr/^\QUsage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\E/m,
+    qr/^\QUsage: d2 which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\E/m,
     'which rejects direct calls under the wrong command name with the usage text',
 );
 
@@ -723,7 +740,7 @@ like(
             );
         }
     ),
-    qr/^\QUsage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\E/m,
+    qr/^\QUsage: d2 which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\E/m,
     'which requires a target command token',
 );
 
@@ -736,14 +753,14 @@ like(
             );
         }
     ),
-    qr/^\QUsage: dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\E/m,
+    qr/^\QUsage: d2 which [--edit] <cmd>|<skill>.<cmd>|<skill>.<sub-skill>.<cmd>\E/m,
     'which rejects unexpected extra positional arguments',
 );
 
 is_deeply(
     [ Developer::Dashboard::CLI::Which::_dashboard_entry_command() ],
-    [ $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || 'dashboard' ],
-    'which edit handoff defaults to the current public dashboard entrypoint',
+    [ $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || 'd2' ],
+    'which edit handoff defaults to the current public d2 entrypoint',
 );
 
 {
@@ -751,18 +768,31 @@ is_deeply(
     is_deeply(
         [ Developer::Dashboard::CLI::Which::_dashboard_entry_command() ],
         ['/tmp/custom-dashboard'],
-        'which edit handoff honors an overridden public dashboard entrypoint',
+        'which edit handoff honors an overridden public d2 entrypoint',
     );
 }
 
 {
-    my $pid = fork();
-    die "fork failed: $!" if !defined $pid;
-    if (!$pid) {
-        Developer::Dashboard::CLI::Which::_command_exec($home_command);
+    # The handoff target must be something the native spawn can run. On
+    # Unix that is the #!/bin/sh demo-tool itself. Windows cannot spawn an
+    # extensionless sh script (build #506: "Can't spawn cmd.exe", exit
+    # 255), so there the same check runs against a .bat twin kept outside
+    # the which fixture tree, so it cannot change any which lookup.
+    my $exec_target = $home_command;
+    if ( $^O eq 'MSWin32' ) {
+        $exec_target = File::Spec->catfile( tempdir( CLEANUP => 1 ), 'demo-tool.bat' );
+        open my $exec_target_fh, '>', $exec_target or die "Unable to write $exec_target: $!";
+        print {$exec_target_fh} "\@echo off\necho home\n";
+        close $exec_target_fh;
     }
-    waitpid( $pid, 0 );
-    is( $? >> 8, 0, 'which exec helper delegates to process exec' );
+    is(
+        _run_perl_child(
+            'use Developer::Dashboard::CLI::Which (); Developer::Dashboard::CLI::Which::_command_exec($ARGV[0]);',
+            $exec_target,
+        ),
+        0,
+        'which exec helper delegates to process exec',
+    );
 }
 chdir $which_original_cwd or die "Unable to restore cwd to $which_original_cwd: $!";
 
@@ -1222,23 +1252,25 @@ like( $query_error, qr/^EXIT:0\b/, 'run_query_command exits through the test hoo
 is( $query_stdout, "7\n", 'run_query_command prints extracted scalar values' );
 
 {
-    my $pid = fork();
-    die "fork failed: $!" if !defined $pid;
-    if (!$pid) {
-        Developer::Dashboard::CLI::Query::_command_exit(7);
-    }
-    waitpid( $pid, 0 );
-    is( $? >> 8, 7, 'query command exit helper delegates to process exit' );
+    is(
+        _run_perl_child(
+            'use Developer::Dashboard::CLI::Query (); Developer::Dashboard::CLI::Query::_command_exit($ARGV[0]);',
+            7,
+        ),
+        7,
+        'query command exit helper delegates to process exit',
+    );
 }
 
 {
-    my $pid = fork();
-    die "fork failed: $!" if !defined $pid;
-    if (!$pid) {
-        Developer::Dashboard::CLI::OpenFile::_command_exit(9);
-    }
-    waitpid( $pid, 0 );
-    is( $? >> 8, 9, 'open-file exit helper delegates to process exit' );
+    is(
+        _run_perl_child(
+            'use Developer::Dashboard::CLI::OpenFile (); Developer::Dashboard::CLI::OpenFile::_command_exit($ARGV[0]);',
+            9,
+        ),
+        9,
+        'open-file exit helper delegates to process exit',
+    );
 }
 
 my $exec_script = File::Spec->catfile( $project_root, 'fake-editor.sh' );
@@ -1248,13 +1280,16 @@ close $exec_fh;
 chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
 
 {
-    my $pid = fork();
-    die "fork failed: $!" if !defined $pid;
-    if (!$pid) {
-        Developer::Dashboard::CLI::OpenFile::_command_exec( $exec_script, '--wait', $notes_file );
-    }
-    waitpid( $pid, 0 );
-    is( $? >> 8, 0, 'open-file exec helper delegates to process exec' );
+    is(
+        _run_perl_child(
+            'use Developer::Dashboard::CLI::OpenFile (); Developer::Dashboard::CLI::OpenFile::_command_exec(@ARGV);',
+            $exec_script,
+            '--wait',
+            $notes_file,
+        ),
+        0,
+        'open-file exec helper delegates to process exec',
+    );
 }
 
 {
@@ -1282,9 +1317,9 @@ chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
     chdir $api_project or die "Unable to chdir to $api_project: $!";
 
     my $default_list = _run_api_command_capture();
-    is( $default_list->{exit_code}, 0, 'dashboard api defaults to ls' );
-    like( $default_list->{stdout}, qr/^Key\s+Secret\s+Route/m, 'dashboard api default list renders a table header' );
-    like( $default_list->{stdout}, qr/home-client\s+home-secret-hash\s+\/ajax\/home-only/, 'dashboard api default list includes inherited keys' );
+    is( $default_list->{exit_code}, 0, 'd2 api defaults to ls' );
+    like( $default_list->{stdout}, qr/^Key\s+Secret\s+Route/m, 'd2 api default list renders a table header' );
+    like( $default_list->{stdout}, qr/home-client\s+home-secret-hash\s+\/ajax\/home-only/, 'd2 api default list includes inherited keys' );
 
     my $add_secret = _run_api_command_capture(
         'add',
@@ -1293,9 +1328,9 @@ chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
         '--route', '/ajax/leaf-first',
         '--route', '/ajax/leaf-second',
     );
-    is( $add_secret->{exit_code}, 0, 'dashboard api add creates a new writable-layer API group from one raw secret plus repeated routes' );
-    like( $add_secret->{stdout}, qr/^Key\s+Secret\s+Route/m, 'dashboard api add defaults to a table summary' );
-    like( $add_secret->{stdout}, qr/leaf-client\s+\S+\s+\/ajax\/leaf-first/, 'dashboard api add table summary lists the created route rows' );
+    is( $add_secret->{exit_code}, 0, 'd2 api add creates a new writable-layer API group from one raw secret plus repeated routes' );
+    like( $add_secret->{stdout}, qr/^Key\s+Secret\s+Route/m, 'd2 api add defaults to a table summary' );
+    like( $add_secret->{stdout}, qr/leaf-client\s+\S+\s+\/ajax\/leaf-first/, 'd2 api add table summary lists the created route rows' );
     my $add_secret_payload = json_decode( _run_api_command_capture(
         'add',
         '--key', 'leaf-client',
@@ -1304,44 +1339,44 @@ chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
         '--route', '/ajax/leaf-second',
         '-o', 'json',
     )->{stdout} );
-    is( $add_secret_payload->{file}, File::Spec->catfile( $leaf_api_dir, 'api.json' ), 'dashboard api add writes to the deepest writable layer' );
-    is( $add_secret_payload->{api}{'leaf-client'}{secret}, sha256_hex('leaf-secret'), 'dashboard api add hashes the raw secret before saving it' );
-    is_deeply( $add_secret_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second' ], 'dashboard api add accepts repeated routes in one command' );
+    is( $add_secret_payload->{file}, File::Spec->catfile( $leaf_api_dir, 'api.json' ), 'd2 api add writes to the deepest writable layer' );
+    is( $add_secret_payload->{api}{'leaf-client'}{secret}, sha256_hex('leaf-secret'), 'd2 api add hashes the raw secret before saving it' );
+    is_deeply( $add_secret_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second' ], 'd2 api add accepts repeated routes in one command' );
 
     my $add_route = _run_api_command_capture( 'add', '--key', 'leaf-client', '--route', '/ajax/leaf' );
-    is( $add_route->{exit_code}, 0, 'dashboard api add can append a route to an existing API group' );
+    is( $add_route->{exit_code}, 0, 'd2 api add can append a route to an existing API group' );
     my $add_route_payload = json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--route', '/ajax/leaf', '-o', 'json' )->{stdout} );
-    is_deeply( $add_route_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second', '/ajax/leaf' ], 'dashboard api add stores later routes after an initial batched create' );
+    is_deeply( $add_route_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second', '/ajax/leaf' ], 'd2 api add stores later routes after an initial batched create' );
 
     my $duplicate_route = _run_api_command_capture( 'add', '--key', 'leaf-client', '--route', '/ajax/leaf' );
-    is( $duplicate_route->{exit_code}, 0, 'dashboard api add accepts duplicate route requests without failing' );
-    is( json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--route', '/ajax/leaf', '-o', 'json' )->{stdout} )->{changed}, 0, 'dashboard api add reports no change when a repeated route already exists' );
+    is( $duplicate_route->{exit_code}, 0, 'd2 api add accepts duplicate route requests without failing' );
+    is( json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--route', '/ajax/leaf', '-o', 'json' )->{stdout} )->{changed}, 0, 'd2 api add reports no change when a repeated route already exists' );
 
     my $update_secret = _run_api_command_capture( 'add', '--key', 'leaf-client', '--secret', 'updated-secret' );
-    is( $update_secret->{exit_code}, 0, 'dashboard api add updates the stored secret for an existing key' );
-    is( json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--secret', 'updated-secret', '-o', 'json' )->{stdout} )->{api}{'leaf-client'}{secret}, sha256_hex('updated-secret'), 'dashboard api add rewrites the secret digest on update' );
+    is( $update_secret->{exit_code}, 0, 'd2 api add updates the stored secret for an existing key' );
+    is( json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--secret', 'updated-secret', '-o', 'json' )->{stdout} )->{api}{'leaf-client'}{secret}, sha256_hex('updated-secret'), 'd2 api add rewrites the secret digest on update' );
 
     my $maybe_secret_update = _run_api_command_capture( 'add', '--key', 'leaf-client', '--maybe-secret', 'maybe-secret', '--route', '/ajax/maybe' );
-    is( $maybe_secret_update->{exit_code}, 0, 'dashboard api add accepts --maybe-secret for route-oriented updates' );
+    is( $maybe_secret_update->{exit_code}, 0, 'd2 api add accepts --maybe-secret for route-oriented updates' );
     my $maybe_secret_payload = json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--maybe-secret', 'maybe-secret', '--route', '/ajax/maybe', '-o', 'json' )->{stdout} );
-    is( $maybe_secret_payload->{api}{'leaf-client'}{secret}, sha256_hex('maybe-secret'), 'dashboard api add overwrites the stored secret when --maybe-secret is supplied for an existing key' );
-    is_deeply( $maybe_secret_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second', '/ajax/leaf', '/ajax/maybe' ], 'dashboard api add can append routes while updating the secret through --maybe-secret' );
+    is( $maybe_secret_payload->{api}{'leaf-client'}{secret}, sha256_hex('maybe-secret'), 'd2 api add overwrites the stored secret when --maybe-secret is supplied for an existing key' );
+    is_deeply( $maybe_secret_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second', '/ajax/leaf', '/ajax/maybe' ], 'd2 api add can append routes while updating the secret through --maybe-secret' );
 
     my $add_route_without_secret = _run_api_command_capture( 'add', '--key', 'new-client', '--route', '/ajax/needs-secret' );
-    like( $add_route_without_secret->{error}, qr/API key 'new-client' does not exist yet; add --secret or --maybe-secret first/, 'dashboard api add rejects route-only creation before a secret exists' );
+    like( $add_route_without_secret->{error}, qr/API key 'new-client' does not exist yet; add --secret or --maybe-secret first/, 'd2 api add rejects route-only creation before a secret exists' );
 
     my $conflicting_secret_modes = _run_api_command_capture( 'add', '--key', 'leaf-client', '--secret', 's1', '--maybe-secret', 's2' );
-    like( $conflicting_secret_modes->{error}, qr/Use either --secret or --maybe-secret, not both/, 'dashboard api add rejects simultaneous --secret and --maybe-secret values' );
+    like( $conflicting_secret_modes->{error}, qr/Use either --secret or --maybe-secret, not both/, 'd2 api add rejects simultaneous --secret and --maybe-secret values' );
 
     my $list_json = _run_api_command_capture( 'ls', '-o', 'json' );
-    is( $list_json->{exit_code}, 0, 'dashboard api ls supports JSON output' );
+    is( $list_json->{exit_code}, 0, 'd2 api ls supports JSON output' );
     my $list_payload = json_decode( $list_json->{stdout} );
-    is( $list_payload->{api}{'leaf-client'}{secret}, sha256_hex('maybe-secret'), 'dashboard api ls JSON output reports the maybe-secret overwrite hash' );
-    is_deeply( $list_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second', '/ajax/leaf', '/ajax/maybe' ], 'dashboard api ls JSON output reports all writable routes after batched, incremental, and maybe-secret updates' );
-    is_deeply( $list_payload->{api}{'home-client'}{ajax}, ['/ajax/home-only'], 'dashboard api ls JSON output keeps inherited routes visible' );
+    is( $list_payload->{api}{'leaf-client'}{secret}, sha256_hex('maybe-secret'), 'd2 api ls JSON output reports the maybe-secret overwrite hash' );
+    is_deeply( $list_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second', '/ajax/leaf', '/ajax/maybe' ], 'd2 api ls JSON output reports all writable routes after batched, incremental, and maybe-secret updates' );
+    is_deeply( $list_payload->{api}{'home-client'}{ajax}, ['/ajax/home-only'], 'd2 api ls JSON output keeps inherited routes visible' );
 
     my $leaf_list_json = _run_api_command_capture( 'ls', '--key', 'leaf-client', '-o', 'json' );
-    is( $leaf_list_json->{exit_code}, 0, 'dashboard api ls can filter JSON output to one key' );
+    is( $leaf_list_json->{exit_code}, 0, 'd2 api ls can filter JSON output to one key' );
     is_deeply(
         json_decode( $leaf_list_json->{stdout} )->{api},
         {
@@ -1350,37 +1385,37 @@ chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
                 ajax   => [ '/ajax/leaf-first', '/ajax/leaf-second', '/ajax/leaf', '/ajax/maybe' ],
             },
         },
-        'dashboard api ls --key returns only the requested key in JSON mode',
+        'd2 api ls --key returns only the requested key in JSON mode',
     );
 
     my $remove_route = _run_api_command_capture( 'rm', '--key', 'leaf-client', '--route', '/ajax/leaf-second' );
-    is( $remove_route->{exit_code}, 0, 'dashboard api rm can remove one route from a writable API group' );
-    like( $remove_route->{stdout}, qr/^Key\s+Secret\s+Route/m, 'dashboard api rm defaults to a table summary for route removals' );
-    is_deeply( json_decode( _run_api_command_capture( 'rm', '--key', 'leaf-client', '--route', '/ajax/leaf-second', '-o', 'json' )->{stdout} )->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf', '/ajax/maybe' ], 'dashboard api rm leaves the API group in place when only one route is removed from a larger set' );
+    is( $remove_route->{exit_code}, 0, 'd2 api rm can remove one route from a writable API group' );
+    like( $remove_route->{stdout}, qr/^Key\s+Secret\s+Route/m, 'd2 api rm defaults to a table summary for route removals' );
+    is_deeply( json_decode( _run_api_command_capture( 'rm', '--key', 'leaf-client', '--route', '/ajax/leaf-second', '-o', 'json' )->{stdout} )->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf', '/ajax/maybe' ], 'd2 api rm leaves the API group in place when only one route is removed from a larger set' );
     my $remove_route_table = _run_api_command_capture( 'rm', '--key', 'leaf-client', '--route', '/ajax/leaf', '-o', 'table' );
-    is( $remove_route_table->{exit_code}, 0, 'dashboard api rm supports table output when one route is removed from an API group' );
-    like( $remove_route_table->{stdout}, qr/^Key\s+Secret\s+Route/m, 'dashboard api rm table output includes the standard key table header for route removals' );
-    like( $remove_route_table->{stdout}, qr/leaf-client\s+\S+\s+\/ajax\/leaf-first/, 'dashboard api rm table output lists the remaining route rows for the API group' );
+    is( $remove_route_table->{exit_code}, 0, 'd2 api rm supports table output when one route is removed from an API group' );
+    like( $remove_route_table->{stdout}, qr/^Key\s+Secret\s+Route/m, 'd2 api rm table output includes the standard key table header for route removals' );
+    like( $remove_route_table->{stdout}, qr/leaf-client\s+\S+\s+\/ajax\/leaf-first/, 'd2 api rm table output lists the remaining route rows for the API group' );
 
     my $remove_shared = _run_api_command_capture( 'rm', '--key', 'shared-client', '-o', 'table' );
-    is( $remove_shared->{exit_code}, 0, 'dashboard api rm can mask an inherited API group' );
-    like( $remove_shared->{stdout}, qr/^Key\s+Status/m, 'dashboard api rm table output includes headers for whole-key removals' );
-    like( $remove_shared->{stdout}, qr/shared-client\s+removed/, 'dashboard api rm table output reports removed inherited keys' );
+    is( $remove_shared->{exit_code}, 0, 'd2 api rm can mask an inherited API group' );
+    like( $remove_shared->{stdout}, qr/^Key\s+Status/m, 'd2 api rm table output includes headers for whole-key removals' );
+    like( $remove_shared->{stdout}, qr/shared-client\s+removed/, 'd2 api rm table output reports removed inherited keys' );
     my $writable_api = json_decode( _slurp_file( File::Spec->catfile( $leaf_api_dir, 'api.json' ) ) );
-    ok( $writable_api->{'shared-client'}{disabled}, 'dashboard api rm writes a child-layer tombstone for inherited keys' );
+    ok( $writable_api->{'shared-client'}{disabled}, 'd2 api rm writes a child-layer tombstone for inherited keys' );
 
     my $shared_hidden = json_decode( _run_api_command_capture( 'ls', '--key', 'shared-client', '-o', 'json' )->{stdout} );
-    ok( !exists $shared_hidden->{api}{'shared-client'}, 'dashboard api ls hides inherited keys once a child-layer tombstone masks them' );
+    ok( !exists $shared_hidden->{api}{'shared-client'}, 'd2 api ls hides inherited keys once a child-layer tombstone masks them' );
     my $remove_shared_again = _run_api_command_capture( 'rm', '--key', 'shared-client', '-o', 'json' );
-    is( $remove_shared_again->{exit_code}, 0, 'dashboard api rm treats repeated inherited-key masking as a successful no-op' );
-    is( json_decode( $remove_shared_again->{stdout} )->{changed}, 0, 'dashboard api rm reports no change when the writable layer already contains a disabled tombstone for the key' );
+    is( $remove_shared_again->{exit_code}, 0, 'd2 api rm treats repeated inherited-key masking as a successful no-op' );
+    is( json_decode( $remove_shared_again->{stdout} )->{changed}, 0, 'd2 api rm reports no change when the writable layer already contains a disabled tombstone for the key' );
 
     my $remove_missing_table = _run_api_command_capture( 'rm', '--key', 'missing-client', '-o', 'table' );
-    is( $remove_missing_table->{exit_code}, 0, 'dashboard api rm treats missing whole-key removals as a no-op' );
-    like( $remove_missing_table->{stdout}, qr/missing-client\s+no-change/, 'dashboard api rm table output reports no-change for missing whole-key removals' );
+    is( $remove_missing_table->{exit_code}, 0, 'd2 api rm treats missing whole-key removals as a no-op' );
+    like( $remove_missing_table->{stdout}, qr/missing-client\s+no-change/, 'd2 api rm table output reports no-change for missing whole-key removals' );
 
     my $unknown_action = _run_api_command_capture('wat');
-    like( $unknown_action->{error}, qr/Unknown api action: wat/, 'dashboard api rejects unknown actions with a usage error' );
+    like( $unknown_action->{error}, qr/Unknown api action: wat/, 'd2 api rejects unknown actions with a usage error' );
 
     chdir $original_cwd or die "Unable to restore cwd to $original_cwd: $!";
 }
@@ -1397,9 +1432,9 @@ chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
     my $original_cwd = cwd();
     chdir $fresh_home or die "Unable to chdir to $fresh_home: $!";
     my $fresh_add = _run_api_command_capture( 'add', '--key', 'fresh-client', '--maybe-secret', 'fresh-secret' );
-    is( $fresh_add->{exit_code}, 0, 'dashboard api add bootstraps config/api.json on a fresh runtime' );
+    is( $fresh_add->{exit_code}, 0, 'd2 api add bootstraps config/api.json on a fresh runtime' );
     my $fresh_file = File::Spec->catfile( $fresh_home, '.developer-dashboard', 'config', 'api.json' );
-    ok( -f $fresh_file, 'dashboard api add creates config/api.json when it was previously missing' );
+    ok( -f $fresh_file, 'd2 api add creates config/api.json when it was previously missing' );
     is( json_decode( _slurp_file($fresh_file) )->{'fresh-client'}{secret}, sha256_hex('fresh-secret'), 'fresh runtime API config stores the hashed maybe-secret' );
     chdir $original_cwd or die "Unable to restore cwd to $original_cwd: $!";
 }
@@ -1467,12 +1502,12 @@ __END__
 
 =head1 NAME
 
-22-cli-module-coverage.t - direct coverage tests for dashboard CLI helper modules
+22-cli-module-coverage.t - direct coverage tests for d2 CLI helper modules
 
 =head1 DESCRIPTION
 
 This test exercises the in-process helper code behind the built-in
-open-file and structured-data dashboard command paths so their library
+open-file and structured-data d2 command paths so their library
 coverage stays at 100%.
 
 =for comment FULL-POD-DOC START

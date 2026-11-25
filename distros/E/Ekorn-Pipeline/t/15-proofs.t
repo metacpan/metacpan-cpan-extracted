@@ -932,6 +932,8 @@ package My::Table {
 }
 
 package My::Set {    ## no critic (Modules::ProhibitMultiplePackages)
+
+
     sub as_list ($self) { return @$self }
 }
 

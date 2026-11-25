@@ -3,7 +3,7 @@
 ## Purpose
 
 Developer Dashboard now ships a built-in `housekeeper` collector and a matching
-`dashboard housekeeper` command.
+`d2 housekeeper` command.
 
 The cleanup target is the dashboard-owned shared temp area:
 
@@ -63,13 +63,13 @@ directory genuinely held nothing.
 Run it directly:
 
 ```bash
-dashboard housekeeper
+d2 housekeeper
 ```
 
 Run it through the managed collector surface:
 
 ```bash
-dashboard collector run housekeeper
+d2 collector run housekeeper
 ```
 
 The built-in collector runs every `900` seconds by default. A user or project

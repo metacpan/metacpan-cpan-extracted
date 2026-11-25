@@ -1,0 +1,66 @@
+{
+   "abstract" : "Query a bundled snapshot of Bioconda package metadata",
+   "author" : [
+      "Andrea Telatin <andrea.telatin@quadram.ac.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bioconda-Packages",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "File::ShareDir" : "0",
+            "File::ShareDir::Install" : "0",
+            "IO::Socket::SSL" : "1.42",
+            "Net::SSLeay" : "1.49"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "IO::Compress::Gzip" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/telatin/bioconda-packages.git",
+         "web" : "https://github.com/telatin/bioconda-packages"
+      }
+   },
+   "version" : "v2026.11.4",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

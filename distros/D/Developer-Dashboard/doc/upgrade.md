@@ -4,7 +4,7 @@ Developer Dashboard provides the same self-upgrade flow through both public
 entrypoints:
 
 ```text
-dashboard upgrade
+d2 upgrade
 d2 upgrade
 ```
 
@@ -27,7 +27,7 @@ Preview the exact platform, installer URL, and interpreter plan without a
 network request or host mutation:
 
 ```text
-dashboard upgrade --dry-run
+d2 upgrade --dry-run
 d2 upgrade --dry-run
 ```
 
@@ -43,7 +43,7 @@ prove -lv t/136-upgrade-cli.t
 
 Release-grade verification also requires the normal source-suite, all-metric
 coverage, packaged-install, and platform gates. Exercise `d2 upgrade --dry-run`
-and `dashboard upgrade --dry-run` after installing the built distribution in a
+and `d2 upgrade --dry-run` after installing the built distribution in a
 blank environment. Run the Unix path on the supported Linux container matrix
 and a real macOS QEMU guest, and run the PowerShell path on a real Windows QEMU
 guest.

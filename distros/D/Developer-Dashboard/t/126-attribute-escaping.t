@@ -92,6 +92,9 @@ sub drain {
 #    not put an executable tag into the rendered page or the editor. PageStore
 #    only rejects traversal components, so a quote in a BOOKMARK id reaches the
 #    route builders and used to close the href/action attribute it landed in.
+#    That holds where the file name can hold the id; on Windows the quote and
+#    angle brackets are illegal in file names, so the save boundary refuses the
+#    id instead (round 59) and the test pins that refusal there.
 # ---------------------------------------------------------------------------
 {
     my $page = Developer::Dashboard::PageDocument->new(
@@ -99,17 +102,32 @@ sub drain {
         title  => 'Planted',
         layout => { body => '<p>planted</p>' },
     );
-    $store->save_page($page);
 
-    for my $route ( "/app/$PAYLOAD", "/app/$PAYLOAD/edit" ) {
-        my $res  = $app->handle( path => $route, remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } );
-        my $body = drain( $res->[2] );
-        is( $res->[0], 200, "hostile bookmark id still serves $route" );
-        unlike( $body, $BREAKOUT, "$route does not break out of an HTML attribute into an executable tag" );
-        # The URL builders percent-encode the id before it ever reaches the
-        # attribute escaper, so the id survives as inert, valid-URL text
-        # instead of raw markup characters that only entity-escaping defuses.
-        like( $body, qr/probe%22%3E%3Csvg/, "$route carries the bookmark id percent-encoded in its URL attributes" );
+    # Windows cannot store this id: '"' '<' and '>' are illegal in Windows
+    # file names, so the write-branch sysopen fails and the save dies with
+    # 'Invalid page path' (round 59, PageStore.pm line 578). That refusal is
+    # the product's Windows behaviour - the web layer turns the same die into
+    # a clean 400 - so pin it here instead of skipping the block: the hostile
+    # id still never produces an executable tag on Windows, it just never
+    # gets saved.
+    if ( $^O eq 'MSWin32' ) {
+        my $saved = eval { $store->save_page($page); 1 };
+        ok( !$saved && $@ =~ /Invalid page path/,
+            'a bookmark id with Windows-illegal file-name characters is refused at the save boundary' );
+    }
+    else {
+        $store->save_page($page);
+
+        for my $route ( "/app/$PAYLOAD", "/app/$PAYLOAD/edit" ) {
+            my $res  = $app->handle( path => $route, remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } );
+            my $body = drain( $res->[2] );
+            is( $res->[0], 200, "hostile bookmark id still serves $route" );
+            unlike( $body, $BREAKOUT, "$route does not break out of an HTML attribute into an executable tag" );
+            # The URL builders percent-encode the id before it ever reaches the
+            # attribute escaper, so the id survives as inert, valid-URL text
+            # instead of raw markup characters that only entity-escaping defuses.
+            like( $body, qr/probe%22%3E%3Csvg/, "$route carries the bookmark id percent-encoded in its URL attributes" );
+        }
     }
 }
 
@@ -252,9 +270,12 @@ This test is the injection contract for the web layer's HTML attributes. A
 saved bookmark id is attacker-influenced data: it comes from the C<BOOKMARK:>
 directive of a submitted instruction, and the page store only rejects
 traversal components, so quotes and angle brackets reach the route builders
-intact. Every route string the web chrome and the bookmark editor interpolate
-into a quoted attribute must therefore be escaped, and no module under
-F<lib/> may introduce a new raw attribute interpolation.
+intact on platforms where the file name can hold them. On Windows the quote
+and angle brackets are illegal in file names, so the save boundary refuses
+such an id instead, and the test pins that refusal there. Every route string
+the web chrome and the bookmark editor interpolate into a quoted attribute
+must therefore be escaped, and no module under F<lib/> may introduce a new
+raw attribute interpolation.
 
 =head1 WHY IT EXISTS
 

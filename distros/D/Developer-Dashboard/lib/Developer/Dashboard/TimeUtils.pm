@@ -3,10 +3,11 @@ package Developer::Dashboard::TimeUtils;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Exporter 'import';
 use POSIX qw(strftime);
+use Time::Local qw(timegm);
 
 our @EXPORT_OK = qw(_now_iso8601);
 
@@ -25,7 +26,23 @@ sub _now_iso8601 {
         return strftime( '%Y-%m-%dT%H:%M:%SZ', gmtime() );
     }
     elsif ( $tz eq 'local' ) {
-        return strftime( '%Y-%m-%dT%H:%M:%S%z', localtime() );
+        # Do NOT use strftime %z here: on Windows the C runtime renders
+        # it as the timezone name ('GMT Standard Time') instead of a
+        # numeric offset, so the result would not be ISO-8601. Compute
+        # the numeric offset portably from the localtime/gmtime
+        # difference for this instant (DST included), then format it.
+        my $now            = time();
+        my @local          = localtime($now);
+        my $offset_seconds = timegm(@local) - $now;
+        my $sign           = $offset_seconds < 0 ? '-' : '+';
+        my $absolute       = abs($offset_seconds);
+        my $offset = sprintf(
+            '%s%02d%02d',
+            $sign,
+            int( $absolute / 3600 ),
+            int( ( $absolute % 3600 ) / 60 )
+        );
+        return strftime( '%Y-%m-%dT%H:%M:%S', @local ) . $offset;
     }
 
     die "_now_iso8601: unrecognized tz value '$tz' - expected 'utc' or 'local'\n";

@@ -16,7 +16,9 @@ use lib 'lib';
 
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Platform ();
+use Developer::Dashboard::PerlEnv;
 use Developer::Dashboard::SkillManager;
+use Developer::Dashboard::GoRoutine ();
 
 # ---------------------------------------------------------------------------
 # Hermetic runtime rooted in an isolated HOME. Config resolution keys off the
@@ -46,21 +48,28 @@ my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
 chdir $home or die "Unable to chdir to $home: $!";
 
+# The platform PATH separator: a ':' join mangles drive-letter entries on
+# Windows, so a fake bin directory prepended with ':' is never reached.
+my $path_sep = Developer::Dashboard::PerlEnv::path_separator();
+
 # A stub PATH so external dependency commands never touch the real system.
+# Every stub is written by _stub/_stub_exit, which produce a .cmd file on
+# Windows (a #!/bin/sh script cannot run where there is no sh) and the
+# shell script itself on Unix.
 my $fake_bin = tempdir( CLEANUP => 1 );
-_stub( 'cpanm',      "#!/bin/sh\nexit 0\n" );
-_stub( 'apt-get',    "#!/bin/sh\nexit 0\n" );
-_stub( 'apk',        "#!/bin/sh\nif [ \"\$1\" = info ]; then exit 1; fi\nexit 0\n" );
-_stub( 'dnf',        "#!/bin/sh\nexit 0\n" );
-_stub( 'brew',       "#!/bin/sh\nexit 0\n" );
-_stub( 'winget',     "#!/bin/sh\nexit 0\n" );
-_stub( 'dpkg-query', "#!/bin/sh\nexit 1\n" );
-_stub( 'rpm',        "#!/bin/sh\nexit 1\n" );
-_stub( 'sudo',       "#!/bin/sh\nexec \"\$@\"\n" );
-_stub( 'dashboard',  "#!/bin/sh\nexit 0\n" );
-_stub( 'make',       "#!/bin/sh\nexit 0\n" );
-_stub( 'docker',     "#!/bin/sh\nexit 0\n" );
-_stub( 'rsync',      "#!/bin/sh\nexit 0\n" );
+_stub_exit( 'cpanm',      0 );
+_stub_exit( 'apt-get',    0 );
+_stub( 'apk', "#!/bin/sh\nif [ \"\$1\" = info ]; then exit 1; fi\nexit 0\n", "\@echo off\nif \"%1\"==\"info\" exit /b 1\nexit /b 0\n" );
+_stub_exit( 'dnf',        0 );
+_stub_exit( 'brew',       0 );
+_stub_exit( 'winget',     0 );
+_stub_exit( 'dpkg-query', 1 );
+_stub_exit( 'rpm',        1 );
+_stub( 'sudo', "#!/bin/sh\nexec \"\$@\"\n", "\@echo off\n%*\n" );
+_stub_exit( 'd2',     0 );
+_stub_exit( 'make',   0 );
+_stub_exit( 'docker', 0 );
+_stub_exit( 'rsync',  0 );
 _stub(
     'npx',
     <<'SH',
@@ -72,10 +81,21 @@ for spec in "$@"; do
 done
 exit 0
 SH
+    <<'CMD',
+@echo off
+shift
+shift
+shift
+:next
+if "%~1"=="" exit /b 0
+for /f "tokens=1 delims=@" %%n in ("%~1") do mkdir "%CD%\node_modules\%%n" 2>nul
+shift
+goto next
+CMD
 );
-_stub( 'python',  "#!/bin/sh\nexit 0\n" );
-_stub( 'python3', "#!/bin/sh\nexit 0\n" );
-local $ENV{PATH} = "$fake_bin:" . ( $ENV{PATH} || '' );
+_stub_exit( 'python',  0 );
+_stub_exit( 'python3', 0 );
+local $ENV{PATH} = "$fake_bin$path_sep" . ( $ENV{PATH} || '' );
 
 my $paths   = Developer::Dashboard::PathRegistry->new( home => $home );
 my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
@@ -104,7 +124,13 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
 
     # Neither home variable set: the passwd database answers on a runtime that
     # has one.
-    {
+    SKIP: {
+        # getpwuid is unimplemented on Windows, so there is no passwd
+        # database to answer and the constructor dies with "Missing home
+        # directory" instead — the Windows shape of this block is the
+        # one below, which localizes the platform and expects that error.
+        skip 'getpwuid is unimplemented on Windows, so there is no passwd database to answer', 2
+          if $^O eq 'MSWin32';
         local %ENV = %ENV;
         delete $ENV{HOME};
         delete $ENV{USERPROFILE};
@@ -323,9 +349,8 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
         no warnings 'redefine';
         local *Developer::Dashboard::SkillManager::_rsync_available = sub { 1 };
         my $bin2 = tempdir( CLEANUP => 1 );
-        _spew( File::Spec->catfile( $bin2, 'rsync' ), "#!/bin/sh\nexit 3\n" );
-        chmod 0755, File::Spec->catfile( $bin2, 'rsync' );
-        local $ENV{PATH} = "$bin2:$ENV{PATH}";
+        _stub_at( File::Spec->catfile( $bin2, 'rsync' ), "#!/bin/sh\nexit 3\n", "\@echo off\nexit /b 3\n" );
+        local $ENV{PATH} = "$bin2$path_sep$ENV{PATH}";
         my $failed = $manager->_sync_local_skill_source( $src, File::Spec->catdir( tempdir( CLEANUP => 1 ), 'rf' ) );
         like( $failed->{error}, qr/Failed to sync local skill source/, 'sync reports rsync failures' );
     }
@@ -359,9 +384,8 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
 
     # Silent-failing git stub so both stderr and stdout are empty.
     my $bin2 = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin2, 'git' ), "#!/bin/sh\nexit 1\n" );
-    chmod 0755, File::Spec->catfile( $bin2, 'git' );
-    local $ENV{PATH} = "$bin2:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $bin2, 'git' ), "#!/bin/sh\nexit 1\n", "\@echo off\nexit /b 1\n" );
+    local $ENV{PATH} = _path_without_git($bin2);
     my $failed = $manager->_clone_skill_source( 'file:///nope', File::Spec->catdir( tempdir( CLEANUP => 1 ), 'c' ) );
     like( $failed->{error}, qr/git clone failed without output/, 'clone reports a fallback message when git is silent' );
 
@@ -449,7 +473,7 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     like( $@, qr/env must be a hash reference/, 'streaming command rejects a non-hash env' );
 
     # No cwd, no banner, real output on both handles.
-    my $run = $manager->_run_streaming_command( command => [ 'sh', '-c', 'printf out; printf err 1>&2' ] );
+    my $run = $manager->_run_streaming_command( command => [ $^X, '-e', 'print q{out}; print STDERR q{err}' ] );
     is( $run->{exit}, 0, 'streaming command runs without a cwd' );
     is( $run->{stdout}, 'out', 'streaming command captures stdout' );
     is( $run->{stderr}, 'err', 'streaming command captures stderr' );
@@ -459,13 +483,13 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     # raw $? stays set in the caller's process on return.
     {
         $? = 12 << 8;    ## no critic (Variables::RequireLocalizedPunctuationVars)
-        $manager->_run_streaming_command( command => [ 'sh', '-c', 'exit 0' ] );
+        $manager->_run_streaming_command( command => [ $^X, '-e', 'exit 0' ] );
         is( $? >> 8, 12,
             '_run_streaming_command does not leak its own child status into the caller global $?' );
     }
 
     # Empty cwd string takes the no-chdir path; empty banner is skipped.
-    my $empty_cwd = $manager->_run_streaming_command( command => ['true'], cwd => '', banner => '' );
+    my $empty_cwd = $manager->_run_streaming_command( command => [ $^X, '-e', 'exit 0' ], cwd => '', banner => '' );
     is( $empty_cwd->{exit}, 0, 'streaming command treats an empty cwd as no cwd' );
 
     # Real cwd plus a banner, streamed through an active progress task.
@@ -477,7 +501,7 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     local $progress_manager->{_active_dependency_task_id} = 'install_cpanfile';
     my $work = tempdir( CLEANUP => 1 );
     my $banner_run = $progress_manager->_run_streaming_command(
-        command => [ 'sh', '-c', 'printf "line-one\nline-two\n"' ],
+        command => [ $^X, '-e', 'print qq{line-one\nline-two\n}' ],
         cwd     => $work,
         banner  => 'starting',
         env     => { DD_STREAM_ENV => 'yes' },
@@ -490,9 +514,19 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     like( $@, qr/Unable to chdir to/, 'streaming command dies when the cwd cannot be entered' );
 
     # launcher failure (exec of a missing binary) is rethrown after chdir back.
+    # On Windows open3 falls back to cmd.exe for a missing binary instead of
+    # throwing, so the failure surfaces as a non-zero exit with cmd's message
+    # rather than an exception; the cwd is still restored.
     my $before_cwd = getcwd();
-    eval { $manager->_run_streaming_command( command => ['/nonexistent-binary-xyz'], cwd => $work ); 1 };
-    ok( $@, 'streaming command rethrows a launcher failure' );
+    if ( $^O eq 'MSWin32' ) {
+        my $missing = $manager->_run_streaming_command( command => ['/nonexistent-binary-xyz'], cwd => $work );
+        is( $missing->{exit}, 1, 'streaming command reports a launcher failure as a non-zero exit on Windows' );
+        like( $missing->{stderr}, qr/not recognized/, 'streaming command surfaces the missing binary through cmd on Windows' );
+    }
+    else {
+        eval { $manager->_run_streaming_command( command => ['/nonexistent-binary-xyz'], cwd => $work ); 1 };
+        ok( $@, 'streaming command rethrows a launcher failure' );
+    }
     is( getcwd(), $before_cwd, 'streaming command restores the original cwd after a launcher failure' );
 }
 
@@ -569,7 +603,7 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
         # With no DD_TEST_OS override, _current_os falls through to $^O.
         delete local $ENV{DD_TEST_OS};
         is( $manager->_current_os, $^O, 'current OS falls back to the real OS when unset' );
-        is( $manager->_is_windows, 0, 'windows detection falls back to the real OS when unset' );
+        is( $manager->_is_windows, $^O eq 'MSWin32' ? 1 : 0, 'windows detection falls back to the real OS when unset' );
     }
     {
         # Linux host, env overrides off: exercises the -f probes on the real host.
@@ -842,6 +876,7 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     }
     {
         local $ENV{DD_TEST_OS} = 'MSWin32';
+        local $ENV{PATH} = _path_without_winget($fake_bin);
         ok( !$manager->_install_skill_wingetfile($skill)->{error}, 'wingetfile install runs on Windows' );
     }
     {
@@ -872,11 +907,10 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     # Failure paths: the package manager exits non-zero.
     my $failbin = tempdir( CLEANUP => 1 );
     for my $cmd (qw(apk dnf winget brew apt-get docker cpanm npx python make dpkg-query)) {
-        _spew( File::Spec->catfile( $failbin, $cmd ), "#!/bin/sh\nexit 7\n" );
-        chmod 0755, File::Spec->catfile( $failbin, $cmd );
+        _stub_at( File::Spec->catfile( $failbin, $cmd ), "#!/bin/sh\nexit 7\n", "\@echo off\nexit /b 7\n" );
     }
     {
-        local $ENV{PATH} = "$failbin:$ENV{PATH}";
+        local $ENV{PATH} = "$failbin$path_sep$ENV{PATH}";
         {
             local $ENV{DD_TEST_OS} = 'linux';
             local $ENV{DD_TEST_ALPINE} = 1;
@@ -889,6 +923,7 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
         }
         {
             local $ENV{DD_TEST_OS} = 'MSWin32';
+            local $ENV{PATH} = _path_without_winget($failbin);
             like( $manager->_install_skill_wingetfile($skill)->{error}, qr/winget dependencies/, 'wingetfile install reports failures' );
         }
         {
@@ -950,9 +985,8 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     # Makefile failure surfaces through the eval wrapper.
     {
         my $failbin = tempdir( CLEANUP => 1 );
-        _spew( File::Spec->catfile( $failbin, 'make' ), "#!/bin/sh\necho boom 1>&2\nexit 2\n" );
-        chmod 0755, File::Spec->catfile( $failbin, 'make' );
-        local $ENV{PATH} = "$failbin:$ENV{PATH}";
+        _stub_at( File::Spec->catfile( $failbin, 'make' ), "#!/bin/sh\necho boom 1>&2\nexit 2\n", "\@echo off\n1>&2 echo boom\nexit /b 2\n" );
+        local $ENV{PATH} = "$failbin$path_sep$ENV{PATH}";
         like( $manager->_install_skill_makefile($makeskill)->{error}, qr/Failed to run skill Makefile target/, 'makefile install reports a target failure' );
     }
 
@@ -963,9 +997,8 @@ my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     ok( !$manager->_install_skill_dockerfile($dockerskill)->{error}, 'dockerfile install builds an image' );
     {
         my $failbin = tempdir( CLEANUP => 1 );
-        _spew( File::Spec->catfile( $failbin, 'docker' ), "#!/bin/sh\nexit 5\n" );
-        chmod 0755, File::Spec->catfile( $failbin, 'docker' );
-        local $ENV{PATH} = "$failbin:$ENV{PATH}";
+        _stub_at( File::Spec->catfile( $failbin, 'docker' ), "#!/bin/sh\nexit 5\n", "\@echo off\nexit /b 5\n" );
+        local $ENV{PATH} = "$failbin$path_sep$ENV{PATH}";
         like( $manager->_install_skill_dockerfile($dockerskill)->{error}, qr/Failed to build Docker image/, 'dockerfile install reports build failures' );
     }
 }
@@ -990,22 +1023,20 @@ my $repos = tempdir( CLEANUP => 1 );
     _run_or_die( 'git', 'clone', '--quiet', $main_repo, $head_target );
     {
         my $fake_git = tempdir( CLEANUP => 1 );
-        _spew( File::Spec->catfile( $fake_git, 'git' ), "#!/bin/sh\nprintf 'HEAD\\n'\n" );
-        chmod 0755, File::Spec->catfile( $fake_git, 'git' );
-        local $ENV{PATH} = "$fake_git:$ENV{PATH}";
+        _stub_at( File::Spec->catfile( $fake_git, 'git' ), "#!/bin/sh\nprintf 'HEAD\\n'\n", "\@echo off\necho HEAD\n" );
+        local $ENV{PATH} = _path_without_git($fake_git);
         is( $manager->_current_installed_skill_branch($head_target), undef,
             'branch lookup treats a successful detached HEAD response as unnamed' );
     }
     for my $probe (
-        [ 'empty', "#!/bin/sh\nexit 0\n", 'successful empty branch output' ],
-        [ 'stdout', "#!/bin/sh\necho branch-stdout\nexit 1\n", 'branch failure with stdout only' ],
-        [ 'silent', "#!/bin/sh\nexit 1\n", 'silent branch failure' ],
+        [ 'empty', "#!/bin/sh\nexit 0\n", "\@echo off\nexit /b 0\n", 'successful empty branch output' ],
+        [ 'stdout', "#!/bin/sh\necho branch-stdout\nexit 1\n", "\@echo off\necho branch-stdout\nexit /b 1\n", 'branch failure with stdout only' ],
+        [ 'silent', "#!/bin/sh\nexit 1\n", "\@echo off\nexit /b 1\n", 'silent branch failure' ],
     ) {
-        my ( $label, $script, $description ) = @{$probe};
+        my ( $label, $script, $cmd_script, $description ) = @{$probe};
         my $fake_git = tempdir( CLEANUP => 1 );
-        _spew( File::Spec->catfile( $fake_git, 'git' ), $script );
-        chmod 0755, File::Spec->catfile( $fake_git, 'git' );
-        local $ENV{PATH} = "$fake_git:$ENV{PATH}";
+        _stub_at( File::Spec->catfile( $fake_git, 'git' ), $script, $cmd_script );
+        local $ENV{PATH} = _path_without_git($fake_git);
         my $branch_result = $manager->_current_installed_skill_branch($head_target);
         is( $branch_result, undef, "$description is handled without inventing a current branch ($label)" )
           if $label eq 'empty';
@@ -1032,22 +1063,19 @@ my $repos = tempdir( CLEANUP => 1 );
     like( $manager->_validate_skill_branch('bad..branch')->{error}, qr/Invalid skill branch/, 'git ref validation rejects an invalid branch name' );
 
     my $fake_git = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $fake_git, 'git' ), "#!/bin/sh\necho branch lookup failed >&2\nexit 1\n" );
-    chmod 0755, File::Spec->catfile( $fake_git, 'git' );
-    local $ENV{PATH} = "$fake_git:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $fake_git, 'git' ), "#!/bin/sh\necho branch lookup failed >&2\nexit 1\n", "\@echo off\n1>&2 echo branch lookup failed\nexit /b 1\n" );
+    local $ENV{PATH} = _path_without_git($fake_git);
     like( $manager->_current_installed_skill_branch($main_target)->{error}, qr/Unable to detect current branch/, 'branch lookup reports git errors instead of silently changing branches' );
 
     my $stdout_git = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $stdout_git, 'git' ), "#!/bin/sh\necho ref-check-stdout\nexit 1\n" );
-    chmod 0755, File::Spec->catfile( $stdout_git, 'git' );
-    local $ENV{PATH} = "$stdout_git:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $stdout_git, 'git' ), "#!/bin/sh\necho ref-check-stdout\nexit 1\n", "\@echo off\necho ref-check-stdout\nexit /b 1\n" );
+    local $ENV{PATH} = _path_without_git($stdout_git);
     like( $manager->_validate_skill_branch('invalid-test')->{error}, qr/ref-check-stdout/,
         'ref validation includes a stdout-only git diagnostic' );
 
     my $silent_git = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $silent_git, 'git' ), "#!/bin/sh\nexit 1\n" );
-    chmod 0755, File::Spec->catfile( $silent_git, 'git' );
-    local $ENV{PATH} = "$silent_git:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $silent_git, 'git' ), "#!/bin/sh\nexit 1\n", "\@echo off\nexit /b 1\n" );
+    local $ENV{PATH} = _path_without_git($silent_git);
     like( $manager->_validate_skill_branch('invalid-test')->{error}, qr/git rejected the branch name/,
         'ref validation supplies a clear diagnostic when git is silent' );
 }
@@ -1163,9 +1191,8 @@ my $repos = tempdir( CLEANUP => 1 );
     # update failure: git pull fails against a broken remote.
     {
         my $failbin = tempdir( CLEANUP => 1 );
-        _spew( File::Spec->catfile( $failbin, 'git' ), "#!/bin/sh\necho nope 1>&2\nexit 1\n" );
-        chmod 0755, File::Spec->catfile( $failbin, 'git' );
-        local $ENV{PATH} = "$failbin:$ENV{PATH}";
+        _stub_at( File::Spec->catfile( $failbin, 'git' ), "#!/bin/sh\necho nope 1>&2\nexit 1\n", "\@echo off\n1>&2 echo nope\nexit /b 1\n" );
+        local $ENV{PATH} = _path_without_git($failbin);
         like( $manager->update('rich-skill')->{error}, qr/Failed to update skill/, 'update reports git pull failures' );
     }
 
@@ -1722,7 +1749,9 @@ my $repos = tempdir( CLEANUP => 1 );
         delete local $ENV{DD_TEST_DEBIAN_LIKE};
         delete local $ENV{DD_TEST_ALPINE};
         delete local $ENV{DD_TEST_FEDORA};
-        is_deeply( [ $manager->_host_progress_system_task_ids ], ['install_aptfile'], 'host progress detects Debian from the filesystem marker' );
+        is_deeply( [ $manager->_host_progress_system_task_ids ],
+            $^O eq 'MSWin32' ? ['install_wingetfile'] : $^O eq 'darwin' ? ['install_brewfile'] : ['install_aptfile'],
+            'host progress detects the native package manager' );
     }
 }
 
@@ -1731,15 +1760,13 @@ my $repos = tempdir( CLEANUP => 1 );
 # ===========================================================================
 {
     my $bin = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin, 'dpkg-query' ), "#!/bin/sh\nprintf 'install ok installed'\nexit 0\n" );
-    chmod 0755, File::Spec->catfile( $bin, 'dpkg-query' );
-    local $ENV{PATH} = "$bin:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $bin, 'dpkg-query' ), "#!/bin/sh\nprintf 'install ok installed'\nexit 0\n", "\@echo off\necho install ok installed\nexit /b 0\n" );
+    local $ENV{PATH} = "$bin$path_sep$ENV{PATH}";
     is( $manager->_apt_package_is_installed('git'), 1, 'apt detection recognizes an installed package' );
 
     my $bin2 = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin2, 'dpkg-query' ), "#!/bin/sh\nprintf 'unknown'\nexit 0\n" );
-    chmod 0755, File::Spec->catfile( $bin2, 'dpkg-query' );
-    local $ENV{PATH} = "$bin2:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $bin2, 'dpkg-query' ), "#!/bin/sh\nprintf 'unknown'\nexit 0\n", "\@echo off\necho unknown\nexit /b 0\n" );
+    local $ENV{PATH} = "$bin2$path_sep$ENV{PATH}";
     is( $manager->_apt_package_is_installed('nope'), 0, 'apt detection rejects an unmatched dpkg status' );
 }
 
@@ -1760,9 +1787,8 @@ my $repos = tempdir( CLEANUP => 1 );
     {
         my ( $method, $bin_name ) = @$spec;
         my $bin = tempdir( CLEANUP => 1 );
-        _spew( File::Spec->catfile( $bin, $bin_name ), "#!/bin/sh\nexit 1\n" );
-        chmod 0755, File::Spec->catfile( $bin, $bin_name );
-        local $ENV{PATH} = "$bin:$ENV{PATH}";
+        _stub_at( File::Spec->catfile( $bin, $bin_name ), "#!/bin/sh\nexit 1\n", "\@echo off\nexit /b 1\n" );
+        local $ENV{PATH} = "$bin$path_sep$ENV{PATH}";
         $? = 19 << 8;    ## no critic (Variables::RequireLocalizedPunctuationVars)
         $manager->$method('not-a-real-package');
         is( $? >> 8, 19, "$method does not leak its own $bin_name subprocess status into the caller global \$?" );
@@ -1780,12 +1806,10 @@ my $repos = tempdir( CLEANUP => 1 );
 
     # Success with output: apt-get echoes and exits 0.
     my $okbin = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $okbin, 'apt-get' ),    "#!/bin/sh\nprintf 'installing pkg\\n'\nprintf 'apt-note\\n' 1>&2\nexit 0\n" );
-    _spew( File::Spec->catfile( $okbin, 'dpkg-query' ), "#!/bin/sh\nexit 1\n" );
-    chmod 0755, File::Spec->catfile( $okbin, 'apt-get' );
-    chmod 0755, File::Spec->catfile( $okbin, 'dpkg-query' );
+    _stub_at( File::Spec->catfile( $okbin, 'apt-get' ),    "#!/bin/sh\nprintf 'installing pkg\\n'\nprintf 'apt-note\\n' 1>&2\nexit 0\n", "\@echo off\necho installing pkg\n1>&2 echo apt-note\nexit /b 0\n" );
+    _stub_at( File::Spec->catfile( $okbin, 'dpkg-query' ), "#!/bin/sh\nexit 1\n", "\@echo off\nexit /b 1\n" );
     {
-        local $ENV{PATH}                = "$okbin:$ENV{PATH}";
+        local $ENV{PATH}                = "$okbin$path_sep$ENV{PATH}";
         local $ENV{DD_TEST_OS}          = 'linux';
         local $ENV{DD_TEST_DEBIAN_LIKE} = 1;
         my $res = $manager->_install_skill_dependencies($skill);
@@ -1795,12 +1819,10 @@ my $repos = tempdir( CLEANUP => 1 );
 
     # Failure with the aptfile task visible (Debian host view).
     my $failbin = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $failbin, 'apt-get' ),    "#!/bin/sh\nprintf 'boom\\n' 1>&2\nexit 9\n" );
-    _spew( File::Spec->catfile( $failbin, 'dpkg-query' ), "#!/bin/sh\nexit 1\n" );
-    chmod 0755, File::Spec->catfile( $failbin, 'apt-get' );
-    chmod 0755, File::Spec->catfile( $failbin, 'dpkg-query' );
+    _stub_at( File::Spec->catfile( $failbin, 'apt-get' ),    "#!/bin/sh\nprintf 'boom\\n' 1>&2\nexit 9\n", "\@echo off\n1>&2 echo boom\nexit /b 9\n" );
+    _stub_at( File::Spec->catfile( $failbin, 'dpkg-query' ), "#!/bin/sh\nexit 1\n", "\@echo off\nexit /b 1\n" );
     {
-        local $ENV{PATH}                = "$failbin:$ENV{PATH}";
+        local $ENV{PATH}                = "$failbin$path_sep$ENV{PATH}";
         local $ENV{DD_TEST_OS}          = 'linux';
         local $ENV{DD_TEST_DEBIAN_LIKE} = 1;
         like( $manager->_install_skill_dependencies($skill)->{error}, qr/apt dependencies/, 'dependency install reports a visible-task failure' );
@@ -1808,7 +1830,7 @@ my $repos = tempdir( CLEANUP => 1 );
 
     # Failure with the aptfile task hidden (macOS host view) but still executed.
     {
-        local $ENV{PATH}                = "$failbin:$ENV{PATH}";
+        local $ENV{PATH}                = "$failbin$path_sep$ENV{PATH}";
         local $ENV{DD_TEST_OS}          = 'darwin';
         local $ENV{DD_TEST_DEBIAN_LIKE} = 1;
         like( $manager->_install_skill_dependencies($skill)->{error}, qr/apt dependencies/, 'dependency install reports a hidden-task failure' );
@@ -1824,10 +1846,9 @@ my $repos = tempdir( CLEANUP => 1 );
     make_path($skill);
     _spew( File::Spec->catfile( $skill, 'ddfile' ), "loop-dep\n" );
     my $bin = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin, 'dashboard' ), "#!/bin/sh\nprintf out\nprintf err 1>&2\nexit 0\n" );
-    chmod 0755, File::Spec->catfile( $bin, 'dashboard' );
+    _stub_at( File::Spec->catfile( $bin, 'd2' ), "#!/bin/sh\nprintf out\nprintf err 1>&2\nexit 0\n", "\@echo off\n<nul set /p=out\n1>&2 <nul set /p=err\nexit /b 0\n" );
     {
-        local $ENV{PATH} = "$bin:$ENV{PATH}";
+        local $ENV{PATH} = "$bin$path_sep$ENV{PATH}";
         my $res = $manager->_install_skill_ddfile($skill);
         ok( !$res->{error}, 'dependency manifest install runs a dependent skill' ) or diag $res->{error};
         is( $res->{stdout}, 'out', 'dependency manifest install collects dependent stdout' );
@@ -1836,7 +1857,7 @@ my $repos = tempdir( CLEANUP => 1 );
     # A pre-seeded install stack short-circuits the split fallback and marks
     # the running skill and stack entries as already-seen dependencies.
     {
-        local $ENV{PATH} = "$bin:$ENV{PATH}";
+        local $ENV{PATH} = "$bin$path_sep$ENV{PATH}";
         local $ENV{DEVELOPER_DASHBOARD_INSTALL_STACK} = 'loop-dep:already';
         ok( $manager->_install_skill_ddfile($skill)->{skipped}, 'dependency manifest install honours a pre-seeded install stack' );
     }
@@ -1846,10 +1867,9 @@ my $repos = tempdir( CLEANUP => 1 );
     make_path($skill2);
     _spew( File::Spec->catfile( $skill2, 'ddfile' ), "silent-dep\n" );
     my $bin2 = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin2, 'dashboard' ), "#!/bin/sh\nexit 0\n" );
-    chmod 0755, File::Spec->catfile( $bin2, 'dashboard' );
+    _stub_at( File::Spec->catfile( $bin2, 'd2' ), "#!/bin/sh\nexit 0\n", "\@echo off\nexit /b 0\n" );
     {
-        local $ENV{PATH} = "$bin2:$ENV{PATH}";
+        local $ENV{PATH} = "$bin2$path_sep$ENV{PATH}";
         ok( $manager->_install_skill_ddfile($skill2)->{skipped}, 'dependency manifest install skips when the dependent is silent' );
     }
 
@@ -1858,10 +1878,9 @@ my $repos = tempdir( CLEANUP => 1 );
     make_path($skill3);
     _spew( File::Spec->catfile( $skill3, 'ddfile' ), "stderr-dep\n" );
     my $bin3 = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin3, 'dashboard' ), "#!/bin/sh\nprintf warn 1>&2\nexit 0\n" );
-    chmod 0755, File::Spec->catfile( $bin3, 'dashboard' );
+    _stub_at( File::Spec->catfile( $bin3, 'd2' ), "#!/bin/sh\nprintf warn 1>&2\nexit 0\n", "\@echo off\n1>&2 <nul set /p=warn\nexit /b 0\n" );
     {
-        local $ENV{PATH} = "$bin3:$ENV{PATH}";
+        local $ENV{PATH} = "$bin3$path_sep$ENV{PATH}";
         my $res = $manager->_install_skill_ddfile($skill3);
         is( $res->{stderr}, 'warn', 'dependency manifest install collects dependent stderr alone' );
     }
@@ -1886,12 +1905,11 @@ my $repos = tempdir( CLEANUP => 1 );
         my $victim = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'victim-cwd' );
         make_path($victim);
         my $killbin = tempdir( CLEANUP => 1 );
-        _spew( File::Spec->catfile( $killbin, 'dashboard' ), "#!/bin/sh\nrmdir '$victim'\nexit 0\n" );
-        chmod 0755, File::Spec->catfile( $killbin, 'dashboard' );
+        _stub_at( File::Spec->catfile( $killbin, 'd2' ), "#!/bin/sh\nrmdir '$victim'\nexit 0\n", "\@echo off\nrmdir \"$victim\"\nexit /b 0\n" );
         my $save = getcwd();
         chdir $victim or die "Unable to chdir to $victim: $!";
         {
-            local $ENV{PATH} = "$killbin:$ENV{PATH}";
+            local $ENV{PATH} = "$killbin$path_sep$ENV{PATH}";
             eval { $manager->_install_skill_ddfile($depskill); 1 };
         }
         my $err = $@;
@@ -1917,11 +1935,9 @@ my $repos = tempdir( CLEANUP => 1 );
     make_path($skill);
     _spew( File::Spec->catfile( $skill, 'requirements.txt' ), "requests\n" );
     my $bin = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin, 'python' ),  "#!/bin/sh\nexit 4\n" );
-    _spew( File::Spec->catfile( $bin, 'python3' ), "#!/bin/sh\nexit 4\n" );
-    chmod 0755, File::Spec->catfile( $bin, 'python' );
-    chmod 0755, File::Spec->catfile( $bin, 'python3' );
-    local $ENV{PATH} = "$bin:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $bin, 'python' ),  "#!/bin/sh\nexit 4\n", "\@echo off\nexit /b 4\n" );
+    _stub_at( File::Spec->catfile( $bin, 'python3' ), "#!/bin/sh\nexit 4\n", "\@echo off\nexit /b 4\n" );
+    local $ENV{PATH} = "$bin$path_sep$ENV{PATH}";
     like( $manager->_install_skill_requirements_txt($skill)->{error}, qr/Failed to install skill Python dependencies/, 'requirements.txt install reports pip failures' );
 }
 
@@ -1933,9 +1949,8 @@ my $repos = tempdir( CLEANUP => 1 );
 {
     local $ENV{DEVELOPER_DASHBOARD_SKILL_INSTALL_TIMEOUT_MS} = 200;
     my $bin = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin, 'npx' ), "#!/bin/sh\nsleep 30\n" );
-    chmod 0755, File::Spec->catfile( $bin, 'npx' );
-    local $ENV{PATH} = "$bin:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $bin, 'npx' ), "#!/bin/sh\nsleep 30\n", "\@echo off\nping -n 31 127.0.0.1 >nul\n" );
+    local $ENV{PATH} = "$bin$path_sep$ENV{PATH}";
 
     my $skill = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'node-hang' );
     make_path($skill);
@@ -1950,11 +1965,9 @@ my $repos = tempdir( CLEANUP => 1 );
 {
     local $ENV{DEVELOPER_DASHBOARD_SKILL_INSTALL_TIMEOUT_MS} = 200;
     my $bin = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin, 'python' ),  "#!/bin/sh\nsleep 30\n" );
-    _spew( File::Spec->catfile( $bin, 'python3' ), "#!/bin/sh\nsleep 30\n" );
-    chmod 0755, File::Spec->catfile( $bin, 'python' );
-    chmod 0755, File::Spec->catfile( $bin, 'python3' );
-    local $ENV{PATH} = "$bin:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $bin, 'python' ),  "#!/bin/sh\nsleep 30\n", "\@echo off\nping -n 31 127.0.0.1 >nul\n" );
+    _stub_at( File::Spec->catfile( $bin, 'python3' ), "#!/bin/sh\nsleep 30\n", "\@echo off\nping -n 31 127.0.0.1 >nul\n" );
+    local $ENV{PATH} = "$bin$path_sep$ENV{PATH}";
 
     my $skill = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'py-hang' );
     make_path($skill);
@@ -1979,14 +1992,14 @@ my $repos = tempdir( CLEANUP => 1 );
 {
     # _run_streaming_command: timeout_ms is opt-in - omitted means unbounded
     # behavior is unchanged for every other caller.
-    my $run = $manager->_run_streaming_command( command => [ 'sh', '-c', 'printf ok' ] );
+    my $run = $manager->_run_streaming_command( command => [ $^X, '-e', 'print q{ok}' ] );
     is( $run->{stdout}, 'ok', 'streaming command without timeout_ms runs unbounded as before' );
     ok( !$run->{timed_out}, 'streaming command without timeout_ms never reports timed_out' );
 }
 {
     # _run_streaming_command: a real command finishing within its timeout
     # completes normally rather than being killed.
-    my $run = $manager->_run_streaming_command( command => [ 'sh', '-c', 'printf fast' ], timeout_ms => 5000 );
+    my $run = $manager->_run_streaming_command( command => [ $^X, '-e', 'print q{fast}' ], timeout_ms => 5000 );
     is( $run->{stdout}, 'fast', 'streaming command with a generous timeout still completes normally' );
     ok( !$run->{timed_out}, 'streaming command completing in time never reports timed_out' );
 }
@@ -1998,41 +2011,41 @@ my $repos = tempdir( CLEANUP => 1 );
     # it, even while ignored, exercising the same "reaped without KILL"
     # branch as a cooperative child - looping keeps it alive past the whole
     # window), and the child must have its ignore-handler installed BEFORE
-    # terminate sends TERM (a bare fork with no synchronization races: TERM
-    # can arrive before the child's first statement runs, in which case the
+    # terminate sends TERM (an unsynchronized process launch races: TERM
+    # can arrive before the child's handler setup runs, in which case the
     # default disposition kills it immediately and no escalation is ever
     # exercised - confirmed by reproducing this race directly). A readiness
     # file makes the parent wait for the handler to be installed first.
     my $ready = File::Spec->catfile( tempdir( CLEANUP => 1 ), 'ready' );
-    my $pid = fork;
-    die "fork failed: $!" if !defined $pid;    # uncoverable branch true
-    if ( $pid == 0 ) {
-        local $SIG{TERM} = 'IGNORE';
-        open my $fh, '>', $ready or die "Unable to write $ready: $!";    # uncoverable branch true
-        close $fh;
-        sleep 1 for 1 .. 30;
-        exit 0;    # uncoverable statement
-    }
+    my $pid = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', q{
+            my ($ready) = @ARGV;
+            $SIG{TERM} = 'IGNORE';
+            open my $fh, '>', $ready or die "Unable to write $ready: $!";
+            close $fh or die "Unable to close $ready: $!";
+            sleep 1 for 1 .. 30;
+        }, $ready ],
+        {},
+    );
+    die "GoRoutine spawn failed: $!" if !defined $pid;
     my $waited_ready = 0;
     while ( !-e $ready && $waited_ready < 500 ) {
         select( undef, undef, undef, 0.005 );
         $waited_ready++;
     }
     $manager->_terminate_streaming_command($pid);
-    my $waited = waitpid( $pid, 1 );
-    ok( $waited == $pid || $waited == -1, 'terminate escalates to KILL when the child ignores TERM, and it is reaped' );
+    ok( Developer::Dashboard::GoRoutine::process_exited($pid),
+        'terminate escalates to KILL when the child ignores TERM, and it is reaped' );
 
     # A child reaped by someone else before terminate is called: the internal
     # waitpid answers -1 (no such child), exercising that side of the
     # $waited == $pid || $waited == -1 condition without needing a KILL -
     # matching CollectorRunner::_terminate_command_process's own established
     # test for the identical pattern (t/115-collectorrunner-coverage-2.t).
-    my $gone = fork;
-    die "fork failed: $!" if !defined $gone;    # uncoverable branch true
-    if ( $gone == 0 ) {
-        exit 0;    # uncoverable statement
-    }
-    waitpid( $gone, 0 );
+    my $gone = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'exit 0;' ], {} );
+    die "GoRoutine spawn failed: $!" if !defined $gone;
+    is( Developer::Dashboard::GoRoutine::wait_process($gone), 0,
+        'already-finished process fixture exits before the termination check' );
     ok( $manager->_terminate_streaming_command($gone),
         'terminate treats a waitpid of -1 as an already-reaped child, without escalating to KILL' );
 
@@ -2235,9 +2248,8 @@ my $repos = tempdir( CLEANUP => 1 );
     make_path($skill);
     _spew( File::Spec->catfile( $skill, 'wingetfile' ), "Git.Git\n" );
     my $bin = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin, 'winget' ), "#!/bin/sh\nprintf out\nprintf err 1>&2\nexit 0\n" );
-    chmod 0755, File::Spec->catfile( $bin, 'winget' );
-    local $ENV{PATH}       = "$bin:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $bin, 'winget' ), "#!/bin/sh\nprintf out\nprintf err 1>&2\nexit 0\n", "\@echo off\n<nul set /p=out\n1>&2 <nul set /p=err\nexit /b 0\n" );
+    local $ENV{PATH}       = _path_without_winget($bin);
     local $ENV{DD_TEST_OS} = 'MSWin32';
     my $res = $manager->_install_skill_wingetfile($skill);
     ok( !$res->{error}, 'wingetfile install runs and accumulates output' ) or diag $res->{error};
@@ -2257,9 +2269,8 @@ my $repos = tempdir( CLEANUP => 1 );
     make_path($skill2);
     _spew( File::Spec->catfile( $skill2, 'Makefile' ), "install:\n\t\@:\n" );
     my $bin = tempdir( CLEANUP => 1 );
-    _spew( File::Spec->catfile( $bin, 'make' ), "#!/bin/sh\nprintf out\nprintf err 1>&2\nexit 0\n" );
-    chmod 0755, File::Spec->catfile( $bin, 'make' );
-    local $ENV{PATH} = "$bin:$ENV{PATH}";
+    _stub_at( File::Spec->catfile( $bin, 'make' ), "#!/bin/sh\nprintf out\nprintf err 1>&2\nexit 0\n", "\@echo off\n<nul set /p=out\n1>&2 <nul set /p=err\nexit /b 0\n" );
+    local $ENV{PATH} = "$bin$path_sep$ENV{PATH}";
     ok( !$manager->_install_skill_makefile($skill2)->{error}, 'makefile install collects make stdout and stderr' );
 }
 
@@ -2448,11 +2459,88 @@ done_testing;
 
 # _stub($name, $body): writes an executable stub into the fake PATH bin.
 sub _stub {
-    my ( $name, $body ) = @_;
-    my $path = File::Spec->catfile( $fake_bin, $name );
-    _spew( $path, $body );
+    my ( $name, $shell_body, $cmd_body ) = @_;
+    return _stub_at( File::Spec->catfile( $fake_bin, $name ), $shell_body, $cmd_body );
+}
+
+# _stub_exit($name, $code): a fake-bin stub that just exits with $code.
+sub _stub_exit {
+    my ( $name, $code ) = @_;
+    return _stub( $name, "#!/bin/sh\nexit $code\n", "\@echo off\nexit /b $code\n" );
+}
+
+# _stub_at($path, $shell_body, $cmd_body): writes a fake executable stub
+# runnable on this platform at $path. On Windows the stub is the .cmd form
+# (a #!/bin/sh script cannot run where there is no sh), reached through
+# cmd.exe's PATHEXT fallback when a direct spawn finds no same-named .exe
+# (see _path_without_git); on Unix it is the shell script itself, made
+# executable. The .cmd body is given alongside the shell body so the two
+# stay visibly in step.
+sub _stub_at {
+    my ( $path, $shell_body, $cmd_body ) = @_;
+    if ( $^O eq 'MSWin32' ) {
+        my ( $vol, $dir, $file ) = File::Spec->splitpath($path);
+        $path = File::Spec->catpath( $vol, $dir, "$file.cmd" );
+        _spew( $path, $cmd_body );
+        return $path;
+    }
+    _spew( $path, $shell_body );
     chmod 0755, $path or die "Unable to chmod $path: $!";
     return $path;
+}
+
+# _path_without_git($fake_bin): a PATH with $fake_bin first and every
+# directory holding a real git.exe/git.com removed. On Windows a direct
+# spawn finds a same-named .exe in a later PATH directory before a .cmd
+# stub in an earlier one (only when no .exe exists anywhere in PATH does
+# the spawn fall back to cmd.exe, which honours PATHEXT and runs the
+# stub), so a fake git only shadows the real one when no git executable
+# remains in PATH at all. On Unix the fake directory is simply first,
+# since no directory holds a git.exe.
+sub _path_without_git {
+    my ($fake_bin) = @_;
+    return "$fake_bin$path_sep$ENV{PATH}" if $^O ne 'MSWin32';
+    my @kept;
+    for my $dir ( split /\Q$path_sep\E/, ( $ENV{PATH} || '' ) ) {
+        next if $dir eq '';
+        push @kept, $dir
+          if !-f File::Spec->catfile( $dir, 'git.exe' )
+          && !-f File::Spec->catfile( $dir, 'git.com' );
+    }
+    return join( $path_sep, $fake_bin, @kept );
+}
+
+# _path_without_winget($fake_bin): like _path_without_git, but for winget.
+# The new Windows box has a real winget.exe (the App Installer execution
+# alias in the user's WindowsApps directory) in PATH; a direct spawn finds
+# it before the winget.cmd stub, so the test would run the real installer
+# instead of the stub. The alias is a 0-byte reparse point that Perl's
+# -f, -e and -l all miss (stat fails on it), so the directory is detected
+# by listing it instead: readdir sees winget.exe where stat cannot.
+sub _path_without_winget {
+    my ($fake_bin) = @_;
+    return "$fake_bin$path_sep$ENV{PATH}" if $^O ne 'MSWin32';
+    my @kept;
+    for my $dir ( split /\Q$path_sep\E/, ( $ENV{PATH} || '' ) ) {
+        next if $dir eq '';
+        push @kept, $dir if !_dir_has_winget($dir);
+    }
+    return join( $path_sep, $fake_bin, @kept );
+}
+
+# _dir_has_winget($dir): true when the directory lists winget.exe or
+# winget.com. Listing, not stat: an App Installer execution alias is a
+# reparse point that -f/-e/-l cannot see, but readdir reports it.
+sub _dir_has_winget {
+    my ($dir) = @_;
+    opendir my $dh, $dir or return 0;
+    my @entries = readdir $dh;
+    closedir $dh;
+    for my $entry (@entries) {
+        my $lower = lc $entry;
+        return 1 if $lower eq 'winget.exe' || $lower eq 'winget.com';
+    }
+    return 0;
 }
 
 # _spew($path, $content): writes a file, creating parent directories.

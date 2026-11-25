@@ -13,6 +13,8 @@ package My::Odd {
     our @ISA = 'Ekorn::Pipeline';
 
     our @STAGES;
+
+
     sub stages ($self) { return @STAGES }
 }
 

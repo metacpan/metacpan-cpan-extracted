@@ -2,7 +2,9 @@ use strict;
 use warnings;
 
 use Capture::Tiny qw(capture);
+use Config ();
 use Cwd qw(abs_path);
+use Fcntl qw(:flock);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -26,6 +28,30 @@ my $shortfall = "File              stmt   bran   cond    sub  total\nTotal      
 plan skip_all => 'Devel::Cover is not installed, so the coverage gate cannot be exercised'
   if !eval { require Devel::Cover::DB::IO; 1 };
 
+# Purpose: serialise this file against t/149-coverage-gate-moving-target.t.
+# Input: none. Output: an exclusive flock held for the life of this process.
+# t/149 deliberately creates a file under t/ while its own gate run is in
+# progress, to prove the gate notices a moving tree. The gate fingerprints
+# t/ and lib/ before and after the suite, so when prove -j runs both files
+# at once, t/149's probe can land inside this file's fingerprint window and
+# the gate refuses to report - a failure that looks like a defect in the
+# gate but is only the two files racing each other. The gate already
+# sequences these two files for the suites it runs itself; the outer
+# harness (dzil test, prove -j) knows no such rule, so the files sequence
+# themselves here instead. The lock file lives in the system temp dir,
+# never under t/ or lib/, so creating it cannot itself change the
+# fingerprint. The handle is a file-scope lexical, never closed explicitly:
+# the flock is released when the process exits, after END blocks run, so
+# it covers every gate invocation in this file.
+my $serial_lock_dir = File::Spec->tmpdir();
+$serial_lock_dir = '.' if !defined $serial_lock_dir || !-d $serial_lock_dir;
+my $serial_lock_path
+  = File::Spec->catfile( $serial_lock_dir, 'developer-dashboard-coverage-gate-148-149.lock' );
+open my $serial_lock_fh, '>>', $serial_lock_path
+  or die "cannot open serial lock $serial_lock_path: $!";
+flock $serial_lock_fh, LOCK_EX
+  or die "cannot lock $serial_lock_path: $!";
+
 # The scripted stand-in used for both cover and prove. It records the
 # environment it observed before doing anything, which is how the one-
 # environment guarantee is measured rather than assumed.
@@ -38,10 +64,11 @@ my $root = '__STUB_ROOT__';
 my $name = '__STUB_NAME__';
 
 open my $log, '>>', "$root/invocations.log" or die "stub cannot log: $!";
-printf {$log} "%s\t%s\t%s\t%s\n",
+printf {$log} "%s\t%s\t%s\t%s\t%s\n",
     $name,
     defined $ENV{PERL5LIB} ? $ENV{PERL5LIB} : '(unset)',
     defined $ENV{DD_COVERAGE_GATE_PROBE} ? $ENV{DD_COVERAGE_GATE_PROBE} : '(unset)',
+    defined $ENV{HARNESS_PERL_SWITCHES} ? $ENV{HARNESS_PERL_SWITCHES} : '(unset)',
     join ' ', @ARGV;
 close $log or die "stub cannot close its log: $!";
 
@@ -55,7 +82,9 @@ sub slurp {
 
 if ( $name eq 'prove' ) {
     print "stub prove ran the suite\n";
-    exit slurp("$root/prove.exit") + 0;
+    my $native_thread_suite = grep { /(?:^|\/)t\/231-goroutine-integration\.t\z/ } @ARGV;
+    my $exit_file = $native_thread_suite ? 'native-prove.exit' : 'prove.exit';
+    exit slurp("$root/$exit_file") + 0;
 }
 
 exit 0 if grep { $_ eq '-delete' } @ARGV;
@@ -102,6 +131,7 @@ sub build_stub_path {
     write_file( File::Spec->catfile( $dir, 'report.err' ),  defined $behaviour{report_err}  ? $behaviour{report_err}  : '' );
     write_file( File::Spec->catfile( $dir, 'report.exit' ), defined $behaviour{report_exit} ? $behaviour{report_exit} : 0 );
     write_file( File::Spec->catfile( $dir, 'prove.exit' ),  defined $behaviour{prove_exit}  ? $behaviour{prove_exit}  : 0 );
+    write_file( File::Spec->catfile( $dir, 'native-prove.exit' ), defined $behaviour{native_prove_exit} ? $behaviour{native_prove_exit} : 0 );
 
     for my $name (qw(cover prove)) {
         my $body = $STUB_TEMPLATE;
@@ -152,10 +182,34 @@ sub invocations {
     my ($stub) = @_;
     my @rows;
     for my $line ( grep { length } split /\n/, slurp_file( $stub->{log} ) ) {
-        my ( $name, $library, $probe, $arguments ) = split /\t/, $line, 4;
-        push @rows, { name => $name, library => $library, probe => $probe, arguments => defined $arguments ? $arguments : '' };
+        my ( $name, $library, $probe, $harness_switches, $arguments ) = split /\t/, $line, 5;
+        push @rows, {
+            name              => $name,
+            library           => $library,
+            probe             => $probe,
+            harness_switches  => $harness_switches,
+            arguments         => defined $arguments ? $arguments : '',
+        };
     }
     return @rows;
+}
+
+# Scenario: selecting ten parallel workers applies to both test groups.
+# The fully instrumented group and the native-thread group must both use
+# the requested worker count without altering the coverage verdict.
+{
+    my $stub = build_stub_path();
+    my ( $exit, $stdout, $stderr ) = run_entry( $stub, '--jobs', '10' );
+    is( $exit, 0, 'the 100 percent coverage gate accepts ten workers' );
+    my @ran = invocations($stub);
+    is( scalar @ran, 4, 'parallel coverage still runs both groups and the report' );
+    is( $ran[1]{name}, 'prove', 'instrumented group uses prove' );
+    is( $ran[2]{name}, 'prove', 'native-thread group uses prove' );
+    like( $ran[1]{arguments}, qr/\A-j 10 --rules=seq=t\/05-cli-smoke\.t.*--rules=par=\*\* -l\b/,
+        'instrumented test group uses ten workers' );
+    like( $ran[2]{arguments}, qr/\A-j 10 --rules=seq=t\/05-cli-smoke\.t.*--rules=par=\*\* -l\b/,
+        'native-thread group also uses ten workers' );
+    is( $stderr, '', 'passing parallel coverage emits no error' );
 }
 
 # Feature: one canonical entrypoint runs the whole coverage chain.
@@ -170,9 +224,10 @@ sub invocations {
 
 # Scenario: the whole chain runs inside ONE environment.
 # Given a scripted PATH, when the entrypoint runs the chain, then the delete,
-# suite and report commands are all invoked and every one of them observed the
-# same library path and the same marker variable - which is the property that
-# makes a split-environment read impossible by construction.
+# instrumented suite, native-thread suite and report commands are invoked. Both
+# suites must see the same library path and marker; only the ordinary suite may
+# receive Devel::Cover's harness hook because Devel::Cover does not support
+# ithreads.
 {
     my $stub = build_stub_path();
     my ( $exit, $stdout, $stderr ) = run_entry($stub);
@@ -180,17 +235,84 @@ sub invocations {
     is( $exit, 0, 'a clean four-metric report passes through the canonical entrypoint' );
 
     my @ran = invocations($stub);
-    is( scalar @ran, 3, 'the entrypoint ran exactly three commands: delete, suite, report' );
-    is_deeply( [ map { $_->{name} } @ran ], [qw(cover prove cover)], 'the chain ran delete, then the instrumented suite, then the report' );
+    is( scalar @ran, 4, 'the entrypoint ran database drop, both suites, and report' );
+    is_deeply( [ map { $_->{name} } @ran ], [qw(cover prove prove cover)], 'the chain ran database drop, both suites, then the report' );
+    like( $ran[1]{arguments}, qr/t\/232-goroutine-process\.t/, 'the instrumented suite includes non-thread tests' );
+    unlike(
+        $ran[1]{arguments},
+        qr{t/(?:17-web-server-ssl|231-goroutine-integration|237-goroutine-shared-objects|238-goroutine-routine-controls|241-system-menu-runner|244-goroutine-channels|245-goroutine-native-reference-types|248-dashboard-goroutine-exports)\.t},
+        'the instrumented suite excludes tests that start native GoRoutine threads',
+    );
+    is_deeply(
+        [ split / /, $ran[2]{arguments} ],
+        [
+            '-l',
+            't/17-web-server-ssl.t',
+            't/231-goroutine-integration.t',
+            't/237-goroutine-shared-objects.t',
+            't/238-goroutine-routine-controls.t',
+            't/241-system-menu-runner.t',
+            't/244-goroutine-channels.t',
+            't/245-goroutine-native-reference-types.t',
+            't/248-dashboard-goroutine-exports.t',
+        ],
+        'the native-thread suite runs every excluded test without coverage instrumentation',
+    );
+    like( $ran[1]{harness_switches}, qr/Devel::Cover/, 'the ordinary suite is instrumented' );
+    like( $ran[1]{harness_switches}, qr/-select,\^lib\//,
+        'the instrumented suite collects repository lib/ source only' );
+    like( $ran[1]{harness_switches}, qr/-ignore,\^/,
+        'non-library dynamic test source never contaminates the library report' );
+    like( $ran[1]{harness_switches}, qr/-db,\Q$stub->{dir}\E\/cover_db(?:,|\s)/, 'the instrumented suite uses the shared database that GoRoutine children inherit' );
+    is( $ran[2]{harness_switches}, '(unset)', 'thread tests run without the unsupported coverage hook' );
 
     my %libraries = map { $_->{library} => 1 } @ran;
     is( scalar keys %libraries, 1, 'every command in the chain saw exactly one PERL5LIB value' );
+
+    my $checkout_xs_arch = File::Spec->catdir( $repo, 'blib', 'arch' );
+    if ( -d $checkout_xs_arch ) {
+        my ($first_library) = split /\Q$Config::Config{path_sep}\E/, $ran[0]{library};
+        is(
+            $first_library,
+            $checkout_xs_arch,
+            'coverage child processes prefer the checkout-built XS extension over an installed stale copy',
+        );
+    }
 
     my %probes = map { $_->{probe} => 1 } @ran;
     is_deeply( [ keys %probes ], ['one-environment'], 'every command in the chain inherited the caller environment unchanged' );
 
     like( $stdout, qr/\Q100.0\E/, 'the entrypoint prints the coverage report it collected' );
     is( $stderr, '', 'a passing run emits no error output' );
+}
+
+# Scenario: a requested ordinary test runs without scheduling the native suite.
+# Given one explicit test file that is not a GoRoutine ithread test, when the
+# gate runs, then the file is instrumented once and the empty native suite is
+# visible in the command summary.
+{
+    my $stub = build_stub_path();
+    my ( $exit, $stdout, $stderr ) = run_entry( $stub, 't/148-coverage-gate-entrypoint.t' );
+
+    is( $exit, 0, 'a focused ordinary test file can be coverage-gated' );
+    my @ran = invocations($stub);
+    is( scalar @ran, 3, 'a focused ordinary test uses database drop, one suite and report' );
+    is_deeply( [ map { $_->{name} } @ran ], [qw(cover prove cover)], 'a focused ordinary test does not launch an empty thread suite' );
+    like( $ran[1]{arguments}, qr/t\/148-coverage-gate-entrypoint\.t/, 'the explicit test file reaches the instrumented suite' );
+    like( $stdout, qr/native-thread suite: \(none\)/, 'the command summary states that no native-thread tests were selected' );
+    is( $stderr, '', 'a focused ordinary run has no diagnostics' );
+}
+
+# Scenario: selecting only tests that cannot be instrumented fails before the
+# database is dropped, since it cannot produce a meaningful lib/ report.
+{
+    my $stub = build_stub_path();
+    my ( $exit, $stdout, $stderr ) = run_entry( $stub, 't/231-goroutine-integration.t' );
+
+    is( $exit, 2, 'a native-thread-only request is refused as an unusable coverage run' );
+    like( $stderr, qr/no instrumentable test files remain/i, 'the refusal explains why no coverage verdict can be produced' );
+    is( slurp_file( $stub->{log} ), '', 'a native-thread-only refusal does not delete or change a coverage database' );
+    is( $stdout, '', 'a native-thread-only refusal emits no success output' );
 }
 
 # Scenario: the collected report is the four-metric lib/ report.
@@ -202,7 +324,7 @@ sub invocations {
 
     my @ran    = invocations($stub);
     my $delete = $ran[0]{arguments};
-    my $report = $ran[2]{arguments};
+    my $report = $ran[3]{arguments};
 
     like( $delete, qr/-delete/,            'the chain drops the previous coverage database first' );
     like( $report, qr/-report text/,       'the report step asks for the text report' );
@@ -246,7 +368,7 @@ sub invocations {
 }
 
 # Scenario: a failing suite stops the chain before any coverage verdict.
-# Given an instrumented suite that fails, when the chain runs, then the
+# Given either suite that fails, when the chain runs, then the
 # entrypoint stops, says which step failed, and reports no coverage figure.
 {
     my $stub = build_stub_path( prove_exit => 1 );
@@ -255,9 +377,22 @@ sub invocations {
     isnt( $exit, 0, 'a failing instrumented suite fails the coverage gate' );
     isnt( $exit, 1, 'a failing suite is not reported as a coverage shortfall' );
     isnt( $exit, 3, 'a failing suite is not reported as an instrument failure' );
-    like( $stderr, qr/instrumented suite/i, 'the failing step is named' );
+    like( $stderr, qr/instrumented suite/i, 'the failing instrumented step is named' );
     unlike( $stdout, qr/coverage gate: statement/, 'no coverage verdict is produced when the suite failed' );
-    is( scalar invocations($stub), 2, 'the report step is never reached after a failing suite' );
+    is( scalar invocations($stub), 2, 'the second suite and report are never reached after a failing instrumented suite' );
+}
+
+# Scenario: a failing native-thread suite stops the chain before the report.
+# Given a clean instrumented suite and a failing ithread suite, the gate must
+# name the second step and must not emit a coverage verdict.
+{
+    my $stub = build_stub_path( native_prove_exit => 1 );
+    my ( $exit, $stdout, $stderr ) = run_entry($stub);
+
+    isnt( $exit, 0, 'a failing native-thread suite fails the coverage gate' );
+    like( $stderr, qr/native-thread suite/i, 'the failing native-thread step is named' );
+    unlike( $stdout, qr/coverage gate: statement/, 'no report is produced after native-thread failures' );
+    is( scalar invocations($stub), 3, 'the report is not reached after a native-thread failure' );
 }
 
 # Scenario: a report that was never produced fails closed.
@@ -281,7 +416,8 @@ sub invocations {
 
     is( $exit, 0, 'a dry run succeeds' );
     like( $stdout, qr/cover_db/,                 'the dry run names the coverage database it would use' );
-    like( $stdout, qr/prove -lr t\b/,            'the dry run shows the instrumented suite command' );
+    like( $stdout, qr/instrumented suite.*prove/s, 'the dry run shows the instrumented suite command' );
+    like( $stdout, qr/native-thread suite.*prove/s, 'the dry run shows the native-thread suite command' );
     like( $stdout, qr/-coverage subroutine/,     'the dry run shows the four-metric report command' );
     like( $stdout, qr/Devel\/Cover\/DB\/IO\.pm/, 'the dry run names the serializer module the chain resolved' );
     is( slurp_file( $stub->{log} ), '', 'a dry run executes none of the chain' );
@@ -375,11 +511,15 @@ coverage-gate entrypoint
 
 An executable specification for C<script/coverage-gate>, the single command that
 runs the whole four-metric coverage chain: dropping the coverage database,
-running the instrumented suite, collecting the C<lib/> report, and passing that
-report through the enforcing checker.
+running ordinary tests under Devel::Cover, running GoRoutine/native-thread
+tests without the unsupported hook, collecting the C<lib/> report, and passing
+that report through the enforcing checker. Instrumented GoRoutine subprocesses
+inherit the harness's C<PERL5OPT> and shared database. Their tests start from the
+checkout so Devel::Cover includes repository modules in C<lib/>.
 
 It proves the property the entrypoint exists to guarantee: that every command in
-the chain runs inside one environment. The scenarios run the real entrypoint
+the chain runs inside one environment and child-process coverage remains in the
+same database. The scenarios run the real entrypoint
 against scripted C<cover> and C<prove> stand-ins placed on C<PATH>, then read
 back what each stand-in actually observed, so the guarantee is measured rather
 than asserted.
@@ -423,14 +563,15 @@ Example 2:
 
   perl script/coverage-gate --dry-run
 
-Inspect the resolved environment and the three commands the gate would run,
+Inspect the resolved environment and the commands the gate would run,
 without spending a host-exclusive suite slot.
 
 Example 3:
 
   perl script/coverage-gate
 
-Run the real gate: drop the database, run the instrumented suite, and enforce
-100.0 on statement, branch, condition and subroutine coverage for C<lib/>.
+Run the real gate: drop the database, run the instrumented suite and the native
+thread suite, then enforce 100.0 on statement, branch, condition and subroutine
+coverage for C<lib/>.
 
 =cut

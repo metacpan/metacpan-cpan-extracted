@@ -1,5 +1,9 @@
 Revision history for Dist-Conformance
 
+0.008 2026-11-24 TEODESIAN
+    - A flavor can give SystemPackages a template metamerge.yml.  The check then fails unless the repository declares each dependency of the template, and the update adds the missing ones.
+    - The update edits the text of an existing metamerge.yml, so its comments and the order of its keys stay as they were.
+
 0.007 2026-11-20 TEODESIAN
     - The perlcritic profile is now the template with the overrides of the
       repository, and nothing else.  A repository declares each departure

@@ -12,7 +12,7 @@ package Matplotlib::Simple::Matplotlib;
 # The helpers keep checking their own keywords, against the same lists Matplotlib::Simple
 # checks them with, which are shared below rather than copied.
 require 5.010;
-our $VERSION = 0.3345;
+our $VERSION = 0.3346;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use File::Spec;
@@ -1313,6 +1313,10 @@ sub hist_helper {
 			p @infinite;
 			die "$set has the above infinite values, which $current_sub cannot bin";
 		}
+		# A set of NaN alone is written as the empty set it bins to, since
+		# matplotlib cannot find a range in it ("autodetected range of [nan, nan]
+		# is not finite", 3.11.2) but bins an empty set over 0 to 1.
+		my @values = ( grep { is_finite($_) } @{ $plot->{data}{$set} } ) ? @{ $plot->{data}{$set} } : ();
 		my $set_options = '';
 		foreach
 		 my $arg ( grep { ref $plot->{$_} eq 'HASH' } ( 'bins', 'color' ) )
@@ -1333,7 +1337,7 @@ sub hist_helper {
 				$set_options .= ", $arg = " . hist_value( $arg, $plot->{$arg}{$set} );
 			}
 		}
-		say {$args->{fh}} 'd = [' . py_nums( @{ $plot->{data}{$set} } ) . ']';
+		say {$args->{fh}} 'd = [' . py_nums(@values) . ']';
 		# hist() returns (counts, bin edges, patches); the counts are the only
 		# way to know a bin's height, since matplotlib, not this module, does
 		# the binning. Naming them changes nothing about what is drawn.

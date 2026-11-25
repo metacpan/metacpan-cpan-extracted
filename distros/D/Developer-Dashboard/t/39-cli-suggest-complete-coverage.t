@@ -214,7 +214,7 @@ is_deeply(
         )
     ],
     [ qw(DD-123 DD-456) ],
-    'complete suggests tmux workspace session names for dashboard workspace',
+    'complete suggests tmux workspace session names for d2 workspace',
 );
 
 is_deeply(
@@ -237,7 +237,7 @@ is_deeply(
         )
     ],
     [qw(alpha.collector)],
-    'complete suggests configured collector names for dashboard restart collector',
+    'complete suggests configured collector names for d2 restart collector',
 );
 
 is_deeply(
@@ -249,7 +249,7 @@ is_deeply(
         )
     ],
     [qw(beta.collector)],
-    'complete suggests configured collector names for dashboard log collector',
+    'complete suggests configured collector names for d2 log collector',
 );
 
 {
@@ -378,23 +378,23 @@ is_deeply(
     );
 }
 
-like( $suggest->unknown_command_message('dokr'), qr/Unknown dashboard command 'dokr'\./, 'unknown_command_message reports the mistyped top-level command' );
-like( $suggest->unknown_command_message('dokr'), qr/Did you mean:\n  dashboard docker\n/s, 'unknown_command_message includes the closest command suggestion when available' );
+like( $suggest->unknown_command_message('dokr'), qr/Unknown d2 command 'dokr'\./, 'unknown_command_message reports the mistyped top-level command' );
+like( $suggest->unknown_command_message('dokr'), qr/Did you mean:\n  d2 docker\n/s, 'unknown_command_message includes the closest command suggestion when available' );
 unlike( $suggest->unknown_command_message('zzzzzzzz'), qr/Did you mean:/, 'unknown_command_message omits the suggestion block when no close match exists' );
 
 like( $suggest->unknown_skill_command_message( 'missing-skill', 'run-tst' ), qr/Skill 'missing-skill' not found\./, 'unknown_skill_command_message reports missing skills' );
-like( $suggest->unknown_skill_command_message( 'missing-skill', 'run-tst' ), qr/dashboard alpha-skill\.run-test/, 'missing-skill guidance suggests close installed dotted commands' );
+like( $suggest->unknown_skill_command_message( 'missing-skill', 'run-tst' ), qr/d2 alpha-skill\.run-test/, 'missing-skill guidance suggests close installed dotted commands' );
 unlike( $suggest->unknown_skill_command_message( 'missing-skill', 'zzzzzzzz' ), qr/Did you mean:/, 'missing-skill guidance omits suggestions when no close dotted match exists' );
 
 is(
     $suggest->unknown_skill_command_message( 'disabled-skill', 'run-test' ),
-    "Skill 'disabled-skill' is disabled.\n\nEnable it with:\n  dashboard skills enable disabled-skill\n",
+    "Skill 'disabled-skill' is disabled.\n\nEnable it with:\n  d2 skills enable disabled-skill\n",
     'unknown_skill_command_message reports the explicit enable guidance for disabled skills',
 );
 
 like( $suggest->unknown_skill_command_message( 'alpha-skill', 'run-tst' ), qr/Command 'run-tst' not found in skill 'alpha-skill'\./, 'unknown_skill_command_message reports missing commands inside installed skills' );
-like( $suggest->unknown_skill_command_message( 'alpha-skill', 'run-tst' ), qr/dashboard alpha-skill\.run-test/, 'missing command guidance suggests close dotted commands inside one skill' );
-like( $suggest->unknown_skill_command_message( 'alpha-skill', 'zzzzzzzz' ), qr/dashboard alpha-skill\.nested\.deep/, 'missing command guidance can still fall back to nested dotted suggestions for distant command tails' );
+like( $suggest->unknown_skill_command_message( 'alpha-skill', 'run-tst' ), qr/d2 alpha-skill\.run-test/, 'missing command guidance suggests close dotted commands inside one skill' );
+like( $suggest->unknown_skill_command_message( 'alpha-skill', 'zzzzzzzz' ), qr/d2 alpha-skill\.nested\.deep/, 'missing command guidance can still fall back to nested dotted suggestions for distant command tails' );
 
 ok( grep( $_ eq 'docker', $suggest->top_level_suggestions('dokr') ), 'top_level_suggestions returns the closest built-in command' );
 ok( grep( $_ eq 'alpha-skill.run-test', $suggest->skill_command_suggestions('alpha-skill.run-tst') ), 'skill_command_suggestions can rank dotted commands across all skills' );

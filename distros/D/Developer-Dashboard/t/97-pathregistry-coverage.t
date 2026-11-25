@@ -16,7 +16,13 @@ use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::PathIdentity ();
 use Developer::Dashboard::Config;
 use Developer::Dashboard::JSON qw(json_decode);
-use Developer::Dashboard::Platform ();
+use Developer::Dashboard::Platform qw(effective_mode_octal);
+
+sub _without_private_var_prefix {
+    my ($path) = @_;
+    $path =~ s{/private(?=/var/folders/)}{}g if defined $path;
+    return $path;
+}
 
 # Hermetic runtime: isolated home + isolated state root, cwd anchored inside the
 # temp home so DD-OOP-LAYER discovery resolves from a controlled tree.
@@ -59,8 +65,10 @@ my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
     is( $paths->config_root, $overlay, 'config writes target the private overlay when configured' );
     is_deeply( [ $paths->config_roots ], [ $overlay, @base_roots ], 'private config overlay augments existing config lookup roots at highest priority' );
     is_deeply( [ $paths->config_layers ], [ ( map { File::Spec->catdir( $_, 'config' ) } $paths->runtime_layers ), $overlay ], 'private config overlay is the final inherited config layer' );
-    my @overlay_stat = stat $overlay;
-    is( $overlay_stat[2] & 0777, 0700, 'private config overlay is restricted to its owner' );
+    # Raw stat cannot see a Windows DACL (a directory stays 0777 whatever
+    # its ACL says), so read the effective mode, which derives 0700 from an
+    # owner-only DACL on Windows and is the stat mode unchanged on Unix.
+    is( effective_mode_octal($overlay), '0700', 'private config overlay is restricted to its owner' );
 }
 
 {
@@ -231,9 +239,9 @@ sub dies_like {
     local *Developer::Dashboard::PathRegistry::cwd = sub { die "current_working_directory must not fork pwd\n"; };
 
     my $reg = Developer::Dashboard::PathRegistry->new( home => $home, cwd => '' );
-    is( $reg->current_working_directory, $first, 'empty cwd uses the live in-process working directory' );
+    is( _without_private_var_prefix( $reg->current_working_directory ), _without_private_var_prefix($first), 'empty cwd uses the live in-process working directory' );
     chdir $second or die "Unable to chdir to $second: $!";
-    is( $reg->current_working_directory, $second, 'the same registry observes a later process chdir' );
+    is( _without_private_var_prefix( $reg->current_working_directory ), _without_private_var_prefix($second), 'the same registry observes a later process chdir' );
     is( $getcwd_calls, 2, 'the live working directory is read without stale per-instance memoization' );
 
     my $fixed = Developer::Dashboard::PathRegistry->new( home => $home, cwd => $first );
@@ -246,7 +254,7 @@ sub dies_like {
     chdir $home or die "Unable to chdir to $home: $!";
 }
 
-is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the in-process lookup' );
+    is( _without_private_var_prefix( $paths->cwd ), _without_private_var_prefix($home), 'the public cwd compatibility accessor delegates to the in-process lookup' );
 
 {
     my $nested = File::Spec->catdir( $home, 'with-dir-getcwd' );
@@ -257,11 +265,11 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     local *Developer::Dashboard::PathRegistry::cwd = sub { die "with_dir must not fork pwd\n"; };
 
     is(
-        $paths->with_dir( $nested, sub { return Cwd::getcwd(); } ),
-        $nested,
+        _without_private_var_prefix( $paths->with_dir( $nested, sub { return File::Spec->canonpath( Cwd::getcwd() ); } ) ),
+        _without_private_var_prefix($nested),
         'with_dir enters the requested directory without using external pwd',
     );
-    is( Cwd::getcwd(), $home, 'with_dir restores the original working directory' );
+    is( _without_private_var_prefix( File::Spec->canonpath( Cwd::getcwd() ) ), _without_private_var_prefix($home), 'with_dir restores the original working directory' );
     is( $cwd_calls, 1, 'with_dir snapshots the original directory in-process once' );
 }
 
@@ -442,6 +450,58 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
 }
 
 # --------------------------------------------------------------------------
+# Windows root/child separator mixes must not skip the hardening suffix.
+# Exercise the production method with Win32 path operations on every host.
+# --------------------------------------------------------------------------
+{
+    require File::Spec::Win32;
+    no warnings 'redefine';
+    no warnings 'once'; # Scoped File::Spec overrides are intentional.
+    my $root  = 'Q:\\dd-fixture\\runtime';
+    my $child = 'Q:/dd-fixture/runtime/config/auth';
+    my @visited;
+    local *Developer::Dashboard::PathRegistry::runtime_layer_root_for = sub { return $root };
+    local *File::Spec::abs2rel = sub {
+        my ( $class, $path, $base ) = @_;
+        return File::Spec::Win32->abs2rel( $path, $base );
+    };
+    local *File::Spec::splitdir = sub {
+        my ( $class, $path ) = @_;
+        return File::Spec::Win32->splitdir($path);
+    };
+    local *File::Spec::file_name_is_absolute = sub {
+        my ( $class, $path ) = @_;
+        return File::Spec::Win32->file_name_is_absolute($path);
+    };
+    local *File::Spec::catdir = sub {
+        my ( $class, @parts ) = @_;
+        push @visited, [@parts];
+        return File::Spec::Win32->catdir(@parts);
+    };
+    is( $paths->secure_dir_permissions($child), $child,
+        'Windows mixed-separator hardening preserves the original requested path' );
+    is_deeply(
+        \@visited,
+        [
+            [ $root, 'config' ],
+            [ File::Spec::Win32->catdir( $root, 'config' ), 'auth' ],
+        ],
+        'Windows mixed-separator roots still visit every child directory in the hardening chain',
+    );
+    dies_like(
+        sub { $paths->secure_dir_permissions('Q:/dd-fixture/elsewhere') },
+        qr/Runtime directory is not a lexical descendant of its layer/,
+        'Windows hardening rejects a parent traversal instead of chmodding outside its root',
+    );
+    dies_like(
+        sub { $paths->secure_dir_permissions('R:/dd-fixture/elsewhere') },
+        qr/Runtime directory is not a lexical descendant of its layer/,
+        'Windows hardening rejects a relative suffix on a different drive',
+    );
+    is( scalar @visited, 2, 'invalid Windows suffixes never enter the chmod traversal loop' );
+}
+
+# --------------------------------------------------------------------------
 # secure_file_permissions guards + real chmod (default and executable).
 # --------------------------------------------------------------------------
 {
@@ -486,12 +546,18 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     my $written = do { local $/; <$read_fh> };
     close $read_fh;
     is( $written, "hello\n", 'the destination file holds the written content' );
-    is( ( stat($target) )[2] & 07777, 0600, 'a default-mode write lands at 0600' );
+    SKIP: {
+        skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
+        is( ( stat($target) )[2] & 07777, 0600, 'a default-mode write lands at 0600' );
+    }
 
     my $exec_target = File::Spec->catfile( $fresh, 'atomic-exec-target' );
     my $exec_tmp    = "$exec_target.pending";
     $reg->atomic_write_secure( $exec_tmp, $exec_target, '#!/bin/true', executable => 1 );
-    is( ( stat($exec_target) )[2] & 07777, 0700, 'an executable write lands at 0700' );
+    SKIP: {
+        skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
+        is( ( stat($exec_target) )[2] & 07777, 0700, 'an executable write lands at 0700' );
+    }
 
     # Open failure: the staging path is itself an existing directory.
     my $open_target = File::Spec->catfile( $fresh, 'open-blocked-target' );
@@ -550,6 +616,7 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
         # and changes nothing.
         my $devnull   = File::Spec->devnull;
         my $null_mode = ( stat $devnull )[2];
+        skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
         skip 'cannot stat the null device to probe chmod ownership', 1 if !defined $null_mode;
         skip 'this process can chmod a device it does not own, so the chmod failure cannot occur', 1
           if chmod( $null_mode & 07777, $devnull );
@@ -690,15 +757,28 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
 
     chmod 0644, $metadata or die "Unable to loosen test metadata $metadata: $!";
     $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
-    is( $secure_calls, 4, 'metadata with loose permissions is rewritten and secured' );
+    if ( $^O eq 'MSWin32' ) {
+        # Modes are not a Windows security control, so the metadata is
+        # already secured there and identical content is not rewritten.
+        is( $secure_calls, 3, 'metadata with loose permissions is already secured on Windows, so it is not rewritten' );
+    }
+    else {
+        is( $secure_calls, 4, 'metadata with loose permissions is rewritten and secured' );
+    }
+    # The loose-permissions rewrite above does not happen on Windows, so
+    # every secure-count after it runs one lower there.
+    my $mode_rewrite_offset = $^O eq 'MSWin32' ? -1 : 0;
     my @secure_stat = stat $metadata;
-    is( $secure_stat[2] & 0777, 0600, 'rewritten state metadata remains owner-only' );
+    SKIP: {
+        skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
+        is( $secure_stat[2] & 0777, 0600, 'rewritten state metadata remains owner-only' );
+    }
 
     open my $empty_fh, '>:raw', $metadata or die "Unable to empty test metadata $metadata: $!";
     close $empty_fh or die "Unable to close empty test metadata $metadata: $!";
     chmod 0600, $metadata or die "Unable to secure empty test metadata $metadata: $!";
     $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
-    is( $secure_calls, 5, 'an empty existing metadata file is rewritten' );
+    is( $secure_calls, 5 + $mode_rewrite_offset, 'an empty existing metadata file is rewritten' );
 
     {
         require Symbol;
@@ -716,7 +796,7 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
             return $close->(@_);
         };
         $metadata_paths->_write_state_metadata( $metadata_dir, '/rt/x' );
-        is( $secure_calls, 6, 'metadata with an unreadable empty content stream is rewritten' );
+        is( $secure_calls, 6 + $mode_rewrite_offset, 'metadata with an unreadable empty content stream is rewritten' );
     }
 
     can_ok( 'Developer::Dashboard::PathRegistry',
@@ -989,7 +1069,7 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     is( $paths->_path_identity(undef), '', 'undef path has empty identity' );
     is( $paths->_path_identity(''),    '', 'empty path has empty identity' );
     ok( length $paths->_path_identity('/tmp'), 'an existing path resolves to a canonical identity' );
-    is( $paths->_path_identity('/no/such/path/zzz'), '/no/such/path/zzz',
+    is( $paths->_path_identity('/no/such/path/zzz'), File::Spec->canonpath('/no/such/path/zzz'),
         'a non-existent path falls back to a canonical string' );
 }
 
@@ -1022,9 +1102,16 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     is( $paths->_prefer_reference_style( '/other/place', '/ref/base' ), '/other/place',
         'a path outside the reference is unchanged' );
 
-    # A '..' segment is stripped when restyling under the reference.
+    # A '..' segment is stripped when restyling under the reference. On
+    # Windows the identity canonicalisation collapses a/.. first, so the
+    # restyled path has no 'a' to keep; on Unix the segment survives
+    # canonicalisation and is dropped here instead. Either way the output
+    # carries no '..' segment.
+    my $restyled = $^O eq 'MSWin32'
+      ? File::Spec->catdir( '/nx', 'b' )
+      : File::Spec->catdir( '/nx', 'a', 'b' );
     is( $paths->_prefer_reference_style( '/nx/a/../b', '/nx' ),
-        File::Spec->catdir( '/nx', 'a', 'b' ),
+        $restyled,
         'equivalent path is restyled beneath the reference' );
 }
 
@@ -1039,7 +1126,16 @@ is( $paths->cwd, $home, 'the public cwd compatibility accessor delegates to the 
     # On Linux /private/tmp/... does not resolve to /tmp/..., so the alias is
     # rejected and the original path is returned.
     my $priv = '/private/tmp/dd-nonexistent-alias-xyz';
-    is( $paths->_display_path($priv), $priv, 'an unresolved /private alias leaves the path unchanged' );
+    is( $paths->_display_path($priv),
+        $^O eq 'darwin' ? '/tmp/dd-nonexistent-alias-xyz' : $priv,
+        'the /private alias is resolved according to the host filesystem' );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PathRegistry::_path_identity = sub { return $_[1] };
+        is( $paths->_display_path($priv), $priv,
+            '_display_path preserves an alias when canonical identities differ' );
+    }
 }
 
 # --------------------------------------------------------------------------
@@ -1848,10 +1944,17 @@ SKIP: {
 
     $registry->all_paths;
     my $new_layer = File::Spec->catdir( $repo, '.d2' );
-    make_path($new_layer);
+    make_path( File::Spec->catdir( $new_layer, 'config' ) );
+    my $config_path = File::Spec->catfile( $new_layer, 'config', 'config.json' );
+    open my $config_fh, '>', $config_path or die "Unable to create runtime-layer config '$config_path': $!";
+    close $config_fh or die "Unable to close runtime-layer config '$config_path': $!";
+    my $resolved_root = $registry->runtime_layer_root_for($config_path);
+    $resolved_root =~ s{/private(?=/var/folders/)}{}g;
+    my $expected_root = $new_layer;
+    $expected_root =~ s{/private(?=/var/folders/)}{}g;
     is(
-        $registry->runtime_layer_root_for( File::Spec->catfile( $new_layer, 'config', 'config.json' ) ),
-        $new_layer,
+        $resolved_root,
+        $expected_root,
         'a later security lookup discovers a runtime layer created after all_paths completed',
     );
 }

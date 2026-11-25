@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
@@ -46,10 +46,11 @@ subtest cache => sub {
 };
 
 subtest clone_dir => sub {
-    my %dir = map { $_ => $CLASS->new( url => '/bogus/repo', ref => $_, cache => '/bogus/c' )->clone_dir->to_string } qw{main v1};
-    like( $dir{main}, qr{\A/bogus/c/[[:xdigit:]]{40}\z}, 'a directory of the cache, named by a SHA-1' );
-    isnt( $dir{main}, $dir{v1}, 'two refs of one repository have two clones' );
-    is( $CLASS->new( url => '/bogus/repo', ref => 'main', cache => '/bogus/c' )->clone_dir->to_string, $dir{main}, 'and one ref always has the same one' );
+    my %dir = map { local ($_) = $_; $_ => $CLASS->new( url => '/bogus/repo', ref => $_, cache => '/bogus/c' )->clone_dir->to_string } qw{main v1};
+    my ( $main, $v1 ) = @dir{qw{main v1}};
+    like( $main, qr{\A/bogus/c/[[:xdigit:]]{40}\z}, 'a directory of the cache, named by a SHA-1' );
+    isnt( $main, $v1, 'two refs of one repository have two clones' );
+    is( $CLASS->new( url => '/bogus/repo', ref => 'main', cache => '/bogus/c' )->clone_dir->to_string, $main, 'and one ref always has the same one' );
 };
 
 subtest fetch => sub {

@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Ask;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Capture::Tiny qw(capture tee);
 use File::Find qw(find);
@@ -44,7 +44,7 @@ my %IMAGE_MEDIA_TYPE = (
 );
 
 # run_ask(%args)
-# Runs one `dashboard ask` turn against the selected AI backend, keeping a
+# Runs one `d2 ask` turn against the selected AI backend, keeping a
 # per-workspace conversation transcript so follow-up questions have context.
 # Input: args (argv arrayref) plus optional injectable seams for testing --
 # out (scalar ref or filehandle), env (hashref), config, paths, stdin string,
@@ -190,7 +190,7 @@ sub _parse_args {
 }
 
 # _usage_text()
-# The real, complete usage text for `dashboard ask --help` - every
+# The real, complete usage text for `d2 ask --help` - every
 # backend flag (DD-1039: --nova already has a full working
 # implementation but was never mentioned in any usage string, which is
 # what made it look unsupported) and every other real option.
@@ -198,7 +198,7 @@ sub _parse_args {
 # Output: usage text string, trailing newline included.
 sub _usage_text {
     return <<'USAGE';
-Usage: dashboard ask [--claude|--codex|--copilot|--gemini|--nova] [--model M] [--file PATH]... <question>
+Usage: d2 ask [--claude|--codex|--copilot|--gemini|--nova] [--model M] [--file PATH]... <question>
 
 Backend selection (default: claude):
   --claude              Use Claude (Anthropic API, falling back to the local claude CLI)
@@ -218,7 +218,7 @@ USAGE
 }
 
 # _docs_context()
-# Curated, purpose-built onboarding text for `dashboard ask --docs`
+# Curated, purpose-built onboarding text for `d2 ask --docs`
 # (DD-938) - deliberately NOT the full CLAUDE.md (owner-specified: too
 # large/expensive to inject on every ask call) and never written to any
 # file. Makes a blank agent DD-*aware* (the DD-OOP-LAYERS stack, where a
@@ -228,19 +228,18 @@ USAGE
 # Output: onboarding context string.
 sub _docs_context {
     return <<'DOCS';
-Developer Dashboard onboarding (dashboard ask --docs)
+Developer Dashboard onboarding (d2 ask --docs)
 
-You are working on a machine with Developer Dashboard installed (two
-entrypoints: `dashboard` and its short alias `d2`, same behavior). This is a
-curated summary, not the whole product - use `dashboard source --files` to
+You are working on a machine with Developer Dashboard installed (one
+entrypoint: `d2`). This is a
+curated summary, not the whole product - use `d2 source --files` to
 list every installed file and read the real implementation for anything
 this doesn't cover.
 
 ENTRYPOINTS AND COMMAND RESOLUTION
-- `dashboard <command> [args...]` and `d2 <command> [args...]` are
-  equivalent. Skills nest with dots: `dashboard <skill>.<subcommand>`,
-  arbitrarily deep (`dashboard nest.level1.level2.here`).
-- `dashboard which <command>` prints the resolved file(s) actually backing
+- `d2 <command> [args...]` is the form. Skills nest with dots: `d2 <skill>.<subcommand>`,
+  arbitrarily deep (`d2 nest.level1.level2.here`).
+- `d2 which <command>` prints the resolved file(s) actually backing
   any command - built-in, layered custom, or dotted skill - plus which
   per-layer hook files participate. Use this before guessing where a
   command's logic lives.
@@ -272,13 +271,13 @@ WHERE A DISPOSABLE HELPER SCRIPT BELONGS
 SKILLS
 - Installable repos under `<layer>/skills/<repo-name>/`, each with its own
   `cli/`, config, and isolated dependency tree. Dotted dispatch
-  (`dashboard <skill>.<cmd>`) is how you invoke into one.
+  (`d2 <skill>.<cmd>`) is how you invoke into one.
 
 FINDING MORE
-- `dashboard which <name>` - resolve any command to its real file(s).
-- `dashboard source --files` - list every file DD installed under
+- `d2 which <name>` - resolve any command to its real file(s).
+- `d2 source --files` - list every file DD installed under
   `~/perl5/{lib,bin}`, to grep/read directly.
-- `dashboard ask "<question>"` (without --docs) - ask an AI backend a
+- `d2 ask "<question>"` (without --docs) - ask an AI backend a
   question directly, with per-workspace conversation memory; this is a
   generic ask wrapper, not itself DD-aware beyond this summary.
 DOCS
@@ -791,17 +790,27 @@ sub _scoped_tool_path {
 # Collapses '.'/'..' segments in an absolute path string, purely
 # lexically - no filesystem access, so it works on a path that does not
 # exist.
+# On Windows File::Spec spells absolute paths with backslashes and a drive
+# letter (C:\dir\file); those are turned into forward slashes first and
+# the drive letter is kept as the prefix (C:/dir/file), so the containment
+# check in _scoped_tool_path compares like with like. Without this every
+# in-root path was refused on Windows.
 # Input: absolute path string.
 # Output: normalized absolute path string.
 sub _normalize_path_segments {
     my ($path) = @_;
+    my $prefix = '/';
+    if ( $^O eq 'MSWin32' ) {
+        $path =~ tr{\\}{/};
+        $prefix = uc($1) . '/' if $path =~ s{\A([A-Za-z]:)(?=/|\z)}{};
+    }
     my @out;
     for my $part ( split m{/}, $path ) {
         next if $part eq '' || $part eq '.';
         if ( $part eq '..' ) { pop @out; }
         else                 { push @out, $part; }
     }
-    return '/' . join( '/', @out );
+    return $prefix . join( '/', @out );
 }
 
 # _extract_api_text($data)
@@ -934,6 +943,21 @@ sub _emit {
 # Output: (stdout, stderr, exit-code) list.
 sub _run_cli {
     my ($argv) = @_;
+    if ( $^O eq 'MSWin32' ) {
+        # On Unix system() fails to exec a missing command with -1 and
+        # "Can't exec" on STDERR, which is the contract this runner's
+        # callers rely on. On Windows system() hands the command to cmd.exe
+        # instead, which exits 1 with "not recognized" text - a missing
+        # backend then looks like a backend that ran and failed. Check
+        # resolvability first and report the same -1, with the same words,
+        # before anything runs.
+        my $command = $argv->[0] || '';
+        if ( $command eq '' || !command_in_path($command) ) {
+            my $message = "Can't exec \"$command\": No such file or directory\n";
+            print STDERR $message;
+            return ( '', $message, -1 );
+        }
+    }
     my ( $stdout, $stderr, $status ) = tee { system( @{$argv} ); };
     my $exit = $status == -1 ? -1 : ( $status >> 8 );
     return ( $stdout, $stderr, $exit );
@@ -970,7 +994,7 @@ __END__
 
 =head1 NAME
 
-Developer::Dashboard::CLI::Ask - ask an AI backend from the dashboard CLI
+Developer::Dashboard::CLI::Ask - ask an AI backend from the d2 CLI
 
 =head1 SYNOPSIS
 
@@ -979,7 +1003,7 @@ Developer::Dashboard::CLI::Ask - ask an AI backend from the dashboard CLI
 
 =head1 DESCRIPTION
 
-This module powers the built-in C<dashboard ask> command. It sends a question to
+This module powers the built-in C<d2 ask> command. It sends a question to
 a selected AI backend and keeps a per-workspace conversation transcript so
 follow-up questions carry context.
 
@@ -987,15 +1011,15 @@ follow-up questions carry context.
 
 =head2 run_ask
 
-Run one C<dashboard ask> turn and return a process exit code.
+Run one C<d2 ask> turn and return a process exit code.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
 This module lets an operator ask a coding assistant a question straight from the
-dashboard shell and get a plain-text answer, while the dashboard remembers the
-running conversation per workspace so a later C<dashboard ask> continues the same
+d2 shell and get a plain-text answer, while the dashboard remembers the
+running conversation per workspace so a later C<d2 ask> continues the same
 thread instead of starting over.
 
 =head1 WHY IT EXISTS
@@ -1015,7 +1039,7 @@ Read/Grep access.
 
 =head1 WHEN TO USE
 
-Use this file when changing C<dashboard ask> syntax, adding or adjusting an
+Use this file when changing C<d2 ask> syntax, adding or adjusting an
 assistant backend, changing how the Anthropic API request is built, changing how
 attachments are inlined or encoded, or changing where and how the per-workspace
 conversation transcript is stored.
@@ -1044,21 +1068,21 @@ command to the shared runtime, by CLI smoke tests, and by module coverage tests.
 
 Example 1:
 
-  dashboard ask "How do I list collectors?"
+  d2 ask "How do I list collectors?"
 
 Ask the default claude backend and print a plain-text answer, remembering the
 turn for this workspace.
 
 Example 2:
 
-  dashboard ask --codex "Explain this stack trace" --file trace.txt
+  d2 ask --codex "Explain this stack trace" --file trace.txt
 
 Switch the workspace to the codex backend (sticky) and inline a text attachment
 into the question.
 
 Example 3:
 
-  dashboard ask --new --model claude-sonnet-5 "Start over: summarize the repo"
+  d2 ask --new --model claude-sonnet-5 "Start over: summarize the repo"
 
 Start a fresh conversation for this workspace and override the model for the
 turn.

@@ -22,18 +22,18 @@ skills - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard skills ...
+  d2 skills ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard skills>, the command family that installs, updates, lists, enables, disables, and uninstalls skills while also serving as the private handoff target for dotted skill command execution.
+This staged helper exposes C<d2 skills>, the command family that installs, updates, lists, enables, disables, and uninstalls skills while also serving as the private handoff target for dotted skill command execution.
 
 =head1 WHY IT EXISTS
 
@@ -41,11 +41,11 @@ It exists because skill lifecycle management is a built-in feature, but the wrap
 
 =head1 WHEN TO USE
 
-Use this file when changing the C<dashboard skills> CLI verbs or the dotted-command handoff into the skill runtime.
+Use this file when changing the C<d2 skills> CLI verbs or the dotted-command handoff into the skill runtime.
 
 =head1 HOW TO USE
 
-Users run C<dashboard skills install>, C<enable>, C<disable>, C<list>, C<usage>, or C<uninstall>. The singular C<dashboard skill> command is accepted as an alias for the same management family. The staged helper forwards those lifecycle requests into the private runtime, which loads the skill manager and performs the requested action. Install accepts one or more Git URLs, direct local checked-out skill directories, shorthand source names, or no source at all when the home root F<~/.developer-dashboard/ddfile> already lists registered skills to reinstall. Install shows a progress rundown before long work starts and defaults to a before/after version table; C<-o json> keeps the raw payload for scripts. The public dotted form C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> also lands here through an internal action so installed skill commands keep one private helper surface.
+Users run C<d2 skills install>, C<enable>, C<disable>, C<list>, C<usage>, or C<uninstall>. The singular C<d2 skill> command is accepted as an alias for the same management family. The staged helper forwards those lifecycle requests into the private runtime, which loads the skill manager and performs the requested action. Install accepts one or more Git URLs, direct local checked-out skill directories, shorthand source names, or no source at all when the home root F<~/.developer-dashboard/ddfile> already lists registered skills to reinstall. Install shows a progress rundown before long work starts and defaults to a before/after version table; C<-o json> keeps the raw payload for scripts. The public dotted form C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> also lands here through an internal action so installed skill commands keep one private helper surface.
 
 =head1 WHAT USES IT
 
@@ -55,10 +55,10 @@ It is used by developers managing installed skills, by dotted skill command disp
 
 Example 1:
 
-  dashboard skills install git@github.com:user/example-skill.git
-  dashboard skills install /absolute/path/to/example-skill
-  dashboard skills install browser foo/bar git@github.com:user/example-skill.git
-  dashboard skill install browser
+  d2 skills install git@github.com:user/example-skill.git
+  d2 skills install /absolute/path/to/example-skill
+  d2 skills install browser foo/bar git@github.com:user/example-skill.git
+  d2 skill install browser
 
 Install or reinstall one or more isolated skills into their runtime roots from
 Git, shorthand sources, or qualified local checkouts. Direct local installs use
@@ -68,13 +68,13 @@ F<~/.developer-dashboard/ddfile> without duplicates.
 
 Example 2:
 
-  dashboard skills install
+  d2 skills install
 
 Reinstall every skill source listed in the home root F<~/.developer-dashboard/ddfile>.
 
 Example 3:
 
-  dashboard skills list
+  d2 skills list
 
 Inspect installed skill metadata. The default output is a readable table, and
 C<-o json> returns structured output.
@@ -89,7 +89,7 @@ Example 5:
 
   ~/.developer-dashboard/cli/dd/skills --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 6:
 

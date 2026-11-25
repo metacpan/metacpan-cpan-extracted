@@ -55,7 +55,7 @@ $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} ||= File::Spec->catfile( $Bin, '_dashbo
 my @POWERSHELL_ENV_KEYS = qw(PATH PERL5LIB PERL_LOCAL_LIB_ROOT PERL_MB_OPT PERL_MM_OPT);
 my %POWERSHELL_ENV_LIST_KEYS = map { $_ => 1 } qw(PATH PERL5LIB PERL_LOCAL_LIB_ROOT);
 
-my $cmd = shift @ARGV || die "Missing built-in dashboard command\n";
+my $cmd = shift @ARGV || die "Missing built-in d2 command\n";
 $0 = join q{ }, 'developer-dashboard', $cmd, @ARGV;
 
 if ( Developer::Dashboard::InternalCLI::canonical_helper_name($cmd) ne '' ) {
@@ -73,7 +73,7 @@ if ( Developer::Dashboard::InternalCLI::canonical_helper_name($cmd) ne '' ) {
 if ( $cmd eq 'complete' ) {
     require Developer::Dashboard::CLI::Complete;
     my $index = shift @ARGV;
-    die "Usage: dashboard complete <index> <word0> <word1> ...\n" if !defined $index || $index !~ /\A\d+\z/;
+    die "Usage: d2 complete <index> <word0> <word1> ...\n" if !defined $index || $index !~ /\A\d+\z/;
     my @candidates = Developer::Dashboard::CLI::Complete::complete(
         index => $index,
         words => \@ARGV,
@@ -296,7 +296,7 @@ sub _sync_configured_collector_indicators {
 }
 
 # _runtime_cpanfile_path(%args)
-# Resolves the project-local cpanfile used by dashboard cpan installs.
+# Resolves the project-local cpanfile used by d2 cpan installs.
 # Input: hash containing an optional path registry under the "paths" key.
 # Output: absolute cpanfile path string.
 sub _runtime_cpanfile_path {
@@ -350,9 +350,8 @@ sub _runtime_perl5lib_env {
     else {
         @local_libs = ( _runtime_local_lib(%args) );
     }
-    for my $local_lib (@local_libs) {
-        next if !defined $local_lib || $local_lib eq '' || !-d $local_lib;
-    }
+    # PerlEnv->perl5lib_list filters undefined, empty and nonexistent roots
+    # when building PERL5LIB. A loop with only 'next' does not filter them.
     return (
         PERL5LIB => Developer::Dashboard::PerlEnv->perl5lib_env(
             dashboard_lib => $dashboard_lib,
@@ -504,7 +503,7 @@ elsif ( $cmd eq 'indicator' ) {
     my $action = shift @ARGV || '';
     if ( $action eq 'set' ) {
         my ( $name, $label, $icon, $status ) = @ARGV;
-        die "Usage: dashboard indicator set <name> <label> <icon> <status>\n" if !$status;
+        die "Usage: d2 indicator set <name> <label> <icon> <status>\n" if !$status;
         my $item = $indicators->set_indicator(
             $name,
             label          => $label,
@@ -530,7 +529,7 @@ elsif ( $cmd eq 'collector' ) {
     my $action = shift @ARGV || '';
     if ( $action eq 'write-result' ) {
         my ( $name, $exit_code ) = @ARGV;
-        die "Usage: dashboard collector write-result <name> <exit_code>\n" if !defined $exit_code;
+        die "Usage: d2 collector write-result <name> <exit_code>\n" if !defined $exit_code;
         local $/;
         my $stdout = <STDIN>;
         $collectors->write_result(
@@ -542,7 +541,7 @@ elsif ( $cmd eq 'collector' ) {
         exit 0;
     }
     elsif ( $action eq 'status' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector status <name>\n";
+        my $name = shift @ARGV || die "Usage: d2 collector status <name>\n";
         print json_encode( $collectors->read_status($name) || {} );
         exit 0;
     }
@@ -551,23 +550,23 @@ elsif ( $cmd eq 'collector' ) {
         exit 0;
     }
     elsif ( $action eq 'job' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector job <name>\n";
+        my $name = shift @ARGV || die "Usage: d2 collector job <name>\n";
         print json_encode( $collectors->read_job($name) || {} );
         exit 0;
     }
     elsif ( $action eq 'output' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector output <name>\n";
+        my $name = shift @ARGV || die "Usage: d2 collector output <name>\n";
         print json_encode( $collectors->read_output($name) || {} );
         exit 0;
     }
     elsif ( $action eq 'inspect' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector inspect <name>\n";
+        my $name = shift @ARGV || die "Usage: d2 collector inspect <name>\n";
         print json_encode( $collectors->inspect_collector($name) || {} );
         exit 0;
     }
     elsif ( $action eq 'log' ) {
         my $name = shift @ARGV;
-        die "Usage: dashboard collector log [name]\n" if @ARGV;
+        die "Usage: d2 collector log [name]\n" if @ARGV;
         if ( defined $name && $name ne '' ) {
             die "Unknown collector '$name'\n" if !_collector_known($name);
             my $log = $collectors->read_log($name);
@@ -594,20 +593,20 @@ elsif ( $cmd eq 'collector' ) {
         exit 0;
     }
     elsif ( $action eq 'run' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector run <name>\n";
+        my $name = shift @ARGV || die "Usage: d2 collector run <name>\n";
         my $job = _find_collector_job($name);
         die "Unknown collector '$name'\n" if !$job;
         print json_encode( $runner->run_once($job) );
         exit 0;
     }
     elsif ( $action eq 'start' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector start <name>\n";
+        my $name = shift @ARGV || die "Usage: d2 collector start <name>\n";
         my $started = $runtime->start_named_collector( name => $name );
         print $started->{pid} . "\n";
         exit 0;
     }
     elsif ( $action eq 'stop' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector stop <name>\n";
+        my $name = shift @ARGV || die "Usage: d2 collector stop <name>\n";
         my @stopped = $runtime->stop_collectors( names => [$name], structured => 1 );
         my ($entry) = grep { ( $_->{name} || '' ) eq $name } @stopped;
         my $pid = $entry ? $entry->{pid} : undef;
@@ -615,7 +614,7 @@ elsif ( $cmd eq 'collector' ) {
         exit 0;
     }
     elsif ( $action eq 'restart' ) {
-        my $name = shift @ARGV || die "Usage: dashboard collector restart <name>\n";
+        my $name = shift @ARGV || die "Usage: d2 collector restart <name>\n";
         my $result = $runtime->restart_target( scope => 'collector', name => $name );
         my $collector = $result->{collectors}[0] || {};
         print $collector->{pid} . "\n" if defined $collector->{pid};
@@ -647,7 +646,7 @@ elsif ( $cmd eq 'auth' ) {
     my $action = shift @ARGV || '';
     if ( $action eq 'add-user' ) {
         my ( $username, $password ) = @ARGV;
-        die "Usage: dashboard auth add-user <username> <password>\n" if !$username || !$password;
+        die "Usage: d2 auth add-user <username> <password>\n" if !$username || !$password;
         print json_encode(
             $auth->add_user(
                 username => $username,
@@ -661,7 +660,7 @@ elsif ( $cmd eq 'auth' ) {
         exit 0;
     }
     elsif ( $action eq 'remove-user' ) {
-        my $username = shift @ARGV || die "Usage: dashboard auth remove-user <username>\n";
+        my $username = shift @ARGV || die "Usage: d2 auth remove-user <username>\n";
         $auth->remove_user($username);
         print json_encode( { removed => $username } );
         exit 0;
@@ -699,7 +698,18 @@ elsif ( $cmd eq 'init' ) {
     }
     my %helper_sync_args = ( paths => $paths );
     if (is_windows()) {
-        $helper_sync_args{skip_names} = ['init'];
+        # A staged `init` helper that already exists must not be replaced
+        # in place during init's own sync: on Windows a running executable
+        # is locked, and the init wrapper may be the process that got us
+        # here. But a MISSING `init` helper must still be staged: in a
+        # fresh home nothing is running from that path yet, and skipping
+        # it leaves `d2 doctor` reporting a missing managed helper
+        # forever (t/05 doctor checks on Windows fail on exactly that).
+        my $init_target = Developer::Dashboard::InternalCLI::helper_path(
+            paths => $paths,
+            name  => 'init',
+        );
+        $helper_sync_args{skip_names} = ['init'] if -f $init_target;
     }
     my $internal_cli = Developer::Dashboard::InternalCLI::ensure_helpers(%helper_sync_args);
 
@@ -756,7 +766,7 @@ elsif ( $cmd eq 'page' ) {
         exit 0;
     }
     elsif ( $action eq 'save' ) {
-        my $id = shift @ARGV || die "Usage: dashboard page save <id>\n";
+        my $id = shift @ARGV || die "Usage: d2 page save <id>\n";
         local $/;
         my $source = <STDIN>;
         my $page = $source =~ /^\s*\{/
@@ -772,7 +782,7 @@ elsif ( $cmd eq 'page' ) {
         exit 0;
     }
     elsif ( $action eq 'show' ) {
-        my $id = shift @ARGV || die "Usage: dashboard page show <id>\n";
+        my $id = shift @ARGV || die "Usage: d2 page show <id>\n";
         my $page = $resolver->load_named_page($id);
         print $page->canonical_instruction;
         exit 0;
@@ -804,7 +814,7 @@ elsif ( $cmd eq 'page' ) {
         exit 0;
     }
     elsif ( $action eq 'urls' ) {
-        my $id = shift @ARGV || die "Usage: dashboard page urls <id>\n";
+        my $id = shift @ARGV || die "Usage: d2 page urls <id>\n";
         my $page = $pages->load_saved_page($id);
         print json_encode(
             {
@@ -850,7 +860,7 @@ elsif ( $cmd eq 'page' ) {
         exit 0;
     }
     elsif ( $action eq 'source' ) {
-        my $source = shift @ARGV || die "Usage: dashboard page source <id|token>\n";
+        my $source = shift @ARGV || die "Usage: d2 page source <id|token>\n";
         my $page = eval { $resolver->load_named_page($source) };
         if ( !$page ) {
             die $@ if $source !~ /^[A-Za-z0-9+\/=]+$/;
@@ -866,8 +876,8 @@ elsif ( $cmd eq 'action' ) {
     _migrate_saved_pages();
     my $sub = shift @ARGV || '';
     if ( $sub eq 'run' ) {
-        my $page_id = shift @ARGV || die "Usage: dashboard action run <page_id> <action_id>\n";
-        my $action_id = shift @ARGV || die "Usage: dashboard action run <page_id> <action_id>\n";
+        my $page_id = shift @ARGV || die "Usage: d2 action run <page_id> <action_id>\n";
+        my $action_id = shift @ARGV || die "Usage: d2 action run <page_id> <action_id>\n";
         my $page = $resolver->load_named_page($page_id);
         my ($action) = grep { ref($_) eq 'HASH' && ( $_->{id} || '' ) eq $action_id } @{ $page->as_hash->{actions} || [] };
         die "Unknown action '$action_id'\n" if !$action;
@@ -886,22 +896,22 @@ elsif ( $cmd eq 'docker' ) {
     my $sub = shift @ARGV || '';
     if ( $sub eq '' || $sub eq 'help' || $sub eq '-h' || $sub eq '--help' ) {
         print <<'DOCKER_USAGE';
-Usage: dashboard docker <subcommand> [arguments]
+Usage: d2 docker <subcommand> [arguments]
 
 Docker Compose:
-  dashboard docker compose [--addon NAME] [--mode NAME] [--service NAME]
+  d2 docker compose [--addon NAME] [--mode NAME] [--service NAME]
                            [--project DIR] [--dry-run] <compose-args...>
   Resolve layered Compose files and pass remaining arguments to Docker Compose.
 
 Service management:
-  dashboard docker list [--enabled|--disabled]
-  dashboard docker enable <service> [service...]
-  dashboard docker disable <service> [service...]
-  dashboard docker development enable <service> [service...]
-  dashboard docker development disable <service> [service...]
+  d2 docker list [--enabled|--disabled]
+  d2 docker enable <service> [service...]
+  d2 docker disable <service> [service...]
+  d2 docker development enable <service> [service...]
+  d2 docker development disable <service> [service...]
 
-Use 'dashboard docker compose --help' for Docker Compose options, or
-'dashboard help' for the complete command reference.
+Use 'd2 docker compose --help' for Docker Compose options, or
+'d2 help' for the complete command reference.
 DOCKER_USAGE
         exit 0;
     }
@@ -938,7 +948,7 @@ DOCKER_USAGE
     }
     if ( $sub eq 'development' ) {
         my $action = @ARGV ? shift @ARGV : '';
-        die "Usage: dashboard docker development {enable|disable} <service> [service...]\n"
+        die "Usage: d2 docker development {enable|disable} <service> [service...]\n"
           if $action !~ /\A(?:enable|disable)\z/ || !@ARGV;
         my $toggle = $action eq 'enable' ? 'enable_service_development' : 'disable_service_development';
         my @results;
@@ -960,7 +970,7 @@ DOCKER_USAGE
         # DD-919: accepts one or more service names, toggling each independently
         # so a bad name among good ones is reported per-service instead of
         # aborting the whole call; single-service is the size-1 case of the loop.
-        die "Usage: dashboard docker $sub <service> [service...]\n" if !@ARGV;
+        die "Usage: d2 docker $sub <service> [service...]\n" if !@ARGV;
         my $toggle = $sub eq 'disable' ? 'disable_service' : 'enable_service';
         my @results;
         my $failed = 0;
@@ -985,7 +995,7 @@ DOCKER_USAGE
             'enabled!'  => \$enabled_only,
             'disabled!' => \$disabled_only,
         );
-        die "Usage: dashboard docker list [--enabled|--disabled]\n"
+        die "Usage: d2 docker list [--enabled|--disabled]\n"
           if @ARGV || ( $enabled_only && $disabled_only );
         my $filter = 'all';
         $filter = 'enabled'  if $enabled_only;
@@ -997,7 +1007,7 @@ DOCKER_USAGE
         );
         exit 0;
     }
-    die "Unknown docker subcommand '$sub'. Run 'dashboard docker --help' for usage.\n";
+    die "Unknown docker subcommand '$sub'. Run 'd2 docker --help' for usage.\n";
 }
 elsif ( $cmd eq 'serve' ) {
     _load_configured_path_aliases();
@@ -1100,28 +1110,87 @@ elsif ( $cmd eq 'web-foreground' ) {
         'workers=i' => \$workers,
         'ssl!'      => \$ssl,
     );
-    die "Usage: dashboard web-foreground [--host HOST] [--port PORT] [--workers N] [--ssl|--no-ssl]\n" if @ARGV;
-    $runtime->start_web(
-        foreground => 1,
-        host       => $host,
-        port       => $port,
-        workers    => $workers,
-        ssl        => $ssl,
+    die "Usage: d2 web-foreground [--host HOST] [--port PORT] [--workers N] [--ssl|--no-ssl]\n" if @ARGV;
+    require Developer::Dashboard::SystemMenu::Runner;
+    my $menu_platform = $^O eq 'darwin' ? 'macos'
+      : $^O eq 'MSWin32' ? 'windows'
+      : $^O eq 'linux' ? 'ubuntu'
+      : 'unsupported';
+    my $menu_runner = Developer::Dashboard::SystemMenu::Runner->new(
+        config   => $config->merged,
+        store    => $indicators,
+        platform => $menu_platform,
     );
+    $menu_runner->run_with( sub {
+        return $runtime->start_web(
+            foreground => 1,
+            host       => $host,
+            port       => $port,
+            workers    => $workers,
+            ssl        => $ssl,
+        );
+    } );
     exit 0;
+}
+elsif ( $cmd eq 'system-menu-foreground' ) {
+    die "Usage: d2 system-menu-foreground\n" if @ARGV;
+    require JSON::XS;
+    require Developer::Dashboard::System::Menu;
+    local $/;
+    my $items_json = <STDIN>;
+    die "system-menu-foreground requires menu items JSON on stdin\n"
+      if !defined $items_json || $items_json eq '';
+    my $items = JSON::XS->new->utf8->decode($items_json);
+    die "system-menu-foreground requires a menu items array\n"
+      if ref($items) ne 'ARRAY';
+    my $menu = Developer::Dashboard::System::Menu::menu();
+    # A TERM/INT from the parent (the menu runner stopping the worker)
+    # asks the menu to stop cleanly: the run loop sees active=0, exits,
+    # and the native helper is stopped. Without this the child would die
+    # at once and leave the helper running.
+    local $SIG{TERM} = sub { $menu->stop; };
+    local $SIG{INT}  = sub { $menu->stop; };
+    $menu->run($items);
+    exit 0;
+}
+elsif ( $cmd eq 'web-ssl-backend-foreground' ) {
+    _load_configured_path_aliases();
+    _migrate_saved_pages();
+    my $host = '127.0.0.1';
+    my $port = 0;
+    my $workers = 1;
+    GetOptionsFromArray(
+        \@ARGV,
+        'host=s'    => \$host,
+        'port=i'    => \$port,
+        'workers=i' => \$workers,
+    );
+    die "Usage: d2 web-ssl-backend-foreground --host HOST --port PORT [--workers N]\n"
+      if @ARGV || !$port;
+    my $status = $runtime->serve_ssl_backend_foreground(
+        host    => $host,
+        port    => $port,
+        workers => $workers,
+    );
+    exit $status;
 }
 elsif ( $cmd eq 'collector-loop-foreground' ) {
     my $name = '';
+    my $runtime = '';
     GetOptionsFromArray(
         \@ARGV,
-        'name=s' => \$name,
+        'name=s'    => \$name,
+        'runtime=s' => \$runtime,
     );
-    die "Usage: dashboard collector-loop-foreground --name NAME\n" if !$name || @ARGV;
+    # The --runtime token is accepted and ignored: it is identity for
+    # observers (the finder scopes adoption through it, the detector
+    # confirms foreign loops through it), not an input the loop acts on.
+    die "Usage: d2 collector-loop-foreground --name NAME\n" if !$name || @ARGV;
     my $job = $collectors->read_job($name) || die "Unknown collector '$name'\n";
     my $schedule_mode = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );
     my $interval = $runner->_effective_interval_seconds($job);
     $runner->_run_loop_child(
-        daemonize     => 0,
+        daemonize     => 1,
         interval      => $interval,
         job           => $job,
         name          => $name,
@@ -1138,7 +1207,7 @@ elsif ( $cmd eq 'collector-worker-foreground' ) {
         'name=s'     => \$name,
         'loop-pid=i' => \$loop_pid,
     );
-    die "Usage: dashboard collector-worker-foreground --name NAME --loop-pid PID\n"
+    die "Usage: d2 collector-worker-foreground --name NAME --loop-pid PID\n"
       if !$name || !$loop_pid || @ARGV;
     my $job = $collectors->read_job($name) || die "Unknown collector '$name'\n";
     $runner->_run_loop_worker(
@@ -1152,10 +1221,7 @@ elsif ( $cmd eq 'collector-worker-foreground' ) {
 elsif ( $cmd eq 'collector-supervisor-foreground' ) {
     _load_configured_path_aliases();
     _migrate_saved_pages();
-    $runtime->_run_collector_supervisor_child(
-        daemonize => 0,
-        redirect  => 0,
-    );
+    $runtime->_run_collector_supervisor_child();
     exit 0;
 }
 elsif ( $cmd eq 'stop' ) {
@@ -1219,11 +1285,19 @@ elsif ( $cmd eq 'skills' ) {
     );
     exit $exit_code;
 }
+elsif ( $cmd eq 'which' ) {
+    require Developer::Dashboard::CLI::Which;
+    my $exit_code = Developer::Dashboard::CLI::Which::run_which_command(
+        command => $cmd,
+        args    => \@ARGV,
+    );
+    exit $exit_code;
+}
 elsif ( $cmd eq 'complete' ) {
-    die "dashboard complete should have exited before runtime bootstrap\n";
+    die "d2 complete should have exited before runtime bootstrap\n";
 }
 else {
-    die "Unsupported built-in dashboard command '$cmd'\n";
+    die "Unsupported built-in d2 command '$cmd'\n";
 }
 
 # _lifecycle_progress(%args)
@@ -1262,25 +1336,20 @@ sub _seed_init_page {
 }
 
 # _shell_dashboard_command()
-# Builds a shell-safe command that re-invokes the current dashboard entrypoint.
+# Builds a shell-safe command that re-invokes the current d2 entrypoint.
 # Input: none.
 # Output: shell command string suitable for generated shell bootstrap helpers.
 sub _shell_dashboard_command {
     my ($shell) = @_;
     my $script = $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || File::Spec->rel2abs($0);
-    if ( $shell eq 'powershell' || $shell eq 'pwsh' ) {
-        my $repo_lib = $ENV{DEVELOPER_DASHBOARD_REPO_LIB} || File::Spec->rel2abs( File::Spec->catdir( $Bin, '..', 'lib' ) );
-        if ( -f File::Spec->catfile( $repo_lib, 'Developer', 'Dashboard.pm' ) ) {
-            return join ' ',
-              shell_quote_for( $shell, $^X ),
-              shell_quote_for( $shell, '-I' . $repo_lib ),
-              shell_quote_for( $shell, $script );
-        }
-        return join ' ',
-          shell_quote_for( $shell, $^X ),
-          shell_quote_for( $shell, $script );
-    }
-    return shell_quote_for( $shell, $script );
+    my $repo_lib = $ENV{DEVELOPER_DASHBOARD_REPO_LIB} || File::Spec->rel2abs( File::Spec->catdir( $Bin, '..', 'lib' ) );
+    my @argv = ($^X);
+    push @argv, '-I' . $repo_lib
+      if -f File::Spec->catfile( $repo_lib, 'Developer', 'Dashboard.pm' );
+    push @argv, $script;
+    # A checkout's bin/d2 can lack its executable bit; use Perl for
+    # every generated shell rather than executing the file directly.
+    return join ' ', map { shell_quote_for( $shell, $_ ) } @argv;
 }
 
 # _shell_bootstrap($shell)
@@ -1291,7 +1360,7 @@ sub _shell_dashboard_command {
 sub _shell_bootstrap {
     my ($shell) = @_;
     my $dashboard_cmd = _shell_dashboard_command($shell);
-    my $tmux_status_cmd = shell_quote_for( 'sh', $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || File::Spec->rel2abs($0) );
+    my $tmux_status_cmd = _shell_dashboard_command('sh');
     my $dashboard_json_matches = _shell_json_extract_command(
         $shell,
         'my $h=JSON::XS->new->decode($_); print join qq(\n), @{ $h->{matches} || [] }',
@@ -1350,7 +1419,7 @@ function cdr {
 
 Set-Alias dd_cdr cdr
 
-Register-ArgumentCompleter -CommandName 'dashboard', 'd2' -ScriptBlock {
+Register-ArgumentCompleter -CommandName 'd2' -ScriptBlock {
   param($wordToComplete, $commandAst, $cursorPosition)
   $tokens = @()
   foreach ($element in $commandAst.CommandElements) {
@@ -1474,7 +1543,7 @@ _dashboard_complete_zsh() {
   compadd -a completions
 }
 
-compdef _dashboard_complete_zsh dashboard d2
+compdef _dashboard_complete_zsh d2
 
 _dashboard_complete_cdr_zsh() {
   local -a completions
@@ -1529,7 +1598,7 @@ $completion_output
 EOF
 }
 
-complete -F _dashboard_complete dashboard d2
+complete -F _dashboard_complete d2
 
 _dashboard_complete_cdr() {
   COMPREPLY=()
@@ -1599,7 +1668,7 @@ sub _shell_json_extract_command {
 }
 
 # _shell_prompt_bootstrap($shell)
-# Builds the prompt hook snippet for a supported shell so dashboard ps1 can be
+# Builds the prompt hook snippet for a supported shell so d2 ps1 can be
 # reused outside bash as well.
 # Input: normalized shell name.
 # Output: shell snippet string.
@@ -1864,7 +1933,7 @@ _dashboard-core - internal staged built-in command runtime for Developer Dashboa
 =head1 DESCRIPTION
 
 This internal helper runs the heavier built-in Developer Dashboard commands
-after the public C<dashboard> entrypoint has already handled hook execution and
+after the public C<d2> entrypoint has already handled hook execution and
 switchboard dispatch. It is staged under F<~/.developer-dashboard/cli/dd/> as
 F<_dashboard-core> and is not meant to be called by users directly. It also
 generates the shared shell bootstrap snippets that expose C<cdr>,
@@ -1886,7 +1955,7 @@ _dashboard-core - contains the shared private built-in command runtime that the 
 
 =head1 PURPOSE
 
-This private staged runtime owns the heavier built-in command implementations after C<bin/dashboard> has already done hook execution and helper dispatch. It is also where the generated shell bootstrap snippets come from, including C<cdr>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and PowerShell. Detached internal foreground helpers such as the web listener and collector watchdog also re-enter through this file when the runtime needs a background-managed process without bloating the public entrypoint. While it runs, it normalizes the live process title to C<developer-dashboard ...> so operators see the public command name in C<ps> output instead of the staged helper path under F<~/.developer-dashboard/cli/dd/>.
+This private staged runtime owns the heavier built-in command implementations after C<bin/d2> has already done hook execution and helper dispatch. It is also where the generated shell bootstrap snippets come from, including C<cdr>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and PowerShell. Detached internal foreground helpers such as the web listener and collector watchdog also re-enter through this file when the runtime needs a background-managed process without bloating the public entrypoint. While it runs, it normalizes the live process title to C<developer-dashboard ...> so operators see the public command name in C<ps> output instead of the staged helper path under F<~/.developer-dashboard/cli/dd/>.
 
 =head1 WHY IT EXISTS
 
@@ -1898,11 +1967,11 @@ Use this file when changing built-in command dispatch after helper staging, shel
 
 =head1 HOW TO USE
 
-Users do not call this file directly. C<dashboard init> or on-demand staging writes wrappers under F<~/.developer-dashboard/cli/dd/>, and those wrappers invoke C<_dashboard-core> with the built-in command name they represent.
+Users do not call this file directly. C<d2 init> or on-demand staging writes wrappers under F<~/.developer-dashboard/cli/dd/>, and those wrappers invoke C<_dashboard-core> with the built-in command name they represent.
 
 For Docker service overlays, the staged C<docker> helper dispatches
-C<dashboard docker development enable E<lt>serviceE<gt>> and
-C<dashboard docker development disable E<lt>serviceE<gt>> here. These commands
+C<d2 docker development enable E<lt>serviceE<gt>> and
+C<d2 docker development disable E<lt>serviceE<gt>> here. These commands
 write or remove the service folder's C<develop.yml> marker; the Compose
 resolver then loads C<compose.yml> first and an existing
 C<development.compose.yml> after it. The Docker helper's C<--help>, C<-h>,
@@ -1926,8 +1995,8 @@ Before dispatching a public built-in body, this runtime checks explicit
 C<--help>, C<-h>, and trailing C<help> requests against
 C<Developer::Dashboard::CLI::Help>. It exits with the matching command or
 action synopsis before running the requested operation. The shared
-C<dashboard complete> helper reads the same catalog for action and option TAB
-candidates, including targets after global C<dashboard help>.
+C<d2 complete> helper reads the same catalog for action and option TAB
+candidates, including targets after global C<d2 help>.
 
 =head1 WHAT USES IT
 
@@ -1937,7 +2006,7 @@ It is used by every staged dashboard-managed helper under F<~/.developer-dashboa
 
 Example 1:
 
-  dashboard paths
+  d2 paths
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -1945,7 +2014,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/_dashboard-core --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 
@@ -1961,9 +2030,9 @@ Verify that the helper still behaves correctly inside the complete repository su
 
 Example 5:
 
-  dashboard docker development enable web
-  dashboard docker compose config web
-  dashboard docker development disable web
+  d2 docker development enable web
+  d2 docker compose config web
+  d2 docker development disable web
 
 Opt a service into its development Compose overlay, inspect the resolved config
 without starting containers, then turn the overlay back off.

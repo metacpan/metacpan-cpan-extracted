@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Test::More;
+use Config;
 use File::Temp qw(tempdir);
 use File::Spec ();
 use Cwd qw(abs_path getcwd);
@@ -40,7 +41,7 @@ chdir $home or die "Unable to chdir to $home: $!";
     is( d2->paths->{home}, $direct->home, 'AC-1: d2->paths->{home} matches PathRegistry->home directly' );
 }
 
-# AC-2: a custom alias added the same way `dashboard path add` does (through
+# AC-2: a custom alias added the same way `d2 path add` does (through
 # the real CLI dispatch, so it is genuinely persisted, not a stub) is
 # resolvable through d2->paths too.
 {
@@ -75,7 +76,7 @@ chdir $home or die "Unable to chdir to $home: $!";
 }
 
 # AC-5/AC-8: a bareword single-word method (AUTOLOAD) shells to the real
-# `dashboard <name>` and a nonzero exit dies with stderr attached, rather
+# `d2 <name>` and a nonzero exit dies with stderr attached, rather
 # than silently returning as if it had succeeded.
 {
     # REWRITTEN FOR Q-101. This used to assert that a bareword call shells out
@@ -93,13 +94,13 @@ chdir $home or die "Unable to chdir to $home: $!";
     like( $@, qr/failed \(exit \d+\)/, 'and the die message names the exit code' );
 }
 
-# AC-6/AC-7: Handle->run() drives an arbitrary "dashboard"-named executable
+# AC-6/AC-7: Handle->run() drives an arbitrary "d2"-named executable
 # on PATH (stubbed here so the test does not depend on the real CLI's own
 # subcommand set), decoding JSON-shaped stdout and passing through plain
 # text, to isolate the run()/AUTOLOAD contract from the real CLI's behavior.
 {
     my $bin_dir = tempdir( CLEANUP => 1 );
-    my $stub    = File::Spec->catfile( $bin_dir, 'dashboard' );
+    my $stub    = File::Spec->catfile( $bin_dir, 'd2' );
     open my $fh, '>', $stub or die $!;
     print {$fh} <<'STUB';
 #!/bin/sh
@@ -112,7 +113,26 @@ esac
 STUB
     close $fh;
     chmod 0755, $stub;
-    local $ENV{PATH} = "$bin_dir:$ENV{PATH}";
+    if ( $^O eq 'MSWin32' ) {
+        # Windows twin of the sh stub above: the extensionless script is
+        # invisible to Windows program search (PATHEXT needs .exe/.bat/.cmd),
+        # so the product's list-form system('d2', ...) died with
+        # "'d2' is not recognized" (round 72). Mirrors the sh stub case by case.
+        my $bat = File::Spec->catfile( $bin_dir, 'd2.bat' );
+        open my $bfh, '>', $bat or die "Unable to write $bat: $!";
+        print {$bfh} <<'BAT';
+@echo off
+if "%1"=="json-thing" echo {"alpha":"beta"}
+if "%1"=="text-thing" echo plain text output
+if "%1"=="fail-thing" echo stub failure detail 1>&2
+if "%1"=="fail-thing" exit /b 7
+BAT
+        close $bfh or die "Unable to close $bat: $!";
+    }
+    # $Config{path_sep}: joining with ':' fuses the stub dir with the next
+    # PATH entry on Windows (';' separates there), so the stub was unreachable
+    # even as a .bat - proved by probe on win-ts.
+    local $ENV{PATH} = join $Config{path_sep}, $bin_dir, ( $ENV{PATH} // q{} );
 
     my $handle = Developer::Dashboard::Handle->new( cwd => $home );
 
@@ -157,7 +177,13 @@ STUB
 # avoids by always passing cwd explicitly.
 {
     my $handle = Developer::Dashboard::Handle->new;
-    is( $handle->{cwd}, getcwd(), 'new() with no cwd uses the shared current-directory lookup' );
+    # current_working_directory() canonpaths (backslashes on Windows) while
+    # getcwd() returns forward slashes there - the same directory either way,
+    # so compare separator-normalised spellings. (Round 72 never reached
+    # this assertion on Windows: the file died at test 9 first.)
+    ( my $got = $handle->{cwd} ) =~ s{\\}{/}g;
+    ( my $want = getcwd() ) =~ s{\\}{/}g;
+    is( $got, $want, 'new() with no cwd uses the shared current-directory lookup' );
 }
 
 # Coverage: run() validates its own subcommand argument - both the "missing
@@ -189,7 +215,7 @@ STUB
 # not be mistaken for the decoded-structure case.
 {
     my $bin_dir = tempdir( CLEANUP => 1 );
-    my $stub    = File::Spec->catfile( $bin_dir, 'dashboard' );
+    my $stub    = File::Spec->catfile( $bin_dir, 'd2' );
     open my $fh, '>', $stub or die $!;
     print {$fh} <<'STUB';
 #!/bin/sh
@@ -199,7 +225,17 @@ esac
 STUB
     close $fh;
     chmod 0755, $stub;
-    local $ENV{PATH} = "$bin_dir:$ENV{PATH}";
+    if ( $^O eq 'MSWin32' ) {
+        # Windows twin of the sh stub above - see the AC-6/AC-7 block.
+        my $bat = File::Spec->catfile( $bin_dir, 'd2.bat' );
+        open my $bfh, '>', $bat or die "Unable to write $bat: $!";
+        print {$bfh} <<'BAT';
+@echo off
+if "%1"=="number-thing" echo 42
+BAT
+        close $bfh or die "Unable to close $bat: $!";
+    }
+    local $ENV{PATH} = join $Config{path_sep}, $bin_dir, ( $ENV{PATH} // q{} );
 
     my $handle = Developer::Dashboard::Handle->new( cwd => $home );
     my $result = $handle->run('number-thing');
@@ -252,7 +288,7 @@ is( scalar(@warnings), 0, 'no warnings escaped: ' . join( '; ', @warnings ) );
 {
     my $bin_dir = tempdir( CLEANUP => 1 );
     my $log     = File::Spec->catfile( $bin_dir, 'invocations' );
-    my $stub    = File::Spec->catfile( $bin_dir, 'dashboard' );
+    my $stub    = File::Spec->catfile( $bin_dir, 'd2' );
     open my $sfh, '>', $stub or die "Unable to write $stub: $!";
     print {$sfh} <<"STUB";
 #!/bin/sh
@@ -261,7 +297,22 @@ echo 'stub-ran'
 STUB
     close $sfh or die "Unable to close $stub: $!";
     chmod 0755, $stub or die "Unable to chmod $stub: $!";
-    local $ENV{PATH} = "$bin_dir:$ENV{PATH}";
+    if ( $^O eq 'MSWin32' ) {
+        # Windows twin of the sh stub above - see the AC-6/AC-7 block.
+        # %* is the batch spelling of "$*" (all args, space-joined). The
+        # redirect comes FIRST: `echo %*>>file` lets a trailing digit fuse
+        # with >> into a handle redirect (`1>>` eats the 1, leaving a
+        # trailing space), so `somecmd --arg1 1` logged as `somecmd --arg1 `.
+        my $bat = File::Spec->catfile( $bin_dir, 'd2.bat' );
+        open my $bfh, '>', $bat or die "Unable to write $bat: $!";
+        print {$bfh} <<"BAT";
+\@echo off
+>>"$log" echo %*
+echo stub-ran
+BAT
+        close $bfh or die "Unable to close $bat: $!";
+    }
+    local $ENV{PATH} = join $Config{path_sep}, $bin_dir, ( $ENV{PATH} // q{} );
 
     # purpose: report every argv the stub has been invoked with since the last reset.
     # input: none. output: list of argv strings, oldest first.
@@ -296,7 +347,7 @@ STUB
             1;
         };
         is_deeply( [ $invocations->() ], [$dotted],
-            "AC-1: d2()->" . join( '->', @{$words} ) . "->() invokes exactly `dashboard $dotted`" );
+            "AC-1: d2()->" . join( '->', @{$words} ) . "->() invokes exactly `d2 $dotted`" );
     }
 
     # Q-107 TRANSLATION, AT EVERY SEGMENT AND EVERY DEPTH. A Perl method name
@@ -316,7 +367,7 @@ STUB
             1;
         };
         is_deeply( [ $invocations->() ], [$dotted],
-            "Q-107: d2()->" . join( '->', @{$words} ) . "->() invokes exactly `dashboard $dotted`" );
+            "Q-107: d2()->" . join( '->', @{$words} ) . "->() invokes exactly `d2 $dotted`" );
     }
 
     # DD-739 NAMED-ARGUMENT TRANSLATION. d2()->somecmd(arg1 => 1) is
@@ -342,7 +393,7 @@ STUB
         $reset->();
         eval { $handle->$word(@$args)->(); 1 };
         is_deeply( [ $invocations->() ], [$expect],
-            "DD-739: d2()->$word(" . join( ', ', @$args ) . ")->() invokes `dashboard $expect`" );
+            "DD-739: d2()->$word(" . join( ', ', @$args ) . ")->() invokes `d2 $expect`" );
     }
 
     # THE TERMINATOR'S OWN ARGS ARE TRANSLATED TOO, not just ones supplied at
@@ -412,7 +463,7 @@ STUB
             'Q-101: and stringifies as a proxy at depth 1 too' );
         $reset->();
         eval { $one->(); 1 };
-        is_deeply( [ $invocations->() ], ['doctor'], 'Q-101: terminating it invokes `dashboard doctor`' );
+        is_deeply( [ $invocations->() ], ['doctor'], 'Q-101: terminating it invokes `d2 doctor`' );
     }
 
     # AC-4 run() UNCHANGED - the documented bypass other code depends on.
@@ -427,7 +478,7 @@ STUB
     # AC-6 HOOKS STILL RUN. Asserted here by its MECHANISM, which is the thing a
     # refactor could actually lose (the main-gate block near the end of this file
     # asserts the consequence directly, with a real layered runtime). Layered pre-run hooks execute because
-    # Handle::run shells out through the real `dashboard` entrypoint; anything
+    # Handle::run shells out through the real `d2` entrypoint; anything
     # that reaches the CLI that way gets them for free. So what has to hold is
     # that the proxy terminator goes through run() and inherits its WHOLE
     # contract, rather than growing its own system() call that would bypass the
@@ -437,7 +488,7 @@ STUB
     # _execute shell out directly, both would break loudly.
     {
         my $json_dir = tempdir( CLEANUP => 1 );
-        my $js = File::Spec->catfile( $json_dir, 'dashboard' );
+        my $js = File::Spec->catfile( $json_dir, 'd2' );
         open my $jfh, '>', $js or die "Unable to write $js: $!";
         print {$jfh} <<'JSTUB';
 #!/bin/sh
@@ -448,7 +499,19 @@ esac
 JSTUB
         close $jfh or die "Unable to close $js: $!";
         chmod 0755, $js or die "Unable to chmod $js: $!";
-        local $ENV{PATH} = "$json_dir:$ENV{PATH}";
+        if ( $^O eq 'MSWin32' ) {
+            # Windows twin of the sh stub above - see the AC-6/AC-7 block.
+            my $bat = File::Spec->catfile( $json_dir, 'd2.bat' );
+            open my $bfh, '>', $bat or die "Unable to write $bat: $!";
+            print {$bfh} <<'BAT';
+@echo off
+if "%1"=="deep.json" echo {"via":"proxy"}
+if "%1"=="deep.fail" echo proxy failure detail 1>&2
+if "%1"=="deep.fail" exit /b 9
+BAT
+            close $bfh or die "Unable to close $bat: $!";
+        }
+        local $ENV{PATH} = join $Config{path_sep}, $json_dir, ( $ENV{PATH} // q{} );
         my $h = Developer::Dashboard::Handle->new( cwd => $home );
 
         is_deeply( $h->deep->json->(), { via => 'proxy' },
@@ -494,7 +557,7 @@ JSTUB
 # DD-810 AC-2/AC-6 - THE MAIN GATE IS INHERITED THROUGH THE HANDLE, asserted
 # DIRECTLY this time. The AC-6 block above proves the mechanism (run() reaches
 # the real entrypoint); this block proves the consequence with a real layered
-# runtime: a `dashboard` on PATH that execs the checkout's own bin/dashboard, a
+# runtime: a `d2` on PATH that execs the checkout's own bin/d2, a
 # main-gate hook under <home>/.developer-dashboard/hooks/, and a marker file the
 # hook appends its argv to. Handle::run('version') must fire that hook exactly
 # once, with the full command argv, and the command must still answer.
@@ -514,14 +577,26 @@ JSTUB
     chmod 0755, $hook or die "Unable to chmod $hook: $!";
 
     my $real_dir   = tempdir( CLEANUP => 1 );
-    my $real       = File::Spec->catfile( $real_dir, 'dashboard' );
-    my $entrypoint = File::Spec->catfile( $starting_cwd, 'bin', 'dashboard' );
+    my $real       = File::Spec->catfile( $real_dir, 'd2' );
+    my $entrypoint = File::Spec->catfile( $starting_cwd, 'bin', 'd2' );
     my $lib        = File::Spec->catdir( $starting_cwd, 'lib' );
     open my $rfh, '>', $real or die "Unable to write $real: $!";
     print {$rfh} "#!/bin/sh\nexec '$^X' -I'$lib' '$entrypoint' \"\$@\"\n";
     close $rfh or die "Unable to close $real: $!";
     chmod 0755, $real or die "Unable to chmod $real: $!";
-    local $ENV{PATH} = "$real_dir:$ENV{PATH}";
+    if ( $^O eq 'MSWin32' ) {
+        # Windows twin of the sh stub above - see the AC-6/AC-7 block.
+        # Runs the checkout's bin/d2 through the running perl, as the
+        # sh stub execs it on Unix.
+        my $bat = File::Spec->catfile( $real_dir, 'd2.bat' );
+        open my $bfh, '>', $bat or die "Unable to write $bat: $!";
+        print {$bfh} <<"BAT";
+\@echo off
+"$^X" -I"$lib" "$entrypoint" %*
+BAT
+        close $bfh or die "Unable to close $bat: $!";
+    }
+    local $ENV{PATH} = join $Config{path_sep}, $real_dir, ( $ENV{PATH} // q{} );
 
     my $h   = Developer::Dashboard::Handle->new( cwd => $home );
     my $out = $h->run('version');
@@ -549,7 +624,7 @@ t/166-dashboard-d2-handle.t - spec for the exported d2() Perl-code proxy
 =head1 PURPOSE
 
 Assert that C<d2()>, exported by L<Developer::Dashboard>, gives Perl code a
-one-line equivalent of the C<dashboard>/C<d2> command line, both for the
+one-line equivalent of the C<d2> command line, both for the
 fast in-process path-alias case and for the general subcommand proxy.
 
 =head1 WHY IT EXISTS
@@ -578,6 +653,6 @@ entrypoint for external Perl code embedding this distribution.
 
 The assertion that matters reads as the property it protects:
 
-    d2->paths->{name} matches what `dashboard path resolve name` prints
+    d2->paths->{name} matches what `d2 path resolve name` prints
 
 =cut

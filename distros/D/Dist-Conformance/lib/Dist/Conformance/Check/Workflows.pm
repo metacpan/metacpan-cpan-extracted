@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::Workflows 0.007;
+package Dist::Conformance::Check::Workflows 0.008;
 
 # ABSTRACT: The CI workflows exist
 
@@ -23,7 +23,7 @@ sub config_schema ($) {
 
 sub missing_workflows ( $self, $snapshot ) {
     my ( $directory, $required ) = @{ $self->config }{qw{directory required}};
-    my @missing = grep { !$snapshot->contains("$directory/$_") } sort keys %$required;
+    my @missing = grep { local ($_) = $_; !$snapshot->contains("$directory/$_") } sort keys %$required;
     return @missing;
 }
 
@@ -65,7 +65,7 @@ Dist::Conformance::Check::Workflows - The CI workflows exist
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

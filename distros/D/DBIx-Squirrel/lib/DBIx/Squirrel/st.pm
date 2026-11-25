@@ -3,8 +3,10 @@ use v5.36;
 package DBIx::Squirrel::st;
 
 use DBI        qw();
-use List::Util qw(pairs);
-use Ref::Util  qw(is_plain_arrayref);
+use List::Util qw(max pairs);
+use Ref::Util  qw(
+    is_arrayref is_coderef is_plain_arrayref is_plain_hashref
+    is_ref);
 
 use DBIx::Squirrel::Errors       qw(at_caller croakf);
 use DBIx::Squirrel::Iterator     qw();
@@ -86,7 +88,8 @@ sub bind_param ($self, $param, $value, @attrs) {
 # to the DBI's execute in the order of their positions, which binds them
 # as bind_param would, in one call. With the ekorn_finish_active
 # attribute, a statement still active from an earlier execute is finished
-# first.
+# first. While execute_for_fetch runs, values come by position already, a
+# value for each use of each placeholder, and go to the DBI as they are.
 sub execute ($self, @args) {
     my $state = $self->{private_ekorn};
     $self->finish
@@ -96,12 +99,126 @@ sub execute ($self, @args) {
     # them (roadmap 2026-0028).
     @args = _unwrap($self, @args) if @args == 1 && is_plain_arrayref($args[0]);
     my $binds = $state && $state->{Binds};
-    if ($binds) {
+    if ($binds && !$state->{InOrder}) {
         _check_bound($self) unless @args;
         @args = _in_order($state, \@args) if @args;
         $state->{AllBound} = 1;
     }
     return at_caller { $self->SUPER::execute(@args) };
+}
+
+
+# Execute the statement once for each row of values the fetch gives, as
+# the DBI's execute_for_fetch does, and return what it returns. A
+# statement whose placeholders are mapped takes each row as the values for
+# its placeholders, in order: by number, or for names, as each first
+# appears; or, for named ones, as a hash by name. Each row's values go to
+# the DBI by position, a value for each use, so a driver gets them as it
+# would for "?" (roadmap 2026-0037).
+sub execute_for_fetch ($self, $fetch, @status) {
+    _binds($self)
+        or return at_caller { $self->SUPER::execute_for_fetch($fetch, @status) };
+    my $state = $self->{private_ekorn};
+    _no_lists_for_rows($state);
+    my $keys     = _row_keys($state);
+    my $in_order = sub {
+        my $row = $fetch->() or return;
+        $state->{AllBound} = 1;
+        return [_row_in_order($state, $keys, $row)];
+    };
+    local $state->{InOrder} = 1;
+    return at_caller { $self->SUPER::execute_for_fetch($in_order, @status) };
+}
+
+
+# Execute the statement once for each row of values, as the DBI's
+# execute_array does, and return what it returns: the rows come from the
+# arrays given, a value for each placeholder in the order
+# execute_for_fetch takes them, or from those bound with
+# bind_param_array, or from ArrayTupleFetch. A statement whose
+# placeholders are mapped is counted by its placeholders, not their uses,
+# as the DBI's NUM_OF_PARAMS counts them (roadmap 2026-0037). The DBI's
+# own checks keep its messages, raised as it raises them.
+sub execute_array ($self, $attrs, @arrays) {
+    _binds($self)
+        or return at_caller { $self->SUPER::execute_array($attrs, @arrays) };
+    my $state = $self->{private_ekorn};
+    _no_lists_for_rows($state);
+    my $keys   = _row_keys($state);
+    my $needed = @$keys;
+    my $status = $attrs && $attrs->{ArrayTupleStatus};
+    return _dbi_error(
+        $self,
+        execute_array => 'ArrayTupleStatus attribute must be an arrayref',
+    ) if $status && !is_plain_arrayref($status);
+    my $fetch;
+    if (my $source = $attrs && $attrs->{ArrayTupleFetch}) {
+        return _dbi_error(
+            $self,
+            execute_array => "Can't use both ArrayTupleFetch and explicit bind values",
+        ) if @arrays;
+        $fetch = _fetch_from($self, $source, $needed)
+            or return;
+    }
+    else {
+        if (@arrays) {
+            return _dbi_error(
+                $self,
+                execute_array => @arrays . " bind values supplied but $needed expected",
+            ) unless @arrays == $needed;
+            $state->{ParamArrays} = {};
+            for my $i (keys @arrays) {
+                $self->bind_param_array($keys->[$i], $arrays[$i])
+                    or return;
+            }
+        }
+        my $given = $state->{ParamArrays} // {};
+        my $count = keys %$given;
+        return _dbi_error(
+            $self,
+            execute_array => "$count bind values supplied but $needed expected",
+        ) unless $count == $needed;
+        my $rows
+            = max(1, map { scalar @$_ } grep { is_plain_arrayref($_) } values %$given);
+        my $row = 0;
+        $fetch = sub {
+            return if $row >= $rows;
+            my @values
+                = map { is_plain_arrayref($_) ? $_->[$row] : $_ } @$given{@$keys};
+            $row++;
+            return \@values;
+        };
+    }
+    return $self->execute_for_fetch($fetch, $status ? $status : ());
+}
+
+
+# Bind an array of values, one for each row execute_array executes, to a
+# placeholder, as the DBI's bind_param_array does, and return what it
+# returns. A statement whose placeholders are mapped takes the
+# placeholder's number or name, with or without its sigil, where the
+# DBI's takes only a number; attributes given are bound to every use of
+# it, as bind_param binds them. Its arrays are kept with the statement's
+# map, not in the DBI's ParamArrays, which only the driver's side of the
+# handle can set (roadmap 2026-0037).
+sub bind_param_array ($self, $param, $values, @attrs) {
+    my $binds = _binds($self)
+        or return
+        at_caller { $self->SUPER::bind_param_array($param, $values, @attrs) };
+    my $state = $self->{private_ekorn};
+    _no_lists_for_rows($state);
+    return _dbi_error(
+        $self, bind_param_array =>
+            "Value for parameter $param must be a scalar or an arrayref, not a "
+            . ref $values,
+    ) if is_ref($values) && !is_plain_arrayref($values);
+    my $key = key_of($param);
+    croakf 'Expected a placeholder of the statement (%s)', $param
+        unless $binds->{$key};
+    $state->{ParamArrays}{$key} = $values;
+    return $self->bind_param($key, undef, @attrs)
+        if @attrs && $attrs[0];
+    return 1;
 }
 
 # Return an iterator over the statement's results, executed with the bind
@@ -186,6 +303,94 @@ sub _in_order ($state, $args) {
         $in_order[$placed->[$i] - 1] = $placed->[$i + 1];
     }
     return @in_order;
+}
+
+
+# Return the numbers or names a row of values gives a statement values
+# for, in the order it gives them: each number to the highest, as execute
+# takes them, or the names in the order each first appears (roadmap
+# 2026-0037, D1). A statement's handle keeps them.
+sub _row_keys ($state) {
+    return $state->{RowKeys}
+        if $state->{RowKeys};
+    my $binds = $state->{Binds};
+    return $state->{RowKeys}
+        = is_numbered($binds)
+        ? [1 .. values_taken($binds)]
+        : [sort { $binds->{$a}[0] <=> $binds->{$b}[0] } keys %$binds];
+}
+
+
+# Return a row's values for a statement's placeholders in the order of
+# their positions, a value for each use, as _in_order does, given what the
+# statement handle keeps about it, the numbers or names its rows give
+# values for, and the row: an array of values in that order, or, for a
+# named statement, a hash of them by name.
+sub _row_in_order ($state, $keys, $row) {
+    my $numbered = is_numbered($state->{Binds});
+    return _in_order($state, [$row])
+        if !$numbered && is_plain_hashref($row);
+    croakf 'Expected a row of values: an array, or a hash for named placeholders'
+        unless is_arrayref($row);
+    return _in_order($state, $row)
+        if $numbered;
+    croakf 'Expected %d bind values, not %d', scalar @$keys, scalar @$row
+        unless @$row == @$keys;
+    my %values;
+    @values{@$keys} = @$row;
+    return @values{@{ $state->{Order} }};
+}
+
+
+# Return a fetch of rows, for execute_array, from what ArrayTupleFetch
+# holds: a code reference, as it is, or an active statement handle, read
+# a row at a time, with as many columns as the statement has
+# placeholders. Otherwise, set the DBI's error, as it does, and return
+# nothing.
+sub _fetch_from ($self, $source, $needed) {
+    return $source
+        if is_coderef($source);
+    return _dbi_error(
+        $self,
+        execute_array =>
+            "ArrayTupleFetch '$source' is not a code ref or statement handle",
+    ) unless $source isa 'DBI::st';
+    return _dbi_error(
+        $self,
+        execute_array =>
+            'ArrayTupleFetch sth is not Active, need to execute() it first',
+    ) unless $source->{Active};
+    my $fields = $source->{NUM_OF_FIELDS};    # an active statement has them
+    return _dbi_error(
+        $self,
+        execute_array =>
+            "$fields columns from ArrayTupleFetch sth but $needed expected",
+    ) if $fields != $needed;
+    return sub { $source->fetchrow_arrayref };
+}
+
+
+# Croak if a statement has list placeholders: its handle is prepared for
+# lists of the lengths it was given, so rows of values can't share it
+# (roadmap 2026-0037, D4).
+sub _no_lists_for_rows ($state) {
+    my $lists = $state->{Lists};
+    croakf 'Expected no list placeholder in a statement for rows of values (%s)',
+        join ', ', sort values %$lists
+        if $lists;
+    return;
+}
+
+
+# Set the DBI's error on a statement handle, with one of the DBI's own
+# messages, as its execute_array and bind_param_array set them, so it's
+# raised, printed or handled as the handle's attributes say, named for
+# the method given, as the DBI names it; return what set_err returns. An
+# error left from an earlier call is cleared first, as the DBI clears it
+# at the start of each of its methods, or set_err would add to it.
+sub _dbi_error ($self, $method, $message) {
+    $self->set_err(undef, undef);
+    return at_caller { $self->set_err($DBI::stderr, $message, undef, $method) };
 }
 
 1;
@@ -302,6 +507,23 @@ The value for a list placeholder is its list. Each value in it is
 bound to a position of its own, with the same C<\%attr> or
 C<$bind_type>.
 
+=head2 bind_param_array
+
+    $rv = $sth->bind_param_array($placeholder, \@values);
+    $rv = $sth->bind_param_array($placeholder, $value);
+    $rv = $sth->bind_param_array($placeholder, \@values, \%attr);
+
+Binds an array of values to a placeholder, a value for each row
+L</execute_array> executes, or a plain value for every row, as the
+DBI's C<bind_param_array> does, and returns what it returns. The
+placeholder is named as for L</bind_param>: by number or name, with or
+without its sigil, where the DBI's takes only a number. Attributes
+given are bound to every use of it.
+
+For any style but C<?>, the arrays are kept with the statement, not in
+the DBI's C<ParamArrays>, which only the driver's side of the handle
+can set.
+
 =head2 execute
 
     $rv = $sth->execute;
@@ -324,6 +546,54 @@ C<execute> before executing it again. Nor does C<execute>, unless the
 C<ekorn_finish_active> attribute is true. Pass it to
 L<DBIx::Squirrel/connect> to set it for every statement of a database
 handle, or to L<DBIx::Squirrel::db/prepare> for one statement.
+
+=head2 execute_array
+
+    $tuples = $sth->execute_array(\%attr, @arrays);
+    ($tuples, $rows) = $sth->execute_array(\%attr, @arrays);
+    $tuples = $sth->execute_array(\%attr);
+
+Executes the statement once for each row of values, as the DBI's
+C<execute_array> does, and returns what it returns: in a list, the
+rows executed and the rows changed. The rows come from C<@arrays>, an
+array for each placeholder; from those bound with
+L</bind_param_array>; or from C<ArrayTupleFetch> in C<%attr>, a code
+reference returning a row at a time, or an active statement handle to
+read them from. Each row's status goes in C<ArrayTupleStatus>, as with
+the DBI.
+
+A row's values come in the order of the statement's placeholders: by
+number, or, for names, in the order each first appears. So
+C<:id, :name, :id> takes two values a row, and the DBI's counts are of
+the placeholders, not their uses. The DBI's errors keep its messages,
+raised, printed or handled as the handle's attributes say.
+
+    my $sth = $dbh->prepare('INSERT INTO gig (artist, city) VALUES (:artist, :city)');
+    $sth->execute_array({}, ['Abba', 'Blur'], ['Brighton', 'Colchester']);
+
+=head2 execute_for_fetch
+
+    $tuples = $sth->execute_for_fetch($fetch);
+    $tuples = $sth->execute_for_fetch($fetch, \@status);
+    ($tuples, $rows) = $sth->execute_for_fetch($fetch, \@status);
+
+Executes the statement once for each row C<$fetch> returns, until it
+returns nothing, as the DBI's C<execute_for_fetch> does, and returns
+what it returns. A row is an array of values, in the order
+L</execute_array> takes them, or, for named placeholders, a hash of
+them by name, with or without the sigil:
+
+    my @rows = ({artist => 'Cream', city => 'Windsor'});
+    $sth->execute_for_fetch(sub { shift @rows });
+
+Each row's values go to the DBI by position, a value for each use of
+each placeholder, so a driver with its own C<execute_for_fetch> gets
+them as it would for C<?>.
+
+A statement with a list placeholder, described in L</Lists>, can't
+take rows, as its handle is prepared for lists of one length:
+C<execute_array>, C<execute_for_fetch> and C<bind_param_array> croak
+for it.
 
 =head2 iterate
 
@@ -361,7 +631,9 @@ sink, the sink's result.
 =item Expected %d bind values, not %d
 
 A statement with numbered placeholders was given more or fewer values
-than its highest number.
+than its highest number; or a row given to L</execute_for_fetch>, for
+numbered or named placeholders, had more or fewer values than the
+statement has placeholders.
 
 =item Expected names and values in pairs
 
@@ -376,6 +648,11 @@ A value was given for a placeholder the statement doesn't have.
 A statement with named placeholders wasn't given a value for each
 name, or a statement with numbered or named placeholders was executed
 without values when some had none bound.
+
+=item Expected one value for each placeholder (two for %s)
+
+A statement with named placeholders was given a value for a name twice,
+written with and without its sigil, as C<:id> and C<id>.
 
 =item Expected a reference to an ARRAY for a list (%s)
 
@@ -393,6 +670,18 @@ so the caller must deal with an empty list.
 A list held an unblessed reference, such as an array reference inside
 the one given, as in C<[[1, 2]]> to a statement whose one value is a
 list.
+
+=item Expected a row of values: an array, or a hash for named placeholders
+
+A row given to L</execute_for_fetch>, or by C<ArrayTupleFetch> to
+L</execute_array>, was neither an array, nor, for named placeholders, a
+hash. The rows before it have been executed.
+
+=item Expected no list placeholder in a statement for rows of values (%s)
+
+L</execute_array>, L</execute_for_fetch> or L</bind_param_array> was
+called on a statement with a list placeholder. Its handle is prepared
+for lists of one length, so rows of values can't share it.
 
 =item Expected %d values in a list, as prepared, not %d (%s)
 

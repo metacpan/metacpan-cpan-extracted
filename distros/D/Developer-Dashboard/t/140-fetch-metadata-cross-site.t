@@ -4,6 +4,13 @@ use strict;
 use warnings;
 use utf8;
 
+# `use lib` must come before the first Developer::Dashboard use: PerlEnv
+# loads Platform, and PathRegistry (loaded below) imports the new ACL
+# exports from it. With the prove -I blib ahead of lib, a Dashboard module
+# loaded first pins the stale blib Platform and the import dies.
+use lib 'lib';
+use lib 't/lib';
+
 use Cwd qw(getcwd);
 use Developer::Dashboard::PerlEnv;
 use File::Basename qw(dirname);
@@ -12,9 +19,6 @@ use File::Spec;
 use File::Temp qw(tempdir);
 use HTTP::Request::Common qw(GET);
 use Test::More;
-
-use lib 'lib';
-use lib 't/lib';
 
 use Developer::Dashboard::ActionRunner;
 use Developer::Dashboard::Auth;
@@ -148,7 +152,7 @@ sub run_ajax {
 # ---------------------------------------------------------------------------
 # 1. Controls. The saved-Ajax route is the dashboard's own "run a command from
 #    a page" mechanism, so the request shapes the product itself produces must
-#    keep executing: the dashboard page's own GET (same-origin), a
+#    keep executing: the d2 page's own GET (same-origin), a
 #    user-initiated load (none), and a machine client that sends no fetch
 #    metadata at all.
 # ---------------------------------------------------------------------------
@@ -253,7 +257,7 @@ sub run_ajax {
         fetch_site => 'same-origin',
         origin     => 'http://127.0.0.1:7890',
     );
-    is( $code, $control, 'a same-origin POST from the dashboard page is unaffected' );
+    is( $code, $control, 'a same-origin POST from the d2 page is unaffected' );
 }
 
 # ---------------------------------------------------------------------------

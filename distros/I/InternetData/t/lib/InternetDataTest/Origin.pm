@@ -34,6 +34,8 @@ sub new {
         my $c = shift;
         push @{ $self->{requests} }, {
             path => $c->req->url->path->to_string,
+            # The query as it arrived, read before anything parses it.
+            raw_query => $c->req->url->query->to_string,
             query => $c->req->url->query->to_hash,
             headers => $c->req->headers->to_hash,
         };

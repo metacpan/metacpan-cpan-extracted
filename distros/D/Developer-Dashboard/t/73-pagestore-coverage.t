@@ -227,6 +227,55 @@ for my $platform_id ( 'C:\\outside', 'C:relative', 'double//separator', 'trailin
     ok( !-e $missing_target, 'dangling directory symlink creates no outside directory' );
 }
 
+# On Windows, Cwd::abs_path does not resolve symlink components, so a save
+# through a symlinked directory looked contained and wrote outside its root.
+# Model that abs_path here (canonicalise the spelling, follow no link) and
+# prove containment still rejects both a symlinked directory and a write
+# whose fallback layer is reached through one. This is a Linux model of
+# Windows-only behaviour: it still needs a box solo run to prove on the
+# Windows box itself.
+{
+    my $outside_dir = tempdir( CLEANUP => 1 );
+    my $outside_file = File::Spec->catfile( $outside_dir, 'page' );
+    my $linked_dir = File::Spec->catdir( $droot, 'modelled-winlink' );
+    symlink $outside_dir, $linked_dir
+      or die "Unable to create modelled Windows link $linked_dir -> $outside_dir: $!";
+
+    no warnings qw(redefine once);
+    local *Developer::Dashboard::PageStore::abs_path = sub {
+        my ($path) = @_;
+        return if !defined $path || $path eq '';
+        return if !-e $path && !-l $path;
+        return File::Spec->canonpath($path);
+    };
+
+    my $ok = eval { $store->save_page( { id => 'modelled-winlink/page', title => 'No outside write' } ); 1 };
+    ok( !$ok, 'save_page rejects a directory symlink even when abs_path does not resolve links' );
+    like( $@, qr/Invalid page (?:id|path)/, 'non-resolving abs_path escape reports an explicit validation error' );
+    ok( !-e $outside_file, 'non-resolving abs_path escape writes nothing outside dashboards_root' );
+
+    my $layer_base = tempdir( CLEANUP => 1 );
+    my $layer_write = File::Spec->catdir( $layer_base, 'write', 'dashboards' );
+    my $layer_fallback = File::Spec->catdir( $layer_base, 'fallback', 'dashboards' );
+    make_path( $layer_write, $layer_fallback );
+    my $layer_paths = bless {
+        write_root    => $layer_write,
+        fallback_root => $layer_fallback,
+    }, 'DD395::LayeredPaths';
+    my $layered_store = Developer::Dashboard::PageStore->new( paths => $layer_paths );
+    my $layer_link = File::Spec->catdir( $layer_write, 'modelled-winlink' );
+    symlink $layer_fallback, $layer_link
+      or die "Unable to create modelled Windows layered link $layer_link -> $layer_fallback: $!";
+    my $layer_outside = File::Spec->catfile( $layer_fallback, 'overwritten' );
+    my $layered_ok = eval {
+        $layered_store->save_page( { id => 'modelled-winlink/overwritten', title => 'No layered write' } );
+        1;
+    };
+    ok( !$layered_ok, 'save_page rejects a layered directory symlink when abs_path does not resolve links' );
+    like( $@, qr/Invalid page (?:id|path)/, 'layered non-resolving abs_path escape reports an explicit validation error' );
+    ok( !-e $layer_outside, 'layered non-resolving abs_path escape writes nothing into the fallback root' );
+}
+
 # Listing must not parse valid-looking bookmark content reached through a
 # symlink to an external file.
 {
@@ -977,6 +1026,47 @@ like( $structured_nav->{layout}{body}, qr/structured navigation/,
         ok( !exists $store->{_nav_fragment_cache}{entries}{$changed_file},
             'content changed during a read is not cached under the stale fingerprint' );
     }
+
+    # Windows file timestamps move coarsely, so a same-tick same-size rewrite
+    # leaves every fingerprinted stat field identical. Freeze lstat to model
+    # that and prove the cache compares bytes, not just stats. This is a
+    # Linux model of Windows-only behaviour: it still needs a box solo run
+    # to prove on the Windows box itself.
+    my $frozen_file = File::Spec->catfile( $nav_dir, 'frozen-stat.tt' );
+    write_raw( $frozen_file, '<p>ready</p>' );
+    my @frozen_stat = Time::HiRes::lstat($frozen_file);
+    {
+        no warnings qw(once redefine);
+        local *Time::HiRes::lstat = sub { return @frozen_stat };
+        my $first = $store->load_nav_fragment('nav/frozen-stat.tt');
+        is( $first->{body}, '<p>ready</p>', 'a frozen-stat first load caches its literal body' );
+        write_raw( $frozen_file, '<p>fresh</p>' );
+        my $second = $store->load_nav_fragment('nav/frozen-stat.tt');
+        is( $second->{body}, '<p>fresh</p>', 'a same-tick same-size rewrite is not served stale from the cache' );
+        is( $store->{_nav_fragment_cache}{entries}{$frozen_file}{body}, '<p>fresh</p>',
+            'the refreshed cache holds the rewritten bytes under the frozen fingerprint' );
+    }
+
+    my $frozen_changed_file = File::Spec->catfile( $nav_dir, 'frozen-changed.tt' );
+    write_raw( $frozen_changed_file, '<b>first body</b>' );
+    my @frozen_changed_stat = Time::HiRes::lstat($frozen_changed_file);
+    my $frozen_real_read = Developer::Dashboard::PageStore->can('_read_saved_instruction');
+    my $frozen_changed_reads = 0;
+    {
+        no warnings qw(once redefine);
+        local *Time::HiRes::lstat = sub { return @frozen_changed_stat };
+        local *Developer::Dashboard::PageStore::_read_saved_instruction = sub {
+            my $body = $frozen_real_read->(@_);
+            if ( $_[1] eq $frozen_changed_file && !$frozen_changed_reads++ ) {
+                write_raw( $frozen_changed_file, '<b>other body</b>' );
+            }
+            return $body;
+        };
+        my $result = $store->load_nav_fragment('nav/frozen-changed.tt');
+        is( $result->{body}, '<b>first body</b>', 'a frozen-stat in-flight response keeps the bytes it securely read' );
+        ok( !exists $store->{_nav_fragment_cache}{entries}{$frozen_changed_file},
+            'content changed during a read is not cached when the fingerprint cannot move' );
+    }
 }
 
 {
@@ -1157,6 +1247,50 @@ SKIP: {
             'migrate dies when the source file cannot be unlinked' );
         chmod 0700, $bm;
     }
+}
+
+# File type checks must work when a Windows Fcntl build omits S_ISLNK.
+# Forced platform branches exercise the portable fallback under Devel::Cover.
+{
+    my $mode_fixture = File::Spec->catfile( $home, 'file-type-probe.txt' );
+    write_raw( $mode_fixture, 'ok' );
+    my $mode = ( stat $mode_fixture )[2];
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageStore::is_windows = sub { return 1 };
+        ok( !$store->_page_is_symlink( $mode_fixture, $mode ),
+            'Windows file test does not classify a regular page as a symlink' );
+        ok( $store->_page_is_regular( $mode_fixture, $mode ),
+            'Windows file test recognises a regular page without Fcntl macros' );
+        ok( !$store->_page_is_regular( "$mode_fixture.missing", $mode ),
+            'Windows file test rejects a missing page path' );
+    }
+    SKIP: {
+        skip 'POSIX Fcntl mode macros are not guaranteed on Windows', 2
+          if $^O eq 'MSWin32';
+        no warnings 'redefine';
+        local *Developer::Dashboard::PageStore::is_windows = sub { return 0 };
+        ok( !$store->_page_is_symlink( $mode_fixture, $mode ),
+            'POSIX mode test does not classify a regular page as a symlink' );
+        ok( $store->_page_is_regular( $mode_fixture, $mode ),
+            'POSIX mode test accepts a regular page' );
+    }
+}
+
+# Saved instructions must not change newline representation between a
+# Windows text-mode writer and the intentionally raw reader.
+{
+    my $document = Developer::Dashboard::PageDocument->new(
+        id => 'canonical-newlines',
+        title => 'Canonical newlines',
+        layout => { body => "first\nsecond" },
+    );
+    my $file = $store->save_page($document);
+    open my $raw_fh, '<:raw', $file or die "Unable to read raw page $file: $!";
+    my $bytes = do { local $/; <$raw_fh> };
+    close $raw_fh or die "Unable to close raw page $file: $!";
+    is( $bytes, $document->canonical_instruction,
+        'page writes preserve canonical LF on disk on every platform' );
 }
 
 done_testing;

@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Fcntl qw(:flock);
+use Cwd qw(cwd);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -31,6 +32,7 @@ use Developer::Dashboard::Collector;
 use Developer::Dashboard::FileSlurp;
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard qw(spawn wait_process);
 
 {
     # Test::Collector::FixedRoots is a minimal path-registry stand-in that
@@ -61,10 +63,23 @@ use Developer::Dashboard::PathRegistry;
 
 # Hermetic runtime: a throwaway home, a throwaway state root, and a working
 # directory inside that home so the deepest runtime layer resolves from the cwd.
+my $repo_root = cwd();
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME}                           = $home;
 local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = tempdir( CLEANUP => 1 );
 chdir $home or die "Unable to chdir to $home: $!";
+
+# spawn_test_perl($source, @arguments)
+# Starts a separate Perl process through GoRoutine for tests that require real
+# process-level locking or serialization; child arguments remain literal argv.
+# Input: Perl source text and zero or more child @ARGV values.
+# Output: the GoRoutine child process identifier.
+sub spawn_test_perl {
+    my ( $source, @arguments ) = @_;
+    my @include = map { '-I' . File::Spec->catdir( $repo_root, $_ ) }
+      qw(lib blib/lib blib/arch);
+    return spawn( [ $^X, @include, '-e', $source, @arguments ], { cwd => $home } );
+}
 
 my $paths     = Developer::Dashboard::PathRegistry->new( home => $home );
 my $collector = Developer::Dashboard::Collector->new( paths => $paths );
@@ -435,6 +450,18 @@ SKIP: {
     is( $collector->read_log($name), '', 'an unreadable artifact is not mistaken for log payload' );
 }
 
+# On macOS and Windows /proc/self/mem is unavailable, so exercise the same
+# undefined artifact guard with a method-level fixture on every platform.
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::Collector::_first_existing_text_file = sub { return undef };
+    my $output = $collector->read_output('undefined-artifact-fixture');
+    ok( !defined $output->{last_run}, 'read_output preserves an undefined last_run' );
+    ok( !defined $output->{stdout}, 'read_output preserves an undefined stdout' );
+    is( $collector->_log_payload_present( {}, $output ), 0,
+        '_log_payload_present ignores undefined artifacts on every platform' );
+}
+
 # ---------------------------------------------------------------------------
 # append_log_entry formatting and log-file failures.
 # ---------------------------------------------------------------------------
@@ -467,9 +494,12 @@ SKIP: {
     like( $full, qr/\[stdout\]\nout-without-newline\n/, 'stdout is rendered with a normalized trailing newline' );
     like( $full, qr/\[stderr\]\nerr\n/, 'stderr is rendered in its own section' );
     like( $full, qr/\[error\]\nboom\n/, 'an error is rendered in its own section' );
-    is( sprintf( '%04o', ( stat $collector->collector_paths($name)->{log} )[2] & 07777 ), '0600', 'serialized log appends keep the collector log owner-only' );
-    my $lock = File::Spec->catfile( $collector->collector_paths($name)->{dir}, '.log.lock' );
-    is( sprintf( '%04o', ( stat $lock )[2] & 07777 ), '0600', 'the collector log lock is owner-only' );
+  SKIP: {
+        skip 'Unix permission modes are not a Windows security control', 2 if $^O eq 'MSWin32';
+        is( sprintf( '%04o', ( stat $collector->collector_paths($name)->{log} )[2] & 07777 ), '0600', 'serialized log appends keep the collector log owner-only' );
+        my $lock = File::Spec->catfile( $collector->collector_paths($name)->{dir}, '.log.lock' );
+        is( sprintf( '%04o', ( stat $lock )[2] & 07777 ), '0600', 'the collector log lock is owner-only' );
+    }
 }
 
 {
@@ -517,64 +547,74 @@ SKIP: {
     my $name = 'log-rotation-race';
     seed_collector( $name, 'log' => "old-line\nkept-line\n" );
 
-    pipe my $ready_r, my $ready_w or die "Unable to create rotation-ready pipe: $!";
-    pipe my $release_r, my $release_w or die "Unable to create rotation-release pipe: $!";
-    my $apply_rotation = \&Developer::Dashboard::Collector::_apply_log_rotation;
-    my $rotation_pid = fork();
-    die "Unable to fork log rotation child: $!" if !defined $rotation_pid;
-    if ( !$rotation_pid ) {
-        close $ready_r;
-        close $release_w;
-        no warnings 'redefine';
-        local *Developer::Dashboard::Collector::_apply_log_rotation = sub {
-            syswrite $ready_w, 'R' or POSIX::_exit(91);
-            my $released = '';
-            sysread $release_r, $released, 1 or POSIX::_exit(92);
-            return $apply_rotation->(@_);
-        };
-        eval { $collector->rotate_log( $name, { lines => 1 } ); 1 }
-          or POSIX::_exit(93);
-        POSIX::_exit(0);
+    my $sync_dir = tempdir( DIR => $home, CLEANUP => 1 );
+    my $ready_path = File::Spec->catfile( $sync_dir, 'rotation-ready' );
+    my $release_path = File::Spec->catfile( $sync_dir, 'rotation-release' );
+    my $rotation_pid = spawn_test_perl(
+        q{
+            use Developer::Dashboard::Collector;
+            use Developer::Dashboard::PathRegistry;
+            my $paths = Developer::Dashboard::PathRegistry->new( home => $ENV{HOME} );
+            my $collector = Developer::Dashboard::Collector->new( paths => $paths );
+            my $apply_rotation = \&Developer::Dashboard::Collector::_apply_log_rotation;
+            no warnings 'redefine';
+            local *Developer::Dashboard::Collector::_apply_log_rotation = sub {
+                open my $ready, '>', $ARGV[1] or die "Unable to mark rotation ready: $!";
+                close $ready or die "Unable to close rotation-ready marker: $!";
+                while ( !-e $ARGV[2] ) { select undef, undef, undef, 0.01; }
+                return $apply_rotation->(@_);
+            };
+            $collector->rotate_log( $ARGV[0], { lines => 1 } );
+        },
+        $name,
+        $ready_path,
+        $release_path,
+    );
+    die "Unable to spawn log rotation child: $!" if !defined $rotation_pid;
+    my $ready_deadline = time + 5;
+    while ( !-f $ready_path && time < $ready_deadline ) {
+        select undef, undef, undef, 0.01;
     }
-    close $ready_w;
-    close $release_r;
-    my $ready = '';
-    sysread $ready_r, $ready, 1 or die 'Rotation child exited before reading its log snapshot';
+    die 'Rotation child exited before reading its log snapshot' if !-f $ready_path;
 
     my $lock = File::Spec->catfile( $collector->collector_paths($name)->{dir}, '.log.lock' );
     open my $probe_fh, '>>', $lock or die "Unable to open log-lock probe $lock: $!";
     my $rotation_holds_lock = !flock( $probe_fh, LOCK_EX | LOCK_NB );
     flock( $probe_fh, LOCK_UN ) if !$rotation_holds_lock;
 
-    pipe my $appended_r, my $appended_w or die "Unable to create append-complete pipe: $!";
-    my $append_pid = fork();
-    die "Unable to fork log append child: $!" if !defined $append_pid;
-    if ( !$append_pid ) {
-        close $appended_r;
-        eval {
+    my $append_done_path = File::Spec->catfile( $sync_dir, 'append-complete' );
+    my $append_pid = spawn_test_perl(
+        q{
+            use Developer::Dashboard::Collector;
+            use Developer::Dashboard::PathRegistry;
+            my $paths = Developer::Dashboard::PathRegistry->new( home => $ENV{HOME} );
+            my $collector = Developer::Dashboard::Collector->new( paths => $paths );
             $collector->append_log_entry(
-                $name,
+                $ARGV[0],
                 happened_at => '2026-07-29T12:00:00Z',
                 stdout      => "concurrent-marker\n",
             );
-            1;
-        } or POSIX::_exit(94);
-        syswrite $appended_w, 'A' or POSIX::_exit(95);
-        POSIX::_exit(0);
+            open my $done, '>', $ARGV[1] or die "Unable to mark append complete: $!";
+            close $done or die "Unable to close append marker: $!";
+        },
+        $name,
+        $append_done_path,
+    );
+    die "Unable to spawn log append child: $!" if !defined $append_pid;
+
+    my $append_deadline = time + 5;
+    while ( !$rotation_holds_lock && !-f $append_done_path && time < $append_deadline ) {
+        select undef, undef, undef, 0.01;
     }
-    close $appended_w;
+    open my $release_fh, '>', $release_path or die "Unable to release paused log rotation: $!";
+    close $release_fh or die "Unable to close rotation-release marker: $!";
+    my $append_after_release_deadline = time + 5;
+    while ( !-f $append_done_path && time < $append_after_release_deadline ) {
+        select undef, undef, undef, 0.01;
+    }
 
-    my $appended = '';
-    sysread $appended_r, $appended, 1
-      if !$rotation_holds_lock;
-    syswrite $release_w, 'G' or die 'Unable to release paused log rotation';
-    sysread $appended_r, $appended, 1
-      if $rotation_holds_lock;
-
-    waitpid( $rotation_pid, 0 );
-    is( $? >> 8, 0, 'the coordinated log rotation child exits cleanly' );
-    waitpid( $append_pid, 0 );
-    is( $? >> 8, 0, 'the coordinated log append child exits cleanly' );
+    is( wait_process($rotation_pid), 0, 'the coordinated log rotation child exits cleanly' );
+    is( wait_process($append_pid), 0, 'the coordinated log append child exits cleanly' );
     like( $collector->read_log($name), qr/concurrent-marker/, 'a concurrent append survives a rotation that already read its input snapshot' );
 }
 

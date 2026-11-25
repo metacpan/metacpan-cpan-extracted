@@ -13,7 +13,10 @@ use File::Temp qw(tempdir);
 my $repo = abs_path('.');
 my $gate = File::Spec->catfile( $repo, 'script', 'coverage-gate' );
 
-ok( -x $gate, 'the coverage gate is executable' );
+SKIP: {
+    skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
+    ok( -x $gate, 'the coverage gate is executable' );
+}
 
 # Purpose: run the gate the way a scheduler runs it - with a named environment
 #          and nothing inherited from this shell.
@@ -21,9 +24,15 @@ ok( -x $gate, 'the coverage gate is executable' );
 # Output:  (stdout, stderr, exit code)
 sub run_gate_with_env {
     my (%env) = @_;
-    my @assignments = map { "$_=$env{$_}" } sort keys %env;
+
+    # A clean environment without a shell: localise %ENV to exactly the named
+    # variables and run perl on the gate by path. The old form ran `env -i`
+    # and let it exec the gate directly, which Windows cannot do - an
+    # extensionless Perl script is not executable - so the gate never ran
+    # there and exited 126.
     my ( $stdout, $stderr, $exit ) = capture {
-        system( 'env', '-i', @assignments, $gate, '--help' );
+        local %ENV = %env;
+        system $^X, $gate, '--help';
     };
     return ( $stdout, $stderr, $exit >> 8 );
 }
@@ -106,8 +115,8 @@ SKIP: {
         'and the non-existent tree is never added to the path, so it cannot mask or misdirect a later failure' );
 
     my $source = do { open my $fh, '<', $gate or die $!; local $/; <$fh> };
-    like( $source, qr/if \( -d \$local_lib \)/,
-        'the source adds the tree only when it exists - the guarantee that an absent module stays absent' );
+    like( $source, qr/my \@leading_paths = grep \{ defined \$_ && -d \$_ \}/,
+        'the source adds only existing build and local-library paths - absent modules stay absent' );
     # Against the BLOCK, not the whole file: the first version matched the word
     # "install" in the script's own help text and failed on its own prose.
     my ($block) = $source =~ /^BEGIN \{(.*?)^\}/ms;

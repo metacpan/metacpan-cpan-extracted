@@ -33,7 +33,6 @@ sub log_end ($name) {
     };
 }
 
-
 # Return a stage holding its values back, and giving them all from its
 # flush in a stop.
 sub stop_in_flush () {
@@ -43,7 +42,6 @@ sub stop_in_flush () {
     };
 }
 
-
 # Return a stage passing each value on, whose flush dies.
 sub die_in_flush () {
     return gather {
@@ -51,13 +49,11 @@ sub die_in_flush () {
     };
 }
 
-
 # Return an error's text, with its line numbers made N, so a feed's
 # and an iterator's compare.
 sub plain_error ($error) {
     return ref $error ? $error : $error =~ s( \ line \ \d+ )( line N)xgr;
 }
-
 
 # Return what an iterator of $stages gives over a source of @values,
 # one value a pull: [the results or the error, ended, the ends' log].
@@ -68,7 +64,6 @@ sub pulled ($stages, @values) {
     my $got  = eval { [$next->all] } // plain_error($@);
     return [$got, $next->ended, [@log]];
 }
-
 
 # Return what a feed of $stages gives for @values pushed in chunks of
 # $size, then closed, stopping at the first push after which the run

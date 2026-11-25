@@ -22,18 +22,18 @@ shell - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard shell ...
+  d2 shell ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard shell>, which prints the shell bootstrap snippet for bash, zsh, POSIX sh, PowerShell, or pwsh. It is the CLI surface for shell integration features such as C<cdr>, C<d2>, C<which_dir>, prompt wiring, and live tab completion for C<dashboard> and C<d2>.
+This staged helper exposes C<d2 shell>, which prints the shell bootstrap snippet for bash, zsh, POSIX sh, PowerShell, or pwsh. It is the CLI surface for shell integration features such as C<cdr>, C<d2>, C<which_dir>, prompt wiring, and live tab completion for C<d2> and C<d2>.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing supported shell names, generated bootstrap content, 
 
 =head1 HOW TO USE
 
-Users run C<dashboard shell bash>, C<dashboard shell zsh>, C<dashboard shell sh>, or the PowerShell variants, then evaluate the printed snippet in their shell startup flow. The generated snippet exposes C<d2> as a short shell shortcut for C<dashboard> and wires shell-native completion back into C<dashboard complete>.
+Users run C<d2 shell bash>, C<d2 shell zsh>, C<d2 shell sh>, or the PowerShell variants, then evaluate the printed snippet in their shell startup flow. The generated snippet exposes C<d2> as a short shell shortcut for C<d2> and wires shell-native completion back into C<d2 complete>.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by developers integrating the dashboard into their shell prompt and n
 
 Example 1:
 
-  dashboard shell bash
+  d2 shell bash
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/shell --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

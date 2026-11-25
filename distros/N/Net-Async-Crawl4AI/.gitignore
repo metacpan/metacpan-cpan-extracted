@@ -1,4 +1,4 @@
-# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Claude Code — commit: skills/, agents/, rules/, hooks/, settings.json
 # Ignore: local overrides, credentials, session data
 
 # Tracked: shared config & extensibility
@@ -10,6 +10,8 @@
 !.claude/agents/**
 !.claude/skills/
 !.claude/skills/**
+!.claude/rules/
+!.claude/rules/**
 !.claude/hooks/
 !.claude/hooks/**
 
@@ -22,6 +24,9 @@
 .claude/statsig/
 .claude/todos/
 .claude/projects/
+
+# Claude Code worktrees (claude --worktree / isolated agents) -- never commit
+/.claude/worktrees/
 
 /Net-Async-Crawl4AI-*
 /.build/
@@ -45,3 +50,7 @@
 # docker-compose local overrides
 docker-compose.override.yml
 docker-compose.override.yaml
+
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore

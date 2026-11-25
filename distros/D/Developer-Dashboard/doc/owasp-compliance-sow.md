@@ -116,7 +116,7 @@ The target rigor is:
   - home-runtime directory and file permission tightening
   - helper-user and helper-session file permissions
   - no-store and cookie protections documented in `doc/security.md`
-  - runtime permission audit through `dashboard doctor`
+  - runtime permission audit through `d2 doctor`
 
 ### V9 Communication
 

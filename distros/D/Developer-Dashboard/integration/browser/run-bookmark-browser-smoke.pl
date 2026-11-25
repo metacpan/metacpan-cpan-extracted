@@ -74,13 +74,13 @@ sub main {
 
     eval {
         my $serve = _run_command(
-            label   => 'dashboard serve',
+            label   => 'd2 serve',
             cwd     => $project,
             env     => \%cmd_env,
             command => [
                 'perl',
                 '-I' . File::Spec->catdir( $repo_root, 'lib' ),
-                File::Spec->catfile( $repo_root, 'bin', 'dashboard' ),
+                File::Spec->catfile( $repo_root, 'bin', 'd2' ),
                 'serve',
                 '--host', $opts{host},
                 '--port', $listen_port,
@@ -367,14 +367,14 @@ sub _run_command {
 sub _stop_dashboard {
     my ( $repo_root, $project, $env ) = @_;
     _run_command(
-        label      => 'dashboard stop',
+        label      => 'd2 stop',
         cwd        => $project,
         env        => $env,
         allow_fail => 1,
         command    => [
             'perl',
             '-I' . File::Spec->catdir( $repo_root, 'lib' ),
-            File::Spec->catfile( $repo_root, 'bin', 'dashboard' ),
+            File::Spec->catfile( $repo_root, 'bin', 'd2' ),
             'stop',
         ],
     );

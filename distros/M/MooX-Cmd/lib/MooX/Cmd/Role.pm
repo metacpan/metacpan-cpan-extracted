@@ -1,8 +1,8 @@
 package MooX::Cmd::Role;
 # ABSTRACT: MooX cli app commands do this
-our $VERSION = '1.000';
 use strict;
 use warnings;
+our $VERSION = '1.001';
 
 use Moo::Role;
 
@@ -230,7 +230,7 @@ MooX::Cmd::Role - MooX cli app commands do this
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -305,7 +305,7 @@ COMMAND accesses the finally detected command in chain
 
 =head2 command_name
 
-ARRAY-REF the name of the command lead to this command
+The name of the command that lead to this command, as plain string
 
 =head2 command_commands
 
@@ -347,7 +347,7 @@ returns the content of $self->{execute_return}
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-moox-cmd/issues>.
 
 =head2 IRC
@@ -360,11 +360,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

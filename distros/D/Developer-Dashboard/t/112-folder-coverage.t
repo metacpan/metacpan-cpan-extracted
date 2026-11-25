@@ -15,6 +15,19 @@ use lib 'lib';
 
 use Developer::Dashboard::Config ();
 use Developer::Dashboard::Folder;
+
+# Normalises a path for comparison: strips the macOS /private prefix
+# (cwd() spells /var/folders/... with it, tempdir without) and folds
+# backslashes to forward slashes (on Windows cwd() spells with forward
+# slashes while tempdir spells with backslashes). Same directory, two
+# spellings - compare the normalised form (solo #423, t/112 tests 36-37).
+sub _normalised_path {
+    my ($path) = @_;
+    return if !defined $path;
+    $path =~ s{/private(?=/var/folders/)}{}g;
+    $path =~ s{\\}{/}g;
+    return $path;
+}
 use Developer::Dashboard::PathRegistry;
 
 # Stub registries that answer nothing at all, used to drive the defensive
@@ -85,8 +98,13 @@ is( Developer::Dashboard::Folder->tmp, File::Spec->tmpdir, 'tmp() reports the sy
 
     my $built = Developer::Dashboard::Folder::_paths_obj();
     isa_ok( $built, 'Developer::Dashboard::PathRegistry', 'a default path registry is built from HOME' );
-    is_deeply( [ $built->workspace_roots ], [ "$home/projects", "$home/work" ], 'the default registry keeps only existing workspace roots' );
-    is_deeply( [ $built->project_roots ],   [ "$home/projects", "$home/work" ], 'the default registry keeps only existing project roots' );
+    # catdir, not "$home/projects": the product builds default roots with
+    # File::Spec->catdir (Folder.pm _paths_obj, native separators), and
+    # interpolation spells the separator with a forward slash, so on Windows
+    # the expected value is a mixed-separator path the product never produces
+    # (round 56, t/112 tests 12-13: tempdir returns backslashes).
+    is_deeply( [ $built->workspace_roots ], [ File::Spec->catdir( $home, 'projects' ), File::Spec->catdir( $home, 'work' ) ], 'the default registry keeps only existing workspace roots' );
+    is_deeply( [ $built->project_roots ],   [ File::Spec->catdir( $home, 'projects' ), File::Spec->catdir( $home, 'work' ) ], 'the default registry keeps only existing project roots' );
 }
 
 # A registry object that cannot answer the runtime accessors must not be called
@@ -177,11 +195,14 @@ is_deeply( \@stayed, [$target], 'cd() hands the resolved directory to the callba
 
 # When the caller directory has been removed there is nowhere to return to, so
 # cd() must stay in the target instead of chdir-ing to an empty path.
+# Windows cannot remove a directory that is a process's current directory,
+# so a vanished caller directory cannot occur there at all.
 my $dest = File::Spec->catdir( $home, 'cd-dest' );
 make_path($dest);
 open my $marker_fh, '>', File::Spec->catfile( $dest, 'marker' ) or die "Unable to write marker: $!";
 close $marker_fh or die "Unable to close marker: $!";
-{
+SKIP: {
+    skip 'a process cannot remove its own current directory on Windows', 2 if $^O eq 'MSWin32';
     my $vanishing = File::Spec->catdir( $home, 'vanishing' );
     make_path($vanishing);
     chdir $vanishing or die "Unable to chdir to $vanishing: $!";
@@ -211,7 +232,7 @@ chdir $home or die "Unable to chdir back to $home: $!";
     my $err = $@;
     ok( !$died, 'cd() lets a dying callback\'s exception propagate out of cd() itself' );
     like( $err, qr/\Aboom\n/, 'and the ORIGINAL exception is not swallowed or replaced' );
-    is( cwd(), $home,
+    is( _normalised_path( cwd() ), _normalised_path($home),
         'cd() still restores the caller\'s original directory when the callback dies' );
 }
 
@@ -232,7 +253,7 @@ chdir $home or die "Unable to chdir back to $home: $!";
             }
         );
     };
-    is( cwd(), $stay_dest,
+    is( _normalised_path( cwd() ), _normalised_path($stay_dest),
         'cd() restores to the stay()-redirected directory, not the original, when the callback dies after calling stay()' );
 }
 chdir $home or die "Unable to chdir back to $home: $!";

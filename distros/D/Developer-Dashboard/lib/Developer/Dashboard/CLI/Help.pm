@@ -3,29 +3,29 @@ package Developer::Dashboard::CLI::Help;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Developer::Dashboard::InternalCLI ();
 
 my %COMMANDS = (
     action => {
-        usage => 'dashboard action <run> <page-id> <action-id>',
+        usage => 'd2 action <run> <page-id> <action-id>',
         description => 'Run one saved-page action.',
         actions => {
-            run => [ 'dashboard action run <page-id> <action-id>', 'Execute an action declared by a saved page.' ],
+            run => [ 'd2 action run <page-id> <action-id>', 'Execute an action declared by a saved page.' ],
         },
     },
     api => {
-        usage => 'dashboard api [ls|add|rm] [options]',
+        usage => 'd2 api [ls|add|rm] [options]',
         description => 'Manage the layered machine-to-machine API registry.',
         actions => {
-            ls  => [ 'dashboard api ls [--key <name>] [-o|--output json|table]', 'List registered keys and routes (the default action).' ],
-            add => [ 'dashboard api add --key <name> [--secret <raw>|--maybe-secret <raw>] [--route /ajax/... ]... [-o json|table]', 'Create a key or add routes to a key.' ],
-            rm  => [ 'dashboard api rm --key <name> [--route /ajax/... ]... [-o json|table]', 'Remove a key or one of its routes.' ],
+            ls  => [ 'd2 api ls [--key <name>] [-o|--output json|table]', 'List registered keys and routes (the default action).' ],
+            add => [ 'd2 api add --key <name> [--secret <raw>|--maybe-secret <raw>] [--route /ajax/... ]... [-o json|table]', 'Create a key or add routes to a key.' ],
+            rm  => [ 'd2 api rm --key <name> [--route /ajax/... ]... [-o json|table]', 'Remove a key or one of its routes.' ],
         },
     },
     ask => {
-        usage => 'dashboard ask [--claude|--codex|--copilot|--gemini|--nova] [options] <question>',
+        usage => 'd2 ask [--claude|--codex|--copilot|--gemini|--nova] [options] <question>',
         description => 'Ask a configured coding assistant with optional file and workspace context.',
         options => [
             '--claude|--codex|--copilot|--gemini|--nova  Select the assistant backend (default: claude)',
@@ -37,206 +37,206 @@ my %COMMANDS = (
         ],
     },
     auth => {
-        usage => 'dashboard auth <add-user|list-users|remove-user> [arguments]',
+        usage => 'd2 auth <add-user|list-users|remove-user> [arguments]',
         description => 'Manage browser dashboard helper users.',
         actions => {
-            'add-user'    => [ 'dashboard auth add-user <username> <password>', 'Add a helper login.' ],
-            'list-users'  => [ 'dashboard auth list-users', 'List configured helper usernames.' ],
-            'remove-user' => [ 'dashboard auth remove-user <username>', 'Remove a helper login.' ],
+            'add-user'    => [ 'd2 auth add-user <username> <password>', 'Add a helper login.' ],
+            'list-users'  => [ 'd2 auth list-users', 'List configured helper usernames.' ],
+            'remove-user' => [ 'd2 auth remove-user <username>', 'Remove a helper login.' ],
         },
     },
     collector => {
-        usage => 'dashboard collector <action> [arguments]',
+        usage => 'd2 collector <action> [arguments]',
         description => 'Inspect, run, and control configured collectors.',
         actions => {
-            'write-result' => [ 'dashboard collector write-result <name> <exit-code>', 'Read collector stdout from standard input and store a result.' ],
-            status         => [ 'dashboard collector status <name>', 'Print the collector status record.' ],
-            list           => [ 'dashboard collector list', 'List known collectors.' ],
-            job            => [ 'dashboard collector job <name>', 'Print the collector job definition.' ],
-            output         => [ 'dashboard collector output <name>', 'Print the latest collector output record.' ],
-            inspect        => [ 'dashboard collector inspect <name>', 'Print combined collector diagnostics.' ],
-            log            => [ 'dashboard collector log [name]', 'Print one or all collector logs.' ],
-            run            => [ 'dashboard collector run <name>', 'Run a configured collector once.' ],
-            start          => [ 'dashboard collector start <name>', 'Start one collector.' ],
-            stop           => [ 'dashboard collector stop <name>', 'Stop one collector.' ],
-            restart        => [ 'dashboard collector restart <name>', 'Restart one collector.' ],
+            'write-result' => [ 'd2 collector write-result <name> <exit-code>', 'Read collector stdout from standard input and store a result.' ],
+            status         => [ 'd2 collector status <name>', 'Print the collector status record.' ],
+            list           => [ 'd2 collector list', 'List known collectors.' ],
+            job            => [ 'd2 collector job <name>', 'Print the collector job definition.' ],
+            output         => [ 'd2 collector output <name>', 'Print the latest collector output record.' ],
+            inspect        => [ 'd2 collector inspect <name>', 'Print combined collector diagnostics.' ],
+            log            => [ 'd2 collector log [name]', 'Print one or all collector logs.' ],
+            run            => [ 'd2 collector run <name>', 'Run a configured collector once.' ],
+            start          => [ 'd2 collector start <name>', 'Start one collector.' ],
+            stop           => [ 'd2 collector stop <name>', 'Stop one collector.' ],
+            restart        => [ 'd2 collector restart <name>', 'Restart one collector.' ],
         },
     },
     complete => {
-        usage => 'dashboard complete <index> <word0> <word1> ...',
+        usage => 'd2 complete <index> <word0> <word1> ...',
         description => 'Print shell-completion candidates, one per line.',
     },
     config => {
-        usage => 'dashboard config <init|show>',
+        usage => 'd2 config <init|show>',
         description => 'Initialize or inspect the effective configuration.',
         actions => {
-            init => [ 'dashboard config init', 'Create the base configuration if it does not exist.' ],
-            show => [ 'dashboard config show', 'Print the merged runtime configuration.' ],
+            init => [ 'd2 config init', 'Create the base configuration if it does not exist.' ],
+            show => [ 'd2 config show', 'Print the merged runtime configuration.' ],
         },
     },
     cpan => {
-        usage => 'dashboard cpan <module> [module ...]',
+        usage => 'd2 cpan <module> [module ...]',
         description => 'Install Perl modules into the active dashboard runtime.',
     },
-    csvq => { usage => 'dashboard csvq [file] [query]', description => 'Query CSV input from a file or standard input.' },
-    decode => { usage => 'dashboard decode <token> (or read token from standard input)', description => 'Decode a dashboard payload token.' },
+    csvq => { usage => 'd2 csvq [file] [query]', description => 'Query CSV input from a file or standard input.' },
+    decode => { usage => 'd2 decode <token> (or read token from standard input)', description => 'Decode a dashboard payload token.' },
     docker => {
-        usage => 'dashboard docker <compose|list|enable|disable|development> [arguments]',
+        usage => 'd2 docker <compose|list|enable|disable|development> [arguments]',
         description => 'Resolve Docker Compose configuration and manage service enablement.',
         actions => {
-            compose     => [ 'dashboard docker compose [selectors] <compose-arguments...>', 'Resolve layered Compose files and execute Docker Compose; supports --addon, --mode, --service, --project, and --dry-run.' ],
-            list        => [ 'dashboard docker list [--enabled|--disabled]', 'List detected Docker services.' ],
-            enable      => [ 'dashboard docker enable <service> [service ...]', 'Enable one or more services.' ],
-            disable     => [ 'dashboard docker disable <service> [service ...]', 'Disable one or more services.' ],
-            development => [ 'dashboard docker development <enable|disable> <service> [service ...]', 'Enable or disable a service development overlay.' ],
+            compose     => [ 'd2 docker compose [selectors] <compose-arguments...>', 'Resolve layered Compose files and execute Docker Compose; supports --addon, --mode, --service, --project, and --dry-run.' ],
+            list        => [ 'd2 docker list [--enabled|--disabled]', 'List detected Docker services.' ],
+            enable      => [ 'd2 docker enable <service> [service ...]', 'Enable one or more services.' ],
+            disable     => [ 'd2 docker disable <service> [service ...]', 'Disable one or more services.' ],
+            development => [ 'd2 docker development <enable|disable> <service> [service ...]', 'Enable or disable a service development overlay.' ],
         },
     },
     'docker development' => {
-        usage => 'dashboard docker development <enable|disable> <service> [service ...]',
+        usage => 'd2 docker development <enable|disable> <service> [service ...]',
         description => 'Manage opt-in development Compose overlays.',
         actions => {
-            enable  => [ 'dashboard docker development enable <service> [service ...]', 'Create development markers for services.' ],
-            disable => [ 'dashboard docker development disable <service> [service ...]', 'Remove development markers for services.' ],
+            enable  => [ 'd2 docker development enable <service> [service ...]', 'Create development markers for services.' ],
+            disable => [ 'd2 docker development disable <service> [service ...]', 'Remove development markers for services.' ],
         },
     },
     'docker compose' => {
-        usage => 'dashboard docker compose [selectors] <compose-arguments...>',
+        usage => 'd2 docker compose [selectors] <compose-arguments...>',
         description => 'Resolve layered Compose configuration and pass remaining arguments to Docker Compose.',
         passthrough_arguments => 1,
     },
-    doctor => { usage => 'dashboard doctor [--fix]', description => 'Check the installation and optionally repair supported drift.' },
-    encode => { usage => 'dashboard encode <text from standard input>', description => 'Encode input as a dashboard payload token.' },
+    doctor => { usage => 'd2 doctor [--fix]', description => 'Check the installation and optionally repair supported drift.' },
+    encode => { usage => 'd2 encode <text from standard input>', description => 'Encode input as a dashboard payload token.' },
     file => {
-        usage => 'dashboard file <resolve|locate|add|del|list> [arguments]',
+        usage => 'd2 file <resolve|locate|add|del|list> [arguments]',
         description => 'Manage named file aliases and locate files.',
         actions => {
-            resolve => [ 'dashboard file resolve <name>', 'Print the resolved alias path.' ],
-            locate  => [ 'dashboard file locate [root-or-alias] <term...> [-o json|table]', 'Search beneath a directory for file names.' ],
-            add     => [ 'dashboard file add <name> <path> [-c|--create[=MODE]] [-o json|table]', 'Register a named file alias.' ],
-            del     => [ 'dashboard file del <name> [-o json|table]', 'Remove a named file alias.' ],
-            list    => [ 'dashboard file list [-o json|table]', 'List named file aliases.' ],
+            resolve => [ 'd2 file resolve <name>', 'Print the resolved alias path.' ],
+            locate  => [ 'd2 file locate [root-or-alias] <term...> [-o json|table]', 'Search beneath a directory for file names.' ],
+            add     => [ 'd2 file add <name> <path> [-c|--create[=MODE]] [-o json|table]', 'Register a named file alias.' ],
+            del     => [ 'd2 file del <name> [-o json|table]', 'Remove a named file alias.' ],
+            list    => [ 'd2 file list [-o json|table]', 'List named file aliases.' ],
         },
     },
-    files => { usage => 'dashboard files [-o json|table]', description => 'List effective named file aliases.' },
-    housekeeper => { usage => 'dashboard housekeeper [--dry-run]', description => 'Clean dashboard-managed stale runtime state.' },
+    files => { usage => 'd2 files [-o json|table]', description => 'List effective named file aliases.' },
+    housekeeper => { usage => 'd2 housekeeper [--dry-run]', description => 'Clean dashboard-managed stale runtime state.' },
     indicator => {
-        usage => 'dashboard indicator <set|list|refresh-core> [arguments]',
+        usage => 'd2 indicator <set|list|refresh-core> [arguments]',
         description => 'Manage prompt and dashboard indicators.',
         actions => {
-            set          => [ 'dashboard indicator set <name> <label> <icon> <status>', 'Set an indicator.' ],
-            list         => [ 'dashboard indicator list', 'List indicators.' ],
-            'refresh-core' => [ 'dashboard indicator refresh-core [cwd]', 'Refresh local project and Git indicators; Docker remains collector-configured.' ],
+            set          => [ 'd2 indicator set <name> <label> <icon> <status>', 'Set an indicator.' ],
+            list         => [ 'd2 indicator list', 'List indicators.' ],
+            'refresh-core' => [ 'd2 indicator refresh-core [cwd]', 'Refresh local project and Git indicators; Docker remains collector-configured.' ],
         },
     },
-    iniq => { usage => 'dashboard iniq [file] [query]', description => 'Query INI input from a file or standard input.' },
-    init => { usage => 'dashboard init', description => 'Initialize the user runtime and stage managed helper assets.' },
-    jq => { usage => 'dashboard jq [file] [query]', description => 'Query JSON input from a file or standard input.' },
+    iniq => { usage => 'd2 iniq [file] [query]', description => 'Query INI input from a file or standard input.' },
+    init => { usage => 'd2 init', description => 'Initialize the user runtime and stage managed helper assets.' },
+    jq => { usage => 'd2 jq [file] [query]', description => 'Query JSON input from a file or standard input.' },
     log => {
-        usage => 'dashboard log [-t] [-f] [web|collector [name]] [--tail <lines>|--tail=<lines>] [-n <lines>]',
+        usage => 'd2 log [-t] [-f] [web|collector [name]] [--tail <lines>|--tail=<lines>] [-n <lines>]',
         description => 'Print, timestamp, follow, and tail dashboard or collector logs.',
         actions => {
-            web       => [ 'dashboard log web [-t] [-f] [--tail <lines>|--tail=<lines>] [-n <lines>]', 'Read, timestamp, follow, or tail the web service log.' ],
-            collector => [ 'dashboard log collector [name] [-t] [-f] [--tail <lines>|--tail=<lines>] [-n <lines>]', 'Read, timestamp, follow, or tail one or all collector logs.' ],
+            web       => [ 'd2 log web [-t] [-f] [--tail <lines>|--tail=<lines>] [-n <lines>]', 'Read, timestamp, follow, or tail the web service log.' ],
+            collector => [ 'd2 log collector [name] [-t] [-f] [--tail <lines>|--tail=<lines>] [-n <lines>]', 'Read, timestamp, follow, or tail one or all collector logs.' ],
         },
     },
     of => {
-        usage => 'dashboard of [options] <file-or-scope> [pattern ...] | grep <grep-args...>',
+        usage => 'd2 of [options] <file-or-scope> [pattern ...] | grep <grep-args...>',
         description => 'Open, print, or content-search matching files.',
         passthrough_actions => { grep => 1 },
     },
-    'open-file' => { usage => 'dashboard open-file [options] <file-or-scope> [pattern ...]', description => 'Alias for the file-opening helper.' },
+    'open-file' => { usage => 'd2 open-file [options] <file-or-scope> [pattern ...]', description => 'Alias for the file-opening helper.' },
     page => {
-        usage => 'dashboard page <new|save|list|show|encode|decode|urls|render|source> [arguments]',
+        usage => 'd2 page <new|save|list|show|encode|decode|urls|render|source> [arguments]',
         description => 'Create, edit, inspect, encode, and render dashboard pages.',
         actions => {
-            new    => [ 'dashboard page new [id] [title]', 'Print a starter page document.' ],
-            save   => [ 'dashboard page save <id> < page-document', 'Save page JSON or instruction text from standard input.' ],
-            list   => [ 'dashboard page list', 'List saved pages.' ],
-            show   => [ 'dashboard page show <id>', 'Print a saved page document.' ],
-            encode => [ 'dashboard page encode [id] (or read a page from standard input)', 'Encode a page as a transient URL token.' ],
-            decode => [ 'dashboard page decode [token] (or read from standard input)', 'Decode a transient page token.' ],
-            urls   => [ 'dashboard page urls <id>', 'Print edit, render, and source URLs.' ],
-            render => [ 'dashboard page render [id-or-file] (or read from standard input)', 'Render a page as HTML.' ],
-            source => [ 'dashboard page source <id-or-token>', 'Print canonical page source.' ],
+            new    => [ 'd2 page new [id] [title]', 'Print a starter page document.' ],
+            save   => [ 'd2 page save <id> < page-document', 'Save page JSON or instruction text from standard input.' ],
+            list   => [ 'd2 page list', 'List saved pages.' ],
+            show   => [ 'd2 page show <id>', 'Print a saved page document.' ],
+            encode => [ 'd2 page encode [id] (or read a page from standard input)', 'Encode a page as a transient URL token.' ],
+            decode => [ 'd2 page decode [token] (or read from standard input)', 'Decode a transient page token.' ],
+            urls   => [ 'd2 page urls <id>', 'Print edit, render, and source URLs.' ],
+            render => [ 'd2 page render [id-or-file] (or read from standard input)', 'Render a page as HTML.' ],
+            source => [ 'd2 page source <id-or-token>', 'Print canonical page source.' ],
         },
     },
     path => {
-        usage => 'dashboard path <resolve|locate|cdr|complete-cdr|add|del|rm|project-root|list> [arguments]',
+        usage => 'd2 path <resolve|locate|cdr|complete-cdr|add|del|rm|project-root|list> [arguments]',
         description => 'Manage and resolve project path aliases.',
         actions => {
-            resolve      => [ 'dashboard path resolve <name>', 'Print the resolved alias path.' ],
-            locate       => [ 'dashboard path locate <term...> [-o json|table]', 'Search for project paths.' ],
-            cdr          => [ 'dashboard path cdr [name] [term...]', 'Resolve a path alias or find a matching project directory.' ],
-            'complete-cdr' => [ 'dashboard path complete-cdr <index> <word...>', 'Print path candidates for the shell cdr helper.' ],
-            add          => [ 'dashboard path add <name> <path> [-c|--create[=MODE]] [-o json|table]', 'Register a path alias.' ],
-            del          => [ 'dashboard path del <name> [-o json|table]', 'Remove a path alias.' ],
-            rm           => [ 'dashboard path rm <name> [-o json|table]', 'Compatibility alias for path del.' ],
-            'project-root' => [ 'dashboard path project-root', 'Print the resolved project root.' ],
-            list         => [ 'dashboard path list [-o json|table]', 'List effective path aliases.' ],
+            resolve      => [ 'd2 path resolve <name>', 'Print the resolved alias path.' ],
+            locate       => [ 'd2 path locate <term...> [-o json|table]', 'Search for project paths.' ],
+            cdr          => [ 'd2 path cdr [name] [term...]', 'Resolve a path alias or find a matching project directory.' ],
+            'complete-cdr' => [ 'd2 path complete-cdr <index> <word...>', 'Print path candidates for the shell cdr helper.' ],
+            add          => [ 'd2 path add <name> <path> [-c|--create[=MODE]] [-o json|table]', 'Register a path alias.' ],
+            del          => [ 'd2 path del <name> [-o json|table]', 'Remove a path alias.' ],
+            rm           => [ 'd2 path rm <name> [-o json|table]', 'Compatibility alias for path del.' ],
+            'project-root' => [ 'd2 path project-root', 'Print the resolved project root.' ],
+            list         => [ 'd2 path list [-o json|table]', 'List effective path aliases.' ],
         },
     },
-    paths => { usage => 'dashboard paths [-o json|table]', description => 'List effective path aliases.' },
-    ps1 => { usage => 'dashboard ps1 [options]', description => 'Render the shell prompt status line.', options => [] },
-    propq => { usage => 'dashboard propq [file] [query]', description => 'Query Java properties input.' },
+    paths => { usage => 'd2 paths [-o json|table]', description => 'List effective path aliases.' },
+    ps1 => { usage => 'd2 ps1 [options]', description => 'Render the shell prompt status line.', options => [] },
+    propq => { usage => 'd2 propq [file] [query]', description => 'Query Java properties input.' },
     restart => {
-        usage => 'dashboard restart [web|collector [name]] [options]',
+        usage => 'd2 restart [web|collector [name]] [options]',
         description => 'Restart dashboard services or collectors.',
         actions => {
-            web       => [ 'dashboard restart web [options]', 'Restart the web service.' ],
-            collector => [ 'dashboard restart collector [name]', 'Restart one or all collectors.' ],
+            web       => [ 'd2 restart web [options]', 'Restart the web service.' ],
+            collector => [ 'd2 restart collector [name]', 'Restart one or all collectors.' ],
         },
     },
     serve => {
-        usage => 'dashboard serve [logs|workers] [arguments]',
+        usage => 'd2 serve [logs|workers] [arguments]',
         description => 'Start the web service or manage its logs and worker count.',
         actions => {
-            logs    => [ 'dashboard serve logs [-t] [-f] [--tail <lines>|--tail=<lines>] [-n <lines>]', 'Read, timestamp, follow, or tail web-service logs.' ],
-            workers => [ 'dashboard serve workers <count> [--host <host>] [--port <port>]', 'Set the web worker count.' ],
+            logs    => [ 'd2 serve logs [-t] [-f] [--tail <lines>|--tail=<lines>] [-n <lines>]', 'Read, timestamp, follow, or tail web-service logs.' ],
+            workers => [ 'd2 serve workers <count> [--host <host>] [--port <port>]', 'Set the web worker count.' ],
         },
     },
     shell => {
-        usage => 'dashboard shell [bash|zsh|sh|ps|powershell|pwsh]',
+        usage => 'd2 shell [bash|zsh|sh|ps|powershell|pwsh]',
         description => 'Print shell bootstrap code and install supported shell integrations.',
         actions => {
-            bash       => [ 'dashboard shell bash', 'Print Bash bootstrap code.' ],
-            zsh        => [ 'dashboard shell zsh', 'Print Zsh bootstrap code.' ],
-            sh         => [ 'dashboard shell sh', 'Print POSIX shell bootstrap code.' ],
-            ps         => [ 'dashboard shell ps', 'Print PowerShell bootstrap code.' ],
-            powershell => [ 'dashboard shell powershell', 'Print PowerShell bootstrap code.' ],
-            pwsh       => [ 'dashboard shell pwsh', 'Print PowerShell bootstrap code.' ],
+            bash       => [ 'd2 shell bash', 'Print Bash bootstrap code.' ],
+            zsh        => [ 'd2 shell zsh', 'Print Zsh bootstrap code.' ],
+            sh         => [ 'd2 shell sh', 'Print POSIX shell bootstrap code.' ],
+            ps         => [ 'd2 shell ps', 'Print PowerShell bootstrap code.' ],
+            powershell => [ 'd2 shell powershell', 'Print PowerShell bootstrap code.' ],
+            pwsh       => [ 'd2 shell pwsh', 'Print PowerShell bootstrap code.' ],
         },
     },
     skills => {
-        usage => 'dashboard skills <install|uninstall|enable|disable|list|usage> [arguments]',
+        usage => 'd2 skills <install|uninstall|enable|disable|list|usage> [arguments]',
         description => 'Install, inspect, and manage installed skills.',
         actions => {
-            install   => [ 'dashboard skills install [--notest] [-b branch] [-o json|table] <git-url-or-local-dir> ...', 'Install one or more skills; branch selection applies to Git sources.' ],
-            uninstall => [ 'dashboard skills uninstall <repo-name> [-o json|table]', 'Uninstall an installed skill.' ],
-            enable    => [ 'dashboard skills enable <repo-name> [-o json|table]', 'Enable an installed skill.' ],
-            disable   => [ 'dashboard skills disable <repo-name> [-o json|table]', 'Disable an installed skill.' ],
-            list      => [ 'dashboard skills list [-o json|table]', 'List installed skills.' ],
-            usage     => [ 'dashboard skills usage <repo-name> [-o json|table]', 'Show usage information for an installed skill.' ],
+            install   => [ 'd2 skills install [--notest] [-b branch] [-o json|table] <git-url-or-local-dir> ...', 'Install one or more skills; branch selection applies to Git sources.' ],
+            uninstall => [ 'd2 skills uninstall <repo-name> [-o json|table]', 'Uninstall an installed skill.' ],
+            enable    => [ 'd2 skills enable <repo-name> [-o json|table]', 'Enable an installed skill.' ],
+            disable   => [ 'd2 skills disable <repo-name> [-o json|table]', 'Disable an installed skill.' ],
+            list      => [ 'd2 skills list [-o json|table]', 'List installed skills.' ],
+            usage     => [ 'd2 skills usage <repo-name> [-o json|table]', 'Show usage information for an installed skill.' ],
         },
     },
-    source => { usage => 'dashboard source --files', description => 'List installed dashboard source files.' },
+    source => { usage => 'd2 source --files', description => 'List installed d2 source files.' },
     stop => {
-        usage => 'dashboard stop [web|collector [name]]',
+        usage => 'd2 stop [web|collector [name]]',
         description => 'Stop dashboard services or collectors.',
         actions => {
-            web       => [ 'dashboard stop web', 'Stop the web service.' ],
-            collector => [ 'dashboard stop collector [name]', 'Stop one or all collectors.' ],
+            web       => [ 'd2 stop web', 'Stop the web service.' ],
+            collector => [ 'd2 stop collector [name]', 'Stop one or all collectors.' ],
         },
     },
-    tomq => { usage => 'dashboard tomq [file] [query]', description => 'Query TOML input from a file or standard input.' },
-    upgrade => { usage => 'dashboard upgrade [--dry-run]', description => 'Download and run the canonical dashboard installer.' },
-    version => { usage => 'dashboard version', description => 'Print the installed Developer Dashboard version.' },
-    which => { usage => 'dashboard which [--edit] <cmd-or-skill-command>', description => 'Resolve a command and show its hook chain.' },
+    tomq => { usage => 'd2 tomq [file] [query]', description => 'Query TOML input from a file or standard input.' },
+    upgrade => { usage => 'd2 upgrade [--dry-run]', description => 'Download and run the canonical dashboard installer.' },
+    version => { usage => 'd2 version', description => 'Print the installed Developer Dashboard version.' },
+    which => { usage => 'd2 which [--edit] <cmd-or-skill-command>', description => 'Resolve a command and show its hook chain.' },
     workspace => {
-        usage => 'dashboard workspace <name> [-c|-C] [-d|--docker]',
+        usage => 'd2 workspace <name> [-c|-C] [-d|--docker]',
         description => 'Create or attach to a tmux workspace session. Docker mode uses the Compose service named workspace, which must mount the alias at /workspace. A stopped service starts without building by default; uppercase -C requests a cached build with live progress. Running containers are reused.',
     },
-    xmlq => { usage => 'dashboard xmlq [file] [query]', description => 'Query XML input from a file or standard input.' },
-    yq => { usage => 'dashboard yq [file] [query]', description => 'Query YAML input from a file or standard input.' },
+    xmlq => { usage => 'd2 xmlq [file] [query]', description => 'Query XML input from a file or standard input.' },
+    yq => { usage => 'd2 yq [file] [query]', description => 'Query YAML input from a file or standard input.' },
 );
 
 my %ACTION_ORDER = (
@@ -323,13 +323,13 @@ sub command_names {
 # Input: none.
 # Output: newline-terminated overview containing every public command and its purpose.
 sub overview_text {
-    my $text = "Usage: dashboard <command> [arguments]\n\nAvailable built-in commands:\n";
+    my $text = "Usage: d2 <command> [arguments]\n\nAvailable built-in commands:\n";
     my @commands = command_names();
     for my $command ( sort @commands ) {
         my $spec = $COMMANDS{$command};
         $text .= "  $spec->{usage}\n    $spec->{description}\n";
     }
-    $text .= "\nUse 'dashboard <command> --help' for command details and actions.\n";
+    $text .= "\nUse 'd2 <command> --help' for command details and actions.\n";
     return $text;
 }
 
@@ -379,12 +379,12 @@ sub help_text {
         if ($nested) {
             return _render_root_help( $parent, $nested );
         }
-        my $spec = $COMMANDS{$canonical} || die "Unknown dashboard command '$command'\n";
+        my $spec = $COMMANDS{$canonical} || die "Unknown d2 command '$command'\n";
         my $entry = ref($spec->{actions}) eq 'HASH' ? $spec->{actions}{$action} : undef;
-        die "Unknown action '$action' for dashboard command '$command'\n" if !$entry;
+        die "Unknown action '$action' for d2 command '$command'\n" if !$entry;
         return _render_action_help( $entry, $canonical, $action );
     }
-    my $spec = $COMMANDS{$canonical} || die "Unknown dashboard command '$command'\n";
+    my $spec = $COMMANDS{$canonical} || die "Unknown d2 command '$command'\n";
     return _render_root_help( $canonical, $spec );
 }
 
@@ -572,7 +572,7 @@ sub _render_root_help {
             }
         }
     }
-    $text .= "\nHelp: dashboard $name --help | dashboard $name help\n";
+    $text .= "\nHelp: d2 $name --help | d2 $name help\n";
     return $text;
 }
 
@@ -591,7 +591,7 @@ sub _render_action_help {
         $text .= "\nOptions:\n";
         $text .= "  $_\n" for @options;
     }
-    return $text . "\nHelp: dashboard $name --help | dashboard $name help\n";
+    return $text . "\nHelp: d2 $name --help | d2 $name help\n";
 }
 
 1;
@@ -641,13 +641,13 @@ The help request result is empty when the arguments do not explicitly ask for
 help or when a delegated command owns the request, even if Dashboard wrapper
 options precede the delegated command; otherwise it contains the
 canonical command and an optional action name. In particular,
-C<dashboard of grep --help> and C<dashboard docker compose config --help>
+C<d2 of grep --help> and C<d2 docker compose config --help>
 leave their trailing help options with grep or Docker Compose. That ownership
 is preserved when C<of --print> or Docker Compose selectors occur before the
 delegated command. Dotted skill invocations enter the private C<skills _exec>
 dispatch; help detection stops there so a skill CLI receives its own C<-h> or
 C<--help> unchanged. The built-in Compose synopsis remains available as
-C<dashboard docker compose --help> or C<dashboard help docker compose>.
+C<d2 docker compose --help> or C<d2 help docker compose>.
 
 =head1 WHAT USES IT
 
@@ -658,15 +658,15 @@ actions, flags, and targets following global help.
 
 =head1 EXAMPLES
 
-  dashboard api --help
-  dashboard path cdr --help
-  dashboard of --print grep --help
-  dashboard docker compose config --help
-  dashboard docker compose --service dev exec dev docker --help
+  d2 api --help
+  d2 path cdr --help
+  d2 of --print grep --help
+  d2 docker compose config --help
+  d2 docker compose --service dev exec dev docker --help
   d2 workspace --help
-  dashboard of grep --help
-  dashboard help docker development
-  dashboard complete 3 dashboard api add -
+  d2 of grep --help
+  d2 help docker development
+  d2 complete 3 d2 api add -
   prove -lv t/265-cli-help-completion-contract.t
 
 =cut

@@ -18,5 +18,7 @@ t/10_errors.t
 t/11_returns.t
 t/12_defaults.t
 t/13_no_time_hires.t
+t/14_monotonic.t
+t/15_no_monotonic.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

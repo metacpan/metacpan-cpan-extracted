@@ -106,8 +106,40 @@ print {$repo_cfg_fh} <<'JSON';
 JSON
 close $repo_cfg_fh;
 
-open my $docker_bin_fh, '>', File::Spec->catfile( $bin, 'docker' ) or die $!;
-print {$docker_bin_fh} <<"SH";
+if ( $^O eq 'MSWin32' ) {
+    # Windows has no sh, and an extensionless 'docker' file is not an
+    # executable Windows recognises (PATHEXT needs .exe/.bat/.cmd), so
+    # the shell stub below would die with "'docker' is not recognized".
+    # Write a docker.cmd batch stub instead; 'docker' resolves to it
+    # via PATHEXT. It mirrors the shell stub: print ARGS/DEBUG/MODE when
+    # the -f file is a merged compose file, else a fake compose config.
+    open my $docker_bin_fh, '>', File::Spec->catfile( $bin, 'docker.cmd' ) or die $!;
+    print {$docker_bin_fh} <<'BAT';
+@echo off
+setlocal enabledelayedexpansion
+set "merged_file="
+set "previous="
+for %%A in (%*) do (
+    if "!previous!"=="-f" set "merged_file=%%A"
+    set "previous=%%A"
+)
+echo !merged_file! | findstr /C:"merged-compose-" >nul 2>&1
+if !errorlevel!==0 (
+    echo ARGS:%*
+    echo DEBUG:%DEBUG_ENABLED%
+    echo MODE:%APP_MODE%
+) else (
+    echo services:
+    echo   app: {}
+    echo   worker: {}
+)
+endlocal
+BAT
+    close $docker_bin_fh;
+}
+else {
+    open my $docker_bin_fh, '>', File::Spec->catfile( $bin, 'docker' ) or die $!;
+    print {$docker_bin_fh} <<"SH";
 #!/bin/sh
 last=''
 merged_file=''
@@ -118,7 +150,7 @@ for arg in "\$@"; do
     previous="\$arg"
 done
 case "\$merged_file" in
-*/merged-compose.yml)
+*/merged-compose-*.yml)
     printf 'ARGS:%s\n' "\$*"
     printf 'DEBUG:%s\n' "\${DEBUG_ENABLED:-}"
     printf 'MODE:%s\n' "\${APP_MODE:-}"
@@ -128,9 +160,11 @@ case "\$merged_file" in
     ;;
 esac
 SH
-close $docker_bin_fh;
-chmod 0755, File::Spec->catfile( $bin, 'docker' );
-local $ENV{PATH} = $bin . ':' . ( $ENV{PATH} || '' );
+    close $docker_bin_fh;
+    chmod 0755, File::Spec->catfile( $bin, 'docker' );
+}
+my $path_sep = $^O eq 'MSWin32' ? ';' : ':';
+local $ENV{PATH} = $bin . $path_sep . ( $ENV{PATH} || '' );
 
 my $paths = Developer::Dashboard::PathRegistry->new(
     home            => $home,
@@ -248,7 +282,7 @@ my $saved_page = Developer::Dashboard::PageDocument->new(
     title       => 'Saved Page',
     layout      => { body => 'saved body' },
     actions     => [
-        { id => 'alias-run', kind => 'command', command => 'printf alias-ok', cwd => 'home' },
+        { id => 'alias-run', kind => 'command', command => $^O eq 'MSWin32' ? 'echo alias-ok' : 'printf alias-ok', cwd => 'home' },
     ],
     permissions => {},
 );
@@ -351,8 +385,14 @@ my $background_result = $actions->run_command_action(
     background => 1,
     timeout_ms => 1000,
 );
-ok( $background_result->{pid} > 0, 'background action forks a child process' );
-my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 500 : 20;
+ok( $background_result->{pid} > 0, 'background action launches a child process' );
+# The supervisor is a fresh perl that loads ActionRunner before it can
+# stop: ~0.75s on the qemu ARM64 box, slower under load, and its
+# TERM/wait/KILL shutdown is also slow to schedule there. A 2s poll
+# budget flakes (round 3 and the solo repro failed test 36, and test 38
+# once in ten runs); six seconds gives a slow box room while the loop
+# still exits as soon as the pid stops, so fast machines are unaffected.
+my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 500 : 60;
 for ( 1 .. $background_wait_loops ) {
     last if !$actions->_pid_is_running( $background_result->{pid} );
     sleep 0.1;
@@ -373,169 +413,23 @@ for ( 1 .. $background_wait_loops ) {
 ok( !$actions->_pid_is_running( $signalled_background->{pid} ), 'background action reaps a detached command that exits by signal' );
 
 {
+    require Developer::Dashboard::GoRoutine;
     no warnings 'redefine';
-    local *Developer::Dashboard::ActionRunner::_fork_process = sub { return undef };
+    local *Developer::Dashboard::GoRoutine::spawn = sub { die "native launch denied\n" };
     my $error = eval {
         $actions->run_command_action(
-            command    => 'printf fork-fail',
+            command    => 'printf spawn-fail',
             cwd        => $repo,
             background => 1,
             timeout_ms => 1000,
         );
         return '';
     } || $@;
-    like( $error, qr/Unable to fork background action:/, 'background action surfaces direct fork failures explicitly' );
-}
-
-{
-    no warnings 'redefine';
-    local *Developer::Dashboard::ActionRunner::_detach_background_session = sub {
-        $! = 1;
-        return undef;
-    };
-    my $error = eval {
-        $actions->run_command_action(
-            command    => 'printf background-fail',
-            cwd        => $repo,
-            background => 1,
-            timeout_ms => 1000,
-        );
-        return '';
-    } || $@;
-    like( $error, qr/Unable to detach background action session:/, 'background action surfaces detach failures explicitly' );
-}
-
-{
-    no warnings qw(redefine once);
-    local *File::Spec::devnull = sub { return File::Spec->catfile( $home, 'missing-devnull' ) };
-    my $error = eval {
-        $actions->run_command_action(
-            command    => 'printf bad-stdin',
-            cwd        => $repo,
-            background => 1,
-            timeout_ms => 1000,
-        );
-        return '';
-    } || $@;
-    like( $error, qr/Unable to redirect background action stdin:/, 'background action surfaces stdin redirect failures explicitly' );
-}
-
-{
-    no warnings 'redefine';
-    local *Developer::Dashboard::FileRegistry::dashboard_log = sub { return $repo };
-    my $error = eval {
-        $actions->run_command_action(
-            command    => 'printf bad-stdout',
-            cwd        => $repo,
-            background => 1,
-            timeout_ms => 1000,
-        );
-        return '';
-    } || $@;
-    like( $error, qr/Unable to redirect background action stdout:/, 'background action surfaces stdout redirect failures explicitly' );
-}
-
-{
-    my $valid_log = $files->dashboard_log;
-    my $dashboard_log_calls = 0;
-    no warnings 'redefine';
-    local *Developer::Dashboard::FileRegistry::dashboard_log = sub {
-        $dashboard_log_calls++;
-        return $dashboard_log_calls == 1 ? $valid_log : $repo;
-    };
-    my $error = eval {
-        $actions->run_command_action(
-            command    => 'printf bad-stderr',
-            cwd        => $repo,
-            background => 1,
-            timeout_ms => 1000,
-        );
-        return '';
-    } || $@;
-    like( $error, qr/Unable to redirect background action stderr:/, 'background action surfaces stderr redirect failures explicitly' );
-}
-
-{
-    no warnings 'redefine';
-    local *Developer::Dashboard::ActionRunner::_detach_background_session = sub {
-        exit 0;
-    };
-    my $error = eval {
-        $actions->run_command_action(
-            command    => 'printf no-start-line',
-            cwd        => $repo,
-            background => 1,
-            timeout_ms => 1000,
-        );
-        return '';
-    } || $@;
-    like( $error, qr/Unable to start background action/, 'background action reports startup EOF when the detached child exits before acknowledging readiness' );
-}
-
-{
-    my $fork_calls = 0;
-    no warnings 'redefine';
-    local *Developer::Dashboard::ActionRunner::_fork_process = sub {
-        $fork_calls++;
-        return fork() if $fork_calls == 1;
-        return undef;
-    };
-    my $error = eval {
-        $actions->run_command_action(
-            command    => 'printf detached-child-fail',
-            cwd        => $repo,
-            background => 1,
-            timeout_ms => 1000,
-        );
-        return '';
-    } || $@;
-    like( $error, qr/Unable to fork detached background action command:/, 'background action surfaces detached command fork failures explicitly' );
-}
-
-{
-    my $transient_cwd = tempdir( CLEANUP => 1 );
-    my $fork_calls = 0;
-    no warnings 'redefine';
-    local *Developer::Dashboard::ActionRunner::_fork_process = sub {
-        $fork_calls++;
-        return fork() if $fork_calls == 1;
-        return 0;
-    };
-    local *Developer::Dashboard::ActionRunner::_detach_background_session = sub {
-        remove_tree($transient_cwd);
-        return 1;
-    };
-    my $error = eval {
-        $actions->run_command_action(
-            command    => 'printf missing-cwd-after-fork',
-            cwd        => $transient_cwd,
-            background => 1,
-            timeout_ms => 1000,
-        );
-        return '';
-    } || $@;
-    like( $error, qr/Unable to chdir to background action cwd '.*'/, 'background action surfaces detached child cwd failures explicitly' );
-}
-
-{
-    my $fork_calls = 0;
-    no warnings 'redefine';
-    local *Developer::Dashboard::ActionRunner::_fork_process = sub {
-        $fork_calls++;
-        return fork() if $fork_calls == 1;
-        return 0;
-    };
-    local *Developer::Dashboard::ActionRunner::shell_command_argv = sub { return ('/definitely/missing-action-runner-binary') };
-    my $error = eval {
-        $actions->run_command_action(
-            command    => 'printf never-execs',
-            cwd        => $repo,
-            background => 1,
-            timeout_ms => 1000,
-        );
-        return '';
-    } || $@;
-    like( $error, qr/Unable to exec background action command:/, 'background action surfaces detached child exec failures explicitly' );
+    like(
+        $error,
+        qr/Unable to launch background action supervisor: native launch denied/,
+        'background action reports native GoRoutine process-launch errors with caller context',
+    );
 }
 
 my $interrupt_result = $actions->run_command_action(
@@ -545,12 +439,31 @@ my $interrupt_result = $actions->run_command_action(
     timeout_ms => 5000,
 );
 ok( $interrupt_result->{pid} > 0, 'background action returns a pid for interrupt coverage' );
-kill 'INT', $interrupt_result->{pid};
-for ( 1 .. $background_wait_loops ) {
-    last if !$actions->_pid_is_running( $interrupt_result->{pid} );
-    sleep 0.1;
+SKIP: {
+    # INT delivery to the supervisor is a Unix mechanism: on Windows Perl
+    # kill INT reaches a CreateProcess child only as a console-control
+    # event, which a child without a console never receives, so the
+    # handler never runs and the supervisor would only exit on its own
+    # timeout. Termination by timeout is covered by the block below.
+    skip 'INT delivery to a CreateProcess child does not exist on Windows', 1
+      if $^O eq 'MSWin32';
+    # Give the supervisor time to load and install its INT handler
+    # before signalling it. The supervisor is a fresh perl that loads
+    # ActionRunner first, which takes ~0.75s on the qemu ARM64 box and
+    # longer under load: a 0.5s sleep usually sent the INT while it was
+    # still loading, so the process died on the default disposition
+    # instead of exercising the handler at all, and under load the
+    # shutdown after the INT could still run past the poll budget.
+    # Two seconds lets the handler install and the child spawn first,
+    # so this test actually exercises the INT handler.
+    sleep 2;
+    kill 'INT', $interrupt_result->{pid};
+    for ( 1 .. $background_wait_loops ) {
+        last if !$actions->_pid_is_running( $interrupt_result->{pid} );
+        sleep 0.1;
+    }
+    ok( !$actions->_pid_is_running( $interrupt_result->{pid} ), 'background action INT handler stops the detached wrapper cleanly' );
 }
-ok( !$actions->_pid_is_running( $interrupt_result->{pid} ), 'background action INT handler stops the detached wrapper cleanly' );
 
 my $timeout_background = $actions->run_command_action(
     command    => "$^X -e 'sleep 2'",
@@ -583,33 +496,21 @@ ok( !$actions->_pid_is_running('abc'), '_pid_is_running ignores invalid pid valu
 is( $actions->_wait_status_exit_code( 3 << 8 ), 3, '_wait_status_exit_code keeps normal process exit codes unchanged' );
 is( $actions->_wait_status_exit_code(9), 137, '_wait_status_exit_code maps signal-only wait statuses into shell-style 128+signal codes' );
 {
-    my $child = fork();
-    die "fork failed for background child exit helper coverage: $!" if !defined $child;
-    if ( !$child ) {
-        exit 7;
-    }
-    my $observed;
+    require Developer::Dashboard::GoRoutine;
+    my $child = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'exit 7' ], {} );
     for ( 1 .. $background_wait_loops ) {
-        my $status = $actions->_background_child_exit_status($child);
-        if ( defined $status ) {
-            $observed = 1;
-            is( $status, 7, '_background_child_exit_status returns the direct child exit code when the detached child is reaped' );
-            last;
-        }
+        last if Developer::Dashboard::GoRoutine::process_exited($child);
         sleep 0.05;
     }
-    ok( $observed, '_background_child_exit_status eventually reaps an exited child' );
+    ok( Developer::Dashboard::GoRoutine::process_exited($child), 'native process API observes an exited action child' );
+    is( Developer::Dashboard::GoRoutine::wait_process($child), 7, 'native process API collects its shell-style exit code' );
 }
 {
-    my $running_child = fork();
-    die "fork failed for background child running coverage: $!" if !defined $running_child;
-    if ( !$running_child ) {
-        sleep 2;
-        exit 0;
-    }
-    is( scalar $actions->_background_child_exit_status($running_child), undef, '_background_child_exit_status returns undef while the detached child is still running' );
-    kill 'TERM', $running_child;
-    waitpid( $running_child, 0 );
+    require Developer::Dashboard::GoRoutine;
+    my $running_child = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'sleep 2' ], {} );
+    ok( Developer::Dashboard::GoRoutine::process_running($running_child), 'native process API reports a live child before termination' );
+    Developer::Dashboard::GoRoutine::terminate_process( $running_child, 'TERM' );
+    Developer::Dashboard::GoRoutine::wait_process($running_child);
 }
 ok( !defined $actions->_read_process_state(999999), '_read_process_state falls back cleanly when proc and ps both fail for a missing pid' );
 
@@ -618,7 +519,14 @@ ok( !defined $actions->_read_process_state(999999), '_read_process_state falls b
     local *Developer::Dashboard::ActionRunner::capture = sub (&) {
         return ( "S\n", '', 0 );
     };
-    is( $actions->_read_process_state(999998), 'S', '_read_process_state falls back to ps output when proc state is unavailable but ps succeeds' );
+    if ( $^O eq 'MSWin32' ) {
+        # No ps on Windows: _read_process_state returns undef early and
+        # never reaches the ps fallback, so the mocked capture is unused.
+        is( $actions->_read_process_state(999998), undef, '_read_process_state returns undef on Windows where no ps fallback exists' );
+    }
+    else {
+        is( $actions->_read_process_state(999998), 'S', '_read_process_state falls back to ps output when proc state is unavailable but ps succeeds' );
+    }
 }
 
 {
@@ -630,22 +538,14 @@ ok( !defined $actions->_read_process_state(999999), '_read_process_state falls b
 }
 
 {
-    my $child = fork();
-    die "fork failed for action runner reap helper coverage: $!" if !defined $child;
-    if ( !$child ) {
-        exit 0;
-    }
-    my $zombie_seen = 0;
+    require Developer::Dashboard::GoRoutine;
+    my $child = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'exit 0' ], {} );
     for ( 1 .. $background_wait_loops ) {
-        my $state = $actions->_read_process_state($child);
-        if ( defined $state && $state eq 'Z' ) {
-            $zombie_seen = 1;
-            last;
-        }
+        last if Developer::Dashboard::GoRoutine::process_exited($child);
         sleep 0.1;
     }
-    ok( $zombie_seen, 'action runner child becomes a zombie before the helper reaps it' );
-    ok( $actions->_reap_child_process($child), '_reap_child_process reaps one exited direct child pid' );
+    ok( Developer::Dashboard::GoRoutine::process_exited($child), 'native process API observes child termination without relying on POSIX zombie state' );
+ok( $actions->_reap_child_process($child), '_reap_child_process collects one exited GoRoutine-managed process' );
     ok( !$actions->_pid_is_running($child), '_pid_is_running treats an already-reaped background pid as stopped' );
 }
 
@@ -657,14 +557,11 @@ ok( !defined $actions->_read_process_state(999999), '_read_process_state falls b
 }
 
 {
-    my $child = fork();
-    die "fork failed for action runner live-pid coverage: $!" if !defined $child;
-    if ( !$child ) {
-        sleep 2;
-        exit 0;
-    }
+    require Developer::Dashboard::GoRoutine;
+    my $child = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'sleep 2' ], {} );
     ok( $actions->_pid_is_running($child), '_pid_is_running reports a live action wrapper when signal 0 still succeeds' );
-    waitpid( $child, 0 );
+    Developer::Dashboard::GoRoutine::terminate_process( $child, 'TERM' );
+    Developer::Dashboard::GoRoutine::wait_process($child);
 }
 
 {
@@ -677,7 +574,9 @@ ok( !defined $actions->_read_process_state(999999), '_read_process_state falls b
         );
         return '';
     } || $@;
-    like( $error, qr/Unable to restore cwd to \Q$old_dir\E/, '_run_command surfaces restore-cwd failures when the original cwd disappears mid-run' );
+    ( my $portable_error = $error ) =~ s{/private(?=/var/folders/)}{}g;
+    ( my $portable_old_dir = $old_dir ) =~ s{/private(?=/var/folders/)}{}g;
+    like( $portable_error, qr/Unable to restore cwd to \Q$portable_old_dir\E/, '_run_command surfaces restore-cwd failures when the original cwd disappears mid-run' );
     chdir $repo or die "Unable to chdir back to repo $repo after restore-cwd coverage: $!";
     remove_tree($old_dir);
 }
@@ -711,7 +610,10 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
 my $collector_result = $runner->run_once(
     {
         name      => 'coverage.collector',
-        command   => 'printf collector-ok',
+        # printf is not a Windows cmd.exe command, so use a perl one-liner
+        # (double-quoted program, which CommandRunner rewrites to a temp
+        # file on Windows) so this runs on every platform.
+        command   => "$^X -e \"print 'collector-ok'\"",
         cwd       => 'home',
         interval  => 2,
         indicator => { name => 'coverage.collector', icon => 'C' },
@@ -991,6 +893,10 @@ unlike( $provider_html, qr{id="share-url"}, 'provider pages do not expose a brok
 
 my $prompt = Developer::Dashboard::Prompt->new( indicators => $indicators, paths => $paths );
 my $project_only_prompt = $prompt->render( cwd => $repo, jobs => 0 );
+# The prompt normalises the home-shortened cwd to forward slashes on every
+# platform (Prompt::render, since e5eb6b4da), so the expected bracketed path
+# always uses forward slashes - never the platform separator. Every other
+# prompt test in the suite (t/02, t/07) expects the same ~/... form.
 like( $project_only_prompt, qr{\Q[~/projects/coverage-app]\E}, 'prompt renders the bracketed cwd when git branch is unavailable' );
 unlike( $project_only_prompt, qr/\{coverage-app\}/, 'prompt no longer appends the old project-only brace context' );
 

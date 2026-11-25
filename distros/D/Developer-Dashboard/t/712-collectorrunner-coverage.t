@@ -41,6 +41,8 @@ BEGIN {
 
 use File::Spec;
 use File::Temp qw(tempdir);
+use Cwd qw(abs_path);
+use Config;
 use POSIX ();
 use Test::More;
 
@@ -51,6 +53,12 @@ use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::GoRoutine ();
+
+my @worker_inc = map { abs_path($_) }
+  grep { !ref($_) && defined($_) && -d $_ }
+  @INC;
+my $worker_perl5lib = join $Config{path_sep}, grep { defined && -d $_ } @worker_inc;
 
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
@@ -74,19 +82,15 @@ sub write_file {
     return $file;
 }
 
-# Run a block in a forked child and return its exit status; the child exits 0
-# only when the block dies with the expected message.
+# Evaluate a block and return the child-fixture status; status is zero only when
+# the block dies with the expected message. The cases exercise exceptions and
+# do not require process isolation, so containment with eval preserves their
+# behavior without creating an operating-system child.
 sub child_dies_with {
     my ( $re, $code ) = @_;
-    my $pid = fork();
-    die "fork: $!" if !defined $pid;
-    if ( !$pid ) {
-        my $ok  = eval { $code->(); 1 };
-        my $err = $@;
-        exit( !$ok && $err =~ $re ? 0 : 1 );
-    }
-    waitpid( $pid, 0 );
-    return $? >> 8;
+    my $ok  = eval { $code->(); 1 };
+    my $err = $@;
+    return !$ok && $err =~ $re ? 0 : 1;
 }
 
 # --- schedule mode resolution ------------------------------------------------
@@ -108,7 +112,7 @@ is( $runner->_schedule_mode( {} ), 'manual', 'nothing selects manual' );
     local *Developer::Dashboard::CollectorRunner::_spawn_windows_background_command = sub { return 4242 };
     my $pid = $runner->_start_windows_loop_process( job => { name => 's8-win', command => 'true' }, name => 's8-win' );
     is( $pid, 4242, 'the Windows loop launcher returns the spawned pid' );
-    is( $runner->loop_state('s8-win')->{process_name}, 'dashboard collector: s8-win', 'the Windows loop launcher defaults the process title' );
+    is( $runner->loop_state('s8-win')->{process_name}, 'd2 collector: s8-win', 'the Windows loop launcher defaults the process title' );
 }
 
 # --- loop child daemon setup failures ---------------------------------------
@@ -154,17 +158,41 @@ is( $runner->_schedule_mode( {} ), 'manual', 'nothing selects manual' );
 }
 {
     my $job = { name => 's8-worker', command => 'true', cwd => File::Spec->catdir( $home, 'missing-cwd' ) };
-    my $pid = fork();
-    die "fork: $!" if !defined $pid;
-    if ( !$pid ) {
-        $runner->_run_loop_worker( $job, 's8-worker', undef, undef );
-        exit 0;
-    }
-    waitpid( $pid, 0 );
-    is( $? >> 8, 255, 'a failing worker exits 255' );
+    my $worker = File::Spec->catfile( $home, 'failing-loop-worker.pl' );
+    write_file( $worker, <<'WORKER' );
+use strict;
+use warnings;
+use File::Spec;
+use Developer::Dashboard::Collector;
+use Developer::Dashboard::CollectorRunner;
+use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::IndicatorStore;
+use Developer::Dashboard::PathRegistry;
+my ($home) = @ARGV;
+local $ENV{HOME} = $home;
+my $paths = Developer::Dashboard::PathRegistry->new(
+    home => $home,
+    workspace_roots => [ File::Spec->catdir($home, 'workspace') ],
+);
+my $runner = Developer::Dashboard::CollectorRunner->new(
+    collectors => Developer::Dashboard::Collector->new(paths => $paths),
+    files => Developer::Dashboard::FileRegistry->new(paths => $paths),
+    indicators => Developer::Dashboard::IndicatorStore->new(paths => $paths),
+    paths => $paths,
+);
+my $job = { name => 's8-worker', command => 'true', cwd => File::Spec->catdir($home, 'missing-cwd') };
+$runner->_run_loop_worker($job, 's8-worker', undef, undef);
+WORKER
+    my @include_args = map { '-I' . $_ } @worker_inc;
+    my $pid = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, @include_args, $worker, $home ],
+        { cwd => $home, env => { HOME => $home, PERL5LIB => $worker_perl5lib } },
+    );
+    is( Developer::Dashboard::GoRoutine::wait_process($pid), 255,
+        'a failing worker exits 255' );
     my $state = $runner->loop_state('s8-worker');
     is( $state->{pid}, $pid, 'the worker error state falls back to the worker pid' );
-    is( $state->{process_name}, 'dashboard collector: s8-worker', 'the worker error state falls back to the derived title' );
+    is( $state->{process_name}, 'd2 collector: s8-worker', 'the worker error state falls back to the derived title' );
     is( $state->{schedule}, 'manual', 'the worker error state records the resolved schedule' );
 }
 
@@ -175,7 +203,7 @@ is( $runner->_schedule_mode( {} ), 'manual', 'nothing selects manual' );
     local *Developer::Dashboard::CollectorRunner::_is_managed_loop     = sub { return 1 };
     local *Developer::Dashboard::CollectorRunner::_write_loop_state    = sub { return {} };
     my $pidfile = File::Spec->catfile( $home, 's8-adopt.pid' );
-    my %args = ( pidfile => $pidfile, name => 's8-adopt', title => 'dashboard collector: s8-adopt', interval => 1, schedule_mode => 'interval' );
+    my %args = ( pidfile => $pidfile, name => 's8-adopt', title => 'd2 collector: s8-adopt', interval => 1, schedule_mode => 'interval' );
     {
         local $FAIL{$pidfile} = 0;
         my $err = eval { $runner->_adopt_existing_loop_if_running(%args); 1 } ? '' : $@;
@@ -183,6 +211,27 @@ is( $runner->_schedule_mode( {} ), 'manual', 'nothing selects manual' );
     }
     is( $runner->_adopt_existing_loop_if_running(%args), $$, 'adopting a loop repairs the missing pidfile' );
     ok( -f $pidfile, 'the repaired pidfile exists' );
+}
+
+# --- adopting with no pidfile and an unreadable state record ------------------
+{
+    # With the pidfile gone and nothing found in the process table, the
+    # state record is the last place asked. A state file that is empty or
+    # torn is no record of a running loop: adoption must answer "nothing to
+    # adopt" so start_loop goes on to spawn, never die and fail the start.
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_find_running_loop = sub { return; };
+    for my $case ( [ 's8-adopt-empty', '', 'an empty' ], [ 's8-adopt-torn', '{"pid":', 'a torn' ] ) {
+        my ( $name, $content, $label ) = @{$case};
+        my $pidfile = File::Spec->catfile( $home, "$name.pid" );
+        write_file( $runner->_statefile($name), $content );
+        my %args = ( pidfile => $pidfile, name => $name, title => "d2 collector: $name", interval => 1, schedule_mode => 'interval' );
+        my $adopted = 'not-run';
+        my $err = eval { $adopted = $runner->_adopt_existing_loop_if_running(%args); 1 } ? '' : $@;
+        is( $err, '', "adopting with no pidfile does not die on $label state file" );
+        is( $adopted, undef, "adopting with no pidfile and $label state file finds nothing to adopt" );
+        ok( !-f $pidfile, "adopting with no pidfile and $label state file writes no pidfile" );
+    }
 }
 
 # --- loop state read failures -----------------------------------------------
@@ -226,9 +275,28 @@ SKIP: {
     skip '/proc is not listable here', 2 if !-d '/proc';
     no warnings 'redefine';
     my $calls = 0;
+    my @seen;
     local *Developer::Dashboard::CollectorRunner::_read_proc_file      = sub { return 'x' };
-    local *Developer::Dashboard::CollectorRunner::_read_process_title  = sub { return 'dashboard collector: s8-ns' };
-    local *Developer::Dashboard::CollectorRunner::_same_pid_namespace  = sub { return ++$calls >= 2 ? 1 : 0 };
+    local *Developer::Dashboard::CollectorRunner::_read_process_title  = sub { return 'd2 collector: s8-ns' };
+    local *Developer::Dashboard::CollectorRunner::_same_pid_namespace  = sub {
+        my ( undef, $pid ) = @_;
+        push @seen, $pid;
+        return ++$calls >= 2 ? 1 : 0;
+    };
+    # Fix C scopes every _find_running_loop branch through
+    # _loop_runtime_matches, which fails closed on a candidate with no
+    # runtime identity - and this fixture provides none, so the gate
+    # rejects the positive candidate the scan reaches (micro-proven in
+    # t/981). Hold the gate at yes for the positive candidate only: the
+    # pid is taken from the scan itself ($seen[1], the second
+    # candidate), and for every other pid this is exactly the real
+    # gate's answer here (the candidates carry no marker, no --runtime
+    # token and no loop state), so the filtering this block pins is
+    # unchanged.
+    local *Developer::Dashboard::CollectorRunner::_loop_runtime_matches = sub {
+        my ( undef, $pid ) = @_;
+        return $pid == $seen[1] ? 1 : 0;
+    };
     my $found = $runner->_find_running_loop('s8-ns');
     ok( $found, '_find_running_loop returns a title match from the same pid namespace' );
     is( $calls, 2, '_find_running_loop skips a title match from another pid namespace' );

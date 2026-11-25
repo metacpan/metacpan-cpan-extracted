@@ -70,6 +70,7 @@ if ($config) {
         prompt       => $context_content . $prompt,
         raw_text     => $full_text,
         model_config => $callType eq 'autocomplete_text' ? $config->{autocomplete_model} : $config->{default_model},
+        feature      => $callType,
     );
 
     if ( $response->{success} ) {
@@ -90,6 +91,16 @@ if ($config) {
 else {
     $result_text = '';
     RT->Logger->debug("Configuration for queue $queue not found.");
+}
+
+# The modal forms swap this response into the page with htmx, so escape it
+# there. The editor fetches it directly and inserts it as text, so it gets
+# the unescaped text as text/plain.
+if ( RT::Interface::Web::RequestENV('HTTP_HX_REQUEST') ) {
+    $result_text = $m->interp->apply_escapes( $result_text, 'h' );
+}
+else {
+    $r->content_type('text/plain; charset=utf-8');
 }
 
 </%INIT>

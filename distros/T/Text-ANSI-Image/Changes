@@ -1,0 +1,12 @@
+Revision history for Perl extension Text-ANSI-Image
+
+0.01 2026-11-25T10:12:34Z
+
+    - Text::ANSI::Image draws an image in the terminal as lines of
+      text, which can be laid out and paged like any other text.  A
+      method is a module Text::ANSI::Image::NAME; the first is kitty,
+      the Unicode placeholders of the kitty graphics protocol (kitty,
+      Ghostty, iTerm2 3.7.3 or later)
+    - ansipic, the command, and App::ansipic, the command as a
+      function, which Command::Run can call
+

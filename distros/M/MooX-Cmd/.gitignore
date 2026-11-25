@@ -1,3 +1,20 @@
 MooX-Cmd-*
 .build/
 cover_db/
+
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+# karr materialized task view -- never commit
+tasks/
+config.yml
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore
+# Claude Code worktrees (claude --worktree / isolated agents) -- never commit
+/.claude/worktrees/

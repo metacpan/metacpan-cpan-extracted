@@ -11,4 +11,5 @@ dist.ini
 lib/File/URIList.pm
 t/01_load.t
 t/02_misc.t
+t/10_list.t
 xt/author/pod-syntax.t

@@ -128,7 +128,13 @@ Commit files after a release
 
 Define the release options. Choose between:
 
-`cpan` or `stratopan`. When fake release is used, this overrides these two options
+`cpan` or `stratopan`. When fake release is used, this overrides these two options.
+
+If `DZIL_CPAN_HOST` is set in the environment (or `cpan_host` is set in
+`dist.ini`), uploads go to that host instead of PAUSE/CPAN, e.g. to
+release to a darkpan:
+
+    DZIL_CPAN_HOST=https://orepan.local.opndev.io/authenquery dzil release
 
 ## build\_network\_plugins
 

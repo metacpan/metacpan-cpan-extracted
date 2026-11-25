@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
@@ -8,6 +8,7 @@ use FindBin::libs;
 
 use Fixture();
 use Dist::Conformance::Check::SystemPackages();
+use Dist::Conformance::Schema();
 use Dist::Conformance::Snapshot::Directory();
 use Dist::Conformance::Snapshot::Tree();
 
@@ -100,7 +101,7 @@ subtest declared => sub {
 };
 
 subtest 'deb package names' => sub {
-    is( deb_refusal($_), q{}, "$_ is a deb name" ) for qw{ffmpeg libmagic-dev g++ libstdc++6 python3.12 0ad xz};
+    for my $name (qw{ffmpeg libmagic-dev g++ libstdc++6 python3.12 0ad xz}) { is( deb_refusal($name), q{}, "$name is a deb name" ) }
     like( deb_refusal('x'),                          qr{/Dep/deb:}, 'one character is not' );
     like( deb_refusal('ffmpeg-'),                    qr{/Dep/deb:}, 'a name that ends in -, which apt reads as a removal, is refused' );
     like( deb_refusal('libMagic'),                   qr{/Dep/deb:}, 'and so is an uppercase letter' );
@@ -113,7 +114,7 @@ subtest 'deb package names' => sub {
 };
 
 subtest dependencies => sub {
-    is( refusal_of("x_system_packages:\n  $_: { deb: dep }\n"), q{}, "$_ is the name of a dependency" ) for qw{Foo::Lib ffmpeg libfoo 0ad Foo-Bar_1.2+x};
+    for my $name (qw{Foo::Lib ffmpeg libfoo 0ad Foo-Bar_1.2+x}) { is( refusal_of("x_system_packages:\n  $name: { deb: dep }\n"), q{}, "$name is the name of a dependency" ) }
     like( refusal_of("x_system_packages:\n  '-dep': { deb: dep }\n"),    qr{Properties\ not\ allowed:\ -dep},              'a dependency starts with a letter or a digit' );
     like( refusal_of("x_system_packages:\n  'foo lib': { deb: dep }\n"), qr{Properties\ not\ allowed:\ foo},               'and has no space' );
     like( refusal_of("x_system_packages:\n  'foo/lib': { deb: dep }\n"), qr{Properties\ not\ allowed:\ foo/lib},           'nor a /' );
@@ -142,7 +143,7 @@ subtest entries => sub {
     like( dependency_refusal("    deb: {}\n"),                                                     qr{/Dep/deb:.*names\ no\ package}, 'a mapping without a key is refused' );
     like( dependency_refusal("    deb: { source: jellyfin }\nx_system_sources:\n  deb:\n$SOURCE"), qr{/Dep/deb:.*names\ no\ package}, 'and so is one with a source and no package' );
     my @lines = split /\n/, dependency_refusal("    deb: { Ubuntu: libfoo }\n");
-    is( scalar( grep { /Properties\ not\ allowed/ } @lines ), 1, 'and each error of an entry of a packager with its own rule is reported once, not again under the generic rule' ) or diag join "\n", @lines;
+    is( scalar( grep { index( $_, 'Properties not allowed' ) != -1 } @lines ), 1, 'and each error of an entry of a packager with its own rule is reported once, not again under the generic rule' ) or diag join "\n", @lines;
     like( dependency_refusal("    deb: { Ubuntu: libfoo }\n"),                                                qr{/Dep/deb:.*Properties\ not\ allowed:\ Ubuntu},               'and a key that is not a distro' );
     like( dependency_refusal("    deb: { 'ubuntu/24 04': libfoo }\n"),                                        qr{/Dep/deb:.*Properties\ not\ allowed},                        'or a release' );
     like( dependency_refusal("    deb: { ubuntu/24.04/x: libfoo }\n"),                                        qr{/Dep/deb:.*Properties\ not\ allowed},                        'and a key has one / at most' );
@@ -233,8 +234,8 @@ subtest resolve => sub {
     is( $noble->{sources}[1],                          { name => 'noble', uri => 'https://noble.test.test', suites => ['noble'], components => ['main'], key => 'https://noble.test.test/k', fingerprint => 'E' x 40 }, 'and a resolved source has no distros' );
 
     my $jammy = on( distro => 'ubuntu', release => '22.04', codename => 'jammy' );
-    is( [ grep { /ssl/ } @{ $jammy->{packages} } ], ['libssl3u'],                'on another release of the distro, the distro wins' );
-    is( $jammy->{unresolved},                       [qw{Deb Foo Noble RpmOnly}], 'and an entry only for the release is unresolved' );
+    is( [ grep { index( $_, 'ssl' ) != -1 } @{ $jammy->{packages} } ], ['libssl3u'],                'on another release of the distro, the distro wins' );
+    is( $jammy->{unresolved},                                          [qw{Deb Foo Noble RpmOnly}], 'and an entry only for the release is unresolved' );
 
     my $trixie = on( distro => 'debian', release => '13', codename => 'trixie' );
     is( $trixie->{packages},                                                           [qw{libbar debpkg ffmpeg jellyfin media}],                                           'a null on the release needs no package, and the distro wins over name' );
@@ -286,7 +287,22 @@ subtest check => sub {
     is( check_of("x_system_packages:\n  Dep: { deb: dep- }\n"), [ 'fail', match(qr{\Ametamerge[.]yml\ is\ not\ valid:\ /x_\w+/Dep/deb:\ }) ], 'an invalid one fails, with the error on one line' );
     is( check_of("x_system_sources:\n  deb:\n$SOURCE"),         [ 'fail', match(qr{no\ dependency\ names\ jellyfin}) ],                       'and so does one that only the cross-check refuses' );
     is( check_of("x_system_packages: [\n"),                     [ 'fail', match(qr/\Ametamerge[.]yml\ does\ not\ parse\ as\ YAML/) ],         'and a file that does not parse' );
-    like( dies { Fixture::make_check( $CLASS, { file => 'x.yml' } ) }, qr/Properties\ not\ allowed:\ file/, 'the check takes no configuration of its own' );
+    like( dies { Fixture::make_check( $CLASS, { file => 'x.yml' } ) }, qr/Properties\ not\ allowed:\ file/, 'the check takes no key but template' );
+};
+
+# The fixture template declares aspell, and ffmpeg from the source jellyfin.
+my $TEMPLATE = { template => 'templates/metamerge.yml' };
+
+sub templated_check_of ($metamerge) { return [ Fixture::make_check( $CLASS, $TEMPLATE )->check( snapshot_of($metamerge) ) ] }
+
+subtest 'check with a template' => sub {
+    is( templated_check_of(undef),                                                                         [ 'fail', 'there is no metamerge.yml, to declare aspell, ffmpeg' ], 'no file fails, and names what it must declare' );
+    is( templated_check_of("name: x\n"),                                                                   [ 'fail', 'metamerge.yml does not declare aspell, ffmpeg' ],        'and so does a file without the keys' );
+    is( templated_check_of("x_system_packages:\n  aspell: { deb: aspell }\n"),                             [ 'fail', 'metamerge.yml does not declare ffmpeg' ],                'a file that lacks one names only that one' );
+    is( templated_check_of("x_system_packages:\n  aspell: { deb: aspell }\n  ffmpeg: { rpm: ffmpeg }\n"),  [ 'pass', 'metamerge.yml declares 2 dependencies' ],                'one that declares each passes, with its own entry for it' );
+    is( templated_check_of("x_system_packages:\n  aspell: { deb: aspell- }\n  ffmpeg: { rpm: ffmpeg }\n"), [ 'fail', match(qr/\Ametamerge[.]yml\ is\ not\ valid:/) ],          'and an invalid entry for it still fails' );
+    like( dies { Fixture::make_check( $CLASS, { template => 'templates/prereqs.yml' } )->check( snapshot_of(undef) ) }, qr/variables\ PERL_FLOOR,/, 'a template with a placeholder that nothing fills dies, which reports fail' );
+    like( dies { Fixture::make_check( $CLASS, { template => 'templates/CLAUDE.md' }, DIST => 'Foo-Bar' )->check( snapshot_of(undef) ) }, qr/\Atemplates\/CLAUDE[.]md\ does\ not/, 'and so does one that is not a mapping of YAML' );
 };
 
 subtest update => sub {
@@ -295,6 +311,118 @@ subtest update => sub {
     my $update = Fixture::run_update( Fixture::make_check( $CLASS, {} ), $root );
     is( Fixture::tree_of($root), $before,                                                             'nothing is written' );
     is( $update->manual,         [ match(qr/Dep\/deb.*:\ SystemPackages\ has\ no\ automatic\ fix/) ], 'and a person is told what is wrong' );
+};
+
+subtest 'update with a template' => sub {
+    my $check = Fixture::make_check( $CLASS, $TEMPLATE );
+
+    my $root = Fixture::checkout();
+    Fixture::run_update( $check, $root );
+    is( $root->child('metamerge.yml')->slurp, Fixture::standards()->file('templates/metamerge.yml'), 'a repository without the file gets the template, with its comments' );
+
+    $root = Fixture::checkout( 'metamerge.yml' => "name: x\nx_system_packages:\n  aspell: { deb: my-aspell }\n  Own: { rpm: own }\n" );
+    my $update   = Fixture::run_update( $check, $root );
+    my $declared = $CLASS->declared( Dist::Conformance::Snapshot::Directory->new( root => $root ) );
+    is( $declared->{packages}{aspell},                                                                          { deb => 'my-aspell' },                                'the entry that a repository has for a dependency is its own' );
+    is( $declared->{packages}{Own},                                                                             { rpm => 'own' },                                      'a dependency that the template lacks stays' );
+    is( $declared->{packages}{ffmpeg},                                                                          { deb => { name => 'ffmpeg', source => 'jellyfin' } }, 'a missing one is added' );
+    is( [ map { $_->{name} } @{ $declared->{sources}{deb} } ],                                                  ['jellyfin'],                                          'with the source that it names' );
+    is( Dist::Conformance::Schema::parse_yaml( $root->child('metamerge.yml')->slurp, 'metamerge.yml' )->{name}, 'x',                                                   'and every other key stays' );
+    is( $update->changes,                                                                                       [ { action => 'replace', path => 'metamerge.yml' } ],  'the update says that it replaced the file' );
+    is( Fixture::run_update( $check, $root )->changes,                                                          [],                                                    'and a second update has nothing to do' );
+
+    $root = Fixture::checkout( 'metamerge.yml' => "x_system_packages:\n  aspell: { deb: xx }\n  Own: { deb: { name: own, source: jellyfin } }\nx_system_sources:\n  deb:\n    - { name: jellyfin, uri: 'https://own.test.test', suites: [stable], components: [main], key: 'https://own.test.test/k', fingerprint: 0123456789ABCDEF0123456789ABCDEF01234567 }\n" );
+    Fixture::run_update( $check, $root );
+    $declared = $CLASS->declared( Dist::Conformance::Snapshot::Directory->new( root => $root ) );
+    is( [ map { $_->{uri} } @{ $declared->{sources}{deb} } ], ['https://own.test.test'], 'a source of the same name that the repository has is its own' );
+
+    my %said = ( "x_system_packages: [\n" => qr/does\ not\ parse/, "x_system_packages:\n  Dep: { deb: x- }\n" => qr{is\ not\ valid:\ /x_\w+/Dep} );
+    for my $broken ( sort keys %said ) {
+        $root = Fixture::checkout( 'metamerge.yml' => $broken );
+        my $before = Fixture::tree_of($root);
+        $update = Fixture::run_update( $check, $root );
+        is( Fixture::tree_of($root), $before,                                                                  'a file that is not valid is not written' );
+        is( $update->manual,         [ match(qr/\Ametamerge[.]yml\ $said{$broken}.*:\ fix\ it\ by\ hand\z/) ], 'and a person is told what is wrong' );
+    }
+
+    $root   = Fixture::checkout();
+    $update = Fixture::run_update( $check, $root, 1 );
+    ok( !-e $root->child('metamerge.yml'), 'a dry run writes nothing' );
+    is( $update->changes, [ { action => 'create', path => 'metamerge.yml' } ], 'and says what it would create' );
+};
+
+# The template adds ffmpeg, with its source jellyfin, to the end of each block, in the layout of the YAML::XS dump.
+subtest 'update keeps the text of the file' => sub {
+    my $check = Fixture::make_check( $CLASS, $TEMPLATE );
+    my $own   = <<'YAML';
+# The packages of the operating system.
+x_system_packages:
+  # For the thumbnails.
+  zeta: { deb: { name: zeta, source: own } }
+  aspell: { deb: aspell }    # our own name
+
+x_system_sources:
+  deb:
+    - name: own
+      uri: https://own.test.test
+      suites: [stable]
+      components: [main]
+      key: https://own.test.test/k
+      fingerprint: 0123456789ABCDEF0123456789ABCDEF01234567
+# Not for the packager.
+name: x
+YAML
+    my $added = <<'YAML';
+# The packages of the operating system.
+x_system_packages:
+  # For the thumbnails.
+  zeta: { deb: { name: zeta, source: own } }
+  aspell: { deb: aspell }    # our own name
+  ffmpeg:
+    deb:
+      name: ffmpeg
+      source: jellyfin
+
+x_system_sources:
+  deb:
+    - name: own
+      uri: https://own.test.test
+      suites: [stable]
+      components: [main]
+      key: https://own.test.test/k
+      fingerprint: 0123456789ABCDEF0123456789ABCDEF01234567
+    - components:
+      - main
+      fingerprint: 0123456789ABCDEF0123456789ABCDEF01234567
+      key: https://repo.test.test/key.gpg
+      name: jellyfin
+      suites:
+      - '{codename}'
+      uri: https://repo.test.test/ubuntu
+# Not for the packager.
+name: x
+YAML
+    my $root = Fixture::checkout( 'metamerge.yml' => $own );
+    is( Fixture::run_update( $check, $root )->manual, [],     'the update leaves nothing for a person' );
+    is( $root->child('metamerge.yml')->slurp,         $added, 'and adds each entry at the end of its block, with the comments, the order and the layout of the rest kept' );
+
+    $root = Fixture::checkout( 'metamerge.yml' => "# Only this.\nname: x" );
+    Fixture::run_update( $check, $root );
+    is( index( $root->child('metamerge.yml')->slurp, "# Only this.\nname: x\nx_system_packages:\n  aspell:\n" ), 0, 'a key that is absent is a new block at the end' );
+
+    my %refused = (
+        'a key in flow style'             => "x_system_packages: { aspell: { deb: aspell } }\n",
+        'an anchor on the key'            => "x_system_packages: &packages\n  aspell: { deb: aspell }\n",
+        'a key in quotes'                 => qq{"x_system_packages":\n  aspell: { deb: aspell }\n},
+        'a list at the indent of its key' => "x_system_packages:\n  aspell: { deb: aspell }\n  zeta: { deb: { name: zeta, source: own } }\nx_system_sources:\n  deb:\n  - { name: own, uri: 'https://own.test.test', suites: [stable], components: [main], key: 'https://own.test.test/k', fingerprint: 0123456789ABCDEF0123456789ABCDEF01234567 }\n",
+    );
+    for my $layout ( sort keys %refused ) {
+        $root = Fixture::checkout( 'metamerge.yml' => $refused{$layout} );
+        my $before = Fixture::tree_of($root);
+        my $update = Fixture::run_update( $check, $root );
+        is( Fixture::tree_of($root), $before,                                                      "$layout is left as it is" );
+        is( $update->manual,         [ match(qr/\AAdd\ ffmpeg\ to\ metamerge[.]yml\ by\ hand:/) ], 'and a person is told to add the entries' );
+    }
 };
 
 done_testing;

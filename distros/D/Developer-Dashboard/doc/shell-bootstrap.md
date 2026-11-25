@@ -1,7 +1,7 @@
 Shell Bootstrap
 ===============
 
-`dashboard shell <bash|zsh|sh|ps|pwsh>` prints the shell bootstrap snippet that
+`d2 shell <bash|zsh|sh|ps|pwsh>` prints the shell bootstrap snippet that
 integrates Developer Dashboard into an interactive shell session.
 
 Generated helpers
@@ -9,7 +9,7 @@ Generated helpers
 
 The generated snippet exposes these helpers:
 
-- `cdr`: resolve a saved dashboard path alias or search below the current
+- `cdr`: resolve a saved d2 path alias or search below the current
   directory and change into the chosen target.
 - `dd_cdr`: compatibility wrapper that forwards to `cdr`.
 - `d2`: short shell shortcut that forwards directly to `dashboard`, so commands
@@ -28,7 +28,7 @@ The generated snippet exposes these helpers:
 Shell-specific behavior
 -----------------------
 
-- bash: keeps the compact `dashboard ps1` prompt with `\j` job counts and
+- bash: keeps the compact `d2 ps1` prompt with `\j` job counts and
   wires `_dashboard_complete` for `dashboard` and `d2`, plus
   `_dashboard_complete_cdr` for `cdr`, `dd_cdr`, and `which_dir`, through
   `complete -F`.
@@ -43,7 +43,7 @@ Shell-specific behavior
 Prompt hot path
 ---------------
 
-`dashboard ps1` is expected to be safe to call on every prompt render, even on
+`d2 ps1` is expected to be safe to call on every prompt render, even on
 slower shells and hosts such as iSH.
 
 The switchboard keeps that path lighter by:
@@ -65,13 +65,13 @@ Examples
 --------
 
 ```bash
-eval "$(dashboard shell bash)"
+eval "$(d2 shell bash)"
 d2 version
 cdr bookmarks_root
 which_dir foobar alpha
 ```
 
 ```bash
-dashboard complete 1 dashboard do
-dashboard complete 1 d2 sk
+d2 complete 1 dashboard do
+d2 complete 1 d2 sk
 ```

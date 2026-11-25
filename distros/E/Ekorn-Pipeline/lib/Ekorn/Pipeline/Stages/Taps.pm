@@ -14,6 +14,8 @@ use Ekorn::Pipeline::Stage  qw();
 
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v0.4.0';
+
 our @EXPORT = qw(peek count_into);    ## no critic (Modules::ProhibitAutomaticExportation)
 
 our @EXPORT_OK   = (@EXPORT, qw(dump_to tee));
@@ -60,11 +62,11 @@ sub count_into ($count) {
 # Return a stage running each value through a branch of the stages
 # given, one run of its own beside the main run, fed by the stage, and
 # passing the value on unchanged. What comes out of the branch is
-# dropped; a stop in it ends only it; its flushes are called in the
-# stage's flush, which closes it, and it's finished in the stage's
-# end, if the main run ended first. A branch with nothing to flush or
-# end needs neither, so the stage has none, and the main run can take
-# the plain loop.
+# dropped; a stop in it ends only it; it's closed, so its flushes are
+# called, in the stage's flush, or in its end if the main run stopped
+# first, and finished in its end if the main run died. A branch with
+# nothing to flush or end needs neither, so the stage has none, and
+# the main run can take the plain loop.
 sub tee (@stages) {
     my $branch = Ekorn::Pipeline->new(@stages);
     return gather {
@@ -91,12 +93,19 @@ sub tee (@stages) {
             $open = 0;
             return;
         };
-        return ($step, $flush) unless $feed->{ends};
-        # The end: the branch, if still open, is told it stopped.
-        return ($step, $flush, sub ($how) { $feed->finish });
+        # The end: a branch still open is closed, as a stop ends the
+        # branch's input as much as running out would (roadmap
+        # 2026-0050), unless the main run died, when it's finished, its
+        # ends told it stopped. What its flushes give is dropped.
+        my $end = sub ($how) {
+            return unless $open;
+            $open = 0;
+            $how eq 'died' ? $feed->finish : $feed->close;
+            return;
+        };
+        return ($step, $flush, $end);
     };
 }
-
 
 # Return a stage writing each value, with Data::Dumper, to the filehandle
 # given, or STDERR, and passing it on, with its secrets redacted when
@@ -323,14 +332,21 @@ the branch's:
 closes the branch: so once the main run's values have run out, before
 the stages after the tee are flushed. A total, a last batch or a
 sink's result is given then. If a stop after the tee ends the main
-run, the tee's flush isn't called, so neither are the branch's.
+run first, such as C<take>'s or an iterator's C<first>, the tee's
+flush isn't called, so the tee closes the branch in its end: a stop
+ends the branch's input as much as running out would, so a writer in
+the branch keeps what it holds. That's new in v0.3.10; before, the
+branch's flushes weren't called, and what they held was lost. A
+branch's flush that dies there kills the run, as an end that dies
+does.
 
 =item * B<The branch's ends> are called as its run ends, told how it
 ended from where each stands: in the push that met a stop or a death
-in it; in the tee's flush, which closes it; or, if the main run ended
-before either, in the tee's end, told C<stopped>, as the branch's
-input was cut short. That's so even when the main run died, as it is
-for an iterator read as a source by a run that dies.
+in it; or as the tee closes it, in its flush or its end. If the main
+run died, the tee's end doesn't close the branch, but finishes it, its
+flushes not called, and its ends told C<stopped>, as the branch's
+input was cut short, as they are for an iterator read as a source by a
+run that dies.
 
 =item * B<The value itself> goes into the branch, not a copy, as it
 goes to C<peek>'s block. A branch that changes a hash changes it for
@@ -344,7 +360,7 @@ such as a statement's columns.
 
 Each value costs a push into the branch: about 1.3 microseconds a
 value through a branch of one plain stage, against C<peek>'s 0.4, on
-Perl 5.36. A tee has a flush, and an end, only if its branch needs
+Perl 5.36. A tee has a flush and an end only if its branch needs
 them, so a branch of plain stages leaves the main run on the plain
 loop. A branch with a flush, such as C<batch>'s, puts the main run on
 the full path, and costs about 2.2 microseconds a value. It's for

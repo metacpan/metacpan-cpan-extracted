@@ -1,3 +1,6 @@
+v0.06  2026-11-25Z
+    - Added more tests
+
 v0.05  2026-08-08Z
     - Fixed dependencies
     - Added $list->media_subtype()

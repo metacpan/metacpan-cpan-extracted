@@ -12,8 +12,11 @@ use Time::HiRes qw(sleep time);
 use lib 'lib';
 
 use Developer::Dashboard::PageRuntime;
+use Developer::Dashboard::GoRoutine ();
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Platform qw(is_windows);
+
+my @runtime_inc = map { File::Spec->rel2abs($_) } qw(blib/arch blib/lib lib);
 
 sub _process_is_live {
     my ($pid) = @_;
@@ -73,6 +76,8 @@ SKIP: {
 
     my $home = tempdir( 'dd396-process-tree-XXXXXX', TMPDIR => 1, CLEANUP => 1 );
     local $ENV{HOME} = $home;
+    local $ENV{PERL5LIB} = join ':', @runtime_inc, grep { length } split /:/, ( $ENV{PERL5LIB} // '' );
+    local $ENV{PERL5OPT} = join ' ', ( map { "-I$_" } @runtime_inc ), ( $ENV{PERL5OPT} // '' );
     my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
     my $runtime = Developer::Dashboard::PageRuntime->new( paths => $paths );
     my $ajax_dir = File::Spec->catdir( $paths->dashboards_root, 'ajax' );
@@ -84,18 +89,20 @@ SKIP: {
     open my $saved_fh, '>', $saved_path or die "Unable to write $saved_path: $!";
     print {$saved_fh} <<'SAVED_AJAX';
 my $marker = params()->{marker} || die "missing marker\n";
-my $grandchild = fork();
-die "fork failed: $!\n" if !defined $grandchild;
-if ( !$grandchild ) {
-    close STDOUT;
-    close STDERR;
-    $SIG{TERM} = 'IGNORE';
-    open my $marker_fh, '>', $marker or exit 91;
-    print {$marker_fh} "$$\n";
-    close $marker_fh or exit 92;
-    sleep 30;
-    exit 0;
-}
+require Developer::Dashboard::GoRoutine;
+my $grandchild = Developer::Dashboard::GoRoutine::spawn(
+    [ $^X, '-e', q{
+        my ($marker) = @ARGV;
+        $SIG{TERM} = 'IGNORE';
+        open my $marker_fh, '>', $marker or die "Unable to write grandchild marker '$marker': $!\n";
+        print {$marker_fh} "$$\n";
+        close $marker_fh or die "Unable to close grandchild marker: $!\n";
+        close STDOUT or die "Unable to close grandchild stdout: $!\n";
+        close STDERR or die "Unable to close grandchild stderr: $!\n";
+        sleep 30;
+    }, '--', $marker ],
+    {},
+);
 for ( 1 .. 100 ) {
     last if -s $marker;
     select undef, undef, undef, 0.02;
@@ -108,6 +115,7 @@ SAVED_AJAX
     chmod 0700, $saved_path or die "Unable to chmod $saved_path: $!";
 
     my ( $worker_pid, $grandchild_pid, $stream_result );
+    my @stream_stderr;
     my $grandchild_was_live = 0;
     my $run_error = '';
     {
@@ -132,7 +140,10 @@ SAVED_AJAX
                     }
                     return 0;
                 },
-                stderr_writer => sub { return 0 },
+                stderr_writer => sub {
+                    push @stream_stderr, $_[0] if defined $_[0];
+                    return 0;
+                },
             );
             1;
         } or do {
@@ -141,6 +152,7 @@ SAVED_AJAX
         alarm 0;
     }
     $grandchild_pid ||= _read_pid_marker($marker);
+    diag( 'saved-Ajax stderr: ' . join( '', @stream_stderr ) ) if !defined $worker_pid && @stream_stderr;
 
     # Feature: Saved-Ajax cancellation owns the complete POSIX process tree.
     # Scenario: Browser disconnects after a saved-Ajax worker forks a descendant.

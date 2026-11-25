@@ -1,9 +1,11 @@
 #!/usr/bin/perl -w
 
+use strict;
+use warnings;
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More tests => 2 + 4*3 + 7;
+use Test::More tests => 2 + 4*3 + 7 + 5;
 
 use_ok('Data::Identifier');
 use_ok('Data::Identifier::Cloudlet');
@@ -38,5 +40,13 @@ ok(!$cl->is_root( Data::Identifier->new(sid => 3)), 'Is root negative');
 ok( $cl->is_entry(Data::Identifier->new(sid => 1)), 'Is is entry positive');
 ok( $cl->is_entry(Data::Identifier->new(sid => 2)), 'Is is entry positive');
 ok(!$cl->is_entry(Data::Identifier->new(sid => 3)), 'Is is entry negative');
+
+$cl = Data::Identifier::Cloudlet->new(root => []);
+isa_ok($cl, 'Data::Identifier::Cloudlet');
+ok(!$cl->is_root( Data::Identifier->new(sid => 1)), 'Is root negative');
+ok(!$cl->is_entry(Data::Identifier->new(sid => 1)), 'Is is entry negative');
+$cl->add_entry(Data::Identifier->new(sid => 1));
+ok(!$cl->is_root( Data::Identifier->new(sid => 1)), 'Is root negative');
+ok( $cl->is_entry(Data::Identifier->new(sid => 1)), 'Is is entry positive');
 
 exit 0;

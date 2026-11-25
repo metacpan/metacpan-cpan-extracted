@@ -1,3 +1,21 @@
+1.001     2026-11-24 19:24:08Z
+  - Fix the module headers of all modules so that strict and warnings are
+    enabled before any other code, as perlcritic requires.
+  - Correct the documentation of the command_name attribute: it holds the
+    command name as plain string, not an array reference.
+  - Ship a LICENSE file and state the copyright year, so the distribution
+    builds again.
+  - Load Text::Abbrev only when abbreviated commands are used and
+    MooX::ConfigFromFile::Role only when with_config_from_file is given, so
+    applications not using these options no longer need the recommended
+    modules. A missing module now results in an error naming it.
+  - Require MooX::ConfigFromFile and Text::Abbrev for testing, so the tests
+    of the optional roles run instead of being skipped. Recommend
+    MooX::Options 4.100 for testing, so the tests using it are declared
+    (they skip themselves when it is absent).
+  - Run the test suite and the author tests on GitHub Actions for Perl 5.30,
+    5.38 and 5.40.
+
 1.000     2026-02-28 19:14:47Z
     - Switch to Dist::Zilla with @Author::GETTY plugin bundle
 

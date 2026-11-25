@@ -184,16 +184,20 @@ examples needn't.
     # Blur
     # Cream
 
-    # Stages beside the query, and a sink last to say what comes back
-    my @top = $dbh->iterate(
+    # Stages beside the query, for what SQL can't do, and a sink last to
+    # say what comes back: the two most played tracks not yet on a phone
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
+    my @next = $dbh->iterate(
         'SELECT name FROM track ORDER BY plays DESC',
         pluck('name'),
+        drop_if { $on_my_phone{$_} },
         take(2),
         keep_all,
     );
-    say join ', ', @top;    # Dancing Queen, Sunshine of Your Love
+    say join ', ', @next;    # Girls & Boys, Knowing Me, Knowing You
 
-    say $dbh->iterate('SELECT * FROM track WHERE plays > ?', 6000, count_items);    # 3
+    # The words in the tracks' names
+    say $dbh->iterate('SELECT name FROM track', sub { split ' ', $_->[0] }, count_items);    # 16
 
     # Each row as an object, with a method for each column
     say $dbh->results('SELECT * FROM album WHERE id = ?', 2)->first->title;    # Parklife
@@ -269,6 +273,12 @@ B<Holds:> C<from_json>, C<from_jsonl>, C<to_json>, C<to_jsonl>
 
 B<Made in:> Ekorn::Pipeline::JSON
 
+=item C<:csv>
+
+B<Holds:> C<from_csv>, C<to_csv>
+
+B<Made in:> Ekorn::Pipeline::CSV
+
 =item C<:words>
 
 B<Holds:> C<pipeline>, C<stage>, C<gather>, C<source>, C<generator>, C<yield>, C<sink_one>, C<sink_many>
@@ -320,6 +330,11 @@ C<use Ekorn::Pipeline::Operators> puts in force, in its own scope.
 B<JSON.pm's names.> JSON exports a C<from_json> and a C<to_json> of
 its own, by default, so a module using both imports C<:all> or C<:json>
 from only one of them, or calls the other's by its full name.
+
+=item *
+
+B<Text::CSV.> C<:csv>'s names need it, but load it only when one
+is first called, so C<:csv> and C<:all> import without it.
 
 =item *
 
@@ -806,6 +821,10 @@ A name isn't one of the statement's: C<Expected a placeholder of the statement (
 
 A name has no value: C<Expected a value for each placeholder (none for id)>.
 
+=item named
+
+A name is given twice, as C<:id> and C<id>: C<Expected one value for each placeholder (two for id)>.
+
 =back
 
 =head2 An array reference of values
@@ -875,6 +894,76 @@ to a position of its own.
     $sth->execute;
     say join ' ', @{ $sth->fetchrow_arrayref };    # 4 3
 
+=head2 execute_array
+
+C<execute_array> and C<execute_for_fetch> execute a statement once for
+each row of values, as the DBI's do, and C<bind_param_array> binds an
+array of values to a placeholder, a value for each row. They're how
+the DBI loads many rows at once. Plain DBI's work for C<?>, and for
+other styles only as far as the driver reads them; here they work for
+every style:
+
+=over 4
+
+=item *
+
+A row's values come in the order of its placeholders: by number, or,
+for names, in the order each first appears. C<:id, :name, :id> takes
+two values a row, not three.
+
+=item *
+
+For named placeholders, a row can be a hash, keyed by name, with or
+without the sigil: rows shaped by L<as_hash|/"as_hash">, or records
+from anywhere, load as they are.
+
+=item *
+
+C<bind_param_array> names its placeholder as
+L<C<bind_param>|/"bind_param"> does: by number or by name, with or
+without the sigil. A plain value, not an array, is the value for
+every row.
+
+=back
+
+    $dbh->do('CREATE TEMP TABLE gig (artist TEXT, city TEXT, year INTEGER)');
+    my $sth = $dbh->prepare('INSERT INTO gig (artist, city, year) VALUES (:artist, :city, :year)');
+
+    # An array for each name, in the order each first appears
+    say scalar $sth->execute_array({}, ['Abba', 'Blur'], ['Brighton', 'Colchester'], [1974, 1990]);    # 2
+
+    # Rows as hashes, from anything that gives them
+    my @rows = ({artist => 'Cream', city => 'Windsor', year => 1966});
+    say scalar $sth->execute_for_fetch(sub { shift @rows });    # 1
+
+    # Arrays bound by name, and a value for every row
+    $sth->bind_param_array(':artist', ['Abba', 'Cream']);
+    $sth->bind_param_array(city => ['London', 'London']);
+    $sth->bind_param_array(year => 1977);
+    my @status;
+    say scalar $sth->execute_array({ArrayTupleStatus => \@status});    # 2
+    say "@status";                                                     # 1 1
+
+    say $dbh->selectrow_array('SELECT COUNT(*) FROM gig');    # 5
+    $dbh->do('DROP TABLE gig');
+
+C<ArrayTupleFetch> and C<ArrayTupleStatus> work as the DBI's do, and so
+does context: in a list, C<execute_array> gives the rows executed and the
+rows changed. The counts the DBI checks are of the placeholders, not
+their uses, and its errors are its own, raised as its attributes say. A
+row of the wrong shape croaks at the caller's line, as C<execute> would:
+one with too few or too many values, C<Expected 2 bind values, not 1>, or
+one that's neither an array nor, for named placeholders, a hash,
+C<Expected a row of values: an array, or a hash for named placeholders>.
+The rows before it have been executed, so load in a transaction to keep
+all or none. For C<?>, the DBI's way holds instead: the row's error goes
+in its status, and the rows after it are executed. A statement with a
+L<list|/"Lists"> can't take rows, as its handle is prepared for lists of
+one length: each of the three croaks, C<Expected no list placeholder in a
+statement for rows of values (...:ids)>. Arrays bound with
+C<bind_param_array> are kept with the statement, not in the DBI's
+C<ParamArrays>, for any style but C<?>.
+
 =head2 do
 
 Unlike the DBI's, the attributes may be left out. The first argument
@@ -942,10 +1031,10 @@ own, and C<selectrow_array> each of the row's values. The others return
 one reference, so a stage gets all of it at once: every row, for
 C<selectall_arrayref>.
 
-    my @names = $dbh->selectall_array('SELECT name FROM artist ORDER BY id', pluck, sub {uc});
-    say "@names";    # ABBA BLUR CREAM
+    my @slugs = $dbh->selectall_array('SELECT title FROM album ORDER BY year', pluck, sub { lc s( \W+ )(-)xgr });
+    say "@slugs";    # disraeli-gears arrival parklife the-great-escape
 
-    say scalar $dbh->selectall_array('SELECT * FROM artist', sub { $_->[0] > 1 ? $_ : () });    # 2
+    say scalar $dbh->selectall_array('SELECT name FROM track', sub { split ' ', $_->[0] });    # 16
 
     say join ',', $dbh->selectrow_array('SELECT id, name FROM artist WHERE id = :id', id => 2, sub {"<$_>"});    # <2>,<Blur>
 
@@ -1173,13 +1262,19 @@ values come out in order. A stage returns whatever its last statement
 gives, so a stage run for its side effects should still return what
 the next stage needs.
 
+    my %little = map { $_ => 1 } qw(a of the);
+
     my @words = $dbh->iterate(
-        'SELECT title, year FROM album ORDER BY year',
-        sub { $_->[1] < 1990 ? $_ : () },    # filter
-        sub { split ' ', $_->[0] },          # flatMap
-        sub {lc},                            # map
+        'SELECT title FROM album ORDER BY year',
+        sub { split ' ', $_->[0] },       # flatMap
+        sub {lc},                         # map
+        sub { $little{$_} ? () : $_ },    # filter
     )->all;
-    say "@words";    # disraeli gears arrival
+    say "@words";    # disraeli gears arrival parklife great escape
+
+The filter here tests words a stage made, which no C<WHERE> can see. A
+row the database could leave out, it should: a C<WHERE> is quicker,
+and fewer rows cross the wire.
 
 A stage can be a code reference, a L<pipeline|/"10. Pipelines">, or one
 of Ekorn::Pipeline's stage objects, such as those its words and the
@@ -1195,13 +1290,18 @@ from, and the iterator reading them. None is exported by default.
 
     use DBIx::Squirrel::Context qw(iterator result_number result_original);
 
-C<result_original> works in any run reading a statement: an iterator's
-or result set's own stages, and the stages of a chain made with C<|>,
-or of a pipeline of yours, reading one, as it's read from the L<run's
-context|/"The run's context">. C<result_number> and C<iterator> work only
-in an iterator's or result set's own stages, run by its C<next>, C<all>,
-C<first> or C<single>, or by a sink given last to the call that made it.
-Elsewhere, and outside a stage, they return C<undef>.
+C<result_number> works in any run, as Ekorn::Pipeline counts every
+run's results: an iterator's or result set's own stages, a chain made
+with C<|>, and a pipeline of yours, each counting its own.
+C<result_original> gives a statement's row in any run reading one,
+chains included: it's Ekorn::Pipeline::Context's, and the statement's
+source gives Ekorn the row as its original, which Ekorn passes through
+chains. In a run reading no statement, it's the value the run's source
+gave, or that was pushed.
+C<iterator> works only in an iterator's or result set's own stages, run
+by its C<next>, C<all>, C<first> or C<single>, or by a sink given last to
+the call that made it. Elsewhere it returns C<undef>, and outside a run
+all three do.
 
     my @chart = $dbh->iterate(
         'SELECT name, plays FROM track ORDER BY plays DESC',
@@ -1215,15 +1315,17 @@ the number stays the same, and each value a stage returns in place of
 one row is a result of its own. So numbering after a filter numbers
 what's left:
 
-    my @hits = $dbh->iterate(
-        'SELECT name, plays FROM track ORDER BY id',
-        take_if { $_->[1] > 6000 },
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
+
+    my @to_copy = $dbh->iterate(
+        'SELECT name FROM track ORDER BY id',
+        drop_if { $on_my_phone{ $_->[0] } },
         sub { result_number() . ". $_->[0]" },
     )->all;
-    say for @hits;
-    # 1. Dancing Queen
+    say for @to_copy;
+    # 1. Knowing Me, Knowing You
     # 2. Girls & Boys
-    # 3. Sunshine of Your Love
+    # 3. Country House
 
 C<result_original> keeps the row as it was fetched, so a stage after
 others that reshaped it can still read any of its columns. For a
@@ -1313,6 +1415,12 @@ query that lost a column shows at once:
     say join ' ', keys %{ $artists[0] };              # name
     say join ' ', map { $_->{name} } @artists;       # Abba Blur
 
+The run's context still names every column the statement has, so a
+stage reading it sees them all. C<to_csv>'s C<< header => 1 >> is one: after
+C<as_hash> with names, give C<to_csv> the same names as its header,
+C<< header => [qw(name plays)] >>, or it writes a column for each, empty
+for those left out.
+
 **C<pluck> reads the statement's columns, not the row's.** After a
 stage that reshapes rows, a name or position for an array row picks
 the wrong field, and says nothing. Make the rows hashes first, with
@@ -1387,7 +1495,9 @@ ends only the branch, and a death in it kills the run. It shares the
 main run's context, so C<pluck> and C<as_hash> work in it on a
 statement's rows. Each value costs a push into the branch, several
 times what C<peek> costs, so it's for side jobs and debugging, not a
-hot loop.
+hot loop. A stop after the tee, such as C<take>'s or C<first>'s, closes
+the branch, so its flushes run, and what it holds, such as a
+part-filled C<batch>, is handed on, as when the input runs out.
 
     my @hits;
     my @names = $dbh->iterate(
@@ -1476,24 +1586,28 @@ including those the canned stages throw, such as C<take>'s:
 =head2 Taking and dropping
 
 DBIx::Squirrel::Stages::Flow's stages decide which values go on, by
-their place or by a test. In SQL, C<LIMIT> and C<OFFSET> page results in
-the database, which is quicker; these are for when Perl decides which
-rows go on. A stage that stops the run stops the fetching too, so no
-more rows are read than are wanted.
+their place or by a test. In SQL, C<LIMIT>, C<OFFSET> and C<WHERE> do
+that in the database, which is quicker; these are for when Perl
+decides: a test on data the database doesn't have, a test on what
+came before, or a limit on what's left after one. A stage that stops
+the run stops the fetching too, so no more rows are read than are
+wanted. Some examples use a hash of the tracks already on a phone,
+which the database knows nothing of.
 
 B<By place.> C<take> and C<drop> give a page: C<drop(20), take(10)>
 passes on values 21 to 30. C<take> stops the run at its last
 value, so the statement is finished then:
 
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
+
     my @page = $dbh->iterate(
         'SELECT name FROM track ORDER BY id',
         pluck,
-        drop(2),
+        drop_if { $on_my_phone{$_} },
+        drop(1),
         take(2),
     )->all;
-    say join ', ', @page;    # Girls & Boys, Parklife
-
-    say join ', ', $dbh->iterate('SELECT name FROM track ORDER BY plays DESC', pluck, take(2))->all;    # Dancing Queen, Sunshine of Your Love
+    say join ', ', @page;    # Girls & Boys, Country House
 
 C<take_first>, C<take_last> and C<take_single> each pass on one value,
 and are the stages of the sinks C<keep_first>, C<keep_last> and
@@ -1517,19 +1631,32 @@ B<By a test.> C<take_if> and C<drop_if> test every value, as C<grep>
 does, and never stop the run. A plain stage ending in a test passes on
 what the test returns, true or false; C<take_if> passes on the value:
 
-    my @popular = $dbh->iterate(
-        'SELECT name, plays FROM track ORDER BY id',
-        take_if { $_->[1] > 6000 },
-        pluck(0),
-    )->all;
-    say join ', ', @popular;    # Dancing Queen, Girls & Boys, Sunshine of Your Love
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
 
-    my @quiet = $dbh->iterate(
-        'SELECT name, plays FROM track ORDER BY id',
-        drop_if { $_->[1] > 6000 },
+    my @copied = $dbh->iterate(
+        'SELECT name FROM track ORDER BY id',
+        take_if { $on_my_phone{ $_->[0] } },
         pluck(0),
     )->all;
-    say join ', ', @quiet;    # Knowing Me, Knowing You, Parklife, Country House
+    say join ', ', @copied;    # Dancing Queen, Parklife, Sunshine of Your Love
+
+    my @to_copy = $dbh->iterate(
+        'SELECT name FROM track ORDER BY id',
+        drop_if { $on_my_phone{ $_->[0] } },
+        pluck(0),
+    )->all;
+    say join ', ', @to_copy;    # Knowing Me, Knowing You, Girls & Boys, Country House
+
+A test the database could do, such as C<< plays > 6000 >>, belongs in the
+C<WHERE>. In a stage, it's for debugging: trying a condition on a
+query's rows without touching the query, before it goes in the SQL:
+
+    my @would_keep = $dbh->iterate(
+        'SELECT name, plays FROM track ORDER BY id',
+        take_if { $_->[1] > 6000 },    # trying it out, before it goes in a WHERE
+        pluck(0),
+    )->all;
+    say join ', ', @would_keep;    # Dancing Queen, Girls & Boys, Sunshine of Your Love
 
 C<take_while> and C<drop_while> test values only until the first that
 fails, so they suit rows in the order the test reads. C<take_while>
@@ -1537,19 +1664,25 @@ stops the run there, and reads no further, where C<take_if> would read
 every row; C<drop_while> passes on everything from there, without
 testing again:
 
+    my $half   = $dbh->selectrow_array('SELECT SUM(plays) FROM track') / 2;
+    my $so_far = 0;
+
     my @hits = $dbh->iterate(
         'SELECT name, plays FROM track ORDER BY plays DESC',
-        take_while { $_->[1] > 6000 },
-        pluck(0),
+        take_while { $so_far < $half },    # the hits making half the plays
+        sub { $so_far += $_->[1]; $_->[0] },
     )->all;
     say join ', ', @hits;    # Dancing Queen, Sunshine of Your Love, Girls & Boys
 
-    my @later = $dbh->iterate(
-        'SELECT title, year FROM album ORDER BY year',
-        drop_while { $_->[1] < 1990 },
-        pluck(0),
+    my $stopped_at = 'Arrival';    # where the last run stopped
+
+    my @still_to_do = $dbh->iterate(
+        'SELECT title FROM album ORDER BY year',
+        pluck,
+        drop_while { $_ ne $stopped_at },
+        drop(1),
     )->all;
-    say join ', ', @later;    # Parklife, The Great Escape
+    say join ', ', @still_to_do;    # Parklife, The Great Escape
 
 =head1 7. Gathering: stages made for each run
 
@@ -1767,7 +1900,7 @@ C<file> or an C<fh>: they write each result as JSON, and give how many.
     );
     # Dancing Queen, Sunshine of Your Love
 
-    say $dbh->iterate('SELECT * FROM album', count_items);    # 4
+    say $dbh->iterate('SELECT title FROM album', sub { split ' ', $_->[0] }, count_items);    # 7
 
 The iterator's methods and the sinks overlap: C<all> and C<keep_all>,
 C<first> and C<keep_first>, C<single> and C<keep_single>. A method takes
@@ -1932,18 +2065,20 @@ it limits the whole run:
 
     use Ekorn::Pipeline;
 
-    my $hits = Ekorn::Pipeline->new(
-        sub { $_->[1] >= 5000 ? $_ : () },
+    my %on_my_phone = map { $_ => 1 } 'Dancing Queen', 'Parklife', 'Sunshine of Your Love';
+    my $to_copy = Ekorn::Pipeline->new(
+        drop_if { $on_my_phone{ $_->[0] } },
         pluck('name'),
     );
-    my $sql  = 'SELECT name, plays FROM track ORDER BY plays DESC';
-    say join ', ', $dbh->iterate($sql, $hits)->all;             # Dancing Queen, Sunshine of Your Love, Girls & Boys, Parklife
+    my $sql = 'SELECT name, plays FROM track ORDER BY plays DESC';
+    say join ', ', $dbh->iterate($sql, $to_copy)->all;
+    # Girls & Boys, Knowing Me, Knowing You, Country House
     say join ', ', $dbh->iterate(
         $sql,
-        $hits,
+        $to_copy,
         take(1),
     )->all;
-    # Dancing Queen
+    # Girls & Boys
 
 Make a stage that counts or remembers with
 L<C<gather>|/"7. Gathering: stages made for each run">. A plain closure is
@@ -2560,8 +2695,9 @@ The row the statement gave last, as fetched, or as a row object for a result set
 
 A run whose context has a C<statement> that's a C<DBIx::Squirrel::st> is
 reading a statement; any other run, such as a pipeline called with
-values, has some other context, or none. C<pluck>, C<as_hash> and
-C<result_original> read it, and so can a stage of yours. While a flush
+values, has some other context, or none. C<pluck> and C<as_hash> read
+it, and so can a stage of yours; C<result_original> gives the same
+row, which the source also gives Ekorn as its original. While a flush
 gives its values, which come from every row, not one,
 C<Ekorn::Pipeline::ending()> is true, and the row is no value's;
 C<result_original> gives C<undef> then.
@@ -2656,7 +2792,7 @@ The first argument after the statement in C<do>, C<iterate>, C<results> or a sel
 
 =item C<Expected %d bind values, not %d>
 
-A statement with numbered placeholders was given more or fewer values than its highest number.
+A statement with numbered placeholders was given more or fewer values than its highest number; or a row given to C<execute_for_fetch> had more or fewer values than the statement has placeholders.
 
 =item C<Expected names and values in pairs>
 
@@ -2666,9 +2802,21 @@ A statement with named placeholders was given an odd number of values.
 
 A value was given for a placeholder the statement doesn't have.
 
+=item C<Expected no list placeholder in a statement for rows of values (%s)>
+
+C<execute_array>, C<execute_for_fetch> or C<bind_param_array> was called on a statement with a list placeholder, whose handle is prepared for lists of one length.
+
+=item C<Expected a row of values: an array, or a hash for named placeholders>
+
+A row given to C<execute_for_fetch>, or by C<ArrayTupleFetch>, was neither an array, nor, for named placeholders, a hash.
+
 =item C<Expected a value for each placeholder (none for %s)>
 
 A statement with named placeholders wasn't given a value for each name, or a statement with numbered or named placeholders was executed without values when some had none bound.
+
+=item C<Expected one value for each placeholder (two for %s)>
+
+A statement with named placeholders was given a value for a name twice, written with and without its sigil, as C<:id> and C<id>.
 
 =item C<Expected bind values with a statement taking a list (%s)>
 
@@ -2899,7 +3047,7 @@ finds there, and what L<Context|/"Context">'s functions give it:
 
 **C<result_original>:** C<undef>
 
-**C<result_number>, in an iterator's own run:** C<undef>
+**C<result_number>:** C<undef>
 
 =item a stage's B<step>
 
@@ -2907,7 +3055,7 @@ finds there, and what L<Context|/"Context">'s functions give it:
 
 **C<result_original>:** the row
 
-**C<result_number>, in an iterator's own run:** the number of the result being made
+**C<result_number>:** the number of the result being made
 
 =item a stage's B<flush>
 
@@ -2915,7 +3063,7 @@ finds there, and what L<Context|/"Context">'s functions give it:
 
 **C<result_original>:** C<undef>
 
-**C<result_number>, in an iterator's own run:** the number of the first value it gives
+**C<result_number>:** the number of the first value it gives
 
 =item a sink's B<step>
 
@@ -2923,7 +3071,7 @@ finds there, and what L<Context|/"Context">'s functions give it:
 
 **C<result_original>:** the row
 
-**C<result_number>, in an iterator's own run:** not the value's number, which has been counted: a sink counts for itself
+**C<result_number>:** the number of the value it's given
 
 =item a sink's B<flush>
 
@@ -2931,7 +3079,7 @@ finds there, and what L<Context|/"Context">'s functions give it:
 
 **C<result_original>:** C<undef>
 
-**C<result_number>, in an iterator's own run:** not used
+**C<result_number>:** the results so far, plus one
 
 =item an B<end>
 
@@ -2939,7 +3087,7 @@ finds there, and what L<Context|/"Context">'s functions give it:
 
 **C<result_original>:** C<undef>
 
-**C<result_number>, in an iterator's own run:** not used
+**C<result_number>:** C<undef>
 
 =back
 
@@ -3200,6 +3348,12 @@ B<Plain DBI:> Left to the driver, which most read as C<NULL>.
 
 B<DBIx::Squirrel:> Croaks, for numbered and named placeholders: C<Expected a value for each placeholder (none for id)>.
 
+=item C<execute_array>, C<execute_for_fetch> and C<bind_param_array>
+
+B<Plain DBI:> For C<?>, and other styles as far as the driver reads them.
+
+B<DBIx::Squirrel:> For every style: a row's values in placeholder order, or a hash by name; C<bind_param_array> by name.
+
 =item Stages after the select methods' values
 
 B<Plain DBI:> None.
@@ -3289,11 +3443,11 @@ B<What happens now:> the same, now called the flush
 
 B<How to move:> nothing; an end, told how the run ended, can follow it
 
-=item C<result_number> or C<iterator> in a pipeline of your own reading an iterator
+=item C<iterator> in a pipeline of your own reading an iterator
 
 B<What happens now:> C<undef>
 
-B<How to move:> count in a stage of your own
+B<How to move:> keep the iterator in a variable the stage can see
 
 =item C<< my($first) = $sth->iterate->next >>, then using the handle
 
@@ -3630,7 +3784,10 @@ Returns the number of the result being made, from 1. It counts
 results, not rows: while a stage drops rows, the number stays the
 same, and each value a stage returns in place of one row is a result
 of its own. In a flush of a stage made with L<gather|/"gather">, it's
-the number of the first value the flush returns. Exported upon request.
+the number of the first value the flush returns. It works in any run,
+each counting its own results, and is C<undef> outside one. It has an
+empty prototype, so C<result_number + 1> adds one. Exported upon
+request.
 
 See L<Context|/"Context">.
 
@@ -3641,8 +3798,10 @@ See L<Context|/"Context">.
 Returns the row the result is being made from, as it was fetched,
 before any stage changed it; for a result set, the row object. In a
 flush of a stage made with L<gather|/"gather">, and the stages after it,
-it's C<undef>, as what a flush gives comes from every row, not one.
-Exported upon request.
+it's C<undef>, as what a flush gives comes from every row, not one. In
+a run reading no statement, it's the value the run's source gave, or
+that was pushed. It's Ekorn::Pipeline::Context's own, with an empty
+prototype. Exported upon request.
 
 See L<Context|/"Context">.
 
@@ -4080,6 +4239,21 @@ the placeholder in the statement.
 
 See L<bind_param|/"bind_param">.
 
+=head3 bind_param_array
+
+    $rv = $sth->bind_param_array($placeholder, \@values);
+    $rv = $sth->bind_param_array($placeholder, $value);
+    $rv = $sth->bind_param_array($placeholder, \@values, \%attr);
+
+Binds an array of values to a placeholder, a value for each row
+L<execute_array|/"execute_array"> executes, or one value for every
+row, as the DBI's C<bind_param_array> does, and returns what it
+returns. The placeholder is named as for L<bind_param|/"bind_param">:
+by number or name, with or without the sigil, for numbered and named
+placeholders. Attributes given are bound to every use of it.
+
+See L<execute_array|/"execute_array">.
+
 =head3 execute
 
     $rv = $sth->execute;
@@ -4100,6 +4274,37 @@ placeholder unbound, which most drivers read as C<NULL>. C<do>,
 iterators and the select methods check the same way.
 
 See L<execute|/"execute">.
+
+=head3 execute_array
+
+    $tuples = $sth->execute_array(\%attr, @arrays);
+    ($tuples, $rows) = $sth->execute_array(\%attr, @arrays);
+    $tuples = $sth->execute_array(\%attr);
+
+Executes the statement once for each row of values, as the DBI's
+C<execute_array> does, and returns what it returns: in a list, the
+rows executed and the rows changed. The rows come from C<@arrays>, one
+for each placeholder, in order, by number, or for names, in the order
+each first appears; from those bound with
+L<bind_param_array|/"bind_param_array">; or from C<ArrayTupleFetch> in
+C<%attr>. Each row's status goes in C<ArrayTupleStatus>. A statement
+with a list croaks.
+
+See L<execute_array|/"execute_array">.
+
+=head3 execute_for_fetch
+
+    $tuples = $sth->execute_for_fetch($fetch);
+    $tuples = $sth->execute_for_fetch($fetch, \@status);
+    ($tuples, $rows) = $sth->execute_for_fetch($fetch, \@status);
+
+Executes the statement once for each row C<$fetch> returns, until it
+returns nothing, as the DBI's C<execute_for_fetch> does, and returns
+what it returns. A row is an array of values, in the order
+L<execute_array|/"execute_array"> takes them, or, for named
+placeholders, a hash of them by name. A statement with a list croaks.
+
+See L<execute_array|/"execute_array">.
 
 =head3 iterate
 
@@ -4313,7 +4518,9 @@ C<fetchrow_hashref>, of two columns with the same name, the hash has
 the last. Given column names, found in any case, the hash has only
 those columns, keyed as it would be without them; a hash row is made
 into a new hash, and a name the row hasn't got croaks, C<Expected a
-column of the row (age)>. It finds the names in the L<run's context|/"The run's context">, so
+column of the row (age)>. It leaves the run's context as it is, so
+C<to_csv>, after it, takes a header of the same names. It finds the
+names in the L<run's context|/"The run's context">, so
 it needs a statement to be what the run reads; elsewhere it croaks,
 C<Expected a statement to read, for the column names>. Exported by
 default.
@@ -4399,7 +4606,8 @@ Runs each value through a branch of C<@stages>, for what they do on the
 side, and passes the value on unchanged. What comes out of the branch
 is dropped. The branch is a run of its own beside the main run, so its
 stages keep their state across the values, and each main run gets a
-fresh branch. Exported upon request.
+fresh branch. A stop after the tee closes the branch, so its flushes
+run. Exported upon request.
 
 See L<Taps|/"Taps">.
 
@@ -4468,19 +4676,20 @@ runs|/"Defining them as the program runs">.
 
 Exports what callers use to do work, from one place, by tags. Nothing
 by default: ask for the names in the modules above, or the tags that
-hold them, C<:all>, C<:batch>, C<:context>, C<:core>, C<:flow>, C<:json>,
-C<:rows>, C<:sinks>, C<:sources>, C<:stages>, C<:taps> and C<:words> (see
+hold them, C<:all>, C<:batch>, C<:context>, C<:core>, C<:csv>, C<:flow>,
+C<:json>, C<:rows>, C<:sinks>, C<:sources>, C<:stages>, C<:taps> and
+C<:words> (see
 L<Importing|/"Importing: DBIx::Squirrel::Tooling">).
 
 =head2 DBIx::Squirrel::Util
 
 Helpers the modules share. Internal: they may change without notice.
 
-Pipelines, the operators, the sources, the sinks and the JSON parts
-are Ekorn::Pipeline's own: C<Ekorn::Pipeline>,
+Pipelines, the operators, the sources, the sinks and the JSON and CSV
+parts are Ekorn::Pipeline's own: C<Ekorn::Pipeline>,
 C<Ekorn::Pipeline::Operators>, C<Ekorn::Pipeline::Sources>,
-C<Ekorn::Pipeline::Sinks>, C<Ekorn::Pipeline::JSON> and
-C<Ekorn::Pipeline::Factories>.
+C<Ekorn::Pipeline::Sinks>, C<Ekorn::Pipeline::JSON>,
+C<Ekorn::Pipeline::CSV> and C<Ekorn::Pipeline::Factories>.
 
 =head1 SEE ALSO
 

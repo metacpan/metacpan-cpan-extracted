@@ -42,6 +42,7 @@ sub Commit {
         prompt       => $config->{prompts}{summarize_ticket},
         raw_text     => $conversation,
         model_config => $config->{default_model},
+        feature      => 'summarize_ticket',
     );
 
     unless ( $response->{success} ) {
@@ -52,7 +53,9 @@ sub Commit {
     }
 
     my $summary = $response->{result};
-    RT->Logger->info("Generated summary for ticket #$ticket_id: $summary");
+    RT->Logger->info( "Generated summary for ticket #$ticket_id ("
+            . length($summary) . " characters)" );
+    RT->Logger->debug("Summary for ticket #$ticket_id: $summary");
 
     $ticket->AddCustomFieldValue(
         Field => 'Ticket Summary',

@@ -7,7 +7,7 @@ use warnings;
 # test is compiled. They only misbehave for exact, explicitly registered
 # operations, so the failure paths run identically for root and non-root users
 # (chmod-based failures are not reliable when the suite runs as root).
-our ( %OPEN_FAIL, %OPEN_REDIRECT, $FORK_FAIL, $PIPE_FAIL, $SEEK_FAIL, $SYSREAD_UNDEF );
+our ( %OPEN_FAIL, %OPEN_REDIRECT, %OPEN_AUTOFLUSH, $TIED_OPENED, $PIPE_FAIL, $SEEK_FAIL, $SYSREAD_UNDEF );
 
 BEGIN {
     require Symbol;
@@ -22,7 +22,20 @@ BEGIN {
                 }
             }
             if ( my $redirect = $OPEN_REDIRECT{ $_[2] } ) {
-                return CORE::open( $_[0], $redirect->[0], @{$redirect}[ 1 .. $#{$redirect} ] );
+                if ( $redirect->[0] eq 'TIED_CLOSE_FAIL' || $redirect->[0] eq 'TIED_PRINT_FAIL' ) {
+                    $TIED_OPENED++;
+                    $_[0] = Symbol::gensym() if !defined $_[0];
+                    tie *{ $_[0] }, $redirect->[0] eq 'TIED_PRINT_FAIL'
+                        ? 'Local::PidfilePrintFailure' : 'Local::PidfileCloseFailure';
+                    return 1;
+                }
+                my $opened = CORE::open( $_[0], $redirect->[0], @{$redirect}[ 1 .. $#{$redirect} ] );
+                if ( $opened && $OPEN_AUTOFLUSH{ $_[2] } ) {
+                    my $selected = select( $_[0] );
+                    $| = 1;
+                    select($selected);
+                }
+                return $opened;
             }
         }
         my $handle;
@@ -39,13 +52,6 @@ BEGIN {
         return CORE::open( $handle, $_[1] ) if @_ == 2;
         return CORE::open( $handle, $_[1], @_[ 2 .. $#_ ] ) if @_ >= 3;
         return CORE::open( $_[0] );
-    };
-    *CORE::GLOBAL::fork = sub () {
-        if ($FORK_FAIL) {
-            $! = 11;
-            return undef;
-        }
-        return CORE::fork();
     };
     *CORE::GLOBAL::pipe = sub (**) {
         if ($PIPE_FAIL) {
@@ -75,11 +81,38 @@ BEGIN {
     };
 }
 
+{
+    package Local::PidfileCloseFailure;
+    sub TIEHANDLE { return bless {}, shift }
+    sub PRINT      { return 1 }
+    sub CLOSE      { $! = 5; return 0 }
+}
+
+{
+    package Local::PidfilePrintFailure;
+    sub TIEHANDLE { return bless {}, shift }
+    sub PRINT { $! = 5; return 0 }
+    sub CLOSE { return 1 }
+}
+
+# A Perl-made full device: a PerlIO::via layer whose every write fails
+# with ENOSPC, the way a write to Linux /dev/full does. Opened as
+# '>:via(Local::FullDevice):perlio' it gives the code under test a real,
+# untied filehandle with a buffer layer on top, so with autoflush on the
+# print itself fails and CORE::close reports the failure quietly, on
+# every platform, with no /dev/full needed.
+{
+    package Local::FullDevice;
+    sub PUSHED { my ($class) = @_; return bless {}, $class }
+    sub WRITE  { $! = 28; return -1 }
+    sub FLUSH  { return 0 }
+}
+
 use Cwd qw(getcwd);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
-use POSIX ();
+use Capture::Tiny qw(capture);
 use Test::More;
 
 use lib 'lib';
@@ -88,6 +121,7 @@ use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::RuntimeManager;
+use Developer::Dashboard::GoRoutine ();
 
 {
     package Local::FailRunner;
@@ -119,54 +153,16 @@ my $stub_collectors = bless {}, 'Local::StubCollectors';
 is( Developer::Dashboard::RuntimeManager->new( %new_args, collectors => $stub_collectors )->{collectors}, $stub_collectors, 'an injected collectors object is kept' );
 isa_ok( $manager->{collectors}, 'Developer::Dashboard::Collector', 'a default collectors object is built when none is injected' );
 
-# Runs a code block in a forked child and returns the text of the error it
-# died with (empty string when it survived). Needed where the block redirects
-# the process stdio, which must never happen in the TAP-producing process.
-sub in_child {
+# Runs one failure-injection block while capturing its output, then returns the
+# exception text (empty string when it survives). Capture::Tiny restores the
+# caller's standard handles before TAP output resumes.
+sub capture_failure {
     my ($code) = @_;
-    my $result = File::Spec->catfile( $work, 'child-result.' . ( $$ + int rand 100000 ) );
-    my $pid = fork();
-    die "fork failed: $!" if !defined $pid;
-    if ( !$pid ) {
-        my $err = eval { $code->(); 1 } ? '' : "$@";
-        CORE::open( my $out, '>', $result ) or POSIX::_exit(2);
-        print {$out} $err;
-        close $out;
-        exit 0;
-    }
-    waitpid( $pid, 0 );
-    CORE::open( my $in, '<', $result ) or return "no child result: $!";
-    local $/;
-    my $err = <$in>;
-    close $in;
-    unlink $result;
-    return defined $err ? $err : '';
-}
-
-{
-    no warnings 'redefine';
-
-    # Startup pipe creation failure.
-    local *Developer::Dashboard::RuntimeManager::is_windows = sub { 0 };
-    local *Developer::Dashboard::RuntimeManager::running_web = sub { return undef };
-    local $PIPE_FAIL = 1;
-    eval { $manager->start_web( host => '127.0.0.1', port => 47991 ) };
-    like( $@, qr/Unable to create startup pipe/, 'start_web dies when the startup pipe cannot be created' );
-}
-
-{
-    no warnings 'redefine';
-
-    # A startup child that exits without writing any status line.
-    local *Developer::Dashboard::RuntimeManager::is_windows = sub { 0 };
-    local *Developer::Dashboard::RuntimeManager::running_web = sub { return undef };
-    local *Developer::Dashboard::RuntimeManager::_fork_process = sub {
-        my $pid = fork();
-        POSIX::_exit(0) if defined $pid && !$pid;
-        return $pid;
+    my $error = '';
+    my ( $stdout, $stderr, $exit ) = capture {
+        eval { $code->(); 1 } or $error = $@ || 'unknown failure';
     };
-    eval { $manager->start_web( host => '127.0.0.1', port => 47992 ) };
-    like( $@, qr/Unable to start dashboard web service/, 'start_web dies when the startup child exits without a status line' );
+    return $error;
 }
 
 {
@@ -186,7 +182,7 @@ sub in_child {
     is( $pid, 4242, 'the Windows background start falls back to the spawned pid when the listener pid is not truthy' );
 }
 
-# Collector supervisor start failures.
+# GoRoutine collector-supervisor start failures.
 {
     no warnings 'redefine';
     local *Developer::Dashboard::RuntimeManager::_collector_supervisor_running = sub { return undef };
@@ -194,27 +190,63 @@ sub in_child {
     my $pidfile = $manager->_collector_supervisor_pidfile;
 
     {
-        local *Developer::Dashboard::RuntimeManager::is_windows = sub { 1 };
-        local *Developer::Dashboard::RuntimeManager::_windows_background_collector_supervisor_command = sub { return ('noop') };
-        local *Developer::Dashboard::RuntimeManager::_spawn_windows_background_command = sub { return 5151 };
+        local *Developer::Dashboard::GoRoutine::spawn = sub { die "native spawn failure\n" };
+        eval { $manager->_start_collector_supervisor };
+        like( $@, qr/native spawn failure/, 'the collector supervisor reports native GoRoutine spawn failures' );
+    }
+    {
+        local *Developer::Dashboard::GoRoutine::spawn = sub { return 5151 };
         local $OPEN_FAIL{"> $pidfile"} = ['fail'];
         eval { $manager->_start_collector_supervisor };
-        like( $@, qr/Unable to write \Q$pidfile\E/, 'the Windows supervisor start dies when its pidfile cannot be written' );
+        like( $@, qr/Unable to write \Q$pidfile\E/, 'the supervisor start dies when its pidfile cannot be written' );
     }
+    {
+        my $full = File::Spec->catfile( $work, 'collector-supervisor-full-device' );
+        my $sink = File::Spec->catfile( $work, 'collector-supervisor-full-device-sink' );
+        local *Developer::Dashboard::RuntimeManager::_collector_supervisor_pidfile = sub { return $full };
+        local *Developer::Dashboard::RuntimeManager::_collector_supervisor_running = sub { return undef };
+        local *Developer::Dashboard::GoRoutine::spawn = sub { return 5152 };
+        local $OPEN_REDIRECT{$full} = [ '>:via(Local::FullDevice):perlio', $sink ];
+        local $OPEN_AUTOFLUSH{$full} = 1;
+        my ( $write_error, $write_stderr );
+        ( undef, $write_stderr ) = capture {
+            eval { $manager->_start_collector_supervisor };
+            $write_error = $@;
+        };
+        like( $write_error, qr/Unable to write collector supervisor pid to/, 'the supervisor start surfaces an immediate pidfile print failure' );
+        is( $write_stderr, '', 'the supervisor closes a failed pidfile write without leaking a close warning' );
+        $manager->_cleanup_collector_supervisor_files;
 
-    local *Developer::Dashboard::RuntimeManager::is_windows = sub { 0 };
-    {
-        local $FORK_FAIL = 1;
+        $manager->_write_collector_supervisor_state( { watched_names => ['alpha'] } );
+        $OPEN_REDIRECT{$full} = ['TIED_CLOSE_FAIL'];
+        local $TIED_OPENED = 0;
         eval { $manager->_start_collector_supervisor };
-        like( $@, qr/Unable to fork collector supervisor/, 'the Unix supervisor start dies when fork fails' );
+        like( $@, qr/Unable to close collector supervisor pidfile/, 'the supervisor start surfaces a buffered pidfile close failure' );
+        is( $TIED_OPENED, 1, 'the close-failure filehandle was opened through the deterministic tie' );
+        $manager->_cleanup_collector_supervisor_files;
+    }
+}
+
+# The same two failures again through tied handles, on all hosts.
+# The test callback supplies a real tied handle to the unmodified production
+# print and CORE::close operations, with the watched loop process stubbed.
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_collector_supervisor_running = sub { return undef };
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return 5153 };
+    $manager->_write_collector_supervisor_state( { watched_names => ['alpha'] } );
+    my $pidfile = $manager->_collector_supervisor_pidfile;
+    {
+        local $OPEN_REDIRECT{$pidfile} = ['TIED_PRINT_FAIL'];
+        my $error = capture_failure(sub { $manager->_start_collector_supervisor });
+        like( $error, qr/Unable to write collector supervisor pid to/,
+            'supervisor reports immediate pidfile print failure on all hosts' );
     }
     {
-        local *Developer::Dashboard::RuntimeManager::_run_collector_supervisor_child = sub { exit 0 };
-        local $OPEN_FAIL{"> $pidfile"} = ['fail'];
-        eval { $manager->_start_collector_supervisor };
-        like( $@, qr/Unable to write \Q$pidfile\E/, 'the Unix supervisor start dies in the parent when its pidfile cannot be written' );
-        1 while waitpid( -1, POSIX::WNOHANG() ) > 0;
-        wait();
+        local $OPEN_REDIRECT{$pidfile} = ['TIED_CLOSE_FAIL'];
+        my $error = capture_failure(sub { $manager->_start_collector_supervisor });
+        like( $error, qr/Unable to close collector supervisor pidfile/,
+            'supervisor reports pidfile close failure on all hosts' );
     }
 }
 
@@ -237,8 +269,8 @@ sub in_child {
     {
         my ( $label, $code, $key, $queue ) = @{$case};
         local $OPEN_FAIL{$key} = [ @{$queue} ];
-        my $err = in_child($code);
-        like( $err, qr/\S/, "$label redirect failure dies in the child" );
+        my $err = capture_failure($code);
+        like( $err, qr/\S/, "$label redirect failure is reported" );
     }
 }
 
@@ -328,7 +360,7 @@ sub in_child {
     local $Developer::Dashboard::RuntimeManager::PROCFS_ROOT = File::Spec->catdir( $work, 'no-such-proc' );
     is( $manager->_procfs_available, 0, 'procfs is reported unavailable when the root does not exist' );
 }
-is( $manager->_procfs_available, 1, 'procfs is reported available on this host' );
+is( $manager->_procfs_available, -d '/proc' ? 1 : 0, 'procfs availability matches host' );
 
 chdir $cwd;
 done_testing;
@@ -343,7 +375,7 @@ t/530-runtimemanager-failure-injection-coverage.t - failure-injection coverage f
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. It drives the pipe, fork, open, seek, sysread and syswrite failure paths of RuntimeManager through BEGIN-time CORE::GLOBAL overrides that fail only for exactly registered operations.
+Test file in the Developer Dashboard codebase. It drives the pipe, open, seek, sysread and syswrite failure paths of RuntimeManager through BEGIN-time CORE::GLOBAL overrides that fail only for exactly registered operations. Synchronous output capture keeps TAP isolated while failure exceptions are inspected.
 
 =head1 WHY IT EXISTS
 
@@ -353,25 +385,29 @@ It exists because the lib/ coverage gate requires every branch to be genuinely e
 
 Use this file when you change start_web, the collector supervisor start, the child stdio redirection, the state-file writers, the log follower, or the procfs readers in RuntimeManager.
 
+On every host, the registered open redirect also checks immediate and
+buffered supervisor pidfile write failures, through a Perl-made full
+device (a PerlIO::via layer whose writes fail) in place of C</dev/full>.
+
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/530-runtimemanager-failure-injection-coverage.t>. The overrides are keyed by "mode path" and consume a queue of pass/fail verdicts, so a test can let the first open succeed and fail the second.
+Run it in the dev Docker container with C<d2 docker compose exec -T dev prove -lv t/530-runtimemanager-failure-injection-coverage.t>. The overrides are keyed by "mode path" and consume a queue of pass/fail verdicts, so a test can let the first open succeed and fail the second.
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by the Devel::Cover coverage gate, and by release verification.
+It is used by developers during TDD, by the full C<d2 docker compose exec -T dev prove -lr t> suite, by the Devel::Cover coverage gate, and by release verification.
 
 =head1 EXAMPLES
 
 Example 1:
 
-  prove -lv t/530-runtimemanager-failure-injection-coverage.t
+  d2 docker compose exec -T dev prove -lv t/530-runtimemanager-failure-injection-coverage.t
 
 Run the failure-injection tests by themselves.
 
 Example 2:
 
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/530-runtimemanager-failure-injection-coverage.t
+  d2 docker compose exec -T -e HARNESS_PERL_SWITCHES=-MDevel::Cover dev prove -lv t/530-runtimemanager-failure-injection-coverage.t
 
 Confirm the injected failure branches are reported as covered.
 

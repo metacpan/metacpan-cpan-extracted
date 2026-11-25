@@ -5,6 +5,7 @@ use warnings;
 
 use Capture::Tiny qw(capture);
 use File::Spec;
+use File::Temp qw(tempfile);
 use FindBin qw($RealBin);
 use Test::More;
 
@@ -50,8 +51,14 @@ $no_warnings_line
 $override_line
 print "OK\\n";
 PERL
+    # The script goes through a temp file, not "-e": on Windows a
+    # multi-line argument carrying double quotes does not survive the
+    # command line that system() has to build there.
+    my ( $script_fh, $script_file ) = tempfile( 'd2-t203-XXXXXX', SUFFIX => '.pl', TMPDIR => 1, UNLINK => 1 );
+    print {$script_fh} $script or die "Unable to write $script_file: $!";
+    close $script_fh or die "Unable to close $script_file: $!";
     my ( $stdout, $stderr, $exit ) = capture {
-        system( $^X, '-e', $script );
+        system( $^X, $script_file );
     };
     return ( $exit != 0, $stderr );
 }

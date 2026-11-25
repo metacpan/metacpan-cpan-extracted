@@ -5,8 +5,9 @@ use warnings;
 use utf8;
 
 use Exporter qw(import);
-use POSIX qw(:sys_wait_h);
+use POSIX qw(WNOHANG);
 use Time::HiRes ();
+use Developer::Dashboard::GoRoutine qw(spawn wait_process);
 
 our @EXPORT_OK = qw(run_bounded);
 
@@ -47,7 +48,7 @@ my $SYS_PRCTL_X86_64_LINUX = 157;
 #   that a bound was exceeded. Returning lets the caller fail in its own words,
 #   and lets a test assert the timeout without trapping an exception.
 #
-# WHY IT BECOMES A SUBREAPER BEFORE FORKING (DD-1051)
+# WHY IT BECOMES A SUBREAPER BEFORE SPAWNING (DD-1051)
 #   A command that backgrounds a job and is then signalled before it reaps
 #   that job itself orphans it. On a bare host that orphan reparents to init,
 #   which reaps it straight away - but inside a container run without an init
@@ -70,28 +71,16 @@ sub run_bounded {
 
     my $became_subreaper = _set_child_subreaper(1);
 
-    my $pid = fork();
-    die "run_bounded could not fork for $label: $!" if !defined $pid;
-
-    if ( !$pid ) {
-        # Own process group, so the parent can signal this command and everything
-        # it starts without touching itself or its siblings.
-        setpgrp( 0, 0 );
-        exec { $command->[0] } @{$command};
-
-        # exec only returns on failure, and the child must not fall through into
-        # the caller's test code.
-        exit 127;
-    }
+    my $pid = spawn( $command, { process_group => 1 } );
 
     my $deadline = Time::HiRes::time() + $seconds;
     while (1) {
-        my $reaped = waitpid( $pid, WNOHANG );
-        if ( $reaped == $pid ) {
+        if ( Developer::Dashboard::GoRoutine::process_exited($pid) ) {
+            my $exit = wait_process($pid);
             _set_child_subreaper(0) if $became_subreaper;
             return {
                 timed_out => 0,
-                exit      => $? >> 8,
+                exit      => $exit,
                 message   => '',
             };
         }
@@ -146,12 +135,30 @@ sub _set_child_subreaper {
 sub _terminate_group {
     my ( $pid, $can_reap_orphans ) = @_;
 
+    if ( $^O eq 'MSWin32' ) {
+        # Windows has no process-group signal: Perl's kill() rejects a
+        # negative pid with EINVAL (proven live on win-ts - kill TERM
+        # -pid returns 0 and the child stays alive), TerminateProcess
+        # kills one process only, and wait_process would then block
+        # until the child exits on its own - 600 seconds for the
+        # sleeper this helper exists to bound. Kill the whole tree
+        # with taskkill /T /F instead, the discipline
+        # CommandRunner::terminate_command_process already follows
+        # (t/121: the supervisor timeout escalation), then collect the
+        # leader (already reaped by then, so wait_process reports the
+        # documented 255 unknown status).
+        require Developer::Dashboard::CommandRunner;
+        Developer::Dashboard::CommandRunner::terminate_command_process($pid);
+        wait_process($pid);
+        return;
+    }
+
     kill 'TERM', -$pid;
 
     my $reaped_politely = 0;
     my $deadline         = Time::HiRes::time() + $GRACE_SECONDS;
     while ( Time::HiRes::time() < $deadline ) {
-        if ( waitpid( $pid, WNOHANG ) == $pid ) {
+        if ( Developer::Dashboard::GoRoutine::process_exited($pid) ) {
             $reaped_politely = 1;
             last;
         }
@@ -160,8 +167,8 @@ sub _terminate_group {
 
     if ( !$reaped_politely ) {
         kill 'KILL', -$pid;
-        waitpid( $pid, 0 );
     }
+    wait_process($pid);
 
     # A leader that dies from the TERM alone (dash, and most other direct
     # commands, do not trap it) never reaches the KILL escalation above - but
@@ -251,6 +258,17 @@ forking, so that orphan reparents to the caller instead of to PID 1, and gets
 reaped directly once the group is killed. On a bare host, or on any other
 platform/architecture, this is a no-op: init there already reaps the orphan
 on its own, which is the behaviour this module always had.
+
+=head1 ON WINDOWS
+
+Perl's C<kill> cannot signal a process group on Windows: a negative pid is
+rejected with EINVAL, so the TERM/KILL escalation above would leave the
+child alive and C<wait_process> would block until it exits on its own -
+600 seconds for the sleeper this module exists to bound. The Windows
+branch of C<_terminate_group> therefore kills the whole tree with
+C<taskkill /T /F>, the discipline
+C<CommandRunner::terminate_command_process> already follows, and then
+collects the leader.
 
 =head1 HOW TO USE
 

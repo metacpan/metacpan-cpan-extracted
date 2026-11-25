@@ -22,18 +22,18 @@ api - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard api ...
+  d2 api ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard api> management commands for layered
+This staged helper exposes C<d2 api> management commands for layered
 F<config/api.json> files, including API-key secret hashing and saved Ajax
 route allowlists.
 
@@ -41,16 +41,16 @@ route allowlists.
 
 It exists because machine-auth API configuration is part of the built-in CLI
 surface, but the public switchboard should only dispatch to a staged helper
-instead of embedding config-mutation logic directly in C<bin/dashboard>.
+instead of embedding config-mutation logic directly in C<bin/d2>.
 
 =head1 WHEN TO USE
 
-Use this file when changing the C<dashboard api> command surface or when
+Use this file when changing the C<d2 api> command surface or when
 fixing how API-key administration is routed into the private runtime.
 
 =head1 HOW TO USE
 
-Users run C<dashboard api>, C<dashboard api add>, or C<dashboard api rm>. The
+Users run C<d2 api>, C<d2 api add>, or C<d2 api rm>. The
 staged helper forwards the raw argv list into the private built-in runtime,
 which loads the API CLI module and updates the deepest writable OOP config
 layer.
@@ -64,13 +64,13 @@ and by staged-helper coverage tests.
 
 Example 1:
 
-  dashboard api
+  d2 api
 
 List the effective API registry through the public built-in command path.
 
 Example 2:
 
-  dashboard api add --key bot --secret raw-secret --route /ajax/health
+  d2 api add --key bot --secret raw-secret --route /ajax/health
 
 Create or update one API group from the staged helper path.
 

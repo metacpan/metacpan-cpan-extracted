@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
+use Cwd qw(cwd);
 use File::Spec;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
@@ -22,6 +23,54 @@ use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::GoRoutine ();
+
+my $repo_root = cwd();
+
+# _run_perl_child($source, @arguments)
+# Runs an isolated Perl fixture through GoRoutine and returns its exit code.
+# Input: Perl source and arguments passed to that source.
+# Output: child exit code.
+sub _run_perl_child {
+    my ( $source, @arguments ) = @_;
+    my @include = map { '-I' . File::Spec->catdir( $repo_root, $_ ) } qw(lib blib/lib blib/arch);
+    my %options;
+    my $coverage_switches = $ENV{HARNESS_PERL_SWITCHES};
+    if ( defined $coverage_switches && length $coverage_switches && $coverage_switches =~ /Devel::Cover/ ) {
+        # These fixtures normally inherit the temporary HOME as their CWD.
+        # During coverage, start at the checkout so Devel::Cover recognizes the
+        # repository modules loaded by each isolated GoRoutine child.
+        $options{cwd} = $repo_root;
+        $options{env} = { PERL5OPT => $coverage_switches };
+    }
+    my $pid = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, @include, '-e', $source, @arguments ],
+        \%options,
+    );
+    die "GoRoutine spawn failed: $!" if !defined $pid;
+    return Developer::Dashboard::GoRoutine::wait_process($pid);
+}
+
+# _spawn_sleeping_loop_process($name, $group)
+# Starts a long-lived isolated Perl process for pid and process-group tests.
+# Input: process title string and boolean requesting a private process group.
+# Output: spawned process pid.
+sub _spawn_sleeping_loop_process {
+    my ( $name, $group ) = @_;
+    my $source = q{
+        my ($name) = @ARGV;
+        $0 = $name;
+        $ENV{DEVELOPER_DASHBOARD_LOOP_NAME} = $name;
+        $SIG{TERM} = 'DEFAULT';
+        select undef, undef, undef, 30;
+    };
+    my $pid = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', $source, $name ],
+        { $group ? ( process_group => 1 ) : () },
+    );
+    die "GoRoutine spawn failed: $!" if !defined $pid;
+    return $pid;
+}
 
 # ---------------------------------------------------------------------------
 # Hermetic runtime rooted in a throwaway HOME. The config root resolves from
@@ -45,6 +94,30 @@ my $runner          = Developer::Dashboard::CollectorRunner->new(
     indicators => $indicator_store,
     paths      => $paths,
 );
+
+{
+    my $cwd_marker = File::Spec->catfile( $home, 'goroutine-child-cwd.txt' );
+    my $source = q{
+        use Cwd qw(cwd);
+        open my $fh, '>', $ARGV[0] or die "Unable to write child cwd marker: $!";
+        print {$fh} cwd(), "\n";
+        close $fh or die "Unable to close child cwd marker: $!";
+    };
+    is( _run_perl_child( $source, $cwd_marker ), 0, 'GoRoutine coverage-CWD probe exits successfully' );
+    open my $fh, '<', $cwd_marker or die "Unable to read child cwd marker '$cwd_marker': $!";
+    my $child_cwd = <$fh>;
+    close $fh or die "Unable to close child cwd marker '$cwd_marker': $!";
+    my $expected_cwd = ( $ENV{HARNESS_PERL_SWITCHES} // q{} ) =~ /Devel::Cover/ ? $repo_root : $home;
+    ( my $portable_child_cwd = $child_cwd ) =~ s{/private(?=/var/folders/)}{}g;
+    ( my $portable_expected_cwd = "$expected_cwd\n" ) =~ s{/private(?=/var/folders/)}{}g;
+    # Windows spells the same directory two ways: Cwd::cwd() returns
+    # forward slashes while File::Temp::tempdir returns backslashes, so
+    # the raw strings never match there (round 52, test 2). Compare
+    # with one separator; Unix paths carry no backslashes to disturb.
+    $portable_child_cwd =~ s{\\}{/}g;
+    $portable_expected_cwd =~ s{\\}{/}g;
+    is( $portable_child_cwd, $portable_expected_cwd, 'coverage-instrumented GoRoutine children start in the checkout while ordinary fixtures retain the temporary HOME cwd' );
+}
 
 my $PKG = 'Developer::Dashboard::CollectorRunner';
 
@@ -207,7 +280,7 @@ is( $runner->_effective_interval_seconds( { interval => 5 } ),     5,  '_effecti
 # L603/L605/L607.
 is( $runner->_is_dashboard_subcommand_collector('not-a-hash'), 0, '_is_dashboard_subcommand_collector rejects a non-hash job' );
 is( $runner->_is_dashboard_subcommand_collector( { command => '' } ), 0, '_is_dashboard_subcommand_collector rejects an empty command' );
-is( $runner->_is_dashboard_subcommand_collector( { command => '/opt/tools/dashboard status' } ), 1, '_is_dashboard_subcommand_collector detects an absolute dashboard path command' );
+is( $runner->_is_dashboard_subcommand_collector( { command => '/opt/tools/dashboard status' } ), 1, '_is_dashboard_subcommand_collector detects an absolute d2 path command' );
 
 # ===========================================================================
 # _sleep_until_next_tick internals.
@@ -322,7 +395,11 @@ is( $runner->_state_confirms_managed_loop( 'confirm.nostatus', $$ ), 1, '_state_
 # _read_process_env_marker / _read_process_title / _read_process_state.
 # ===========================================================================
 is( $runner->_read_process_env_marker( 999999999, 'ANY' ), undef, '_read_process_env_marker returns undef for an unreadable environ' );
-ok( defined $runner->_read_process_env_marker( $$, 'PATH' ), '_read_process_env_marker reads a present env marker for the current process' );
+SKIP: {
+    skip 'procfs environment unavailable', 1 if !-r "/proc/$$/environ";
+    ok( defined $runner->_read_process_env_marker( $$, 'PATH' ),
+        '_read_process_env_marker reads a present env marker for the current process' );
+}
 
 # A child that clears %ENV before exec has a genuinely empty (zero-length)
 # environ, which reads back as a defined empty string and drives the
@@ -338,19 +415,31 @@ ok( defined $runner->_read_process_env_marker( $$, 'PATH' ), '_read_process_env_
 # call being made. Nothing pinned that: is($marker, undef) is satisfied just as
 # well by a populated environ that lacks the key, so the empty-environ leg could
 # stop being exercised without a single assertion failing. Clearing the
-# environment in this very fork removes the intermediate process entirely, and
+# environment in this very child process removes the intermediate process entirely, and
 # the environ assertion below turns the precondition into a real one.
 SKIP: {
+    skip 'empty environment probe requires procfs', 2 if !-r "/proc/$$/environ";
     my ($sleep_bin) = grep { -x } qw(/bin/sleep /usr/bin/sleep);
     skip 'no sleep binary available to hold an empty environment open', 2 if !defined $sleep_bin;
     my $probe_title = 'dd-empty-environ-probe';
-    my $child       = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        %ENV = ();
-        exec { $sleep_bin } $probe_title, '30' or CORE::exit(127);
-    }
-    # Poll on the exec'd argv[0], which only the post-exec process can show.
+    my $child = Developer::Dashboard::GoRoutine::spawn(
+        [
+            $^X, '-e',
+            'my ($sleep, $title, $duration) = @ARGV; %ENV = (); exec { $sleep } $title, $duration; die "exec failed: $!\n";',
+            '--', $sleep_bin, $probe_title, '30'
+        ],
+        {},
+    );
+    # Poll on the exec'd argv[0] together with the empty environ: neither
+    # alone proves the child has reached the post-exec state. The title is
+    # argv[0] after exec, but it is NOT at offset 0 of the cmdline string
+    # under an emulator - qemu-aarch64 prefixes the exec'd argv with its own
+    # binary path, so the title sits at a later offset - and before exec the
+    # title is already present as an argument to the -e program while the
+    # environ is still the inherited (populated) one. So the title is matched
+    # as a substring, and the match is only accepted once the environ reads
+    # back empty. A zombie's cmdline is empty, so it can never match the
+    # title and the poll cannot mistake a dead child for a live one.
     #
     # BOUND BY WALL-CLOCK, NOT A POLL COUNT (DD-767, closing a gap DD-482
     # specified but never shipped). DD-482 measured 678 polls (~6.8s) needed
@@ -375,11 +464,12 @@ SKIP: {
         $probe_polls++;
         my $cmdline = '';
         if ( open my $cf, '<', "/proc/$child/cmdline" ) { local $/; $cmdline = <$cf>; close $cf; }
-        if ( defined $cmdline && index( $cmdline, $probe_title ) == 0 ) {
+        if ( defined $cmdline && index( $cmdline, $probe_title ) >= 0 ) {
             if ( open my $ef, '<', "/proc/$child/environ" ) { local $/; $probe_environ = <$ef>; close $ef; }
-            diag("probe child did not expose a readable environ after $probe_polls polls: $!")
-              if !defined $probe_environ;
-            last;
+            if ( defined $probe_environ && $probe_environ eq '' ) {
+                last;
+            }
+            $probe_environ = undef;
         }
         select undef, undef, undef, 0.01;
     }
@@ -413,15 +503,54 @@ SKIP: {
     # empty-environ leg can stop being exercised without a single test failing.
     is( $probe_environ, '', 'the probe child exposes a readable zero-length environ' );
     is( $runner->_read_process_env_marker( $child, 'ANY' ), undef, '_read_process_env_marker returns undef for an empty environ' );
-    kill 9, $child;
-    waitpid( $child, 0 );
+    Developer::Dashboard::GoRoutine::terminate_process( $child, 'KILL' );
+    Developer::Dashboard::GoRoutine::wait_process($child);
 }
 
 # _read_process_title: proc cmdline path, then the ps fallback under a mocked
 # capture so every exit-code and defined-title branch is exercised.
 {
-    my $title = $runner->_read_process_title($$);
-    ok( defined $title && $title ne '', '_read_process_title reads the current process cmdline' );
+    # On Windows the reader returns the CIM launch command line for a
+    # live process (the t/07 work: a $0 assignment never rewrites the
+    # Windows launch command line, but the process table still lists
+    # the full launch command), so the title is defined there too; on
+    # a Unix host the current process always has a readable cmdline.
+    if ( $^O eq 'MSWin32' ) {
+        my $title = $runner->_read_process_title($$);
+        ok( defined $title && $title ne '', '_read_process_title reads the current process command line on Windows via CIM' );
+    }
+    else {
+        my $title = $runner->_read_process_title($$);
+        ok( defined $title && $title ne '', '_read_process_title reads the current process cmdline' );
+    }
+}
+{
+    # Windows branch: with procfs mocked away the reader takes the CIM
+    # path on a live Windows host, where PowerShell resolves, so the
+    # capture runs once and returns the trimmed title; on a simulated
+    # Windows there is no PowerShell to run, so it returns undef
+    # without spawning anything at all. Proved on Linux by mocking
+    # the procfs read and localizing the platform; on Windows the
+    # branch is live.
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub { return undef };
+    my $capture_called = 0;
+    local *Developer::Dashboard::CollectorRunner::capture = sub { $capture_called++; return ( 'ps-title   ', '', 0 ) };
+    {
+        local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+        if ( $^O eq 'MSWin32' ) {
+            is( $runner->_read_process_title($$), 'ps-title', 'on Windows _read_process_title reads the title via CIM when procfs is unavailable' );
+        }
+        else {
+            is( $runner->_read_process_title($$), undef, 'on Windows _read_process_title returns undef without spawning ps' );
+        }
+    }
+    if ( $^O eq 'MSWin32' ) {
+        is( $capture_called, 1, 'on Windows _read_process_title calls capture once for the CIM read' );
+    }
+    else {
+        is( $capture_called, 0, 'on Windows _read_process_title does not spawn ps at all' );
+    }
 }
 {
     no warnings 'redefine';
@@ -450,12 +579,25 @@ SKIP: {
     {
         local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub { return 'garbage-without-format' };
         local *Developer::Dashboard::CollectorRunner::capture         = sub { return ( ' Ss ', '', 0 ) };
-        is( $runner->_read_process_state($$), 'S', '_read_process_state falls back to ps when procfs stat is unparseable' );
+        if ( $^O eq 'MSWin32' ) {
+            # ps does not exist on Windows, so a state procfs did not
+            # supply is simply unavailable there (the product returns
+            # early) and the callers treat undef as unknown.
+            is( $runner->_read_process_state($$), undef, '_read_process_state returns undef on Windows, where ps does not exist and state is unavailable' );
+        }
+        else {
+            is( $runner->_read_process_state($$), 'S', '_read_process_state falls back to ps when procfs stat is unparseable' );
+        }
     }
     {
         local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub { return '' };
         local *Developer::Dashboard::CollectorRunner::capture         = sub { return ( 'R', '', 0 ) };
-        is( $runner->_read_process_state($$), 'R', '_read_process_state falls back to ps when procfs stat is empty' );
+        if ( $^O eq 'MSWin32' ) {
+            is( $runner->_read_process_state($$), undef, '_read_process_state returns undef on Windows, where ps does not exist and state is unavailable' );
+        }
+        else {
+            is( $runner->_read_process_state($$), 'R', '_read_process_state falls back to ps when procfs stat is empty' );
+        }
     }
     {
         local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub { return undef };
@@ -592,7 +734,11 @@ is( $runner->_descriptor_is_inherited_pipe(999999999), 0, '_descriptor_is_inheri
         is( $runner->_current_perl_command, 'x', '_current_perl_command falls through to $^X when no Windows perl is resolvable' );
     }
 }
-{
+SKIP: {
+    # The Linux path is unreachable on Windows: _current_perl_command takes
+    # the Windows branch first there, so the mocked '/usr/bin/perl' is what
+    # a Windows host returns, not $^X.
+    skip 'the Linux _current_perl_command path is unreachable on Windows', 4 if $^O eq 'MSWin32';
     no warnings 'redefine';
     local *Developer::Dashboard::CollectorRunner::command_in_path = sub { return '/usr/bin/perl' };
     local *Developer::Dashboard::ProcessSupervision::command_in_path = \&Developer::Dashboard::CollectorRunner::command_in_path;
@@ -650,13 +796,21 @@ is( $runner->_helper_file_supports_internal_command( File::Spec->catfile( $home,
 }
 
 # _powershell_command / _powershell_single_quote on Linux.
-is( $runner->_powershell_command, '', '_powershell_command returns empty on a non-Windows host' );
+SKIP: {
+    skip '_powershell_command resolves the real PowerShell on a Windows host', 1 if $^O eq 'MSWin32';
+    is( $runner->_powershell_command, '', '_powershell_command returns empty on a non-Windows host' );
+}
 is( Developer::Dashboard::CollectorRunner::_powershell_single_quote(undef), q{''}, '_powershell_single_quote defaults an undef value to an empty literal' );
 {
     no warnings 'redefine';
     local *Developer::Dashboard::CollectorRunner::is_windows      = sub { return 1 };
     local *Developer::Dashboard::CollectorRunner::command_in_path = sub { return undef };
     local *Developer::Dashboard::ProcessSupervision::command_in_path = \&Developer::Dashboard::CollectorRunner::command_in_path;
+    # _powershell_command is compiled in ProcessSupervision, so its
+    # is_windows check must be mirrored there too (the t/07 pattern):
+    # without it this block passes vacuously off Windows and never
+    # exercises the SystemRoot fallback it names.
+    local *Developer::Dashboard::ProcessSupervision::is_windows = sub { return 1 };
     {
         local $ENV{SystemRoot} = '/tmp/win-system-root';
         is( $runner->_powershell_command, '', '_powershell_command falls back through SystemRoot and returns empty when no binary exists' );
@@ -664,13 +818,22 @@ is( Developer::Dashboard::CollectorRunner::_powershell_single_quote(undef), q{''
     {
         local %ENV = %ENV;
         delete $ENV{SystemRoot};
-        is( $runner->_powershell_command, '', '_powershell_command defaults SystemRoot when it is unset' );
+        # With SystemRoot unset the resolver guesses the standard
+        # C:\Windows root (deliberate since the original resolver in
+        # a8a95985, kept by DD-753): on a Windows host that file exists
+        # and is returned, off Windows the guess names nothing.
+        my $default = File::Spec->catfile( 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe' );
+        my $expected = -f $default ? $default : '';
+        is( $runner->_powershell_command, $expected, '_powershell_command defaults SystemRoot when it is unset' );
     }
 }
 
 # _replace_path_via_powershell early return, powershell-missing guards, and the
 # stderr/stdout merge on a non-zero PowerShell exit.
-is_deeply( [ $runner->_replace_path_via_powershell( 'a', 'b' ) ], [ 0, '' ], '_replace_path_via_powershell no-ops on a non-Windows host' );
+SKIP: {
+    skip '_replace_path_via_powershell runs real PowerShell on a Windows host', 1 if $^O eq 'MSWin32';
+    is_deeply( [ $runner->_replace_path_via_powershell( 'a', 'b' ) ], [ 0, '' ], '_replace_path_via_powershell no-ops on a non-Windows host' );
+}
 {
     no warnings 'redefine';
     local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
@@ -707,7 +870,17 @@ is_deeply( [ $runner->_replace_path_via_powershell( 'a', 'b' ) ], [ 0, '' ], '_r
 }
 
 # _overwrite_state_file_in_place: Linux no-op and Windows failure/success paths.
-is_deeply( [ $runner->_overwrite_state_file_in_place( 'a', 'b' ) ], [ 0, '' ], '_overwrite_state_file_in_place no-ops on a non-Windows host' );
+if ( $^O eq 'MSWin32' ) {
+    # On Windows the helper does not no-op: it takes the Windows path and
+    # tries to read the source, so a missing source fails with a read
+    # error instead of the (0, '') no-op (solo #410, test 137). Match
+    # the stable error prefix; the trailing $! text varies by platform.
+    my ( $ok, $err ) = $runner->_overwrite_state_file_in_place( 'a', 'b' );
+    ok( !$ok && $err =~ /\AUnable to read a for in-place overwrite: /, '_overwrite_state_file_in_place fails to read a missing source on Windows' );
+}
+else {
+    is_deeply( [ $runner->_overwrite_state_file_in_place( 'a', 'b' ) ], [ 0, '' ], '_overwrite_state_file_in_place no-ops on a non-Windows host' );
+}
 {
     no warnings 'redefine';
     local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
@@ -760,36 +933,21 @@ is_deeply( [ $runner->_overwrite_state_file_in_place( 'a', 'b' ) ], [ 0, '' ], '
     }
 }
 
-# _spawn_windows_background_command: missing PowerShell, non-zero exit, and pid parse.
-like( ( eval { $runner->_spawn_windows_background_command( 'perl', 'x' ); 1 } ? '' : $@ ), qr/powershell is unavailable/, '_spawn_windows_background_command dies when PowerShell is unavailable' );
+# _spawn_windows_background_command: native spawn failure and PID validation.
 {
-    no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_powershell_command = sub { return undef };
-    like( ( eval { $runner->_spawn_windows_background_command( 'perl', 'x' ); 1 } ? '' : $@ ), qr/powershell is unavailable/, '_spawn_windows_background_command dies when PowerShell resolves to undef' );
+    no warnings qw(redefine once);
+    local *Developer::Dashboard::GoRoutine::spawn = sub { die "native spawn failed\n" };
+    like( ( eval { $runner->_spawn_windows_background_command( 'perl', 'x' ); 1 } ? '' : $@ ), qr/native spawn failed/, '_spawn_windows_background_command exposes native spawn errors' );
 }
 {
-    no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_powershell_command = sub { return 'pwsh' };
-    local *Developer::Dashboard::CollectorRunner::capture             = sub { return ( 'boom', 'err', 1 ) };
-    like( ( eval { $runner->_spawn_windows_background_command( 'perl', 'x' ); 1 } ? '' : $@ ), qr/Unable to launch detached Windows collector process/, '_spawn_windows_background_command dies on a non-zero PowerShell exit' );
+    no warnings qw(redefine once);
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return undef };
+    like( ( eval { $runner->_spawn_windows_background_command( 'perl', 'x' ); 1 } ? '' : $@ ), qr/Unable to launch detached collector process/, '_spawn_windows_background_command rejects a missing process id' );
 }
 {
-    no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_powershell_command = sub { return 'pwsh' };
-    local *Developer::Dashboard::CollectorRunner::capture             = sub { return ( "42\nabc\n0\n", '', 0 ) };
-    is( $runner->_spawn_windows_background_command( 'perl', 'x' ), 42, '_spawn_windows_background_command parses the first positive numeric pid from stdout' );
-}
-{
-    no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_powershell_command = sub { return 'pwsh' };
-    local *Developer::Dashboard::CollectorRunner::capture             = sub { return ( '', '', 0 ) };
-    is( $runner->_spawn_windows_background_command( 'perl', 'x' ), undef, '_spawn_windows_background_command returns undef when stdout carries no pid' );
-}
-{
-    no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_powershell_command = sub { return 'pwsh' };
-    local *Developer::Dashboard::CollectorRunner::capture             = sub { return ( "0\n", '', 0 ) };
-    is( $runner->_spawn_windows_background_command( 'perl', 'x' ), undef, '_spawn_windows_background_command rejects a zero pid' );
+    no warnings qw(redefine once);
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return 4242 };
+    is( $runner->_spawn_windows_background_command( 'perl', 'x' ), 4242, '_spawn_windows_background_command returns the native process id' );
 }
 
 # ===========================================================================
@@ -803,7 +961,17 @@ like( ( eval { $runner->_spawn_windows_background_command( 'perl', 'x' ); 1 } ? 
     my $existing_src = File::Spec->catfile( $home, 'rs-src' );
     open my $sfh, '>', $existing_src or die $!;
     close $sfh;
-    like( ( eval { $runner->_replace_state_file( $existing_src, File::Spec->catfile( $home, 'no-tgt2' ) ); 1 } ? '' : $@ ), qr/Unable to rename/, '_replace_state_file unlinks an existing source before dying on a non-Windows rename failure' );
+    my $rs_tgt = File::Spec->catfile( $home, 'no-tgt2' );
+    if ( $^O eq 'MSWin32' ) {
+        # On Windows the rename failure is rescued by the retry path:
+        # the PowerShell fallback runs first, and the in-place overwrite
+        # rescues it even when PowerShell fails, so the call succeeds and
+        # the file is moved instead of dying (solo #411, test 148).
+        ok( $runner->_replace_state_file( $existing_src, $rs_tgt ) && !-e $existing_src && -e $rs_tgt, '_replace_state_file succeeds on Windows by moving the file when the rename fails' );
+    }
+    else {
+        like( ( eval { $runner->_replace_state_file( $existing_src, $rs_tgt ); 1 } ? '' : $@ ), qr/Unable to rename/, '_replace_state_file unlinks an existing source before dying on a non-Windows rename failure' );
+    }
 }
 {
     no warnings 'redefine';
@@ -896,9 +1064,19 @@ ok( !$runner->_cron_due( "* * $other_month_day * $other_weekday", 'problem30.day
     'Problem 30: when both day fields are restricted, neither match means the cron job is not due' );
 ok( $runner->_cron_due( "* * $cron_now[3] * *", 'problem30.dom-wild-dow' ),
     'Problem 30: a matching day-of-month applies when day-of-week is a wildcard' );
-my $other_minute = ( $cron_now[1] + 1 ) % 60;
-my $other_hour   = ( $cron_now[2] + 1 ) % 24;
-my $other_month  = ( $cron_now[4] + 1 ) % 12 + 1;
+# The non-matching fields below are picked far from now on purpose, not one
+# step away: @cron_now was captured at the top of this block and the four
+# _cron_due calls above it take about 0.9s on Windows (real state file reads
+# and writes), so a minute one step ahead can tick into "now" before the
+# assertion below evaluates it and the cron then fires - that is what flaked
+# test 168 in round 70. A minute 30 minutes ahead, an hour 12 hours ahead
+# and a month 6 months ahead cannot become current during this test, so the
+# "rejects" assertions below are stable. Proved by probe-t103-cron-boundary
+# on win-ts: the +1 minute expression flipped from not-due to due across a
+# real minute boundary while the +30 expression stayed not-due.
+my $other_minute = ( $cron_now[1] + 30 ) % 60;
+my $other_hour   = ( $cron_now[2] + 12 ) % 24;
+my $other_month  = ( $cron_now[4] + 6 ) % 12 + 1;
 ok( !$runner->_cron_due( "$other_minute * * * *", 'problem30.minute-no-match' ),
     'Problem 30: cron rejects a non-matching minute' );
 ok( !$runner->_cron_due( "* $other_hour * * *", 'problem30.hour-no-match' ),
@@ -960,6 +1138,22 @@ $cron_config->save_global(
 );
 my ($cron_job) = grep { ( $_->{name} || '' ) eq 'problem30.config-json' } @{ $cron_config->collectors };
 ok( $cron_job && $cron_job->{cron} eq '* * * * *', 'Problem 30: config.json collector cron expression survives configuration loading' );
+# The two _job_is_due calls below must land in the same minute: the
+# de-duplication stamp is minute-granular, so if the clock ticks into a new
+# minute between them the second call is legitimately due again and the
+# "runs only once" assertion fails - that is what flaked test 199 in solo
+# #467. A _job_is_due call takes up to about 1s on Windows (real state file
+# reads and writes), so wait until at least 5 seconds of the current minute
+# remain before starting. The fully qualified Time::HiRes::sleep is
+# deliberate: this file imports only Time::HiRes::time, so a bare sleep would
+# compile to CORE::sleep and truncate the fraction to 0. Proved by micro
+# t/997 on win-ts: due then not-due inside one minute, due then due again
+# across a boundary 2 seconds apart.
+my $waited_for_minute = 0;
+while ( ( localtime() )[0] > 55 && $waited_for_minute < 10 ) {
+    Time::HiRes::sleep(0.5);
+    $waited_for_minute += 0.5;
+}
 ok( $runner->_job_is_due( $cron_job, 'problem30.config-json' ), 'Problem 30: a loaded config.json cron collector is due in its matching minute' );
 ok( !$runner->_job_is_due( $cron_job, 'problem30.config-json' ), 'Problem 30: a config.json cron collector runs only once in the matching minute' );
 
@@ -1014,6 +1208,11 @@ like( ( eval { $runner->_run_command( source => 'true', cwd => File::Spec->catdi
 {
     no warnings 'redefine';
     local *Developer::Dashboard::CommandRunner::shell_command_argv = sub { die "argv boom\n" };
+    # On Windows the command goes through _windows_powershell_argv, not
+    # shell_command_argv, so only mocking the latter leaves the die
+    # unfired there (solo #412, test 228). Mock both builders; each
+    # platform calls exactly one of them.
+    local *Developer::Dashboard::CommandRunner::_windows_powershell_argv = sub { die "argv boom\n" };
     like( ( eval { $runner->_run_command( source => 'true', cwd => $home, timeout_ms => 1000 ); 1 } ? '' : $@ ), qr/argv boom/, '_run_command re-throws a non-timeout error from the command build' );
 }
 {
@@ -1080,15 +1279,11 @@ ok( $runner->_terminate_command_process(0), '_terminate_command_process tolerate
 SKIP: {
     skip 'stubborn command cleanup needs POSIX process groups', 1
       if Developer::Dashboard::Platform::is_windows();
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        POSIX::setsid();
-        $SIG{TERM} = 'IGNORE';
-        select undef, undef, undef, 30;
-        POSIX::_exit(0);
-    }
-    select undef, undef, undef, 0.1;
+    my $child = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', q{$SIG{TERM} = 'IGNORE'; select undef, undef, undef, 30;} ],
+        { process_group => 1 },
+    );
+    die "GoRoutine spawn failed: $!" if !defined $child;
     ok( $runner->_terminate_command_process($child),
         '_terminate_command_process escalates a stubborn POSIX group to KILL' );
 }
@@ -1097,18 +1292,16 @@ SKIP: {
     open my $fh, '>', $pidfile or die $!;
     print {$fh} "4242\n";
     close $fh;
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
+    my $source = q{
+        use Developer::Dashboard::CommandRunner;
         no warnings 'redefine';
         local *Developer::Dashboard::CommandRunner::is_windows = sub { return 1 };
         local *Developer::Dashboard::CommandRunner::await_command_pid = sub { return 4242 };
         local *Developer::Dashboard::CommandRunner::terminate_command_process = sub { return 1 };
-        $runner->_forward_command_signal( $pidfile, 'TERM', 15 );
-        POSIX::_exit(1);
-    }
-    waitpid( $child, 0 );
-    is( $? >> 8, 143, '_forward_command_signal preserves the numeric signal exit on Windows' );
+        Developer::Dashboard::CommandRunner::forward_command_signal( $ARGV[0], 'TERM', 15 );
+    };
+    is( _run_perl_child( $source, $pidfile ), 143,
+        '_forward_command_signal preserves the numeric signal exit on Windows' );
     ok( !-e $pidfile, '_forward_command_signal removes the command pid file' );
 }
 
@@ -1137,7 +1330,13 @@ like( ( eval { $runner->_run_code( source => '1', cwd => File::Spec->catdir( $ho
     my $run_cwd = File::Spec->catdir( $home, 'restore-run-cmd' );
     make_path( $old_cwd, $run_cwd );
     chdir $old_cwd or die $!;
-    my $err = eval { $runner->_run_command( source => qq{rmdir '$old_cwd'}, cwd => $run_cwd, timeout_ms => 2000 ); 1 } ? '' : $@;
+    # A cold powershell.exe spawn on Windows takes about 2.2s (first-use
+    # module preparation), longer than the 2000ms this fixture used to
+    # allow, so the command was killed before rmdir ran, the directory
+    # survived, and the chdir back succeeded instead of dying (solo
+    # #413, test 253). Give it the product's own 30s default budget;
+    # the point of the test is the restore failure, not the timeout.
+    my $err = eval { $runner->_run_command( source => qq{rmdir '$old_cwd'}, cwd => $run_cwd, timeout_ms => 30000 ); 1 } ? '' : $@;
     chdir $home or die $!;
     like( $err, qr/Unable to restore cwd/, '_run_command dies when it cannot chdir back to the original cwd' );
 }
@@ -1152,34 +1351,38 @@ like( ( eval { $runner->_run_code( source => '1', cwd => File::Spec->catdir( $ho
 }
 
 # ===========================================================================
-# start_loop: name guard, fork failure, pidfile-open failure, and the parent
-# branch (mocked fork) with matching and differing configured intervals.
+# start_loop: name guard, GoRoutine process-launch failure, pidfile-open failure,
+# and returned process identifiers with matching and differing intervals.
 # ===========================================================================
 like( ( eval { $runner->start_loop( {} ); 1 } ? '' : $@ ), qr/missing name/, 'start_loop requires a collector name' );
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_fork_process = sub { return undef };
-    like( ( eval { $runner->start_loop( { name => 'forkfail.loop', command => 'sleep 1', cwd => $home, interval => 5 } ); 1 } ? '' : $@ ), qr/Unable to fork/, 'start_loop dies when fork fails' );
+    local *Developer::Dashboard::CollectorRunner::_find_running_loop = sub { return undef };
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return undef };
+    like( ( eval { $runner->start_loop( { name => 'forkfail.loop', command => 'sleep 1', cwd => $home, interval => 5 } ); 1 } ? '' : $@ ), qr/Unable to launch detached collector process/, 'start_loop dies when GoRoutine cannot launch the collector process' );
 }
 {
     my $dir_pidfile = $runner->_pidfile('pidfiledir.loop');
     make_path($dir_pidfile);
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_fork_process = sub { return 4242 };
+    local *Developer::Dashboard::CollectorRunner::_find_running_loop = sub { return undef };
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return 4242 };
     like( ( eval { $runner->start_loop( { name => 'pidfiledir.loop', command => 'sleep 1', cwd => $home, interval => 5 } ); 1 } ? '' : $@ ), qr/Unable to write/, 'start_loop dies when the pidfile cannot be written' );
 }
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_fork_process = sub { return 515151 };
-    is( $runner->start_loop( { name => 'parent.matching.loop', command => 'sleep 1', cwd => $home, interval => 5 } ), 515151, 'start_loop returns the (mocked) child pid in the parent branch' );
+    local *Developer::Dashboard::CollectorRunner::_find_running_loop = sub { return undef };
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return 515151 };
+    is( $runner->start_loop( { name => 'parent.matching.loop', command => 'sleep 1', cwd => $home, interval => 5 } ), 515151, 'start_loop returns the GoRoutine process identifier' );
     my $state = $runner->loop_state('parent.matching.loop');
     ok( !exists $state->{configured_interval}, 'start_loop omits configured_interval when the effective interval matches' );
     $runner->_cleanup_loop_files('parent.matching.loop');
 }
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_fork_process = sub { return 525252 };
-    is( $runner->start_loop( { name => 'parent.floored.loop', command => 'dashboard status', cwd => $home, interval => 1 } ), 525252, 'start_loop returns the (mocked) child pid for a floored dashboard collector' );
+    local *Developer::Dashboard::CollectorRunner::_find_running_loop = sub { return undef };
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return 525252 };
+    is( $runner->start_loop( { name => 'parent.floored.loop', command => 'dashboard status', cwd => $home, interval => 1 } ), 525252, 'start_loop returns the GoRoutine process identifier for a floored d2 collector' );
     is( $runner->loop_state('parent.floored.loop')->{configured_interval}, 1, 'start_loop records configured_interval when the effective interval is floored' );
     $runner->_cleanup_loop_files('parent.floored.loop');
 }
@@ -1216,7 +1419,8 @@ like( ( eval { $runner->start_loop( {} ); 1 } ? '' : $@ ), qr/missing name/, 'st
     no warnings 'redefine';
     local *Developer::Dashboard::CollectorRunner::_is_managed_loop            = sub { return 0 };
     local *Developer::Dashboard::CollectorRunner::_state_confirms_managed_loop = sub { return 0 };
-    local *Developer::Dashboard::CollectorRunner::_fork_process               = sub { return 636363 };
+    local *Developer::Dashboard::CollectorRunner::_find_running_loop           = sub { return undef };
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return 636363 };
     is( $runner->start_loop( { name => $name, command => 'sleep 1', cwd => $home, interval => 5 } ), 636363, 'start_loop replaces a stale pidfile and starts a new loop' );
     $runner->_cleanup_loop_files($name);
 }
@@ -1226,7 +1430,8 @@ like( ( eval { $runner->start_loop( {} ); 1 } ? '' : $@ ), qr/missing name/, 'st
     print {$fh} "0\n";
     close $fh;
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_fork_process = sub { return 646464 };
+    local *Developer::Dashboard::CollectorRunner::_find_running_loop = sub { return undef };
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return 646464 };
     is( $runner->start_loop( { name => $name, command => 'sleep 1', cwd => $home, interval => 5 } ), 646464, 'start_loop discards a falsy recorded pid and starts a new loop' );
     $runner->_cleanup_loop_files($name);
 }
@@ -1429,14 +1634,76 @@ like( ( eval { $runner->_run_loop_child( job => {} ); 1 } ? '' : $@ ), qr/Missin
     is( $reaped, 1, 'the CHLD handler only reaps when a runner and worker hash are both present' );
 }
 
+# The managed signal handler records both an explicit signal and its documented
+# fallback when called without an argument, then delegates shutdown once.
+{
+    my @logged;
+    my @shutdown;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Collector::append_log_entry = sub {
+        my ( $store, $name, %entry ) = @_;
+        push @logged, [ $name, \%entry ];
+        return 1;
+    };
+    local *Developer::Dashboard::CollectorRunner::_shutdown_loop = sub {
+        my ( $instance, @args ) = @_;
+        push @shutdown, \@args;
+        return 1;
+    };
+    {
+        local $Developer::Dashboard::CollectorRunner::SIGNAL_RUNNER = $runner;
+        local $Developer::Dashboard::CollectorRunner::SIGNAL_LOOP_NAME = 'coverage.signal';
+        local $Developer::Dashboard::CollectorRunner::SIGNAL_LOOP_WORKERS = {};
+        Developer::Dashboard::CollectorRunner::_signal_stop();
+    }
+    like( $logged[-1][1]{error}, qr/^SIGunknown received by pid \d+$/, '_signal_stop records unknown when no signal argument is supplied' );
+    {
+        local $Developer::Dashboard::CollectorRunner::SIGNAL_RUNNER = $runner;
+        local $Developer::Dashboard::CollectorRunner::SIGNAL_LOOP_NAME = 'coverage.signal';
+        local $Developer::Dashboard::CollectorRunner::SIGNAL_LOOP_WORKERS = {};
+        Developer::Dashboard::CollectorRunner::_signal_stop('TERM');
+    }
+    like( $logged[-1][1]{error}, qr/^SIGTERM received by pid \d+$/, '_signal_stop records the supplied signal name' );
+    is( scalar @shutdown, 2, '_signal_stop delegates both cases to shutdown' );
+}
+
+# The compatibility wrapper forwards the process-signal arguments unchanged.
+{
+    my @received;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CommandRunner::forward_command_signal = sub {
+        @received = @_;
+        return 'forwarded';
+    };
+    is( $runner->_forward_command_signal('collector.pid', 'TERM', 15), 'forwarded', 'collector signal wrapper returns the delegated result' );
+    is_deeply( \@received, [ 'collector.pid', 'TERM', 15 ], 'collector signal wrapper forwards all process-signal arguments' );
+}
+
 # ===========================================================================
-# _run_loop_child daemon path: successful single tick (fork), and the STDOUT
+# _run_loop_child daemon path: successful single tick (spawned process), and the STDOUT
 # reopen failure when the collector log path is a directory (fresh runtime).
 # ===========================================================================
 {
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
+    my $source = q{
+        use File::Spec;
+        use Developer::Dashboard::Collector;
+        use Developer::Dashboard::CollectorRunner;
+        use Developer::Dashboard::FileRegistry;
+        use Developer::Dashboard::IndicatorStore;
+        use Developer::Dashboard::PathRegistry;
+        my ( $home, $name ) = @ARGV;
+        $ENV{HOME} = $home;
+        chdir $home or die "Unable to chdir to $home: $!";
+        my $paths = Developer::Dashboard::PathRegistry->new(
+            home => $home,
+            workspace_roots => [ File::Spec->catdir( $home, 'workspace' ) ],
+        );
+        my $runner = Developer::Dashboard::CollectorRunner->new(
+            collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+            files => Developer::Dashboard::FileRegistry->new( paths => $paths ),
+            indicators => Developer::Dashboard::IndicatorStore->new( paths => $paths ),
+            paths => $paths,
+        );
         no warnings 'redefine';
         local *Developer::Dashboard::CollectorRunner::_job_is_due = sub { return 0 };
         my $ok = eval {
@@ -1444,16 +1711,16 @@ like( ( eval { $runner->_run_loop_child( job => {} ); 1 } ? '' : $@ ), qr/Missin
                 single_tick   => 1,
                 interval      => 1,
                 job           => { command => 'true', cwd => $home },
-                name          => 'daemon.tick',
+                name          => $name,
                 schedule_mode => 'interval',
-                title         => $runner->_process_title('daemon.tick'),
+                title         => $runner->_process_title($name),
             );
             1;
         };
-        CORE::exit( $ok ? 0 : 1 );
-    }
-    waitpid( $child, 0 );
-    is( $? >> 8, 0, '_run_loop_child completes a default-daemonized single tick and exits cleanly' );
+        exit( $ok ? 0 : 1 );
+    };
+    is( _run_perl_child( $source, $home, 'daemon.tick' ), 0,
+        '_run_loop_child completes a default-daemonized single tick and exits cleanly' );
 }
 {
     my $home2 = tempdir( CLEANUP => 1 );
@@ -1467,33 +1734,46 @@ like( ( eval { $runner->_run_loop_child( job => {} ); 1 } ? '' : $@ ), qr/Missin
     );
     make_path( $files2->collector_log );    # make the log path a directory so the append open fails
 
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        open STDERR, '>', File::Spec->devnull();
+    my $source = q{
+        use File::Spec;
+        use Developer::Dashboard::Collector;
+        use Developer::Dashboard::CollectorRunner;
+        use Developer::Dashboard::FileRegistry;
+        use Developer::Dashboard::IndicatorStore;
+        use Developer::Dashboard::PathRegistry;
+        my ($home) = @ARGV;
+        $ENV{HOME} = $home;
+        my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
+        my $runner = Developer::Dashboard::CollectorRunner->new(
+            collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+            files => Developer::Dashboard::FileRegistry->new( paths => $paths ),
+            indicators => Developer::Dashboard::IndicatorStore->new( paths => $paths ),
+            paths => $paths,
+        );
+        open STDERR, '>', File::Spec->devnull() or die "Unable to silence expected daemon failure: $!";
         no warnings 'redefine';
         local *Developer::Dashboard::CollectorRunner::_job_is_due = sub { return 0 };
         my $died = eval {
-            $runner2->_run_loop_child(
+            $runner->_run_loop_child(
                 daemonize     => 1,
                 single_tick   => 1,
                 interval      => 1,
-                job           => { command => 'true', cwd => $home2 },
+                job           => { command => 'true', cwd => $home },
                 name          => 'daemon.logfail',
                 schedule_mode => 'interval',
-                title         => $runner2->_process_title('daemon.logfail'),
+                title         => $runner->_process_title('daemon.logfail'),
             );
             0;
         } ? 0 : 1;
         open STDOUT, '>', File::Spec->devnull();
-        CORE::exit( $died ? 3 : 0 );
-    }
-    waitpid( $child, 0 );
-    is( $? >> 8, 3, '_run_loop_child dies in the daemon child when the collector log cannot be reopened for append' );
+        exit( $died ? 3 : 0 );
+    };
+    is( _run_perl_child( $source, $home2 ), 3,
+        '_run_loop_child dies in the daemon child when the collector log cannot be reopened for append' );
 }
 
 # ===========================================================================
-# _start_loop_worker (Windows spawn + fork failure) and _run_loop_worker
+# _start_loop_worker (GoRoutine spawn failure) and _run_loop_worker
 # (setsid guard and the error-branch loop-state write).
 # ===========================================================================
 {
@@ -1507,39 +1787,65 @@ like( ( eval { $runner->_run_loop_child( job => {} ); 1 } ? '' : $@ ), qr/Missin
 }
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::CollectorRunner::_fork_process = sub { return undef };
-    like( ( eval { $runner->_start_loop_worker( { command => 'true' }, 'forkworker', 'title' ); 1 } ? '' : $@ ), qr/Unable to fork collector worker/, '_start_loop_worker dies when the worker fork fails' );
+    local *Developer::Dashboard::CollectorRunner::_spawn_windows_background_command = sub { die "Unable to launch detached collector process\n" };
+    like( ( eval { $runner->_start_loop_worker( { command => 'true' }, 'spawnfail.worker', 'title' ); 1 } ? '' : $@ ), qr/Unable to launch detached collector process/, '_start_loop_worker reports a GoRoutine worker launch failure' );
 }
 
 # _run_loop_worker error branch (run_once dies) with a supplied loop pid/title/schedule.
 {
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        open STDERR, '>', File::Spec->devnull();
+    my $source = q{
+        use File::Spec;
+        use Developer::Dashboard::Collector;
+        use Developer::Dashboard::CollectorRunner;
+        use Developer::Dashboard::FileRegistry;
+        use Developer::Dashboard::IndicatorStore;
+        use Developer::Dashboard::PathRegistry;
+        my ($home) = @ARGV;
+        $ENV{HOME} = $home;
+        my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
+        my $runner = Developer::Dashboard::CollectorRunner->new(
+            collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+            files => Developer::Dashboard::FileRegistry->new( paths => $paths ),
+            indicators => Developer::Dashboard::IndicatorStore->new( paths => $paths ),
+            paths => $paths,
+        );
+        open STDERR, '>', File::Spec->devnull() or die "Unable to silence expected worker failure: $!";
         no warnings 'redefine';
         local *Developer::Dashboard::CollectorRunner::run_once = sub { die "worker body failure\n" };
         $runner->_run_loop_worker( { command => 'x', schedule => 'interval' }, 'worker.explicit', 'explicit-title', 4242 );
-        CORE::exit(9);
-    }
-    waitpid( $child, 0 );
-    is( $? >> 8, 255, '_run_loop_worker exits non-zero when the worker body dies (explicit identity)' );
+        exit 9;
+    };
+    is( _run_perl_child( $source, $home ), 255,
+        '_run_loop_worker exits non-zero when the worker body dies (explicit identity)' );
     my $state = $runner->loop_state('worker.explicit');
     is( $state->{pid}, 4242, '_run_loop_worker records the supplied loop pid on failure' );
     is( $state->{process_name}, 'explicit-title', '_run_loop_worker records the supplied title on failure' );
 }
 {
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        open STDERR, '>', File::Spec->devnull();
+    my $source = q{
+        use File::Spec;
+        use Developer::Dashboard::Collector;
+        use Developer::Dashboard::CollectorRunner;
+        use Developer::Dashboard::FileRegistry;
+        use Developer::Dashboard::IndicatorStore;
+        use Developer::Dashboard::PathRegistry;
+        my ($home) = @ARGV;
+        $ENV{HOME} = $home;
+        my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
+        my $runner = Developer::Dashboard::CollectorRunner->new(
+            collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+            files => Developer::Dashboard::FileRegistry->new( paths => $paths ),
+            indicators => Developer::Dashboard::IndicatorStore->new( paths => $paths ),
+            paths => $paths,
+        );
+        open STDERR, '>', File::Spec->devnull() or die "Unable to silence expected worker failure: $!";
         no warnings 'redefine';
         local *Developer::Dashboard::CollectorRunner::run_once = sub { die "worker body failure\n" };
         $runner->_run_loop_worker( { command => 'x', interval => 5 }, 'worker.defaulted', undef, 0 );
-        CORE::exit(9);
-    }
-    waitpid( $child, 0 );
-    is( $? >> 8, 255, '_run_loop_worker exits non-zero when the worker body dies (defaulted identity)' );
+        exit 9;
+    };
+    is( _run_perl_child( $source, $home ), 255,
+        '_run_loop_worker exits non-zero when the worker body dies (defaulted identity)' );
     my $state = $runner->loop_state('worker.defaulted');
     ok( $state->{pid} > 0, '_run_loop_worker falls back to the current pid when no loop pid is supplied' );
     is( $state->{process_name}, $runner->_process_title('worker.defaulted'), '_run_loop_worker falls back to the process title when none is supplied' );
@@ -1547,18 +1853,31 @@ like( ( eval { $runner->_run_loop_child( job => {} ); 1 } ? '' : $@ ), qr/Missin
 }
 # _run_loop_worker on the Windows branch skips setsid before running.
 {
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        open STDERR, '>', File::Spec->devnull();
+    my $source = q{
+        use File::Spec;
+        use Developer::Dashboard::Collector;
+        use Developer::Dashboard::CollectorRunner;
+        use Developer::Dashboard::FileRegistry;
+        use Developer::Dashboard::IndicatorStore;
+        use Developer::Dashboard::PathRegistry;
+        my ($home) = @ARGV;
+        $ENV{HOME} = $home;
+        my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
+        my $runner = Developer::Dashboard::CollectorRunner->new(
+            collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+            files => Developer::Dashboard::FileRegistry->new( paths => $paths ),
+            indicators => Developer::Dashboard::IndicatorStore->new( paths => $paths ),
+            paths => $paths,
+        );
+        open STDERR, '>', File::Spec->devnull() or die "Unable to silence expected worker output: $!";
         no warnings 'redefine';
         local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
-        local *Developer::Dashboard::CollectorRunner::run_once   = sub { return {} };
+        local *Developer::Dashboard::CollectorRunner::run_once = sub { return {} };
         $runner->_run_loop_worker( { command => 'x' }, 'worker.windows', 'title', 5 );
-        CORE::exit(9);
-    }
-    waitpid( $child, 0 );
-    is( $? >> 8, 0, '_run_loop_worker skips setsid and exits cleanly on the Windows branch' );
+        exit 9;
+    };
+    is( _run_perl_child( $source, $home ), 0,
+        '_run_loop_worker skips setsid and exits cleanly on the Windows branch' );
 }
 
 # ===========================================================================
@@ -1577,15 +1896,60 @@ ok( $runner->_terminate_loop_workers(undef), '_terminate_loop_workers tolerates 
     is_deeply( \%active, {}, '_terminate_loop_workers still clears the active set on the Windows branch' );
 }
 {
-    # Real POSIX branch: a stubborn worker child that ignores SIGTERM.
-    my $worker = fork();
-    die "fork failed: $!" if !defined $worker;
-    if ( !$worker ) {
-        POSIX::setsid();
-        $SIG{TERM} = 'IGNORE';
-        select undef, undef, undef, 30;
-        POSIX::_exit(0);
+    # The Windows branch resolves taskkill through the shared
+    # _taskkill_command helper, the one RuntimeManager's _send_signal uses,
+    # instead of handing a bare name to system(). The helper is replaced
+    # here with a Perl recorder so the check runs the same way on every
+    # platform and never starts a real taskkill: both tree kills (the first
+    # one on the live worker and the escalation one) must go through it.
+    no warnings qw(redefine prototype);
+    my $recorder = File::Spec->catfile( $home, 'r93-taskkill-recorder.pl' );
+    my $recorded = File::Spec->catfile( $home, 'r93-taskkill-args.txt' );
+    open my $recorder_fh, '>', $recorder or die "Unable to write $recorder: $!";
+    print {$recorder_fh} <<'RECORDER';
+open my $fh, '>>', $ENV{R93_TASKKILL_ARGS} or die "Unable to append $ENV{R93_TASKKILL_ARGS}: $!";
+print {$fh} join( ' ', @ARGV ), "\n";
+close $fh or die "Unable to close $ENV{R93_TASKKILL_ARGS}: $!";
+exit 0;
+RECORDER
+    close $recorder_fh or die "Unable to close $recorder: $!";
+    local $ENV{R93_TASKKILL_ARGS} = $recorded;
+    my $helper_calls = 0;
+    my @terminated;
+    local *Developer::Dashboard::CollectorRunner::is_windows          = sub { return 1 };
+    local *Developer::Dashboard::CollectorRunner::_pid_is_running     = sub { return 1 };
+    local *Developer::Dashboard::CollectorRunner::_reap_child_process = sub { return 1 };
+    local *Developer::Dashboard::CollectorRunner::sleep               = sub { return 0 };
+    local *Developer::Dashboard::CollectorRunner::_taskkill_command   = sub { $helper_calls++; return ( $^X, $recorder ) };
+    local *Developer::Dashboard::GoRoutine::terminate_process         = sub { push @terminated, [@_]; return 1 };
+    my %active = ( 808080 => 1 );
+    ok( $runner->_terminate_loop_workers( \%active ), '_terminate_loop_workers returns true when taskkill is resolved through the helper' );
+    is( $helper_calls, 2, '_terminate_loop_workers asks _taskkill_command for both Windows tree kills' );
+    my @recorded_lines;
+    if ( open my $recorded_fh, '<', $recorded ) {
+        @recorded_lines = <$recorded_fh>;
+        close $recorded_fh;
+        s/\r?\n\z// for @recorded_lines;
     }
+    is_deeply(
+        \@recorded_lines,
+        [ '/PID 808080 /T /F', '/PID 808080 /T /F' ],
+        '_terminate_loop_workers runs the resolved taskkill with the tree-kill arguments, first on the live worker and again on escalation'
+    );
+    is_deeply(
+        \@terminated,
+        [ [ 808080, 'TERM' ], [ 808080, 'KILL' ] ],
+        '_terminate_loop_workers still terminates a worker the tree kill leaves behind, TERM first and KILL on escalation'
+    );
+    is_deeply( \%active, {}, '_terminate_loop_workers clears the active set after the helper-resolved tree kills' );
+}
+{
+    # Real POSIX branch: a stubborn worker child that ignores SIGTERM.
+    my $worker = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', q{$SIG{TERM} = 'IGNORE'; select undef, undef, undef, 30;} ],
+        { process_group => 1 },
+    );
+    die "GoRoutine spawn failed: $!" if !defined $worker;
     select undef, undef, undef, 0.1;
     ok( $runner->_terminate_loop_workers( { $worker => 1 } ), '_terminate_loop_workers group-kills a stubborn worker on the POSIX branch' );
     kill 9, $worker;
@@ -1608,16 +1972,7 @@ ok( !defined $runner->stop_loop('stop.missing'), 'stop_loop returns undef with n
 # Live managed loop: full kill path (real POSIX group kill).
 {
     my $name  = 'stop.managed.posix';
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        POSIX::setsid();
-        $0 = $runner->_process_title($name);
-        $ENV{DEVELOPER_DASHBOARD_LOOP_NAME} = $name;
-        $SIG{TERM} = 'DEFAULT';
-        select undef, undef, undef, 30;
-        POSIX::_exit(0);
-    }
+    my $child = _spawn_sleeping_loop_process( $runner->_process_title($name), 1 );
     my $pidfile = $runner->_pidfile($name);
     open my $fh, '>', $pidfile or die $!;
     print {$fh} $child;
@@ -1636,15 +1991,7 @@ ok( !defined $runner->stop_loop('stop.missing'), 'stop_loop returns undef with n
 # Live managed loop under the Windows branch: no process-group kill.
 {
     my $name  = 'stop.managed.windows';
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) {
-        $0 = $runner->_process_title($name);
-        $ENV{DEVELOPER_DASHBOARD_LOOP_NAME} = $name;
-        $SIG{TERM} = 'DEFAULT';
-        select undef, undef, undef, 30;
-        POSIX::_exit(0);
-    }
+    my $child = _spawn_sleeping_loop_process( $runner->_process_title($name), 0 );
     my $pidfile = $runner->_pidfile($name);
     open my $fh, '>', $pidfile or die $!;
     print {$fh} $child;
@@ -1664,9 +2011,8 @@ ok( !defined $runner->stop_loop('stop.missing'), 'stop_loop returns undef with n
 # Already-reaped loop child: the reap short-circuits the kill path.
 {
     my $name  = 'stop.reaped';
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) { POSIX::_exit(0); }
+    my $child = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'exit 0;' ], {} );
+    die "GoRoutine spawn failed: $!" if !defined $child;
     my $pidfile = $runner->_pidfile($name);
     open my $fh, '>', $pidfile or die $!;
     print {$fh} $child;
@@ -1679,9 +2025,7 @@ ok( !defined $runner->stop_loop('stop.missing'), 'stop_loop returns undef with n
 # Foreign-namespace loop: pid is alive but reported in another namespace.
 {
     my $name  = 'stop.foreign';
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) { $SIG{TERM} = 'DEFAULT'; select undef, undef, undef, 30; POSIX::_exit(0); }
+    my $child = _spawn_sleeping_loop_process( 'foreign-process', 0 );
     my $pidfile = $runner->_pidfile($name);
     open my $fh, '>', $pidfile or die $!;
     print {$fh} $child;
@@ -1699,9 +2043,7 @@ ok( !defined $runner->stop_loop('stop.missing'), 'stop_loop returns undef with n
 # Unrecognized live loop with recorded worker pids: else-branch worker sweep.
 {
     my $name  = 'stop.unrecognized';
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) { $SIG{TERM} = 'DEFAULT'; select undef, undef, undef, 30; POSIX::_exit(0); }
+    my $child = _spawn_sleeping_loop_process( 'unrecognized-process', 0 );
     my $pidfile = $runner->_pidfile($name);
     open my $fh, '>', $pidfile or die $!;
     print {$fh} $child;
@@ -1742,35 +2084,26 @@ ok( !defined $runner->stop_loop('stop.missing'), 'stop_loop returns undef with n
     { open my $fh, '>', File::Spec->catfile( $root, 'rl.zero.pid' ) or die $!; print {$fh} "0\n"; close $fh; }
 
     # Reaped (exited, unwaited) child -> reaped and cleaned up.
-    my $reaped = fork();
-    die "fork failed: $!" if !defined $reaped;
-    if ( !$reaped ) { POSIX::_exit(0); }
+    my $reaped = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'exit 0;' ], {} );
+    die "GoRoutine spawn failed: $!" if !defined $reaped;
     { open my $fh, '>', File::Spec->catfile( $root, 'rl.reaped.pid' ) or die $!; print {$fh} $reaped; close $fh; }
     select undef, undef, undef, 0.1;
 
     # Live loop recognized by process identity -> reported.
-    my $managed = fork();
-    die "fork failed: $!" if !defined $managed;
-    if ( !$managed ) { $SIG{TERM} = 'DEFAULT'; select undef, undef, undef, 30; POSIX::_exit(0); }
+    my $managed = _spawn_sleeping_loop_process( 'managed-process', 0 );
     { open my $fh, '>', File::Spec->catfile( $root, 'rl.managed.pid' ) or die $!; print {$fh} $managed; close $fh; }
 
     # Live loop recognized only by recorded state (process identity unavailable).
-    my $confirmed = fork();
-    die "fork failed: $!" if !defined $confirmed;
-    if ( !$confirmed ) { $SIG{TERM} = 'DEFAULT'; select undef, undef, undef, 30; POSIX::_exit(0); }
+    my $confirmed = _spawn_sleeping_loop_process( 'confirmed-process', 0 );
     { open my $fh, '>', File::Spec->catfile( $root, 'rl.confirmed.pid' ) or die $!; print {$fh} $confirmed; close $fh; }
     $rl_runner->_write_loop_state( 'rl.confirmed', { pid => $confirmed, name => 'rl.confirmed', process_name => $rl_runner->_process_title('rl.confirmed'), status => 'running' } );
 
     # Unrecognized same-namespace live loop -> pidfile swept.
-    my $unrec = fork();
-    die "fork failed: $!" if !defined $unrec;
-    if ( !$unrec ) { $SIG{TERM} = 'DEFAULT'; select undef, undef, undef, 30; POSIX::_exit(0); }
+    my $unrec = _spawn_sleeping_loop_process( 'unrecognized-process', 0 );
     { open my $fh, '>', File::Spec->catfile( $root, 'rl.unrec.pid' ) or die $!; print {$fh} $unrec; close $fh; }
 
     # Foreign-namespace live loop -> skipped without cleanup.
-    my $foreign = fork();
-    die "fork failed: $!" if !defined $foreign;
-    if ( !$foreign ) { $SIG{TERM} = 'DEFAULT'; select undef, undef, undef, 30; POSIX::_exit(0); }
+    my $foreign = _spawn_sleeping_loop_process( 'foreign-process', 0 );
     { open my $fh, '>', File::Spec->catfile( $root, 'rl.foreign.pid' ) or die $!; print {$fh} $foreign; close $fh; }
 
     my %by_name;
@@ -1796,18 +2129,46 @@ ok( !defined $runner->stop_loop('stop.missing'), 'stop_loop returns undef with n
 # _shutdown_loop: falsy and truthy status, with and without a worker set.
 # ===========================================================================
 {
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) { $runner->_shutdown_loop( 'shutdown.default', '', undef ); CORE::exit(9); }
-    waitpid( $child, 0 );
-    is( $? >> 8, 0, '_shutdown_loop defaults a falsy status to stopped and exits cleanly' );
+    my $source = q{
+        use Developer::Dashboard::Collector;
+        use Developer::Dashboard::CollectorRunner;
+        use Developer::Dashboard::FileRegistry;
+        use Developer::Dashboard::IndicatorStore;
+        use Developer::Dashboard::PathRegistry;
+        my ($home) = @ARGV;
+        $ENV{HOME} = $home;
+        my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
+        my $runner = Developer::Dashboard::CollectorRunner->new(
+            collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+            files => Developer::Dashboard::FileRegistry->new( paths => $paths ),
+            indicators => Developer::Dashboard::IndicatorStore->new( paths => $paths ),
+            paths => $paths,
+        );
+        $runner->_shutdown_loop( 'shutdown.default', '', undef );
+    };
+    is( _run_perl_child( $source, $home ), 0,
+        '_shutdown_loop defaults a falsy status to stopped and exits cleanly' );
 }
 {
-    my $child = fork();
-    die "fork failed: $!" if !defined $child;
-    if ( !$child ) { $runner->_shutdown_loop( 'shutdown.crashed', 'crashed', {} ); CORE::exit(9); }
-    waitpid( $child, 0 );
-    is( $? >> 8, 0, '_shutdown_loop honors an explicit status and terminates the worker set' );
+    my $source = q{
+        use Developer::Dashboard::Collector;
+        use Developer::Dashboard::CollectorRunner;
+        use Developer::Dashboard::FileRegistry;
+        use Developer::Dashboard::IndicatorStore;
+        use Developer::Dashboard::PathRegistry;
+        my ($home) = @ARGV;
+        $ENV{HOME} = $home;
+        my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
+        my $runner = Developer::Dashboard::CollectorRunner->new(
+            collectors => Developer::Dashboard::Collector->new( paths => $paths ),
+            files => Developer::Dashboard::FileRegistry->new( paths => $paths ),
+            indicators => Developer::Dashboard::IndicatorStore->new( paths => $paths ),
+            paths => $paths,
+        );
+        $runner->_shutdown_loop( 'shutdown.crashed', 'crashed', {} );
+    };
+    is( _run_perl_child( $source, $home ), 0,
+        '_shutdown_loop honors an explicit status and terminates the worker set' );
 }
 
 # ---------------------------------------------------------------------------
@@ -1958,6 +2319,121 @@ ok( !defined $runner->stop_loop('stop.missing'), 'stop_loop returns undef with n
         'Problem 28: an unknown qualified alias remains an explicit invalid-cwd error' );
 }
 
+# ===========================================================================
+# Lifetime owner: a starter that can be killed without ever running a stop
+# ties each loop it starts to its own pid through
+# DEVELOPER_DASHBOARD_LIFETIME_PID. Mocked throughout: no real process is
+# started, stopped or probed.
+# ===========================================================================
+{
+    # The loop reads the owner through the one shared reader.
+    {
+        local $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID};
+        delete $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID};
+        is( scalar( $runner->_lifetime_owner_pid ), undef, 'a loop has no lifetime owner when the starter did not opt in' );
+        $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID} = 'abc';
+        is( scalar( $runner->_lifetime_owner_pid ), undef, 'a loop ignores a malformed lifetime owner value' );
+        $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID} = 0;
+        is( scalar( $runner->_lifetime_owner_pid ), undef, 'a loop ignores a zero lifetime owner value' );
+        $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID} = $$;
+        is( scalar( $runner->_lifetime_owner_pid ), undef, 'a loop is never tied to its own pid' );
+        $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID} = 4242;
+        is( scalar( $runner->_lifetime_owner_pid ), 4242, 'a loop takes a numeric lifetime owner value as its owner pid' );
+    }
+    is(
+        \&Developer::Dashboard::CollectorRunner::_lifetime_owner_pid,
+        \&Developer::Dashboard::ProcessSupervision::_lifetime_owner_pid,
+        'the loop and the supervisor share one owner-pid reader',
+    );
+    ok( $runner->_lifetime_owner_poll_seconds > 0, 'the lifetime owner poll period is a positive number of seconds' );
+
+    my $owner_running = 1;
+    my @probed;
+    my @logged;
+    my @shutdown;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_pid_is_running = sub {
+        my ( undef, $pid ) = @_;
+        push @probed, $pid;
+        return $owner_running;
+    };
+    local *Developer::Dashboard::Collector::append_log_entry = sub {
+        my ( $store, $name, %entry ) = @_;
+        push @logged, [ $name, \%entry ];
+        die "log write failed\n";
+    };
+    local *Developer::Dashboard::CollectorRunner::_shutdown_loop = sub {
+        my ( $instance, @args ) = @_;
+        push @shutdown, \@args;
+        die "shutdown-$args[1]\n";
+    };
+
+    # The two-dead-polls rule itself.
+    is( $runner->_lifetime_owner_is_gone(undef), 0, 'no owner state is never a dead owner' );
+    is( $runner->_lifetime_owner_is_gone( { pid => undef, dead_polls => 0 } ), 0, 'an owner state with no pid is never a dead owner' );
+    is_deeply( \@probed, [], 'no liveness probe is made when there is no owner' );
+    my $owner = { pid => 4242, dead_polls => 1, slept => 0 };
+    is( $runner->_lifetime_owner_is_gone($owner), 0, 'a live owner is not gone' );
+    is( $owner->{dead_polls}, 0, 'a live poll resets the dead-poll count' );
+    $owner_running = 0;
+    is( $runner->_lifetime_owner_is_gone($owner), 0, 'one dead poll alone is not enough' );
+    is( $runner->_lifetime_owner_is_gone($owner), 1, 'two dead polls in a row confirm the owner is gone' );
+    is_deeply( \@probed, [ 4242, 4242, 4242 ], 'each poll probes the owner pid through the liveness helper' );
+
+    # The loop's own reaction.
+    $owner = { pid => 4242, dead_polls => 0, slept => 0 };
+    my $workers = { 77 => 1 };
+    $owner_running = 1;
+    is( scalar( $runner->_check_loop_lifetime_owner( 'coverage.owner', $owner, $workers ) ),
+        undef, 'the loop carries on while its owner is alive' );
+    $owner_running = 0;
+    is( scalar( $runner->_check_loop_lifetime_owner( 'coverage.owner', $owner, $workers ) ),
+        undef, 'the loop carries on after one dead poll' );
+    is( scalar @shutdown, 0, 'nothing is shut down before the second dead poll' );
+    my $error = eval {
+        $runner->_check_loop_lifetime_owner( 'coverage.owner', $owner, $workers );
+        return '';
+    } || $@;
+    like( $error, qr/shutdown-lifetime-owner-gone/, 'a second dead poll in a row shuts the loop down' );
+    is_deeply( $shutdown[-1], [ 'coverage.owner', 'lifetime-owner-gone', $workers ],
+        'the shutdown names the loop, records that the lifetime owner is gone, and is handed the workers to end' );
+    is( $logged[-1][0], 'coverage.owner', 'the reason is written to the collector log of that loop' );
+    like( $logged[-1][1]{error}, qr/^lifetime owner pid 4242 is gone; loop pid \d+ is stopping$/,
+        'the log entry names the dead owner and the stopping loop, and a failed log write does not keep the loop alive' );
+
+    # The sleep polls the owner only when one is set, and only once per
+    # poll period of slept time.
+    my @checks;
+    my $period = 5;
+    local *Developer::Dashboard::CollectorRunner::sleep = sub { return 0 };
+    local *Developer::Dashboard::CollectorRunner::_reap_finished_loop_workers = sub { return 0 };
+    local *Developer::Dashboard::CollectorRunner::_lifetime_owner_poll_seconds = sub { return $period };
+    local *Developer::Dashboard::CollectorRunner::_check_loop_lifetime_owner = sub {
+        my ( undef, @args ) = @_;
+        push @checks, \@args;
+        return;
+    };
+    $runner->_sleep_until_next_tick( interval => 12, active_workers => $workers, name => 'coverage.owner' );
+    $runner->_sleep_until_next_tick(
+        interval       => 12,
+        active_workers => $workers,
+        name           => 'coverage.owner',
+        lifetime_owner => { pid => undef, dead_polls => 0, slept => 0 },
+    );
+    is( scalar @checks, 0, 'a loop with no lifetime owner never polls for one while it sleeps' );
+    $owner = { pid => 4242, dead_polls => 0, slept => 0 };
+    $period = 0.25;
+    $runner->_sleep_until_next_tick(
+        interval       => 1,
+        active_workers => $workers,
+        name           => 'coverage.owner',
+        lifetime_owner => $owner,
+    );
+    ok( @checks >= 2 && @checks <= 4, 'a loop with a lifetime owner polls it once per poll period of slept time, not on every slice' );
+    is_deeply( $checks[0], [ 'coverage.owner', $owner, $workers ],
+        'the sleep hands the loop name, the owner state and the workers to the owner check' );
+}
+
 done_testing;
 
 __END__
@@ -1975,9 +2451,11 @@ runtime: cwd accessor, configured path-alias, skill C<Folder.pm> alias, and
 schedule resolution in C<run_once>, indicator template
 materialization, collector-source and execution-policy normalization, interval
 and cron scheduling, process-identity and namespace probing, loop pidfile and
-state lifecycle, the daemonized child and worker fork paths, the Windows
+state lifecycle, the daemonized child and worker process paths, the Windows
 detached-launch and PowerShell state-replacement fallbacks, and the timeout and
-chdir-restore error paths in the command and code executors.
+chdir-restore error paths in the command and code executors. It also verifies
+the collector signal handler's explicit and unknown-signal diagnostics and the
+compatibility wrapper that forwards a process signal to C<CommandRunner>.
 Problem 30 cases pin the config.json cron property, five-field parsing, names,
 lists, range steps, crontab day-of-month/day-of-week semantics, invalid-input
 startup errors, and per-minute execution deduplication.
@@ -2011,11 +2489,11 @@ Run it under the repository coverage gate when closing the library coverage:
 
   HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/103-collectorrunner-coverage.t
 
-Several checks fork managed loop and worker children, install real pidfiles and
-loop-state files under a throwaway HOME, and reap the children afterward. Others
-mock the platform predicate, the capture helper, or the fork and rename
-primitives so the Windows and failure arms run deterministically on a Linux
-host.
+Several checks launch isolated managed-loop and worker processes through
+GoRoutine, install real pidfiles and loop-state files under a throwaway HOME,
+and reap the children afterward. Others mock the platform predicate, capture
+helper, GoRoutine launcher, and rename primitives so Windows and failure arms
+run deterministically on a Linux host.
 
 =head1 WHAT USES IT
 

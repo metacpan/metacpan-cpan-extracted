@@ -1,8 +1,8 @@
-# dashboard which
+# d2 which
 
-`dashboard which <target>` explains what the public `dashboard` switchboard
+`d2 which <target>` explains what the public `dashboard` switchboard
 would run for one command target without executing the target itself. If you
-add `--edit`, it re-enters `dashboard open-file` with the resolved command file
+add `--edit`, it re-enters `d2 open-file` with the resolved command file
 path instead of only printing the inspection output.
 
 ## Supported targets
@@ -22,11 +22,11 @@ The command prints:
 ## Examples
 
 ```bash
-dashboard which jq
-dashboard which layered-tool
-dashboard which example-skill.somecmd
-dashboard which nest.level1.level2.here
-dashboard which --edit jq
+d2 which jq
+d2 which layered-tool
+d2 which example-skill.somecmd
+d2 which nest.level1.level2.here
+d2 which --edit jq
 ```
 
 ## DD-OOP-LAYERS behavior

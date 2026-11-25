@@ -259,7 +259,7 @@ function Install-CpanmIfMissing {
     return $cpanm
 }
 
-# Purpose: resolve the installed dashboard command path.
+# Purpose: resolve the installed d2 command path.
 # Input: optional explicit dashboard executable path.
 # Output: returns the dashboard executable path or throws if it is missing from PATH.
 function Get-DashboardBin {
@@ -274,7 +274,7 @@ function Get-DashboardBin {
         return $commandPath
     }
 
-    throw "Unable to find installed dashboard command in PATH"
+    throw "Unable to find installed d2 command in PATH"
 }
 
 # Purpose: assert that a text blob contains a required fragment.
@@ -502,12 +502,12 @@ Get-Content -Raw -LiteralPath `$env:DD_INSTALL_BOOTSTRAP_SCRIPT | Invoke-Express
 }
 
 # Purpose: prove that a brand-new profile-loaded PowerShell session can resolve
-# the installed dashboard command after install.ps1 completes.
+# the installed d2 command after install.ps1 completes.
 # Input: none.
 # Output: returns nothing or throws when the fresh session cannot resolve
 # dashboard, print a version, restart the runtime, install one deterministic
 # local smoke skill that exercises cpanm plus Makefile handling, and run
-# dashboard logs successfully.
+# d2 logs successfully.
 function New-SmokeSkillFixture {
     $fixtureRoot = Join-Path ([System.IO.Path]::GetTempPath()) "dd-win-smoke-skill"
     if (Test-Path $fixtureRoot) {
@@ -551,15 +551,15 @@ Write-TraceLine "DASHBOARD_SOURCE_START"
 $dashboardSource = (Get-Command dashboard -ErrorAction Stop).Source
 Write-TraceLine $dashboardSource
 Write-TraceLine "DASHBOARD_VERSION_START"
-dashboard version
-if ($LASTEXITCODE -ne 0) { throw "dashboard version failed with exit code $LASTEXITCODE" }
+d2 version
+if ($LASTEXITCODE -ne 0) { throw "d2 version failed with exit code $LASTEXITCODE" }
 Write-TraceLine "DASHBOARD_RESTART_START"
-dashboard restart
-if ($LASTEXITCODE -ne 0) { throw "dashboard restart failed with exit code $LASTEXITCODE" }
+d2 restart
+if ($LASTEXITCODE -ne 0) { throw "d2 restart failed with exit code $LASTEXITCODE" }
 Write-TraceLine "DASHBOARD_RESTART_END"
 Write-TraceLine "DASHBOARD_SKILL_INSTALL_START"
-$smokeSkillInstallOutput = dashboard skills install $env:DD_SMOKE_SKILL_SOURCE 2>&1 | Out-String
-if ($LASTEXITCODE -ne 0) { throw "dashboard skills install smoke skill failed with exit code $LASTEXITCODE`n$smokeSkillInstallOutput" }
+$smokeSkillInstallOutput = d2 skills install $env:DD_SMOKE_SKILL_SOURCE 2>&1 | Out-String
+if ($LASTEXITCODE -ne 0) { throw "d2 skills install smoke skill failed with exit code $LASTEXITCODE`n$smokeSkillInstallOutput" }
 $smokeSkillPath = Join-Path $env:HOME '.developer-dashboard\skills\dd-win-smoke-skill'
 $smokeSkillMakeLog = Join-Path $smokeSkillPath 'make.log'
 if (-not (Test-Path $smokeSkillMakeLog)) { throw "smoke skill Makefile log missing at $smokeSkillMakeLog" }
@@ -570,8 +570,8 @@ if ($smokeSkillMakeLogText -notmatch 'install') { throw "smoke skill Makefile in
 if ($smokeSkillMakeLogText -notmatch 'clean') { throw "smoke skill Makefile clean target did not run" }
 Write-TraceLine "DASHBOARD_SKILL_INSTALL_END"
 Write-TraceLine "DASHBOARD_LOGS_START"
-$dashboardLogsOutput = dashboard logs | Out-String
-if ($LASTEXITCODE -ne 0) { throw "dashboard logs failed with exit code $LASTEXITCODE" }
+$dashboardLogsOutput = d2 logs | Out-String
+if ($LASTEXITCODE -ne 0) { throw "d2 logs failed with exit code $LASTEXITCODE" }
 Write-TraceLine "DASHBOARD_LOGS_END"
 '@
 
@@ -807,7 +807,7 @@ Set-Content -Path (Join-Path $configRoot "config.json") -Value $configJson
 Write-PhaseStatus -Phase "bootstrap-powershell"
 $psBootstrap = & $Dashboard shell ps | Out-String
 if ($LASTEXITCODE -ne 0) {
-    throw "dashboard shell ps failed with exit code $LASTEXITCODE"
+    throw "d2 shell ps failed with exit code $LASTEXITCODE"
 }
 Invoke-AssertContains -Text $psBootstrap -Fragment "function prompt {" -Label "PowerShell bootstrap"
 Invoke-AssertContains -Text $psBootstrap -Fragment "ps1 --mode compact" -Label "PowerShell bootstrap"
@@ -815,21 +815,21 @@ Invoke-AssertNotContains -Text $psBootstrap -Fragment "PS1=" -Label "PowerShell 
 
 $promptText = & $Dashboard ps1 | Out-String
 if ($LASTEXITCODE -ne 0) {
-    throw "dashboard ps1 failed with exit code $LASTEXITCODE"
+    throw "d2 ps1 failed with exit code $LASTEXITCODE"
 }
 if ([string]::IsNullOrWhiteSpace($promptText)) {
-    throw "dashboard ps1 returned empty prompt text"
+    throw "d2 ps1 returned empty prompt text"
 }
 
 Push-Location $projectRoot
 try {
     Write-PhaseStatus -Phase "run-page-and-collector-checks"
-    Invoke-LoggedCommand -Label "dashboard page list" -Command @($Dashboard, "page", "list")
-    Invoke-LoggedCommand -Label "dashboard collector run windows.collector" -Command @($Dashboard, "collector", "run", "windows.collector")
+    Invoke-LoggedCommand -Label "d2 page list" -Command @($Dashboard, "page", "list")
+    Invoke-LoggedCommand -Label "d2 collector run windows.collector" -Command @($Dashboard, "collector", "run", "windows.collector")
 
     $collectorOutput = & $Dashboard collector output windows.collector | Out-String
     if ($LASTEXITCODE -ne 0) {
-        throw "dashboard collector output windows.collector failed with exit code $LASTEXITCODE"
+        throw "d2 collector output windows.collector failed with exit code $LASTEXITCODE"
     }
     Invoke-AssertContains -Text $collectorOutput -Fragment "collector-ok" -Label "collector output"
 
@@ -890,7 +890,7 @@ exit( $result->{exit_code} == 124 && $result->{timed_out} ? 0 : 1 );
     }
     Write-Host "Windows collector timeout $timeoutProof marker_processes=$($timeoutDescendants.Count)"
 
-    Invoke-LoggedCommand -Label "dashboard auth add-user helper smoke-pass-123" -Command @($Dashboard, "auth", "add-user", "helper", "smoke-pass-123")
+    Invoke-LoggedCommand -Label "d2 auth add-user helper smoke-pass-123" -Command @($Dashboard, "auth", "add-user", "helper", "smoke-pass-123")
 
     Write-PhaseStatus -Phase "start-dashboard-server"
     $serve = Start-Process -FilePath $Dashboard -ArgumentList @("serve", "--host", "127.0.0.1", "--port", $Port) -PassThru -NoNewWindow
@@ -959,8 +959,8 @@ run-strawberry-smoke.ps1 - verify the built tarball under Strawberry Perl and Po
 =head1 DESCRIPTION
 
 This script normally installs the built C<Developer::Dashboard> tarball with
-C<cpanm> under Strawberry Perl, verifies C<dashboard shell ps> and
-C<dashboard ps1>, checks one PowerShell-backed collector command, starts the
+C<cpanm> under Strawberry Perl, verifies C<d2 shell ps> and
+C<d2 ps1>, checks one PowerShell-backed collector command, starts the
 dashboard web service, exercises one saved Ajax handler through
 C<Invoke-WebRequest>, and optionally dumps DOM through Edge or Chrome when a
 browser binary is present on the Windows host.

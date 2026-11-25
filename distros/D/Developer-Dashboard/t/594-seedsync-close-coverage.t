@@ -39,7 +39,10 @@ use Developer::Dashboard::SeedSync;
 
 my $dir  = tempdir( CLEANUP => 1 );
 my $file = File::Spec->catfile( $dir, 'seed.txt' );
-open my $fh, '>', $file or die "Unable to write $file: $!";
+# Written in :raw mode so the file's bytes are exactly "seed body\n" on every
+# platform: a text-mode write stores "seed body\r\n" on Windows, and the
+# byte-exact MD5 comparison would rightly report a mismatch.
+open my $fh, '>:raw', $file or die "Unable to write $file: $!";
 print {$fh} "seed body\n";
 close $fh or die "Unable to close $file: $!";
 

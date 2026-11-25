@@ -17,6 +17,13 @@ BEGIN {
     *CORE::GLOBAL::chmod = sub {
         my ( $mode, @files ) = @_;
         push @DD621_CHMOD_CALLS, [ $mode, @files ];
+        # Windows has no fchmod, so a handle-form chmod (File::Temp's
+        # tempfile hardening and _open_channel_file) dies unimplemented
+        # there; Unix modes are not a Windows security control, so treat
+        # the handle form as a successful no-op instead of reaching
+        # CORE::chmod. Path-form chmod still passes through. Same shape
+        # as t/710.
+        return 1 if $^O eq 'MSWin32' && @files == 1 && ref $files[0];
         return CORE::chmod( $mode, @files );
     };
 }
@@ -272,16 +279,38 @@ my $P = 'Developer::Dashboard::Runtime::Result';
     my ( $fh, $fd_path ) = Developer::Dashboard::Runtime::Result::_open_channel_file();
     umask($old_umask);
     my $mode = ( stat($fh) )[2] & 07777;
-    is( sprintf( '%04o', $mode ), '0600',
-        '_open_channel_file creates the RESULT tempfile at exactly 0600, even under a permissive umask' );
+    # The file's mode is a Unix property: on Windows chmod is a no-op and
+    # the stat mode is whatever the filesystem reports, so the exact
+    # 0600 end state cannot be asserted there. The explicit chmod call
+    # itself is still recorded and asserted below, which is the point of
+    # this block.
+    if ( $^O eq 'MSWin32' ) {
+        pass('_open_channel_file creates the RESULT tempfile (mode is not a Windows property)');
+    }
+    else {
+        is( sprintf( '%04o', $mode ), '0600',
+            '_open_channel_file creates the RESULT tempfile at exactly 0600, even under a permissive umask' );
+    }
     # File::Temp's own tempfile() already issues its own internal chmod on
     # the path as part of creation, so the call count alone cannot prove
     # _open_channel_file's OWN explicit chmod fired - it targets the
     # filehandle specifically (File::Temp's targets the path string), which
     # is the one distinguishing signal available here.
-    my @fh_calls = grep { ref $_->[1] eq 'GLOB' } @DD621_CHMOD_CALLS;
-    is( scalar(@fh_calls), 1, '_open_channel_file explicitly chmods the tempfile handle exactly once' );
-    is( $fh_calls[0][0], 0600, "the explicit chmod call requests mode 0600" );
+    if ( $^O eq 'MSWin32' ) {
+        # Strawberry Perl has no fchmod, so on Windows _open_channel_file
+        # issues its explicit chmod by path, the same form File::Temp's own
+        # creation chmod uses. The distinguishing signal there is the count
+        # on the returned tempfile path: File::Temp's one call alone would
+        # leave exactly one, the product's explicit call makes it two.
+        my @path_calls = grep { !ref $_->[1] && $_->[1] eq $fd_path } @DD621_CHMOD_CALLS;
+        is( scalar(@path_calls) - 1, 1, '_open_channel_file explicitly chmods the tempfile handle exactly once' );
+        is( $path_calls[-1][0], 0600, "the explicit chmod call requests mode 0600" );
+    }
+    else {
+        my @fh_calls = grep { ref $_->[1] eq 'GLOB' } @DD621_CHMOD_CALLS;
+        is( scalar(@fh_calls), 1, '_open_channel_file explicitly chmods the tempfile handle exactly once' );
+        is( $fh_calls[0][0], 0600, "the explicit chmod call requests mode 0600" );
+    }
     ok( defined $fd_path && length $fd_path, '_open_channel_file still returns a usable fd-backed path' );
     close $fh;
 }
@@ -310,19 +339,19 @@ my $P = 'Developer::Dashboard::Runtime::Result';
 # ---------------------------------------------------------------------------
 {
     local $0 = '/';
-    is( Developer::Dashboard::Runtime::Result::_command_name(), 'dashboard', 'a root slash script path resolves to the default command name' );
+    is( Developer::Dashboard::Runtime::Result::_command_name(), 'd2', 'a root slash script path resolves to the default command name' );
 }
 {
     local $0 = '///';
-    is( Developer::Dashboard::Runtime::Result::_command_name(), 'dashboard', 'a slash-only script path normalizes to the default command name' );
+    is( Developer::Dashboard::Runtime::Result::_command_name(), 'd2', 'a slash-only script path normalizes to the default command name' );
 }
 {
     local $0 = "\\";
-    is( Developer::Dashboard::Runtime::Result::_command_name(), 'dashboard', 'a backslash-only script path resolves to the default command name' );
+    is( Developer::Dashboard::Runtime::Result::_command_name(), 'd2', 'a backslash-only script path resolves to the default command name' );
 }
 {
     local $0 = 'C:';
-    is( Developer::Dashboard::Runtime::Result::_command_name(), 'dashboard', 'a bare drive script path resolves to the default command name' );
+    is( Developer::Dashboard::Runtime::Result::_command_name(), 'd2', 'a bare drive script path resolves to the default command name' );
 }
 {
     local $0 = '/opt/tools/run';
@@ -331,12 +360,12 @@ my $P = 'Developer::Dashboard::Runtime::Result';
 {
     delete local $ENV{DEVELOPER_DASHBOARD_COMMAND};
     local $0 = '/run';
-    is( Developer::Dashboard::Runtime::Result::_command_name(), 'dashboard', 'a run wrapper whose parent is the root falls back to the default command name' );
+    is( Developer::Dashboard::Runtime::Result::_command_name(), 'd2', 'a run wrapper whose parent is the root falls back to the default command name' );
 }
 {
     delete local $ENV{DEVELOPER_DASHBOARD_COMMAND};
     local $0 = '/\\/run';
-    is( Developer::Dashboard::Runtime::Result::_command_name(), 'dashboard', 'a run wrapper whose parent basename is a bare separator falls back to the default command name' );
+    is( Developer::Dashboard::Runtime::Result::_command_name(), 'd2', 'a run wrapper whose parent basename is a bare separator falls back to the default command name' );
 }
 
 done_testing;

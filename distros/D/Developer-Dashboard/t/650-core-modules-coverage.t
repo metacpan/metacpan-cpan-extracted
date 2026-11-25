@@ -10,6 +10,7 @@ our ( %FAIL, %FAIL_PREFIX, %FAIL_OPENDIR, %CLOSE_FAIL_PREFIX, %CLOSE_FAIL_HANDLE
 
 BEGIN {
     require Scalar::Util;
+    require Symbol;
     *CORE::GLOBAL::open = sub (*;$@) {
         if ( @_ >= 3 && defined $_[2] && !ref $_[2] ) {
             my $path = $_[2];
@@ -22,6 +23,16 @@ BEGIN {
                 $CLOSE_FAIL_HANDLE{ Scalar::Util::refaddr( ref $_[0] ? $_[0] : \$_[0] ) } = 1 if $ok && ref $_[0];
                 return $ok;
             }
+        }
+        # A bareword handle such as STDOUT reaches a "*" prototype as a plain
+        # string, which CORE::open refuses under strict refs. Resolve it to
+        # the caller's glob first, as the close override below does. Windows
+        # is where this is exercised: the product secures runtime paths there
+        # by running icacls with STDOUT and STDERR redirected and restored.
+        if ( defined $_[0] && !ref $_[0] ) {
+            my $glob = Symbol::qualify_to_ref( $_[0], scalar caller );
+            return CORE::open( $glob, $_[1] ) if @_ == 2;
+            return CORE::open( $glob, $_[1], @_[ 2 .. $#_ ] );
         }
         return CORE::open( $_[0], $_[1] ) if @_ == 2;
         return CORE::open( $_[0], $_[1], @_[ 2 .. $#_ ] );
@@ -48,6 +59,7 @@ BEGIN {
 }
 
 use Test::More;
+use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -444,21 +456,34 @@ sub fresh {
     {
         no warnings 'redefine';
         local *Developer::Dashboard::PerlEnv::abs_path = sub { return undef };
-        local $^X = '/usr/bin/s6-perl';
-        is( Developer::Dashboard::PerlEnv::current_perl_bin_dir(), '/usr/bin', 'current_perl_bin_dir falls back to $^X when abs_path fails' );
-        like( Developer::Dashboard::PerlEnv::current_shell_bin_dir(), qr{^(?:|/.+)$}, 'current_shell_bin_dir falls back to the raw shell path when abs_path fails' );
+        # The fallback reads $^X directly, so use the real interpreter: a
+        # fixture path such as /usr/bin/s6-perl does not exist on Windows
+        # and the -d guard would refuse it for the wrong reason.
+        is( Developer::Dashboard::PerlEnv::current_perl_bin_dir(), File::Spec->canonpath( dirname($^X) ), 'current_perl_bin_dir falls back to $^X when abs_path fails' );
+        # On Windows the shell fallback is the platform shell directory, a
+        # drive-letter path rather than a Unix one.
+        like( Developer::Dashboard::PerlEnv::current_shell_bin_dir(), qr{^(?:|/.+|[A-Za-z]:[\\/].+)$}, 'current_shell_bin_dir falls back to the raw shell path when abs_path fails' );
     }
     ok( defined Developer::Dashboard::PerlEnv->perl5lib_env( path_sep => ';', env => { PERL5LIB => 'a;b' } ), 'perl5lib_env honours an explicit path_sep' );
     ok( defined Developer::Dashboard::PerlEnv->perl5lib_env( env => { PERL5LIB => 'a' } ), 'perl5lib_env defaults the separator' );
     ok( defined Developer::Dashboard::PerlEnv->perl5lib_list( path_sep => ';', env => {} ) ? 1 : 0, 'perl5lib_list honours an explicit path_sep' );
-    like( Developer::Dashboard::PerlEnv->path_with_current_perl( path_sep => ';', env => { PATH => "$home;/tmp" } ), qr/\Q$home;\E/, 'path_with_current_perl honours an explicit path_sep' );
+    # The trailing entry of the PATH fixture is /tmp, which is not a
+    # directory on Windows and is dropped, so $home can land last with no
+    # separator after it: match the separator or the end of the string.
+    like( Developer::Dashboard::PerlEnv->path_with_current_perl( path_sep => ';', env => { PATH => "$home;/tmp" } ), qr/\Q$home\E(?:;|\z)/, 'path_with_current_perl honours an explicit path_sep' );
     ok( defined Developer::Dashboard::PerlEnv->path_with_current_perl( env => { PATH => 'x' } ), 'path_with_current_perl defaults the separator' );
 }
 
 # --- Handle / Dashboard ------------------------------------------------------
 {
     my $h = Developer::Dashboard::Handle->new;
-    is( $h->{cwd}, Cwd::cwd(), 'Handle->new defaults cwd to the current directory' );
+    # Windows hands back the same directory with either separator depending
+    # on which API produced it; compare one spelling of the same path.
+    my ( $handle_cwd, $process_cwd ) = ( $h->{cwd}, Cwd::cwd() );
+    if ( $^O eq 'MSWin32' ) {
+        s{\\}{/}g for $handle_cwd, $process_cwd;
+    }
+    is( $handle_cwd, $process_cwd, 'Handle->new defaults cwd to the current directory' );
     {
         no warnings 'redefine';
         local *Developer::Dashboard::Handle::current_working_directory = sub { return undef };

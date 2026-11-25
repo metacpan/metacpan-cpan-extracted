@@ -17,7 +17,7 @@ use Carp;
 
 use Data::Identifier;
 
-our $VERSION = v0.38;
+our $VERSION = v0.39.02;
 
 my @_old_subobjects = qw(db extractor fii store);
 
@@ -177,7 +177,7 @@ Data::Identifier::Cloudlet - format independent identifier object
 
 =head1 VERSION
 
-version v0.38
+version v0.39.02
 
 =head1 SYNOPSIS
 

@@ -24,7 +24,7 @@ yq - YAML query command for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard yq [path] [file]
+  d2 yq [path] [file]
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ This command provides YAML query extraction for Developer Dashboard.
 
 =head1 PURPOSE
 
-This staged helper owns the public C<dashboard yq> command. It accepts an
+This staged helper owns the public C<d2 yq> command. It accepts an
 optional dotted YAML path or C<$d>-based Perl expression plus an optional input
 file, then hands the request to the shared query runtime so parsing,
 file-vs-STDIN handling, and output formatting stay consistent with the rest of
@@ -42,15 +42,15 @@ the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
-It exists because the dashboard ships a private, repo-local YAML inspection tool instead of depending on a globally installed parser binary. Keeping C<yq> as a staged helper also preserves the thin-switchboard contract in C<bin/dashboard>.
+It exists because the dashboard ships a private, repo-local YAML inspection tool instead of depending on a globally installed parser binary. Keeping C<yq> as a staged helper also preserves the thin-switchboard contract in C<bin/d2>.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing how C<dashboard yq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
+Use this file when you are changing how C<d2 yq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
 
 =head1 HOW TO USE
 
-Users run C<dashboard yq [path] [file]>. The staged helper selects the YAML
+Users run C<d2 yq [path] [file]>. The staged helper selects the YAML
 backend in the shared query runtime, which accepts the file and path in either
 order, reads STDIN when no file is given, prints scalar hits as plain text, and
 prints the whole parsed document when the path is C<$d> or C<.>. If the query
@@ -59,15 +59,15 @@ against the decoded YAML document before formatting the result.
 
 =head1 WHAT USES IT
 
-It is used by the public C<dashboard yq> command, by shell snippets that want a runtime-local YAML query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
+It is used by the public C<d2 yq> command, by shell snippets that want a runtime-local YAML query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
 
 =head1 EXAMPLES
 
-  printf 'alpha:\n  beta: 3\n' | dashboard yq alpha.beta
-  dashboard yq config.yml '$d'
-  dashboard yq '$d' config.yml
-  printf 'foo:\n  - 1\nbar:\n  - 2\n' | dashboard yq 'sort keys %$d'
-  printf 'items:\n  - name: demo\n' | dashboard yq items.0.name
+  printf 'alpha:\n  beta: 3\n' | d2 yq alpha.beta
+  d2 yq config.yml '$d'
+  d2 yq '$d' config.yml
+  printf 'foo:\n  - 1\nbar:\n  - 2\n' | d2 yq 'sort keys %$d'
+  printf 'items:\n  - name: demo\n' | d2 yq items.0.name
 
 =for comment FULL-POD-DOC END
 

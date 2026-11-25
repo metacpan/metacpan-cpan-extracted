@@ -11,6 +11,8 @@ use Ekorn::Pipeline::Sink   qw();
 use Ekorn::Pipeline::Source qw();
 use Ekorn::Pipeline::Stage  qw();
 
+our $VERSION = 'v0.4.0';
+
 our @EXPORT_OK
     = qw(pipeline stage gather source generator yield sink_one sink_many);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -34,12 +36,10 @@ sub stage : prototype(&) ($code) {
     return Ekorn::Pipeline::Stage->new($code);
 }
 
-
 # Return a Source made for each run by the set-up given.
 sub source : prototype(&) ($setup) {
     return Ekorn::Pipeline::Source->new($setup);
 }
-
 
 # Return a Source giving what the block yields: each run calls the block
 # once, collecting every value it passes to yield, and gives them all
@@ -57,7 +57,6 @@ sub generator : prototype(&) ($block) {
     });
 }
 
-
 # Add the values given to what the generator whose block is running
 # gives.
 sub yield (@values) {
@@ -66,13 +65,11 @@ sub yield (@values) {
     return;
 }
 
-
 # Return a Sink made for each run by the set-up given, its result one
 # value.
 sub sink_one : prototype(&) ($setup) {
     return Ekorn::Pipeline::Sink->new_sink_one($setup);
 }
-
 
 # Return a Sink made for each run by the set-up given, its result a
 # list.
@@ -188,9 +185,11 @@ Ekorn::Pipeline::Gather exports.
 Returns a source made afresh for each run. Its set-up returns its
 step, called with nothing, again and again, giving the next value or
 values, or an empty list when there are no more; optionally, its end,
-told how the run ended; and, optionally, a context for the run, which
-its stages ask for with L<Ekorn::Pipeline/run_context>. With a context
-but no end, give C<undef> for the end, or return the parts by name, as
+told how the run ended; optionally, a context for the run, which its
+stages ask for with L<Ekorn::Pipeline/run_context>; and, optionally,
+an original, returning the original of the value it gave last, which
+L<Ekorn::Pipeline::Context/result_original> gives. With a context but
+no end, give C<undef> for the end, or return the parts by name, as
 L<Ekorn::Pipeline/Made for a run> describes. It's an
 L<Ekorn::Pipeline::Source>.
 

@@ -1,19 +1,13 @@
 ---
-abstract: 'Preload declared skills into Claude Code and Codex subagents at spawn time'
+abstract: 'Retired: Claude Code preloads agent skills natively'
 author:
   - 'Torsten Raudssus <torsten@raudssus.de>'
 build_requires:
-  Cwd: '0'
-  Exporter: '0'
-  File::Temp: '0'
   FindBin: '0'
-  IPC::Open3: '0'
-  Symbol: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  Module::CPANfile: '1.1004'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -23,31 +17,23 @@ name: App-Briefing
 provides:
   App::Briefing:
     file: lib/App/Briefing.pm
-    version: '0.006000'
+    version: '0.007000'
   App::Briefing::CLI:
     file: lib/App/Briefing/CLI.pm
-    version: '0.006000'
+    version: '0.007000'
   App::Briefing::Filesystem:
     file: lib/App/Briefing/Filesystem.pm
-    version: '0.006000'
+    version: '0.007000'
   App::Briefing::Team:
     file: lib/App/Briefing/Team.pm
-    version: '0.006000'
+    version: '0.007000'
 requires:
-  B: '0'
-  Carp: '0'
-  Encode: '0'
-  JSON::MaybeXS: '0'
-  Moo: '0'
-  Path::Tiny: '0'
-  TOML::Tiny::Parser: '0.22'
-  namespace::clean: '0'
   perl: '5.020'
 resources:
   bugtracker: https://github.com/Getty/briefing/issues
   homepage: https://github.com/Getty/briefing
   repository: https://github.com/Getty/briefing.git
-version: '0.006000'
+version: '0.007000'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -59,90 +45,85 @@ x_Dist_Zilla:
           exclude_filename:
             - .karr
             - README.md
-          exclude_match:
-            - ^bin/
-          include_dotfiles: 1
+          exclude_match: []
+          include_dotfiles: 0
           prefix: ''
           prune_directory: []
           root: .
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
-      name: '@Author::GETTY/Git::GatherDir'
+      name: '@Filter/Git::GatherDir'
       version: '2.052'
     -
-      class: Dist::Zilla::Plugin::GatherAgentContext
-      name: '@Author::GETTY/GatherAgentContext'
-      version: '0.002'
-    -
       class: Dist::Zilla::Plugin::ManifestSkip
-      name: '@Author::GETTY/@Filter/ManifestSkip'
+      name: '@Filter/@Filter/ManifestSkip'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaYAML
-      name: '@Author::GETTY/@Filter/MetaYAML'
+      name: '@Filter/@Filter/MetaYAML'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::Readme
-      name: '@Author::GETTY/@Filter/Readme'
+      name: '@Filter/@Filter/Readme'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::ExtraTests
-      name: '@Author::GETTY/@Filter/ExtraTests'
+      name: '@Filter/@Filter/ExtraTests'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::ExecDir
-      name: '@Author::GETTY/@Filter/ExecDir'
+      name: '@Filter/@Filter/ExecDir'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::ShareDir
-      name: '@Author::GETTY/@Filter/ShareDir'
+      name: '@Filter/@Filter/ShareDir'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
-      name: '@Author::GETTY/@Filter/MakeMaker'
+      name: '@Filter/@Filter/MakeMaker'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::Manifest
-      name: '@Author::GETTY/@Filter/Manifest'
+      name: '@Filter/@Filter/Manifest'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::TestRelease
-      name: '@Author::GETTY/@Filter/TestRelease'
+      name: '@Filter/@Filter/TestRelease'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
-      name: '@Author::GETTY/@Filter/UploadToCPAN'
+      name: '@Filter/@Filter/UploadToCPAN'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::Author::GETTY::InstallCheck
-      name: '@Author::GETTY/Author::GETTY::InstallCheck'
-      version: '0.329'
+      name: '@Filter/Author::GETTY::InstallCheck'
+      version: '0.330'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@Author::GETTY/ConfirmRelease'
+      name: '@Filter/ConfirmRelease'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::LicenseFile
-      name: '@Author::GETTY/LicenseFile'
+      name: '@Filter/LicenseFile'
       version: '0.002'
     -
       class: Dist::Zilla::Plugin::MetaConfig
-      name: '@Author::GETTY/MetaConfig'
+      name: '@Filter/MetaConfig'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::MetaJSON
-      name: '@Author::GETTY/MetaJSON'
+      name: '@Filter/MetaJSON'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
-      name: '@Author::GETTY/PodSyntaxTests'
+      name: '@Filter/PodSyntaxTests'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
-      name: '@Author::GETTY/Test::ChangesHasContent'
+      name: '@Filter/Test::ChangesHasContent'
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
@@ -151,7 +132,7 @@ x_Dist_Zilla:
           finder_objects:
             -
               class: Dist::Zilla::Plugin::FinderCode
-              name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
               version: '6.040'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
@@ -162,19 +143,19 @@ x_Dist_Zilla:
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000038'
           version: '0.006'
-      name: '@Author::GETTY/MetaProvides::Package'
+      name: '@Filter/MetaProvides::Package'
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::GithubMeta
-      name: '@Author::GETTY/GithubMeta'
+      name: '@Filter/GithubMeta'
       version: '0.58'
     -
       class: Dist::Zilla::Plugin::InstallRelease
-      name: '@Author::GETTY/InstallRelease'
+      name: '@Filter/InstallRelease'
       version: '0.008'
     -
       class: Dist::Zilla::Plugin::Authority
-      name: '@Author::GETTY/Authority'
+      name: '@Filter/Authority'
       version: '1.009'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
@@ -182,11 +163,11 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.47.3
           repo_root: .
-      name: '@Author::GETTY/Git::CheckFor::CorrectBranch'
+      name: '@Filter/Git::CheckFor::CorrectBranch'
       version: '0.015'
     -
       class: Dist::Zilla::Plugin::Prereqs::FromCPANfile
-      name: '@Author::GETTY/Prereqs::FromCPANfile'
+      name: '@Filter/Prereqs::FromCPANfile'
       version: '0.08'
     -
       class: Dist::Zilla::Plugin::PodWeaver
@@ -249,7 +230,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Author::GETTY::Support
               name: '@GETTY/Support'
-              version: '0.329'
+              version: '0.330'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@GETTY/Contributing'
@@ -261,7 +242,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Author::GETTY::Legal
               name: '@GETTY/Legal'
-              version: '0.329'
+              version: '0.330'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/List'
@@ -270,7 +251,7 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/GETTY'
               version: '4.022'
-      name: '@Author::GETTY/PodWeaver'
+      name: '@Filter/PodWeaver'
       version: '4.010'
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -278,7 +259,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Prereqs:
           phase: develop
           type: recommends
-      name: '@Author::GETTY/@Git::VersionManager/pluginbundle version'
+      name: '@Filter/@Git::VersionManager/pluginbundle version'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
@@ -291,11 +272,11 @@ x_Dist_Zilla:
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
-      name: '@Author::GETTY/@Git::VersionManager/RewriteVersion::Transitional'
+      name: '@Filter/@Git::VersionManager/RewriteVersion::Transitional'
       version: '0.009'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
-      name: '@Author::GETTY/@Git::VersionManager/MetaProvides::Update'
+      name: '@Filter/@Git::VersionManager/MetaProvides::Update'
       version: '0.007'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
@@ -304,7 +285,7 @@ x_Dist_Zilla:
           filename:
             - Changes
           match: []
-      name: '@Author::GETTY/@Git::VersionManager/CopyFilesFromRelease'
+      name: '@Filter/@Git::VersionManager/CopyFilesFromRelease'
       version: '0.007'
     -
       class: Dist::Zilla::Plugin::Git::Commit
@@ -323,7 +304,7 @@ x_Dist_Zilla:
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: '@Author::GETTY/@Git::VersionManager/release snapshot'
+      name: '@Filter/@Git::VersionManager/release snapshot'
       version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Tag
@@ -332,7 +313,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.006000'
+          tag: '0.007000'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -340,7 +321,7 @@ x_Dist_Zilla:
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: '@Author::GETTY/@Git::VersionManager/Git::Tag'
+      name: '@Filter/@Git::VersionManager/Git::Tag'
       version: '2.052'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
@@ -352,11 +333,11 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
-      name: '@Author::GETTY/@Git::VersionManager/BumpVersionAfterRelease::Transitional'
+      name: '@Filter/@Git::VersionManager/BumpVersionAfterRelease::Transitional'
       version: '0.009'
     -
       class: Dist::Zilla::Plugin::NextRelease
-      name: '@Author::GETTY/@Git::VersionManager/NextRelease'
+      name: '@Filter/@Git::VersionManager/NextRelease'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::Git::Commit
@@ -380,7 +361,7 @@ x_Dist_Zilla:
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: '@Author::GETTY/@Git::VersionManager/post-release commit'
+      name: '@Filter/@Git::VersionManager/post-release commit'
       version: '2.052'
     -
       class: Dist::Zilla::Plugin::Git::Push
@@ -392,28 +373,16 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.47.3
           repo_root: .
-      name: '@Author::GETTY/Git::Push'
+      name: '@Filter/Git::Push'
       version: '2.052'
     -
       class: Dist::Zilla::Plugin::Author::GETTY::GitHubRelease
-      name: '@Author::GETTY/Author::GETTY::GitHubRelease'
-      version: '0.329'
+      name: '@Filter/Author::GETTY::GitHubRelease'
+      version: '0.330'
     -
-      class: Dist::Zilla::Plugin::Author::GETTY::Binary
-      name: briefing/briefing
-      version: '0.329'
-    -
-      class: Dist::Zilla::Plugin::ExecDir
-      name: ExecDir
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: PruneFiles
       version: '6.040'
-    -
-      class: Dist::Zilla::Plugin::DynamicPrereqs
-      config:
-        Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000038'
-          version: '0.006'
-      name: DynamicPrereqs
-      version: '0.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -456,7 +425,7 @@ x_Dist_Zilla:
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::FinderCode
-      name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
       version: '6.040'
   zilla:
     class: Dist::Zilla::Dist::Builder
@@ -464,29 +433,6 @@ x_Dist_Zilla:
       is_trial: 0
     version: '6.040'
 x_authority: cpan:GETTY
-x_binaries:
-  binaries:
-    briefing:
-      modules: []
-      pp_args: 'bash scripts/binary-pp-args.sh'
-      require:
-        - App::Briefing
-        - App::Briefing::CLI
-        - App::Briefing::Team
-        - Moo
-        - Path::Tiny
-        - JSON::MaybeXS
-        - TOML::Tiny::Parser
-        - namespace::clean
-      script: script/briefing
-      smoke: 'bash scripts/binary-smoke.sh'
-      verify: 'bash scripts/binary-verify.sh'
-  platforms:
-    - linux-x86_64
-    - linux-arm64
-    - macos-arm64
-    - macos-x86_64
-    - windows-x86_64
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

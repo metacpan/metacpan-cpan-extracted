@@ -35,6 +35,12 @@ chdir $home or die "Unable to chdir to $home: $!";
 
 my $skills_root = File::Spec->catdir( $home, '.developer-dashboard', 'skills' );
 
+# A control byte that the file system can store in a directory name but that
+# validated_path_segments refuses. Windows cannot create a name holding
+# \x01 (bytes 0-31 are illegal there), but it can store DEL (\x7F), which
+# the same validation line refuses in the same way.
+my $ctl = $^O eq 'MSWin32' ? "\x7F" : "\x01";
+
 # dies { CODE }
 # Runs a code block and returns the exception text, or the empty string when
 # it did not die - a tiny block-form helper so call sites read as
@@ -193,7 +199,7 @@ subtest 'nested skill inventory carries write locations equivalent to strict cha
     my $foo_dir = File::Spec->catdir( $skills_root, 'foo' );
     my $bar_dir = File::Spec->catdir( $foo_dir, 'skills', 'bar' );
     my $baz_dir = File::Spec->catdir( $bar_dir, 'skills', 'baz' );
-    my $odd_dir = File::Spec->catdir( $baz_dir, 'skills', "odd\x01name" );
+    my $odd_dir = File::Spec->catdir( $baz_dir, 'skills', "odd${ctl}name" );
     make_path( $odd_dir, File::Spec->catdir( $bar_dir, '.git' ) );
 
     my %validation_calls;
@@ -209,7 +215,7 @@ subtest 'nested skill inventory carries write locations equivalent to strict cha
     }
     my %inventory = map { join( '.', @{ $_->{segments} } ) => $_->{config_write_location} } @entries;
 
-    is_deeply( \%validation_calls, { foo => 1, bar => 1, baz => 1, "odd\x01name" => 1 },
+    is_deeply( \%validation_calls, { foo => 1, bar => 1, baz => 1, "odd${ctl}name" => 1 },
         'discovery validates each path segment once instead of revalidating every chain prefix' );
 
     is_deeply( $inventory{foo}, $paths->skill_config_write_location(['foo']),
@@ -218,7 +224,7 @@ subtest 'nested skill inventory carries write locations equivalent to strict cha
         'git-managed parent inventory result matches the strict public resolver' );
     is_deeply( $inventory{'foo.bar.baz'}, $paths->skill_config_write_location( [ 'foo', 'bar', 'baz' ] ),
         'deeper inventory result reuses the nearest safe ancestor correctly' );
-    is( $inventory{"foo.bar.baz.odd\x01name"}, undef,
+    is( $inventory{"foo.bar.baz.odd${ctl}name"}, undef,
         'a control-byte segment remains undiscoverable as a safe write target' );
 
     remove_tree_quiet($skills_root);
@@ -229,7 +235,7 @@ subtest 'nested inventory handles invalid root names and git-free parent write l
 
     my $foo_dir = File::Spec->catdir( $skills_root, 'foo' );
     my $bar_dir = File::Spec->catdir( $foo_dir, 'skills', 'bar' );
-    my $invalid_root = File::Spec->catdir( $skills_root, "bad\x01name" );
+    my $invalid_root = File::Spec->catdir( $skills_root, "bad${ctl}name" );
     my $invalid_child = File::Spec->catdir( $invalid_root, 'skills', 'child' );
     my $disabled_root = File::Spec->catdir( $skills_root, 'disabled' );
     my $disabled_child = File::Spec->catdir( $disabled_root, 'skills', 'child' );
@@ -246,13 +252,13 @@ subtest 'nested inventory handles invalid root names and git-free parent write l
         'git-free inventory parent becomes the child skill config write location',
     );
     ok(
-        exists $entries{"bad\x01name"}
-          && !defined $entries{"bad\x01name"}{config_write_location},
+        exists $entries{"bad${ctl}name"}
+          && !defined $entries{"bad${ctl}name"}{config_write_location},
         'an invalid top-level skill name remains discoverable but has no config write target',
     );
     ok(
-        exists $entries{"bad\x01name.child"}
-          && !defined $entries{"bad\x01name.child"}{config_write_location},
+        exists $entries{"bad${ctl}name.child"}
+          && !defined $entries{"bad${ctl}name.child"}{config_write_location},
         'a child of an invalid root remains discoverable without inheriting an unsafe write target',
     );
 
@@ -336,7 +342,9 @@ subtest 'd2 path add writes a nested alias into the git-free ancestor skill conf
     my $saved = json_decode($out);
     is( $saved->{name},     'foo.bar.something', 'the reported alias name stays the full dotted form' );
     is( $saved->{path},     '/foobar',           'the reported alias path is the target directory' );
-    is( $saved->{resolved}, '/foobar',           'the alias resolves to the target directory immediately' );
+    # The resolved form comes back in the platform's own spelling
+    # (backslashes on Windows), so compare against the canonical path.
+    is( $saved->{resolved}, File::Spec->canonpath('/foobar'), 'the alias resolves to the target directory immediately' );
 
     my $config_file = File::Spec->catfile( $foo_dir, 'config', 'config.json' );
     ok( -f $config_file, 'the alias physically landed in the git-free ancestor (foo), not inside bar' );
@@ -356,12 +364,12 @@ subtest 'd2 path add writes a nested alias into the git-free ancestor skill conf
     is( $aliases->{'foo.bar.something'}, '/foobar', 'path_aliases() surfaces the nested alias under its full dotted name' );
 
     $paths->register_named_paths($aliases);
-    is( $paths->resolve_dir('foo.bar.something'), '/foobar', 'cdr/resolve_dir resolves the nested alias to its target' );
+    is( $paths->resolve_dir('foo.bar.something'), File::Spec->canonpath('/foobar'), 'cdr/resolve_dir resolves the nested alias to its target' );
 
     my ( $list_out, $list_err ) = run_path( 'list', '-o', 'json' );
     is( $list_err, '', 'path list writes nothing to STDERR' );
     my $listed = json_decode($list_out);
-    is( $listed->{'foo.bar.something'}, '/foobar', 'dashboard path list shows the nested alias in its full JSON payload' );
+    is( $listed->{'foo.bar.something'}, '/foobar', 'd2 path list shows the nested alias in its full JSON payload' );
 
     remove_tree_quiet($skills_root);
 };
@@ -588,14 +596,18 @@ subtest 'Config: a discovered nested directory whose name itself fails segment v
     # so nested_skill_entries discovers it as a real directory while
     # skill_config_write_location can never resolve it - the "or next" guard
     # in _nested_skill_alias_entries' pass 2 loop.
-    my $weird_dir = File::Spec->catdir( $foo_dir, 'skills', 'weird\\name' );
+    # On Windows a backslash is a path separator and can never be part of
+    # one directory name, so the stand-in there is a name carrying DEL,
+    # which Windows can store and validated_path_segments also refuses.
+    my $weird_name = $^O eq 'MSWin32' ? "weird${ctl}name" : 'weird\\name';
+    my $weird_dir = File::Spec->catdir( $foo_dir, 'skills', $weird_name );
     make_path($weird_dir);
 
     my ( undef, $config ) = fresh_registries();
     is( eval { $config->path_aliases; 1 }, 1, 'a nested skill directory with an unvalidatable name does not blow up path_aliases()' );
 
     my ($paths) = fresh_registries();
-    my @found = grep { join( '.', @{ $_->{segments} } ) eq 'foo.weird\\name' } $paths->nested_skill_entries;
+    my @found = grep { join( '.', @{ $_->{segments} } ) eq "foo.$weird_name" } $paths->nested_skill_entries;
     ok( @found, 'nested_skill_entries still discovers the oddly-named directory on disk' );
     is( $paths->skill_config_write_location( $found[0]->{segments} ), undef,
         'skill_config_write_location cannot resolve it (its own segment fails validation), matching the "or next" it drives' );
@@ -928,11 +940,11 @@ __END__
 =head1 NAME
 
 t/205-skill-depth-alias.t - skill-depth-prefixed dotted alias name support for
-dashboard path/file add and del
+d2 path/file add and del
 
 =head1 PURPOSE
 
-Covers DD-1004: C<dashboard path add>/C<dashboard file add> (and their C<del>
+Covers DD-1004: C<d2 path add>/C<d2 file add> (and their C<del>
 counterparts) now support a dotted alias name such as C<foo.bar.something>,
 resolving it against arbitrarily nested C<skills/foo/skills/bar/> directories
 and writing the alias into the correct ancestor skill's C<config/config.json>

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
@@ -34,6 +34,18 @@ subtest parse_ini => sub {
 
 subtest encode_json => sub {
     is( Dist::Conformance::Schema::encode_json( { b => 1, a => { c => [] } } ), qq{{\n  "a": {\n    "c": []\n  },\n  "b": 1\n}\n}, 'sorted, indented by two, with a final newline' );
+};
+
+subtest insert_yaml => sub {
+    my $insert = \&Dist::Conformance::Schema::insert_yaml;
+    is( $insert->( "# top\na:\n    b: 1   # mine\nc: 2", ['a'],     { d => 3 } ), "# top\na:\n    b: 1   # mine\n    d: 3\nc: 2\n", 'an entry goes at the end of its block, at its indentation' );
+    is( $insert->( "a:\n  - x\n  # the end\nb: 1\n",     ['a'],     ['y'] ),      "a:\n  - x\n  - y\n  # the end\nb: 1\n",          'and an item at the end of a list, before a comment after it' );
+    is( $insert->( "a:\n  b:\n    - x\n  c: 1\n",        [qw{a b}], ['y'] ),      "a:\n  b:\n    - x\n    - y\n  c: 1\n",           'a path reaches a nested collection' );
+    is( $insert->( "a:\n  c: 1\n",                       [qw{a b}], ['y'] ),      "a:\n  c: 1\n  b:\n  - y\n",                      'a key that is not there goes at the end of the block above it' );
+    is( $insert->( "c: 1",                               [qw{a b}], { d => 1 } ), "c: 1\na:\n  b:\n    d: 1\n",                     'or of the text' );
+    is( $insert->( "a:\nb: 1\n",                         ['a'],     { d => 1 } ), "a:\n  d: 1\nb: 1\n",                             'an empty block gets an indentation of two' );
+    like( dies { $insert->( "a: { b: 1 }\n",   ['a'], { d => 1 } ) }, qr/\Aa\ has\ something\ after\ it/, 'a key in flow style dies' );
+    like( dies { $insert->( "a: &x\n  b: 1\n", ['a'], { d => 1 } ) }, qr/\Aa\ has\ something\ after\ it/, 'and so does a key with an anchor' );
 };
 
 subtest validate => sub {
@@ -72,8 +84,8 @@ subtest matches => sub {
 };
 
 subtest relative_path => sub {
-    is( Dist::Conformance::Schema::relative_path( $_, 'here' ), $_, "'$_' is a relative path" ) for qw{a a/b .a a/..b ...};
-    for my $bad ( qw{/a .. ../a a/.. a/../b}, q{}, "a\nb" ) {
+    for my $path (qw{a a/b .a a/..b ...}) { is( Dist::Conformance::Schema::relative_path( $path, 'here' ), $path, "'$path' is a relative path" ) }
+    for my $bad  ( qw{/a .. ../a a/.. a/../b}, q{}, "a\nb" ) {
         like( dies { Dist::Conformance::Schema::relative_path( $bad, 'here' ) }, qr/is\ not\ a\ relative\ path\ inside\ here/, "'$bad' is refused" );
     }
     like( dies { Dist::Conformance::Schema::relative_path( undef, 'here' ) }, qr/not\ a\ relative\ path/, 'and so is undef' );

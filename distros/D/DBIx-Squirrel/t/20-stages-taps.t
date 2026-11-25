@@ -5,9 +5,10 @@ use Test2::Plugin::NoWarnings;
 use DBIx::Squirrel;
 use Ekorn::Pipeline qw();
 use DBIx::Squirrel::Stages::Flow;
-use DBIx::Squirrel::Stages::Taps qw(:all);
-use DBIx::Squirrel::Stages::Rows qw(pluck as_hash);
-use Ekorn::Pipeline::Sinks       qw(count_items);
+use DBIx::Squirrel::Stages::Taps  qw(:all);
+use DBIx::Squirrel::Stages::Batch qw(batch);
+use DBIx::Squirrel::Stages::Rows  qw(pluck as_hash);
+use Ekorn::Pipeline::Sinks        qw(count_items);
 
 my $class = 'Ekorn::Pipeline';
 
@@ -134,6 +135,24 @@ subtest 'tee, from an iterator' => sub {
             count_items,
         )
     }, qr( bad )x, 'a death in the branch kills the run';
+};
+
+# From Ekorn::Pipeline v0.3.10, a stop after the tee closes its branch,
+# so what a branch holds is flushed, not dropped (roadmap 2026-0045).
+subtest 'tee, with a stop after it' => sub {
+    my @batches;
+    my $branch = sub {
+        tee(pluck, batch(2), sub { push @batches, [@$_]; () });
+    };
+    my $five  = 'WITH n (x) AS (VALUES (1), (2), (3), (4), (5)) SELECT x FROM n';
+    my @taken = $dbh->iterate($five, $branch->(), take(3), pluck)->all;
+    is \@taken, [1, 2, 3], 'take after the tee stops the run';
+    is \@batches, [[1, 2], [3]], 'and the batch the branch held is flushed';
+
+    @batches = ();
+    my $first = $dbh->iterate($five, $branch->(), pluck)->first;
+    is $first,    1,     'first, after the tee';
+    is \@batches, [[1]], 'and what the branch held is flushed';
 };
 
 subtest 'on a handle, with pipe and tap' => sub {

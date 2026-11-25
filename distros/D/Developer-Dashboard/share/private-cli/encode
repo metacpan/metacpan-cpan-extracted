@@ -22,18 +22,18 @@ encode - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard encode
+  d2 encode
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard encode>, the text-to-token half of the dashboard codec pair. It lets users turn bookmark or action text into the portable payload format used by transient dashboard URLs.
+This staged helper exposes C<d2 encode>, the text-to-token half of the dashboard codec pair. It lets users turn bookmark or action text into the portable payload format used by transient dashboard URLs.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing the CLI contract for token generation or when fixing
 
 =head1 HOW TO USE
 
-Users pipe text into C<dashboard encode> or redirect a file into it. The staged helper forwards the request to the private runtime, which compresses and base64-encodes the payload and prints the token.
+Users pipe text into C<d2 encode> or redirect a file into it. The staged helper forwards the request to the private runtime, which compresses and base64-encodes the payload and prints the token.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by token-debugging workflows, by docs that show the encode/decode rou
 
 Example 1:
 
-  dashboard encode /app/test
+  d2 encode /app/test
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/encode --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

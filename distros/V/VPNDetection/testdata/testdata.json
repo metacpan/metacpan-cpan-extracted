@@ -8591,6 +8591,709 @@
           "blocked": false,
           "missing": []
         }
+      },
+      {
+        "name": "list-member-scalar-matches-any-element",
+        "why": "A term on a member the answer holds as a list matches when any element matches it, not only the first.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": true,
+            "protocols": [
+              "http",
+              "socks5"
+            ],
+            "num_ports": 3,
+            "num_proxies": 2,
+            "last_seen": "2026-10-17",
+            "last_usable": ""
+          },
+          "is_web": false,
+          "web": []
+        },
+        "condition": {
+          "pubproxy": {
+            "protocols": "socks5"
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "list-member-scalar-case-insensitive",
+        "why": "An element is compared as any string member is.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": true,
+            "protocols": [
+              "http",
+              "socks5"
+            ],
+            "num_ports": 3,
+            "num_proxies": 2,
+            "last_seen": "2026-10-17",
+            "last_usable": ""
+          },
+          "is_web": false,
+          "web": []
+        },
+        "condition": {
+          "pubproxy": {
+            "protocols": "SOCKS5"
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "list-member-any-of-matches",
+        "why": "An array of values against a list matches when any element is any of them.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": true,
+            "protocols": [
+              "http",
+              "socks5"
+            ],
+            "num_ports": 3,
+            "num_proxies": 2,
+            "last_seen": "2026-10-17",
+            "last_usable": ""
+          },
+          "is_web": false,
+          "web": []
+        },
+        "condition": {
+          "pubproxy": {
+            "protocols": [
+              "socks4",
+              "socks5"
+            ]
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "list-member-scalar-misses",
+        "why": "No element matches, and a served list is never reported missing.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": true,
+            "protocols": [
+              "http",
+              "socks5"
+            ],
+            "num_ports": 3,
+            "num_proxies": 2,
+            "last_seen": "2026-10-17",
+            "last_usable": ""
+          },
+          "is_web": false,
+          "web": []
+        },
+        "condition": {
+          "pubproxy": {
+            "protocols": "socks4"
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "list-of-objects-partial-match",
+        "why": "An object term matches a list of objects when one element matches it.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": true,
+            "protocols": [
+              "socks5"
+            ],
+            "num_ports": 3,
+            "num_proxies": 2,
+            "last_seen": "2026-10-17",
+            "last_usable": ""
+          },
+          "is_web": true,
+          "web": [
+            {
+              "port": 80,
+              "tls_ok": false,
+              "session_ok": true,
+              "status_code": 301,
+              "server": "nginx",
+              "location": "https://146.70.116.130/",
+              "title": "",
+              "cert_subject_cn": "",
+              "cert_subject_o": "",
+              "cert_issuer_dn": "",
+              "cert_browser_trusted": false,
+              "tls_version": "",
+              "first_seen": "2026-09-02",
+              "last_seen": "2026-11-12"
+            },
+            {
+              "port": 443,
+              "tls_ok": true,
+              "session_ok": true,
+              "status_code": 200,
+              "server": "cloudflare",
+              "location": "",
+              "title": "Welcome",
+              "cert_subject_cn": "example.com",
+              "cert_subject_o": "Example Inc.",
+              "cert_issuer_dn": "C=US, O=Example CA, CN=Example CA R1",
+              "cert_browser_trusted": true,
+              "tls_version": "TLSv1.3",
+              "first_seen": "2026-09-02",
+              "last_seen": "2026-11-12"
+            }
+          ]
+        },
+        "condition": {
+          "web": {
+            "port": 443
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "list-of-objects-same-element",
+        "why": "Every member of an object term must match the SAME element.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": true,
+            "protocols": [
+              "socks5"
+            ],
+            "num_ports": 3,
+            "num_proxies": 2,
+            "last_seen": "2026-10-17",
+            "last_usable": ""
+          },
+          "is_web": true,
+          "web": [
+            {
+              "port": 80,
+              "tls_ok": false,
+              "session_ok": true,
+              "status_code": 301,
+              "server": "nginx",
+              "location": "https://146.70.116.130/",
+              "title": "",
+              "cert_subject_cn": "",
+              "cert_subject_o": "",
+              "cert_issuer_dn": "",
+              "cert_browser_trusted": false,
+              "tls_version": "",
+              "first_seen": "2026-09-02",
+              "last_seen": "2026-11-12"
+            },
+            {
+              "port": 443,
+              "tls_ok": true,
+              "session_ok": true,
+              "status_code": 200,
+              "server": "cloudflare",
+              "location": "",
+              "title": "Welcome",
+              "cert_subject_cn": "example.com",
+              "cert_subject_o": "Example Inc.",
+              "cert_issuer_dn": "C=US, O=Example CA, CN=Example CA R1",
+              "cert_browser_trusted": true,
+              "tls_version": "TLSv1.3",
+              "first_seen": "2026-09-02",
+              "last_seen": "2026-11-12"
+            }
+          ]
+        },
+        "condition": {
+          "web": {
+            "port": 443,
+            "server": "nginx"
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "list-of-objects-numeric-bound",
+        "why": "A bound applies to an element member.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": true,
+            "protocols": [
+              "socks5"
+            ],
+            "num_ports": 3,
+            "num_proxies": 2,
+            "last_seen": "2026-10-17",
+            "last_usable": ""
+          },
+          "is_web": true,
+          "web": [
+            {
+              "port": 80,
+              "tls_ok": false,
+              "session_ok": true,
+              "status_code": 301,
+              "server": "nginx",
+              "location": "https://146.70.116.130/",
+              "title": "",
+              "cert_subject_cn": "",
+              "cert_subject_o": "",
+              "cert_issuer_dn": "",
+              "cert_browser_trusted": false,
+              "tls_version": "",
+              "first_seen": "2026-09-02",
+              "last_seen": "2026-11-12"
+            },
+            {
+              "port": 443,
+              "tls_ok": true,
+              "session_ok": true,
+              "status_code": 200,
+              "server": "cloudflare",
+              "location": "",
+              "title": "Welcome",
+              "cert_subject_cn": "example.com",
+              "cert_subject_o": "Example Inc.",
+              "cert_issuer_dn": "C=US, O=Example CA, CN=Example CA R1",
+              "cert_browser_trusted": true,
+              "tls_version": "TLSv1.3",
+              "first_seen": "2026-09-02",
+              "last_seen": "2026-11-12"
+            }
+          ]
+        },
+        "condition": {
+          "web": {
+            "status_code": {
+              "gte": 300,
+              "lt": 400
+            }
+          }
+        },
+        "expect": {
+          "blocked": true,
+          "missing": []
+        }
+      },
+      {
+        "name": "list-of-objects-numeric-bound-misses",
+        "why": "A bound no element meets never matches.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": true,
+            "protocols": [
+              "socks5"
+            ],
+            "num_ports": 3,
+            "num_proxies": 2,
+            "last_seen": "2026-10-17",
+            "last_usable": ""
+          },
+          "is_web": true,
+          "web": [
+            {
+              "port": 80,
+              "tls_ok": false,
+              "session_ok": true,
+              "status_code": 301,
+              "server": "nginx",
+              "location": "https://146.70.116.130/",
+              "title": "",
+              "cert_subject_cn": "",
+              "cert_subject_o": "",
+              "cert_issuer_dn": "",
+              "cert_browser_trusted": false,
+              "tls_version": "",
+              "first_seen": "2026-09-02",
+              "last_seen": "2026-11-12"
+            },
+            {
+              "port": 443,
+              "tls_ok": true,
+              "session_ok": true,
+              "status_code": 200,
+              "server": "cloudflare",
+              "location": "",
+              "title": "Welcome",
+              "cert_subject_cn": "example.com",
+              "cert_subject_o": "Example Inc.",
+              "cert_issuer_dn": "C=US, O=Example CA, CN=Example CA R1",
+              "cert_browser_trusted": true,
+              "tls_version": "TLSv1.3",
+              "first_seen": "2026-09-02",
+              "last_seen": "2026-11-12"
+            }
+          ]
+        },
+        "condition": {
+          "web": {
+            "status_code": {
+              "gte": 500
+            }
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
+      },
+      {
+        "name": "list-member-empty-list",
+        "why": "An empty list is served, so it matches nothing and is not missing.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true,
+          "is_hosting": true,
+          "is_relay": false,
+          "is_tor": false,
+          "is_cdn": false,
+          "is_resproxy": true,
+          "is_dcproxy": false,
+          "is_mobproxy": false,
+          "vpn": {
+            "provider": "nordvpn",
+            "confidence": "high",
+            "method": "rdns",
+            "last_seen": "2026-09-01"
+          },
+          "hosting": {
+            "provider": "ovh",
+            "confidence": "medium",
+            "last_seen": "2026-09-01"
+          },
+          "relay": {},
+          "tor": {},
+          "cdn": {},
+          "resproxy": {
+            "provider": "brightdata",
+            "first_seen": "2026-06-01",
+            "last_seen": "2026-09-01",
+            "hits": 7,
+            "hits_days_pct": 42,
+            "providers_num": 2
+          },
+          "dcproxy": {},
+          "mobproxy": {},
+          "is_pubproxy": true,
+          "pubproxy": {
+            "entry": true,
+            "exit": true,
+            "protocols": [
+              "socks5"
+            ],
+            "num_ports": 3,
+            "num_proxies": 2,
+            "last_seen": "2026-10-17",
+            "last_usable": ""
+          },
+          "is_web": false,
+          "web": []
+        },
+        "condition": {
+          "web": {
+            "port": 443
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": []
+        }
       }
     ],
     "invalidConditions": [

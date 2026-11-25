@@ -22,18 +22,18 @@ cpan - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard cpan <Module...>
+  d2 cpan <Module...>
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard cpan>, the runtime-local dependency installer. It lets a project or home runtime add optional Perl modules such as C<DBD::SQLite> or C<DBD::ODBC> without changing the base distribution dependencies.
+This staged helper exposes C<d2 cpan>, the runtime-local dependency installer. It lets a project or home runtime add optional Perl modules such as C<DBD::SQLite> or C<DBD::ODBC> without changing the base distribution dependencies.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing the CLI contract for runtime-local dependency instal
 
 =head1 HOW TO USE
 
-Users run C<dashboard cpan E<lt>Module...E<gt>> from the runtime they want to extend. The staged helper forwards that request into the private runtime, which updates the runtime-local C<cpanfile> and installs into C<local/>.
+Users run C<d2 cpan E<lt>Module...E<gt>> from the runtime they want to extend. The staged helper forwards that request into the private runtime, which updates the runtime-local C<cpanfile> and installs into C<local/>.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by developers enabling optional runtime integrations and by tests and
 
 Example 1:
 
-  dashboard cpan DBD::SQLite
+  d2 cpan DBD::SQLite
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/cpan --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

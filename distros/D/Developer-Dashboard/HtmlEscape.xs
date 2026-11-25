@@ -2,6 +2,12 @@
 #include "perl.h"
 #include "XSUB.h"
 #include <string.h>
+#include "Native.h"
+#include "GoRoutineProcessNative.h"
+#include "SystemMenuNative.h"
+#include "GoRoutineEvent.h"
+
+/* Native.xs is included at the end to keep every XSUB in one boot module. */
 
 MODULE = Developer::Dashboard    PACKAGE = Developer::Dashboard::HtmlEscape
 PROTOTYPES: DISABLE
@@ -206,3 +212,8 @@ _xs_escape_html_chunked(input)
     }
   OUTPUT:
     RETVAL
+
+INCLUDE: Native.xs
+INCLUDE: GoRoutine012.xs
+INCLUDE: GoRoutineProcess.xs
+INCLUDE: SystemMenu.xs

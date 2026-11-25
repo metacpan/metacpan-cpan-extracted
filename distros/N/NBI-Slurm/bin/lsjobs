@@ -51,19 +51,21 @@ my $opt_name = '.+';
 my $opt_tab = 0;
 my $opt_summary = 0;
 my @opt_hide = ();
+my $opt_exclude = undef;
 GetOptions(
-    'u|user=s'  => \$opt_user,
-    'n|name=s'  => \$opt_name,
-    's|status=s'=> \$opt_status,
-    'r|running' => \$opt_running_bool,
-    'p|pending' => \$opt_pending_bool,
-    'd|delete'  => \$opt_delete_bool,
-    't|tab'     => \$opt_tab,
-    'summary'   => \$opt_summary,
-    'hide=s'    => \@opt_hide,
-    'verbose'   => \$opt_verbose_bool,
-    'version'   => sub { say "lsjobs v", $NBI::Slurm::VERSION; exit },
-    'help'      => sub { usage() },
+    'u|user=s'    => \$opt_user,
+    'n|name=s'    => \$opt_name,
+    'x|exclude=s' => \$opt_exclude,
+    's|status=s'  => \$opt_status,
+    'r|running'   => \$opt_running_bool,
+    'p|pending'   => \$opt_pending_bool,
+    'd|delete'    => \$opt_delete_bool,
+    't|tab'       => \$opt_tab,
+    'summary'     => \$opt_summary,
+    'hide=s'      => \@opt_hide,
+    'verbose'     => \$opt_verbose_bool,
+    'version'     => sub { say "lsjobs v", $NBI::Slurm::VERSION; exit },
+    'help'        => sub { usage() },
 );
 
 if (not NBI::Slurm::has_squeue()) {
@@ -125,6 +127,10 @@ for my $job (sort keys %{$jobs}) {
 
     # Check name
     if ($jobs->{$job}->{NAME} !~ /$opt_name/) {
+        next;
+    }
+    # Exclude jobs matching pattern
+    if (defined $opt_exclude && $jobs->{$job}->{NAME} =~ /$opt_exclude/) {
         next;
     }
     # Check status (general pattern match)
@@ -897,6 +903,7 @@ sub usage {
                            Type 'all' to show all users
 
    -n, --name <pattern>    Show only jobs with this name (regex) [default: .+]
+   -x, --exclude <pattern> Exclude jobs whose name matches this pattern (regex)
 
    -s, --status <pattern>  Show only jobs matching this status (regex) [default: .+]
    -r, --running           Show only running jobs
@@ -929,7 +936,7 @@ lsjobs - List your jobs (or others), and delete them if you wish
 
 =head1 VERSION
 
-version 0.22.0
+version 0.24.0
 
 =head1 SYNOPSIS
 
@@ -951,6 +958,10 @@ Show only jobs from the specified user. Default: current user.
 =item B<-n, --name <pattern>>
 
 Show only jobs with the specified name pattern. Default: .+ (matches any name).
+
+=item B<-x, --exclude <pattern>>
+
+Exclude jobs whose name matches the specified pattern (regex). Can be combined with C<--name>.
 
 =item B<-s, --status <pattern>>
 

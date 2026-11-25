@@ -21,6 +21,11 @@ use Developer::Dashboard::PathRegistry;
 # directory, so the test chdirs into the temp home before constructing anything.
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
+# Every collector loop this file starts is detached, and only the matching
+# stop further down ends it. A run that is killed part-way never reaches
+# that stop, and the loops then live on for days. Tie them to this test
+# process: each loop ends itself once this pid is gone.
+local $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID} = $$;
 chdir $home or die "Unable to chdir to $home: $!";
 
 my $paths  = Developer::Dashboard::PathRegistry->new( home => $home );
@@ -45,9 +50,13 @@ my $state_written = 0;
 {
     no warnings 'redefine';
 
-    # A pid that is alive but is not a loop child, so nothing is actually forked.
-    local *Developer::Dashboard::CollectorRunner::_fork_process = sub { return $$ };
-
+    # NOTE: start_loop spawns a REAL supervisor through the GoRoutine
+    # spawn layer (there is no _fork_process in lib/ any more - the mock
+    # that used to stand here was dead code, and the comment that claimed
+    # "nothing is actually forked" was false). The loop it starts is
+    # stopped at the end of this file: left running, its supervisor holds
+    # the tempdir and prove's stdout pipe open, so prove never sees EOF
+    # after 1..6 and the run stalls (round 67).
     my $real_write_state = \&Developer::Dashboard::CollectorRunner::_write_loop_state;
     local *Developer::Dashboard::CollectorRunner::_write_loop_state = sub {
         my ( $self, $loop_name, @rest ) = @_;
@@ -84,7 +93,15 @@ my $state = $runner->loop_state($name);
 is( $state->{name}, $name, 'the recorded state identifies the loop by name' );
 ok( $state->{pid}, 'the recorded state carries the pid a sweep would match against' );
 
-$runner->_cleanup_loop_files($name);
+# Stop the loop this file started. _cleanup_loop_files alone only
+# removes the pidfile and state - it leaves the supervisor process
+# running, and a live supervisor holds this tempdir (as its cwd, with
+# collectors.log open) and prove's stdout pipe (inherited through the
+# GoRoutine spawn) open, so prove never sees EOF after 1..6 and the run
+# stalls until the failsafe kills it (round 67). stop_loop terminates
+# the supervisor through the native process API, sweeps its workers,
+# and cleans the pidfile and state up itself.
+$runner->stop_loop($name);
 
 done_testing();
 

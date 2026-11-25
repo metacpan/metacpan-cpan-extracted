@@ -13,6 +13,17 @@ BEGIN {
     require Symbol;
 
     *CORE::GLOBAL::open = sub (*;$@) {
+        # A bareword handle such as STDOUT reaches a "*" prototype as a plain
+        # string, which CORE::open refuses under strict refs. Resolve it to
+        # the caller's glob first. Windows is where this is exercised: the
+        # product secures runtime paths there by running icacls with STDOUT
+        # and STDERR redirected and restored.
+        if ( defined $_[0] && !ref $_[0] ) {
+            my $glob = Symbol::qualify_to_ref( $_[0], scalar caller );
+            return CORE::open($glob) if @_ == 1;
+            return CORE::open( $glob, $_[1] ) if @_ == 2;
+            return CORE::open( $glob, $_[1], @_[ 2 .. $#_ ] );
+        }
         if ( @_ >= 3 && defined $_[2] && !ref $_[2] ) {
             if ( $FAIL_OPEN{"$_[1]|$_[2]"} ) {
                 $! = 13;
@@ -22,8 +33,11 @@ BEGIN {
             $HANDLE_PATH{ Scalar::Util::refaddr( $_[0] ) } = "$_[1]|$_[2]" if $ok && ref $_[0] && $FAIL_CLOSE{"$_[1]|$_[2]"};
             return $ok;
         }
+        return CORE::open( $_[0] ) if @_ == 1;
         return CORE::open( $_[0], $_[1] ) if @_ == 2;
-        return CORE::open( $_[0] );
+        # Three or more arguments with a reference in the third place, such
+        # as a dup of \*STDOUT, must keep every argument.
+        return CORE::open( $_[0], $_[1], @_[ 2 .. $#_ ] );
     };
 
     *CORE::GLOBAL::close = sub (;*) {
@@ -73,11 +87,14 @@ use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use File::Spec;
 use Cwd qw(getcwd);
+use Config ();
 
 use lib 'lib';
 
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SkillManager;
+use Developer::Dashboard::GoRoutine ();
+use Developer::Dashboard::PathIdentity ();
 
 my $SM = 'Developer::Dashboard::SkillManager';
 
@@ -263,14 +280,23 @@ my $manager = $SM->new( paths => $paths );
 
 # Timeout / streaming edge cases.
 {
-    my $out = $manager->_run_streaming_command( command => [ 'sh', '-c', 'echo hi' ], cwd => $home );
+    # 'sh' is not on PATH on Windows; cmd.exe is the local equivalent for a
+    # trivial echo command.
+    my $echo_cmd = $^O eq 'MSWin32' ? [ 'cmd', '/d', '/c', 'echo hi' ] : [ 'sh', '-c', 'echo hi' ];
+    my $out = $manager->_run_streaming_command( command => $echo_cmd, cwd => $home );
     is( $out->{exit}, 0, 'streaming command with a cwd runs' );
 
     {
         my $other = tempdir( CLEANUP => 1 );
-        my $orig_cwd = getcwd();
+        # The product records the directory to return to with its own
+        # current_working_directory helper, which hands back the native
+        # canonical spelling (backslashes on Windows) where getcwd gives
+        # forward slashes, so key the injected chdir failure on the same
+        # helper. The launched command is Perl itself because Windows has
+        # no "true" program.
+        my $orig_cwd = Developer::Dashboard::PathIdentity::current_working_directory();
         local $FAIL_CHDIR{$orig_cwd} = 0;
-        eval { $manager->_run_streaming_command( command => ['true'], cwd => $other ) };
+        eval { $manager->_run_streaming_command( command => [ $^X, '-e', 'exit 0' ], cwd => $other ) };
         like( $@, qr/Unable to chdir back to \Q$orig_cwd\E after command launch/, 'a failed chdir back is reported' );
     }
     chdir $home or die $!;
@@ -278,26 +304,38 @@ my $manager = $SM->new( paths => $paths );
     {
         no warnings 'redefine';
         local *Developer::Dashboard::SkillManager::_drain_ready_handle = sub { die "boom\n" };
-        eval { $manager->_run_streaming_command( command => [ 'sh', '-c', 'echo hi; sleep 1' ], timeout_ms => 5000 ) };
+        # Windows cannot select on pipes, so its timed read loop drains
+        # through _drain_child_streams_windows and never reaches the
+        # handle drain above; raise the same error from that step there.
+        local *Developer::Dashboard::SkillManager::_drain_child_streams_windows = sub { die "boom\n" };
+        my $sleep_cmd = $^O eq 'MSWin32' ? [ 'cmd', '/d', '/c', 'echo hi' ] : [ 'sh', '-c', 'echo hi; sleep 1' ];
+        eval { $manager->_run_streaming_command( command => $sleep_cmd, timeout_ms => 5000 ) };
         is( $@, "boom\n", 'a non-timeout error inside the timed read loop is rethrown' );
     }
 
     # A TERM-slow child forces the bounded wait loop to sleep and retry.
-    pipe( my $r, my $w ) or die $!;
-    my $pid = fork();
-    die "fork failed: $!" if !defined $pid;
-    if ( !$pid ) {
-        close $r;
+    my $ready = File::Spec->catfile( tempdir( CLEANUP => 1 ), 'term-handler-ready' );
+    my $script = q{
+        my ($ready_file) = @ARGV;
         $SIG{TERM} = sub { select( undef, undef, undef, 0.15 ); exit 0 };
-        syswrite( $w, 'x' );
-        close $w;
+        open my $ready_fh, '>', $ready_file or die "Unable to write readiness file: $!";
+        print {$ready_fh} "ready\n" or die "Unable to write readiness marker: $!";
+        close $ready_fh or die "Unable to close readiness file: $!";
         sleep 10;
         exit 0;
+    };
+    my $pid = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', $script, $ready ], {} );
+    for ( 1 .. 100 ) {
+        last if -f $ready;
+        select( undef, undef, undef, 0.01 );
     }
-    close $w;
-    sysread( $r, my $buf, 1 );
+    die "Timed out waiting for the fixture signal handler readiness file $ready" if !-f $ready;
     ok( $manager->_terminate_streaming_command($pid), 'a slow-to-terminate child is waited for' );
-    is( waitpid( $pid, 1 ), -1, 'the slow child was reaped' );
+    # process_exited is the liveness answer that holds on every platform:
+    # on Windows process_running stays true for a GoRoutine child until
+    # wait_process collects its kept handle, by documented contract, and
+    # the terminate helper reaps with waitpid (t/102 asserts the same way).
+    ok( Developer::Dashboard::GoRoutine::process_exited($pid), 'the slow GoRoutine child was terminated and reaped' );
 }
 
 # Host detection helpers.
@@ -327,6 +365,15 @@ my $manager = $SM->new( paths => $paths );
     my $m = $SM->new( paths => $paths, skip_tests => 1 );
     no warnings 'redefine';
     local *Developer::Dashboard::SkillManager::command_in_path = sub { return undef };
+    # The bare name "make" is then resolved by the operating system. The
+    # Windows box has no make program, so give it a make.bat twin on PATH
+    # that succeeds, as the real make does for this Makefile on Unix.
+    local $ENV{PATH} = $ENV{PATH};
+    if ( $^O eq 'MSWin32' ) {
+        my $make_dir = tempdir( CLEANUP => 1 );
+        spew( File::Spec->catfile( $make_dir, 'make.bat' ), "\@echo off\nexit /b 0\n" );
+        $ENV{PATH} = join $Config::Config{path_sep}, $make_dir, $ENV{PATH};
+    }
     my $res = $m->_install_skill_makefile($d);
     ok( $res->{success}, 'make falls back to the bare command name' );
 
@@ -379,7 +426,7 @@ Use this file when you change file handling, host detection or the streaming com
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/500-skillmanager-no-annotations-coverage.t> while iterating, then keep it green under C<prove -lr t> and the Devel::Cover run before release.
+Run C<d2 docker compose exec dev prove -blv t/500-skillmanager-no-annotations-coverage.t> while iterating, then keep it green under the Docker full suite and Devel::Cover run before release.
 
 =head1 WHAT USES IT
 
@@ -389,13 +436,13 @@ It is used by developers during TDD, by the full C<prove -lr t> suite, by the De
 
 Example 1:
 
-  prove -lv t/500-skillmanager-no-annotations-coverage.t
+  d2 docker compose exec dev prove -blv t/500-skillmanager-no-annotations-coverage.t
 
 Run this coverage-gap test by itself while editing SkillManager.
 
 Example 2:
 
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/500-skillmanager-no-annotations-coverage.t
+  d2 docker compose exec dev env HARNESS_PERL_SWITCHES=-MDevel::Cover prove -blv t/500-skillmanager-no-annotations-coverage.t
 
 Confirm the formerly annotated branches are reported as covered.
 

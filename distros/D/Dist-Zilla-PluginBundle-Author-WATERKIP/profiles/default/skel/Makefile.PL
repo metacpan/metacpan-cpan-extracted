@@ -16,8 +16,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => {{ '"' . $dist->name =~ s/-/::/gr . '"' }},
   "PREREQ_PM" => {
-    "Moose" => 0,
-    "namespace::autoclean" => 0
+    "Object::Pad" => 0,
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -40,11 +39,10 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Import::Into" => "1.002003",
-  "Moose" => 0,
+  "Object::Pad" => 0,
   "Sub::Override" => 0,
   "Test::More" => "0.96",
   "Test::Most" => 0,
-  "namespace::autoclean" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

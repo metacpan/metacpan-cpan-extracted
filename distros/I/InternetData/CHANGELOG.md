@@ -2,6 +2,16 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.20.0 - 2026-11-25
+
+### Features
+
+- Send the user agent of the request you are deciding on with a lookup ([`17d3b50`](https://github.com/internetdata/sdk-perl/commit/17d3b506a612647c01ada13f6cfbf27f01d80041))
+
+### Fixes
+
+- Re-pin the spec to 2026.11.25: the Data plan, a key per quota ([`4cf849f`](https://github.com/internetdata/sdk-perl/commit/4cf849f52832054b905db7e176684ed8d4f4c983))
+
 ## 1.19.0 - 2026-11-24
 
 ### Features

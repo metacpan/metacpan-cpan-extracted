@@ -6,9 +6,25 @@ use utf8;
 
 use Test::More;
 use Capture::Tiny qw(capture);
+use File::Spec;
+use File::Temp qw(tempdir);
 
 use lib 'lib';
 use Developer::Dashboard::JSON qw(json_decode json_decode_state json_encode json_encode_with_options);
+
+# Multi-line -e scripts do not survive Win32 command-line construction (the
+# nested quotes are mangled and the child sees an empty program), so probes
+# run from temp .pl files instead - the same approach as t/654.
+my $probe_dir = tempdir( CLEANUP => 1 );
+
+sub _write_probe_file {
+    my ( $name, $code ) = @_;
+    my $file = File::Spec->catfile( $probe_dir, $name );
+    open my $fh, '>', $file or die "Unable to write $file: $!";
+    print {$fh} $code or die "Unable to write $file: $!";
+    close $fh or die "Unable to close $file: $!";
+    return $file;
+}
 
 my $encoder_probe = <<'PERL_PROBE';
 use strict;
@@ -32,7 +48,7 @@ print "$created\n";
 PERL_PROBE
 
 my ( $encoder_out, $encoder_err, $encoder_exit ) = capture {
-    system $^X, '-Ilib', '-e', $encoder_probe;
+    system $^X, '-Ilib', _write_probe_file( 'encoder-probe.pl', $encoder_probe );
     return $? >> 8;
 };
 is( $encoder_exit, 0, 'the JSON encoder probe completes without state leakage' );
@@ -64,7 +80,7 @@ print "$created\n";
 PERL_PROBE
 
 my ( $decoder_out, $decoder_err, $decoder_exit ) = capture {
-    system $^X, '-Ilib', '-e', $decoder_probe;
+    system $^X, '-Ilib', _write_probe_file( 'decoder-probe.pl', $decoder_probe );
     return $? >> 8;
 };
 is( $decoder_exit, 0, 'the JSON decoder probe recovers after malformed state input' );

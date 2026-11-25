@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use File::Spec;
-use POSIX ();
+use File::Temp qw(tempdir);
 use Test::More;
 use Time::HiRes qw(time);
 
@@ -10,6 +10,7 @@ use lib 'lib';
 
 use Developer::Dashboard::RuntimeManager;
 use Developer::Dashboard::CollectorRunner;
+use Developer::Dashboard::GoRoutine ();
 
 {
     my $helper = File::Spec->catfile( File::Spec->tmpdir, sprintf 'developer-dashboard-t47-%d-%d.helper', $$, int( time() * 1_000_000 ) );
@@ -68,48 +69,44 @@ use Developer::Dashboard::CollectorRunner;
 }
 
 {
-    my $runner = bless {}, 'Developer::Dashboard::CollectorRunner';
-    my ( $keep_reader, $keep_writer );
-    pipe $keep_reader, $keep_writer or die "Unable to create keep pipe: $!";
-    my ( $drop_reader, $drop_writer );
-    pipe $drop_reader, $drop_writer or die "Unable to create drop pipe: $!";
-    my ( $result_reader, $result_writer );
-    pipe $result_reader, $result_writer or die "Unable to create result pipe: $!";
-
-    my $pid = fork();
-    die "fork failed: $!" if !defined $pid;
-    if ( !$pid ) {
+    my $scratch = tempdir( 'dd-fd-close-XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+    my $result_file = File::Spec->catfile( $scratch, 'result' );
+    my $error_file = File::Spec->catfile( $scratch, 'stderr' );
+    my $child_script = q{
+        use strict;
+        use warnings;
+        use POSIX ();
+        $| = 1;
+        pipe my $keep_reader, my $keep_writer or die "Unable to create keep pipe: $!";
+        pipe my $drop_reader, my $drop_writer or die "Unable to create drop pipe: $!";
         local $SIG{PIPE} = 'IGNORE';
         local $SIG{__WARN__} = sub {
             my ($warning) = @_;
             return if defined $warning && $warning =~ /Bad file descriptor/;
             warn $warning;
         };
+        my $runner = bless {}, 'Developer::Dashboard::CollectorRunner';
         $runner->_close_inherited_fds(
-            keep => [
-                undef,
-                'not-a-fd',
-                fileno($result_writer),
-                fileno($keep_reader),
-                fileno($keep_writer),
-            ],
+            keep => [ undef, 'not-a-fd', fileno($keep_reader), fileno($keep_writer) ],
         );
         my $keep_ok = defined syswrite( $keep_writer, "kept\n" ) ? 1 : 0;
         my $drop_ok = defined syswrite( $drop_writer, "dropped\n" ) ? 1 : 0;
-        print {$result_writer} "$keep_ok:$drop_ok\n";
-        close $result_writer;
-        undef $drop_writer;
-        undef $drop_reader;
-        undef $keep_writer;
-        undef $keep_reader;
-        undef $result_reader;
+        print "$keep_ok:$drop_ok\n" or die "Unable to write result: $!";
         POSIX::_exit(0);
-    }
-
-    close $result_writer;
-    my $payload = <$result_reader>;
-    close $result_reader;
-    waitpid( $pid, 0 );
+    };
+    my $pid = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-MDeveloper::Dashboard::CollectorRunner', '-e', $child_script ],
+        { stdout => $result_file, stderr => $error_file },
+    );
+    my $exit = Developer::Dashboard::GoRoutine::wait_process($pid);
+    open my $error_fh, '<', $error_file or die "Unable to read $error_file: $!";
+    my $error = do { local $/; <$error_fh> } // '';
+    close $error_fh or die "Unable to close $error_file: $!";
+    is( $error, '', 'GoRoutine descriptor fixture emits no warnings or errors' );
+    is( $exit, 0, 'GoRoutine child exits successfully after the descriptor contract check' );
+    open my $result_fh, '<', $result_file or die "Unable to read $result_file: $!";
+    my $payload = <$result_fh>;
+    close $result_fh or die "Unable to close $result_file: $!";
     chomp $payload if defined $payload;
     is(
         $payload,
@@ -169,21 +166,21 @@ add unnecessary setup noise.
 Run it directly while iterating on collector zombie handling or runtime helper
 resolution:
 
-  prove -lv t/23-zombie-coverage-closure.t
+  d2 docker compose exec -T dev prove -lv t/23-zombie-coverage-closure.t
 
 Run it under coverage when closing the final library coverage gap:
 
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/23-zombie-coverage-closure.t
+  d2 docker compose exec -T -e HARNESS_PERL_SWITCHES=-MDevel::Cover dev prove -lv t/23-zombie-coverage-closure.t
 
 =head1 EXAMPLES
 
 Direct focused rerun:
 
-  prove -lv t/23-zombie-coverage-closure.t
+  d2 docker compose exec -T dev prove -lv t/23-zombie-coverage-closure.t
 
 Covered focused rerun:
 
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/23-zombie-coverage-closure.t
+  d2 docker compose exec -T -e HARNESS_PERL_SWITCHES=-MDevel::Cover dev prove -lv t/23-zombie-coverage-closure.t
 
 =head1 WHAT USES IT
 

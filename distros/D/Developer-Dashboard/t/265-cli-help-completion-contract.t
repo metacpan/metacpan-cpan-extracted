@@ -52,12 +52,12 @@ my @top_level = Developer::Dashboard::CLI::Complete::complete(
 );
 ok( ( grep { $_ eq 'help' } @top_level ), 'top-level TAB completion includes the global help entrypoint' );
 my @root_help_flags = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', '-' ],
+    words => [ 'd2', '-' ],
     index => 1,
 );
 is_deeply( \@root_help_flags, [qw(-h --help)], 'root TAB completion offers both explicit help flags' );
 my @action_help = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', 'api', 'h' ],
+    words => [ 'd2', 'api', 'h' ],
     index => 2,
 );
 ok( ( grep { $_ eq 'help' } @action_help ), 'action TAB completion offers the trailing help form' );
@@ -75,12 +75,12 @@ my @log_options = Developer::Dashboard::CLI::Help::options_for('log');
 ok( ( grep { $_ eq '--tail' } @log_options ), 'log help and completion catalog expose --tail' );
 
 for my $command (@public_commands) {
-    like( $global_overview, qr/^\s*dashboard\s+\Q$command\E\b/m, "$command appears in the global help overview" );
+    like( $global_overview, qr/^\s*d2\s+\Q$command\E\b/m, "$command appears in the global help overview" );
 }
 
 for my $command (@public_commands) {
     my $text = Developer::Dashboard::CLI::Help::help_text($command);
-    like( $text, qr/^Usage:\s+dashboard\s+\Q$command\E\b/m, "$command has a command-specific usage synopsis" );
+    like( $text, qr/^Usage:\s+d2\s+\Q$command\E\b/m, "$command has a command-specific usage synopsis" );
     like( $text, qr/\S/, "$command help is not empty" );
     for my $option ( grep { $_ ne '-h' && $_ ne '--help' } Developer::Dashboard::CLI::Help::options_for($command) ) {
         like( $text, qr/\Q$option\E/, "$command help documents accepted option '$option'" );
@@ -99,7 +99,7 @@ for my $command ( sort keys %expected_actions ) {
     is_deeply( \@actions, $expected_actions{$command}, "$command action inventory matches dispatch" );
     for my $action (@actions) {
         my $text = Developer::Dashboard::CLI::Help::help_text( $command, $action );
-        like( $text, qr/^Usage:\s+dashboard\s+\Q$command $action\E(?:\s|$)/m, "$command $action has its own usage synopsis" );
+        like( $text, qr/^Usage:\s+d2\s+\Q$command $action\E(?:\s|$)/m, "$command $action has its own usage synopsis" );
         for my $option ( grep { $_ ne '-h' && $_ ne '--help' } Developer::Dashboard::CLI::Help::options_for($command, $action) ) {
             like( $text, qr/\Q$option\E/, "$command $action help documents accepted option '$option'" );
         }
@@ -124,7 +124,7 @@ for my $command ( sort keys %expected_actions ) {
 for my $command ( sort keys %expected_actions ) {
     my @words = split /\s+/, $command;
     my $index = @words + 1;
-    my @complete_words = ( 'dashboard', @words );
+    my @complete_words = ( 'd2', @words );
     my @candidates = Developer::Dashboard::CLI::Complete::complete(
         words => \@complete_words,
         index => $index,
@@ -161,7 +161,7 @@ is_deeply( [ Developer::Dashboard::CLI::Help::actions_for('not-a-command') ], []
 is_deeply( [ Developer::Dashboard::CLI::Help::options_for('') ], [], 'missing option command returns no option candidates' );
 is_deeply( [ Developer::Dashboard::CLI::Help::options_for(undef) ], [], 'undefined option command returns no option candidates' );
 is_deeply( [ Developer::Dashboard::CLI::Help::options_for('api', '') ], [ Developer::Dashboard::CLI::Help::options_for('api') ], 'empty option action keeps the root options' );
-like( Developer::Dashboard::CLI::Help::help_text('api', ''), qr/^Usage: dashboard api/m, 'empty help action resolves to root help' );
+like( Developer::Dashboard::CLI::Help::help_text('api', ''), qr/^Usage: d2 api/m, 'empty help action resolves to root help' );
 is_deeply( [ Developer::Dashboard::CLI::Help::help_request(command => 'api') ], [], 'help request without argv is a no-op' );
 is_deeply( [ Developer::Dashboard::CLI::Help::help_request(command => 'api', args => []) ], [], 'empty argv is a no-op' );
 is_deeply( [ Developer::Dashboard::CLI::Help::help_request(command => undef, args => ['--help']) ], [], 'missing command is a no-op' );
@@ -173,12 +173,12 @@ is_deeply(
 is_deeply(
     [ Developer::Dashboard::CLI::Help::help_request(command => 'of', args => ['grep', '--help']) ],
     [],
-    'delegated grep --help remains owned by grep rather than the dashboard help catalog',
+    'delegated grep --help remains owned by grep rather than the d2 help catalog',
 );
 is_deeply(
     [ Developer::Dashboard::CLI::Help::help_request(command => 'of', args => ['other', '--help']) ],
     [ 'of', 'other' ],
-    'non-delegated open-file actions still resolve through dashboard help',
+    'non-delegated open-file actions still resolve through d2 help',
 );
 is_deeply(
     [ Developer::Dashboard::CLI::Help::help_request(command => 'not-a-command', args => ['action', '--help']) ],
@@ -258,7 +258,7 @@ for my $invalid (
 }
 
 my @global_help_commands = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', 'help', '' ],
+    words => [ 'd2', 'help', '' ],
     index => 2,
 );
 for my $command ( Developer::Dashboard::CLI::Help::command_names() ) {
@@ -268,41 +268,41 @@ for my $alias ( keys %{ Developer::Dashboard::CLI::Help::aliases() } ) {
     ok( ( grep { $_ eq $alias } @global_help_commands ), "global help TAB includes compatibility alias '$alias'" );
 }
 my @global_docker_actions = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', 'help', 'docker', '' ],
+    words => [ 'd2', 'help', 'docker', '' ],
     index => 3,
 );
 is_deeply( \@global_docker_actions, $expected_actions{docker}, 'global help TAB includes Docker actions' );
 my @nested_docker_actions = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', 'help', 'docker', 'development', '' ],
+    words => [ 'd2', 'help', 'docker', 'development', '' ],
     index => 4,
 );
 is_deeply( \@nested_docker_actions, $expected_actions{'docker development'}, 'global help TAB includes nested development actions' );
 my @terminal_help_actions = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', 'help', 'api', 'add', '' ],
+    words => [ 'd2', 'help', 'api', 'add', '' ],
     index => 4,
 );
 is_deeply( \@terminal_help_actions, [], 'global help TAB has no sibling actions after a terminal action' );
 my @terminal_nested_help_actions = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', 'help', 'docker', 'development', 'enable', '' ],
+    words => [ 'd2', 'help', 'docker', 'development', 'enable', '' ],
     index => 5,
 );
 is_deeply( \@terminal_nested_help_actions, [], 'global help TAB has no parent actions after a nested terminal action' );
 
 my @api_actions = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', 'api' ],
+    words => [ 'd2', 'api' ],
     index => 2,
 );
 is_deeply( [ grep { $_ ne '-h' && $_ ne '--help' && $_ ne 'help' } @api_actions ], $expected_actions{api}, 'API actions are tab-completable' );
 
 my @file_actions = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', 'file' ],
+    words => [ 'd2', 'file' ],
     index => 2,
 );
 is_deeply( [ grep { $_ ne '-h' && $_ ne '--help' && $_ ne 'help' } @file_actions ], $expected_actions{file}, 'file actions are tab-completable' );
 
 my $workspace_completion_provider_calls = 0;
 my @workspace_option_candidates = Developer::Dashboard::CLI::Complete::complete(
-    words          => [ 'dashboard', 'workspace', '-' ],
+    words          => [ 'd2', 'workspace', '-' ],
     index          => 2,
     ticket_sessions => sub { $workspace_completion_provider_calls++; return ('unused-session') },
 );
@@ -310,7 +310,7 @@ ok( ( grep { $_ eq '-c' } @workspace_option_candidates ), 'workspace TAB complet
 is( $workspace_completion_provider_calls, 0, 'workspace option completion does not query tmux sessions' );
 
 my @api_default_options = Developer::Dashboard::CLI::Complete::complete(
-    words => [ 'dashboard', 'api', '-' ],
+    words => [ 'd2', 'api', '-' ],
     index => 2,
 );
 ok( ( grep { $_ eq '--key' } @api_default_options ), 'API TAB completion offers the default ls --key option without an explicit action' );
@@ -323,44 +323,44 @@ like( $api_root_help, qr/--output.*-o|-o.*--output/, 'API root help documents th
 for my $spec ( [ api => '--' ], [ file => '--' ], [ path => '--' ] ) {
     my ( $command, $prefix ) = @{$spec};
     my @matches = Developer::Dashboard::CLI::Complete::complete(
-        words => [ 'dashboard', $command, $prefix ],
+        words => [ 'd2', $command, $prefix ],
         index => 2,
     );
     ok( ( grep { $_ eq '--help' } @matches ), "$command TAB completion offers --help" );
 }
 
 for my $spec (
-    [ [ 'dashboard', 'ask', '-' ], 2, [qw(--claude --codex --copilot --gemini --nova --model -m --file -f --new --reset --no-memory --docs)] ],
-    [ [ 'dashboard', 'api', 'ls', '-' ], 3, [qw(--output -o --key)] ],
-    [ [ 'dashboard', 'ps1', '-' ], 2, [qw(--jobs --cwd --mode --color --no-color --max-age --width --no-indicators --no-no-indicators)] ],
-    [ [ 'dashboard', 'api', 'add', '-' ], 3, [qw(--key --secret --maybe-secret --route --output)] ],
-    [ [ 'dashboard', 'api', 'rm', '-' ], 3, [qw(--key --route --output)] ],
-    [ [ 'dashboard', 'docker', 'list', '-' ], 3, [qw(--enabled --disabled)] ],
-    [ [ 'dashboard', 'file', 'add', '-' ], 3, [qw(--create --output)] ],
-    [ [ 'dashboard', 'file', 'locate', '-' ], 3, [qw(--output)] ],
-    [ [ 'dashboard', 'file', 'del', '-' ], 3, [qw(--output)] ],
-    [ [ 'dashboard', 'file', 'list', '-' ], 3, [qw(--output)] ],
-    [ [ 'dashboard', 'files', '-' ], 2, [qw(--output)] ],
-    [ [ 'dashboard', 'housekeeper', '-' ], 2, [qw(--dry-run --no-dry-run)] ],
-    [ [ 'dashboard', 'path', 'add', '-' ], 3, [qw(--create --output)] ],
-    [ [ 'dashboard', 'path', 'locate', '-' ], 3, [qw(--output)] ],
-    [ [ 'dashboard', 'path', 'del', '-' ], 3, [qw(--output)] ],
-    [ [ 'dashboard', 'path', 'rm', '-' ], 3, [qw(--output)] ],
-    [ [ 'dashboard', 'path', 'list', '-' ], 3, [qw(--output)] ],
-    [ [ 'dashboard', 'paths', '-' ], 2, [qw(--output)] ],
-    [ [ 'dashboard', 'docker', 'compose', '-' ], 3, [qw(--addon --mode --service --project --dry-run)] ],
-    [ [ 'dashboard', 'doctor', '-' ], 2, [qw(--fix --no-fix)] ],
-    [ [ 'dashboard', 'skills', 'install', '-' ], 3, [qw(--ddfile --notest --branch --output)] ],
-    [ [ 'dashboard', 'skills', 'list', '-' ], 3, [qw(--output)] ],
-    [ [ 'dashboard', 'source', '-' ], 2, [qw(--files)] ],
-    [ [ 'dashboard', 'upgrade', '-' ], 2, [qw(--dry-run)] ],
-    [ [ 'dashboard', 'which', '-' ], 2, [qw(--edit --no-edit)] ],
-    [ [ 'dashboard', 'workspace', '-' ], 2, [qw(-c -C -d --docker)] ],
-    [ [ 'dashboard', 'of', '-' ], 2, [qw(--print --no-print --line --editor --online --no-online)] ],
-    [ [ 'dashboard', 'log', 'web', '-' ], 3, [qw(-f -n)] ],
-    [ [ 'dashboard', 'serve', 'workers', '-' ], 3, [qw(--host --port)] ],
-    [ [ 'dashboard', 'serve', '-' ], 2, [qw(--host --port --workers --ssl --no-ssl --editor --no-editor --endit --no-endit --indicator --no-indicator --indicators --no-indicators --foreground --no-foreground)] ],
-    [ [ 'dashboard', 'restart', 'web', '-' ], 3, [qw(--output --host --port --workers --ssl --no-ssl)] ],
+    [ [ 'd2', 'ask', '-' ], 2, [qw(--claude --codex --copilot --gemini --nova --model -m --file -f --new --reset --no-memory --docs)] ],
+    [ [ 'd2', 'api', 'ls', '-' ], 3, [qw(--output -o --key)] ],
+    [ [ 'd2', 'ps1', '-' ], 2, [qw(--jobs --cwd --mode --color --no-color --max-age --width --no-indicators --no-no-indicators)] ],
+    [ [ 'd2', 'api', 'add', '-' ], 3, [qw(--key --secret --maybe-secret --route --output)] ],
+    [ [ 'd2', 'api', 'rm', '-' ], 3, [qw(--key --route --output)] ],
+    [ [ 'd2', 'docker', 'list', '-' ], 3, [qw(--enabled --disabled)] ],
+    [ [ 'd2', 'file', 'add', '-' ], 3, [qw(--create --output)] ],
+    [ [ 'd2', 'file', 'locate', '-' ], 3, [qw(--output)] ],
+    [ [ 'd2', 'file', 'del', '-' ], 3, [qw(--output)] ],
+    [ [ 'd2', 'file', 'list', '-' ], 3, [qw(--output)] ],
+    [ [ 'd2', 'files', '-' ], 2, [qw(--output)] ],
+    [ [ 'd2', 'housekeeper', '-' ], 2, [qw(--dry-run --no-dry-run)] ],
+    [ [ 'd2', 'path', 'add', '-' ], 3, [qw(--create --output)] ],
+    [ [ 'd2', 'path', 'locate', '-' ], 3, [qw(--output)] ],
+    [ [ 'd2', 'path', 'del', '-' ], 3, [qw(--output)] ],
+    [ [ 'd2', 'path', 'rm', '-' ], 3, [qw(--output)] ],
+    [ [ 'd2', 'path', 'list', '-' ], 3, [qw(--output)] ],
+    [ [ 'd2', 'paths', '-' ], 2, [qw(--output)] ],
+    [ [ 'd2', 'docker', 'compose', '-' ], 3, [qw(--addon --mode --service --project --dry-run)] ],
+    [ [ 'd2', 'doctor', '-' ], 2, [qw(--fix --no-fix)] ],
+    [ [ 'd2', 'skills', 'install', '-' ], 3, [qw(--ddfile --notest --branch --output)] ],
+    [ [ 'd2', 'skills', 'list', '-' ], 3, [qw(--output)] ],
+    [ [ 'd2', 'source', '-' ], 2, [qw(--files)] ],
+    [ [ 'd2', 'upgrade', '-' ], 2, [qw(--dry-run)] ],
+    [ [ 'd2', 'which', '-' ], 2, [qw(--edit --no-edit)] ],
+    [ [ 'd2', 'workspace', '-' ], 2, [qw(-c -C -d --docker)] ],
+    [ [ 'd2', 'of', '-' ], 2, [qw(--print --no-print --line --editor --online --no-online)] ],
+    [ [ 'd2', 'log', 'web', '-' ], 3, [qw(-f -n)] ],
+    [ [ 'd2', 'serve', 'workers', '-' ], 3, [qw(--host --port)] ],
+    [ [ 'd2', 'serve', '-' ], 2, [qw(--host --port --workers --ssl --no-ssl --editor --no-editor --endit --no-endit --indicator --no-indicator --indicators --no-indicators --foreground --no-foreground)] ],
+    [ [ 'd2', 'restart', 'web', '-' ], 3, [qw(--output --host --port --workers --ssl --no-ssl)] ],
 ) {
     my ( $words, $index, $expected ) = @{$spec};
     my @candidates = Developer::Dashboard::CLI::Complete::complete(
@@ -373,9 +373,9 @@ for my $spec (
 }
 
 for my $spec (
-    [ [ 'dashboard', 'docker', 'compose', '--' ], 3, 'dashboard docker compose --help' ],
-    [ [ 'dashboard', 'skills', 'install', '--' ], 3, 'dashboard skills install --help' ],
-    [ [ 'dashboard', 'path', 'add', '--' ], 3, 'dashboard path add --help' ],
+    [ [ 'd2', 'docker', 'compose', '--' ], 3, 'd2 docker compose --help' ],
+    [ [ 'd2', 'skills', 'install', '--' ], 3, 'd2 skills install --help' ],
+    [ [ 'd2', 'path', 'add', '--' ], 3, 'd2 path add --help' ],
 ) {
     my ( $words, $index, $help_command ) = @{$spec};
     my @help = Developer::Dashboard::CLI::Help::help_request(

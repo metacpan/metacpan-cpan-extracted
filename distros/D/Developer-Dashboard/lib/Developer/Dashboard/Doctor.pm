@@ -3,7 +3,7 @@ package Developer::Dashboard::Doctor;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use File::Find ();
 use File::Spec;
@@ -14,9 +14,10 @@ use Developer::Dashboard::Config ();
 use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::JSON qw(json_decode);
 use Developer::Dashboard::PathsRegistryArg qw(require_paths_arg);
+use Developer::Dashboard::Platform qw(effective_mode_octal);
 
 # new(%args)
-# Constructs the dashboard doctor runtime service.
+# Constructs the d2 doctor runtime service.
 # Input: paths object.
 # Output: Developer::Dashboard::Doctor object.
 sub new {
@@ -122,12 +123,21 @@ sub _audit_root {
         {
             no_chdir => 1,
             wanted   => sub {
-                my $entry = $File::Find::name;
+                # File::Find spells names with forward slashes on Windows
+                # even when the starting path uses backslashes, while
+                # File::Spec spells the same directory with backslashes, so
+                # the raw name never equals a catdir-built path and no
+                # consumer could match an issue back to its path. Canonicalise
+                # at this boundary (a no-op on Unix) so issue paths, the fix
+                # path and the audit all speak one spelling.
+                my $entry = File::Spec->canonpath( $File::Find::name );
                 my $issue = $self->_permission_issue_for_path($entry);
                 return if !$issue;
                 if ($fix) {
-                    chmod oct( $issue->{expected_mode} ), $entry
-                      or die sprintf 'Unable to chmod %s to %s: %s', $entry, $issue->{expected_mode}, $!;
+                    $self->{paths}->secure_path_permissions(
+                        $entry,
+                        executable => $issue->{expected_mode} eq '0700' ? 1 : 0,
+                    );
                     $issue->{fixed} = 1;
                     $issue->{current_mode} = $issue->{expected_mode};
                 }
@@ -153,6 +163,11 @@ sub _audit_root {
 sub _permission_issue_for_path {
     my ( $self, $path ) = @_;
     return if !defined $path || $path eq '';
+
+    # Windows is no longer exempt from the mode audit: the product sets real
+    # owner-only ACLs there now, and _mode_octal reads the DACL back, so a
+    # mode mismatch both passes and fails for a real reason and --fix can
+    # actually repair it.
     my $mode = _mode_octal($path);
     return if !defined $mode;
 
@@ -387,7 +402,7 @@ sub _is_dashboard_bashrc_line {
     return 1 if $line =~ /\Aexport PERLBREW_HOME=.*perlbrew.*\z/;
     return 1 if $line =~ /\Aexport PATH=.*perlbrew\/perls\/.*:\$PATH"?\z/;
     return 1 if $line =~ /\Aeval "\$\(".*-Mlocal::lib\)"\z/;
-    return 1 if $line =~ /\Aeval "\$\(".*dashboard" shell bash\)"\z/;
+    return 1 if $line =~ /\Aeval "\$\(".*d2" shell bash\)"\z/;
     return 0;
 }
 
@@ -447,14 +462,16 @@ sub _config {
 }
 
 # _mode_octal($path)
-# Returns the permission bits for one file-system entry in four-digit octal form.
+# Returns the permission bits for one file-system entry in four-digit octal
+# form, in the terms the owner-only policy understands on this platform:
+# the stat mode on Unix, and the DACL-derived mode on Windows (where stat
+# mode bits do not reflect ACLs). See
+# Developer::Dashboard::Platform::effective_mode_octal.
 # Input: file or directory path string.
 # Output: four-digit octal mode string or undef when stat fails.
 sub _mode_octal {
     my ($path) = @_;
-    my @stat = stat($path);
-    return undef if !@stat;
-    return sprintf '%04o', $stat[2] & 07777;
+    return effective_mode_octal($path);
 }
 
 # _ssl_certificate_issues(%args)
@@ -596,7 +613,7 @@ It exists because runtime security should be inspectable and fixable from inside
 
 =head1 WHEN TO USE
 
-Use this file when changing the runtime permission policy, the report format for C<dashboard doctor>, or the set of files and directories that should be audited and repaired.
+Use this file when changing the runtime permission policy, the report format for C<d2 doctor>, or the set of files and directories that should be audited and repaired.
 
 =head1 HOW TO USE
 
@@ -604,7 +621,7 @@ Construct it with the active path registry, call C<run(fix =E<gt> 0)> to audit o
 
 =head1 WHAT USES IT
 
-It is used by the C<dashboard doctor> helper, by security and integration tests, and by contributors verifying that init/update paths do not leave insecure runtime permissions behind.
+It is used by the C<d2 doctor> helper, by security and integration tests, and by contributors verifying that init/update paths do not leave insecure runtime permissions behind.
 
 =head1 EXAMPLES
 

@@ -16,6 +16,7 @@ use Developer::Dashboard::Platform qw(
   normalize_shell_name
   shell_command_argv
   command_in_path
+  command_in_path_direct
   resolve_runnable_file
   command_argv_for_path
   shell_quote_for
@@ -61,6 +62,11 @@ sub only_commands {
 
 my $win = 'MSWin32';
 
+# On Windows the SHELL env is never consulted: the native shell is powershell
+# (or pwsh when present). Compute the expectation the same way the product
+# does so the fallback assertions stay meaningful on both platforms.
+my $native_shell = $^O eq 'MSWin32' ? ( command_in_path('pwsh') ? 'pwsh' : 'powershell' ) : 'bash';
+
 # ---------------------------------------------------------------------------
 # native_shell_name / normalize_shell_name : line 44 + 65 + 66 + 67 + 71
 # ---------------------------------------------------------------------------
@@ -68,12 +74,12 @@ my $win = 'MSWin32';
 # line 44 condition: requested defined+non-empty (row3), requested='' (row2),
 # requested undef (row1 via no-arg call).
 is( native_shell_name('bash'), 'bash', 'native_shell_name honours an explicit selector' );
-is( native_shell_name(''),     'bash', 'native_shell_name empty-string falls back to the SHELL env' );
-is( native_shell_name(),       'bash', 'native_shell_name() with no selector falls back' );
+is( native_shell_name(''),     $native_shell, 'native_shell_name empty-string falls back to the native shell' );
+is( native_shell_name(),       $native_shell, 'native_shell_name() with no selector falls back to the native shell' );
 
 # line 65 branch true + condition rows: normalize called with undef and ''.
-is( normalize_shell_name(),   'bash', 'normalize_shell_name() defaults to native shell' );
-is( normalize_shell_name(''), 'bash', 'normalize_shell_name empty-string defaults to native shell' );
+is( normalize_shell_name(),   $native_shell, 'normalize_shell_name() defaults to native shell' );
+is( normalize_shell_name(''), $native_shell, 'normalize_shell_name empty-string defaults to native shell' );
 
 # line 65 branch false + line 71 operand chain (bash/zsh/sh/powershell/pwsh).
 is( normalize_shell_name('bash'),       'bash',       'normalize keeps bash' );
@@ -108,9 +114,12 @@ is_deeply(
     [ 'bash', '-c', 'echo hi' ],
     'explicit bash selector builds -c argv',
 );
+my @default_shell_argv = $native_shell eq 'bash'
+  ? ( 'bash', '-c', 'echo hi' )
+  : ( $native_shell, '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', 'echo hi' );
 is_deeply(
     [ shell_command_argv('echo hi') ],
-    [ 'bash', '-c', 'echo hi' ],
+    \@default_shell_argv,
     'default selector resolves through native shell',
 );
 
@@ -215,6 +224,46 @@ ok( !defined command_in_path(''),    'command_in_path empty-string returns undef
 }
 
 # ---------------------------------------------------------------------------
+# command_in_path_direct : only a file the native spawn can execute
+# directly counts. On Windows an extensionless POSIX script is never
+# returned, even though it is a file on PATH, because neither
+# CreateProcess nor cmd can execute it (t/05 tests 694/696 - the fake
+# vim). The .bat twin next to it IS returned.
+# ---------------------------------------------------------------------------
+ok( !defined command_in_path_direct(undef), 'command_in_path_direct(undef) returns undef' );
+ok( !defined command_in_path_direct(''),    'command_in_path_direct empty-string returns undef' );
+ok( !defined command_in_path_direct('definitely-absent-xyz'),
+    'command_in_path_direct returns undef for an absent command' );
+ok( !defined command_in_path_direct( File::Spec->catfile( $bin, 'python' ) ),
+    'command_in_path_direct never resolves a separator-bearing path, it is a bare-name lookup only' );
+{
+    local $ENV{PATH} = $bin;
+    my $sh_fake = File::Spec->catfile( $bin, 'vim' );
+    write_file( $sh_fake, "#!/bin/sh\necho vim\n" );
+    chmod 0755, $sh_fake;
+    my $bat_twin = File::Spec->catfile( $bin, 'vim.bat' );
+    write_file( $bat_twin, "echo vim\n" );
+    if ( $^O eq 'MSWin32' ) {
+        is( command_in_path_direct('vim'), $bat_twin,
+            'command_in_path_direct skips the extensionless script and returns the .bat twin on Windows' );
+    }
+    else {
+        is( command_in_path_direct('vim'), $sh_fake,
+            'command_in_path_direct returns the executable script itself on Unix' );
+    }
+    unlink $bat_twin;
+    if ( $^O eq 'MSWin32' ) {
+        ok( !defined command_in_path_direct('vim'),
+            'command_in_path_direct returns undef on Windows when only the extensionless script is on PATH' );
+    }
+    else {
+        is( command_in_path_direct('vim'), $sh_fake,
+            'command_in_path_direct still returns the script on Unix once the twin is gone' );
+    }
+    unlink $sh_fake;
+}
+
+# ---------------------------------------------------------------------------
 # resolve_runnable_file : line 129
 # ---------------------------------------------------------------------------
 ok( !defined resolve_runnable_file(undef), 'resolve_runnable_file(undef) returns undef' );
@@ -289,6 +338,7 @@ like( $@, qr/Unable to find runnable file/, 'unresolvable path error surfaced' )
     );
 }
 
+{
 # The two counterpart natural-Linux (is_windows() false) states on the same
 # lines are ALSO gaps: Devel::Cover measures the true/false columns against
 # the literal written condition (!is_windows() on line 226; is_windows() as
@@ -296,7 +346,18 @@ like( $@, qr/Unable to find runnable file/, 'unresolvable path error surfaced' )
 # text it prints ("unless is_windows()") - so the forced-Windows block above
 # only closes half of each line's coverage. See docs/forced-windows-unit-tests.md.
 
-my $noexec = File::Spec->catfile( $work, 'notexec.sh' );
+# These four assertions pin the is_windows()-false side, so on a real Windows
+# host that side has to be forced the same way the block above forces the
+# is_windows()-true side on Unix: by localizing $OS_NAME. Unix hosts keep
+# their own name, so nothing changes there.
+local $Developer::Dashboard::Platform::OS_NAME = $^O eq 'MSWin32' ? 'linux' : $^O;
+
+# Windows has no execute bit: a .sh file there counts as runnable whenever a
+# POSIX shell can be found (resolve_runnable_file deliberately accepts what
+# the real platform can run), so "exists but is not executable" needs a file
+# Windows cannot run either - a data file with no shebang. Unix keeps the
+# .sh file whose mode says not executable.
+my $noexec = File::Spec->catfile( $work, $^O eq 'MSWin32' ? 'notexec.dat' : 'notexec.sh' );
 write_file( $noexec, "echo x\n" );
 chmod 0644, $noexec;    # exists, but not executable
 is(
@@ -344,6 +405,7 @@ is_deeply(
     [ $^X, '-I', Developer::Dashboard::Platform::_module_lib_root(), $noshebangpl ],
     'DD-856: a .pl file with no shebang at all still resolves through perl (extension fallback, no regression)',
 );
+}
 
 # ---------------------------------------------------------------------------
 # _shebang_uses_perl : line 173 (open) + 176 (defined first)
@@ -390,6 +452,13 @@ my $iwrc = \&Developer::Dashboard::Platform::_is_windows_runnable_candidate;
 {
     local $ENV{PATH} = $bin;
 
+    # A real Windows host with Git for Windows installed would rescue the
+    # "no shell anywhere" case through %ProgramFiles%\Git\usr\bin, which is
+    # not on PATH. Point both install roots somewhere empty so only $bin
+    # decides, as it does on Unix.
+    local $ENV{ProgramFiles}        = File::Spec->catdir( $home, 'no-git-here' );
+    local $ENV{'ProgramFiles(x86)'} = File::Spec->catdir( $home, 'no-git-here-x86' );
+
     # line 242: .py with python present / python3 present / neither.
     only_commands('python');
     is( $iwrc->($pyfile), 1, '.py runnable when python present' );
@@ -420,6 +489,41 @@ my $iwrc = \&Developer::Dashboard::Platform::_is_windows_runnable_candidate;
 }
 
 # ---------------------------------------------------------------------------
+# _git_for_windows_roots: the install root is derived from the git on PATH,
+# not just the conventional %ProgramFiles% location. A splitpath nofile flag
+# previously kept the git.exe filename in the directory parts, so the
+# cmd/bin pop never fired and the derived root was discarded.
+# ---------------------------------------------------------------------------
+{
+    local $Developer::Dashboard::Platform::OS_NAME = $win;
+    my $gitroot   = File::Spec->catdir( $home, 'gitroot' );
+    my $gitcmd    = File::Spec->catdir( $gitroot, 'cmd' );
+    my $gitusrbin = File::Spec->catdir( $gitroot, 'usr', 'bin' );
+    make_path($gitcmd);
+    make_path($gitusrbin);
+    write_file( File::Spec->catfile( $gitcmd, 'git.exe' ), "stub\n" );
+    write_file( File::Spec->catfile( $gitusrbin, 'sh.exe' ), "stub\n" );
+    local $ENV{PATH} = $gitcmd;
+    local $ENV{ProgramFiles} = File::Spec->catdir( $home, 'no-git-here' );    # the fallback must not rescue this
+    delete $ENV{'ProgramFiles(x86)'};
+    is(
+        Developer::Dashboard::Platform::_git_for_windows_shell('sh'),
+        File::Spec->catfile( $gitusrbin, 'sh.exe' ),
+        '_git_for_windows_shell resolves sh.exe from the git install on PATH',
+    );
+
+    # And the .sh resolution that depends on it: with no bash or sh on PATH,
+    # only the git-resolved shell makes the script runnable.
+    my $gitscript = File::Spec->catfile( $work, 'gitscript.sh' );
+    write_file( $gitscript, "#!/bin/sh\necho git\n" );
+    is(
+        resolve_runnable_file($gitscript),
+        $gitscript,
+        'resolve_runnable_file finds a .sh file through the git-resolved shell on Windows',
+    );
+}
+
+# ---------------------------------------------------------------------------
 # _has_shebang : line 256 (open) + 259 (defined + regex)
 # ---------------------------------------------------------------------------
 my $shebang = write_file( File::Spec->catfile( $work, 'run.sh' ), "#!/bin/sh\necho\n" );
@@ -436,6 +540,11 @@ is( Developer::Dashboard::Platform::_has_shebang($shebang),   1, 'shebang detect
 # ---------------------------------------------------------------------------
 {
     local $ENV{PATH} = $bin;
+
+    # Same isolation as above: without it a Git for Windows install answers
+    # the final-fallback lookup with its own bash.exe.
+    local $ENV{ProgramFiles}        = File::Spec->catdir( $home, 'no-git-here' );
+    local $ENV{'ProgramFiles(x86)'} = File::Spec->catdir( $home, 'no-git-here-x86' );
 
     only_commands('pwsh');
     is( Developer::Dashboard::Platform::_powershell_binary(), File::Spec->catfile( $bin, 'pwsh' ), 'pwsh preferred when present' );
@@ -710,7 +819,24 @@ is(
     ok( $cp_written, 'the dependency:build-classpath mvn call resolved a classpath file' );
     is( $java_exec[0], 'java', 'java is invoked to run the resolved main class' );
     is( $java_exec[1], '-cp', 'the -cp flag is passed' );
-    like( $java_exec[2], qr{\Q/target/classes\E:/fake/dep1\.jar:/fake/dep2\.jar\z}, 'classpath includes the layer target/classes plus mvn-resolved dependencies' );
+    # The layer classes directory is spelled with the platform's directory
+    # separator, and joined to mvn's own output with the JVM's classpath
+    # separator for the platform (';' on Windows, ':' elsewhere).
+    my $classes_dir = File::Spec->catdir( $skill, 'target', 'classes' );
+    my $cp_sep      = $^O eq 'MSWin32' ? ';' : ':';
+    is( $java_exec[2], $classes_dir . $cp_sep . '/fake/dep1.jar:/fake/dep2.jar', 'classpath includes the layer target/classes plus mvn-resolved dependencies' );
+
+    # The other platform's separator, forced through $OS_NAME so both sides
+    # of the choice are pinned on every host.
+    {
+        my $other_os  = $^O eq 'MSWin32' ? 'linux' : $win;
+        my $other_sep = $^O eq 'MSWin32' ? ':'     : ';';
+        local $Developer::Dashboard::Platform::OS_NAME = $other_os;
+        my @other_exec;
+        local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub { @other_exec = @_; return 1 };
+        eval { Developer::Dashboard::Platform::_exec_java_source_via_mvn( $pom, 'demo.Foo' ); 1 } or diag $@;
+        is( $other_exec[2], $classes_dir . $other_sep . '/fake/dep1.jar:/fake/dep2.jar', 'classpath separator follows the platform the launch is resolved for' );
+    }
     is( $java_exec[3], 'demo.Foo', 'the resolved fully-qualified class is execed' );
     is( $java_exec[4], 'alpha', 'passthrough argv reaches java' );
 
@@ -781,7 +907,7 @@ is(
         local $Developer::Dashboard::Platform::EXEC_LAUNCHER = sub { @java_exec = @_; return 1 };
         my $ok = eval { Developer::Dashboard::Platform::_exec_java_source($baz); 1 };
         ok( $ok, '_exec_java_source succeeds with an empty resolved classpath' );
-        like( $java_exec[2], qr{\Q/target/classes\E\z}, 'an empty dependency classpath leaves just the layer target/classes, no trailing colon-suffix' );
+        is( $java_exec[2], File::Spec->catdir( $skill, 'target', 'classes' ), 'an empty dependency classpath leaves just the layer target/classes, no trailing colon-suffix' );
     }
 
     # the final java exec fails.
@@ -816,10 +942,14 @@ is(
 {
     my $skill = File::Spec->catdir( $work, 'pyskill' );
     my $cli   = File::Spec->catdir( $skill, 'cli' );
-    my $venv_bin = File::Spec->catdir( $skill, 'local', 'venv', 'bin' );
+    # A Python venv keeps its interpreter in bin/python on Unix and in
+    # Scripts\python.exe on Windows; the product looks where the platform
+    # puts it, so the fixture is laid out the same way.
+    my ( $venv_bin_name, $venv_python_name ) = $^O eq 'MSWin32' ? ( 'Scripts', 'python.exe' ) : ( 'bin', 'python' );
+    my $venv_bin = File::Spec->catdir( $skill, 'local', 'venv', $venv_bin_name );
     mkdir $skill; mkdir $cli;
     make_path($venv_bin) if !-d $venv_bin;
-    my $venv_python = write_file( File::Spec->catfile( $venv_bin, 'python' ), "#!/bin/sh\n" );
+    my $venv_python = write_file( File::Spec->catfile( $venv_bin, $venv_python_name ), "#!/bin/sh\n" );
     chmod 0755, $venv_python;
     my $foo = write_file( File::Spec->catfile( $cli, 'foo.py' ), "print('hi')\n" );
 
@@ -851,10 +981,10 @@ is(
     # against its own venv, with no interference between the two.
     my $skill2 = File::Spec->catdir( $work, 'pyskill2' );
     my $cli2   = File::Spec->catdir( $skill2, 'cli' );
-    my $venv_bin2 = File::Spec->catdir( $skill2, 'local', 'venv', 'bin' );
+    my $venv_bin2 = File::Spec->catdir( $skill2, 'local', 'venv', $venv_bin_name );
     mkdir $skill2; mkdir $cli2;
     make_path($venv_bin2) if !-d $venv_bin2;
-    my $venv_python2 = write_file( File::Spec->catfile( $venv_bin2, 'python' ), "#!/bin/sh\n" );
+    my $venv_python2 = write_file( File::Spec->catfile( $venv_bin2, $venv_python_name ), "#!/bin/sh\n" );
     chmod 0755, $venv_python2;
     my $bar = write_file( File::Spec->catfile( $cli2, 'bar.py' ), "print('hi')\n" );
     is( Developer::Dashboard::Platform::_find_layer_venv_python($bar), $venv_python2,
@@ -868,9 +998,15 @@ is(
 {
     # A uid that owns no passwd record on the test host, so the "no record"
     # outcome is exercised with the real lookup instead of a stub.
-    my $absent_uid = 4294967294;
+    # Windows perl leaves getpwuid unimplemented and dies when it is called,
+    # so the test's own reference lookups go through eval. There every uid
+    # is "absent" and the reference record is empty, which is exactly the
+    # product's contract on Windows: no passwd database, undef answers.
+    my ($absent_uid) = grep { !defined scalar eval { getpwuid($_) } }
+      (4294967293, 4294967292, 2147483647, 999999999);
+    die 'Unable to select an absent uid' if !defined $absent_uid;
 
-    my @real = getpwuid($<);
+    my @real = eval { getpwuid($<) };
     is( passwd_user_name($<),      $real[0], 'passwd_user_name resolves the account name' );
     is( passwd_home_directory($<), $real[7], 'passwd_home_directory resolves the home directory' );
 

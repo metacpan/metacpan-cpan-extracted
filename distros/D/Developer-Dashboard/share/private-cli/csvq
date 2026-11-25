@@ -24,7 +24,7 @@ csvq - CSV query command for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard csvq [path] [file]
+  d2 csvq [path] [file]
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ This command provides CSV query extraction for Developer Dashboard.
 
 =head1 PURPOSE
 
-This staged helper owns the public C<dashboard csvq> command. It accepts an
+This staged helper owns the public C<d2 csvq> command. It accepts an
 optional row-and-column path or C<$d>-based Perl expression plus an optional
 input file, then hands the request to the shared query runtime so parsing,
 file-vs-STDIN handling, and output formatting stay consistent with the rest of
@@ -42,15 +42,15 @@ the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
-It exists because the dashboard ships a private, repo-local CSV inspection tool instead of depending on a globally installed parser binary. Keeping C<csvq> as a staged helper also preserves the thin-switchboard contract in C<bin/dashboard>.
+It exists because the dashboard ships a private, repo-local CSV inspection tool instead of depending on a globally installed parser binary. Keeping C<csvq> as a staged helper also preserves the thin-switchboard contract in C<bin/d2>.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing how C<dashboard csvq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
+Use this file when you are changing how C<d2 csvq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
 
 =head1 HOW TO USE
 
-Users run C<dashboard csvq [path] [file]>. The staged helper selects the CSV
+Users run C<d2 csvq [path] [file]>. The staged helper selects the CSV
 backend in the shared query runtime, which accepts the file and path in either
 order, reads STDIN when no file is given, and treats the dotted path as
 C<row.column> indexes such as C<1.1>. Use C<$d> or C<.> to print the entire
@@ -60,15 +60,15 @@ before formatting the result.
 
 =head1 WHAT USES IT
 
-It is used by the public C<dashboard csvq> command, by shell snippets that want a runtime-local CSV query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
+It is used by the public C<d2 csvq> command, by shell snippets that want a runtime-local CSV query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
 
 =head1 EXAMPLES
 
-  printf 'alpha,beta\n7,8\n' | dashboard csvq 1.1
-  dashboard csvq data.csv '$d'
-  dashboard csvq '$d' data.csv
-  printf 'name,count\nfoo,7\nbar,8\n' | dashboard csvq 'join q(-), map { $d->[1][$_] } 0 .. $#{$d->[1]}'
-  printf 'name,status\ndemo,ok\n' | dashboard csvq 1.0
+  printf 'alpha,beta\n7,8\n' | d2 csvq 1.1
+  d2 csvq data.csv '$d'
+  d2 csvq '$d' data.csv
+  printf 'name,count\nfoo,7\nbar,8\n' | d2 csvq 'join q(-), map { $d->[1][$_] } 0 .. $#{$d->[1]}'
+  printf 'name,status\ndemo,ok\n' | d2 csvq 1.0
 
 =for comment FULL-POD-DOC END
 

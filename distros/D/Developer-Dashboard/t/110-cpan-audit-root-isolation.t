@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Capture::Tiny qw(capture_merged);
 use File::Path qw(make_path remove_tree);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -16,6 +17,52 @@ plan skip_all => "audit gate not present at $GATE" if !-f $GATE;
 plan skip_all => 'checkout-only audit documentation is not shipped in release tarballs'
     if !-f File::Spec->catfile( $ROOT, 'docs', 'gate-map.md' );
 
+# _bash_binary()
+# Purpose: resolve the bash interpreter that runs the gate. On Windows the
+#          Git for Windows usr/bin directory is not on PATH (only Git\cmd
+#          is), so a bare 'bash' is never found and system() fails before the
+#          gate runs at all - every assertion about the gate then passes or
+#          fails on the strength of a missing interpreter instead of the
+#          gate's behaviour. Resolve bash.exe from the Git for Windows
+#          install, mirroring the product's own lookup in
+#          Developer::Dashboard::Platform::_git_for_windows_shell (derive the
+#          Git root from the git on PATH, then try the conventional
+#          %ProgramFiles% installs), and fall back to the bare name when no
+#          Git bash is found.
+# Input:   none.
+# Output:  absolute bash path string on Windows when Git bash is found,
+#          otherwise the bare name 'bash'.
+sub _bash_binary {
+    return 'bash' if $^O ne 'MSWin32';
+
+    my @roots;
+    my %seen;
+
+    # git.exe lives in <root>\cmd, <root>\bin or <root>\mingw64\bin: strip
+    # those trailing components to recover the Git install root.
+    for my $dir ( split /;/, $ENV{PATH} // '' ) {
+        my $git = File::Spec->catfile( $dir, 'git.exe' );
+        next if !-f $git;
+        my ( $volume, $dirs ) = File::Spec->splitpath($git);
+        my @parts = grep { $_ ne '' } File::Spec->splitdir($dirs);
+        pop @parts while @parts && $parts[-1] =~ /\A(?:cmd|bin|mingw64|mingw32)\z/i;
+        my $root = File::Spec->catdir( $volume . File::Spec->rootdir(), @parts );
+        push @roots, $root if !$seen{$root}++;
+        last;
+    }
+
+    for my $program_files ( grep { defined && $_ ne '' } $ENV{ProgramFiles}, $ENV{'ProgramFiles(x86)'} ) {
+        my $root = File::Spec->catdir( $program_files, 'Git' );
+        push @roots, $root if !$seen{$root}++;
+    }
+
+    for my $root (@roots) {
+        my $bash = File::Spec->catfile( $root, 'usr', 'bin', 'bash.exe' );
+        return $bash if -f $bash;
+    }
+    return 'bash';
+}
+
 # _run_gate($root, %env)
 # Purpose: execute the audit gate against a library root and report exactly what
 #          it did, without letting a pipe launder the exit status.
@@ -25,8 +72,40 @@ sub _run_gate {
     my ( $root, %env ) = @_;
 
     local @ENV{ keys %env } = values %env;
-    my $out = `bash \Q$GATE\E \Q$root\E 2>&1`;
-    return ( ${^CHILD_ERROR_NATIVE} >> 8, $out );
+    # Convert Windows native paths to MSYS paths before Bash opens the script.
+    # Use list-form system so the native Perl shell never strips backslashes.
+    my @args = ( $GATE, $root );
+    my $bash = 'bash';
+    if ( $^O eq 'MSWin32' ) {
+        for my $path (@args) {
+            $path =~ s{\\}{/}g;
+            $path =~ s{\A([A-Za-z]):}{'/' . lc($1)}e;
+        }
+        $bash = _bash_binary();
+    }
+    # The gate is a bash script that also calls dirname and grep, so the
+    # interpreter alone is not enough: those helpers must resolve to the
+    # Git for Windows tools as well. On this box a native coreutils
+    # dirname is first on PATH and returns a C:/ spelling, which makes
+    # the gate's own repo_root come out as /tmp/... (bash's pwd spells
+    # the Windows temp directory that way) while the audited root keeps
+    # the /c/... spelling it was given - so the gate's in-tree comparison
+    # sees two spellings of the same tree and refuses a root inside the
+    # checkout. Prepend the tool directory the interpreter came from, so
+    # dirname and grep resolve to the MSYS tools and both sides agree.
+    # Scoped to this call; a bare 'bash' leaves PATH untouched.
+    my $path = $ENV{PATH} // '';
+    if ( $bash ne 'bash' ) {
+        my ( $volume, $bash_dir ) = File::Spec->splitpath($bash);
+        $path = $volume . $bash_dir . ';' . $path;
+    }
+    local $ENV{PATH} = $path;
+    my $status;
+    my $out = capture_merged {
+        system $bash, @args;
+        $status = $?;
+    };
+    return ( $status < 0 ? 255 : ( $status >> 8 ), $out );
 }
 
 # _seed_root($dir)
@@ -68,7 +147,13 @@ sub _slurp {
         qr/cpan-audit-declared-chain/,
         'gate names the instrument that does answer the question for a shared tree'
     );
-    like( $out, qr/\Q$outside\E/, 'gate states the subject it was pointed at' );
+    my $display_root = $outside;
+    if ( $^O eq 'MSWin32' ) {
+        # The audited Bash gate reports the MSYS path it actually receives.
+        $display_root =~ s{\\}{/}g;
+        $display_root =~ s{\A([A-Za-z]):}{'/' . lc($1)}e;
+    }
+    like( $out, qr/\Q$display_root\E/, 'gate states the subject it was pointed at' );
 }
 
 # The escape hatch exists so a genuinely isolated root built outside the

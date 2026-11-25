@@ -1,12 +1,10 @@
 package Skilletor::Error::Catalog;
-# ABSTRACT: A source tree cannot be scanned (the reference's CatalogError)
+# ABSTRACT: Retired stub, see Skilletor
 
-use Moo;
-use namespace::clean;
+use strict;
+use warnings;
 
-extends 'Skilletor::Error';
-
-our $VERSION = '0.008000';
+our $VERSION = '0.009000';
 
 1;
 
@@ -18,15 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Error::Catalog - A source tree cannot be scanned (the reference's CatalogError)
+Skilletor::Error::Catalog - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
+version 0.009000
 
 =head1 DESCRIPTION
 
-Thrown by L<Skilletor::Catalog> where the reference throws its C<CatalogError>, and for a file system call that fails during a scan, worded as Node words it. See L<Skilletor::Error> for the interface.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
+
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Skilletor>
+
+=item * L<https://github.com/Getty/skilletor#install>
+
+=back
 
 =head1 SUPPORT
 

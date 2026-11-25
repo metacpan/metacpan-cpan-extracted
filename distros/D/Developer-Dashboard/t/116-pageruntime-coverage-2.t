@@ -15,6 +15,7 @@ use lib 'lib';
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::GoRoutine ();
 use Template;
 
 # A path registry stand-in whose bookmark roots deliberately do not exist on
@@ -143,10 +144,12 @@ sub fail_first_template_new {
 
 # ---- L657/L662/L666: group-owning termination of an already-gone worker ------
 {
-    my $reaped = fork();
-    die "fork failed: $!" if !defined $reaped;
-    if ( !$reaped ) { POSIX::_exit(0); }
-    waitpid( $reaped, 0 );
+    my $reaped = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-MPOSIX', '-e', 'POSIX::_exit(0)' ],
+        { process_group => 1 },
+    );
+    my $exit = Developer::Dashboard::GoRoutine::wait_process($reaped);
+    is( $exit, 0, 'GoRoutine process fixture exits cleanly before termination assertions' );
     ok( !kill( 0, $reaped ), 'the throwaway worker pid is gone before termination runs' );
 
     # Owning a process group skips the early "already dead" return, so the wait
@@ -263,7 +266,7 @@ sub fail_first_template_new {
     is(
         $first_inc,
         File::Spec->catdir( $page_skill_root, 'lib' ),
-        'the exact skill path serving the dashboard page is the first runtime @INC entry',
+        'the exact skill path serving the d2 page is the first runtime @INC entry',
     );
 }
 
@@ -303,8 +306,8 @@ ownership and execs the worker command.
 
 =head1 HOW TO USE
 
-Run it on its own with C<prove -lv t/116-pageruntime-coverage-2.t> while
-iterating, then keep it green under C<prove -lr t> and under the Devel::Cover
+Run it on its own with C<d2 docker compose exec -T dev prove -lv t/116-pageruntime-coverage-2.t> while
+iterating, then keep it green under C<d2 docker compose exec -T dev prove -lr t> and under the Devel::Cover
 gate. The test is hermetic: it roots a throwaway home, changes into it so the
 deepest runtime layer resolves from the working directory, builds path registries
 explicitly, and only ever signals process ids it forked itself.
@@ -319,13 +322,13 @@ the module at 100 percent on statement, subroutine, branch, and condition.
 
 Example 1:
 
-  prove -lv t/116-pageruntime-coverage-2.t
+  d2 docker compose exec -T dev prove -lv t/116-pageruntime-coverage-2.t
 
 Run this coverage closure test by itself while iterating on the page runtime.
 
 Example 2:
 
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/116-pageruntime-coverage-2.t
+  d2 docker compose exec -T -e HARNESS_PERL_SWITCHES=-MDevel::Cover dev prove -lv t/116-pageruntime-coverage-2.t
 
 Collect coverage for the page runtime while running only these cases.
 

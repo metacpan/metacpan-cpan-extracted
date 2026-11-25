@@ -3,7 +3,7 @@ package Developer::Dashboard::EnvLoader;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use File::Basename qw(dirname);
 use File::Spec;
@@ -16,9 +16,10 @@ our $INHERITED_ENV_KEYS = '_DEVELOPER_DASHBOARD_INHERITED_ENV_KEYS';
 
 # load_runtime_layers(%args)
 # Loads every participating plain-directory and DD-OOP-LAYER runtime env file
-# from the configured root toward the current working directory. Optional scope
-# selects all layers, home defaults only, or non-home descendant overrides.
-# Caller-exported variables remain above all file values.
+# in parent-to-child order, interleaving each directory's plain files before its
+# runtime subdirectory files. Optional scope selects all layers, home defaults
+# only, or non-home descendant overrides. Caller-exported variables remain
+# above all file values.
 # Input: hash with paths => Developer::Dashboard::PathRegistry object and
 # optional scope => all|home|descendants.
 # Output: ordered array reference of loaded env file paths.
@@ -40,8 +41,29 @@ sub load_runtime_layers {
         } @runtime_layers;
     }
     my @files;
-    push @files, map { $class->_env_file_candidates($_) } @plain_layers;
-    push @files, map { $class->_env_file_candidates($_) } @runtime_layers;
+    my %plain_index = map { $class->_path_identity( $plain_layers[$_] ) => $_ } 0 .. $#plain_layers;
+    my %runtime_by_parent;
+    my @unmatched_runtime;
+    for my $runtime_root (@runtime_layers) {
+        my $parent_id = $class->_path_identity( dirname($runtime_root) );
+        if ( exists $plain_index{$parent_id} ) {
+            push @{ $runtime_by_parent{$parent_id} }, $runtime_root;
+        }
+        else {
+            push @unmatched_runtime, $runtime_root;
+        }
+    }
+
+    # Explicit or out-of-tree runtime roots still precede files in the current
+    # directory, preserving inherited values for project-level .env.pl files.
+    push @files, map { $class->_env_file_candidates($_) } @unmatched_runtime;
+    for my $plain_root (@plain_layers) {
+        push @files, $class->_env_file_candidates($plain_root);
+        my $parent_id = $class->_path_identity($plain_root);
+        push @files,
+          map { $class->_env_file_candidates($_) }
+          @{ $runtime_by_parent{$parent_id} || [] };
+    }
     return $class->load_files(
         files => \@files,
     );
@@ -91,6 +113,31 @@ sub load_skill_cli_layers {
     return $class->load_files( files => \@files );
 }
 
+# _restore_overlay_key_case($overlay)
+# Restores the as-loaded spelling of overlay keys on Windows, where
+# enumerating %ENV folds names to uppercase (FOO_VERSION) while direct
+# access stays case-insensitive, so a mixed-case key such as the nested
+# skill alias foo_VERSION would otherwise be returned only under its
+# folded spelling. The EnvAudit inventory records every loaded key under
+# its as-written spelling, so a folded overlay entry is moved back to the
+# recorded spelling when the recorded spelling is absent. No-op off
+# Windows and whenever the recorded spelling is already present.
+# Input: hash reference of the overlay built from %ENV.
+# Output: true value.
+sub _restore_overlay_key_case {
+    my ( $class, $overlay ) = @_;
+    return 1 if $^O ne 'MSWin32' || ref($overlay) ne 'HASH';
+    my $audit = Developer::Dashboard::EnvAudit->keys;
+    for my $recorded ( sort keys %{$audit} ) {
+        my $folded = uc $recorded;
+        next if $folded eq $recorded;
+        next if exists $overlay->{$recorded};
+        next if !exists $overlay->{$folded};
+        $overlay->{$recorded} = delete $overlay->{$folded};
+    }
+    return 1;
+}
+
 # load_skill_layers_into_hash(%args)
 # Loads the ordered nested skill env chain into an isolated temporary
 # environment and returns only the added or changed keys.
@@ -119,6 +166,7 @@ sub load_skill_layers_into_hash {
           );
         $overlay{$key} = $ENV{$key};
     }
+    $class->_restore_overlay_key_case( \%overlay );
 
     return {
         files => $loaded,
@@ -157,6 +205,19 @@ sub load_files {
     $class->_restore_inherited_env($protected_env);
     die $error if !$ok;
     return \@loaded;
+}
+
+# inherited_key_names($env)
+# Public switchboard helper: selects environment names safe for the inherited-key JSON marker.
+# Windows can expose hidden drive-directory entries such as =C: in %ENV;
+# these are not shell variable names and must not reach the strict loader.
+# Input: hash reference containing the caller's current environment.
+# Output: sorted array reference of valid, non-marker names.
+sub inherited_key_names {
+    my ( $class, $env ) = @_;
+    return [ sort grep {
+        $_ ne $INHERITED_ENV_KEYS && /\A[A-Za-z_][A-Za-z0-9_]*\z/
+    } keys %{$env} ];
 }
 
 # _capture_inherited_env()
@@ -227,6 +288,7 @@ sub load_files_into_hash {
           );
         $overlay{$key} = $ENV{$key};
     }
+    $class->_restore_overlay_key_case( \%overlay );
 
     return {
         files => $loaded,
@@ -607,7 +669,14 @@ sub _strip_env_comments {
 sub _expand_env_value {
     my ( $class, %args ) = @_;
     my $value = defined $args{value} ? $args{value} : '';
-    $value =~ s/\A~(?=\/|\z)/$ENV{HOME} || '~'/e;
+    # A leading tilde expands to the home directory, but on Windows the
+    # home uses backslashes while the remainder keeps its forward slash,
+    # producing a mixed-separator path that never equals the native form.
+    # Canonicalize the joined path so the expansion is separator-clean.
+    # With no home set the value is left untouched, as before.
+    if ( $value =~ /\A~(?=\/|\z)/ && defined $ENV{HOME} && $ENV{HOME} ne '' ) {
+        $value = File::Spec->canonpath( $ENV{HOME} . substr( $value, 1 ) );
+    }
     $value =~ s/\$\{([^}]+)\}/$class->_expand_braced_env_expression(
         expression => $1,
         file       => $args{file},
@@ -706,7 +775,15 @@ layer; files may set unset keys but cannot replace those caller values. The
 switchboard carries only the names of those inherited keys to helper
 processes, never their values.
 
-Plain C<.env> files load before C<.env.pl> at every participating directory.
+For runtime loading, plain-directory and runtime-root files are interleaved in
+parent-to-child order. At each physical directory, its plain C<.env> and
+C<.env.pl> files run before the runtime roots beneath it; each runtime root
+loads C<.env> before C<.env.pl>, and deeper directories load later. Explicit
+runtime roots outside the plain-directory chain are loaded before that chain
+so its C<.env.pl> files can use inherited values. For skill execution, the
+home runtime, skill roots, skill C<cli/> roots, and descendant runtime scopes
+retain the distinct precedence described above. At every participating
+directory, plain C<.env> files load before C<.env.pl>.
 The plain-file parser accepts C<KEY=VALUE> lines, ignores blank lines, whole
 line C<#> comments, whole line C<//> comments, and C</* ... */> block comments
 that can span multiple lines. It expands a leading C<~> to C<$ENV{HOME}>, bare
@@ -720,7 +797,7 @@ ignored.
 
 =head1 PURPOSE
 
-This module is the ordered env-file loader for the dashboard switchboard and skill dispatcher. Read it when you need to understand which env files participate, in what order they load, and how failures become explicit.
+This module is the ordered env-file loader for the d2 switchboard and skill dispatcher. Read it when you need to understand which env files participate, in what order they load, and how failures become explicit.
 
 =head1 WHY IT EXISTS
 
@@ -741,7 +818,7 @@ Both entrypoints preserve caller-exported values above the files they load.
 
 =head1 WHAT USES IT
 
-It is used by C<bin/dashboard>, by the skill dispatcher, by custom commands and hooks that inherit the loaded environment, and by tests that verify precedence and failure behavior.
+It is used by C<bin/d2>, by the skill dispatcher, by custom commands and hooks that inherit the loaded environment, and by tests that verify precedence and failure behavior.
 
 =head1 EXAMPLES
 
@@ -749,7 +826,9 @@ Example 1:
 
   Developer::Dashboard::EnvLoader->load_runtime_layers(paths => $paths);
 
-Load every participating plain-directory and runtime-layer env file from root to leaf for one dashboard process.
+Load every participating plain-directory and runtime-layer env file in
+parent-to-child order for one dashboard process. A project-root C<.env.pl>
+can therefore read a value already loaded from C<~/.developer-dashboard/.env>.
 
 Example 2:
 

@@ -1,6 +1,6 @@
 use Test::Roo;
 use Test::Exception;
-use List::MoreUtils qw(all);
+use List::Util qw(all);
 use File::Temp qw(tempfile);
 use DBIx::MultiStatementDo;
 use File::Slurp;
@@ -71,6 +71,24 @@ test 'SQLite STRSTARTS SARG with language literal' => sub {
 	like($sql, qr#SELECT "t0"."subject" AS "s", "t0"."predicate" AS "p", "t0"."object" AS "o" FROM quad t0, term (\S+) WHERE [(]t0.graph IN [(][?][)][)] AND [(]"t0"."object" = \1.term_id[)] AND [(]\1."type" = [?][)] AND [(]INSTR[(]\1.value, [?][)] = 1[)] AND [(]\1.language = [?][)]#, 'generated SQL');
 	is_deeply([splice(@bind, 1)], ['literal', 'foo', 'en'], 'bound values');
 };
+
+test 'SQLite get_quads with triple term pattern' => sub {
+	my $self	= shift;
+	my $t1		= triple(iri('s'), iri('p1'), iri('o1'));
+	my $t2		= triple(iri('s'), iri('p2'), iri('o2'));
+	my $q1		= quad(iri('a'), iri('b'), iri('c'), iri('g'));
+	my $q2		= quad(iri('a'), iri('b1'), $t1, iri('g'));
+	my $q3		= quad(iri('a'), iri('b2'), $t2, iri('g'));
+	my $store	= $self->create_store(quads => [$q1, $q2, $q3]);
+
+	my $tp		= Attean::TriplePattern->new( object => iri('o2') );
+	my $iter	= $store->get_quads(undef, undef, $tp);
+	my @quads	= $iter->elements;
+	is(scalar(@quads), 1);
+	my $got		= $quads[0];
+	is($got->predicate->value, 'b2'); # b2 predciate correlated with the object triple term with the o2 object
+};
+
 
 with 'Test::Attean::QuadStore', 'Test::Attean::MutableQuadStore';
 with 'Test::AtteanX::Store::DBI';

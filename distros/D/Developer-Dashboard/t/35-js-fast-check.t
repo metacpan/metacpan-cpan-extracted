@@ -4,6 +4,7 @@ use warnings FATAL => 'all';
 use Capture::Tiny qw(capture);
 use Cwd qw(abs_path);
 use File::Spec;
+use File::Temp qw(tempfile);
 use FindBin qw($RealBin);
 use Test::More;
 
@@ -43,18 +44,61 @@ if ( !-d $node_modules ) {
 }
 ok( -d $node_modules, 'the fast-check dependency tree is present' );
 
-my ( $stdout, $stderr, $exit ) = capture {
-    local %ENV = %ENV;
-    _configure_npm_test_env();
-    $ENV{DD_FAST_CHECK_RUNS} = _fast_check_run_count();
-    system( $npm_bin, 'run', 'fuzz:scorecard' );
-};
+my ( $stdout, $stderr, $exit ) = _run_fuzz_with_progress();
 
 is( $exit,   0,  'fast-check property tests pass' );
 is( $stderr, '', 'fast-check property tests do not emit stderr' );
 like( $stdout, qr/^>/m, 'npm run produced the expected script runner banner' );
 
 done_testing;
+
+# _run_fuzz_with_progress()
+# Runs the npm fuzz script and relays its stdout into the test log line by
+# line WHILE it runs. The fuzz starts two Perl processes per property run
+# (100 at the default count) and needs about a minute of CPU, so on a busy
+# machine it can take several minutes. Holding all of its output until the
+# end made a slow run look exactly like a stuck one to anything watching the
+# log for silence. The script prints one progress line per property run, and
+# each line is passed on here as a TAP note as soon as it arrives.
+# Input: none.
+# Output: list of the script's whole stdout, its whole stderr, and its wait
+# status, the same three values the assertions below have always checked.
+sub _run_fuzz_with_progress {
+    local %ENV = %ENV;
+    _configure_npm_test_env();
+    $ENV{DD_FAST_CHECK_RUNS}     = _fast_check_run_count();
+    $ENV{DD_FAST_CHECK_PROGRESS} = '1';
+
+    # stderr goes to a file so it stays out of the stdout pipe and can still
+    # be asserted empty. The child inherits the redirected handle; the test's
+    # own STDERR is restored as soon as the child has been started.
+    my ( $err_fh, $err_path ) = tempfile( 'dd-fast-check-stderr-XXXXXX', TMPDIR => 1, UNLINK => 1 );
+    close $err_fh or die "Unable to close $err_path: $!";
+    open my $saved_stderr, '>&', \*STDERR or die "Unable to save STDERR: $!";
+    open STDERR, '>', $err_path or die "Unable to redirect STDERR to $err_path: $!";
+    my $started = open my $out_fh, '-|', $npm_bin, 'run', 'fuzz:scorecard';
+    my $start_error = $!;
+    open STDERR, '>&', $saved_stderr or die "Unable to restore STDERR: $!";
+    close $saved_stderr or die "Unable to close the saved STDERR handle: $!";
+    die "Unable to start $npm_bin run fuzz:scorecard: $start_error" if !$started;
+
+    note('fast-check fuzz run started; one progress line follows per property run');
+    my $out = q{};
+    while ( my $line = <$out_fh> ) {
+        $out .= $line;
+        ( my $shown = $line ) =~ s/\s+\z//;
+        note($shown) if $shown ne q{};
+    }
+    # A non-zero exit of the child makes close return false with $! unset;
+    # that is a test result for the assertions below, not an error here.
+    close $out_fh;
+    my $status = $?;
+
+    open my $err_in, '<', $err_path or die "Unable to read $err_path: $!";
+    my $err = do { local $/; <$err_in> };
+    close $err_in or die "Unable to close $err_path: $!";
+    return ( $out, defined $err ? $err : q{}, $status );
+}
 
 sub _find_command {
     my ($name) = @_;
@@ -94,7 +138,7 @@ t/35-js-fast-check.t - run the Scorecard-targeted fast-check property suite
 
 This test is the executable regression contract for the repository-side
 Scorecard and workflow guardrails, specifically the JavaScript C<fast-check>
-property suite that exercises the dashboard encode and decode path.
+property suite that exercises the d2 encode and decode path.
 
 =head1 WHY IT EXISTS
 
@@ -107,7 +151,7 @@ GitHub Actions only.
 =head1 WHEN TO USE
 
 Use this file when changing the Scorecard fuzz workflow, the npm property
-harness, or the dashboard encode and decode path covered by C<fast-check>.
+harness, or the d2 encode and decode path covered by C<fast-check>.
 
 =head1 HOW TO USE
 

@@ -3,11 +3,12 @@ package Developer::Dashboard::ProcessSupervision;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Exporter 'import';
 
 use Capture::Tiny qw(capture);
+use Cwd qw(getcwd);
 use File::Spec;
 use Time::HiRes qw(sleep);
 
@@ -19,6 +20,11 @@ use Time::HiRes qw(sleep);
 use POSIX ();
 
 use Developer::Dashboard::Platform qw(command_in_path is_windows);
+
+# Capture the directory in which Perl loaded its process helpers. Relative
+# @INC entries remain relative after chdir, but a fresh child would resolve
+# them against its new cwd rather than the location that loaded this runtime.
+our $PERL_LIBRARY_BASE = getcwd();
 
 # These are exported into the consuming package rather than called as functions,
 # so every existing call site stays `$self->_helper(...)` unchanged. Perl resolves
@@ -34,21 +40,26 @@ use Developer::Dashboard::Platform qw(command_in_path is_windows);
 # silently change the other module - against a test suite that would stay green,
 # because each version satisfies its own module's tests.
 our @EXPORT_OK = qw(
+    _perl_library_args
     _current_perl_command
     _dashboard_core_helper_path
     _descriptor_is_inherited_pipe
-    _fork_process
     _open_file_descriptors
     _overwrite_state_file_in_place
     _pid_is_running
+    _lifetime_owner_pid
+    _lifetime_owner_is_gone
+    _lifetime_owner_poll_seconds
     _pid_namespace_id
     _powershell_command
     _powershell_single_quote
+    _taskkill_command
     _process_exists
     _read_process_env_marker
     _reap_child_process
     _rename_path
     _replace_state_file
+    _source_is_movable
     _unlink_path
     _helper_file_supports_internal_command
     _same_pid_namespace
@@ -70,6 +81,15 @@ sub _reap_child_process {
     # leak only became visible once a test process ended with the stale value.
     local $?;
     return 0 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
+    if ( is_windows() ) {
+        # A GoRoutine (CreateProcess) child is reaped through the native
+        # process API, because waitpid below cannot reliably see one once
+        # its process object is gone. A pid the spawn registry does not
+        # know falls through to waitpid, which keeps its existing behaviour
+        # for any other direct child.
+        require Developer::Dashboard::GoRoutine;
+        return 1 if Developer::Dashboard::GoRoutine::reap_child($pid);
+    }
     my $waited = waitpid( $pid, 1 );
     return $waited == $pid ? 1 : 0;
 }
@@ -87,12 +107,63 @@ sub _pid_is_running {
     return $self->_process_exists($pid) ? 1 : 0;
 }
 
-# _fork_process()
-# Wraps Perl fork so tests can drive parent and child runtime paths directly.
+# _lifetime_owner_pid()
+# Returns the pid this runtime's lifetime is tied to. A starter opts in
+# by exporting DEVELOPER_DASHBOARD_LIFETIME_PID before it starts the
+# runtime; every process the runtime starts inherits it. It exists for
+# starters that can be killed without ever running a stop, such as a
+# test run ended by a CI stop-all: the web, the supervisor and the loops
+# are all detached, so nothing else would ever end them. An ordinary
+# user never sets it, so a runtime started from a shell still outlives
+# that shell exactly as before. The calling process's own pid is
+# refused, so a process cannot be tied to itself. This is the one
+# reader of the variable: the collector supervisor, each collector loop
+# and the web owner watcher all go through it.
 # Input: none.
-# Output: child pid in the parent, zero in the child, or undef on failure.
-sub _fork_process {
-    return fork();
+# Output: pid integer, or undef when no usable owner pid is set.
+sub _lifetime_owner_pid {
+    my ($self) = @_;
+    my $value = $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID};
+    # An explicit undef, never a bare return: callers build a hash with
+    # this value in list context, and an empty list there would shift
+    # the next key into the pid slot and make an ordinary user look
+    # opted in to an owner that can never be alive.
+    return undef if !defined $value || $value !~ /\A\d+\z/ || $value < 1;    ## no critic (ProhibitExplicitReturnUndef)
+    return undef if $value == $$;                                             ## no critic (ProhibitExplicitReturnUndef)
+    return $value + 0;
+}
+
+# _lifetime_owner_is_gone($owner)
+# Counts one liveness poll of the opted-in lifetime owner and reports
+# whether it is now confirmed dead. The owner must be seen dead on two
+# polls in a row, so one failed liveness probe cannot end a healthy
+# process; a live poll resets the count. Liveness is the consumer's own
+# _pid_is_running, reached by method dispatch like every other helper
+# here, so the identical platform-aware path runs on Windows.
+# Input: owner-state hash reference the caller keeps across polls (pid,
+# dead_polls). An undef pid means the starter did not opt in.
+# Output: boolean true once the owner has been dead on two polls in a
+# row, false otherwise.
+sub _lifetime_owner_is_gone {
+    my ( $self, $owner ) = @_;
+    return 0 if ref($owner) ne 'HASH' || !defined $owner->{pid};
+    if ( $self->_pid_is_running( $owner->{pid} ) ) {
+        $owner->{dead_polls} = 0;
+        return 0;
+    }
+    $owner->{dead_polls}++;
+    return $owner->{dead_polls} >= 2 ? 1 : 0;
+}
+
+# _lifetime_owner_poll_seconds()
+# Returns how many seconds pass between two polls of the opted-in
+# lifetime owner in a process that has no faster loop of its own to
+# poll from. Two dead polls in a row are needed, so such a process ends
+# about twice this long after its owner dies.
+# Input: none.
+# Output: seconds number.
+sub _lifetime_owner_poll_seconds {
+    return 5;
 }
 
 # _replace_state_file($source, $target)
@@ -107,6 +178,25 @@ sub _replace_state_file {
 
     my $rename_error = $!;
     if ( $self->is_windows ) {
+        # A rename can fail two ways: the target already exists (a collision,
+        # where the source itself is movable) or the source is locked against
+        # rename/delete (which the writer itself holds briefly after close).
+        # Only the second case goes straight to the in-place overwrite: it
+        # reads the source (which still works while the source is locked) and
+        # rewrites the target without ever removing it, so a reader never
+        # finds the target missing. The unlink-then-rename and PowerShell
+        # paths below delete the target first and can leave it missing for
+        # seconds (PowerShell startup) while a locked source defeats every
+        # move, which starved loop_state and killed the t/07 stale-loop
+        # test at 580.
+        if ( !$self->_source_is_movable($source) ) {
+            my ( $overwrite_ok, $overwrite_error ) = $self->_overwrite_state_file_in_place( $source, $target );
+            return 1 if $overwrite_ok;
+            if ( defined $overwrite_error && $overwrite_error ne '' ) {
+                chomp $overwrite_error;
+                $rename_error = "$rename_error; in-place overwrite fallback failed: $overwrite_error";
+            }
+        }
         for my $attempt ( 1 .. 10 ) {
             if ( -e $target ) {
                 $self->_unlink_path($target)
@@ -158,6 +248,25 @@ sub _unlink_path {
     return unlink $path;
 }
 
+# _source_is_movable($source)
+# Probes whether a prepared temporary file can be renamed, to tell a target
+# collision (the rename failed only because the destination exists) from a
+# locked source (the rename fails because the source itself cannot be moved).
+# Renames the source to a probe name and straight back, so the file ends up
+# exactly where it started; uses the real rename, not the _rename_path
+# wrapper, so a test stubbing that wrapper to simulate a collision still sees
+# the true movability of the file on disk.
+# Input: temporary source path string.
+# Output: true when the source renames away and back, false otherwise.
+sub _source_is_movable {
+    my ( $self, $source ) = @_;
+    my $probe = $source . '.movable-probe';
+    return 0 if !CORE::rename( $source, $probe );
+    CORE::rename( $probe, $source )
+      or die "Unable to restore $source after movability probe: $!";
+    return 1;
+}
+
 # _overwrite_state_file_in_place($source, $target)
 # Rewrites one runtime state target in place from the prepared temporary
 # payload when Windows denies delete-or-move replacement but still permits a
@@ -186,15 +295,43 @@ sub _overwrite_state_file_in_place {
 # Output: sorted list of descriptor integers.
 sub _open_file_descriptors {
     my ($self) = @_;
+    if ( is_windows() ) {
+        # There is no /proc or /dev/fd on Windows, so there is no
+        # directory to list descriptors from. Probe the CRT descriptor
+        # table instead: a descriptor that duplicates is open, one that
+        # does not is not. The bound is the common CRT table size; a
+        # detached child only ever inherits low-numbered descriptors,
+        # and the standard three are always found this way, so the
+        # listing still includes stdin.
+        my @fds;
+        for my $fd ( 0 .. 1023 ) {
+            my $handle;
+            if ( open( $handle, '<&', $fd ) || open( $handle, '>&', $fd ) ) {
+                push @fds, $fd;
+                close $handle;
+            }
+        }
+        return @fds;
+    }
     my %seen;
     my @fds;
-    for my $path ( glob('/proc/self/fd/*'), glob('/dev/fd/*') ) {
+    for my $path ( Developer::Dashboard::ProcessSupervision::_fd_candidate_paths($self) ) {
         my ($fd) = $path =~ m{(\d+)\z};
         $fd += 0;
         next if $seen{$fd}++;
         push @fds, $fd;
     }
     return sort { $a <=> $b } @fds;
+}
+
+# _fd_candidate_paths()
+# Returns procfs and devfs descriptor paths; isolated as a method so tests can
+# supply duplicated directory entries on hosts without both descriptor trees.
+# Input: none.
+# Output: list of descriptor-path strings.
+sub _fd_candidate_paths {
+    my ($self) = @_;
+    return ( glob('/proc/self/fd/*'), glob('/dev/fd/*') );
 }
 
 # _descriptor_is_inherited_pipe($fd)
@@ -207,13 +344,24 @@ sub _open_file_descriptors {
 sub _descriptor_is_inherited_pipe {
     my ( $self, $fd, %args ) = @_;
     return 0 if !defined $fd || $fd !~ /^\d+$/;
-    my $proc_target = readlink("/proc/self/fd/$fd");
-    my $dev_target  = readlink("/dev/fd/$fd");
-    my $target = defined $proc_target ? $proc_target : $dev_target;
-    return 0 if !defined $target;
-    return 1 if $target =~ /^pipe:/;
+    my $handle;
+    open( $handle, '<&', $fd ) or open( $handle, '>&', $fd ) or return 0;
+    my $pipe   = -p $handle ? 1 : 0;
+    my $socket = -S $handle ? 1 : 0;
+    close $handle;
+    return 1 if $pipe;
     return 0 if !$args{close_ipc};
-    return $target =~ /^(?:socket:|anon_inode:)/ ? 1 : 0;
+    return 1 if $socket;
+    my $target = _fd_link_target($fd);
+    return defined($target) && $target =~ /^anon_inode:/ ? 1 : 0;
+}
+
+# Linux anonymous kernel handles have no ordinary socket or pipe file type.
+# Keep their procfs identity check while using portable fstat for other FDs.
+sub _fd_link_target {
+    my ($fd) = @_;
+    my $target = readlink("/proc/self/fd/$fd");
+    return defined $target ? $target : readlink("/dev/fd/$fd");
 }
 
 # _current_perl_command()
@@ -232,6 +380,30 @@ sub _current_perl_command {
     return command_in_path('perl')     if command_in_path('perl');
     return command_in_path('perl.exe') if command_in_path('perl.exe');
     return $^X;
+}
+
+# _perl_library_args()
+# Builds literal Perl -I arguments for string-valued entries in the current
+# interpreter's @INC, preserving its active module search path in native child
+# processes that cannot inherit in-memory use lib changes. Relative entries are
+# made absolute against the directory that loaded this helper. Every path is
+# canonicalised (File::Spec->canonpath): on Windows @INC routinely mixes
+# separators, because Strawberry Perl and local::lib PERL5LIB entries use
+# forward slashes (e.g. C:\...\try\lib\perl5/MSWin32-x64-multi-thread), while
+# the spawned child must receive the native form the dashboard's own path
+# comparisons and the t/236 contract expect.
+# Input: none; reads the current interpreter's @INC.
+# Output: list of -I<path> argument strings; reference hooks are omitted because
+#         they are not filesystem paths and cannot be passed to another Perl.
+sub _perl_library_args {
+    my ($self) = @_;
+    my $base = $PERL_LIBRARY_BASE || getcwd();
+    return map {
+        my $path = $_;
+        $path = File::Spec->rel2abs( $path, $base ) if !File::Spec->file_name_is_absolute($path);
+        $path = File::Spec->canonpath($path);
+        "-I$path";
+    } grep { defined && !ref && length } @INC;
 }
 
 # _powershell_command()
@@ -256,6 +428,31 @@ sub _powershell_command {
     return '';
 }
 
+# _taskkill_command()
+# Resolves the taskkill executable _send_signal shells out to on
+# Windows. A bare 'taskkill' handed to system() is resolved by
+# CreateProcess, which only appends .exe, so a .bat on PATH is
+# invisible to it - the t/09 fake taskkill.bat never ran and build
+# #269 died reading the args file it never wrote (the real taskkill
+# ran instead and exited 128 for the nonexistent pids; micro t/988
+# proved it). Resolving here through command_in_path, which expands
+# PATHEXT, finds the .bat, and the absolute path runs it through cmd.
+# Falls back to System32 taskkill.exe when PATH cannot find it, and
+# to the bare name when even that is absent, so callers that stub
+# capture keep their existing behaviour. Called as a plain function,
+# not a method - it needs no object state.
+# Input: none.
+# Output: taskkill path string (resolved, System32 fallback, or bare name).
+sub _taskkill_command {
+    return 'taskkill' if !is_windows();
+    my $resolved = command_in_path('taskkill');
+    return $resolved if defined $resolved && $resolved ne '';
+    my $system_root = $ENV{SystemRoot} || 'C:\\Windows';
+    my $fallback = File::Spec->catfile( $system_root, 'System32', 'taskkill.exe' );
+    return $fallback if -f $fallback;
+    return 'taskkill';
+}
+
 # _powershell_single_quote($value)
 # Escapes one literal string for safe use in a single-quoted PowerShell
 # argument position.
@@ -268,13 +465,17 @@ sub _powershell_single_quote {
     return "'$value'";
 }
 
+# Default procfs root; tests may use a private fixture directory so process
+# metadata parsing is exercised on systems without Linux procfs.
+our $PROCFS_ROOT = '/proc';
+
 # _read_process_env_marker($pid, $key)
 # Reads a specific environment variable from a running process when possible.
 # Input: process id integer and env key string.
 # Output: env value string or undef.
 sub _read_process_env_marker {
     my ( $self, $pid, $key ) = @_;
-    my $proc = "/proc/$pid/environ";
+    my $proc = "$PROCFS_ROOT/$pid/environ";
     return if !-r $proc;
     open my $fh, '<', $proc or return;
     local $/;
@@ -293,17 +494,104 @@ sub _read_process_env_marker {
 # Output: namespace identity string or undef.
 sub _pid_namespace_id {
     my ( $self, $pid ) = @_;
-    my $path = "/proc/$pid/ns/pid";
+    my $path = "$PROCFS_ROOT/$pid/ns/pid";
     return if !-l $path;
     return readlink $path;
 }
 
+# Cached Win32 process-query imports, attempted once; a failed import is
+# never retried, so a missing Win32 primitive degrades to kill(0) exactly
+# once (the Watch.pm _windows_peek_named_pipe shape).
+my $_WINDOWS_PROCESS_API;
+my $_WINDOWS_PROCESS_API_FAILED;
+
+# STILL_ACTIVE is the exit code GetExitCodeProcess reports for a process
+# that has not exited; PROCESS_QUERY_LIMITED_INFORMATION is the access
+# right OpenProcess needs to query it (micro t/997, solo #385).
+my $_WINDOWS_STILL_ACTIVE              = 259;
+my $_WINDOWS_QUERY_LIMITED_INFORMATION = 0x1000;
+
+# _windows_process_api()
+# Imports the four kernel32 functions the Windows liveness check needs,
+# once, and caches them. Win32::API is loaded lazily so Unix legs never
+# pay for it and a leg without it keeps working.
+# Input: none.
+# Output: hash reference of imported function objects, or undef when the
+# import fails (callers fall back to kill(0)).
+sub _windows_process_api {
+    return $_WINDOWS_PROCESS_API if defined $_WINDOWS_PROCESS_API;
+    return undef if $_WINDOWS_PROCESS_API_FAILED;
+    my $api = eval {
+        require Win32::API;
+        my $open_process = Win32::API->new( 'kernel32', 'OpenProcess', 'NIN', 'Q' );
+        die "OpenProcess import failed\n" if !defined $open_process;
+        my $get_exit_code = Win32::API->new( 'kernel32', 'GetExitCodeProcess', 'QP', 'I' );
+        die "GetExitCodeProcess import failed\n" if !defined $get_exit_code;
+        my $get_process_id = Win32::API->new( 'kernel32', 'GetProcessId', 'Q', 'N' );
+        die "GetProcessId import failed\n" if !defined $get_process_id;
+        my $close_handle = Win32::API->new( 'kernel32', 'CloseHandle', 'Q', 'I' );
+        die "CloseHandle import failed\n" if !defined $close_handle;
+        {
+            open_process   => $open_process,
+            get_exit_code  => $get_exit_code,
+            get_process_id => $get_process_id,
+            close_handle   => $close_handle,
+        };
+    };
+    if ( !$api ) {
+        $_WINDOWS_PROCESS_API_FAILED = 1;
+        return undef;
+    }
+    $_WINDOWS_PROCESS_API = $api;
+    return $api;
+}
+
+# _process_exists_windows($pid)
+# Windows-only liveness check. A bare kill(0) cannot be trusted here:
+# Perl's kill(0) on Windows is OpenProcess-based, and OpenProcess rounds
+# the requested pid DOWN to a multiple of 4 (Windows pids are multiples
+# of 4), so kill(0, 3101) tests live pid 3100 and answers true - and a
+# process object can linger after exit while some handle to it is still
+# open, so the exit code must be checked too (round 42, t/09 test 209
+# with fake loop pids 3101/3102; micro t/997 proved both traps in solo
+# #385). All three must hold: the handle opened, GetProcessId on the
+# handle is exactly the pid asked for, and the exit code is STILL_ACTIVE.
+# The handle is closed on every path once opened: the values are read
+# into Perl scalars first and CloseHandle runs before any of the verdict
+# returns below, so there is no early return that can leak it. Called as
+# a plain function, not a method - it needs no object state. When the
+# Win32 imports are unavailable the check falls back to kill(0), so
+# behaviour degrades to today's rather than dying.
+# Input: process id integer.
+# Output: boolean true when the process is really running.
+sub _process_exists_windows {
+    my ($pid) = @_;
+    my $api = _windows_process_api();
+    return kill( 0, $pid ) ? 1 : 0 if !$api;
+    my $handle = $api->{open_process}->Call( $_WINDOWS_QUERY_LIMITED_INFORMATION, 0, $pid );
+    return 0 if !$handle;
+    my $real_pid = $api->{get_process_id}->Call($handle);
+    my $code_buf = pack 'L', 0;
+    my $ok = $api->{get_exit_code}->Call( $handle, $code_buf );
+    my $code = $ok ? unpack( 'L', $code_buf ) : undef;
+    $api->{close_handle}->Call($handle);
+    return 0 if !defined $real_pid || $real_pid != $pid;
+    return 0 if !defined $code;
+    return $code == $_WINDOWS_STILL_ACTIVE ? 1 : 0;
+}
+
 # _process_exists($pid)
 # Checks whether one process id still exists from the current runtime view.
+# On Windows a bare kill(0) is not that check: OpenProcess rounds the pid
+# down to a multiple of 4 and a lingering process object still opens, so
+# _process_exists_windows verifies the handle, the real pid and the exit
+# code instead (round 42, micro t/997). Unix keeps the bare kill(0),
+# which is exact there.
 # Input: process id integer.
-# Output: boolean true when signal 0 succeeds.
+# Output: boolean true when the process is really running.
 sub _process_exists {
     my ( $self, $pid ) = @_;
+    return _process_exists_windows($pid) if is_windows();
     return kill( 0, $pid ) ? 1 : 0;
 }
 

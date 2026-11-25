@@ -475,7 +475,9 @@ saying so:
 
 namely a horizontal `boxplot` or `hist` in gnuplot, a horizontal `violin` with
 `whiskers` in gnuplot, a hist whose `bins` are edges of different widths in
-gnuplot, and, in ggplot2, a `bar`, `boxplot` or `violin` overlaid with a type
+gnuplot, a `boxplot` set of fewer than 4 values with `showfliers => 0` in
+gnuplot (whose boxplot draws such a set as its points alone, with no box),
+and, in ggplot2, a `bar`, `boxplot` or `violin` overlaid with a type
 whose positions are numbers, since native ggplot2 puts their keys on a category
 axis.  `style` too belongs to the whole figure, and is refused inside a
 subplot.

@@ -88,7 +88,7 @@ the broader indicator-ordering contract this file does not duplicate.
 
 The suite, through C<prove -lr t>. Its subject is
 L<Developer::Dashboard::IndicatorStore>'s sort comparator, as consumed by
-the web status strip and C<dashboard ps1> prompt rendering wherever the
+the web status strip and C<d2 ps1> prompt rendering wherever the
 full indicator set is displayed in order.
 
 =head1 EXAMPLES

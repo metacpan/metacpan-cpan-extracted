@@ -13,6 +13,8 @@ use Ekorn::Pipeline::Errors    qw(croakf);
 use Ekorn::Pipeline::Factories qw(gather sink_one source stage);
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v0.4.0';
+
 our @EXPORT_OK   = qw(from_json from_jsonl to_json to_jsonl);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -42,7 +44,6 @@ sub from_json (@options) {
     };
 }
 
-
 # A source of the documents in a file or filehandle of JSON Lines, each
 # as it is. Given neither, a stage decoding each value, a text of one or
 # more lines, into each line's document.
@@ -68,7 +69,6 @@ sub from_jsonl (@options) {
     };
 }
 
-
 # A sink writing every value to the file or filehandle as one JSON
 # document, an array, giving how many. Given neither, a stage passing on
 # every value as that array's text, once they've all come.
@@ -85,7 +85,6 @@ sub to_json (@options) {
     };
 }
 
-
 # A sink writing each value to the file or filehandle as a line of JSON
 # Lines, giving how many. Given neither, a stage passing on each value
 # as its line, without its newline.
@@ -97,7 +96,6 @@ sub to_jsonl (@options) {
     return _writer(\%option, 'lines', $json) if _has_input(\%option);
     return stage { _encoded($json, $_) };
 }
-
 
 # Return the options given, checked, with "new", a sub returning the
 # encoder: one made from json's options, over the defaults, or json's
@@ -132,12 +130,10 @@ sub _options (@given) {
     return %option;
 }
 
-
 # Return true if the options name a file or a filehandle.
 sub _has_input ($option) {
     return defined $option->{file} || !!$option->{fh};
 }
-
 
 # Return true if the encoder indents, so writes a document over many
 # lines.
@@ -145,13 +141,11 @@ sub _indents ($json) {
     return $json->can('get_indent') && $json->get_indent;
 }
 
-
 # Return an error's message without the place it was raised, as a
 # message of ours says where.
 sub _unplaced ($error) {
     return "$error" =~ s( ,? \s+ at \s+ \S+ \s+ line \s+ \d+ \.? \s* \z )()xr;
 }
-
 
 # Croak that what's read from $from can't be decoded, and why. The
 # decoder is reset, for the next run, if it's the caller's.
@@ -159,7 +153,6 @@ sub _undecodable ($json, $from, $why) {
     $json->incr_reset;
     return croakf q(Can't decode JSON from %s: %s), $from, $why;
 }
-
 
 # Croak unless the decoder has a whole number of documents: it croaks,
 # asked for the text it holds, if it's inside one.
@@ -172,7 +165,6 @@ sub _complete ($json, $from) {
     };    # the ; ends the statement for Perl::Critic, which doesn't know try
     return;
 }
-
 
 # Return a source of the documents in the file or filehandle: as they
 # come, for JSON Lines; or, for one document, its elements, if it's an
@@ -224,7 +216,6 @@ sub _reader ($option, $format) {
     };
 }
 
-
 # Return the next chunk of $fh, read from $from: up to $BLOCK, and on to
 # the end of its line; nothing at its end.
 sub _chunk ($fh, $from) {
@@ -240,7 +231,6 @@ sub _chunk ($fh, $from) {
     return $chunk;
 }
 
-
 # Return $value encoded.
 sub _encoded ($json, $value) {
     my $text;
@@ -252,7 +242,6 @@ sub _encoded ($json, $value) {
     };    # the ; ends the statement for Perl::Critic, which doesn't know try
     return $text;
 }
-
 
 # Return a sink writing each value, encoded, to the file or filehandle,
 # as the format says, giving how many. One document is an array,
@@ -297,6 +286,7 @@ sub _writer ($option, $format, $json) {
         };
     };
 }
+
 1;
 
 __END__

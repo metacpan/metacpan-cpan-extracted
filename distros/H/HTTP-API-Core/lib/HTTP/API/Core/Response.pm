@@ -177,6 +177,22 @@ __END__
 
 HTTP::API::Core::Response - HTTP API response object
 
+=head1 CONSTRUCTION
+
+=head2 new
+
+    my $response = HTTP::API::Core::Response->new(
+        status  => 200,
+        headers => { 'Content-Type' => 'application/json' },
+        content => '{}',
+    );
+
+Creates a response object. C<status> must be an HTTP status in the
+100-599 range. C<headers> is a hash reference with scalar, array-of-scalar
+or undefined values; C<reason>, C<content>, C<method>, C<url> and
+C<elapsed> are optional scalar metadata. Missing content becomes an
+empty string. Header names are normalized case-insensitively.
+
 =head1 RESPONSE BODY
 
 =head2 content
@@ -220,6 +236,16 @@ C<Set-Cookie>. C<header($name)> returns a scalar for a single value or
 identical repeated values; conflicting repeated values return C<undef>.
 Case-insensitively duplicated header names with matching values are preserved;
 conflicting values become C<undef> rather than being chosen arbitrarily.
+
+=head2 is_success
+
+Returns true for HTTP status codes 200 through 299, and false otherwise.
+
+=head2 rate_limit
+
+Returns an L<HTTP::API::Core::RateLimit> object derived from the response
+headers. Ambiguous scalar header values are not used to infer quota
+or retry delay.
 
 =head2 elapsed
 

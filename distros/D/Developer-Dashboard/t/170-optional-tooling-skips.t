@@ -17,6 +17,8 @@ my $repo = abs_path('.');
 # SKIP when the module is unavailable rather than report its assertions as failures.
 my @SPECS = qw(
   t/148-coverage-gate-entrypoint.t
+  t/149-coverage-gate-moving-target.t
+  t/150-coverage-gate-lock-rename.t
   t/151-coverage-gate-launch-boundary.t
   t/138-coverage-exec-truncation.t
 );

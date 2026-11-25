@@ -34,7 +34,7 @@ print $result->is_anycast;           # 0
 
 ### With an API key
 
-Every paid plan answers every field: the VPN, proxy, hosting and CDN flags as well, the detail behind each flag, the city and coordinates, WHOIS and RWHOIS, and the domains hosted on the address. The plans differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.internetdata.io), then pass it in:
+A paid plan answers every field: the VPN, proxy, hosting and CDN flags as well, the detail behind each flag, the city and coordinates, WHOIS and RWHOIS, the domains hosted on the address, and `user_agent`, the verdict on a user agent you send with a lookup. Its quotas differ only in how many lookups they include, and a free account tries every field. Create a key in the [console](https://app.internetdata.io), then pass it in:
 
 ```perl
 my $client = InternetData->new(api_key => $ENV{INTERNETDATA_API_KEY});
@@ -44,6 +44,20 @@ print $result->is_vpn;                # 1, on a paid plan
 print $result->vpn->{provider_name};  # Mullvad, on a paid plan
 print $result->location->{city};      # Vienna, on a paid plan
 ```
+
+### Is that crawler who it says it is?
+
+Pass the `User-Agent` of the request you are deciding on, and with every field (a paid plan, or a free account's trial) the answer says whose agent it names and whether this address bears that out:
+
+```perl
+my $result = $client->lookup('66.249.66.1', user_agent => $request_user_agent);
+print $result->user_agent->{verdict};   # verified
+print $result->user_agent->{agent};     # Googlebot
+
+my $answers = $client->lookup_batch(\@ips, user_agents => { '66.249.66.1' => $request_user_agent });
+```
+
+`user_agent` is a hashref of `agent`, `kind` and `verdict`. `verdict` is `verified` where the agent's operator vouches for the address, `spoofed` where it does not, `unverifiable` for a bot nothing published can confirm, and `not_bot` for a browser, an app or a script. `my_ip` takes `user_agent` too. A batch's `user_agents` is keyed by each address as you list it, and an address with no agent, or an empty one, is looked up plainly. An answer with an agent is cached apart from the address's plain answer and from another agent's. Unlimited's answers, a private address's and a lookup that sent none carry no `user_agent` (`undef`, and `has('user_agent')` is 0).
 
 ### An AS or a domain
 
@@ -329,7 +343,7 @@ Each redirect URI must be https on a public host name, or http on a loopback add
 
 ### Absent is not false
 
-Unlimited leaves out `is_vpn`, `is_hosting`, `is_cdn` and the four proxy flags, the detail behind them, `bot` (whose bot uses the address, behind `is_bot`), and the paid members inside `location`, `asn`, `company` and `abuse`, such as `location->{city}`; a free-plan key's answer carries `trial_expired`, true once its trial is spent. A paid key's carries `cap_reached`, true once its organization's overage cap is reached, when the answer has Unlimited's fields and isn't billed. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
+Unlimited leaves out `is_vpn`, `is_hosting`, `is_cdn` and the four proxy flags, the detail behind them, `bot` (whose bot uses the address, behind `is_bot`), and the paid members inside `location`, `asn`, `company` and `abuse`, such as `location->{city}`; a free-plan key's answer carries `trial_expired`, true once its trial is spent. A paid key's carries `cap_reached`, true once its organization's overage cap is reached, when the answer has Unlimited's fields and isn't billed. `user_agent` is there only when the lookup sent one, with every field. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
 
 ```perl
 if ($result->is_hosting // 0) { ... }          # absent counts as false
@@ -345,9 +359,9 @@ There are official InternetData client libraries available for many languages in
 
 ## About InternetData
 
-Geolocation, anonymity, ownership and network data for IP addresses, AS numbers and domains, as an API and as databases you download and query yourself.
+Geolocation, anonymity, ownership, network, service and domain data for any IP address, AS or domain, by API or as databases you download.
 
-[<img src="https://s3.internetdata.io/internetdata-public/brand/mark.svg" alt="InternetData" height="64"/>](https://internetdata.io/)
+[<picture><source media="(prefers-color-scheme: dark)" srcset="https://s3.internetdata.io/internetdata-public/brand/logo-dark.svg"><img src="https://s3.internetdata.io/internetdata-public/brand/logo.svg" alt="InternetData" height="40"/></picture>](https://internetdata.io/)
 
 ## License
 

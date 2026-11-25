@@ -1,0 +1,18 @@
+# The system packages that every repository declares.
+x_system_packages:
+  aspell:
+    deb: aspell
+    rpm: aspell
+    test: aspell --version
+  ffmpeg:
+    deb:
+      name: ffmpeg
+      source: jellyfin
+x_system_sources:
+  deb:
+    - name: jellyfin
+      uri: https://repo.test.test/ubuntu
+      suites: ['{codename}']
+      components: [main]
+      key: https://repo.test.test/key.gpg
+      fingerprint: 0123456789ABCDEF0123456789ABCDEF01234567

@@ -10,7 +10,7 @@ source distributions so stale compiled binaries are not shipped either.
 To verify the installed version in a development container, run:
 
 ```sh
-perl bin/dashboard version
+perl bin/d2 version
 perl bin/d2 version
 ```
 

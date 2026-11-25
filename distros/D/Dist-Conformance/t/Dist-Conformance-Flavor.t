@@ -1,7 +1,8 @@
-#!/usr/bin/env perl
+#!perl
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
+no autovivification;
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
 use FindBin::libs;
@@ -18,7 +19,7 @@ my $FIXTURES = Dist::Conformance::Source::Directory->new( directory => "$FindBin
 sub standards (%flavors) {
     my $root = Mojo::File->new( File::Temp::tempdir( CLEANUP => 1 ) );
     my $dir  = $root->child('conformance')->make_path;
-    $dir->child("$_.yml")->spew( $flavors{$_} ) for keys %flavors;
+    for my $name ( keys %flavors ) { $dir->child("$name.yml")->spew( $flavors{$name} ) }
     return Dist::Conformance::Source::Directory->new( directory => "$root" );
 }
 

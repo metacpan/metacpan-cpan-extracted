@@ -5,12 +5,29 @@ use warnings;
 
 use Storable 'dclone';
 
+# _now() is the clock timeouts are measured on, best first:
+#   - the monotonic clock: NTP corrections or a manual change of the system
+#     time cannot move it, so a clock set back cannot freeze a cached value;
+#   - Time::HiRes::time, for fractional timeouts without a monotonic clock;
+#   - the built-in time, in whole seconds.
+# The monotonic clock counts from an arbitrary point (usually boot), so its
+# readings mean nothing on their own - which is why a fresh key has
+# last => undef rather than 0.
 BEGIN {
-    eval { require Time::HiRes; };
-    Time::HiRes->import('time') unless $@;
+    my $hires = eval { require Time::HiRes; 1 };
+
+    my $monotonic;
+    $monotonic = eval {
+        my $id = Time::HiRes::CLOCK_MONOTONIC();
+        Time::HiRes::clock_gettime($id) >= 0 ? $id : undef     # -1 on failure
+    } if $hires;
+
+    *_now = defined $monotonic ? sub { Time::HiRes::clock_gettime($monotonic) }
+          : $hires             ? \&Time::HiRes::time
+          :                      sub { time };
 }
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 sub TIEHASH {
     my $class       = shift;
@@ -21,7 +38,7 @@ sub TIEHASH {
         $self->{ $k } = {
             timeout => $v->{timeout} || 1,
             source  => $v->{source},
-            last    => 0,
+            last    => undef,
             result  => undef,
             clone   => $v->{clone} ? 1 : 0
         }
@@ -42,7 +59,7 @@ sub STORE {
     $self->{ $k } = {
         timeout => $v->{timeout} || 1,
         source  => $v->{source},
-        last    => 0,
+        last    => undef,
         result  => undef,
         clone   => $v->{clone} ? 1 : 0
     }
@@ -65,11 +82,25 @@ sub DESTROY  { return 1 }
 sub _fetch {
     my ( $self, $k ) = @_;
 
-    if ( $self->{$k}{last} + $self->{$k}{timeout} < time() ) {
+    if ( !defined $self->{$k}{last}
+        || $self->{$k}{last} + $self->{$k}{timeout} < _now() ) {
 
-        my @result = eval { $self->{$k}{source}->() };
-        if ( $@ ) {
-            warn qq/Check source subroutine for key $k. Error - $@\n/;
+        # Failure is judged by eval's own value, not by $@: before 5.14 a
+        # destructor that runs eval while the source is dying clears $@, and an
+        # exception object may be false - either way the error would be taken
+        # for an empty result and cached for the whole timeout.
+        my @result;
+        my $ok = eval {
+            # Before 5.18, calling an undefined source warns "Use of
+            # uninitialized value in subroutine entry" on top of dying.
+            no warnings 'uninitialized';
+            @result = $self->{$k}{source}->();
+            1
+        };
+        unless ( $ok ) {
+            my $error = "$@";
+            $error = 'unknown error' unless length $error;
+            warn qq/Check source subroutine for key $k. Error - $error\n/;
             return undef
         }
 
@@ -81,7 +112,7 @@ sub _fetch {
             $self->{$k}{result} = \@result;
         }
 
-        $self->{$k}{last} = time();
+        $self->{$k}{last} = _now();
     }
 
     return $self->{$k}{clone} && ref $self->{$k}{result}
@@ -99,7 +130,7 @@ Tie::Cache::Autoupdater - a tied hash whose values refresh themselves on a timeo
 
 =head1 VERSION
 
-This documentation refers to C<Tie::Cache::Autoupdater> version 0.22
+This documentation refers to C<Tie::Cache::Autoupdater> version 0.23
 
 =head1 SYNOPSIS
 
@@ -190,6 +221,12 @@ warning and C<undef> on the first read.
 How long a cached value stays fresh, in seconds. Defaults to 1 second. With
 C<Time::HiRes> installed the timeout may be fractional; without it, values
 below 1 second simply mean "refresh on every read whose timestamp differs".
+
+Where the system provides a monotonic clock (Linux, the BSDs, macOS and most
+other Unix systems, through C<Time::HiRes>), timeouts are measured on it, so
+setting the system clock back - by hand or by an NTP correction - does not keep
+a stale value in the cache, and setting it forward does not expire values early.
+Without one, the wall clock is used.
 
 In the example below the value of C<db_counters> is refreshed at most once
 every 0.2 seconds, and the value of C<file_count> at most once every
@@ -283,6 +320,10 @@ the next read retries immediately instead of waiting for the timeout. A value
 cached by an earlier successful call stays in the cache but is not returned by
 the failed read; it will be returned again only if a later call succeeds.
 
+Every C<die> counts as a failure, including one whose error is lost or empty -
+a destructor that clears C<$@> on perl older than 5.14, or an exception object
+that is false. The warning then says C<unknown error>.
+
 Reading a key that was never registered returns C<undef> quietly, without
 calling anything and without a warning.
 
@@ -319,6 +360,8 @@ Stops the tie; the cached data is released with the underlying object.
 
 =head1 DEPENDENCIES
 
+Perl 5.8 or newer.
+
 =over 4
 
 =item *
@@ -328,7 +371,8 @@ L<Storable> - core module, used for C<clone>.
 =item *
 
 L<Time::HiRes> - core module, optional. Loaded at compile time if available,
-and then used instead of the built-in C<time> so that fractional timeouts work.
+and then used for its monotonic clock, or failing that for its C<time>, so
+that fractional timeouts work and timeouts are immune to system clock changes.
 
 =back
 

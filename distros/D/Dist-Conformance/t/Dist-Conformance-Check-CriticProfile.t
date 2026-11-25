@@ -1,7 +1,8 @@
-#!/usr/bin/env perl
+#!perl
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
+no autovivification;
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
 use FindBin::libs;
@@ -43,12 +44,12 @@ subtest profile_of => sub {
 subtest rewrite => sub {
     my $rewrite = \&Dist::Conformance::Check::CriticProfile::rewrite;
     my @body    = ( "a = 1\n", "# about b\n", "b = 2\n", "\n", "# the next one\n" );
-    is( [ $rewrite->( \@body, {} ) ],                          \@body,                                                                       'no overlay changes nothing' );
-    is( [ $rewrite->( \@body, { b => 3 } ) ],                  [ "a = 1\n", "# about b\n", "b = 3\n", "\n", "# the next one\n" ],               'a key keeps its line, with the new value' );
-    is( [ $rewrite->( \@body, { a => undef } ) ],              [ "# about b\n", "b = 2\n", "\n", "# the next one\n" ],                          'undef removes its line' );
-    is( [ $rewrite->( \@body, { d => 4, c => 3 } ) ],          [ "a = 1\n", "# about b\n", "b = 2\n", "c = 3\n", "d = 4\n", "\n", "# the next one\n" ], 'a new key goes after the last parameter, sorted, before the comments that end the section' );
-    is( [ $rewrite->( [ "# just a comment\n" ], { k => 'v' } ) ], [ "k = v\n", "# just a comment\n" ],                                  'and first when the section has none' );
-    is( [ $rewrite->( \@body, { z => undef } ) ],              \@body,                                                                       'and removing a key that is not there changes nothing' );
+    is( [ $rewrite->( \@body, {} ) ],                           \@body,                                                                                  'no overlay changes nothing' );
+    is( [ $rewrite->( \@body, { b => 3 } ) ],                   [ "a = 1\n", "# about b\n", "b = 3\n", "\n", "# the next one\n" ],                       'a key keeps its line, with the new value' );
+    is( [ $rewrite->( \@body, { a => undef } ) ],               [ "# about b\n", "b = 2\n", "\n", "# the next one\n" ],                                  'undef removes its line' );
+    is( [ $rewrite->( \@body, { d => 4, c => 3 } ) ],           [ "a = 1\n", "# about b\n", "b = 2\n", "c = 3\n", "d = 4\n", "\n", "# the next one\n" ], 'a new key goes after the last parameter, sorted, before the comments that end the section' );
+    is( [ $rewrite->( ["# just a comment\n"], { k => 'v' } ) ], [ "k = v\n", "# just a comment\n" ],                                                     'and first when the section has none' );
+    is( [ $rewrite->( \@body, { z => undef } ) ],               \@body,                                                                                  'and removing a key that is not there changes nothing' );
 };
 
 subtest expected => sub {
@@ -73,16 +74,16 @@ subtest expected => sub {
         "${HEADER}severity = 3\ntheme = core\n[RegularExpressions::RequireDefault]\nstrict = 1\n[Variables::ProhibitReusedNames]\n[-Subroutines::ProhibitSubroutinePrototypes]\n\n# The overrides of .conformance.yml\n[A::Mine]\n[-Not::Installed]\n[Z::Mine]\nmax = 3\n",
         'a policy that the template does not name goes at the end, sorted, and the settings change in place'
     );
-    is( profile( overrides => { ProhibitReusedNames => { allow => 'x' } } )->expected, "${HEADER}severity = 1\n[RegularExpressions::RequireDefault]\nstrict = 1\n[Variables::ProhibitReusedNames]\nallow = x\n[-Subroutines::ProhibitSubroutinePrototypes]\n", 'an override by the short name of a policy of the template changes that policy' );
-    is( dies { profile( overrides => { ProhibitReusedNames => 'off', 'Variables::ProhibitReusedNames' => {} } )->expected }, "overrides names the policy Variables::ProhibitReusedNames twice\n", 'so its short and its full name are one policy twice' );
-    is( with_template( "[A::B]\nk = v" )->expected, "[A::B]\nk = v\n", 'a template without a newline at its end gets one' );
-    is( dies { with_template( "[A::B]\nmax = {{MAX}}\n" )->expected }, "perlcriticrc needs the variables MAX in .conformance.yml: nothing sets them\n", 'a placeholder that nothing fills dies, naming it' );
-    is( dies { profile( overrides => { '-A::B' => 'off' } )->expected },               "overrides names -A::B, which is not the name of a policy\n", 'an override named as a section that turns a policy off is refused' );
-    is( dies { profile( overrides => { 'A::B' => 'off', 'Perl::Critic::Policy::A::B' => {} } )->expected }, "overrides names the policy A::B twice\n", 'and so is one policy named twice' );
+    is( profile( overrides => { ProhibitReusedNames => { allow => 'x' } } )->expected,                                       "${HEADER}severity = 1\n[RegularExpressions::RequireDefault]\nstrict = 1\n[Variables::ProhibitReusedNames]\nallow = x\n[-Subroutines::ProhibitSubroutinePrototypes]\n", 'an override by the short name of a policy of the template changes that policy' );
+    is( dies { profile( overrides => { ProhibitReusedNames => 'off', 'Variables::ProhibitReusedNames' => {} } )->expected }, "overrides names the policy Variables::ProhibitReusedNames twice\n",                                                                                                    'so its short and its full name are one policy twice' );
+    is( with_template("[A::B]\nk = v")->expected,                                                                            "[A::B]\nk = v\n",                                                                                                                                                      'a template without a newline at its end gets one' );
+    is( dies { with_template("[A::B]\nmax = {{MAX}}\n")->expected },                                                         "perlcriticrc needs the variables MAX in .conformance.yml: nothing sets them\n",                                                                                        'a placeholder that nothing fills dies, naming it' );
+    is( dies { profile( overrides => { '-A::B' => 'off' } )->expected },                                                     "overrides names -A::B, which is not the name of a policy\n",                                                                                                           'an override named as a section that turns a policy off is refused' );
+    is( dies { profile( overrides => { 'A::B' => 'off', 'Perl::Critic::Policy::A::B' => {} } )->expected },                  "overrides names the policy A::B twice\n",                                                                                                                              'and so is one policy named twice' );
     my $yaml = Dist::Conformance::Schema::parse_yaml( "Mine:\n  max: 30\n  name: x\n  gone: ~\nOther: off\n", 'the overrides' );
     like( profile( overrides => $yaml )->expected, qr/^\[Mine\]\nmax\ =\ 30\nname\ =\ x\n\[-Other\]\n/m, 'overrides as YAML gives them: a number, a string, ~ and off' );
-    like( dies { profile( overrides => { 'A::B' => 'on' } ) },                        qr{/overrides/A::B},                                          'an override is off or a mapping' );
-    like( dies { profile( overrides => { 'A::B' => { k => [1] } } ) },                qr{/overrides/A::B},                                          'and a parameter is a string or a number' );
+    like( dies { profile( overrides => { 'A::B' => 'on' } ) },         qr{/overrides/A::B}, 'an override is off or a mapping' );
+    like( dies { profile( overrides => { 'A::B' => { k => [1] } } ) }, qr{/overrides/A::B}, 'and a parameter is a string or a number' );
 };
 
 subtest differences => sub {
@@ -98,7 +99,7 @@ subtest differences => sub {
 };
 
 subtest check => sub {
-    is( check_of( Fixture::checkout() ),       [ 'fail', '.perlcriticrc is missing' ],                         'a missing profile fails' );
+    is( check_of( Fixture::checkout() ),      [ 'fail', '.perlcriticrc is missing' ],                     'a missing profile fails' );
     is( check_of( checkout_with($TEMPLATE) ), [ 'pass', 'is templates/perlcriticrc with the overrides' ], 'the template passes' );
     is(
         check_of( checkout_with("severity=1\n[Variables::ProhibitReusedNames]\n[RegularExpressions::RequireDefault]\nstrict=1\n[-Subroutines::ProhibitSubroutinePrototypes]\n") ),
@@ -117,29 +118,29 @@ subtest check => sub {
         [ 'fail', 'lacks the policy Subroutines::ProhibitSubroutinePrototypes; sets other parameters for the policy RegularExpressions::RequireDefault; sets other global settings, which conformance update corrects' ],
         'a policy that it lacks, a parameter, and a setting'
     );
-    is( check_of( checkout_with("junk\n") ), [ 'fail', '.perlcriticrc does not parse as a perlcritic profile: Syntax error at line 1: \'junk\', and conformance update replaces it' ], 'a profile that does not parse fails' );
-    is( check_of( checkout_with($TEMPLATE), replace => 1, retired => ['Old::One'], header => '# Other', outdated => ['# Old'] ), [ 'pass', 'is templates/perlcriticrc with the overrides' ], 'the deprecated keys still load, and decide nothing' );
+    is( check_of( checkout_with("junk\n") ),                                                                                     [ 'fail', '.perlcriticrc does not parse as a perlcritic profile: Syntax error at line 1: \'junk\', and conformance update replaces it' ], 'a profile that does not parse fails' );
+    is( check_of( checkout_with($TEMPLATE), replace => 1, retired => ['Old::One'], header => '# Other', outdated => ['# Old'] ), [ 'pass', 'is templates/perlcriticrc with the overrides' ],                                                                               'the deprecated keys still load, and decide nothing' );
 };
 
 subtest update => sub {
     my $root   = Fixture::checkout();
     my $update = Fixture::run_update( profile(), $root );
     is( $update->changes,                     [ { action => 'create', path => '.perlcriticrc' } ], 'a missing profile is written' );
-    is( $root->child('.perlcriticrc')->slurp, $TEMPLATE,                                         'from the template' );
+    is( $root->child('.perlcriticrc')->slurp, $TEMPLATE,                                           'from the template' );
 
     my %over = ( overrides => { 'RegularExpressions::RequireDefault' => { strict => 0 }, Mine => 'off' } );
     my $old  = checkout_with("# mine\n[Old::One]\n[RegularExpressions::RequireDefault]\nstrict = 1\n");
-    is( Fixture::run_update( profile(%over), $old )->changes, [ { action => 'replace', path => '.perlcriticrc' } ], 'a profile that differs is replaced' );
-    is( $old->child('.perlcriticrc')->slurp,                  profile(%over)->expected,                             'by the template with the overrides' );
+    is( Fixture::run_update( profile(%over), $old )->changes, [ { action => 'replace', path => '.perlcriticrc' } ],       'a profile that differs is replaced' );
+    is( $old->child('.perlcriticrc')->slurp,                  profile(%over)->expected,                                   'by the template with the overrides' );
     is( check_of( $old, %over ),                              [ 'pass', 'is templates/perlcriticrc with the overrides' ], 'and then passes' );
-    is( Fixture::run_update( profile(%over), $old )->changes, [],                                                   'so a second update has nothing to do' );
+    is( Fixture::run_update( profile(%over), $old )->changes, [],                                                         'so a second update has nothing to do' );
 
     my $layout = checkout_with("severity=1\n[Variables::ProhibitReusedNames]\n[RegularExpressions::RequireDefault]\nstrict=1\n[-Subroutines::ProhibitSubroutinePrototypes]\n");
-    is( Fixture::run_update( profile(), $layout )->changes, [ { action => 'replace', path => '.perlcriticrc' } ], 'a profile that differs only in layout is rewritten too' );
+    is( Fixture::run_update( profile(), $layout )->changes,                 [ { action => 'replace', path => '.perlcriticrc' } ], 'a profile that differs only in layout is rewritten too' );
     is( Fixture::run_update( profile(), checkout_with("junk\n") )->changes, [ { action => 'replace', path => '.perlcriticrc' } ], 'and so is one that does not parse' );
 
     my $unfilled = Fixture::run_update( with_template("[A::B]\nmax = {{MAX}}\n"), checkout_with($TEMPLATE) );
-    is( $unfilled->changes, [], 'a template with a placeholder that nothing fills is not written' );
+    is( $unfilled->changes, [],                                                                                                                        'a template with a placeholder that nothing fills is not written' );
     is( $unfilled->manual,  ['perlcriticrc needs the variables MAX in .conformance.yml: nothing sets them: CriticProfile cannot write .perlcriticrc'], 'and a person is told what it needs' );
 
     my $dry    = checkout_with("[Old::One]\n");
@@ -158,9 +159,9 @@ subtest full_name => sub {
 };
 
 subtest adopt => sub {
-    is( profile()->adopt( snapshot( Fixture::checkout() ) ),        undef, 'nothing for a missing profile' );
-    is( profile()->adopt( snapshot( checkout_with($TEMPLATE) ) ),   undef, 'nor for the template' );
-    my $text = "severity = 3\n[RegularExpressions::RequireDefault]\nextra = x\n[Subroutines::ProhibitSubroutinePrototypes]\nmax = 2\n[Mine]\nk = v\n[-Off::Mine]\n[-Subroutines::ProhibitSubroutinePrototypes2]\n";
+    is( profile()->adopt( snapshot( Fixture::checkout() ) ),      undef, 'nothing for a missing profile' );
+    is( profile()->adopt( snapshot( checkout_with($TEMPLATE) ) ), undef, 'nor for the template' );
+    my $text    = "severity = 3\n[RegularExpressions::RequireDefault]\nextra = x\n[Subroutines::ProhibitSubroutinePrototypes]\nmax = 2\n[Mine]\nk = v\n[-Off::Mine]\n[-Subroutines::ProhibitSubroutinePrototypes2]\n";
     my $root    = checkout_with($text);
     my $adopted = profile()->adopt( snapshot($root) );
     is(
@@ -184,7 +185,7 @@ subtest adopt => sub {
     is( [ $kept->check( snapshot($root) ) ], [ 'fail', 'lacks the policy Variables::ProhibitReusedNames, which conformance update corrects' ], 'with what it adopts, the profile differs only by the policy that the template gained' );
     Fixture::run_update( $kept, $root );
     my $after = Dist::Conformance::Check::CriticProfile::profile_of( $root->child('.perlcriticrc')->slurp, 'after' );
-    my $was   = Dist::Conformance::Check::CriticProfile::profile_of( $text,                               'before' );
+    my $was   = Dist::Conformance::Check::CriticProfile::profile_of( $text,                                'before' );
     delete $after->{policies}{'Variables::ProhibitReusedNames'};
     is( $after, $was, 'so the update keeps what Perl::Critic read, and adds that policy' );
 };

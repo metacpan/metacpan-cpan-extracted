@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
@@ -77,15 +77,17 @@ subtest 'update' => sub {
 subtest 'adopt' => sub {
     my $root = repo( 'troglodyne-5.040', '.perlcriticrc' => "severity = 1\n[RegularExpressions::RequireDefault]\nstrict = 1\n[Variables::ProhibitReusedNames]\nallow = \$self\n[-Subroutines::ProhibitSubroutinePrototypes]\n[Mine]\n" );
     my $run  = run_main( qw{adopt --root}, $root );
-    is( $run->{status}, 0, 'exits 0' );
+    is( $run->{status},                                                     0,                                                                                                                            'exits 0' );
     is( Dist::Conformance::Schema::parse_yaml( $run->{out}, 'the output' ), { checks => { CriticProfile => { overrides => { 'Variables::ProhibitReusedNames' => { allow => '$self' }, Mine => {} } } } }, 'prints what the checks would take in .conformance.yml, as YAML' );
 
-    my $adopted = Fixture::checkout( '.conformance.yml' => "flavor: troglodyne-5.040\nsource: { directory: $STANDARDS }\n$run->{out}" =~ s/^---\n//mr, '.perlcriticrc' => slurp_of( $root, '.perlcriticrc' ) );
-    like( run_main( qw{check --root}, $adopted )->{out}, qr/^info\ \ CriticProfile\ +differs\ .+\ only\ in\ comments\ and\ layout/m, 'and with it in .conformance.yml, the profile differs only in layout' );
+    my $adopted     = Fixture::checkout( '.conformance.yml' => "flavor: troglodyne-5.040\nsource: { directory: $STANDARDS }\n$run->{out}" =~ s/^---\n//mr, '.perlcriticrc' => slurp_of( $root, '.perlcriticrc' ) );
+    my $differs     = qr/^info\ \ CriticProfile\ +differs\ /m;
+    my $only_layout = qr/\ only\ in\ comments\ and\ layout/;
+    like( run_main( qw{check --root}, $adopted )->{out}, qr/$differs.+$only_layout/, 'and with it in .conformance.yml, the profile differs only in layout' );
 
     my $json = Dist::Conformance::Schema::parse_json( run_main( qw{adopt --json --root}, $root )->{out}, 'the output' );
-    is( [ @{$json}{qw{command adopted}} ], [ 'adopt', { CriticProfile => { overrides => { 'Variables::ProhibitReusedNames' => { allow => '$self' }, Mine => {} } } } ], 'and as JSON' );
-    is( run_main( qw{adopt --root}, repo('troglodyne-5.040') )->{out}, "---\nchecks: {}\n", 'nothing to adopt is an empty mapping' );
+    is( [ @{$json}{qw{command adopted}} ],                             [ 'adopt', { CriticProfile => { overrides => { 'Variables::ProhibitReusedNames' => { allow => '$self' }, Mine => {} } } } ], 'and as JSON' );
+    is( run_main( qw{adopt --root}, repo('troglodyne-5.040') )->{out}, "---\nchecks: {}\n",                                                                                                         'nothing to adopt is an empty mapping' );
 };
 
 subtest '--standards and --offline' => sub {

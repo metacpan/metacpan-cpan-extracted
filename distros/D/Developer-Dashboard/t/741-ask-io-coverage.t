@@ -36,6 +36,9 @@ chdir $home or die "Unable to chdir to $home: $!";
 sub wf {
     my ( $path, $content ) = @_;
     open my $fh, '>', $path or die "Unable to write $path: $!";
+    # Raw mode: the product reads these fixtures raw, so a text-mode write
+    # would add a carriage return on Windows.
+    binmode $fh;
     print {$fh} $content;
     close $fh or die "Unable to close $path: $!";
     return $path;
@@ -60,6 +63,10 @@ sub wf {
     my $good = wf( File::Spec->catfile( $root, 'good.txt' ), "needle good\n" );
     local $OPEN_FAIL{$bad} = 1;
     $OPEN_FAIL{ File::Spec->rel2abs($bad) } = 1;
+    # The search walks the root in forward-slash spelling on Windows, so the
+    # injected failure is keyed on that spelling of the same file as well.
+    ( my $bad_slashed = File::Spec->rel2abs($bad) ) =~ tr{\\}{/};
+    local $OPEN_FAIL{$bad_slashed} = 1;
     my $out = $M->can('_execute_grep_repo')->( 'needle', undef, $root );
     like( $out, qr/good\.txt:1:needle good/, 'readable files are still searched' );
     unlike( $out, qr/bad\.txt/, 'the unreadable file is skipped' );

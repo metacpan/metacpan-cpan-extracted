@@ -13,24 +13,24 @@ use lib 'lib';
 use Developer::Dashboard::PerlEnv;
 
 my $repo_root = getcwd();
-my $dashboard = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
+my $dashboard = File::Spec->catfile( $repo_root, 'bin', 'd2' );
 my $d2        = File::Spec->catfile( $repo_root, 'bin', 'd2' );
 my $source = _slurp($dashboard);
 
-like( $source, qr/\A#!\/usr\/bin\/env perl\b/, 'dashboard entrypoint uses /usr/bin/env perl' );
-unlike( $source, qr/BOOKMARK:\s+\S+-dashboard/, 'dashboard entrypoint no longer embeds extracted dashboard bookmark ids' );
-unlike( $source, qr/Developer::Dashboard::CLI::SeededPages/, 'dashboard entrypoint no longer loads the seeded bookmark loader directly' );
-unlike( $source, qr/Developer::Dashboard::CLI::Query/, 'dashboard entrypoint no longer loads the query CLI module directly' );
-unlike( $source, qr/Developer::Dashboard::CLI::OpenFile/, 'dashboard entrypoint no longer loads the open-file CLI module directly' );
-unlike( $source, qr/Developer::Dashboard::CLI::Ticket/, 'dashboard entrypoint no longer loads the ticket CLI module directly' );
-unlike( $source, qr/\bif\s*\(\s*\$cmd\s+eq\s+'(?:encode|decode|indicator|collector|config|auth|init|cpan|page|action|docker|serve|stop|restart|shell|doctor|skills|skill)'\s*\)/, 'dashboard entrypoint no longer embeds built-in command implementation branches' );
-like( $source, qr/Developer::Dashboard::InternalCLI/, 'dashboard entrypoint delegates built-in commands through InternalCLI staging' );
-like( $source, qr/_exec_switchboard_command/, 'dashboard entrypoint only resolves and execs staged commands' );
-like( $source, qr/_custom_command_path/, 'dashboard entrypoint resolves layered custom commands' );
-like( $source, qr/_builtin_helper_path/, 'dashboard entrypoint resolves staged private built-in helpers' );
+like( $source, qr/\A#!\/usr\/bin\/env perl\b/, 'd2 entrypoint uses /usr/bin/env perl' );
+unlike( $source, qr/BOOKMARK:\s+\S+-dashboard/, 'd2 entrypoint no longer embeds extracted dashboard bookmark ids' );
+unlike( $source, qr/Developer::Dashboard::CLI::SeededPages/, 'd2 entrypoint no longer loads the seeded bookmark loader directly' );
+unlike( $source, qr/Developer::Dashboard::CLI::Query/, 'd2 entrypoint no longer loads the query CLI module directly' );
+unlike( $source, qr/Developer::Dashboard::CLI::OpenFile/, 'd2 entrypoint no longer loads the open-file CLI module directly' );
+unlike( $source, qr/Developer::Dashboard::CLI::Ticket/, 'd2 entrypoint no longer loads the ticket CLI module directly' );
+unlike( $source, qr/\bif\s*\(\s*\$cmd\s+eq\s+'(?:encode|decode|indicator|collector|config|auth|init|cpan|page|action|docker|serve|stop|restart|shell|doctor|skills|skill)'\s*\)/, 'd2 entrypoint no longer embeds built-in command implementation branches' );
+like( $source, qr/Developer::Dashboard::InternalCLI/, 'd2 entrypoint delegates built-in commands through InternalCLI staging' );
+like( $source, qr/_exec_switchboard_command/, 'd2 entrypoint only resolves and execs staged commands' );
+like( $source, qr/_custom_command_path/, 'd2 entrypoint resolves layered custom commands' );
+like( $source, qr/_builtin_helper_path/, 'd2 entrypoint resolves staged private built-in helpers' );
 like( $source, qr/_builtin_helper_path\('skills'\)/, 'dashboard dotted skill dispatch reuses the staged skills helper' );
-like( $source, qr/_exec_switchboard_command\( \$helper_path, '_exec', \$skill_name, \$skill_command, \@ARGV \)/, 'dashboard dotted skill dispatch hands skill commands through the internal skills exec route' );
-like( $source, qr/Developer::Dashboard::PerlEnv->bootstrap_perl5lib/, 'dashboard entrypoint bootstraps a safe Perl library order before helper dispatch' );
+like( $source, qr/_exec_switchboard_command\( \$helper_path, (?:\@helper_argv, )?'_exec', \$skill_name, \$skill_command, \@ARGV \)/, 'dashboard dotted skill dispatch hands skill commands through the internal skills exec route' );
+like( $source, qr/Developer::Dashboard::PerlEnv->bootstrap_perl5lib/, 'd2 entrypoint bootstraps a safe Perl library order before helper dispatch' );
 
 my $private_core = _slurp( File::Spec->catfile( $repo_root, 'share', 'private-cli', '_dashboard-core' ) );
 like( $private_core, qr/Developer::Dashboard::PerlEnv->bootstrap_perl5lib/, 'private helper core bootstraps a safe Perl library order before loading command modules' );
@@ -48,7 +48,7 @@ like(
 my $share_seeded_root = File::Spec->catdir( $repo_root, 'share', 'seeded-pages' );
 ok(
     !-e $share_seeded_root || -d $share_seeded_root,
-    'share/seeded-pages is either omitted from the dist or present as a directory outside the dashboard entrypoint',
+    'share/seeded-pages is either omitted from the dist or present as a directory outside the d2 entrypoint',
 );
 is_deeply(
     [ sort glob( File::Spec->catfile( $share_seeded_root, '*' ) ) ],
@@ -75,32 +75,32 @@ open my $jq_fh, '>', $jq_json or die "Unable to write $jq_json: $!";
 print {$jq_fh} qq|{"alpha":1}\n|;
 close $jq_fh;
 
-my $jq_output = qx{$^X -I$lib $dashboard jq .alpha "$jq_json" 2>&1};
+my $jq_output = qx{$^X -I$lib $d2 jq .alpha "$jq_json" 2>&1};
 my $jq_exit = $? >> 8;
-is( $jq_exit, 0, 'dashboard jq stays on the lazy lightweight path without loading heavy web modules' )
+is( $jq_exit, 0, 'd2 jq stays on the lazy lightweight path without loading heavy web modules' )
   or diag $jq_output;
-like( $jq_output, qr/\b1\b/, 'dashboard jq still returns the requested value' );
+like( $jq_output, qr/\b1\b/, 'd2 jq still returns the requested value' );
 
-my $version_output = qx{$^X -I$lib $dashboard version 2>&1};
+my $version_output = qx{$^X -I$lib $d2 version 2>&1};
 my $version_exit = $? >> 8;
-is( $version_exit, 0, 'dashboard version also stays on the lightweight path without loading heavy web modules' )
+is( $version_exit, 0, 'd2 version also stays on the lightweight path without loading heavy web modules' )
   or diag $version_output;
-like( $version_output, qr/^\d+\.\d+\s*\z/, 'dashboard version still prints the package version' );
+like( $version_output, qr/^\d+\.\d+\s*\z/, 'd2 version still prints the package version' );
 
 my $lazy_home = tempdir( CLEANUP => 1 );
 {
     local $ENV{HOME} = $lazy_home;
-    my $init_output = qx{$^X -I$lib $dashboard init 2>&1};
+    my $init_output = qx{$^X -I$lib $d2 init 2>&1};
     my $init_exit = $? >> 8;
-    is( $init_exit, 0, 'dashboard init stages private helpers before the prompt lazy-load check' )
+    is( $init_exit, 0, 'd2 init stages private helpers before the prompt lazy-load check' )
       or diag $init_output;
 }
 my $private_cli_root = File::Spec->catdir( $lazy_home, '.developer-dashboard', 'cli' );
 my $private_dd_root  = File::Spec->catdir( $private_cli_root, 'dd' );
-ok( -d $private_dd_root, 'dashboard init creates the private dd helper namespace' );
-ok( -f File::Spec->catfile( $private_dd_root, 'jq' ), 'dashboard init keeps built-in helpers inside cli/dd' );
-ok( !-e File::Spec->catfile( $private_cli_root, 'jq' ), 'dashboard init does not leak built-in helpers into the user CLI root' );
-ok( !-e File::Spec->catfile( $private_cli_root, '_dashboard-core' ), 'dashboard init does not leak the private core runtime into the user CLI root' );
+ok( -d $private_dd_root, 'd2 init creates the private dd helper namespace' );
+ok( -f File::Spec->catfile( $private_dd_root, 'jq' ), 'd2 init keeps built-in helpers inside cli/dd' );
+ok( !-e File::Spec->catfile( $private_cli_root, 'jq' ), 'd2 init does not leak built-in helpers into the user CLI root' );
+ok( !-e File::Spec->catfile( $private_cli_root, '_dashboard-core' ), 'd2 init does not leak the private core runtime into the user CLI root' );
 my $d2_home = tempdir( CLEANUP => 1 );
 {
     local $ENV{HOME} = $d2_home;
@@ -119,15 +119,15 @@ my $lazy_file_dir = File::Spec->catdir( $lazy_lib, 'File' );
 make_path( $lazy_cli_dir, $lazy_skill_dir, $lazy_file_dir );
 _write_perl_module(
     File::Spec->catfile( $lazy_cli_dir, 'Suggest.pm' ),
-    "package Developer::Dashboard::CLI::Suggest;\ndie qq(lazy-loader-regression: suggestion runtime loaded during dashboard ps1\\n);\n",
+    "package Developer::Dashboard::CLI::Suggest;\ndie qq(lazy-loader-regression: suggestion runtime loaded during d2 ps1\\n);\n",
 );
 _write_perl_module(
     File::Spec->catfile( $lazy_skill_dir, 'SkillManager.pm' ),
-    "package Developer::Dashboard::SkillManager;\ndie qq(lazy-loader-regression: skill manager loaded during dashboard ps1\\n);\n",
+    "package Developer::Dashboard::SkillManager;\ndie qq(lazy-loader-regression: skill manager loaded during d2 ps1\\n);\n",
 );
 _write_perl_module(
     File::Spec->catfile( $lazy_skill_dir, 'SeedSync.pm' ),
-    "package Developer::Dashboard::SeedSync;\ndie qq(lazy-loader-regression: seed sync loaded during dashboard ps1\\n);\n",
+    "package Developer::Dashboard::SeedSync;\ndie qq(lazy-loader-regression: seed sync loaded during d2 ps1\\n);\n",
 );
 _write_perl_module(
     File::Spec->catfile( $lazy_skill_dir, 'FileRegistry.pm' ),
@@ -135,7 +135,7 @@ _write_perl_module(
 );
 _write_perl_module(
     File::Spec->catfile( $lazy_file_dir, 'ShareDir.pm' ),
-    "package File::ShareDir;\ndie qq(lazy-loader-regression: File::ShareDir loaded during dashboard ps1\\n);\n",
+    "package File::ShareDir;\ndie qq(lazy-loader-regression: File::ShareDir loaded during d2 ps1\\n);\n",
 );
 my $lazy_capture_dir = File::Spec->catdir( $lazy_lib, 'Capture' );
 make_path($lazy_capture_dir);
@@ -149,26 +149,26 @@ _write_perl_module(
     local $ENV{PERL5OPT} = '-I' . $lazy_lib;
     local $ENV{TMUX} = '';
     local $ENV{TICKET_REF} = undef;
-    my $ps1_output = qx{$^X -I$lib $dashboard ps1 --cwd "$lazy_home" --mode compact --no-indicators 2>&1};
+    my $ps1_output = qx{$^X -I$lib $d2 ps1 --cwd "$lazy_home" --mode compact --no-indicators 2>&1};
     my $ps1_exit = $? >> 8;
-    is( $ps1_exit, 0, 'dashboard ps1 stays on the lightweight helper path once helpers are already staged' )
+    is( $ps1_exit, 0, 'd2 ps1 stays on the lightweight helper path once helpers are already staged' )
       or diag $ps1_output;
-    unlike( $ps1_output, qr/lazy-loader-regression:/, 'dashboard ps1 does not load suggestion, skill, or helper-staging-only modules on the hot path' );
+    unlike( $ps1_output, qr/lazy-loader-regression:/, 'd2 ps1 does not load suggestion, skill, or helper-staging-only modules on the hot path' );
 
-    my $paths_output = qx{$^X -I$lib $dashboard paths -o json 2>&1};
+    my $paths_output = qx{$^X -I$lib $d2 paths -o json 2>&1};
     my $paths_exit = $? >> 8;
-    is( $paths_exit, 0, 'dashboard paths lists runtime paths without requiring FileRegistry' )
+    is( $paths_exit, 0, 'd2 paths lists runtime paths without requiring FileRegistry' )
       or diag $paths_output;
-    unlike( $paths_output, qr/lazy-loader-regression:/, 'dashboard paths does not load FileRegistry for path-only config access' );
+    unlike( $paths_output, qr/lazy-loader-regression:/, 'd2 paths does not load FileRegistry for path-only config access' );
 }
 
 {
     my $compat_home = tempdir( CLEANUP => 1 );
     {
         local $ENV{HOME} = $compat_home;
-        my $init_output = qx{$^X -I$lib $dashboard init 2>&1};
+        my $init_output = qx{$^X -I$lib $d2 init 2>&1};
         my $init_exit = $? >> 8;
-        is( $init_exit, 0, 'dashboard init stages private helpers before the ps1 compatibility check' )
+        is( $init_exit, 0, 'd2 init stages private helpers before the ps1 compatibility check' )
           or diag $init_output;
     }
 
@@ -326,7 +326,7 @@ PERL
 }
 
 my @perl_scripts = (
-    File::Spec->catfile( $repo_root, 'bin', 'dashboard' ),
+    File::Spec->catfile( $repo_root, 'bin', 'd2' ),
     File::Spec->catfile( $repo_root, 'bin', 'd2' ),
     File::Spec->catfile( $repo_root, 'app.psgi' ),
     (
@@ -468,14 +468,14 @@ __END__
 
 =head1 DESCRIPTION
 
-This test keeps the public dashboard entrypoint free from embedded bookmark
+This test keeps the public d2 entrypoint free from embedded bookmark
 source, verifies lightweight commands avoid the heavy web runtime, and enforces
 the C</usr/bin/env perl> shebang for shipped Perl scripts. It also runs real
 switchboard and dotted skill commands under isolated homes to verify that
 caller-exported environment values take precedence while ordinary skill values
 still override home defaults.
 It also blocks FileRegistry with a failing stub to prove the prompt and
-C<dashboard paths -o json> paths do not load file-registry code for config
+C<d2 paths -o json> paths do not load file-registry code for config
 operations that only require path resolution.
 
 =for comment FULL-POD-DOC START

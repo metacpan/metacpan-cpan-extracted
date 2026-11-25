@@ -1583,7 +1583,8 @@ Cause: install.sh bootstraps from MetaCPAN, which may lag behind fixes on
 master. No image workflow replaced that installed CPAN package with a tarball
 built from the checked-out source.
 
-Red-first regression: t/228-dockerhub-image-workflow.t checks secret wiring,
+Red-first regression: the test 228-dockerhub-image-workflow (removed on
+2026-11-23 with the GitHub workflow files) checked secret wiring,
 the master/manual triggers, tag derivation, multi-platform build, and the
 install.sh -> dzil build -> cpanm sequence. It also guards the shared Docker
 context exception needed to retain the archive for d2 docker.images.build. It
@@ -1619,7 +1620,8 @@ confirmed the workflow contract test is included and no coverage database is
 packaged. README/POD parity and all 76 library module versions were verified.
 
 Post-push Scorecard found the Dockerfile's Ubuntu tag was not digest-pinned
-(Pinned-Dependencies 9/10). t/228 now requires the Ubuntu reference to include
+(Pinned-Dependencies 9/10). The test 228-dockerhub-image-workflow (removed on
+2026-11-23 with the GitHub workflow files) then required the Ubuntu reference to include
 an immutable manifest digest; it failed before the Dockerfile change and
 passed afterward. The base now uses Scorecard's reported multi-platform
 manifest digest. This corrective follow-up is version 5.82. Rerun Scorecard
@@ -1660,7 +1662,8 @@ installation had no --notest, rerunning the 23,000+ test suite for each
 emulated target architecture despite separate full repository and coverage
 gates.
 
-Red test: t/228-dockerhub-image-workflow.t was first updated to require
+Red test: the test 228-dockerhub-image-workflow (removed on 2026-11-23 with
+the GitHub workflow files) was first updated to require
 cpanm --notest --reinstall for installing the generated archive. In the Docker
 dev service it failed against the old Dockerfile (31 passed, 1 failed),
 reproducing the duplicate suite.

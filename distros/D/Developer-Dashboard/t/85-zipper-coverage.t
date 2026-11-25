@@ -164,8 +164,11 @@ ok( -f $stored_undef->{path}, '_saved_ajax_url_and_store writes an empty file wh
     );
     umask($old_umask);
     ok( defined $DD601_OBSERVED_RENAME_MODE, 'DD-601: _saved_ajax_url_and_store renamed a source file into the predictable final path (rename observed)' );
-    is( sprintf( '%04o', $DD601_OBSERVED_RENAME_MODE // -1 ), '0700',
-        'DD-601: the source file was already 0700 BEFORE the rename that made it visible at its final, predictable path - even under umask(0)' );
+  SKIP: {
+        skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
+        is( sprintf( '%04o', $DD601_OBSERVED_RENAME_MODE // -1 ), '0700',
+            'DD-601: the source file was already 0700 BEFORE the rename that made it visible at its final, predictable path - even under umask(0)' );
+    }
 }
 
 # DD-601: force the earlier open-stage die. _pending_ajax_file is pinned to a
@@ -255,6 +258,7 @@ SKIP: {
         # existing mode, which answers the question without changing anything.
         my $devnull   = File::Spec->devnull;
         my $null_mode = ( stat $devnull )[2];
+        skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
         skip 'cannot stat the null device to probe chmod ownership', 1 if !defined $null_mode;
         skip 'this process can chmod a device it does not own, so the chmod failure cannot occur', 1
           if chmod( $null_mode & 07777, $devnull );

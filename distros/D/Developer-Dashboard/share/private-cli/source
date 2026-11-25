@@ -24,14 +24,14 @@ source - private runtime installed-file listing helper for Developer Dashboard (
 
 =head1 SYNOPSIS
 
-  dashboard source --files
+  d2 source --files
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-main C<dashboard> command can list every file Developer Dashboard installed
+main C<d2> command can list every file Developer Dashboard installed
 under C<~/perl5/{lib,bin}>, as a fallback reference for an agent digging
-deeper than C<dashboard ask --docs>'s curated onboarding summary covers,
+deeper than C<d2 ask --docs>'s curated onboarding summary covers,
 without bloating the public switchboard.
 
 =head1 PURPOSE
@@ -43,8 +43,8 @@ command and its own test coverage.
 
 =head1 WHY IT EXISTS
 
-C<dashboard ask --docs> is a short, curated summary - cheap to inject on
-every call, but necessarily incomplete. C<dashboard source --files> answers
+C<d2 ask --docs> is a short, curated summary - cheap to inject on
+every call, but necessarily incomplete. C<d2 source --files> answers
 "what is actually installed, and where?" so an agent can read the real,
 current implementation directly rather than rely only on the summary.
 
@@ -56,10 +56,10 @@ implementation.
 
 =head1 HOW TO USE
 
-  dashboard source --files
+  d2 source --files
 
 Lists every file under C<~/perl5/lib> and C<~/perl5/bin>, one per line,
-sorted. Run it directly as C<dashboard source --files> (or C<d2 source
+sorted. Run it directly as C<d2 source --files> (or C<d2 source
 --files>) from anywhere on a machine with Developer Dashboard installed;
 C<--files> is required and no other flags exist. Pipe the output into
 C<grep> or C<Read> individual paths to inspect the real, current
@@ -67,8 +67,8 @@ implementation of any command or module.
 
 =head1 WHAT USES IT
 
-The public C<dashboard> switchboard resolves and stages this file; an agent
-or user runs it directly as C<dashboard source --files>.
+The public C<d2> switchboard resolves and stages this file; an agent
+or user runs it directly as C<d2 source --files>.
 
 =for comment FULL-POD-DOC START
 
@@ -76,11 +76,11 @@ or user runs it directly as C<dashboard source --files>.
 
 Example 1:
 
-  dashboard source --files
+  d2 source --files
 
 List every file Developer Dashboard installed on this machine, for an agent
 that needs to grep/Read the real implementation beyond the curated
-C<dashboard ask --docs> summary.
+C<d2 ask --docs> summary.
 
 =for comment FULL-POD-DOC END
 

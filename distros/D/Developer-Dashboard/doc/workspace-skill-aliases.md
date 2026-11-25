@@ -1,6 +1,6 @@
 # Workspace Skill Path Aliases
 
-`dashboard workspace` resolves configured path aliases before preparing a tmux
+`d2 workspace` resolves configured path aliases before preparing a tmux
 session. Skill-qualified aliases use the same spelling as `cdr`: for example,
 if skill `bar` defines path alias `foo`, run `d2 workspace bar.foo` to create or
 reuse session `bar.foo` in that directory. The session keeps the qualified

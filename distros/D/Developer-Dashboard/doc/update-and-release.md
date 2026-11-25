@@ -47,7 +47,7 @@ Hard implementation rules under this gate:
 - move required `write` permissions down to the job that actually needs them
 - keep action refs pinned by full SHA
 - keep Docker `FROM` lines pinned by digest when Scorecard scans them
-- keep a detectable fuzzing signal in the repo; this tree uses `fast-check` plus `.clusterfuzzlite/Dockerfile`, and any workflow that drives `dashboard encode` / `dashboard decode` must install the Perl runtime first
+- keep a detectable fuzzing signal in the repo; this tree uses `fast-check` plus `.clusterfuzzlite/Dockerfile`, and any workflow that drives `d2 encode` / `d2 decode` must install the Perl runtime first
 - keep `Signed-Releases` backed by a real GitHub release that contains the release tarball and its detached signature asset
 - keep workflow coverage gates matching the `Devel::Cover` `Total` summary line by regex instead of fixed-width spacing, because host upgrades can change padding without changing the real `100.0 / 100.0 / 100.0` outcome
 
@@ -81,7 +81,7 @@ be recovered, and it is not something the dispatch path is meant to bypass.
 The GitHub-hosted CPAN upload workflow is deliberately manual-only. Do not
 wire tag pushes to automatic PAUSE uploads here; ordinary `vX.XX` tags are for
 the signed GitHub release path, while CPAN publication stays an explicit
-`workflow_dispatch`, local `dashboard pause-release`, or local `dzil release`
+`workflow_dispatch`, local `d2 pause-release`, or local `dzil release`
 operator action. The repository configures `Dist::Zilla::Plugin::UploadToCPAN`
 as the real releaser for `dzil release`. Configure credentials only in
 `~/.dzil/config.ini` or `~/.pause`, never in tracked repository files. Run
@@ -193,13 +193,13 @@ worktrees, runtime state, and local output.
 Run:
 
 ```bash
-perl -Ilib bin/dashboard version
+perl -Ilib bin/d2 version
 mkdir -p ~/.developer-dashboard/cli/update.d
 printf '#!/usr/bin/env perl\nuse Developer::Dashboard::Runtime::Result;\nprint Developer::Dashboard::Runtime::Result::stdout(q{01-runtime});\nprint $ENV{RESULT} // q{}\n' > ~/.developer-dashboard/cli/update
 chmod +x ~/.developer-dashboard/cli/update
 printf '#!/bin/sh\necho runtime-update\n' > ~/.developer-dashboard/cli/update.d/01-runtime
 chmod +x ~/.developer-dashboard/cli/update.d/01-runtime
-perl -Ilib bin/dashboard update
+perl -Ilib bin/d2 update
 ```
 
 This executes ordered scripts from either `~/.developer-dashboard/cli/update`
@@ -212,7 +212,7 @@ or `~/.developer-dashboard/cli/update.d`:
 5. rewriting `RESULT` after each hook so later hook files can react to earlier output
 6. passing the final `RESULT` JSON to the real command
 
-`dashboard update` has no special built-in path. If you want it, provide it as
+`d2 update` has no special built-in path. If you want it, provide it as
 a normal user command and let its hook files run through the same top-level
 command-hook path as every other dashboard subcommand.
 
@@ -221,7 +221,7 @@ structured hook output without hand-parsing the JSON blob. If the final Perl
 command wants a compact summary after the hook chain finishes, it can call
 `Developer::Dashboard::Runtime::Result->report()`.
 
-Use `dashboard version` to print the installed Developer Dashboard version.
+Use `d2 version` to print the installed Developer Dashboard version.
 
 Before a release or push, regenerate the checkout manual with:
 
@@ -288,13 +288,13 @@ source-tree test and coverage gates already covered that work.
 Initialize runtime state:
 
 ```bash
-perl -Ilib bin/dashboard init
+perl -Ilib bin/d2 init
 ```
 
 Serve the local app in the background:
 
 ```bash
-perl -Ilib bin/dashboard serve
+perl -Ilib bin/d2 serve
 ```
 
 The root path now redirects to `/app/index` when a saved `index` bookmark exists, and otherwise opens the free-form bookmark editor directly. `/apps` still redirects to `/app/index`.
@@ -314,35 +314,35 @@ Edit and source routes must preserve raw Template Toolkit placeholders in bookma
 Create a helper login user:
 
 ```bash
-perl -Ilib bin/dashboard auth add-user <username> <password>
+perl -Ilib bin/d2 auth add-user <username> <password>
 ```
 
 Remove a helper login user:
 
 ```bash
-perl -Ilib bin/dashboard auth remove-user helper
+perl -Ilib bin/d2 auth remove-user helper
 ```
 
 Render shell bootstrap:
 
 ```bash
-perl -Ilib bin/dashboard shell bash
-perl -Ilib bin/dashboard shell zsh
-perl -Ilib bin/dashboard shell sh
-perl -Ilib bin/dashboard shell ps
+perl -Ilib bin/d2 shell bash
+perl -Ilib bin/d2 shell zsh
+perl -Ilib bin/d2 shell sh
+perl -Ilib bin/d2 shell ps
 ```
 
 Audit runtime permissions:
 
 ```bash
-perl -Ilib bin/dashboard doctor
-perl -Ilib bin/dashboard doctor --fix
+perl -Ilib bin/d2 doctor
+perl -Ilib bin/d2 doctor --fix
 ```
 
 Refresh local project and Git indicators:
 
 ```bash
-perl -Ilib bin/dashboard indicator refresh-core
+perl -Ilib bin/d2 indicator refresh-core
 ```
 
 The core refresh does not probe for Docker or create a Docker indicator. A
@@ -354,7 +354,7 @@ records named `docker` are preserved.
 Inspect collector state:
 
 ```bash
-perl -Ilib bin/dashboard collector inspect healthy.collector
+perl -Ilib bin/d2 collector inspect healthy.collector
 ```
 
 Collector definitions may use either a shell `command` string or Perl `code`
@@ -364,39 +364,39 @@ block is enough for the common case. Collector indicators are also seeded
 before the first run, so prompt and page status views show configured checks
 immediately as missing until a collector reports a real exit code. Prompt
 rendering prefixes the collector icon with `✅` for healthy checks and `🚨`
-for failing or missing checks. `dashboard shell` now emits shell-specific
+for failing or missing checks. `d2 shell` now emits shell-specific
 bootstrap for bash, zsh, POSIX `sh`, and PowerShell `ps`, so release
 validation should cover whichever interactive shell bootstrap a new feature
 touches. PowerShell verification should check the generated `prompt`
 function rather than looking for a POSIX `PS1` export.
 The browser top-right status strip should also show the configured collector
 icon instead of the collector name, and a collector rename should remove the
-old managed indicator from both `/system/status` and `dashboard ps1`. Verify
+old managed indicator from both `/system/status` and `d2 ps1`. Verify
 that UTF-8 icons such as `🐳` and `💰` are actually visible in the browser
 chrome, not just present in `/system/status` JSON. For bookmark Ajax helper
 pages that declare `var endpoints = {};`, verify the saved `set_chain_value()`
 bindings run after that declaration so `$(document).ready(...)` helper calls
 populate the DOM without a console `ReferenceError`.
-Permission-sensitive changes should also verify that `dashboard doctor`
+Permission-sensitive changes should also verify that `d2 doctor`
 reports insecure older or home-runtime paths before repair and returns clean
 after `--fix`.
 
 Render prompt in extended colored mode:
 
 ```bash
-perl -Ilib bin/dashboard ps1 --jobs 1 --mode extended --color
+perl -Ilib bin/d2 ps1 --jobs 1 --mode extended --color
 ```
 
 Stop the web service and managed collector loops:
 
 ```bash
-perl -Ilib bin/dashboard stop
+perl -Ilib bin/d2 stop
 ```
 
 Restart the web service and configured collector loops:
 
 ```bash
-perl -Ilib bin/dashboard restart
+perl -Ilib bin/d2 restart
 ```
 
 Customize runtime locations:
@@ -420,7 +420,7 @@ helper login returns the browser to the original route, such as `/app/index`,
 instead of always sending it to `/`.
 
 The default bind is `0.0.0.0:7890`, so the service is reachable on local and VPN interfaces unless the host firewall blocks it.
-Run `dashboard serve --ssl` to enable HTTPS with the generated self-signed
+Run `d2 serve --ssl` to enable HTTPS with the generated self-signed
 certificate stored under `~/.developer-dashboard/certs/`, and verify the local
 listener at `https://127.0.0.1:7890/`. When SSL is enabled, the public HTTP
 socket on that same host and port must return a same-port `307` redirect to
@@ -448,21 +448,21 @@ The extension layer now includes:
 - config-backed provider pages resolved through the page resolver
 - action execution through the page action runner
 - user CLI hook directories under `~/.developer-dashboard/cli`
-- project-aware Docker Compose resolution through `dashboard docker compose`
+- project-aware Docker Compose resolution through `d2 docker compose`
 
-Compose setup can stay isolated in service folders under `./.developer-dashboard/config/docker/<service>/compose.yml` for the current project, with home runtime service folders as fallback. The wrapper infers service names from passthrough docker compose args such as `config green` before building the final `docker compose` command. When no service name is passed, the resolver scans isolated service folders and preloads every service without a `disabled.yml` marker in any active config layer. Each enabled service contributes `compose.yml` as its base when present. Its `development.compose.yml` is loaded afterward when `develop.yml` exists in any active config layer; the overlay is skipped without error if its marker exists but the file does not. `dashboard docker enable <service>` removes all disable markers for that service, and `dashboard docker development disable <service>` removes all development markers. Newly created markers are written under the selected home runtime (`~/.developer-dashboard` when it exists, otherwise an existing `~/.d2`). The compose runtime also exports `DDDC` as the runtime `config/docker` directory for the current runtime. Wrapper-only flags are consumed first and remaining docker compose flags such as `-d` and `--build` pass through untouched.
+Compose setup can stay isolated in service folders under `./.developer-dashboard/config/docker/<service>/compose.yml` for the current project, with home runtime service folders as fallback. The wrapper infers service names from passthrough docker compose args such as `config green` before building the final `docker compose` command. When no service name is passed, the resolver scans isolated service folders and preloads every service without a `disabled.yml` marker in any active config layer. Each enabled service contributes `compose.yml` as its base when present. Its `development.compose.yml` is loaded afterward when `develop.yml` exists in any active config layer; the overlay is skipped without error if its marker exists but the file does not. `d2 docker enable <service>` removes all disable markers for that service, and `d2 docker development disable <service>` removes all development markers. Newly created markers are written under the selected home runtime (`~/.developer-dashboard` when it exists, otherwise an existing `~/.d2`). The compose runtime also exports `DDDC` as the runtime `config/docker` directory for the current runtime. Wrapper-only flags are consumed first and remaining docker compose flags such as `-d` and `--build` pass through untouched.
 Without `--dry-run`, the wrapper now hands off with `exec`, so terminal users see the normal streaming output from `docker compose` itself instead of a dashboard JSON wrapper.
-Path aliases can now be managed from the CLI with `dashboard path add <name> <path>` and `dashboard path del <name>`. These commands persist user-defined aliases in the effective config root, using a project-local `./.developer-dashboard` tree first when it exists and otherwise the home runtime. Both repeated adds and repeated deletes are intentionally idempotent. When an added path lives under the current home directory, the stored config rewrites it to `$HOME/...` so a shared dashboard config directory does not hard-code one developer's absolute home path.
+Path aliases can now be managed from the CLI with `d2 path add <name> <path>` and `d2 path del <name>`. These commands persist user-defined aliases in the effective config root, using a project-local `./.developer-dashboard` tree first when it exists and otherwise the home runtime. Both repeated adds and repeated deletes are intentionally idempotent. When an added path lives under the current home directory, the stored config rewrites it to `$HOME/...` so a shared d2 config directory does not hard-code one developer's absolute home path.
 Use `Developer::Dashboard::Folder` for runtime path helpers. It resolves the
-same root-style names exposed by `dashboard paths`, including runtime,
+same root-style names exposed by `d2 paths`, including runtime,
 bookmark, config, and configured alias names such as `docker`, without relying
 on unscoped CPAN-global module names.
-`dashboard init` now seeds the current dashboard-managed starter pages as editable saved bookmarks when those ids are missing. Re-running init keeps existing user config intact, creates `config.json` as `{}` only when it is missing, keeps dashboard-managed helpers under `~/.developer-dashboard/cli/dd/`, preserves user-owned files under `~/.developer-dashboard/cli/`, and skips rewriting dashboard-managed helper or starter files when the shipped content MD5 already matches.
-`dashboard cpan <Module...>` now manages optional runtime Perl modules under `./.developer-dashboard/local` and appends matching requirements to `./.developer-dashboard/cpanfile`, while keeping the implementation in `bin/dashboard` and letting saved Ajax workers derive `local/lib/perl5` directly from the runtime root.
+`d2 init` now seeds the current dashboard-managed starter pages as editable saved bookmarks when those ids are missing. Re-running init keeps existing user config intact, creates `config.json` as `{}` only when it is missing, keeps dashboard-managed helpers under `~/.developer-dashboard/cli/dd/`, preserves user-owned files under `~/.developer-dashboard/cli/`, and skips rewriting dashboard-managed helper or starter files when the shipped content MD5 already matches.
+`d2 cpan <Module...>` now manages optional runtime Perl modules under `./.developer-dashboard/local` and appends matching requirements to `./.developer-dashboard/cpanfile`, while keeping the implementation in `bin/d2` and letting saved Ajax workers derive `local/lib/perl5` directly from the runtime root.
 
 ## Release To PAUSE
 
-CPAN/PAUSE release happens only locally, via `dashboard pause-release` -
+CPAN/PAUSE release happens only locally, via `d2 pause-release` -
 there is no GitHub-triggered path (see
 `docs/cpan-release-is-local-only.md`). Build the release using
 Dist::Zilla:
@@ -523,7 +523,7 @@ The installed executable audit should also confirm that the built tarball
 exports only `dashboard` into the global PATH. Generic helper names such as
 `of`, `open-file`, `jq`, `yq`, `tomq`, `propq`, `iniq`, `csvq`, `xmlq`, and
 `ticket` must not appear as a repo-shipped top-level executable or public
-dashboard alias. Use `dashboard workspace`; compatibility environment variables
+dashboard alias. Use `d2 workspace`; compatibility environment variables
 such as `TICKET_REF` may remain inside the workspace implementation for older
 tmux sessions.
 
@@ -541,7 +541,7 @@ Generated release metadata should also include repository resources plus an
 explicit C<provides> section, and the repository root should ship
 F<SECURITY.md> and F<CONTRIBUTING.md>.
 
-Runtime JSON handling is implemented with `JSON::XS`, including the shell bootstrap helper used by `dashboard shell`.
+Runtime JSON handling is implemented with `JSON::XS`, including the shell bootstrap helper used by `d2 shell`.
 The Dist::Zilla runtime prerequisite list pins `JSON::XS` explicitly so PAUSE
 and other clean-install test environments always see that dependency in the
 built tarball metadata.

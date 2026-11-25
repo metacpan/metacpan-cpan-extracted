@@ -9,6 +9,8 @@ use namespace::clean;
 # soon as nothing else holds it.
 use overload '&{}' => sub ($self, @) { $self->{call} }, fallback => 1;
 
+our $VERSION = 'v0.4.0';
+
 # Call the element, as calling it as a code reference does.
 sub call ($self, @arguments) {
     return $self->{call}->(@arguments);

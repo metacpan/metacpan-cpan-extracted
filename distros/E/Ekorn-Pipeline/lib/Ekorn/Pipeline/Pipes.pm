@@ -4,11 +4,14 @@ package Ekorn::Pipeline::Pipes;
 
 use Ekorn::Pipeline qw();
 
-# Run the invocant through a pipeline of stages.
+our $VERSION = 'v0.4.0';
+
+# Return what a run of the stages gives, the invocant its one value, as
+# a pipeline of them called with it gives it, in either context: what
+# comes out of the last stage; in scalar context, how many did, or a
+# sink's result.
 sub pipe ($self, @stages) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
-    my $pipeline = Ekorn::Pipeline->new(@stages);
-    my @results  = $pipeline->($self);
-    return wantarray ? @results : $results[0];
+    return Ekorn::Pipeline->new(@stages)->($self);
 }
 
 # Run the invocant through a pipeline of stages for their side effects, and
@@ -64,15 +67,28 @@ methods, and are where they began.
 =head2 pipe
 
     @results = $object->pipe(@stages);
-    $first   = $object->pipe(@stages);
+    $count   = $object->pipe(@stages);
+    ($first) = $object->pipe(@stages);
+    $first   = $object->pipe(@stages, keep_first);
 
 Runs the invocant through a pipeline of C<@stages>, and returns what
-comes out of the last stage. The stages are what
-L<Ekorn::Pipeline/new> takes: code references and pipelines, not
-names. To use a named pipeline, pass C<pipeline('clean')> (see
-L<Ekorn::Pipeline/pipeline>). In scalar context, it returns the first
-result, or C<undef> if there are none. With no stages, it returns the
-invocant.
+the run gives, as C<< Ekorn::Pipeline->new(@stages)->($object) >>
+would, in either context: what comes out of the last stage; in scalar
+context, how many results came out, or, if a sink is last, the sink's
+result, a list sink's as an array reference, as
+L<Ekorn::Pipeline/new> describes. For one value, read it in list
+context, or end with a sink of one, such as C<keep_first>. With no
+stages, it gives the invocant, or, in scalar context, 1.
+
+The stages are what L<Ekorn::Pipeline/new> takes: code references
+and pipelines, not names. To use a named pipeline, pass
+C<pipeline('clean')> (see L<Ekorn::Pipeline::Factories/pipeline>).
+
+Until v0.4.0, in scalar context, it gave the first result, or
+C<undef>, unlike a pipeline; a list sink's first value, not its
+list. Code that reads one value from it in scalar context, as
+C<< my $name = $object->pipe(sub { $_->name }) >>, reads it in list
+context now, C<< my($name) = ... >>, or ends with C<keep_first>.
 
 =head2 tap
 

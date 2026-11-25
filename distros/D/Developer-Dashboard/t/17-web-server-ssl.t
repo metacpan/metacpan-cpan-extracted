@@ -27,9 +27,49 @@ use Time::HiRes qw(sleep);
 use lib 'lib';
 use lib 't/lib';
 
-use Developer::Dashboard::Web::Server;
-use Developer::Dashboard::Web::DancerApp;
-use Local::PSGITest;
+# Every web process this file starts is detached or outlives a killed
+# run, and only the matching stop further down ends it. Tie them to
+# this test process: each web process is ended once this pid is gone.
+local $ENV{DEVELOPER_DASHBOARD_LIFETIME_PID} = $$;
+
+sub _command_available {
+    my ($name) = @_;
+    my @extensions = $^O eq 'MSWin32'
+      ? split( /;/, $ENV{PATHEXT} || '.EXE;.BAT;.CMD' )
+      : ('');
+    for my $directory ( File::Spec->path ) {
+        for my $extension (@extensions) {
+            my $candidate = File::Spec->catfile( $directory, $name . $extension );
+            return 1 if -f $candidate && ( $^O eq 'MSWin32' || -x $candidate );
+        }
+    }
+    return 0;
+}
+
+plan skip_all => 'OpenSSL executable is required for certificate integration checks'
+  if !_command_available('openssl');
+my $ssl_modules_loaded = eval {
+    require Developer::Dashboard::Web::Server;
+    require Developer::Dashboard::Web::DancerApp;
+    require Local::PSGITest;
+    require Developer::Dashboard::GoRoutine;
+    1;
+};
+plan skip_all => 'Dashboard XS bundle or SSL integration modules are unavailable'
+  if !$ssl_modules_loaded;
+
+# _spawn_perl_fixture($program, @args)
+# Starts an isolated Perl test fixture through GoRoutine's native process API.
+# Input: Perl source string followed by literal command-line arguments.
+# Output: child process id managed by Developer::Dashboard::GoRoutine.
+sub _spawn_perl_fixture {
+    my ( $program, @args ) = @_;
+    my @library_args = map { ( '-I', $_ ) } grep { defined && -d $_ } @INC;
+    return Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, @library_args, '-e', $program, @args ],
+        {},
+    );
+}
 
 sub _openssl_cert_text {
     my ($cert_file) = @_;
@@ -178,9 +218,12 @@ OPENSSL_CONFIG
     ok(-f $key_file, 'server.key file exists');
     ok(-s $cert_file > 0, 'server.crt has content');
     ok(-s $key_file > 0, 'server.key has content');
-    is(_mode_octal($cert_dir), '0700', 'cert directory is owner-only');
-    is(_mode_octal($cert_file), '0600', 'certificate file is owner-only');
-    is(_mode_octal($key_file), '0600', 'private key file is owner-only');
+    SKIP: {
+        skip 'Unix permission modes are not a Windows security control', 3 if $^O eq 'MSWin32';
+        is(_mode_octal($cert_dir), '0700', 'cert directory is owner-only');
+        is(_mode_octal($cert_file), '0600', 'certificate file is owner-only');
+        is(_mode_octal($key_file), '0600', 'private key file is owner-only');
+    }
     
     # Verify cert is self-signed and valid
     my $cert_text = do {
@@ -418,8 +461,16 @@ OPENSSL_CONFIG
     ok($runner, 'Plack runner created with SSL configuration');
     my %runner_options = @{ $runner->{options} || [] };
     is( $runner_options{ssl}, 1, 'Plack runner enables SSL mode explicitly' );
-    ok( $runner_options{ssl_key}, 'Plack runner includes SSL key path' );
-    ok( $runner_options{ssl_cert}, 'Plack runner includes SSL certificate path' );
+    if ( $^O eq 'MSWin32' ) {
+        # Standalone (HTTP::Server::PSGI) reads ssl_key_file/ssl_cert_file,
+        # not the Starman-style ssl_key/ssl_cert names.
+        ok( $runner_options{ssl_key_file}, 'Plack runner includes SSL key path for Standalone' );
+        ok( $runner_options{ssl_cert_file}, 'Plack runner includes SSL certificate path for Standalone' );
+    }
+    else {
+        ok( $runner_options{ssl_key}, 'Plack runner includes SSL key path' );
+        ok( $runner_options{ssl_cert}, 'Plack runner includes SSL certificate path' );
+    }
 
     my $ssl_proxy_daemon = Developer::Dashboard::Web::Server::Daemon->new(
         host          => '127.0.0.1',
@@ -452,7 +503,7 @@ OPENSSL_CONFIG
     ok($psgi_app, 'PSGI app created');
     ok(ref($psgi_app) eq 'CODE', 'PSGI app is a code reference');
     
-    Local::PSGITest::test_psgi $psgi_app, sub {
+    Local::PSGITest::test_psgi( $psgi_app, sub {
         my ($cb) = @_;
         my $http_request = GET 'http://127.0.0.1:17891/?from=http';
         my $http_response = $cb->($http_request);
@@ -469,12 +520,12 @@ OPENSSL_CONFIG
         ok($https_response, 'PSGI app responds to HTTPS request');
         is($https_response->code, 200, 'HTTPS request reaches the wrapped app');
         is($https_response->decoded_content, 'OK', 'HTTPS request preserves the wrapped app response body');
-    };
+    } );
 }
 
 # Test 8: Command line --ssl flag parsing
 {
-    # This test is handled in bin/dashboard integration tests
+    # This test is handled in bin/d2 integration tests
     # Verify that the flag exists in the POD
     my $dashboard_pm = do {
         open my $fh, '<', 'lib/Developer/Dashboard.pm' or die "Cannot read: $!";
@@ -685,13 +736,19 @@ OPENSSL_CONFIG
     close $partial_peer;
 
     {
-        no warnings 'redefine';
-        local *IO::Select::new = sub { return Local::EmptySelect->new };
+        socketpair( my $proxy_client, my $proxy_client_peer, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+          or die "proxy client socketpair failed: $!";
+        socketpair( my $proxy_backend, my $proxy_backend_peer, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+          or die "proxy backend socketpair failed: $!";
+        close $proxy_client_peer;
+        close $proxy_backend_peer;
         is(
-            Developer::Dashboard::Web::Server::_proxy_streams( 'client', 'backend' ),
+            Developer::Dashboard::Web::Server::_proxy_streams( $proxy_client, $proxy_backend ),
             1,
-            'stream proxy returns cleanly when the readiness loop finishes without readable sockets'
+            'stream proxy returns cleanly when either peer closes'
         );
+        close $proxy_client;
+        close $proxy_backend;
     }
 
     {
@@ -738,10 +795,10 @@ OPENSSL_CONFIG
 
     {
         no warnings 'redefine';
-        local *Developer::Dashboard::Web::Server::_waitpid = sub { return 0 };
+        local *Developer::Dashboard::GoRoutine::wait_process = sub { return 0 };
         ok(
             Developer::Dashboard::Web::Server::_wait_for_managed_child(1234),
-            '_wait_for_managed_child tolerates nonterminal waitpid responses during best-effort cleanup',
+            '_wait_for_managed_child delegates cleanup to the GoRoutine process API',
         );
     }
 
@@ -784,15 +841,19 @@ OPENSSL_CONFIG
         );
     }
 
-    my $default_signal_pid = fork();
-    die "Unable to fork default signal test child: $!" if !defined $default_signal_pid;
-    if ( !$default_signal_pid ) {
-        local $SIG{TERM} = 'IGNORE';
-        Developer::Dashboard::Web::Server::_signal_default_term();
-        exit 0;
-    }
-    waitpid( $default_signal_pid, 0 );
-    is( ($? >> 8), 0, 'TERM helper returns when TERM is ignored in the child process' );
+    my $default_signal_pid = _spawn_perl_fixture( <<'SIGNAL_PERL' );
+use strict;
+use warnings;
+use Developer::Dashboard::Web::Server;
+$SIG{TERM} = 'IGNORE';
+Developer::Dashboard::Web::Server::_signal_default_term();
+exit 0;
+SIGNAL_PERL
+    is(
+        Developer::Dashboard::GoRoutine::wait_process($default_signal_pid),
+        0,
+        'TERM helper returns when TERM is ignored in the child process',
+    );
 }
 
 # Test 13: Direct SSL backend and listener helpers stay explicit outside the forked frontend loop
@@ -885,13 +946,10 @@ OPENSSL_CONFIG
     }
 }
 
-# Test 14: Forked SSL frontend still reaps the backend child and exits cleanly
+# Test 14: SSL frontend supervises its backend through GoRoutine's process API
 {
     my $temp_home = tempdir(CLEANUP => 1);
     local $ENV{HOME} = $temp_home;
-
-    my ( $marker_fh, $marker_file ) = tempfile();
-    close $marker_fh or die "Unable to close SSL marker file $marker_file: $!";
 
     my $server = Developer::Dashboard::Web::Server->new(
         app     => Local::SSLTestApp->new,
@@ -899,6 +957,10 @@ OPENSSL_CONFIG
         port    => 17895,
         workers => 1,
         ssl     => 1,
+        ssl_backend_command_builder => sub {
+            my ( $host, $port, $workers ) = @_;
+            return [ $^X, '-e', 'exit 0', $host, $port, $workers ];
+        },
     );
     my $daemon = Developer::Dashboard::Web::Server::Daemon->new(
         host          => '127.0.0.1',
@@ -909,9 +971,21 @@ OPENSSL_CONFIG
 
     {
         no warnings 'redefine';
-        local *Developer::Dashboard::Web::Server::_build_runner = sub {
-            return Local::MarkerRunner->new( marker => $marker_file );
+        my @spawned;
+        my @terminated;
+        local *Developer::Dashboard::GoRoutine::spawn = sub {
+            my ( $argv, $options ) = @_;
+            push @spawned, [ [@{$argv}], {%{$options}} ];
+            return 4243;
         };
+        local *Developer::Dashboard::GoRoutine::process_running = sub { return 1 };
+        local *Developer::Dashboard::GoRoutine::process_exited = sub { return 1 };
+        local *Developer::Dashboard::GoRoutine::wait_process = sub { return 0 };
+        local *Developer::Dashboard::GoRoutine::terminate_process = sub {
+            push @terminated, [@_];
+            return 1;
+        };
+        local *Developer::Dashboard::Web::Server::_wait_for_ssl_backend_ready = sub { return 1 };
         local *IO::Socket::INET::new = sub {
             return Local::FrontendListener->new;
         };
@@ -924,17 +998,83 @@ OPENSSL_CONFIG
         is(
             $server->_serve_ssl_frontend($daemon),
             1,
-            'SSL frontend returns cleanly after reaping the backend child through the local CHLD handler',
+            'SSL frontend returns cleanly after the process API reports backend exit',
+        );
+        is( scalar @spawned, 2, 'SSL frontend starts one backend process and one backend watchdog through GoRoutine' );
+        is_deeply( $spawned[0][0], [ $^X, '-e', 'exit 0', '127.0.0.1', 17896, 1 ],
+            'backend process receives explicit executable arguments and its internal endpoint' );
+        is( $spawned[0][1]{process_group}, 1, 'backend process is isolated in a managed process group' );
+        is( $spawned[1][0][0], $^X, 'backend watchdog runs under the same perl' );
+        is( $spawned[1][0][-4], '-e', 'backend watchdog runs an inline program' );
+        is( $spawned[1][0][-2], $$, 'backend watchdog watches the frontend process' );
+        is( $spawned[1][0][-1], 4243, 'backend watchdog watches the spawned backend process' );
+        is_deeply( $spawned[1][1], {}, 'backend watchdog is spawned without process-group isolation' );
+        is_deeply( $terminated[0], [ 4243, 'TERM' ], 'frontend shutdown terminates the managed backend process' );
+    }
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} = '/tmp/private dashboard helper';
+    my $server = Developer::Dashboard::Web::Server->new(
+        app => Local::SSLTestApp->new, host => '127.0.0.1', port => 17897, ssl => 0,
+    );
+    my $daemon = Developer::Dashboard::Web::Server::Daemon->new(
+        host => '127.0.0.1', port => 17897,
+        internal_host => '127.0.0.1', internal_port => 17898,
+    );
+    is_deeply(
+        $server->_ssl_backend_command($daemon),
+        [ $^X, File::Spec->catfile( '/tmp', '_dashboard-core' ), 'web-ssl-backend-foreground',
+          '--host', '127.0.0.1', '--port', 17898, '--workers', 1 ],
+        'default SSL backend command resolves the staged core dispatcher beside its command wrapper',
+    );
+}
+
+# Test 14a: Frontend shutdown cancels a client routine waiting for its first byte
+{
+    my $temp_home = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $temp_home;
+    my $server = Developer::Dashboard::Web::Server->new(
+        app     => Local::SSLTestApp->new,
+        host    => '127.0.0.1',
+        port    => 17899,
+        workers => 1,
+        ssl     => 1,
+        ssl_backend_command_builder => sub { return [ $^X, '-e', 'exit 0' ] },
+    );
+    my $daemon = Developer::Dashboard::Web::Server::Daemon->new(
+        host => '127.0.0.1', port => 17899,
+        internal_host => '127.0.0.1', internal_port => 17900,
+    );
+    socketpair( my $client, my $peer, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+      or die "idle SSL client socketpair failed: $!";
+    my $accept_count = 0;
+    my @stopped;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::GoRoutine::spawn = sub { return 4244 };
+        local *Developer::Dashboard::GoRoutine::process_running = sub { return 1 };
+        local *Developer::Dashboard::GoRoutine::terminate_process = sub {
+            push @stopped, [@_];
+            return 1;
+        };
+        local *Developer::Dashboard::GoRoutine::wait_process = sub { return 0 };
+        local *Developer::Dashboard::Web::Server::_wait_for_ssl_backend_ready = sub { return 1 };
+        local *IO::Socket::INET::new = sub { return Local::FrontendListener->new };
+        local *Local::FrontendListener::accept = sub {
+            return $client if !$accept_count++;
+            sleep 0.05;
+            $SIG{TERM}->();
+            return;
+        };
+        is(
+            $server->_serve_ssl_frontend($daemon),
+            1,
+            'SSL frontend shuts down after cancelling an idle GoRoutine client handler',
         );
     }
-
-    open my $marker_reader, '<', $marker_file or die "Unable to read SSL runner marker $marker_file: $!";
-    my $marker_text = do {
-        local $/;
-        <$marker_reader>;
-    };
-    close $marker_reader or die "Unable to close SSL runner marker reader $marker_file: $!";
-    is( $marker_text, "ran\n", 'forked SSL frontend still runs the backend child process before the frontend loop exits' );
+    is_deeply( \@stopped, [ [ 4244, 'TERM' ] ], 'idle-client shutdown stops and waits for the backend process' );
+    close $peer or die "Unable to close idle SSL client peer: $!";
 }
 
 # Test 15: Live SSL frontend redirects plain HTTP and still serves HTTPS on the public port
@@ -952,23 +1092,59 @@ OPENSSL_CONFIG
     my $port = $listener->sockport;
     close $listener or die "Unable to close reserved live SSL test port: $!";
 
-    my $server = Developer::Dashboard::Web::Server->new(
-        app     => Local::SSLTestApp->new,
-        host    => '127.0.0.1',
-        port    => $port,
-        workers => 1,
-        ssl     => 1,
-    );
-
-    my $pid = fork();
-    die "Unable to fork live SSL server test: $!" if !defined $pid;
-    if ( !$pid ) {
-        $server->run;
-        exit 0;
-    }
+    my $frontend_program = <<'FRONTEND_PERL';
+use strict;
+use warnings;
+use Developer::Dashboard::GoRoutine ();
+use Developer::Dashboard::Web::Server;
+{
+    package Local::SSLTestApp;
+    sub new { bless {}, shift }
+    sub authorize_request { return; }
+    sub root_response { return [ 200, 'text/plain; charset=utf-8', 'OK', {} ]; }
+}
+my ( $port, $home ) = @ARGV;
+$ENV{HOME} = $home;
+my $server = Developer::Dashboard::Web::Server->new(
+    app     => Local::SSLTestApp->new,
+    host    => '127.0.0.1',
+    port    => $port,
+    workers => 1,
+    ssl     => 1,
+    ssl_backend_command_builder => sub {
+        my ( $backend_host, $backend_port, $workers ) = @_;
+        my $backend_program = <<'BACKEND_PERL';
+use strict;
+use warnings;
+use Developer::Dashboard::GoRoutine ();
+use Developer::Dashboard::Web::Server;
+{
+    package Local::SSLTestApp;
+    sub new { bless {}, shift }
+    sub authorize_request { return; }
+    sub root_response { return [ 200, 'text/plain; charset=utf-8', 'OK', {} ]; }
+}
+my ( $host, $port, $workers ) = @ARGV;
+my $server = Developer::Dashboard::Web::Server->new(
+    app => Local::SSLTestApp->new, host => $host, port => $port,
+    workers => $workers, ssl => 1,
+);
+my $daemon = Developer::Dashboard::Web::Server::Daemon->new(
+    host => $host, port => $port, internal_host => $host, internal_port => $port,
+);
+exit $server->_run_ssl_backend_process($daemon);
+BACKEND_PERL
+        my @library_args = map { ( '-I', $_ ) } grep { defined && -d $_ } @INC;
+        return [ $^X, @library_args, '-e', $backend_program, $backend_host, $backend_port, $workers ];
+    },
+);
+exit $server->run;
+FRONTEND_PERL
+    my $pid = _spawn_perl_fixture( $frontend_program, $port, $temp_home );
 
     my $ready = 0;
-    for ( 1 .. 50 ) {
+    # Ten parallel TAP workers can delay native server startup on CI.
+    for ( 1 .. 200 ) {
         my $probe = IO::Socket::INET->new(
             PeerAddr => '127.0.0.1',
             PeerPort => $port,
@@ -1016,7 +1192,13 @@ OPENSSL_CONFIG
             <$https_socket>;
         };
         close $https_socket;
-        like( $https_raw, qr/^HTTP\/1\.1 200 OK\r\n/, 'live SSL frontend still serves HTTPS on the public port' );
+        # The Windows backend is Plack Standalone (HTTP::Server::PSGI),
+        # which always answers HTTP/1.0 (its status line is a literal
+        # "HTTP/1.0" and its POD says to use Starman for HTTP/1.1),
+        # while Starman on Linux/macOS answers HTTP/1.1. Either version
+        # is a valid 200 response to this HTTP/1.1 request; the test is
+        # about serving HTTPS on the public port, not the version token.
+        like( $https_raw, qr/^HTTP\/1\.[01] 200 OK\r\n/, 'live SSL frontend still serves HTTPS on the public port' );
         like( $https_raw, qr/\r\n\r\nOK\z/s, 'live SSL frontend preserves the HTTPS app response body' );
     }
     else {
@@ -1025,8 +1207,14 @@ OPENSSL_CONFIG
         fail('live SSL frontend preserves the HTTPS app response body');
     }
 
-    kill 'TERM', $pid;
-    waitpid( $pid, 0 );
+    Developer::Dashboard::GoRoutine::terminate_process($pid);
+    my $exit_status = Developer::Dashboard::GoRoutine::wait_process($pid);
+    is(
+        Developer::Dashboard::GoRoutine::process_running($pid),
+        0,
+        'live SSL frontend process is reaped after termination',
+    );
+    ok( defined $exit_status, 'live SSL frontend termination status is collected' );
 }
 
 # Test 16: The HTTPS-enforcement redirect never names a client-supplied authority

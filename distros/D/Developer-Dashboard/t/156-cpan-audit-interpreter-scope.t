@@ -14,6 +14,13 @@ my $GATE = File::Spec->catfile( $ROOT, 'script', 'cpan-audit-project' );
 
 plan skip_all => "audit gate not present at $GATE" if !-f $GATE;
 
+# cpan-audit-project is a bash script (it refuses non-bash shells) and the
+# shim it writes is a /bin/sh script. There is no bash or sh on Windows,
+# so the gate cannot execute there at all; its scope is the Unix CI
+# pipeline, and skipping reports that instead of a false failure.
+plan skip_all => 'cpan-audit-project is a bash script and there is no bash on Windows'
+  if $^O eq 'MSWin32';
+
 # WHY THIS FILE EXISTS (DD-567)
 #   Five consecutive merges landed on master with no test verdict and no coverage
 #   verdict. CI step 7 - "Audit isolated dependency root" - failed because the

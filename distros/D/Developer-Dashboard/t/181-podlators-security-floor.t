@@ -11,7 +11,7 @@ my $ROOT = File::Spec->rel2abs( File::Spec->catdir( $FindBin::Bin, File::Spec->u
 my $cpanfile = _slurp('cpanfile');
 my $makefile = _slurp('Makefile.PL');
 my $dist     = _slurp('dist.ini');
-my $cli      = _slurp('bin/dashboard');
+my $cli      = _slurp('bin/d2');
 my $audit    = _slurp('script/cpan-audit-project');
 my $exclude  = _slurp('cpan-audit-exclusions.txt');
 
@@ -61,7 +61,7 @@ C<dist.ini>.
 
 The CI isolated dependency audit found C<podlators> 6.0.2, whose C<Pod::Text>
 implementation is vulnerable to CPU and memory exhaustion when formatting
-attacker-controlled deeply nested POD. The dashboard CLI invokes C<Pod::Usage>,
+attacker-controlled deeply nested POD. The d2 CLI invokes C<Pod::Usage>,
 which uses C<Pod::Text> to render usage text. Without an explicit minimum, a
 fresh install can resolve an affected release even when the runtime dependency
 chain audit looks clean. CPAN::Audit's installed scanner can identify the

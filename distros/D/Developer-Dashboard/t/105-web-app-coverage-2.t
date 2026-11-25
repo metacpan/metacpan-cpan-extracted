@@ -10,6 +10,7 @@ use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
+use Time::HiRes ();
 use URI::Escape qw(uri_escape);
 
 use lib 'lib';
@@ -1630,6 +1631,35 @@ $m->{_current_request_context} ||= { host => '127.0.0.1', remote_addr => '127.0.
         'nav-id scanning tolerates a missing root-provenance map from the scanner' );
     is_deeply( $nav_app->{_nav_ids_cache}{root_by_id}, {},
         'a missing root-provenance map is normalized to an empty cached map' );
+}
+
+{
+    # On Windows, directory timestamps move coarsely, so a file added in the
+    # same tick leaves the directory stat identity unchanged and the cached
+    # nav ids went stale. Freeze the directory stats to model that and prove
+    # the child names in the signature still invalidate the cache. This is a
+    # Linux model of Windows-only behaviour: it still needs a box solo run
+    # to prove on the Windows box itself.
+    my $frozen_root = tempdir( CLEANUP => 1 );
+    my $frozen_nav  = File::Spec->catdir( $frozen_root, 'nav' );
+    wfile( File::Spec->catfile( $frozen_nav, 'alpha.tt' ), "<div>Alpha Nav</div>\n", 0644 );
+    my $real_stat = Time::HiRes->can('stat');
+    my %frozen_stats = ( $frozen_nav => [ $real_stat->($frozen_nav) ] );
+    no warnings qw(redefine once);
+    local *Time::HiRes::stat = sub {
+        my ($path) = @_;
+        return wantarray ? @{ $frozen_stats{$path} } : 1 if exists $frozen_stats{$path};
+        return $real_stat->(@_);
+    };
+    my $frozen_app = Developer::Dashboard::Web::App->new(
+        actions => $actions, auth => $auth, config => $config, pages => $store,
+        prompt => $prompt, runtime => $runtime, sessions => $sessions,
+    );
+    is_deeply( $frozen_app->_nav_ids_for_roots( [$frozen_root] ), ['nav/alpha.tt'],
+        'nav ids list the first saved nav file' );
+    wfile( File::Spec->catfile( $frozen_nav, 'beta.tt' ), "<div>Beta Nav</div>\n", 0644 );
+    is_deeply( $frozen_app->_nav_ids_for_roots( [$frozen_root] ), [ 'nav/alpha.tt', 'nav/beta.tt' ],
+        'nav ids notice a newly added nav file when the directory stat cannot move' );
 }
 {
     my $nav_dir = File::Spec->catdir( $paths->dashboards_root, 'nav' );

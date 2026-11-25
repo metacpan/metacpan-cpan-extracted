@@ -1,0 +1,155 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(abs_path);
+use File::Spec;
+use FindBin qw($RealBin);
+use Pod::Checker qw(podchecker);
+
+my $ROOT = abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
+
+exit main(@ARGV);
+
+sub main {
+    my @paths = @_ ? @_ : _tracked_perl_paths();
+    if ( !@paths ) {
+        print STDERR "POD coverage gate found no Perl source files to check\n";
+        return 2;
+    }
+
+    my @failures;
+    my $covered = 0;
+
+    for my $path (@paths) {
+        my $full = File::Spec->file_name_is_absolute($path)
+          ? $path
+          : File::Spec->catfile( $ROOT, split m{/}, $path );
+
+        my $source = _slurp($full);
+        if ( !defined $source ) {
+            push @failures, "$path: unreadable";
+            next;
+        }
+
+        my @reasons;
+        push @reasons, 'missing POD heading'
+          if $source !~ /^=(?:pod|head1)\b/m;
+
+        if ( !@reasons ) {
+            my $diagnostic = q{};
+            open my $out, '>', \$diagnostic
+              or die "Unable to open in-memory POD diagnostic stream: $!";
+            my $errors = podchecker( $full, $out );
+            close $out or die "Unable to close in-memory POD diagnostic stream: $!";
+            if ($errors) {
+                $diagnostic =~ s/\s+\z//;
+                push @reasons, "invalid POD" . ( length $diagnostic ? ": $diagnostic" : q{} );
+            }
+        }
+
+        if (@reasons) {
+            push @failures, "$path: " . join( '; ', @reasons );
+            next;
+        }
+
+        $covered++;
+    }
+
+    my $total = scalar @paths;
+    my $percent = $total ? ( 100 * $covered / $total ) : 0;
+    printf "POD coverage: %d/%d (%.1f%%)\n", $covered, $total, $percent;
+
+    if ( $covered != $total ) {
+        print STDERR "$_\n" for @failures;
+        return 1;
+    }
+
+    print "POD coverage gate passed at 100.0%\n";
+    return 0;
+}
+
+sub _tracked_perl_paths {
+    open my $git, '-|', 'git', '-C', $ROOT, 'ls-files', '-z'
+      or die "Unable to list tracked files: $!";
+    local $/ = "\0";
+    my @paths;
+    while ( my $path = <$git> ) {
+        $path =~ s/\0\z//;
+        next if $path eq q{};
+        if ( $path =~ m{\Alib/.*\.pm\z} || $path =~ m{\At/.*\.t\z} || $path =~ /\.pod\z/i ) {
+            push @paths, $path;
+            next;
+        }
+        if ( $path =~ m{\A(?:bin|script)/} && _has_perl_shebang($path) ) {
+            push @paths, $path;
+        }
+    }
+    close $git or die "git ls-files failed while discovering POD coverage inputs";
+    return sort @paths;
+}
+
+sub _has_perl_shebang {
+    my ($path) = @_;
+    my $full = File::Spec->catfile( $ROOT, split m{/}, $path );
+    open my $fh, '<', $full or return 0;
+    my $line = <$fh> // q{};
+    close $fh or die "Unable to close $full: $!";
+    return $line =~ /\A#!.*\bperl\b/i ? 1 : 0;
+}
+
+sub _slurp {
+    my ($path) = @_;
+    open my $fh, '<', $path or return undef;
+    local $/;
+    my $text = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return $text;
+}
+
+__END__
+
+=head1 NAME
+
+pod-coverage-gate - require valid POD in every tracked Perl source file
+
+=head1 PURPOSE
+
+Measure POD file coverage across the tracked Perl source surface and fail unless
+every discovered file contains syntactically valid POD.
+
+=head1 WHY IT EXISTS
+
+A passing test suite does not prove that every maintained Perl source file is
+documented. The repository requires documentation coverage to be an explicit
+100 percent gate rather than a best-effort convention.
+
+=head1 WHEN TO USE
+
+Run this gate after adding, removing, or renaming Perl modules, tests, executable
+Perl scripts, or standalone POD files.
+
+=head1 HOW TO USE
+
+    perl script/pod-coverage-gate
+
+Explicit paths may be supplied for focused checks:
+
+    perl script/pod-coverage-gate t/example.t lib/Example.pm
+
+=head1 WHAT USES IT
+
+The Coverage GitHub Actions workflow runs this gate on pushes to master and pull
+requests.
+
+=head1 EXAMPLES
+
+A complete run prints a line such as:
+
+    POD coverage: 312/312 (100.0%)
+
+Any missing or invalid POD makes the process exit non-zero. POD ending at EOF is
+accepted when Pod::Checker accepts it; an explicit =cut is not required.
+
+=cut

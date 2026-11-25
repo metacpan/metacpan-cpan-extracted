@@ -34,19 +34,19 @@ paths - private runtime path helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard paths
+  d2 paths
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
-C<dashboard> command can expose the active runtime path set without loading the
+C<d2> command can expose the active runtime path set without loading the
 full runtime first.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard paths>, the command that prints the
+This staged helper exposes C<d2 paths>, the command that prints the
 active runtime path set as JSON. It is the shell-visible entrypoint for the
 layered runtime roots, helper directories, config roots, and other path values
 that the dashboard discovers for the current working directory.
@@ -59,13 +59,13 @@ the layered discovery and serialization rules.
 
 =head1 WHEN TO USE
 
-Use this file when changing the C<dashboard paths> CLI contract, the staged
+Use this file when changing the C<d2 paths> CLI contract, the staged
 helper handoff, or the exact examples contributors use to inspect active
 runtime roots from the shell.
 
 =head1 HOW TO USE
 
-Users run C<dashboard paths>. The staged helper uses the repository library
+Users run C<d2 paths>. The staged helper uses the repository library
 path passed by the public switchboard when available. Direct standalone
 invocation retains a C<FindBin> fallback to the helper-relative library
 directory. The helper forwards the request to the lightweight path runtime,
@@ -84,7 +84,7 @@ layer precedence.
 
 Example 1:
 
-  dashboard paths
+  d2 paths
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -92,7 +92,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/paths --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

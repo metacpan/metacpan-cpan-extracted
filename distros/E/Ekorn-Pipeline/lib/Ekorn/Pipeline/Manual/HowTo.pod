@@ -258,6 +258,12 @@ B<Made in:> Ekorn::Pipeline::Stages::Taps
 
 B<What it gives you:> C<:flow>, C<:batch> and C<:taps>
 
+=item C<:context>
+
+B<What it gives you:> C<result_number> and C<result_original>
+
+B<Made in:> Ekorn::Pipeline::Context
+
 =item C<:sources>
 
 B<What it gives you:> C<from_array>, C<from_file>, C<from_fh> and C<counter>
@@ -275,6 +281,12 @@ B<Made in:> Ekorn::Pipeline::Sinks
 B<What it gives you:> C<from_json>, C<from_jsonl>, C<to_json> and C<to_jsonl>
 
 B<Made in:> Ekorn::Pipeline::JSON
+
+=item C<:csv>
+
+B<What it gives you:> C<from_csv> and C<to_csv>
+
+B<Made in:> Ekorn::Pipeline::CSV
 
 =item C<:words>
 
@@ -1365,6 +1377,40 @@ Given no file, each is a stage, decoding each value it's given:
     )->('{"plays":8000}', '{"plays":5800}');
     say "@plays";    # 8000 5800
 
+=head2 Read CSV, or TSV
+
+C<from_csv> reads a CSV file a row at a time, as the rows are pulled,
+with Text::CSV, which Ekorn recommends: install it from CPAN if
+C<from_csv> says it isn't there. Each row is an array of its fields.
+With C<< header => 1 >>, it's a hash keyed by the first row's names, and
+C<< munge => 'db' >> makes those names fit for code, or for a database's
+placeholders:
+
+    my $plays = "$dir/plays.csv";
+    open my $fh, '>', $plays or die "Can't write $plays: $!\n";
+    print {$fh} qq(Track Name,Plays\nWaterloo,8000\n"Knowing Me, Knowing You",4200\n);
+    close $fh or die "Can't write $plays: $!\n";
+
+    my $next = Ekorn::Pipeline->new(sub { "$_->{track_name}: $_->{plays}" })
+        ->iterator(from_csv(file => $plays, header => 1, munge => 'db'));
+    say for $next->all;
+    # Waterloo: 8000
+    # Knowing Me, Knowing You: 4200
+
+C<< header => 'skip' >> drops the first row and keeps the arrays. Either
+way, the header's names are the run's C<columns>, for a stage that
+wants them (see "Tell the stages about the run"). A TSV file is the
+same, with Text::CSV's options in C<csv>:
+C<< csv => {sep_char => "\t"} >>. Files are read as UTF-8, unless
+C<encoding> names another, and a row that won't parse croaks, saying
+which, rather than ending the run as if the file had.
+
+Given no file, C<from_csv> is a stage, parsing each value it's given,
+a text of any number of rows:
+
+    my @rows = Ekorn::Pipeline->new(from_csv(header => 1))->("title,plays\nWaterloo,8000\nParklife,5800\n");
+    say join ', ', map { "$_->{title} ($_->{plays})" } @rows;    # Waterloo (8000), Parklife (5800)
+
 =head2 Write a source that closes what it opens
 
 The word C<source> makes a source of your own. Its block is the
@@ -1446,9 +1492,62 @@ it with C<Ekorn::Pipeline::run_context()>, and each run has its own:
 
     say join ', ', Ekorn::Pipeline->new(column('artist'))->iterator(rows_of($csv))->all;    # Blur, Abba
 
-A real CSV reader would handle quoting, of course. The shape is what
+A real CSV reader handles quoting, as C<from_csv> does, which gives
+its header's names as the run's C<columns> the same way, so C<column>
+works on it unchanged (see "Read CSV, or TSV"). The shape is what
 matters: the source knows something about its values, and a stage
 anywhere in the pipeline can ask.
+
+=head2 Ask which result a stage is making, and from what
+
+Each run counts the results it makes, a result being a value that
+leaves the last stage, or reaches a sink, and keeps the value each is
+made from. A stage asks with C<result_number> and C<result_original>,
+from Ekorn::Pipeline::Context, which C<:all> gives you:
+
+    say for tracks(
+        take_if { $_->{plays} > 6000 },
+        sub { $_->{title} },
+        sub { result_number . ". $_, " . result_original->{plays} . ' plays' },
+    );
+    # 1. Dancing Queen, 9100 plays
+    # 2. Girls & Boys, 6100 plays
+    # 3. Sunshine of Your Love, 7700 plays
+
+The number counts results, not values: it stays the same while
+C<take_if> drops tracks, and each value a stage returns in place of one
+is a result of its own. The original is the value as it came in,
+before C<< sub { $_->{title} } >> made it a title, so a later stage can
+still reach the whole track. A flush's values have none: in a flush,
+and the stages after it, C<result_original> is undef. Each run counts
+its own, so a pipeline run inside a stage starts again from 1, and
+leaves its caller's count alone.
+
+A source can give the original itself, when what it hands out is made
+from something a stage may want, such as a record. Its set-up returns
+an C<original> beside its step: a code reference returning the original
+of the value it gave last, called only when a stage asks. A run
+reading an iterator of that source's run gets it too, so it reaches
+every pipeline in a chain:
+
+    # Each track's title, made from the track, which is its original.
+    my $titles = source {
+        my @left = @tracks;
+        my $last;
+        return {
+            step     => sub () { return unless @left; $last = shift @left; $last->{title} },
+            original => sub () { $last },
+        };
+    };
+    my $upper = Ekorn::Pipeline->new(sub { uc })->iterator($titles);
+    my $hits  = Ekorn::Pipeline->new(take_if { result_original->{plays} > 6000 });
+    say for $hits->iterator($upper)->all;
+    # DANCING QUEEN
+    # GIRLS & BOYS
+    # SUNSHINE OF YOUR LOVE
+
+Every run counts, whether its stages ask or not, at 15 to 75
+nanoseconds a value, so there's nothing to turn on.
 
 =head2 Write a producer as a loop with C<generator>
 
@@ -1626,6 +1725,37 @@ C<to_json> every value as one array, once they've all come:
         to_json(),
     );
     # ["Abba","Abba","Blur"]
+
+=head2 Write CSV, or TSV
+
+C<to_csv> writes each row, an array of its fields, as a line, and gives
+how many it wrote. With C<header>, the names in it are written first,
+and a hash's fields are written in their order:
+
+    my $chart = "$dir/chart.csv";
+    my $n     = tracks(
+        take_if { $_->{plays} >= 7000 },
+        to_csv(file => $chart, header => [qw(title plays)]),
+    );
+    say "$n written";    # 2 written
+
+    open my $in, '<', $chart or die "Can't read $chart: $!\n";
+    print <$in>;
+    # title,plays
+    # "Dancing Queen",9100
+    # "Sunshine of Your Love",7700
+
+Fields are quoted as Text::CSV quotes them: those with a space among
+them, or a comma, a quote or a newline. C<< header => 1 >> takes the names
+from the run's C<columns>, so a run reading with C<from_csv> and a header
+writes the same columns back, in the same order.
+
+Given no file, C<to_csv> is a stage passing on each row's line, without
+its newline, ready for C<to_file>:
+
+    say for tracks(take(2), sub { [$_->{artist}, $_->{plays}] }, to_csv());
+    # Abba,9100
+    # Abba,4200
 
 =head2 Write a sink of your own
 
@@ -2460,7 +2590,11 @@ feed:
                         $feed->close unless defined $feed->ended;
                         return;
                     },
-                    sub ($how) { $feed->finish },
+                    sub ($how) {
+                        return if defined $feed->ended;
+                        $how eq 'died' ? $feed->finish : $feed->close;
+                        return;
+                    },
                 );
             };
         }
@@ -2489,9 +2623,12 @@ track, and the main run went on; the second branch's C<collect> gave
 its total when the main run's values ran out. A branch that stops
 ends only itself, as the tee checks C<ended> before each push; one that
 dies kills the main run, as any stage's error does. Its ends are
-called as its run ends: at a stop or a death in it, when the flush
-closes it, or, if the main run ended first, when the end's C<finish>
-tells it that it stopped. Ekorn's C<tee> works just so.
+called as its run ends: at a stop or a death in it, or when the flush
+closes it. If a stop after the tee ended the main run first, the
+flush isn't called, so the end closes the branch, and a branch
+holding values, such as a C<batch>, still gives them; if the main run
+died, the end's C<finish> tells the branch that it stopped. Ekorn's
+C<tee> works just so.
 
 =head2 Run each key's values through a run of their own
 

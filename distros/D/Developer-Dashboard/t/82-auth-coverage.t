@@ -134,8 +134,11 @@ isa_ok( $auth, 'Developer::Dashboard::Auth', 'constructed auth manager' );
         $auth->add_user( username => 'rename-observed-user', password => 'password123' );
         umask($old_umask);
         ok( defined $DD599_OBSERVED_RENAME_MODE, 'DD-599: add_user renamed a source file into the predictable final path (rename observed)' );
-        is( sprintf( '%04o', $DD599_OBSERVED_RENAME_MODE // -1 ), '0600',
-            'DD-599: the source file was already 0600 BEFORE the rename that made it visible at its final, predictable path - even under umask(0)' );
+      SKIP: {
+            skip 'Unix permission modes are not a Windows security control', 1 if $^O eq 'MSWin32';
+            is( sprintf( '%04o', $DD599_OBSERVED_RENAME_MODE // -1 ), '0600',
+                'DD-599: the source file was already 0600 BEFORE the rename that made it visible at its final, predictable path - even under umask(0)' );
+        }
         $auth->remove_user('rename-observed-user');    # avoid polluting list_users' exact-membership assertions below
     }
 
@@ -387,7 +390,7 @@ isa_ok( $auth, 'Developer::Dashboard::Auth', 'constructed auth manager' );
             { family => undef, addr => '' },
             { family => 2,     addr => $v4 },
             { family => 2,     addr => $v4 },
-            { family => 10,    addr => $v6 },
+            { family => AF_INET6, addr => $v6 },
             { family => 99,    addr => '' },
         );
     };

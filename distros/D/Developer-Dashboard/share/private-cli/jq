@@ -24,7 +24,7 @@ jq - JSON query command for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard jq [path] [file]
+  d2 jq [path] [file]
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ This command provides JSON query extraction for Developer Dashboard.
 
 =head1 PURPOSE
 
-This staged helper owns the public C<dashboard jq> command. It accepts an
+This staged helper owns the public C<d2 jq> command. It accepts an
 optional dotted JSON path or C<$d>-based Perl expression plus an optional input
 file, then hands the request to the shared query runtime so parsing,
 file-vs-STDIN handling, and output formatting stay consistent with the rest of
@@ -42,15 +42,15 @@ the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
-It exists because the dashboard ships a private, repo-local JSON inspection tool instead of depending on a globally installed parser binary. Keeping C<jq> as a staged helper also preserves the thin-switchboard contract in C<bin/dashboard>.
+It exists because the dashboard ships a private, repo-local JSON inspection tool instead of depending on a globally installed parser binary. Keeping C<jq> as a staged helper also preserves the thin-switchboard contract in C<bin/d2>.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing how C<dashboard jq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
+Use this file when you are changing how C<d2 jq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
 
 =head1 HOW TO USE
 
-Users run C<dashboard jq [path] [file]>. The staged helper under
+Users run C<d2 jq [path] [file]>. The staged helper under
 F<~/.developer-dashboard/cli/dd/jq> re-enters the shared query runtime, which
 parses JSON, accepts the file and path in either order, reads STDIN when no
 file is given, prints scalar hits as plain text, and prints the whole parsed
@@ -60,15 +60,15 @@ document before formatting the result.
 
 =head1 WHAT USES IT
 
-It is used by the public C<dashboard jq> command, by shell snippets that want a runtime-local JSON query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
+It is used by the public C<d2 jq> command, by shell snippets that want a runtime-local JSON query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
 
 =head1 EXAMPLES
 
-  printf '{"alpha":{"beta":2}}' | dashboard jq alpha.beta
-  dashboard jq response.json '$d'
-  dashboard jq '$d' response.json
-  printf '{"foo":[1,2],"bar":[3,4]}' | dashboard jq 'sort keys %$d'
-  printf '{"ok":true}' | dashboard jq ok
+  printf '{"alpha":{"beta":2}}' | d2 jq alpha.beta
+  d2 jq response.json '$d'
+  d2 jq '$d' response.json
+  printf '{"foo":[1,2],"bar":[3,4]}' | d2 jq 'sort keys %$d'
+  printf '{"ok":true}' | d2 jq ok
 
 =for comment FULL-POD-DOC END
 

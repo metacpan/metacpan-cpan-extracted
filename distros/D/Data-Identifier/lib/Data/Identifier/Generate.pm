@@ -32,7 +32,7 @@ use constant {
 };
 
 
-our $VERSION = v0.38;
+our $VERSION = v0.39.02;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -148,6 +148,14 @@ my %_hash_type_aliases = (
     rfc9530 => '8238da08-ca93-4d67-bf40-54818aa94405',
     openpgp => '0d4ef6fa-0f9a-4bc8-9fc1-e4f00725397e',
     sni     => '039e0bb7-5dd3-40ee-a98c-596ff6cce405',
+);
+
+my %_language_backups = (
+    tok      => 'Toki Pona',
+    djd      => 'Djamindjung',
+    pgl      => 'Primitive Irish',
+    pgl_ogam => 'Primitive Irish (Ogham)',
+    pgl_latn => 'Primitive Irish (Latin)',
 );
 
 
@@ -319,7 +327,7 @@ sub language {
 
     croak 'Bad language: '.$req unless I18N::LangTags::List::is_decent($req);
 
-    $name = I18N::LangTags::List::name($req);
+    $name = I18N::LangTags::List::name($req) // $_language_backups{lc($req) =~ tr/-/_/r};
 
     unless (defined($name) && length($name)) {
         croak 'Bad language: '.$req;
@@ -684,7 +692,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.38
+version v0.39.02
 
 =head1 SYNOPSIS
 

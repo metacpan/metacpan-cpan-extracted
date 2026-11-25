@@ -1,3 +1,242 @@
+6.31  2026-11-18
+
+  - Replace the GoRoutine perl_clone/ithreads engine with a fully
+    independent single-threaded C event loop (timers, IO readiness,
+    process-exit waiting). Perl only uses it for async; nothing depends
+    on fork, threads.pm, or perl_clone. go registers a callback plus an
+    optional trigger and the engine invokes it on the main thread;
+    wait_all and the shutdown drain run on the main thread, so the
+    Windows shutdown teardown race (t/240 access violation) cannot
+    recur. channel and share are reimplemented on the new engine (a
+    main-thread queue and plain values); every public API piece is
+    preserved, with two inherent adjustments: no true parallelism
+    (callbacks run interleaved) and no force-kill of a running routine
+    (cooperative cancel instead).
+  - Migrate the SSL frontend to pump-driven client state machines and
+    run the system menu in its own worker process instead of a GoRoutine.
+  - Rewrite the thirteen goroutine test files to the new semantics.
+
+6.30  2026-11-08
+
+  - Allow headless Linux CPAN builds to omit the optional GTK/Ayatana System
+    Menu helper with a visible notice; keep Linux CI strict and skip only the
+    helper-binary assertion when its development modules are unavailable.
+  - Add configure regression coverage for available and unavailable native
+    dependencies and document the CPAN tester behavior.
+
+6.29  2026-11-06
+
+  - Install the GTK and Ayatana development packages required by the Linux
+    coverage workflow before building the native System Menu helper.
+  - Refresh workflow regression contracts for the five-platform coverage
+    chain and document its Linux native build dependencies.
+
+6.28  2026-11-03
+
+  - Replace an ineffective Scalar::Util monkeypatch in the GoRoutine coverage
+    test with an unsupported regexp-reference contract assertion, and remove
+    the unreachable reftype fallback so coverage remains behavior-driven.
+  - Document the local act runner's init option for process cleanup tests.
+
+6.27  2026-11-03
+
+  - Place the bounded child-log wait inside the broken-loop regression that
+    asserts the asynchronous failure entry, restoring the unrelated preceding
+    test's delay and preserving the explicit missing-log failure.
+
+6.26  2026-11-03
+
+  - Begin synchronizing the collector child-log regression for asynchronous
+    failure reporting; the hosted test exposed that the initial wait was placed
+    in a preceding test and was corrected in 6.27.
+
+6.25  2026-11-03
+
+  - Complete the SSL backend dispatcher correction with regression coverage
+    for the staged command-wrapper marker in both server test suites, and
+    document backend readiness and helper resolution.
+
+6.24  2026-11-03
+
+  - Launch the isolated SSL backend through the staged _dashboard-core
+    dispatcher, even when the running-helper marker names a command wrapper;
+    this prevents recursive SSL frontend startup and makes the Chromium smoke
+    test reach the ready backend.
+  - Detect an exited-but-unreaped SSL backend before each readiness probe and
+    report its collected exit status immediately.
+
+6.23  2026-11-03
+
+  - Stream Windows saved-Ajax stdout and stderr through dedicated reader
+    threads with bounded events, interrupted-read retries, explicit failures,
+    and child cleanup on disconnect; add forced-Windows regression coverage.
+  - Keep SSL frontend worker and backend cleanup running after socket-close
+    failures, then report the first close error; cover client and listener
+    close failures.
+  - Close remaining library branch and condition coverage gaps with
+    behavior-driven tests. The full four-metric gate passes at 100.0%.
+  - Pin the post-build Docker guard to Perl 5.44 with ithreads enabled and
+    verify that prerequisite before installing the distribution.
+  - Pin the full blank-environment install to the same threaded Perl 5.44
+    build, check `Config{useithreads}`, and provide GTK/Ayatana build headers.
+
+6.20  2026-11-01
+
+  - Export the complete GoRoutine API, including process_exited, beside d2
+    through use Developer::Dashboard. Preserve the GoRoutine source syntax
+    filter for callers and add Docker coverage for the imported routines,
+    shared values, channels, and child-process lifecycle.
+  - Wire the opt-in native System Menu into the foreground web-service
+    lifecycle. The staged runtime now supplies merged configuration and the
+    indicator store to SystemMenu::Runner; GoRoutine-managed menu workers are
+    stopped and joined on service return or error. Add Docker lifecycle and
+    runtime-wiring regression tests, and document that native visibility still
+    requires hosted platform verification.
+  - Repair hosted native builds: install GTK/Ayatana development packages on
+    Linux workflow runners and the published image; build the macOS helper
+    with ARC and deprecated-API diagnostics as errors; and omit unsupported
+    Devel::Cover installation from Windows test dependencies.
+  - Keep the CPAN audit tool installation running after an earlier build-gate
+    failure, so the always-run declared dependency-chain audit reports its own
+    result instead of failing only because CPAN::Audit was never installed.
+
+6.19  2026-10-31
+
+  - Extend GoRoutine shared graph transport to preserve compiled regular
+    expressions and named format references across the parent and worker
+    interpreters, with focused Docker regression coverage.
+  - Use platform-aware worker interpreter clone flags, including the optional
+    Windows host-clone flag when provided by Perl, and add focused regression
+    coverage for the guarded Windows contract.
+  - Replace the Ubuntu system-menu helper's deprecated GTK tray API with
+    Ayatana AppIndicator3. Build the helper with deprecated-declaration
+    diagnostics as errors, add the development package to the reusable dev
+    image, and cover the backend/build contract in Docker tests.
+  - Integrate GoRoutine 0.04 shared-object graphs into the Dashboard XS
+    extension. `share` now supports nested hashes and arrays, scalar
+    references, aliases, cycles, and ordinary blessed Perl-data objects while
+    retaining normal dereferencing, Unicode semantics, and methods. Add
+    Docker regression coverage for concurrent nested updates and graph
+    relationships.
+  - Integrate the GoRoutine 0.06 REF diagnostic contract: rejected shared
+    values now report the actual reference type, with regression coverage for
+    CODE references.
+  - Fix the Windows x64 full-suite workflow failure caused by missing
+    TAP::Harness::Env in nested test runs. Declare Test::Harness 3.48 as a
+    test-only prerequisite in cpanfile, Makefile.PL, and dist.ini; install and
+    verify it in the Windows workflow's local test environment, keeping it out
+    of end-user runtime installation dependencies. Launch App::Prove through
+    the workflow-selected Perl on Windows so the test runner cannot resolve a
+    foreign prove wrapper from Strawberry Perl. Keep Unix full-suite execution
+    in Bash and run the Windows suite in native PowerShell to avoid MSYS path
+    conversion and Perl selection.
+  - Declare Devel::Cover as a test-only prerequisite so blank tarball installs
+    can run coverage-gate tests. Prefer the checkout's built blib/arch XS
+    extension in coverage child processes, avoiding stale installed binaries.
+  - Build the Dashboard XS extension before tests in the GitHub Release
+    workflow, and pass blib/arch and blib/lib to prove so release verification
+    exercises the extension built from that checkout.
+  - Expose checkout-local configure dependencies through PERL5LIB before
+    Makefile.PL in the Linux Test and cross-platform workflows. This allows
+    File::ShareDir::Install to load before blib is created on Unix and Windows.
+  - Prefer the source checkout's built blib/arch before installed Perl library
+    paths in dashboard child environments. This keeps newly added GoRoutine
+    XSUBs paired with the source GoRoutine module instead of selecting an older
+    Dashboard.so from Perl's site library.
+
+6.18  2026-10-31
+
+  - Fix the Linux Test workflow to compile the Dashboard XS extension before
+    running native tests and export both blib paths to test and coverage child
+    processes. Keep the four-metric Perl coverage report free of unrelated gcov
+    tables from compiled XS artefacts. Add workflow and configuration-snapshot
+    freshness regression coverage.
+  - Exclude test sources from Devel::Cover instrumentation because they are not
+    part of the lib-only coverage target and dynamic fixtures produce stale
+    source-map warnings. Keep every lib module instrumented and the warning gate
+    strict.
+
+6.17  2026-10-31
+
+  - Fix stale web configuration snapshots when macOS filesystem watcher
+    events arrive after an atomic config-file replacement. Native-watcher
+    cache hits now verify high-resolution path and file metadata before reuse;
+    the content-hash fallback remains in place when native watching is absent.
+    Add a delayed-event regression and document the cache invalidation model.
+
+6.16  2026-10-31
+
+  - Fix Makefile.PL on Windows runners where HOME is unset: resolve the
+    developer local::lib from USERPROFILE, avoid undefined-value warnings,
+    and retain the project-local fallback when neither home variable exists.
+    Add regression coverage for Unix, Windows, and no-home environments.
+
+6.15  2026-10-31
+
+  - Fix Windows XS CI to use the workflow-installed Perl from PowerShell for
+    extension builds and coverage-tool setup, not Git Bash's MSYS Perl.
+  - Report missing native Windows ARM64 Perl with a visible workflow warning
+    and skip only the ARM64 Perl-dependent watcher steps without claiming a
+    native ARM64 test pass. Add Docker regression checks for both behaviours.
+
+6.14  2026-10-31
+
+  - Replace FFI::Platypus and FFI::CheckLib runtime backends for PBKDF2,
+    Linux inotify, and Windows directory notifications with the distribution's
+    shared XS extension. Build and load the extension explicitly in platform
+    workflows, including Windows ARM64, and add parity and workflow tests.
+
+6.13  2026-10-30
+
+  - Correct the macOS ARM64 OpenSSL architecture preflight after the hosted
+    run showed that Apple's lipo rejected the previous -verify_arch argument
+    order. Read lipo -archs output and require the arm64 token explicitly.
+
+6.12  2026-10-30
+
+  - Make macOS ARM64 OpenSSL selection explicit for the platform compatibility
+    workflow. Install or reuse Homebrew openssl@3, verify its ARM64 library,
+    export OPENSSL_PREFIX, and show verbose Net::SSLeay build diagnostics.
+    Add a Docker-run workflow contract test and document that the original
+    nested cpanm build log did not expose the precise compiler/linker failure.
+  - Raise the declared YAML minimum to 1.30 in all dependency manifests after
+    the live advisory gate found that 1.28 permits CPANSA-YAML-2017-20285.
+
+6.11  2026-10-30
+
+  - Fix the platform compatibility workflow setup: install Devel::Cover into
+    the local dependency tree and export PERL5LIB before the full suite, so
+    coverage-gate child processes can load Devel::Cover::DB::IO. The original
+    assertions remain unchanged; Docker reruns pass all four affected tests.
+
+6.10  2026-10-30
+
+  - Fix DKT-009: interleave plain-directory and DD-OOP runtime env files in
+    parent-to-child order so project .env.pl files can read inherited home
+    runtime values while deeper values continue to override their parents.
+
+6.09  2026-10-29
+
+  - Complete the GitHub release coverage fix by testing the successful Linux
+    inotify descriptor-wrap and byte-safe watch-registration paths in the fake
+    backend. The focused four-metric gate now reports 100.0% for
+    IndicatorStore::Watch.pm; no runtime behavior changed.
+
+6.08  2026-10-29
+
+  - Begin closing the GitHub release coverage gap on runners without optional
+    FFI::Platypus by invoking the Linux inotify backend's close callback in the
+    deterministic fake-backend test. Document that GitHub releases require a
+    matching pushed vX.XX tag; changing dist.ini alone does not trigger a
+    release. The next run exposed two additional successful native-adapter
+    paths, covered in 6.09. No runtime behavior changed.
+
+6.07  2026-10-29
+
+  - Clarify five-field cron expressions with explicit hourly and per-minute
+    examples. `0 */1 * * *` runs at minute zero each hour; `* */1 * * *`
+    intentionally runs every minute. No scheduler runtime behavior changed.
+
 6.06  2026-10-29
 
   - Fix the installer bootstrap regression test by isolating TMPDIR and
@@ -4021,7 +4260,7 @@
       has to fall back to persisted-state listener pids, and still escalate the
       saved pid to KILL when process discovery lags after TERM
     - scope web stop ajax cleanup to the current dashboard runtime root instead
-      of sweeping every `dashboard ajax:` process owned by the user
+      of sweeping every `d2 ajax:` process owned by the user
     - make collector loop shutdown kill active worker process groups so
       long-running singleton commands stop with the collector loop instead of
       surviving as orphaned subprocesses

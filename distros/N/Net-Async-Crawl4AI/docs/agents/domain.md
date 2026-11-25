@@ -1,20 +1,20 @@
 # Domain Docs
 
-Wie die Engineering-Skills die Domänen-Doku dieses Repos lesen sollen, wenn sie den
-Code erkunden.
+How the engineering skills should read this repo's domain docs when they
+explore the code.
 
-## Vor dem Erkunden lesen
+## Read before exploring
 
-- **`CONTEXT.md`** im Repo-Root — das Glossar / die Domänensprache.
-- **`docs/adr/`** — die ADRs, die den Bereich berühren, an dem gerade gearbeitet wird.
+- **`CONTEXT.md`** at the repo root — the glossary / the domain language.
+- **`docs/adr/`** — the ADRs that touch the area currently being worked on.
 
-Dies ist ein **Single-context**-Repo: ein `CONTEXT.md` plus `docs/adr/` im Root.
+This is a **single-context** repo: one `CONTEXT.md` plus `docs/adr/` at the root.
 
-Wenn eine dieser Dateien nicht existiert, **stillschweigend fortfahren**. Ihr Fehlen
-nicht melden und nicht vorab vorschlagen, sie anzulegen. Die Producer-Skills legen
-sie erst dann an, wenn Begriffe oder Entscheidungen tatsächlich fixiert werden.
+If one of these files does not exist, **proceed silently**. Do not report its absence
+and do not suggest creating it up front. The producer skills only create
+them once terms or decisions actually get fixed.
 
-## Dateistruktur
+## File structure
 
 ```
 /
@@ -25,20 +25,20 @@ sie erst dann an, wenn Begriffe oder Entscheidungen tatsächlich fixiert werden.
 └── lib/
 ```
 
-## Das Glossar-Vokabular verwenden
+## Use the glossary vocabulary
 
-Wenn die Ausgabe ein Domänenkonzept benennt (Issue-Titel, Refactor-Vorschlag,
-Hypothese, Testname), den in `CONTEXT.md` definierten Begriff verwenden. Nicht zu
-Synonymen abdriften, die das Glossar bewusst vermeidet.
+When the output names a domain concept (issue title, refactor proposal,
+hypothesis, test name), use the term defined in `CONTEXT.md`. Do not drift to
+synonyms the glossary deliberately avoids.
 
-## Async-spezifische Domäne
+## Async-specific domain
 
-`Net::Async::Crawl4AI` erbt die Domänensprache von `WWW::Crawl4AI` — die Begriffe
-Strategy Chain, Attempt, Result, Classification, DeepCrawl gelten hier genauso.
-Die async-Sphäre fügt hinzu: Future contract, retry policy, concurrency knob,
+`Net::Async::Crawl4AI` inherits the domain language of `WWW::Crawl4AI` — the terms
+Strategy Chain, Attempt, Result, Classification, DeepCrawl apply here just the same.
+The async sphere adds: Future contract, retry policy, concurrency knob,
 delay_sub (test hook), poll_interval (job polling).
 
-## ADR-Konflikte melden
+## Report ADR conflicts
 
-Widerspricht die Ausgabe einem bestehenden ADR, das explizit ansprechen statt
-stillschweigend zu übergehen.
+If the output contradicts an existing ADR, call that out explicitly instead of
+silently passing over it.

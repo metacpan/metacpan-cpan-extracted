@@ -24,21 +24,21 @@ upgrade - private self-upgrade helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard upgrade
-  dashboard upgrade --dry-run
+  d2 upgrade
+  d2 upgrade --dry-run
   d2 upgrade
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint remains a thin switchboard while the reusable
+public C<d2> entrypoint remains a thin switchboard while the reusable
 upgrade module owns platform selection, download validation, and execution.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-Expose the first-class C<dashboard upgrade> and C<d2 upgrade> command surface
+Expose the first-class C<d2 upgrade> and C<d2 upgrade> command surface
 through the managed private-helper namespace.
 
 =head1 WHY IT EXISTS
@@ -55,7 +55,7 @@ C<Developer::Dashboard::CLI::Upgrade> instead.
 
 =head1 HOW TO USE
 
-Run C<dashboard upgrade> or C<d2 upgrade> to download the canonical installer,
+Run C<d2 upgrade> or C<d2 upgrade> to download the canonical installer,
 validate its Developer Dashboard markers, and execute it through the active
 platform interpreter while preserving its visible output and exit status. Add
 C<--dry-run> to print the platform, canonical HTTPS URL, and argv-style command
@@ -65,12 +65,12 @@ execution-policy bypass.
 
 =head1 WHAT USES IT
 
-The public dashboard switchboard, the C<d2> short entrypoint, installed home
+The public d2 switchboard, the C<d2> short entrypoint, installed home
 runtimes, and focused upgrade acceptance tests use this helper.
 
 =head1 EXAMPLES
 
-  dashboard upgrade --dry-run
+  d2 upgrade --dry-run
   d2 upgrade
   prove -lv t/136-upgrade-cli.t
 

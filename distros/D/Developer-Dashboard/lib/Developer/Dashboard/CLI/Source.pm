@@ -3,14 +3,14 @@ package Developer::Dashboard::CLI::Source;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use File::Find ();
 use File::Spec;
 use Getopt::Long qw(GetOptionsFromArray);
 
 # run_source_command(%args)
-# Dispatches the lightweight `dashboard source` helper command (DD-938).
+# Dispatches the lightweight `d2 source` helper command (DD-938).
 # Input: command name under "command", remaining argv under "args", optional
 # "out" sink (scalar ref/filehandle/undef for STDOUT) and "home" override
 # (defaults to $ENV{HOME}) for tests.
@@ -54,9 +54,9 @@ sub run_source_command {
 
 # _usage()
 # Input: none.
-# Output: usage message string for a dashboard source invocation error.
+# Output: usage message string for a d2 source invocation error.
 sub _usage {
-    return "Usage: dashboard source --files\n";
+    return "Usage: d2 source --files\n";
 }
 
 # _emit($out, $text)
@@ -91,26 +91,26 @@ Developer::Dashboard::CLI::Source - list installed Developer Dashboard files (DD
 
 =head1 PURPOSE
 
-Implements C<dashboard source --files>, a fallback reference command for an
+Implements C<d2 source --files>, a fallback reference command for an
 agent that needs to dig into Developer Dashboard's real, current
-implementation beyond what C<dashboard ask --docs>'s curated summary covers.
+implementation beyond what C<d2 ask --docs>'s curated summary covers.
 
 =head1 WHY IT EXISTS
 
-C<dashboard ask --docs> (DD-938) is deliberately a short, curated summary -
+C<d2 ask --docs> (DD-938) is deliberately a short, curated summary -
 cheap enough to inject on every call. When an agent needs more than that
-summary, C<dashboard source --files> answers "what files exist to read?" by
+summary, C<d2 source --files> answers "what files exist to read?" by
 listing every file installed under C<~/perl5/{lib,bin}>, so the agent can
 C<grep>/C<Read> the real source directly rather than guess.
 
 =head1 WHEN TO USE
 
-Called via the C<dashboard source> switchboard entry, staged the same way as
+Called via the C<d2 source> switchboard entry, staged the same way as
 every other private CLI helper (C<share/private-cli/source>).
 
 =head1 HOW TO USE
 
-  dashboard source --files
+  d2 source --files
 
 Run this from anywhere on a machine with Developer Dashboard installed. It
 takes no other flags, needs no arguments beyond C<--files>, and prints one
@@ -125,9 +125,8 @@ C<share/private-cli/source> dispatches straight into C<run_source_command>.
 
 =head1 EXAMPLES
 
-  $ dashboard source --files
+  $ d2 source --files
   /home/user/perl5/bin/d2
-  /home/user/perl5/bin/dashboard
   /home/user/perl5/lib/perl5/Developer/Dashboard.pm
   ...
 

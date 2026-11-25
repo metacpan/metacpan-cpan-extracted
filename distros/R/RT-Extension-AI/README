@@ -143,6 +143,21 @@ CONFIGURATION
     reject it. To pin a specific API version, add an anthropic_version key
     to the provider configuration; it defaults to 2023-06-01.
 
+    Newer models, such as Claude Haiku 5.5, can think before they answer,
+    and the thinking counts against max_tokens. With a small limit like the
+    20 tokens autocomplete uses, the model can run out of tokens before it
+    writes any text, and no suggestion appears. Turn thinking off for
+    autocomplete with a thinking key, which is passed to the API as is:
+
+        autocomplete_model => {
+            name       => 'claude-haiku-5-5',
+            max_tokens => 20,
+            thinking   => { type => 'disabled' },
+        },
+
+    Check the Anthropic documentation for the thinking values each model
+    accepts; some newer models reject disabled.
+
   Global and Queue-specific Configuration
     The block of configuration defined for the "Default" key, as shown
     above, is used as the default global settings for your RT. You can
@@ -172,6 +187,10 @@ CONFIGURATION
         lash:generateContent
 
     *   Claude (Anthropic), URL: https://api.anthropic.com/v1/messages
+
+    To add another provider, subclass RT::Extension::AI::Provider and
+    implement _process_request, and optionally _usage to report token
+    counts. See that module's documentation for details.
 
   Models
     Some API providers have different models that are optimized for
@@ -213,7 +232,40 @@ CONFIGURATION
     provider and watch your token usage for both input and output. Confirm
     that your account's limits and budget can absorb the volume you expect.
     Refer to your AI provider's documentation for the details of their token
-    limits, pricing, and policies.
+    limits, pricing, and policies. The log entry for each request, described
+    in "Logging", includes the token counts reported by the provider.
+
+  Logging
+    Each request to the AI provider is logged with the provider, the model,
+    the RT feature that made the request, the time it took, and the input
+    and output token counts when the provider reports them. For example:
+
+        AI request succeeded: provider=Claude model=claude-sonnet-4-5
+          feature=summarize_ticket elapsed_ms=1843 input_tokens=2210 output_tokens=187
+
+    The entry is a single line in the log; it is wrapped here for
+    readability.
+
+    Successful requests are logged at the info level and failed requests at
+    the warning level, with the error returned by the provider. Use RT's
+    normal logging settings, such as $LogToFile and $LogToSyslog, to choose
+    which levels are recorded.
+
+    The feature is one of summarize_ticket, assess_sentiment,
+    generate_ticketsql, queue_creation_assistant, or the name of the editor
+    feature, such as adjust_tone or suggest_response. The Queue Creation
+    Assistant retries failed requests, and each attempt is logged
+    separately.
+
+    Autocomplete sends a request each time the user pauses while typing, so
+    when autocomplete_text is enabled, logging at the info level records
+    many feature=autocomplete_text entries. Logging at warning skips them,
+    along with the entries for all other successful requests. To reduce them
+    while still logging at info, limit autocomplete to selected queues as
+    described in "Global and Queue-specific Configuration".
+
+    Prompts, ticket content, responses from the provider, and request
+    headers, which contain the API key, are not included in this entry.
 
   Prompts
     You can define different prompts for different AI features. The keys in
@@ -285,12 +337,14 @@ FEATURES
         Content from the ticket is sent to the AI provider and analyzed to
         assess the sentiment of the end user. Responses are Satisfied,
         Dissatisfied, or Neutral and the value is saved in the "Ticket
-        Summary" custom field on the ticket.
+        Sentiment" custom field on the ticket.
 
     Generate Ticket Summary
         Content from the ticket is sent to the AI provider and a concise
-        summary is requested. The result is saved in the "Ticket Sentiment"
-        custom field on the ticket.
+        summary is requested. The result is saved in the "Ticket Summary"
+        custom field on the ticket. The log records the length of the
+        summary at the info level; the summary text itself is logged only at
+        the debug level.
 
   Editor Features
     The following features are available in RT's editor.

@@ -36,6 +36,7 @@ t/19.engines.t
 t/20.review.fixes.0.3342.t
 t/21.review.fixes.0.3343.t
 t/22.review.fixes.0.3344.t
+t/23.review.fixes.0.3345.t
 t/output.images/add.single.svg
 t/output.images/bar.sub.self.svg
 t/output.images/bar.sub.svg

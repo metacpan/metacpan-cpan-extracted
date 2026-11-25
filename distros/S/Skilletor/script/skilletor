@@ -1,11 +1,10 @@
 #!/usr/bin/env perl
 # PODNAME: skilletor
-# ABSTRACT: The skilletor command: skills, agents and rules for Claude Code, Codex and Hermes Agent
+# ABSTRACT: Retired: the skilletor command of the CPAN distribution, now a notice
 use strict;
 use warnings;
 use Skilletor::CLI;
 
-binmode $_, ':raw' for \*STDOUT, \*STDERR;    # Skilletor::CLI writes UTF-8 bytes, newlines as they are
 exit Skilletor::CLI::run(@ARGV);
 
 __END__
@@ -16,173 +15,27 @@ __END__
 
 =head1 NAME
 
-skilletor - The skilletor command: skills, agents and rules for Claude Code, Codex and Hermes Agent
+skilletor - Retired: the skilletor command of the CPAN distribution, now a notice
 
 =head1 VERSION
 
-version 0.008000
-
-=head1 SYNOPSIS
-
-  skilletor add Getty                          # add, trust and sync a source
-  skilletor available getty                    # what it offers
-  skilletor install getty-perl-moo@getty       # an item, then a sync
-  skilletor install bundle:house@getty --project
-  skilletor status                             # declared vs. installed, per scope
-  skilletor check                              # exit 1 when a sync is due
-  skilletor sync                               # bring everything in line now
+version 0.009000
 
 =head1 DESCRIPTION
 
-skilletor installs the skills, agents and rules that Claude Code, Codex and
-Hermes Agent work with, from git repositories, https tarballs and local
-directories. You name the items once, in F<~/.claude/skilletor.json> or in
-a project's F<.claude/skilletor.json>; a sync puts them where each agent reads
-them and renders templates per project. A source that only a project's
-config declares is fetched once you C<trust> it, never before.
+This was the command of skilletor's Perl port, which is retired. Whatever it
+is given, it prints a notice to standard error that says where to go instead
+and exits 1; the C<hook> command, which the plugins run, exits 0. L<Skilletor>
+names the replacement: the skilletor plugin for Claude Code, Codex or Hermes
+Agent, or F<install.sh> for the command line,
+L<https://github.com/Getty/skilletor#install>.
 
-  $ skilletor add Getty
-  added source getty ({"git":"https://github.com/Getty/skills"})
-  skilletor: up to date
-  $ skilletor install getty-perl-moo@getty
-  skilletor: user scope
-    + skills/getty-perl-moo (active now)
-
-C<Getty> is short for the git repository L<https://github.com/Getty/skills>,
-kept as the source C<getty>. Each line of the report says when the item takes
-effect: in Claude Code a skill at once, an agent or a rule after
-C</reload-plugins> or a restart; in Codex and Hermes from the next session.
-
-This is the command of the CPAN distribution L<Skilletor>, which needs Perl
-5.40 and C<git>. It has the same commands, options, messages and exit codes
-as the C<skilletor> command of the Claude Code and Codex plugin; only the
-version is spelled its own way, C<x.yyyzzz> for the plugin's x.y.z (C<0.008000>
-is 0.8.0). The plugins keep your items current at every session start; this
-command is for a shell, a script, or as the command the Hermes plugin runs
-(C<$SKILLETOR_BIN>, else C<skilletor> on the C<PATH>). The guide is the
-F<README.md> at L<https://github.com/Getty/skilletor>.
-
-=head1 COMMANDS
-
-=over 4
-
-=item sync
-
-Reconcile installed items with the config. C<--force> adopts and overwrites
-files a sync reports as conflicts.
-
-=item check
-
-Report whether a sync is due; writes nothing. Prints C<changed> and exits 1
-when one is, else C<up to date> and 0.
-
-=item status
-
-Show declared vs. installed items, per scope.
-
-=item add [name] <spec>
-
-Add a source to the user config (the project's with C<--project>), trust it,
-then sync. A spec is a shorthand such as C<Getty> or C<obra/superpowers>, a
-git URL, an https C<.tar.gz>, or a local directory.
-
-=item source list
-
-List the declared sources.
-
-=item source remove <name>
-
-Remove a source, then sync. It refuses while items of the source are
-installed, unless C<--force> is given.
-
-=item available [source]
-
-List the items the trusted sources offer, or one source's; C<E<0x2713>>
-marks what is installed.
-
-=item install <item>...
-
-Install items, then sync. An item is C<name@source>, with a type when the name
-is ambiguous (C<skill:name@source>); C<type:*@source> installs every item of
-that type, C<type:perl-*@source> every one whose name matches, and
-C<bundle:name@source> a bundle. Sources a bundle needs are offered for adding
-on a terminal; elsewhere the C<add> commands are shown.
-
-=item uninstall <item>...
-
-Remove entries, written as for C<install>, then sync.
-
-=item trust <source>
-
-Trust a source that only a project's config declares.
-
-=back
-
-=head1 OPTIONS
-
-=over 4
-
-=item --scope user|project|all
-
-The scope of C<sync>, C<check> and C<status>; default C<all>.
-
-=item --project
-
-Edit the project config instead of the user config (C<add>, C<install>,
-C<uninstall>, C<source remove>).
-
-=item --json
-
-Machine-readable output (C<sync>, C<check>, C<status>, C<source list>,
-C<available>).
-
-=item --force
-
-C<sync>: adopt foreign files on conflict; C<source remove>: remove even if
-items are installed.
-
-=item --project-dir <dir>
-
-The project root, for every command; default: the git top level of the
-current directory, else the current directory.
-
-=item -h, --help
-
-Show the usage, anywhere on the command line; nothing else runs.
-
-=item -v, --version
-
-Show the version, as the first argument only.
-
-=back
-
-An option the command does not accept is an error (exit 2).
-
-=head1 EXIT STATUS
-
-0 on success. 1 when a command fails or refuses, and when C<check> finds a
-sync due. 2 for a usage error (an unknown command or option, a missing
-argument) and when a config error stops C<sync>, C<check>, C<status> or the
-sync that C<add>, C<install>, C<uninstall> and C<source remove> run after
-their edit; that edit stays saved. The internal C<hook> command, which the
-plugins run, always exits 0.
-
-=head1 ENVIRONMENT
-
-C<HOME> holds the user scope: F<~/.claude/skilletor.json>, and the cache and
-state under F<~/.claude/skilletor/>. With C<CLAUDE_CONFIG_DIR> set, Claude
-Code's config dir stands in for F<~/.claude>. C<CODEX_HOME> is the Codex home
-(default F<~/.codex>), C<HERMES_HOME> the Hermes home (else the one the last
-sync used, else F<~/.hermes>, on native Windows F<%LOCALAPPDATA%\hermes>).
-For a test run, point C<HOME> and C<CODEX_HOME> at a temporary directory,
-unset C<CLAUDE_CONFIG_DIR> and C<HERMES_HOME>, and run it from a temporary
-directory, or with C<--project-dir> pointing at one; otherwise a run acts on
-your real homes and on the project of the current directory.
+This last release of the distribution ships it as a stub, so an upgrade
+replaces the earlier program.
 
 =head1 SEE ALSO
 
-L<Skilletor>, the library; L<Skilletor::CLI>, this command's reference, case
-by case; L<https://github.com/Getty/skilletor>, the plugin and its guide.
+L<Skilletor>, L<Skilletor::CLI>.
 
 =head1 SUPPORT
 

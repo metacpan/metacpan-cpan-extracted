@@ -70,27 +70,22 @@ sub write_file {
     like( $result->{stdout}, qr/\S/, 'an action without a cwd runs in the current directory' );
 }
 
-# A failing pipe stops a background action before it forks.
+# Native spawn failures stop a background action before returning a PID.
 {
-    local $FAIL_PIPE = 1;
+    require Developer::Dashboard::GoRoutine;
+    no warnings 'redefine';
+    local *Developer::Dashboard::GoRoutine::spawn = sub { die "unable to create native process\n" };
     my $err = eval { $runner->run_command_action( command => 'true', cwd => $home, background => 1 ); 1 } ? '' : $@;
-    like( $err, qr/Unable to create background action pipe/, 'a background action reports a pipe failure' );
+    like( $err, qr/unable to create native process/, 'a background action reports native process spawn errors' );
 }
 
-# Devel::Cover stops recording in a process once a real exec has been attempted,
-# so the "exec returned" failure path is driven through a stubbed _exec_command
-# that returns false while the detached child is simulated in-process.
+# A false native spawn result is rejected explicitly.
 {
-    my $fork_calls = 0;
+    require Developer::Dashboard::GoRoutine;
     no warnings 'redefine';
-    local *Developer::Dashboard::ActionRunner::_fork_process = sub {
-        $fork_calls++;
-        return fork() if $fork_calls == 1;
-        return 0;
-    };
-    local *Developer::Dashboard::ActionRunner::_exec_command = sub { return 0 };
-    my $err = eval { $runner->run_command_action( command => 'never-execs', cwd => $home, background => 1, timeout_ms => 1000 ); 1 } ? '' : $@;
-    like( $err, qr/Unable to exec background action command/, 'a background command whose exec returns reports the failure' );
+    local *Developer::Dashboard::GoRoutine::spawn = sub { return 0 };
+    my $err = eval { $runner->run_command_action( command => 'never-spawns', cwd => $home, background => 1, timeout_ms => 1000 ); 1 } ? '' : $@;
+    like( $err, qr/Unable to launch background action supervisor/, 'a background action rejects a false native spawn result' );
 }
 
 # The procfs state reader tolerates an unreadable or unparsable stat file.

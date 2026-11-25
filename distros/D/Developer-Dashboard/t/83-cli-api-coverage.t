@@ -21,7 +21,7 @@ local $ENV{HOME} = $home;
 chdir $home or die "Unable to chdir to $home: $!";
 
 # run_ok(@argv)
-# Runs one dashboard api command while swallowing its stdout/stderr.
+# Runs one d2 api command while swallowing its stdout/stderr.
 # Input: raw command argument list.
 # Output: (exit_code, captured_stdout, captured_stderr).
 sub run_ok {
@@ -33,7 +33,7 @@ sub run_ok {
 }
 
 # run_dies(@argv)
-# Runs one dashboard api command expected to die and returns the message.
+# Runs one d2 api command expected to die and returns the message.
 # Input: raw command argument list.
 # Output: die message string, or empty string when the command did not die.
 sub run_dies {
@@ -80,9 +80,9 @@ sub run_dies {
 
 # --- ls usage and output validation --------------------------------------
 {
-    like( run_dies( 'ls', 'extra' ), qr/Usage: dashboard api \[ls\]/,
+    like( run_dies( 'ls', 'extra' ), qr/Usage: d2 api \[ls\]/,
         'ls rejects extra positional arguments' );
-    like( run_dies( 'ls', '-o', 'xml' ), qr/Usage: dashboard api \[ls\]/,
+    like( run_dies( 'ls', '-o', 'xml' ), qr/Usage: d2 api \[ls\]/,
         'ls rejects unknown output formats' );
     is( ( run_ok( 'ls', '-o', 'json' ) )[0], 0,
         'ls accepts json output' );
@@ -94,9 +94,9 @@ sub run_dies {
 
 # --- add usage, secret sourcing, and route validation --------------------
 {
-    like( run_dies('add'), qr/Usage: dashboard api add/,
+    like( run_dies('add'), qr/Usage: d2 api add/,
         'add without --key is rejected' );
-    like( run_dies( 'add', '--key', 'needs-secret' ), qr/Usage: dashboard api add/,
+    like( run_dies( 'add', '--key', 'needs-secret' ), qr/Usage: d2 api add/,
         'add with only --key and no secret or route is rejected' );
     like(
         run_dies( 'add', '--key', 'route-only', '--route', '/ajax/x' ),
@@ -105,12 +105,12 @@ sub run_dies {
     );
     like(
         run_dies( 'add', '--key', 'bad-output', '--secret', 'raw', '-o', 'xml' ),
-        qr/Usage: dashboard api add/,
+        qr/Usage: d2 api add/,
         'add rejects unknown output formats'
     );
     like(
         run_dies( 'add', '--key', 'extra-pos', '--secret', 'raw', 'trailing' ),
-        qr/Usage: dashboard api add/,
+        qr/Usage: d2 api add/,
         'add rejects extra positional arguments'
     );
     like(
@@ -145,11 +145,11 @@ sub run_dies {
 
 # --- rm usage, route removal, and tombstone handling ---------------------
 {
-    like( run_dies('rm'), qr/Usage: dashboard api rm/,
+    like( run_dies('rm'), qr/Usage: d2 api rm/,
         'rm without --key is rejected' );
-    like( run_dies( 'rm', '--key', 'k', 'extra' ), qr/Usage: dashboard api rm/,
+    like( run_dies( 'rm', '--key', 'k', 'extra' ), qr/Usage: d2 api rm/,
         'rm rejects extra positional arguments' );
-    like( run_dies( 'rm', '--key', 'k', '-o', 'xml' ), qr/Usage: dashboard api rm/,
+    like( run_dies( 'rm', '--key', 'k', '-o', 'xml' ), qr/Usage: d2 api rm/,
         'rm rejects unknown output formats' );
     like( run_dies( 'rm', '--key', 'k', '--route', '/nope' ), qr{Route must begin with /ajax/},
         'rm rejects routes outside the /ajax namespace' );
@@ -244,11 +244,11 @@ __END__
 
 =head1 NAME
 
-t/83-cli-api-coverage.t - branch and condition coverage closure for the dashboard api CLI
+t/83-cli-api-coverage.t - branch and condition coverage closure for the d2 api CLI
 
 =head1 PURPOSE
 
-This test is the executable coverage contract for the layered C<dashboard api>
+This test is the executable coverage contract for the layered C<d2 api>
 key manager. It drives every dispatch guard, usage-validation die, secret
 sourcing rule, route allowlist edit, writable-layer tombstone transition, and
 table renderer edge case so the branch and condition metrics for the API CLI
@@ -266,7 +266,7 @@ silently annotated away.
 
 =head1 WHEN TO USE
 
-Use this file when changing C<dashboard api> argument parsing, the writable
+Use this file when changing C<d2 api> argument parsing, the writable
 versus visible registry split, API-key secret hashing, the C</ajax> route
 allowlist rules, tombstone/disable behavior, or the JSON and table renderers.
 

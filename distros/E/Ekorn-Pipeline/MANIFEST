@@ -8,6 +8,8 @@ README.pod
 SECURITY.md
 cpanfile
 lib/Ekorn/Pipeline.pm
+lib/Ekorn/Pipeline/CSV.pm
+lib/Ekorn/Pipeline/Context.pm
 lib/Ekorn/Pipeline/Element.pm
 lib/Ekorn/Pipeline/Errors.pm
 lib/Ekorn/Pipeline/Factories.pm
@@ -59,7 +61,15 @@ t/26-dump-to-redacts.t
 t/27-plain-runs.t
 t/28-feed.t
 t/29-tee.t
+t/30-csv.t
+t/31-csv-without-text-csv.t
+t/32-context.t
+t/33-source-original.t
+t/34-versions.t
+xt/agreement.t
+xt/examples.t
 xt/howto.t
+xt/lib/Examples.pm
 xt/manuals.t
 xt/reference-index.t
 xt/scaling.t

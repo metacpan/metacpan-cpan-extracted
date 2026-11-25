@@ -18,9 +18,12 @@ use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Platform ();
+use Developer::Dashboard::GoRoutine ();
 
-plan skip_all => 'the Windows command-timeout simulation needs POSIX signals and fork'
+plan skip_all => 'the Windows command-timeout simulation needs POSIX process-group signals'
   if Developer::Dashboard::Platform::is_windows();
+
+my @test_lib_paths = map { File::Spec->rel2abs($_) } qw(lib blib/lib blib/arch);
 
 # Hermetic runtime rooted at a throwaway home. The runtime root resolves from the
 # deepest .developer-dashboard layer discovered from the current working
@@ -59,33 +62,31 @@ SH
 }
 
 # spawn_marked_command_tree($marker_file, $seconds)
-# Forks a session-leading stand-in for a Windows command shell that records
+# Spawns a process-group-leading stand-in for a Windows command shell that records
 # itself and one descendant before blocking, so the timeout assertions can prove
 # the whole subtree is gone rather than only the direct child.
 # Input: path the pids are recorded to and how long the tree blocks.
 # Output: the session-leading child pid.
 sub spawn_marked_command_tree {
     my ( $marker_file, $seconds ) = @_;
-    my $child = fork();
-    die "Unable to fork the stand-in Windows command: $!" if !defined $child;
-    if ( !$child ) {
-        POSIX::setsid();
+    my $script = q{
+        use strict;
+        use warnings;
+        use Developer::Dashboard::GoRoutine qw(spawn);
+        my ($marker_file, $seconds) = @ARGV;
         $| = 1;
-        my $descendant = fork();
-        POSIX::_exit(1) if !defined $descendant;
-        if ( !$descendant ) {
-            sleep $seconds;
-            POSIX::_exit(0);
-        }
-        open my $fh, '>', $marker_file or POSIX::_exit(1);
+        my $descendant = spawn([ $^X, '-e', 'sleep shift', $seconds ], {});
+        open my $fh, '>', $marker_file or die "Unable to write marker: $!\n";
         print {$fh} "$$ $descendant\n";
-        close $fh or POSIX::_exit(1);
+        close $fh or die "Unable to close marker: $!\n";
         print "command-stdout-ready\n";
         print STDERR "command-stderr-ready\n";
         sleep $seconds;
-        POSIX::_exit(0);
-    }
-    return $child;
+    };
+    return Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, ( map { "-I$_" } @test_lib_paths ), '-e', $script, '--', $marker_file, $seconds ],
+        { process_group => 1 },
+    );
 }
 
 # read_marked_pids($marker_file)
@@ -157,10 +158,20 @@ sub await_absent_pids {
       or die "Unable to block SIGALRM: $!";
 
     my $started = time();
+    # The timeout must exceed the stand-in command tree's startup time, or
+    # the timeout fires before the tree has printed its ready lines and
+    # written its marker file: a bare `perl -e 1` takes ~0.05s under qemu
+    # user-mode emulation against ~0.00s natively, and this tree (perl
+    # loading GoRoutine, spawning a descendant perl, writing the marker)
+    # measured 0.39s to first output there against 0.02s on amd64. 5000ms
+    # leaves more than 10x headroom over the measured slow-host startup
+    # while still proving the contract - the command blocks for 20s, the
+    # collector must return at its timeout with exit code 124, and the
+    # elapsed assertion below still bounds it well under 10s.
     my ( $stdout, $stderr, $exit_code, $timed_out ) = $runner->_run_command(
         source     => 'dd389-blocked-command',
         cwd        => $home,
-        timeout_ms => 200,
+        timeout_ms => 5000,
     );
     my $elapsed = time() - $started;
 
@@ -174,9 +185,12 @@ sub await_absent_pids {
     like( $stdout, qr/command-stdout-ready/, 'stdout written before the Windows timeout stays captured' );
     like( $stderr, qr/command-stderr-ready/, 'stderr written before the Windows timeout stays captured' );
     is( scalar @spawned_argv, 1, 'the Windows path spawns the command exactly once' );
+    # The Windows path spawns through _windows_powershell_argv, not
+    # shell_command_argv: -Command loses quotes, so the command goes
+    # base64 -EncodedCommand instead (5f1c27fb).
     is_deeply(
         $spawned_argv[0],
-        [ Developer::Dashboard::Platform::shell_command_argv( 'dd389-blocked-command', login => 0 ) ],
+        [ Developer::Dashboard::CommandRunner::_windows_powershell_argv('dd389-blocked-command') ],
         'the Windows path spawns the resolved shell argv without the POSIX pid-file launcher',
     );
 
@@ -193,12 +207,10 @@ sub await_absent_pids {
 # ===========================================================================
 {
     my $pidfile = File::Spec->catfile( $home, 'completed-windows-command.pid' );
-    my $child   = fork();
-    die "Unable to fork the stand-in Windows command: $!" if !defined $child;
-    if ( !$child ) {
-        sleep 0.3;
-        POSIX::_exit(7);
-    }
+    my $child = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-e', 'select undef, undef, undef, 0.3; exit 7' ],
+        {},
+    );
 
     no warnings 'redefine';
     local *Developer::Dashboard::CommandRunner::spawn_windows_command = sub { return $child };
@@ -309,11 +321,7 @@ SKIP: {
 # ===========================================================================
 {
     my $pidfile = File::Spec->catfile( $home, 'dd597-pollution-command.pid' );
-    my $child   = fork();
-    die "Unable to fork the stand-in Windows command: $!" if !defined $child;
-    if ( !$child ) {
-        POSIX::_exit(9);
-    }
+    my $child = Developer::Dashboard::GoRoutine::spawn( [ $^X, '-e', 'exit 9' ], {} );
 
     no warnings 'redefine';
     local *Developer::Dashboard::CommandRunner::spawn_windows_command = sub { return $child };

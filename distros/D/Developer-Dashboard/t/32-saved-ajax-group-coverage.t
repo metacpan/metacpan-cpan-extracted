@@ -6,6 +6,7 @@ use utf8;
 
 use Test::More;
 use Capture::Tiny qw(capture);
+use Cwd qw(cwd);
 use File::Spec;
 use File::Temp qw(tempdir);
 use POSIX qw(:sys_wait_h);
@@ -16,6 +17,7 @@ use lib 'lib';
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Platform ();
+use Developer::Dashboard qw(spawn wait_process);
 
 plan skip_all => 'POSIX saved-Ajax process-group units do not run on Windows'
   if Developer::Dashboard::Platform::is_windows();
@@ -23,6 +25,7 @@ plan skip_all => 'POSIX saved-Ajax process-group units do not run on Windows'
 # Hermetic, isolated runtime: an empty HOME that is also the CWD so any layer
 # discovery resolves under the throwaway directory and never the real home.
 my $home = tempdir( CLEANUP => 1 );
+my $repo_root = cwd();
 local $ENV{HOME} = $home;
 chdir $home or die "Unable to chdir to $home: $!";
 my $paths   = Developer::Dashboard::PathRegistry->new( home => $home );
@@ -38,21 +41,20 @@ END {
     }
 }
 
-# _fork_reaped_child()
-# Forks a child that exits immediately and reaps it, returning a pid that is
-# guaranteed dead so kill(0, $pid) fails deterministically.
+# _spawn_reaped_child()
+# Starts and reaps a short-lived Perl process through the exported GoRoutine
+# API, returning a pid that is guaranteed dead for deterministic cleanup tests.
 # Input: none.
 # Output: reaped child pid integer.
-sub _fork_reaped_child {
-    my $pid = fork();
-    die "fork failed: $!" if !defined $pid;
-    if ( !$pid ) { POSIX::_exit(0); }
-    waitpid( $pid, 0 );
+sub _spawn_reaped_child {
+    my $pid = spawn( [ $^X, '-e', 'exit 0;' ], {} );
+    die "GoRoutine spawn failed: $!" if !defined $pid;
+    wait_process($pid);
     return $pid;
 }
 
 # _exec_failure_in_child($command)
-# Drives the launcher's failed-exec path in a forked child and hands the
+# Drives the launcher's failed-exec path in an independent Perl process and hands the
 # exception text back to the harness.
 # The exec attempt must never happen in the harness process. Devel::Cover
 # writes its run and stops recording the moment a process attempts an exec,
@@ -64,31 +66,28 @@ sub _fork_reaped_child {
 # Output: exception text the launcher died with, or the empty string.
 sub _exec_failure_in_child {
     my ($command) = @_;
-    pipe my $error_r, my $error_w or die "pipe: $!";
-    my $pid = fork();
-    die "fork failed: $!" if !defined $pid;
-    if ( !$pid ) {
-        close $error_r;
-
-        # Stub setpgid to success so the child reaches the exec itself; it is
-        # already its own group leader, so nothing is detached by saying so.
+    my $error_file = File::Spec->catfile( $home, 'failed-exec-error.txt' );
+    my $source = q{
+        use Capture::Tiny qw(capture);
+        use Developer::Dashboard::PageRuntime;
         local $Developer::Dashboard::PageRuntime::SETPGID = sub { return '0 but true' };
         my $error = '';
-
-        # capture swallows perl's mandatory failed-exec warning so the run
-        # stays output-clean.
         capture {
-            eval { Developer::Dashboard::PageRuntime->_exec_saved_ajax_command($command); 1 };
+            eval { Developer::Dashboard::PageRuntime->_exec_saved_ajax_command($ARGV[0]); 1 };
             $error = $@;
         };
-        syswrite $error_w, $error;
-        close $error_w;
-        POSIX::_exit(0);
-    }
-    close $error_w;
-    my $error = do { local $/; <$error_r> } // '';
-    close $error_r;
-    waitpid( $pid, 0 );
+        open my $fh, '>', $ARGV[1] or die $!;
+        print {$fh} $error or die $!;
+        close $fh or die $!;
+    };
+    my @include = map { '-I' . File::Spec->catdir( $repo_root, $_ ) } qw(lib blib/lib blib/arch);
+    my $pid = spawn( [ $^X, @include, '-e', $source, $command, $error_file ], { cwd => $home } );
+    die "GoRoutine spawn failed: $!" if !defined $pid;
+    my $status = wait_process($pid);
+    die "Failed-exec child exited unsuccessfully: $status" if $status != 0;
+    open my $fh, '<', $error_file or die "Unable to read child error '$error_file': $!";
+    my $error = do { local $/; <$fh> } // '';
+    close $fh or die "Unable to close child error '$error_file': $!";
     return $error;
 }
 
@@ -151,7 +150,7 @@ sub _exec_failure_in_child {
 {
     is( $runtime->_terminate_saved_ajax_process(0), 1, '_terminate_saved_ajax_process returns for a falsy pid' );
 
-    my $dead = _fork_reaped_child();
+    my $dead = _spawn_reaped_child();
 
     {
         local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
@@ -166,36 +165,32 @@ sub _exec_failure_in_child {
 # ---- _terminate_saved_ajax_process: live owned group with a descendant -------
 {
     my $marker = File::Spec->catfile( $home, "dd396-group-grandchild-$$.txt" );
-    pipe my $ready_r, my $ready_w or die "pipe: $!";
-    my $leader = fork();
-    die "fork failed: $!" if !defined $leader;
-    if ( !$leader ) {
-        close $ready_r;
-        POSIX::setpgid( 0, 0 ) or POSIX::_exit(97);
-        my $grandchild = fork();
-        POSIX::_exit(98) if !defined $grandchild;
-        if ( !$grandchild ) {
+    my $ready_file = File::Spec->catfile( $home, "dd396-group-ready-$$.txt" );
+    my $leader_source = q{
+        use Developer::Dashboard::GoRoutine ();
+        my ( $marker, $ready ) = @ARGV;
+        my $worker_source = q{
+            my ($marker) = @ARGV;
             $SIG{TERM} = 'IGNORE';
-            open my $marker_fh, '>', $marker or POSIX::_exit(91);
-            print {$marker_fh} "$$\n";
-            close $marker_fh or POSIX::_exit(92);
+            open my $fh, '>', $marker or die "Unable to write worker marker: $!";
+            print {$fh} "$$\n" or die "Unable to write worker pid: $!";
+            close $fh or die "Unable to close worker marker: $!";
             select undef, undef, undef, 30;
-            POSIX::_exit(0);
-        }
-        for ( 1 .. 200 ) {
-            last if -s $marker;
-            select undef, undef, undef, 0.02;
-        }
-        syswrite $ready_w, 'up';
+        };
+        my $worker = Developer::Dashboard::GoRoutine::spawn(
+            [ $^X, '-e', $worker_source, $marker ], {},
+        );
+        die "GoRoutine grandchild launch failed: $!" if !defined $worker;
+        open my $fh, '>', $ready or die "Unable to write readiness marker: $!";
+        print {$fh} "up\n" or die "Unable to publish readiness: $!";
+        close $fh or die "Unable to close readiness marker: $!";
         select undef, undef, undef, 30;
-        POSIX::_exit(0);
-    }
+    };
+    my $leader = spawn( [ $^X, '-e', $leader_source, $marker, $ready_file ], { process_group => 1 } );
+    die "GoRoutine spawn failed: $!" if !defined $leader;
     push @cleanup_pids, $leader;
-    close $ready_w;
-    my $ready = '';
-    sysread $ready_r, $ready, 2;
-    close $ready_r;
-    is( $ready, 'up', 'group fixture reports the leader ready after its grandchild started' );
+    ok( _wait_for_marker($ready_file), 'group fixture reports the leader ready after its grandchild started' );
+    ok( _wait_for_marker($marker), 'group fixture waits for the grandchild to publish its pid before checking liveness' );
 
     my $grandchild_pid;
     if ( open my $marker_fh, '<', $marker ) {
@@ -222,18 +217,6 @@ sub _exec_failure_in_child {
 
 # ---- DD-428: the SIGTERM escalation grants a real elapsed grace window -------
 
-# _await_ready($read_handle)
-# Blocks until a fixture process reports that its signal handlers are installed.
-# Input: read end of the fixture readiness pipe.
-# Output: the two-byte readiness token the fixture wrote.
-sub _await_ready {
-    my ($read_handle) = @_;
-    my $ready = '';
-    sysread $read_handle, $ready, 2;
-    close $read_handle;
-    return $ready;
-}
-
 # _read_marker_pid($path)
 # Reads a pid a fixture descendant recorded in its marker file.
 # Input: marker file path.
@@ -245,6 +228,19 @@ sub _read_marker_pid {
     close $fh;
     $line =~ s/\s+//g;
     return $line =~ /^\d+$/ ? $line + 0 : undef;
+}
+
+# _wait_for_marker($path)
+# Waits until a spawned process publishes its readiness marker.
+# Input: absolute marker path string.
+# Output: true when the marker exists before the bounded deadline.
+sub _wait_for_marker {
+    my ($path) = @_;
+    my $deadline = Time::HiRes::time() + 5;
+    while ( !-e $path && Time::HiRes::time() < $deadline ) {
+        select undef, undef, undef, 0.01;
+    }
+    return -e $path ? 1 : 0;
 }
 
 # The shipped window is what production actually grants a signalled worker, so
@@ -266,10 +262,17 @@ sub _read_marker_pid {
 # directly instead of leaving the contract to be inferred from them: a future
 # refactor that reads the guard as dead defensive code has to fail this first.
 {
-    my $orphan = fork();
-    die "fork failed: $!" if !defined $orphan;
-    if ( !$orphan ) { POSIX::_exit(0); }
+    my $orphan = spawn( [ $^X, '-e', 'exit 0;' ], {} );
+    die "GoRoutine spawn failed: $!" if !defined $orphan;
     push @cleanup_pids, $orphan;
+    my $deadline = Time::HiRes::time() + 5;
+    while ( !Developer::Dashboard::GoRoutine::process_exited($orphan)
+        && Time::HiRes::time() < $deadline )
+    {
+        select undef, undef, undef, 0.01;
+    }
+    die "GoRoutine worker did not exit before deadline"
+      if !Developer::Dashboard::GoRoutine::process_exited($orphan);
 
     is( $runtime->_await_saved_ajax_exit( $orphan, undef ), 1, '_await_saved_ajax_exit drains an exited worker with no status reference supplied' );
     is( waitpid( $orphan, WNOHANG ), -1, '_await_saved_ajax_exit reaped the worker it drained without a status reference' );
@@ -283,12 +286,10 @@ sub _read_marker_pid {
     local $Developer::Dashboard::PageRuntime::SAVED_AJAX_TERM_GRACE_SECONDS = 5;
 
     my $marker = File::Spec->catfile( $home, "dd428-worker-cleanup-$$.txt" );
-    pipe my $ready_r, my $ready_w or die "pipe: $!";
-    my $worker = fork();
-    die "fork failed: $!" if !defined $worker;
-    if ( !$worker ) {
-        close $ready_r;
-        POSIX::setpgid( 0, 0 ) or POSIX::_exit(97);
+    my $ready_file = File::Spec->catfile( $home, "dd428-worker-ready-$$.txt" );
+    my $worker_source = q{
+        use POSIX ();
+        my ( $marker, $ready ) = @ARGV;
         $SIG{TERM} = sub {
             select undef, undef, undef, 0.3;
             open my $marker_fh, '>', $marker or POSIX::_exit(91);
@@ -296,13 +297,19 @@ sub _read_marker_pid {
             close $marker_fh or POSIX::_exit(92);
             POSIX::_exit(0);
         };
-        syswrite $ready_w, 'up';
+        open my $fh, '>', $ready or die "Unable to write readiness marker: $!";
+        print {$fh} "up\n" or die "Unable to publish readiness: $!";
+        close $fh or die "Unable to close readiness marker: $!";
         select undef, undef, undef, 30;
         POSIX::_exit(0);
-    }
+    };
+    my $worker = spawn(
+        [ $^X, '-e', $worker_source, $marker, $ready_file ],
+        { process_group => 1 },
+    );
+    die "GoRoutine spawn failed: $!" if !defined $worker;
     push @cleanup_pids, $worker;
-    close $ready_w;
-    is( _await_ready($ready_r), 'up', 'cooperative worker fixture installed its SIGTERM cleanup handler' );
+    is( _wait_for_marker($ready_file), 1, 'cooperative worker fixture installed its SIGTERM cleanup handler' );
 
     my $reaped_status;
     my $started = Time::HiRes::time();
@@ -321,40 +328,50 @@ sub _read_marker_pid {
 {
     my $descendant_marker = File::Spec->catfile( $home, "dd428-descendant-pid-$$.txt" );
     my $cleanup_marker    = File::Spec->catfile( $home, "dd428-descendant-cleanup-$$.txt" );
-    pipe my $ready_r, my $ready_w or die "pipe: $!";
-    my $leader = fork();
-    die "fork failed: $!" if !defined $leader;
-    if ( !$leader ) {
-        close $ready_r;
-        POSIX::setpgid( 0, 0 ) or POSIX::_exit(97);
-        my $descendant = fork();
-        POSIX::_exit(98) if !defined $descendant;
-        if ( !$descendant ) {
+    my $ready_file        = File::Spec->catfile( $home, "dd428-descendant-ready-$$.txt" );
+    my $leader_source = q{
+        use Developer::Dashboard::GoRoutine ();
+        use POSIX ();
+        my ( $descendant_marker, $cleanup_marker, $ready ) = @ARGV;
+        my $descendant_source = q{
+            use POSIX ();
+            my ( $descendant_marker, $cleanup_marker ) = @ARGV;
             $SIG{TERM} = sub {
                 select undef, undef, undef, 0.3;
-                open my $cleanup_fh, '>', $cleanup_marker or POSIX::_exit(91);
-                print {$cleanup_fh} "cleaned up\n";
-                close $cleanup_fh or POSIX::_exit(92);
+                open my $fh, '>', $cleanup_marker or POSIX::_exit(91);
+                print {$fh} "cleaned up\n";
+                close $fh or POSIX::_exit(92);
                 POSIX::_exit(0);
             };
-            open my $marker_fh, '>', $descendant_marker or POSIX::_exit(93);
-            print {$marker_fh} "$$\n";
-            close $marker_fh or POSIX::_exit(94);
+            open my $fh, '>', $descendant_marker or POSIX::_exit(93);
+            print {$fh} "$$\n" or POSIX::_exit(94);
+            close $fh or POSIX::_exit(95);
             select undef, undef, undef, 30;
             POSIX::_exit(0);
-        }
+        };
+        my $descendant = Developer::Dashboard::GoRoutine::spawn(
+            [ $^X, '-e', $descendant_source, $descendant_marker, $cleanup_marker ], {},
+        );
+        die "GoRoutine descendant launch failed: $!" if !defined $descendant;
         $SIG{TERM} = sub { POSIX::_exit(0) };
         for ( 1 .. 200 ) {
             last if -s $descendant_marker;
             select undef, undef, undef, 0.02;
         }
-        syswrite $ready_w, 'up';
+        die "GoRoutine descendant did not publish its pid marker" if !-s $descendant_marker;
+        open my $fh, '>', $ready or die "Unable to publish readiness: $!";
+        print {$fh} "up\n" or die "Unable to write readiness: $!";
+        close $fh or die "Unable to close readiness: $!";
         select undef, undef, undef, 30;
         POSIX::_exit(0);
-    }
+    };
+    my $leader = spawn(
+        [ $^X, '-e', $leader_source, $descendant_marker, $cleanup_marker, $ready_file ],
+        { process_group => 1 },
+    );
+    die "GoRoutine spawn failed: $!" if !defined $leader;
     push @cleanup_pids, $leader;
-    close $ready_w;
-    is( _await_ready($ready_r), 'up', 'descendant fixture reports the leader ready after its descendant started' );
+    is( _wait_for_marker($ready_file), 1, 'descendant fixture reports the leader ready after its descendant started' );
 
     my $descendant_pid = _read_marker_pid($descendant_marker);
     push @cleanup_pids, $descendant_pid;
@@ -381,34 +398,37 @@ sub _read_marker_pid {
     local $Developer::Dashboard::PageRuntime::SAVED_AJAX_TERM_GRACE_SECONDS = 0.4;
 
     my $marker = File::Spec->catfile( $home, "dd428-stubborn-pid-$$.txt" );
-    pipe my $ready_r, my $ready_w or die "pipe: $!";
-    my $leader = fork();
-    die "fork failed: $!" if !defined $leader;
-    if ( !$leader ) {
-        close $ready_r;
-        POSIX::setpgid( 0, 0 ) or POSIX::_exit(97);
-        $SIG{TERM} = 'IGNORE';
-        my $descendant = fork();
-        POSIX::_exit(98) if !defined $descendant;
-        if ( !$descendant ) {
+    my $ready_file = File::Spec->catfile( $home, "dd428-stubborn-ready-$$.txt" );
+    my $leader_source = q{
+        use Developer::Dashboard::GoRoutine ();
+        my ( $marker, $ready ) = @ARGV;
+        my $descendant_source = q{
+            my ($marker) = @ARGV;
             $SIG{TERM} = 'IGNORE';
-            open my $marker_fh, '>', $marker or POSIX::_exit(91);
-            print {$marker_fh} "$$\n";
-            close $marker_fh or POSIX::_exit(92);
+            open my $fh, '>', $marker or die "Unable to write descendant marker: $!";
+            print {$fh} "$$\n" or die "Unable to write descendant pid: $!";
+            close $fh or die "Unable to close descendant marker: $!";
             select undef, undef, undef, 30;
-            POSIX::_exit(0);
-        }
+        };
+        my $descendant = Developer::Dashboard::GoRoutine::spawn(
+            [ $^X, '-e', $descendant_source, $marker ], {},
+        );
+        die "GoRoutine descendant launch failed: $!" if !defined $descendant;
+        $SIG{TERM} = 'IGNORE';
         for ( 1 .. 200 ) {
             last if -s $marker;
             select undef, undef, undef, 0.02;
         }
-        syswrite $ready_w, 'up';
+        die "GoRoutine descendant did not publish its pid marker" if !-s $marker;
+        open my $fh, '>', $ready or die "Unable to publish readiness: $!";
+        print {$fh} "up\n" or die "Unable to write readiness: $!";
+        close $fh or die "Unable to close readiness: $!";
         select undef, undef, undef, 30;
-        POSIX::_exit(0);
-    }
+    };
+    my $leader = spawn( [ $^X, '-e', $leader_source, $marker, $ready_file ], { process_group => 1 } );
+    die "GoRoutine spawn failed: $!" if !defined $leader;
     push @cleanup_pids, $leader;
-    close $ready_w;
-    is( _await_ready($ready_r), 'up', 'TERM-ignoring fixture reports the leader ready after its descendant started' );
+    is( _wait_for_marker($ready_file), 1, 'TERM-ignoring fixture reports the leader ready after its descendant started' );
 
     my $descendant_pid = _read_marker_pid($marker);
     push @cleanup_pids, $descendant_pid;
@@ -451,7 +471,10 @@ TERM-ignoring descendant. It also pins the elapsed SIGTERM grace window the
 terminator grants before escalating to SIGKILL: a cooperative worker completes
 its own cleanup handler, a still-draining descendant holds the escalation off,
 and a group that ignores SIGTERM is killed only after the configured window has
-really passed.
+really passed. Isolated helper processes are launched with the public
+C<Developer::Dashboard> GoRoutine C<spawn> and C<wait_process> exports; the
+failed-exec assertion captures its diagnostic in a child so the test harness
+does not lose coverage instrumentation when C<exec> is attempted.
 
 =for comment FULL-POD-DOC START
 
@@ -476,8 +499,9 @@ or termination escalation logic changes.
 
 =head1 HOW TO USE
 
-Run C<prove -lv t/32-saved-ajax-group-coverage.t> directly, or include it in
-the repository-wide suite and coverage gates.
+Run C<d2 docker compose exec dev prove -Iblib/lib -Iblib/arch -lv
+t/32-saved-ajax-group-coverage.t> during development, or include it in the
+repository-wide Docker suite and coverage gates.
 
 =head1 WHAT USES IT
 
@@ -486,11 +510,11 @@ file to hold the saved-Ajax lifecycle helpers at full coverage.
 
 =head1 EXAMPLES
 
-  prove -lv t/32-saved-ajax-group-coverage.t
+  d2 docker compose exec dev prove -Iblib/lib -Iblib/arch -lv t/32-saved-ajax-group-coverage.t
 
 Run the focused process-group unit checks.
 
-  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lv t/32-saved-ajax-group-coverage.t
+  d2 docker compose exec dev prove -Iblib/lib -Iblib/arch -MDevel::Cover -lv t/32-saved-ajax-group-coverage.t
 
 Collect the per-branch coverage these units exist to provide.
 

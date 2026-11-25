@@ -6,7 +6,7 @@ use warnings;
 use Scalar::Util ();
 use Time::HiRes ();
 
-our $VERSION = '3.19.0';
+our $VERSION = '3.19.1';
 
 # A node is [key, value, expires_at, older, newer]. The hash finds a node, the
 # links order them by recency, so a get, a set and an eviction are each O(1). A

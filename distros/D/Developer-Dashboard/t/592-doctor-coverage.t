@@ -63,7 +63,10 @@ sub write_file {
 }
 
 # chmod failure while repairing permissions.
-{
+SKIP: {
+    # The doctor does not audit modes on Windows (modes are not a Windows
+    # security control), so the injected chmod failure can never fire there.
+    skip 'Unix permission modes are not a Windows security control', 2 if $^O eq 'MSWin32';
     my $root = File::Spec->catdir( $home, 'audit-root' );
     make_path($root);
     my $file = write_file( File::Spec->catfile( $root, 'loose.txt' ), "x\n" );

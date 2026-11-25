@@ -100,11 +100,19 @@ L<JSON: Ekorn::Pipeline::JSON|/"JSON: Ekorn::Pipeline::JSON">
 
 =item *
 
+L<CSV: Ekorn::Pipeline::CSV|/"CSV: Ekorn::Pipeline::CSV">
+
+=item *
+
 L<Operators: Ekorn::Pipeline::Operators|/"Operators: Ekorn::Pipeline::Operators">
 
 =item *
 
 L<Errors: Ekorn::Pipeline::Errors|/"Errors: Ekorn::Pipeline::Errors">
+
+=item *
+
+L<Which result: Ekorn::Pipeline::Context|/"Which result: Ekorn::Pipeline::Context">
 
 =item *
 
@@ -215,6 +223,12 @@ B<Made in:> L<Stages::Taps|/"Taps: Ekorn::Pipeline::Stages::Taps">
 
 B<Holds:> C<:flow>, C<:batch> and C<:taps>
 
+=item C<:context>
+
+B<Holds:> C<result_number>, C<result_original>
+
+B<Made in:> L<Context|/"Which result: Ekorn::Pipeline::Context">
+
 =item C<:sources>
 
 B<Holds:> C<from_array>, C<from_fh>, C<from_file>, C<counter>
@@ -232,6 +246,12 @@ B<Made in:> L<Sinks|/"Sinks: Ekorn::Pipeline::Sinks">
 B<Holds:> C<from_json>, C<from_jsonl>, C<to_json>, C<to_jsonl>
 
 B<Made in:> L<JSON|/"JSON: Ekorn::Pipeline::JSON">
+
+=item C<:csv>
+
+B<Holds:> C<from_csv>, C<to_csv>
+
+B<Made in:> L<CSV|/"CSV: Ekorn::Pipeline::CSV">
 
 =item C<:words>
 
@@ -387,9 +407,9 @@ It exports nothing by default, and C<is_stage> and C<is_sink> on
 request. C<is_stage> is new in v0.1.3, so ask for that version on the
 C<use> line, as above. Without it, C<use Ekorn::Pipeline qw(is_stage)>
 compiles under v0.1.2, which has no C<import>, and fails only when
-C<is_stage> is called. C<pipeline_in>, C<named> and C<is_sink> are new in
-v0.3.0. The word C<pipeline>, which makes a pipeline whose stages can
-be names, is in L<Factories|/"Words: Ekorn::Pipeline::Factories">.
+C<is_stage> is called. The word C<pipeline>, which makes a pipeline
+whose stages can be names, is in
+L<Factories|/"Words: Ekorn::Pipeline::Factories">.
 
 A subclass inherits its C<import>, Exporter's, so C<use My::Pipeline;>
 imports nothing, and C<use My::Pipeline qw(name)> croaks unless the
@@ -489,7 +509,10 @@ stage that stops, such as C<take>, saves the work of making the rest.
         take_if { $_ % 2 },
         take(3),
     )->iterator(sub { ++$n });
-    while (my($square) = $next->()) { say $square }    # 1, 9, 25
+    while (my($square) = $next->()) { say $square }
+    # 1
+    # 9
+    # 25
     say "$n numbers read";    # 5 numbers read
 
 The source here counts without end, and is read five times: once for
@@ -777,7 +800,6 @@ keyword-like function, one line over a class method: syntax, not
 behaviour, so it lives here, not in the class it makes. A package
 built on Ekorn uses them as they are (see L<Delivering parts for
 Ekorn|/"Delivering parts for Ekorn">). Nothing is exported by default.
-Each is new in v0.3.0.
 
 =over 4
 
@@ -803,7 +825,7 @@ B<Its block:> a set-up, returning the step, and, optionally, the flush and the e
 
 B<Makes:> a Source
 
-B<Its block:> a set-up, returning the step, and, optionally, the end and a context
+B<Its block:> a set-up, returning the step, and, optionally, the end, a context and an original
 
 =item C<generator {...}>
 
@@ -933,15 +955,15 @@ never taken for a count.
         top    => ['titles', take(3)],
     };
 
-    my @top  = top(@tracks);                         # the first three titles
-    my @loud = top(@tracks, pipeline(sub { uc }));    # and more stages
-    my $next = pipeline('top')->iterator($source);    # pulled
+    my @top  = top(@tracks);                                     # the first three titles
+    my @loud = top(@tracks, pipeline(sub { uc }));                # and more stages
+    my $next = pipeline('top')->iterator(from_array(@tracks));    # pulled
 
 C<use Ekorn::Pipeline::Sugar> takes C<pipeline> and the definitions after
 it, each a name and an array of stages: a hash, C<{...}>, or an array of
 pairs, C<[...]>, to read in order. Each pipeline is named in the package
 that uses the module, as C<named> names one, so C<pipeline('name')> finds
-it, and the package gets a function of each name. New in v0.3.0.
+it, and the package gets a function of each name.
 
 =over 4
 
@@ -1200,6 +1222,12 @@ optional;
 B<a context,> for a source only, and optional: anything its stages
 may ask for with L<C<run_context>|/"Stages that ask about their run">.
 
+=item *
+
+B<an original,> for a source only, and optional: called with
+nothing, it returns the original of the value the source gave last,
+which L<C<result_original>|/"Which result: Ekorn::Pipeline::Context"> gives.
+
 =back
 
     use Ekorn::Pipeline::Factories qw(source);
@@ -1221,8 +1249,8 @@ a run: it's the same code, with the same closure, in every run.
 The set-up returns its parts as a list, in the order above, leaving
 out those it doesn't give from the end, and giving C<undef> for one it
 leaves out before one it gives. Or it returns them B<by name,> as a
-hash reference whose keys are C<step>, C<flush>, C<end> and C<context>,
-giving only those it has, in any order:
+hash reference whose keys are C<step>, C<flush>, C<end>, C<context> and
+C<original>, giving only those it has, in any order:
 
     use Ekorn::Pipeline::Factories qw(gather);
 
@@ -1243,7 +1271,7 @@ giving only those it has, in any order:
 A key Ekorn doesn't read is ignored, and a hash without what its part
 needs, a step, and a sink's flush, croaks, as a list without them
 does. Only a plain hash reference returned alone is taken for parts by
-name. Parts by name are new in v0.3.0.
+name.
 
 =head2 How a run ends
 
@@ -1412,6 +1440,7 @@ read, and a source holding a resource, such as a file or a statement's
 lock, lets it go. C<single> reads one more, to warn if there's another:
 for when one value is meant, and a mistake could give more.
 
+    my @setlist  = ('Intro', 'Parklife', 'Song 2', 'encore', 'Tender');
     my $numbered = Ekorn::Pipeline->new(take_if { m( \d )x });
     say $numbered->iterator(from_array(@setlist))->single;    # Song 2
 
@@ -1423,6 +1452,9 @@ stop, rather than when the iterator goes, so a file is closed then:
         last if $song eq 'encore';
         say $song;
     }
+    # Intro
+    # Parklife
+    # Song 2
     $next->finish;    # the file is closed now
 
 An iterator that's dropped before its values run out ends its run when
@@ -1781,11 +1813,15 @@ database and statement handles have the same two methods.
         ->tap(sub { say 'Starting with ', scalar $_->tracks, ' tracks' })    # Starting with 2 tracks
         ->add($tracks[4]);
     say join ', ', $list->pipe(sub { $_->tracks }, sub { $_->{artist} });    # ABBA, ABBA, Cream
-    say scalar $list->pipe(sub { $_->tracks }, take_if { $_->{plays} < 5000 }, sub { $_->{title} });    # Knowing Me, Knowing You
+    say scalar $list->pipe(sub { $_->tracks }, take_if { $_->{plays} < 5000 });    # 1
+    say $list->pipe(sub { $_->tracks }, take_if { $_->{plays} < 5000 }, sub { $_->{title} }, keep_first);    # Knowing Me, Knowing You
 
-In scalar context, C<pipe> gives the first result, not how many, as a
-pipeline called would, so a pipeline that finds one thing reads
-naturally after it.
+C<pipe> gives what a pipeline of its stages, called with the object,
+gives, in either context: in scalar context, how many results came
+out, or a sink's result. So for one value, end with a sink of one,
+such as C<keep_first>, or read it in list context, C<< my($title) =
+$list->pipe(...) >>. Until v0.4.0, in scalar context, C<pipe> gave the
+first result instead, unlike a pipeline.
 
 =head1 Canned stages
 
@@ -2006,16 +2042,23 @@ B<The branch's flushes> are called in the tee's flush, which closes
 the branch: once the main run's values have run out, before the
 stages after the tee are flushed. A total, a last batch or a sink's
 result is given then, as below. If a stop after the tee ends the
-main run, the tee's flush isn't called, so neither are the branch's.
+main run first, such as C<take>'s or an iterator's C<first>, the tee's
+flush isn't called, so the tee closes the branch in its end: a stop
+ends the branch's input as much as running out would, so a writer in
+the branch keeps what it holds. That's new in v0.3.10; before, the
+branch's flushes weren't called, and what they held was lost. A
+branch's flush that dies there kills the run, as an end that dies
+does.
 
 =item *
 
 B<The branch's ends> are called as its run ends, each told how it
 ended from where it stands: in the push that met a stop or a death
-in the branch; in the tee's flush, which closes it; or, if the main
-run ended before either, in the tee's end, told C<stopped>, as the
-branch's input was cut short. That's so even when the main run died,
-as it is for an iterator read as a source by a run that dies.
+in the branch; or as the tee closes it, in its flush or its end. If
+the main run died, the tee's end doesn't close the branch, but
+finishes it, its flushes not called, and its ends told C<stopped>, as
+the branch's input was cut short, as they are for an iterator read
+as a source by a run that dies.
 
 =item *
 
@@ -2048,7 +2091,7 @@ A branch totalling what it saw, in its flush:
 
 Each value costs a push into the branch: about 1.3 microseconds a
 value through a branch of one plain stage, against C<peek>'s 0.4, on
-Perl 5.36. A tee has a flush, and an end, only if its branch needs
+Perl 5.36. A tee has a flush and an end only if its branch needs
 them, so a branch of plain stages leaves the main run on the plain
 loop. A branch with a flush, such as C<batch>'s, puts the main run on
 the full path, and costs about 2.2 microseconds a value. It's for
@@ -2060,7 +2103,7 @@ Ready-made sources, needing nothing beyond Perl, for
 L<iterator|/"iterator">: the values you give, numbers counting on
 without end, and the records of a file or a filehandle. Each is made
 afresh for each run, so each run reads from the start. Nothing is
-exported by default. Each is new in v0.3.0.
+exported by default.
 
     use Ekorn::Pipeline::Sources qw(from_array from_fh from_file counter);
     use Ekorn::Pipeline::Sources qw(:all);
@@ -2104,8 +2147,7 @@ to step by".
 
 Ready-made sinks, usually given last in a pipeline, so that a sink's
 result is what the run gives (see L<Sinks|/"Sinks: Ekorn::Pipeline::Sink">).
-Each is made afresh for each run. Nothing is exported by default. Each
-is new in v0.3.0.
+Each is made afresh for each run. Nothing is exported by default.
 
     use Ekorn::Pipeline::Sinks qw(keep_all count_items keep_first);
     use Ekorn::Pipeline::Sinks qw(:all);
@@ -2168,7 +2210,7 @@ Four functions, one for each direction and format, each making a
 different part by its options: given a C<file> or an C<fh>, a C<from_>
 function makes a source and a C<to_> function a sink; given neither,
 each makes a stage. Each part is made afresh for each run. Nothing is
-exported by default. All four are new in v0.3.0.
+exported by default.
 
     use Ekorn::Pipeline::JSON qw(from_json from_jsonl to_json to_jsonl);
     use Ekorn::Pipeline::Tooling qw(:json);    # the same
@@ -2230,6 +2272,87 @@ two at once. JSON.pm exports a C<from_json> and a C<to_json> of its own
 by default: a module using both imports one under another name, or
 calls it by its full name.
 
+=head1 CSV: Ekorn::Pipeline::CSV
+
+Two functions, one for each direction, each making a different part by
+its options, as JSON's do: given a C<file> or an C<fh>, C<from_csv> makes
+a source and C<to_csv> a sink; given neither, each makes a stage. Each
+part is made afresh for each run, so a source read twice reads its
+header twice. Nothing is exported by default. Both are new in v0.3.10.
+
+    use Ekorn::Pipeline::CSV qw(from_csv to_csv);
+    use Ekorn::Pipeline::Tooling qw(:csv);    # the same
+
+Rows are array references of their fields, or, with a C<header>, hash
+references keyed by its names. A header read from a file gives the
+run's context its C<columns>, as DBIx::Squirrel's statements do, and
+C<to_csv>'s C<< header => 1 >> writes them back, in their order:
+
+    my $written = Ekorn::Pipeline->new(
+        to_csv(file => 'tracks.csv', header => [qw(title artist plays)]),
+    )->(@tracks);    # 6
+
+    my @blur = Ekorn::Pipeline->new(sub { $_->{artist} eq 'Blur' ? $_->{title} : () })
+        ->iterator(from_csv(file => 'tracks.csv', header => 1))->all;
+    say join ', ', @blur;    # Girls & Boys, Parklife, Country House
+
+    my($copied) = Ekorn::Pipeline->new(
+        take_if { $_->{plays} > 6000 },
+        to_csv(file => 'hits.csv', header => 1),
+    )->iterator(from_csv(file => 'tracks.csv', header => 1))->all;    # 3, under title,artist,plays
+
+Given no file, C<to_csv>'s stage passes on each row's line, without its
+end of line, and C<from_csv>'s parses each value, a text of any number
+of rows, as a quoted field may hold a newline. Fields are quoted as
+Text::CSV quotes them, those with a space among them:
+
+    my @lines = Ekorn::Pipeline->new(to_csv(header => [qw(title plays)]))->(@tracks[0, 1]);
+    say for @lines;
+    # title,plays
+    # "Dancing Queen",9100
+    # "Knowing Me, Knowing You",4200
+
+The parser is Text::CSV's: Text::CSV_XS where it's installed,
+Text::CSV_PP otherwise. Ekorn only recommends Text::CSV, so the module
+loads without it, and C<from_csv> and C<to_csv> croak when called if it
+isn't installed. A file's text is UTF-8 unless C<encoding> says, so its
+fields are characters; text that won't decode, a character the
+encoding can't hold, and a row that won't parse each croak at its row,
+saying where. A byte order mark that starts the input is dropped.
+
+=over 4
+
+=item C<file>
+
+the path of a file to read or write; opened as the run starts, emptied if it's written, and closed once the run ends, however it ended
+
+=item C<fh>
+
+an open filehandle, read or written with its own layers, and left open
+
+=item C<csv>
+
+a hash reference of options for C<< Text::CSV->new >>, over the defaults C<binary> on and C<auto_diag> off, such as C<< {sep_char => "\t"} >> for TSV; or a parser object of your own, used as it is
+
+=item C<header>
+
+reading: false, every row data, as arrays; true, the first row names each row's fields, as hashes; C<'skip'>, the first row dropped, rows as arrays. Writing: false, no header, rows as arrays; an array reference of names, written first, ordering a hash's fields; true, the names from the run's context's C<columns>
+
+=item C<munge>
+
+reading, with a header: C<none>, the default, C<lc>, C<uc>, or C<db>, which makes C<Track Name> C<track_name>; a hash reference mapping names; or a code reference given each name, as C<$_> too, as Text::CSV's C<munge_column_names>
+
+=item C<encoding>
+
+a file's encoding, as Encode names it, C<UTF-8> by default, or C<raw>, for bytes as they are
+
+=back
+
+A header naming a column twice croaks, when rows are hashes, as one
+field's value would be lost; C<munge> can name columns apart, and runs
+first. A short row's missing fields are C<undef>, and a long row's extra
+fields are dropped.
+
 =head1 Operators: Ekorn::Pipeline::Operators
 
     use Ekorn::Pipeline::Operators;
@@ -2238,11 +2361,11 @@ It puts C<|>, C<|=> and C<@{}> in force for Ekorn's sources, stages,
 gathers and chains, for the rest of the scope it's used in;
 C<no Ekorn::Pipeline::Operators> takes them out again. Written where
 they're not in force, they croak: "Expected use
-Ekorn::Pipeline::Operators in scope". They're new in v0.3.0, and a
-shorthand for the commonest shapes, not the whole of Ekorn: a pipeline
-made with C<new> can have stages after a sink, give a list as a list,
-and, pulled with C<iterator>, be a source that gives a sink's result,
-none of which a chain can.
+Ekorn::Pipeline::Operators in scope". They're a shorthand for the
+commonest shapes, not the whole of Ekorn: a pipeline made with C<new>
+can have stages after a sink, give a list as a list, and, pulled with
+C<iterator>, be a source that gives a sink's result, none of which a
+chain can.
 
 =over 4
 
@@ -2496,6 +2619,113 @@ module's. Then C<croakf> in a helper reports at the line that called
 the module. A helper in the same package needs nothing.
 
 =back
+
+=head1 Which result: Ekorn::Pipeline::Context
+
+Each run counts the results it makes, and keeps the value each is
+being made from, so a stage can ask which result it's making, and
+from what. A I<result> is a value that leaves the last stage, or that
+reaches a sink. C<result_number> is the run's results so far, plus one,
+and C<result_original> the value the run's source gave, or that was
+pushed, before any stage changed it:
+
+    use Ekorn::Pipeline::Context qw(result_number result_original);
+    use Ekorn::Pipeline::Tooling qw(:context);    # the same, from v0.3.15
+
+    my @hits = Ekorn::Pipeline->new(
+        sub { $_->{plays} > 6000 ? $_ : () },
+        sub { result_number . ". $_->{title}" },
+    )->(@tracks);    # 1. Dancing Queen, 2. Girls & Boys, 3. Sunshine of Your Love
+
+    my @titles = Ekorn::Pipeline->new(
+        sub { $_->{plays} },
+        sub { $_ > 6000 ? result_original->{title} : () },
+    )->(@tracks);    # Dancing Queen, Girls & Boys, Sunshine of Your Love
+
+=over 4
+
+=item *
+
+B<A bare call is a term,> as a constant is: each takes no
+arguments, and has an empty prototype, so C<result_number + 1> adds
+one, and C<result_original // 'none'> gives C<'none'> where there's
+none. In v0.3.11, C<result_number + 1> died with "Too many
+arguments".
+
+=item *
+
+B<A value dropped makes no result,> so the number stays the same
+while a stage drops values.
+
+=item *
+
+B<Each value a stage returns in place of one is a result of its
+own,> numbered one after another, each with the original of the
+value it was made from. So is each value a stop carries.
+
+=item *
+
+B<A flush's values have no original.> In a flush, C<result_number>
+is the number of the first value it returns, and C<result_original>
+is undef there and in the stages after it, for the values it gives,
+as below.
+
+=item *
+
+B<Each run counts its own,> from 1: a pipeline run inside a stage, a
+tee's branch, and an iterator read as a source each count theirs,
+and leave the count of the run around them as it was. For a run
+reading an iterator, the original is the value the iterator handed
+out, unless its source says otherwise, as below.
+
+=item *
+
+B<A source can give the original itself,> with an C<original> part,
+a code reference returning the original of the value it gave last,
+such as the row a statement fetched. C<result_original> then gives
+what that says, calling it only when asked, and a run reading an
+iterator of that source's run gets it too, so it reaches every
+pipeline in a chain. A flush's values have none, whatever it says.
+The part answers for the value the source gave last, which is the
+one the stages are working from, as values a stage returns several
+of go through the stages before the next is pulled; but a source
+whose step returns several values at once has it answer for the
+last of them. New in v0.3.13.
+
+=item *
+
+B<They're for stages,> their flushes and sinks. Outside a run, and
+in an end, both give undef. In a source's step, they give where the
+run reading it has got to, which isn't promised.
+
+=item *
+
+B<Every run counts,> whether its stages ask or not. It costs a
+value about 15 to 75 nanoseconds, measured on Perl 5.36 and 5.44
+through one stage that does nothing: 1 to 3% for C<all>, 3 to 12% for
+a pushed run, and 6 to 8% for an iterator's C<next>, which counts once
+a call. Less through stages that do work. Roadmap 2026-0046's record
+has the measurements.
+
+=back
+
+A batch filled by a value has that value's original; the last, given
+by C<batch>'s flush, has none:
+
+    my @lines = Ekorn::Pipeline->new(
+        batch(4),
+        sub {
+            my $last = result_original ? result_original->{title} : 'from the flush';
+            result_number . ': ' . @$_ . " tracks, the last $last";
+        },
+    )->(@tracks);    # 1: 4 tracks, the last Parklife; 2: 2 tracks, the last from the flush
+
+The run's context is asked with
+L<C<run_context>|/"Stages that ask about their run">, and whether a
+value came from a flush with L<C<ending>|/"ending">. DBIx::Squirrel has
+the same functions under the same names, from its v3.6.1, its rows
+carried through chains by its source's original, so a program
+importing both Toolings gets one of each.
 
 =head1 Writing stages
 
@@ -2791,8 +3021,9 @@ B<Returns:> its step, called with each value, its return ignored; its flush, giv
 =back
 
 Each returns its parts as a list, in the order the table gives, or by
-name, as a hash reference with the keys C<step>, C<flush>, C<end> and
-C<context>, as a set-up does (see L<Made for a run|/"Made for a run">).
+name, as a hash reference with the keys C<step>, C<flush>, C<end>,
+C<context> and C<original>, as a set-up does (see
+L<Made for a run|/"Made for a run">).
 
 The methods are named for Ekorn, so an object of yours with a method
 of its own such as C<as_list> is never taken for a part. One object can
@@ -2834,7 +3065,8 @@ can take a column by its name, wherever it is in the row:
 Each run has its own context, and an iterator used as a source passes
 on the context of the run inside it. A pushed run has none, and a feed
 none of its own: its stages see the context of the code pushing into
-it.
+it. Which result a stage is making, and from what, it asks
+L<Ekorn::Pipeline::Context|/"Which result: Ekorn::Pipeline::Context">.
 
 =head2 C<|> for your sources
 
@@ -2965,6 +3197,16 @@ B<When it's called:> read by stages, while the run lasts
 
 B<What it returns:> any value: stages ask for it with C<Ekorn::Pipeline::run_context()>
 
+=item a source's B<original>
+
+B<When it's called:> when a stage asks C<result_original>
+
+B<What it's given:> nothing
+
+B<What it returns:> the original of the value the source gave last
+
+B<Can it stop the run?:> no
+
 =back
 
 What each part's set-up returns, as a list in this order, or as a
@@ -2976,7 +3218,7 @@ hash reference with these keys:
 
 B<Made with:> C<source {...}>, or C<EKORN_SOURCE>
 
-B<Its pieces, in order:> C<step>, C<end>, C<context>
+B<Its pieces, in order:> C<step>, C<end>, C<context>, C<original>
 
 B<Required:> the step
 
@@ -3328,6 +3570,12 @@ else. Reported when the run starts.
 
 =item *
 
+B<Expected the source's original to be a code reference:> a
+source's C<EKORN_SOURCE> returned an original that's something else.
+Reported when the run starts.
+
+=item *
+
 B<Expected stage #%s to return a code reference, and optionally a
 flush and an end:> a stage's C<EKORN_STAGE> returned something else.
 Reported when the run starts.
@@ -3564,6 +3812,136 @@ opened, read, written or closed, or a filehandle read or written.
 
 =back
 
+=head2 Ekorn::Pipeline::CSV
+
+=over 4
+
+=item *
+
+B<Can't find Text::CSV, which %s needs; install it from CPAN:>
+C<from_csv> or C<to_csv> was called without Text::CSV installed.
+
+=item *
+
+B<Can't load Text::CSV, which %s needs: %s:> it's installed, but
+failed to load; the second part says why.
+
+=item *
+
+B<Expected options as name =E<gt> value pairs:> a function was given
+an odd number of arguments.
+
+=item *
+
+B<Expected the options %s, not %s:> an option it doesn't know,
+named after "not"; the first part lists those it does.
+
+=item *
+
+B<Expected file to be a path:> C<file> was undefined.
+
+=item *
+
+B<Expected a file or a filehandle, not both:> it was given both
+C<file> and C<fh>.
+
+=item *
+
+B<Expected an open filehandle:> C<fh> was something else.
+
+=item *
+
+B<Expected encoding only with a file:> C<encoding> was given with a
+filehandle, or for a stage.
+
+=item *
+
+B<Expected an encoding Perl knows, not %s:> C<encoding> wasn't C<raw>
+or an encoding Encode knows.
+
+=item *
+
+B<Expected header to be true, false or 'skip':> C<from_csv>'s
+C<header> was something else.
+
+=item *
+
+B<Expected header to be true, false or an array reference of
+names:> C<to_csv>'s C<header> was something else.
+
+=item *
+
+B<Expected munge only with a header:> C<munge> was given without a
+C<header>.
+
+=item *
+
+B<Expected munge to be lc, uc, db, none, a hash reference or a code
+reference:> C<munge> was something else.
+
+=item *
+
+B<Expected csv to be a hash reference of options, or a parser
+object:> C<csv> was something else.
+
+=item *
+
+B<Expected csv options the parser knows: %s:> C<csv>'s options
+included one Text::CSV doesn't have; the rest is its message.
+
+=item *
+
+B<Expected a header naming each column once, not "%s" twice:>
+C<from_csv>, with C<header> true, read a header naming a column twice,
+after munging.
+
+=item *
+
+B<Can't parse CSV from %s, record %d, field %d: %s:> a row wasn't
+CSV: the file's path, "the filehandle", or "a value", for a stage;
+the record, counting the header as the first; the field; and
+Text::CSV's reason.
+
+=item *
+
+B<Can't read %s: %s> and B<Can't write %s: %s:> a file couldn't be
+opened, read, written or closed, or a filehandle written; or its
+text wouldn't decode, or a character encode, as its encoding says.
+
+=item *
+
+B<Expected a row as an array or a hash reference:> C<to_csv> was
+given something else as a row.
+
+=item *
+
+B<Expected a header naming the columns, to write a hash:> C<to_csv>
+was given a hash without a C<header>.
+
+=item *
+
+B<Expected the run's context to name its columns, for to_csv's
+header:> C<header> was true, but the run's context had no C<columns>.
+
+=item *
+
+B<Can't write a row as CSV: field %d is a reference:> a row's
+field, counting from 1, was a reference, which CSV can't hold.
+
+=item *
+
+B<Can't write a row as CSV: field %d holds a wide character, and the
+file is written raw:> a row's field, counting from 1, held a
+character that isn't a byte, in a file written with C<encoding>
+C<raw>.
+
+=item *
+
+B<Can't write a row as CSV: %s:> the parser wouldn't combine a
+row's fields, saying why.
+
+=back
+
 =head2 Ekorn::Pipeline::Sources
 
 =over 4
@@ -3780,7 +4158,7 @@ Returns C<one> if C<$thing> is a sink of one, giving one value, and
 C<many> if it's a sink of many, giving a list; for a pipeline, the kind
 of sink it ends in, if any. Both are true. It's false for anything
 else. A sink is anything offering C<EKORN_SINK_ONE> or
-C<EKORN_SINK_MANY>. New in v0.3.0. Exported upon request.
+C<EKORN_SINK_MANY>. Exported upon request.
 
 See L<Writing functions that take
 stages|/"Writing functions that take stages">.
@@ -3829,7 +4207,7 @@ See L<iterator|/"iterator">.
 
 Returns the first name the pipeline was given with C<named>, qualified
 by its package, as C<main::clean>, or C<undef> if it has none. Errors in
-its stages name it. New in v0.3.0.
+its stages name it.
 
 See L<Named pipelines|/"Named pipelines">.
 
@@ -3849,7 +4227,7 @@ A name is identifiers, as Perl's, joined by C<::>, such as C<clean> or
 C<My::Module::clean>; anything else croaks "Expected a name, made of
 words joined by ::". A name can't be defined twice, or removed:
 defining it again croaks "A pipeline named main::clean is already
-defined". New in v0.3.0.
+defined".
 
 See L<Named pipelines|/"Named pipelines">.
 
@@ -3883,7 +4261,7 @@ code reference, a pipeline, or the name of one, looked up in
 C<$package> unless it's qualified. Given one name alone, it returns the
 pipeline named, itself, if it's of the invocant's class or a subclass.
 It's the only method that reads names, and what the word C<pipeline>
-calls, with its caller's package. New in v0.3.0.
+calls, with its caller's package.
 
 See L<pipeline_in|/"pipeline_in">.
 
@@ -3893,7 +4271,7 @@ See L<pipeline_in|/"pipeline_in">.
 
 Returns the context the run's source gave, if any: its C<context>, or
 the third part its C<EKORN_SOURCE> returned as a list, such as a
-statement's column names. A stage calls it as it runs. New in v0.3.0.
+statement's column names. A stage calls it as it runs.
 Not exported: call it by its full name.
 
 See L<Stages that ask about their
@@ -3911,6 +4289,79 @@ and a code reference given to C<new> as an Ekorn::Pipeline::Stage of
 it.
 
 See L<stages|/"stages">.
+
+=head2 Ekorn::Pipeline::Context
+
+What a stage can ask about the result it's making. Nothing is exported
+by default; each is exported upon request, and is in Tooling's
+C<:context>, from v0.3.15. New in v0.3.11.
+
+=head3 result_number
+
+    my $n = result_number;
+
+Returns the number of the result being made, from 1: the run's
+results so far, plus one, a result being a value that leaves the last
+stage or reaches a sink. In a flush, the number of the first value it
+returns. Each run counts its own. Undef outside a run, and in an end.
+Exported upon request.
+
+See L<Which result|/"Which result: Ekorn::Pipeline::Context">.
+
+=head3 result_original
+
+    my $original = result_original;
+
+Returns the value the result is being made from, as the run's source
+gave it, or as it was pushed, before any stage changed it: the value
+itself, not a copy. Undef in a flush and the stages after it, for the
+values it gives, outside a run, and in an end. If the run's source
+gave an C<original> part, directly or through an iterator read as a
+source, what that returns instead, called only now. Exported upon
+request.
+
+See L<Which result|/"Which result: Ekorn::Pipeline::Context">.
+
+=head2 Ekorn::Pipeline::CSV
+
+Reads and writes CSV and TSV, as sources, stages or sinks, with
+Text::CSV, which is loaded when either is first called. Nothing is
+exported by default; each is exported upon request, and is in
+Tooling's C<:csv>. Each takes the options C<file>, C<fh>, C<csv>, C<header>
+and C<encoding>, and C<from_csv> C<munge> too, which the
+L<CSV|/"CSV: Ekorn::Pipeline::CSV"> section describes, and is new in v0.3.10.
+
+=head3 from_csv
+
+    my $source = from_csv(file => $path);
+    my $source = from_csv(file => $path, header => 1, munge => 'db');
+    my $source = from_csv(fh => $fh, header => 'skip', csv => {sep_char => "\t"});
+    my $stage  = from_csv();
+
+Given a C<file> or an C<fh>, returns a source of its rows, read a row at
+a time as values are pulled: array references, or, with C<header>
+true, hash references keyed by the header's names, which are the
+run's context's C<columns> whenever a header is read. Given neither,
+returns a stage parsing each value, a text of any number of rows,
+into its rows. Exported upon request.
+
+See L<CSV: Ekorn::Pipeline::CSV|/"CSV: Ekorn::Pipeline::CSV">.
+
+=head3 to_csv
+
+    my $sink  = to_csv(file => $path);
+    my $sink  = to_csv(file => $path, header => [qw(title plays)]);
+    my $sink  = to_csv(fh => $fh, header => 1, csv => {eol => "\r\n"});
+    my $stage = to_csv();
+
+Given a C<file> or an C<fh>, returns a sink writing each row, an array
+or a hash reference, as a line, after the header's, and giving how
+many rows it wrote. Given neither, returns a stage passing on each
+row's line, without its end of line, ready for C<to_file>, after the
+header's. A header's names are given, or, with C<header> true, the run's
+context's C<columns>. Exported upon request.
+
+See L<CSV: Ekorn::Pipeline::CSV|/"CSV: Ekorn::Pipeline::CSV">.
 
 =head2 Ekorn::Pipeline::Element
 
@@ -3951,7 +4402,7 @@ See L<croakf|/"croakf">.
 
 The words that make Ekorn's types from what you write. Nothing is
 exported by default; each is exported upon request, and is in
-Tooling's C<:words>. Each is new in v0.3.0.
+Tooling's C<:words>.
 
 =head3 gather
 
@@ -4029,12 +4480,15 @@ See L<sink_one and sink_many|/"sink_one and sink_many">.
     my $source = source { ...; return ($step, $end) };
     my $source = source { ...; return $step };
     my $source = source { ...; return {step => $step, context => $context} };
+    my $source = source { ...; return {step => $step, original => $original} };
 
 Returns a Source, made for each run by its block, a set-up returning
 its step, called with nothing, giving the next value or values, or an
 empty list when there are no more; optionally, its end, told how the
-run ended; and, optionally, a context, which its stages ask for with
-C<run_context>. It croaks "Expected a code reference" if it's given
+run ended; optionally, a context, which its stages ask for with
+C<run_context>; and, optionally, an original, returning the original of
+the value it gave last, which C<result_original> gives (new in
+v0.3.13). It croaks "Expected a code reference" if it's given
 something other than a block or code reference. Exported upon request.
 
 See L<source|/"source">.
@@ -4181,7 +4635,8 @@ See L<Iterators: Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterato
 
 Makes the iterator a source, for another pipeline's C<iterator>: its
 values go through the second pipeline's stages, its run ends when the
-second's does, and the second's stages see its context. It's one run,
+second's does, and the second's stages see its context, and its
+source's original, if it gave one. It's one run,
 so it can be a source only once, before it has handed out everything
 it will; after, it croaks "Expected a source with values still to
 give: an iterator is one run, and this one is spent". A run calls it
@@ -4237,8 +4692,7 @@ See L<Iterators: Ekorn::Pipeline::Iterator|/"Iterators: Ekorn::Pipeline::Iterato
 Reads and writes JSON and JSON Lines, as sources, stages or sinks.
 Nothing is exported by default; each is exported upon request, and is
 in Tooling's C<:json>. Each takes the options C<file>, C<fh> and C<json>,
-which the L<JSON|/"JSON: Ekorn::Pipeline::JSON"> section describes, and is
-new in v0.3.0.
+which the L<JSON|/"JSON: Ekorn::Pipeline::JSON"> section describes.
 
 =head3 from_json
 
@@ -4348,13 +4802,17 @@ Exports nothing.
 =head3 pipe
 
     my @results = $object->pipe(@stages);
-    my $first   = $object->pipe(@stages);
+    my $count   = $object->pipe(@stages);
+    my $first   = $object->pipe(@stages, keep_first);
 
 Runs the object through a pipeline of C<@stages>, the first given the
-object, and returns what comes out of the last; in scalar context, the
-first result, or C<undef> if there's none, not how many. The stages are
-what C<new> takes, not names: pass C<pipeline('clean')> for a named one.
-With no stages, it returns the object.
+object, and returns what the run gives, as
+C<< Ekorn::Pipeline->new(@stages)->($object) >> would, in either context:
+what comes out of the last stage; in scalar context, how many did, or
+a sink's result. Until v0.4.0, in scalar context, it gave the first
+result. The stages are what C<new> takes, not names: pass
+C<pipeline('clean')> for a named one. With no stages, it gives the
+object.
 
 See L<pipe and tap: Ekorn::Pipeline::Pipes|/"pipe and tap: Ekorn::Pipeline::Pipes">.
 
@@ -4423,7 +4881,7 @@ See L<Sinks: Ekorn::Pipeline::Sink|/"Sinks: Ekorn::Pipeline::Sink">.
 =head2 Ekorn::Pipeline::Sinks
 
 Ready-made sinks. Nothing is exported by default; each is exported
-upon request, and is in Tooling's C<:sinks>. Each is new in v0.3.0.
+upon request, and is in Tooling's C<:sinks>.
 
 =head3 count_items
 
@@ -4519,7 +4977,7 @@ A source made afresh for each run. Exports nothing.
     my @parts = $source->EKORN_SOURCE;
 
 Calls the set-up for a new run, and returns what it returns: the step,
-and, optionally, the end and a context. A run calls it as it starts;
+and, optionally, the end, a context and an original. A run calls it as it starts;
 you needn't.
 
 See L<Sources: Ekorn::Pipeline::Source|/"Sources: Ekorn::Pipeline::Source">.
@@ -4542,7 +5000,7 @@ See L<Sources: Ekorn::Pipeline::Source|/"Sources: Ekorn::Pipeline::Source">.
 
 Ready-made sources, needing nothing beyond Perl. Nothing is exported
 by default; each is exported upon request, and is in Tooling's
-C<:sources>. Each is new in v0.3.0.
+C<:sources>.
 
 =head3 counter
 
@@ -4684,7 +5142,7 @@ Ekorn::Pipeline::Stages::Flow|/"Taking and dropping: Ekorn::Pipeline::Stages::Fl
 Drops each value the block is true of, and passes on the rest, testing
 every one: C<take_if>'s opposite. The block gets each value in C<$_> and
 as its argument. It croaks "Expected a code reference" if it isn't
-given a block or code reference. New in v0.3.0. Exported upon request.
+given a block or code reference. Exported upon request.
 
 See L<Taking and dropping:
 Ekorn::Pipeline::Stages::Flow|/"Taking and dropping: Ekorn::Pipeline::Stages::Flow">.
@@ -4735,8 +5193,8 @@ Ekorn::Pipeline::Stages::Flow|/"Taking and dropping: Ekorn::Pipeline::Stages::Fl
 Passes on each value the block is true of, and drops the rest,
 testing every one, as C<grep> does; it never stops the run. The block
 gets each value in C<$_> and as its argument. It croaks "Expected a
-code reference" if it isn't given a block or code reference. New in
-v0.3.0. Exported upon request.
+code reference" if it isn't given a block or code reference.
+Exported upon request.
 
 See L<Taking and dropping:
 Ekorn::Pipeline::Stages::Flow|/"Taking and dropping: Ekorn::Pipeline::Stages::Flow">.
@@ -4884,8 +5342,8 @@ See L<Sugar of your own|/"Sugar of your own">.
 
 Exports what callers use to do work, from one place, by the names of
 the other modules' functions, or by tags that hold them: C<:core>,
-C<:flow>, C<:batch>, C<:taps>, C<:stages>, C<:sources>, C<:sinks>, C<:json>,
-C<:words> and C<:all> (see L<Importing|/"Importing: Ekorn::Pipeline::Tooling">).
+C<:flow>, C<:batch>, C<:taps>, C<:stages>, C<:context>, C<:sources>,
+C<:sinks>, C<:json>, C<:csv>, C<:words> and C<:all> (see L<Importing|/"Importing: Ekorn::Pipeline::Tooling">).
 Nothing is exported by default. It has no names of its own.
 
 =head1 SEE ALSO

@@ -22,18 +22,18 @@ serve - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard serve ...
+  d2 serve ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard serve>, the command that starts the dashboard web server in background or foreground mode and can also print, timestamp, tail, or follow web logs and worker information, including the persisted browser-only C<--no-editor>/C<--no-endit> and C<--no-indicators>/C<--no-indicator> modes.
+This staged helper exposes C<d2 serve>, the command that starts the dashboard web server in background or foreground mode and can also print, timestamp, tail, or follow web logs and worker information, including the persisted browser-only C<--no-editor>/C<--no-endit> and C<--no-indicators>/C<--no-indicator> modes.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing serve CLI flags, foreground/background behavior, or 
 
 =head1 HOW TO USE
 
-Users run C<dashboard serve> or one of its log/worker submodes. The staged helper forwards the request into the private runtime, which launches or inspects the managed web process and persists serve settings such as the read-only C<--no-editor>/C<--no-endit> browser mode and the top-right-chrome C<--no-indicators>/C<--no-indicator> browser mode.
+Users run C<d2 serve> or one of its log/worker submodes. The staged helper forwards the request into the private runtime, which launches or inspects the managed web process and persists serve settings such as the read-only C<--no-editor>/C<--no-endit> browser mode and the top-right-chrome C<--no-indicators>/C<--no-indicator> browser mode.
 
 =head1 WHAT USES IT
 
@@ -55,20 +55,20 @@ It is used by local dashboard startup, by integration smoke runs, and by runtime
 
 Example 1:
 
-  dashboard serve --foreground
+  d2 serve --foreground
 
 Run the public built-in command path that stages or re-enters this helper.
 
 Example 2:
 
-  dashboard serve --no-editor
+  d2 serve --no-editor
 
 Start the dashboard in read-only browser mode so bookmark edit and source
 routes stay blocked.
 
 Example 3:
 
-  dashboard serve --no-indicators
+  d2 serve --no-indicators
 
 Start the dashboard with the top-right browser context and indicator strip
 removed while leaving the left-side page chrome and terminal prompt behavior
@@ -76,7 +76,7 @@ unchanged.
 
 Example 4:
 
-  dashboard serve logs -t --tail 50 -f
+  d2 serve logs -t --tail 50 -f
 
 Print the last 50 web log lines with UTC timestamps, then follow appended
 output.
@@ -85,7 +85,7 @@ Example 5:
 
   ~/.developer-dashboard/cli/dd/serve --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 6:
 

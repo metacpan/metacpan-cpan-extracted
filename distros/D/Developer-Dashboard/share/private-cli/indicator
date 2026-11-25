@@ -22,18 +22,18 @@ indicator - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard indicator ...
+  d2 indicator ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes indicator maintenance commands such as C<dashboard indicator set>, C<list>, and C<refresh-core>. It is the CLI surface for prompt and browser status indicators.
+This staged helper exposes indicator maintenance commands such as C<d2 indicator set>, C<list>, and C<refresh-core>. It is the CLI surface for prompt and browser status indicators.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing indicator CLI verbs, refresh-core behavior, or the h
 
 =head1 HOW TO USE
 
-Users run C<dashboard indicator ...>. The staged helper forwards those arguments into the private runtime, which updates indicator state or recomputes project and Git state. Docker is not a core indicator; Docker indicators come only from explicitly configured collectors.
+Users run C<d2 indicator ...>. The staged helper forwards those arguments into the private runtime, which updates indicator state or recomputes project and Git state. Docker is not a core indicator; Docker indicators come only from explicitly configured collectors.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by developers curating prompt indicators, by integration smoke that v
 
 Example 1:
 
-  dashboard indicator refresh sample-indicator
+  d2 indicator refresh sample-indicator
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/indicator --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

@@ -106,7 +106,27 @@ sub dies_like {
     is( scalar @commands, 1, 'the downloaded Unix installer runs exactly once' );
     is( $commands[0][0], 'sh', 'the Unix-like installer runs through sh instead of shell interpolation' );
     ok( -f $commands[0][1], 'the Unix installer exists while the runner executes it' );
-    is( ( stat $commands[0][1] )[2] & 07777, 0600, 'the downloaded Unix installer is private before execution' );
+
+    # Windows has no Unix mode bits: chmod 0600 is a silent no-op there
+    # (proven live on win-ts: the mode stays 0666 even though chmod
+    # returns true). Privacy on Windows comes from the per-user temp
+    # directory, whose ACL admits only the owner, SYSTEM and
+    # Administrators (icacls, round 62) - so pin that the installer
+    # lands inside that private directory instead of the mode.
+    if ( $^O eq 'MSWin32' ) {
+        my $tmpdir  = File::Spec->tmpdir() // '';
+        my $profile = $ENV{USERPROFILE} // '';
+        ok(
+            $tmpdir ne ''
+              && index( $commands[0][1], $tmpdir ) == 0
+              && $profile ne ''
+              && index( lc $tmpdir, lc $profile ) == 0,
+            'the downloaded Unix installer is private before execution',
+        );
+    }
+    else {
+        is( ( stat $commands[0][1] )[2] & 07777, 0600, 'the downloaded Unix installer is private before execution' );
+    }
 }
 
 {
@@ -184,8 +204,8 @@ sub dies_like {
 }
 
 for my $case (
-    [ [ '--unknown' ], qr/Usage: dashboard upgrade \[--dry-run\]/, 'unsupported options fail with upgrade usage' ],
-    [ ['operand'],     qr/Usage: dashboard upgrade \[--dry-run\]/, 'positional operands fail with upgrade usage' ],
+    [ [ '--unknown' ], qr/Usage: d2 upgrade \[--dry-run\]/, 'unsupported options fail with upgrade usage' ],
+    [ ['operand'],     qr/Usage: d2 upgrade \[--dry-run\]/, 'positional operands fail with upgrade usage' ],
   )
 {
     my $error = '';
@@ -266,12 +286,36 @@ dies_like(
     );
 }
 
+dies_like(
+    sub { Developer::Dashboard::CLI::Upgrade::_run_command( [] ) },
+    qr/Unable to start Developer Dashboard installer/,
+    'an empty installer command is reported clearly',
+);
+
 {
-    is(
-        Developer::Dashboard::CLI::Upgrade::_run_command( [ $^X, '-e', 'kill 15, $$' ] ),
-        143,
-        'a signalled installer returns the conventional 128-plus-signal status',
-    );
+    # The 128-plus-signal convention is Unix-only: on Windows a process
+    # has no signal bits in $?, and Perl's kill(15, $$) broadcasts a
+    # console control event to the whole console group - it can kill the
+    # test harness and hang the Jenkins batch wrapper on a 'Terminate
+    # batch job (Y/N)?' prompt (round 62, proven live on win-ts: the
+    # child survives and exits 0 while a sharing parent dies with exit
+    # 21). The Windows analogue of a signal kill is TerminateProcess:
+    # the child terminates itself through Win32::Process and the
+    # installer status is the termination code.
+    if ( $^O eq 'MSWin32' ) {
+        is(
+            Developer::Dashboard::CLI::Upgrade::_run_command( [ $^X, '-MWin32::Process', '-e', 'Win32::Process::Open(my $p, $$, 0) or die $^E; $p->Kill(1);' ] ),
+            1,
+            'a terminated installer returns its termination code',
+        );
+    }
+    else {
+        is(
+            Developer::Dashboard::CLI::Upgrade::_run_command( [ $^X, '-e', 'kill 15, $$' ] ),
+            143,
+            'a signalled installer returns the conventional 128-plus-signal status',
+        );
+    }
     is(
         Developer::Dashboard::CLI::Upgrade::_run_command( [ $^X, '-e', 'exit 7' ] ),
         7,
@@ -316,7 +360,7 @@ for my $case (
     is(
         $ua->agent,
         "Developer-Dashboard/$Developer::Dashboard::CLI::Upgrade::VERSION upgrade",
-        'the production downloader identifies the installed dashboard version',
+        'the production downloader identifies the installed d2 version',
     );
     is( $ua->timeout, 60, 'the production downloader has a bounded timeout' );
     is( $ua->max_size, 512_000, 'the production downloader bounds installer size' );
@@ -334,7 +378,16 @@ for my $case (
         'the default platform path resolves on the active host',
     );
     close $out;
-    like( $output, qr/^Platform: unix$/m, 'the active non-Windows host resolves to the Unix installer family' );
+
+    # The active host resolves to its own installer family (proven live
+    # on win-ts: bin/d2 upgrade --dry-run reports Platform: windows,
+    # round 62).
+    if ( $^O eq 'MSWin32' ) {
+        like( $output, qr/^Platform: windows$/m, 'the active Windows host resolves to the Windows installer family' );
+    }
+    else {
+        like( $output, qr/^Platform: unix$/m, 'the active non-Windows host resolves to the Unix installer family' );
+    }
 }
 
 {
@@ -377,14 +430,34 @@ for my $case (
 
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::CLI::Upgrade::_user_agent = sub {
-        return upgrade_ua( content => $unix_installer );
-    };
-    is(
-        Developer::Dashboard::CLI::Upgrade::run_upgrade( args => [], platform => 'unix' ),
-        0,
-        'the default downloader and runner seams execute a validated installer successfully',
-    );
+
+    # The default runner seam can only execute an installer the host can
+    # actually run: sh is not installed on Windows (proven live on
+    # win-ts: 'sh' is not recognized, round 62), so the Windows host
+    # exercises the same seam through the Windows installer and
+    # PowerShell, which is resolvable there. The output is captured so
+    # the installer's own progress line cannot leak into the TAP stream.
+    if ( $^O eq 'MSWin32' ) {
+        local *Developer::Dashboard::CLI::Upgrade::_user_agent = sub {
+            return upgrade_ua( content => $windows_installer );
+        };
+        my $exit = 0;
+        my ( $stdout, $stderr ) = capture {
+            $exit = Developer::Dashboard::CLI::Upgrade::run_upgrade( args => [], platform => 'windows' );
+        };
+        is( $exit, 0, 'the default downloader and runner seams execute a validated installer successfully' );
+        like( $stdout, qr/Developer Dashboard install progress/, 'the Windows installer runs through the default runner seam' );
+    }
+    else {
+        local *Developer::Dashboard::CLI::Upgrade::_user_agent = sub {
+            return upgrade_ua( content => $unix_installer );
+        };
+        is(
+            Developer::Dashboard::CLI::Upgrade::run_upgrade( args => [], platform => 'unix' ),
+            0,
+            'the default downloader and runner seams execute a validated installer successfully',
+        );
+    }
 }
 
 {
@@ -402,7 +475,7 @@ is(
 );
 
 my $repo_root = abs_path( File::Spec->catdir( dirname(__FILE__), '..' ) );
-my $dashboard = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
+my $dashboard = File::Spec->catfile( $repo_root, 'bin', 'd2' );
 my $d2 = File::Spec->catfile( $repo_root, 'bin', 'd2' );
 my $lib = File::Spec->catdir( $repo_root, 'lib' );
 my $home = tempdir( CLEANUP => 1 );
@@ -414,11 +487,11 @@ my ( $d2_out, $d2_err, $d2_status ) = capture {
     local $ENV{HOME} = $home;
     system $^X, '-I', $lib, $d2, 'upgrade', '--dry-run';
 };
-is( $dashboard_status >> 8, 0, 'dashboard upgrade --dry-run dispatches successfully' );
-is( $dashboard_err, '', 'dashboard upgrade --dry-run emits no stderr' );
+is( $dashboard_status >> 8, 0, 'd2 upgrade --dry-run dispatches successfully' );
+is( $dashboard_err, '', 'd2 upgrade --dry-run emits no stderr' );
 is( $d2_status >> 8, 0, 'd2 upgrade --dry-run reaches the same built-in command' );
 is( $d2_err, '', 'd2 upgrade --dry-run emits no stderr' );
-is( $d2_out, $dashboard_out, 'd2 upgrade output is identical to dashboard upgrade output' );
+is( $d2_out, $dashboard_out, 'd2 upgrade output is identical to d2 upgrade output' );
 like( $dashboard_out, qr/^Developer Dashboard upgrade plan$/m, 'the public command prints the upgrade plan' );
 
 ok(
@@ -434,14 +507,19 @@ __END__
 
 =head1 NAME
 
-t/136-upgrade-cli.t - acceptance contract for dashboard and d2 self-upgrade
+t/136-upgrade-cli.t - acceptance contract for d2 self-upgrade
 
 =head1 PURPOSE
 
 This test is the automated BDD and ATDD contract for the first-class
-C<dashboard upgrade> and C<d2 upgrade> command. It verifies that the command
+C<d2 upgrade> and C<d2 upgrade> command. It verifies that the command
 selects the canonical platform installer, validates downloaded content, and
-runs it without shell-string interpolation.
+runs it without shell-string interpolation. On Windows the downloaded
+installer is private by landing in the per-user temp directory rather than
+by mode bits, process creation failure is reported by resolving the program
+before spawning it, a terminated installer returns its termination code
+instead of a 128-plus-signal status, and the default seams resolve to the
+Windows installer family on a Windows host.
 
 =head1 WHY IT EXISTS
 

@@ -355,3 +355,98 @@ sub _escape {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+HTTP::API::Core::Pagination - Iterate through HTTP API response pages
+
+=head1 SYNOPSIS
+
+    my $pager = $api->paginate(
+        '/users',
+        mode      => 'page',
+        page_size => 100,
+        max_pages => 50,
+    );
+
+    my $items = $pager->all;
+
+=head1 DESCRIPTION
+
+Provides lazy, synchronous pagination for C<next_url>, C<page>, C<cursor>,
+and C<offset> APIs. Requests are issued only when more items are needed.
+The default mode is C<next_url>. See L<HTTP::API::Core> for the client
+interface.
+
+=head1 METHODS
+
+=head2 new
+
+    my $pager = HTTP::API::Core::Pagination->new(
+        client => $api,
+        path   => '/users',
+        mode   => 'next_url',
+        items  => 'data.items',
+        next   => 'links.next',
+    );
+
+Constructs a paginator without fetching a page. Normally use the client's
+C<paginate> method. C<client> and C<path> are required.
+
+C<items>, C<next>, C<has_more>, and C<total> accept dotted paths or code
+references. A code reference receives the decoded body; with
+C<response_aware_extractors> enabled, it also receives the response object.
+The items extractor must return an array reference. An empty items path
+selects the whole decoded body.
+
+C<query> and C<request> are hash references. Query options are applied
+when constructing page requests; subsequent C<next_url> continuations
+are followed as returned. Request options are passed to the client on
+every page. Absolute HTTP(S) continuation URLs are restricted to the
+client's configured origin by default; C<allow_cross_origin> explicitly
+opts out of that check.
+
+C<page_size>, when supplied, must be a positive integer. Page numbering
+starts at C<start_page> (default 1); offset numbering starts at
+C<start_offset> (default 0) and advances by the actual returned item count.
+For offset mode, an explicit C<total> takes precedence over C<has_more>.
+C<max_pages> optionally limits the number of successfully validated pages.
+The default is unlimited. If another page is needed after that limit,
+an exception is raised before another request.
+
+=head2 next
+
+    my $item = $pager->next;
+
+Returns the next item, or C<undef> at exhaustion. A decoded JSON null
+item also returns C<undef>, so this interface cannot distinguish null
+from exhaustion. Use C<all> if null items must be preserved.
+
+=head2 all
+
+    my $items = $pager->all;
+    my @items = $pager->all;
+
+Consumes the remaining items. Returns an array reference in scalar
+context or a list in list context. JSON null items are preserved as
+C<undef> elements. Items already consumed through C<next> are not returned
+again.
+
+=head1 ERRORS
+
+Malformed item or continuation metadata, repeated continuations and
+page limit violations raise exceptions. A page is committed only after
+its response and continuation have been validated; a failed page does
+not advance the iterator or consume its page allowance. A subsequent
+call may retry that page. Earlier successful pages remain consumed.
+
+Continuation errors do not include the rejected URL or cursor value,
+which could contain sensitive data.
+
+=head1 SEE ALSO
+
+L<HTTP::API::Core>
+
+=cut

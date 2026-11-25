@@ -91,6 +91,13 @@ C<hook>.
 
 =head1 METHODS
 
+=head2 new
+
+Constructs a structured error with optional scalar metadata and an optional
+response object implementing the response accessors. The client normally
+creates these objects; custom transports and hooks may throw a structured
+error to preserve its metadata.
+
 =head2 message, category, status, method, url
 
 Basic structured error metadata.

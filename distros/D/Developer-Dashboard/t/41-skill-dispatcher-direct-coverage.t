@@ -74,7 +74,12 @@ is( $watcher_chdir_status, 0,
         my ($self) = @_;
         my @entries;
         for my $root ( @{ $self->{installed} || [] } ) {
-            my ($name) = $root =~ m{/([^/]+)\z};
+            # The last path component is the skill name. Match either
+            # separator: installed roots are File::Spec spellings, so a
+            # forward-slash pattern never matches a backslash-spelled
+            # Windows root and the entry was skipped, leaving the
+            # aggregate nav snapshot empty.
+            my ($name) = $root =~ m{[\\/]+([^\\/]+)\z};
             next if !defined $name;
             push @entries, {
                 skill_name => $name,
@@ -577,8 +582,8 @@ is_deeply(
 );
 
 my ( $leaf_index, $leaf_owner ) = $dispatcher->_page_location( 'layered', 'index' );
-is( $leaf_index, File::Spec->catfile( $leaf_skill, 'dashboards', 'index' ), '_page_location prefers the deepest layered dashboard file' );
-is( $leaf_owner, $leaf_skill, '_page_location reports the skill layer that served the dashboard file' );
+is( $leaf_index, File::Spec->catfile( $leaf_skill, 'dashboards', 'index' ), '_page_location prefers the deepest layered d2 file' );
+is( $leaf_owner, $leaf_skill, '_page_location reports the skill layer that served the d2 file' );
 ok( !defined scalar $dispatcher->_page_location( 'layered', '../outside' ),
     '_page_location rejects an untrusted parent-directory route' );
 ok( !defined scalar $dispatcher->_page_location(
@@ -613,7 +618,7 @@ ok( !defined scalar $dispatcher->_page_location(
     '_page_location rejects a non-array inventory segment value' );
 
 my ( $base_welcome, $base_owner ) = $dispatcher->_page_location( 'layered', 'welcome' );
-is( $base_welcome, File::Spec->catfile( $base_skill, 'dashboards', 'welcome' ), '_page_location falls back to inherited dashboard files when the leaf layer has none' );
+is( $base_welcome, File::Spec->catfile( $base_skill, 'dashboards', 'welcome' ), '_page_location falls back to inherited d2 files when the leaf layer has none' );
 is( $base_owner, $base_skill, '_page_location reports the inherited layer when falling back' );
 
 is_deeply(
@@ -663,6 +668,47 @@ is_deeply( { $dispatcher->_skill_nav_route_ids('') }, {},
     ok( exists $updated_inventory{'inventory-added.tt'}, 'nav inventory notices a newly added route' );
     is( $inventory_scans, 3, 'changed directory metadata triggers only the affected nav-root rescan' );
     unlink $inventory_added_file or die "Unable to remove inventory nav fixture '$inventory_added_file': $!";
+}
+
+{
+    # On Windows, directory timestamps move coarsely, so a file added in the
+    # same tick leaves the directory stat identity unchanged and the
+    # inventory kept serving a stale file list. Freeze the directory stats
+    # to model that and prove the child names in the fingerprint still
+    # invalidate the inventory. This is a Linux model of Windows-only
+    # behaviour: it still needs a box solo run to prove on the Windows box
+    # itself.
+    my $frozen_dispatcher = Developer::Dashboard::SkillDispatcher->new(
+        manager => Local::SkillManager->new( paths => $paths ),
+        paths   => $paths,
+    );
+    my $original_relative_files = Developer::Dashboard::SkillDispatcher->can('_relative_files');
+    my $frozen_scans = 0;
+    my $real_stat = Time::HiRes->can('stat');
+    my %frozen_stats;
+    no warnings qw(redefine once);
+    local *Developer::Dashboard::SkillDispatcher::_relative_files = sub {
+        $frozen_scans++;
+        return $original_relative_files->(@_);
+    };
+    local *Time::HiRes::stat = sub {
+        my ($path) = @_;
+        return wantarray ? @{ $frozen_stats{$path} } : 1 if exists $frozen_stats{$path};
+        return $real_stat->(@_);
+    };
+    my %first_frozen = $frozen_dispatcher->_skill_nav_route_ids('layered');
+    is( $frozen_scans, 2, 'frozen-stat first layered nav inventory scans each contributing nav root once' );
+    for my $entry ( values %{ $frozen_dispatcher->{_skill_nav_inventory_cache}{entries} } ) {
+        for my $directory ( @{ $entry->{directories} } ) {
+            $frozen_stats{ $directory->[0] } = [ $real_stat->( $directory->[0] ) ];
+        }
+    }
+    my $frozen_added_file = File::Spec->catfile( $leaf_skill, 'dashboards', 'nav', 'frozen-added.tt' );
+    _write_file( $frozen_added_file, '<div>frozen route</div>\n' );
+    my %updated_frozen = $frozen_dispatcher->_skill_nav_route_ids('layered');
+    ok( exists $updated_frozen{'frozen-added.tt'}, 'nav inventory notices a newly added route when the directory stat cannot move' );
+    is( $frozen_scans, 3, 'frozen directory stat still triggers only the affected nav-root rescan' );
+    unlink $frozen_added_file or die "Unable to remove frozen inventory nav fixture '$frozen_added_file': $!";
 }
 
 {
@@ -1420,7 +1466,14 @@ is_deeply( { $dispatcher->_skill_nav_route_ids('') }, {},
     {
         no warnings qw(redefine once);
         my $catdir_calls = 0;
-        local *File::Spec::Unix::catdir = sub { $catdir_calls++; return undef };
+        # File::Spec->catdir resolves to the platform class (File::Spec::Win32
+        # on Windows, which defines its own catdir), so override it there.
+        my $spec_class = File::Spec->can('catdir') == File::Spec::Unix->can('catdir')
+          ? 'File::Spec::Unix'
+          : $File::Spec::ISA[0];
+        no strict 'refs';
+        local *{ $spec_class . '::catdir' } = sub { $catdir_calls++; return undef };
+        use strict 'refs';
         ok( !$ancestor_dispatcher->_cache_all_skill_nav_pages( [$literal_page], [], ['layer'] ),
             'aggregate cache skips an invalid target returned by path construction' );
         is( $catdir_calls, 3, 'aggregate cache attempts all watched directory targets through File::Spec' );
@@ -2722,6 +2775,15 @@ EOF
 
 {
     local $Local::ExecShim::MODE = 'fail';
+
+    # On Windows _exec_replacement never calls exec(): it runs the command
+    # with system() and exits with its status, so the exec shim above cannot
+    # make it fail and a real launch would end this process. Stand in for
+    # the failed handoff there, as t/104 does, so the error wrapping in
+    # _exec_resolved_command is still checked on every platform.
+    no warnings 'redefine';
+    local *Developer::Dashboard::SkillDispatcher::_exec_replacement = sub { 'No such file or directory' }
+      if $^O eq 'MSWin32';
     my $error = $dispatcher->_exec_resolved_command(
         '/bin/echo',
         ['/bin/echo'],

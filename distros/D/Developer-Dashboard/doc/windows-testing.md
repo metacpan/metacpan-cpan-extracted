@@ -28,7 +28,7 @@ PowerShell sessions still expose `node`, `npm`, and `npx`.
 1. Forced-Windows unit tests in `t/`
 
 - locally override the platform detector so Linux CI can still exercise Windows dispatch logic
-- assert `dashboard shell ps` and PowerShell prompt bootstrap output
+- assert `d2 shell ps` and PowerShell prompt bootstrap output
 - assert `ps` resolves to PowerShell rather than the POSIX `PS1` variable
 - assert `.pl`, `.py`, `.js`, `.ps1`, `.cmd`, and `.bat` command argv resolution
 - assert Windows `PATHEXT` lookup behavior
@@ -39,7 +39,7 @@ PowerShell sessions still expose `node`, `npm`, and `npx`.
 - run `install.ps1` from a checkout or streamed through `irm ... | iex` when the change targets the bootstrap path itself
 - when validating that bootstrap path inside the smoke guest, use `-UseInstallBootstrap`; the smoke sets `DD_INSTALL_CPAN_TARGET` to the staged tarball and executes `install.ps1` through `Invoke-Expression`
 - install the built tarball with `cpanm`
-- verify `dashboard shell ps` and `dashboard ps1`
+- verify `d2 shell ps` and `d2 ps1`
 - verify a fresh PowerShell session can load the generated profile without a
   `running scripts is disabled` execution-policy failure
 - verify that same fresh PowerShell session can resolve `dashboard` on `PATH`
@@ -169,8 +169,25 @@ executes `install.ps1` through a streamed `Invoke-Expression` wrapper. The
 release-grade verification still comes from the Developer Dashboard smoke that
 runs after that install step: the normal streamed operator path defaults to
 a fresh clone of the GitHub `master` checkout, while the smoke overrides that
-with the exact staged tarball under test; `dashboard shell ps`, `dashboard ps1`,
+with the exact staged tarball under test; `d2 shell ps`, `d2 ps1`,
 collector, saved Ajax, web, and browser checks still execute in the guest.
+
+## Saved Ajax pipe streaming
+
+Windows anonymous pipes do not provide reliable readiness through
+`IO::Select::can_read`, so saved-Ajax output and error streams use separate Perl
+reader threads and a bounded event queue. Each reader forwards chunks or an
+explicit read error; `EINTR` is retried. If the client disconnects or a writer
+fails, the worker is terminated and both readers are joined before the stream
+returns. `t/12-legacy-helper-coverage.t` forces the Windows dispatch path and
+checks chunk delivery, retry, disconnect, and termination behavior on Linux.
+That simulation is a regression test, not a substitute for native Windows
+validation: the committed Windows x64 Actions job must still pass.
+
+The SSL frontend also treats socket close errors as shutdown errors. It joins
+client workers and stops the managed backend before surfacing the first close
+failure; `t/88-web-server-coverage.t` uses real failing pipe closes to verify
+that cleanup order.
 
 ## Release Rule
 

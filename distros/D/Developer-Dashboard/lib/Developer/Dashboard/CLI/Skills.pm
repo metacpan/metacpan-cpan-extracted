@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
@@ -14,7 +14,7 @@ use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SkillManager;
 
 # run_skills_command(%args)
-# Dispatches the lightweight dashboard skills helper command.
+# Dispatches the lightweight d2 skills helper command.
 # Input: command name under "command" and remaining argv array reference under
 # "args".
 # Output: prints JSON or table output to STDOUT and returns the process exit
@@ -36,11 +36,11 @@ sub run_skills_command {
     if ( $action eq 'usage' )     { return _skills_action_usage( \@argv ) }
     if ( $action eq '_exec' )     { return _skills_action_exec( \@argv ) }
 
-    die "Unknown skills action: $action\nUsage: dashboard skills [install|uninstall|enable|disable|list|usage]\n";
+    die "Unknown skills action: $action\nUsage: d2 skills [install|uninstall|enable|disable|list|usage]\n";
 }
 
 # _skills_action_install($argv)
-# Implements "dashboard skills install [--ddfile] [--notest] [-b branch]
+# Implements "d2 skills install [--ddfile] [--notest] [-b branch]
 # [-o json|table] [<git-url-or-local-dir> ...]".
 # Input: array reference of the arguments following the "install" action.
 # Output: prints the install result as JSON or a summary table; returns the
@@ -54,7 +54,7 @@ sub _skills_action_install {
     my $branch;
     for my $idx ( 0 .. $#argv ) {
         next if $argv[$idx] ne '-b' && $argv[$idx] ne '--branch';
-        return _usage_error("Usage: dashboard skills install [--notest] [-b branch] [-o json|table] [<git-url-or-local-dir> ...]\n")
+        return _usage_error("Usage: d2 skills install [--notest] [-b branch] [-o json|table] [<git-url-or-local-dir> ...]\n")
           if !defined $argv[ $idx + 1 ] || $argv[ $idx + 1 ] =~ /\A-/;
     }
     my $options_ok = GetOptionsFromArray(
@@ -64,12 +64,12 @@ sub _skills_action_install {
         'notest'      => \$notest,
         'b|branch=s'  => \$branch,
     );
-    return _usage_error("Usage: dashboard skills install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n")
+    return _usage_error("Usage: d2 skills install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n")
       if $output ne 'json' && $output ne 'table';
     return _usage_error(
-        "Usage: dashboard skills install [--notest] [-b branch] [-o json|table] [<git-url-or-local-dir> ...]\n"
-          . "Usage: dashboard skill install [--notest] [-b branch] [-o json|table] [<git-url-or-local-dir> ...]\n"
-          . "Usage: dashboard skills install --ddfile [--notest] [-o json|table]\n"
+        "Usage: d2 skills install [--notest] [-b branch] [-o json|table] [<git-url-or-local-dir> ...]\n"
+          . "Usage: d2 skill install [--notest] [-b branch] [-o json|table] [<git-url-or-local-dir> ...]\n"
+          . "Usage: d2 skills install --ddfile [--notest] [-o json|table]\n"
     ) if !$options_ok || ( defined $branch && ( $branch eq '' || $use_ddfile || !@argv ) ) || ( $use_ddfile && @argv );
     my $paths = _build_paths();
     my @progress_sources = @argv;
@@ -100,7 +100,7 @@ sub _skills_action_install {
             : $manager->install_registered_skills;
         1;
     } or do {
-        $error = $@ || "dashboard skills install failed\n";
+        $error = $@ || "d2 skills install failed\n";
     };
     if ($error) {
         $progress->finish if $progress;
@@ -117,7 +117,7 @@ sub _skills_action_install {
 }
 
 # _skills_action_uninstall($argv)
-# Implements "dashboard skills uninstall <repo-name> [-o json|table]".
+# Implements "d2 skills uninstall <repo-name> [-o json|table]".
 # Input: array reference of the arguments following the "uninstall" action.
 # Output: prints the removal result as JSON or a state summary table;
 # returns the numeric exit code.
@@ -127,19 +127,19 @@ sub _skills_action_uninstall {
     my $output = 'table';
     GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
     my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-    my $repo_name = shift @argv || die "Usage: dashboard skills uninstall <repo-name>\n";
+    my $repo_name = shift @argv || die "Usage: d2 skills uninstall <repo-name>\n";
     my $result = $manager->uninstall($repo_name);
     if ( $output eq 'json' ) {
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
-    die "Usage: dashboard skills uninstall <repo-name> [-o json|table]\n" if $output ne 'table';
+    die "Usage: d2 skills uninstall <repo-name> [-o json|table]\n" if $output ne 'table';
     print _skills_state_table( $repo_name, $result->{error} ? 'error' : 'removed', undef );
     return $result->{error} ? 1 : 0;
 }
 
 # _skills_action_enable($argv)
-# Implements "dashboard skills enable <repo-name> [-o json|table]".
+# Implements "d2 skills enable <repo-name> [-o json|table]".
 # Input: array reference of the arguments following the "enable" action.
 # Output: prints the enable result as JSON or a state summary table; returns
 # the numeric exit code.
@@ -149,19 +149,19 @@ sub _skills_action_enable {
     my $output = 'table';
     GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
     my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-    my $repo_name = shift @argv || die "Usage: dashboard skills enable <repo-name>\n";
+    my $repo_name = shift @argv || die "Usage: d2 skills enable <repo-name>\n";
     my $result = $manager->enable($repo_name);
     if ( $output eq 'json' ) {
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
-    die "Usage: dashboard skills enable <repo-name> [-o json|table]\n" if $output ne 'table';
+    die "Usage: d2 skills enable <repo-name> [-o json|table]\n" if $output ne 'table';
     print _skills_state_table( $repo_name, $result->{enabled} ? 'enabled' : 'disabled', $result->{enabled} );
     return $result->{error} ? 1 : 0;
 }
 
 # _skills_action_disable($argv)
-# Implements "dashboard skills disable <repo-name> [-o json|table]".
+# Implements "d2 skills disable <repo-name> [-o json|table]".
 # Input: array reference of the arguments following the "disable" action.
 # Output: prints the disable result as JSON or a state summary table;
 # returns the numeric exit code.
@@ -171,19 +171,19 @@ sub _skills_action_disable {
     my $output = 'table';
     GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
     my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-    my $repo_name = shift @argv || die "Usage: dashboard skills disable <repo-name>\n";
+    my $repo_name = shift @argv || die "Usage: d2 skills disable <repo-name>\n";
     my $result = $manager->disable($repo_name);
     if ( $output eq 'json' ) {
         print json_encode($result);
         return $result->{error} ? 1 : 0;
     }
-    die "Usage: dashboard skills disable <repo-name> [-o json|table]\n" if $output ne 'table';
+    die "Usage: d2 skills disable <repo-name> [-o json|table]\n" if $output ne 'table';
     print _skills_state_table( $repo_name, $result->{enabled} ? 'enabled' : 'disabled', $result->{enabled} );
     return $result->{error} ? 1 : 0;
 }
 
 # _skills_action_list($argv)
-# Implements "dashboard skills list [-o json|table]".
+# Implements "d2 skills list [-o json|table]".
 # Input: array reference of the arguments following the "list" action.
 # Output: prints the installed-skill inventory as JSON or a summary table;
 # returns 0, or dies with a usage message for an unsupported format.
@@ -202,11 +202,11 @@ sub _skills_action_list {
         print _skills_table($skills);
         return 0;
     }
-    die "Usage: dashboard skills list [-o json|table]\n";
+    die "Usage: d2 skills list [-o json|table]\n";
 }
 
 # _skills_action_usage($argv)
-# Implements "dashboard skills usage <repo-name> [-o json|table]".
+# Implements "d2 skills usage <repo-name> [-o json|table]".
 # Input: array reference of the arguments following the "usage" action.
 # Output: prints the skill's usage summary as JSON or a table; returns the
 # numeric exit code, or dies with a usage message for missing/unsupported
@@ -217,7 +217,7 @@ sub _skills_action_usage {
     my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
     my $output = 'table';
     GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
-    my $repo_name = shift @argv || die "Usage: dashboard skills usage <repo-name> [-o json|table]\n";
+    my $repo_name = shift @argv || die "Usage: d2 skills usage <repo-name> [-o json|table]\n";
     my $usage = $manager->usage($repo_name);
     if ( $output eq 'json' ) {
         print json_encode($usage);
@@ -228,11 +228,11 @@ sub _skills_action_usage {
         print _usage_table($usage);
         return 0;
     }
-    die "Usage: dashboard skills usage <repo-name> [-o json|table]\n";
+    die "Usage: d2 skills usage <repo-name> [-o json|table]\n";
 }
 
 # _skills_action_exec($argv)
-# Implements the internal "dashboard skills _exec <skill> <command> [args...]"
+# Implements the internal "d2 skills _exec <skill> <command> [args...]"
 # dotted-command dispatch entrypoint.
 # Input: array reference of the arguments following the "_exec" action.
 # Output: prints any dispatch error to STDERR; returns the numeric exit code.
@@ -240,8 +240,8 @@ sub _skills_action_exec {
     my ($argv) = @_;
     my @argv = @{$argv};
     require Developer::Dashboard::SkillDispatcher;
-    my $skill_name = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
-    my $skill_cmd  = shift @argv || die "Usage: dashboard <skill-name>.<command> [args...]\n";
+    my $skill_name = shift @argv || die "Usage: d2 <skill-name>.<command> [args...]\n";
+    my $skill_cmd  = shift @argv || die "Usage: d2 <skill-name>.<command> [args...]\n";
     my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
     my $result = $dispatcher->exec_command( $skill_name, $skill_cmd, @argv );
     if ( $result->{error} ) {
@@ -276,14 +276,14 @@ sub _build_paths {
 }
 
 # _skills_install_progress()
-# Builds the optional task board used by dashboard skills install.
+# Builds the optional task board used by d2 skills install.
 # Input: none.
 # Output: Developer::Dashboard::CLI::Progress object or undef when progress is disabled.
 sub _skills_install_progress {
     my $enabled = $ENV{DEVELOPER_DASHBOARD_PROGRESS} ? 1 : 0;
     return if !$enabled && !-t STDERR;
     return Developer::Dashboard::CLI::Progress->new(
-        title   => 'dashboard skills install progress',
+        title   => 'd2 skills install progress',
         max_detail_lines => 10,
         tasks   => _skills_install_progress_tasks(),
         stream  => \*STDERR,
@@ -303,7 +303,7 @@ sub _skills_install_progress_for_sources {
     return if !$enabled && !-t STDERR;
     return if !@sources;
     return Developer::Dashboard::CLI::Progress->new(
-        title   => 'dashboard skills install progress',
+        title   => 'd2 skills install progress',
         max_detail_lines => 10,
         tasks   => Developer::Dashboard::SkillManager->install_progress_tasks_for_sources(@sources),
         stream  => \*STDERR,
@@ -494,7 +494,7 @@ Developer::Dashboard::CLI::Skills - lightweight skills helper dispatch
 
 =head1 DESCRIPTION
 
-Implements the staged C<dashboard skills> helper so the public entrypoint can
+Implements the staged C<d2 skills> helper so the public entrypoint can
 hand off skill management to a dedicated Perl module instead of embedding the
 action parsing inline.
 
@@ -502,7 +502,7 @@ action parsing inline.
 
 =head1 PURPOSE
 
-This module is the command runtime behind C<dashboard skills> and the singular C<dashboard skill> alias. It owns the CLI parsing for skill install, uninstall, enable, disable, list, and usage; renders table output by default for install summaries; supports C<-o json> for machine-readable install payloads; and handles the internal dotted-command handoff used by C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
+This module is the command runtime behind C<d2 skills> and the singular C<d2 skill> alias. It owns the CLI parsing for skill install, uninstall, enable, disable, list, and usage; renders table output by default for install summaries; supports C<-o json> for machine-readable install payloads; and handles the internal dotted-command handoff used by C<d2 E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
 
 =head1 WHY IT EXISTS
 
@@ -510,11 +510,11 @@ It exists because the skill lifecycle contract grew beyond a single inline branc
 
 =head1 WHEN TO USE
 
-Use this file when changing the public C<dashboard skills ...> verbs, the JSON payloads returned by C<list> or C<usage>, or the human-facing table output used for quick inspection in a terminal. Remote Git installs accept C<-b> or C<--branch>; a fresh install tries C<master> then C<main>, while reinstall keeps the currently checked-out named branch unless explicitly overridden.
+Use this file when changing the public C<d2 skills ...> verbs, the JSON payloads returned by C<list> or C<usage>, or the human-facing table output used for quick inspection in a terminal. Remote Git installs accept C<-b> or C<--branch>; a fresh install tries C<master> then C<main>, while reinstall keeps the currently checked-out named branch unless explicitly overridden.
 
 =head1 HOW TO USE
 
-Call C<run_skills_command> with the public helper name and argv array reference. The module builds a lightweight path registry, constructs a skill manager, dispatches the requested action, and prints either canonical JSON or sectioned tables depending on C<-o json> or C<-o table>. The default output for C<install>, C<list>, C<usage>, C<enable>, C<disable>, and C<uninstall> is a human-readable summary table, while C<-o json> returns the full machine payload. The thin C<dashboard> switchboard also routes dotted skill execution through this helper with an internal action so the public execution contract stays C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
+Call C<run_skills_command> with the public helper name and argv array reference. The module builds a lightweight path registry, constructs a skill manager, dispatches the requested action, and prints either canonical JSON or sectioned tables depending on C<-o json> or C<-o table>. The default output for C<install>, C<list>, C<usage>, C<enable>, C<disable>, and C<uninstall> is a human-readable summary table, while C<-o json> returns the full machine payload. The thin C<d2> switchboard also routes dotted skill execution through this helper with an internal action so the public execution contract stays C<d2 E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
 
 =head1 WHAT USES IT
 
@@ -522,17 +522,17 @@ It is used by the staged C<skills> private helper, by dotted skill command dispa
 
 =head1 EXAMPLES
 
-  dashboard skills list
-  dashboard skills list -o table
-  dashboard skills install /absolute/path/to/example-skill
-  dashboard skills install -b main git@github.com:user/example-skill.git
-  dashboard skills install browser foo/bar git@github.com:user/example-skill.git
-  dashboard skill install browser
-  dashboard skills install --ddfile
-  dashboard skills usage example-skill
-  dashboard skills usage example-skill -o table
-  dashboard skills disable example-skill
-  dashboard skills enable example-skill
+  d2 skills list
+  d2 skills list -o table
+  d2 skills install /absolute/path/to/example-skill
+  d2 skills install -b main git@github.com:user/example-skill.git
+  d2 skills install browser foo/bar git@github.com:user/example-skill.git
+  d2 skill install browser
+  d2 skills install --ddfile
+  d2 skills usage example-skill
+  d2 skills usage example-skill -o table
+  d2 skills disable example-skill
+  d2 skills enable example-skill
 
 =for comment FULL-POD-DOC END
 

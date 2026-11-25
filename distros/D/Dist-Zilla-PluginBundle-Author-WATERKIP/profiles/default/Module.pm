@@ -1,13 +1,15 @@
-use utf8;
 package {{$name}};
+use v5.26;
+use Object::Pad;
+
 our $VERSION = '{{$dist->version}}';
-use Moose;
-use namespace::autoclean;
 
-# ABSTRACT: {{$name}} package needs a propper abstract
+# ABSTRACT: {{$name}} needs a propper abstract
 
+class {{$name}};
+use Carp qw(croak);
 
-__PACKAGE__->meta->make_immutable;
+1;
 
 __END__
 

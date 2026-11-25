@@ -166,6 +166,8 @@ subtest 'croakf' => sub {
 
     package My::Percent {
         use Ekorn::Pipeline::Errors qw(croakf);
+
+
         sub fail () { croakf 'Expected 100%% or less' }
     }
     like dies { My::Percent::fail() }, qr( \A Expected\ 100%\ or\ less\  )x,

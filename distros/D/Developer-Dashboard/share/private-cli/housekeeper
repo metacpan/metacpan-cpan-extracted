@@ -22,12 +22,12 @@ housekeeper - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard housekeeper [--dry-run]
+  d2 housekeeper [--dry-run]
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
@@ -47,12 +47,12 @@ private helpers and modules.
 
 =head1 WHEN TO USE
 
-Use this file when changing the public C<dashboard housekeeper> command route
+Use this file when changing the public C<d2 housekeeper> command route
 or when fixing how the cleanup helper is staged into the home runtime.
 
 =head1 HOW TO USE
 
-Users run C<dashboard housekeeper>. The staged helper forwards the request to
+Users run C<d2 housekeeper>. The staged helper forwards the request to
 the private runtime, which loads the cleanup module and prints the JSON
 summary.
 
@@ -65,7 +65,7 @@ C<housekeeper> collector job, and by CLI regression tests.
 
 Example 1:
 
-  dashboard housekeeper
+  d2 housekeeper
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -73,12 +73,12 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/housekeeper
 
-Inspect the staged helper directly after C<dashboard init> or helper
+Inspect the staged helper directly after C<d2 init> or helper
 extraction has populated the home runtime.
 
 Example 3:
 
-  dashboard collector run housekeeper
+  d2 collector run housekeeper
 
 Run the built-in collector that executes this helper through the collector
 runtime.
@@ -92,7 +92,7 @@ dispatch behavior.
 
 Example 5:
 
-  dashboard housekeeper --dry-run
+  d2 housekeeper --dry-run
 
 Preview exactly what a real run would scan, remove, and rotate - state
 roots, temp files, collector logs, and expired sessions - without touching

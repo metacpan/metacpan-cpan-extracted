@@ -149,6 +149,7 @@ END_REQUEST
         prompt       => $full_prompt,
         raw_text     => '',  # The query is in the prompt
         model_config => $config->{default_model},
+        feature      => 'generate_ticketsql',
     );
 
     if ($response->{success}) {

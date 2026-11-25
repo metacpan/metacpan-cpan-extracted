@@ -1,6 +1,7 @@
 use Test::Roo;
 use Test::Exception;
-use List::MoreUtils qw(all);
+use List::Util qw(all);
+use Module::Load::Conditional qw[can_load];
 
 use v5.14;
 use warnings;
@@ -14,12 +15,17 @@ sub create_store {
 	my $self	= shift;
 	my %args	= @_;
 	my $quads	= $args{quads} // [];
+	my @args;
+	if (my $port = $ENV{ATTEAN_STORE_MYSQL_PORT}) {
+		push(@args, port => $port);
+	}
 	my @connect		= AtteanX::Store::DBI->dbi_connect_args(
 		'mysql',
 		database	=> $ENV{ATTEAN_STORE_MYSQL_DATABASE},
 		host		=> $ENV{ATTEAN_STORE_MYSQL_HOST},
 		user		=> $ENV{ATTEAN_STORE_MYSQL_USER},
 		password	=> $ENV{ATTEAN_STORE_MYSQL_PASSWORD},
+		@args
 	);
 	my $dbh			= DBI->connect(@connect);
 	my $store		= Attean->get_store('DBI')->new( dbh => $dbh );
@@ -30,6 +36,10 @@ sub create_store {
 		$store->add_quad($q);
 	}
 	return $store;
+}
+
+unless (can_load( modules => { 'DBD::mysql' => 0 })) {
+	plan skip_all => "DBD::mysql not available.";
 }
 
 unless (all { exists $ENV{$_} } qw(ATTEAN_STORE_MYSQL_DATABASE ATTEAN_STORE_MYSQL_HOST ATTEAN_STORE_MYSQL_USER ATTEAN_STORE_MYSQL_PASSWORD)) {

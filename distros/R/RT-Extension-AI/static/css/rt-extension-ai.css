@@ -1,6 +1,9 @@
 #aiModal {
     overflow-y: scroll;
 }
+#ai-result {
+    white-space: pre-wrap;
+}
 
 #ai-progress-indicator {
     position: fixed;

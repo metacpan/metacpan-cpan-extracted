@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.19.0';
+our $VERSION = '1.20.0';
 
 our @FLAGS = qw(
     is_vpn is_tor is_relay is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn
@@ -39,8 +39,12 @@ our %MEMBERS = (
 # its paid-plan twin: false while the answer has every field, true once the
 # organization's overage cap is reached.
 our @MARKERS = qw(trial_expired cap_reached);
+# What the user agent sent with the lookup names, and whether the address bears
+# it out: on an answer with every field to a lookup that sent one, and on no
+# other, so never on a bogon's.
+our @VERDICTS = qw(user_agent);
 
-my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @MARKERS;
+my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @VERDICTS, @MARKERS;
 
 # The one place a wire body becomes a result. Every field is copied on key
 # PRESENCE and never on truthiness: a plan that includes `is_hosting` and
@@ -56,7 +60,7 @@ sub from_wire {
         next unless exists $body->{$flag};
         $answer{$flag} = defined $body->{$flag} ? ($body->{$flag} ? 1 : 0) : undef;
     }
-    for my $detail (@DETAILS, @OBJECTS) {
+    for my $detail (@DETAILS, @OBJECTS, @VERDICTS) {
         $answer{$detail} = $body->{$detail} if exists $body->{$detail};
     }
     return $class->_new(\%answer, $body);
@@ -75,7 +79,7 @@ sub has {
 # a key is entitled to without reading the plan table.
 sub fields {
     my ($self) = @_;
-    return grep { exists $self->{$_} } 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @MARKERS;
+    return grep { exists $self->{$_} } 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @VERDICTS, @MARKERS;
 }
 
 # The response exactly as it came off the wire, with its original names and its
@@ -92,7 +96,7 @@ sub _new {
 
 # One reader per field rather than AUTOLOAD, so a typo is a compile-adjacent
 # "Can't locate object method" rather than a silent undef.
-for my $field ('ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @MARKERS) {
+for my $field ('ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @VERDICTS, @MARKERS) {
     no strict 'refs';
     *{__PACKAGE__ . "::$field"} = sub { $_[0]->{$field} };
 }
@@ -162,7 +166,7 @@ The paid flags: C<1>, C<0>, or C<undef> when your plan omits the field.
 
 The detail behind each flag, as plain hash references (C<web> an array reference
 of the web servers found), or C<undef> when your plan omits them. Unlimited
-answers C<tor> and C<relay>; every paid plan answers them all. C<bot> names whose
+answers C<tor> and C<relay>; a paid plan answers them all. C<bot> names whose
 bot uses the address (C<provider>, C<provider_name>), its bots as their user
 agents name them (C<agents>), what they do (C<categories>) and whether the
 operator vouches for the address (C<verified>, C<identity>, C<verified_by>).
@@ -181,6 +185,23 @@ name, an empty string where there is none.
 Paid: the WHOIS and RWHOIS records for the range, and how many domains point at
 the address with the 10 most popular (C<< {total => 4, domains => [...]} >>), or
 C<undef> when your plan omits them.
+
+=head2 user_agent
+
+What the user agent sent with the lookup names, and whether the address bears it
+out, as a plain hash reference, or C<undef> on an answer that does not carry it:
+one to a lookup that sent no C<user_agent>, one without every field, and a
+bogon's, which is answered locally. It carries C<agent> (the agent the user agent
+names, such as C<Googlebot> or C<Chrome>, C<Unknown> where it names none),
+C<kind> (C<browser>, C<inapp>, C<automation>, C<bot>, C<ai-bot>, C<http-client>
+or C<unknown>) and C<verdict>: C<verified> when the agent's operator vouches for
+the address as it, C<spoofed> when the operator of a bot that publishes its
+addresses does not vouch for this one, C<unverifiable> for a bot nothing can
+confirm, and C<not_bot> for a browser, an app or a script.
+
+    my $r = $client->lookup($ip, user_agent => $request->headers->user_agent);
+    my $verdict = ($r->user_agent // {})->{verdict} // '';
+    deny() if $verdict eq 'spoofed';
 
 =head2 trial_expired
 

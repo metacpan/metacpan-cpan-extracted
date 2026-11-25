@@ -8,6 +8,12 @@ use Test::More;
 
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
 
+sub _portable_path {
+    my ($path) = @_;
+    $path =~ s{/private(?=/var/folders/)}{}g if defined $path;
+    return $path;
+}
+
 my @identity_cases = (
     [ [],        [ 1, 2 ], 0, 'a failed candidate stat is rejected' ],
     [ [ 1, 2 ],  [],       0, 'a failed current-directory stat is rejected' ],
@@ -84,7 +90,7 @@ for my $invalid_pwd (
   )
 {
     local $ENV{PWD} = $invalid_pwd;
-    is( current_working_directory(), $physical_cwd,
+    is( _portable_path(current_working_directory()), _portable_path($physical_cwd),
         'falls back to the physical working directory when PWD is absent or invalid' );
 }
 

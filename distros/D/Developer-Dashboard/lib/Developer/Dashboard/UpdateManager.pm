@@ -3,7 +3,7 @@ package Developer::Dashboard::UpdateManager;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::PathIdentity qw(current_working_directory);
@@ -176,7 +176,7 @@ Construct and execute dashboard updates.
 
 =head1 PURPOSE
 
-This module runs the ordered update hook chain for C<dashboard update>. It discovers executable update scripts, runs them in sorted order, streams their stdout and stderr, updates the structured C<RESULT> state between hooks, and coordinates collector stop/start around the update window.
+This module runs the ordered update hook chain for C<d2 update>. It discovers executable update scripts, runs them in sorted order, streams their stdout and stderr, updates the structured C<RESULT> state between hooks, and coordinates collector stop/start around the update window.
 
 =head1 WHY IT EXISTS
 
@@ -192,7 +192,7 @@ Construct it with the file registry, path registry, and collector runner, then c
 
 =head1 WHAT USES IT
 
-It is used by the C<dashboard update> flow, by runtime bootstrap/update smoke tests, and by coverage that verifies update hook ordering and collector restart semantics.
+It is used by the C<d2 update> flow, by runtime bootstrap/update smoke tests, and by coverage that verifies update hook ordering and collector restart semantics.
 
 =head1 EXAMPLES
 

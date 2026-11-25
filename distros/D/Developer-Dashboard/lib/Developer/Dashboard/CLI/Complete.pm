@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Complete;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::Config;
@@ -15,7 +15,7 @@ use Developer::Dashboard::CLI::Suggest;
 use Developer::Dashboard::CLI::Ticket ();
 
 # complete(%args)
-# Returns shell-completion candidates for one dashboard command line snapshot.
+# Returns shell-completion candidates for one d2 command line snapshot.
 # Input: array reference of words and the active completion word index.
 # Output: ordered list of completion candidate strings.
 sub complete {
@@ -82,7 +82,7 @@ sub complete {
 }
 
 # _help_target_candidates($words, $index)
-# Returns public command or action names after the global `dashboard help` prefix.
+# Returns public command or action names after the global `d2 help` prefix.
 # Input: command-line words array reference and active word index.
 # Output: ordered help target candidates for the current nested namespace.
 sub _help_target_candidates {
@@ -193,8 +193,8 @@ sub _workspace_path_alias_candidates {
 
 # _subcommand_candidates($command)
 # Returns static second-level completion candidates for supported built-in
-# dashboard commands.
-# Input: resolved first dashboard subcommand string.
+# d2 commands.
+# Input: resolved first d2 subcommand string.
 # Output: ordered list of candidate strings.
 sub _subcommand_candidates {
     my ($command) = @_;
@@ -256,13 +256,13 @@ Developer::Dashboard::CLI::Complete - shell completion candidates for dashboard
 
   use Developer::Dashboard::CLI::Complete;
   my @candidates = Developer::Dashboard::CLI::Complete::complete(
-      words => [ 'dashboard', 'do' ],
+      words => [ 'd2', 'do' ],
       index => 1,
   );
 
 =head1 DESCRIPTION
 
-Builds completion candidates for dashboard subcommands, built-in second-level
+Builds completion candidates for d2 subcommands, built-in second-level
 actions, option flags, global help targets, dotted skill commands, and
 workspace path aliases. Commands and aliases are separated by argument
 position so dotted path names do not appear among command candidates.
@@ -271,11 +271,11 @@ position so dotted path names do not appear among command candidates.
 
 =head1 PURPOSE
 
-This module centralizes shell-completion candidate generation for C<dashboard>
+This module centralizes shell-completion candidate generation for C<d2>
 and the C<d2> shortcut. It exposes top-level built-ins, layered custom
 commands, dotted installed skill commands, and nested built-in actions through
 one reusable API. Command and option candidates are read from the shared help
-catalog; global C<dashboard help> completion follows the same nested action
+catalog; global C<d2 help> completion follows the same nested action
 tree. Docker completion lists C<compose>, C<list>, C<enable>, C<disable>, and
 C<development>, then offers C<enable> and C<disable> after
 C<docker development>. Workspace names and configured or skill-provided path
@@ -305,7 +305,7 @@ per line by the private completion helper.
 
 =head1 WHAT USES IT
 
-It is used by the private C<dashboard complete> helper, by generated bash and
+It is used by the private C<d2 complete> helper, by generated bash and
 zsh shell bootstraps, and by shell-smoke regression tests that pin the tab
 completion contract.
 
@@ -319,7 +319,7 @@ Preview top-level completion candidates from a source checkout.
 
 Example 2:
 
-  perl -Ilib -MDeveloper::Dashboard::CLI::Complete -e 'print join qq(\n), Developer::Dashboard::CLI::Complete::complete(words => [qw(dashboard docker co)], index => 2)'
+  perl -Ilib -MDeveloper::Dashboard::CLI::Complete -e 'print join qq(\n), Developer::Dashboard::CLI::Complete::complete(words => [qw(d2 docker co)], index => 2)'
 
 Preview second-level completion candidates for one built-in command.
 
@@ -343,14 +343,14 @@ Recheck completion behavior inside the full repository suite before release.
 
 Example 6:
 
-  dashboard complete 3 dashboard api add -
+  d2 complete 3 d2 api add -
 
 Print option candidates for the API add action, including long options, short
 aliases, and the explicit help flags.
 
 Example 7:
 
-  dashboard complete 2 d2 workspace -
+  d2 complete 2 d2 workspace -
 
 Offer workspace flags including C<-d>/C<--docker>, C<-c>, and uppercase C<-C>
 without querying tmux. The uppercase form opts into building a stopped Docker

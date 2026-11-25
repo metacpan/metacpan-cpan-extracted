@@ -4,7 +4,7 @@ AtteanX::Store::DBI - Database quad-store
 
 =head1 VERSION
 
-This document describes AtteanX::Store::DBI version 0.003
+This document describes AtteanX::Store::DBI version 0.004
 
 =head1 SYNOPSIS
 
@@ -30,24 +30,27 @@ use v5.14;
 use warnings;
 
 package AtteanX::Store::DBI {
-	our $VERSION	= '0.003';
+	our $VERSION	= '0.004';
 	use Moo;
 	use DBI;
 	use Attean 0.013;
-	use DBI::Const::GetInfoType;
-	use Type::Tiny::Role;
-	use Types::Standard qw(Int Str ArrayRef HashRef ConsumerOf InstanceOf);
-	use Encode;
 	use Cache::LRU;
-	use Set::Scalar;
+	use Data::Dumper;
+	use DBI::Const::GetInfoType;
 	use DBIx::MultiStatementDo;
-	use List::MoreUtils qw(zip);
-	use List::Util qw(any all first);
+	use Encode;
 	use File::ShareDir qw(dist_dir dist_file);
 	use File::Slurp;
+	use List::MoreUtils qw(zip);
+	use List::Util qw(any all first mesh);
 	use Scalar::Util qw(refaddr reftype blessed);
+	use Set::Scalar;
+	use Type::Tiny::Role;
+	use Types::Standard qw(Bool Int Str ArrayRef HashRef ConsumerOf InstanceOf);
 	use namespace::clean;
 
+	our $CURRENT_MODEL_VERSION	= 1;
+	
 	with 'Attean::API::MutableQuadStore';
 	with 'Attean::API::BulkUpdatableStore';
 	with 'Attean::API::QuadStore';
@@ -71,9 +74,77 @@ supplied database handle.
 
 =cut
 
+	sub BUILDARGS {
+		my $class	= shift;
+		my @params	= @_;
+		my @connect;
+		
+		my %args;
+		if (scalar(@params) % 2 == 0) {
+			my %params	= @params;
+			
+			if (my $i = delete $params{'init'}) {
+				$args{'should_init'}	= $i;
+			}
+			
+			if (my $dbh = $params{ dbh }) {
+				return \%params;
+			}
+			my $type	= delete($params{ type });
+			@connect	= $class->dbi_connect_args($type, %params);
+		} else {
+			my $type	= shift(@params);
+			@connect	= $class->dbi_connect_args($type, @params);
+		}
+		$args{dbh}	= DBI->connect(@connect);
+		return \%args;
+	}
+
+	has should_init => (is => 'ro', isa => Bool, default => 0);
 	has dbh => (is => 'ro', isa => InstanceOf['DBI::db'], required => 1);
 	has _i2t_cache => (is => 'ro', default => sub { Cache::LRU->new( size => 256 ) });
 	has _t2i_cache => (is => 'ro', default => sub { Cache::LRU->new( size => 256 ) });
+	has insert_term_sth	=> (is => 'ro', lazy => 1, default => sub {
+		my $self	= shift;
+		my $dbh		= $self->dbh;
+		return $dbh->prepare('INSERT INTO term (type, value, datatype_id, language) VALUES (?, ?, ?, ?)');
+	});
+	has insert_quad_sth	=> (is => 'ro', lazy => 1, default => sub {
+		my $self	= shift;
+		my $dbh		= $self->dbh;
+		my $type	= $self->database_type;
+		my $sql		= 'INSERT INTO quad (subject, predicate, object, graph) VALUES (?, ?, ?, ?)';
+		if ($type eq 'sqlite') {
+			$sql	= 'INSERT OR IGNORE INTO quad (subject, predicate, object, graph) VALUES (?, ?, ?, ?)';
+		} elsif ($type eq 'mysql') {
+			$sql	= 'INSERT IGNORE INTO quad (subject, predicate, object, graph) VALUES (?, ?, ?, ?)';
+		} elsif ($type eq 'postgresql') {
+			$sql	= 'INSERT INTO quad (subject, predicate, object, graph) SELECT ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM quad WHERE subject = ? AND predicate = ? AND object = ? AND graph = ?)';
+		}
+		return $self->dbh->prepare($sql);
+	});
+	has get_term_sth	=> (is => 'ro', lazy => 1, default => sub {
+		my $self	= shift;
+		my $dbh		= $self->dbh;
+		return $self->dbh->prepare('SELECT term.type, term.value, dtterm.value AS datatype, term.language, tt.subject, tt.predicate, tt.object FROM term LEFT JOIN term dtterm ON (term.datatype_id = dtterm.term_id) LEFT JOIN triple_term tt ON (term.term_id = tt.term_id) WHERE term.term_id = ?');
+	});
+	has get_term_id_sth	=> (is => 'ro', lazy => 1, default => sub {
+		my $self	= shift;
+		my $dbh		= $self->dbh;
+		return $self->dbh->prepare('SELECT term_id FROM term WHERE type = ? AND value = ?');
+	});
+	has get_literal_term_id_sth	=> (is => 'ro', lazy => 1, default => sub {
+		my $self	= shift;
+		my $dbh		= $self->dbh;
+		return $self->dbh->prepare('SELECT term_id FROM term WHERE type = ? AND value = ? AND datatype_id = ? AND language = ?');
+	});
+
+	sub BUILD {
+		my $self	= shift;
+		if ($self->should_init) {
+			$self->init();
+		}
+	}
 
 =item C<< init() >>
 
@@ -96,7 +167,10 @@ Returns a temporary (in-memory, SQLite) store.
 =cut
 	sub temporary_store {
 		my $class	= shift;
-		my $dbh		= DBI->connect('dbi:SQLite:dbname=:memory:', '', '');
+		my $dbh		= DBI->connect('dbi:SQLite:dbname=:memory:', '', '', {
+			RaiseError		=> 1,
+			sqlite_unicode	=> 1,
+		});
 		my $store	= $class->new(dbh => $dbh);
 		$store->init();
 		return $store;
@@ -115,7 +189,7 @@ Returns a temporary (in-memory, SQLite) store.
 		if (my $term = $self->_i2t_cache->get($id)) {
 			return $term;
 		}
-		my $sth		= $self->dbh->prepare('SELECT term.type, term.value, dtterm.value AS datatype, term.language FROM term LEFT JOIN term dtterm ON (term.datatype_id = dtterm.term_id) WHERE term.term_id = ?');
+		my $sth		= $self->get_term_sth;
 		$sth->execute($id);
 		my $row		= $sth->fetchrow_hashref;
 		my $type	= $row->{type};
@@ -130,15 +204,25 @@ Returns a temporary (in-memory, SQLite) store.
 		} elsif ($type eq 'literal') {
 			my %args	= (value => $value, datatype => Attean::IRI->new(value => $datatype));
 			if ($lang) {
-				$args{language} = $lang;
+				if ($lang =~ /--/) {
+					my ($l, $dir)	= split('--', $lang);
+					$args{language} = $l;
+					$args{base_dir} = $dir;
+				} else {
+					$args{language} = $lang;
+				}
 			}
 			$term	= Attean::Literal->new( %args );
+		} elsif ($type eq 'triple') {
+			my @ids	= @{ $row }{ qw(subject predicate object) };
+			my ($s,$p,$o)	= map { $self->_get_term($_) } @ids;
+			$term	= Attean::Triple->new(subject => $s, predicate => $p, object => $o);
 		}
 		if ($term) {
 			$self->_i2t_cache->set($id => $term);
 			return $term;
 		}
-		Carp::confess "Failed to load term values for bad ID " . Dumper($id);
+		die "Failed to load term values for bad ID " . Dumper($id);
 	}
 	
 	sub _get_term_id {
@@ -150,22 +234,31 @@ Returns a temporary (in-memory, SQLite) store.
 		my $dbh			= $self->dbh;
 		my $tid;
 		if ($term->does('Attean::API::IRI')) {
-			my $sth	= $dbh->prepare('SELECT term_id FROM term WHERE type = ? AND value = ?');
+			my $sth	= $self->get_term_id_sth;
 			my $value	= $term->value;
 			$sth->execute('iri', $value);
 			($tid) = $sth->fetchrow_array;
 		} elsif ($term->does('Attean::API::Blank')) {
-			my $sth	= $dbh->prepare('SELECT term_id FROM term WHERE type = ? AND value = ?');
+			my $sth	= $self->get_term_id_sth;
 			my $value	= $term->value;
 			$sth->execute('blank', $value);
 			($tid) = $sth->fetchrow_array;
 		} elsif ($term->does('Attean::API::Literal')) {
 			my $dtid	= $self->_get_or_create_term_id($term->datatype);
-			my $sth	= $dbh->prepare('SELECT term_id FROM term WHERE type = ? AND value = ? AND datatype_id = ? AND language = ?');
+			my $sth	= $self->get_literal_term_id_sth;
 			my $value	= $term->value;
-			my $lang	= $term->language;
+			my $lang	= $term->lang_dir;
 			$sth->execute('literal', $value, $dtid, $lang);
 			($tid) = $sth->fetchrow_array;
+		} elsif ($term->does('Attean::API::TriplePattern') and $term->is_ground) {
+			my @terms	= $term->values;
+			my @ids		= map { $self->_get_term_id($_) || 0 } @terms;
+			my $value	= join(' ', map { +$_ } @ids);
+			my $sth	= $self->get_term_id_sth;
+			$sth->execute('triple', $value);
+			($tid) = $sth->fetchrow_array;
+		} else {
+			die "Failed to get ID for term: " . $term->as_string;
 		}
 		if (defined($tid)) {
 			$self->_t2i_cache->set($term->as_string => $tid);
@@ -182,9 +275,9 @@ Returns a temporary (in-memory, SQLite) store.
 		}
 		my $dbh			= $self->dbh;
 		my $tid;
-		my $insert_term_sth	= $dbh->prepare('INSERT INTO term (type, value, datatype_id, language) VALUES (?, ?, ?, ?)');
+		my $insert_term_sth	= $self->insert_term_sth;
 		if ($term->does('Attean::API::IRI')) {
-			my $sth	= $dbh->prepare('SELECT term_id FROM term WHERE type = ? AND value = ?');
+			my $sth	= $self->get_term_id_sth;
 			my $value	= $term->value;
 			$sth->execute('iri', $value);
 			($tid) = $sth->fetchrow_array;
@@ -193,7 +286,7 @@ Returns a temporary (in-memory, SQLite) store.
 				$tid	= $self->_last_insert_id('term');
 			}
 		} elsif ($term->does('Attean::API::Blank')) {
-			my $sth	= $dbh->prepare('SELECT term_id FROM term WHERE type = ? AND value = ?');
+			my $sth	= $self->get_term_id_sth;
 			my $value	= $term->value;
 			$sth->execute('blank', $value);
 			($tid) = $sth->fetchrow_array;
@@ -206,7 +299,7 @@ Returns a temporary (in-memory, SQLite) store.
 			my $sql		= 'SELECT term_id FROM term WHERE type = ? AND value = ? AND datatype_id = ?';
 			my $value	= $term->value;
 			my @bind	= ('literal', $value, $dtid);
-			my $lang	= $term->language;
+			my $lang	= $term->lang_dir;
 			if ($lang) {
 				$sql	.= ' AND language = ?';
 				push(@bind, $lang);
@@ -218,12 +311,27 @@ Returns a temporary (in-memory, SQLite) store.
 				$insert_term_sth->execute('literal', $value, $dtid, $lang);
 				$tid	= $self->_last_insert_id('term');
 			}
+		} elsif ($term->does('Attean::API::Triple')) {
+			my $insert_triple_term_sth	= $dbh->prepare('INSERT INTO triple_term (term_id, subject, predicate, object) VALUES (?, ?, ?, ?)');
+			my @terms	= $term->values;
+			my @ids		= map { $self->_get_or_create_term_id($_) } @terms;
+			my $value	= join(' ', map { +$_ } @ids);
+			my $sth	= $dbh->prepare('SELECT term_id FROM triple_term WHERE subject = ? AND predicate = ? AND object = ?');
+			
+			$sth->execute(@ids);
+			($tid) = $sth->fetchrow_array;
+			unless (defined($tid)) {
+				$insert_term_sth->execute('triple', $value, undef, undef);
+				$tid	= $self->_last_insert_id('term');
+				$insert_triple_term_sth->execute($tid, @ids);
+			}
 		} else {
 			die "Failed to get ID for term: " . $term->as_string;
 		}
 		
 		if (defined($tid)) {
 			$self->_t2i_cache->set($term->as_string => $tid);
+			$self->_i2t_cache->set($tid => $term);
 			return $tid;
 		}
 		die;
@@ -243,19 +351,26 @@ position.
 		my @nodes	= map { ref($_) eq 'ARRAY' ? $_ : [$_] } @_;
 		my @where;
 		my @bind;
+		my %post_filters;
 		foreach my $i (0 .. 3) {
 			my $name	= $pos_names[$i];
 			my $terms = $nodes[$i];
 			if (defined($terms)) {
-				unless (scalar(@$terms) == 1 and not defined($terms->[0])) {
-					unless (any { $_->does('Attean::API::Variable') } @$terms) {
-						my @ids	= map { $self->_get_term_id($_) } @$terms;
-						unless (scalar(@ids)) {
-							return Attean::ListIterator->new( values => [], item_type => 'Attean::API::Quad' );
-						}
-						push(@where, "$name IN (" . join(', ', ('?') x scalar(@ids)) . ")");
-						push(@bind, @ids);
+				next if (scalar(@$terms) == 1 and not defined($terms->[0]));
+				if (any { $_->does('Attean::API::TriplePattern') and not($_->is_ground) } @$terms) {
+					# we'll do the full scan, and post-filter to ensure the triple matches
+					if (any { not($_->does('Attean::API::Variable')) } @$terms) {
+						$post_filters{ $name }	= $terms;
 					}
+				} else {
+					next if (any { $_->does('Attean::API::Variable') } @$terms);
+	
+					my @ids	= map { $self->_get_term_id($_) } @$terms;
+					unless (scalar(@ids)) {
+						return Attean::ListIterator->new( values => [], item_type => 'Attean::API::Quad' );
+					}
+					push(@where, "$name IN (" . join(', ', ('?') x scalar(@ids)) . ")");
+					push(@bind, @ids);
 				}
 			}
 		}
@@ -268,9 +383,27 @@ position.
 		my $ok	= 1;
 		my $sub	= sub {
 			return unless ($ok);
-			if (my $row	= $sth->fetchrow_arrayref) {
+			ROW: while (my $row	= $sth->fetchrow_arrayref) {
 				my @terms	= map { $self->_get_term($_) } @$row;
-				my $quad	= Attean::Quad->new(zip @pos_names, @terms);
+				my %args;
+				@args{ @pos_names }	= @terms;
+				my $quad	= Attean::Quad->new(%args);
+				if (%post_filters) {
+					# there was a triple term pattern in the match request, so validate that here
+					foreach my $pos (keys %post_filters) {
+						my $terms		= $post_filters{ $pos };
+						my $got			= $quad->$pos();
+						foreach my $expected (@$terms) {
+							if ($expected->does('Attean::API::TriplePattern') and $expected->matches($got)) {
+								return $quad;
+							} elsif (eval { $got->equals($expected) }) {
+								return $quad;
+							}
+						}
+						next ROW; # no requested term matched the value in this quad
+					}
+				}
+
 				return $quad;
 			}
 			$ok	= 0;
@@ -340,6 +473,15 @@ the set of graphs of the stored quads.
 
 	# -----------------------------------------------------------------------------
 
+	around 'add_iter' => sub {
+		my $orig	= shift;
+		my $self	= shift;
+		my $dbh		= $self->dbh;
+		local($dbh->{AutoCommit})	= 0;
+		return $self->$orig(@_);
+	};
+
+
 =item C<< add_quad ( $quad ) >>
 
 Adds the specified C<$quad> to the underlying model.
@@ -356,16 +498,10 @@ Adds the specified C<$quad> to the underlying model.
 		
 		my $type	= $self->database_type;
 		my @bind	= @ids;
-		my $sql		= 'INSERT INTO quad (subject, predicate, object, graph) VALUES (?, ?, ?, ?)';
-		if ($type eq 'sqlite') {
-			$sql	= 'INSERT OR IGNORE INTO quad (subject, predicate, object, graph) VALUES (?, ?, ?, ?)';
-		} elsif ($type eq 'mysql') {
-			$sql	= 'INSERT IGNORE INTO quad (subject, predicate, object, graph) VALUES (?, ?, ?, ?)';
-		} elsif ($type eq 'postgresql') {
-			$sql	= 'INSERT INTO quad (subject, predicate, object, graph) SELECT ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM quad WHERE subject = ? AND predicate = ? AND object = ? AND graph = ?)';
+		my $sth		= $self->insert_quad_sth;
+		if ($type eq 'postgresql') {
 			push(@bind, @ids);
 		}
-		my $sth		= $self->dbh->prepare($sql);
 		$sth->execute(@bind);
 		return;
 	}
@@ -510,8 +646,8 @@ Insert data into the attean_version table.
 		my $self	= shift;
 		my $dbh		= $self->dbh;
 		$dbh->do('DELETE FROM attean_version');
-		my $sql		= 'INSERT INTO attean_version (attean_version, store_version) VALUES (?, ?);';
-		$dbh->do($sql, undef, $Attean::VERSION, $AtteanX::Store::DBI::VERSION);
+		my $sql		= 'INSERT INTO attean_version (attean_version, model_version, store_version) VALUES (?, ?, ?);';
+		$dbh->do($sql, undef, $Attean::VERSION, $CURRENT_MODEL_VERSION, $AtteanX::Store::DBI::VERSION);
 	}
 
 =item C<< create_schema_file >>
@@ -524,10 +660,20 @@ for the current database type if available, undef otherwise.
 	sub create_schema_file {
 		my $self	= shift;
 		my $type	= $self->database_type;
-		my $dir		= $ENV{ATTEAN_SHAREDIR} || eval { dist_dir('AtteanX-Store-DBI') } || 'share';
-		my $file	= File::Spec->catfile($dir, 'database-schema', sprintf('%s-create.sql', $type));
-		if (-r $file) {
-			return $file;
+		my @options;
+		push(@options, $ENV{ATTEAN_SHAREDIR}) if ($ENV{ATTEAN_SHAREDIR});
+		push(@options, $ENV{ATTEANX_STORE_DBI_SHAREDIR}) if ($ENV{ATTEANX_STORE_DBI_SHAREDIR});
+		eval {
+			my $path	= dist_dir('AtteanX-Store-DBI');
+			push(@options, $path);
+		};
+		push(@options, 'share');
+		foreach my $dir (@options) {
+			my $file	= sprintf('%s-create.sql', $type);
+			my $abs	= File::Spec->catfile($dir, 'database-schema', $file);
+			if (-r $abs) {
+				return $abs;
+			}
 		}
 		return;
 	}
@@ -589,8 +735,19 @@ C<< AtteanX::Store::DBI >> object.
 
 	sub dbi_connect_args {
 		my $self		= shift;
-		my $type		= blessed($self) ? $self->database_type : shift;
-		my %args		= @_;
+		my $type;
+		my %args;
+		if (blessed($self)) {
+			$type	= $self->database_type;
+		} else {
+			if (scalar(@_) % 2 == 0) {
+				%args	= @_;
+				$type	= $args{type};
+			} else {
+				$type		= shift;
+				%args		= @_;
+			}
+		}
 		my $database	= $args{database};
 		my $user		= $args{user};
 		my $password	= $args{password};
@@ -599,7 +756,6 @@ C<< AtteanX::Store::DBI >> object.
 		my $dsn;
 		my %connect_args;
 		$connect_args{RaiseError}	= 1;
-
 		if ($type eq 'mysql') {
 			$dsn		= "DBI:mysql:database=${database}";
 			if (defined($host)) {
@@ -608,7 +764,7 @@ C<< AtteanX::Store::DBI >> object.
 			if (defined($port)) {
 				$dsn	.= ";port=$port";
 			}
-			$connect_args{mysql_enable_utf8}	= 1;
+			$connect_args{mysql_enable_utf8mb4}	= 1;
 		} elsif ($type eq 'postgresql') {
 			$dsn		= "DBI:Pg:dbname=${database}";
 			if (defined($host)) {
@@ -622,6 +778,7 @@ C<< AtteanX::Store::DBI >> object.
 			$connect_args{sqlite_unicode}	= 1;
 		}
 		
+		$connect_args{PrintError}	= 1;
 		return ($dsn, $user, $password, \%connect_args);
 	}
 
@@ -703,7 +860,7 @@ returns undef.
 										push(@{ $plan->bindings }, $literal->value);
 									}
 								
-									if (my $lang = $literal->language) {
+									if (my $lang = $literal->lang_dir) {
 										push(@{ $plan->where }, "$termtable.language = ?");
 										push(@{ $plan->bindings }, $lang);
 									} else {
@@ -758,9 +915,14 @@ returns undef.
 			my @bind;
 			my $graph	= Attean::Variable->new(value => '___g');
 			$seen_vars{ $graph->value }++;
-			my $graph_values	= sprintf('(%s)', join(', ', ('?') x scalar(@graph_ids)));
-			push(@bind, @graph_ids);
-			my @where	= ("t0.graph IN $graph_values");
+			my @where;
+			if (scalar(@graph_ids)) {
+				my $graph_values	= sprintf('(%s)', join(', ', ('?') x scalar(@graph_ids)));
+				push(@bind, @graph_ids);
+				push(@where, "t0.graph IN $graph_values");
+			} else {
+				push(@where, "0");
+			}
 			
 			foreach my $t (@triples) {
 				my $table	= 't' . $tcounter++;
@@ -773,8 +935,11 @@ returns undef.
 					my $node	= $nodes[$i];
 					my $name	= $pos_names[$i];
 					if ($node->does('Attean::API::Variable')) {
+
 						my $var	= $node;
 						push(@vars, [$var, $name]);
+					} elsif ($node->does('Attean::API::TriplePattern') and not $node->is_ground) {
+						return; # cannot plan this efficiently
 					} elsif ($node->does('Attean::API::Blank')) {
 						my $id	= $node->value;
 						unless (exists $blanks{$id}) {
@@ -809,7 +974,7 @@ returns undef.
 				my ($as, $bs)		= map { sprintf('%s.%s', @$_) } ($a, $b);
 				push(@where, join(' ', $as, $op, $bs));
 			}
-			
+
 			return AtteanX::Store::DBI::Plan->new(
 				store => $self,
 				select => \@select,
@@ -840,9 +1005,65 @@ Returns the estimated cost for a DBI-specific query plan, undef otherwise.
 		return;
 	}
 
+sub _dump_database {
+	my $self	= shift;
+	$self->_dump_dictionary;
+	$self->_dump_quads;
 }
 
-package AtteanX::Store::DBI::Plan 0.012 {
+sub _dump_dictionary {
+	my $self	= shift;
+	my $dbh		= $self->dbh;
+	use Text::Table;
+	my @headers	= qw(term_id type datatype_id value language);
+	my $table = Text::Table->new(@headers);
+	my @rows;
+	my $sql		= 'SELECT term_id, type, datatype_id, value, language FROM term';
+	my $sth	= $dbh->prepare($sql);
+	$sth->execute();
+	while (my $row = $sth->fetchrow_arrayref) {
+		push(@rows, [@$row]);
+	}
+	$table->load(@rows);
+	my @rule			= qw(- +);
+	warn "[[[ DICTIONARY ]]]\n";
+	warn join('',
+			$table->rule(@rule),
+			$table->title,
+			$table->rule(@rule),
+			map({ $table->body($_) } 0 .. @rows),
+			$table->rule(@rule)
+		);
+}
+
+sub _dump_quads {
+	my $self	= shift;
+	my $dbh		= $self->dbh;
+	use Text::Table;
+	my @headers	= qw(subject predicate object graph);
+	my $table = Text::Table->new(@headers);
+	my @rows;
+	my $sql		= 'SELECT subject, predicate, object, graph FROM quad';
+	my $sth	= $dbh->prepare($sql);
+	$sth->execute();
+	while (my $row = $sth->fetchrow_arrayref) {
+		push(@rows, [@$row]);
+	}
+	$table->load(@rows);
+	my @rule			= qw(- +);
+	warn "[[[ QUADS ]]]\n";
+	warn join('',
+			$table->rule(@rule),
+			$table->title,
+			$table->rule(@rule),
+			map({ $table->body($_) } 0 .. @rows),
+			$table->rule(@rule)
+		);
+}
+
+}
+
+package AtteanX::Store::DBI::Plan 0.004 {
 	use Moo;
 	use Type::Tiny::Role;
 	use Types::Standard qw(HashRef ArrayRef InstanceOf Str);
@@ -867,7 +1088,6 @@ package AtteanX::Store::DBI::Plan 0.012 {
 	sub sql {
 		my $self	= shift;
 		my $bind	= shift;
-
 		my $store	= $self->store;
 		my $dbh		= $store->dbh;
 		my @bind	= @{ $self->bindings };

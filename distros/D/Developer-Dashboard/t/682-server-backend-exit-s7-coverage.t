@@ -3,45 +3,43 @@
 use strict;
 use warnings;
 
-# CORE::GLOBAL::fork and exit overrides must exist before Web::Server is
-# compiled. They are inert unless a test arms them, so the backend child branch
-# of the SSL frontend can be driven in-process without really forking or
-# terminating the test run.
-our ( $FORK_HOOK, $EXIT_HOOK );
-
-BEGIN {
-    *CORE::GLOBAL::fork = sub () {
-        return $FORK_HOOK->() if $FORK_HOOK;
-        return CORE::fork();
-    };
-    *CORE::GLOBAL::exit = sub (;$) {
-        die bless( { code => ( @_ ? $_[0] : 0 ) }, 'Local::Exit' ) if $EXIT_HOOK;
-        CORE::exit( @_ ? $_[0] : 0 );
-    };
-}
-
 use Test::More;
 
 use lib 'lib';
 
 use Developer::Dashboard::Web::Server;
 
-my $server = bless {}, 'Developer::Dashboard::Web::Server';
+# internal_sockhost()
+# Returns the test backend host required by the SSL command builder.
+# Input: daemon fixture object.
+# Output: loopback host string.
+sub Local::DashboardTestDaemon::internal_sockhost { return '127.0.0.1' }
+
+# internal_sockport()
+# Returns the test backend port required by the SSL command builder.
+# Input: daemon fixture object.
+# Output: positive port integer.
+sub Local::DashboardTestDaemon::internal_sockport { return 23456 }
+
+my @spawned;
+my $server = bless {
+    ssl_backend_command_builder => sub { return [ $^X, '-e', 'exit 7' ] },
+}, 'Developer::Dashboard::Web::Server';
 
 {
     no warnings 'redefine';
-    my @daemons;
-    local *Developer::Dashboard::Web::Server::_run_ssl_backend_process = sub {
-        push @daemons, $_[1];
-        return 7;
+    local *Developer::Dashboard::GoRoutine::spawn = sub {
+        @spawned = @_;
+        die "simulated GoRoutine process launch failure\n";
     };
-    local $FORK_HOOK = sub { return 0 };
-    local $EXIT_HOOK = 1;
-    my $ok = eval { $server->_serve_ssl_frontend( { marker => 'daemon' } ); 1 };
-    ok( !$ok, 'the backend child never returns to the frontend loop' );
-    isa_ok( $@, 'Local::Exit', 'the backend child leaves through exit' );
-    is( $@->{code}, 7, 'the backend child exits with the backend process status' );
-    is_deeply( \@daemons, [ { marker => 'daemon' } ], 'the backend child receives the daemon descriptor' );
+    my $ok = eval {
+        $server->_serve_ssl_frontend( bless {}, 'Local::DashboardTestDaemon' );
+        1;
+    };
+    ok( !$ok, 'the SSL frontend reports a GoRoutine process launch failure' );
+    like( $@, qr/simulated GoRoutine process launch failure/, 'the process-launch error is propagated visibly' );
+    is_deeply( \@spawned, [ [ $^X, '-e', 'exit 7' ], { process_group => 1 } ],
+        'the SSL backend command is launched as a separately managed process group' );
 }
 
 done_testing;
@@ -52,34 +50,42 @@ __END__
 
 =head1 NAME
 
-t/682-server-backend-exit-s7-coverage.t - covers the backend-child exit of the SSL frontend in Developer::Dashboard::Web::Server
+t/682-server-backend-exit-s7-coverage.t - covers the GoRoutine SSL backend process launch boundary
 
 =head1 PURPOSE
 
-Test file in the Developer Dashboard codebase. It arms BEGIN-time fork and exit overrides so the forked backend child branch of _serve_ssl_frontend runs in-process.
+This regression test verifies that the SSL frontend delegates backend startup
+to GoRoutine's native process API, requests a separately manageable process
+group, and propagates a process-launch failure without swallowing it.
 
 =head1 WHY IT EXISTS
 
-It exists because the mandatory 100 percent lib/ coverage gate allows no uncoverable annotations, so every branch must be reached by a real test or removed from the code.
+It exists because process startup is an external boundary whose failure must be
+visible and whose process-group option is required for bounded backend cleanup.
 
 =head1 WHEN TO USE
 
-Use this file when you change the code paths it exercises, or when a coverage run reports one of them as uncovered.
+Use this file when changing SSL backend startup or the GoRoutine process API
+integration.
 
 =head1 HOW TO USE
 
-Run it directly with C<prove -lv t/682-server-backend-exit-s7-coverage.t> while iterating, then keep it green under C<prove -lr t> and the Devel::Cover run before release.
+Run it in the dev Docker container:
+
+  d2 docker compose exec dev prove -lv t/682-server-backend-exit-s7-coverage.t
 
 =head1 WHAT USES IT
 
-It is used by developers during TDD, by the full C<prove -lr t> suite, by the Devel::Cover coverage gate, and by release verification before commit or push.
+It is used by the full test suite and the coverage gate to verify the SSL
+frontend's process-launch boundary.
 
 =head1 EXAMPLES
 
-Example 1:
+Example:
 
-  prove -lv t/682-server-backend-exit-s7-coverage.t
+  d2 docker compose exec dev prove -lv t/682-server-backend-exit-s7-coverage.t
 
-Run this coverage-gap test by itself while editing the code it covers.
+The test injects a literal child argv vector, substitutes a failing launcher,
+and checks both the process-group option and visible error propagation.
 
 =cut

@@ -305,7 +305,7 @@ ok( $read_failure_store->{_indicator_sync_watcher_unavailable},
 
 my $native_watcher = Developer::Dashboard::IndicatorStore::Watch->new;
 SKIP: {
-    skip 'native FFI inotify backend is optional in the standard test image', 5 if !$native_watcher;
+    skip 'native XS inotify backend is unavailable in the standard test image', 5 if !$native_watcher;
     my $native_store = Developer::Dashboard::IndicatorStore->new( paths => $paths );
     $native_store->{_indicator_sync_watcher} = $native_watcher;
     my @native_jobs = map {

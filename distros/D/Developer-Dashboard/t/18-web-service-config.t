@@ -220,7 +220,7 @@ t/18-web-service-config.t - Configuration persistence tests for web service sett
 =head1 DESCRIPTION
 
 Tests that host, port, workers, and ssl settings are properly saved to and loaded from
-the global configuration, so dashboard restart inherits the previous serve session settings.
+the global configuration, so d2 restart inherits the previous serve session settings.
 
 =for comment FULL-POD-DOC START
 

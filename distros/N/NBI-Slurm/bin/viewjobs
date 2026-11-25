@@ -129,7 +129,7 @@ my $state = {
     term_height => 24,
     term_width => 80,
     header_rows => 1,
-    footer_rows => 1,
+    footer_rows => 2,
 
     # UI state
     mode => 'normal',
@@ -284,6 +284,12 @@ sub read_key {
 sub load_jobs {
     my $state = shift;
 
+    # ── Save interactive state before fetching (restored after refresh) ─────
+    my @interactive_filters = grep { !$_->{from_cli} } @{$state->{filters}};
+    my $active_jobid = @{$state->{jobs}}
+        ? ($state->{jobs}[$state->{active_row}]{JOBID} // '')
+        : '';
+
     # ── Snapshot previously live jobs (exclude already-completed ghosts) ────
     my %prev_live = map  { $_->{JOBID} => $_ }
                     grep { ($_->{STATE} // '') ne 'COMPLETED' }
@@ -310,20 +316,27 @@ sub load_jobs {
     my @live_jobs = map { $jobs_hash->{$_} } sort keys %$jobs_hash;
     my @all_jobs  = (@live_jobs, values %{$state->{completed_jobs}});
 
-    $state->{all_jobs}      = \@all_jobs;
-    $state->{jobs}          = [@all_jobs];
+    $state->{all_jobs} = \@all_jobs;
+    $state->{jobs}     = [@all_jobs];
 
-    # Clear interactive filters and selections on every (re)load
-    $state->{filters}       = [];
-    $state->{selected}      = {};
-    $state->{active_row}    = 0;
-    $state->{scroll_offset} = 0;
-
-    # Re-seed CLI-derived filters (persist across refreshes)
+    # ── Restore filters: CLI first, then interactive (preserved across refresh) ─
+    $state->{filters} = [];
     push_cli_filters($state);
+    push @{$state->{filters}}, @interactive_filters;
 
-    # Apply them (also clamps active_row, re-sorts, adjusts scroll)
+    # ── Apply filters (clamps active_row, re-sorts, adjusts scroll) ─────────
     apply_filters($state);
+
+    # ── Restore cursor to previously active job (if still visible) ──────────
+    if ($active_jobid ne '') {
+        for my $i (0 .. $#{$state->{jobs}}) {
+            if ($state->{jobs}[$i]{JOBID} eq $active_jobid) {
+                $state->{active_row} = $i;
+                adjust_scroll($state);
+                last;
+            }
+        }
+    }
 }
 
 sub getjobs {
@@ -393,6 +406,7 @@ sub push_cli_filters {
             col_name => 'User',
             pattern  => '^(?:' . $opts->{user} . ')$',
             negate   => 0,
+            from_cli => 1,
         };
     }
 
@@ -402,6 +416,7 @@ sub push_cli_filters {
             col_name => 'Name',
             pattern  => $opts->{name},
             negate   => 0,
+            from_cli => 1,
         };
     }
 
@@ -411,6 +426,7 @@ sub push_cli_filters {
             col_name => 'State',
             pattern  => $opts->{status},
             negate   => 0,
+            from_cli => 1,
         };
     }
 }
@@ -434,6 +450,7 @@ sub render_screen {
 
     render_header($state);
     render_data_rows($state);
+    render_info_bar($state);
     render_footer($state);
 
     print $ANSI->{show_cursor};
@@ -562,6 +579,66 @@ sub render_job_row {
     }
 
     print $line . $COLORS->{reset} . "\r\n";
+}
+
+sub render_info_bar {
+    my $state = shift;
+
+    my %counts = (running => 0, pending => 0, completed => 0, failed => 0);
+    for my $job (@{$state->{all_jobs}}) {
+        my $s = $job->{STATE} // '';
+        if    ($s =~ /^RUNNING/i)   { $counts{running}++   }
+        elsif ($s =~ /^PENDING/i)   { $counts{pending}++   }
+        elsif ($s =~ /^COMPLETED/i) { $counts{completed}++ }
+        elsif ($s =~ /^(FAILED|CANCELLED|TIMEOUT|NODE_FAIL|OUT_OF_MEMORY)/i) {
+            $counts{failed}++
+        }
+    }
+
+    my $total   = scalar @{$state->{all_jobs}};
+    my $showing = scalar @{$state->{jobs}};
+
+    # Build left-side segments: [color, visible_text]
+    my @segs;
+    push @segs, ['', "  Total: $total"];
+    if ($counts{running}) {
+        push @segs, ['', '   '];
+        push @segs, [$COLORS->{cell_running},   "▶ Running: $counts{running}"];
+    }
+    if ($counts{pending}) {
+        push @segs, ['', '   '];
+        push @segs, [$COLORS->{cell_pending},   "◷ Queued: $counts{pending}"];
+    }
+    if ($counts{completed}) {
+        push @segs, ['', '   '];
+        push @segs, [$COLORS->{cell_completed}, "✓ Completed: $counts{completed}"];
+    }
+    if ($counts{failed}) {
+        push @segs, ['', '   '];
+        push @segs, [$COLORS->{cell_error},     "✗ Failed: $counts{failed}"];
+    }
+
+    my $left_vlen = 0;
+    $left_vlen += length($_->[1]) for @segs;
+
+    # Right side: "Showing X of Y" only when a filter is narrowing the view
+    my $right      = '  ';
+    my $right_vlen = 2;
+    if ($showing != $total) {
+        $right      = "  Showing: $showing of $total  ";
+        $right_vlen = length($right);
+    }
+
+    my $pad = $state->{term_width} - $left_vlen - $right_vlen;
+    $pad = 0 if $pad < 0;
+
+    my $line = $COLORS->{normal};
+    $line .= $_->[0] . $_->[1] . $COLORS->{normal} for @segs;
+    $line .= ' ' x $pad;
+    $line .= $right;
+    $line .= $COLORS->{reset};
+
+    print $line . "\r\n";
 }
 
 sub render_footer {
@@ -998,9 +1075,9 @@ sub handle_detail_input {
     } elsif ($key eq 'DOWN' || $key eq 'j') {
         $state->{detail_scroll}++
             if $state->{detail_scroll} < $total - $vis;
-    } elsif ($key eq 'PGUP') {
+    } elsif ($key eq 'PGUP' || $key eq 'P') {
         $state->{detail_scroll} = max(0, $state->{detail_scroll} - $vis);
-    } elsif ($key eq 'PGDN') {
+    } elsif ($key eq 'PGDN' || $key eq 'L') {
         $state->{detail_scroll} = max(0,
             min($total - $vis, $state->{detail_scroll} + $vis));
     } elsif ($key eq 'HOME' || $key eq 'g') {
@@ -1137,9 +1214,9 @@ sub handle_file_view_input {
     } elsif ($key eq 'DOWN' || $key eq 'j') {
         $state->{file_view_scroll}++
             if $state->{file_view_scroll} < $total - $vis;
-    } elsif ($key eq 'PGUP') {
+    } elsif ($key eq 'PGUP' || $key eq 'P') {
         $state->{file_view_scroll} = max(0, $state->{file_view_scroll} - $vis);
-    } elsif ($key eq 'PGDN') {
+    } elsif ($key eq 'PGDN' || $key eq 'L') {
         $state->{file_view_scroll} = max(0,
             min($total - $vis, $state->{file_view_scroll} + $vis));
     } elsif ($key eq 'HOME' || $key eq 'g') {
@@ -1291,9 +1368,9 @@ sub handle_input {
         move_cursor_right($state);
     }
     # Page navigation
-    elsif ($key eq 'PGUP') {
+    elsif ($key eq 'PGUP' || $key eq 'P') {
         move_page_up($state);
-    } elsif ($key eq 'PGDN') {
+    } elsif ($key eq 'PGDN' || $key eq 'L') {
         move_page_down($state);
     } elsif ($key eq 'HOME' || $key eq 'g') {
         move_to_top($state);
@@ -1634,10 +1711,11 @@ Keyboard shortcuts (inside the TUI):
   Enter         Open full job details (via scontrol)
   /             Filter: keep rows where the active column matches a pattern
   !             Filter: exclude rows where the active column matches a pattern
-  r             Refresh job list and reset all interactive filters
+  r             Refresh job list (interactive filters and selection preserved)
   ↑↓ / j k     Move cursor up/down
   ←→ / h l     Move cursor left/right (columns)
-  PgUp/PgDn     Scroll by page          g / G   Jump to top / bottom
+  PgUp/PgDn     Scroll by page (also Shift+P / Shift+L)
+  g / G         Jump to top / bottom
   Space         Toggle job selection
   [ / ]         Sort active column ascending / descending
   + / -         Widen / narrow active column
@@ -1663,7 +1741,7 @@ viewjobs - Interactive TUI for viewing and managing SLURM jobs
 
 =head1 VERSION
 
-version 0.22.0
+version 0.24.0
 
 =head1 SYNOPSIS
 

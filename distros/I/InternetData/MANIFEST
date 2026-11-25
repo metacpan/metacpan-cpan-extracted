@@ -25,6 +25,7 @@ t/05-lookup.t
 t/06-bogon.t
 t/07-live.t
 t/08-cache-life.t
+t/09-user-agent.t
 t/lib/InternetDataTest.pm
 t/lib/InternetDataTest/Origin.pm
 testdata/bogons.json

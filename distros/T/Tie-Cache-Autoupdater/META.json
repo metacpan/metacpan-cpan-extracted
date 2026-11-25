@@ -32,11 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Storable" : "0"
+            "Storable" : "0",
+            "perl" : "5.008"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

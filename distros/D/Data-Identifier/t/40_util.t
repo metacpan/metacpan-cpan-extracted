@@ -1,11 +1,14 @@
 #!/usr/bin/perl -w
 
+use strict;
+use warnings;
 use v5.10;
 use lib 'lib', '../lib'; # able to run prove in project dir and .t locally
 
-use Test::More tests => 41;
+use Test::More tests => 48;
 
 use_ok('Data::Identifier::Util');
+use_ok('Data::Identifier::Generate');
 use_ok('Data::Identifier');
 
 my $id = Data::Identifier->new(wellknown => 'sid');
@@ -21,6 +24,7 @@ my %packed = (
     sni8        => "\163",
     sni16       => "\0\163",
     sni32       => "\0\0\0\163",
+    '4+12'      => "\x40\33",
     uuid128     => "\xf8\x7a\x38\xcb\xfd\x13\x4e\x15\x86\x6c\xe4\x99\x01\xad\xbe\xc5",
     uuidhexdash => 'f87a38cb-fd13-4e15-866c-e49901adbec5',
     uuidHEXDASH => 'F87A38CB-FD13-4E15-866C-E49901ADBEC5',
@@ -48,6 +52,19 @@ my %sirtx = (
 
 foreach my $value (sort keys %sirtx) {
     ok($util->parse_sirtx($value)->eq($sirtx{$value}), 'parse_sirtx "'.$value.'"');
+}
+
+my @sirtx_render = (
+    [[sid => 9999] => 'sid:9999'],
+    [[sni => 9999] => 'sni:9999'],
+    [[wd => 'Q1234'] => 'wd:Q1234'],
+    [Data::Identifier::Generate->integer(10) => '\'10'],
+);
+
+foreach my $vector (@sirtx_render) {
+    my ($inp, $res) = @{$vector};
+    $inp = Data::Identifier->new(@{$inp}) if ref($inp) eq 'ARRAY';
+    is($util->render_sirtx($inp), $res, 'SIRTX rendering');
 }
 
 {

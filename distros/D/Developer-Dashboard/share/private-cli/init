@@ -22,18 +22,18 @@ init - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard init
+  d2 init
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard init>, the command that creates or refreshes the runtime tree, stages dashboard-managed helpers, and seeds starter pages when they are missing or safely refreshable.
+This staged helper exposes C<d2 init>, the command that creates or refreshes the runtime tree, stages dashboard-managed helpers, and seeds starter pages when they are missing or safely refreshable.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing init CLI behavior or the handoff into the runtime bo
 
 =head1 HOW TO USE
 
-Users run C<dashboard init> in a project or from home. The staged helper forwards that request into the private runtime, which creates the runtime directories, preserves existing config, stages helpers, and writes starter pages as needed.
+Users run C<d2 init> in a project or from home. The staged helper forwards that request into the private runtime, which creates the runtime directories, preserves existing config, stages helpers, and writes starter pages as needed.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used for first-run setup, by integration smoke that builds fresh runtimes,
 
 Example 1:
 
-  dashboard init
+  d2 init
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/init --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

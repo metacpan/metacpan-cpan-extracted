@@ -1,7 +1,7 @@
 This archive contains the distribution Skilletor,
-version 0.008000:
+version 0.009000:
 
-  Install and sync skills, agents and rules for Claude Code, Codex and Hermes Agent
+  Retired: skilletor's Perl port; use the skilletor plugin or its install.sh
 
 This software is Copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 

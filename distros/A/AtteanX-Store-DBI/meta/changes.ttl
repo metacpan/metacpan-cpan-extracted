@@ -28,7 +28,30 @@ my:project
 	:bug-database			<https://github.com/kasei/atteanx-store-dbi/issues> ;
 	doap:download-page		<https://metacpan.org/release/AtteanX-Store-DBI/> ;
 	doap:download-mirror	<http://kasei.us/code/files/> ;
-	:release				my:v_0-001 , my:v_0-002 , my:v_0-003 ;
+	:release				my:v_0-001 , my:v_0-002 , my:v_0-003 , my:v_0-004 ;
+	.
+
+my:v_0-004
+	a					:Version ;
+	dc:issued			"2026-11-XX"^^xsd:date ;
+	:revision			"0.004" ;
+	dcterms:replaces	my:v_0-003 ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Addition ; rdfs:label "Add support for RDF 1.2 triple terms." ],
+			[ a dcs:Addition ; rdfs:label "Add support for init-on-construct." ],
+			[ a dcs:Addition ; rdfs:label "Add load and dump commands to attean_dbi tool." ],
+			[ a dcs:Update ; rdfs:label "Skip mysql and postgres tests if the DBD modules or environment variables are not available." ],
+			[ a dcs:Update ; rdfs:label "Improvements to path discovery logic in create_schema_file()." ],
+			[ a dcs:Update ; rdfs:label "Fix unicode configuration of the sqlite-based temporary_store()." ],
+			[ a dcs:Update ; rdfs:label "Fix unicode configuration of the MySQL store." ],
+			[ a dcs:Update ; rdfs:label "Update dbi_connect_args() to handle both ($type, %args) and (%args) calling variants." ],
+			[ a dcs:Update ; rdfs:label "Update add_iter to load all quads in a single transaction." ],
+			[ a dcs:Update ; rdfs:label "Fix SQL-generation bug in handling queries where the requested graph does not exist in the database." ],
+			[ a dcs:Update ; rdfs:label "Update required version of Attean to 0.041." ],
+			[ a dcs:Update ; rdfs:label "Remove dependency on List::MoreUtils." ],
+			[ a dcs:Update ; rdfs:label "Improve developer tests." ]
+	]
 	.
 
 my:v_0-003

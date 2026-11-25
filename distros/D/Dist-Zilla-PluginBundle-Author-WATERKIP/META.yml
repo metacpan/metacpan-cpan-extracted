@@ -10,11 +10,13 @@ build_requires:
   Test::More: '0'
   perl: '5.010'
 configure_requires:
+  CPAN::Meta::Requirements: '2.120620'
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
+  Module::Metadata: '0'
   perl: '5.010'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +29,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::WATERKIP:
     file: lib/Dist/Zilla/MintingProfile/Author/WATERKIP.pm
-    version: '3.3'
+    version: '3.4'
   Dist::Zilla::PluginBundle::Author::WATERKIP:
     file: lib/Dist/Zilla/PluginBundle/Author/WATERKIP.pm
-    version: '3.3'
+    version: '3.4'
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::App::Command::xtest: '0'
@@ -50,6 +52,7 @@ requires:
   Dist::Zilla::Plugin::PromptIfStale: '0'
   Dist::Zilla::Plugin::ReadmeFromPod: '0'
   Dist::Zilla::Plugin::Repository: '0.22'
+  Dist::Zilla::Plugin::UploadToDarkPAN: '0'
   Dist::Zilla::Plugin::lib: '0'
   Dist::Zilla::PluginBundle::Filter: '0'
   Dist::Zilla::PluginBundle::Git::VersionManager: '0'
@@ -71,14 +74,15 @@ requires:
   Test::NoTabs: '0'
   Test::Pod::Coverage: '0'
   Test::Vars: '0'
+  URI: '0'
   namespace::autoclean: '0'
   namespace::clean: '0'
   perl: '5.010'
 resources:
   repository: git://gitlab.com/waterkip/dist-zilla-pluginbundle-author-waterkip.git
-version: '3.3'
+version: '3.4'
 x_contributors:
   - 'Wesley Schwengle <waterkip@cpan.org>'
-x_generated_by_perl: v5.36.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

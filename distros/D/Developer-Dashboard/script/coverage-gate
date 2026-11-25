@@ -14,6 +14,14 @@
 use strict;
 use warnings;
 
+our $CHILD_INSTRUMENT_ERROR = '';
+
+
+use Config ();
+use Cwd ();
+use File::Spec ();
+use FindBin qw($RealBin);
+
 # BEFORE anything tries to load Devel::Cover. The product's dependencies live in
 # the operator's local library tree, and PERL5LIB is exported only by the
 # interactive shell profile - so cron, transient systemd units and agent
@@ -28,26 +36,31 @@ use warnings;
 # typed as three shell lines can set the library path on one and omit it from the
 # next, leaving the reader unable to parse what the writer just wrote.
 BEGIN {
+    my $repository = Cwd::abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
+    my $blib_arch = defined $repository
+      ? File::Spec->catdir( $repository, 'blib', 'arch' )
+      : undef;
     my $home = $ENV{HOME};
-    if ( defined $home && length $home ) {
-        my $local_lib = "$home/perl5/lib/perl5";
-        if ( -d $local_lib ) {
-            my $current = $ENV{PERL5LIB};
-            if ( !defined $current || !grep { $_ eq $local_lib } split /:/, $current ) {
-                $ENV{PERL5LIB} = defined $current && length $current ? "$local_lib:$current" : $local_lib;
-            }
-            unshift @INC, $local_lib if !grep { $_ eq $local_lib } @INC;
-        }
+    my $local_lib = defined $home && length $home ? "$home/perl5/lib/perl5" : undef;
+    my @leading_paths = grep { defined $_ && -d $_ } ( $blib_arch, $local_lib );
+    my $path_sep = $Config::Config{path_sep} || ':';
+    my %seen;
+    my @perl5lib = grep { length $_ && !$seen{$_}++ } (
+        @leading_paths,
+        split( /\Q$path_sep\E/, $ENV{PERL5LIB} // q{} ),
+    );
+    $ENV{PERL5LIB} = join $path_sep, @perl5lib if @perl5lib;
+
+    for my $path ( reverse @leading_paths ) {
+        unshift @INC, $path if !grep { $_ eq $path } @INC;
     }
 }
 
 use Capture::Tiny qw(capture);
-use Cwd ();
 use Digest::SHA qw(sha256_hex);
 use Fcntl qw(:flock);
 use File::Find ();
-use File::Basename qw(dirname);
-use File::Spec;
+use File::Basename qw(basename dirname);
 use Getopt::Long qw(GetOptions);
 
 use constant EXIT_CLEAN    => 0;
@@ -208,12 +221,13 @@ sub main {
     my @argv = @_;
 
     my $database = 'cover_db';
-    my ( $dry_run, $help ) = ( 0, 0 );
+    my ( $dry_run, $help, $jobs ) = ( 0, 0, 1 );
 
     local @ARGV = @argv;
     GetOptions(
         'database=s' => \$database,
         'dry-run'    => \$dry_run,
+        'jobs=i'     => \$jobs,
         'help'       => \$help,
     ) or return _usage('unrecognized option');
 
@@ -221,6 +235,8 @@ sub main {
         print _usage_text();
         return EXIT_CLEAN;
     }
+
+    return _usage('--jobs must be a positive integer') if $jobs < 1;
 
     my @tests = @ARGV ? @ARGV : ('t');
 
@@ -272,6 +288,22 @@ sub main {
 
     chdir $repository or return _unusable("cannot enter the repository root $repository: $!");
 
+    my @test_files = _expand_test_paths(@tests);
+    my %native_thread_tests = map { $_ => 1 } qw(
+        17-web-server-ssl.t
+        231-goroutine-integration.t
+        237-goroutine-shared-objects.t
+        238-goroutine-routine-controls.t
+        241-system-menu-runner.t
+        244-goroutine-channels.t
+        245-goroutine-native-reference-types.t
+        248-dashboard-goroutine-exports.t
+    );
+    my @native_thread_tests = grep { $native_thread_tests{ basename($_) } } @test_files;
+    my @instrumented_tests = grep { !$native_thread_tests{ basename($_) } } @test_files;
+    return _unusable('no instrumentable test files remain after separating native-thread tests')
+        if !@instrumented_tests;
+
     my $instrument = _instrument_module();
     return _unusable(
         'Devel::Cover::DB::IO could not be loaded, so this chain could neither write nor read a '
@@ -297,9 +329,10 @@ sub main {
         return _unusable(
             'a child process could not load Devel::Cover::DB::IO at all, though this process can. '
                 . 'The suite and the report run as children, so the chain would write or read nothing usable'
+                . ( length $CHILD_INSTRUMENT_ERROR ? "\n  child probe: $CHILD_INSTRUMENT_ERROR" : '' )
         );
     }
-    if ( $child_instrument ne $instrument ) {
+    if ( !_same_instrument_path( $child_instrument, $instrument ) ) {
         return _unusable(
             "this process and its children resolve different Devel::Cover installs, so the suite would "
                 . "write a database the report cannot read:\n"
@@ -322,17 +355,54 @@ sub main {
     my $stamp_failure = _check_database_stamp( $database, $instrument );
     return $stamp_failure if defined $stamp_failure;
 
-    my @delete = ( 'cover', $database, '-delete' );
-    my @suite  = ( 'prove', '-lr', @tests );
+    # Native Strawberry Perl can dispatch a bare cover command through
+    # Git Bash's MSYS shebang resolver. That changes how Windows drive-letter
+    # PERL5LIB entries are interpreted and makes Devel::Cover's JSON/Storable
+    # serializer unavailable even though the current interpreter loads it.
+    # Execute the configured installed script with this same Perl instead.
+    # Preserve the original command in dry-run output for contract tests.
+    my @cover_command = ('cover');
+    if ( $^O eq 'MSWin32' && !$dry_run && defined $ENV{DD_NATIVE_COVER_SCRIPT}
+        && length $ENV{DD_NATIVE_COVER_SCRIPT} ) {
+        my $script = $ENV{DD_NATIVE_COVER_SCRIPT};
+        return _unusable("the configured native cover script is missing: $script") if !-f $script;
+        @cover_command = ( $^X, $script );
+    }
+    # The extensionless prove launcher has the same MSYS shebang problem as
+    # cover on Windows. Keep the harness and its TAP modules under the pinned
+    # native Perl interpreter; preserve ordinary dry-run output for contracts.
+    my @prove_command = ('prove');
+    if ( $^O eq 'MSWin32' && !$dry_run && defined $ENV{DD_NATIVE_PROVE_SCRIPT}
+        && length $ENV{DD_NATIVE_PROVE_SCRIPT} ) {
+        my $script = $ENV{DD_NATIVE_PROVE_SCRIPT};
+        return _unusable("the configured native prove script is missing: $script") if !-f $script;
+        @prove_command = ( $^X, $script );
+    }
+    my @delete = ( @cover_command, $database, '-delete' );
+    # Some integration-style tests own real ports or inspect transient source
+    # files. Keep those test files isolated from other workers; the remaining
+    # suite still has all requested parallel slots.
+    my @parallel = $jobs > 1 ? (
+        '-j', $jobs,
+        '--rules=seq=t/05-cli-smoke.t',
+        '--rules=seq=t/09-runtime-manager.t',
+        '--rules=seq=t/15-release-metadata.t',
+        # t/149 creates a temporary file under t/ as part of its own test.
+        # Running it beside t/148 can change the latter's grading fingerprint.
+        '--rules=seq=t/{148-coverage-gate-entrypoint,149-coverage-gate-moving-target}.t',
+        '--rules=par=**',
+    ) : ();
+    my @suite  = ( @prove_command, @parallel, '-l', @instrumented_tests );
+    my @native_thread_suite = @native_thread_tests ? ( @prove_command, @parallel, '-l', @native_thread_tests ) : ();
     my @report = (
-        'cover', $database, '-report', 'text', '-select_re', '^lib/',
+        @cover_command, $database, '-report', 'text', '-select_re', '^lib/', '-gcov', '0',
         '-coverage', 'statement',
         '-coverage', 'branch',
         '-coverage', 'condition',
         '-coverage', 'subroutine',
     );
 
-    _announce( $instrument, $database, \@delete, \@suite, \@report );
+    _announce( $instrument, $database, \@delete, \@suite, \@native_thread_suite, \@report );
     return EXIT_CLEAN if $dry_run;
 
     # Taken after the dry run returns, so describing the chain never blocks on a
@@ -346,35 +416,109 @@ sub main {
 
     my $before = _grading_identity();
 
-    # Coverage is enforced only for lib/. Tests deliberately stage executable
-    # helper trees under /tmp and .developer-dashboard, then remove those trees;
-    # asking Devel::Cover to hash those non-target files during report generation
-    # produces missing-file warnings after cleanup. Keep its defaults and exclude
-    # only those disposable source roots, leaving every repository lib/ file
-    # instrumented and graded.
+    # Only repository lib/ is the coverage target. Devel::Cover's select
+    # regex takes priority over ignore: all lib/ code is measured, while tests,
+    # temporary source trees, and generated subroutines are not collected.
+    # Collecting dynamic test-fixture sources from different Perl processes
+    # causes incompatible structures and 'ignoring extra' merge diagnostics,
+    # which make an otherwise complete 100% report untrustworthy.
+    # -blib,0 also ensures the built copy does not shadow lib/ during coverage.
     local $ENV{HARNESS_PERL_SWITCHES}
-        = "-MDevel::Cover=-db,$database,-blib,0,+ignore,^/tmp/,\\.developer-dashboard/";
-    my $ran = _run( 'instrumented suite', @suite );
-
-    my $after = _grading_identity();
-    if ( $before ne $after ) {
-        print "coverage gate: refusing to report - the code being graded changed while the suite ran\n";
-        print "coverage gate: t/ or lib/ is not what it was at the start, so this run describes no single "
-            . "state of the tree and its number would be unsafe to trust\n";
-        print "coverage gate: rerun it on a tree nobody is moving\n";
-        return EXIT_MOVED;
+        = "-MDevel::Cover=-db,$database,-blib,0,-select,^lib/,-ignore,^";
+    # cmd.exe rejects command lines longer than 8191 characters. The full
+    # instrumented test list grows beyond that limit on Windows; split only
+    # the invocation, not the coverage database or the selected test suite.
+    # Every batch still uses the requested prove -j worker count and contributes
+    # to the same Devel::Cover database before the single final report.
+    my $ran;
+    if ( $^O eq 'MSWin32' ) {
+        my @prefix = ( @prove_command, @parallel, '-l' );
+        my @batch;
+        for my $test (@instrumented_tests) {
+            push @batch, $test;
+            if ( @batch >= 40 ) {
+                $ran = _run( 'instrumented suite batch', @prefix, @batch );
+                last if $ran != EXIT_CLEAN;
+                @batch = ();
+            }
+        }
+        $ran = _run( 'instrumented suite final batch', @prefix, @batch )
+            if ( !defined($ran) || $ran == EXIT_CLEAN ) && @batch;
+        $ran = EXIT_CLEAN if !defined $ran;
+    }
+    else {
+        $ran = _run( 'instrumented suite', @suite );
     }
 
-    return $ran if $ran != EXIT_CLEAN;
+    if ( $ran != EXIT_CLEAN ) {
+        return _grading_identity() eq $before ? $ran : _tree_moved();
+    }
+
+    if (@native_thread_suite) {
+        {
+            local $ENV{HARNESS_PERL_SWITCHES};
+            delete $ENV{HARNESS_PERL_SWITCHES};
+            $ran = _run( 'native-thread suite', @native_thread_suite );
+        }
+        if ( $ran != EXIT_CLEAN ) {
+            return _grading_identity() eq $before ? $ran : _tree_moved();
+        }
+    }
+
+    return _tree_moved() if _grading_identity() ne $before;
 
     my ( $stdout, $stderr, $status ) = capture {
         system(@report);
     };
 
+
     _warn( sprintf 'the report command exited %d; its output is being judged anyway', $status >> 8 )
         if $status != 0;
 
     return _judge( $checker, $database, $stdout . $stderr );
+}
+
+# Purpose: expand requested test files and directories into an explicit stable
+#          list so selected ithread tests can run outside Devel::Cover.
+# Input: one or more test file or directory paths.
+# Output: test file paths in request order, with each directory's files sorted.
+sub _expand_test_paths {
+    my (@requested) = @_;
+    my @expanded;
+
+    for my $path (@requested) {
+        if ( !-d $path ) {
+            push @expanded, $path;
+            next;
+        }
+
+        my @found;
+        File::Find::find(
+            {
+                no_chdir => 1,
+                wanted   => sub {
+                    my $candidate = $File::Find::name;
+                    push @found, $candidate if -f $candidate && $candidate =~ /\.t\z/;
+                },
+            },
+            $path,
+        );
+        push @expanded, sort @found;
+    }
+
+    return @expanded;
+}
+
+# Purpose: emit the standard refusal when grading inputs changed during either
+#          test suite, so a coverage number cannot describe a moving tree.
+# Input: none.
+# Output: EXIT_MOVED after writing a visible diagnostic.
+sub _tree_moved {
+    print "coverage gate: refusing to report - the code being graded changed while the suite ran\n";
+    print "coverage gate: t/ or lib/ is not what it was at the start, so this run describes no single "
+        . "state of the tree and its number would be unsafe to trust\n";
+    print "coverage gate: rerun it on a tree nobody is moving\n";
+    return EXIT_MOVED;
 }
 
 # Purpose: fingerprint Perl source and tests so the gate can refuse a result
@@ -488,16 +632,43 @@ sub _instrument_module {
     return defined $loaded ? $loaded : $INC{'Devel/Cover/DB/IO.pm'};
 }
 
+# Purpose: compare resolved Devel::Cover module identities across processes.
+# Input: two module paths reported by Perl's %INC.
+# Output: true when both names identify the same existing module file.
+#
+# Login shells may add `$HOME/perl5/bin/../lib/perl5` while the invoking process
+# already has `$HOME/perl5/lib/perl5` in @INC. Those are the same installation;
+# resolving the existing module file preserves rejection of genuinely different
+# Devel::Cover installs without treating a harmless `..` spelling as one.
+sub _same_instrument_path {
+    my ( $left, $right ) = @_;
+    return 0 if !defined $left || !defined $right;
+    my $resolved_left  = Cwd::abs_path($left)  // $left;
+    my $resolved_right = Cwd::abs_path($right) // $right;
+    return $resolved_left eq $resolved_right;
+}
+
 # Purpose: ask a child process which Devel::Cover serializer IT resolves, because
 #          the suite and the report are children and resolve it independently of
 #          this process.
 # Input:   none
 # Output:  the child's resolved path, or undef when the child cannot load it.
 sub _child_instrument_module {
-    my $path = qx{$^X -MDevel::Cover::DB::IO -e 'print \$INC{"Devel/Cover/DB/IO.pm"}' 2>/dev/null};
-    return undef if $? != 0 || !defined $path;
-    chomp $path;
-    return length $path ? $path : undef;
+    # Avoid shell quoting: cmd.exe does not interpret Unix single quotes.
+    # A list-form system uses the selected Perl on Windows and Unix.
+    my ( $stdout, $stderr, $status ) = capture {
+        system $^X, '-MDevel::Cover::DB::IO',
+            '-e', 'print $INC{q(Devel/Cover/DB/IO.pm)}';
+    };
+    if ( $status != 0 || !defined $stdout || $stdout eq '' ) {
+        $CHILD_INSTRUMENT_ERROR = "exit status $status";
+        $stderr =~ s/\s+\z// if defined $stderr;
+        $CHILD_INSTRUMENT_ERROR .= "; stderr: $stderr" if defined $stderr && length $stderr;
+        return undef;
+    }
+    chomp $stdout;
+    return undef if !length $stdout;
+    return $stdout;
 }
 
 # Purpose: refuse to grade a database written by a different Devel::Cover than the
@@ -515,7 +686,7 @@ sub _check_database_stamp {
             next if !-f $candidate;
             my $previous = _slurp_stamp($candidate);
             next if !defined $previous;
-            next if $previous eq $instrument;
+            next if _same_instrument_path( $previous, $instrument );
             return _unusable(
                 "this database was written by a different Devel::Cover than the one that would read it "
                     . "now, so any number it produced would be meaningless:\n"
@@ -569,12 +740,12 @@ sub _slurp_stamp {
     return length $line ? $line : undef;
 }
 
-# Purpose: print the one environment and the three commands, so the operator can
-#          see what is about to run and confirm writer and reader agree.
-# Input: the resolved instrument path, the database, and the three command lists.
+# Purpose: print the one environment and the coverage commands, so the operator
+#          can verify the database and command chain before execution.
+# Input: the resolved instrument path, the database, and the command lists.
 # Output: nothing; writes to standard output.
 sub _announce {
-    my ( $instrument, $database, $delete, $suite, $report ) = @_;
+    my ( $instrument, $database, $delete, $suite, $native_thread_suite, $report ) = @_;
 
     print "coverage gate: one environment for the whole chain\n";
     printf "coverage gate:   perl        : %s\n",       $^X;
@@ -586,7 +757,8 @@ sub _announce {
     # a --dry-run inspection (DD-744).
     printf "coverage gate:   database    : %s\n",       File::Spec->rel2abs($database);
     printf "coverage gate:   drop        : %s\n", join ' ', @{$delete};
-    printf "coverage gate:   suite       : %s\n", join ' ', @{$suite};
+    printf "coverage gate:   instrumented suite: %s\n", join ' ', @{$suite};
+    printf "coverage gate:   native-thread suite: %s\n", @{$native_thread_suite} ? join ' ', @{$native_thread_suite} : '(none)';
     printf "coverage gate:   report      : %s\n", join ' ', @{$report};
 
     return;
@@ -673,7 +845,7 @@ sub _usage {
 # Output: the usage text as one string.
 sub _usage_text {
     return <<'USAGE';
-usage: perl script/coverage-gate [--database DIR] [--dry-run] [--help] [TEST_PATH...]
+usage: perl script/coverage-gate [--database DIR] [--jobs N] [--dry-run] [--help] [TEST_PATH...]
 
 Refuses when your working directory is inside a different git checkout from the
 one this script belongs to - run that checkout's own script/coverage-gate.
@@ -682,12 +854,14 @@ Runs the whole four-metric coverage gate as one process, so every command in the
 chain inherits one environment:
 
   1. drop the coverage database
-  2. run the instrumented suite (default: the whole t/ tree)
-  3. collect the lib/ report for statement, branch, condition and subroutine
-  4. enforce 100.0 on all four through script/check-all-metric-coverage
+  2. run ordinary tests under Devel::Cover
+  3. run GoRoutine's three ithread tests without the unsupported coverage hook
+  4. collect the lib/ report for statement, branch, condition and subroutine
+  5. enforce 100.0 on all four through script/check-all-metric-coverage
 
   --database DIR  use DIR as the coverage database (default: cover_db)
-  --dry-run       print the resolved environment and the three commands, run none
+  --jobs N        run both prove suites with N parallel workers (default: 1)
+  --dry-run       print the resolved environment and each command, run none
   --help          print this text
 
 Exit status: 0 all four metrics at 100.0, 1 a genuine shortfall, 2 the gate could
@@ -705,9 +879,10 @@ coverage-gate - run the whole four-metric coverage gate inside one environment
 =head1 WHAT IT IS
 
 The canonical entrypoint for the repository coverage gate. It drops the coverage
-database, runs the instrumented test suite, collects the C<lib/> report for
-statement, branch, condition and subroutine coverage, and enforces 100.0 on all
-four through C<script/check-all-metric-coverage>.
+database, runs ordinary tests under Devel::Cover, runs the three GoRoutine
+ithread tests separately without that unsupported hook, collects the C<lib/>
+report for statement, branch, condition and subroutine coverage, and enforces
+100.0 on all four through C<script/check-all-metric-coverage>.
 
 =head1 WHAT IT IS FOR
 
@@ -757,10 +932,17 @@ so a copy running from a scratch directory is unaffected.
 
 The resolved database is reported as an ABSOLUTE path. The configured name is
 relative and therefore identical whichever tree it lands in, which is precisely
-why a C<--dry-run> inspection could not tell two trees apart. Give it test paths
-to narrow the instrumented run, C<--database> to keep the database somewhere
-other than C<cover_db>, and C<--dry-run> to see the resolved environment and the
-exact commands before spending a suite slot.
+why a C<--dry-run> inspection could not tell two trees apart. The default C<t/>
+directory is expanded to an explicit sorted list. The three GoRoutine ithread
+tests are excluded from the instrumented invocation and run in a second
+C<prove> process because Devel::Cover cannot instrument ithreads safely. That
+invocation uses C<-l> to load checkout modules alongside built XS libraries
+from C<PERL5LIB>. They remain mandatory functional tests; a failure in either suite prevents report
+generation. A request containing only those three tests is refused because it
+cannot produce a meaningful library coverage report. Give it test paths to
+narrow the run, C<--database> to keep the database somewhere other than
+C<cover_db>, and C<--dry-run> to see the resolved environment and every command
+before spending a suite slot.
 
 The reader identity stamp is stored in a hidden sibling file next to the
 database, never inside C<cover_db>, because Devel::Cover treats unknown files
@@ -768,11 +950,17 @@ in that directory as invalid database content. A prior C<gate-serializer>
 marker inside the database is compared with the current reader and removed
 before the database is dropped; a mismatch still fails closed.
 
-The coverage collector excludes only disposable C</tmp/> and staged
-C<.developer-dashboard/> source trees. Tests remove those temporary helper files
-before report generation, which would otherwise make Devel::Cover emit missing
-source warnings. The enforced report still includes every repository C<lib/>
-source; these exclusions do not reduce the library coverage target.
+The coverage collector selects every repository C<lib/> source and ignores
+all non-library test and transient fixture code. Devel::Cover may otherwise
+merge dynamic anonymous subroutines created in different test processes and
+produce C<ignoring extra> warnings that invalidate a strict coverage report.
+The selection never excludes library source and does not reduce the enforced
+statement, branch, condition, or subroutine coverage target. The report
+also disables optional C<gcov> output: its contract covers Perl files under
+C<lib/>, while native XS paths are verified by functional tests. C<gcov> adds
+extra C-file tables and diagnostics to the text stream, which the fail-closed
+Perl report checker must reject rather than mistake for part of its single
+coverage table.
 
 It takes TWO locks, and they guard different things. The first is named after
 the coverage B<database>, so two gates conflict exactly when they would share a

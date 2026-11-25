@@ -26,7 +26,19 @@ my $SHA_OTHER  = 'b' x 40;
 # ---------------------------------------------------------------------------
 
 ok( -f $GATE, 'the action-pin provenance gate is tracked in script/' );
-ok( -x $GATE, 'the action-pin provenance gate is executable' );
+# Windows has no exec bit for an extensionless script: Strawberry Perl
+# derives -x from the file extension, so script/audit-action-pins is never
+# -x there even though git tracks it 100755 (round 64, proven live on
+# win-ts: the checkout lands at mode 0666 and -x reports NO). The gate is
+# always run through $^X, never executed directly, so on Windows the
+# shebang is the runnable-script evidence and is asserted instead of the
+# exec bit — the same shape as the t/13 launcher fix (commit 077209f28).
+if ( $^O eq 'MSWin32' ) {
+    like( $SOURCE, qr{\A\#!/usr/bin/env perl\n}, 'the action-pin provenance gate is executable' );
+}
+else {
+    ok( -x $GATE, 'the action-pin provenance gate is executable' );
+}
 like( $SOURCE, qr{\A\#!/usr/bin/env perl\n}, 'the gate uses the portable env shebang' );
 like( $SOURCE, qr/^use strict;$/m,   'the gate runs under strict' );
 like( $SOURCE, qr/^use warnings;$/m, 'the gate runs under warnings' );

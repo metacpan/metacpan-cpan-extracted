@@ -2,32 +2,32 @@
 
 ## Language
 
-Erbt von `WWW::Crawl4AI`: **Strategy Chain**, **Strategy**, **Classification**, **Attempt**, **Result**, **DeepCrawl**, **Error**, **Action Endpoints** — alle definiert in der WWW::Crawl4AI CONTEXT.md.
+Inherits from `WWW::Crawl4AI`: **Strategy Chain**, **Strategy**, **Classification**, **Attempt**, **Result**, **DeepCrawl**, **Error**, **Action Endpoints** — all defined in the WWW::Crawl4AI CONTEXT.md.
 
-Async-spezifische Begriffe:
+Async-specific terms:
 
-**Future Contract**: Jede Endpoint-Methode gibt ein `Future` zurück. `crawl`/`markdown` lösen nie für per-strategy Fehler — failed strategy = Attempt in history, all-failed = Result mit `ok == 0`. `transport`/`api` Errors failed die Future direkt mit `WWW::Crawl4AI::Error`. `content` Errors landen im Result, nicht in der Future.
+**Future Contract**: Every endpoint method returns a `Future`. `crawl`/`markdown` never fail for per-strategy errors — failed strategy = Attempt in history, all-failed = Result with `ok == 0`. `transport`/`api` errors fail the Future directly with `WWW::Crawl4AI::Error`. `content` errors end up in the Result, not in the Future.
 
-**Retry Policy**: `max_attempts`, `retry_backoff`, `retry_statuses`, `on_retry` leben auf dem unterljegenden `WWW::Crawl4AI::Client`. Net::Async::Crawl4AI teilt diese Policy via `_do_request_with_retry`.
+**Retry Policy**: `max_attempts`, `retry_backoff`, `retry_statuses`, `on_retry` live on the underlying `WWW::Crawl4AI::Client`. Net::Async::Crawl4AI shares this policy via `_do_request_with_retry`.
 
-**Concurrency Knob**: `deep_crawl` crawlt jede depth level concurrent. Default 4, einstellbar via `concurrency => N`. Async-only Parameter — sync WWW::Crawl4AI hat kein Equivalent.
+**Concurrency Knob**: `deep_crawl` crawls each depth level concurrently. Default 4, adjustable via `concurrency => N`. Async-only parameter — sync WWW::Crawl4AI has no equivalent.
 
-**delay_sub**: Test-Hook. Ersetzt `loop->delay_future`. Ermöglicht isolierte Tests der retry/polling Logik ohne echte Timeouts.
+**delay_sub**: Test hook. Replaces `loop->delay_future`. Allows isolated tests of the retry/polling logic without real timeouts.
 
-**poll_interval**: Sekunden zwischen job_status polls. Default 2. Per-call überschreibbar via `crawl_job_and_wait($url, poll_interval => 5)`.
+**poll_interval**: Seconds between job_status polls. Default 2. Overridable per call via `crawl_job_and_wait($url, poll_interval => 5)`.
 
 ## Relationships
 
-- `Net::Async::Crawl4AI` wrappt ein `WWW::Crawl4AI` via `crawl4ai` attribute
-- `crawl()` / `markdown()` nutzen `_run_strategy_future` für async dispatch
+- `Net::Async::Crawl4AI` wraps a `WWW::Crawl4AI` via the `crawl4ai` attribute
+- `crawl()` / `markdown()` use `_run_strategy_future` for async dispatch
 - `crawl_once` via `_parsed` dispatch → Future
-- `deep_crawl` nutzt `Future::Utils::fmap_void` für concurrent frontier crawling
-- `_poll_job` via `Future::Utils::repeat` für polling loop
+- `deep_crawl` uses `Future::Utils::fmap_void` for concurrent frontier crawling
+- `_poll_job` via `Future::Utils::repeat` for the polling loop
 
 ## Example dialogue
 
-> **Dev:** "Ich rufe `deep_crawl` auf und kriege eine Failed Future — was ist passiert?"
-> **Docs:** "`deep_crawl` failed nur bei echten Problemen — kein Crawl4AI erreichbar oder async Job Fehler. Wenn eine einzelne Seite `ok == 0` hat, wird sie im Result-array zurückgegeben, nicht als Failed Future. Schau ins `result->attempts` um zu sehen welche Strategie fehlgeschlagen hat und warum."
+> **Dev:** "I call `deep_crawl` and get a failed Future — what happened?"
+> **Docs:** "`deep_crawl` only fails on real problems — no Crawl4AI reachable or an async job error. If a single page has `ok == 0`, it is returned in the result array, not as a failed Future. Look into `result->attempts` to see which strategy failed and why."
 
-> **Dev:** "Kann ich den retry backoff ändern?"
-> **Docs:** "Nicht zur Laufzeit — die Policy ist auf dem unterljegenden WWW::Crawl4AI::Client konfiguriert. Override `client` mit deiner eigenen Instance die `max_attempts` / `retry_backoff` gesetzt hat."
+> **Dev:** "Can I change the retry backoff?"
+> **Docs:** "Not at runtime — the policy is configured on the underlying WWW::Crawl4AI::Client. Override `client` with your own instance that has `max_attempts` / `retry_backoff` set."

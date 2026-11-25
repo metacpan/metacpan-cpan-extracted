@@ -1,5 +1,5 @@
-#!/usr/bin/env perl
-package Dist::Conformance::Program 0.007;
+#!perl
+package Dist::Conformance::Program 0.008;
 
 use 5.040;
 use warnings FATAL => 'all';
@@ -78,7 +78,7 @@ sub packages_lines ( $directory, $options ) {
     return $resolved->{programs}                                                                             if $options->{programs};
     return $resolved->{packages}                                                                             if !$options->{sources} && !$options->{needs};
     my $json = Cpanel::JSON::XS->new->utf8->canonical;
-    return [ map { $json->encode($_) } @{ $resolved->{ $options->{sources} ? 'sources' : 'needs' } } ];
+    return [ map { local ($_) = $_; $json->encode($_) } @{ $resolved->{ $options->{sources} ? 'sources' : 'needs' } } ];
 }
 
 
@@ -124,7 +124,7 @@ sub report_update ( $conformance, $options ) {
 sub report_adopt ( $conformance, $options ) {
     my $adopted = $conformance->adopt;
     return ( json_of( $conformance, command => 'adopt', adopted => $adopted ), 0 ) if $options->{json};
-    return ( YAML::XS::Dump( { checks => $adopted } ), 0 );
+    return ( YAML::XS::Dump( { checks => $adopted } ),                         0 );
 }
 
 
@@ -157,7 +157,7 @@ conformance - Check a repository against its flavor of the standards, and bring 
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -25,6 +25,9 @@ use lib 'lib';
 
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::GoRoutine ();
+
+my $repo_root = File::Spec->rel2abs('.');
 
 # build_collector()
 # Builds a Collector backed by a throwaway home-rooted path registry so the
@@ -135,9 +138,10 @@ SKIP: {
 # active-run counter incremented by mark_run_started is never decremented, so the
 # collector is reported as permanently running (COLLECTOR-GHOST-STATUS).
 #
-# The reproduction below is deterministic, not opportunistic: the two workers are
-# rendezvoused through a pair of pipes at the exact instant that matters. The
-# child worker is frozen inside its own _atomic_write_text between close() and
+# The reproduction below is deterministic, not opportunistic: GoRoutine starts
+# the isolated worker, and ready/release marker files rendezvous the two writers
+# at the exact instant that matters. The child worker is frozen inside its own
+# _atomic_write_text between close() and
 # rename() (the paths registry's secure_file_permissions call on the pending file
 # is that seam), the parent worker then performs a whole run start-to-finish, and
 # only afterwards is the child released to attempt its rename. No sleep, no race
@@ -158,71 +162,62 @@ SKIP: {
     my $child_payload  = 'child-' x 1000;
     my $parent_payload = 'parent-' x 1000;
 
-    pipe my ( $ready_r, $ready_w ) or die "Unable to create the rendezvous pipe: $!";
-    pipe my ( $go_r,    $go_w )    or die "Unable to create the release pipe: $!";
-
+    my $ready_file = File::Spec->catfile( $home, 'overlapping-ready.txt' );
+    my $release_file = File::Spec->catfile( $home, 'overlapping-release.txt' );
     my $child_error_file = File::Spec->catfile( $home, 'overlapping-child-error.txt' );
-
-    my $child_pid = fork;
-    die "Unable to fork the second collector worker: $!" if !defined $child_pid;
-
-    if ( !$child_pid ) {
-        # Worker A. It freezes mid-write so worker B can be driven past it.
-        close $ready_r;
-        close $go_w;
-        {
-            my $previous = select $ready_w;
-            $| = 1;
-            select $previous;
-        }
-
-        # DD-610: the write/secure/rename sequence now lives in
-        # PathRegistry::atomic_write_secure (shared by every DD-599/600/601/
-        # 602 writer), with its own securing step (_chmod_pending) as an
-        # ordinary overridable method - the same rendezvous shape as before,
-        # just retargeted at the new seam between securing and renaming.
+    my $child_source = q{
+        use Developer::Dashboard::Collector;
+        use Developer::Dashboard::PathRegistry;
+        my ( $home, $name, $payload, $ready_file, $release_file, $error_file ) = @ARGV;
+        $ENV{HOME} = $home;
+        my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
+        my $collector = Developer::Dashboard::Collector->new( paths => $paths );
         my $real_chmod_pending = \&Developer::Dashboard::PathRegistry::_chmod_pending;
         my $rendezvoused = 0;
         no warnings 'redefine';
         local *Developer::Dashboard::PathRegistry::_chmod_pending = sub {
             my ( $registry, $file, $mode ) = @_;
-            if ( !$rendezvoused && defined $file && $file =~ m{stdout[^/\\]*\.pending\z} ) {
+            if ( !$rendezvoused && defined $file && $file =~ m{stdout[^/\\\\]*\.pending\z} ) {
                 $rendezvoused = 1;
-                print {$ready_w} "paused\n";
-                my $release = <$go_r>;
-                die "Rendezvous pipe closed before the overlapping worker was released\n"
-                  if !defined $release;
+                open my $ready, '>', $ready_file or die "Unable to create $ready_file: $!";
+                print {$ready} "paused\n" or die "Unable to write $ready_file: $!";
+                close $ready or die "Unable to close $ready_file: $!";
+                my $waited = 0;
+                while ( !-e $release_file && $waited < 1000 ) {
+                    select undef, undef, undef, 0.01;
+                    ++$waited;
+                }
+                die "Timed out waiting for overlapping writer release\n" if !-e $release_file;
             }
             return $real_chmod_pending->( $registry, $file, $mode );
         };
         use warnings 'redefine';
-
         $collector->mark_run_started( $name, { enabled => 1 } );
         my $finished = eval {
-            $collector->mark_run_finished(
-                $name,
-                exit_code => 0,
-                stdout    => $child_payload,
-                stderr    => '',
-            );
+            $collector->mark_run_finished( $name, exit_code => 0, stdout => $payload, stderr => '' );
             1;
         };
         if ( !$finished ) {
-            my $error = "$@";
-            if ( open my $efh, '>:raw', $child_error_file ) {
-                print {$efh} $error;
-                close $efh;
-            }
+            open my $error, '>:raw', $error_file or die "Unable to write $error_file: $!";
+            print {$error} "$@" or die "Unable to report worker error: $!";
+            close $error or die "Unable to close worker error report: $!";
             exit 17;
         }
-        exit 0;
-    }
-
-    close $ready_w;
-    close $go_r;
+    };
+    my @include = map { '-I' . File::Spec->catdir( $repo_root, $_ ) } qw(lib blib/lib blib/arch);
+    my $child_pid = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, @include, '-e', $child_source, $home, $name, $child_payload, $ready_file, $release_file, $child_error_file ],
+        { cwd => $home },
+    );
+    die "GoRoutine spawn failed: $!" if !defined $child_pid;
 
     # Blocks until worker A is parked between its close() and its rename().
-    my $paused = <$ready_r>;
+    my $ready_deadline = time() + 10;
+    select undef, undef, undef, 0.01 while !-e $ready_file && time() < $ready_deadline;
+    die "First collector worker did not reach the rename rendezvous" if !-e $ready_file;
+    open my $ready, '<', $ready_file or die "Unable to read $ready_file: $!";
+    my $paused = <$ready>;
+    close $ready or die "Unable to close $ready_file: $!";
     is( $paused, "paused\n", 'the first collector worker parked between its pending write and its rename' );
 
     # Worker B: a whole overlapping run, exactly as a mode => 'multiple' loop
@@ -235,11 +230,11 @@ SKIP: {
         stderr    => '',
     );
 
-    print {$go_w} "release\n";
-    close $go_w;
+    open my $release, '>', $release_file or die "Unable to release first writer: $!";
+    print {$release} "release\n" or die "Unable to write release marker: $!";
+    close $release or die "Unable to close release marker: $!";
 
-    waitpid $child_pid, 0;
-    my $child_exit = $? >> 8;
+    my $child_exit = Developer::Dashboard::GoRoutine::wait_process($child_pid);
 
     my $child_error = '';
     if ( -f $child_error_file ) {
@@ -335,8 +330,9 @@ and whenever a focused failure points here.
 Run it directly with C<prove -lv t/54-hunt-collector.t> while iterating, then
 keep it green under C<prove -lr t> and the coverage runs before release. The
 flush-failure assertion uses C</dev/full> and self-skips where that device is
-unavailable. The overlapping-worker case forks a second worker and rendezvouses
-the two through pipes, so it is deterministic and needs no timing tolerance.
+unavailable. The overlapping-worker case launches a second interpreter through
+GoRoutine and uses bounded ready/release marker files, so it is deterministic
+and does not rely on an unsynchronized timing race.
 
 =head1 WHAT USES IT
 

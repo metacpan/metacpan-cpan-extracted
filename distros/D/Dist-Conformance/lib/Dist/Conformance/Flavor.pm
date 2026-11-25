@@ -1,10 +1,11 @@
-package Dist::Conformance::Flavor 0.007;
+package Dist::Conformance::Flavor 0.008;
 
 # ABSTRACT: A named set of checks and their configuration, read from a standards source
 
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
+no autovivification;
 use Mojo::Base -base, -signatures;
 
 use List::Util();
@@ -118,7 +119,7 @@ Dist::Conformance::Flavor - A named set of checks and their configuration, read 
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

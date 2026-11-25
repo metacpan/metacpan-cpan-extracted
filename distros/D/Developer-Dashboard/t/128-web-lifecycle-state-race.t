@@ -7,9 +7,8 @@ use utf8;
 use File::Spec;
 use File::Temp qw(tempdir);
 use IO::Socket::INET;
-use POSIX qw(:sys_wait_h);
 use Test::More;
-use Time::HiRes qw(sleep);
+use Time::HiRes qw(sleep time);
 
 use lib 'lib';
 use Developer::Dashboard::Collector;
@@ -18,6 +17,7 @@ use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::RuntimeManager;
+use Developer::Dashboard::GoRoutine ();
 
 # Hermetic runtime: the state root resolves from the deepest .developer-dashboard
 # layer at or above the CWD, so the temp home must also be the working directory.
@@ -63,44 +63,81 @@ sub capture_warnings {
 
 # spawn_managed_web()
 # Starts a second process that looks exactly like a managed dashboard web
-# service: it carries the "dashboard web: HOST:PORT" process title and holds a
-# real TCP listener on the reported port.
+# service: it carries the "d2 web: HOST:PORT" process title and holds a
+# real TCP listener on the reported port. A readiness file replaces the
+# inherited pipe so the fixture uses the same native process API on every OS.
+# The port is picked here, not inside the child: Windows has no getppid(),
+# and a $0 assignment never rewrites the Windows launch command line, so the
+# endpoint must already be literal in the spawned arguments for the lifecycle
+# to recover it from the process table there. The parent pid travels as an
+# argument for the same reason - the child watches it with kill 0 instead of
+# getppid(), which Strawberry Perl does not implement (it dies with "The
+# getppid function is unimplemented"). The child still reports the port it
+# actually bound through the readiness file, so the contract is unchanged.
 # Input: none.
 # Output: two-element list of the child process id and the bound port.
 sub spawn_managed_web {
-    pipe my $reader, my $writer or die "Unable to create port pipe: $!";
-    my $child = fork();
-    die "Unable to fork the managed web stand-in: $!" if !defined $child;
-    if ( !$child ) {
-        close $reader;
+    my $probe_socket = IO::Socket::INET->new(
+        Listen => 5, LocalAddr => '127.0.0.1', LocalPort => 0,
+        Proto => 'tcp', ReuseAddr => 1,
+    ) or die "Unable to reserve a managed web stand-in port: $!";
+    my $web_port_hint = $probe_socket->sockport;
+    close $probe_socket or die "Unable to close the stand-in port probe: $!";
+    my $scratch = tempdir( 'dd-web-race-XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+    my $port_file = File::Spec->catfile( $scratch, 'bound-port' );
+    my $stdout_file = File::Spec->catfile( $scratch, 'child.stdout' );
+    my $stderr_file = File::Spec->catfile( $scratch, 'child.stderr' );
+    my $script = q{
+        my ($ready_file, $parent_pid) = @ARGV;
         my $socket = IO::Socket::INET->new(
-            Listen    => 5,
-            LocalAddr => '127.0.0.1',
-            LocalPort => 0,
-            Proto     => 'tcp',
-            ReuseAddr => 1,
-        );
-        POSIX::_exit(1) if !$socket;
+            Listen => 5, LocalAddr => '127.0.0.1', LocalPort => __WEB_PORT__,
+            Proto => 'tcp', ReuseAddr => 1,
+        ) or die "Unable to bind managed web stand-in: $!";
         my $bound = $socket->sockport;
-        $0 = "dashboard web: 0.0.0.0:$bound";
-        print {$writer} "$bound\n" or POSIX::_exit(1);
-        close $writer;
-
-        # Release the harness output handles and stop as soon as the test process
-        # is gone, so an early test exit cannot leave prove waiting on this child.
-        my $parent = getppid();
-        open STDOUT, '>', File::Spec->devnull() or POSIX::_exit(1);
-        open STDERR, '>', File::Spec->devnull() or POSIX::_exit(1);
-        for ( 1 .. 300 ) {
-            POSIX::_exit(0) if getppid() != $parent;
-            sleep 0.1;
+        $0 = "d2 web: 0.0.0.0:__WEB_PORT__";
+        open my $ready_fh, '>', $ready_file or die "Unable to create readiness file: $!";
+        print {$ready_fh} "$bound\n" or die "Unable to write bound port: $!";
+        close $ready_fh or die "Unable to close readiness file: $!";
+        # 300 seconds of parent-watch budget: the file takes longer than the
+        # old 30-second budget on Windows, where every process-table scan
+        # costs a PowerShell launch, and the direct endpoint-recovery
+        # checks below need the stand-in alive to the end of the file.
+        for (1 .. 3000) {
+            exit 0 if !kill 0, $parent_pid;
+            Time::HiRes::sleep(0.1);
         }
-        POSIX::_exit(0);
+        exit 0;
+    };
+    $script =~ s/__WEB_PORT__/$web_port_hint/g;
+    my $child = Developer::Dashboard::GoRoutine::spawn(
+        [ $^X, '-MIO::Socket::INET', '-MTime::HiRes', '-e', $script, $port_file, $$ ],
+        { stdout => $stdout_file, stderr => $stderr_file },
+    );
+    my $deadline = time() + 5;
+    my $line;
+    while ( time() < $deadline ) {
+        if ( open my $reader, '<', $port_file ) {
+            $line = <$reader>;
+            close $reader or die "Unable to close $port_file: $!";
+            last if defined $line && $line =~ /\A\d+\s*\z/;
+        }
+        if ( Developer::Dashboard::GoRoutine::process_exited($child) ) {
+            my $exit = Developer::Dashboard::GoRoutine::wait_process($child);
+            open my $error_fh, '<', $stderr_file or die "Managed web stand-in exited $exit; cannot read $stderr_file: $!";
+            my $error = do { local $/; <$error_fh> } // '';
+            close $error_fh or die "Unable to close $stderr_file: $!";
+            die "Managed web stand-in exited $exit before readiness: $error";
+        }
+        sleep 0.02;
     }
-    close $writer;
-    my $line = <$reader>;
-    close $reader;
-    die 'the managed web stand-in never reported its port' if !defined $line;
+    if ( !defined $line || $line !~ /\A\d+\s*\z/ ) {
+        Developer::Dashboard::GoRoutine::terminate_process( $child, 'KILL' );
+        Developer::Dashboard::GoRoutine::wait_process($child);
+        open my $error_fh, '<', $stderr_file or die "the managed web stand-in never reported its port; cannot read $stderr_file: $!";
+        my $error = do { local $/; <$error_fh> } // '';
+        close $error_fh or die "Unable to close $stderr_file: $!";
+        die "the managed web stand-in never reported its port: $error";
+    }
     chomp $line;
     return ( $child, $line + 0 );
 }
@@ -132,19 +169,19 @@ sub open_replace_window {
 }
 
 # attempt_background_start(%args)
-# Runs a background start with the real fork replaced by a recorder, so a
+# Runs a background start with the native launcher replaced by a recorder, so a
 # deduplicated start can be told apart from one that would spawn a second
 # listener.
 # Input: host, port, and worker count for the start request.
-# Output: hash reference with the returned pid, fork attempt count, error text,
+# Output: hash reference with the returned pid, native launch attempt count, error text,
 # and collected warnings.
 sub attempt_background_start {
     my (%args) = @_;
-    my $forks = 0;
+    my $launches = 0;
     my $error = '';
     no warnings 'redefine';
-    local *Developer::Dashboard::RuntimeManager::_fork_process = sub {
-        $forks++;
+    local *Developer::Dashboard::RuntimeManager::_start_web_background = sub {
+        $launches++;
         die "duplicate web start attempted\n";
     };
     my ( $pid, $warnings ) = capture_warnings(
@@ -156,7 +193,7 @@ sub attempt_background_start {
     );
     return {
         error    => $error,
-        forks    => $forks,
+        launches => $launches,
         pid      => $pid,
         warnings => $warnings,
     };
@@ -172,7 +209,7 @@ sub complete_state {
         host         => '0.0.0.0',
         pid          => $web_pid,
         port         => $web_port,
-        process_name => "dashboard web: 0.0.0.0:$web_port",
+        process_name => "d2 web: 0.0.0.0:$web_port",
         started_at   => '2026-07-30T00:00:00Z',
         status       => 'running',
         workers      => 1,
@@ -201,11 +238,11 @@ is( $endpointless->{port}, $web_port, 'running_web recovers the port from the li
 is_deeply( $endpointless_warnings, [], 'running_web is warning-free for a payload with no endpoint' );
 
 # The start path must recognize that recovered endpoint as the requested service:
-# forking a second listener strands the first process as an untrackable orphan.
+# starting a second listener strands the first process as an untrackable orphan.
 {
     my $attempt = attempt_background_start( host => '0.0.0.0', port => $web_port, workers => 1 );
     is( $attempt->{pid},   $web_pid, 'start_web deduplicates the running service when the persisted payload carries no endpoint' );
-    is( $attempt->{forks}, 0,        'start_web forks no duplicate web child when the running service already satisfies the request' );
+    is( $attempt->{launches}, 0,     'start_web launches no duplicate web child when the running service already satisfies the request' );
     is( $attempt->{error}, '',       'start_web returns the running pid instead of failing on a duplicate start' );
     is_deeply( $attempt->{warnings}, [], 'the start_web dedup comparison never warns about an incomplete payload' );
 }
@@ -218,7 +255,7 @@ open_replace_window();
 {
     my $attempt = attempt_background_start( host => '0.0.0.0', port => $web_port, workers => 1 );
     is( $attempt->{pid},   $web_pid, 'start_web deduplicates the running service while the state file is mid-replace' );
-    is( $attempt->{forks}, 0,        'start_web forks no duplicate web child while the state file is mid-replace' );
+    is( $attempt->{launches}, 0,     'start_web launches no duplicate web child while the state file is mid-replace' );
     is_deeply( $attempt->{warnings}, [], 'the start_web dedup comparison never warns during the replace window' );
 }
 
@@ -237,7 +274,7 @@ open_replace_window();
 }
 ok( -f $files->web_state, 'running_web keeps a state file it could not read' );
 ok( -f $files->web_pid,   'running_web keeps the pid file when the state file could not be read' );
-ok( kill( 0, $web_pid ),  'the managed web stand-in is still running after the failed probe' );
+ok( Developer::Dashboard::GoRoutine::process_running($web_pid), 'the managed web stand-in is still running after the failed probe' );
 
 # A confirmed-stopped service is still cleaned up: the tolerance above must not
 # turn into stale state that never gets reclaimed.
@@ -343,8 +380,8 @@ ok( !-f $files->web_pid,   'running_web removes the pid file of a confirmed-stop
     );
 }
 
-kill 'KILL', $web_pid;
-waitpid( $web_pid, 0 );
+Developer::Dashboard::GoRoutine::terminate_process( $web_pid, 'KILL' );
+Developer::Dashboard::GoRoutine::wait_process($web_pid);
 
 done_testing;
 
@@ -364,17 +401,17 @@ exactly like a managed dashboard web service - the real process title plus a
 real TCP listener - and then asks the runtime manager what is running while the
 persisted state is missing its endpoint, is observable as zero-length, or cannot
 be read at all. The runtime manager must report the live service with a
-comparable endpoint, deduplicate a background start instead of forking a second
-listener, keep persisted files it could not read, and still reclaim the files of
-a confirmed-stopped service.
+comparable endpoint, deduplicate a background start instead of launching a
+second listener, keep persisted files it could not read, and still reclaim the
+files of a confirmed-stopped service.
 
 =head1 WHY IT EXISTS
 
 Under full-suite load the runtime-manager suite failed with a duplicated web
 start: the persisted payload carried no host, the start path compared that
 undefined host against the requested one, warned, decided the request did not
-match, deleted the running server's pid and state files, and forked a second
-listener that stranded the first child as an orphan. A two-process reproduction
+match, deleted the running server's pid and state files, and started a second
+listener that stranded the first process as an orphan. A two-process reproduction
 showed two independent ways to reach that payload - the write-and-replace window
 that makes an existing state file briefly unreadable, and a shutdown write that
 persists a pid and status with no endpoint - so the fix belongs in the lifecycle
@@ -388,12 +425,13 @@ already up.
 
 =head1 HOW TO USE
 
-Run C<prove -lv t/128-web-lifecycle-state-race.t> while iterating on the web
-lifecycle. The test is hermetic - it builds its own temporary home, state root,
-and stand-in web process - so it can run repeatedly without touching a real
-runtime. Keep it green under C<prove -lr t> and under the all-metric coverage
-gate before release, and run it together with C<prove -lv t/09-runtime-manager.t>
-whenever the start or probe paths change.
+Run C<d2 docker compose exec dev prove -blv
+t/128-web-lifecycle-state-race.t> while iterating on the web lifecycle. The test
+is hermetic - it builds its own temporary home, state root, and GoRoutine-spawned
+stand-in web process - so it can run repeatedly without touching a real runtime.
+Keep it green under C<d2 docker compose exec dev prove -blr t> and the all-metric
+coverage gate before release, and run it together with C<d2 docker compose exec
+dev prove -blv t/09-runtime-manager.t> whenever the start or probe paths change.
 
 =head1 WHAT USES IT
 
@@ -405,13 +443,13 @@ cleanup safe against incomplete observations.
 
 Example 1:
 
-  prove -lv t/128-web-lifecycle-state-race.t
+  d2 docker compose exec dev prove -blv t/128-web-lifecycle-state-race.t
 
 Run the web lifecycle state contract by itself.
 
 Example 2:
 
-  prove -lv t/09-runtime-manager.t t/128-web-lifecycle-state-race.t
+  d2 docker compose exec dev prove -blv t/09-runtime-manager.t t/128-web-lifecycle-state-race.t
 
 Run it beside the full runtime-manager suite after changing start_web or
 running_web.

@@ -2,107 +2,922 @@
 
 use strict;
 use warnings;
+use utf8;
 
-use File::Spec;
+use Cwd qw(abs_path);
 use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use Developer::Dashboard::PerlEnv ();
+use File::Spec;
 
-# d2 is the first-class short entrypoint for the dashboard CLI. It is a real,
-# installed command (shipped in the same bin directory as `dashboard`), not a
-# shell alias, so it works in scripts and fresh shells without loading the shell
-# bootstrap. It re-execs its sibling `dashboard` entrypoint with the same
-# arguments so the two commands behave identically.
-#
-# The sibling path is resolved from this Perl script's install directory, then
-# executed through the active Perl interpreter so all dashboard commands use
-# the same interpreted entrypoint.
-my $dashboard = File::Spec->catfile( $Bin, 'dashboard' );
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
 
-exec { $^X } $^X, $dashboard, @ARGV;
-die "Unable to exec dashboard entrypoint at $dashboard from d2: $!\n";
+BEGIN {
+    my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
+    Developer::Dashboard::PerlEnv->bootstrap_perl5lib(
+        dashboard_lib => $dashboard_lib,
+    );
+}
+
+if ( (!defined $ENV{HOME} || $ENV{HOME} eq '') && defined $ENV{USERPROFILE} && $ENV{USERPROFILE} ne '' ) {
+    $ENV{HOME} = $ENV{USERPROFILE};
+}
+
+my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
+require Developer::Dashboard::PathIdentity;
+my $switchboard_cwd = eval { Developer::Dashboard::PathIdentity::current_working_directory() };
+my $switchboard_paths;
+
+my $cmd = shift @ARGV || '';
+
+_load_runtime_env();
+
+# DD-835 (reverses DD-832): also set before the main gate runs, as an
+# additional signal - a main-gate hook's own @ARGV already carries the
+# top-level command name (prepended below), but a hook may prefer reading
+# it from the environment instead.
+$ENV{DEVELOPER_DASHBOARD_COMMAND} = $cmd if $cmd ne '';
+my $main_gate_results = _run_main_gate_hooks( $cmd, @ARGV );
+_prime_command_result_env( $cmd, $main_gate_results, @ARGV ) if $cmd ne '';
+
+if ( $cmd eq 'help' ) {
+    require Developer::Dashboard::CLI::Help;
+    if ( !@ARGV || $ARGV[0] eq '--help' || $ARGV[0] eq '-h' ) {
+        print Developer::Dashboard::CLI::Help::overview_text();
+        exit 0;
+    }
+    if (@ARGV) {
+        my $target = shift @ARGV;
+        my $action;
+        while (@ARGV) {
+            my $candidate = shift @ARGV;
+            my @available = Developer::Dashboard::CLI::Help::actions_for(
+                defined $action ? "$target $action" : $target,
+            );
+            die "Unknown help target '$candidate' for '$target'\n"
+              if !grep { $_ eq $candidate } @available;
+            if ( defined $action ) {
+                $target = "$target $action";
+            }
+            $action = $candidate;
+        }
+        print Developer::Dashboard::CLI::Help::help_text( $target, $action );
+        exit 0;
+    }
+}
+elsif ( $cmd eq '--help' || $cmd eq '-h' ) {
+    require Developer::Dashboard::CLI::Help;
+    print Developer::Dashboard::CLI::Help::overview_text();
+    exit 0;
+}
+elsif ( $cmd eq 'version' ) {
+    if (@ARGV) {
+        require Developer::Dashboard::CLI::Help;
+        my @request = Developer::Dashboard::CLI::Help::help_request(
+            command => $cmd,
+            args    => \@ARGV,
+        );
+        if (@request) {
+            print Developer::Dashboard::CLI::Help::help_text(@request);
+            exit 0;
+        }
+    }
+}
+elsif ( $cmd ne '' ) {
+    require Developer::Dashboard::InternalCLI;
+    if ( Developer::Dashboard::InternalCLI::canonical_helper_name($cmd) ne '' ) {
+        require Developer::Dashboard::CLI::Help;
+        my @request = Developer::Dashboard::CLI::Help::help_request(
+            command => $cmd,
+            args    => \@ARGV,
+        );
+        if (@request) {
+            print Developer::Dashboard::CLI::Help::help_text(@request);
+            exit 0;
+        }
+    }
+}
+
+if ( $cmd eq '' ) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(
+        -exitval  => 1,
+        -verbose  => 99,
+        -sections => [qw(NAME SYNOPSIS)],
+    );
+}
+if ( $cmd eq 'version' ) {
+    require Developer::Dashboard::Version;
+    print $Developer::Dashboard::Version::VERSION, "\n";
+    exit 0;
+}
+
+if ( my @helper_command = _builtin_helper_command($cmd) ) {
+    my ( $helper_path, @helper_argv ) = @helper_command;
+    _exec_switchboard_command( $helper_path, @helper_argv, @ARGV );
+}
+
+if ( my $custom_path = _custom_command_path($cmd) ) {
+    _exec_switchboard_command( $custom_path, @ARGV );
+}
+
+if ( my ( $skill_name, $skill_command ) = _skill_dotted_command_parts($cmd) ) {
+    # Use _builtin_helper_command, not _builtin_helper_path: on Windows the
+    # skills helper is a dashboard-core helper, so its command returns a
+    # non-empty argv ('skills') and _builtin_helper_path returns '' for it,
+    # which made every dotted skill command fall through to "Unknown d2
+    # command". Passing the helper argv through invokes the core as
+    # `core skills _exec <skill> <command>` on Windows and keeps the
+    # direct-helper call unchanged on Unix (where the argv is empty).
+    my ( $helper_path, @helper_argv ) = _builtin_helper_command('skills');
+    _exec_switchboard_command( $helper_path, @helper_argv, '_exec', $skill_name, $skill_command, @ARGV );
+}
+
+if ( my $skill_name = _skill_bare_init_command_name($cmd) ) {
+    # Same Windows dashboard-core shape as the dotted branch above:
+    # _builtin_helper_path('skills') returns '' on Windows because the
+    # skills helper carries a non-empty argv, which made every bare
+    # "d2 <skill>" fall through to "Unknown d2 command" (build #79,
+    # tests 670/671). The micro in build #80 proved the name lookup
+    # itself resolves fine on Windows; only the helper form was wrong.
+    # Passing the helper argv through invokes the core as
+    # `core skills _exec <skill> __init__` on Windows and keeps the
+    # direct-helper call unchanged on Unix (where the argv is empty).
+    my ( $helper_path, @helper_argv ) = _builtin_helper_command('skills');
+    _exec_switchboard_command( $helper_path, @helper_argv, '_exec', $skill_name, '__init__', @ARGV );
+}
+
+if ( $cmd ne '' ) {
+    require Developer::Dashboard::CLI::Suggest;
+    print STDERR Developer::Dashboard::CLI::Suggest->new()->unknown_command_message($cmd);
+}
+
+require Pod::Usage;
+Pod::Usage::pod2usage(
+    -exitval  => 1,
+    -verbose  => 99,
+    -sections => [qw(NAME SYNOPSIS)],
+);
+
+# _prime_command_result_env($cmd, $main_gate_results, @argv)
+# Runs executable per-command hook files from every DD-OOP-LAYERS CLI root and
+# exposes their captured output through RESULT JSON for later hooks and the
+# final command target. The record starts from whatever the main gate already
+# wrote, so the command sees both stages; with no main-gate results the
+# inherited channels are cleared exactly as before the main gate existed.
+# Input: top-level command name, the main gate's results hash reference, and
+# the remaining argv list.
+# Output: true value after hook execution completes.
+sub _prime_command_result_env {
+    my ( $cmd, $main_gate_results, @argv ) = @_;
+    require Developer::Dashboard::Runtime::Result;
+    my %results = %{ $main_gate_results || {} };
+    if ( !%results ) {
+        Developer::Dashboard::Runtime::Result::clear_current();
+        Developer::Dashboard::Runtime::Result::clear_last_result();
+    }
+    return 1 if !defined $cmd || $cmd eq '';
+
+    my @hook_roots = _command_hook_roots($cmd);
+    return 1 if !@hook_roots;
+    require Developer::Dashboard::Platform;
+    my $stream = $cmd eq 'doctor' ? 0 : 1;
+
+    for my $hook_root (@hook_roots) {
+        opendir my $dh, $hook_root or next;
+        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
+            my $path = File::Spec->catfile( $hook_root, $entry );
+            next if !Developer::Dashboard::Platform::is_runnable_file($path);
+            next if $entry eq 'run';
+
+            my $hook_result = _run_command_hook_streaming(
+                $path,
+                stream => $stream,
+                argv   => \@argv,
+            );
+            my $result_key = exists $results{$entry} ? _command_hook_result_key($path) : $entry;
+            $results{$result_key} = {
+                stdout => $hook_result->{stdout},
+                stderr => $hook_result->{stderr},
+            };
+            $results{$result_key}{exit_code} = $hook_result->{exit_code} if defined $hook_result->{exit_code};
+            Developer::Dashboard::Runtime::Result::set_current( \%results );
+            Developer::Dashboard::Runtime::Result::set_last_result(
+                {
+                    file   => $path,
+                    exit   => $hook_result->{exit_code},
+                    STDOUT => $hook_result->{stdout},
+                    STDERR => $hook_result->{stderr},
+                }
+            );
+            return 1 if Developer::Dashboard::Runtime::Result::stop_requested( $hook_result->{stderr} );
+        }
+        closedir $dh;
+    }
+
+    if ( !%results ) {
+        Developer::Dashboard::Runtime::Result::clear_current();
+        Developer::Dashboard::Runtime::Result::clear_last_result();
+    }
+    return 1;
+}
+
+# _load_runtime_env()
+# Loads the participating DD-OOP-LAYERS plain-directory and runtime-layer env
+# files before command resolution, preserving explicitly inherited variables
+# across later helper execs. Only inherited key names are serialized into the
+# private marker; environment values remain in their normal process entries.
+# Input: none.
+# Output: true value.
+sub _load_runtime_env {
+    require Developer::Dashboard::EnvAudit;
+    require Developer::Dashboard::EnvLoader;
+    require Developer::Dashboard::JSON;
+    Developer::Dashboard::EnvAudit->clear();
+    my @inherited_keys = @{ Developer::Dashboard::EnvLoader->inherited_key_names( \%ENV ) };
+    {
+        # The marker name is an intentional package variable shared with the
+        # loader. Perl's once-only warning would pollute every CLI response.
+        no warnings 'once';
+        $ENV{$Developer::Dashboard::EnvLoader::INHERITED_ENV_KEYS} =
+          Developer::Dashboard::JSON::json_encode_with_options( \@inherited_keys );
+    }
+    my $paths = _switchboard_paths();
+    Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths );
+    return 1;
+}
+
+# _switchboard_paths()
+# Lazily constructs and memoizes the runtime path registry shared by the public
+# switchboard helpers during one command invocation.
+# Input: none.
+# Output: Developer::Dashboard::PathRegistry object.
+sub _switchboard_paths {
+    return $switchboard_paths if defined $switchboard_paths;
+    require Developer::Dashboard::PathRegistry;
+    $switchboard_paths = Developer::Dashboard::PathRegistry->new(
+        cwd             => $switchboard_cwd,
+        home            => $ENV{HOME},
+        workspace_roots => [],
+        project_roots   => [],
+    );
+    return $switchboard_paths;
+}
+
+# _run_command_hook_streaming($path, %args)
+# Executes one hook file, streams its output live, and captures stdout/stderr so
+# later hooks and the final command can inspect RESULT JSON.
+# Input: executable hook path plus an optional stream flag and argv array ref.
+# Output: hash reference containing stdout, stderr, and exit_code.
+sub _run_command_hook_streaming {
+    my ( $path, %args ) = @_;
+    my $stream = exists $args{stream} ? $args{stream} : 1;
+    my @argv = @{ $args{argv} || [] };
+    open my $stdin, '<', File::Spec->devnull() or die "Unable to open " . File::Spec->devnull() . " for hook stdin: $!";
+    require IO::Select;
+    require IPC::Open3;
+    require Symbol;
+    require IO::Handle;
+    my $stderr = Symbol::gensym();
+    my $stdout;
+    require Developer::Dashboard::Platform;
+    my @command = Developer::Dashboard::Platform::command_argv_for_path($path);
+    my $pid = IPC::Open3::open3( $stdin, $stdout, $stderr, @command, @argv );
+    close $stdin;
+
+    my $selector  = IO::Select->new( $stdout, $stderr );
+    my $stdout_fd = fileno($stdout);
+    my $stderr_fd = fileno($stderr);
+    my $stdout_text = '';
+    my $stderr_text = '';
+    local $| = 1;
+    STDOUT->autoflush(1);
+    STDERR->autoflush(1);
+
+    # On Windows IO::Select only works for real sockets, so can_read over
+    # the open3 pipes returns at once with nothing ready and the hook's
+    # output is silently lost. Drain both pipes with PeekNamedPipe there
+    # instead; the select loop below stays for every other platform.
+    my $drained = 0;
+    if ( $^O eq 'MSWin32' ) {
+        require Developer::Dashboard::StreamDrain;
+        $drained = Developer::Dashboard::StreamDrain::_drain_child_streams_windows(
+            undef,
+            $stdout,
+            $stderr,
+            sub {
+                my ( $is_stdout, $chunk ) = @_;
+                if ($is_stdout) {
+                    print STDOUT $chunk if $stream;
+                    $stdout_text .= $chunk;
+                }
+                else {
+                    print STDERR $chunk if $stream;
+                    $stderr_text .= $chunk;
+                }
+            },
+        );
+    }
+    if ( !$drained ) {
+        while ( my @ready = $selector->can_read ) {
+            for my $fh (@ready) {
+                my $buffer = '';
+                my $read = sysread( $fh, $buffer, 8192 );
+                if ( !defined $read || $read == 0 ) {
+                    $selector->remove($fh);
+                    close $fh;
+                    next;
+                }
+
+                if ( fileno($fh) == $stdout_fd ) {
+                    print STDOUT $buffer if $stream;
+                    $stdout_text .= $buffer;
+                    next;
+                }
+
+                if ( fileno($fh) == $stderr_fd ) {
+                    print STDERR $buffer if $stream;
+                    $stderr_text .= $buffer;
+                    next;
+                }
+            }
+        }
+    }
+
+    waitpid( $pid, 0 );
+    if ( $^O eq 'MSWin32' ) {
+        # The hook child writes through Perl's :crlf layer, so its
+        # captured stdout/stderr carry \r\n; later hooks and commands
+        # read RESULT expecting \n, as on Unix (build #108: tests 782
+        # and 809 saw "hook-one\r\n" / "custom-hook\r\n"). Normalize
+        # the captured text so the RESULT contract is LF-only on every
+        # platform. The streamed display already happened in the drain
+        # callback, so this changes only what RESULT records.
+        $stdout_text =~ s/\r\n/\n/g;
+        $stderr_text =~ s/\r\n/\n/g;
+    }
+    return {
+        stdout    => $stdout_text,
+        stderr    => $stderr_text,
+        exit_code => $? >> 8,
+    };
+}
+
+# _main_gate_hook_roots()
+# Resolves every main-gate hook directory (<layer>/hooks/) across the runtime
+# layer stack, deepest participating layer first and the home layer last, so
+# the layer closest to the working directory speaks before the ones it inherits.
+# Input: none.
+# Output: ordered list of existing hook directory paths.
+sub _main_gate_hook_roots {
+    return grep { -d $_ }
+      map { File::Spec->catdir( $_, 'hooks' ) } reverse _switchboard_paths()->runtime_layers;
+}
+
+# _run_main_gate_hooks($cmd, @argv)
+# Runs the main gate once per invocation, before the command is resolved and
+# for every form of the command line (no command, help, version, which, an
+# unknown command). Each runnable file directly under a main-gate root runs in
+# sorted order with the FULL command line as typed - the top-level command
+# name ('' when none) prepended to the remaining argv (DD-835, reversing
+# DD-832's contract of stripping it) - so a hook can tell which command is
+# running directly from its own @ARGV; $ENV{DEVELOPER_DASHBOARD_COMMAND} (set
+# by the caller before this sub runs) carries the same information as a
+# secondary signal. Output is streamed as it appears and its captured result
+# recorded in RESULT/LAST_RESULT for the hooks after it and for the command.
+# A hook printing the [[STOP]] marker on stderr ends the invocation: the
+# remaining hooks are skipped, the command never runs and the process exits 1
+# with the hook's stderr already on the terminal. A dashboard started by a
+# hook inherits DEVELOPER_DASHBOARD_MAIN_GATE and skips the gate, so a hook
+# may call d2 without re-firing itself.
+# Input: top-level command name ('' when none) plus the remaining argv list.
+# Output: hash reference of hook results keyed by hook name; empty when the
+# gate ran no hook.
+sub _run_main_gate_hooks {
+    my ( $cmd, @argv ) = @_;
+    return {} if $ENV{DEVELOPER_DASHBOARD_MAIN_GATE};
+    my @hook_roots = _main_gate_hook_roots();
+    return {} if !@hook_roots;
+
+    require Developer::Dashboard::Platform;
+    require Developer::Dashboard::Runtime::Result;
+    Developer::Dashboard::Runtime::Result::clear_current();
+    Developer::Dashboard::Runtime::Result::clear_last_result();
+    local $ENV{DEVELOPER_DASHBOARD_MAIN_GATE} = 1;
+    my @hook_argv = ( ( $cmd ne '' ? $cmd : () ), @argv );
+    my %results;
+    for my $hook_root (@hook_roots) {
+        opendir my $dh, $hook_root or next;
+        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
+            my $path = File::Spec->catfile( $hook_root, $entry );
+            next if !Developer::Dashboard::Platform::is_runnable_file($path);
+            next if $entry eq 'run';
+            my $hook_result = _run_command_hook_streaming( $path, stream => 1, argv => \@hook_argv );
+            my $result_key = exists $results{$entry} ? _command_hook_result_key($path) : $entry;
+            $results{$result_key} = {
+                stdout => $hook_result->{stdout},
+                stderr => $hook_result->{stderr},
+            };
+            $results{$result_key}{exit_code} = $hook_result->{exit_code} if defined $hook_result->{exit_code};
+            Developer::Dashboard::Runtime::Result::set_current( \%results );
+            Developer::Dashboard::Runtime::Result::set_last_result(
+                {
+                    file   => $path,
+                    exit   => $hook_result->{exit_code},
+                    STDOUT => $hook_result->{stdout},
+                    STDERR => $hook_result->{stderr},
+                }
+            );
+            if ( Developer::Dashboard::Runtime::Result::stop_requested( $hook_result->{stderr} ) ) {
+                closedir $dh;
+                exit 1;
+            }
+        }
+        closedir $dh;
+    }
+    return \%results;
+}
+
+# _command_hook_roots($cmd)
+# Resolves every per-command hook directory across DD-OOP-LAYERS from home to
+# the deepest participating layer.
+# Input: top-level command name string.
+# Output: ordered list of hook directory paths.
+sub _command_hook_roots {
+    my ($cmd) = @_;
+    return () if !defined $cmd || $cmd eq '';
+    my @roots;
+    for my $root ( _cli_runtime_layers() ) {
+        my $plain_root = File::Spec->catdir( $root, $cmd );
+        if ( -d $plain_root ) {
+            push @roots, $plain_root;
+            next;
+        }
+        my $d_root = File::Spec->catdir( $root, $cmd . '.d' );
+        push @roots, $d_root if -d $d_root;
+    }
+    return @roots;
+}
+
+# _custom_command_path($cmd)
+# Resolves the effective layered custom command target from the deepest child
+# layer outward to the home runtime.
+# Input: top-level command name string.
+# Output: file or directory path string, or empty string when absent.
+sub _custom_command_path {
+    my ($cmd) = @_;
+    return '' if !defined $cmd || $cmd eq '';
+    require Developer::Dashboard::Platform;
+    for my $root ( _cli_runtime_roots() ) {
+        my $path = File::Spec->catfile( $root, $cmd );
+        return $path if -d $path;
+        my $resolved = Developer::Dashboard::Platform::resolve_runnable_file($path);
+        return $resolved if defined $resolved && $resolved ne '';
+    }
+    return '';
+}
+
+# _builtin_helper_path($cmd)
+# Resolves one dashboard-managed built-in helper path under the home runtime
+# and stages the shipped helper assets there on demand.
+# Input: top-level command name string.
+# Output: helper path string, or an empty string when unsupported.
+sub _builtin_helper_path {
+    my ($cmd) = @_;
+    my ( $path, @argv ) = _builtin_helper_command($cmd);
+    return '' if !defined $path || $path eq '' || @argv;
+    return $path;
+}
+
+# _builtin_helper_command($cmd)
+# Resolves one dashboard-managed built-in helper command under the home runtime
+# and stages the shipped helper assets there on demand.
+# Input: top-level command name string.
+# Output: helper path plus any fixed leading argv values, or an empty list when
+# unsupported.
+sub _builtin_helper_command {
+    my ($cmd) = @_;
+    require Developer::Dashboard::InternalCLI;
+    my $helper = Developer::Dashboard::InternalCLI::canonical_helper_name($cmd);
+    return () if $helper eq '';
+    require Developer::Dashboard::Platform;
+    my $paths = _switchboard_paths();
+    if ( Developer::Dashboard::Platform::is_windows() && Developer::Dashboard::InternalCLI::_helper_uses_dashboard_core($helper) ) {
+        Developer::Dashboard::InternalCLI::ensure_dashboard_core(
+            paths => $paths,
+        );
+        return (
+            Developer::Dashboard::InternalCLI::dashboard_core_path(
+                paths => $paths,
+            ),
+            $helper,
+        );
+    }
+    Developer::Dashboard::InternalCLI::ensure_helper(
+        paths => $paths,
+        name  => $helper,
+    );
+    return (
+        Developer::Dashboard::InternalCLI::helper_path(
+            paths => $paths,
+            name  => $helper,
+        )
+    );
+}
+
+# _skill_dotted_command_parts($cmd)
+# Resolves d2 <skill>.<command> shorthand into one installed skill name and one skill-local command.
+# Input: top-level command token such as skill-name.run-test.
+# Output: skill name and command name strings, or an empty list when the token is not an installed skill shorthand.
+sub _skill_dotted_command_parts {
+    my ($cmd) = @_;
+    return if !defined $cmd || $cmd eq '' || $cmd !~ /\./;
+    my ( $skill_name, $skill_command ) = split /\./, $cmd, 2;
+    return if !defined $skill_name || $skill_name eq '';
+    return if !defined $skill_command || $skill_command eq '';
+    require Developer::Dashboard::SkillManager;
+    my $paths = _switchboard_paths();
+    my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
+    return if !$manager->get_skill_path( $skill_name, include_disabled => 1 );
+    return ( $skill_name, $skill_command );
+}
+
+# _skill_bare_init_command_name($cmd)
+# DD-954: resolves a bare "d2 <name>" (no dotted subcommand at all)
+# to an installed skill whose own cli/__init__.<ext> self-script exists, so
+# a skill can be invoked directly without a subcommand. An explicit
+# top-level command (built-in, custom, or an installed skill with its OWN
+# top-level .d2/cli/<name>, all checked earlier in the dispatch chain above)
+# always wins - this only ever runs once nothing more specific matched.
+# Input: top-level command token such as skill-name.
+# Output: skill name string when it resolves to an installed skill carrying
+# its own cli/__init__ self-script, or an empty list otherwise.
+sub _skill_bare_init_command_name {
+    my ($cmd) = @_;
+    return if !defined $cmd || $cmd eq '' || $cmd =~ /\./;
+    require Developer::Dashboard::SkillManager;
+    require Developer::Dashboard::Platform;
+    my $paths = _switchboard_paths();
+    my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
+    my $skill_path = $manager->get_skill_path( $cmd, include_disabled => 1 );
+    return if !$skill_path;
+    return if !Developer::Dashboard::Platform::resolve_runnable_file( File::Spec->catfile( $skill_path, 'cli', '__init__' ) );
+    return $cmd;
+}
+
+sub _exec_switchboard_command {
+    my ( $path, @argv ) = @_;
+    return 0 if !defined $path || $path eq '';
+    require Developer::Dashboard::Platform;
+    # The public entrypoint for this invocation must win over any inherited
+    # source-tree path so packaged helpers and shell bootstraps re-enter the
+    # current dashboard tree instead of a stale parent environment.
+    $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = abs_path($0) || $0;
+    $ENV{DEVELOPER_DASHBOARD_REPO_LIB} = $dashboard_lib if defined $dashboard_lib && -d $dashboard_lib;
+
+    if ( -d $path ) {
+        my $run = _resolve_directory_runner($path);
+        if ($run) {
+            my @command = Developer::Dashboard::Platform::command_argv_for_path($run);
+            if (Developer::Dashboard::Platform::is_windows()) {
+                system @command, @argv;
+                my $status = $?;
+                my $exit_code = $status > 255 ? $status >> 8 : $status;
+                exit $exit_code;
+            }
+            exec { $command[0] } @command, @argv;
+            die "Unable to exec $run: $!";
+        }
+    }
+    if ( my $command_path = Developer::Dashboard::Platform::resolve_runnable_file($path) ) {
+        my @command = Developer::Dashboard::Platform::command_argv_for_path($command_path);
+        if (Developer::Dashboard::Platform::is_windows()) {
+            system @command, @argv;
+            my $status = $?;
+            my $exit_code = $status > 255 ? $status >> 8 : $status;
+            exit $exit_code;
+        }
+        exec { $command[0] } @command, @argv;
+        die "Unable to exec $command_path: $!";
+    }
+    return 0;
+}
+
+# _command_hook_result_key($path)
+# Builds a stable RESULT hash key for one hook path so same-named hooks from
+# different layers do not overwrite each other.
+# Input: absolute hook path string.
+# Output: stable hook result key string.
+sub _command_hook_result_key {
+    my ($path) = @_;
+    my $home = $ENV{HOME} || '';
+    return File::Spec->abs2rel( $path, $home ) if $home ne '';
+    return $path;
+}
+
+# _cli_runtime_layers()
+# Resolves the participating CLI roots for DD-OOP-LAYERS in home-to-leaf order.
+# Input: none.
+# Output: ordered list of CLI root directory paths.
+sub _cli_runtime_layers {
+    my $paths = _switchboard_paths();
+    return $paths->cli_layers;
+}
+
+# _cli_runtime_roots()
+# Returns layered CLI roots in deepest-first lookup order for top-level command
+# resolution.
+# Input: none.
+# Output: ordered list of CLI root directory paths.
+sub _cli_runtime_roots {
+    return reverse _cli_runtime_layers();
+}
+
+# _resolve_directory_runner($dir)
+# Resolves the runnable entrypoint for one directory-backed command or helper.
+# Input: command directory path.
+# Output: runnable file path string or undef when no known runner exists.
+sub _resolve_directory_runner {
+    my ($dir) = @_;
+    return if !defined $dir || $dir eq '' || !-d $dir;
+    require Developer::Dashboard::Platform;
+    for my $name (qw(run run.pl run.ps1 run.cmd run.bat run.sh run.bash)) {
+        my $path = File::Spec->catfile( $dir, $name );
+        my $resolved = Developer::Dashboard::Platform::resolve_runnable_file($path);
+        return $resolved if $resolved;
+    }
+    return;
+}
 
 __END__
 
 =head1 NAME
 
-d2 - first-class short entrypoint for the Developer Dashboard CLI
+d2 - thin command switchboard for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  d2 version
-  d2 doctor
+  d2 help
+  d2 init
+  d2 doctor [--fix]
+  d2 ps1 [--jobs N] [--cwd PATH] [--mode compact|extended] [--color]
+  d2 paths [-o json|table]
+  d2 files
+  d2 files [-o json|table]
+  d2 path list [-o json|table]
+  d2 path resolve <name>
+  d2 path add <name> <path> [-o json|table]
+  d2 path del <name> [-o json|table]
+  d2 path rm <name>
+  d2 path locate <term...>
+  d2 path project-root
+  d2 file list [-o json|table]
+  d2 file resolve <name>
+  d2 file add <name> <path> [-o json|table]
+  d2 file del <name> [-o json|table]
+  d2 file locate <term...>
+  d2 of [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
+  d2 open-file [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
+  d2 workspace <workspace-ref> [-c] [-d|--docker]
+  d2 jq [path] [file]
+  d2 yq [path] [file]
+  d2 tomq [path] [file]
+  d2 propq [path] [file]
+  d2 iniq [path] [file]
+  d2 csvq [path] [file]
+  d2 xmlq [path] [file]
+  d2 encode < input.txt
+  d2 decode < token.txt
+  d2 indicator set <name> <label> <icon> <status>
+  d2 indicator list
+  d2 indicator refresh-core [cwd]
+  d2 collector write-result <name> <exit_code>
+  d2 collector status <name>
+  d2 collector list
+  d2 collector job <name>
+  d2 collector output <name>
+  d2 collector inspect <name>
+  d2 collector log [name]
+  d2 collector run <name>
+  d2 collector start <name>
+  d2 collector stop <name>
+  d2 collector restart <name>
+  d2 housekeeper
+  d2 skills install [-b branch] <git-url-or-local-dir>
+  d2 skills enable <repo-name>
+  d2 skills disable <repo-name>
+  d2 skills uninstall <repo-name>
+  d2 skills update <repo-name>
+  d2 skills list
+  d2 skills usage <repo-name> [-o json|table]
+  d2 which [--edit] <cmd>|<skill>.<cmd>|<skill1>.<skill2>...<cmd>
+  d2 config init
+  d2 config show
+  d2 api [ls] [--key <name>] [-o json|table]
+  d2 api add --key <name> [--secret <raw>|--maybe-secret <raw>] [--route /ajax/...]... [-o json|table]
+  d2 api rm --key <name> [--route /ajax/...] [-o json|table]
+  d2 auth add-user <username> <password>
+  d2 auth list-users
+  d2 auth remove-user <username>
+  d2 page new [id] [title]
+  d2 page save <id>
+  d2 page list
+  d2 page show <id>
+  d2 page encode [id]
+  d2 page decode [token]
+  d2 page urls <id>
+  d2 page render [id|file]
+  d2 page source <id|token>
+  d2 action run <page_id> <action_id>
+  d2 docker compose [--addon NAME] [--mode NAME] [--service NAME] [--project DIR] [--dry-run] <compose-args...>
+  d2 docker list [--enabled|--disabled]
+  d2 docker enable <service> [service...]
+  d2 docker disable <service> [service...]
+  d2 docker development {enable|disable} <service> [service...]
+      d2 serve [logs [-t] [-f] [--tail N|--tail=N] [-n N]|workers <N>] [--host HOST] [--port PORT] [--workers N] [--foreground] [--no-editor|--no-endit] [--no-indicators|--no-indicator]
+  d2 stop
+  d2 restart [--host HOST] [--port PORT] [--workers N]
+  d2 shell [bash|zsh|sh|ps|powershell|pwsh]
   d2 upgrade [--dry-run]
-  d2 collector status housekeeper
-  d2 ask "How do I list collectors?"
+  d2 version
+  d2 <custom-subcommand> [args...]
 
 =head1 DESCRIPTION
 
-C<d2> is a real, installed command that runs the same dashboard CLI as the
-longer C<dashboard> command. It re-execs its sibling C<dashboard> entrypoint in
-the same C<bin> directory with the same arguments, so anything you can do with
-C<dashboard> you can do with C<d2>.
+The public C<d2> entrypoint is intentionally kept thin.
+
+It only:
+
+=over 4
+
+=item *
+
+bootstraps the repo lib path when running from a checkout
+
+=item *
+
+runs the main gate: every executable file under a layer's F<hooks/>
+directory, once per invocation, before the command is even resolved
+
+=item *
+
+runs layered per-command hooks across C<DD-OOP-LAYERS>
+
+=item *
+
+stages dashboard-managed built-in helpers under F<~/.developer-dashboard/cli/dd/>
+
+=item *
+
+resolves the effective command from the deepest child layer back to home
+
+=item *
+
+execs the resolved helper or custom command
+
+=back
+
+The real built-in command implementations live outside this entrypoint, either
+in private staged helper scripts under F<share/private-cli/> or in reusable
+Perl modules loaded by those helpers.
+
+Built-in help requests are resolved through the shared CLI help catalog after
+the established main and per-command hook gates have run, but before a helper
+body is dispatched. Root commands and actions accept C<--help>, C<-h>, or a
+trailing C<help>; the global form is C<d2 help E<lt>commandE<gt>
+[action...]>. Bare C<d2 help>, C<d2 --help>, and C<d2
+-h> print a concise index of public built-in commands instead of this full
+manual. Shell completion calls the same catalog-backed C<d2
+complete> command for public command, action, and option candidates.
+
+=head2 The main gate
+
+Before any command is resolved - including C<d2> with no command,
+C<help>, C<version>, C<which> and a command that does not exist - the
+switchboard runs the main gate: every executable regular file directly under a
+runtime layer's F<hooks/> directory, in sorted filename order. Files that are
+not executable, subdirectories and a file named F<run> are skipped, exactly as
+the per-command hook chain skips them. The layers run deepest first and home
+last, so F<./.developer-dashboard/hooks/> speaks before
+F<~/.developer-dashboard/hooks/>, and every layer between the working
+directory and home contributes its own hooks.
+
+Each hook receives the full command line, command word first (for
+C<d2 version --json> that is C<version --json>; with no command the hook gets
+no arguments). Its stdout streams to the terminal ahead of the command's
+output, and its captured stdout, stderr and exit code are recorded in
+C<RESULT> and C<LAST_RESULT> for the hooks after it and for the command
+itself. A hook that prints the literal marker C<[[STOP]]> on stderr stops the
+invocation: the remaining hooks are skipped, the command does not run, and
+C<d2> exits 1 with the hook's stderr visible. That differs on purpose
+from a per-command hook's C<[[STOP]]>, which only ends the remaining hook chain
+and still runs the command.
+
+A hook that itself runs C<d2> does not re-fire the gate: the
+hooks run with C<DEVELOPER_DASHBOARD_MAIN_GATE> set, and a nested switchboard
+that inherits it skips the gate. There is only one entrypoint, so the gate fires exactly once.
+With no F<hooks/> directory on any layer, nothing changes: no output, no
+stderr, the same exit status as before the gate existed.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This entrypoint gives operators a short, real command name for the dashboard CLI
-that behaves exactly like C<dashboard>, so C<d2 version> or C<d2 collector
-status> work the same as their C<dashboard> equivalents without typing the full
-command name.
+This is the one public executable users invoke. It bootstraps C<PERL5LIB>
+when running from a checkout, runs layered command hooks across
+C<DD-OOP-LAYERS>, stages dashboard-managed built-in helpers under
+F<~/.developer-dashboard/cli/dd/>, and then C<exec>s the final helper or
+custom command instead of owning the heavy implementation itself. The
+switchboard also leaves hook-process modules unloaded on commands that do not
+run executable hooks, and loads usage-rendering support only on usage-error
+paths.
 
 =head1 WHY IT EXISTS
 
-It exists so C<d2> is a genuine installed command rather than only a shell
-function defined by the shell bootstrap. As a real entrypoint in the same
-C<bin> directory as C<dashboard>, C<d2> is available in non-interactive scripts,
-cron jobs, and fresh shells that never sourced the dashboard shell integration,
-which a shell-only alias could not guarantee.
+It exists to keep the command surface stable while the implementation stays decomposed. The repo rule is that C<d2> remains a switchboard, so this file owns dispatch, helper staging, and hook execution rather than data queries, SQL workspaces, page rendering, or other subsystem logic.
 
 =head1 WHEN TO USE
 
-Use this file when changing how the short C<d2> command locates and re-enters
-the main C<dashboard> entrypoint, or when adjusting how C<d2> is packaged as an
-installed executable.
+Use this file when you are changing top-level command discovery, the order of command hooks, how built-in helpers are staged, or the deepest-to-home lookup rules for layered custom commands.
 
 =head1 HOW TO USE
 
-Run C<d2> followed by any dashboard subcommand and arguments, exactly as you
-would run C<dashboard>. The script resolves its sibling C<dashboard> file from
-its own install directory and re-execs it through the active Perl interpreter,
-so the full command surface, hooks, and shell bootstrap output are identical.
+Users run C<d2 E<lt>subcommandE<gt>>. This script resolves whether that
+subcommand is a dashboard-managed helper or a user-layer command, primes the
+C<RESULT> and C<LAST_RESULT> hook state, honors the explicit C<[[STOP]]>
+stderr marker when one hook wants to stop the remaining hook chain, and then
+hands off with C<exec>. If behavior belongs to a subsystem, move it into a
+module or private helper instead of expanding this file.
 
 =head1 WHAT USES IT
 
-It is used by operators who prefer the short command name, by shell bootstrap
-tab-completion that also completes C<d2>, and by CLI smoke tests that exercise
-the short entrypoint.
+It is used directly by end users, shell bootstraps, private staged helpers that re-enter the public command path, tests that execute d2 commands, and release/integration smoke runs that verify the installed command surface.
 
 =head1 EXAMPLES
 
 Example 1:
 
-  d2 version
+  d2 paths
 
-Print the dashboard version through the short real command.
+Exercise thin command dispatch through one lightweight built-in helper.
 
 Example 2:
 
-  d2 ask --codex "Explain this stack trace"
+  d2 page source index
 
-Run any dashboard subcommand through C<d2> exactly as through C<dashboard>.
+Use the public entrypoint to reach a heavier staged helper without embedding that implementation here.
 
 Example 3:
 
-  prove -lv t/05-cli-smoke.t t/40-install-bootstrap.t
+  d2 serve --foreground
 
-Rerun the focused CLI-smoke and install-bootstrap tests after changing the short
-entrypoint.
+Run the public command through its server bootstrap path while keeping logs in the foreground.
 
 Example 4:
 
-  prove -lr t
+  d2 which nest.level1.level2.here
+  d2 which --edit jq
 
-Verify the short entrypoint inside the complete repository suite.
+Inspect the exact resolved command file and hook chain without running the
+command body.
+
+Example 5:
+
+  d2 workspace -c project --docker
+
+Use the public switchboard to reach the staged workspace helper; that helper
+executes Docker Compose from the registered alias directory and starts the
+interactive tmux workspace inside its configured C<workspace> service.
+
+Example 6:
+
+  mkdir -p ~/.developer-dashboard/cli/update.d
+  printf '#!/bin/sh\necho first\n' > ~/.developer-dashboard/cli/update.d/00-first
+  printf '#!/bin/sh\necho stop >&2; echo "[[STOP]]" >&2\n' > ~/.developer-dashboard/cli/update.d/01-stop
+  chmod +x ~/.developer-dashboard/cli/update.d/00-first ~/.developer-dashboard/cli/update.d/01-stop
+  d2 update
+
+Exercise the explicit stop-marker hook path, where one hook ends the remaining
+hook chain but control still returns to the main command.
+
+Example 7:
+
+  mkdir -p ~/.developer-dashboard/hooks
+  printf '#!/bin/sh\n[ -n "$DD_TICKET" ] && exit 0\necho "set DD_TICKET first" >&2\necho "[[STOP]]" >&2\n' > ~/.developer-dashboard/hooks/10-ticket
+  chmod +x ~/.developer-dashboard/hooks/10-ticket
+  d2 version          # refused, exit 1, stderr says why
+  DD_TICKET=DD-1 d2 version  # gate passes, version prints
+
+Exercise the main gate: one hook under F<hooks/> runs before every command,
+through both entrypoints, and its C<[[STOP]]> refuses the command entirely.
+
+Example 8:
+
+  prove -lv t/30-dashboard-loader.t
+
+Rerun the loader contract test after changing how this public switchboard stages or dispatches helpers.
+
 
 =for comment FULL-POD-DOC END
 

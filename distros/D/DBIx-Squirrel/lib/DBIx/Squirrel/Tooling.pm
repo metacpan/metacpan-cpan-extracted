@@ -15,6 +15,7 @@ use Exporter qw(import);
 use Ekorn::Pipeline::Sources   qw(:all);
 use Ekorn::Pipeline::Sinks     qw(:all);
 use Ekorn::Pipeline::JSON      qw(:all);
+use Ekorn::Pipeline::CSV       qw(:all);
 use Ekorn::Pipeline::Factories qw(
     pipeline stage source generator yield
     sink_one sink_many);
@@ -43,6 +44,7 @@ our %EXPORT_TAGS = (
         qw(to_fh to_file),
     ],
     json  => [qw(from_json from_jsonl to_json to_jsonl)],
+    csv   => [qw(from_csv  to_csv)],
     words => [
         qw(pipeline stage gather source generator yield),
         qw(sink_one sink_many),
@@ -55,7 +57,7 @@ our @EXPORT_OK = do {
     my %seen;
     grep { !$seen{$_}++ }
         map { @{ $EXPORT_TAGS{$_} } }
-        qw(core stages context sources sinks json words);
+        qw(core stages context sources sinks json csv words);
 };
 $EXPORT_TAGS{all} = [@EXPORT_OK];
 
@@ -90,7 +92,8 @@ What a caller uses to do work with DBIx::Squirrel is made in several
 modules: stages in L<DBIx::Squirrel::Stages::Flow>, Batch, Taps and
 Rows, C<Stop>, C<gather> and the run's context in modules of their
 own, sinks, sources and words in Ekorn::Pipeline's, and JSON's sources,
-sinks and stages in L<Ekorn::Pipeline::JSON>. This module
+sinks and stages in L<Ekorn::Pipeline::JSON>, and CSV's in
+L<Ekorn::Pipeline::CSV>. This module
 exports all of them, by the tags below, so there's one module to
 import from, and nothing to remember about which module makes which.
 
@@ -171,6 +174,12 @@ Everything L<Ekorn::Pipeline::JSON> exports: C<from_json>,
 C<from_jsonl>, C<to_json> and C<to_jsonl>. L<JSON> exports a
 C<from_json> and a C<to_json> of its own, by default, so a module using
 both imports C<:all> from only one of them.
+
+=item C<:csv>
+
+Everything L<Ekorn::Pipeline::CSV> exports: C<from_csv> and
+C<to_csv>. Text::CSV, which they need, is loaded only when one of them
+is first called, so this tag, and C<:all>, work without it.
 
 =item C<:words>
 

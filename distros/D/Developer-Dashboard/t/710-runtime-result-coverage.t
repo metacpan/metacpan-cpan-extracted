@@ -15,6 +15,19 @@ BEGIN {
             $! = 1;
             return 0;
         }
+        # Windows has no fchmod, so the product hardens the RESULT
+        # tempfile by path there; fail that path-form call (and only the
+        # product's own, never File::Temp's) when the flag is armed.
+        if ( $FAIL{chmod} && $^O eq 'MSWin32' && @_ == 2 && !ref $_[1] && caller eq 'Developer::Dashboard::Runtime::Result' ) {
+            $! = 1;
+            return 0;
+        }
+        # Windows has no fchmod, so a handle-form chmod (File::Temp's
+        # tempfile hardening and _open_channel_file) dies unimplemented
+        # there; Unix modes are not a Windows security control, so treat
+        # the handle form as a successful no-op instead of reaching
+        # CORE::chmod. Path-form chmod still passes through.
+        return 1 if $^O eq 'MSWin32' && @_ == 2 && ref $_[1];
         return CORE::chmod(@_);
     };
     *CORE::GLOBAL::fcntl = sub (*$$) {
@@ -41,7 +54,15 @@ BEGIN {
 {
     package ScriptedHandle;
     sub TIEHANDLE { my ( $class, %args ) = @_; return bless { content => '', read => 0, %args }, $class }
-    sub PRINT     { my $self = shift; $self->{content} .= join( '', @_ ); return 1 }
+    sub PRINT     {
+        my $self = shift;
+        if ( exists $self->{print_ok} && !$self->{print_ok} ) {
+            $! = 5;
+            return 0;
+        }
+        $self->{content} .= join( '', @_ );
+        return 1;
+    }
     sub TELL      { return length $_[0]{content} }
     sub SEEK      { $! = 29; return $_[0]{seek_ok} ? 1 : 0 }
     sub CLOSE     { $! = 9; return $_[0]{close_ok} ? 1 : 0 }
@@ -77,10 +98,13 @@ sub scripted {
 
 # A RESULT_FILE that names a directory opens but fails to close after the
 # read error, so the close failure is reported; an empty file is no payload.
+# On Windows the open itself fails (a directory cannot be opened for
+# reading there), so the same unreadable RESULT file is reported at the
+# read step instead of the close step; either wording names the failure.
 {
     local $ENV{RESULT_FILE} = $home;
     my $err = eval { Developer::Dashboard::Runtime::Result::current(); 1 } ? '' : $@;
-    like( $err, qr/Unable to close RESULT file/, 'a RESULT_FILE that cannot be read cleanly is fatal' );
+    like( $err, qr/Unable to (?:read|close) RESULT file/, 'a RESULT_FILE that cannot be read cleanly is fatal' );
 
     my $empty = File::Spec->catfile( $home, 'empty-result' );
     open my $fh, '>', $empty or die "Unable to write $empty: $!";
@@ -99,13 +123,23 @@ sub scripted {
 
     for my $case ( [ chmod => qr/Unable to chmod RESULT tempfile/ ], [ fcntl_get => qr/Unable to inspect RESULT file descriptor flags/ ], [ fcntl_set => qr/Unable to clear close-on-exec/ ] ) {
         my ( $flag, $re ) = @{$case};
-        local $FAIL{$flag} = 1;
-        my $err = eval { Developer::Dashboard::Runtime::Result::_open_channel_file(); 1 } ? '' : $@;
-        like( $err, $re, "_open_channel_file reports a $flag failure" );
+        SKIP: {
+            # The fcntl flag dance is a Unix mechanism: F_GETFD and
+            # F_SETFD do not exist on Strawberry Perl, so the product
+            # skips it on Windows and there is no failure to inject
+            # there. The chmod case still runs on Windows (the
+            # override treats handle-form chmod as a successful no-op).
+            skip "_open_channel_file does no fcntl on Windows (F_GETFD/F_SETFD do not exist there)", 1
+              if $^O eq 'MSWin32' && $flag =~ /^fcntl_/;
+            local $FAIL{$flag} = 1;
+            my $err = eval { Developer::Dashboard::Runtime::Result::_open_channel_file(); 1 } ? '' : $@;
+            like( $err, $re, "_open_channel_file reports a $flag failure" );
+        }
     }
 
+    local $Developer::Dashboard::Runtime::Result::CHANNEL_USE_NAMED_PATH = 0;
     my ( $fh, $path ) = Developer::Dashboard::Runtime::Result::_open_channel_file();
-    like( $path, qr{\A/(?:dev|proc/self)/fd/\d+\z}, 'the default channel path is fd-backed' );
+    like( $path, qr{\A/(?:dev|proc/self)/fd/\d+\z}, 'the fd channel path is available on Linux' );
     close $fh;
 
     local $Developer::Dashboard::Runtime::Result::DEV_FD_DIR = '/nonexistent-dev-fd';
@@ -114,14 +148,51 @@ sub scripted {
     close $fh;
 }
 
+# Windows branch: close-on-exec is a Unix flag, so the product skips the
+# fcntl dance on Windows and the channel still opens. Proved on Linux by
+# localizing the platform; on Windows the branch is live.
+{
+    my ( $fh, $path );
+    {
+        local $^O = 'MSWin32';
+        local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+        ( $fh, $path ) = Developer::Dashboard::Runtime::Result::_open_channel_file();
+    }
+    ok( defined $fh, 'on Windows _open_channel_file still returns a handle without the fcntl dance' );
+    ok( defined $path && length $path, 'on Windows _open_channel_file still returns a usable fd-backed path' );
+    close $fh if $fh;
+}
+
+{
+    local $Developer::Dashboard::Runtime::Result::CHANNEL_USE_NAMED_PATH = 1;
+    delete local $ENV{RESULT};
+    delete local $ENV{RESULT_FILE};
+    my $payload = { big => 'x' x 80 };
+    is( Developer::Dashboard::Runtime::Result::set_current( $payload, max_inline_bytes => 0 ),
+        'file', 'Darwin mode spills RESULT into a named mode-0600 tempfile' );
+    my $path = $ENV{RESULT_FILE};
+    like( $path, qr/dashboard-result-[A-Za-z0-9_]+\z/,
+        'Darwin mode exposes a named tempfile rather than an inherited fd' );
+    is_deeply( Developer::Dashboard::Runtime::Result::current(), $payload,
+        'Darwin named channel is readable by the parent' );
+    is( system( $^X, '-Ilib', '-MDeveloper::Dashboard::Runtime::Result',
+        '-e', 'my $x = Developer::Dashboard::Runtime::Result::current(); exit(length($x->{big} // q{}) == 80 ? 0 : 1)' ),
+        0, 'Darwin named channel is readable independently after exec' );
+    Developer::Dashboard::Runtime::Result::clear_current();
+}
+
 # Truncate, rewind, and close failures on the file-backed channel.
 {
     no warnings 'redefine';
     my $handle;
     local *Developer::Dashboard::Runtime::Result::_open_channel_file = sub { return ( $handle, '/virtual/fd/9' ) };
 
-    $handle = scripted( truncate_ok => 0, seek_ok => 1, close_ok => 1 );
+    $handle = scripted( print_ok => 0, truncate_ok => 1, seek_ok => 1, close_ok => 1 );
     my $err = eval { Developer::Dashboard::Runtime::Result::set_current( { a => 1 }, max_inline_bytes => 1 ); 1 } ? '' : $@;
+    like( $err, qr/Unable to write RESULT file/, 'set_current reports a failed channel write' );
+
+    $handle = scripted( truncate_ok => 0, seek_ok => 1, close_ok => 1 );
+    $err = eval { Developer::Dashboard::Runtime::Result::set_current( { a => 1 }, max_inline_bytes => 1 ); 1 } ? '' : $@;
     like( $err, qr/Unable to truncate RESULT file/, 'set_current reports a truncate failure' );
 
     $handle = scripted( truncate_ok => 1, seek_ok => 0, close_ok => 1 );
@@ -139,15 +210,15 @@ sub scripted {
 # report() and last_result() accept being called as a class method or function.
 {
     local $ENV{RESULT} = encode_json( { '00-a.pl' => { exit_code => 0 } } );
-    local $0 = '/usr/bin/dashboard';
-    like( $P->report(), qr/dashboard Run Report/, 'report as a class method strips the package name' );
+    local $0 = '/usr/bin/d2';
+    like( $P->report(), qr/d2 Run Report/, 'report as a class method strips the package name' );
     like( Developer::Dashboard::Runtime::Result::report( command => 'x' ), qr/x Run Report/, 'report as a function honours the command override' );
-    like( Developer::Dashboard::Runtime::Result::report(), qr/dashboard Run Report/, 'report with no arguments works' );
+    like( Developer::Dashboard::Runtime::Result::report(), qr/d2 Run Report/, 'report with no arguments works' );
     my @warnings;
     {
         local $SIG{__WARN__} = sub { push @warnings, @_ };
-        like( Developer::Dashboard::Runtime::Result::report(undef), qr/dashboard Run Report/, 'report tolerates an undef leading argument' );
-        like( Developer::Dashboard::Runtime::Result::report( [1] ), qr/dashboard Run Report/, 'report ignores a reference leading argument' );
+        like( Developer::Dashboard::Runtime::Result::report(undef), qr/d2 Run Report/, 'report tolerates an undef leading argument' );
+        like( Developer::Dashboard::Runtime::Result::report( [1] ), qr/d2 Run Report/, 'report ignores a reference leading argument' );
     }
     like( join( '', @warnings ), qr/Odd number of elements in hash assignment/, 'a malformed argument list is reported as an odd-elements warning' );
     like( join( '', @warnings ), qr/Reference found where even-sized list expected/, 'a reference argument is reported as a reference-found warning' );

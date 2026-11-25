@@ -8,6 +8,8 @@ use Ekorn::Pipeline::Errors    qw(croakf);
 use Ekorn::Pipeline::Factories qw(source);
 use namespace::clean -except => 'import';
 
+our $VERSION = 'v0.4.0';
+
 our @EXPORT_OK   = qw(from_array from_fh from_file counter);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -24,14 +26,12 @@ sub from_array (@values) {
     };
 }
 
-
 # Return a source giving the filehandle's records, as $/ divides them,
 # with $/ taken off, leaving it open, for its opener to close.
 sub from_fh ($fh) {
     croakf 'Expected an open filehandle' unless defined openhandle($fh);
     return source { _records($fh) };
 }
-
 
 # Return a source giving the file's records, as $/ divides them, with $/
 # taken off; the file is opened for each run, with the I/O layers given,
@@ -45,7 +45,6 @@ sub from_file ($path, $layers = '') {
     };
 }
 
-
 # Return a source giving $start, then on by $step, without end.
 sub counter ($start = 1, $step = 1) {
     croakf 'Expected a number to start from, and one to step by'
@@ -57,7 +56,6 @@ sub counter ($start = 1, $step = 1) {
         return sub { my $n = $next; $next += $step; return $n };
     };
 }
-
 
 # Return a step reading the filehandle's records, as $/ divides them, at
 # each read, with $/ taken off. With $/ undefined, what's left is one

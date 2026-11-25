@@ -21,7 +21,7 @@ use InternetData::Error;
 use InternetData::Oauth;
 use InternetData::Result;
 
-our $VERSION = '1.19.0';
+our $VERSION = '1.20.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.internetdata.io';
@@ -137,6 +137,7 @@ our $LOOKUP = [fields => [
     [location => $LOCATION, 1], [asn => $ASN, 1], [company => $COMPANY, 1], [hostname => ['string'], 1],
     [abuse => $ABUSE, 1], [whois => $WHOIS], [rwhois => $RWHOIS],
     [hosted_domains => [fields => [[total => ['integer'], 1], [domains => [list => ['string']]]]]],
+    [user_agent => [fields => [map { [$_ => ['string'], 1] } qw(agent kind verdict)]]],
     [trial_expired => ['boolean']],
     [cap_reached => ['boolean']],
 ]];
@@ -289,7 +290,8 @@ sub lookup {
 sub lookup_p {
     my ($self, $ip, %options) = @_;
     Carp::croak('lookup: expected an IP address') if !defined $ip || !length $ip;
-    $self->_check_options('lookup', \%options, 'retries', 'timeout');
+    $self->_check_options('lookup', \%options, 'retries', 'timeout', 'user_agent');
+    my $agent = _agent('lookup', $options{user_agent});
     # Judged, cached and sent as the IPv4 address it carries, if it is mapped.
     $ip = InternetData::Bogon::unmapped($ip);
     # This API answers an AS or a domain at the same path, as an answer this call
@@ -299,26 +301,30 @@ sub lookup_p {
         message => "'$ip' is not an IP address: look up an AS with lookup_asn, and a domain with lookup_domain",
     )) unless InternetData::Bogon::is_ip($ip);
 
+    # A bogon is never sent, so it carries no user_agent.
     return Mojo::Promise->resolve(InternetData::Bogon::bogon_result($ip))
         if InternetData::Bogon::is_bogon($ip);
 
+    # An answer to an agent is cached and shared on the address and that agent,
+    # apart from the address's plain answer and from another agent's.
+    my $key = _key($ip, $agent);
     if ($self->{cache}) {
-        my $hit = $self->{cache}->get($ip);
+        my $hit = $self->{cache}->get($key);
         return Mojo::Promise->resolve($hit) if $hit;
         # A miss for an address already in flight, for a lookup or a batch,
         # takes that request's answer rather than sending its own.
-        return $self->{flights}{$ip}->then(sub { shift }) if $self->{flights}{$ip};
+        return $self->{flights}{$key}->then(sub { shift }) if $self->{flights}{$key};
     }
 
-    my $flight = $self->_board($ip);
-    my $url = $self->_url('/' . Mojo::Util::url_escape($ip, '^A-Za-z0-9\-._~:'));
+    my $flight = $self->_board($key);
+    my $url = $self->_url('/' . Mojo::Util::url_escape($ip, '^A-Za-z0-9\-._~:'), _agent_query($agent));
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
     # Anything that dies before a request is under way lands the flight too, or
     # every later lookup of the address would wait on it forever.
     my $sent = eval { $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $LOOKUP) }) };
     if (!$sent) {
         my $error = $@;
-        $self->_land($ip, $flight, 0, $error);
+        $self->_land($key, $flight, 0, $error);
         die $error;
     }
     return $sent->then(
@@ -327,13 +333,13 @@ sub lookup_p {
             # Only a served answer is cached, and before it lands, so a miss
             # after the flight is gone finds it. Errors never are, and bogons
             # never reach this far.
-            $self->{cache}->set($ip, $result) if $self->{cache};
-            $self->_land($ip, $flight, 1, $result);
+            $self->{cache}->set($key, $result) if $self->{cache};
+            $self->_land($key, $flight, 1, $result);
             return $result;
         },
         sub {
             my $error = shift;
-            $self->_land($ip, $flight, 0, $error);
+            $self->_land($key, $flight, 0, $error);
             return Mojo::Promise->reject($error);
         },
     );
@@ -346,21 +352,46 @@ sub lookup_p {
 # since every lookup is then served. A Mojo::Promise cannot be canceled, so no
 # waiter is ever left behind by a leader that gave up.
 sub _board {
-    my ($self, $ip) = @_;
+    my ($self, $key) = @_;
     return undef unless $self->{cache};
     my $flight = Mojo::Promise->new;
     # Handled even when no waiter joined, so a failure is not warned about.
     $flight->catch(sub { });
-    return $self->{flights}{$ip} = $flight;
+    return $self->{flights}{$key} = $flight;
 }
 
 # Takes an address off the board and settles its flight for every waiter.
 sub _land {
-    my ($self, $ip, $flight, $ok, $value) = @_;
+    my ($self, $key, $flight, $ok, $value) = @_;
     return unless $flight;
-    delete $self->{flights}{$ip}
-        if $self->{flights}{$ip} && $self->{flights}{$ip} == $flight;
+    delete $self->{flights}{$key}
+        if $self->{flights}{$key} && $self->{flights}{$key} == $flight;
     return $ok ? $flight->resolve($value) : $flight->reject($value);
+}
+
+# The cache and flight key of an address and the agent sent with it. A NUL can
+# be in neither an address the API answers nor a header, so no pair reads as
+# another.
+sub _key {
+    my ($ip, $agent) = @_;
+    return defined $agent ? "$ip\0$agent" : $ip;
+}
+
+# The user agent a call sends: undef for none, an empty one included, as the API
+# reads `user_agent=`. One longer than the spec's 1024 characters is sent whole,
+# since the API cuts it there and answers.
+sub _agent {
+    my ($method, $agent) = @_;
+    return undef unless defined $agent;
+    Carp::croak("InternetData::$method: user_agent must be a string") if ref $agent;
+    return length $agent ? "$agent" : undef;
+}
+
+# The query a lookup sends its agent in. Mojo percent-encodes every byte but
+# letters, digits and `*-._`, a `+` included, and writes a space as `+`.
+sub _agent_query {
+    my ($agent) = @_;
+    return defined $agent ? (user_agent => $agent) : ();
 }
 
 # What every database says about one AS. Not cached and not batched: only an
@@ -411,9 +442,9 @@ sub my_ip {
 
 sub my_ip_p {
     my ($self, %options) = @_;
-    $self->_check_options('my_ip', \%options, 'retries', 'timeout');
+    $self->_check_options('my_ip', \%options, 'retries', 'timeout', 'user_agent');
 
-    my $url = $self->_url('/myip');
+    my $url = $self->_url('/myip', _agent_query(_agent('my_ip', $options{user_agent})));
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
     return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $LOOKUP) })
         ->then(sub { InternetData::Result->from_wire(shift) });
@@ -448,7 +479,10 @@ sub lookup_batch_p {
     my ($self, $ips, %options) = @_;
     Carp::croak('lookup_batch: expected an array reference of addresses')
         if ref $ips ne 'ARRAY';
-    $self->_check_options('lookup_batch', \%options, 'retries', 'concurrency', 'timeout');
+    $self->_check_options('lookup_batch', \%options, 'retries', 'concurrency', 'timeout', 'user_agents');
+    my $wanted = $options{user_agents};
+    Carp::croak('InternetData::lookup_batch: user_agents must be a hash reference of address to agent')
+        if defined $wanted && ref $wanted ne 'HASH';
 
     my $limit = defined $options{concurrency} ? $options{concurrency} : $self->{concurrency};
     my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
@@ -459,6 +493,13 @@ sub lookup_batch_p {
     # carries, once however many of its spellings were asked, and answered under
     # each one asked.
     my @asked = grep { defined && length } @$ips;
+    # Each address's agent, keyed by the address as sent: where two spellings of
+    # one IPv4-mapped address carry different agents, the first listed is sent.
+    my %agents;
+    for my $ip (@asked) {
+        my $agent = _agent('lookup_batch', $wanted ? $wanted->{$ip} : undef);
+        $agents{ InternetData::Bogon::unmapped($ip) } //= $agent if defined $agent;
+    }
     my %seen;
     my @unique = grep { !$seen{$_}++ } map { InternetData::Bogon::unmapped($_) } @asked;
     my %answers;
@@ -469,29 +510,30 @@ sub lookup_batch_p {
             $answers{$ip} = InternetData::Bogon::bogon_result($ip);
             next;
         }
-        my $hit = $self->{cache} ? $self->{cache}->get($ip) : undef;
+        my $key = _key($ip, $agents{$ip});
+        my $hit = $self->{cache} ? $self->{cache}->get($key) : undef;
         if ($hit) {
             $answers{$ip} = $hit;
             next;
         }
-        # Already in flight, for a lookup or another batch: this batch takes
-        # that request's answer rather than sending the address again.
-        if ($self->{cache} && $self->{flights}{$ip}) {
-            $joined{$ip} = $self->{flights}{$ip};
+        # Already in flight with the same agent, for a lookup or another batch:
+        # this batch takes that request's answer rather than sending it again.
+        if ($self->{cache} && $self->{flights}{$key}) {
+            $joined{$ip} = $self->{flights}{$key};
             next;
         }
         push @pending, $ip;
     }
     # Boarded before any chunk is built, so a lookup of one of these arriving
     # meanwhile waits for this batch's answer.
-    my %boarded = map { ($_ => $self->_board($_)) } @pending;
+    my %boarded = map { ($_ => $self->_board(_key($_, $agents{$_}))) } @pending;
     my @queue;
     push @queue, [splice @pending, 0, BATCH_MAX] while @pending;
 
     my $batch = {
         queue => \@queue, answers => \%answers, active => 0, limit => $limit,
         retries => $retries, timeout => $options{timeout}, promise => Mojo::Promise->new,
-        boarded => \%boarded,
+        boarded => \%boarded, agents => \%agents,
     };
     $self->_dispatch($batch);
     my $done = %joined ? Mojo::Promise->all(
@@ -537,13 +579,13 @@ sub _dispatch {
     while ($batch->{active} < $batch->{limit} && @{$batch->{queue}}) {
         my $chunk = shift @{$batch->{queue}};
         $batch->{active}++;
-        $self->_lookup_chunk_p($chunk, $batch->{retries}, $batch->{timeout})->then(sub {
+        $self->_lookup_chunk_p($chunk, $batch->{agents}, $batch->{retries}, $batch->{timeout})->then(sub {
             my $answers = shift;
             for my $ip (keys %$answers) {
                 my $answer = $answers->{$ip};
                 $batch->{answers}{$ip} = $answer;
                 my $failed = Scalar::Util::blessed($answer) && $answer->isa('InternetData::Error');
-                $self->_land($ip, $batch->{boarded}{$ip}, !$failed, $answer);
+                $self->_land(_key($ip, $batch->{agents}{$ip}), $batch->{boarded}{$ip}, !$failed, $answer);
             }
             $self->_settled($batch);
         });
@@ -555,9 +597,12 @@ sub _dispatch {
 # exhausted - becomes every address's error, exactly as it would have been had
 # each been looked up alone. Never rejects: the failure is the value.
 sub _lookup_chunk_p {
-    my ($self, $chunk, $retries, $timeout) = @_;
+    my ($self, $chunk, $agents, $retries, $timeout) = @_;
     my $url = $self->_url('/batch');
-    return $self->_retry_p($retries, sub { $self->_json_p($url, { ips => $chunk }, $timeout, undef, $BATCH) })->then(
+    # Sent only when an address of this chunk carries an agent, never as {}.
+    my %sent = map { ($_ => $agents->{$_}) } grep { defined $agents->{$_} } @$chunk;
+    my $body = { ips => $chunk, %sent ? (user_agents => \%sent) : () };
+    return $self->_retry_p($retries, sub { $self->_json_p($url, $body, $timeout, undef, $BATCH) })->then(
         sub {
             my $body = shift;
             my $results = $body->{results};
@@ -568,7 +613,7 @@ sub _lookup_chunk_p {
             for my $ip (@$chunk) {
                 if (defined $results->{$ip} && !defined _nonconforming($LOOKUP, $results->{$ip}, [])) {
                     my $result = InternetData::Result->from_wire($results->{$ip});
-                    $self->{cache}->set($ip, $result) if $self->{cache};
+                    $self->{cache}->set(_key($ip, $agents->{$ip}), $result) if $self->{cache};
                     $answers{$ip} = $result;
                 }
                 elsif (defined $errors->{$ip} && !defined _nonconforming($BATCH_ERROR, $errors->{$ip}, [])) {
@@ -981,7 +1026,7 @@ before writing an C<if>.
 Your API key. Without one a lookup is on Unlimited, the free plan: C<ip>,
 C<is_bogon>, the Tor, relay, bot, anycast, carrier, satellite and service flags,
 C<location> to the country, C<asn>, C<company>, C<hostname> and the abuse email,
-with no daily or monthly cap. Every paid plan answers every field, and a batch
+with no daily or monthly cap. A paid plan answers every field, and a batch
 needs one. The database calls need a key carrying the C<db.download> scope, and
 keys are default-deny, so an existing key reaches them only once the scope is
 added to it. An empty or blank key is the same as none, and sends no
@@ -1046,6 +1091,18 @@ C<lookup_domain>, C<my_ip> and C<my_entitlement>.
 C<$ip> is an IPv4 or IPv6 address. Anything else is refused before it is sent,
 as a C<bad_request> naming C<lookup_asn> and C<lookup_domain>.
 
+C<user_agent> is the C<User-Agent> header of the request you are deciding on:
+
+    my $result = $client->lookup($ip, user_agent => $ua_header);
+    $result->user_agent->{verdict};   # verified, spoofed, unverifiable or not_bot
+
+With every field, on a paid plan or the trial, the answer then carries
+L<InternetData::Result/user_agent>: the agent it names, and whether this address
+bears that out. An empty one is none, and one longer than 1024 characters is sent
+whole, since the API reads its first 1024. An answer to an agent is cached apart
+from the address's plain answer and from another agent's. A bogon is still
+answered locally, with no C<user_agent>.
+
 =head2 lookup_asn
 
     my $as = $client->lookup_asn(9009);
@@ -1062,10 +1119,11 @@ Not cached and not batched.
 
 =head2 my_ip
 
-    my $me = $client->my_ip;
+    my $me = $client->my_ip(%options);
 
 Looks up the address this client is calling from, returning an
-L<InternetData::Result>.
+L<InternetData::Result>. It takes C<retries>, C<timeout> and C<user_agent>, as
+C<lookup> does.
 
 The same answer C<lookup> would give for that address, at the same cost against
 your allowance. The address is the one our edge observed, so a call made through
@@ -1108,6 +1166,15 @@ request, bogons never reach the network, and an address that failed carries its
 L<InternetData::Error> as its value instead of failing the batch. C<retries>,
 C<concurrency> and C<timeout> are the per-call options, and the timeout bounds
 each chunk.
+
+C<user_agents> is a hash reference of address to the C<User-Agent> to send with
+it, keyed by the address as it appears in C<@ips>, as C<lookup>'s C<user_agent>
+for each one:
+
+    my $answers = $client->lookup_batch(\@ips, user_agents => { '66.249.66.1' => $ua_header });
+
+An address with none, or an empty one, is looked up plainly. Where two spellings
+of one IPv4-mapped address carry different agents, the first listed is sent.
 
 There is no cap on how many addresses one call takes: everything not answered
 locally goes out in chunks of up to 1000, the most one request carries. The batch

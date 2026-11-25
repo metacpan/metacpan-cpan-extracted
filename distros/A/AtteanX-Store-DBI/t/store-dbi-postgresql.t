@@ -1,6 +1,7 @@
 use Test::Roo;
 use Test::Exception;
-use List::MoreUtils qw(all);
+use List::Util qw(all);
+use Module::Load::Conditional qw[can_load];
 
 use v5.14;
 use warnings;
@@ -14,12 +15,17 @@ sub create_store {
 	my $self	= shift;
 	my %args	= @_;
 	my $quads	= $args{quads} // [];
+	my @args;
+	if (my $port = $ENV{ATTEAN_STORE_PG_PORT}) {
+		push(@args, port => $port);
+	}
 	my @connect		= AtteanX::Store::DBI->dbi_connect_args(
 		'postgresql',
 		database	=> $ENV{ATTEAN_STORE_PG_DATABASE},
 		host		=> $ENV{ATTEAN_STORE_PG_HOST},
 		user		=> $ENV{ATTEAN_STORE_PG_USER},
 		password	=> $ENV{ATTEAN_STORE_PG_PASSWORD},
+		@args
 	);
 	my $dbh			= DBI->connect(@connect);
 	my $store		= Attean->get_store('DBI')->new( dbh => $dbh );
@@ -32,9 +38,14 @@ sub create_store {
 	return $store;
 }
 
-unless (all { exists $ENV{$_} } qw(ATTEAN_STORE_PG_DATABASE ATTEAN_STORE_PG_HOST ATTEAN_STORE_PG_USER ATTEAN_STORE_PG_PASSWORD)) {
-	plan skip_all => "Set the MySQL environment variables to run these tests (ATTEAN_STORE_PG_DATABASE, ATTEAN_STORE_PG_HOST, ATTEAN_STORE_PG_USER, ATTEAN_STORE_PG_PASSWORD)";
+unless (can_load( modules => { 'DBD::Pg' => 0 })) {
+	plan skip_all => "DBD::Pg not available.";
 }
+
+unless (all { exists $ENV{$_} } qw(ATTEAN_STORE_PG_DATABASE ATTEAN_STORE_PG_HOST ATTEAN_STORE_PG_USER ATTEAN_STORE_PG_PASSWORD)) {
+	plan skip_all => "Set the MySQL environment variables to run these tests (ATTEAN_STORE_PG_DATABASE, ATTEAN_STORE_PG_HOST, ATTEAN_STORE_PG_PORT, ATTEAN_STORE_PG_USER, ATTEAN_STORE_PG_PASSWORD)";
+}
+
 
 test 'Pg STRSTARTS SARG with string literal' => sub {
 	my $self	= shift;

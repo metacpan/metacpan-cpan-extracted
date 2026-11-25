@@ -227,7 +227,7 @@ t/65-cli-suggest-coverage.t - branch and condition closure for the CLI suggestio
 =head1 PURPOSE
 
 This test is the executable coverage contract for the harder-to-reach branches
-and conditions in the dashboard command-suggestion helper. It drives the
+and conditions in the d2 command-suggestion helper. It drives the
 de-duplication guards, the falsy-logical-name skips, the unreadable-directory
 failure paths, and the ranking tiebreakers so the module keeps full branch and
 condition coverage without loosening the gate.

@@ -1,5 +1,19 @@
 Revision history for Matplotlib-Simple
 
+0.3346 2026-11-24 CST (Claude Opus 5.5 helped)
+
+ [Fixed]
+
+ - The gnuplot and ggplot2 engines print what their script wrote to STDERR when it succeeds, as the matplotlib engine has since 0.3343, so R's and gnuplot's warnings reach the caller: a `scatter` with `logscale => ['x']` and an x of 0 now says "log-10 transformation introduced infinite values" under `engine => 'ggplot2'`, where it dropped the point without a word. The 0.3343 entry promised this of every engine, and only matplotlib did it.
+
+ - A native gnuplot `boxplot` whose sets all have fewer than 4 values is drawn. It died in gnuplot as "x range is invalid", with `data => { A => [ 1, 2, 3 ] }` or `{ A => [1], B => [ 1, 2, 3 ] }`. gnuplot's boxplot draws such a set as its points alone, with no box, and these are now drawn so; `style => 'matplotlib'` draws a box, as before. Under `showfliers => 0` gnuplot does not draw such a set at all, so that is refused by name rather than left out of the figure. Seen with gnuplot 6.0.
+
+ - The gnuplot engine draws an `imshow`, a `colored_table`, a `scatter` colored by `color_key`, or a `hist2d` whose colored values are all the same, or whose `vmin` equals its `vmax`. Under `style => 'native'` it died as "Can't plot with an empty cb range!"; under `style => 'matplotlib'` it drew them at the bottom of the colormap beside a colorbar running from 1 to 1. The scale is now widened as matplotlib's colorbar widens it (by a tenth of the value either side), so a constant image is drawn in the middle color of its colormap, as matplotlib draws it; a `colored_table`, whose cells matplotlib colors before its colorbar widens the scale, keeps the bottom color.
+
+ - The gnuplot engine draws an `imshow` or `colored_table` of one row or one column, such as a `colored_table` with one row key. gnuplot's `with image` draws nothing for one, saying only "Image grid must be at least 4 points (2 x 2)", which was not shown (see above), so the figure was written as an empty frame. Such a matrix is now drawn a cell at a time. A larger one is an image, as before.
+
+ - A matplotlib `hist` set whose values are all NaN is drawn as the empty set it bins to. It died in Python as "ValueError: autodetected range of [nan, nan] is not finite" (matplotlib 3.11.2). NaN beside numbers is left for matplotlib to bin around, as before, and the gnuplot and ggplot2 engines already drew such a set.
+
 0.3345 2026-11-20 CST (Claude Opus 5.5 helped)
 
  [Fixed]

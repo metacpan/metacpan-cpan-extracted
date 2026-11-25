@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Cwd qw(abs_path);
+use Config;
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
@@ -14,6 +16,17 @@ use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Platform ();
+
+my @test_perl_libs = map { abs_path($_) }
+  grep { -d $_ }
+  ( 'blib/lib', 'blib/arch', 'lib' );
+my $test_perl5lib = join $Config{path_sep},
+  grep { defined && -d $_ }
+  map  { abs_path($_) }
+  (
+    @test_perl_libs,
+    ( grep { !ref($_) && defined($_) } @INC ),
+  );
 
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
@@ -90,10 +103,36 @@ is( $runner->_normalize_timeout_ms('not-a-hash'), undef,
 # firing on every one-second scheduling tick.
 # ----------------------------------------------------------------------------
 {
-    my $cron_name = 'cron.everyminute';
-    ok( $runner->_cron_due( '* * * * *', $cron_name ),
+    # The two calls must share one minute for the dedup to hold. On Windows
+    # the first call's state-file write takes 150 ms or more, so a minute
+    # boundary can fall between the calls; then the second call is correctly
+    # due in the new minute and the pair must be tried again with a fresh
+    # cron name. At most three attempts: a real dedup failure still fails,
+    # and a minute that keeps rolling over fails loudly instead of looping.
+    my $minute_stamp = sub {
+        my @now = localtime();
+        return sprintf '%04d-%02d-%02dT%02d:%02d',
+          $now[5] + 1900, $now[4] + 1, $now[3], $now[2], $now[1];
+    };
+    my $first_due;
+    my $second_due;
+    my $decided = 0;
+    for my $attempt ( 1 .. 3 ) {
+        my $cron_name = "cron.everyminute.$attempt";
+        my $before = $minute_stamp->();
+        $first_due  = $runner->_cron_due( '* * * * *', $cron_name );
+        $second_due = $runner->_cron_due( '* * * * *', $cron_name );
+        my $after = $minute_stamp->();
+        if ( $before eq $after ) {
+            $decided = 1;
+            last;
+        }
+    }
+    diag 'the minute kept rolling over between the two _cron_due calls'
+      if !$decided;
+    ok( $decided && $first_due,
         'wildcard cron is due on the first tick of a minute' );
-    ok( !$runner->_cron_due( '* * * * *', $cron_name ),
+    ok( $decided && !$second_due,
         'wildcard cron is de-duplicated within the same minute' );
 }
 
@@ -151,22 +190,13 @@ SKIP: {
     print {$helper_fh} <<'HELPER';
 use strict;
 use warnings;
+use Developer::Dashboard::GoRoutine ();
 $| = 1;
 my ($pidfile) = @ARGV;
-my $descendant;
-if ( $^O eq 'MSWin32' ) {
-    $descendant = system 1, $^X, '-e', '$| = 1; print "descendant-ready\\n"; sleep 30';
-    die "Unable to spawn timeout descendant: $!" if !defined $descendant || $descendant < 1;
-}
-else {
-    $descendant = fork();
-    die "Unable to fork timeout descendant: $!" if !defined $descendant;
-    if ( !$descendant ) {
-        print "descendant-ready\n";
-        sleep 30;
-        exit 0;
-    }
-}
+my $descendant = Developer::Dashboard::GoRoutine::spawn(
+    [ $^X, '-e', '$| = 1; print "descendant-ready\\n"; sleep 30' ],
+    {},
+);
 open my $pid_fh, '>', $pidfile or die "Unable to write $pidfile: $!";
 print {$pid_fh} "$$ $descendant\n";
 close $pid_fh or die "Unable to close $pidfile: $!";
@@ -176,15 +206,29 @@ sleep 30;
 HELPER
     close $helper_fh or die "Unable to close $helper: $!";
 
-    my $shell = Developer::Dashboard::Platform::is_windows() ? 'cmd' : 'sh';
+    # Collector commands run through PowerShell on Windows (cmd is not a
+    # shell the product supports), where a quoted program path needs the
+    # call operator in front of it.
+    my $is_windows = Developer::Dashboard::Platform::is_windows();
+    my $shell = $is_windows ? Developer::Dashboard::Platform::native_shell_name() : 'sh';
+    my @build_inc = map { '-I' . $_ } @test_perl_libs;
     my $command = join ' ',
       map { Developer::Dashboard::Platform::shell_quote_for( $shell, $_ ) }
-      ( $^X, $helper, $pidfile );
-    my ( $stdout, $stderr, $exit_code, $timed_out ) = $runner->_run_command(
-        source     => $command,
-        cwd        => $home,
-        timeout_ms => 100,
-    );
+      ( $^X, @build_inc, $helper, $pidfile );
+    $command = "& $command" if $is_windows;
+    my ( $stdout, $stderr, $exit_code, $timed_out );
+    {
+        local $ENV{PERL5LIB} = $test_perl5lib;
+        ( $stdout, $stderr, $exit_code, $timed_out ) = $runner->_run_command(
+            source     => $command,
+            cwd        => $home,
+            env        => { PERL5LIB => $test_perl5lib },
+            # PowerShell itself needs well over 100 ms to start on
+            # Windows, so the helper would be killed before it could
+            # record its pids; give it time to get ready there.
+            timeout_ms => $is_windows ? 8000 : 100,
+        );
+    }
 
     is( $exit_code, 124, 'a command-subtree timeout returns exit 124' );
     ok( $timed_out, 'a command-subtree timeout is flagged as timed out' );

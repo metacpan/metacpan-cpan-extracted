@@ -7,6 +7,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'static/js',
+    emptyOutDir: false,
     cssCodeSplit: true,
     lib: {
       entry: resolve(__dirname, 'src/index.js'),

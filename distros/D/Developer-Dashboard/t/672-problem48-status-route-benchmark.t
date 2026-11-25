@@ -9,24 +9,72 @@ use Test::More;
 my $script = "$Bin/../script/problem48-status-route-benchmark";
 my $repo_lib = abs_path("$Bin/../lib");
 
-my ( $help_stdout, $help_stderr, $help_exit ) = capture {
+# _wait_status($raw_status)
+# Decomposes a raw wait status from system() into exit code, signal number
+# and core-dump flag. Checking $? >> 8 alone masks a signal death: a child
+# killed by a signal reports exit code 0, so the exit test passes while the
+# output tests fail on empty output (round 41, ARM64: test 12 passed while
+# tests 14-15 failed with empty stdout). A raw status of 0 is the only clean
+# exit: exit code 0, no signal, no core dump.
+# Input: raw wait status ($?).
+# Output: (exit code, signal number, core-dump flag).
+sub _wait_status {
+    my ($raw) = @_;
+    return ( $raw >> 8, $raw & 127, ( $raw & 128 ) ? 1 : 0 );
+}
+
+# _is_clean_exit($raw_status, $name)
+# Asserts the benchmark child exited cleanly: raw wait status 0 means exit
+# code 0, no signal, no core dump. A signal death fails here with the signal
+# named in the diagnostic, instead of passing the exit test and failing the
+# output tests on empty output.
+# Input: raw wait status, test name.
+# Output: Test::More pass/fail boolean.
+sub _is_clean_exit {
+    my ( $raw, $name ) = @_;
+    my $ok = is( $raw, 0, $name );
+    if ( !$ok ) {
+        my ( $exit, $signal, $core ) = _wait_status($raw);
+        diag("benchmark child wait status $raw: exit $exit, signal $signal, core $core");
+    }
+    return $ok;
+}
+
+# _isnt_clean_exit($raw_status, $name)
+# Asserts the benchmark child failed with a clean non-zero exit (exit code
+# non-zero, no signal, no core dump). A signal death is a crash, not the
+# expected usage error, so it fails here with the signal named instead of
+# passing as a rejection.
+# Input: raw wait status, test name.
+# Output: Test::More pass/fail boolean.
+sub _isnt_clean_exit {
+    my ( $raw, $name ) = @_;
+    my ( $exit, $signal, $core ) = _wait_status($raw);
+    my $ok = ok( $exit != 0 && $signal == 0 && !$core, $name );
+    if ( !$ok ) {
+        diag("benchmark child wait status $raw: exit $exit, signal $signal, core $core");
+    }
+    return $ok;
+}
+
+my ( $help_stdout, $help_stderr, $help_status ) = capture {
     local $ENV{P48_LIB} = $repo_lib;
     system( $^X, $script, '--help' );
-    return $? >> 8;
+    return $?;
 };
-is( $help_exit, 0, 'status route benchmark help exits successfully' );
+_is_clean_exit( $help_status, 'status route benchmark help exits successfully' );
 is( $help_stderr, q{}, 'status route benchmark help emits no stderr' );
 like( $help_stdout, qr/--indicators N.*--iterations N.*--runs ODD_N/s,
     'status route benchmark help documents scale and sample options' );
 like( $help_stdout, qr/--portable-config-cache/,
     'status route benchmark help documents a portable-config control' );
 
-my ( $run_stdout, $run_stderr, $run_exit ) = capture {
+my ( $run_stdout, $run_stderr, $run_status ) = capture {
     local $ENV{P48_LIB} = $repo_lib;
     system( $^X, $script, '--indicators', 2, '--iterations', 1, '--runs', 3 );
-    return $? >> 8;
+    return $?;
 };
-is( $run_exit, 0, 'small status route benchmark completes' );
+_is_clean_exit( $run_status, 'small status route benchmark completes' );
 is( $run_stderr, q{}, 'small status route benchmark emits no stderr' );
 like( $run_stdout, qr/response_status=200 response_bytes=\d+ response_sha256=[0-9a-f]{64} exact_response_parity=yes/,
     'status route benchmark proves successful byte-identical responses' );
@@ -39,36 +87,36 @@ like( $run_stdout, qr/collector_projections=1\b/,
 like( $run_stdout, qr/collector_signature_encodes=1\b/,
     'status route benchmark reports that the validated collector signature is encoded once' );
 
-my ( $portable_stdout, $portable_stderr, $portable_exit ) = capture {
+my ( $portable_stdout, $portable_stderr, $portable_status ) = capture {
     local $ENV{P48_LIB} = $repo_lib;
     system( $^X, $script, '--indicators', 2, '--iterations', 1, '--runs', 3, '--portable-config-cache' );
-    return $? >> 8;
+    return $?;
 };
-is( $portable_exit, 0, 'status route benchmark can force portable configuration validation' );
+_is_clean_exit( $portable_status, 'status route benchmark can force portable configuration validation' );
 is( $portable_stderr, q{}, 'portable configuration benchmark emits no stderr' );
 like( $portable_stdout, qr/config_snapshot=portable\b/,
     'portable configuration benchmark reports which freshness path ran' );
 like( $portable_stdout, qr/exact_response_parity=yes/,
     'portable configuration validation preserves the exact status response' );
 
-my ( $uncached_stdout, $uncached_stderr, $uncached_exit ) = capture {
+my ( $uncached_stdout, $uncached_stderr, $uncached_status ) = capture {
     local $ENV{P48_LIB} = $repo_lib;
     system( $^X, $script, '--indicators', 2, '--iterations', 1, '--runs', 3, '--no-collector-cache' );
-    return $? >> 8;
+    return $?;
 };
-is( $uncached_exit, 0, 'status route benchmark can disable the collector projection cache' );
+_is_clean_exit( $uncached_status, 'status route benchmark can disable the collector projection cache' );
 is( $uncached_stderr, q{}, 'uncached collector benchmark emits no stderr' );
 like( $uncached_stdout, qr/collector_projections=6\b/,
     'uncached control rebuilds the collector projection for every warmup and sample request' );
 like( $uncached_stdout, qr/exact_response_parity=yes/,
     'disabling the collector cache preserves the exact status response' );
 
-my ( $signature_uncached_stdout, $signature_uncached_stderr, $signature_uncached_exit ) = capture {
+my ( $signature_uncached_stdout, $signature_uncached_stderr, $signature_uncached_status ) = capture {
     local $ENV{P48_LIB} = $repo_lib;
     system( $^X, $script, '--indicators', 2, '--iterations', 1, '--runs', 3, '--no-collector-signature-cache' );
-    return $? >> 8;
+    return $?;
 };
-is( $signature_uncached_exit, 0, 'status route benchmark can disable collector-signature reuse' );
+_is_clean_exit( $signature_uncached_status, 'status route benchmark can disable collector-signature reuse' );
 is( $signature_uncached_stderr, q{}, 'uncached signature benchmark emits no stderr' );
 like( $signature_uncached_stdout, qr/collector_signature_encodes=\d+/,
     'uncached signature benchmark reports collector signature work' );
@@ -77,21 +125,21 @@ unlike( $signature_uncached_stdout, qr/collector_signature_encodes=1\b/,
 like( $signature_uncached_stdout, qr/exact_response_parity=yes/,
     'disabling collector-signature reuse preserves the exact status response' );
 
-my ( $bad_stdout, $bad_stderr, $bad_exit ) = capture {
+my ( $bad_stdout, $bad_stderr, $bad_status ) = capture {
     local $ENV{P48_LIB} = $repo_lib;
     system( $^X, $script, '--indicators', 0 );
-    return $? >> 8;
+    return $?;
 };
-isnt( $bad_exit, 0, 'status route benchmark rejects an empty inventory' );
+_isnt_clean_exit( $bad_status, 'status route benchmark rejects an empty inventory' );
 like( $bad_stderr, qr/--indicators must be a positive integer/,
     'invalid benchmark input reports the exact correction' );
 
-my ( $profile_stdout, $profile_stderr, $profile_exit ) = capture {
+my ( $profile_stdout, $profile_stderr, $profile_status ) = capture {
     local $ENV{P48_LIB} = $repo_lib;
     system( $^X, $script, '--profile' );
-    return $? >> 8;
+    return $?;
 };
-isnt( $profile_exit, 0, 'profile mode rejects a process without NYTProf' );
+_isnt_clean_exit( $profile_status, 'profile mode rejects a process without NYTProf' );
 like( $profile_stderr, qr/--profile requires perl -d:NYTProf/,
     'profile mode explains how to enable NYTProf' );
 
@@ -123,7 +171,10 @@ and reports whether watcher-backed config and normalized collector-projection
 reuse actually occurred. Its no-cache controls verify that recomputing the
 collector projection or collector-job signature does not alter the HTTP
 response; its portable-config control verifies that bypassing only the config
-watcher also preserves exact response bytes.
+watcher also preserves exact response bytes. Its exit checks assert on the
+full wait status, so a benchmark child killed by a signal fails the exit test
+with the signal named instead of passing it and failing the output tests on
+empty output.
 
 =head1 WHEN TO USE
 

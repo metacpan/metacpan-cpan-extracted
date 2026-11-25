@@ -18,7 +18,7 @@ use Carp;
 use Data::Identifier;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.38;
+our $VERSION = v0.39.02;
 
 use constant {
     BOOL_TRUE  => Data::Identifier->new(uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5')->register,
@@ -612,6 +612,76 @@ sub render_unit_request {
 }
 
 
+sub normalise_uri {
+    my ($self, $uri, @opts) = @_;
+
+    require URI;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    return 'null' if $uri eq 'null';
+
+    if (ref $uri) {
+        if ($uri->isa('URI')) {
+            # no-op
+        } elsif ($uri->isa('Mojo::URL')) {
+            $uri = URI->new("$uri");
+        } else {
+            ...;
+        }
+    } else {
+        $uri = URI->new($uri);
+    }
+
+    return $uri->canonical;
+}
+
+
+sub match_origin {
+    my ($self, $uri, $origin, @opts) = @_;
+    state $host_port_schemes = do { require URI; scalar {map {$_ => 1} qw(http https ftp gopher ssh)} };
+
+    croak 'Stray options passed' if scalar @opts;
+
+    return undef unless defined($uri) && defined($origin);
+    return undef if $uri eq 'null' || $origin eq 'null';
+
+    croak 'Not a valid uri'     unless ref($uri)    && $uri->isa('URI');
+    croak 'Not a valid origin'  unless ref($origin) && $origin->isa('URI');
+
+    return undef unless _eq($uri->scheme, $origin->scheme);
+
+    # We do an extra safety check here:
+    return undef unless $host_port_schemes->{$origin->scheme};
+
+    return 1 if $uri->eq($origin);
+
+    return undef unless eval {_eq($uri->host, $origin->host)};
+    return undef unless eval {_eq($uri->port, $origin->port)};
+
+    return 1;
+}
+
+
+sub register_package {
+    my ($self, $pkg, %opts) = @_;
+    state $perl_package_registrations = Data::Identifier->_get_perl_package_registrations;
+    my $from_identifier = delete $opts{from_identifier};
+    my $to_identifier = delete $opts{to_identifier};
+    my $r;
+
+    croak 'No package given' unless defined $pkg;
+    croak 'Bad package name' unless $pkg =~ /^[A-Z]/ || $pkg =~ /::/;
+    croak 'Stray options passed' if scalar keys %opts;
+
+    $r = $perl_package_registrations->{$pkg} //= {};
+    $r->{from_identifier} //= $from_identifier;
+    $r->{to_identifier} //= $to_identifier;
+
+    return $self;
+}
+
+
 sub announce {
     my ($pkg, $type, $regs, @opts) = @_;
 
@@ -814,6 +884,13 @@ sub _register_base {
     return ($self, $identifier, %opts);
 }
 
+# undef aware eq, any undef -> false:
+sub _eq {
+    my ($x, $y) = @_;
+    return undef unless defined($x) && defined($y);
+    return $x eq $y;
+}
+
 1;
 
 __END__
@@ -828,7 +905,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.38
+version v0.39.02
 
 =head1 SYNOPSIS
 
@@ -1000,6 +1077,98 @@ This might might support more values if L<Data::Identifier::Wellknown> is loaded
 and/or if a L<Data::TagMap> is given via L<Data::Identifier::Interface::Subobjects/so_attach>.
 
 See also L</parse_sirtx>.
+
+=head2 normalise_uri
+
+    my URI $uri = $util->normalise_uri($uri);
+
+(experimental since v0.39)
+
+Returns a normalised version of the given URI or C<'null'> if the input was the string C<'null'>.
+
+The result is an instance of L<URI> (or C<'null'>).
+The argument can be an URI as a string, as an instance of L<URI>, or an instance of L<Mojo::URL>.
+Other types might be supported.
+
+This method is suitable to normalise both URIs and origins for L</match_origin>.
+
+=head2 match_origin
+
+    my $bool = $util->match_origin($uri, $origin);
+
+(experimental since v0.39)
+
+This method returns a true-ish value if the given URI matches the provided origin.
+Otherwise a false-ish value.
+
+If the URI or the origin is undefined or the special value C<'null'> (RFC 6454)
+this method will always return false-ish.
+
+As of v0.39 both URI and origin must be a L<URI> object, or the plain string C<'null'>.
+
+B<Note:>
+In order to correctly work both the URI and the origin must be in canonical form.
+This can be done by L<URI/canonical>.
+This step is intentionally left out here for performance reasons as the normalisation only needs to be performend
+once for every URI and origin.
+Therefore this step can virtually always be moved out of any loop.
+
+=head2 register_package
+
+    $util->register_package($pkg [, %opts ] );
+
+(experimental since v0.39)
+
+This method registers a Perl package to be known by L<Data::Identifier> and related modules.
+
+The package name must conform the Perl specification,
+and the limitations of L<Data::Identifier/as> (must start with a uppercase letter or contain a C<::>).
+
+The package must also be loaded (normally with L<perlfunc/use> or L<perlfunc/require>) B<before> this method is called.
+This method may also call any methods from L<UNIVERSAL> or any of the methods defined by interface of this dist
+(for those interfaces that are implemented) on the package.
+This means that the package must be fully set up for that (virtually all packages are after you C<use>-ed them).
+
+If this method is called multiple times for the same package, this method will try to merge the information provided
+reasonable smart. However if conflicting data is provided, this method may C<die>.
+
+It is also not defined (as of v0.39) how package registrations interact with package inheritance.
+However if inheritance is considered the most actual package is considered before it's parents.
+
+The following options, all optional, are supported:
+
+=over
+
+=item C<from_identifier>
+
+(experimental since v0.39)
+
+A function reference to a function that can convert from an L<Data::Identifier> to the given package.
+The function gets the target package passed as first argument, the identifier object as second,
+and after that a hash (not hashref) of options.
+
+Currently the options C<autocreate>, and C<so> are passed.
+All passed options have the same meaning as in L<Data::Identifier/as>.
+Future versions may pass more options.
+
+B<Note:>
+It is not required to provide this converter function for packages that implement L<Data::Identifier::Interface::Simple>.
+Implementating L<Data::Identifier::Interface::Simple> is recommended over package registrations.
+
+=item C<to_identifier>
+
+(experimental since v0.39)
+
+A function reference to a function that can convert the given package to an identifier.
+The function gets the object passed via the first argument (C<$_[0]>).
+It is expected to return a L<Data::Identifier>, a L<Data::Identifier::Interface::Simple>,
+or a pair of type and value. It is always called in list context.
+
+B<Note:>
+It is not required to provide this converter function for packages that implement L<Data::Identifier::Interface::Simple>.
+Implementating L<Data::Identifier::Interface::Simple> is recommended over package registrations.
+
+=back
 
 =head2 announce
 

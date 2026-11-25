@@ -37,6 +37,7 @@ BEGIN {
 }
 
 use Capture::Tiny qw(capture);
+use Config ();
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
@@ -62,6 +63,25 @@ sub write_fake_git {
     my ($dir) = @_;
     my $bin = File::Spec->catdir( $dir, 'fakebin' );
     mkdir $bin or die "Unable to mkdir $bin: $!";
+    if ( $^O eq 'MSWin32' ) {
+        # Windows cannot start an extensionless sh script, so the shim is a
+        # git.bat launcher running a Perl script with the same behaviour.
+        # No extensionless `git` file is written there: a direct spawn
+        # would pick it first and fail to start it.
+        my $script = File::Spec->catfile( $bin, 'fake-git.pl' );
+        open my $pl, '>', $script or die "Unable to write $script: $!";
+        print {$pl} <<'PL';
+if ( ( $ARGV[0] || '' ) eq 'rev-parse' ) { print "true\n"; exit 0 }
+if ( ( $ARGV[0] || '' ) eq 'diff' ) { exit( $ENV{FAKE_GIT_DIFF_EXIT} || 0 ) }
+exit 0;
+PL
+        close $pl or die "Unable to close $script: $!";
+        my $bat = File::Spec->catfile( $bin, 'git.bat' );
+        open my $bfh, '>', $bat or die "Unable to write $bat: $!";
+        print {$bfh} qq{\@echo off\r\n"$^X" "$script" %*\r\nexit /b %ERRORLEVEL%\r\n};
+        close $bfh or die "Unable to close $bat: $!";
+        return $bin;
+    }
     my $git = File::Spec->catfile( $bin, 'git' );
     open my $fh, '>', $git or die "Unable to write $git: $!";
     print {$fh} <<'SH';
@@ -78,6 +98,27 @@ SH
     close $fh or die "Unable to close $git: $!";
     chmod 0755, $git or die "Unable to chmod $git: $!";
     return $bin;
+}
+
+# path_without_git($fake_bin)
+# Builds a PATH with $fake_bin first, joined with the native separator. On
+# Windows every directory holding a real git.exe/git.com is dropped as well: a
+# direct spawn finds a same-named .exe in a later PATH directory before a .bat
+# shim in an earlier one, so the shim only shadows the real git when no git
+# executable remains in PATH at all (same shape as t/102's _path_without_git).
+# Input: the shim's bin directory.
+# Output: PATH string.
+sub path_without_git {
+    my ($fake_bin) = @_;
+    my $sep = $Config::Config{path_sep};
+    my @dirs = grep { $_ ne '' } split /\Q$sep\E/, ( defined $ENV{PATH} ? $ENV{PATH} : '' );
+    if ( $^O eq 'MSWin32' ) {
+        @dirs = grep {
+                 !-f File::Spec->catfile( $_, 'git.exe' )
+              && !-f File::Spec->catfile( $_, 'git.com' )
+        } @dirs;
+    }
+    return join( $sep, $fake_bin, @dirs );
 }
 
 # git_status_for($repo, $exit)
@@ -107,7 +148,7 @@ sub git_status_for {
     mkdir $repo or die "Unable to mkdir $repo: $!";
     mkdir File::Spec->catdir( $repo, '.git' ) or die "Unable to seed .git: $!";
     my $bin = write_fake_git($repo);
-    local $ENV{PATH} = "$bin" . ( defined $ENV{PATH} ? ":$ENV{PATH}" : '' );
+    local $ENV{PATH} = path_without_git($bin);
 
     is( git_status_for( $repo, 0 ), 'clean',
         'git diff exit 0 maps to clean' );

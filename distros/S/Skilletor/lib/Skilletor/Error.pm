@@ -1,27 +1,10 @@
 package Skilletor::Error;
-# ABSTRACT: Exception base class of Skilletor
+# ABSTRACT: Retired stub, see Skilletor
 
-use Moo;
-use Carp qw( croak );
-use namespace::clean;
-# After namespace::clean, not before: overload keeps its table as subs in this package ("((",
-# "()", "(\"\"", "(bool"), and namespace::clean removes every sub that exists when it is used.
-use overload
-  '""'     => sub { $_[0]->message },
-  'bool'   => sub { 1 },
-  fallback => 1;
+use strict;
+use warnings;
 
-our $VERSION = '0.008000';
-
-has message => (
-  is       => 'ro',
-  required => 1,
-);
-
-sub throw {
-  my ( $class, @args ) = @_;
-  croak( $class->new( @args == 1 ? ( message => $args[0] ) : @args ) );
-}
+our $VERSION = '0.009000';
 
 1;
 
@@ -33,46 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Error - Exception base class of Skilletor
+Skilletor::Error - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
-
-=head1 SYNOPSIS
-
-  use Skilletor::Error::Config;
-
-  Skilletor::Error::Config->throw('~/.claude/skilletor.json: sources must be an object');
-
-  # caller
-  my $ok = eval { ...; 1 };
-  if ( !$ok && ref $@ && $@->isa('Skilletor::Error::Config') ) {
-    print $@->message, "\n";
-  }
+version 0.009000
 
 =head1 DESCRIPTION
 
-Every error Skilletor reports to a user is an object of a subclass of this
-class. Its L</message> is the reference implementation's message for the same
-case, exactly – no Perl file and line appended – and the object stringifies to
-it, so C<print "$@"> shows what C<skilletor> would show.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
 
-=head2 message
-
-The message, as the reference implementation words it.
-
-=head2 throw
-
-  Skilletor::Error::Config->throw($message);
-  Skilletor::Error::Config->throw( message => $message );
-
-Builds the error and C<croak>s with it.
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
 
 =head1 SEE ALSO
 
-L<Skilletor::Error::Config>, L<Skilletor::Error::Spec>, L<Skilletor::Error::Source>,
-L<Skilletor::Error::Tar>, L<Skilletor::Error::JSON>, L<Skilletor::Error::Target>
+=over
+
+=item * L<Skilletor>
+
+=item * L<https://github.com/Getty/skilletor#install>
+
+=back
 
 =head1 SUPPORT
 

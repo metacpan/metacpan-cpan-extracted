@@ -22,19 +22,19 @@ complete - private built-in completion helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard complete <index> <word0> <word1> ...
+  d2 complete <index> <word0> <word1> ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can keep shell-completion logic inside the
+public C<d2> entrypoint can keep shell-completion logic inside the
 private helper runtime.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard complete>, which prints shell-completion candidates for C<dashboard> and C<d2>. It is meant to be called by generated shell bootstrap fragments instead of by users typing completion logic by hand.
+This staged helper exposes C<d2 complete>, which prints shell-completion candidates for C<d2> and C<d2>. It is meant to be called by generated shell bootstrap fragments instead of by users typing completion logic by hand.
 
 =head1 WHY IT EXISTS
 
@@ -50,19 +50,19 @@ Generated bash and zsh shell bootstrap snippets call this helper with the curren
 
 =head1 WHAT USES IT
 
-It is used by generated shell bootstrap snippets, by the shell-completion library code they hand off into, and by shell smoke tests that verify tab-completion wiring for C<dashboard> and C<d2>.
+It is used by generated shell bootstrap snippets, by the shell-completion library code they hand off into, and by shell smoke tests that verify tab-completion wiring for C<d2> and C<d2>.
 
 =head1 EXAMPLES
 
 Example 1:
 
-  dashboard complete 1 dashboard do
+  d2 complete 1 dashboard do
 
 Print top-level completion candidates for the current C<do> prefix.
 
 Example 2:
 
-  dashboard complete 2 dashboard docker co
+  d2 complete 2 d2 docker co
 
 Print second-level completion candidates for the built-in C<docker> command.
 

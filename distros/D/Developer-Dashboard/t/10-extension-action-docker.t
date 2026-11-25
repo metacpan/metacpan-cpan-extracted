@@ -35,6 +35,16 @@ sub is_same_path {
     is( _portable_path($got), _portable_path($expected), $label );
 }
 
+sub _path_suffix_matches {
+    my ( $path, $suffix ) = @_;
+    return 0 if !defined $path || !defined $suffix;
+    my $backslash = quotemeta( chr(92) );
+    ( my $portable_path = $path ) =~ s{$backslash}{/}g;
+    ( my $portable_suffix = $suffix ) =~ s{$backslash}{/}g;
+    return 1 if $portable_suffix eq '';
+    return substr( $portable_path, -length($portable_suffix) ) eq $portable_suffix;
+}
+
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
 local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
@@ -227,7 +237,13 @@ my $saved_page = Developer::Dashboard::PageDocument->new(
     state       => { alpha => 'one' },
     actions     => [
         { id => 'state', label => 'State', kind => 'builtin', builtin => 'page.state', safe => 1 },
-        { id => 'run', label => 'Run', kind => 'command', command => "printf shell-output\n", cwd => $repo },
+        # printf does not exist on the Windows job PATH and command
+        # actions run through PowerShell there, so use a portable perl
+        # -e instead. Single quotes keep the program literal under both
+        # sh and PowerShell (the env block below and t/11 use the same
+        # shape through this runner); qq() avoids quotes inside the
+        # program, which plain -Command would strip.
+        { id => 'run', label => 'Run', kind => 'command', command => "$^X -e 'print qq(shell-output\\n)'", cwd => $repo },
     ],
     permissions => {},
 );
@@ -266,10 +282,10 @@ is( $command_result->{exit_code}, 0, 'trusted saved page command action executes
 like( $command_result->{stdout}, qr/shell-output/, 'trusted command action captures stdout' );
 
 my $env_result = $actions->run_command_action(
-    command    => 'printf "$ACTION_ENV"',
+    command    => "$^X -e 'print \$ENV{ACTION_ENV}'",
     cwd        => $repo,
     env        => { ACTION_ENV => 'env-ok' },
-    timeout_ms => 1000,
+    timeout_ms => 10000, # Windows needs headroom: powershell + perl spawn takes ~1.5s
 );
 like( $env_result->{stdout}, qr/env-ok/, 'command actions inject explicit env values' );
 
@@ -289,7 +305,7 @@ my $background_result = $actions->run_command_action(
 ok( $background_result->{pid} > 0, 'background command action returns a child pid' );
 ok( $actions->_pid_is_running( $background_result->{pid} ), 'background action child is running initially' );
 kill 'TERM', $background_result->{pid};
-my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 400 : 20;
+my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 400 : 60;
 for ( 1 .. $background_wait_loops ) {
     last if !$actions->_pid_is_running( $background_result->{pid} );
     sleep 0.1;
@@ -334,7 +350,9 @@ like( $@, qr/Unsupported builtin action/, 'unsupported builtin actions are rejec
 my $transient_allowed = Developer::Dashboard::PageDocument->new(
     title       => 'Transient Allowed',
     actions     => [
-        { id => 'run', label => 'Run', kind => 'command', command => 'printf allowed' },
+        # Same portable perl -e shape as the saved-page command above:
+        # printf does not exist on the Windows job PATH.
+        { id => 'run', label => 'Run', kind => 'command', command => "$^X -e 'print qq(allowed\\n)'" },
     ],
     permissions => {
         allow_untrusted_actions => 1,
@@ -343,7 +361,7 @@ my $transient_allowed = Developer::Dashboard::PageDocument->new(
 );
 my $allowed_page = $transient_allowed;
 my $allowed_result = $actions->run_page_action(
-    action => { id => 'run', label => 'Run', kind => 'command', command => 'printf allowed' },
+    action => { id => 'run', label => 'Run', kind => 'command', command => "$^X -e 'print qq(allowed\\n)'" },
     page   => $allowed_page,
     source => 'transient',
 );
@@ -358,7 +376,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     );
     local $ENV{DOCKER_SKILL_BASE} = 'skill-base';
     local $ENV{DD_TEST_DOCKER_ROOT} = File::Spec->catdir( $home, '.developer-dashboard', 'config', 'docker' );
-    is(
+    is_same_path(
         $docker->_expand_env_path('${DD_TEST_DOCKER_ROOT}/green/compose.yml'),
         File::Spec->catfile( $ENV{DD_TEST_DOCKER_ROOT}, 'green', 'compose.yml' ),
         'docker compose resolver expands defined braced environment variables in configured compose paths',
@@ -368,7 +386,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
         'green/compose.yml',
         'docker compose resolver collapses undefined braced environment variables in configured compose paths',
     );
-    is(
+    is_same_path(
         $docker->_expand_env_path('$DD_TEST_DOCKER_ROOT/green/compose.yml'),
         File::Spec->catfile( $ENV{DD_TEST_DOCKER_ROOT}, 'green', 'compose.yml' ),
         'docker compose resolver expands defined bare environment variables in configured compose paths',
@@ -391,9 +409,9 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     ok( grep( { /compose\.worker\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes service overlay' );
     ok( grep( { /compose\.dev\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes mode overlay' );
     ok( grep( { /compose\.mailhog\.yaml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes config addon overlay' );
-    ok( grep( { /green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes the isolated base file before its development overlays' );
-    ok( grep( { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes isolated development compose files automatically for selected services' );
-    ok( !grep( { /skills\/beta-skill\/config\/docker\/green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver excludes docker roots contributed by disabled skills' );
+    ok( grep( { _path_suffix_matches( $_, 'green/compose.yml' ) } @{ $resolved->{files} } ), 'docker compose resolver includes the isolated base file before its development overlays' );
+    ok( grep( { _path_suffix_matches( $_, 'green/development.compose.yml' ) } @{ $resolved->{files} } ), 'docker compose resolver includes isolated development compose files automatically for selected services' );
+    ok( !grep( { _path_suffix_matches( $_, 'skills/beta-skill/config/docker/green/compose.yml' ) } @{ $resolved->{files} } ), 'docker compose resolver excludes docker roots contributed by disabled skills' );
     is( $resolved->{env}{APP_MODE}, 'dev', 'docker compose resolver merges mode env' );
     is_same_path(
         $resolved->{env}{alpha_skill_DDDC},
@@ -403,13 +421,13 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     is( $resolved->{env}{ORANGE_SKILL_ENV}, 'orange-skill', 'docker compose resolver loads .env from participating skill docker roots' );
     is( $resolved->{env}{SKILL_ENV_REF}, 'skill-base', 'docker compose resolver expands participating skill .env values against the current process environment' );
     ok( !exists $resolved->{env}{DISABLED_SKILL_ENV}, 'docker compose resolver skips .env from disabled skill docker roots' );
-    ok( grep( { /skills\/alpha-skill\/\.env$/ } @{ $resolved->{env_files} } ), 'docker compose resolver reports participating skill .env files in dry-run data' );
+    ok( grep( { _path_suffix_matches( $_, 'skills/alpha-skill/.env' ) } @{ $resolved->{env_files} } ), 'docker compose resolver reports participating skill .env files in dry-run data' );
     is_same_path( $resolved->{env}{DDDC}, File::Spec->catdir( $repo, '.developer-dashboard', 'config', 'docker' ), 'docker compose resolver exports DDDC as the effective project-local docker config root' );
     is( $resolved->{env}{MAILHOG_ENABLED}, '1', 'docker compose resolver merges addon env' );
     is_deeply( [ @{ $resolved->{command} }[0,1] ], [ 'docker', 'compose' ], 'docker compose resolver produces docker compose command' );
     is_deeply( $resolved->{precedence}, [ qw(base project service addon mode) ], 'docker compose resolver exposes overlay precedence' );
     is_same_path(
-        ( grep { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } )[-1],
+        ( grep { _path_suffix_matches( $_, 'green/development.compose.yml' ) } @{ $resolved->{files} } )[-1],
         File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'green', 'development.compose.yml' ),
         'docker compose resolver leaves the deepest project-local config/docker service folder as the last overriding development compose layer',
     );
@@ -433,12 +451,12 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     ok( grep( { $_ eq 'orange' } @{ $resolved->{services} } ), 'docker compose resolver auto-loads isolated services contributed by installed skills' );
     ok( grep( { $_ eq 'purple' } @{ $resolved->{services} } ), 'docker compose resolver auto-loads isolated services without requiring activation markers' );
     ok( !grep( { $_ eq 'blue' } @{ $resolved->{services} } ), 'docker compose resolver skips isolated services marked disabled' );
-    ok( grep( { /green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes the isolated base file during plain docker compose passthrough' );
-    ok( grep( { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes the opted-in development overlay during plain docker compose passthrough' );
-    ok( !grep( { /skills\/beta-skill\/config\/docker\/green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose passthrough excludes compose roots contributed by disabled skills' );
-    ok( grep( { /skills\/alpha-skill\/config\/docker\/orange\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes skill docker compose roots during plain docker compose passthrough' );
-    ok( grep( { /purple\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes non-disabled isolated compose folders during plain docker compose passthrough' );
-    ok( !grep( { /blue\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver does not include disabled isolated compose folders' );
+    ok( grep( { _path_suffix_matches( $_, 'green/compose.yml' ) } @{ $resolved->{files} } ), 'docker compose resolver includes the isolated base file during plain docker compose passthrough' );
+    ok( grep( { _path_suffix_matches( $_, 'green/development.compose.yml' ) } @{ $resolved->{files} } ), 'docker compose resolver includes the opted-in development overlay during plain docker compose passthrough' );
+    ok( !grep( { _path_suffix_matches( $_, 'skills/beta-skill/config/docker/green/compose.yml' ) } @{ $resolved->{files} } ), 'docker compose passthrough excludes compose roots contributed by disabled skills' );
+    ok( grep( { _path_suffix_matches( $_, 'skills/alpha-skill/config/docker/orange/compose.yml' ) } @{ $resolved->{files} } ), 'docker compose resolver includes skill docker compose roots during plain docker compose passthrough' );
+    ok( grep( { _path_suffix_matches( $_, 'purple/compose.yml' ) } @{ $resolved->{files} } ), 'docker compose resolver includes non-disabled isolated compose folders during plain docker compose passthrough' );
+    ok( !grep( { _path_suffix_matches( $_, 'blue/compose.yml' ) } @{ $resolved->{files} } ), 'docker compose resolver does not include disabled isolated compose folders' );
     is_same_path(
         $resolved->{env}{alpha_skill_DDDC},
         File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'alpha-skill', 'config', 'docker' ),
@@ -499,9 +517,9 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
         File::Spec->catdir( $nested_skill_leaf_root, 'config', 'docker' ),
         'docker compose resolver exports the cumulative nested skill DDDC alias for a participating nested skill compose root',
     );
-    ok( grep( { /skills\/foo\/\.env$/ } @{ $resolved->{env_files} } ), 'docker compose resolver reports the root nested skill .env file when a nested compose service participates' );
-    ok( grep( { /skills\/foo\/skills\/bar\/\.env$/ } @{ $resolved->{env_files} } ), 'docker compose resolver reports the parent nested skill .env file when a nested compose service participates' );
-    ok( grep( { /skills\/foo\/skills\/bar\/skills\/zzz\/\.env$/ } @{ $resolved->{env_files} } ), 'docker compose resolver reports the leaf nested skill .env file when a nested compose service participates' );
+    ok( grep( { _path_suffix_matches( $_, 'skills/foo/.env' ) } @{ $resolved->{env_files} } ), 'docker compose resolver reports the root nested skill .env file when a nested compose service participates' );
+    ok( grep( { _path_suffix_matches( $_, 'skills/foo/skills/bar/.env' ) } @{ $resolved->{env_files} } ), 'docker compose resolver reports the parent nested skill .env file when a nested compose service participates' );
+    ok( grep( { _path_suffix_matches( $_, 'skills/foo/skills/bar/skills/zzz/.env' ) } @{ $resolved->{env_files} } ), 'docker compose resolver reports the leaf nested skill .env file when a nested compose service participates' );
 }
 
 {
@@ -633,7 +651,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     );
     my $green_resolved = $docker->resolve( project_root => $auto_repo, args => ['config'] );
     ok(
-        grep( { /green\/development\.compose\.yml$/ } @{ $green_resolved->{files} } ),
+        grep( { _path_suffix_matches( $_, 'green/development.compose.yml' ) } @{ $green_resolved->{files} } ),
         'Problem 31: a shallower develop.yml marker enables the development overlay stack-wide',
     );
     my $disabled_development = $docker->disable_service_development( project_root => $auto_repo, service => 'green' );

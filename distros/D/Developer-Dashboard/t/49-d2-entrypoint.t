@@ -15,13 +15,24 @@ use File::Temp qw(tempdir);
 my $repo_root = abs_path( File::Spec->catdir( dirname(__FILE__), '..' ) );
 my $lib       = File::Spec->catdir( $repo_root, 'lib' );
 my $d2        = File::Spec->catfile( $repo_root, 'bin', 'd2' );
-my $dashboard = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
 
 ok( -f $d2, 'bin/d2 is shipped as a real entrypoint' );
-ok( -x $d2, 'bin/d2 is executable' );
+# Windows has no exec bit for an extensionless script (Strawberry Perl
+# derives -x from the file extension), and d2 is run there through perl,
+# never executed directly. The shebang is the runnable-script evidence on
+# Windows, the same shape as t/142.
+if ( $^O eq 'MSWin32' ) {
+    open my $d2_fh, '<', $d2 or die "Unable to read $d2: $!";
+    my $first_line = <$d2_fh>;
+    close $d2_fh;
+    like( $first_line, qr{\A\#!/usr/bin/env perl\r?\n}, 'bin/d2 is executable' );
+}
+else {
+    ok( -x $d2, 'bin/d2 is executable' );
+}
 
-# d2 must be a real re-exec into the sibling dashboard, not a copy of the
-# switchboard body and not a shell alias.
+# d2 is the switchboard itself, not a re-exec into a sibling entrypoint
+# and not a shell alias. bin/dashboard is gone; d2 is the only entrypoint.
 my $source = do {
     open my $fh, '<:raw', $d2 or die "Unable to read $d2: $!";
     local $/;
@@ -29,26 +40,22 @@ my $source = do {
 };
 like( $source, qr/^#!.*perl/,             'bin/d2 is a real perl script' );
 like( $source, qr/\bexec\b/,              'bin/d2 execs rather than aliasing' );
-like( $source, qr/catfile\(\s*\$Bin\s*,\s*'dashboard'\s*\)/, 'bin/d2 resolves its sibling dashboard entrypoint' );
-unlike( $source, qr/_exec_switchboard_command|_builtin_helper_command/, 'bin/d2 does not duplicate the switchboard body' );
+ok( !-f File::Spec->catfile( $repo_root, 'bin', 'dashboard' ), 'bin/dashboard no longer exists; d2 is the only entrypoint' );
+like( $source, qr/_exec_switchboard_command|_builtin_helper_command/, 'bin/d2 carries the switchboard body' );
 
-# Functionally identical to dashboard for a representative command.
+# d2 runs the command surface for a representative command.
 my ( $d2_out, $d2_err, $d2_exit ) = capture {
     system( $^X, '-I', $lib, $d2, 'version' );
 };
-my ( $db_out, $db_err, $db_exit ) = capture {
-    system( $^X, '-I', $lib, $dashboard, 'version' );
-};
 is( $d2_exit >> 8, 0,        'd2 version exits cleanly' );
-is( $d2_out,       $db_out,  'd2 version output matches dashboard version output' );
-like( $d2_out, qr/\A\d+\.\d+\s*\z/, 'd2 version prints the dashboard version number' );
+like( $d2_out, qr/\A\d+\.\d+\s*\z/, 'd2 version prints the d2 version number' );
 
 # d2 forwards further arguments to the same command surface.
 my ( $help_out, undef, $help_exit ) = capture {
     system( $^X, '-I', $lib, $d2, 'help' );
 };
 is( $help_exit >> 8, 0, 'd2 help exits cleanly' );
-like( $help_out, qr/dashboard/, 'd2 help renders the dashboard command manual' );
+like( $help_out, qr/dashboard/, 'd2 help renders the d2 command manual' );
 
 # File-specific POD (no generic boilerplate) is present.
 like( $source, qr/^=head1 NAME$/m, 'bin/d2 carries POD documentation' );
@@ -67,8 +74,8 @@ like(
     'Makefile.PL installs bin/d2 as an executable so d2 is a real command after install',
 );
 
-# DD-810: the main gate is inherited through the re-exec, and runs exactly
-# once for it - d2 must not gate once itself and once again in dashboard.
+# DD-810: the main gate runs exactly once - with a single entrypoint
+# there is no second gating pass.
 {
     my $gate_home  = abs_path( tempdir( CLEANUP => 1 ) );
     my $hooks_dir  = File::Spec->catdir( $gate_home, '.developer-dashboard', 'hooks' );
@@ -85,7 +92,7 @@ like(
         system( $^X, '-I', $lib, $d2, 'version' );
     };
     is( $gated_exit >> 8, 0,       'd2 version exits cleanly with a main-gate hook installed' );
-    is( $gated_out,       $db_out, 'd2 version prints the same version through the main gate' );
+    is( $gated_out,       $d2_out, 'd2 version prints the same version through the main gate' );
     is( $gated_err,       '',      'd2 version through the main gate writes nothing to stderr' );
 
     my @marker_lines = ();
@@ -97,7 +104,7 @@ like(
     # DD-835 (reverses DD-832): the hook's argv is the full command line as
     # typed - "version" is prepended, not stripped.
     is_deeply( \@marker_lines, ['HOOK-RAN version'],
-        'd2 inherits the main gate through its re-exec exactly once, not twice' );
+        'd2 runs the main gate exactly once, not twice' );
 }
 
 done_testing;
@@ -108,39 +115,39 @@ __END__
 
 =head1 NAME
 
-t/49-d2-entrypoint.t - regression contract for the real d2 short entrypoint
+t/49-d2-entrypoint.t - regression contract for the d2 entrypoint
 
 =head1 PURPOSE
 
 This test is the executable regression contract for C<bin/d2>. It verifies that
-C<d2> is shipped as a real, executable Perl entrypoint that re-execs its sibling
-C<dashboard> command rather than duplicating the switchboard body or existing
-only as a shell alias, and that C<d2> and C<dashboard> produce identical output
-for a representative command.
+C<d2> is shipped as a real, executable Perl entrypoint carrying the full
+switchboard body (not a shell alias and not a re-exec into a sibling
+entrypoint), that C<bin/dashboard> is gone, and that a representative
+command runs cleanly.
 
 =head1 WHY IT EXISTS
 
-C<d2> used to exist only as a shell function defined by the dashboard shell
-bootstrap, so it was unavailable in scripts and fresh shells. This test exists
-so C<d2> stays a genuine installed command that behaves exactly like
-C<dashboard>, and so a future change cannot quietly turn it back into a
-shell-only alias or fork the command body.
+C<d2> used to be a thin wrapper that re-executed C<bin/dashboard>, and before
+that only a shell function defined by the d2 shell bootstrap, so it was
+unavailable in scripts and fresh shells. This test exists so C<d2> stays a
+genuine installed command and the only entrypoint, and so a future change
+cannot quietly turn it back into a shell-only alias, a wrapper, or a fork
+of the command body.
 
 =head1 WHEN TO USE
 
-Use this file when changing how C<d2> locates and re-enters the main
-C<dashboard> entrypoint, or when changing how C<d2> is packaged as an installed
-executable.
+Use this file when changing how C<d2> is packaged as an installed
+executable, or when changing the switchboard dispatch in C<bin/d2>.
 
 =head1 HOW TO USE
 
-Run C<prove -lv t/49-d2-entrypoint.t> while iterating on the short entrypoint.
+Run C<prove -lv t/49-d2-entrypoint.t> while iterating on the entrypoint.
 Keep it green under C<prove -lr t> before calling the work complete.
 
 =head1 WHAT USES IT
 
 Developers during TDD, the repository test suite, and the release gate all use
-this file to keep C<d2> a real, dashboard-equivalent command.
+this file to keep C<d2> the real, single CLI entrypoint.
 
 =head1 EXAMPLES
 

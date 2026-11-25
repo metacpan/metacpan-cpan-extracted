@@ -843,7 +843,7 @@ function Ensure-GnuMakeCommand {
 }
 
 function Ensure-NodeToolchain {
-    # Purpose: make sure node, npm, and npx all exist before dashboard skills need package.json support.
+    # Purpose: make sure node, npm, and npx all exist before d2 skills need package.json support.
     # Input: the current PATH and optional winget package manager.
     # Output: returns nothing after the Node toolchain is available or throws on failure.
     $nodePath = Resolve-CommandPath -Names @('node.exe', 'node')
@@ -917,7 +917,7 @@ function Assert-ValidPowerShellCache {
     )
 
     if (-not (Test-Path -LiteralPath $Path -PathType Leaf) -or (Get-Item -LiteralPath $Path).Length -le 0) {
-        throw "PowerShell startup cache generation failed: $Label is missing or empty at $Path. Run 'dashboard shell ps' to refresh the cache files."
+        throw "PowerShell startup cache generation failed: $Label is missing or empty at $Path. Run 'd2 shell ps' to refresh the cache files."
     }
 
     $tokens = $null
@@ -925,7 +925,7 @@ function Assert-ValidPowerShellCache {
     $null = [System.Management.Automation.Language.Parser]::ParseFile($Path, [ref]$tokens, [ref]$parseErrors)
     if ($parseErrors.Count -gt 0) {
         $messages = ($parseErrors | ForEach-Object { $_.Message }) -join '; '
-        throw "PowerShell startup cache generation failed: $Label is invalid at $Path ($messages). Run 'dashboard shell ps' to refresh the cache files."
+        throw "PowerShell startup cache generation failed: $Label is invalid at $Path ($messages). Run 'd2 shell ps' to refresh the cache files."
     }
 }
 
@@ -1107,19 +1107,19 @@ if ((Test-Path -LiteralPath `$ddEnvironmentCache -PathType Leaf) -and
         . `$ddBootstrapCache
     }
     catch {
-        Write-Warning "Developer Dashboard PowerShell startup cache files could not be loaded. Run 'dashboard shell ps' to refresh them. `$(`$_.Exception.Message)"
+        Write-Warning "Developer Dashboard PowerShell startup cache files could not be loaded. Run 'd2 shell ps' to refresh them. `$(`$_.Exception.Message)"
     }
 }
 else {
-    Write-Warning "Developer Dashboard PowerShell startup cache files are missing or empty. Run 'dashboard shell ps' to refresh them."
+    Write-Warning "Developer Dashboard PowerShell startup cache files are missing or empty. Run 'd2 shell ps' to refresh them."
 }
 # <<< Developer Dashboard bootstrap <<<
 "@
 Set-StepStatus -Id 'bootstrap_perl' -Status 'ok' -Detail 'cpanm, local::lib, GNU make, and configure prereqs ready'
 
-$dashboardCommand = Resolve-CommandPath -Names @('dashboard.bat', 'dashboard', 'dashboard.cmd')
+$dashboardCommand = Resolve-CommandPath -Names @('d2.bat', 'd2', 'd2.cmd')
 if ([string]::IsNullOrWhiteSpace($dashboardCommand)) {
-    $candidate = Join-Path $InstallRoot 'bin\dashboard.bat'
+    $candidate = Join-Path $InstallRoot 'bin\d2.bat'
     if (Test-Path $candidate) {
         $dashboardCommand = $candidate
     }
@@ -1150,18 +1150,18 @@ else {
         $effectiveCpanTarget
     )
 }
-$dashboardCommand = Resolve-CommandPath -Names @('dashboard.bat', 'dashboard', 'dashboard.cmd')
+$dashboardCommand = Resolve-CommandPath -Names @('d2.bat', 'd2', 'd2.cmd')
 if ([string]::IsNullOrWhiteSpace($dashboardCommand)) {
-    $candidate = Join-Path $InstallRoot 'bin\dashboard.bat'
+    $candidate = Join-Path $InstallRoot 'bin\d2.bat'
     if (-not (Test-Path $candidate)) {
-        throw 'Developer Dashboard installed but dashboard command is still unavailable on PATH'
+        throw 'Developer Dashboard installed but d2 command is still unavailable on PATH'
     }
     $dashboardCommand = $candidate
 }
 Set-StepStatus -Id 'install_dashboard' -Status 'ok' -Detail ("target: {0}" -f $effectiveCpanTarget)
 
 Set-StepStatus -Id 'initialize_dashboard' -Status 'running'
-Invoke-NativeCommand -Label 'dashboard init' -FilePath $dashboardCommand -Arguments @('init')
+Invoke-NativeCommand -Label 'd2 init' -FilePath $dashboardCommand -Arguments @('init')
 $dashboardShellBootstrap = & $perlPath $dashboardCommand shell ps
 $dashboardShellBootstrapText = Join-ScriptText -Value $dashboardShellBootstrap
 $powershellCacheRoot = Join-Path $env:HOME '.developer-dashboard\cache'
@@ -1169,7 +1169,7 @@ $powershellEnvironmentCache = Join-Path $powershellCacheRoot 'powershell-env.ps1
 $powershellBootstrapCache = Join-Path $powershellCacheRoot 'powershell-bootstrap.ps1'
 if (-not (Test-Path -LiteralPath $powershellEnvironmentCache -PathType Leaf) -or
     -not (Test-Path -LiteralPath $powershellBootstrapCache -PathType Leaf)) {
-    throw "PowerShell startup cache generation failed. Run 'dashboard shell ps' to refresh the cache files."
+    throw "PowerShell startup cache generation failed. Run 'd2 shell ps' to refresh the cache files."
 }
 Assert-ValidPowerShellCache -Path $powershellEnvironmentCache -Label 'environment cache'
 Assert-ValidPowerShellCache -Path $powershellBootstrapCache -Label 'shell bootstrap cache'
@@ -1184,12 +1184,12 @@ if (-not [string]::IsNullOrWhiteSpace($ShellCommands)) {
         throw "Post-install activation commands failed with exit code $LASTEXITCODE"
     }
 }
-Set-StepStatus -Id 'initialize_dashboard' -Status 'ok' -Detail 'dashboard init completed'
+Set-StepStatus -Id 'initialize_dashboard' -Status 'ok' -Detail 'd2 init completed'
 
 Write-Host ("Shell setup was written to: {0}" -f $ProfilePath)
 Write-Host 'Developer Dashboard is installed and initialized.'
 Write-Host 'Open a new PowerShell window or run this in the current shell:'
 Write-Host (". '{0}'" -f $ProfilePath)
 Write-Host 'Then verify with:'
-Write-Host 'dashboard version'
+Write-Host 'd2 version'
 } @args

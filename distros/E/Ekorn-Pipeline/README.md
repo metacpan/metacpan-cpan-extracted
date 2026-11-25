@@ -98,9 +98,7 @@ written where they ask for the values, in the order it happens, and
 reads as a list of steps.
 - **The work stops when the caller has enough.** A stage that
 stops ends the function's work too. A caller who wants ten results
-reads ten lines, or fetches one page, not all of them. Nothing is held
-between stages, so a function over a million values needs no more
-memory than one over ten.
+reads ten lines, or fetches one page, not all of them.
 - **The author keeps an interface that doesn't grow.** One list of
 stages replaces every option a caller might ask for next. The
 function's signature, documentation and tests stay the size of what
@@ -199,8 +197,10 @@ stages instead: `users($active_names->stages, take(10))`.
 
 Each value goes through every stage before the next one starts, as it
 would in a `for` loop. The values come out in order, and each stage
-sees them in order. Nothing is held between stages, so a pipeline over
-a million values needs no more memory than one over ten.
+sees them in order. Nothing is held between stages, but by a stage
+that holds values itself, such as `batch` or `collect`; without
+one, a pipeline over a million values needs no more memory than one
+over ten.
 
 A pipeline runs three ways:
 
@@ -562,10 +562,11 @@ as a stage that's neither a code reference nor a pipeline, or
 
 ## What comes with it
 
-- [Ekorn::Pipeline::Tooling](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3ATooling): everything below but the
+- [Ekorn::Pipeline::Tooling](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3ATooling): the functions of every module
+below but Sugar, which names pipelines as it's loaded, and the
 operators, from one module, by tags: `:core`, `:flow`, `:batch`,
-`:taps`, `:stages`, `:sources`, `:sinks`, `:json`, `:words` and
-`:all`.
+`:taps`, `:stages`, `:context`, `:sources`, `:sinks`, `:json`,
+`:csv`, `:words` and `:all`.
 - [Ekorn::Pipeline::Stages::Flow](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AStages%3A%3AFlow): `take`, `drop`,
 `take_first`, `take_last`, `take_single`, `take_if`, `drop_if`,
 `take_while` and `drop_while`, which pass values on by their position
@@ -576,6 +577,10 @@ which gather values and pass them on together.
 `dump_to` and `tee`, which look at each value and pass it on, for
 logging, counting and debugging; `tee` runs each through a branch of
 stages of your own, so a tap can be any pipeline.
+- [Ekorn::Pipeline::Context](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AContext): `result_number` and
+`result_original`, which a stage asks for the number of the result
+it's making, and the value it's being made from, as each run counts
+its results.
 - [Ekorn::Pipeline::Sources](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3ASources) and [Ekorn::Pipeline::Sinks](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3ASinks):
 the sources and sinks above.
 - [Ekorn::Pipeline::JSON](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AJSON): `from_json` and `to_json`, which
@@ -583,6 +588,10 @@ read and write one JSON document, and `from_jsonl` and `to_jsonl`,
 which read and write JSON Lines: each a source or a sink given a file
 or a filehandle, and a stage given neither. The how-to walks through
 how a module like it is put together.
+- [Ekorn::Pipeline::CSV](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3ACSV): `from_csv` and `to_csv`, which read
+and write CSV and TSV, in the same way, with [Text::CSV](https://metacpan.org/pod/Text%3A%3ACSV), which Ekorn
+recommends: rows as arrays, or as hashes keyed by a header, whose names
+are the run's columns.
 - [Ekorn::Pipeline::Sugar](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3ASugar): pipelines named as the program
 compiles, each with a function of its name.
 - [Ekorn::Pipeline::Factories](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AFactories): the words that make Ekorn's

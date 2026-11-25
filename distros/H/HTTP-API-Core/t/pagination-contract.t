@@ -413,4 +413,61 @@ my $secret_continuation = 'opaque-secret-123abc';
         'rejected sensitive URL is never requested';
 }
 
+
+# Constructor rejection must happen before contacting the client and without
+# warnings from coercing malformed option lists or reference-valued options.
+my $validation_client = T::PagerClient->new({
+    '/validation' => { items => [1], next => undef },
+});
+for my $case (
+    [ [client => $validation_client, path => '/validation', 'dangling'],
+      qr/pagination options must be key\/value pairs/, 'odd option list' ],
+    [ [client => $validation_client, path => '/validation', [] => 1],
+      qr/pagination option names must be scalars/, 'reference option name' ],
+    [ [client => undef, path => '/validation'],
+      qr/client is required/, 'explicit undefined client' ],
+    [ [client => $validation_client, path => '/validation', response_aware_extractors => []],
+      qr/response_aware_extractors must be a scalar/, 'reference response-aware flag' ],
+    [ [client => $validation_client, path => '/validation', allow_cross_origin => {}],
+      qr/allow_cross_origin must be a scalar/, 'reference cross-origin flag' ],
+    [ [client => $validation_client, path => '/validation', cursor => []],
+      qr/cursor must be a scalar or undef/, 'reference cursor' ],
+    [ [client => $validation_client, path => '/validation', start_offset => undef],
+      qr/start_offset must be a non-negative integer/, 'undefined start offset' ],
+) {
+    my ($args, $pattern, $label) = @$case;
+    my @warnings;
+    my $error;
+    {
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
+        eval { HTTP::API::Core::Pagination->new(@$args); 1 } or $error = $@;
+    }
+    like $error, $pattern, "$label is rejected";
+    is_deeply \@warnings, [], "$label does not cause coercion warnings";
+}
+
+for my $name (qw(page_param page_size_param cursor_param offset_param)) {
+    for my $case ([undef, 'undefined'], ['', 'empty'], [[], 'reference-valued']) {
+        my ($value, $label) = @$case;
+        dies_like(
+            sub {
+                HTTP::API::Core::Pagination->new(
+                    client => $validation_client, path => '/validation', $name => $value,
+                );
+            },
+            qr/pagination \Q$name\E must be a non-empty scalar/,
+            "$label $name is rejected",
+        );
+    }
+}
+
+is_deeply $validation_client->{calls}, [], 'invalid constructor options never fetch a page';
+
+my $default_mode = HTTP::API::Core::Pagination->new(
+    client => $validation_client, path => '/validation', mode => '',
+);
+is_deeply scalar($default_mode->all), [1], 'empty mode retains next_url default';
+is_deeply [map { $_->[0] } @{ $validation_client->{calls} }],
+    ['/validation'], 'default mode uses the original URL';
+
 done_testing;

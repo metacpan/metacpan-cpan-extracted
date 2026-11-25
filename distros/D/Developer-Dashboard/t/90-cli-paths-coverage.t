@@ -202,12 +202,12 @@ subtest 'run_paths_command rejects malformed dispatch arguments' => sub {
 
 subtest 'paths and path list reject leftover positional arguments' => sub {
     my $paths_extra = eval { $run->( command => 'paths', args => ['leftover'] ); 1 };
-    is( $paths_extra, undef, 'dashboard paths refuses a stray positional argument' );
-    like( $@, qr/^Usage: dashboard paths \[-o json\|table\]$/m, 'the paths usage message is printed' );
+    is( $paths_extra, undef, 'd2 paths refuses a stray positional argument' );
+    like( $@, qr/^Usage: d2 paths \[-o json\|table\]$/m, 'the paths usage message is printed' );
 
     my $list_extra = eval { $run->( command => 'path', args => [ 'list', 'leftover' ] ); 1 };
-    is( $list_extra, undef, 'dashboard path list refuses a stray positional argument' );
-    like( $@, qr/^Usage: dashboard path list \[-o json\|table\]$/m, 'the list usage message is printed' );
+    is( $list_extra, undef, 'd2 path list refuses a stray positional argument' );
+    like( $@, qr/^Usage: d2 path list \[-o json\|table\]$/m, 'the list usage message is printed' );
 };
 
 subtest 'paths reuses one nested-skill inventory for configured and Folder.pm aliases' => sub {
@@ -229,15 +229,39 @@ subtest 'paths reuses one nested-skill inventory for configured and Folder.pm al
     like( $out, qr/\A\{/, 'the path list still emits its JSON payload' );
 };
 
+subtest 'nested skill discovery resolves backslash-spelled Windows roots' => sub {
+    my $registry = Developer::Dashboard::PathRegistry->new( home => $home );
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PathRegistry::installed_skill_roots = sub {
+            return ( 'C:\skills\alpha-skill', 'C:\skills\beta-skill' );
+        };
+        my @entries = $registry->nested_skill_entries;
+        is_deeply( [ map { $_->{segments} } @entries ], [ ['alpha-skill'], ['beta-skill'] ],
+            'backslash-spelled Windows skill roots resolve their names' );
+        is_deeply( [ map { $_->{dir} } @entries ], [ 'C:\skills\alpha-skill', 'C:\skills\beta-skill' ],
+            'backslash-spelled Windows skill roots keep their directories' );
+    }
+    {
+        no warnings qw(once redefine);
+        local *Developer::Dashboard::PathRegistry::installed_skill_roots = sub {
+            return ( 'alpha-skill', 'C:\\' );
+        };
+        my @entries = $registry->nested_skill_entries;
+        is_deeply( \@entries, [],
+            'skill roots without an extractable name are skipped instead of producing a phantom alias' );
+    }
+};
+
 subtest 'path dispatch reports usage for missing verbs and operands' => sub {
     my $no_action = eval { $run->( command => 'path', args => [] ); 1 };
     is( $no_action, undef, 'an empty path argument list falls through to the dispatch usage error' );
-    like( $@, qr/^Usage: dashboard path <resolve\|locate\|cdr\|complete-cdr\|add\|del\|rm\|project-root\|list> \.\.\.$/m,
+    like( $@, qr/^Usage: d2 path <resolve\|locate\|cdr\|complete-cdr\|add\|del\|rm\|project-root\|list> \.\.\.$/m,
         'the path dispatch usage message is printed' );
 
     my $no_name = eval { $run->( command => 'path', args => ['resolve'] ); 1 };
     is( $no_name, undef, 'path resolve without a name aborts' );
-    like( $@, qr/^Usage: dashboard path resolve <name>$/m, 'the resolve usage message is printed' );
+    like( $@, qr/^Usage: d2 path resolve <name>$/m, 'the resolve usage message is printed' );
 };
 
 subtest 'path complete-cdr defaults a missing or empty completion index' => sub {
@@ -265,15 +289,15 @@ subtest 'path project-root prints nothing outside a project checkout' => sub {
 subtest 'path add reports usage for every incomplete operand form' => sub {
     my $no_operands = eval { $run->( command => 'path', args => ['add'] ); 1 };
     is( $no_operands, undef, 'path add without operands aborts' );
-    like( $@, qr/^Usage: dashboard path add <name> <path>$/m, 'the add usage message is printed for no operands' );
+    like( $@, qr/^Usage: d2 path add <name> <path>$/m, 'the add usage message is printed for no operands' );
 
     my $lone_name = eval { $run->( command => 'path', args => [ 'add', 'solo' ] ); 1 };
     is( $lone_name, undef, 'a single non-dot operand is not the current-directory shorthand' );
-    like( $@, qr/^Usage: dashboard path add <name> <path>$/m, 'the add usage message is printed for a lone alias name' );
+    like( $@, qr/^Usage: d2 path add <name> <path>$/m, 'the add usage message is printed for a lone alias name' );
 
     my $empty_name = eval { $run->( command => 'path', args => [ 'add', '', 'target' ] ); 1 };
     is( $empty_name, undef, 'an empty alias name aborts' );
-    like( $@, qr/^Usage: dashboard path add <name> <path>$/m, 'the add usage message is printed for an empty alias name' );
+    like( $@, qr/^Usage: d2 path add <name> <path>$/m, 'the add usage message is printed for an empty alias name' );
 };
 
 subtest '_normalize_delete_argument guards its injected dependencies' => sub {
@@ -290,11 +314,11 @@ subtest '_normalize_delete_argument guards its injected dependencies' => sub {
 
     my $no_name = eval { $normalize_delete->( paths => $paths, config => $config ); 1 };
     is( $no_name, undef, 'an undefined alias name aborts alias deletion' );
-    like( $@, qr/^Usage: dashboard path del <name>$/m, 'the del usage message is printed for an undefined name' );
+    like( $@, qr/^Usage: d2 path del <name>$/m, 'the del usage message is printed for an undefined name' );
 
     my $empty_name = eval { $normalize_delete->( paths => $paths, config => $config, name => '' ); 1 };
     is( $empty_name, undef, 'an empty alias name aborts alias deletion' );
-    like( $@, qr/^Usage: dashboard path del <name>$/m, 'the del usage message is printed for an empty name' );
+    like( $@, qr/^Usage: d2 path del <name>$/m, 'the del usage message is printed for an empty name' );
 };
 
 subtest '_normalize_delete_argument falls back to the directory basename' => sub {
@@ -425,6 +449,17 @@ subtest 'Folder.pm alias validation reports malformed providers and unsafe layou
     is( $entries_without_segments[0]{name}, '',
         'a skill entry without segments defaults to an empty name safely' );
     @entries = ();
+
+    my @entries_with_bad_segments = $folder_entries->(
+        $paths,
+        [
+            { segments => [undef, 'work'], dir => $home },
+            { segments => ['', 'work'],    dir => $home },
+            { segments => ['good'],        dir => $home },
+        ],
+    );
+    is_deeply( [ map { $_->{name} } @entries_with_bad_segments ], ['good'],
+        'skill entries with an undef or empty name segment are skipped instead of producing a phantom alias' );
 
     my $missing_entry = eval { Developer::Dashboard::CLI::Paths::_load_skill_folder_module(undef); 1 };
     is( $missing_entry, undef, '_load_skill_folder_module rejects a non-hash entry' );
@@ -635,19 +670,19 @@ FOLDER_MODULE
         $run->( command => 'path', args => [ 'cdr', 'folder-skill.docs' ] );
     };
     is( $config_cdr_err, '', 'a configured skill alias resolves without a Folder.pm error' );
-    is( json_decode($config_cdr)->{target}, '/configured/docs', 'config/config.json takes precedence over a colliding Folder.pm method' );
+    is( json_decode($config_cdr)->{target}, File::Spec->canonpath('/configured/docs'), 'config/config.json takes precedence over a colliding Folder.pm method' );
 
     my ( $folder_cdr, $folder_cdr_err ) = capture {
         $run->( command => 'path', args => [ 'cdr', 'folder-skill.module_only' ] );
     };
     is( $folder_cdr_err, '', 'a Folder.pm-only skill alias resolves without diagnostics' );
-    is( json_decode($folder_cdr)->{target}, '/module/only', 'cdr resolves an alias from the skill Folder.pm method' );
+    is( json_decode($folder_cdr)->{target}, File::Spec->canonpath('/module/only'), 'cdr resolves an alias from the skill Folder.pm method' );
 
     my ( $resolved_output, $resolved_err ) = capture {
         $run->( command => 'path', args => [ 'resolve', 'folder-skill.module_only' ] );
     };
     is( $resolved_err, '', 'path resolve handles Folder.pm aliases without diagnostics' );
-    is( $resolved_output, "/module/only\n", 'path resolve consults Folder.pm after configured aliases' );
+    is( $resolved_output, File::Spec->canonpath('/module/only') . "\n", 'path resolve consults Folder.pm after configured aliases' );
 
     my ( $paths_json, $paths_err ) = capture {
         $run->( command => 'paths', args => [ '-o', 'json' ] );
@@ -655,13 +690,16 @@ FOLDER_MODULE
     is( $paths_err, '', 'paths lists Folder.pm aliases without diagnostics' );
     my $listed_paths = json_decode($paths_json);
     is( $listed_paths->{'folder-skill.docs'}, '/configured/docs', 'paths keeps the config alias value when a Folder.pm alias collides' );
-    is( $listed_paths->{'folder-skill.module_only'}, '/module/only', 'paths merges aliases returned by Folder->__list__ and Folder methods' );
+    # Folder.pm targets are handed through _expand_home, which returns the
+    # native spelling on Windows (as the cdr and resolve checks above already
+    # expect); the configured alias is listed exactly as stored.
+    is( $listed_paths->{'folder-skill.module_only'}, File::Spec->canonpath('/module/only'), 'paths merges aliases returned by Folder->__list__ and Folder methods' );
 
     my ( $path_list_json, $path_list_err ) = capture {
         $run->( command => 'path', args => [ 'list', '-o', 'json' ] );
     };
     is( $path_list_err, '', 'path list includes Folder.pm aliases without diagnostics' );
-    is( json_decode($path_list_json)->{'folder-skill.module_only'}, '/module/only', 'path list merges the listed Folder.pm aliases without persisting them' );
+    is( json_decode($path_list_json)->{'folder-skill.module_only'}, File::Spec->canonpath('/module/only'), 'path list merges the listed Folder.pm aliases without persisting them' );
 
     my ( $completion, $completion_err ) = capture {
         $run->( command => 'path', args => [ 'complete-cdr', 1, 'cdr', 'folder-skill.m' ] );
@@ -1085,7 +1123,7 @@ t/90-cli-paths-coverage.t - branch and condition coverage for the path CLI runti
 
 This test drives every remaining decision point in
 C<Developer::Dashboard::CLI::Paths> that the behavioural suites never reach: the
-dispatch argument guards, the usage errors for each C<dashboard path> verb, the
+dispatch argument guards, the usage errors for each C<d2 path> verb, the
 current-directory delete shorthand when alias targets are missing, blank, or
 unexpandable, the C<cdr> payload and completion helpers when an alias resolves
 to a blank target or the completion index runs past the supplied words,
@@ -1129,8 +1167,8 @@ columns for the path CLI module.
 =head1 WHAT USES IT
 
 The repository test suite, the Devel::Cover gate, and developers changing the
-path CLI runtime use this file to keep the defensive edges of C<dashboard path>
-and C<dashboard paths> behaving as documented. Its skill fixture also pins
+path CLI runtime use this file to keep the defensive edges of C<d2 path>
+and C<d2 paths> behaving as documented. Its skill fixture also pins
 config-first resolution, list-context C<Folder-E<gt>__list__> discovery, and
 the rule that C<path add> writes config without editing an installed skill. It
 also verifies that C<cdr> completion lists direct children and descends one

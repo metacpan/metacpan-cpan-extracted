@@ -3,7 +3,7 @@ package Developer::Dashboard::Housekeeper;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use File::Path qw(remove_tree);
 use File::Spec;
@@ -441,7 +441,7 @@ actually being removed, rotated, or unlinked on disk.
 
 =head1 WHAT USES IT
 
-It is used by the built-in C<dashboard housekeeper> command and by the built-in
+It is used by the built-in C<d2 housekeeper> command and by the built-in
 C<housekeeper> collector job that runs through the normal collector runtime.
 
 =head1 EXAMPLES
@@ -454,13 +454,13 @@ Compile-load the module directly from a source checkout.
 
 Example 2:
 
-  dashboard housekeeper
+  d2 housekeeper
 
 Run the built-in command path and print the JSON cleanup summary.
 
 Example 3:
 
-  dashboard collector run housekeeper
+  d2 collector run housekeeper
 
 Run the built-in housekeeper collector through the collector runtime and store
 its output like any other managed collector.

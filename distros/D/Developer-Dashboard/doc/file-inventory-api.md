@@ -8,20 +8,20 @@ existing path alias surface.
 Use these commands for named files:
 
 ```bash
-dashboard files
-dashboard file list
-dashboard file add notes ~/notes.txt
-dashboard file resolve notes
-dashboard file del notes
+d2 files
+d2 file list
+d2 file add notes ~/notes.txt
+d2 file resolve notes
+d2 file del notes
 ```
 
 Behavior:
 
-- `dashboard files` prints the full built-in plus configured file inventory
-- `dashboard file list` prints only configured named file aliases
-- `dashboard file add` writes to the deepest participating config layer
-- `dashboard file add` stores home-local targets as `$HOME/...` for portability
-- `dashboard file del` is idempotent for missing aliases
+- `d2 files` prints the full built-in plus configured file inventory
+- `d2 file list` prints only configured named file aliases
+- `d2 file add` writes to the deepest participating config layer
+- `d2 file add` stores home-local targets as `$HOME/...` for portability
+- `d2 file del` is idempotent for missing aliases
 
 ## Perl API
 

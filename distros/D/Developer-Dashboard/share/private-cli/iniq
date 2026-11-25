@@ -24,7 +24,7 @@ iniq - INI query command for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard iniq [path] [file]
+  d2 iniq [path] [file]
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ This command provides INI query extraction for Developer Dashboard.
 
 =head1 PURPOSE
 
-This staged helper owns the public C<dashboard iniq> command. It accepts an
+This staged helper owns the public C<d2 iniq> command. It accepts an
 optional dotted INI path or C<$d>-based Perl expression plus an optional input
 file, then hands the request to the shared query runtime so parsing,
 file-vs-STDIN handling, and output formatting stay consistent with the rest of
@@ -42,15 +42,15 @@ the dashboard toolchain.
 
 =head1 WHY IT EXISTS
 
-It exists because the dashboard ships a private, repo-local INI inspection tool instead of depending on a globally installed parser binary. Keeping C<iniq> as a staged helper also preserves the thin-switchboard contract in C<bin/dashboard>.
+It exists because the dashboard ships a private, repo-local INI inspection tool instead of depending on a globally installed parser binary. Keeping C<iniq> as a staged helper also preserves the thin-switchboard contract in C<bin/d2>.
 
 =head1 WHEN TO USE
 
-Use this file when you are changing how C<dashboard iniq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
+Use this file when you are changing how C<d2 iniq> chooses between STDIN and files, how it reports parse errors, or how the staged helper is wired into the shared query implementation.
 
 =head1 HOW TO USE
 
-Users run C<dashboard iniq [path] [file]>. The staged helper selects the INI
+Users run C<d2 iniq [path] [file]>. The staged helper selects the INI
 backend in the shared query runtime, which accepts the file and path in either
 order, reads STDIN when no file is given, treats section keys as dotted paths
 such as C<alpha.beta>, and prints the whole parsed document when the path is
@@ -60,15 +60,15 @@ formatting the result.
 
 =head1 WHAT USES IT
 
-It is used by the public C<dashboard iniq> command, by shell snippets that want a runtime-local INI query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
+It is used by the public C<d2 iniq> command, by shell snippets that want a runtime-local INI query tool, by integration smoke runs, and by the focused query-helper coverage under C<t/>.
 
 =head1 EXAMPLES
 
-  printf '[alpha]\nbeta=6\n' | dashboard iniq alpha.beta
-  dashboard iniq config.ini '$d'
-  dashboard iniq '$d' config.ini
-  printf '[foo]\na=1\n[bar]\nb=2\n' | dashboard iniq 'sort keys %$d'
-  printf '[service]\nname=demo\n' | dashboard iniq service.name
+  printf '[alpha]\nbeta=6\n' | d2 iniq alpha.beta
+  d2 iniq config.ini '$d'
+  d2 iniq '$d' config.ini
+  printf '[foo]\na=1\n[bar]\nb=2\n' | d2 iniq 'sort keys %$d'
+  printf '[service]\nname=demo\n' | d2 iniq service.name
 
 =for comment FULL-POD-DOC END
 

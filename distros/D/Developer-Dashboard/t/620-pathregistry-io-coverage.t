@@ -13,6 +13,16 @@ BEGIN {
     require Scalar::Util;
     require Symbol;
     *CORE::GLOBAL::open = sub (*;$@) {
+        # A bareword handle such as STDOUT reaches a "*" prototype as a plain
+        # string, which CORE::open refuses under strict refs. Resolve it to
+        # the caller's glob first. Windows is where this is exercised: the
+        # product secures runtime paths there by running icacls with STDOUT
+        # and STDERR redirected and restored.
+        if ( defined $_[0] && !ref $_[0] ) {
+            my $glob = Symbol::qualify_to_ref( $_[0], scalar caller );
+            return CORE::open( $glob, $_[1] ) if @_ == 2;
+            return CORE::open( $glob, $_[1], @_[ 2 .. $#_ ] );
+        }
         if ( @_ >= 3 && defined $_[2] && !ref $_[2] && $FAIL_OPEN{ $_[2] } ) {
             $! = 13;
             return 0;
@@ -196,7 +206,10 @@ sub error_of  { my ($code) = @_; return eval { $code->(); 1 } ? '' : $@ }
         like( error_of( sub { $paths->with_dir( $dir, sub { 1 } ) } ), qr/Unable to chdir to \Q$dir\E/, 'with_dir dies when chdir fails' );
     }
     {
-        my $old = getcwd();
+        # with_dir saves the cwd with the product's own lookup and restores
+        # to that exact spelling (backslashes on Windows, where Cwd's getcwd
+        # gives forward slashes), so key the injected failure on it.
+        my $old = Developer::Dashboard::PathIdentity::current_working_directory();
         local $FAIL_CHDIR{$old} = 1;
         like( error_of( sub { $paths->with_dir( $dir, sub { 1 } ) } ), qr/Unable to restore cwd to \Q$old\E/, 'with_dir dies when restoring the cwd fails' );
         delete $FAIL_CHDIR{$old};
@@ -217,11 +230,11 @@ sub error_of  { my ($code) = @_; return eval { $code->(); 1 } ? '' : $@ }
         my $sub = File::Spec->catdir( $work, 'one' );
         local $FAIL_OPENDIR{$sub} = 1;
         my @found = $paths->locate_dirs_under($work);
-        ok( !grep( { m{/two\z} } @found ), 'locate_dirs_under does not descend into an unreadable directory' );
-        ok( scalar( grep { m{/one\z} } @found ), 'locate_dirs_under still reports the unreadable directory itself' );
+        ok( !grep( { m{[\\/]two\z} } @found ), 'locate_dirs_under does not descend into an unreadable directory' );
+        ok( scalar( grep { m{[\\/]one\z} } @found ), 'locate_dirs_under still reports the unreadable directory itself' );
     }
     my @all = $paths->locate_dirs_under($work);
-    ok( scalar( grep { m{/two\z} } @all ), 'locate_dirs_under descends when readable' );
+    ok( scalar( grep { m{[\\/]two\z} } @all ), 'locate_dirs_under descends when readable' );
 }
 
 # --- chmod failures --------------------------------------------------------
@@ -231,6 +244,18 @@ sub error_of  { my ($code) = @_; return eval { $code->(); 1 } ? '' : $@ }
     my $sub   = File::Spec->catdir( $root, 'cfg' );
     make_path($sub);
     CORE::chmod 0755, $root, $sub or die "Unable to prepare chmod-failure fixture: $!";
+    # These checks are about the chmod and stat mechanism. On a real Windows
+    # host the product hardens paths with an owner-only DACL instead and
+    # never reaches chmod or stat, so the injected failures would not be
+    # seen. The chmod branch is plain Perl and runs anywhere, so pin the
+    # product's platform probe to "not Windows" for the failure-injection
+    # checks only. The helpers are loaded first so the import cannot
+    # replace the pinned probe. This changes nothing on other platforms,
+    # where the probe is already false.
+    Developer::Dashboard::PathRegistry::_load_platform_helpers();
+    my $real_windows_probe = \&Developer::Dashboard::PathRegistry::is_real_windows;
+    no warnings 'redefine';
+    *Developer::Dashboard::PathRegistry::is_real_windows = sub { return 0 };
     {
         local $FAIL_CHMOD{$root} = 1;
         like( error_of( sub { $paths->secure_dir_permissions($sub) } ), qr/Unable to chmod \Q$root\E to 0700/, 'secure_dir_permissions dies when the layer root chmod fails' );
@@ -263,6 +288,10 @@ sub error_of  { my ($code) = @_; return eval { $code->(); 1 } ? '' : $@ }
         local $FAIL_CHMOD{$sub} = 1;
         like( error_of( sub { $paths->_ensure_state_dir($sub) } ), qr/Unable to chmod \Q$sub\E to 0700/, '_ensure_state_dir dies when chmod of an existing dir fails' );
     }
+    # Back to the real platform probe: the remaining checks pass through the
+    # mechanism the host really uses.
+    *Developer::Dashboard::PathRegistry::is_real_windows = $real_windows_probe;
+    use warnings 'redefine';
     CORE::chmod 0700, $root, $sub or die "Unable to prepare already-private directory fixture: $!";
     {
         local $FAIL_CHMOD{$root} = 1;

@@ -40,9 +40,27 @@ ok( -f 'integration/windows/run-host-windows-smoke.sh', 'Windows host rerun help
 ok( -f 'integration/windows/run-collector-timeout-e2e.ps1', 'Windows collector timeout E2E script exists' ) if $has_integration_assets;
 ok( -f 'integration/windows/run-dockur-collector-timeout-e2e.sh', 'host-side Dockur collector timeout E2E driver exists' ) if $has_integration_assets;
 ok( -f 't/29-windows-qemu-smoke.t', 'Windows QEMU smoke test exists under t/' );
-ok( -x 'integration/windows/run-qemu-windows-smoke.sh', 'Windows QEMU smoke launcher is executable' ) if $has_integration_assets;
-ok( -x 'integration/windows/run-host-windows-smoke.sh', 'Windows host rerun helper is executable' ) if $has_integration_assets;
-ok( -x 'integration/windows/run-dockur-collector-timeout-e2e.sh', 'host-side Dockur collector timeout E2E driver is executable' ) if $has_integration_assets;
+# Windows has no exec bit for .sh files: Strawberry Perl derives -x from
+# the file extension, so a .sh file is never -x there even though git
+# tracks it 100755 (round 61, proven live on win-ts: the same content
+# copied to test.exe, test.bat and test.cmd reports mode 0777 and -x,
+# while test.sh reports mode 0666 and not -x; a fresh git checkout of a
+# 100755 .sh file also lands at mode 0666 with core.fileMode=false).
+# These are host-side Unix launchers, run under sh on the host to drive
+# QEMU and Dockur, so on Windows the shebang is the runnable-script
+# evidence and is asserted instead of the exec bit.
+if ($has_integration_assets) {
+    if ( $^O eq 'MSWin32' ) {
+        ok( _file_has_shebang('integration/windows/run-qemu-windows-smoke.sh'), 'Windows QEMU smoke launcher is executable' );
+        ok( _file_has_shebang('integration/windows/run-host-windows-smoke.sh'), 'Windows host rerun helper is executable' );
+        ok( _file_has_shebang('integration/windows/run-dockur-collector-timeout-e2e.sh'), 'host-side Dockur collector timeout E2E driver is executable' );
+    }
+    else {
+        ok( -x 'integration/windows/run-qemu-windows-smoke.sh', 'Windows QEMU smoke launcher is executable' );
+        ok( -x 'integration/windows/run-host-windows-smoke.sh', 'Windows host rerun helper is executable' );
+        ok( -x 'integration/windows/run-dockur-collector-timeout-e2e.sh', 'host-side Dockur collector timeout E2E driver is executable' );
+    }
+}
 
 if ($has_source_tree_docs) {
     open my $plan_fh, '<', 'doc/integration-test-plan.md' or die $!;
@@ -52,7 +70,7 @@ if ($has_source_tree_docs) {
     like( $plan, qr/cpanm/, 'integration plan covers cpanm install' );
     like( $plan, qr/installation: `cpanm <tarball>`/, 'integration plan installs the blank-environment tarball with cpanm test phase enabled' );
     unlike( $plan, qr/Windows-only cpanm --notest exception|Windows guest currently installs the tarball with\s+`cpanm --notest`/s, 'integration plan no longer treats cpanm --notest as a Windows-only exception' );
-    like( $plan, qr/dashboard serve/, 'integration plan covers installed web lifecycle' );
+    like( $plan, qr/d2 serve/, 'integration plan covers installed web lifecycle' );
     like( $plan, qr/helper logout/i, 'integration plan covers helper logout cleanup' );
     like( $plan, qr/Chromium|browser/i, 'integration plan covers browser-backed verification' );
     like( $plan, qr/\.developer-dashboard/, 'integration plan covers fake-project local runtime overrides' );
@@ -75,7 +93,7 @@ if ($has_source_tree_docs) {
     close $install_fh;
     like( $install, qr{#!/bin/sh}, 'bootstrap installer uses a POSIX sh shebang' );
     like( $install, qr/cpanm --notest/, 'bootstrap installer performs the dashboard install through cpanm --notest' );
-    like( $install, qr/dashboard init/, 'bootstrap installer initializes the dashboard runtime after installation' );
+    like( $install, qr/d2 init/, 'bootstrap installer initializes the dashboard runtime after installation' );
     like( $install, qr/aptfile/, 'bootstrap installer reads the repo apt manifest' );
     like( $install, qr/apkfile/, 'bootstrap installer reads the repo apk manifest' );
     like( $install, qr/brewfile/, 'bootstrap installer reads the repo brew manifest' );
@@ -86,7 +104,7 @@ if ($has_source_tree_docs) {
     like( $install_ps, qr/Set-StrictMode -Version Latest/, 'Windows bootstrap installer uses strict PowerShell mode' );
     like( $install_ps, qr/winget/, 'Windows bootstrap installer uses winget to bootstrap missing packages' );
     like( $install_ps, qr/cpanm.*--notest/s, 'Windows bootstrap installer installs the dashboard with cpanm --notest' );
-    like( $install_ps, qr/dashboard init/, 'Windows bootstrap installer initializes the runtime' );
+    like( $install_ps, qr/d2 init/, 'Windows bootstrap installer initializes the runtime' );
     like( $install_ps, qr/\bshell ps\b/, 'Windows bootstrap installer activates the PowerShell shell bootstrap' );
     like( $install_ps, qr/Get-WindowsBootstrapArchitecture/, 'Windows bootstrap installer detects the active Windows architecture before choosing fallback assets' );
     like( $install_ps, qr/win-arm64-zip|arm64/i, 'Windows bootstrap installer includes an ARM-aware fallback path for Windows bootstrap dependencies' );
@@ -128,17 +146,17 @@ if ($has_integration_assets) {
     like( $runner, qr/_copy_file\( \$tarball, \$install_tarball \)/, 'integration runner stages the mounted tarball into a versioned local copy before cpanm install' );
     like( $runner, qr/cpanm install host-built tarball.*'cpanm '.*\$install_tarball/s, 'integration runner installs the versioned local tarball copy with cpanm test phase enabled' );
     unlike( $runner, qr/cpanm install host-built tarball.*\$tarball/s, 'integration runner does not hand the generic mounted tarball path directly to cpanm' );
-    like( $runner, qr/dashboard update/, 'integration runner exercises dashboard update' );
+    like( $runner, qr/d2 update/, 'integration runner exercises d2 update' );
     like( $runner, qr/d2 version/, 'integration runner verifies the installed short d2 entrypoint version' );
     like( $runner, qr/d2 of grep --help/, 'integration runner verifies d2 delegates grep help after tarball installation' );
     like( $runner, qr/d2 docker compose config --help/, 'integration runner verifies d2 delegates Docker Compose help after tarball installation' );
     like( $runner, qr/Runtime::Result/, 'integration runner exercises Runtime::Result-aware hook chaining' );
-    like( $runner, qr/dashboard docker compose --project .* --dry-run config/, 'integration runner exercises docker compose dry-run' );
-    like( $runner, qr/dashboard auth add-user helper_login helper-login-pass-123/, 'integration runner exercises helper login path' );
+    like( $runner, qr/d2 docker compose --project .* --dry-run config/, 'integration runner exercises docker compose dry-run' );
+    like( $runner, qr/d2 auth add-user helper_login helper-login-pass-123/, 'integration runner exercises helper login path' );
     unlike( $runner, qr/cpanm --notest.*\$install_tarball/s, 'integration runner does not disable tests while installing the tarball' );
     like( $runner, qr/broken\.collector/, 'integration runner provisions a broken config collector regression case' );
     like( $runner, qr/healthy\.collector/, 'integration runner provisions a healthy config collector regression case' );
-    like( $runner, qr/dashboard indicator list after restart/, 'integration runner checks indicator isolation after restart' );
+    like( $runner, qr/d2 indicator list after restart/, 'integration runner checks indicator isolation after restart' );
     like( $runner, qr/_browser_binary|chromium-browser|google-chrome|apt-get install -y --no-install-recommends chromium/s, 'integration runner resolves or bootstraps a headless browser for browser checks' );
     like( $runner, qr/IPC::Open3|open3/, 'integration runner uses a live subprocess bridge for long-running command output' );
     like( $runner, qr/IO::Select/, 'integration runner monitors long-running command streams without fully buffering them first' );
@@ -168,16 +186,27 @@ if ($has_integration_assets) {
     is( main::_distribution_version(''), undef, 'integration runner rejects an empty source root' );
 
     like( $runner, qr/\.developer-dashboard/, 'integration runner provisions a fake-project local runtime tree' );
-    like( $runner, qr/cpanm install host-built tarball.*dashboard init/s, 'integration runner builds the fake-project local runtime only after the tarball install step' );
-    like( $runner, qr/dashboard init reports only the fake-project bookmark files that the integration fixture created instead of seeding extracted core starter dashboards/, 'integration runner documents that dashboard init now reports the fixture bookmark files instead of seeding extracted starter dashboards from core' );
+    like( $runner, qr/cpanm install host-built tarball.*d2 init/s, 'integration runner builds the fake-project local runtime only after the tarball install step' );
+    like( $runner, qr/d2 init reports only the fake-project bookmark files that the integration fixture created instead of seeding extracted core starter dashboards/, 'integration runner documents that d2 init now reports the fixture bookmark files instead of seeding extracted starter dashboards from core' );
     like( $runner, qr/__END__/, 'integration runner carries POD trailer' );
+
+    open my $router_test_fh, '<', 't/44-smart-router-two-stage.t' or die $!;
+    my $router_test = do { local $/; <$router_test_fh> };
+    close $router_test_fh;
+    like( $router_test, qr/perl:5\.44-threaded/, 'post-build guard pins a threaded Perl image for the GoRoutine XS extension' );
+    like( $router_test, qr/Config\{useithreads\}/, 'post-build guard rejects a Perl image without ithreads' );
+    like( $router_test, qr/libayatana-appindicator3-dev.*libgtk-3-dev/s, 'post-build guard installs native menu build headers before cpanm' );
 
     open my $docker_fh, '<', 'integration/blank-env/Dockerfile' or die $!;
     my $dockerfile = do { local $/; <$docker_fh> };
     close $docker_fh;
+    like( $dockerfile, qr/^FROM perl:5\.44-threaded-bookworm\@sha256:/m, 'blank-environment install uses the pinned threaded Perl runtime required by GoRoutine XS' );
+    like( $dockerfile, qr/RUN perl -MConfig.*Config\{useithreads\}/, 'blank-environment image verifies its Perl interpreter has ithreads enabled' );
     like( $dockerfile, qr/\bchromium\b/, 'integration Dockerfile installs Chromium for browser verification' );
     like( $dockerfile, qr/\blibexpat1-dev\b/, 'integration Dockerfile installs libexpat1-dev for XML::Parser during host-built tarball installs' );
     like( $dockerfile, qr/\blibssl-dev\b/, 'integration Dockerfile installs libssl-dev for Net::SSLeay during host-built tarball installs' );
+    like( $dockerfile, qr/\blibgtk-3-dev\b/, 'integration Dockerfile installs GTK headers for the native menu helper during tarball builds' );
+    like( $dockerfile, qr/\blibayatana-appindicator3-dev\b/, 'integration Dockerfile installs Ayatana headers for the native menu helper during tarball builds' );
     like( $dockerfile, qr/\bpkg-config\b/, 'integration Dockerfile installs pkg-config for native CPAN prerequisite discovery' );
     like( $dockerfile, qr/\bzlib1g-dev\b/, 'integration Dockerfile installs zlib1g-dev for native CPAN prerequisite builds' );
     unlike( $dockerfile, qr/\bDist::Zilla\b/, 'integration Dockerfile no longer installs Dist::Zilla because host builds the tarball' );
@@ -238,19 +267,19 @@ if ($has_integration_assets) {
     like( $windows_smoke, qr/Add-Content -Path \$env:DD_FRESH_SESSION_LOG -Value \$Line/, 'Windows Strawberry smoke script records fresh-session progress markers through a dedicated child-side log file instead of outer stdout capture' );
     like( $windows_smoke, qr/Stopwatch\]::StartNew\(\).*?TotalMilliseconds.*?500/s, 'Windows Strawberry smoke script enforces the 500 ms fresh profile-load budget' );
     like( $windows_smoke, qr/Win32_ProcessStartTrace.*?perl(?:\.exe)?/si, 'Windows Strawberry smoke script observes process-start events and rejects Perl launches during fresh profile loading' );
-    like( $windows_smoke, qr/DASHBOARD_LOGS_START/, 'Windows Strawberry smoke script prints an explicit dashboard logs marker during the fresh PowerShell bootstrap proof' );
+    like( $windows_smoke, qr/DASHBOARD_LOGS_START/, 'Windows Strawberry smoke script prints an explicit d2 logs marker during the fresh PowerShell bootstrap proof' );
     like( $windows_smoke, qr/Get-Command dashboard -ErrorAction Stop/, 'Windows Strawberry smoke script requires a fresh PowerShell session to resolve dashboard through normal command discovery' );
-    like( $windows_smoke, qr/DASHBOARD_RESTART_START/, 'Windows Strawberry smoke script prints an explicit dashboard restart marker during the fresh PowerShell bootstrap proof' );
+    like( $windows_smoke, qr/DASHBOARD_RESTART_START/, 'Windows Strawberry smoke script prints an explicit d2 restart marker during the fresh PowerShell bootstrap proof' );
     like( $windows_smoke, qr/New-SmokeSkillFixture/, 'Windows Strawberry smoke script creates a deterministic local smoke skill for the fresh PowerShell bootstrap proof' );
     like( $windows_smoke, qr/requires 'JSON::XS';/, 'Windows Strawberry smoke script gives the fresh-session smoke skill a cpanfile that exercises non-interactive cpanm without external CPAN churn' );
     like( $windows_smoke, qr/default>>make\.log/, 'Windows Strawberry smoke script gives the fresh-session smoke skill a Makefile that records target execution' );
     like( $windows_smoke, qr/Set-Content -Path \(Join-Path \$fixtureRoot "Makefile"\) -Encoding ASCII/, 'Windows Strawberry smoke script writes the generated fresh-session Makefile without a UTF-8 BOM that would break Windows make' );
     like( $windows_smoke, qr/DASHBOARD_SKILL_INSTALL_START/, 'Windows Strawberry smoke script prints an explicit smoke skill install marker during the fresh PowerShell bootstrap proof' );
-    like( $windows_smoke, qr/dashboard restart/, 'Windows Strawberry smoke script exercises dashboard restart in the fresh PowerShell session' );
-    like( $windows_smoke, qr/dashboard skills install \$env:DD_SMOKE_SKILL_SOURCE/, 'Windows Strawberry smoke script exercises local smoke skill installation in the fresh PowerShell session' );
-    like( $windows_smoke, qr/dashboard skills install \$env:DD_SMOKE_SKILL_SOURCE 2>&1 \| Out-String/, 'Windows Strawberry smoke script captures the fresh-session smoke skill install transcript before surfacing any failure' );
-    like( $windows_smoke, qr/dashboard restart failed with exit code \$LASTEXITCODE/, 'Windows Strawberry smoke script treats dashboard restart failures as fatal during the fresh PowerShell bootstrap proof' );
-    like( $windows_smoke, qr/dashboard skills install smoke skill failed with exit code \$LASTEXITCODE/, 'Windows Strawberry smoke script treats smoke skill install failures as fatal during the fresh PowerShell bootstrap proof' );
+    like( $windows_smoke, qr/d2 restart/, 'Windows Strawberry smoke script exercises d2 restart in the fresh PowerShell session' );
+    like( $windows_smoke, qr/d2 skills install \$env:DD_SMOKE_SKILL_SOURCE/, 'Windows Strawberry smoke script exercises local smoke skill installation in the fresh PowerShell session' );
+    like( $windows_smoke, qr/d2 skills install \$env:DD_SMOKE_SKILL_SOURCE 2>&1 \| Out-String/, 'Windows Strawberry smoke script captures the fresh-session smoke skill install transcript before surfacing any failure' );
+    like( $windows_smoke, qr/d2 restart failed with exit code \$LASTEXITCODE/, 'Windows Strawberry smoke script treats d2 restart failures as fatal during the fresh PowerShell bootstrap proof' );
+    like( $windows_smoke, qr/d2 skills install smoke skill failed with exit code \$LASTEXITCODE/, 'Windows Strawberry smoke script treats smoke skill install failures as fatal during the fresh PowerShell bootstrap proof' );
     like( $windows_smoke, qr/\[switch\]\$SkipCpanmTests/, 'Windows Strawberry smoke script accepts a switch to skip upstream cpanm dependency tests on Windows' );
     like( $windows_smoke, qr/--notest/, 'Windows Strawberry smoke script can install with cpanm --notest when Windows dependency tests are intentionally skipped' );
     like( $windows_smoke, qr/Get-CommandExecutablePath/, 'Windows Strawberry smoke script centralizes command-object to executable-path resolution' );
@@ -273,8 +302,8 @@ if ($has_integration_assets) {
     unlike( $windows_smoke, qr/Set-NetFirewallProfile failed with exit code/, 'Windows Strawberry smoke script does not assume cmdlets populate LASTEXITCODE' );
     like( $windows_smoke, qr/\$savedErrorActionPreference/, 'Windows Strawberry smoke script saves the caller error preference before native commands' );
     like( $windows_smoke, qr/\$ErrorActionPreference = 'Continue'/, 'Windows Strawberry smoke script avoids PowerShell terminating on native stderr before exit-code checks' );
-    like( $windows_smoke, qr/dashboard shell ps/, 'Windows Strawberry smoke script verifies PowerShell shell bootstrap output' );
-    like( $windows_smoke, qr/dashboard collector run/, 'Windows Strawberry smoke script exercises collector command execution' );
+    like( $windows_smoke, qr/d2 shell ps/, 'Windows Strawberry smoke script verifies PowerShell shell bootstrap output' );
+    like( $windows_smoke, qr/d2 collector run/, 'Windows Strawberry smoke script exercises collector command execution' );
     like( $windows_smoke, qr/windows\.timeout\.collector/, 'Windows Strawberry smoke script exercises the native collector timeout path' );
     like( $windows_smoke, qr/exit_code=124/, 'Windows Strawberry smoke script requires the timed-out collector to return exit code 124' );
     like( $windows_smoke, qr/timed_out=1/, 'Windows Strawberry smoke script requires the timed-out collector flag' );
@@ -368,7 +397,7 @@ if ($has_integration_assets) {
     like( $timeout_e2e, qr/system\( 1, \$\^X/, 'Windows timeout E2E blocker spawns an asynchronous descendant so subtree termination is really exercised' );
     like( $timeout_e2e, qr/descendant-/, 'Windows timeout E2E blocker tags its descendant command line with the run marker' );
     like( $timeout_e2e, qr/sleep 1 for 1 \.\. 3600/, 'Windows timeout E2E blocker blocks far longer than the configured timeout so an interrupt is the only passing path' );
-    like( $timeout_e2e, qr/collector", "run"/, 'Windows timeout E2E script triggers the blocking collector through dashboard collector run' );
+    like( $timeout_e2e, qr/collector", "run"/, 'Windows timeout E2E script triggers the blocking collector through d2 collector run' );
     like( $timeout_e2e, qr/ConvertFrom-Json/, 'Windows timeout E2E script parses the structured collector run result' );
     like( $timeout_e2e, qr/timed_out/, 'Windows timeout E2E script asserts the timed_out flag on the collector result' );
     like( $timeout_e2e, qr/\b124\b/, 'Windows timeout E2E script asserts the canonical timeout exit code 124' );
@@ -429,6 +458,14 @@ else {
 
 done_testing;
 
+sub _file_has_shebang {
+    my ($path) = @_;
+    open my $fh, '<', $path or return 0;
+    my $first = <$fh>;
+    close $fh;
+    return defined $first && $first =~ /^#!/ ? 1 : 0;
+}
+
 sub _path_is_git_tracked {
     my ($path) = @_;
     return 0 if !defined $path || $path eq '';
@@ -457,7 +494,7 @@ extraction for metadata-backed releases and older literal-version archives.
 
 =head1 PURPOSE
 
-This test is the executable regression contract for the blank-environment Docker integration plan and runner assets, including the release-to-local-library behavior of the ignored local D2 image recipe when it is present. Its version-extraction fixture protects releases where the public module delegates its version scalar to a dedicated version module. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
+This test is the executable regression contract for the blank-environment Docker integration plan and runner assets, including the release-to-local-library behavior of the ignored local D2 image recipe when it is present. Its version-extraction fixture protects releases where the public module delegates its version scalar to a dedicated version module. On Windows the three launcher scripts assert a shebang instead of the exec bit, because Strawberry Perl derives -x from the file extension and a .sh file is never -x there. Read it when you need to understand the real fixture setup, assertions, and failure modes for this slice of the repository instead of guessing from the module names alone.
 
 =head1 WHY IT EXISTS
 

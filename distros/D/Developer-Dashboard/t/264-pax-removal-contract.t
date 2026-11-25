@@ -19,7 +19,7 @@ ok( !-e File::Spec->catfile( $repo_root, 'share', 'private-cli', 'pax' ),
 ok( !-e File::Spec->catfile( $repo_root, '.github', 'workflows', 'pax-release.yml' ),
     'PAX standalone-release workflow is removed' );
 
-for my $relative (qw(bin/d2 bin/dashboard lib/Developer/Dashboard/InternalCLI.pm)) {
+for my $relative (qw(bin/d2 bin/d2 lib/Developer/Dashboard/InternalCLI.pm)) {
     my $path   = File::Spec->catfile( $repo_root, split m{/}, $relative );
     my $source = _read_file($path);
     unlike( $source, qr/Developer::Dashboard::PaxCache|PAX_CACHE_ELIGIBLE_COMMANDS|_maybe_exec_self_compiled/,
@@ -73,7 +73,7 @@ source archive. Normal Perl commands remain the supported CLI runtime.
 =head1 WHY IT EXISTS
 
 PAX embeds a second compiler and runtime into the Developer Dashboard. A
-real Docker build of C<dashboard> processed 117 application files and packaged
+real Docker build of C<d2> processed 117 application files and packaged
 2,596 payloads in 41 seconds, before subsequent standalone execution concerns.
 Removing the compiler is intended to reduce iteration cost and eliminate the
 fragile compiled-entrypoint path instead of merely hiding its command.
@@ -88,13 +88,13 @@ workflow, or documentation that could reintroduce the PAX integration.
     prove -lv t/264-pax-removal-contract.t
 
 The full repository test suite also runs this contract. Docker verification
-must additionally prove that C<d2 version> and C<dashboard version> still work
+must additionally prove that C<d2 version> and C<d2 version> still work
 and that no PAX-specific helper is installed.
 
 =head1 WHAT USES IT
 
 The repository release gate uses this test to preserve the no-PAX runtime
-contract for the public C<d2> and C<dashboard> commands.
+contract for the public C<d2> and C<d2> commands.
 
 =head1 EXAMPLES
 

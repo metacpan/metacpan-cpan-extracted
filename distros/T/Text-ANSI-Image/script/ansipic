@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::ansipic qw(ansipic);
+exit ansipic(@ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+ansipic - show images in the terminal as lines of text
+
+=head1 SYNOPSIS
+
+ansipic [options] file ...
+
+    -m#, --method=#      method: kitty, or auto (default)
+    -w#, --width=#       columns that an image may take (number or RPN)
+    -H#, --height=#      rows that an image may take (number or RPN)
+    -t#, --types=#       types of images shown: png,jpeg,gif (default)
+         --term=CxR:WxH  size of the terminal and of a cell in pixels
+         --tty=#         where the images are sent (default: /dev/tty)
+    -h,  --help          show help
+    -v,  --version       show version
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 EXAMPLES
+
+    ansipic logo.png
+    ansipic -w 2/ *.png | less -R
+    ansipic images/*.png | ansicolumn -c 2
+
+=head1 DESCRIPTION
+
+=begin html
+
+<p><img width="602" src="https://raw.githubusercontent.com/tecolicom/Text-ANSI-Image/main/images/ansipic.png"></p>
+
+=end html
+
+B<ansipic> shows image files in the terminal, by
+L<Text::ANSI::Image>.  Each image is printed as lines of text: the
+cells of the image, which the terminal draws.  The lines can be paged
+by C<less> and put in columns by L<ansicolumn(1)|App::ansicolumn>, as
+any other text.
+
+PNG, JPEG and GIF files are shown.  The image itself is sent to the
+terminal (F</dev/tty>), so the lines may go to a pipe or a file, and
+are shown when they come to the terminal.  C<less> needs
+C<LESSUTFCHARDEF=10EEEE:p> (C<less> 632 or later) to show them.
+
+A file which is not shown is told on the standard error, and the
+status is 1.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-m> I<name>, B<--method>=I<name>
+
+The method by which images are drawn: C<kitty>, the Unicode
+placeholders of the kitty graphics protocol (kitty, Ghostty and
+iTerm2 3.7.3 or later), or C<auto> (the default), the first which the
+terminal supports.
+
+=item B<-w> I<n>, B<--width>=I<n>
+
+=item B<-H> I<n>, B<--height>=I<n>
+
+The most columns and rows that an image may take (default: the
+terminal width, and its height but four lines).  An image is as large
+as its pixels, and not larger than that room.
+
+The value is a number, or an RPN (Reverse Polish Notation) expression
+with the terminal width (for B<--width>) or height (for B<--height>) as
+the initial value: B<-w 2/> is half the width of the terminal, and
+B<-w 10-> the width but ten columns.  A C<=> before the value is
+taken away, as L<ansifold(1)|App::ansifold> takes the expression:
+B<-w=2/> is the same as B<-w 2/>.
+
+=item B<-t> I<list>, B<--types>=I<list>
+
+The types of images shown, separated by commas: C<png>, C<jpeg> and
+C<gif> (default: all).
+
+=item B<--term>=I<COLS>B<x>I<ROWS>[B<:>I<W>B<x>I<H>]
+
+The size of the terminal, and of a cell in pixels.  By default it is
+read from F</dev/tty>.
+
+=item B<--tty>=I<file>
+
+Where the images are sent (default: F</dev/tty>).
+
+=item B<-h>, B<--help>
+
+=item B<-v>, B<--version>
+
+=back
+
+=head1 SEE ALSO
+
+L<Text::ANSI::Image>, L<App::ansicolumn>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2026 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

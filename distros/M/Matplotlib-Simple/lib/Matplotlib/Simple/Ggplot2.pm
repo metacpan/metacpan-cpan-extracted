@@ -34,7 +34,7 @@ package Matplotlib::Simple::Ggplot2;
 # with grid's own layouts, not patchwork or cowplot, which ggplot2 does not
 # depend on.
 require 5.010;
-our $VERSION = 0.3345;
+our $VERSION = 0.3346;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max min sum);
 BEGIN { require Matplotlib::Simple }
@@ -1917,7 +1917,13 @@ sub render {
 	say {$fh} '})';
 	if ( $args->{execute} ) {
 		$fh->flush;
-		run_script( [ program_from_env('MATPLOTLIB_SIMPLE_RSCRIPT') // 'Rscript', $fh->filename ] );
+		# What the script wrote to STDERR as it ran and succeeded, as the
+		# matplotlib engine prints it: R's warnings and ggplot2's messages, the
+		# only word that a figure was written but is not what was asked for, such
+		# as "log-10 transformation introduced infinite values". It was dropped
+		# until 0.3346.
+		my $stderr = run_script( [ program_from_env('MATPLOTLIB_SIMPLE_RSCRIPT') // 'Rscript', $fh->filename ] );
+		print STDERR $stderr if ( defined $stderr ) && ( length $stderr );
 	}
 	say 'will write ' . "\e[36;103m$args->{output_file}\e[0m";
 	return $fh->filename;

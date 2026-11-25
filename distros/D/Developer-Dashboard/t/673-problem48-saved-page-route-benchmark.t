@@ -359,7 +359,7 @@ would fail when the test runs from an extracted distribution.
 
 =head1 WHY IT EXISTS
 
-Problem 48 requires evidence from more than one dashboard path. This test
+Problem 48 requires evidence from more than one d2 path. This test
 ensures that the `/app/welcome` route benchmark remains deterministic enough to
 compare v5.88 and current source without treating the live clock as a content
 change.

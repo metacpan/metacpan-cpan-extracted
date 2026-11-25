@@ -28,6 +28,8 @@ package My::Hash::Stop {
 
 # An error object, passed on as it is.
 package My::Error {
+
+
     sub new ($class, $text) { return bless {text => $text}, $class }
 }
 
@@ -43,7 +45,6 @@ sub source_of ($log, @steps) {
     });
 }
 
-
 # Return, by one way, what $read gives from an iterator of $stages over
 # a source of @steps: [values or error, ended, the source's log].
 sub run_one ($stages, $read, @steps) {
@@ -53,7 +54,6 @@ sub run_one ($stages, $read, @steps) {
     $got =~ s( \ line \ \d+ )( line N)x unless ref $got;
     return [$got, $next->ended, \@log];
 }
-
 
 # Return what both ways give, the shorter way and the full path, as
 # run_one does, failing unless the shorter way was taken, and only for
@@ -76,7 +76,6 @@ sub both ($stages, $read, @steps) {
     return ($plain, run_one([@$stages, $same], $read, @steps));
 }
 
-
 # Check both ways give the same, and what's expected.
 sub same ($name, $stages, $read, $steps, $expected) {
     my($plain, $full) = both($stages, $read, @$steps);
@@ -85,13 +84,13 @@ sub same ($name, $stages, $read, $steps, $expected) {
     return;
 }
 
-
 # Read each value, one call at a time.
 sub drain ($next) {
     my @values;
     while (my($value) = $next->()) { push @values, $value }
     return @values;
 }
+
 
 sub all ($next) { return $next->all }
 

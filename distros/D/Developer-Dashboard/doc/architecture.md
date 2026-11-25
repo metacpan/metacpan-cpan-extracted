@@ -62,14 +62,14 @@ instead of a loose pile of utilities.
   PATH, so generic helper names stay inside the dashboard runtime instead of
   leaking into the wider shell ecosystem.
 
-- `dashboard of` / `dashboard open-file`
+- `d2 of` / `d2 open-file`
 - open-file commands keep the interactive numbered chooser workflow for
   multi-match searches, support comma and range selections or blank-for-all,
   and fall back to `vim` when no editor is configured
   Resolve direct files, `file:line` references, Perl module names, Java class names, and recursive file-pattern matches below a resolved scope, then print or exec the configured editor.
-  Scoped searches rank exact helper/script names ahead of broader substring matches, so `dashboard of . jq` prefers `jq` and `jq.js` before `jquery.js`.
+  Scoped searches rank exact helper/script names ahead of broader substring matches, so `d2 of . jq` prefers `jq` and `jq.js` before `jquery.js`.
 
-- `dashboard jq` / `dashboard yq` / `dashboard tomq` / `dashboard propq` / `dashboard iniq` / `dashboard csvq` / `dashboard xmlq`
+- `d2 jq` / `d2 yq` / `d2 tomq` / `d2 propq` / `d2 iniq` / `d2 csvq` / `d2 xmlq`
   Parse JSON, YAML, TOML, Java properties, INI, CSV, and XML input and optionally traverse a dotted path before printing a scalar or canonical JSON. File-path and query-path argument order is interchangeable, and `$d` selects the full parsed document.
 
 - private `~/.developer-dashboard/cli/dd/jq` / `yq` / `tomq` / `propq` / `iniq` / `csvq` / `xmlq` / `of` / `open-file` / `ticket`
@@ -143,17 +143,17 @@ That connection matters to the product story:
 Collector loops are managed explicitly:
 
 - each loop writes a pid file plus `loop.json` metadata
-- the process title is set to `dashboard collector: <name>`
+- the process title is set to `d2 collector: <name>`
 - duplicate prevention requires both a live pid and a matching process title
 - stale or foreign pid files are cleaned up instead of being trusted blindly
 
 Web service lifecycle is managed the same way:
 
-- `dashboard serve` backgrounds the web service by default
-- `dashboard serve` starts the configured collector loops alongside the web service, so `serve`, `stop`, and `restart` all act on the same managed runtime set
-- `dashboard stop` stops both the web service and collector loops
-- `dashboard restart` stops both, restarts configured collectors, then starts the web service again
-- the web process title is set to `dashboard web: <host>:<port>`
+- `d2 serve` backgrounds the web service by default
+- `d2 serve` starts the configured collector loops alongside the web service, so `serve`, `stop`, and `restart` all act on the same managed runtime set
+- `d2 stop` stops both the web service and collector loops
+- `d2 restart` stops both, restarts configured collectors, then starts the web service again
+- the web process title is set to `d2 web: <host>:<port>`
 - shutdown prefers managed-process validation, then falls back to `pkill -f` style matching and explicit process scans
 
 Browser access is managed explicitly:
@@ -186,16 +186,16 @@ Page source compatibility is explicit:
 - `DD-OOP-LAYERS` is the cross-runtime contract: starting at `~/.developer-dashboard` and walking down through every parent directory until the current working directory, every existing `.developer-dashboard/` layer participates as one inherited runtime stack
 - under `DD-OOP-LAYERS`, the deepest discovered layer stays the write target and first lookup hit, while bookmarks, shared `nav/*.tt`, config, collectors, indicators, auth/session stores, runtime `local/lib/perl5`, static assets, and custom CLI hooks are all inherited across the full layer chain instead of only one project-or-home split
 - DD-OOP-LAYERS ancestry and dedupe checks normalize canonical path identities, so macOS path aliases such as `/var/...` and `/private/var/...` still resolve to the same inherited layer chain
-- dashboard-managed built-in helper extraction is the explicit home-only exception to that write rule: `dashboard init` and on-demand helper staging always seed built-in helpers only under `~/.developer-dashboard/cli/dd/`, while layered lookup still applies to user commands and hook directories under the ordinary layered `cli/` roots
-- home-runtime helper staging is non-destructive: `dashboard init` may add or update dashboard-managed built-in helpers under `~/.developer-dashboard/cli/dd/`, but it must preserve the separate user command and hook space under `~/.developer-dashboard/cli/` plus child-layer `./.developer-dashboard/cli/` roots instead of deleting or clobbering user files there
-- dashboard-managed helper and starter-page refreshes are MD5-aware inside Perl, so `dashboard init` skips rewriting a dashboard-managed helper or shipped starter page when the existing file already matches the shipped content digest
-- starter-page refreshes are safe across upgrades too: `dashboard init` records the md5 of the last dashboard-managed shipped starter-page copy under the active runtime config tree, refreshes only pages that still match that recorded or bridged historical managed digest, and preserves diverged user-edited saved pages instead of flattening them back to the shipped bookmark
-- `dashboard init` seeds the current dashboard-managed starter pages as normal editable saved bookmarks, but rerunning it preserves an existing `~/.developer-dashboard/config/config.json` instead of overwriting user config; if the file is missing, init creates it as `{}` without inventing an example collector
+- dashboard-managed built-in helper extraction is the explicit home-only exception to that write rule: `d2 init` and on-demand helper staging always seed built-in helpers only under `~/.developer-dashboard/cli/dd/`, while layered lookup still applies to user commands and hook directories under the ordinary layered `cli/` roots
+- home-runtime helper staging is non-destructive: `d2 init` may add or update dashboard-managed built-in helpers under `~/.developer-dashboard/cli/dd/`, but it must preserve the separate user command and hook space under `~/.developer-dashboard/cli/` plus child-layer `./.developer-dashboard/cli/` roots instead of deleting or clobbering user files there
+- dashboard-managed helper and starter-page refreshes are MD5-aware inside Perl, so `d2 init` skips rewriting a dashboard-managed helper or shipped starter page when the existing file already matches the shipped content digest
+- starter-page refreshes are safe across upgrades too: `d2 init` records the md5 of the last dashboard-managed shipped starter-page copy under the active runtime config tree, refreshes only pages that still match that recorded or bridged historical managed digest, and preserves diverged user-edited saved pages instead of flattening them back to the shipped bookmark
+- `d2 init` seeds the current dashboard-managed starter pages as normal editable saved bookmarks, but rerunning it preserves an existing `~/.developer-dashboard/config/config.json` instead of overwriting user config; if the file is missing, init creates it as `{}` without inventing an example collector
 - the public `dashboard` entrypoint stays thin for all built-in commands: the shipped starter bookmark source plus helper script source live under `share/seeded-pages/` and `share/private-cli/`, dedicated helper bodies cover `jq`/`yq`/`of`/`open-file`/`ticket`/`path`/`paths`/`ps1`, and the remaining built-ins stage thin wrappers into the shared private `_dashboard-core` runtime so those bodies do not bloat the command script; installed copies resolve the same assets from the distribution share dir
-- `dashboard cpan <Module...>` installs optional runtime modules into `./.developer-dashboard/local` and appends them to `./.developer-dashboard/cpanfile`, while keeping that support in the `dashboard` entrypoint and having saved Ajax workers infer `local/lib/perl5` directly from the active runtime root
-- `dashboard serve logs` exposes the combined Dancer2 and Starman runtime log stored in the dashboard log file, with `-t` timestamps, `-n N` tailing, and `-f` follow mode
-- `dashboard log[s]` supports `-t`, `-f`, `--tail N`, and `--tail=N` across web, collector, named-collector, and mixed output; `--tail=0` prints nothing, and the existing `-n N` spelling remains supported
-- `dashboard serve workers N` persists the default Starman worker count in config and auto-starts the web service when it is currently stopped; `--host HOST` and `--port PORT` steer that auto-start path, while `dashboard serve --workers N` and `dashboard restart --workers N` still allow one-off overrides
+- `d2 cpan <Module...>` installs optional runtime modules into `./.developer-dashboard/local` and appends them to `./.developer-dashboard/cpanfile`, while keeping that support in the `dashboard` entrypoint and having saved Ajax workers infer `local/lib/perl5` directly from the active runtime root
+- `d2 serve logs` exposes the combined Dancer2 and Starman runtime log stored in the d2 log file, with `-t` timestamps, `-n N` tailing, and `-f` follow mode
+- `d2 log[s]` supports `-t`, `-f`, `--tail N`, and `--tail=N` across web, collector, named-collector, and mixed output; `--tail=0` prints nothing, and the existing `-n N` spelling remains supported
+- `d2 serve workers N` persists the default Starman worker count in config and auto-starts the web service when it is currently stopped; `--host HOST` and `--port PORT` steer that auto-start path, while `d2 serve --workers N` and `d2 restart --workers N` still allow one-off overrides
 - the editor view auto-submits once focus leaves the whole editor form instead of relying on a visible update button
 - the editor splits bookmark sections into separate visible blocks but still recomposes the canonical separator-based source into a hidden `instruction` field before save and play submits
 - each visible editor block keeps a plain escaped source overlay with wrapping disabled so the visible text geometry stays identical to the real textarea during long bookmark edits
@@ -235,7 +235,7 @@ The runtime also supports user CLI extensions:
 - hook `stdout` and `stderr` stream live to the terminal while also being accumulated into `RESULT` JSON for later hooks and the final command
 - after each hook exits, the updated `RESULT` JSON is written back into the environment before the next hook starts
 - Perl hook scripts can use `Runtime::Result` to decode `RESULT` and inspect prior hook `stdout`, `stderr`, and exit codes
-- there is no special built-in `update` path; `dashboard update` is just another user-provided command when `./.developer-dashboard/cli/update` or `./.developer-dashboard/cli/update/run` exists, with the same home fallback
+- there is no special built-in `update` path; `d2 update` is just another user-provided command when `./.developer-dashboard/cli/update` or `./.developer-dashboard/cli/update/run` exists, with the same home fallback
 - directory-backed custom commands can use `./.developer-dashboard/cli/<command>/run` as the final executable after hooks complete, with the same home fallback
 
 ## Packaging

@@ -85,6 +85,8 @@ subtest 'Names are kept per package' => sub {
     package My::Music {
         use Ekorn::Pipeline::Factories qw(pipeline);
         Ekorn::Pipeline->named(loud => sub { uc });
+
+
         sub find ($name) { pipeline($name) }
     }
     is [My::Music::find('loud')->('a')], ['A'],

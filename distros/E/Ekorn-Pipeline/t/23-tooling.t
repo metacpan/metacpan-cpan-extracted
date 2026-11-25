@@ -17,12 +17,13 @@ my %module = (
     flow    => ['Ekorn::Pipeline::Stages::Flow'],
     batch   => ['Ekorn::Pipeline::Stages::Batch'],
     taps    => ['Ekorn::Pipeline::Stages::Taps'],
+    context => ['Ekorn::Pipeline::Context'],
     sources => ['Ekorn::Pipeline::Sources'],
     sinks   => ['Ekorn::Pipeline::Sinks'],
     json    => ['Ekorn::Pipeline::JSON'],
+    csv     => ['Ekorn::Pipeline::CSV'],
     words   => ['Ekorn::Pipeline::Factories'],
 );
-
 
 # The names a module exports, by default or on request, sorted.
 sub exported_by ($module) {
@@ -123,6 +124,7 @@ subtest "| isn't in force, though Operators is loaded" => sub {
 
     package Tooling::NoOperators {
         use Ekorn::Pipeline::Tooling qw(:all);
+
 
         sub chained () { return from_array(1, 2) | count_items }
     }

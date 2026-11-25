@@ -107,9 +107,7 @@ reads as a list of steps.
 
 =item * B<The work stops when the caller has enough.> A stage that
 stops ends the function's work too. A caller who wants ten results
-reads ten lines, or fetches one page, not all of them. Nothing is held
-between stages, so a function over a million values needs no more
-memory than one over ten.
+reads ten lines, or fetches one page, not all of them.
 
 =item * B<The author keeps an interface that doesn't grow.> One list of
 stages replaces every option a caller might ask for next. The
@@ -136,6 +134,8 @@ whoever wrote it. The ready-made stages here work with all of them.
 
 Every run of a pipeline has the same shape. Values come from
 somewhere, go through stages one at a time, and end up somewhere:
+
+=for not-run
 
     source  -->  stage  -->  stage  -->  stage  -->  sink
    (where       (change, drop, multiply,          (where they
@@ -172,6 +172,8 @@ stages by itself: a I<flatMap>.
 
 One shape covers all three. A pipeline is just a list of stages, and a
 stage needs no wrapper to say which kind it is:
+
+=for not-run
 
     sub { $_ % 2 ? $_ : () }                # filter: the odd numbers
     sub { $_ * 10 }                         # map: ten times each
@@ -220,8 +222,10 @@ stages instead: C<users($active_names-E<gt>stages, take(10))>.
 
 Each value goes through every stage before the next one starts, as it
 would in a C<for> loop. The values come out in order, and each stage
-sees them in order. Nothing is held between stages, so a pipeline over
-a million values needs no more memory than one over ten.
+sees them in order. Nothing is held between stages, but by a stage
+that holds values itself, such as C<batch> or C<collect>; without
+one, a pipeline over a million values needs no more memory than one
+over ten.
 
 A pipeline runs three ways:
 
@@ -484,6 +488,8 @@ named pipeline is reported with its name. L<Ekorn::Pipeline::Sugar>
 names pipelines as the program compiles, and gives your package a
 function of each name:
 
+=for not-run
+
     use Ekorn::Pipeline::Sugar pipeline => {
         active_names => [only_active, value_of('name')],
     };
@@ -573,6 +579,8 @@ A stage that dies is named by its position in the pipeline, and
 reported at the line of the caller's code that ran it, with its
 message below:
 
+=for not-run
+
     Pipeline stage #2 failed at app.pl line 12:
         No name for user 7 at app.pl line 9.
 
@@ -589,10 +597,11 @@ C<take(-1)>, is also reported at the caller's line.
 
 =over
 
-=item * L<Ekorn::Pipeline::Tooling>: everything below but the
+=item * L<Ekorn::Pipeline::Tooling>: the functions of every module
+below but Sugar, which names pipelines as it's loaded, and the
 operators, from one module, by tags: C<:core>, C<:flow>, C<:batch>,
-C<:taps>, C<:stages>, C<:sources>, C<:sinks>, C<:json>, C<:words> and
-C<:all>.
+C<:taps>, C<:stages>, C<:context>, C<:sources>, C<:sinks>, C<:json>,
+C<:csv>, C<:words> and C<:all>.
 
 =item * L<Ekorn::Pipeline::Stages::Flow>: C<take>, C<drop>,
 C<take_first>, C<take_last>, C<take_single>, C<take_if>, C<drop_if>,
@@ -607,6 +616,11 @@ C<dump_to> and C<tee>, which look at each value and pass it on, for
 logging, counting and debugging; C<tee> runs each through a branch of
 stages of your own, so a tap can be any pipeline.
 
+=item * L<Ekorn::Pipeline::Context>: C<result_number> and
+C<result_original>, which a stage asks for the number of the result
+it's making, and the value it's being made from, as each run counts
+its results.
+
 =item * L<Ekorn::Pipeline::Sources> and L<Ekorn::Pipeline::Sinks>:
 the sources and sinks above.
 
@@ -615,6 +629,11 @@ read and write one JSON document, and C<from_jsonl> and C<to_jsonl>,
 which read and write JSON Lines: each a source or a sink given a file
 or a filehandle, and a stage given neither. The how-to walks through
 how a module like it is put together.
+
+=item * L<Ekorn::Pipeline::CSV>: C<from_csv> and C<to_csv>, which read
+and write CSV and TSV, in the same way, with L<Text::CSV>, which Ekorn
+recommends: rows as arrays, or as hashes keyed by a header, whose names
+are the run's columns.
 
 =item * L<Ekorn::Pipeline::Sugar>: pipelines named as the program
 compiles, each with a function of its name.
@@ -726,9 +745,13 @@ authority where they differ.
 
 From CPAN:
 
+=for not-run
+
     cpanm Ekorn::Pipeline
 
 Or the latest from GitHub:
+
+=for not-run
 
     cpanm https://github.com/nukopian/Ekorn-Pipeline.git
 

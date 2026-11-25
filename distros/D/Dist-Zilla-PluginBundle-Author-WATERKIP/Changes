@@ -3,6 +3,11 @@ Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 TODO:
 * Get dual license to work with dzil
 
+3.4       2026-11-24 14:16:20Z
+
+    * Add darkpan release model
+    * Make release branch configurable
+
 3.3       2023-09-15 16:19:02Z
 
     * Add 'use Data::Dumper' to skip for prereqs

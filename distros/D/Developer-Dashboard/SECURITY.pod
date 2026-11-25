@@ -50,7 +50,7 @@ repository.
 =head1 ADDITIONAL CONTEXT
 
 The runtime-facing security baseline and verification notes also live in the
-source tree security documentation, including the C<dashboard doctor> command
+source tree security documentation, including the C<d2 doctor> command
 used to audit and repair owner-only runtime permissions.
 
 =cut

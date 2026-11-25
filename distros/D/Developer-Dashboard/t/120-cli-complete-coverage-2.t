@@ -96,7 +96,7 @@ for my $spec ( [ 'dir_shared', 'alpha' ], [ 'dir_blank', '' ], [ 'dir_fresh', 'g
     );
 
     my @completions = Developer::Dashboard::CLI::Complete::complete(
-        words => [ 'dashboard', 'restart', 'collector', 'alp' ],
+        words => [ 'd2', 'restart', 'collector', 'alp' ],
         index => 3,
     );
     is_deeply(

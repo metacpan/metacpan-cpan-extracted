@@ -37,6 +37,7 @@ my %WriteMakefileArgs = (
     "Mojo::File" => 0,
     "Pod::Usage" => 0,
     "YAML::XS" => 0,
+    "autovivification" => 0,
     "parent" => 0,
     "re" => 0,
     "warnings" => 0
@@ -57,7 +58,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -95,6 +96,7 @@ my %FallbackPrereqs = (
   "Test::MockModule" => 0,
   "Test::More" => 0,
   "YAML::XS" => 0,
+  "autovivification" => 0,
   "parent" => 0,
   "re" => 0,
   "strict" => 0,

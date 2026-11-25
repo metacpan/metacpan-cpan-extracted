@@ -24,6 +24,11 @@ Each field accepts numbers, comma-separated lists, ranges, range steps, and
 
     */10 8-18/2 1,15 JAN,MAR MON-FRI
 
+To run once at the start of every hour, use `0 */1 * * *`: the first field is
+the minute, so `0` selects minute zero, and `*/1` in the second field selects
+every hour. Do not use `* */1 * * *` for an hourly run. Its first field is `*`,
+which matches every minute, so it runs once per minute throughout each hour.
+
 When both day-of-month and day-of-week are restricted, either field may match
 the date. If only one is restricted, that field controls the date. The
 scheduler evaluates local machine time once per second and stores the last

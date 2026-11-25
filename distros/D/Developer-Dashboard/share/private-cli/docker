@@ -22,24 +22,24 @@ docker - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard docker --help
-  dashboard docker compose [options] <compose-args...>
-  dashboard docker list [--enabled|--disabled]
-  dashboard docker development {enable|disable} <service> [service...]
-  dashboard docker ...
+  d2 docker --help
+  d2 docker compose [options] <compose-args...>
+  d2 docker list [--enabled|--disabled]
+  d2 docker development {enable|disable} <service> [service...]
+  d2 docker ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard docker compose>, C<dashboard docker list>,
-and the isolated service toggle commands C<dashboard docker enable> and
-C<dashboard docker disable>, plus C<dashboard docker development
+This staged helper exposes C<d2 docker compose>, C<d2 docker list>,
+and the isolated service toggle commands C<d2 docker enable> and
+C<d2 docker disable>, plus C<d2 docker development
 {enable|disable}>. It is the command surface for dashboard-specific Compose
 discovery, addon/mode handling, dry-run output, service-state reporting, and
 local C<disabled.yml> and C<develop.yml> marker management. C<--help>, C<-h>,
@@ -55,9 +55,9 @@ Use this file when changing docker helper CLI arguments or the handoff into the 
 
 =head1 HOW TO USE
 
-Users run C<dashboard docker compose ...>, C<dashboard docker list>,
-C<dashboard docker enable E<lt>serviceE<gt> [service...]>, C<dashboard docker
-disable E<lt>serviceE<gt> [service...]>, or C<dashboard docker development
+Users run C<d2 docker compose ...>, C<d2 docker list>,
+C<d2 docker enable E<lt>serviceE<gt> [service...]>, C<d2 docker
+disable E<lt>serviceE<gt> [service...]>, or C<d2 docker development
 {enable|disable} E<lt>serviceE<gt> [service...]>. The staged helper forwards
 the request into the private runtime, which either resolves and C<exec>s the
 final Docker command, reports the effective enabled or disabled state of
@@ -65,37 +65,37 @@ isolated services, or creates or removes the deepest-layer service marker for
 one or more services in one invocation. A bad name among good ones does not
 stop the others from being toggled, and is reported per service. C<disabled.yml>
 excludes a service; separate C<develop.yml> opts it into loading
-C<development.compose.yml> after its base C<compose.yml>. C<dashboard docker
+C<development.compose.yml> after its base C<compose.yml>. C<d2 docker
 --help> prints the built-in command reference; shell completion lists all five
 Docker subcommands and offers C<enable>/C<disable> below C<development>.
 
 =head1 WHAT USES IT
 
-It is used by developers who keep compose stacks under dashboard config roots, by docker command tests, and by docs around isolated service folders.
+It is used by developers who keep compose stacks under d2 config roots, by docker command tests, and by docs around isolated service folders.
 
 =head1 EXAMPLES
 
 Example 1:
 
-  dashboard docker compose ps
+  d2 docker compose ps
 
 Run the public built-in command path that stages or re-enters this helper.
 
 Example 2:
 
-  dashboard docker list --disabled
+  d2 docker list --disabled
 
 Show only isolated service folders that are currently disabled by the effective
 layered marker state.
 
 Example 3:
 
-  dashboard docker disable green
-  dashboard docker enable green
-  dashboard docker disable green blue purple
-  dashboard docker enable green blue purple
-  dashboard docker development enable green
-  dashboard docker development disable green
+  d2 docker disable green
+  d2 docker enable green
+  d2 docker disable green blue purple
+  d2 docker enable green blue purple
+  d2 docker development enable green
+  d2 docker development disable green
 
 Toggle one or more isolated services without manually creating or deleting the
 F<disabled.yml> marker file.
@@ -107,7 +107,7 @@ Example 4:
 
   ~/.developer-dashboard/cli/dd/docker --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 5:
 

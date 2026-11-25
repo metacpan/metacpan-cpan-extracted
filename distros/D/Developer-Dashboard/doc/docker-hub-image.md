@@ -34,11 +34,9 @@ build a macOS-kernel container.
 
 ## Local verification
 
-Run the workflow-contract test in the development container:
-
-```bash
-d2 docker compose exec dev prove -lv t/228-dockerhub-image-workflow.t
-```
+The workflow-contract test (228-dockerhub-image-workflow) was removed on
+2026-11-23 together with the GitHub workflow files it checked, so there is no
+local test for the workflow contract any more.
 
 To validate the actual Dockerfile without publishing, build it through an
 isolated Compose project with `d2 docker compose ... build`. A real Docker Hub

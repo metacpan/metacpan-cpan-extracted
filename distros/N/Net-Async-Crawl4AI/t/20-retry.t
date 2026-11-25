@@ -16,6 +16,7 @@ use Net::Async::Crawl4AI;
   sub do_request {
     my ( $self, %args ) = @_;
     push @{ $self->{log} }, $args{request};
+    push @{ $self->{args} }, {%args};
     my $next = shift @{ $self->{q} };
     # Empty queue simulates a Net::Async::HTTP transport failure: a failed
     # Future, not a synchronous die.
@@ -23,6 +24,7 @@ use Net::Async::Crawl4AI;
     return Future->done($next);
   }
   sub log { $_[0]->{log} }
+  sub args { $_[0]->{args} }
 }
 
 sub ok_md {
@@ -33,6 +35,19 @@ sub ok_md {
 sub err { HTTP::Response->new( $_[0], 'err', [ 'Content-Type' => 'text/plain' ], 'nope' ) }
 
 my $loop = IO::Async::Loop->new;
+
+subtest 'timeout is passed to every request; a timed-out request is a retried transport error' => sub {
+  my $http = Test::ScriptedHTTP->new;    # empty queue: each attempt fails like a Net::Async::HTTP timeout
+  my $c = Net::Async::Crawl4AI->new(
+    base_url => 'http://x', http => $http, timeout => 7,
+    delay_sub => sub { Future->done },
+  );
+  $loop->add($c);
+  my @failure = $c->md('https://x')->failure;
+  ok $failure[0]->is_transport, 'type=transport';
+  is scalar @{ $http->log }, 3, 'retried like other transport failures';
+  is $_->{timeout}, 7, 'timeout => 7 passed to do_request' for @{ $http->args };
+};
 
 subtest '429 -> 200 retries with backoff delay' => sub {
   my $http = Test::ScriptedHTTP->new( err(429), ok_md() );

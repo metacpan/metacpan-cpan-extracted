@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::OpenFileUtil;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use Exporter 'import';
 
@@ -41,7 +41,7 @@ __END__
 
 =head1 NAME
 
-Developer::Dashboard::CLI::OpenFileUtil - small shared helpers for dashboard of
+Developer::Dashboard::CLI::OpenFileUtil - small shared helpers for d2 of
 
 =head1 SYNOPSIS
 

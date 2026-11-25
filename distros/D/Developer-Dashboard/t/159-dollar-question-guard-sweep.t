@@ -14,7 +14,15 @@ use Test::More;
 # Input: path segment strings.
 # Output: absolute path string.
 sub _repo_path {
-    return File::Spec->rel2abs( File::Spec->catfile( $RealBin, File::Spec->updir, @_ ) );
+    my $path = File::Spec->rel2abs( File::Spec->catfile( $RealBin, File::Spec->updir, @_ ) );
+    # Windows: File::Spec->catfile returns backslashes, but File::Find
+    # normalizes the names it hands back to forward slashes, so the sweeps'
+    # /\Q$lib_dir\E\/?(.*)/ keying regex never matches on Windows and $rel
+    # comes back undef, mis-keying every hit as "::name". Normalise once
+    # here so both sweeps key by the real relative path on every platform.
+    # Unix paths contain no backslashes, so this is a no-op there.
+    $path =~ s{\\}{/}g;
+    return $path;
 }
 
 # DD-611: this baseline was DD-597's own still-open findings (25 hits at the
@@ -45,7 +53,6 @@ my %BASELINE = map { $_ => 1 } ();
 # now guarded directly in lib/ rather than re-added here - see
 # CommandRunner.pm::terminate_command_process, fixed by this ticket.
 my %SETTER_BASELINE = map { $_ => 1 } (
-    'Developer/Dashboard/ActionRunner.pm::run_command_action',
     'Developer/Dashboard/CLI/Ask.pm::_ask_claude',
     'Developer/Dashboard/CLI/Ask.pm::_missing_backend_message',
     'Developer/Dashboard/CLI/Ask.pm::_run_cli',

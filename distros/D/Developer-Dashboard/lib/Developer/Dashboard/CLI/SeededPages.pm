@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::SeededPages;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use File::Spec;
 use Developer::Dashboard::JSON qw(json_decode json_encode);
@@ -231,7 +231,7 @@ Call the refresh routines from init or runtime update flows with the active runt
 
 =head1 WHAT USES IT
 
-It is used by C<dashboard init>, runtime bootstrap/update scripts, and seed-refresh regressions for stale managed copies.
+It is used by C<d2 init>, runtime bootstrap/update scripts, and seed-refresh regressions for stale managed copies.
 
 =head1 EXAMPLES
 

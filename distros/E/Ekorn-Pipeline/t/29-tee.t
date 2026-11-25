@@ -117,8 +117,8 @@ subtest "the branch's ends, as its run ends" => sub {
 
     @log = ();
     $class->new(tee(log_end('branch')), take(1))->(1, 2);
-    is \@log, ['branch stopped'],
-        'stopped, when a stop after the tee ends the main run';
+    is \@log, ['branch done'],
+        "done, at the tee's end, which closes the branch, when a stop after the tee ends the main run";
 
     @log = ();
     my @queue = (1 .. 5);
@@ -126,7 +126,7 @@ subtest "the branch's ends, as its run ends" => sub {
         ->iterator(sub { @queue ? shift @queue : () });
     $next->();
     $next->finish;
-    is \@log, ['branch stopped'], 'stopped, when the main run is finished';
+    is \@log, ['branch done'], 'done, when the main run is finished';
 
     @log = ();
     eval {
@@ -134,6 +134,46 @@ subtest "the branch's ends, as its run ends" => sub {
     };
     is \@log, ['branch stopped'],
         'stopped, when the main run dies, as a source read by a run that dies is';
+};
+
+subtest 'a stop after the tee closes the branch (roadmap 2026-0050)' => sub {
+    my @batches;
+    my $writer = sub { push @batches, "@$_"; () };
+    is [$class->new(tee(batch(2), $writer), take(3))->(1 .. 10)], [1 .. 3],
+        'the main run stops at its take';
+    is \@batches, ['1 2', '3'],
+        "and the branch's flush gives the batch it held";
+
+    @batches = ();
+    my @queue = (1 .. 10);
+    my $next  = $class->new(tee(batch(2), $writer))
+        ->iterator(sub { @queue ? shift @queue : () });
+    is $next->first, 1,     "an iterator's first";
+    is \@batches,    ['1'], 'closes it too';
+
+    @batches = ();
+    eval {
+        $class->new(tee(batch(2), $writer), sub { die "main\n" })->(1);
+    };
+    is \@batches, [], 'but a main run that dies only finishes it';
+
+    my @held;
+    my $holder = gather {
+        my @kept;
+        return (sub { push @kept, $_[0]; () }, sub () { push @held, "@kept"; () });
+    };
+    is [$class->new(tee(tee($holder), take(2)), take(3))->(1 .. 10)], [1 .. 3],
+        'a tee in a branch the stop ends';
+    is \@held, ['1 2'], 'is closed by its own end, as the branch stops';
+
+    my $flush_dies = gather {
+        return (sub { $_[0] }, sub () { die "flush\n" });
+    };
+    like dies { $class->new(tee($flush_dies), take(1))->(1, 2) },
+        qr( \A Pipeline\ end\ of\ stage\ \#1\ failed\ [^\n]+ \n
+            \ {4} Pipeline\ stage\ \#1\ failed\ [^\n]+ \n
+            \ {8} flush \n \z )x,
+        "a branch's flush that dies there kills the run, from the tee's end";
 };
 
 subtest 'a death in the branch kills the run' => sub {

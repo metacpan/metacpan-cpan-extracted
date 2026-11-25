@@ -1,11 +1,15 @@
 use strict;
 use warnings;
 
+use Config ();
 use Cwd qw(abs_path);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use FindBin qw($RealBin);
+# Below FindBin so this import does not share a hunk with the Config import
+# master adds above Cwd, which would block merging master into this branch.
+use Capture::Tiny qw(capture_merged);
 use Test::More;
 
 my $ROOT  = abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
@@ -15,7 +19,14 @@ my $SOURCE = _slurp($GATE);
 # Source contracts. These hold whether or not the advisory database is
 # installed on this host, so they are checked before anything is executed.
 ok( -f $GATE, 'the declared-chain audit gate is tracked in script/' );
-ok( -x $GATE, 'the declared-chain audit gate is executable' );
+if ( $^O eq 'MSWin32' ) {
+    # Windows launches this .pl script via the Perl interpreter rather than a
+    # POSIX executable permission bit, which NTFS stat does not expose.
+    ok( -f $GATE && -r $GATE, 'native Perl can read the audit gate on Windows' );
+}
+else {
+    ok( -x $GATE, 'the declared-chain audit gate is executable' );
+}
 like( $SOURCE, qr{\A#!/usr/bin/env perl\n}, 'the gate uses the portable env shebang' );
 like( $SOURCE, qr/^use strict;$/m,   'the gate runs under strict' );
 like( $SOURCE, qr/^use warnings;$/m, 'the gate runs under warnings' );
@@ -204,9 +215,14 @@ sub _run_gate {
     # for a reason none of them names. Freshness is owned by
     # t/172-cpan-audit-database-age.t, which shims the stamp and needs no host.
     local $ENV{CPAN_AUDIT_FRESH_DAYS} = 100_000;
-    my $command = join ' ', $^X, $GATE, @args;
-    my $out = `$command 2>&1`;
-    my $rc  = ${^CHILD_ERROR_NATIVE} >> 8;
+    # Execute Perl directly in list form. A command string is passed through
+    # PERL5SHELL on Windows, where Git Bash strips backslashes from D:\\... paths.
+    my $status;
+    my $out = capture_merged {
+        system { $^X } $^X, $GATE, @args;
+        $status = $?;
+    };
+    my $rc = $status < 0 ? 255 : ( $status >> 8 );
     return ( $rc, defined $out ? $out : '' );
 }
 
@@ -263,9 +279,11 @@ sub _write_cpanfile {
 # Input: none.
 # Output: the first matching library root path, or undef when none exists.
 sub _installed_library_root {
+    my $arch = $Config::Config{archname};
     my @candidates = (
-        File::Spec->catdir( $ROOT, 'local', 'lib', 'perl5' ),
-        File::Spec->catdir( $ENV{HOME} // '', 'perl5', 'lib', 'perl5' ),
+        File::Spec->catdir( $ROOT, 'local', 'lib', 'perl5', $arch ),
+        File::Spec->catdir( $ROOT, '.perl5', 'lib', 'perl5', $arch ),
+        File::Spec->catdir( $ENV{HOME} // '', 'perl5', 'lib', 'perl5', $arch ),
     );
 
     for my $candidate (@candidates) {

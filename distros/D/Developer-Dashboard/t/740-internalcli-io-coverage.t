@@ -12,7 +12,18 @@ our ( %OPEN_FAIL, %UNLINK_FAIL, @CLOSE_FAIL_RE, %HANDLE_FAIL );
 
 BEGIN {
     require Scalar::Util;
+    require Symbol;
     *CORE::GLOBAL::open = sub (*;$@) {
+        # A bareword handle such as STDOUT reaches a "*" prototype as a plain
+        # string, which CORE::open refuses under strict refs. Resolve it to
+        # the caller's glob first. Windows is where this is exercised: the
+        # product secures runtime paths there by running icacls with STDOUT
+        # and STDERR redirected and restored.
+        if ( defined $_[0] && !ref $_[0] ) {
+            my $glob = Symbol::qualify_to_ref( $_[0], scalar caller );
+            return CORE::open( $glob, $_[1] ) if @_ == 2;
+            return CORE::open( $glob, $_[1], @_[ 2 .. $#_ ] );
+        }
         if ( @_ >= 3 && defined $_[2] && !ref $_[2] && $OPEN_FAIL{ $_[2] } ) {
             $! = 13;
             return 0;
@@ -31,7 +42,9 @@ BEGIN {
     *CORE::GLOBAL::close = sub (;*) {
         return CORE::close() if !@_;
         my $fail = ref $_[0] && delete $HANDLE_FAIL{ Scalar::Util::refaddr( $_[0] ) };
-        my $ok = CORE::close( $_[0] );
+        # Same bareword rule as the open override above.
+        my $handle = ref $_[0] ? $_[0] : Symbol::qualify_to_ref( $_[0], scalar caller );
+        my $ok = CORE::close($handle);
         if ($fail) {
             $! = 5;
             return 0;
@@ -151,6 +164,21 @@ ok( length call( 'helper_content', 'jq' ), 'helper_content still reads normally'
     {
         local $UNLINK_FAIL{$target} = 1;
         like( eval { call( '_remove_retired_managed_helper', paths => $paths, name => 'skill' ); 1 } ? '' : $@, qr/Unable to remove retired helper/, 'retired helper removal dies on unlink failure' );
+    }
+    {
+        # The same removal with CRLF fixture bytes: on Windows a helper
+        # file is written in text mode, so the managed-marker check must
+        # still recognise it and the unlink failure must still be
+        # reported instead of the file being silently skipped.
+        my $crlf_target = File::Spec->catfile( $root, 'skill-crlf' );
+        # Write the bytes raw: wf() opens in text mode, where Windows would
+        # turn each "\r\n" into "\r\r\n", which is not the CRLF file this
+        # check is about and is not recognised as a managed helper.
+        open my $crlf_fh, '>:raw', $crlf_target or die "Unable to write $crlf_target: $!";
+        print {$crlf_fh} "#!/usr/bin/env perl\r\n" . call( '_managed_helper_marker', 'skill-crlf' ) . "\r\nbody\r\n";
+        close $crlf_fh or die "Unable to close $crlf_target: $!";
+        local $UNLINK_FAIL{$crlf_target} = 1;
+        like( eval { call( '_remove_retired_managed_helper', paths => $paths, name => 'skill-crlf' ); 1 } ? '' : $@, qr/Unable to remove retired helper/, 'retired helper removal dies on unlink failure with CRLF fixture bytes' );
     }
 }
 

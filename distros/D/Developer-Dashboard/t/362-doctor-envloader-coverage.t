@@ -101,7 +101,7 @@ case $- in
     *i*) ;;
       *) return;;
 esac
-eval "$("/opt/bin/dashboard" shell bash)"
+eval "$("/opt/bin/d2" shell bash)"
 BASH
     local $FAIL_WRITE{$bashrc} = 1;
     my $ok = eval { $doctor->_rewrite_bashrc_dashboard_lines($bashrc); 1 };

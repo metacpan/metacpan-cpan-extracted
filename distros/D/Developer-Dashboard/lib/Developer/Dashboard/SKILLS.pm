@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 1;
 
@@ -22,13 +22,13 @@ Developer::Dashboard::SKILLS - shipped skill authoring reference for Developer D
 
 Skill lifecycle:
 
-  dashboard skills install git@github.com:user/example-skill.git
-  dashboard skills install /absolute/path/to/example-skill
-  dashboard skills install --ddfile
-  dashboard skills install
-  dashboard skills list
-  dashboard example-skill.hello arg1 arg2
-  dashboard skills uninstall example-skill
+  d2 skills install git@github.com:user/example-skill.git
+  d2 skills install /absolute/path/to/example-skill
+  d2 skills install --ddfile
+  d2 skills install
+  d2 skills list
+  d2 example-skill.hello arg1 arg2
+  d2 skills uninstall example-skill
 
 =head1 DESCRIPTION
 
@@ -92,30 +92,30 @@ Create a Git repository with at least:
 Install it:
 
   # from Git
-  dashboard skills install file:///absolute/path/to/example-skill
+  d2 skills install file:///absolute/path/to/example-skill
   # or from a direct checked-out local repo with .git/ and .env VERSION=...
-  dashboard skills install /absolute/path/to/example-skill
+  d2 skills install /absolute/path/to/example-skill
   # or install several sources in one ordered batch
-  dashboard skills install browser foo/bar git@github.com:user/example-skill.git
+  d2 skills install browser foo/bar git@github.com:user/example-skill.git
   # singular skill is an alias for skills management commands
-  dashboard skill list
+  d2 skill list
 
-Repeated C<dashboard skills install ...> calls reinstall or refresh the
+Repeated C<d2 skills install ...> calls reinstall or refresh the
 isolated installed copy instead of failing on an existing repo name, using
 C<rsync> when it is available for direct local checkouts and a built-in Perl
 tree-copy fallback when it is not. Each explicit install, including every
 source in a multi-source command, also appends the exact source to the home
 root F<~/.developer-dashboard/ddfile> unless the same non-comment entry
-already exists. Bare C<dashboard skills install> reads that root F<ddfile>
+already exists. Bare C<d2 skills install> reads that root F<ddfile>
 and reinstalls every listed source, which gives operators one update command
 for all registered skills. Install prints a progress rundown before long work
 starts and defaults to a table summary with each skill's F<.env> C<VERSION>
 before and after the install; first-time installs from that root F<ddfile>
 still report C<installed> even when the skill ships no F<.env> C<VERSION>
 metadata. Pass C<-o json> for the raw result payload.
-C<dashboard skill> is only a singular alias for the
+C<d2 skill> is only a singular alias for the
 skills management command family; installed commands still use the dotted
-C<dashboard E<lt>skillE<gt>.E<lt>commandE<gt>> form. If the home runtime
+C<d2 E<lt>skillE<gt>.E<lt>commandE<gt>> form. If the home runtime
 already has F<~/.developer-dashboard/.gitignore>, each install also appends
 C<skills/E<lt>repo-nameE<gt>/> without duplicates so cloned skill trees stay
 out of runtime Git status. An existing F<~/.developer-dashboard/.gitiignore>
@@ -123,7 +123,7 @@ spelling is honored for compatibility.
 
 Run an operator manifest install from the current directory:
 
-  dashboard skills install --ddfile
+  d2 skills install --ddfile
 
 If F<ddfile> exists there, each listed source installs into the base
 home-layer skills root at
@@ -132,12 +132,12 @@ run from a deeper child F<.developer-dashboard/> layer. If F<ddfile.local>
 exists there, each listed source installs into the current directory's nested
 F<skills/E<lt>repo-nameE<gt>/> tree instead. When both manifests are present,
 F<ddfile> runs first and F<ddfile.local> runs second. Repeated
-C<dashboard skills install --ddfile> runs also act as reinstall and refresh
+C<d2 skills install --ddfile> runs also act as reinstall and refresh
 for existing targets.
 
 Run its command:
 
-  dashboard example-skill.hello
+  d2 example-skill.hello
 
 Open its bookmark:
 
@@ -162,11 +162,11 @@ The prepared layout is:
 =item B<cli/>
 
 Executable skill commands. These are run through
-C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>> and are not installed
+C<d2 E<lt>repo-nameE<gt>.E<lt>commandE<gt>> and are not installed
 into the system PATH. Nested skill trees under
 C<skills/E<lt>repo-nameE<gt>/cli/> also stay reachable through the same dotted
 syntax across multiple nested levels, so C<skills/foo/skills/bar/cli/baz> is
-invoked as C<dashboard E<lt>repo-nameE<gt>.foo.bar.baz>.
+invoked as C<d2 E<lt>repo-nameE<gt>.foo.bar.baz>.
 
 =item B<cli/E<lt>commandE<gt>.d/>
 
@@ -181,7 +181,7 @@ Executable F<.java> hooks compile with C<javac> and then run through C<java>.
 =item B<config/config.json>
 
 Skill-owned JSON config. Developer Dashboard guarantees the file exists, does
-not impose a rich schema, and merges it into the effective dashboard config
+not impose a rich schema, and merges it into the effective d2 config
 under C<_E<lt>repo-nameE<gt>>. If the skill declares C<collectors> there,
 those collectors join the normal managed fleet under names such as
 C<example-skill.status>, so serve, restart, stop, prompt rendering, and
@@ -529,7 +529,7 @@ Skill collectors are declared inside the skill's C<config/config.json>:
   }
 
 When that skill is installed, the collector joins the same managed fleet used
-by the main dashboard config. The runtime qualifies the collector name with
+by the main d2 config. The runtime qualifies the collector name with
 the repo name, so the effective collector becomes
 C<example-skill.status> instead of a bare C<status>. That qualified name is
 what the collector runner uses for loop metadata, process titles, and managed
@@ -541,16 +541,16 @@ Operationally that means:
 
 =item *
 
-C<dashboard serve> starts skill collectors together with the system fleet
+C<d2 serve> starts skill collectors together with the system fleet
 
 =item *
 
-C<dashboard restart> restarts both the system collectors and the installed
+C<d2 restart> restarts both the system collectors and the installed
 skill collectors
 
 =item *
 
-C<dashboard stop> stops the whole managed collector fleet, including skills
+C<d2 stop> stops the whole managed collector fleet, including skills
 
 =item *
 
@@ -667,7 +667,7 @@ C</skill/E<lt>repo-nameE<gt>/bookmarks/nav/help.tt>.
 Dashboard-wide custom CLI hooks are separate from skill hooks. They live under
 F<./.developer-dashboard/cli/E<lt>commandE<gt>.d> or
 F<~/.developer-dashboard/cli/E<lt>commandE<gt>.d> and are used for normal
-C<dashboard E<lt>commandE<gt>> commands. They can also use directory-backed
+C<d2 E<lt>commandE<gt>> commands. They can also use directory-backed
 C<run> commands, which skill commands do not currently use.
 
 =head1 FAQ
@@ -700,7 +700,7 @@ Debian-family packages, an C<apkfile> for Alpine packages, a C<dnfile> for
 Fedora packages, a C<brewfile> for
 macOS packages, or a C<package.json> for Node dependencies that should land under
 C<$HOME/node_modules>. The
-explicit operator manifest order for C<dashboard skills install --ddfile> is
+explicit operator manifest order for C<d2 skills install --ddfile> is
 the deferred C<ddfile -> ddfile.local> pass, while the automatic per-skill
 dependency order is C<aptfile -> apkfile -> dnfile -> brewfile -> package.json ->
 cpanfile -> cpanfile.local -> ddfile -> ddfile.local>.
@@ -735,7 +735,7 @@ Treat it as installed reference documentation. Keep its content synchronized wit
 
 =head1 WHAT USES IT
 
-It is used by C<perldoc Developer::Dashboard::SKILLS>, by release metadata checks that compare the shipped docs to the repository skill authoring guide, and by contributors authoring or reviewing dashboard skills.
+It is used by C<perldoc Developer::Dashboard::SKILLS>, by release metadata checks that compare the shipped docs to the repository skill authoring guide, and by contributors authoring or reviewing d2 skills.
 
 =head1 EXAMPLES
 

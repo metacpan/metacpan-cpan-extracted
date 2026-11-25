@@ -222,4 +222,77 @@ dies_like(
     'request rejects false-valued reference path before coercion',
 );
 
+
+# Exercise the public verb wrappers through the transport boundary, not just
+# method existence. Verify the method, final URL, body, headers and response.
+{
+    my @verb_calls;
+    my $client = HTTP::API::Core->new(
+        base_url => 'https://api.example.test',
+        transport => sub {
+            my ($method, $url, $opts) = @_;
+            push @verb_calls, [$method, $url, $opts];
+            return { status => 204, headers => {}, content => '' };
+        },
+    );
+
+    for my $verb (qw(put patch delete)) {
+        my $response = $client->$verb(
+            '/resource', query => { id => 42 },
+            headers => { 'X-Contract' => 'yes' }, content => 'payload',
+        );
+        isa_ok $response, 'HTTP::API::Core::Response';
+        is $response->status, 204, "$verb returns the transport status";
+        is_deeply $verb_calls[-1],
+            [uc($verb), 'https://api.example.test/resource?id=42',
+             { headers => { 'X-Contract' => 'yes' }, content => 'payload' }],
+            "$verb forwards the HTTP method, URL, headers and body";
+    }
+
+    my $before = scalar @verb_calls;
+    for my $verb (qw(get post put patch delete)) {
+        for my $case (
+            [ ['dangling'], qr/request options must be key\/value pairs/, 'odd options' ],
+            [ [[] => 1], qr/request option names must be scalars/, 'reference option name' ],
+        ) {
+            my ($args, $pattern, $label) = @$case;
+            my @warnings;
+            my $error;
+            {
+                local $SIG{__WARN__} = sub { push @warnings, @_ };
+                eval { $client->$verb('/resource', @$args); 1 } or $error = $@;
+            }
+            like $error, $pattern, "$verb rejects $label";
+            is_deeply \@warnings, [], "$verb rejects $label without coercion warnings";
+        }
+    }
+    dies_like(
+        sub { $client->get('/resource', retry => []) },
+        qr/retry must be a hash reference or scalar switch/,
+        'reference-valued per-request retry switch is rejected',
+    );
+    is scalar(@verb_calls), $before, 'invalid request options never reach transport';
+}
+
+# Reject malformed constructor inputs before Perl coerces the option list.
+for my $case (
+    [ ['base_url', 'https://api.example.test', 'dangling'],
+      qr/constructor options must be key\/value pairs/, 'odd constructor options' ],
+    [ [ [] => 1 ], qr/constructor option names must be scalars/, 'reference constructor option' ],
+    [ [base_url => 'https://api.example.test', retry => []],
+      qr/retry must be a hash reference/, 'non-hash constructor retry' ],
+    [ [base_url => 'https://api.example.test', timeout => undef],
+      qr/timeout must be a positive number/, 'undefined timeout' ],
+) {
+    my ($args, $pattern, $label) = @$case;
+    my @warnings;
+    my $error;
+    {
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
+        eval { HTTP::API::Core->new(@$args); 1 } or $error = $@;
+    }
+    like $error, $pattern, "$label is rejected";
+    is_deeply \@warnings, [], "$label does not cause coercion warnings";
+}
+
 done_testing;

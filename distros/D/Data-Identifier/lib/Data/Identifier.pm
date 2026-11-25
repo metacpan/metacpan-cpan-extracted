@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.38;
+our $VERSION = v0.39.02;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
@@ -102,6 +102,8 @@ my %well_known = (
 my %registered;
 
 $_->register foreach values %well_known;
+
+my %perl_package_registrations;
 
 # Refill with namespaces:
 {
@@ -422,7 +424,31 @@ sub new {
                 require Data::Identifier::Generate;
                 return Data::Identifier::Generate->integer($from->bstr);
             } else {
-                croak 'Unsupported input data';
+                my $bad = 1;
+
+                if (defined(my $r = $perl_package_registrations{ref $from})) {
+                    if (defined(my $to_identifier = $r->{to_identifier})) {
+                        my @res = $to_identifier->($from);
+                        if (scalar(@res) == 2) {
+                            ($type, $id) = @res;
+                            $bad = undef;
+                        } elsif (scalar(@res) == 1) {
+                            my ($v) = @res;
+                            if (!$v->isa(__PACKAGE__)) {
+                                return Data::Identifier->new(from => $v, %opts);
+                            } elsif (scalar(keys %opts)) {
+                                $type = $from->type;
+                                $id   = $from->id;
+                                $bad = undef;
+                            } else {
+                                return $from;
+                            }
+                        } else {
+                            croak 'Unsupported return from external converter function';
+                        }
+                    }
+                }
+                croak 'Unsupported input data' if $bad;
             }
         } else {
             # If it's not a ref, try as ise.
@@ -746,7 +772,11 @@ sub as {
 
     if (defined(my $so = $opts{so})) {
         require Data::Identifier::Interface::Subobjects; # Is this required?
-        $opts{$_} //= $so->so_get($_, default => undef) foreach Data::Identifier::Interface::Subobjects->KEYS;
+        if (ref($so) eq 'HASH') {
+            $opts{$_} //= $so->{$_} foreach Data::Identifier::Interface::Subobjects->KEYS;
+        } else {
+            $opts{$_} //= $so->so_get($_, default => undef) foreach Data::Identifier::Interface::Subobjects->KEYS;
+        }
     }
 
     $self = __PACKAGE__->new(from => $self) unless eval {$self->isa(__PACKAGE__)};
@@ -836,6 +866,20 @@ sub as {
             }
         }
         return $self->as('Data::URIID::Colour')->as($as, %opts);
+    } elsif (defined(my $r = $perl_package_registrations{$as})) {
+        if (defined(my $from_identifier = $r->{from_identifier})) {
+            my $so = $opts{so};
+            my $res;
+
+            if (ref($so) eq 'HASH') {
+                require Data::Identifier::Interface::Subobjects;
+                $so = Data::Identifier::Interface::Subobjects->so_new->so_attach(%{$so});
+            }
+
+            $res = $from_identifier->($as, $self, %opts{qw(autocreate)}, so => $so);
+            croak 'Invalid return from external converter function' unless $res->isa($as);
+            return $res;
+        }
     }
 
     return $opts{default} if exists $opts{default};
@@ -1181,6 +1225,11 @@ sub _add_tagnames {
     return $self;
 }
 
+# Interface method for Data::Identifier::Util's register_package() ONLY.
+sub _get_perl_package_registrations {
+    return \%perl_package_registrations;
+}
+
 1;
 
 __END__
@@ -1195,7 +1244,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.38
+version v0.39.02
 
 =head1 SYNOPSIS
 
@@ -1390,17 +1439,29 @@ If it is a code reference the identifier object is passed as C<$_[0]>.
 
 An instance of L<Data::TagDB>. This option is currently ignored.
 
+B<Note:>
+Passing this might become an error as soon as L</as> removes the same option.
+
 =item C<extractor>
 
 An instance of L<Data::URIID>. This option is currently ignored.
+
+B<Note:>
+Passing this might become an error as soon as L</as> removes the same option.
 
 =item C<fii>
 
 An instance of L<File::Information>. This option is currently ignored.
 
+B<Note:>
+Passing this might become an error as soon as L</as> removes the same option.
+
 =item C<store>
 
 An instance of L<File::FStore>. This option is currently ignored.
+
+B<Note:>
+Passing this might become an error as soon as L</as> removes the same option.
 
 =item C<tagname>
 
@@ -1636,6 +1697,7 @@ This will likely be deprecated in future versions. Use subobjects if possible.
 (experimental since v0.28)
 
 A L<Data::Identifier::Interface::Subobjects> that is used to create the new object as needed.
+Alternatively a hashref with the values as could be passed to L<Data::Identifier::Interface::Subobjects/so_attach> (experimental since v0.39).
 
 If C<$identifier> is a L<Data::Identifier::Interface::Subobjects> then subobjects from C<$identifier> are preferred.
 

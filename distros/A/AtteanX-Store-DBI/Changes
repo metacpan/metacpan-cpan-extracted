@@ -5,6 +5,26 @@ Created:      2016-03-14
 Home page:    <https://metacpan.org/release/AtteanX-Store-DBI/>
 Bug tracker:  <https://github.com/kasei/atteanx-store-dbi/issues>
 
+0.004  2026-11-XX
+
+ - (Addition) Add load and dump commands to attean_dbi tool.
+ - (Addition) Add support for RDF 1.2 triple terms.
+ - (Addition) Add support for init-on-construct.
+ - (Update) Fix SQL-generation bug in handling queries where the requested
+   graph does not exist in the database.
+ - (Update) Fix unicode configuration of the MySQL store.
+ - (Update) Fix unicode configuration of the sqlite-based
+   temporary_store().
+ - (Update) Improve developer tests.
+ - (Update) Improvements to path discovery logic in create_schema_file().
+ - (Update) Remove dependency on List::MoreUtils.
+ - (Update) Skip mysql and postgres tests if the DBD modules or environment
+   variables are not available.
+ - (Update) Update add_iter to load all quads in a single transaction.
+ - (Update) Update dbi_connect_args() to handle both ($type, %args) and
+   (%args) calling variants.
+ - (Update) Update required version of Attean to 0.041.
+
 0.003  2025-03-11
 
  - (Update) Fix developer tests to silence warnings.

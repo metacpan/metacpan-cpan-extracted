@@ -22,18 +22,18 @@ config - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard config ...
+  d2 config ...
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes the runtime configuration commands such as C<dashboard config init> and C<dashboard config show>. It is the small public face of the config subsystem.
+This staged helper exposes the runtime configuration commands such as C<d2 config init> and C<d2 config show>. It is the small public face of the config subsystem.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing the CLI config surface or when fixing how configurat
 
 =head1 HOW TO USE
 
-Users run C<dashboard config init> or C<dashboard config show>. The staged helper forwards the request to the private runtime, which reads or writes the runtime config files and prints the result.
+Users run C<d2 config init> or C<d2 config show>. The staged helper forwards the request to the private runtime, which reads or writes the runtime config files and prints the result.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used during first-run setup, by contributors inspecting runtime config sta
 
 Example 1:
 
-  dashboard config show
+  d2 config show
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/config --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

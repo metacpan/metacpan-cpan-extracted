@@ -1,3 +1,34 @@
+0.24.0  2026-11-25
+
+[lsjobs]
+* Added `-x`/`--exclude <pattern>` flag to hide jobs whose name matches a regex
+
+[viewjobs]
+* Added info bar (second footer line) showing total job counts with per-state
+  breakdown: Running (green), Queued (yellow), Completed (cyan), Failed (red);
+  a "Showing X of Y" indicator appears on the right when filters are active
+* Refresh (`r`) now preserves interactive filters and job selection; cursor is
+  restored to the previously active job by ID after the data reload;
+  only CLI-supplied filters (--user, --name, --status) are re-seeded on refresh
+* Added `Shift+P` / `Shift+L` as laptop-friendly synonyms for PgUp / PgDn in
+  all three modes (normal view, detail view, file viewer)
+
+0.23.0  2026-11-23
+
+* waitjobs: added `--submit` flag to submit the waiter itself as a SLURM job
+* waitjobs: added `--status` option to filter watched jobs by SLURM state (e.g. R, PD)
+* waitjobs: job name now accepted as a positional argument
+
+0.22.0  2026-07-21
+
+* Added `slurm-efficiency` tool for per-job CPU/memory efficiency reporting
+* Removed `Capture::Tiny` dependency
+
+0.21.1  2026-05-06
+
+* Improved `slurm-load` output and options
+* Fixed test compatibility on Windows
+
 0.21.0	2026-04-24
 
 * Added 'slurm-status'

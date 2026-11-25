@@ -22,18 +22,18 @@ doctor - private built-in command wrapper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard doctor [--fix]
+  d2 doctor [--fix]
 
 =head1 DESCRIPTION
 
 This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
-public C<dashboard> entrypoint can stay a thin switchboard.
+public C<d2> entrypoint can stay a thin switchboard.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This staged helper exposes C<dashboard doctor> and C<dashboard doctor --fix>. It is the CLI front end for runtime permission audits and repairs.
+This staged helper exposes C<d2 doctor> and C<d2 doctor --fix>. It is the CLI front end for runtime permission audits and repairs.
 
 =head1 WHY IT EXISTS
 
@@ -45,7 +45,7 @@ Use this file when changing doctor CLI flags or the handoff from the staged help
 
 =head1 HOW TO USE
 
-Users run C<dashboard doctor> to inspect or C<dashboard doctor --fix> to repair. The staged helper passes the request into the private runtime, which loads the doctor service and prints its report.
+Users run C<d2 doctor> to inspect or C<d2 doctor --fix> to repair. The staged helper passes the request into the private runtime, which loads the doctor service and prints its report.
 
 =head1 WHAT USES IT
 
@@ -55,7 +55,7 @@ It is used by operators hardening runtime permissions, by security smoke tests, 
 
 Example 1:
 
-  dashboard doctor
+  d2 doctor
 
 Run the public built-in command path that stages or re-enters this helper.
 
@@ -63,7 +63,7 @@ Example 2:
 
   ~/.developer-dashboard/cli/dd/doctor --help
 
-Inspect the staged helper directly after C<dashboard init> or helper extraction has populated the home runtime.
+Inspect the staged helper directly after C<d2 init> or helper extraction has populated the home runtime.
 
 Example 3:
 

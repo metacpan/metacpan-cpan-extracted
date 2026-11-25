@@ -267,9 +267,15 @@ for my $workflow_name (qw(test.yml release-github.yml)) {
         like( $body, qr/'\Q$metric\E'/, "the canonical entrypoint requests $metric coverage" );
     }
     like( $body, qr/\^lib\//,                     'the canonical entrypoint restricts the report to lib/' );
+    like( $body, qr/'-gcov',\s*'0'/,
+        'the Perl lib report excludes unrelated gcov file headers from compiled XS artefacts' );
     like( $body, qr/check-all-metric-coverage/,   'the canonical entrypoint enforces the report through the checker' );
-    like( $body, qr/\+ignore,\^\/tmp\//, 'coverage instrumentation excludes disposable temporary source files' );
-    like( $body, qr/\+ignore[^\n]*\\\.developer-dashboard\//, 'coverage instrumentation excludes staged runtime helper files' );
+    like( $body, qr/-select,\^lib\//,
+        'coverage instrumentation explicitly selects repository library sources' );
+    like( $body, qr/-ignore,\^/,
+        'coverage instrumentation excludes non-library dynamic test fixtures' );
+    like( $body, qr/-blib,0/,
+        'coverage instrumentation never shadows the library source with the build tree' );
 }
 
 # Scenario: the documented gate is the executed gate.
@@ -557,7 +563,11 @@ malformed, or below-target reports fail closed and that CI invokes the gate.
 
 The previous CI check requested only statement and subroutine coverage, so
 branch and condition regressions could pass. These executable BDD scenarios
-prevent the repository workflow and parser from weakening that contract.
+prevent the repository workflow and parser from weakening that contract. The
+gate covers Perl modules under C<lib/>; it disables optional gcov output from
+compiled XS artefacts so extra C-file tables and diagnostics cannot contaminate
+the Perl coverage report. XS behavior remains protected by native functional
+regression tests.
 
 =head1 WHEN TO USE
 

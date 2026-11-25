@@ -34,25 +34,25 @@ chdir $ENV{HOME} or die "Unable to chdir to $ENV{HOME}: $!";
 
 my $perl      = $^X;
 my $lib       = File::Spec->catdir( $repo, 'lib' );
-my $dashboard = File::Spec->catfile( $repo, 'bin', 'dashboard' );
+my $dashboard = File::Spec->catfile( $repo, 'bin', 'd2' );
 
-# Run dashboard init first to stage helpers and create the runtime root
+# Run d2 init first to stage helpers and create the runtime root
 {
     my ( $stdout, $stderr, $exit_code ) = capture {
         system $perl, '-I', $lib, $dashboard, 'init';
         $? >> 8;
     };
-    is( $exit_code, 0, 'dashboard init stages the private helpers' )
-      or die "dashboard init failed: $stderr";
+    is( $exit_code, 0, 'd2 init stages the private helpers' )
+      or die "d2 init failed: $stderr";
 }
 
-# Now run dashboard shell ps — this triggers _cache_powershell_bootstrap
+# Now run d2 shell ps — this triggers _cache_powershell_bootstrap
 {
     my ( $stdout, $stderr, $exit_code ) = capture {
         system $perl, '-I', $lib, $dashboard, 'shell', 'ps';
         $? >> 8;
     };
-    is( $exit_code, 0, 'dashboard shell ps exits successfully' )
+    is( $exit_code, 0, 'd2 shell ps exits successfully' )
       or do {
         diag "STDOUT: $stdout" if $stdout;
         diag "STDERR: $stderr" if $stderr;
@@ -157,7 +157,7 @@ like(
     };
     chdir $ENV{HOME} or die "Unable to chdir to $ENV{HOME}: $!";
 
-    is( $exit_code, 0, 'dashboard shell ps exits successfully from inside a project runtime layer' )
+    is( $exit_code, 0, 'd2 shell ps exits successfully from inside a project runtime layer' )
       or diag "STDERR: $stderr";
     ok( -s File::Spec->catfile( $home_cache_dir, 'powershell-bootstrap.ps1' ),
         'a project-layer refresh rewrites the home-layer PowerShell bootstrap cache' );
@@ -179,8 +179,8 @@ t/31-powershell-bootstrap-cache.t - PowerShell bootstrap cache integration test
 
 =head1 PURPOSE
 
-Verify that the C<dashboard init> command stages private helper tools and
-that C<dashboard shell ps> successfully creates the PowerShell bootstrap
+Verify that the C<d2 init> command stages private helper tools and
+that C<d2 shell ps> successfully creates the PowerShell bootstrap
 and environment-variable cache files (powershell-bootstrap.ps1,
 powershell-env.ps1) under the runtime root.
 
@@ -195,7 +195,7 @@ the expected function definitions, and is written atomically (no stale
 =head1 WHEN TO USE
 
 Run this test after any change to the PowerShell bootstrap generation
-path in the dashboard CLI (typically C<_dashboard-core> or the shell
+path in the d2 CLI (typically C<_dashboard-core> or the shell
 plugin).  Also run after changes to the atomic-write mechanism used by
 the cache layer.
 
@@ -205,8 +205,8 @@ the cache layer.
 
 =head1 WHAT USES IT
 
-L<Developer::Dashboard::Shell::PS> (via the C<dashboard shell ps>
-command), the C<dashboard init> command, and the atomic-write helpers
+L<Developer::Dashboard::Shell::PS> (via the C<d2 shell ps>
+command), the C<d2 init> command, and the atomic-write helpers
 in the runtime layer.
 
 =head1 EXAMPLES

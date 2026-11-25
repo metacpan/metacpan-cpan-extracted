@@ -15,7 +15,7 @@ use lib 'lib';
 use Developer::Dashboard::CLI::Complete;
 
 my $original_cwd = getcwd();
-my $dashboard = File::Spec->catfile( $original_cwd, 'bin', 'dashboard' );
+my $dashboard = File::Spec->catfile( $original_cwd, 'bin', 'd2' );
 my $home = tempdir( CLEANUP => 1 );
 my $project = File::Spec->catdir( $home, 'project' );
 my $home_skill = File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'layered-skill' );
@@ -37,7 +37,7 @@ chdir $project or die "Unable to chdir to $project: $!";
 my ( undef, undef, $init_exit ) = capture {
     system $^X, $dashboard, 'init';
 };
-is( $init_exit >> 8, 0, 'dashboard init stages the normal home private helper runtime for the public-command check' );
+is( $init_exit >> 8, 0, 'd2 init stages the normal home private helper runtime for the public-command check' );
 
 my @candidates = Developer::Dashboard::CLI::Complete::complete(
     words => [ 'd2', 'layered-skill.' ],
@@ -126,7 +126,7 @@ release.
 =head1 WHAT USES IT
 
 The automated test suite runs it through C<prove -lr t>. It checks both
-C<CLI::Complete::complete> and the public C<dashboard complete> helper that
+C<CLI::Complete::complete> and the public C<d2 complete> helper that
 generated bash and zsh completion functions invoke.
 
 =head1 EXAMPLES

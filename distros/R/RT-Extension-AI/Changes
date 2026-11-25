@@ -1,5 +1,18 @@
 Revision history for RT-Extension-AI
 
+0.08 2026-11-24
+ - Display line breaks in AI responses (thanks to Emmanuel Lacour)
+ - Show markup in AI responses as text in the editor modals and when
+   inserted into the editor
+ - Log the duration and token usage of each AI request (thanks to Simon Wilcox)
+ - Log ticket summary text only at the debug level (thanks to Simon Wilcox)
+ - Fix swapped custom field names in the scrip action docs
+   (thanks to Simon Wilcox)
+ - Use the configured default model in the Queue Creation Assistant
+ - Read the full response from Claude models that think before answering
+ - Support a thinking setting in Claude model configuration, so autocomplete
+   can turn thinking off
+
 0.07
  - Move functions to a dedicated section at the bottom of the POD. This is a
    documentation-only change.

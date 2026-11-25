@@ -3,7 +3,7 @@ package Developer::Dashboard::Version;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 1;
 
@@ -20,7 +20,7 @@ application, web stack, or command runtime.
 
 =head1 WHY IT EXISTS
 
-Small commands such as C<dashboard version> need release metadata only. Keeping
+Small commands such as C<d2 version> need release metadata only. Keeping
 that scalar in this dependency-free module avoids loading the full public
 module graph just to print one value. C<Developer::Dashboard> aliases the same
 value so the library and command report one version.
@@ -39,7 +39,7 @@ does not load the dashboard handle, web application, or command helpers.
 
 =head1 WHAT USES IT
 
-C<bin/dashboard> uses the scalar for the C<version> command, and
+C<bin/d2> uses the scalar for the C<version> command, and
 C<Developer::Dashboard> exposes the same scalar as its public module version.
 
 =head1 EXAMPLES

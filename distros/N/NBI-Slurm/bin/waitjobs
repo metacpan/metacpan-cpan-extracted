@@ -6,14 +6,19 @@ use v5.12;
 use warnings;
 use Getopt::Long;
 use FindBin qw($RealBin);
+use File::Basename;
+use File::Spec;
+use Cwd qw(abs_path getcwd);
 use Data::Dumper;
 use Term::ANSIColor qw(:constants);
 if (-e "$RealBin/../dist.ini") {
     say STDERR "[dev mode] Using local lib"  if ($ENV{"DEBUG"});
     use lib "$RealBin/../lib";
-} 
+}
 use NBI::Slurm;
 use NBI::Queue;
+use NBI::Opts;
+use NBI::Job;
 $Data::Dumper::Sortkeys = 1;
 
 my $opt_user = $ENV{USER};
@@ -22,22 +27,45 @@ my $opt_status = '';
 my $opt_verbose_bool = 0;
 my $opt_debug_bool = 0;
 my $refresh_time = 20;
+my $opt_submit = 0;      # resubmit this waiter to SLURM instead of waiting in the foreground
+my $opt_jobname;         # override the derived "wait-<name>" job name
+my $opt_jobtime = '1d';  # walltime for the submitted waiter job
 # Check if this script is running as a job, in case save the job id
 my $self_job_id = $ENV{SLURM_JOB_ID} // undef;
 GetOptions(
     'u|user=s' => \$opt_user,
     'n|name=s' => \$opt_name,
+    's|status=s' => \$opt_status,
     'r|refresh=i' => \$refresh_time,
+    'S|submit' => \$opt_submit,
+    'jobname=s' => \$opt_jobname,
+    'T|jobtime=s' => \$opt_jobtime,
     'verbose' => \$opt_verbose_bool,
     'version' => sub { say "waitjobs v", $NBI::Slurm::VERSION; exit },
     'debug' => \$opt_debug_bool,
     'help' => sub { usage() },
 );
 
-my $queue = NBI::Queue->new(
+# Allow the job name to be passed as a positional argument: waitjobs [options] [job_name]
+$opt_name = $ARGV[0] if @ARGV;
+
+# --submit: instead of waiting in the foreground, submit this very command as a
+# small SLURM job (1 core, 4GB) that does the waiting, then exit printing its job id.
+if ($opt_submit) {
+    submit_self();
+    exit 0;
+}
+
+# Build the queue-selection arguments once and reuse them on every refresh.
+# Only pass -state when a status filter was requested: NBI::Queue validates the
+# value against the list of SLURM short codes and would die on an empty string.
+my @queue_args = (
     -username => $opt_user,
-    -name => $opt_name,
+    -name     => $opt_name,
 );
+push @queue_args, (-state => $opt_status) if length $opt_status;
+
+my $queue = NBI::Queue->new(@queue_args);
 # If $self_job_id is anq integer, remove it from the queue
 if (defined $self_job_id and $self_job_id =~ /^\d+$/) {
     print STDERR timelog("waitjobs"), "Ignoring current job id $self_job_id\n";
@@ -45,17 +73,19 @@ if (defined $self_job_id and $self_job_id =~ /^\d+$/) {
 }
 
 my @starting_ids = @{$queue->ids()};
-print STDERR timelog("waitjobs"),  "There are ", 
-  GREEN, BOLD, scalar @starting_ids, RESET  " jobs for ",
+print STDERR timelog("waitjobs"),  "There are ",
+  GREEN, BOLD, scalar @starting_ids, RESET, " jobs for ",
   GREEN, BOLD, $opt_user,     RESET, " with name matching ",
-  GREEN, BOLD, $opt_name,     RESET, "\n";
+  GREEN, BOLD, $opt_name,     RESET,
+  (length $opt_status ? (" and status ", GREEN, BOLD, $opt_status, RESET) : ()),
+  "\n";
+if ($opt_debug_bool) {
+    say STDERR timelog("waitjobs"), "[debug] Initial job id(s): ", join(",", @starting_ids);
+}
 
 while (scalar @starting_ids > 0) {
     # Create the new queue with the same parameters as the initial queue
-    my $current_jobs = NBI::Queue->new(
-        -username => $opt_user,
-        -name => $opt_name,
-    );
+    my $current_jobs = NBI::Queue->new(@queue_args);
     my @current_ids = @{$current_jobs->ids()};
 
     # Remove from @starting_ids all the jobs that are NOT in @current_ids
@@ -66,6 +96,10 @@ while (scalar @starting_ids > 0) {
         }
     }
     @starting_ids = @new_starting_ids;
+    if ($opt_debug_bool) {
+        say STDERR timelog("waitjobs"), "[debug] Tracking ", scalar @starting_ids,
+          " job id(s): ", join(",", @starting_ids);
+    }
     if ($opt_verbose_bool) {
         say STDERR timelog("waitjobs"), "Waiting for ", scalar @starting_ids, " jobs to finish (refresh in $refresh_time seconds)";
     }
@@ -83,12 +117,108 @@ sub usage {
     Wait for selected jobs to exit the queue
 
   Options:
-   -u, --user       default current user
-   -n, --name       default '.+' (matches any name)
-   -r, --refresh    check every 20 seconds
-    
+   -u, --user       Username to wait for (default: current user)
+   -n, --name       Job name pattern, as a regex (default '.+', matches any name).
+                    Can also be supplied as the positional [job_name] argument.
+   -s, --status     Only wait for jobs in this SLURM state, given as a short
+                    code (e.g. R, PD, CG). Default: any state.
+   -r, --refresh    Seconds to wait between queue checks (default: 20)
+   -S, --submit     Submit this waiter as a SLURM job (1 core, 4GB) and exit,
+                    printing the job id. The job does the waiting for you.
+   --jobname STR    Name for the submitted waiter job (default: wait-<name>)
+   -T, --jobtime    Walltime for the submitted waiter job (default: 1d)
+   --verbose        Print a status line at every refresh
+   --debug          Print the job ids being tracked at every refresh
+   --version        Print the version and exit
+   --help           Print this help and exit
+
 END
     exit;
+}
+
+# Derive a tidy job name from the name pattern, e.g. "concat" -> "wait-concat".
+sub derive_jobname {
+    my ($pattern) = @_;
+    return "wait-all" if !defined $pattern || $pattern eq '' || $pattern eq '.+' || $pattern eq '.*';
+    my $s = $pattern;
+    $s =~ s/[^A-Za-z0-9._-]+/-/g;   # turn regex metacharacters / spaces into dashes
+    $s =~ s/^[-.]+//;
+    $s =~ s/[-.]+$//;
+    return "wait-all" if $s eq '';
+    return "wait-$s";
+}
+
+# Single-quote a string for safe inclusion in a shell command line.
+sub shell_quote {
+    my ($s) = @_;
+    $s = '' unless defined $s;
+    $s =~ s/'/'\\''/g;
+    return "'$s'";
+}
+
+# If the queue name contains a '*', expand it to short/medium/long based on walltime.
+sub update_queue {
+    my ($queue, $time_hours) = @_;
+    return $queue if $queue !~ /\*/;
+    if    ($time_hours <= 2)  { $queue =~ s/\*/short/g; }
+    elsif ($time_hours <= 48) { $queue =~ s/\*/medium/g; }
+    else                      { $queue =~ s/\*/long/g; }
+    return $queue;
+}
+
+# Build an equivalent waitjobs command (minus --submit) and submit it as a SLURM job.
+sub submit_self {
+    my $home   = $ENV{HOME} // (getcwd());
+    my $config = NBI::Slurm::load_config("$home/.nbislurm.config");
+
+    my $queue  = $config->{queue}  // 'qib-short';
+    my $tmpdir = $config->{tmpdir} // '/tmp';
+    my $time_hours = NBI::Opts::_time_to_hour($opt_jobtime);
+    $queue = update_queue($queue, $time_hours);
+
+    my $jobname = defined $opt_jobname ? $opt_jobname : derive_jobname($opt_name);
+
+    # Reconstruct the foreground command from the parsed options (NOT @ARGV), so the
+    # submitted job never carries --submit and cannot resubmit itself in a loop.
+    my $self_exe = abs_path($0) // File::Spec->catfile($RealBin, basename($0));
+    my @cmd = (shell_quote($self_exe));
+    push @cmd, '-u', shell_quote($opt_user);
+    push @cmd, '-n', shell_quote($opt_name);
+    push @cmd, '-s', shell_quote($opt_status) if length $opt_status;
+    push @cmd, '-r', $refresh_time;
+    push @cmd, '--verbose' if $opt_verbose_bool;
+    push @cmd, '--debug'   if $opt_debug_bool;
+    my $wait_command = join(' ', @cmd);
+
+    my $cwd = getcwd();
+    my $opts = NBI::Opts->new(
+        -queue   => $queue,
+        -threads => 1,
+        -memory  => '4GB',
+        -time    => $opt_jobtime,
+        -tmpdir  => $tmpdir,
+    );
+    my $job = NBI::Job->new(
+        -name    => $jobname,
+        -command => "cd " . shell_quote($cwd),
+        -opts    => $opts,
+    );
+    $job->append_command($wait_command);
+
+    if ($opt_verbose_bool || $opt_debug_bool) {
+        say STDERR timelog("waitjobs"), "Submitting waiter job '$jobname' to queue '$queue' (walltime $opt_jobtime)";
+        say STDERR timelog("waitjobs"), "[debug] Command: $wait_command" if $opt_debug_bool;
+    }
+
+    my $jobid = $job->run();
+    if (defined $jobid && $jobid =~ /^\d+$/ && $jobid > 0) {
+        say STDERR timelog("waitjobs"), GREEN, BOLD, "Submitted waiter job $jobid ($jobname)", RESET;
+        say $jobid;   # to STDOUT so it can be captured: JOBID=$(waitjobs -n concat -S)
+    } else {
+        say STDERR timelog("waitjobs"), RED, BOLD, "ERROR:", RESET,
+          " could not submit waiter job (sbatch not found, or you are outside a SLURM cluster?)";
+        exit 1;
+    }
 }
 
 __END__
@@ -103,11 +233,11 @@ waitjobs - Wait for selected jobs to exit the queue
 
 =head1 VERSION
 
-version 0.22.0
+version 0.24.0
 
 =head1 SYNOPSIS
 
-waitjobs [options]
+waitjobs [options] [job_name]
 
 =head1 DESCRIPTION
 
@@ -123,19 +253,56 @@ Specify the username to wait for jobs from. By default, it uses the current user
 
 =item B<-n, --name <pattern>>
 
-Specify the name pattern to filter the jobs. Only jobs with matching names will be considered. The default pattern is '.+' (matches any name).
+Specify the name pattern (a regular expression) to filter the jobs. Only jobs with
+matching names will be considered. The default pattern is '.+' (matches any name).
+The name can also be supplied as a positional C<[job_name]> argument; when both are
+given, the positional argument takes precedence.
+
+=item B<-s, --status <state>>
+
+Only wait for jobs in the given SLURM state. The state must be a SLURM short code,
+for example C<R> (running), C<PD> (pending) or C<CG> (completing); passing a full
+name such as C<RUNNING> is not accepted. By default jobs in any state are matched.
 
 =item B<-r, --refresh <time>>
 
 Specify the refresh time in seconds for checking the job status. The script will wait for this duration before checking the job status again. The default refresh time is 20 seconds.
 
+=item B<-S, --submit>
+
+Instead of waiting in the foreground, submit this very C<waitjobs> invocation as a
+small SLURM job (1 core, 4GB of memory) that performs the waiting, then exit
+immediately after printing the submitted job id to standard output. This is useful
+to make a downstream job depend on a set of jobs finishing, e.g.
+
+  JOBID=$(waitjobs -n concat -S)
+  runjob --after $JOBID -r "next_step.sh"
+
+The submitted command is rebuilt from the parsed options (user, name, status and
+refresh), so it never carries C<--submit> and cannot resubmit itself in a loop. The
+queue, temporary directory and other defaults are taken from C<~/.nbislurm.config>,
+exactly as for C<runjob>.
+
+=item B<--jobname <name>>
+
+Override the name given to the submitted waiter job. By default the name is derived
+from the C<--name> pattern as C<wait-E<lt>nameE<gt>> (for example C<-n concat> gives
+C<wait-concat>); when no specific name is requested the job is called C<wait-all>.
+Only meaningful together with C<--submit>.
+
+=item B<-T, --jobtime <time>>
+
+Walltime for the submitted waiter job, as a time string such as C<2h>, C<1d> or
+C<2d 12h>. The default is C<1d>, chosen so the waiter outlives the jobs it is
+watching. Only meaningful together with C<--submit>.
+
 =item B<--verbose>
 
-Display verbose output, including the number of jobs being waited for.
+Display verbose output, including the number of jobs being waited for at each refresh.
 
 =item B<--debug>
 
-Enable debug mode, printing the output of the squeue command.
+Enable debug mode, printing the list of job ids currently being tracked at each refresh.
 
 =item B<--help>
 
@@ -167,9 +334,23 @@ Wait for jobs with a specific name from a specific user:
 
 =item B<Example 4:>
 
-Wait for jobs with a specific status, refreshing every 10 seconds:
+Wait only for running jobs with a specific name, refreshing every 10 seconds:
 
-  waitjobs -n myjob -r 10 -u username -s RUNNING
+  waitjobs -n myjob -r 10 -u username -s R
+
+=item B<Example 5:>
+
+Pass the job name as a positional argument instead of C<-n>:
+
+  waitjobs myjob
+
+=item B<Example 6:>
+
+Submit the waiter itself to SLURM and capture its job id so another job can depend
+on it (the waiter is named C<wait-concat> and allowed up to two days):
+
+  JOBID=$(waitjobs -n concat -S -T 2d)
+  runjob --after $JOBID -r "launch-coassembly.sh"
 
 =back
 

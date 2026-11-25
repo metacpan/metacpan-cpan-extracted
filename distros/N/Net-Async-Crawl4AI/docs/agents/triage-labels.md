@@ -1,25 +1,25 @@
 # Triage Labels
 
-Die Skills sprechen in fünf kanonischen Triage-Rollen. In diesem Repo sind sie als
-**karr-Tags** mit ihren Standardnamen abgebildet.
+The skills speak in five canonical triage roles. In this repo they are mapped to
+**karr tags** with their default names.
 
-| Rolle in mattpocock/skills | karr-Tag          | Bedeutung                                  |
+| Role in mattpocock/skills  | karr tag          | Meaning                                    |
 | -------------------------- | ----------------- | ------------------------------------------ |
-| `needs-triage`             | `needs-triage`    | Maintainer muss das Issue bewerten         |
-| `needs-info`               | `needs-info`      | Wartet auf Rückmeldung des Reporters       |
-| `ready-for-agent`          | `ready-for-agent` | Vollständig spezifiziert, AFK-Agent-bereit |
-| `ready-for-human`          | `ready-for-human` | Braucht menschliche Implementierung        |
-| `wontfix`                  | `wontfix`         | Wird nicht bearbeitet                      |
+| `needs-triage`             | `needs-triage`    | Maintainer has to assess the issue         |
+| `needs-info`               | `needs-info`      | Waiting for feedback from the reporter     |
+| `ready-for-agent`          | `ready-for-agent` | Fully specified, ready for an AFK agent    |
+| `ready-for-human`          | `ready-for-human` | Needs a human implementation               |
+| `wontfix`                  | `wontfix`         | Will not be worked on                      |
 
-Anwenden / entfernen:
+Apply / remove:
 
 ```bash
 karr edit <id> --add_tag ready-for-agent
 karr edit <id> --remove_tag needs-triage
-karr list --tag ready-for-agent          # nach Rolle filtern
+karr list --tag ready-for-agent          # filter by role
 ```
 
-Wenn ein Skill eine Rolle nennt (z. B. „apply the AFK-ready triage label"), den
-passenden Tag-String aus dieser Tabelle verwenden. Üblicherweise trägt ein Ticket
-genau einen Rollen-Tag zur Zeit — beim Weiterreichen den alten entfernen und den
-neuen setzen.
+When a skill names a role (e.g. "apply the AFK-ready triage label"), use the
+matching tag string from this table. Usually a ticket carries exactly one
+role tag at a time — when passing it on, remove the old one and set the
+new one.

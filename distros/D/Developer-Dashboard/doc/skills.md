@@ -4,11 +4,11 @@ The long-form skill authoring guide lives in [`../SKILL.md`](../SKILL.md).
 
 Use it when you need:
 
-- how `dashboard skills install` accepts Git URLs and qualified local checked-out skill directories
-- how `dashboard skills install` accepts multiple explicit sources in one ordered batch
-- how `dashboard skill` aliases the `dashboard skills` management command family without replacing dotted skill execution
+- how `d2 skills install` accepts Git URLs and qualified local checked-out skill directories
+- how `d2 skills install` accepts multiple explicit sources in one ordered batch
+- how `d2 skill` aliases the `d2 skills` management command family without replacing dotted skill execution
 - how an existing home runtime `.gitignore` or compatibility `.gitiignore` receives `skills/<repo-name>/` entries for installed skill trees without duplicates
-- that repeated `dashboard skills install ...` calls reinstall or refresh the installed isolated copy
+- that repeated `d2 skills install ...` calls reinstall or refresh the installed isolated copy
 - the expected skill directory structure
 - the meaning of each folder
 - the skill CLI and `cli/<command>.d/` hook model, including `RESULT`, `LAST_RESULT`, and `[[STOP]]`

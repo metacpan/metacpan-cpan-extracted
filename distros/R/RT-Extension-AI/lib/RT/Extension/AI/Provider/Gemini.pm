@@ -12,7 +12,7 @@ sub default_headers {
     return { 'x-goog-api-key' => $config->{api_key} };
 }
 
-sub process_request {
+sub _process_request {
     my ( $self, %args ) = @_;
     my $ua = $self->{ua};
 
@@ -55,6 +55,17 @@ sub process_request {
             raw     => $response->decoded_content,
         };
     }
+}
+
+sub _usage {
+    my ( $self, $raw ) = @_;
+    return {} unless ref $raw eq 'HASH' && ref $raw->{usageMetadata} eq 'HASH';
+
+    my $usage = $raw->{usageMetadata};
+    return {
+        input_tokens  => $usage->{promptTokenCount},
+        output_tokens => $usage->{candidatesTokenCount},
+    };
 }
 
 1;

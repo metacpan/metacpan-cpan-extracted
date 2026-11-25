@@ -3,7 +3,7 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use File::Spec;
 use File::Path qw(make_path);
@@ -103,6 +103,8 @@ sub load_global {
           if ref( $merged->{collectors} ) eq 'ARRAY';
         $merged->{providers} = $self->_merge_named_hash_array( [], $merged->{providers}, 'id' )
           if ref( $merged->{providers} ) eq 'ARRAY';
+        $merged->{indicators} = $self->_merge_named_hash_array( [], $merged->{indicators}, 'name' )
+          if ref( $merged->{indicators} ) eq 'ARRAY';
     }
     return $merged;
 }
@@ -221,6 +223,10 @@ sub _merge_hashes {
                 $merged{$key} = $self->_merge_named_hash_array( $left->{$key}, $right->{$key}, 'id' );
                 next;
             }
+            if ( $key eq 'indicators' ) {
+                $merged{$key} = $self->_merge_named_hash_array( $left->{$key}, $right->{$key}, 'name' );
+                next;
+            }
         }
         $merged{$key} = $right->{$key};
     }
@@ -234,6 +240,8 @@ sub _merge_hashes {
       if ref( $merged{collectors} ) eq 'ARRAY';
     $merged{providers} = $self->_merge_named_hash_array( [], $merged{providers}, 'id' )
       if ref( $merged{providers} ) eq 'ARRAY';
+    $merged{indicators} = $self->_merge_named_hash_array( [], $merged{indicators}, 'name' )
+      if ref( $merged{indicators} ) eq 'ARRAY';
 
     return \%merged;
 }
@@ -701,7 +709,7 @@ sub _nested_skill_alias_entries {
 }
 
 # split_skill_alias_name($name)
-# Parses a dotted "dashboard path/file add" alias name into its skill-depth
+# Parses a dotted "d2 path/file add" alias name into its skill-depth
 # path plus the trailing alias segment (DD-1004), e.g. "foo.bar.something" ->
 # (["foo","bar"], "something"). An undotted name is not a skill-prefixed
 # alias at all.
@@ -998,7 +1006,7 @@ sub _normalize_ssl_validity_days {
 }
 
 # ssl_warn_days()
-# The number of days before a certificate's expiry at which dashboard doctor
+# The number of days before a certificate's expiry at which d2 doctor
 # starts warning about it (DD-651). Separate return-undef-style guards rather
 # than one compound condition, which is what keeps Devel::Cover's CONDITION
 # metric at 100 (DD-624).
@@ -1235,7 +1243,7 @@ sub remove_global_file_alias {
 
 # save_path_alias($name, $path)
 # save_file_alias($name, $path)
-# Top-level "dashboard path/file add" entry point (DD-1004): routes a bare
+# Top-level "d2 path/file add" entry point (DD-1004): routes a bare
 # alias name to the existing global-config behaviour unchanged, and a dotted
 # skill-depth-prefixed name (e.g. "foo.bar.something") to
 # save_skill_path_alias/save_skill_file_alias instead - the ONE place this
@@ -1262,7 +1270,7 @@ sub _save_named_alias {
 
 # remove_path_alias($name)
 # remove_file_alias($name)
-# Top-level "dashboard path/file del|rm" entry point (DD-1004): the removal
+# Top-level "d2 path/file del|rm" entry point (DD-1004): the removal
 # symmetry counterpart to save_path_alias/save_file_alias, using the exact
 # same dotted-name routing decision.
 # Input: alias name string as typed on the command line.
@@ -1294,8 +1302,18 @@ sub _normalize_home_path {
     return $path if !defined $home || $home eq '';
     return '$HOME' if $path eq $home;
 
-    my $home_prefix = $home . '/';
-    return '$HOME/' . substr( $path, length($home_prefix) ) if index( $path, $home_prefix ) == 0;
+    # The portable prefix uses a forward slash, but on Windows both the
+    # home and the path use backslashes, so the prefix never matches unless
+    # both are folded to one separator first. The fold is Windows-only: on
+    # Unix a backslash can be a legitimate filename character.
+    my $flat_home = $home;
+    my $flat_path = $path;
+    if ( $^O eq 'MSWin32' ) {
+        $flat_home =~ s{\\}{/}g;
+        $flat_path =~ s{\\}{/}g;
+    }
+    my $home_prefix = $flat_home . '/';
+    return '$HOME/' . substr( $flat_path, length($home_prefix) ) if index( $flat_path, $home_prefix ) == 0;
 
     return $path;
 }
@@ -1310,8 +1328,8 @@ sub _expand_config_path {
 
     my $home = $self->{paths}->home;
     return $home if defined $home && $path eq '$HOME';
-    return $home . substr( $path, 5 ) if defined $home && $path =~ /^\$HOME(?=\/)/;
-    return $home . substr( $path, 1 ) if defined $home && $path =~ /^~/;
+    return File::Spec->canonpath( $home . substr( $path, 5 ) ) if defined $home && $path =~ /^\$HOME(?=\/)/;
+    return File::Spec->canonpath( $home . substr( $path, 1 ) ) if defined $home && $path =~ /^~/;
 
     return $path;
 }
@@ -1371,7 +1389,7 @@ sub api_keys {
 # {_skillname => ...} and so can never collide with a project key at all),
 # _skill_api_fragments returns the raw, un-namespaced key hash: an installed
 # skill naming the same API-client key as the operator's own deepest-layer
-# config/api.json (set via `dashboard api add`) must never be able to silently
+# config/api.json (set via `d2 api add`) must never be able to silently
 # replace its secret/routes or tombstone it. Putting skill fragments first
 # just extends this file's own later-merged-wins idiom by one more rung below
 # the project layers, rather than inventing new collision-rejection logic.
@@ -1865,7 +1883,7 @@ self-signed certificate is valid, defaulting to 365 when unset or unusable; it
 is deliberately not capped, because the 398-day ceiling browsers enforce applies
 to certificates issued by publicly trusted CAs and not to a self-signed
 localhost certificate. These settings persist across restart, so
-dashboard restart inherits the previous serve session configuration.
+d2 restart inherits the previous serve session configuration.
 C<Developer::Dashboard::Web::App> creates a lazy snapshot for each request and
 passes it to these accessors and collector assembly. The snapshot is discarded
 when the request ends, so it avoids duplicate reads within a route without

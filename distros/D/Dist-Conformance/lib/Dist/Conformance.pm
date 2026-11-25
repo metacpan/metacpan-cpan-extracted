@@ -1,10 +1,11 @@
-package Dist::Conformance 0.007;
+package Dist::Conformance 0.008;
 
 # ABSTRACT: Whether the development harness of a repository conforms to its standards, and bringing it up to date
 
 use 5.040;
 use warnings FATAL => 'all';
 use re '/aasx';
+no autovivification;
 use Mojo::Base -base, -signatures;
 
 use List::Util();
@@ -76,7 +77,7 @@ sub checks ($self) {
         Dist::Conformance::Flavor::merge_checks( \%merged, $self->config->{checks} );
         my %variables = ( %{ $flavor->variables }, %{ $self->config->{variables} } );
         [
-            map  { $self->make_check( $_, $merged{$_}, \%variables ) }
+            map  { local ($_) = $_; $self->make_check( $_, $merged{$_}, \%variables ) }
             grep { !$skipped->{$_} } $flavor->check_names
         ];
     };
@@ -109,7 +110,7 @@ our %STATUSES = map { $_ => 1 } qw{pass fail info};
 
 sub check ($self) {
     my $snapshot = $self->snapshot;
-    my %run      = map { $_->name => $_ } @{ $self->checks };
+    my %run      = map { local ($_) = $_; $_->name => $_ } @{ $self->checks };
     my @results;
     for my $name ( $self->flavor->check_names ) {
         my $check = $run{$name};
@@ -171,7 +172,7 @@ Dist::Conformance - Whether the development harness of a repository conforms to 
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

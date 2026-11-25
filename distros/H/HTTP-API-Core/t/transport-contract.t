@@ -137,4 +137,28 @@ use HTTP::API::Core::Error;
         'constructor error states accepted transport forms';
 }
 
+
+# Malformed responses are retryable transport failures, but must never
+# be returned as successful responses. A safe request may recover.
+for my $raw (
+    { status => undef }, { status => [] }, { status => '20x' },
+    { status => '099' }, { status => 600 },
+    { status => 200, headers => [] },
+    { status => 200, headers => { 'X-Test' => [undef, {}] } },
+) {
+    my ($calls, @errors) = (0);
+    my $client = HTTP::API::Core->new(
+        base_url => 'https://api.example.test',
+        retry => { attempts => 2, base_delay => 0, jitter => 0 },
+        hooks => { on_error => sub { push @errors, $_[0] } },
+        transport => sub { return ++$calls == 1 ? $raw : { status => 200 } },
+    );
+    is $client->get('/recover')->status, 200, 'safe request recovers from invalid transport response';
+    is $calls, 2, 'invalid transport response is retried exactly once';
+    is scalar(@errors), 1, 'on_error receives one malformed-response failure';
+    is $errors[0]->category, 'transport', 'malformed response retains transport category';
+    ok $errors[0]->retryable, 'malformed response is classified as retryable';
+    is $errors[0]->response, undef, 'malformed response is not exposed as valid HTTP metadata';
+}
+
 done_testing;

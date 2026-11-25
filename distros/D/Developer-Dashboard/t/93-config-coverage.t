@@ -84,9 +84,16 @@ is( $paths->runtime_layer_root_for(''),    '', 'runtime_layer_root_for empty str
 {
     no warnings 'redefine';
     my $real_root = $paths->home_runtime_path;
+    make_path($real_root);
     local *Developer::Dashboard::PathRegistry::_runtime_layers_from_env = sub { return ( undef, '', $real_root ) };
     my $probe = File::Spec->catdir( $real_root, 'probe.txt' );
-    is( $paths->runtime_layer_root_for($probe), $real_root,
+    open my $probe_fh, '>', $probe or die "Unable to create runtime-layer probe '$probe': $!";
+    close $probe_fh or die "Unable to close runtime-layer probe '$probe': $!";
+    my $resolved_root = $paths->runtime_layer_root_for($probe);
+    $resolved_root =~ s{/private(?=/var/folders/)}{}g;
+    my $expected_root = $real_root;
+    $expected_root =~ s{/private(?=/var/folders/)}{}g;
+    is( $resolved_root, $expected_root,
         'runtime_layer_root_for skips an injected undef and empty layer root and still finds the real one' );
 }
 
@@ -106,6 +113,18 @@ sub set_config {
 sub clear_config {
     unlink $config_file if -e $config_file;
     return;
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::Config::_skill_config_fragments = sub { return () };
+    set_config( { indicators => 'preserved malformed scalar' } );
+    is_deeply(
+        $config->load_global->{indicators},
+        'preserved malformed scalar',
+        'load_global preserves a non-array global indicators value during normalization',
+    );
+    clear_config();
 }
 
 sub dies_like {
@@ -319,7 +338,7 @@ sub dies_like {
     is( $config->_expand_config_path(undef), undef, '_expand_config_path returns undef for an undef path' );
     is( $config->_expand_config_path(''),    '',    '_expand_config_path returns empty for an empty path' );
     is( $config->_expand_config_path('$HOME'),      $home,           '_expand_config_path expands a bare $HOME' );
-    is( $config->_expand_config_path('$HOME/sub'),  "$home/sub",     '_expand_config_path expands a $HOME-prefixed path' );
+    is( $config->_expand_config_path('$HOME/sub'),  File::Spec->canonpath("$home/sub"),     '_expand_config_path expands a $HOME-prefixed path' );
     is( $config->_expand_config_path('~x'),         "$home" . 'x',   '_expand_config_path expands a tilde-prefixed path' );
     is( $config->_expand_config_path('/plain'),     '/plain',        '_expand_config_path leaves a plain path alone' );
 
@@ -570,8 +589,8 @@ sub dies_like {
 
     # 325/336: global alias readers with hash vs non-hash config.
     set_config( { path_aliases => { a => '$HOME/x' }, file_aliases => { b => '$HOME/y' } } );
-    is_deeply( $config->global_path_aliases, { a => "$home/x" }, 'global_path_aliases expands configured path aliases' );
-    is_deeply( $config->global_file_aliases, { b => "$home/y" }, 'global_file_aliases expands configured file aliases' );
+    is_deeply( $config->global_path_aliases, { a => File::Spec->canonpath("$home/x") }, 'global_path_aliases expands configured path aliases' );
+    is_deeply( $config->global_file_aliases, { b => File::Spec->canonpath("$home/y") }, 'global_file_aliases expands configured file aliases' );
     set_config( {} );
     is_deeply( $config->global_path_aliases, {}, 'global_path_aliases returns empty when path aliases are absent' );
     is_deeply( $config->global_file_aliases, {}, 'global_file_aliases returns empty when file aliases are absent' );
@@ -1185,7 +1204,7 @@ sub dies_like {
             '_skill_path_aliases drops an empty-string alias name entirely' );
 
         my $all_without_project = $config->path_aliases;
-        is( $all_without_project->{'pathskill.docs'}, "$home/pathskill-docs",
+        is( $all_without_project->{'pathskill.docs'}, File::Spec->canonpath("$home/pathskill-docs"),
             'path_aliases() expands and surfaces a skill-local path alias under its qualified name, even with no project-level path_aliases at all' );
         ok( !exists $all_without_project->{docs}, 'path_aliases() does not leak the skill alias under its bare name' );
 
@@ -1193,9 +1212,9 @@ sub dies_like {
         # alongside the skill-qualified one, not be dropped by the merge.
         set_config( { path_aliases => { proj => '$HOME/project-alias' } } );
         my $all_with_project = $config->path_aliases;
-        is( $all_with_project->{proj}, "$home/project-alias",
+        is( $all_with_project->{proj}, File::Spec->canonpath("$home/project-alias"),
             'path_aliases() still surfaces a real project-level alias' );
-        is( $all_with_project->{'pathskill.docs'}, "$home/pathskill-docs",
+        is( $all_with_project->{'pathskill.docs'}, File::Spec->canonpath("$home/pathskill-docs"),
             'path_aliases() surfaces the skill-qualified alias alongside the project-level one, not clobbered by it' );
         clear_config();
 
@@ -1230,7 +1249,7 @@ sub dies_like {
             '_skill_file_aliases drops an empty-string alias name entirely' );
 
         my $all_without_project = $config->file_aliases;
-        is( $all_without_project->{'fileskill.readme'}, "$home/fileskill-readme",
+        is( $all_without_project->{'fileskill.readme'}, File::Spec->canonpath("$home/fileskill-readme"),
             'file_aliases() expands and surfaces a skill-local file alias under its qualified name, even with no project-level file_aliases at all' );
         ok( !exists $all_without_project->{readme}, 'file_aliases() does not leak the skill alias under its bare name' );
 
@@ -1238,9 +1257,9 @@ sub dies_like {
         # alongside the skill-qualified one, not be dropped by the merge.
         set_config( { file_aliases => { proj => '$HOME/project-file-alias' } } );
         my $all_with_project = $config->file_aliases;
-        is( $all_with_project->{proj}, "$home/project-file-alias",
+        is( $all_with_project->{proj}, File::Spec->canonpath("$home/project-file-alias"),
             'file_aliases() still surfaces a real project-level alias' );
-        is( $all_with_project->{'fileskill.readme'}, "$home/fileskill-readme",
+        is( $all_with_project->{'fileskill.readme'}, File::Spec->canonpath("$home/fileskill-readme"),
             'file_aliases() surfaces the skill-qualified alias alongside the project-level one, not clobbered by it' );
         clear_config();
 
@@ -1323,10 +1342,13 @@ sub dies_like {
     my $layer_api = File::Spec->catfile( $layer_config_root, 'api.json' );
     $layer_config->_write_json_atomic( $layer_api, json_encode( { keys => [ { id => 'probe', secret_digest => 'deadbeef' } ] } ) );
 
-    is( sprintf( '%04o', ( stat $layer_api )[2] & 07777 ), '0600',
-        'api.json in a project-local layer is written 0600, not left at the umask default (DD-784)' );
-    is( sprintf( '%04o', ( stat $layer_config_root )[2] & 07777 ), '0700',
-        'the project-local config directory is 0700, so the file cannot simply be replaced (DD-784)' );
+  SKIP: {
+        skip 'Unix permission modes are not a Windows security control', 2 if $^O eq 'MSWin32';
+        is( sprintf( '%04o', ( stat $layer_api )[2] & 07777 ), '0600',
+            'api.json in a project-local layer is written 0600, not left at the umask default (DD-784)' );
+        is( sprintf( '%04o', ( stat $layer_config_root )[2] & 07777 ), '0700',
+            'the project-local config directory is 0700, so the file cannot simply be replaced (DD-784)' );
+    }
 
     chdir $saved_cwd or die "Unable to restore cwd: $!";
     if ( defined $saved_home ) { $ENV{HOME} = $saved_home; }

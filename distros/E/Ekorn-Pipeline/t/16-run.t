@@ -22,6 +22,8 @@ my $class = 'Ekorn::Pipeline';
 # delivering parts for Ekorn would: its stage doubles each value, and
 # its end says how the run ended.
 package My::Doubler {
+
+
     sub new ($class, $log) { return bless {log => $log}, $class }
 
 
@@ -42,16 +44,22 @@ package My::Returns {
 
     package My::Returns::EKORN_STAGE {
         our @ISA = 'My::Returns';
+
+
         sub EKORN_STAGE ($self) { return @{ $self->{made} } }
     }
 
     package My::Returns::EKORN_SINK_ONE {
         our @ISA = 'My::Returns';
+
+
         sub EKORN_SINK_ONE ($self) { return @{ $self->{made} } }
     }
 
     package My::Returns::EKORN_SOURCE {
         our @ISA = 'My::Returns';
+
+
         sub EKORN_SOURCE ($self) { return @{ $self->{made} } }
     }
 }
@@ -60,18 +68,24 @@ package My::Returns {
 # keeps.
 package My::Sink {
     our @ISA = 'Ekorn::Pipeline::Sink';
+
+
     sub EKORN_SINK_MANY ($self) { return $self->{setup}->() }
 }
 
 # A subclass of Sink with a sink of one's role method of its own.
 package My::SinkOfOne {
     our @ISA = 'Ekorn::Pipeline::Sink';
+
+
     sub EKORN_SINK_ONE ($self) { return $self->{setup}->() }
 }
 
 # A pipeline whose stages method gives what can't be a stage.
 package My::Odd {
     our @ISA = 'Ekorn::Pipeline';
+
+
     sub stages ($self) { return 'not a stage' }
 }
 
@@ -87,6 +101,8 @@ package My::Plain {
 
 # An error object, thrown as it is.
 package My::Error {
+
+
     sub new ($class, $text) { return bless {text => $text}, $class }
 }
 
@@ -102,7 +118,6 @@ sub logged_source ($log, @values) {
         );
     });
 }
-
 
 # A gather passing values on, logging its flush and how the run ended,
 # its flush giving @flushed.

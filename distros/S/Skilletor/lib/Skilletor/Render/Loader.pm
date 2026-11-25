@@ -1,35 +1,10 @@
 package Skilletor::Render::Loader;
-# ABSTRACT: A Nunjucks loader confined to an item's source root – the reference's makeLoader
+# ABSTRACT: Retired stub, see Skilletor
 
-use Moo;
-use Path::Tiny qw( path );
-use Skilletor::Error::Render;
-use Skilletor::FSUtil qw( decode_utf8_lossy encode_text path_resolve );
-use namespace::clean;
+use strict;
+use warnings;
 
-extends 'Text::Nunjucks::Loader';
-
-our $VERSION = '0.008000';
-
-has root => (
-  is       => 'ro',
-  required => 1,
-);
-
-# The reference's loader has no isRelative, so Nunjucks never resolves a name against the
-# template that includes it: `./x.md` and `../x.md` are relative to the source root as well.
-sub is_relative { 0 }
-
-sub get_source {
-  my ( $self, $name ) = @_;
-  my $base = path_resolve( $self->root );
-  my $path = path_resolve( $base, $name );
-  Skilletor::Error::Render->throw( 'template escapes source root: '.$name ) if $path ne $base && index( $path, $base.'/' ) != 0;
-  # readFileSync(path, "utf8"): whatever cannot be read (missing, a directory) is no template.
-  my $bytes = eval { path( encode_text($path) )->slurp_raw };
-  return undef unless defined $bytes;
-  return { src => decode_utf8_lossy($bytes), path => $path, noCache => !!1 };
-}
+our $VERSION = '0.009000';
 
 1;
 
@@ -41,44 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Render::Loader - A Nunjucks loader confined to an item's source root – the reference's makeLoader
+Skilletor::Render::Loader - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
-
-=head1 SYNOPSIS
-
-  use Text::Nunjucks::Environment;
-  use Skilletor::Render::Loader;
-
-  my $env = Text::Nunjucks::Environment->new( Skilletor::Render::Loader->new( root => $source_dir ),
-    { autoescape => !!0, throwOnUndefined => !!1 } );
+version 0.009000
 
 =head1 DESCRIPTION
 
-The loader L<Skilletor::Render> renders an item's templates through: a
-L<Text::Nunjucks::Loader> that serves files of one source tree, the reference's
-C<makeLoader> (spec §5). A template, an include, an import or a macro file is
-looked up by its path relative to the source root; a name that resolves outside
-it – C<../x.md>, C</etc/passwd> – throws a L<Skilletor::Error::Render>
-C<< template escapes source root: <name> >>. A file is read as UTF-8 the way
-Node reads it (an ill-formed sequence becomes U+FFFD) and never cached.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
 
-=head2 root
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
 
-The source root, the item's source tree.
+=head1 SEE ALSO
 
-=head2 get_source
+=over
 
-  $loader->get_source('snippets/shared.md');   # { src, path, noCache }
+=item * L<Skilletor>
 
-The template's source and absolute path, or undef when there is no such file.
+=item * L<https://github.com/Getty/skilletor#install>
 
-=head2 is_relative
-
-False for every name: a name is always relative to the source root, never to
-the template that includes it.
+=back
 
 =head1 SUPPORT
 

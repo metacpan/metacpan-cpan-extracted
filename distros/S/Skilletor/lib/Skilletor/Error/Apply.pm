@@ -1,12 +1,10 @@
 package Skilletor::Error::Apply;
-# ABSTRACT: A build plan that cannot be applied: an invalid item name, a path leaving its root
+# ABSTRACT: Retired stub, see Skilletor
 
-use Moo;
-use namespace::clean;
+use strict;
+use warnings;
 
-extends 'Skilletor::Error';
-
-our $VERSION = '0.008000';
+our $VERSION = '0.009000';
 
 1;
 
@@ -18,18 +16,29 @@ __END__
 
 =head1 NAME
 
-Skilletor::Error::Apply - A build plan that cannot be applied: an invalid item name, a path leaving its root
+Skilletor::Error::Apply - Retired stub, see Skilletor
 
 =head1 VERSION
 
-version 0.008000
+version 0.009000
 
 =head1 DESCRIPTION
 
-Thrown by L<Skilletor::Apply/apply>, worded as the reference's C<ApplyError>
-(C<invalid item name: …>, C<path escapes target: …>). What the run wrote before
-it is owned by the lock, its entries marked C<partial>. See L<Skilletor::Error>
-for the interface.
+An empty stub: skilletor's Perl port is retired. L<Skilletor> names the
+replacement.
+
+This last release of the distribution ships its modules as empty stubs, so an
+upgrade replaces the earlier library code.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Skilletor>
+
+=item * L<https://github.com/Getty/skilletor#install>
+
+=back
 
 =head1 SUPPORT
 

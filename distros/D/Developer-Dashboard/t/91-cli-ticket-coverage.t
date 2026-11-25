@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 
 use Capture::Tiny qw(capture);
+use Config;
 use Test::More;
 use Cwd qw(abs_path cwd);
 use File::Basename qw(dirname);
@@ -12,9 +13,9 @@ use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Errno qw(EACCES ENOENT);
-use POSIX qw(_exit);
 
 use lib 'lib';
+use lib 't/lib';
 
 use Developer::Dashboard::CLI::Ticket qw(
   apply_ticket_status
@@ -35,6 +36,8 @@ use Developer::Dashboard::CLI::Ticket qw(
   tmux_command
   workspace_environment
 );
+use Developer::Dashboard qw(spawn wait_process);
+use Local::DevelCoverSwitch qw(devel_cover_switches);
 
 # registered_workspace_dir() resolves these three at run time; load them here so
 # the hermetic chdir below cannot strand a relative library path.
@@ -54,6 +57,7 @@ $SIG{__WARN__} = sub { push @warnings, $_[0]; return; };
 # process into the temp home before exercising any path-aware code.
 my $home = tempdir( CLEANUP => 1 );
 local $ENV{HOME}                           = $home;
+local $ENV{TMUX_TMPDIR}                    = $home;
 local $ENV{DEVELOPER_DASHBOARD_STATE_ROOT} = tempdir( CLEANUP => 1 );
 chdir $home or die "Unable to chdir to $home: $!";
 
@@ -80,12 +84,35 @@ sub write_file {
 
 # write_stub_command($path)
 # Writes one silent, successful executable stub used to stand in for a real
-# command found through PATH.
-# Input: absolute file path for the stub.
-# Output: the stub path.
+# command found through PATH. Windows cannot start an extensionless sh
+# script, so there the stub is a .bat file of the same base name, and no
+# extensionless file is written for the command lookup to pick up instead.
+# Input: absolute file path for the stub, without extension.
+# Output: the path of the file actually written.
 sub write_stub_command {
     my ($path) = @_;
+    return write_file( "$path.bat", "\@exit /b 0\r\n" ) if $^O eq 'MSWin32';
     write_file( $path, "#!/bin/sh\nexit 0\n" );
+    chmod 0755, $path or die "Unable to chmod $path: $!";
+    return $path;
+}
+
+# write_perl_stub_command($path, $unix_body, $perl_body)
+# Writes one command stand-in that needs real behaviour. Unix gets the given
+# script body as the executable at $path. Windows cannot start a script by
+# its shebang, so there the stand-in is a .bat launcher that hands its argv
+# to a Perl script with the same behaviour and passes the exit status back;
+# $path itself is not written, so a command lookup finds only the launcher.
+# Input: absolute stub path, Unix script text, equivalent Perl source (the
+# Unix text is reused when no Perl source is given, for Perl-bodied stubs).
+# Output: the path a caller must launch (the .bat launcher on Windows).
+sub write_perl_stub_command {
+    my ( $path, $unix_body, $perl_body ) = @_;
+    if ( $^O eq 'MSWin32' ) {
+        write_file( "$path.stub.pl", defined $perl_body ? $perl_body : $unix_body );
+        return write_file( "$path.bat", qq{\@"$^X" "$path.stub.pl" %*\r\n\@exit /b %ERRORLEVEL%\r\n} );
+    }
+    write_file( $path, $unix_body );
     chmod 0755, $path or die "Unable to chmod $path: $!";
     return $path;
 }
@@ -120,12 +147,49 @@ sub tmux_stub {
 # Output: tmux runner coderef.
 sub ok_tmux { return tmux_stub( sub { return {} } ) }
 
+# test_path(@dirs)
+# Builds a restricted PATH from the given fixture directories. On Windows the
+# System32 directory stays on it, because the product itself needs icacls and
+# cmd.exe from there; it holds no tmux and no d2, so the restriction the
+# tests rely on is unchanged.
+# Input: ordered list of directories.
+# Output: PATH string joined with the native separator.
+sub test_path {
+    my (@dirs) = @_;
+    push @dirs, File::Spec->catdir( $ENV{SystemRoot} || 'C:\\Windows', 'System32' ) if $^O eq 'MSWin32';
+    return join $Config{path_sep}, @dirs;
+}
+
+# unavailable_entrypoint_ok($code, $pattern, $name)
+# Asserts how a Docker Compose run reports an entrypoint that cannot be
+# started. On Unix the failed start is a -1 status and the product dies with
+# the given message. Windows Perl reports a failed spawn differently: system
+# returns exit status 255 after a "Can't spawn" warning and never -1, so the
+# product returns exit code 255 there; that real contract is what is checked,
+# and the expected spawn warning is taken out of the escaped-warnings list.
+# Input: coderef running the product call, Unix error pattern, test name.
+# Output: the test result.
+sub unavailable_entrypoint_ok {
+    my ( $code, $pattern, $name ) = @_;
+    return like( error_from($code), $pattern, $name ) if $^O ne 'MSWin32';
+    my $before = scalar @warnings;
+    my $result = eval { $code->() };
+    my $error  = $@;
+    my @spawn_warnings = grep { /\ACan't spawn / } @warnings[ $before .. $#warnings ];
+    @warnings = ( @warnings[ 0 .. $before - 1 ], grep { !/\ACan't spawn / } @warnings[ $before .. $#warnings ] );
+    return is_deeply(
+        [ ref($result) eq 'HASH' ? $result->{exit_code} : "died: $error", scalar @spawn_warnings ],
+        [ 255, 1 ],
+        $name,
+    );
+}
+
 my $fake_bin  = File::Spec->catdir( $home, 'fakebin' );
 my $dash_bin  = File::Spec->catdir( $home, 'dashbin' );
 my $empty_bin = File::Spec->catdir( $home, 'emptybin' );
 make_path($empty_bin);
 write_stub_command( File::Spec->catfile( $fake_bin, 'tmux' ) );
-write_stub_command( File::Spec->catfile( $dash_bin, 'dashboard' ) );
+my $dash_d2 = write_stub_command( File::Spec->catfile( $dash_bin, 'd2' ) );
 
 my $ws_dir = File::Spec->catdir( $home, 'ws' );
 write_file( File::Spec->catfile( $ws_dir, '.env' ), "WS_LAYER_KEY=layer\n" );
@@ -248,13 +312,22 @@ my $ws_env_file = File::Spec->catfile( abs_path($ws_dir), '.env' );
     my $fake_bin = File::Spec->catdir( $home, 'fake-tmux-bin' );
     my $tmux_trace = File::Spec->catfile( $home, 'tmux.trace' );
     my $fake_tmux = File::Spec->catfile( $fake_bin, 'tmux' );
-    write_file(
+    write_perl_stub_command(
         $fake_tmux,
         "#!/bin/sh\nprintf '%s|%s\\n' \"\$PWD\" \"\$*\" >> \"\$TMUX_TRACE\"\n[ \"\$1\" = has-session ] && exit 1\nexit 0\n",
+        <<'TMUX_TRACE_STUB',
+use strict;
+use warnings;
+use Cwd ();
+use File::Spec;
+open my $fh, '>>', $ENV{TMUX_TRACE} or die "Unable to append $ENV{TMUX_TRACE}: $!";
+print {$fh} File::Spec->canonpath( Cwd::getcwd() ) . '|' . join( ' ', @ARGV ) . "\n";
+close $fh or die "Unable to close $ENV{TMUX_TRACE}: $!";
+exit( ( defined $ARGV[0] && $ARGV[0] eq 'has-session' ) ? 1 : 0 );
+TMUX_TRACE_STUB
     );
-    chmod 0755, $fake_tmux or die "Unable to chmod $fake_tmux: $!";
     {
-        local $ENV{PATH} = "$fake_bin:$ENV{PATH}";
+        local $ENV{PATH} = join $Config{path_sep}, $fake_bin, $ENV{PATH};
         local $ENV{TMUX_TRACE} = $tmux_trace;
         my ( $stdout, $stderr, $exit ) = capture {
             system $^X, "-I" . File::Spec->catdir( $repo, 'lib' ),
@@ -457,11 +530,11 @@ my $ws_env_file = File::Spec->catfile( abs_path($ws_dir), '.env' );
     is(
         Developer::Dashboard::CLI::Ticket::_tmux_socket_directory(
             tmpdir      => '/tmp',
-            fallback    => '/dev/shm',
-            is_writable => sub { return $_[0] eq '/dev/shm' },
+            fallback    => $home,
+            is_writable => sub { return $_[0] eq $home },
         ),
-        '/dev/shm',
-        '_tmux_socket_directory selects shared memory when the default temporary directory is not writable',
+        $home,
+        '_tmux_socket_directory selects a writable fallback when the default temp directory is unavailable',
     );
     is(
         Developer::Dashboard::CLI::Ticket::_tmux_socket_directory(
@@ -516,9 +589,12 @@ my $ws_env_file = File::Spec->catfile( abs_path($ws_dir), '.env' );
 }
 
 {
+    # The test simulates tmux with a private socket directory. Darwin has
+    # no /dev/shm fallback when the default /tmp probe reports unwritable.
+    local $ENV{TMUX_TMPDIR} = $home;
     like( error_from( sub { tmux_command( args => 'nope' ) } ), qr/tmux args must be an array reference/, 'tmux_command rejects a non-array argv container' );
 
-    local $ENV{PATH} = $fake_bin;
+    local $ENV{PATH} = test_path($fake_bin);
     my $bare = tmux_command();
     is( $bare->{exit_code}, 0,  'tmux_command runs tmux with no arguments when none are supplied' );
     is( $bare->{stdout},    '', 'tmux_command captures stdout from the tmux process' );
@@ -530,17 +606,17 @@ my $ws_env_file = File::Spec->catfile( abs_path($ws_dir), '.env' );
     my $tmpdir_probe_bin = File::Spec->catdir( $home, 'tmux-tmpdir-probe-bin' );
     make_path($tmpdir_probe_bin);
     my $tmpdir_probe = File::Spec->catfile( $tmpdir_probe_bin, 'tmux' );
-    write_file( $tmpdir_probe, "#!$^X\nprint defined \$ENV{TMUX_TMPDIR} ? \$ENV{TMUX_TMPDIR} : 'unset';\n" );
-    chmod 0755, $tmpdir_probe or die "Unable to chmod $tmpdir_probe: $!";
+    write_perl_stub_command( $tmpdir_probe, "#!$^X\nprint defined \$ENV{TMUX_TMPDIR} ? \$ENV{TMUX_TMPDIR} : 'unset';\n" );
     {
         no warnings 'redefine';
-        local $ENV{PATH} = $tmpdir_probe_bin;
+        local $ENV{PATH} = test_path($tmpdir_probe_bin);
         local *Developer::Dashboard::CLI::Ticket::_tmux_socket_directory = sub { return '/dev/shm' };
         my $tmpdir = tmux_command(
             args => ['probe'],
         );
         is( $tmpdir->{stdout}, '/dev/shm', 'tmux_command passes the selected writable socket directory to tmux' );
-        ok( !defined $ENV{TMUX_TMPDIR}, 'tmux_command restores TMUX_TMPDIR after the captured subprocess returns' );
+        is( $ENV{TMUX_TMPDIR}, $home,
+            'tmux_command restores the caller socket directory after the child returns' );
     }
 
     # DD-597: system() above mutates the caller's global $? as a side effect;
@@ -555,7 +631,8 @@ my $ws_env_file = File::Spec->catfile( abs_path($ws_dir), '.env' );
 # --- _tmux_stdout -----------------------------------------------------------
 
 {
-    local $ENV{PATH} = $fake_bin;
+    local $ENV{TMUX_TMPDIR} = $home;
+    local $ENV{PATH} = test_path($fake_bin);
     is( scalar Developer::Dashboard::CLI::Ticket::_tmux_stdout(), '', '_tmux_stdout defaults to the real tmux runner and an empty argv' );
 }
 
@@ -588,17 +665,17 @@ is(
 
 {
     local %ENV = %ENV;
-    $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = '/opt/dd/bin/dashboard';
-    is( Developer::Dashboard::CLI::Ticket::_dashboard_command_path(), '/opt/dd/bin/dashboard', '_dashboard_command_path prefers an explicit entrypoint override' );
+    $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = '/opt/dd/bin/d2';
+    is( Developer::Dashboard::CLI::Ticket::_dashboard_command_path(), '/opt/dd/bin/d2', '_dashboard_command_path prefers an explicit entrypoint override' );
 }
 
 {
     local %ENV = %ENV;
     $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = '';
-    $ENV{PATH}                           = $dash_bin;
+    $ENV{PATH}                           = test_path($dash_bin);
     is(
         Developer::Dashboard::CLI::Ticket::_dashboard_command_path(),
-        File::Spec->catfile( $dash_bin, 'dashboard' ),
+        $dash_d2,
         '_dashboard_command_path ignores an empty entrypoint override and searches PATH',
     );
 }
@@ -606,8 +683,8 @@ is(
 {
     local %ENV = %ENV;
     delete $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT};
-    $ENV{PATH} = $empty_bin;
-    is( Developer::Dashboard::CLI::Ticket::_dashboard_command_path(), 'dashboard', '_dashboard_command_path falls back to the bare command name when PATH holds no dashboard' );
+    $ENV{PATH} = test_path($empty_bin);
+    is( Developer::Dashboard::CLI::Ticket::_dashboard_command_path(), 'd2', '_dashboard_command_path falls back to the bare command name when PATH holds no d2' );
 }
 
 # --- _run_workspace_docker_compose ------------------------------------------
@@ -615,7 +692,7 @@ is(
 {
     my $fake_dashboard = File::Spec->catfile( $home, 'fake-dashboard.pl' );
     my $marker = File::Spec->catfile( $home, 'workspace-shell-injection-marker' );
-    write_file( $fake_dashboard, <<'FAKE_DASHBOARD' );
+    $fake_dashboard = write_perl_stub_command( $fake_dashboard, <<'FAKE_DASHBOARD' );
 #!/usr/bin/env perl
 use strict;
 use warnings;
@@ -623,7 +700,6 @@ print join "\n", @ARGV;
 print "\n";
 exit( $ENV{DASHBOARD_STUB_EXIT} || 0 );
 FAKE_DASHBOARD
-    chmod 0755, $fake_dashboard or die "Unable to chmod $fake_dashboard: $!";
     my $argument = "safe; touch $marker";
     local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = $fake_dashboard;
     local $ENV{DASHBOARD_STUB_EXIT} = 0;
@@ -638,7 +714,7 @@ FAKE_DASHBOARD
     is_deeply(
         [ split /\n/, $stdout ],
         [ qw(docker compose up -d --build), $argument ],
-        '_run_workspace_docker_compose sends each argument directly through the dashboard entrypoint',
+        '_run_workspace_docker_compose sends each argument directly through the d2 entrypoint',
     );
     ok( !-e $marker, '_run_workspace_docker_compose does not interpret an alias argument through a shell' );
     my ( $probe_stdout, $probe_stderr, $probe_exit, $probe_result );
@@ -658,17 +734,21 @@ FAKE_DASHBOARD
     is( $failed->{exit_code}, 7, '_run_workspace_docker_compose returns a nonzero dashboard exit status' );
 
     local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = File::Spec->catfile( $home, 'not-an-entrypoint' );
-    my $exec_error = error_from( sub { Developer::Dashboard::CLI::Ticket::_run_workspace_docker_compose( args => [] ) } );
-    like( $exec_error, qr/Unable to execute d2 Docker Compose command/,
-        '_run_workspace_docker_compose reports an unavailable dashboard executable' );
-    my $interactive_exec_error = error_from( sub {
-        Developer::Dashboard::CLI::Ticket::_run_workspace_docker_compose(
-            args        => [],
-            interactive => 1,
-        );
-    } );
-    like( $interactive_exec_error, qr/Unable to execute d2 Docker Compose command/,
-        '_run_workspace_docker_compose reports an unavailable interactive dashboard executable' );
+    unavailable_entrypoint_ok(
+        sub { Developer::Dashboard::CLI::Ticket::_run_workspace_docker_compose( args => [] ) },
+        qr/Unable to execute d2 Docker Compose command/,
+        '_run_workspace_docker_compose reports an unavailable dashboard executable',
+    );
+    unavailable_entrypoint_ok(
+        sub {
+            Developer::Dashboard::CLI::Ticket::_run_workspace_docker_compose(
+                args        => [],
+                interactive => 1,
+            );
+        },
+        qr/Unable to execute d2 Docker Compose command/,
+        '_run_workspace_docker_compose reports an unavailable interactive dashboard executable',
+    );
 
     {
         no warnings 'redefine';
@@ -690,8 +770,7 @@ FAKE_DASHBOARD
 
     {
         my $fake_output = File::Spec->catfile( $home, 'fake-dashboard-output.pl' );
-        write_file( $fake_output, "#!/usr/bin/env perl\nprint \"compose output\\n\";\nprint STDERR \"compose diagnostic\\n\";\n" );
-        chmod 0755, $fake_output or die "Unable to chmod $fake_output: $!";
+        $fake_output = write_perl_stub_command( $fake_output, "#!/usr/bin/env perl\nprint \"compose output\\n\";\nprint STDERR \"compose diagnostic\\n\";\n" );
         local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = $fake_output;
         my ( $visible_stdout, $visible_stderr, $exit ) = capture {
             Developer::Dashboard::CLI::Ticket::_run_workspace_docker_compose( args => [] );
@@ -704,8 +783,7 @@ FAKE_DASHBOARD
 
     {
         my $fake_output = File::Spec->catfile( $home, 'fake-dashboard-interactive-output.pl' );
-        write_file( $fake_output, "#!/usr/bin/env perl\nprint \"interactive output\\n\";\nprint STDERR \"interactive diagnostic\\n\";\n" );
-        chmod 0755, $fake_output or die "Unable to chmod $fake_output: $!";
+        $fake_output = write_perl_stub_command( $fake_output, "#!/usr/bin/env perl\nprint \"interactive output\\n\";\nprint STDERR \"interactive diagnostic\\n\";\n" );
         local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = $fake_output;
         my ( $visible_stdout, $visible_stderr, $exit, $result );
         ( $visible_stdout, $visible_stderr, $exit ) = capture {
@@ -733,11 +811,13 @@ FAKE_DASHBOARD
         '_run_workspace_docker_compose rejects a non-array argument list' );
 
     my $fake_signal = File::Spec->catfile( $home, 'fake-dashboard-signal.pl' );
-    write_file( $fake_signal, "#!/usr/bin/env perl\nkill 9, \$\$;\nexit 0;\n" );
-    chmod 0755, $fake_signal or die "Unable to chmod $fake_signal: $!";
+    $fake_signal = write_perl_stub_command( $fake_signal, "#!/usr/bin/env perl\nkill 9, \$\$;\nexit 0;\n" );
     local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = $fake_signal;
     my $signaled = Developer::Dashboard::CLI::Ticket::_run_workspace_docker_compose( args => [] );
-    is( $signaled->{exit_code}, 137, '_run_workspace_docker_compose converts child signal termination to an exit code' );
+    # Windows has no signals: a child that kills itself with 9 ends with exit
+    # status 9 and no signal bits, so the 128 + signal conversion cannot
+    # apply there and the plain exit code comes back.
+    is( $signaled->{exit_code}, ( $^O eq 'MSWin32' ? 9 : 137 ), '_run_workspace_docker_compose converts child signal termination to an exit code' );
 }
 
 {
@@ -750,11 +830,10 @@ use warnings;
 print join "\n", @ARGV;
 print "\n";
 FAKE_D2
-    write_file( $fake_d2, "#!$^X\n$fake_d2_body" );
-    chmod 0755, $fake_d2 or die "Unable to chmod $fake_d2: $!";
+    write_perl_stub_command( $fake_d2, "#!$^X\n$fake_d2_body" );
     local %ENV = %ENV;
     delete $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT};
-    $ENV{PATH} = $d2_bin;
+    $ENV{PATH} = test_path($d2_bin);
     my ( $stdout, $stderr, $exit, $caller_status );
     {
         local $? = 37;
@@ -774,18 +853,18 @@ FAKE_D2
 
     my $dashboard_bin = File::Spec->catdir( $home, 'dashboard-entrypoint-bin' );
     make_path($dashboard_bin);
-    my $fake_dashboard = File::Spec->catfile( $dashboard_bin, 'dashboard' );
+    my $fake_dashboard = File::Spec->catfile( $dashboard_bin, 'd2' );
     write_stub_command($fake_dashboard);
-    local $ENV{PATH} = $dashboard_bin;
+    local $ENV{PATH} = test_path($dashboard_bin);
     my $dashboard_fallback = Developer::Dashboard::CLI::Ticket::_run_workspace_docker_compose( args => ['dashboard-fallback'] );
-    is( $dashboard_fallback->{exit_code}, 0, '_run_workspace_docker_compose falls back to dashboard when d2 is not on PATH' );
+    is( $dashboard_fallback->{exit_code}, 0, '_run_workspace_docker_compose uses the d2 entrypoint found on PATH' );
 
-    local $ENV{PATH} = File::Spec->catdir( $home, 'no-commands-on-this-path' );
-    my $bare_fallback_error = error_from( sub {
-        Developer::Dashboard::CLI::Ticket::_run_workspace_docker_compose( args => ['bare-fallback'] );
-    } );
-    like( $bare_fallback_error, qr/Unable to execute d2 Docker Compose command 'dashboard'/,
-        '_run_workspace_docker_compose reports when neither d2 nor dashboard is executable from PATH' );
+    local $ENV{PATH} = test_path( File::Spec->catdir( $home, 'no-commands-on-this-path' ) );
+    unavailable_entrypoint_ok(
+        sub { Developer::Dashboard::CLI::Ticket::_run_workspace_docker_compose( args => ['bare-fallback'] ) },
+        qr/Unable to execute d2 Docker Compose command 'd2'/,
+        '_run_workspace_docker_compose reports when d2 is not executable from PATH',
+    );
 }
 
 {
@@ -988,7 +1067,7 @@ FAKE_D2
 {
     my $record = File::Spec->catfile( $home, 'default-docker-workspace-runner.log' );
     my $fake_d2 = File::Spec->catfile( $home, 'fake-default-d2.pl' );
-    write_file( $fake_d2, <<'FAKE_DEFAULT_D2' );
+    $fake_d2 = write_perl_stub_command( $fake_d2, <<'FAKE_DEFAULT_D2' );
 #!/usr/bin/env perl
 use strict;
 use warnings;
@@ -998,7 +1077,6 @@ print {$fh} join("\t", @ARGV), "\n";
 close $fh or die "Unable to close Docker workspace test log: $!";
 print "workspace\n" if grep { $_ eq 'ps' } @ARGV;
 FAKE_DEFAULT_D2
-    chmod 0755, $fake_d2 or die "Unable to chmod $fake_d2: $!";
     local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = $fake_d2;
     local $ENV{WORKSPACE_DOCKER_TEST_LOG} = $record;
     my $result = Developer::Dashboard::CLI::Ticket::_run_docker_workspace(
@@ -1030,7 +1108,7 @@ like(
 );
 
 {
-    local $ENV{PATH} = $fake_bin;
+    local $ENV{PATH} = test_path($fake_bin);
     is( apply_workspace_environment( session => 'DD-1' ), 1, 'apply_workspace_environment defaults to the real tmux runner and an empty env' );
 }
 
@@ -1138,8 +1216,8 @@ like(
 like( error_from( sub { apply_ticket_status() } ), qr/Missing session name/, 'apply_ticket_status requires a session name' );
 
 {
-    local $ENV{PATH} = "$fake_bin:$dash_bin";
-    is( apply_ticket_status( session => 'DD-1' ), 1, 'apply_ticket_status defaults to the real tmux runner and the resolved dashboard entrypoint' );
+    local $ENV{PATH} = test_path( $fake_bin, $dash_bin );
+    is( apply_ticket_status( session => 'DD-1' ), 1, 'apply_ticket_status defaults to the real tmux runner and the resolved d2 entrypoint' );
 }
 
 {
@@ -1153,7 +1231,7 @@ like( error_from( sub { apply_ticket_status() } ), qr/Missing session name/, 'ap
         }
     );
     is(
-        apply_workspace_status( session => 'DD-1', dashboard => '/opt/dd/bin/dashboard', tmux => $tmux ),
+        apply_workspace_status( session => 'DD-1', dashboard => '/opt/dd/bin/d2', tmux => $tmux ),
         1,
         'apply_workspace_status configures the session status through the ticket-status implementation',
     );
@@ -1166,7 +1244,7 @@ like( error_from( sub { apply_ticket_status() } ), qr/Missing session name/, 'ap
     );
 
     my ($indicators) = grep { $_->[0] eq 'set-option' && $_->[2] eq 'status-format[0]' } @calls;
-    like( $indicators->[3], qr{\Q/opt/dd/bin/dashboard\E}, 'apply_workspace_status renders dashboard indicators on the top status row' );
+    like( $indicators->[3], qr{\Q/opt/dd/bin/d2\E}, 'apply_workspace_status renders dashboard indicators on the top status row' );
 }
 
 {
@@ -1262,7 +1340,7 @@ like( error_from( sub { apply_ticket_status() } ), qr/Missing session name/, 'ap
 like( error_from( sub { session_exists() } ), qr/Missing session name/, 'session_exists requires a session name' );
 
 {
-    local $ENV{PATH} = $fake_bin;
+    local $ENV{PATH} = test_path($fake_bin);
     is( session_exists( session => 'DD-1' ), 1, 'session_exists defaults to the real tmux runner' );
 }
 
@@ -1292,7 +1370,7 @@ is( session_exists( session => 'DD-1', tmux => tmux_stub( sub { return { exit_co
 # --- list_sessions ----------------------------------------------------------
 
 {
-    local $ENV{PATH} = $fake_bin;
+    local $ENV{PATH} = test_path($fake_bin);
     is_deeply( [ list_sessions() ], [], 'list_sessions defaults to the real tmux runner and reports no sessions for empty output' );
 }
 
@@ -1332,12 +1410,13 @@ is_deeply( [ list_sessions( tmux => tmux_stub( sub { return { exit_code => 1 } }
 
     my $plan = build_workspace_plan( env_workspace => 'DD-1', tmux => ok_tmux() );
     is( $plan->{session}, 'DD-1', 'build_workspace_plan resolves the workspace without an argv list' );
-    is( $plan->{cwd},     cwd(),  'build_workspace_plan defaults the session cwd to the process cwd' );
+    # The plan carries the native spelling of the cwd (backslashes on Windows).
+    is( $plan->{cwd},     File::Spec->canonpath( cwd() ),  'build_workspace_plan defaults the session cwd to the process cwd' );
     is( $plan->{exists},  1,      'build_workspace_plan reports an already-running session' );
     is( $plan->{create},  0,      'build_workspace_plan skips creation for an already-running session' );
 
     my $empty_cwd_plan = build_workspace_plan( args => ['DD-2'], cwd => '', tmux => ok_tmux() );
-    is( $empty_cwd_plan->{cwd}, cwd(), 'build_workspace_plan treats an empty cwd argument as the process cwd' );
+    is( $empty_cwd_plan->{cwd}, File::Spec->canonpath( cwd() ), 'build_workspace_plan treats an empty cwd argument as the process cwd' );
 
     my $create_plan = build_ticket_plan( args => ['DD-3'], cwd => $ws_dir, tmux => tmux_stub( sub { return { exit_code => 1 } } ) );
     is( $create_plan->{cwd},    $ws_dir, 'build_ticket_plan honours an explicit session cwd' );
@@ -1604,26 +1683,26 @@ is_deeply( [ list_sessions( tmux => tmux_stub( sub { return { exit_code => 1 } }
     # and with a zero exit, because exec succeeds against the PATH tmux stub. A
     # test that hands its process away does not fail - it stops, and the run
     # looks like a pass with a missing plan.
-    local $ENV{PATH} = "$fake_bin:$dash_bin";
+    local $ENV{PATH} = test_path( $fake_bin, $dash_bin );
     my $plan = run_ticket_command( args => ['DD-3'], attach => sub { return { exit_code => 0 } } );
     is( $plan->{session}, 'DD-3', 'run_ticket_command drives the real tmux runner for every call it captures' );
 }
 
 {
     my $err = error_from( sub { run_workspace_command( args => [ '-c', 'DD-4' ], tmux => ok_tmux(), resolve_dir => sub { return undef } ) } );
-    like( $err, qr/Workspace 'DD-4' is not a registered dashboard path/, 'run_workspace_command refuses -c when the resolver knows nothing about the workspace' );
+    like( $err, qr/Workspace 'DD-4' is not a registered d2 path/, 'run_workspace_command refuses -c when the resolver knows nothing about the workspace' );
 }
 
 {
     my $err = error_from( sub { run_workspace_command( args => [ '-c', 'DD-5' ], tmux => ok_tmux(), resolve_dir => sub { return '' } ) } );
-    like( $err, qr/Workspace 'DD-5' is not a registered dashboard path/, 'run_workspace_command refuses -c when the resolver returns an empty path' );
+    like( $err, qr/Workspace 'DD-5' is not a registered d2 path/, 'run_workspace_command refuses -c when the resolver returns an empty path' );
 }
 
 {
     my $err = error_from( sub { run_workspace_command( args => [ '-c', 'dd-ticket-unregistered-workspace' ], tmux => ok_tmux() ) } );
     like(
         $err,
-        qr/Workspace 'dd-ticket-unregistered-workspace' is not a registered dashboard path/,
+        qr/Workspace 'dd-ticket-unregistered-workspace' is not a registered d2 path/,
         'run_workspace_command defaults -c to the registered-paths inventory',
     );
 }
@@ -2012,18 +2091,28 @@ is_deeply( [ list_sessions( tmux => tmux_stub( sub { return { exit_code => 1 } }
 
 
 {
-    my ( $stdout, $stderr, $status ) = capture {
-        my $pid = fork();
-        die "Unable to fork for failed tmux exec test: $!\n" if !defined $pid;
-        if ( !$pid ) {
-            local $ENV{PATH} = '/directory-that-does-not-exist';
-            local $SIG{__WARN__} = 'DEFAULT';
-            Developer::Dashboard::CLI::Ticket::_exec_tmux('attach-session');
-            _exit(23);
-        }
-        waitpid( $pid, 0 );
-        return $? >> 8;
-    };
+    my $stdout_path = File::Spec->catfile( $home, 'failed-tmux-exec.stdout' );
+    my $stderr_path = File::Spec->catfile( $home, 'failed-tmux-exec.stderr' );
+    my @include = map { '-I' . File::Spec->catdir( $repo, $_ ) } qw(lib blib/lib blib/arch);
+    my @coverage_switch = devel_cover_switches($ENV{HARNESS_PERL_SWITCHES});
+    my $pid = spawn(
+        [
+            $^X, @include, @coverage_switch, '-e',
+            q{use Developer::Dashboard::CLI::Ticket (); local $SIG{__WARN__} = 'DEFAULT'; Developer::Dashboard::CLI::Ticket::_exec_tmux('attach-session'); exit 23;},
+        ],
+        {
+            cwd    => $repo,
+            env    => { PATH => '/directory-that-does-not-exist' },
+            stdout => $stdout_path,
+            stderr => $stderr_path,
+        },
+    );
+    die "Unable to spawn failed tmux exec test: $!\n" if !defined $pid;
+    my $status = wait_process($pid);
+    open my $stderr_fh, '<', $stderr_path or die "Unable to read $stderr_path: $!";
+    local $/;
+    my $stderr = <$stderr_fh>;
+    close $stderr_fh or die "Unable to close $stderr_path: $!";
     is( $status, 23, 'the direct tmux exec helper returns control when tmux cannot be found' );
     like( $stderr, qr/Can't exec "tmux"/, 'a failed direct exec reports the operating-system error' );
 }
@@ -2035,7 +2124,7 @@ is_deeply( [ list_sessions( tmux => tmux_stub( sub { return { exit_code => 1 } }
     # operator, so replace that OS boundary here and exercise the caller's error.
     # The direct helper's own command invocation is covered by the earlier tmux
     # runner tests; only a successful exec stays unreachable by design.
-    local $ENV{PATH} = $empty_bin;
+    local $ENV{PATH} = test_path($empty_bin);
     no warnings 'redefine';
     local $! = ENOENT;
     local *Developer::Dashboard::CLI::Ticket::_exec_tmux = sub { return; };
@@ -2110,10 +2199,13 @@ Tmux socket selection honors
 C<TMUX_TMPDIR>, falls back to
 C</dev/shm> when C</tmp> is unwritable, and reports when neither is usable. A
 fake C<d2> executable verifies the default Compose
-handoff uses an argument list without shell interpretation; a fork-isolated
-missing-C<tmux> case exercises the failed C<exec> boundary without replacing
-the test process. Entrypoint fallback, signal status, invalid arguments, and
-malformed runner results are also covered explicitly.
+handoff uses an argument list without shell interpretation; a missing-C<tmux>
+child, launched and reaped through GoRoutine, exercises the
+failed C<exec> boundary without replacing the test process. When the coverage
+harness is active, that child receives the complete C<Devel::Cover> switch so
+the direct C<exec> helper's control-return path is recorded in the same
+database. Entrypoint fallback, signal status,
+invalid arguments, and malformed runner results are also covered explicitly.
 
 =head1 HOW TO USE
 

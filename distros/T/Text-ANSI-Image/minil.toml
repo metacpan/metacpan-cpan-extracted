@@ -1,0 +1,13 @@
+name = "Text-ANSI-Image"
+badges = [ 'github-actions/test', 'metacpan' ]
+authority = "cpan:UTASHIRO"
+script_files = [ "script/ansipic" ]
+
+module_maker = "ModuleBuildTiny"
+static_install = "auto"
+
+[release]
+branch = "main"
+
+[unsupported]
+os = [ "MSWin32" ]

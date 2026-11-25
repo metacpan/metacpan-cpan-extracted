@@ -133,7 +133,7 @@ Copy-Item -Path '$GUEST_SHARE\\$tarball_name' -Destination '$GUEST_TEMP\\$tarbal
 Copy-Item -Path '$GUEST_SHARE\\$harness_name' -Destination '$GUEST_TEMP\\$harness_name' -Force
 
 Write-Output '==> clean slate: stop stray timeout-E2E and collector processes from earlier runs'
-foreach (\$fragment in @('dd-timeout-e2e-', 'dashboard collector')) {
+foreach (\$fragment in @('dd-timeout-e2e-', 'd2 collector')) {
     \$escaped = [regex]::Escape(\$fragment)
     Get-CimInstance Win32_Process |
         Where-Object { (\$null -ne \$_.CommandLine) -and (\$_.CommandLine -match \$escaped) -and (\$_.ProcessId -ne \$PID) } |
@@ -149,8 +149,8 @@ cpanm --notest --no-interactive --reinstall '$GUEST_TEMP\\$tarball_name' 2>&1 | 
 Write-Output "cpanm exit: \$installExit"
 if (\$installExit -ne 0) { exit 10 }
 
-\$installed = (dashboard version 2>&1 | Out-String).Trim()
-Write-Output "installed dashboard version: \$installed"
+\$installed = (d2 version 2>&1 | Out-String).Trim()
+Write-Output "installed d2 version: \$installed"
 if (\$installed -notmatch '$version_pattern') { Write-Output 'VERSION MISMATCH'; exit 11 }
 
 Write-Output '==> assert the installed product really carries the Windows timeout implementation'

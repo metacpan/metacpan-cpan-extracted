@@ -1,5 +1,19 @@
 Revision history for HTTP-API-Core
 
+1.16  2026-11-24
+    - Add an informational Devel::Cover CI workflow with recorded
+      measurement environment and separate library and example reports.
+    - Expand offline regression tests for pagination validation, terminal
+      and malformed continuations, atomic page state, and page limits.
+    - Expand request, retry, lifecycle hook, transport failure, response
+      and rate-limit validation and boundary coverage.
+    - Document existing public methods in Core, Pagination, Response,
+      RateLimit and Error, including failure and retry contracts.
+    - Exercise the reference transport adapter mappings with offline
+      fakes, preserving optional third-party dependencies.
+    - Preserve the existing 1.x public API, Perl 5.10 minimum version
+      and runtime dependencies. No executable behavior changes.
+
 1.15  2026-11-22
     - Accept same-origin HTTP(S) next-page URLs with equivalent default
       ports (including zero-padded forms), and absolute URLs containing only

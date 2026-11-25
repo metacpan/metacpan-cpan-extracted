@@ -1,0 +1,165 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw(abs_path);
+use Encode qw(decode FB_CROAK);
+use File::Spec;
+use FindBin qw($RealBin);
+
+my $ROOT = abs_path( File::Spec->catdir( $RealBin, File::Spec->updir ) );
+
+exit main(@ARGV);
+
+sub main {
+    my @paths = @_ ? @_ : _tracked_markdown_paths();
+    if ( !@paths ) {
+        print STDERR "Markdown coverage gate found no Markdown files to check\n";
+        return 2;
+    }
+
+    my @failures;
+    my $covered = 0;
+
+    for my $path (@paths) {
+        my $full = File::Spec->file_name_is_absolute($path)
+          ? $path
+          : File::Spec->catfile( $ROOT, split m{/}, $path );
+
+        my $bytes = _slurp_raw($full);
+        if ( !defined $bytes ) {
+            push @failures, "$path: unreadable";
+            next;
+        }
+
+        my @reasons;
+        my $text;
+        eval { $text = decode( 'UTF-8', $bytes, FB_CROAK ); 1 }
+          or push @reasons, 'not valid UTF-8';
+
+        if ( defined $text ) {
+            push @reasons, 'empty document' if $text !~ /\S/;
+            my $has_atx = $text =~ /^\s{0,3}#{1,6}[ \t]+\S/m;
+            my $has_setext = $text =~ /^\S.*\n\s{0,3}(?:=+|-+)[ \t]*$/m;
+            push @reasons, 'missing Markdown heading'
+              if !$has_atx && !$has_setext;
+
+            my $fence_error = _fence_error($text);
+            push @reasons, $fence_error if defined $fence_error;
+        }
+
+        if (@reasons) {
+            push @failures, "$path: " . join( '; ', @reasons );
+            next;
+        }
+
+        $covered++;
+    }
+
+    my $total = scalar @paths;
+    my $percent = $total ? ( 100 * $covered / $total ) : 0;
+    printf "Markdown coverage: %d/%d (%.1f%%)\n", $covered, $total, $percent;
+
+    if ( $covered != $total ) {
+        print STDERR "$_\n" for @failures;
+        return 1;
+    }
+
+    print "Markdown coverage gate passed at 100.0%\n";
+    return 0;
+}
+
+sub _tracked_markdown_paths {
+    open my $git, '-|', 'git', '-C', $ROOT, 'ls-files', '-z', '--', '*.md', '**/*.md'
+      or die "Unable to list tracked Markdown files: $!";
+    local $/ = "\0";
+    my ( @paths, %seen );
+    while ( my $path = <$git> ) {
+        $path =~ s/\0\z//;
+        push @paths, $path if $path ne q{} && !$seen{$path}++;
+    }
+    close $git or die "git ls-files failed while discovering Markdown coverage inputs";
+    return sort @paths;
+}
+
+sub _fence_error {
+    my ($text) = @_;
+    my ( $marker, $length );
+
+    for my $line ( split /\n/, $text, -1 ) {
+        next if $line !~ /^\s{0,3}(`{3,}|~{3,})(.*)$/;
+        my ( $run, $rest ) = ( $1, $2 );
+        my $char = substr( $run, 0, 1 );
+        my $run_length = length $run;
+
+        if ( !defined $marker ) {
+            $marker = $char;
+            $length = $run_length;
+            next;
+        }
+
+        if ( $char eq $marker && $run_length >= $length && $rest =~ /^\s*$/ ) {
+            undef $marker;
+            undef $length;
+        }
+    }
+
+    return defined $marker ? "unclosed $marker code fence" : undef;
+}
+
+sub _slurp_raw {
+    my ($path) = @_;
+    open my $fh, '<:raw', $path or return undef;
+    local $/;
+    my $bytes = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return $bytes;
+}
+
+__END__
+
+=head1 NAME
+
+markdown-coverage-gate - require every tracked Markdown file to pass structural checks
+
+=head1 PURPOSE
+
+Measure Markdown file coverage across the repository and fail unless every
+tracked Markdown document is valid UTF-8, non-empty, headed, and has balanced
+fenced code blocks.
+
+=head1 WHY IT EXISTS
+
+Markdown documentation otherwise has no repository-wide gate. A newly added file
+can silently escape every documentation check, so the coverage denominator must
+be discovered from Git rather than maintained by hand.
+
+=head1 WHEN TO USE
+
+Run this gate whenever Markdown documentation is added, removed, renamed, or
+edited.
+
+=head1 HOW TO USE
+
+    perl script/markdown-coverage-gate
+
+Explicit files may be supplied for focused checks:
+
+    perl script/markdown-coverage-gate README.md docs/testing.md
+
+=head1 WHAT USES IT
+
+The Coverage GitHub Actions workflow runs this gate on pushes to master and pull
+requests.
+
+=head1 EXAMPLES
+
+A complete run prints a line such as:
+
+    Markdown coverage: 42/42 (100.0%)
+
+Both ATX headings (C<# Heading>) and Setext headings are accepted. Any
+structurally invalid Markdown file makes the process exit non-zero.
+
+=cut

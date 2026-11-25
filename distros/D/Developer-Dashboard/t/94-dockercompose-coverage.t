@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Cwd qw(getcwd);
+use Cwd qw(abs_path getcwd);
 use File::Path qw(make_path);
 use File::Basename qw(dirname);
 use File::Spec;
@@ -20,6 +20,11 @@ use Developer::Dashboard::Config;
 use Developer::Dashboard::DockerCompose;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
+
+sub _tempdir {
+    my $path = File::Temp::tempdir(@_);
+    return abs_path($path) // $path;
+}
 
 # mkfile($path, $content)
 # Purpose: create a file (and its parent dirs) with content.
@@ -60,7 +65,7 @@ sub build_docker {
 # ---------------------------------------------------------------------------
 # Primary hermetic home (required setup shape).
 # ---------------------------------------------------------------------------
-my $home = tempdir( CLEANUP => 1 );
+my $home = _tempdir( CLEANUP => 1 );
 local $ENV{HOME} = $home;
 chdir $home or die "Unable to chdir to $home: $!";
 
@@ -162,7 +167,7 @@ my ( $docker, $paths ) = build_docker( $home, $repo );
     my $resolved = $docker->resolve( args => ['config'] );
     chdir $old or die $!;
     is_deeply( $resolved->{services}, [], 'runtime services absent from local base are not auto-selected' );
-    ok( !grep( { m{config/docker/} } @{ $resolved->{files} } ), 'no runtime service file overlays a local base service that has no matching runtime definition' );
+    ok( !grep( { m{config[/\\]docker[/\\]} } @{ $resolved->{files} } ), 'no runtime service file overlays a local base service that has no matching runtime definition' );
 }
 
 # Without a local Compose base, legacy ecosystem-wide auto-discovery remains.
@@ -183,7 +188,7 @@ my ( $docker, $paths ) = build_docker( $home, $repo );
 
 # Problem 34: a local Compose project scopes automatic runtime service overlays.
 {
-    my $local_home = tempdir( CLEANUP => 1 );
+    my $local_home = _tempdir( CLEANUP => 1 );
     my $local_repo = File::Spec->catdir( $local_home, 'projects', 'local-compose' );
     my $local_work = File::Spec->catdir( $local_repo, 'work' );
     make_path( File::Spec->catdir( $local_repo, '.git' ), $local_work );
@@ -204,8 +209,8 @@ my ( $docker, $paths ) = build_docker( $home, $repo );
 
     is_deeply( $resolved->{services}, ['foo'], 'automatic service selection is limited to names declared by the local Compose base' );
     ok( grep( { $_ eq File::Spec->catfile( $local_work, 'compose.yml' ) } @{ $resolved->{files} } ), 'Compose base is discovered from the invocation directory' );
-    ok( grep( { m{/foo/compose\.yml\z} } @{ $resolved->{files} } ), 'matching runtime overlay for local service foo is merged' );
-    ok( !grep( { m{/(?:bar|bob)/compose\.yml\z} } @{ $resolved->{files} } ), 'unlisted runtime services bar and bob are not merged automatically' );
+    ok( grep( { m{[/\\]foo[/\\]compose\.yml\z} } @{ $resolved->{files} } ), 'matching runtime overlay for local service foo is merged' );
+    ok( !grep( { m{[/\\](?:bar|bob)[/\\]compose\.yml\z} } @{ $resolved->{files} } ), 'unlisted runtime services bar and bob are not merged automatically' );
 }
 
 subtest '_local_compose_services unions files and rejects invalid Compose documents' => sub {
@@ -266,15 +271,15 @@ subtest '_local_compose_services unions files and rejects invalid Compose docume
     my $resolved = $docker->resolve( args => ['up'], services => ['purple'] );
     chdir $old or die $!;
     ok(
-        grep( { m{config/docker/green/} } @{ $resolved->{files} } ),
+        grep( { m{config[/\\]docker[/\\]green[/\\]} } @{ $resolved->{files} } ),
         'DD-862: requesting only "purple" still includes enabled service "green"\'s compose file'
     );
     ok(
-        grep( { m{config/docker/purple/compose\.yml$} } @{ $resolved->{files} } ),
+        grep( { m{config[/\\]docker[/\\]purple[/\\]compose\.yml$} } @{ $resolved->{files} } ),
         'DD-862: the explicitly requested service "purple" is still included'
     );
     ok(
-        !grep( { m{config/docker/blue/compose\.yml$} } @{ $resolved->{files} } ),
+        !grep( { m{config[/\\]docker[/\\]blue[/\\]compose\.yml$} } @{ $resolved->{files} } ),
         'DD-862: a DISABLED service ("blue") is still excluded even though file-gathering now uses the full enabled set'
     );
     is_deeply(
@@ -284,12 +289,21 @@ subtest '_local_compose_services unions files and rejects invalid Compose docume
 }
 
 # ---- run() with a harmless docker stub on PATH ----------------------------
+# The docker-executing blocks below drive a fake docker through PATH. Each fake
+# is a #!/bin/sh script and Windows has no sh and no docker, so on Windows
+# they are skipped as whole subtests rather than converted to .cmd doubles:
+# the stubs are genuinely complex shell (case matching, invocation logging,
+# multi-line YAML, exit-code arithmetic) and a faithful .cmd translation
+# cannot be verified from this Linux VM. The pure resolve and parser blocks
+# between them still run on Windows.
 my $stubbin = File::Spec->catdir( $home, 'stubbin' );
 make_path($stubbin);
 mkfile( File::Spec->catfile( $stubbin, 'docker' ), "#!/bin/sh\nlast=''\nfor arg in \"\$@\"; do last=\"\$arg\"; done\n[ \"\$last\" = config ] && printf 'services: {}\\n'\nexit 0\n" );
 chmod 0755, File::Spec->catfile( $stubbin, 'docker' );
 
-{
+subtest 'run() executes the docker stub' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     my $old = getcwd();
     chdir $repo or die $!;
     local $ENV{PATH} = "$stubbin:$ENV{PATH}";
@@ -308,12 +322,14 @@ chmod 0755, File::Spec->catfile( $stubbin, 'docker' );
     is( $? >> 8, 12, 'run does not leak its own subprocess status into the caller global $?' );
 
     chdir $old or die $!;
-}
+};
 
 # The public helper needs an operational runner that preserves the normal
 # streaming CLI behavior while keeping the materialized Compose file alive
 # until the real Compose command has completed.
-{
+subtest 'run_streaming() drives the docker stub' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     my $streambin = File::Spec->catdir( $home, 'streambin' );
     make_path($streambin);
     my $removed_restore_cwd = File::Spec->catdir( $home, 'streaming-removed-restore-cwd' );
@@ -460,7 +476,7 @@ STUB
         chdir $repo or die $!;
     }
     chdir $old or die $!;
-}
+};
 
 # ---------------------------------------------------------------------------
 # Problem 40: the base Compose config, not CLI service arguments or every
@@ -468,8 +484,10 @@ STUB
 # The first config pass must therefore contain only non-service inputs; a
 # second config pass may add overlays for services present in its output.
 # ---------------------------------------------------------------------------
-{
-    my $p40_home = tempdir( CLEANUP => 1 );
+subtest 'Problem 40: base Compose config selects service overlays' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
+    my $p40_home = _tempdir( CLEANUP => 1 );
     my $p40_repo = File::Spec->catdir( $p40_home, 'project' );
     my $p40_project_directory = File::Spec->catdir( $p40_home, 'explicit-project-directory' );
     my $p40_explicit_file = File::Spec->catfile( $p40_home, 'explicit-base.yaml' );
@@ -603,7 +621,7 @@ P40_STUB
     };
     is_deeply( \@explicit_env_observations, [ 'config=alpha', 'operation=alpha' ], 'explicit-only base defers service environment until the base services are known' );
 
-}
+};
 
 # Problem 43: an explicitly selected skill service must own interpolation for
 # that invocation even when the base config contains several skill services.
@@ -678,6 +696,9 @@ P43_STUB
     );
 
     my $old = getcwd();
+    subtest 'Problem 43: selected service value reaches the docker stub' => sub {
+        plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     chdir $p43_repo or die $!;
     local $ENV{PATH} = "$p43_bin:$ENV{PATH}";
 
@@ -694,7 +715,8 @@ P43_STUB
         is( scalar @observed, 3, "Problem 43: Compose up $service probes base, materializes, and runs" );
         like( $observed[1] || '', qr/^\Q$expected\E\|.* config\z/, "Problem 43: $service value is used while materializing the merged config" );
         like( $observed[2] || '', qr/^\Q$expected\E\|.* up \Q$service\E\z/, "Problem 43: $service value reaches the selected operation" );
-    }
+    };
+};
 
     chdir $old or die $!;
 }
@@ -732,7 +754,9 @@ exit 0
 STUB
 chmod 0755, File::Spec->catfile( $logbin, 'docker' );
 
-{
+subtest 'DD-857: run() pre-materializes layered files via docker compose config' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     unlink $invocation_log if -e $invocation_log;
     my $old = getcwd();
     chdir $repo or die $!;
@@ -766,13 +790,15 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
     my $merged_content = do { local ( @ARGV, $/ ) = $f_flags[0]; <> };
     like( $merged_content, qr/merged-marker/, 'the merged file holds the materialized config, not a raw layer file' );
     like( $final_call, qr/ app$/, 'the executed call still carries the original passthrough args (app)' );
-}
+};
 
 # Operational commands must retain the invocation Compose root after layered
 # files are materialized into a temporary merged file. Without an explicit
 # project directory, Compose derives relative paths and the default project
 # name from that temporary file instead of the user's local Compose project.
-{
+subtest 'operational commands retain the invocation Compose root' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     my $old = getcwd();
     chdir $repo or die $!;
     local $ENV{PATH} = "$logbin:$ENV{PATH}";
@@ -802,9 +828,11 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
     }
 
     chdir $old or die $!;
-}
+};
 
-{
+subtest 'an explicit project-directory option is preserved' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     my $custom_project_dir = File::Spec->catdir( $home, 'explicit-compose-project' );
     make_path($custom_project_dir);
     my $old = getcwd();
@@ -829,7 +857,7 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
     }
 
     chdir $old or die $!;
-}
+};
 
 # Materialization must reject malformed project-directory and undefined argv
 # values before invoking Compose, instead of letting the temporary -f file
@@ -866,10 +894,13 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
 # so it can never itself produce a zero-files resolution.
 {
     unlink $invocation_log if -e $invocation_log;
-    my $empty_home = tempdir( CLEANUP => 1 );
+    my $empty_home = _tempdir( CLEANUP => 1 );
     my $empty_repo = File::Spec->catdir( $empty_home, 'projects', 'empty-repo' );
     make_path( File::Spec->catdir( $empty_repo, '.git' ) );
     my ( $empty_docker, undef ) = build_docker( $empty_home, $empty_repo );
+
+    subtest 'run() with zero explicit compose files still materializes config first' => sub {
+        plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
 
     my $old = getcwd();
     chdir $empty_repo or die $!;
@@ -885,6 +916,7 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
     is( scalar(@lines), 2, 'run with zero explicit files materializes config before invoking the requested operation' );
     like( $lines[0], qr/\bconfig\s*\n\z/, 'zero-file resolution first asks Compose to materialize from the invocation root' );
     like( $lines[1], qr/\s-f\s+\S+\s+ps\s*\n\z/, 'zero-file resolution then runs the requested operation against the materialized config' );
+    };
 
     for my $command (
         [ File::Spec->catfile( $home, 'standalone-helper' ) ],
@@ -900,7 +932,9 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
 
 # run() dies with the merge's own stderr when the materialize-via-config call
 # itself fails (the real command never runs).
-{
+subtest 'run() dies with the merge stderr when config itself fails' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     my $failbin = File::Spec->catdir( $home, 'failbin' );
     make_path($failbin);
     mkfile( File::Spec->catfile( $failbin, 'docker' ), "#!/bin/sh\necho 'boom: bad compose file' >&2\nexit 3\n" );
@@ -912,13 +946,15 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
     my $err = eval { $docker->run( addons => ['mailhog'], args => ['config'], modes => ['dev'] ); 1 } ? '' : $@;
     chdir $old or die $!;
     like( $err, qr/Unable to materialize merged docker compose config \(3\): boom: bad compose file/, 'run dies with the materialize command\'s own exit code and stderr when config itself fails' );
-}
+};
 
 # Materialized Compose YAML must be UTF-8 even when a Compose/plugin output
 # string contains a legacy single-byte character. This is the producer path
 # behind Problem 38: `d2 docker compose config` captures Compose output and
 # writes it as the temporary merged file consumed by later commands.
-{
+subtest 'materialized Compose YAML is UTF-8 even with a legacy pound byte' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     my $utf8bin = File::Spec->catdir( $home, 'compose-utf8-bin' );
     make_path($utf8bin);
     my $compose_stub = File::Spec->catfile( $utf8bin, 'docker' );
@@ -945,12 +981,14 @@ chmod 0755, File::Spec->catfile( $logbin, 'docker' );
     my $merged_document = eval { YAML::XS::Load($merged_bytes) };
     is( $@, '', 'YAML::XS accepts the generated merged YAML without a UTF-8 error' );
     is( $merged_document->{services}{app}{labels}[0], 'price=£', 'generated merged configuration preserves the pound sign' );
-}
+};
 
 # The same byte-clean merged file must be used for every operational command,
 # not just `config`: run_streaming is the public path for up/down/build and other
 # Compose operations.
-{
+subtest 'run_streaming consumes the byte-clean merged file for every action' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     my $all_actions_bin = File::Spec->catdir( $home, 'compose-utf8-actions-bin' );
     make_path($all_actions_bin);
     my $action_state = File::Spec->catfile( $home, 'compose-utf8-action-count' );
@@ -989,12 +1027,14 @@ STUB
         is( $result->{exit_code}, 0, "materialized UTF-8 YAML is consumed successfully by Compose $action" );
     }
     chdir $old or die $!;
-}
+};
 
 # A legacy byte in the user's source Compose file must not make the resolver's
 # early service-discovery parse fail before `docker compose config` can
 # materialize and normalize the effective YAML.
-{
+subtest 'a legacy byte in the local base survives resolver service discovery' => sub {
+    plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
+
     my $legacy_repo = File::Spec->catdir( $home, 'projects', 'legacy-byte-base' );
     make_path( File::Spec->catdir( $legacy_repo, '.git' ) );
     my $base_file = File::Spec->catfile( $legacy_repo, 'compose.yaml' );
@@ -1068,7 +1108,7 @@ STUB
         encode( 'UTF-8', "services:\n  app:\n    image: stub\n    labels:\n      - price=\x{00A3}\n" ),
         'the actual source-file legacy byte is normalized in the file passed to the operation',
     );
-}
+};
 
 # UTF-8 normalization preserves already-valid UTF-8 of each sequence length,
 # converts isolated Windows-1252 bytes, and also handles Unicode Perl strings.
@@ -1124,6 +1164,8 @@ STUB
 }
 
 # Development compose files are opt-in overlays, not alternatives to the base.
+# The resolved file list holds native paths, so the separators around the
+# service folder are matched as [\\/]: backslashes on Windows.
 {
     my $old = getcwd();
     chdir $repo or die $!;
@@ -1136,8 +1178,8 @@ STUB
         project_root => $repo,
         args         => [ 'config', $service ],
     );
-    ok( grep( { /\/dualcompose\/compose\.yml\z/ } @{ $base_only->{files} } ), 'base compose file loads without a development marker' );
-    ok( !grep( { /\/dualcompose\/development\.compose\.yml\z/ } @{ $base_only->{files} } ), 'development compose file stays opt-in without develop.yml' );
+    ok( grep( { /[\\\/]dualcompose[\\\/]compose\.yml\z/ } @{ $base_only->{files} } ), 'base compose file loads without a development marker' );
+    ok( !grep( { /[\\\/]dualcompose[\\\/]development\.compose\.yml\z/ } @{ $base_only->{files} } ), 'development compose file stays opt-in without develop.yml' );
 
     my $development_enabled = $docker->enable_service_development(
         project_root => $repo,
@@ -1148,8 +1190,8 @@ STUB
         project_root => $repo,
         args         => [ 'config', $service ],
     );
-    my ($base_index) = grep { $both->{files}[$_] =~ /\/dualcompose\/compose\.yml\z/ } 0 .. $#{ $both->{files} };
-    my ($dev_index)  = grep { $both->{files}[$_] =~ /\/dualcompose\/development\.compose\.yml\z/ } 0 .. $#{ $both->{files} };
+    my ($base_index) = grep { $both->{files}[$_] =~ /[\\\/]dualcompose[\\\/]compose\.yml\z/ } 0 .. $#{ $both->{files} };
+    my ($dev_index)  = grep { $both->{files}[$_] =~ /[\\\/]dualcompose[\\\/]development\.compose\.yml\z/ } 0 .. $#{ $both->{files} };
     ok( defined $base_index && defined $dev_index, 'base and development files both load when the marker is enabled' );
     ok( $base_index < $dev_index, 'development file overlays the base file' );
 
@@ -1162,8 +1204,8 @@ STUB
         project_root => $repo,
         args         => [ 'config', $service ],
     );
-    ok( grep( { /\/dualcompose\/compose\.yml\z/ } @{ $base_again->{files} } ), 'base compose remains loaded after development is disabled' );
-    ok( !grep( { /\/dualcompose\/development\.compose\.yml\z/ } @{ $base_again->{files} } ), 'development overlay is omitted after development is disabled' );
+    ok( grep( { /[\\\/]dualcompose[\\\/]compose\.yml\z/ } @{ $base_again->{files} } ), 'base compose remains loaded after development is disabled' );
+    ok( !grep( { /[\\\/]dualcompose[\\\/]development\.compose\.yml\z/ } @{ $base_again->{files} } ), 'development overlay is omitted after development is disabled' );
 
     $docker->enable_service_development( project_root => $repo, service => $service );
     unlink File::Spec->catfile( $service_root, 'development.compose.yml' ) or die $!;
@@ -1174,7 +1216,7 @@ STUB
         );
     };
     ok( !$@, 'an enabled development marker with no overlay file is a no-op' );
-    ok( grep( { /\/dualcompose\/compose\.yml\z/ } @{ $missing_overlay->{files} } ), 'base compose remains when the enabled overlay is missing' );
+    ok( grep( { /[\\\/]dualcompose[\\\/]compose\.yml\z/ } @{ $missing_overlay->{files} } ), 'base compose remains when the enabled overlay is missing' );
     chdir $old or die $!;
 }
 
@@ -1183,12 +1225,12 @@ STUB
 {
     like(
         eval { $docker->enable_service_development(); 1 } ? '' : $@,
-        qr/\AUsage: dashboard docker development enable <service>/,
+        qr/\AUsage: d2 docker development enable <service>/,
         'development enable requires a service name',
     );
     like(
         eval { $docker->disable_service_development(); 1 } ? '' : $@,
-        qr/\AUsage: dashboard docker development disable <service>/,
+        qr/\AUsage: d2 docker development disable <service>/,
         'development disable requires a service name',
     );
 
@@ -1360,7 +1402,7 @@ STUB
     ok( ref $docker->list_services eq 'ARRAY', 'list_services defaults project_root to cwd' );
     chdir $old or die $!;
     eval { $docker->list_services( project_root => $repo, filter => 'bogus' ); 1 };
-    like( $@, qr/Usage: dashboard docker list/, 'invalid filter dies' );
+    like( $@, qr/Usage: d2 docker list/, 'invalid filter dies' );
 }
 
 # ---- opendir-failure paths via an unreadable directory --------------------
@@ -1411,7 +1453,7 @@ SKIP: {
 # Scenario B: an empty runtime with no docker config and no isolated services.
 # ===========================================================================
 {
-    my $homeB = tempdir( CLEANUP => 1 );
+    my $homeB = _tempdir( CLEANUP => 1 );
     local $ENV{HOME} = $homeB;
     my $repoB = File::Spec->catdir( $homeB, 'plain' );
     make_path($repoB);
@@ -1438,7 +1480,7 @@ SKIP: {
 # Scenario C: malformed config (non-hash defs, missing files keys, bad env).
 # ===========================================================================
 {
-    my $homeC = tempdir( CLEANUP => 1 );
+    my $homeC = _tempdir( CLEANUP => 1 );
     local $ENV{HOME} = $homeC;
     my $repoC = File::Spec->catdir( $homeC, 'projects', 'malformed' );
     make_path( File::Spec->catdir( $repoC, '.git' ) );
@@ -1606,9 +1648,9 @@ JSON
     eval { $docker->_service_disabled_marker_path(); 1 };
     like( $@, qr/Missing service/, 'marker path dies without service' );
     eval { $docker->disable_service(); 1 };
-    like( $@, qr/Usage: dashboard docker disable/, 'disable dies without service' );
+    like( $@, qr/Usage: d2 docker disable/, 'disable dies without service' );
     eval { $docker->enable_service(); 1 };
-    like( $@, qr/Usage: dashboard docker enable/, 'enable dies without service' );
+    like( $@, qr/Usage: d2 docker enable/, 'enable dies without service' );
 }
 
 # Problem 40 materializer/parser edge cases: the final service selection must
@@ -1661,6 +1703,11 @@ JSON
         { global_args => [], files => [], project_directory => [ '--project-directory', $repo ], operation_args => [] },
         'Compose parser accepts an omitted argv list as empty',
     );
+    is_deeply(
+        $docker->_compose_argument_parts(),
+        { global_args => [], files => [], project_directory => [], operation_args => [] },
+        'Compose parser omits the project directory when no Compose root is given',
+    );
 
     for my $case (
         [ undefined_arg => [undef], qr/argument 1 is undefined/ ],
@@ -1691,6 +1738,9 @@ JSON
         $literal_help_command,
         'Compose literal help subcommand bypasses materialization unchanged',
     );
+
+    subtest 'Problem 40 materializer edge cases that execute docker' => sub {
+        plan skip_all => 'fake docker doubles are shell scripts and Windows has no sh or docker' if $^O eq 'MSWin32';
 
     my $fallback_args_command = [ 'docker', 'compose', '-f', File::Spec->catfile( $repo, 'compose.yaml' ), 'ps' ];
     my $fallback_args_result = $docker->_materialized_command(
@@ -1762,11 +1812,9 @@ JSON
         like( join( ' ', @{$result} ), qr/\bps\z/, 'selected overlay materializes successfully with an empty environment' );
     }
 
-    my $not_a_directory = File::Spec->catfile( $home, 'materialize-parent-file' );
-    mkfile( $not_a_directory, 'not a directory' );
     {
         no warnings 'redefine';
-        local *File::Temp::tempdir = sub { return $not_a_directory };
+        local *File::Temp::tempfile = sub { die "forced temp-file creation failure\n" };
         my $error = '';
         eval {
             $docker->_materialized_command(
@@ -1777,7 +1825,7 @@ JSON
             );
             1;
         } or $error = $@;
-        like( $error, qr/Unable to write .*merged-compose\.yml/, 'materializer reports a failure to create its temporary merged YAML' );
+        like( $error, qr/forced temp-file creation failure/, 'materializer reports a failure to create its temporary merged YAML' );
     }
 
     {
@@ -1793,7 +1841,7 @@ JSON
             );
             1;
         } or $error = $@;
-        like( $error, qr/Unable to close .*merged-compose\.yml/, 'materializer reports a failure to close its temporary merged YAML' );
+        like( $error, qr/Unable to close .*merged-compose-[^\/]+\.yml/, 'materializer reports a failure to close its temporary merged YAML' );
     }
 
     my $fail_final_bin = File::Spec->catdir( $home, 'fail-final-bin' );
@@ -1829,6 +1877,7 @@ P40_FINAL_FAIL_STUB
         1;
     } or $final_error = $@;
     like( $final_error, qr/Unable to materialize merged docker compose config \(7\): selected overlay rejected/, 'selected-overlay config errors retain Docker stderr and exit status' );
+    };
 }
 
 # Constructor guard clauses.
@@ -1948,9 +1997,9 @@ Put any resolver change back through the whole repository suite before release.
 
 Example 5:
 
-  dashboard docker development enable green
-  dashboard docker compose --dry-run config green
-  dashboard docker development disable green
+  d2 docker development enable green
+  d2 docker compose --dry-run config green
+  d2 docker development disable green
 
 Exercise the public opt-in marker command and inspect the base-plus-overlay
 resolution without starting containers.

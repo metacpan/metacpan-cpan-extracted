@@ -2,6 +2,15 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.19.1 - 2026-11-25
+
+### Fixes
+
+- Refuse a cache size or lifetime that is not a number from 0, as a NaN lifetime held every answer for good ([`ae85a8e`](https://github.com/vpndetection-io/sdk-perl/commit/ae85a8edeb4d3315b48e63748e8c56ddb1b8bcf3))
+- Name the Data plan, not every paid plan, as the one that answers every field ([`19f9cc2`](https://github.com/vpndetection-io/sdk-perl/commit/19f9cc252dc7aa0ebea66e599e9eab6e43d2c098))
+- README: one paid plan, Data; the entitlement example names it ([`f74caab`](https://github.com/vpndetection-io/sdk-perl/commit/f74caabc1411d33e17109e600451d03720e13929))
+- Spec 2026.11.25: doc comments name a paid plan, the entitlement example the Data plan ([`178ea9b`](https://github.com/vpndetection-io/sdk-perl/commit/178ea9bd9cd0f79bee829b347a3b5b54312d11db))
+
 ## 3.19.0 - 2026-11-24
 
 ### Features

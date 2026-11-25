@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+use strict;
+use warnings FATAL => 'all';
+
+# GitHub supplies this file from `git tag --points-at HEAD`. Do not inspect
+# the commit message: only real Git refs pointing to that commit count.
+my ($tag_file) = @ARGV;
+die "Usage: $0 GIT_TAG_LIST_FILE\n" if !defined $tag_file || @ARGV != 1;
+
+open my $fh, '<', $tag_file or die "Cannot read $tag_file: $!\n";
+my @tags = <$fh>;
+close $fh or die "Cannot close $tag_file: $!\n";
+
+my @platforms = qw(mac ubuntu-amd64 ubuntu-arm64 win-amd64 win-arm64);
+my %valid = map { $_ => 1 } @platforms;
+my %selected;
+
+for my $tag (@tags) {
+    $tag =~ s/\r?\n\z//;
+    # Ignore version tags and unrelated Git refs. Exact match required.
+    $selected{$tag} = 1 if $valid{$tag};
+}
+
+my $run_all = !%selected;
+for my $platform (@platforms) {
+    ( my $output = $platform ) =~ tr/-/_/;
+    my $enabled = ( $run_all || $selected{$platform} ) ? 'true' : 'false';
+    print "$output=$enabled\n";
+}
+
+__END__
+
+=head1 NAME
+
+select-ci-platforms - select native coverage stages from Git tags
+
+=head1 PURPOSE
+
+Preserve the five-stage serial coverage chain when a commit has no platform Git
+tags, or select only the stages named by exact Git tags pointing at that commit.
+
+=head1 WHY IT EXISTS
+
+The old all-or-nothing chain forced a failure on an unrelated earlier platform
+to block a targeted test on a later platform. Matching Git refs, rather than
+commit-message text, makes selection independent of commit wording.
+
+=head1 WHEN TO USE
+
+Use this script in the GitHub Actions selector job after fetching all tags and
+checking out the source commit (the PR head SHA for pull requests).
+
+=head1 HOW TO USE
+
+    git tag --points-at HEAD > git-tags.txt
+    perl script/select-ci-platforms git-tags.txt
+
+=head1 WHAT USES IT
+
+The five-platform coverage orchestrator supplies the names of Git tags
+pointing at its selected commit. The regression test checks the output mapping
+for zero, one, multiple, and unrelated Git tag names.
+
+=head1 INPUTS
+
+A newline-separated list of Git tag names produced by C<git tag --points-at
+HEAD>. For pull requests, the source commit is the PR head commit, not the
+synthetic merge commit. No commit-message tags or trailers are read.
+
+=head1 OUTPUTS
+
+Five GitHub Actions output assignments, always written in the canonical stage
+order: C<mac>, C<ubuntu_amd64>, C<ubuntu_arm64>, C<win_amd64> and
+C<win_arm64>. The values are the exact strings C<true> or C<false>.
+
+=head1 EXAMPLES
+
+If C<git-tags.txt> contains C<win-amd64> only, only Windows amd64 runs. If it
+contains C<ubuntu-arm64> and C<win-arm64>, those two stages run in that order.
+An empty file, or a file containing only C<v6.29>, selects every platform.
+
+=cut

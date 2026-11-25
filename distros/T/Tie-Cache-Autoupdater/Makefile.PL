@@ -7,6 +7,7 @@ WriteMakefile(
     AUTHOR      => 'Anton Morozov <antonfin@cpan.org>',
     ABSTRACT_FROM=> 'Autoupdater.pm',
     LICENSE     => 'perl_5',
+    MIN_PERL_VERSION => '5.008',
     PREREQ_PM   => { Storable => 0 },
     test        => { TESTS => 't/*.t' },
 );

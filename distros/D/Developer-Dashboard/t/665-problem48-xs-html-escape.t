@@ -6,6 +6,7 @@ use Capture::Tiny qw(capture);
 use Digest::SHA qw(sha256_hex);
 use Test::More;
 use File::Spec;
+use File::Temp ();
 use FindBin;
 
 my $repo_root = File::Spec->catdir( $FindBin::Bin, '..' );
@@ -179,8 +180,15 @@ local $ENV{P48_HTML_ESCAPE_SPARSE_TAINT} = ( 'ordinary text ' x 20 ) . '<tag>';
 local $ENV{P48_HTML_ESCAPE_SPARSE_TAINT_EXPECTED} = ( 'ordinary text ' x 20 ) . '&lt;tag&gt;';
 local $ENV{P48_HTML_ATTR_TAINT} = '<"\'';
 local $ENV{P48_HTML_ATTR_PLAIN_TAINT} = 'ordinary navigation attribute';
+# The program goes through a script file, not -e: a multi-line -e argument
+# holding double quotes does not survive the Windows command line.
+my $taint_dir    = File::Temp::tempdir( CLEANUP => 1 );
+my $taint_script = File::Spec->catfile( $taint_dir, 'taint-program.pl' );
+open my $taint_fh, '>', $taint_script or die "Unable to write $taint_script: $!";
+print {$taint_fh} $taint_program;
+close $taint_fh or die "Unable to close $taint_script: $!";
 my ( $taint_out, $taint_err, $taint_exit ) = capture {
-    system $^X, '-T', @include_args, '-e', $taint_program;
+    system $^X, '-T', @include_args, $taint_script;
 };
 is( $taint_exit, 0, 'taint-mode subprocess preserves taint and output' );
 is( $taint_out, "taint=yes output=yes\n", 'taint-mode subprocess confirms both properties' );

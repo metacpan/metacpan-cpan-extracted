@@ -8,17 +8,40 @@ use Test::More;
 use FindBin;
 use File::Spec;
 use File::Temp qw(tempdir);
+use FindBin qw($RealBin);
 use Time::HiRes ();
 
 use lib File::Spec->catdir( $FindBin::Bin, 'lib' );
 use Local::BoundedCommand qw(run_bounded);
+
+{
+    my $helper_path = File::Spec->catfile( $RealBin, 'lib', 'Local', 'BoundedCommand.pm' );
+    open my $helper_fh, '<', $helper_path or die "Unable to read bounded-command helper '$helper_path': $!";
+    my $helper_source = do { local $/; <$helper_fh> };
+    close $helper_fh or die "Unable to close bounded-command helper '$helper_path': $!";
+    unlike( $helper_source, qr/\bfork\s*\(/, 'bounded command helper launches processes through GoRoutine, not Perl fork' );
+}
+
+# Windows has no sh or sleep binary (proven live on win-ts: `where sh`
+# and `where sleep` both report nothing found), so the fixture commands
+# are spelled as perl one-liners through the running interpreter on
+# Windows - the t/104 shape - and as the shell commands they name
+# elsewhere.
+sub _exit_command {
+    my ($code) = @_;
+    return $^O eq 'MSWin32' ? [ $^X, '-e', "exit $code" ] : [ 'sh', '-c', "exit $code" ];
+}
+
+sub _sleep_command {
+    return $^O eq 'MSWin32' ? [ $^X, '-e', 'sleep 600' ] : [ 'sleep', '600' ];
+}
 
 # A command that finishes normally must be unaffected: same exit status, no
 # waiting for the bound to expire. A bound that changes the answer for healthy
 # commands would be a cure worse than the disease.
 {
     my $started = Time::HiRes::time();
-    my $result  = run_bounded( command => [ 'sh', '-c', 'exit 0' ], seconds => 30 );
+    my $result  = run_bounded( command => _exit_command(0), seconds => 30 );
     my $elapsed = Time::HiRes::time() - $started;
 
     is( $result->{timed_out}, 0,  'a command that finishes is not reported as timed out' );
@@ -27,7 +50,7 @@ use Local::BoundedCommand qw(run_bounded);
 }
 
 {
-    my $result = run_bounded( command => [ 'sh', '-c', 'exit 3' ], seconds => 30 );
+    my $result = run_bounded( command => _exit_command(3), seconds => 30 );
     is( $result->{timed_out}, 0, 'a failing command is a failure, not a timeout' );
     is( $result->{exit},      3, 'a failing command reports its own exit status' );
 }
@@ -38,7 +61,7 @@ use Local::BoundedCommand qw(run_bounded);
 # still a gate nobody can read.
 {
     my $started = Time::HiRes::time();
-    my $result  = run_bounded( command => [ 'sleep', '600' ], seconds => 2 );
+    my $result  = run_bounded( command => _sleep_command(), seconds => 2 );
     my $elapsed = Time::HiRes::time() - $started;
 
     is( $result->{timed_out}, 1, 'a command that outlives its bound is reported as timed out' );
@@ -57,8 +80,24 @@ use Local::BoundedCommand qw(run_bounded);
 
     # A child that spawns a grandchild and then waits: killing the child alone
     # leaves the grandchild running, exactly as the wedge did.
-    my $script = qq{sh -c 'sleep 600 & echo \$! > "$marker"; sleep 600'};
-    my $result = run_bounded( command => [ 'sh', '-c', $script ], seconds => 2 );
+    my @command;
+    if ( $^O eq 'MSWin32' ) {
+        # No sh on Windows: the child is a perl one-liner that
+        # backgrounds a grandchild with system(1, ...) - the async
+        # spawn form, which returns the grandchild pid - records it in
+        # the marker file, and then waits, mirroring the sh shape
+        # above. The marker path travels as $ARGV[0] so its
+        # backslashes never pass through the code string.
+        my $tree_code = 'my $g = system(1, $^X, "-e", "sleep 600");'
+          . ' open my $fh, ">", $ARGV[0] or die $!;'
+          . ' print $fh $g; close $fh; sleep 600';
+        @command = ( $^X, '-e', $tree_code, $marker );
+    }
+    else {
+        my $script = qq{sh -c 'sleep 600 & echo \$! > "$marker"; sleep 600'};
+        @command = ( 'sh', '-c', $script );
+    }
+    my $result = run_bounded( command => \@command, seconds => 2 );
 
     is( $result->{timed_out}, 1, 'the process-tree case times out as expected' );
 
@@ -81,7 +120,7 @@ use Local::BoundedCommand qw(run_bounded);
 # The message is part of the fix. The wedge was unreadable because there was
 # nothing to read; a timeout that says only "failed" repeats that in miniature.
 {
-    my $result = run_bounded( command => [ 'sleep', '600' ], seconds => 2, label => 'browser fetch' );
+    my $result = run_bounded( command => _sleep_command(), seconds => 2, label => 'browser fetch' );
     like( $result->{message}, qr/browser fetch/, 'the failure message names what timed out' );
     like( $result->{message}, qr/\b2\b/,         'the failure message states the bound that was exceeded' );
 }

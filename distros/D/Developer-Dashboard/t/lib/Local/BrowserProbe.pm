@@ -6,7 +6,12 @@ use utf8;
 
 use Exporter qw(import);
 use Capture::Tiny qw(capture);
+use Errno qw(EPIPE);
+use File::Temp qw(tempdir);
+use File::Spec;
 use IO::Socket::INET;
+use Time::HiRes ();
+use Developer::Dashboard::GoRoutine qw(spawn terminate_process wait_process);
 
 use Local::BoundedCommand qw(run_bounded);
 
@@ -35,30 +40,86 @@ my $MARKER = 'dd-loopback-probe-ok';
 #   missed by one of them.
 sub browser_can_fetch_loopback {
     my (%args) = @_;
+    local $SIG{PIPE} = 'IGNORE';
     my $browser = $args{browser} or die 'browser_can_fetch_loopback requires a browser path';
     my @browser_args = @{ $args{args} || [] };
     my $seconds = $args{seconds} || 30;
 
-    my $listener = IO::Socket::INET->new(
+    my $port_listener = IO::Socket::INET->new(
         LocalAddr => '127.0.0.1',
         LocalPort => 0,
         Proto     => 'tcp',
-        Listen    => 5,
         ReuseAddr => 1,
     ) or return ( 0, "the probe could not open a local listening socket: $!" );
-    my $port = $listener->sockport;
+    my $port = $port_listener->sockport;
+    close $port_listener or die "Unable to close the temporary probe socket: $!";
 
-    my $pid = fork();
-    return ( 0, "the probe could not fork its server: $!" ) if !defined $pid;
-    if ( !$pid ) {
-        my $body = "<html><body>$MARKER</body></html>";
-        while ( my $client = $listener->accept ) {
-            my $request = <$client>;
+    my $scratch = tempdir( 'dd-browser-probe-XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+    my $server_stdout = File::Spec->catfile( $scratch, 'server.stdout' );
+    my $server_stderr = File::Spec->catfile( $scratch, 'server.stderr' );
+    my $server_source = q{
+        use IO::Socket::INET;
+        my ($port, $marker) = @ARGV;
+        my $listener = IO::Socket::INET->new(
+            LocalAddr => '127.0.0.1', LocalPort => $port, Proto => 'tcp',
+            Listen => 5, ReuseAddr => 1,
+        ) or die "probe server could not listen: $!\n";
+        while (my $client = $listener->accept) {
+            my $request = <$client> // '';
+            my $ready = $request =~ m{\AGET /__ready };
+            my $body = $ready ? 'ready' : "<html><body>$marker</body></html>";
             print {$client} "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n"
               . 'Content-Length: ' . length($body) . "\r\nConnection: close\r\n\r\n$body";
-            close $client;
+            close $client or die "probe response close failed: $!\n";
+            last if !$ready;
         }
-        exit 0;
+    };
+
+    my $pid = eval {
+        spawn(
+            [ $^X, '-e', $server_source, '--', $port, $MARKER ],
+            { stdout => $server_stdout, stderr => $server_stderr },
+        );
+    };
+    return ( 0, "the probe could not start its GoRoutine server process: $@" ) if !$pid;
+
+    my $ready = 0;
+    for ( 1 .. 100 ) {
+        last if Developer::Dashboard::GoRoutine::process_exited($pid);
+        my $probe = IO::Socket::INET->new(
+            PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp', Timeout => 0.1,
+        );
+        if ($probe) {
+            print {$probe} "GET /__ready HTTP/1.0\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n";
+            my $response = do { local $/; <$probe> } // '';
+            # Darwin can report EPIPE on close after the peer has shut down.
+            # The complete HTTP response was already read before this close.
+            my $closed = close $probe;
+            die "Unable to close the probe readiness socket: $!"
+              if !$closed && $! != EPIPE;
+            if ( $response =~ /\r?\n\r?\nready\z/ ) {
+                $ready = 1;
+                last;
+            }
+        }
+        Time::HiRes::sleep(0.05);
+    }
+
+    if ( !$ready ) {
+        my $exit = Developer::Dashboard::GoRoutine::process_exited($pid) ? wait_process($pid) : undef;
+        if ( !defined $exit ) {
+            terminate_process( $pid, 'TERM' );
+            for ( 1 .. 20 ) {
+                last if Developer::Dashboard::GoRoutine::process_exited($pid);
+                Time::HiRes::sleep(0.05);
+            }
+            terminate_process( $pid, 'KILL' ) if !Developer::Dashboard::GoRoutine::process_exited($pid);
+            wait_process($pid);
+        }
+        open my $error_fh, '<', $server_stderr or die "Unable to read probe server diagnostics '$server_stderr': $!";
+        my $server_error = do { local $/; <$error_fh> } // '';
+        close $error_fh or die "Unable to close probe server diagnostics '$server_stderr': $!";
+        return ( 0, "the probe server did not become ready (exit " . ( $exit // 'terminated' ) . "): $server_error" );
     }
 
     my $url = "http://127.0.0.1:$port/";
@@ -70,9 +131,15 @@ sub browser_can_fetch_loopback {
         );
     };
 
-    kill 'TERM', $pid;
-    waitpid $pid, 0;
-    close $listener;
+    if ( !Developer::Dashboard::GoRoutine::process_exited($pid) ) {
+        terminate_process( $pid, 'TERM' );
+        for ( 1 .. 20 ) {
+            last if Developer::Dashboard::GoRoutine::process_exited($pid);
+            Time::HiRes::sleep(0.05);
+        }
+        terminate_process( $pid, 'KILL' ) if !Developer::Dashboard::GoRoutine::process_exited($pid);
+    }
+    wait_process($pid);
 
     return ( 1, '' ) if !$result->{timed_out} && $result->{exit} == 0 && $stdout =~ /\Q$MARKER\E/;
 

@@ -17,6 +17,7 @@ use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::PerlEnv;
 use Developer::Dashboard::SessionStore;
 use Developer::Dashboard::SkillDispatcher;
 use Developer::Dashboard::Web::App;
@@ -198,10 +199,18 @@ sub bookmark {
 {
     my $bin = File::Spec->catdir( $home, 'fake-bin' );
     make_path($bin);
-    my $ip = File::Spec->catfile( $bin, 'ip' );
-    write_file( $ip, "#!/bin/sh\necho '2: eth9    inet 10.9.8.7/24 brd 10.9.8.255 scope global eth9'\n" );
-    chmod 0755, $ip or die "Unable to chmod $ip: $!";
-    local $ENV{PATH} = join ':', $bin, $ENV{PATH};
+    # The stub must be runnable by the platform that runs the product: a
+    # #!/bin/sh script cannot run where there is no sh. On Windows it is
+    # a .cmd file, found by the product's command_in_path through PATHEXT.
+    my $ip = File::Spec->catfile( $bin, $^O eq 'MSWin32' ? 'ip.cmd' : 'ip' );
+    if ( $^O eq 'MSWin32' ) {
+        write_file( $ip, "\@echo off\necho 2: eth9    inet 10.9.8.7/24 brd 10.9.8.255 scope global eth9\n" );
+    }
+    else {
+        write_file( $ip, "#!/bin/sh\necho '2: eth9    inet 10.9.8.7/24 brd 10.9.8.255 scope global eth9'\n" );
+        chmod 0755, $ip or die "Unable to chmod $ip: $!";
+    }
+    local $ENV{PATH} = $bin . Developer::Dashboard::PerlEnv::path_separator() . $ENV{PATH};
     is_deeply( [ $app->_ip_pairs_from_ip ], [ { iface => 'eth9', ip => '10.9.8.7' } ], 'a real ip executable output is parsed' );
 }
 

@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Suggest;
 use strict;
 use warnings;
 
-our $VERSION = '6.06';
+our $VERSION = '6.31';
 
 use File::Basename qw(basename);
 use File::Spec;
@@ -34,17 +34,17 @@ sub new {
 }
 
 # unknown_command_message($command)
-# Builds the stderr guidance shown when the public dashboard switchboard receives
+# Builds the stderr guidance shown when the public d2 switchboard receives
 # an unknown top-level command token.
 # Input: mistyped command string.
 # Output: formatted human-readable guidance string.
 sub unknown_command_message {
     my ( $self, $command ) = @_;
     my @suggestions = $self->top_level_suggestions($command);
-    my $message = "Unknown dashboard command '$command'.\n";
+    my $message = "Unknown d2 command '$command'.\n";
     if (@suggestions) {
         $message .= "\nDid you mean:\n";
-        $message .= join '', map { "  dashboard $_\n" } @suggestions;
+        $message .= join '', map { "  d2 $_\n" } @suggestions;
     }
     return $message . "\n";
 }
@@ -62,26 +62,26 @@ sub unknown_skill_command_message {
         my $message = "Skill '$skill_name' not found.\n";
         if (@suggestions) {
             $message .= "\nDid you mean:\n";
-            $message .= join '', map { "  dashboard $_\n" } @suggestions;
+            $message .= join '', map { "  d2 $_\n" } @suggestions;
         }
         return $message . "\n";
     }
 
     if ( !$self->{manager}->is_enabled($skill_name) ) {
-        return "Skill '$skill_name' is disabled.\n\nEnable it with:\n  dashboard skills enable $skill_name\n";
+        return "Skill '$skill_name' is disabled.\n\nEnable it with:\n  d2 skills enable $skill_name\n";
     }
 
     my @suggestions = $self->skill_command_suggestions( $command, $skill_name );
     my $message = "Command '$command' not found in skill '$skill_name'.\n";
     if (@suggestions) {
         $message .= "\nDid you mean:\n";
-        $message .= join '', map { "  dashboard $_\n" } @suggestions;
+        $message .= join '', map { "  d2 $_\n" } @suggestions;
     }
     return $message . "\n";
 }
 
 # top_level_suggestions($command)
-# Returns the closest top-level dashboard command suggestions for one mistyped
+# Returns the closest top-level d2 command suggestions for one mistyped
 # public command token.
 # Input: mistyped command string.
 # Output: ordered list of suggested command names without the dashboard prefix.
@@ -91,7 +91,7 @@ sub top_level_candidates {
 }
 
 # top_level_suggestions($command)
-# Returns the closest top-level dashboard command suggestions for one mistyped
+# Returns the closest top-level d2 command suggestions for one mistyped
 # public command token.
 # Input: mistyped command string.
 # Output: ordered list of suggested command names without the dashboard prefix.
@@ -126,7 +126,7 @@ sub skill_command_suggestions {
 }
 
 # _top_level_candidates()
-# Enumerates the canonical top-level dashboard command names that users can run
+# Enumerates the canonical top-level d2 command names that users can run
 # through the public switchboard.
 # Input: none.
 # Output: ordered list of command name strings.
@@ -325,7 +325,7 @@ sub _levenshtein_distance {
 }
 
 # _logical_command_name($entry)
-# Converts one staged runnable filename into the logical dashboard command token
+# Converts one staged runnable filename into the logical d2 command token
 # users type on the command line.
 # Input: directory entry name.
 # Output: logical command name string.
@@ -354,7 +354,7 @@ Developer::Dashboard::CLI::Suggest - fuzzy command suggestions for dashboard typ
 
 =head1 DESCRIPTION
 
-Builds typo guidance for unknown top-level dashboard commands and dotted skill
+Builds typo guidance for unknown top-level d2 commands and dotted skill
 commands by scanning built-ins, layered custom commands, and installed skills.
 For a same-named skill present at multiple runtime layers, it merges command
 names from all participating layers and returns each dotted name once.
@@ -363,7 +363,7 @@ names from all participating layers and returns each dotted name once.
 
 =head1 PURPOSE
 
-This module centralizes typo suggestions for the public dashboard switchboard and dotted skill dispatch. It gathers built-in helpers, layered custom CLI commands, and installed skill commands, then ranks the nearest matches so error messages can give users a likely correction instead of only dumping generic help text.
+This module centralizes typo suggestions for the public d2 switchboard and dotted skill dispatch. It gathers built-in helpers, layered custom CLI commands, and installed skill commands, then ranks the nearest matches so error messages can give users a likely correction instead of only dumping generic help text.
 
 =head1 WHY IT EXISTS
 
@@ -379,7 +379,7 @@ Construct it with C<new>, then call C<unknown_command_message> for a mistyped pu
 
 =head1 WHAT USES IT
 
-It is used by the public C<dashboard> switchboard for unknown top-level commands, by the skill dispatcher for dotted skill lookup failures, and by CLI regression tests that pin the user-facing typo guidance.
+It is used by the public C<d2> switchboard for unknown top-level commands, by the skill dispatcher for dotted skill lookup failures, and by CLI regression tests that pin the user-facing typo guidance.
 
 =head1 EXAMPLES
 

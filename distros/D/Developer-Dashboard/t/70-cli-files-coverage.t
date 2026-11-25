@@ -68,7 +68,7 @@ sub run_die {
 }
 
 # ---------------------------------------------------------------------------
-# dashboard files (whole inventory).
+# d2 files (whole inventory).
 # ---------------------------------------------------------------------------
 {
     my ( $out, $rv ) = run_ok( command => 'files', args => [] );
@@ -86,15 +86,15 @@ sub run_die {
 }
 {
     my ( undef, $err ) = run_die( command => 'files', args => ['unexpected'] );
-    like( $err, qr/Usage: dashboard files/, 'files rejects extra positional arguments' );
+    like( $err, qr/Usage: d2 files/, 'files rejects extra positional arguments' );
 }
 {
     my ( undef, $err ) = run_die( command => 'files', args => [ '-o', 'xml' ] );
-    like( $err, qr/Usage: dashboard files/, 'files rejects an invalid output format' );
+    like( $err, qr/Usage: d2 files/, 'files rejects an invalid output format' );
 }
 
 # ---------------------------------------------------------------------------
-# dashboard file list (saved aliases).
+# d2 file list (saved aliases).
 # ---------------------------------------------------------------------------
 {
     my ( $out, $rv ) = run_ok( command => 'file', args => ['list'] );
@@ -111,15 +111,15 @@ sub run_die {
 }
 {
     my ( undef, $err ) = run_die( command => 'file', args => [ 'list', 'extra' ] );
-    like( $err, qr/Usage: dashboard file list/, 'file list rejects extra arguments' );
+    like( $err, qr/Usage: d2 file list/, 'file list rejects extra arguments' );
 }
 {
     my ( undef, $err ) = run_die( command => 'file', args => [ 'list', '-o', 'xml' ] );
-    like( $err, qr/Usage: dashboard file list/, 'file list rejects an invalid output format' );
+    like( $err, qr/Usage: d2 file list/, 'file list rejects an invalid output format' );
 }
 
 # ---------------------------------------------------------------------------
-# dashboard file resolve and the empty-action fallthrough.
+# d2 file resolve and the empty-action fallthrough.
 # ---------------------------------------------------------------------------
 {
     my ( $out, $rv ) = run_ok( command => 'file', args => [ 'resolve', 'prompt_log' ] );
@@ -128,15 +128,15 @@ sub run_die {
 }
 {
     my ( undef, $err ) = run_die( command => 'file', args => ['resolve'] );
-    like( $err, qr/Usage: dashboard file resolve/, 'file resolve requires a name' );
+    like( $err, qr/Usage: d2 file resolve/, 'file resolve requires a name' );
 }
 {
     my ( undef, $err ) = run_die( command => 'file', args => [] );    # empty action
-    like( $err, qr/Usage: dashboard file <resolve/, 'file with no action prints the top usage' );
+    like( $err, qr/Usage: d2 file <resolve/, 'file with no action prints the top usage' );
 }
 
 # ---------------------------------------------------------------------------
-# dashboard file add.
+# d2 file add.
 # ---------------------------------------------------------------------------
 my $notes = File::Spec->catfile( $home, 'notes.txt' );
 {
@@ -151,15 +151,15 @@ my $notes = File::Spec->catfile( $home, 'notes.txt' );
 }
 {
     my ( undef, $err ) = run_die( command => 'file', args => ['add'] );
-    like( $err, qr/dashboard file add <name> <path>/, 'file add requires a name' );
+    like( $err, qr/d2 file add <name> <path>/, 'file add requires a name' );
 }
 {
     my ( undef, $err ) = run_die( command => 'file', args => [ 'add', 'only-name' ] );
-    like( $err, qr/dashboard file add <name> <path>/, 'file add requires a path' );
+    like( $err, qr/d2 file add <name> <path>/, 'file add requires a path' );
 }
 
 # ---------------------------------------------------------------------------
-# dashboard file del (existing, missing, and guard paths).
+# d2 file del (existing, missing, and guard paths).
 # ---------------------------------------------------------------------------
 {
     run_ok( command => 'file', args => [ 'add', 'delme', $notes ] );
@@ -178,11 +178,11 @@ my $notes = File::Spec->catfile( $home, 'notes.txt' );
 }
 {
     my ( undef, $err ) = run_die( command => 'file', args => ['del'] );
-    like( $err, qr/dashboard file del <name>/, 'file del requires a name' );
+    like( $err, qr/d2 file del <name>/, 'file del requires a name' );
 }
 
 # ---------------------------------------------------------------------------
-# dashboard file locate: all three root-selection outcomes.
+# d2 file locate: all three root-selection outcomes.
 # ---------------------------------------------------------------------------
 my $locdir = File::Spec->catdir( $home, 'locdir' );
 make_path($locdir);
@@ -295,7 +295,7 @@ t/70-cli-files-coverage.t - branch and condition coverage closure for the file C
 =head1 PURPOSE
 
 This test is the executable coverage contract for the lightweight
-C<dashboard file> and C<dashboard files> command runtime. It drives every
+C<d2 file> and C<d2 files> command runtime. It drives every
 dispatch verb, every usage-guard die, every output-format rejection, and each
 table renderer so the module reaches full branch and condition coverage without
 loading the heavier dashboard runtime.
